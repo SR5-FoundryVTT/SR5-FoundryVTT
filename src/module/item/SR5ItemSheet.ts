@@ -114,6 +114,9 @@ export class SR5ItemSheet extends ItemSheet {
             data['networkController'] = this.item.networkController;
         }
 
+        // @ts-ignore // TODO: put 'opposed test types' into config (see data.config)
+        data.tests = game.shadowrun5e.tests;
+
         return data;
     }
 

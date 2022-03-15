@@ -36,7 +36,16 @@ export class OpposedTest extends SuccessTest {
         super(data, documents, options);
 
         this.against = new SuccessTest(this.data.against);
-        console.error(this.against);
+    }
+
+    // TODO: This could also be done with _prepareTypeData for only type specific fields.
+    _prepareData(data, options?): any {
+        data = super._prepareData(data, options);
+
+        delete data.opposed;
+        delete data.targetActorsUuid;
+
+        return data;
     }
 
     async populateDocuments() {
@@ -51,8 +60,8 @@ export class OpposedTest extends SuccessTest {
             return;
         }
         // @ts-ignore // TODO: Typing here get's confused between boolean when it should be string.
-        if (againstData.opposed.type !== 'custom') {
-            console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type 'custom' is supported`);
+        if (againstData.opposed.type !== '') {
+            console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`);
             return;
         }
         if (!actor) {

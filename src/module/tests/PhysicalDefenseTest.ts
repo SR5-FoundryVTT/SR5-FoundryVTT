@@ -1,3 +1,4 @@
+import { DefaultValues } from "../data/DataDefaults";
 import {OpposedTest, OpposedTestData, OpposedTestValues} from "./OpposedTest";
 import {SuccessTestData, SuccessTestValues} from "./SuccessTest";
 
@@ -13,11 +14,11 @@ export interface PhysicalDefenseTestData extends OpposedTestData {
 export class PhysicalDefenseTest extends OpposedTest {
     public data: PhysicalDefenseTestData;
 
-    static getMessageActionTestData(againstData, actor, previousMessageId): PhysicalDefenseTestData|undefined {
-        const data = super.getMessageActionTestData(againstData, actor, previousMessageId);
+    _prepareData(data, options?): any {
+        data = super._prepareData(data, options);
 
+        data.values.damage = DefaultValues.damageData();
 
-
-        return data as PhysicalDefenseTestData
+        return data;
     }
 }

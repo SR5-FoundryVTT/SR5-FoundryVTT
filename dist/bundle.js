@@ -24016,7 +24016,7 @@ exports.DataDefaults = {
     },
     damage: DefaultValues.damageData({ type: { base: '', value: '' } }),
 };
-},{"../constants":151,"../tests/SuccessTest":231}],153:[function(require,module,exports){
+},{"../constants":151,"../tests/SuccessTest":232}],153:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -26495,6 +26495,7 @@ const SR5VehicleActorSheet_1 = require("./actor/sheets/SR5VehicleActorSheet");
 const SR5CharacterSheet_1 = require("./actor/sheets/SR5CharacterSheet");
 const SR5SpiritActorSheet_1 = require("./actor/sheets/SR5SpiritActorSheet");
 const SR5SpriteActorSheet_1 = require("./actor/sheets/SR5SpriteActorSheet");
+const PhysicalDefenseTest_1 = require("./tests/PhysicalDefenseTest");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 exports.SR5CONFIG = config_1.SR5;
 class HooksManager {
@@ -26559,7 +26560,8 @@ ___________________
              */
             tests: {
                 SuccessTest: SuccessTest_1.SuccessTest,
-                OpposedTest: OpposedTest_1.OpposedTest
+                OpposedTest: OpposedTest_1.OpposedTest,
+                PhysicalDefenseTest: PhysicalDefenseTest_1.PhysicalDefenseTest
             }
         };
         CONFIG.Actor.documentClass = SR5Actor_1.SR5Actor;
@@ -26703,10 +26705,12 @@ ___________________
     static renderChatMessage() {
         // TODO: Remove legacy chat message handling.
         // @ts-ignore // TODO: foundry-vtt-types Type Merging for game.shadowrun5e
-        Object.values(game.shadowrun5e.tests).forEach((test) => {
-            console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
-            Hooks.on('renderChatMessage', test.chatMessageListeners);
-        });
+        // Object.values(game.shadowrun5e.tests).forEach((test: typeof SuccessTest) => {
+        //     console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
+        //     Hooks.on('renderChatMessage', test.chatMessageListeners);
+        // });
+        Hooks.on('renderChatMessage', SuccessTest_1.SuccessTest.chatMessageListeners);
+        Hooks.on('renderChatMessage', OpposedTest_1.OpposedTest.chatMessageListeners);
     }
     static renderItemDirectory(app, html) {
         const button = $('<button>Import Chummer Data</button>');
@@ -26816,7 +26820,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":233,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":109,"./actor/sheets/SR5ICActorSheet":110,"./actor/sheets/SR5SpiritActorSheet":111,"./actor/sheets/SR5SpriteActorSheet":112,"./actor/sheets/SR5VehicleActorSheet":113,"./apps/ChangelogApplication":114,"./apps/EnvModifiersApplication":115,"./apps/gmtools/OverwatchScoreTracker":143,"./canvas":147,"./combat/SR5Combat":149,"./config":150,"./constants":151,"./effect/SR5ActiveEffect":155,"./effect/SR5ActiveEffectSheet":156,"./handlebars/HandlebarManager":160,"./importer/apps/import-form":167,"./item/SR5Item":205,"./item/SR5ItemSheet":206,"./item/flows/NetworkDeviceFlow":209,"./macros":211,"./migrator/Migrator":213,"./rolls/SR5Roll":220,"./rolls/ShadowrunRoller":221,"./settings":227,"./tests/OpposedTest":230,"./tests/SuccessTest":231,"./token/SR5Token":232}],167:[function(require,module,exports){
+},{"../test/quench":234,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":109,"./actor/sheets/SR5ICActorSheet":110,"./actor/sheets/SR5SpiritActorSheet":111,"./actor/sheets/SR5SpriteActorSheet":112,"./actor/sheets/SR5VehicleActorSheet":113,"./apps/ChangelogApplication":114,"./apps/EnvModifiersApplication":115,"./apps/gmtools/OverwatchScoreTracker":143,"./canvas":147,"./combat/SR5Combat":149,"./config":150,"./constants":151,"./effect/SR5ActiveEffect":155,"./effect/SR5ActiveEffectSheet":156,"./handlebars/HandlebarManager":160,"./importer/apps/import-form":167,"./item/SR5Item":205,"./item/SR5ItemSheet":206,"./item/flows/NetworkDeviceFlow":209,"./macros":211,"./migrator/Migrator":213,"./rolls/SR5Roll":220,"./rolls/ShadowrunRoller":221,"./settings":227,"./tests/OpposedTest":230,"./tests/PhysicalDefenseTest":231,"./tests/SuccessTest":232,"./token/SR5Token":233}],167:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31424,7 +31428,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":89,"../chat":148,"../config":150,"../constants":151,"../data/DataDefaults":152,"../data/SR5ItemDataWrapper":154,"../helpers":165,"../parts/PartsList":219,"../rolls/ShadowrunRoller":221,"../rules/MatrixRules":223,"../tests/SuccessTest":231,"./ChatData":204,"./flows/ActionFlow":207,"./flows/NetworkDeviceFlow":209,"./prep/HostPrep":210}],206:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":89,"../chat":148,"../config":150,"../constants":151,"../data/DataDefaults":152,"../data/SR5ItemDataWrapper":154,"../helpers":165,"../parts/PartsList":219,"../rolls/ShadowrunRoller":221,"../rules/MatrixRules":223,"../tests/SuccessTest":232,"./ChatData":204,"./flows/ActionFlow":207,"./flows/NetworkDeviceFlow":209,"./prep/HostPrep":210}],206:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31548,6 +31552,8 @@ class SR5ItemSheet extends ItemSheet {
         if (this.item.canBeNetworkDevice) {
             data['networkController'] = this.item.networkController;
         }
+        // @ts-ignore // TODO: put 'opposed test types' into config (see data.config)
+        data.tests = game.shadowrun5e.tests;
         return data;
     }
     /**
@@ -34160,7 +34166,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../apps/dialogs/ShadowrunTestDialog":141,"../chat":148,"../constants":151,"../helpers":165,"../parts/PartsList":219,"../tests/SuccessTest":231}],222:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":141,"../chat":148,"../constants":151,"../helpers":165,"../parts/PartsList":219,"../tests/SuccessTest":232}],222:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -35024,7 +35030,13 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     constructor(data, documents, options) {
         super(data, documents, options);
         this.against = new SuccessTest_1.SuccessTest(this.data.against);
-        console.error(this.against);
+    }
+    // TODO: This could also be done with _prepareTypeData for only type specific fields.
+    _prepareData(data, options) {
+        data = super._prepareData(data, options);
+        delete data.opposed;
+        delete data.targetActorsUuid;
+        return data;
     }
     populateDocuments() {
         const _super = Object.create(null, {
@@ -35041,8 +35053,8 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
             return;
         }
         // @ts-ignore // TODO: Typing here get's confused between boolean when it should be string.
-        if (againstData.opposed.type !== 'custom') {
-            console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type 'custom' is supported`);
+        if (againstData.opposed.type !== '') {
+            console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`);
             return;
         }
         if (!actor) {
@@ -35098,7 +35110,21 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.OpposedTest = OpposedTest;
-},{"../data/DataDefaults":152,"../parts/PartsList":219,"./SuccessTest":231}],231:[function(require,module,exports){
+},{"../data/DataDefaults":152,"../parts/PartsList":219,"./SuccessTest":232}],231:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PhysicalDefenseTest = void 0;
+const DataDefaults_1 = require("../data/DataDefaults");
+const OpposedTest_1 = require("./OpposedTest");
+class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
+    _prepareData(data, options) {
+        data = super._prepareData(data, options);
+        data.values.damage = DataDefaults_1.DefaultValues.damageData();
+        return data;
+    }
+}
+exports.PhysicalDefenseTest = PhysicalDefenseTest;
+},{"../data/DataDefaults":152,"./OpposedTest":230}],232:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35133,9 +35159,6 @@ class SuccessTest {
     // TODO: store options in data for later re roll with same options?
     constructor(data, documents, options) {
         // TODO: Move roll to documents (or name it context)
-        const roll = options === null || options === void 0 ? void 0 : options.roll;
-        if (options)
-            delete options.roll;
         // Store given documents to avoid later fetching.
         this.actor = documents === null || documents === void 0 ? void 0 : documents.actor;
         this.item = documents === null || documents === void 0 ? void 0 : documents.item;
@@ -35415,7 +35438,7 @@ class SuccessTest {
             data.threshold.base = Number(action.threshold.base);
         }
         // Prepare opposed tests...
-        if (action.opposed.type) {
+        if (action.opposed.test) {
             data.opposed = action.opposed;
         }
         return data;
@@ -35859,20 +35882,15 @@ class SuccessTest {
             label: testCls.label || 'SR5.Tests.SuccessTest'
         };
         const { opposed } = this.data;
-        switch (this.data.opposed) {
-        }
-        if (opposed.type !== 'custom') {
-            action.label = `${helpers_1.Helpers.label(opposed.type)}`;
-        }
-        else if (opposed.skill) {
-            action.label = `${helpers_1.Helpers.label(opposed.skill)}+${helpers_1.Helpers.label(opposed.attribute)}`;
-        }
-        else if (opposed.attribute2) {
-            action.label = `${helpers_1.Helpers.label(opposed.attribute)}+${helpers_1.Helpers.label(opposed.attribute2)}`;
-        }
-        else if (opposed.attribute) {
-            action.label = `${helpers_1.Helpers.label(opposed.attribute)}`;
-        }
+        // if (opposed.type !== 'custom') {
+        //     action.label = testCls.label;
+        // } else if (opposed.skill) {
+        //     action.label = `${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
+        // } else if (opposed.attribute2) {
+        //     action.label = `${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
+        // } else if (opposed.attribute) {
+        //     action.label = `${Helpers.label(opposed.attribute)}`;
+        // }
         if (this.data.opposed.mod) {
             action.label += ` ${this.data.opposed.mod}`;
         }
@@ -36004,7 +36022,7 @@ class SuccessTest {
 }
 exports.SuccessTest = SuccessTest;
 SuccessTest.CHAT_TEMPLATE = 'systems/shadowrun5e/dist/templates/rolls/success-test.html';
-},{"../actor/SR5Actor":86,"../apps/dialogs/ShadowrunTestDialog":141,"../apps/dialogs/TestDialog":142,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":219,"../rolls/SR5Roll":220}],232:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../apps/dialogs/ShadowrunTestDialog":141,"../apps/dialogs/TestDialog":142,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":219,"../rolls/SR5Roll":220}],233:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -36025,7 +36043,7 @@ class SR5Token extends Token {
     }
 }
 exports.SR5Token = SR5Token;
-},{"../constants":151}],233:[function(require,module,exports){
+},{"../constants":151}],234:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
@@ -36058,7 +36076,7 @@ const quenchRegister = () => {
     quench.registerBatch("shadowrun5e.flow.tests", sr5_Testing_spec_1.shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
 };
 exports.quenchRegister = quenchRegister;
-},{"./sr5.ActiveEffect.spec":234,"./sr5.ActorDataPrep.spec":235,"./sr5.Inventory.spec":236,"./sr5.Matrix.spec":237,"./sr5.Modifiers.spec":238,"./sr5.NetworkDevices.spec":239,"./sr5.SR5Actor.spec":240,"./sr5.SR5Item.spec":241,"./sr5.Testing.spec":242}],234:[function(require,module,exports){
+},{"./sr5.ActiveEffect.spec":235,"./sr5.ActorDataPrep.spec":236,"./sr5.Inventory.spec":237,"./sr5.Matrix.spec":238,"./sr5.Modifiers.spec":239,"./sr5.NetworkDevices.spec":240,"./sr5.SR5Actor.spec":241,"./sr5.SR5Item.spec":242,"./sr5.Testing.spec":243}],235:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36177,7 +36195,7 @@ const shadowrunSR5ActiveEffect = context => {
     });
 };
 exports.shadowrunSR5ActiveEffect = shadowrunSR5ActiveEffect;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":243}],235:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":244}],236:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36390,7 +36408,7 @@ const shadowrunSR5ActorDataPrep = context => {
     });
 };
 exports.shadowrunSR5ActorDataPrep = shadowrunSR5ActorDataPrep;
-},{"../module/actor/SR5Actor":86,"../module/constants":151,"../module/item/SR5Item":205,"./utils":243}],236:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/constants":151,"../module/item/SR5Item":205,"./utils":244}],237:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36462,7 +36480,7 @@ const shadowrunInventoryFlow = context => {
     });
 };
 exports.shadowrunInventoryFlow = shadowrunInventoryFlow;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":243}],237:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":244}],238:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunMatrix = void 0;
@@ -36534,7 +36552,7 @@ const shadowrunMatrix = context => {
     });
 };
 exports.shadowrunMatrix = shadowrunMatrix;
-},{"../module/rules/MatrixRules":223}],238:[function(require,module,exports){
+},{"../module/rules/MatrixRules":223}],239:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -36702,7 +36720,7 @@ const shadowrunRulesModifiers = context => {
     });
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
-},{"../module/rules/Modifiers":224}],239:[function(require,module,exports){
+},{"../module/rules/Modifiers":224}],240:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36857,7 +36875,7 @@ const shadowrunNetworkDevices = context => {
     });
 };
 exports.shadowrunNetworkDevices = shadowrunNetworkDevices;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"../module/item/flows/NetworkDeviceFlow":209,"./utils":243}],240:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"../module/item/flows/NetworkDeviceFlow":209,"./utils":244}],241:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36922,7 +36940,7 @@ const shadowrunSR5Actor = context => {
     });
 };
 exports.shadowrunSR5Actor = shadowrunSR5Actor;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":243}],241:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":244}],242:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37005,7 +37023,7 @@ const shadowrunSR5Item = context => {
     });
 };
 exports.shadowrunSR5Item = shadowrunSR5Item;
-},{"../module/item/SR5Item":205,"./utils":243}],242:[function(require,module,exports){
+},{"../module/item/SR5Item":205,"./utils":244}],243:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37151,7 +37169,7 @@ const shadowrunTesting = context => {
     });
 };
 exports.shadowrunTesting = shadowrunTesting;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"../module/tests/SuccessTest":231,"./utils":243}],243:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"../module/tests/SuccessTest":232,"./utils":244}],244:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

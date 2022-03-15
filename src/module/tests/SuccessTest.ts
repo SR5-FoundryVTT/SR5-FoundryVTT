@@ -407,7 +407,7 @@ export class SuccessTest {
         }
 
         // Prepare opposed tests...
-        if (action.opposed.type) {
+        if (action.opposed.test) {
             data.opposed = action.opposed;
         }
 
@@ -899,16 +899,16 @@ export class SuccessTest {
         };
 
         const { opposed } = this.data;
-        switch (this.data.opposed) {}
-        if (opposed.type !== 'custom') {
-            action.label = `${Helpers.label(opposed.type)}`;
-        } else if (opposed.skill) {
-            action.label = `${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
-        } else if (opposed.attribute2) {
-            action.label = `${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
-        } else if (opposed.attribute) {
-            action.label = `${Helpers.label(opposed.attribute)}`;
-        }
+
+        // if (opposed.type !== 'custom') {
+        //     action.label = testCls.label;
+        // } else if (opposed.skill) {
+        //     action.label = `${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
+        // } else if (opposed.attribute2) {
+        //     action.label = `${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
+        // } else if (opposed.attribute) {
+        //     action.label = `${Helpers.label(opposed.attribute)}`;
+        // }
 
         if (this.data.opposed.mod) {
             action.label += ` ${this.data.opposed.mod}`;

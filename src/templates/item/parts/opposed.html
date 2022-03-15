@@ -19,7 +19,21 @@
             </select>
         </div>
     </div>
-    {{#ife data.action.opposed.type "custom"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.OpposedTest"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.opposed.test">
+                {{#select data.action.opposed.test}}
+                <option value=""></option>
+                {{#each tests}}
+                <option value="{{this.name}}">{{localize this.label}}</option>
+                {{/each}}
+                {{/select}}
+            </select>
+        </div>
+    </div>
     <div class="form-line">
         <div class="label">
             {{localize "SR5.Skill"}}
@@ -59,5 +73,4 @@
             {{/unless}}
         </div>
     </div>
-    {{/ife}}
 </div>

@@ -36,6 +36,7 @@ import {SR5BaseActorSheet} from "./actor/sheets/SR5BaseActorSheet";
 import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
 import {TestDialog} from "./apps/dialogs/TestDialog";
+import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -106,7 +107,8 @@ ___________________
              */
             tests: {
                 SuccessTest,
-                OpposedTest
+                OpposedTest,
+                PhysicalDefenseTest
             }
         };
 
@@ -262,10 +264,12 @@ ___________________
     static renderChatMessage() {
         // TODO: Remove legacy chat message handling.
         // @ts-ignore // TODO: foundry-vtt-types Type Merging for game.shadowrun5e
-        Object.values(game.shadowrun5e.tests).forEach((test: typeof SuccessTest) => {
-            console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
-            Hooks.on('renderChatMessage', test.chatMessageListeners);
-        });
+        // Object.values(game.shadowrun5e.tests).forEach((test: typeof SuccessTest) => {
+        //     console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
+        //     Hooks.on('renderChatMessage', test.chatMessageListeners);
+        // });
+        Hooks.on('renderChatMessage', SuccessTest.chatMessageListeners);
+        Hooks.on('renderChatMessage', OpposedTest.chatMessageListeners);
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {
