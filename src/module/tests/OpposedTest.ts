@@ -1,76 +1,50 @@
 import { SR5Actor } from "../actor/SR5Actor";
-import {SuccessTest, SuccessTestData, SuccessTestOptions, SuccessTestValues, TestDocuments} from "./SuccessTest";
+import {
+    SuccessTest,
+    SuccessTestData,
+    TestOptions,
+    SuccessTestValues,
+    TestDocuments,
+    TestData
+} from "./SuccessTest";
 import ValueField = Shadowrun.ValueField;
 import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 
 
-interface OpposedTestData {
-    title?: string
-    type?: string
+export interface OpposedTestValues extends SuccessTestValues {
+}
+
+export interface OpposedTestData extends
+    TestData,
+    Omit<SuccessTestData, 'opposed'>,
+    Omit<SuccessTestData, 'targetActorsUuid'> {
 
     // The message id of the opposed test.
     previousMessageId: string
-
-    // The item id that original action is sourced from.
-    sourceItemUuid?: string
-    // The actor id that is casting this test.
-    sourceActorUuid?: string
-
-    pool: ValueField
-    threshold: ValueField
-    limit: ValueField
-    values: SuccessTestValues
-
+    values: OpposedTestValues
     against: SuccessTestData
 }
 /**
  * An opposed test results from a normal success test as an opposed action.
- *
- * TODO: Need's a way to get the actor (either from selection or target)
- * TODO: What to actually overwrite?
  */
 export class OpposedTest extends SuccessTest {
     public data: OpposedTestData;
+    public against: SuccessTest
 
-    constructor(data, documents?: TestDocuments, options?: SuccessTestOptions) {
+    constructor(data, documents?: TestDocuments, options?: TestOptions) {
         super(data, documents, options);
+
+        this.against = new SuccessTest(this.data.against);
+        console.error(this.against);
     }
-    /**
-     * An opposed test assumes it's opposing another SuccessTest, which might have resulted from an item action
-     * or same or different actor.
-     *
-     * @param data
-     * @param documents
-     * @param options
-     */
-    // static fromTestData(data: SuccessTestData, documents, options?: SuccessTestOptions): OpposedTest {
-    //     const opposedData = {
-    //         // If the first test is a social test, the opposed would also be.
-    //         type: data.type,
-    //
-    //         // The active documents for this test, both item and actor
-    //         // For opposed tests the item might be sourced from a different actor.
-    //         sourceItemUuid: data.sourceItemUuid,
-    //         sourceActorUuid: documents?.actor?.uuid || data.sourceActorUuid,
-    //
-    //         against: data
-    //     };
-    //
-    //     return new OpposedTest(data, {}, options);
-    // }
 
-    // static getActionTestData(item, actor): OpposedTestData {
-    //     return {};
-    // }
+    async populateDocuments() {
+        await super.populateDocuments();
 
-    /**
-     * Create test data for an Opposed Test message action.
-     *
-     * @param againstData The original test cast to test against.
-     * @param actor The actor to resolve values of the opposed action against.
-     * @param previousMessageId
-     */
+        await this.against.populateDocuments();
+    }
+
     static getMessageActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): OpposedTestData|undefined {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData);
@@ -87,7 +61,7 @@ export class OpposedTest extends SuccessTest {
         }
 
         // Prepare testing data.
-        const data: OpposedTestData = {
+        const data = {
             // While not visible, when there is a description set, use it.
             title: againstData.opposed.description || undefined,
 
@@ -133,7 +107,7 @@ export class OpposedTest extends SuccessTest {
             data.pool.base = Number(opposed.mod);
         }
 
-        return data;
+        return data as OpposedTestData;
     }
 
     static chatMessageListeners(message: ChatMessage, html, data) {

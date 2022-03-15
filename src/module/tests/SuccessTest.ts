@@ -5,6 +5,7 @@ import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import {SR5Roll} from "../rolls/SR5Roll";
 import ValueField = Shadowrun.ValueField;
+import DamageData = Shadowrun.DamageData;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import {PartsList} from "../parts/PartsList";
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
@@ -18,14 +19,20 @@ export interface TestDocuments {
     rolls?: SR5Roll[]
 }
 
-export interface SuccessTestValues {
+export interface TestValues {
     pushTheLimit: GenericValueField
     secondChance: GenericValueField
-    [name: string]: ValueField
+
+    [name: string]: ValueField|DamageData
 }
 
-// TODO: Separate types between SuccessTestData and parameter Data within constructor
-export interface SuccessTestData {
+export interface SuccessTestValues extends TestValues {
+    hits: ValueField
+    netHits: ValueField
+    glitches: ValueField
+}
+
+export interface TestData {
     title?: string
     // TODO: implement typing method to apply effects to and for ations.
     // TODO: Show set of test types here
@@ -36,25 +43,28 @@ export interface SuccessTestData {
     pool: ValueField
     threshold: ValueField
     limit: ValueField
-    values: SuccessTestValues
 
-    opposed?: OpposedTestData
+    values: TestValues
 
-    // Documents the test might have been derived from.
+
+    // Documents the test might has been derived from.
     sourceItemUuid?: string
     sourceActorUuid?: string
 
-    // Scene Token Ids marked as targets of this test.
-    targetActorsUuid?: string[]
-
     // Options the test was created with.
-    options?: SuccessTestOptions
+    options?: TestOptions
 }
 
-export interface SuccessTestOptions {
+export interface SuccessTestData extends TestData {
+    opposed: OpposedTestData
+    values: SuccessTestValues
+    // Scene Token Ids marked as targets of this test.
+    targetActorsUuid: string[]
+}
+
+export interface TestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     showMessage?: boolean // Show message when defined as true.
-    roll?: SR5Roll
     rollMode?: keyof typeof CONFIG.Dice.rollModes
 }
 
@@ -84,10 +94,8 @@ export class SuccessTest {
 
     // TODO: include modifiers
     // TODO: store options in data for later re roll with same options?
-    constructor(data, documents?: TestDocuments, options?: SuccessTestOptions) {
+    constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // TODO: Move roll to documents (or name it context)
-        const roll = options?.roll;
-        if (options) delete options.roll;
 
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
@@ -108,7 +116,7 @@ export class SuccessTest {
      * @param data
      * @param options
      */
-    _prepareData(data, options?: SuccessTestOptions) {
+    _prepareData(data, options?: TestOptions) {
         data.type = data.type || this.constructor.name;
 
         // Store the current users targeted token ids for later use.
@@ -156,7 +164,7 @@ export class SuccessTest {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    static fromAction(item: SR5Item, actor?: SR5Actor, options?: SuccessTestOptions): SuccessTest|undefined {
+    static fromAction(item: SR5Item, actor?: SR5Actor, options?: TestOptions): SuccessTest|undefined {
         //@ts-ignore
         if (!actor) actor = item.parent;
         if (!(actor instanceof SR5Actor)) {
@@ -195,7 +203,7 @@ export class SuccessTest {
      * @param documents
      * @param options
      */
-    static fromTestData(data, documents?: TestDocuments, options?: SuccessTestOptions): SuccessTest {
+    static fromTestData(data, documents?: TestDocuments, options?: TestOptions): SuccessTest {
         const type = data.type || 'SuccessTest';
         // @ts-ignore
         const cls = game.shadowrun5e.tests[type];
@@ -211,7 +219,7 @@ export class SuccessTest {
      * @param values
      * @param options
      */
-    static fromPool(values?: {pool?: number, limit?: number, threshold?: number}, options?: SuccessTestOptions): SuccessTest {
+    static fromPool(values?: {pool?: number, limit?: number, threshold?: number}, options?: TestOptions): SuccessTest {
         const testData = {
             pool: DefaultValues.valueData({label: 'SR5.DicePool', base: values?.pool || 0}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold', base: values?.threshold || 0}),
@@ -536,6 +544,14 @@ export class SuccessTest {
                 await roll.evaluate({async: true});
         }
 
+        await this.populateDocuments();
+
+        this.calculateValues();
+
+        return this;
+    }
+
+    async populateDocuments() {
         // Fetch documents, when no reference has been made yet.
         if (!this.actor && this.data.sourceActorUuid)
             this.actor = await fromUuid(this.data.sourceActorUuid) as SR5Actor || undefined;
@@ -547,10 +563,6 @@ export class SuccessTest {
                 this.targets.push(await fromUuid(uuid) as TokenDocument);
             }
         }
-
-        this.calculateValues();
-
-        return this;
     }
 
     /**

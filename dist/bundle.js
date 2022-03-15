@@ -35003,6 +35003,15 @@ class Template extends MeasuredTemplate {
 exports.default = Template;
 },{}],230:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpposedTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
@@ -35010,47 +35019,22 @@ const DataDefaults_1 = require("../data/DataDefaults");
 const PartsList_1 = require("../parts/PartsList");
 /**
  * An opposed test results from a normal success test as an opposed action.
- *
- * TODO: Need's a way to get the actor (either from selection or target)
- * TODO: What to actually overwrite?
  */
 class OpposedTest extends SuccessTest_1.SuccessTest {
     constructor(data, documents, options) {
         super(data, documents, options);
+        this.against = new SuccessTest_1.SuccessTest(this.data.against);
+        console.error(this.against);
     }
-    /**
-     * An opposed test assumes it's opposing another SuccessTest, which might have resulted from an item action
-     * or same or different actor.
-     *
-     * @param data
-     * @param documents
-     * @param options
-     */
-    // static fromTestData(data: SuccessTestData, documents, options?: SuccessTestOptions): OpposedTest {
-    //     const opposedData = {
-    //         // If the first test is a social test, the opposed would also be.
-    //         type: data.type,
-    //
-    //         // The active documents for this test, both item and actor
-    //         // For opposed tests the item might be sourced from a different actor.
-    //         sourceItemUuid: data.sourceItemUuid,
-    //         sourceActorUuid: documents?.actor?.uuid || data.sourceActorUuid,
-    //
-    //         against: data
-    //     };
-    //
-    //     return new OpposedTest(data, {}, options);
-    // }
-    // static getActionTestData(item, actor): OpposedTestData {
-    //     return {};
-    // }
-    /**
-     * Create test data for an Opposed Test message action.
-     *
-     * @param againstData The original test cast to test against.
-     * @param actor The actor to resolve values of the opposed action against.
-     * @param previousMessageId
-     */
+    populateDocuments() {
+        const _super = Object.create(null, {
+            populateDocuments: { get: () => super.populateDocuments }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            yield _super.populateDocuments.call(this);
+            yield this.against.populateDocuments();
+        });
+    }
     static getMessageActionTestData(againstData, actor, previousMessageId) {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData);
@@ -35248,7 +35232,7 @@ class SuccessTest {
         // @ts-ignore
         const cls = game.shadowrun5e.tests[type];
         // Before used documents would be fetched during evaluation.
-        return new SuccessTest(data, documents, options);
+        return new cls(data, documents, options);
     }
     /**
      * A helper method to create a SuccessTest from a simple pool value, without
@@ -35556,6 +35540,13 @@ class SuccessTest {
                 if (!roll._evaluated)
                     yield roll.evaluate({ async: true });
             }
+            yield this.populateDocuments();
+            this.calculateValues();
+            return this;
+        });
+    }
+    populateDocuments() {
+        return __awaiter(this, void 0, void 0, function* () {
             // Fetch documents, when no reference has been made yet.
             if (!this.actor && this.data.sourceActorUuid)
                 this.actor = (yield fromUuid(this.data.sourceActorUuid)) || undefined;
@@ -35567,8 +35558,6 @@ class SuccessTest {
                     this.targets.push(yield fromUuid(uuid));
                 }
             }
-            this.calculateValues();
-            return this;
         });
     }
     /**
