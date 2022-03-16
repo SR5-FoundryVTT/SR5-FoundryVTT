@@ -26703,12 +26703,6 @@ ___________________
      * Must be called on 'ready' or after game.shadowrun is registered.
      */
     static renderChatMessage() {
-        // TODO: Remove legacy chat message handling.
-        // @ts-ignore // TODO: foundry-vtt-types Type Merging for game.shadowrun5e
-        // Object.values(game.shadowrun5e.tests).forEach((test: typeof SuccessTest) => {
-        //     console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
-        //     Hooks.on('renderChatMessage', test.chatMessageListeners);
-        // });
         Hooks.on('renderChatMessage', SuccessTest_1.SuccessTest.chatMessageListeners);
         Hooks.on('renderChatMessage', OpposedTest_1.OpposedTest.chatMessageListeners);
     }
@@ -35112,9 +35106,20 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
 exports.OpposedTest = OpposedTest;
 },{"../data/DataDefaults":152,"../parts/PartsList":219,"./SuccessTest":232}],231:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PhysicalDefenseTest = void 0;
 const DataDefaults_1 = require("../data/DataDefaults");
+const helpers_1 = require("../helpers");
+const PartsList_1 = require("../parts/PartsList");
 const OpposedTest_1 = require("./OpposedTest");
 class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     _prepareData(data, options) {
@@ -35122,9 +35127,23 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
         data.values.damage = DataDefaults_1.DefaultValues.damageData();
         return data;
     }
+    processSuccess() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.error('Before', this.damage);
+            // TODO: Move this into a rules file.
+            const parts = new PartsList_1.PartsList(this.damage.mod);
+            parts.addPart('SR5.AttackHits', this.against.hits.value);
+            parts.addPart('SR5.DefenderHits', -this.netHits.value);
+            helpers_1.Helpers.calcTotal(this.damage, { min: 0 });
+            console.error('After', this.damage);
+        });
+    }
+    get damage() {
+        return this.data.values.damage;
+    }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
-},{"../data/DataDefaults":152,"./OpposedTest":230}],232:[function(require,module,exports){
+},{"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":219,"./OpposedTest":230}],232:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35358,10 +35377,9 @@ class SuccessTest {
                 const data = testClass.getMessageActionTestData(testData.data, actor, id);
                 if (!data)
                     return;
-                const rolls = testData.rolls.map(roll => SR5Roll_1.SR5Roll.fromData(roll));
-                const documents = { actor, rolls };
+                const documents = { actor };
                 const test = new testClass(data, documents);
-                // TODO: Doesn't ask for dialog. Should be based on options...
+                // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
                 yield test.execute();
             }
         });
@@ -35514,13 +35532,14 @@ class SuccessTest {
         return `${game.i18n.localize(this.constructor.label)} (${this.code})`;
     }
     /**
-     * Helper method to create the internal SR5Roll.
-     * @private
+     * Helper method to create the main SR5Roll.
      */
     createRoll() {
         // TODO: Add typing for rolls?
         // @ts-ignore
-        return new SR5Roll_1.SR5Roll(this.formula);
+        const roll = new SR5Roll_1.SR5Roll(this.formula);
+        this.rolls.push(roll);
+        return roll;
     }
     /**
      * What TestDialog class to use for this test type?
@@ -35534,7 +35553,10 @@ class SuccessTest {
      * Show the dialog class for this test type and alter test according to user selection.
      */
     showDialog() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            if (!((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.showDialog))
+                return true;
             const dialog = this._createTestDialog();
             const data = yield dialog.select();
             if (dialog.canceled)
@@ -35797,30 +35819,50 @@ class SuccessTest {
      * TODO: Documentation.
      */
     execute() {
-        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            if ((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.showDialog) {
-                const userConsented = yield this.showDialog();
-                if (!userConsented)
-                    return this;
-            }
-            // Prepare current test state.
+            // Allow user to change details.
+            const userConsented = yield this.showDialog();
+            if (!userConsented)
+                return this;
             this.applyPushTheLimit();
-            const roll = this.createRoll();
-            this.rolls = [roll];
+            this.createRoll();
             yield this.evaluate();
-            if ((_b = this.data.options) === null || _b === void 0 ? void 0 : _b.showMessage) {
-                yield this.toMessage();
-            }
+            yield this.processResults();
+            yield this.toMessage();
             yield this.consumeActorResources();
             return this;
         });
+    }
+    processResults() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.success)
+                yield this.processSuccess();
+            else
+                yield this.processFailure();
+        });
+    }
+    /**
+     * Allow subclasses to override behaviour after a successful test result.
+     * @override
+     */
+    processSuccess() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * Allow subclasses to override behaviour after a failure test result
+     * @override
+     */
+    processFailure() {
+        return __awaiter(this, void 0, void 0, function* () { });
     }
     /**
      * Post this success test as a message to the chat log.
      */
     toMessage() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            if (!((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.showMessage))
+                return;
             // Prepare message content.
             const templateData = this._prepareTemplateData();
             const content = yield renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);

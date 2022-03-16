@@ -906,6 +906,7 @@
   "SR5.Tests": {
     "SuccessTest": "Erfolgs Probe",
     "OpposedTest": "Vergleichende Probe",
-    "ExtendedTest": "Ausgedehnte Probe"
+    "ExtendedTest": "Ausgedehnte Probe",
+    "PhysicalDefenseTest": "Physische Verteidigung"
   }
 }

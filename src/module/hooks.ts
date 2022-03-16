@@ -262,12 +262,6 @@ ___________________
      * Must be called on 'ready' or after game.shadowrun is registered.
      */
     static renderChatMessage() {
-        // TODO: Remove legacy chat message handling.
-        // @ts-ignore // TODO: foundry-vtt-types Type Merging for game.shadowrun5e
-        // Object.values(game.shadowrun5e.tests).forEach((test: typeof SuccessTest) => {
-        //     console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
-        //     Hooks.on('renderChatMessage', test.chatMessageListeners);
-        // });
         Hooks.on('renderChatMessage', SuccessTest.chatMessageListeners);
         Hooks.on('renderChatMessage', OpposedTest.chatMessageListeners);
     }

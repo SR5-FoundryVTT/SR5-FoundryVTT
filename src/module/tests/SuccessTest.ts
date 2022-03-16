@@ -325,10 +325,9 @@ export class SuccessTest {
             const data = testClass.getMessageActionTestData(testData.data, actor, id);
             if (!data) return;
 
-            const rolls = testData.rolls.map(roll => SR5Roll.fromData(roll as any));
-            const documents = {actor, rolls};
+            const documents = {actor};
             const test = new testClass(data, documents);
-            // TODO: Doesn't ask for dialog. Should be based on options...
+            // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
             await test.execute();
         }
     }
@@ -357,7 +356,7 @@ export class SuccessTest {
     /**
      * Test Data is structured around Values that can be modified.
      */
-    static getItemActionTestData(item: SR5Item, actor: SR5Actor) {
+    static getItemActionTestData(item: SR5Item, actor: SR5Actor): SuccessTestData {
         // Prepare general data structure with labeling.
         const data = {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
@@ -368,7 +367,7 @@ export class SuccessTest {
 
         // Try fetching the items action data.
         const action = item.getAction();
-        if (!action || !actor) return data;
+        if (!action || !actor) return data as SuccessTestData;
 
         // Prepare pool values.
         // TODO: Check if knowledge / language skills can be used for actions.
@@ -411,7 +410,7 @@ export class SuccessTest {
             data.opposed = action.opposed;
         }
 
-        return data;
+        return data as SuccessTestData;
     }
 
     /**
@@ -491,13 +490,14 @@ export class SuccessTest {
     }
 
     /**
-     * Helper method to create the internal SR5Roll.
-     * @private
+     * Helper method to create the main SR5Roll.
      */
-    private createRoll(): SR5Roll {
+    createRoll(): SR5Roll {
         // TODO: Add typing for rolls?
         // @ts-ignore
-        return new SR5Roll(this.formula) as unknown as SR5Roll;
+        const roll = new SR5Roll(this.formula) as unknown as SR5Roll;
+        this.rolls.push(roll);
+        return roll;
     }
 
     /**
@@ -513,6 +513,8 @@ export class SuccessTest {
      * Show the dialog class for this test type and alter test according to user selection.
      */
     async showDialog(): Promise<boolean> {
+        if (!this.data.options?.showDialog) return true;
+
         const dialog = this._createTestDialog();
 
         const data = await dialog.select();
@@ -808,32 +810,45 @@ export class SuccessTest {
      * TODO: Documentation.
      */
     async execute(): Promise<this> {
-        if (this.data.options?.showDialog) {
-            const userConsented = await this.showDialog();
-            if (!userConsented) return this;
-        }
+        // Allow user to change details.
+        const userConsented = await this.showDialog();
+        if (!userConsented) return this;
 
-        // Prepare current test state.
         this.applyPushTheLimit();
 
-        const roll = this.createRoll();
-        this.rolls = [roll];
+        this.createRoll();
 
         await this.evaluate();
-
-        if (this.data.options?.showMessage) {
-            await this.toMessage();
-        }
-
+        await this.processResults();
+        await this.toMessage();
         await this.consumeActorResources();
 
         return this;
     }
 
+    async processResults() {
+        if (this.success) await this.processSuccess();
+        else await this.processFailure();
+    }
+
+    /**
+     * Allow subclasses to override behaviour after a successful test result.
+     * @override
+     */
+    async processSuccess() {}
+
+    /**
+     * Allow subclasses to override behaviour after a failure test result
+     * @override
+     */
+    async processFailure() {}
+
     /**
      * Post this success test as a message to the chat log.
      */
     async toMessage(): Promise<ChatMessage|undefined> {
+        if (!this.data.options?.showMessage) return;
+
         // Prepare message content.
         const templateData = this._prepareTemplateData();
         const content = await renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);

@@ -941,6 +941,7 @@
   "SR5.Tests": {
     "SuccessTest": "Success Test",
     "OpposedTest": "Opposed Test",
-    "ExtendedTest": "Extended Test"
+    "ExtendedTest": "Extended Test",
+    "PhysicalDefenseTest": "Physical Defense"
   }
 }
