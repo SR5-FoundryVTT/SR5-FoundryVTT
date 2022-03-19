@@ -6,6 +6,7 @@ import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
 import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
+import {PhysicalDefenseDialog} from "../apps/dialogs/PhysicalDefenseDialog";
 
 export interface AttackTestValues extends SuccessTestValues {
     damage: DamageData

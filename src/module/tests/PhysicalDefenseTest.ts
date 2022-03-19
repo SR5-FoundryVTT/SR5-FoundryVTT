@@ -3,6 +3,7 @@ import { Helpers } from "../helpers";
 import { PartsList } from "../parts/PartsList";
 import {OpposedTest, OpposedTestData, OpposedTestValues} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
+import {PhysicalDefenseDialog} from "../apps/dialogs/PhysicalDefenseDialog";
 
 
 interface PhysicalDefenseTestValues extends OpposedTestValues {
@@ -23,6 +24,10 @@ export class PhysicalDefenseTest extends OpposedTest {
         data.values.damage = DefaultValues.damageData();
 
         return data;
+    }
+
+    _createTestDialog() {
+        return new PhysicalDefenseDialog(this);
     }
 
      async processSuccess() {

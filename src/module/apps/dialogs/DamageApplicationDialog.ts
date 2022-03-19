@@ -4,7 +4,7 @@ import {SR5Actor} from "../../actor/SR5Actor";
 
 export class DamageApplicationDialog extends FormDialog {
 
-    constructor(actors : SR5Actor[], damage: DamageData, options?: ApplicationOptions) {
+    constructor(actors : SR5Actor[], damage: DamageData, options?) {
         const dialogData = DamageApplicationDialog.getDialogData(actors, damage);
         super(dialogData, options);
     }

@@ -146,8 +146,8 @@ export class SuccessTest {
         data.limit = data.limit || DefaultValues.valueData({label: 'SR5.Limit'});
 
         data.values = data.values || {
-            pushTheLimit: DefaultValues.valueData({label: "SR5.PushTheLimit"}),
-            secondChange: DefaultValues.valueData({label: 'SR5.SecondChange'})
+            pushTheLimit: DefaultValues.genericValueData({label: "SR5.PushTheLimit", base: false}),
+            secondChange: DefaultValues.genericValueData({label: 'SR5.SecondChange', base: false})
         }
         data.opposed = data.opposed || undefined;
 
@@ -533,6 +533,8 @@ export class SuccessTest {
         this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
+
+        this.data.values.pushTheLimit.value = Helpers.calcTotal(this.data.values.pushTheLimit);
     }
 
     /**
@@ -571,8 +573,7 @@ export class SuccessTest {
      * Calculate the total of all values.
      */
     calculateValues() {
-        this.calculateBaseValues();
-
+        // Calculate all derived / static values.
         this.data.values.hits = this.calculateHits();
         this.data.values.netHits = this.calculateNetHits();
         this.data.values.glitches = this.calculateGlitches();
@@ -756,12 +757,15 @@ export class SuccessTest {
         if (this.hasPushTheLimit) {
             const edge = this.actor.getEdge().value;
             parts.addUniquePart('SR5.PushTheLimit', edge);
+            // Recalculate pool.
+            this.pool.value = Helpers.calcTotal(this.pool, {min: 0});
         } else {
             parts.removePart('SR5.PushTheLimit');
         }
 
         // Avoid subsequent calls of this test to also apply push the limit
         this.data.values.pushTheLimit.base = false;
+        delete this.data.values.pushTheLimit.override;
     }
 
     /**
@@ -813,6 +817,9 @@ export class SuccessTest {
         // Allow user to change details.
         const userConsented = await this.showDialog();
         if (!userConsented) return this;
+
+        // Recaculate bas values, in case user input overwrote values.
+        this.calculateBaseValues();
 
         this.applyPushTheLimit();
 

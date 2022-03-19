@@ -7,6 +7,11 @@ export interface FormDialogData {
 	onAfterClose?: Function;
 }
 
+export interface FormDialogOptions extends Dialog.Options {
+    // When true, will apply dialog form element inputs to this.data.
+    applyFormChangesOnSubmit: boolean | null
+}
+
 /** TODO: Documentation with usage example
  *  TODO: Rework getDialogData approach with the general getData Application style,
  *        to allow rerender from within the Dialog instance without external data
@@ -14,9 +19,10 @@ export interface FormDialogData {
  *        This would for things like updating a dialog based on currently selected tokens
  *        without reopening.
  */
-export class FormDialog extends Dialog {
+export class FormDialog extends Dialog<FormDialogOptions> {
     selection: object;
     selectedButton: string;
+    form: HTMLFormElement;
 
     _onAfterClose: Function;
     _selectionPromise: Promise<object>;
@@ -25,15 +31,15 @@ export class FormDialog extends Dialog {
     _templateData: object;
     _templatePath: string;
 
-    constructor(dialogData: FormDialogData, options?: ApplicationOptions) {
+    constructor(data: FormDialogData, options?: FormDialogOptions) {
         // @ts-ignore
-        super(dialogData, options);
+        super(data, options);
 
-        const {templateData, templatePath} = dialogData;
+        const {templateData, templatePath} = data;
         this._templateData = templateData;
         this._templatePath = templatePath;
 
-        this._onAfterClose = dialogData.onAfterClose ? dialogData.onAfterClose : () => {};
+        this._onAfterClose = data.onAfterClose || this.onAfterClose;
 
         this.selection = this._emptySelection();
 
@@ -56,6 +62,8 @@ export class FormDialog extends Dialog {
 
     async submit(button) {
         this.selectedButton = button.name ?? button.label;
+        
+        this.applyFormData();
 
         super.submit(button);
         // @ts-ignore
@@ -68,9 +76,30 @@ export class FormDialog extends Dialog {
         this._selectionResolve(this.selection);
     }
 
+    /**
+     * Allow Foundry Sheet behaviour for dialogs with complex forms.
+     * @returns 
+     */
+    applyFormData() {
+        //@ts-ignore // TODO: FormDialog class definition should override options,but doesn't.
+        if (!this.options.applyFormChangesOnSubmit) return;
+
+        if ( !this.form ) throw new Error(`The FormApplication subclass has no registered form element`);
+        const fd = new FormDataExtended(this.form, {editors: {}});
+        const data = fd.toObject();
+
+        this._updateData(data);
+    }
+
+    _updateData(data) {
+        //@ts-ignore // TODO: FormDialog.data typing is missing
+        foundry.utils.mergeObject(this.data.templateData, data);
+    }
+
     // @ts-ignore
     async getData() {
-        const content = await renderTemplate(this._templatePath, this._templateData);
+        //@ts-ignore // TODO: FormDialog.data typing is missing.
+        const content = await renderTemplate(this.data.templatePath, this.data.templateData);
         // @ts-ignore
         return mergeObject(super.getData(), {
             content
@@ -115,4 +144,19 @@ export class FormDialog extends Dialog {
         //@ts-ignore
         Object.keys(this.data.buttons).forEach(name => this.data.buttons[name].name = name);
     }
+
+    /**
+     * See FormApplication._renderInner
+     */
+    async _renderInner(data: object): Promise<JQuery<HTMLElement>> {
+        const html = await super._renderInner(data);
+        this.form = html.filter((i, el) => el instanceof HTMLFormElement)[0] as HTMLFormElement;
+        if ( !this.form ) this.form = html.find("form")[0];
+        return html;
+    }
+
+    /**
+     * Sub dialogs should override this method for custom handling of closing dialog.
+     */
+    onAfterClose(html) {}
 }

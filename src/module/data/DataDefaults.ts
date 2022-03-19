@@ -271,6 +271,16 @@ export class DefaultValues {
         }, partialValueData) as ValueField;
     }
 
+    static genericValueData(partialGenericValueData: Partial<GenericValueField> = {}) {
+        return mergeObject({
+            base: 0,
+            value: 0,
+            temp: 0,
+            mod: [],
+            label: ''
+        }, partialGenericValueData) as GenericValueField;
+    }
+
     static actionData(partialActionData: Partial<ActionRollData> = {}) {
         return mergeObject({
             test: SuccessTest.name,

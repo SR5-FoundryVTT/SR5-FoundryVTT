@@ -568,6 +568,7 @@
   "SR5.OpenOrigin": "Öffne Gegenstand",
   "SR5.SourceFieldEmptyError": "Es wurde keine PDF-Quelle angegeben",
   "SR5.Help": "Hilfe",
+  "SR5.ManualOverride": "Manualle Eingabe",
 
   "SETTINGS": {
     "DiagonalMovementName": "Diagonale Bewegung",
