@@ -568,6 +568,7 @@
   "SR5.OpenOrigin": "Öffne Gegenstand",
   "SR5.SourceFieldEmptyError": "Es wurde keine PDF-Quelle angegeben",
   "SR5.Help": "Hilfe",
+  "SR5.ManualOverride": "Manualle Eingabe",
 
   "SETTINGS": {
     "DiagonalMovementName": "Diagonale Bewegung",
@@ -908,5 +909,8 @@
     "OpposedTest": "Vergleichende Probe",
     "ExtendedTest": "Ausgedehnte Probe",
     "PhysicalDefenseTest": "Physische Verteidigung"
+  },
+  "SR5.MissingResource": {
+    "Edge": "Kein Edge übrig"
   }
 }

@@ -79,10 +79,7 @@ export class OpposedTest extends SuccessTest {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
-            values: {
-                pushTheLimit: DefaultValues.valueData({label: 'SR5.PushTheLimit'}),
-                secondChance: DefaultValues.valueData({label: 'SR5.SecondChange'})
-            },
+            values: {},
 
             against: againstData
         }

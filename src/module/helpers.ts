@@ -701,6 +701,9 @@ export class Helpers {
         whisper = whisper?.length > 0 ? whisper : null;
         // @ts-ignore
         await game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind);
+
+        //@ts-ignore
+        console.error(game.dice3d);
     }
 
 

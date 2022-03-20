@@ -21776,41 +21776,6 @@ class TestDialog extends FormDialog_1.FormDialog {
             }
         };
         const onAfterClose = (html) => {
-            // const rollMode = html.find('input#rollMode').val();
-            // if (test.data.options?.rollMode !== rollMode) { // @ts-ignore
-            //     test.data.options.rollMode = rollMode;
-            // }
-            // const pool = Number(html.find('input[name=pool]').val());
-            // const threshold = Number(html.find('input[name=threshold]').val());
-            // const limit = Number(html.find('input[name=limit]').val());
-            // const pushTheLimit = html.find('input[name=pushTheLimit]').is(':checked');
-            //
-            // const data = duplicate(test.data);
-            //
-            // // Manual changes change everything, so replace all data sources to a static value.
-            // if (data.pool.value !== pool) {
-            //     data.pool = DefaultValues.valueData({
-            //         base: pool,
-            //         label: data.pool.label
-            //     });
-            // }
-            // if (data.threshold.value !== threshold) {
-            //     data.threshold = DefaultValues.valueData({
-            //         base: threshold,
-            //         label: data.threshold.label
-            //     });
-            // }
-            // if (data.limit.value !== limit) {
-            //     data.limit = DefaultValues.valueData({
-            //         base: limit,
-            //         label: data.limit.label
-            //     })
-            // }
-            // if (data.values.pushTheLimit.base !== pushTheLimit) {
-            //     data.values.pushTheLimit.base = pushTheLimit;
-            //     data.values.pushTheLimit.value = pushTheLimit;
-            //
-            // }
             return test.data;
         };
         return {
@@ -21843,11 +21808,23 @@ class TestDialog extends FormDialog_1.FormDialog {
             if (valueField.value === value)
                 return;
             // Override calculation path but keep parts, as to keep the original test code (Automatics + Agility)
-            valueField.base = 0;
+            const valueType = foundry.utils.getType(value);
+            // Determine correct 'no value' value to be used.
+            let zeroValue;
+            switch (valueType) {
+                case "boolean":
+                    zeroValue = false;
+                    break;
+                default:
+                    zeroValue = 0;
+            }
+            // Reset calculation while keeping all values for transparency.
+            valueField.base = zeroValue;
             valueField.mod = valueField.mod.map(mod => {
-                mod.value = 0;
+                mod.value = zeroValue;
                 return mod;
             });
+            // Adding the manual override as only value.
             valueField.mod = PartsList_1.PartsList.AddUniquePart(valueField.mod, 'SR5.ManualOverride', value);
         });
         // Second, apply generic values.
@@ -26448,6 +26425,8 @@ class Helpers {
             whisper = (whisper === null || whisper === void 0 ? void 0 : whisper.length) > 0 ? whisper : null;
             // @ts-ignore
             yield game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind);
+            //@ts-ignore
+            console.error(game.dice3d);
         });
     }
     /**
@@ -35166,10 +35145,7 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
             pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
             limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
             threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
-            values: {
-                pushTheLimit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.PushTheLimit' }),
-                secondChance: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.SecondChange' })
-            },
+            values: {},
             against: againstData
         };
         // An opposing test will oppose net hits of the opposed test.
@@ -35317,16 +35293,15 @@ class SuccessTest {
         options.rollMode = options.rollMode || game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
         options.showDialog = options.showDialog || true;
         options.showMessage = options.showMessage || true;
+        options.pushTheLimit = options.pushTheLimit || false;
+        options.secondChance = options.secondChance || false;
         // Options will be used when a test is reused further on.
         data.options = options;
         // Set possible missing values.
         data.pool = data.pool || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' });
         data.threshold = data.threshold || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' });
         data.limit = data.limit || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' });
-        data.values = data.values || {
-            pushTheLimit: DataDefaults_1.DefaultValues.genericValueData({ label: "SR5.PushTheLimit", base: false }),
-            secondChange: DataDefaults_1.DefaultValues.genericValueData({ label: 'SR5.SecondChange', base: false })
-        };
+        data.values = data.values || {};
         data.opposed = data.opposed || undefined;
         return data;
     }
@@ -35418,7 +35393,7 @@ class SuccessTest {
             }
             const rolls = testData.rolls.map(roll => SR5Roll_1.SR5Roll.fromData(roll));
             const documents = { rolls };
-            return this.fromTestData(testData.data, documents, {});
+            return this.fromTestData(testData.data, documents, testData.data.options);
         });
     }
     /**
@@ -35450,7 +35425,11 @@ class SuccessTest {
             const thresholdValue = dialogData.threshold.value || 0;
             const limitValue = dialogData.limit.value || 0;
             // Create and display SuccessTest.
-            const test = SuccessTest.fromPool({ pool: pool.value, threshold: thresholdValue, limit: limitValue }, { showDialog: false });
+            const test = SuccessTest.fromPool({
+                pool: pool.value,
+                threshold: thresholdValue,
+                limit: limitValue
+            }, { showDialog: false });
             yield test.execute();
             // Store the last used pool size for the next simple SuccessTest
             yield ((_b = game.user) === null || _b === void 0 ? void 0 : _b.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue, pool.value));
@@ -35492,8 +35471,10 @@ class SuccessTest {
         });
     }
     toJSON() {
-        return { data: this.data,
-            rolls: this.rolls };
+        return {
+            data: this.data,
+            rolls: this.rolls
+        };
     }
     /**
      * Get the lowest side for a Shadowrun 5 die to count as a success
@@ -35599,6 +35580,7 @@ class SuccessTest {
      */
     get formula() {
         const pool = helpers_1.Helpers.calcTotal(this.data.pool);
+        // Apply dice explosion, removing the limit is done outside the roll.
         const explode = this.hasPushTheLimit ? 'x6' : '';
         return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}${explode}`;
     }
@@ -35680,7 +35662,6 @@ class SuccessTest {
         this.data.pool.value = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
         this.data.threshold.value = helpers_1.Helpers.calcTotal(this.data.threshold, { min: 0 });
         this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
-        this.data.values.pushTheLimit.value = helpers_1.Helpers.calcTotal(this.data.values.pushTheLimit);
     }
     /**
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
@@ -35694,7 +35675,7 @@ class SuccessTest {
                     yield roll.evaluate({ async: true });
             }
             yield this.populateDocuments();
-            this.calculateValues();
+            this.calculateDerivedValues();
             return this;
         });
     }
@@ -35716,16 +35697,11 @@ class SuccessTest {
     /**
      * Calculate the total of all values.
      */
-    calculateValues() {
+    calculateDerivedValues() {
         // Calculate all derived / static values.
         this.data.values.hits = this.calculateHits();
         this.data.values.netHits = this.calculateNetHits();
         this.data.values.glitches = this.calculateGlitches();
-        // Calculate all dynamics values.
-        Object.values(this.data.values).forEach(field => {
-            // It's likely that most fields will lower out at zero.
-            field.value = helpers_1.Helpers.calcTotal(field, { min: 0 });
-        });
     }
     /**
      * Helper to get the pool value for this success test.
@@ -35743,7 +35719,7 @@ class SuccessTest {
      * Helper to determine if this success test uses a limit.
      */
     get hasLimit() {
-        return this.limit.value > 0;
+        return !this.hasPushTheLimit && this.limit.value > 0;
     }
     /**
      * Helper to determine if the hits have been lowered by the limit.
@@ -35863,12 +35839,16 @@ class SuccessTest {
         return `${poolPart} ${thresholdPart} ${limitPart}`;
     }
     get hasPushTheLimit() {
-        return this.data.values.pushTheLimit.value === true;
+        var _a;
+        return ((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.pushTheLimit) === true;
+    }
+    get hasSecondChance() {
+        var _a;
+        return ((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.secondChance) === true;
     }
     /**
-     * Handle Edge rule 'pushTheLimit' within this test.
+     * Handle Edge rule 'push the limit' within this test.
      * TODO: Is this actually pushTheLimit or is it 'explode sixes?'
-     * TODO: Maybe values.pushTheLimit isn't needed... just let the dialog call this
      */
     applyPushTheLimit() {
         if (!this.actor)
@@ -35876,30 +35856,30 @@ class SuccessTest {
         const parts = new PartsList_1.PartsList(this.pool.mod);
         if (this.hasPushTheLimit) {
             const edge = this.actor.getEdge().value;
-            parts.addUniquePart('SR5.PushTheLimit', edge);
-            // Recalculate pool.
-            this.pool.value = helpers_1.Helpers.calcTotal(this.pool, { min: 0 });
+            // Overwrite is needed to not keep adding edge when test is restored from message.
+            parts.addUniquePart('SR5.PushTheLimit', edge, true);
         }
         else {
             parts.removePart('SR5.PushTheLimit');
         }
-        // Avoid subsequent calls of this test to also apply push the limit
-        this.data.values.pushTheLimit.base = false;
-        delete this.data.values.pushTheLimit.override;
     }
     /**
-     * TODO: Documentation.
+     * Handle Edge rule 'second chance' within this test.
      */
     applySecondChance() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
             if (!this.data.sourceActorUuid)
                 return;
-            const dice = this.rolls.reduce((noneHits, roll) => noneHits + roll.pool - roll.hits, 0);
+            // Only count last roll as there might be multiple second chances already
+            const lastRoll = this.rolls[this.rolls.length - 1];
+            const dice = lastRoll.pool - lastRoll.hits;
             if (dice === 0)
                 return; // TODO: User info about no dice.;
-            // Alter dice pool value for glitch calculation.
-            this.pool.mod = PartsList_1.PartsList.AddUniquePart(this.pool.mod, 'SR5.SecondChange', dice);
+            // Alter dice pool value for overall glitch calculation.
+            const parts = new PartsList_1.PartsList(this.pool.mod);
+            // Second chance can stack, so don't add it as unique.
+            parts.addPart('SR5.SecondChange', dice);
             this.calculateBaseValues();
             const formula = `${dice}d6`;
             const roll = new SR5Roll_1.SR5Roll(formula);
@@ -35908,22 +35888,26 @@ class SuccessTest {
             yield this.toMessage();
         });
     }
-    setSecondChance(active) {
-        this.data.values.secondChance.base = active;
-    }
     /**
      * Handle resulting actor resource consumption after this test.
      *
      * TODO: Maybe make this a hook and transfer resources to consume (edge, ammo)
      */
     consumeActorResources() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.actor)
-                return;
+                return false;
             if (this.hasPushTheLimit) {
+                if (this.actor.getEdge().uses <= 0) {
+                    (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error(game.i18n.localize('SR5.ResourceConsumption.Edge'));
+                    return false;
+                }
+                ;
                 yield this.actor.useEdge();
             }
             // TODO: Add second chance consumption
+            return true;
         });
     }
     /**
@@ -35935,14 +35919,16 @@ class SuccessTest {
             const userConsented = yield this.showDialog();
             if (!userConsented)
                 return this;
-            // Recaculate bas values, in case user input overwrote values.
-            this.calculateBaseValues();
+            // Check if actor has all needed resources to even test.
+            const actorConsumedResources = yield this.consumeActorResources();
+            if (!actorConsumedResources)
+                return this;
             this.applyPushTheLimit();
+            this.calculateBaseValues();
             this.createRoll();
             yield this.evaluate();
             yield this.processResults();
             yield this.toMessage();
-            yield this.consumeActorResources();
             return this;
         });
     }
@@ -35959,14 +35945,16 @@ class SuccessTest {
      * @override
      */
     processSuccess() {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+        });
     }
     /**
      * Allow subclasses to override behaviour after a failure test result
      * @override
      */
     processFailure() {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+        });
     }
     /**
      * Post this success test as a message to the chat log.
@@ -36064,6 +36052,8 @@ class SuccessTest {
         const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
         const actor = (_b = this.actor) === null || _b === void 0 ? void 0 : _b.id;
         const alias = (_c = game.user) === null || _c === void 0 ? void 0 : _c.name;
+        // const roll = SR5Roll.fromTerms([PoolTerm.fromRolls(this.rolls)]);
+        const roll = this.rolls[this.rolls.length - 1];
         const messageData = {
             user: (_d = game.user) === null || _d === void 0 ? void 0 : _d.id,
             speaker: {
@@ -36071,6 +36061,8 @@ class SuccessTest {
                 alias,
                 token
             },
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+            roll,
             content,
             // TODO: Do we need this roll serialization since test is serialized into the message flat?
             rollMode: (_e = this.data.options) === null || _e === void 0 ? void 0 : _e.rollMode

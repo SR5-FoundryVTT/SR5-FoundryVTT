@@ -56,42 +56,6 @@ export class TestDialog extends FormDialog {
         };
 
         const onAfterClose = (html) => {
-            // const rollMode = html.find('input#rollMode').val();
-            // if (test.data.options?.rollMode !== rollMode) { // @ts-ignore
-            //     test.data.options.rollMode = rollMode;
-            // }
-            // const pool = Number(html.find('input[name=pool]').val());
-            // const threshold = Number(html.find('input[name=threshold]').val());
-            // const limit = Number(html.find('input[name=limit]').val());
-            // const pushTheLimit = html.find('input[name=pushTheLimit]').is(':checked');
-            //
-            // const data = duplicate(test.data);
-            //
-            // // Manual changes change everything, so replace all data sources to a static value.
-            // if (data.pool.value !== pool) {
-            //     data.pool = DefaultValues.valueData({
-            //         base: pool,
-            //         label: data.pool.label
-            //     });
-            // }
-            // if (data.threshold.value !== threshold) {
-            //     data.threshold = DefaultValues.valueData({
-            //         base: threshold,
-            //         label: data.threshold.label
-            //     });
-            // }
-            // if (data.limit.value !== limit) {
-            //     data.limit = DefaultValues.valueData({
-            //         base: limit,
-            //         label: data.limit.label
-            //     })
-            // }
-            // if (data.values.pushTheLimit.base !== pushTheLimit) {
-            //     data.values.pushTheLimit.base = pushTheLimit;
-            //     data.values.pushTheLimit.value = pushTheLimit;
-            //
-            // }
-
             return test.data;
         };
 
@@ -126,11 +90,25 @@ export class TestDialog extends FormDialog {
             if (valueField.value === value) return;
 
             // Override calculation path but keep parts, as to keep the original test code (Automatics + Agility)
-            valueField.base = 0;
+            const valueType = foundry.utils.getType(value);
+
+            // Determine correct 'no value' value to be used.
+            let zeroValue: any;
+            switch (valueType) {
+                case "boolean":
+                    zeroValue = false;
+                    break;
+                default:
+                    zeroValue = 0;
+            }
+
+            // Reset calculation while keeping all values for transparency.
+            valueField.base = zeroValue;
             valueField.mod = valueField.mod.map(mod => {
-                mod.value = 0;
+                mod.value = zeroValue;
                 return mod;
             });
+            // Adding the manual override as only value.
             valueField.mod = PartsList.AddUniquePart(valueField.mod, 'SR5.ManualOverride', value);
         });
 

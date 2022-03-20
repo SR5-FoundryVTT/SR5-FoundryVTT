@@ -909,5 +909,8 @@
     "OpposedTest": "Vergleichende Probe",
     "ExtendedTest": "Ausgedehnte Probe",
     "PhysicalDefenseTest": "Physische Verteidigung"
+  },
+  "SR5.MissingResource": {
+    "Edge": "Kein Edge übrig"
   }
 }

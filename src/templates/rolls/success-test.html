@@ -28,7 +28,6 @@
         <div class="card-content">
             <div class="test-line">
                 <div><span class="test-code">{{test.code}}</span></div>
-                {{#if test.data.values.pushTheLimit.value}}<div>{{localize 'SR5.PushTheLimit'}}</div>{{/if}}
             </div>
         </div>
         <div class="card-content">
@@ -98,11 +97,6 @@
     {{/each}}
     {{/if}}
     {{#if test.opposed}}
-    <div class="test-line">
-        <span class="test-name {{#if roll}}test-roll{{/if}}">
-            {{localize "SR5.Tests.OpposedTest"}}
-        </span>
-    </div>
     <div class="card-buttons">
         {{#each opposedActions}}
         <div class="button opposed-action" data-action="{{this.test}}">
