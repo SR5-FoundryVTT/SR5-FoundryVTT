@@ -1,22 +1,17 @@
 import {SuccessTest, SuccessTestData, SuccessTestValues, TestOptions} from "./SuccessTest";
-import ValueField = Shadowrun.ValueField;
 import DamageData = Shadowrun.DamageData;
-import {SR5ItemSheet} from "../item/SR5ItemSheet";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
 import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
-import {PhysicalDefenseDialog} from "../apps/dialogs/PhysicalDefenseDialog";
+import { Helpers } from "../helpers";
 
-export interface AttackTestValues extends SuccessTestValues {
-    damage: DamageData
-    ap: ValueField
-}
 export interface AttackTestData extends SuccessTestData {
-    values: AttackTestValues
+    damage: DamageData
 }
 
 export class AttackTest extends SuccessTest {
+    // TODO: Is this needed here?
     _prepareData(data, options?: TestOptions): any {
         data = super._prepareData(data, options);
 
@@ -25,23 +20,9 @@ export class AttackTest extends SuccessTest {
         return data;
     }
 
-    static getItemActionTestData(item: SR5Item, actor: SR5Actor): AttackTestData {
-        const data = AttackTest.getItemActionTestData(item, actor);
-
-        const action = item.getAction();
-        if (!action || !actor) return data;
-
-        if (action.damage.type.base) {
-            // TODO: Actual damage value calculation from actor to a numerical value.
-            data.values.damage.base = action.damage.base;
-        }
-        if (action.damage.attribute) {
-            const attribute = actor.getAttribute(action.damage.attribute);
-            const value = attribute.value;
-            console.error('Do attribute modification');
-            data.values.damage.mod = PartsList.AddUniquePart(data.values.damage.mod, attribute.label, value);
-        }
-
-        return data;
+    async processSuccess(): Promise<void> {
+        const parts = new PartsList(this.data.damage.mod);
+        parts.addUniquePart('SR5.NetHits', this.netHits.value);
+        this.data.damage.value = Helpers.calcTotal(this.data.damage, {min: 0});
     }
 }

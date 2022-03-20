@@ -37,6 +37,7 @@ import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
 import {TestDialog} from "./apps/dialogs/TestDialog";
 import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
+import {AttackTest} from "./tests/AttackTest";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -108,6 +109,7 @@ ___________________
             tests: {
                 SuccessTest,
                 OpposedTest,
+                AttackTest,
                 PhysicalDefenseTest
             }
         };

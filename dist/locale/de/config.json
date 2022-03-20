@@ -905,9 +905,10 @@
     }
   },
   "SR5.Tests": {
-    "SuccessTest": "Erfolgs Probe",
+    "SuccessTest": "Erfolg Probe",
     "OpposedTest": "Vergleichende Probe",
     "ExtendedTest": "Ausgedehnte Probe",
+    "AttackTest": "Angriff Probe",
     "PhysicalDefenseTest": "Physische Verteidigung"
   },
   "SR5.MissingResource": {

@@ -43,6 +43,8 @@ export interface TestData {
 
     values: TestValues
 
+    damage: DamageData
+
     // Documents the test might has been derived from.
     sourceItemUuid?: string
     sourceActorUuid?: string
@@ -366,6 +368,7 @@ export class SuccessTest {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
+            damage: DefaultValues.damageData(),
             opposed: {}
         };
 
@@ -387,6 +390,7 @@ export class SuccessTest {
             if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
         }
         // The second attribute is only used for attribute only tests.
+        // TODO: Handle skill improvisation.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2);
             if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
@@ -407,6 +411,16 @@ export class SuccessTest {
         // Prepare threshold values...
         if (action.threshold.base) {
             data.threshold.base = Number(action.threshold.base);
+        }
+
+        if (action.damage.base) {
+            // TODO: Actual damage value calculation from actor to a numerical value.
+            data.damage = action.damage;
+        }
+        if (action.damage.attribute) {
+            const attribute = actor.getAttribute(action.damage.attribute);
+            console.error('Do attribute modification');
+            data.damage.mod = PartsList.AddUniquePart(data.damage.mod, attribute.label, attribute.value);
         }
 
         // Prepare opposed tests...
@@ -708,7 +722,7 @@ export class SuccessTest {
      * only report success when there is one.
      */
     get success(): boolean {
-        return this.hasThreshold && this.netHits.value > 0;
+        return this.netHits.value > 0;
     }
 
     /**
@@ -790,6 +804,7 @@ export class SuccessTest {
         this.rolls.push(roll);
 
         await this.evaluate();
+        await this.processResults();
         await this.toMessage();
     }
 
@@ -845,15 +860,13 @@ export class SuccessTest {
      * Allow subclasses to override behaviour after a successful test result.
      * @override
      */
-    async processSuccess() {
-    }
+    async processSuccess() {}
 
     /**
      * Allow subclasses to override behaviour after a failure test result
      * @override
      */
-    async processFailure() {
-    }
+    async processFailure() {}
 
     /**
      * Post this success test as a message to the chat log.

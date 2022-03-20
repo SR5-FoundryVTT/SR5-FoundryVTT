@@ -943,6 +943,7 @@
     "SuccessTest": "Success Test",
     "OpposedTest": "Opposed Test",
     "ExtendedTest": "Extended Test",
+    "AttackTest": "Attack Test",
     "PhysicalDefenseTest": "Physical Defense"
   },
   "SR5.MissingResource": {

@@ -80,7 +80,6 @@ export class TestDialog extends FormDialog {
         Object.entries(data).forEach(([key, value]) => {
             // @ts-ignore
             const valueField = foundry.utils.getProperty(this.data.templateData, key);
-            if (!valueField) return console.error('Shadowrun 5e | TestDialog modified a value not existent on test', key, this.data);
             if (foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
 
             // This data point will be manually handled.
