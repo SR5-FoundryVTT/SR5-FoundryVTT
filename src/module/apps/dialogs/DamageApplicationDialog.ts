@@ -45,6 +45,6 @@ export class DamageApplicationDialog extends FormDialog {
             onAfterClose,
             buttons,
             default: 'damage'
-        }
+        } as unknown as FormDialogData;
     }
 }

@@ -1,7 +1,4 @@
-export interface FormDialogData {
-    title?: string;
-	buttons: Record<string, object>;
-	default?: string;
+export interface FormDialogData extends Dialog.Data{
 	templateData: object;
 	templatePath: string;
 	onAfterClose?: Function;
@@ -49,7 +46,6 @@ export class FormDialog extends Dialog<FormDialogOptions> {
             this._selectionReject = reject;
         });
 
-        this._amendButtonsWithName();
     }
 
     async close() {
@@ -96,14 +92,36 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         foundry.utils.mergeObject(this.data.templateData, data);
     }
 
-    // @ts-ignore
-    async getData() {
-        //@ts-ignore // TODO: FormDialog.data typing is missing.
-        const content = await renderTemplate(this.data.templatePath, this.data.templateData);
-        // @ts-ignore
-        return mergeObject(super.getData(), {
-            content
+    //@ts-ignore
+    getData() {
+        // Dialog.getData expects buttons to be set.
+        this.data.buttons = this.data.buttons || this.buttons;
+        this._amendButtonsWithName(this.data.buttons);
+
+        // Call preconfigured Dialog.getData.
+        const data = super.getData();
+
+        // Merge default Dialog data with whatever's been given.
+        return mergeObject(data, {
+            ...this.data,
+            content: ''
         });
+    }
+
+    /**
+     * Dialog button object to be rendered underneath dialog content.
+     * Follows Dialog.data.buttons typing.
+     */
+    get buttons() {
+        return {}
+    }
+
+    /**
+     * Template file to render the inner dialog content with.
+     * Will be given FormDialog.data to render.
+     */
+    get templateContent(): string {
+        return '';
     }
 
     async select(): Promise<any> {
@@ -138,17 +156,21 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         return {};
     }
 
-    /** Allow for the selected button to be addressed by it's key, not it's localized label.
+    /** Allow for the selected button to be addressed by its key, not it's localized label.
      */
-    _amendButtonsWithName() {
-        //@ts-ignore
-        Object.keys(this.data.buttons).forEach(name => this.data.buttons[name].name = name);
+    _amendButtonsWithName(buttons) {
+        Object.keys(buttons).forEach(name => buttons[name].name = name);
     }
 
     /**
      * See FormApplication._renderInner
      */
-    async _renderInner(data: object): Promise<JQuery<HTMLElement>> {
+    async _renderInner(data): Promise<JQuery<HTMLElement>> {
+        const templatePath = data.templatePath || this.templateContent;
+        if (templatePath)
+            data.content = await renderTemplate(data.templatePath || this.templateContent, 
+                                                data.templateData || data);
+
         const html = await super._renderInner(data);
         this.form = html.filter((i, el) => el instanceof HTMLFormElement)[0] as HTMLFormElement;
         if ( !this.form ) this.form = html.find("form")[0];
@@ -158,5 +180,5 @@ export class FormDialog extends Dialog<FormDialogOptions> {
     /**
      * Sub dialogs should override this method for custom handling of closing dialog.
      */
-    onAfterClose(html) {}
+    onAfterClose(html: JQuery<HTMLElement>) {}
 }

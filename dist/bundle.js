@@ -21207,7 +21207,6 @@ class FormDialog extends Dialog {
             // Reject is stored, but never used in favor of FormDialog.canceled
             this._selectionReject = reject;
         });
-        this._amendButtonsWithName();
     }
     close() {
         const _super = Object.create(null, {
@@ -21258,19 +21257,29 @@ class FormDialog extends Dialog {
         //@ts-ignore // TODO: FormDialog.data typing is missing
         foundry.utils.mergeObject(this.data.templateData, data);
     }
-    // @ts-ignore
+    //@ts-ignore
     getData() {
-        const _super = Object.create(null, {
-            getData: { get: () => super.getData }
-        });
-        return __awaiter(this, void 0, void 0, function* () {
-            //@ts-ignore // TODO: FormDialog.data typing is missing.
-            const content = yield renderTemplate(this.data.templatePath, this.data.templateData);
-            // @ts-ignore
-            return mergeObject(_super.getData.call(this), {
-                content
-            });
-        });
+        // Dialog.getData expects buttons to be set.
+        this.data.buttons = this.data.buttons || this.buttons;
+        this._amendButtonsWithName(this.data.buttons);
+        // Call preconfigured Dialog.getData.
+        const data = super.getData();
+        // Merge default Dialog data with whatever's been given.
+        return mergeObject(data, Object.assign(Object.assign({}, this.data), { content: '' }));
+    }
+    /**
+     * Dialog button object to be rendered underneath dialog content.
+     * Follows Dialog.data.buttons typing.
+     */
+    get buttons() {
+        return {};
+    }
+    /**
+     * Template file to render the inner dialog content with.
+     * Will be given FormDialog.data to render.
+     */
+    get templateContent() {
+        return '';
     }
     select() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -21300,11 +21309,10 @@ class FormDialog extends Dialog {
     static getButtons() {
         return {};
     }
-    /** Allow for the selected button to be addressed by it's key, not it's localized label.
+    /** Allow for the selected button to be addressed by its key, not it's localized label.
      */
-    _amendButtonsWithName() {
-        //@ts-ignore
-        Object.keys(this.data.buttons).forEach(name => this.data.buttons[name].name = name);
+    _amendButtonsWithName(buttons) {
+        Object.keys(buttons).forEach(name => buttons[name].name = name);
     }
     /**
      * See FormApplication._renderInner
@@ -21314,6 +21322,9 @@ class FormDialog extends Dialog {
             _renderInner: { get: () => super._renderInner }
         });
         return __awaiter(this, void 0, void 0, function* () {
+            const templatePath = data.templatePath || this.templateContent;
+            if (templatePath)
+                data.content = yield renderTemplate(data.templatePath || this.templateContent, data.templateData || data);
             const html = yield _super._renderInner.call(this, data);
             this.form = html.filter((i, el) => el instanceof HTMLFormElement)[0];
             if (!this.form)
@@ -21396,7 +21407,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PhysicalDefenseDialog = void 0;
 const TestDialog_1 = require("./TestDialog");
 class PhysicalDefenseDialog extends TestDialog_1.TestDialog {
-    static get template() {
+    static get templateContent() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-dialog.html';
     }
 }
@@ -21736,37 +21747,54 @@ const PartsList_1 = require("../../parts/PartsList");
  */
 class TestDialog extends FormDialog_1.FormDialog {
     // @ts-ignore // TODO: default option value with all the values...
-    constructor(test, options = {}) {
-        const dialogData = TestDialog.getDialogData(test);
+    constructor(data, options = {}) {
         options.applyFormChangesOnSubmit = true;
-        super(dialogData, options);
-    }
-    static get template() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
+        super(data, options);
     }
     static get defaultOptions() {
         const options = super.defaultOptions;
-        options.id = 'damage-application';
+        options.id = 'test-dialog';
         // TODO: Class Dialog here is needed for dialog button styling.
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
         return options;
     }
-    static getDialogData(test) {
+    get templateContent() {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
+    }
+    getData() {
         var _a;
-        // @ts-ignore
-        const title = game.i18n.localize(test.title);
-        const templatePath = this.template;
+        const data = super.getData();
+        //@ts-ignore //TODO: default to general roll mode user setting
+        data.rollMode = (_a = data.test.data.options) === null || _a === void 0 ? void 0 : _a.rollMode;
+        data.rollModes = CONFIG.Dice.rollModes;
+        data.default = 'roll';
+        return data;
+    }
+    get title() {
+        const data = this.data;
+        return game.i18n.localize(data.test.title);
+    }
+    static getDialogData(test) {
+        console.error('TODO: Remove this method');
         // roll mode handling.
-        const rollMode = (_a = test.data.options) === null || _a === void 0 ? void 0 : _a.rollMode;
-        const rollModes = CONFIG.Dice.rollModes;
-        const templateData = {
-            test,
-            rollMode,
-            rollModes
+        // const rollMode = test.data.options?.rollMode;
+        // const rollModes = CONFIG.Dice.rollModes;
+        // const templateData = {
+        //     test,
+        //     rollMode,
+        //     rollModes
+        // };
+        const onAfterClose = (html) => {
+            return test.data;
         };
-        const buttons = {
+        return {
+            onAfterClose
+        };
+    }
+    get buttons() {
+        return {
             roll: {
                 label: game.i18n.localize('SR5.Roll'),
                 icon: '<i class="fas fa-dice-six"></i>'
@@ -21775,17 +21803,9 @@ class TestDialog extends FormDialog_1.FormDialog {
                 label: game.i18n.localize('SR5.Dialogs.Common.Cancel')
             }
         };
-        const onAfterClose = (html) => {
-            return test.data;
-        };
-        return {
-            title,
-            templatePath,
-            templateData,
-            buttons,
-            default: 'roll',
-            onAfterClose
-        };
+    }
+    onAfterClose(html) {
+        return this.data.test.data;
     }
     /**
      * Update ValueField data used on the template and alter automatic calculation with manual override values, where
@@ -21797,7 +21817,7 @@ class TestDialog extends FormDialog_1.FormDialog {
         // First, apply changes to ValueField style values in a way that makes sense.
         Object.entries(data).forEach(([key, value]) => {
             // @ts-ignore
-            const valueField = foundry.utils.getProperty(this.data.templateData, key);
+            const valueField = foundry.utils.getProperty(this.data, key);
             if (foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod'))
                 return;
             // This data point will be manually handled.
@@ -21827,7 +21847,7 @@ class TestDialog extends FormDialog_1.FormDialog {
         });
         // Second, apply generic values.
         // @ts-ignore
-        foundry.utils.mergeObject(this.data.templateData, data);
+        foundry.utils.mergeObject(this.data, data);
     }
 }
 exports.TestDialog = TestDialog;
@@ -23797,6 +23817,7 @@ class DefaultValues {
                 mod: [],
             },
             attribute: '',
+            mod: [],
             base_formula_operator: 'add',
             source: {
                 actorId: '',
@@ -35240,7 +35261,7 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
         return data;
     }
     _createTestDialog() {
-        return new PhysicalDefenseDialog_1.PhysicalDefenseDialog(this);
+        return new PhysicalDefenseDialog_1.PhysicalDefenseDialog({ test: this });
     }
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -35679,7 +35700,7 @@ class SuccessTest {
      * @override This method if you want to use a different TestDialog.
      */
     _createTestDialog() {
-        return new TestDialog_1.TestDialog(this);
+        return new TestDialog_1.TestDialog({ test: this });
     }
     /**
      * Show the dialog class for this test type and alter test according to user selection.

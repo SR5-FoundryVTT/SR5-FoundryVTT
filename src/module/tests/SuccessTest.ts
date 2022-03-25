@@ -525,7 +525,7 @@ export class SuccessTest {
      * @override This method if you want to use a different TestDialog.
      */
     _createTestDialog() {
-        return new TestDialog(this);
+        return new TestDialog({test: this});
     }
 
     /**

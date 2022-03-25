@@ -1,29 +1,31 @@
-import { SR5Actor } from "../../actor/SR5Actor";
 import {FormDialog, FormDialogData, FormDialogOptions} from "./FormDialog";
 import {SuccessTest} from "../../tests/SuccessTest";
-import {CORE_FLAGS, CORE_NAME} from "../../constants";
 import { PartsList } from "../../parts/PartsList";
-import {DefaultValues} from "../../data/DataDefaults";
+import { SuccessTestData } from './../../tests/SuccessTest';
 
+
+export interface TestDialogData extends FormDialogData {
+    test: SuccessTest
+    rollMode: string
+    rollModes: CONFIG.Dice.RollModes
+}
 
 /**
  * TODO: Add TestDialog JSDoc
  */
 export class TestDialog extends FormDialog {
+    data: TestDialogData
+    
     // @ts-ignore // TODO: default option value with all the values...
-    constructor(test: SuccessTest, options?: FormDialogOptions = {}) {
-        const dialogData = TestDialog.getDialogData(test);
+    constructor(data, options?: FormDialogOptions = {}) {
+        
         options.applyFormChangesOnSubmit = true;
-        super(dialogData, options);
-    }
-
-    static get template(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
+        super(data, options);
     }
 
     static get defaultOptions() {
         const options = super.defaultOptions;
-        options.id = 'damage-application';
+        options.id = 'test-dialog';
         // TODO: Class Dialog here is needed for dialog button styling.
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
@@ -31,21 +33,51 @@ export class TestDialog extends FormDialog {
         return options;
     }
 
-    static getDialogData(test: SuccessTest): FormDialogData {
-        // @ts-ignore
-        const title = game.i18n.localize(test.title);
-        const templatePath = this.template;
-        // roll mode handling.
-        const rollMode = test.data.options?.rollMode;
-        const rollModes = CONFIG.Dice.rollModes;
+    get templateContent(): string {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
+    }
 
-        const templateData = {
-            test,
-            rollMode,
-            rollModes
+    getData() {
+        const data = super.getData() as unknown as TestDialogData;
+        
+        //@ts-ignore //TODO: default to general roll mode user setting
+        data.rollMode = data.test.data.options?.rollMode;
+        data.rollModes = CONFIG.Dice.rollModes;
+        data.default = 'roll';
+
+        return data;
+    }
+
+    get title() {
+        const data = this.data as unknown as TestDialogData;
+        return game.i18n.localize(data.test.title);
+    }
+
+    static getDialogData(test: SuccessTest) {
+        console.error('TODO: Remove this method')
+        // roll mode handling.
+        // const rollMode = test.data.options?.rollMode;
+        // const rollModes = CONFIG.Dice.rollModes;
+
+        // const templateData = {
+        //     test,
+        //     rollMode,
+        //     rollModes
+        // };
+
+        
+
+        const onAfterClose = (html) => {
+            return test.data;
         };
 
-        const buttons = {
+        return {
+            onAfterClose
+        }
+    }
+
+    get buttons() {
+        return {
             roll: {
                 label: game.i18n.localize('SR5.Roll'),
                 icon: '<i class="fas fa-dice-six"></i>'
@@ -54,19 +86,10 @@ export class TestDialog extends FormDialog {
                 label: game.i18n.localize('SR5.Dialogs.Common.Cancel')
             }
         };
+    }
 
-        const onAfterClose = (html) => {
-            return test.data;
-        };
-
-        return {
-            title,
-            templatePath,
-            templateData,
-            buttons,
-            default: 'roll',
-            onAfterClose
-        }
+    onAfterClose(html: JQuery<HTMLElement>): SuccessTestData {
+        return this.data.test.data;
     }
 
     /**
@@ -79,7 +102,7 @@ export class TestDialog extends FormDialog {
         // First, apply changes to ValueField style values in a way that makes sense.
         Object.entries(data).forEach(([key, value]) => {
             // @ts-ignore
-            const valueField = foundry.utils.getProperty(this.data.templateData, key);
+            const valueField = foundry.utils.getProperty(this.data, key);
             if (foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
 
             // This data point will be manually handled.
@@ -113,6 +136,6 @@ export class TestDialog extends FormDialog {
 
         // Second, apply generic values.
         // @ts-ignore
-        foundry.utils.mergeObject(this.data.templateData, data)
+        foundry.utils.mergeObject(this.data, data)
     }
 }

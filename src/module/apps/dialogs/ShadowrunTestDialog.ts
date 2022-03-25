@@ -129,6 +129,6 @@ export class ShadowrunTestDialog {
             buttons,
             default: rollButtonName,
             onAfterClose
-        }
+        } as unknown as FormDialogData
     }
 }

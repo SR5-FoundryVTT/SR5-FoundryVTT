@@ -27,12 +27,10 @@ export class PhysicalDefenseTest extends OpposedTest {
     }
 
     _createTestDialog() {
-        return new PhysicalDefenseDialog(this);
+        return new PhysicalDefenseDialog({test: this});
     }
 
      async processSuccess() {
-
-        console.error('Before', this.damage);
 
         // TODO: Move this into a rules file.
         const parts = new PartsList(this.damage.mod);
@@ -41,7 +39,6 @@ export class PhysicalDefenseTest extends OpposedTest {
 
         Helpers.calcTotal(this.damage, {min: 0});
 
-        console.error('After', this.damage);
     }
 
     get damage(): DamageData {
