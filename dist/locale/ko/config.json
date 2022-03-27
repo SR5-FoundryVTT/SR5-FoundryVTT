@@ -25,14 +25,12 @@
   "ITEM.TypeSprite_power": "요정 능력",
   "ITEM.TypeWeapon": "무기",
   "ITEM.TypeHost": "호스트",
-
   "SR5.FOUNDRY": {
     "Actor": "액터",
     "Scene": "장면",
     "Item": "물품",
     "Token": "토큰"
   },
-
   "SR5.SheetActor": "액터 시트",
   "SR5.SheetItem": "물품 시트",
   "SR5.ItemTypes": {
@@ -191,8 +189,9 @@
   "SR5.CreateItemLifestyle": "생활방식 생성",
   "SR5.CreateItemContact": "연락처 생성",
   "SR5.CreateItemCritterPower": "크리터 능력 생성",
-  "SR5.CreateEffect": "효과 생성",
-  "SR5.NewEffect": "새로운 효과",
+  "SR5.CreateItemAmmo": "탄약 생성",
+  "SR5.CreateItemModification": "장비 개조물 생성",
+	"SR5.CreateEffect": "효과 생성",
   "SR5.Weapon": "무기",
   "SR5.Ammo": "탄약",
   "SR5.WeaponMods": "부착물",
@@ -212,7 +211,7 @@
   "SR5.Accuracy": "정확도",
   "SR5.RecoilCompensation": "RC",
   "SR5.Equip": "장착",
-  "SR5.Damage": "미해",
+  "SR5.Damage": "피해",
   "SR5.OutOfRange": "사거리 밖",
   "SR5.Spell": "주문",
   "SR5.SpellCategory": "범주",
@@ -431,6 +430,10 @@
   "SR5.NoSelectableToken": "캔버스 위에 액터가 선택할 수 있는 토큰이 없음",
   "SR5.MissingItemForOpposedTest": "현재 행동 물품이 누락되어 경쟁 테스트를 수행할 수 없음",
   "SR5.TargetingNeedsActorWithToken": "현재 액터가 작업 대상을 지정하기 위해서는 연결된 토큰이 필요",
+  "SR5.OverwatchScoreTracker": {
+    "NotifyNoSelectedTokens": "최소 하나 이상의 연결된 토큰이 선택되어있어야 합니다.",
+    "OnlyLinkedActorsSupported": "연결된 액터만 지원됩니다. 연결되지 않은 액터와 선택된 토큰은 무시됩니다."
+  },
   "SR5.OverwatchScore": "감시 점수",
   "SR5.OverwatchScoreTrackerTitle": "존슨 씨의 육아용 모니터",
   "SR5.PlusFifteenMinutes": "+15분",
@@ -480,6 +483,7 @@
   "SR5.EditSkill": "기술 수정",
   "SR5.EditItem": "물품 수정",
   "SR5.DeleteItem": "물품 삭제",
+  "SR5.MoveItemInventory": "소지품 창으로 물건 옮기기",
   "SR5.Name": "이름",  
   "SR5.AstralInit": "아스트랄 우선권",
   "SR5.AstralDice": "아스트랄 우선권 주사위",
@@ -563,7 +567,6 @@
   "SR5.WalkingSpeed": "걷는 중",
   "SR5.RunningSpeed": "달리는 중",
   "SR5.Help": "도움",
-
   "SETTINGS": {
     "DiagonalMovementName": "대각선 이동",
     "DiagonalMovementDescription": "그리드 사용 시 대각선으로 이동하는 방식",
@@ -633,7 +636,13 @@
       "RollDroneInfiltration": "드론 침투",
       "VehicleConfiguration": "차량 구성",
       "ICConfiguration": "IC 구성",
-      "SetMonitor": "상태 측정기는 수동으로 설정해야 합니다."
+      "SetMonitor": "상태 측정기는 수동으로 설정해야 합니다.",
+      "PersonalInventory": "개인 소지 중",
+      "CreateInventory": "소지품 위치 생성"
+    },
+    "Inventory": {
+      "OpenInventory": "소지품 위치",
+      "Carried": "소지"
     }
   },
   "SR5.Spirit": {
@@ -831,7 +840,9 @@
     "TokenSelectionNeeded": "한 개 이상의 토큰이 선택되어야 함",
     "SkillCantBeDefault": "이 기술에 대해서는 무리한 시도를 할 수 없기 때문에 주사위를 굴릴 수 없음",
     "HostItemOnlyAcceptIC": "IC 액터만 호스트에 추가할 수 있음",
-    "InvalidMarksCount": "잘못된 수의 마커를 배치하려고 함"
+    "InvalidMarksCount": "잘못된 수의 마커를 배치하려고 함",
+    "AlreadyExistingInventory": "해당 이름의 소지품 위치가 이미 존재함",
+    "CantEditDefaultInventory": "기본 소지품 위치의 이름은 재설정할 수 없음"
   },
   "SR5.Errors": {
     "MissingSkill": "액터에게 필요한 기술이 없습니다.",
@@ -841,7 +852,9 @@
     "MarksCantBePlacedOn": "선택된 종류의 액터는 마커를 받을 수 없습니다.",
     "CantEditAppliedItemEffects": "물품에 의해 적용된 활성 효과는 편집할 수 없습니다.",
     "KeyNotModifyableByActiveEffect": "활성 효과 모드 수정은 모드 속성에만 영향을 미칠 수 있습니다.",
-    "CanOnlyAddTechnologyItemsToANetwork": "네트워크에는 장비 물품만 추가할 수 있습니다."
+    "CanOnlyAddTechnologyItemsToANetwork": "네트워크에는 장비 물품만 추가할 수 있습니다.",
+    "InventoryAlreadyExists": "해당 이름의 소지품 위치가 이미 존재합니다.",
+    "DefaultInventoryCantBeRemoved": "기본 소지품 위치는 삭제할 수 없습니다."
   },
   "SR5.ChangelogApplication": {
     "Title": "섀도우런5e 업데이트",
@@ -892,9 +905,14 @@
     "Modifier": {
       "Title": "수정치"
     },
-    "Extreme": "힘든 단계에서 두 가지 이상의 상태 조합",
+    "Extreme": "극단적 단계에서 두 가지 이상의 상태 조합",
     "Total": "결과",
     "ClearModifiers": "개인 수정치 초기화"
+	},
+  "SR5.MoveInventoryDialog" : {
+    "Title": "소지품 위치 선택",
+    "Move": "이동",
+    "Cancel": "취소"
   },
   "SR5.Dialogs": {
     "RangedWeaponTest": {
