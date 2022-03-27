@@ -11,7 +11,6 @@ import {PartsList} from "../parts/PartsList";
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 import {OpposedTest} from "./OpposedTest";
 import {TestDialog} from "../apps/dialogs/TestDialog";
-import GenericValueField = Shadowrun.GenericValueField;
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -41,6 +40,7 @@ export interface TestData {
     threshold: ValueField
     limit: ValueField
 
+    // TODO: Is this still necessary?
     values: TestValues
 
     damage: DamageData
@@ -103,6 +103,8 @@ export class SuccessTest {
         this.rolls = documents?.rolls || [];
         this.targets = [];
 
+        options = options || {}
+
         this.data = this._prepareData(data, options);
 
         this.calculateBaseValues();
@@ -116,7 +118,7 @@ export class SuccessTest {
      * @param data
      * @param options
      */
-    _prepareData(data, options?: TestOptions) {
+    _prepareData(data, options: TestOptions) {
         data.type = data.type || this.constructor.name;
 
         // Store the current users targeted token ids for later use.
@@ -131,7 +133,6 @@ export class SuccessTest {
         // @ts-ignore // Prepare general test information.
         data.title = data.title || this.constructor.label;
 
-        options = options || {}
         // @ts-ignore // In FoundryVTT core settings we shall trust.
         options.rollMode = options.rollMode || game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
         options.showDialog = options.showDialog || true;
@@ -164,7 +165,7 @@ export class SuccessTest {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    static fromAction(item: SR5Item, actor?: SR5Actor, options?: TestOptions): SuccessTest | undefined {
+    static async fromAction(item: SR5Item, actor?: SR5Actor, options?: TestOptions): Promise<SuccessTest | undefined> {
         //@ts-ignore
         if (!actor) actor = item.parent;
         if (!(actor instanceof SR5Actor)) {
@@ -189,7 +190,7 @@ export class SuccessTest {
         // Any action item will return a list of values to create the test pool from.
         // @ts-ignore // Get test class from registry to allow custom module tests.
         const cls = game.shadowrun5e.tests[action.test];
-        const data = cls.getItemActionTestData(item, actor);
+        const data = await cls.getItemActionTestData(item, actor);
 
         return new cls(data, {item, actor}, options);
     }
@@ -362,7 +363,7 @@ export class SuccessTest {
     /**
      * Test Data is structured around Values that can be modified.
      */
-    static getItemActionTestData(item: SR5Item, actor: SR5Actor): SuccessTestData {
+    static async getItemActionTestData(item: SR5Item, actor: SR5Actor): Promise<SuccessTestData> {
         // Prepare general data structure with labeling.
         const data = {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
@@ -413,6 +414,7 @@ export class SuccessTest {
             data.threshold.base = Number(action.threshold.base);
         }
 
+        // Prepare general damage values...
         if (action.damage.base) {
             // TODO: Actual damage value calculation from actor to a numerical value.
             data.damage = action.damage;
@@ -497,15 +499,20 @@ export class SuccessTest {
     }
 
     /**
+     * Determine if this test can have a human-readable shadowrun test code representation.
+     *
      * All parts of the test code can be dynamic, any will do.
      */
     get hasCode(): boolean {
         return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
     }
 
+    /**
+     * Overwrite this method to alter the title of test dialogs and messages.
+     */
     get title(): string {
         // @ts-ignore
-        return `${game.i18n.localize(this.constructor.label)} (${this.code})`
+        return `${game.i18n.localize(this.constructor.label)}`;
     }
 
     /**
@@ -541,9 +548,20 @@ export class SuccessTest {
 
         // Overwrite current test state with whatever the dialog gives.
         this.data = data;
+        await this._alterTestDataFromDialogData();
 
         return true;
     }
+
+    /**
+     * Overwrite this method if you want to alter test data after dialog user selections been done.
+     */
+    async _alterTestDataFromDialogData() {}
+
+    /**
+     * Overwrite this method if you need to alter base values.
+     */
+    prepareBaseValues() {}
 
     /**
      * Calculate only the base test that can be calculated before the test has been evaluated.
@@ -565,13 +583,15 @@ export class SuccessTest {
                 await roll.evaluate({async: true});
         }
 
-        await this.populateDocuments();
-
         this.calculateDerivedValues();
 
         return this;
     }
 
+    /**
+     * Rehydrate this test with Documents, should they be missing.
+     * This can happen when a test is created from a ChatMessage.
+     */
     async populateDocuments() {
         // Fetch documents, when no reference has been made yet.
         if (!this.actor && this.data.sourceActorUuid)
@@ -585,6 +605,11 @@ export class SuccessTest {
             }
         }
     }
+
+    /**
+     * Prepare missing data based on this tests Documents before anything else is done.
+     */
+    async prepareDocumentData() {}
 
     /**
      * Calculate the total of all values.
@@ -832,6 +857,9 @@ export class SuccessTest {
      * TODO: Documentation.
      */
     async execute(): Promise<this> {
+        await this.populateDocuments();
+        await this.prepareDocumentData();
+
         // Allow user to change details.
         const userConsented = await this.showDialog();
         if (!userConsented) return this;
@@ -841,6 +869,7 @@ export class SuccessTest {
         if (!actorConsumedResources) return this;
 
         this.applyPushTheLimit();
+        this.prepareBaseValues();
         this.calculateBaseValues();
         this.createRoll();
 

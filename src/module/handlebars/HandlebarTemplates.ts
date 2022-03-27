@@ -133,6 +133,7 @@ export const preloadHandlebarsTemplates = async () => {
         // dialogs
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html',
         'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html',
 
         // Tests
         'systems/shadowrun5e/dist/templates/rolls/success-test.html',

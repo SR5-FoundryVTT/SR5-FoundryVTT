@@ -574,6 +574,12 @@
   padding: 0;
   border: 1px solid #4d4d4d; }
 
+/**
+ * CSS for Test Dialog styling.
+ */
+.sr5 .dialog-content-column {
+  width: 300px; }
+
 @font-face {
   font-family: 'Nodesto';
   src: url("assets/fonts/NodestoCapsCondensed.otf"); }

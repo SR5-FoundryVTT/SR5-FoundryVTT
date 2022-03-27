@@ -943,8 +943,9 @@
     "SuccessTest": "Success Test",
     "OpposedTest": "Opposed Test",
     "ExtendedTest": "Extended Test",
-    "AttackTest": "Attack Test",
-    "PhysicalDefenseTest": "Physical Defense"
+    "PhysicalDefenseTest": "Physical Defense",
+    "RangedAttackTest": "Ranged Weapon Attack",
+    "MeleeAttackTest": "Melee Weapon Attack"
   },
   "SR5.MissingResource": {
     "Edge": "No Edge left to consume"

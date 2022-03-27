@@ -368,7 +368,7 @@ export class SR5Item extends Item {
     async castAction(event?) {
         if (!this.actor) return;
 
-        const test = SuccessTest.fromAction(this, this.actor);
+        const test = await SuccessTest.fromAction(this, this.actor);
         if (!test) return;
         await test.toMessage();
 

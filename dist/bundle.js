@@ -21748,6 +21748,7 @@ const PartsList_1 = require("../../parts/PartsList");
 class TestDialog extends FormDialog_1.FormDialog {
     // @ts-ignore // TODO: default option value with all the values...
     constructor(data, options = {}) {
+        // Allow for Sheet style form submit value handling.
         options.applyFormChangesOnSubmit = true;
         super(data, options);
     }
@@ -21758,8 +21759,15 @@ class TestDialog extends FormDialog_1.FormDialog {
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
+        // @ts-ignore
+        options.width = 'auto';
         return options;
     }
+    /**
+     * Overwrite this method to provide an alternative template for the dialog inner content.
+     *
+     * data.templatePath work's the same and can be used as well.
+     */
     get templateContent() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
     }
@@ -21772,27 +21780,16 @@ class TestDialog extends FormDialog_1.FormDialog {
         data.default = 'roll';
         return data;
     }
+    /**
+     * Overwrite this method to provide the dialog application title.
+     */
     get title() {
         const data = this.data;
         return game.i18n.localize(data.test.title);
     }
-    static getDialogData(test) {
-        console.error('TODO: Remove this method');
-        // roll mode handling.
-        // const rollMode = test.data.options?.rollMode;
-        // const rollModes = CONFIG.Dice.rollModes;
-        // const templateData = {
-        //     test,
-        //     rollMode,
-        //     rollModes
-        // };
-        const onAfterClose = (html) => {
-            return test.data;
-        };
-        return {
-            onAfterClose
-        };
-    }
+    /**
+     * Overwrite this method to provide dialog buttons.
+     */
     get buttons() {
         return {
             roll: {
@@ -21804,6 +21801,10 @@ class TestDialog extends FormDialog_1.FormDialog {
             }
         };
     }
+    /**
+     * Callback for after the dialoge has closed.
+     * @param html
+     */
     onAfterClose(html) {
         return this.data.test.data;
     }
@@ -25019,6 +25020,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         // dialogs
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html',
         'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html',
         // Tests
         'systems/shadowrun5e/dist/templates/rolls/success-test.html',
         // Rolls
@@ -26588,15 +26590,15 @@ const SR5ICActorSheet_1 = require("./actor/sheets/SR5ICActorSheet");
 const SR5ActiveEffect_1 = require("./effect/SR5ActiveEffect");
 const SR5ActiveEffectSheet_1 = require("./effect/SR5ActiveEffectSheet");
 const NetworkDeviceFlow_1 = require("./item/flows/NetworkDeviceFlow");
-const SR5Roll_1 = require("./rolls/SR5Roll");
-const SuccessTest_1 = require("./tests/SuccessTest");
-const OpposedTest_1 = require("./tests/OpposedTest");
 const SR5VehicleActorSheet_1 = require("./actor/sheets/SR5VehicleActorSheet");
 const SR5CharacterSheet_1 = require("./actor/sheets/SR5CharacterSheet");
 const SR5SpiritActorSheet_1 = require("./actor/sheets/SR5SpiritActorSheet");
 const SR5SpriteActorSheet_1 = require("./actor/sheets/SR5SpriteActorSheet");
+const SR5Roll_1 = require("./rolls/SR5Roll");
 const PhysicalDefenseTest_1 = require("./tests/PhysicalDefenseTest");
-const AttackTest_1 = require("./tests/AttackTest");
+const RangedAttackTest_1 = require("./tests/RangedAttackTest");
+const SuccessTest_1 = require("./tests/SuccessTest");
+const OpposedTest_1 = require("./tests/OpposedTest");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 exports.SR5CONFIG = config_1.SR5;
 class HooksManager {
@@ -26662,7 +26664,7 @@ ___________________
             tests: {
                 SuccessTest: SuccessTest_1.SuccessTest,
                 OpposedTest: OpposedTest_1.OpposedTest,
-                AttackTest: AttackTest_1.AttackTest,
+                RangedAttackTest: RangedAttackTest_1.RangedAttackTest,
                 PhysicalDefenseTest: PhysicalDefenseTest_1.PhysicalDefenseTest
             }
         };
@@ -26737,12 +26739,11 @@ ___________________
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
             $(document).on('click', diceIconSelectorNew, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
             HooksManager.renderChatMessage();
-            console.error('TODO: Remove this dev implementation');
             const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Weapon (Ranged)');
             const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked');
             if (!item || !actor)
                 return;
-            const test = SuccessTest_1.SuccessTest.fromAction(item, actor);
+            const test = yield SuccessTest_1.SuccessTest.fromAction(item, actor);
             if (!test)
                 console.warn('Didnt work');
             yield (test === null || test === void 0 ? void 0 : test.execute());
@@ -26916,7 +26917,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":236,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":109,"./actor/sheets/SR5ICActorSheet":110,"./actor/sheets/SR5SpiritActorSheet":111,"./actor/sheets/SR5SpriteActorSheet":112,"./actor/sheets/SR5VehicleActorSheet":113,"./apps/ChangelogApplication":114,"./apps/EnvModifiersApplication":115,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":228,"./tests/AttackTest":231,"./tests/OpposedTest":232,"./tests/PhysicalDefenseTest":233,"./tests/SuccessTest":234,"./token/SR5Token":235}],168:[function(require,module,exports){
+},{"../test/quench":236,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":109,"./actor/sheets/SR5ICActorSheet":110,"./actor/sheets/SR5SpiritActorSheet":111,"./actor/sheets/SR5SpriteActorSheet":112,"./actor/sheets/SR5VehicleActorSheet":113,"./apps/ChangelogApplication":114,"./apps/EnvModifiersApplication":115,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":228,"./tests/OpposedTest":231,"./tests/PhysicalDefenseTest":232,"./tests/RangedAttackTest":233,"./tests/SuccessTest":234,"./token/SR5Token":235}],168:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30144,7 +30145,7 @@ class SR5Item extends Item {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.actor)
                 return;
-            const test = SuccessTest_1.SuccessTest.fromAction(this, this.actor);
+            const test = yield SuccessTest_1.SuccessTest.fromAction(this, this.actor);
             if (!test)
                 return;
             yield test.toMessage();
@@ -35115,39 +35116,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AttackTest = void 0;
-const SuccessTest_1 = require("./SuccessTest");
-const DataDefaults_1 = require("../data/DataDefaults");
-const PartsList_1 = require("../parts/PartsList");
-const helpers_1 = require("../helpers");
-class AttackTest extends SuccessTest_1.SuccessTest {
-    // TODO: Is this needed here?
-    _prepareData(data, options) {
-        data = super._prepareData(data, options);
-        data.values.damage = DataDefaults_1.DefaultValues.damageData();
-        return data;
-    }
-    processSuccess() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const parts = new PartsList_1.PartsList(this.data.damage.mod);
-            parts.addUniquePart('SR5.NetHits', this.netHits.value);
-            this.data.damage.value = helpers_1.Helpers.calcTotal(this.data.damage, { min: 0 });
-        });
-    }
-}
-exports.AttackTest = AttackTest;
-},{"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"./SuccessTest":234}],232:[function(require,module,exports){
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpposedTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
 const DataDefaults_1 = require("../data/DataDefaults");
@@ -35236,7 +35204,7 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.OpposedTest = OpposedTest;
-},{"../data/DataDefaults":153,"../parts/PartsList":220,"./SuccessTest":234}],233:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"./SuccessTest":234}],232:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35265,13 +35233,11 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     }
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
-            console.error('Before', this.damage);
             // TODO: Move this into a rules file.
             const parts = new PartsList_1.PartsList(this.damage.mod);
             parts.addPart('SR5.AttackHits', this.against.hits.value);
             parts.addPart('SR5.DefenderHits', -this.netHits.value);
             helpers_1.Helpers.calcTotal(this.damage, { min: 0 });
-            console.error('After', this.damage);
         });
     }
     get damage() {
@@ -35279,7 +35245,173 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
-},{"../apps/dialogs/PhysicalDefenseDialog":140,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"./OpposedTest":232}],234:[function(require,module,exports){
+},{"../apps/dialogs/PhysicalDefenseDialog":140,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"./OpposedTest":231}],233:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RangedAttackTest = void 0;
+const SuccessTest_1 = require("./SuccessTest");
+const DataDefaults_1 = require("../data/DataDefaults");
+const PartsList_1 = require("../parts/PartsList");
+const helpers_1 = require("../helpers");
+const TestDialog_1 = require("../apps/dialogs/TestDialog");
+const constants_1 = require("../constants");
+const config_1 = require("../config");
+class RangedAttackTest extends SuccessTest_1.SuccessTest {
+    // TODO: Is this needed here?
+    _prepareData(data, options) {
+        data = super._prepareData(data, options);
+        // TODO: these must go into some _prepareActorData during execution (async is needed)
+        data.fireModes = {};
+        data.fireMode = { value: 0, defense: 0, label: '' };
+        data.ranges = {};
+        data.recoilCompensation = 0;
+        data.damage = data.damage || DataDefaults_1.DefaultValues.damageData();
+        return data;
+    }
+    _prepareFireMode() {
+        var _a, _b;
+        // No firemodes selectable on dialog for invalid item provided.
+        const weaponData = (_a = this.item) === null || _a === void 0 ? void 0 : _a.asWeaponData();
+        if (!weaponData)
+            return;
+        // Firemodes selection.
+        const { modes } = weaponData.data.range;
+        if (modes.single_shot) {
+            this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
+        }
+        if (modes.semi_auto) {
+            this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSemiAutoShort");
+            this.data.fireModes['3'] = game.i18n.localize("SR5.WeaponModeSemiAutoBurst");
+        }
+        if (modes.burst_fire) {
+            this.data.fireModes['3'] = `${modes.semi_auto ? `${game.i18n.localize("SR5.WeaponModeSemiAutoBurst")}/` : ''}${game.i18n.localize("SR5.WeaponModeBurstFireShort")}`;
+            this.data.fireModes['6'] = game.i18n.localize("SR5.WeaponModeBurstFireLong");
+        }
+        if (modes.full_auto) {
+            this.data.fireModes['6'] = `${modes.burst_fire ? 'LB/' : ''}${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(s)`;
+            this.data.fireModes['10'] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
+            this.data.fireModes['20'] = game.i18n.localize('SR5.Suppressing');
+        }
+        // Current firemode selected
+        this.data.fireMode = ((_b = this.item) === null || _b === void 0 ? void 0 : _b.getLastFireMode()) || { value: 0, defense: 0, label: '' };
+    }
+    _prepareWeaponRanges() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            // Don't let missing weapon ranges break test.
+            const itemData = (_a = this.item) === null || _a === void 0 ? void 0 : _a.asWeaponData();
+            if (!itemData)
+                return;
+            // Transform weapon ranges to something useable
+            const { ranges } = itemData.data.range;
+            const { range_modifiers } = constants_1.SR.combat.environmental;
+            const newRanges = {};
+            for (const [key, value] of Object.entries(ranges)) {
+                const distance = value;
+                newRanges[key] = helpers_1.Helpers.createRangeDescription(config_1.SR5.weaponRanges[key], distance, range_modifiers[key]);
+            }
+            this.data.ranges = newRanges;
+            // TODO: template disableTargetRange
+            // Get currently active range modifier.
+            const actor = this.actor;
+            if (!actor)
+                return;
+            const modifiers = yield actor.getModifiers();
+            // If no range is active, set to zero.
+            this.data.range = modifiers.environmental.active.range || 0;
+        });
+    }
+    _prepareRecoilCompensation() {
+        var _a;
+        this.data.recoilCompensation = ((_a = this.item) === null || _a === void 0 ? void 0 : _a.getRecoilCompensation(true)) || 0;
+    }
+    prepareDocumentData() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this._prepareFireMode();
+            yield this._prepareWeaponRanges();
+            this._prepareRecoilCompensation();
+        });
+    }
+    _createTestDialog() {
+        return new TestDialog_1.TestDialog({ templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html',
+            test: this });
+    }
+    _alterTestDataFromDialogData() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: structure the resulting modifiers of these into this.data.Modifiers
+            // Alter data related to fire modes.
+            const { fireMode, fireModes } = this.data;
+            // Store current firemode for next test.
+            fireMode.value = Number(fireMode.value || 0);
+            const fireModeName = fireModes[fireMode.value];
+            const defenseModifier = helpers_1.Helpers.mapRoundsToDefenseDesc(fireMode.value);
+            this.data.fireMode = {
+                label: fireModeName,
+                value: fireMode.value,
+                defense: defenseModifier,
+            };
+            // Store for next usage.
+            yield ((_a = this.item) === null || _a === void 0 ? void 0 : _a.setLastFireMode(this.data.fireMode));
+            // alter data related to weapon ranges.
+            this.data.range = Number(this.data.range);
+            // Store for next usage;
+            const actor = this.actor;
+            if (!actor)
+                return;
+            const modifiers = yield actor.getModifiers();
+            if (!modifiers.hasActiveEnvironmentalOverwrite) {
+                modifiers.activateEnvironmentalCategory('range', this.data.range);
+                yield actor.setModifiers(modifiers);
+            }
+            else {
+                console.error('The actor has an active environmental overwrite, yet could define a manual range selection.');
+            }
+        });
+    }
+    prepareBaseValues() {
+        // Apply recoil modification
+        // TODO: Actual recoil calculation with consumption of recoil compensation.
+        const { fireMode, recoilCompensation } = this.data;
+        const recoil = recoilCompensation - fireMode.value;
+        const parts = new PartsList_1.PartsList(this.data.pool.mod);
+        if (recoil < 0)
+            parts.addUniquePart('SR5.Recoil', recoil);
+        else
+            parts.removePart('SR5.Recoil');
+        // Apply weapon range modification
+        if (this.data.range < 0)
+            parts.addUniquePart('SR5.Range', this.data.range);
+        else
+            parts.removePart('SR5.Range');
+    }
+    processResults() {
+        const _super = Object.create(null, {
+            processResults: { get: () => super.processResults }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            yield _super.processResults.call(this);
+        });
+    }
+    processSuccess() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const parts = new PartsList_1.PartsList(this.data.damage.mod);
+            parts.addUniquePart('SR5.NetHits', this.netHits.value);
+            this.data.damage.value = helpers_1.Helpers.calcTotal(this.data.damage, { min: 0 });
+        });
+    }
+}
+exports.RangedAttackTest = RangedAttackTest;
+},{"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"./SuccessTest":234}],234:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35319,6 +35451,7 @@ class SuccessTest {
         this.item = documents === null || documents === void 0 ? void 0 : documents.item;
         this.rolls = (documents === null || documents === void 0 ? void 0 : documents.rolls) || [];
         this.targets = [];
+        options = options || {};
         this.data = this._prepareData(data, options);
         this.calculateBaseValues();
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
@@ -35341,7 +35474,6 @@ class SuccessTest {
         data.sourceItemUuid = data.sourceItemUuid || ((_b = this.item) === null || _b === void 0 ? void 0 : _b.uuid);
         // @ts-ignore // Prepare general test information.
         data.title = data.title || this.constructor.label;
-        options = options || {};
         // @ts-ignore // In FoundryVTT core settings we shall trust.
         options.rollMode = options.rollMode || game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
         options.showDialog = options.showDialog || true;
@@ -35369,31 +35501,33 @@ class SuccessTest {
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
     static fromAction(item, actor, options) {
-        //@ts-ignore
-        if (!actor)
-            actor = item.parent;
-        if (!(actor instanceof SR5Actor_1.SR5Actor)) {
-            console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.");
-            return;
-        }
-        const action = item.getAction();
-        if (!action)
-            return;
-        // Determine what initial test type to use.
-        if (!action.test) {
-            action.test = 'SuccessTest';
-            console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
-        }
-        // @ts-ignore // Check for test class registration.
-        if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
-            console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
-            return;
-        }
-        // Any action item will return a list of values to create the test pool from.
-        // @ts-ignore // Get test class from registry to allow custom module tests.
-        const cls = game.shadowrun5e.tests[action.test];
-        const data = cls.getItemActionTestData(item, actor);
-        return new cls(data, { item, actor }, options);
+        return __awaiter(this, void 0, void 0, function* () {
+            //@ts-ignore
+            if (!actor)
+                actor = item.parent;
+            if (!(actor instanceof SR5Actor_1.SR5Actor)) {
+                console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.");
+                return;
+            }
+            const action = item.getAction();
+            if (!action)
+                return;
+            // Determine what initial test type to use.
+            if (!action.test) {
+                action.test = 'SuccessTest';
+                console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
+            }
+            // @ts-ignore // Check for test class registration.
+            if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
+                console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
+                return;
+            }
+            // Any action item will return a list of values to create the test pool from.
+            // @ts-ignore // Get test class from registry to allow custom module tests.
+            const cls = game.shadowrun5e.tests[action.test];
+            const data = yield cls.getItemActionTestData(item, actor);
+            return new cls(data, { item, actor }, options);
+        });
     }
     /**
      * Helper method to create a SuccessTest from given data.
@@ -35547,71 +35681,74 @@ class SuccessTest {
      * Test Data is structured around Values that can be modified.
      */
     static getItemActionTestData(item, actor) {
-        // Prepare general data structure with labeling.
-        const data = {
-            pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
-            limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
-            threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
-            damage: DataDefaults_1.DefaultValues.damageData(),
-            opposed: {}
-        };
-        // Try fetching the items action data.
-        const action = item.getAction();
-        if (!action || !actor)
+        return __awaiter(this, void 0, void 0, function* () {
+            // Prepare general data structure with labeling.
+            const data = {
+                pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
+                limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
+                threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
+                damage: DataDefaults_1.DefaultValues.damageData(),
+                opposed: {}
+            };
+            // Try fetching the items action data.
+            const action = item.getAction();
+            if (!action || !actor)
+                return data;
+            // Prepare pool values.
+            // TODO: Check if knowledge / language skills can be used for actions.
+            if (action.skill) {
+                const skill = actor.getSkill(action.skill);
+                if (skill)
+                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
+                // TODO: Check if this is actuall skill specialization and for a +2 config for it instead of MagicValue.
+                if (action.spec)
+                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', 2);
+            }
+            // The first attribute is either used for skill or attribute only tests.
+            if (action.attribute) {
+                const attribute = actor.getAttribute(action.attribute);
+                if (attribute)
+                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+            }
+            // The second attribute is only used for attribute only tests.
+            // TODO: Handle skill improvisation.
+            if (!action.skill && action.attribute2) {
+                const attribute = actor.getAttribute(action.attribute2);
+                if (attribute)
+                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+            }
+            if (action.mod) {
+                data.pool.base = Number(action.mod);
+            }
+            // Prepare limit values...
+            if (action.limit.attribute) {
+                const limit = actor.getLimit(action.limit.attribute);
+                if (limit)
+                    data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value, false);
+            }
+            if (action.limit.base || action.limit.value) {
+                data.limit.base = Number(action.limit.value);
+            }
+            // Prepare threshold values...
+            if (action.threshold.base) {
+                data.threshold.base = Number(action.threshold.base);
+            }
+            // Prepare general damage values...
+            if (action.damage.base) {
+                // TODO: Actual damage value calculation from actor to a numerical value.
+                data.damage = action.damage;
+            }
+            if (action.damage.attribute) {
+                const attribute = actor.getAttribute(action.damage.attribute);
+                console.error('Do attribute modification');
+                data.damage.mod = PartsList_1.PartsList.AddUniquePart(data.damage.mod, attribute.label, attribute.value);
+            }
+            // Prepare opposed tests...
+            if (action.opposed.test) {
+                data.opposed = action.opposed;
+            }
             return data;
-        // Prepare pool values.
-        // TODO: Check if knowledge / language skills can be used for actions.
-        if (action.skill) {
-            const skill = actor.getSkill(action.skill);
-            if (skill)
-                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
-            // TODO: Check if this is actuall skill specialization and for a +2 config for it instead of MagicValue.
-            if (action.spec)
-                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', 2);
-        }
-        // The first attribute is either used for skill or attribute only tests.
-        if (action.attribute) {
-            const attribute = actor.getAttribute(action.attribute);
-            if (attribute)
-                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-        }
-        // The second attribute is only used for attribute only tests.
-        // TODO: Handle skill improvisation.
-        if (!action.skill && action.attribute2) {
-            const attribute = actor.getAttribute(action.attribute2);
-            if (attribute)
-                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-        }
-        if (action.mod) {
-            data.pool.base = Number(action.mod);
-        }
-        // Prepare limit values...
-        if (action.limit.attribute) {
-            const limit = actor.getLimit(action.limit.attribute);
-            if (limit)
-                data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value, false);
-        }
-        if (action.limit.base || action.limit.value) {
-            data.limit.base = Number(action.limit.value);
-        }
-        // Prepare threshold values...
-        if (action.threshold.base) {
-            data.threshold.base = Number(action.threshold.base);
-        }
-        if (action.damage.base) {
-            // TODO: Actual damage value calculation from actor to a numerical value.
-            data.damage = action.damage;
-        }
-        if (action.damage.attribute) {
-            const attribute = actor.getAttribute(action.damage.attribute);
-            console.error('Do attribute modification');
-            data.damage.mod = PartsList_1.PartsList.AddUniquePart(data.damage.mod, attribute.label, attribute.value);
-        }
-        // Prepare opposed tests...
-        if (action.opposed.test) {
-            data.opposed = action.opposed;
-        }
-        return data;
+        });
     }
     /**
      * Create test data from an opposed message action.
@@ -35675,14 +35812,19 @@ class SuccessTest {
         return code;
     }
     /**
+     * Determine if this test can have a human-readable shadowrun test code representation.
+     *
      * All parts of the test code can be dynamic, any will do.
      */
     get hasCode() {
         return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
     }
+    /**
+     * Overwrite this method to alter the title of test dialogs and messages.
+     */
     get title() {
         // @ts-ignore
-        return `${game.i18n.localize(this.constructor.label)} (${this.code})`;
+        return `${game.i18n.localize(this.constructor.label)}`;
     }
     /**
      * Helper method to create the main SR5Roll.
@@ -35716,9 +35858,20 @@ class SuccessTest {
                 return false;
             // Overwrite current test state with whatever the dialog gives.
             this.data = data;
+            yield this._alterTestDataFromDialogData();
             return true;
         });
     }
+    /**
+     * Overwrite this method if you want to alter test data after dialog user selections been done.
+     */
+    _alterTestDataFromDialogData() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * Overwrite this method if you need to alter base values.
+     */
+    prepareBaseValues() { }
     /**
      * Calculate only the base test that can be calculated before the test has been evaluated.
      */
@@ -35738,11 +35891,14 @@ class SuccessTest {
                 if (!roll._evaluated)
                     yield roll.evaluate({ async: true });
             }
-            yield this.populateDocuments();
             this.calculateDerivedValues();
             return this;
         });
     }
+    /**
+     * Rehydrate this test with Documents, should they be missing.
+     * This can happen when a test is created from a ChatMessage.
+     */
     populateDocuments() {
         return __awaiter(this, void 0, void 0, function* () {
             // Fetch documents, when no reference has been made yet.
@@ -35757,6 +35913,12 @@ class SuccessTest {
                 }
             }
         });
+    }
+    /**
+     * Prepare missing data based on this tests Documents before anything else is done.
+     */
+    prepareDocumentData() {
+        return __awaiter(this, void 0, void 0, function* () { });
     }
     /**
      * Calculate the total of all values.
@@ -35980,6 +36142,8 @@ class SuccessTest {
      */
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.populateDocuments();
+            yield this.prepareDocumentData();
             // Allow user to change details.
             const userConsented = yield this.showDialog();
             if (!userConsented)
@@ -35989,6 +36153,7 @@ class SuccessTest {
             if (!actorConsumedResources)
                 return this;
             this.applyPushTheLimit();
+            this.prepareBaseValues();
             this.calculateBaseValues();
             this.createRoll();
             yield this.evaluate();
@@ -37369,7 +37534,7 @@ const shadowrunTesting = context => {
                 'data.attributes.body.base': 5,
                 'data.skills.active.automatics.base': 45 };
             const actor = yield testActor.create(actorData);
-            const test = SuccessTest_1.SuccessTest.fromAction(action, actor);
+            const test = yield SuccessTest_1.SuccessTest.fromAction(action, actor);
             if (test) {
                 yield test.toMessage();
             }

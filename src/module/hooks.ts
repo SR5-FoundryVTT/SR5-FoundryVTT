@@ -7,10 +7,8 @@ import { SR5Item } from './item/SR5Item';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
 import { SR5Token } from './token/SR5Token';
 import { ShadowrunRoller } from './rolls/ShadowrunRoller';
-import { Helpers } from './helpers';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 import { measureDistance } from './canvas';
-import * as chat from './chat';
 import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
@@ -26,18 +24,17 @@ import SocketMessage = Shadowrun.SocketMessageData;
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
 import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
+import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
+import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
+import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
+import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
+
 import {SR5Roll} from "./rolls/SR5Roll";
+import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
+import {RangedAttackTest} from "./tests/RangedAttackTest";
 import {SuccessTest} from "./tests/SuccessTest";
 import {OpposedTest} from "./tests/OpposedTest";
 
-import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
-import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
-import {SR5BaseActorSheet} from "./actor/sheets/SR5BaseActorSheet";
-import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
-import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
-import {TestDialog} from "./apps/dialogs/TestDialog";
-import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
-import {AttackTest} from "./tests/AttackTest";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -109,7 +106,7 @@ ___________________
             tests: {
                 SuccessTest,
                 OpposedTest,
-                AttackTest,
+                RangedAttackTest,
                 PhysicalDefenseTest
             }
         };
@@ -196,11 +193,10 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
         HooksManager.renderChatMessage();
-        console.error('TODO: Remove this dev implementation');
         const item = game.items?.getName('Weapon (Ranged)');
         const actor = game.actors?.getName('Char Linked');
         if (!item || !actor) return;
-        const test = SuccessTest.fromAction(item, actor);
+        const test = await SuccessTest.fromAction(item, actor);
         if (!test) console.warn('Didnt work');
         await test?.execute();
     }

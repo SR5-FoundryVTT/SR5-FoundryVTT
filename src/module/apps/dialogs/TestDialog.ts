@@ -15,10 +15,10 @@ export interface TestDialogData extends FormDialogData {
  */
 export class TestDialog extends FormDialog {
     data: TestDialogData
-    
+
     // @ts-ignore // TODO: default option value with all the values...
     constructor(data, options?: FormDialogOptions = {}) {
-        
+        // Allow for Sheet style form submit value handling.
         options.applyFormChangesOnSubmit = true;
         super(data, options);
     }
@@ -30,16 +30,23 @@ export class TestDialog extends FormDialog {
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
+        // @ts-ignore
+        options.width = 'auto';
         return options;
     }
 
+    /**
+     * Overwrite this method to provide an alternative template for the dialog inner content.
+     *
+     * data.templatePath work's the same and can be used as well.
+     */
     get templateContent(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
     }
 
     getData() {
         const data = super.getData() as unknown as TestDialogData;
-        
+
         //@ts-ignore //TODO: default to general roll mode user setting
         data.rollMode = data.test.data.options?.rollMode;
         data.rollModes = CONFIG.Dice.rollModes;
@@ -48,34 +55,17 @@ export class TestDialog extends FormDialog {
         return data;
     }
 
+    /**
+     * Overwrite this method to provide the dialog application title.
+     */
     get title() {
         const data = this.data as unknown as TestDialogData;
         return game.i18n.localize(data.test.title);
     }
 
-    static getDialogData(test: SuccessTest) {
-        console.error('TODO: Remove this method')
-        // roll mode handling.
-        // const rollMode = test.data.options?.rollMode;
-        // const rollModes = CONFIG.Dice.rollModes;
-
-        // const templateData = {
-        //     test,
-        //     rollMode,
-        //     rollModes
-        // };
-
-        
-
-        const onAfterClose = (html) => {
-            return test.data;
-        };
-
-        return {
-            onAfterClose
-        }
-    }
-
+    /**
+     * Overwrite this method to provide dialog buttons.
+     */
     get buttons() {
         return {
             roll: {
@@ -88,6 +78,10 @@ export class TestDialog extends FormDialog {
         };
     }
 
+    /**
+     * Callback for after the dialoge has closed.
+     * @param html
+     */
     onAfterClose(html: JQuery<HTMLElement>): SuccessTestData {
         return this.data.test.data;
     }

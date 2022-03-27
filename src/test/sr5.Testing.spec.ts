@@ -76,7 +76,7 @@ export const shadowrunTesting = context => {
                                'data.skills.active.automatics.base': 45};
             const actor = await testActor.create(actorData);
 
-            const test = SuccessTest.fromAction(action, actor);
+            const test = await SuccessTest.fromAction(action, actor);
 
             // For a broken test just fail.v
             if (!test) assert.strictEqual(true, false);
@@ -141,7 +141,7 @@ export const shadowrunTesting = context => {
                                'data.skills.active.automatics.base': 45};
             const actor = await testActor.create(actorData);
 
-            const test = SuccessTest.fromAction(action, actor);
+            const test = await SuccessTest.fromAction(action, actor);
 
             if (test) {
                 await test.toMessage();
