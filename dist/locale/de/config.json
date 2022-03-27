@@ -569,6 +569,7 @@
   "SR5.SourceFieldEmptyError": "Es wurde keine PDF-Quelle angegeben",
   "SR5.Help": "Hilfe",
   "SR5.ManualOverride": "Manualle Eingabe",
+  "SR5.Details": "Details",
 
   "SETTINGS": {
     "DiagonalMovementName": "Diagonale Bewegung",

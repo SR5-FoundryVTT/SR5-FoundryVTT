@@ -580,6 +580,12 @@
 .sr5 .dialog-content-column {
   width: 300px; }
 
+.sr5 .sunken select {
+  color: white; }
+
+.sr5 .sunken select option {
+  background-color: #414040; }
+
 @font-face {
   font-family: 'Nodesto';
   src: url("assets/fonts/NodestoCapsCondensed.otf"); }

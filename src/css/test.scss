@@ -1,11 +1,20 @@
 /**
  * CSS for Test Dialog styling.
  */
+@import 'config';
+
 .sr5 {
   .dialog-content-common {
 
   }
   .dialog-content-column {
     width: 300px;
+  }
+
+  .sunken select {
+    color: white;
+  }
+  .sunken select option {
+    background-color: $dark-sunken;
   }
 }

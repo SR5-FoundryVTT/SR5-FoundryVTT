@@ -843,7 +843,7 @@ export class SuccessTest {
 
         if (this.hasPushTheLimit) {
             if (this.actor.getEdge().uses <= 0) {
-                ui.notifications?.error(game.i18n.localize('SR5.ResourceConsumption.Edge'));
+                ui.notifications?.error(game.i18n.localize('SR5.MissingResource.Edge'));
                 return false;
             };
             await this.actor.useEdge();

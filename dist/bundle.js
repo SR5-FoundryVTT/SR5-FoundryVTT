@@ -36127,7 +36127,7 @@ class SuccessTest {
                 return false;
             if (this.hasPushTheLimit) {
                 if (this.actor.getEdge().uses <= 0) {
-                    (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error(game.i18n.localize('SR5.ResourceConsumption.Edge'));
+                    (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error(game.i18n.localize('SR5.MissingResource.Edge'));
                     return false;
                 }
                 ;
