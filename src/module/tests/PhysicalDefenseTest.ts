@@ -22,6 +22,9 @@ export class PhysicalDefenseTest extends OpposedTest {
         data = super._prepareData(data, options);
 
         data.values.damage = DefaultValues.damageData();
+        data.modifiers = {
+            'wounds': null
+        }
 
         return data;
     }

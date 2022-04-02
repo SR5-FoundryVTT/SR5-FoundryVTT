@@ -166,7 +166,7 @@ export class SuccessTest {
 
         data.values = data.values || {};
         data.opposed = data.opposed || undefined;
-        data.modfiers = data.modfiers || {};
+        data.modifiers = data.modifiers || {};
 
         return data;
     }
@@ -434,10 +434,7 @@ export class SuccessTest {
         // Prepare modifier values.
         if (action.modifiers || Array.isArray(action.modifiers)) {
             for (const type of action.modifiers) {
-                const modifiers = await actor.getModifiers();
-                const total = modifiers.getTotalForType(type);
-                const label = SR5.modifierTypes[type];
-                data.modifiers[type] = {total, type, label}
+                data.modifiers[type] = null
             }
         }
 
@@ -480,6 +477,13 @@ export class SuccessTest {
 
     static get label(): string {
         return `SR5.Tests.${this.name}`;
+    }
+
+    /**
+     * Determine if this test has any kind of modifier types active
+     */
+    get hasModifiers(): boolean {
+        return Object.values(this.data.modifiers).length > 0;
     }
 
     /**
@@ -597,10 +601,17 @@ export class SuccessTest {
      * Handle chosen modifier types and apply them to the pool modifiers.
      */
     applyPoolModifiers() {
+        if (!this.data.modifiers) return;
+
         const modifiers = Object.values(this.data.modifiers);
 
         const pool = new PartsList(this.pool.mod);
         for (const modifier of modifiers) {
+            // A modifier might have been asked for, but not given by the actor.
+            if (!modifier) {
+                console.warn(`Shadowrun 5e | ${this.constructor.name} has defined a modifier type which wasn't given by it's actor.`);
+                continue;
+            }
             pool.addUniquePart(modifier.label, modifier.total, true);
         }
     }
@@ -651,7 +662,15 @@ export class SuccessTest {
     /**
      * Prepare missing data based on this tests Documents before anything else is done.
      */
-    async prepareDocumentData() {}
+    async prepareDocumentData() {
+        if (!this.actor) return;
+
+        for (const type of Object.keys(this.data.modifiers) as string[]) {
+            const total = await this.actor.modifiers.totalFor(type);
+            const label = SR5.modifierTypes[type];
+            this.data.modifiers[type] = {type, label, total};
+        }
+    }
 
     /**
      * Calculate the total of all values.

@@ -22,11 +22,9 @@ export interface RangedAttackTestData extends SuccessTestData {
 export class RangedAttackTest extends SuccessTest {
     public data: RangedAttackTestData;
 
-    // TODO: Is this needed here?
     _prepareData(data, options): RangedAttackTestData {
         data = super._prepareData(data, options);
 
-        // TODO: these must go into some _prepareActorData during execution (async is needed)
         data.fireModes = {};
         data.fireMode = {value: 0, defense: 0, label: ''};
         data.ranges = {};
@@ -95,6 +93,8 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     async prepareDocumentData(){
+        await super.prepareDocumentData();
+
         this._prepareFireMode();
         await this._prepareWeaponRanges();
         this._prepareRecoilCompensation();

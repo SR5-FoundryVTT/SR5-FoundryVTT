@@ -4,7 +4,7 @@ import EnvironmentalModifiers = Shadowrun.EnvironmentalModifiers;
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
 import {ModifiableDocumentTypes} from "../apps/EnvModifiersApplication";
-import ModifierTypes = Shadowrun.ModifierTypes;
+import Modifier = Shadowrun.Modifier;
 
 export class Modifiers {
     data: SituationModifiers;
@@ -35,9 +35,9 @@ export class Modifiers {
 
     /**
      *
-     * @param type
+     * @param type A string which SHOULD be of type ModifierTypes
      */
-    getTotalForType(type: ModifierTypes): number {
+    getTotalForType(type: string): number {
         const modifier = this.modifiers[type] || {total: 0};
         return modifier.total;
     }
@@ -201,6 +201,12 @@ export class Modifiers {
         return {
             total: 0,
             active: {}
+        }
+    }
+
+    static getDefaultModifier(): Modifier {
+        return {
+            total: 0
         }
     }
 

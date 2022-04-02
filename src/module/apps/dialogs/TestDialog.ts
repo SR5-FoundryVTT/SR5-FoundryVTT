@@ -131,5 +131,8 @@ export class TestDialog extends FormDialog {
         // Second, apply generic values.
         // @ts-ignore
         foundry.utils.mergeObject(this.data, data)
+
+        this.data.test.prepareBaseValues();
+        this.data.test.calculateBaseValues();
     }
 }

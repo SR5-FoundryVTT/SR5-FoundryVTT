@@ -56,9 +56,16 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         }
     }
 
+    activateListeners(html: JQuery) {
+        super.activateListeners(html);
+
+        html.on("change", "input,select,textarea", this._onChangeInput.bind(this));
+    }
+
+
     async submit(button) {
         this.selectedButton = button.name ?? button.label;
-        
+
         this.applyFormData();
 
         super.submit(button);
@@ -74,7 +81,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
 
     /**
      * Allow Foundry Sheet behaviour for dialogs with complex forms.
-     * @returns 
+     * @returns
      */
     applyFormData() {
         //@ts-ignore // TODO: FormDialog class definition should override options,but doesn't.
@@ -168,13 +175,22 @@ export class FormDialog extends Dialog<FormDialogOptions> {
     async _renderInner(data): Promise<JQuery<HTMLElement>> {
         const templatePath = data.templatePath || this.templateContent;
         if (templatePath)
-            data.content = await renderTemplate(data.templatePath || this.templateContent, 
+            data.content = await renderTemplate(data.templatePath || this.templateContent,
                                                 data.templateData || data);
 
         const html = await super._renderInner(data);
         this.form = html.filter((i, el) => el instanceof HTMLFormElement)[0] as HTMLFormElement;
         if ( !this.form ) this.form = html.find("form")[0];
         return html;
+    }
+
+    async _onChangeInput(event) {
+        const el = event.target;
+        // Maybe submit the form
+        if ( this.options.applyFormChangesOnSubmit ) {
+            this.applyFormData();
+            this.render();
+        }
     }
 
     /**

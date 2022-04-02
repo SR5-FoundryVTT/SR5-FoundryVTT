@@ -60,6 +60,7 @@ import MatrixMarks = Shadowrun.MatrixMarks;
 import InventoryData = Shadowrun.InventoryData;
 import InventoriesData = Shadowrun.InventoriesData;
 import {InventoryFlow} from "./flows/InventoryFlow";
+import {ModifierFlow} from "./flows/ModifierFlow";
 
 function getGame(): Game {
     if (!(game instanceof Game)) {
@@ -93,11 +94,14 @@ export class SR5Actor extends Actor {
 
     // Holds all operations related to this actors inventory.
     inventory: InventoryFlow;
+    // Holds all operations related to fetching an actors modifiers.
+    modifiers: ModifierFlow;
 
     constructor(data, context?) {
         super(data, context);
 
         this.inventory = new InventoryFlow(this);
+        this.modifiers = new ModifierFlow(this);
     }
 
     getOverwatchScore() {
