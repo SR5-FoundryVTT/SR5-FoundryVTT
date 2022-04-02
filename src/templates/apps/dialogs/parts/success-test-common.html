@@ -33,7 +33,7 @@
         {{#each test.data.modifiers}}
         <div class="form-group">
             <label>{{localize this.label}}</label>
-            <input type="number" name="{{'test.data.modifiers.environmental.total'}}" data-dtype="number" value="{{this.total}}"/>
+            <input type="number" name="{{concatStrings 'test.data.modifiers.' this.type '.total'}}" data-dtype="number" value="{{this.total}}"/>
         </div>
         {{/each}}
     </div>
@@ -41,17 +41,17 @@
     <div class="sunken">
         <div class="form-group">
             <label>{{localize "SR5.DicePool"}}</label>
-            <input type='text' name='test.data.pool' dtype="number" size='3' maxlength='3' value='{{test.pool.value}}'
+            <input type='number' name='test.data.pool' dtype="number" size='3' maxlength='3' value='{{test.pool.value}}'
                    data-dtype="Number"/>
         </div>
         <div class="form-group">
             <label>{{localize "SR5.Limit"}}</label>
-            <input type='text' name='test.data.limit' dtype="number" size='3' maxlength='3' value='{{test.limit.value}}'
+            <input type='number' name='test.data.limit' dtype="number" size='3' maxlength='3' value='{{test.limit.value}}'
                    data-dtype="Number"/>
         </div>
         <div class="form-group">
             <label>{{localize "SR5.Threshold"}}</label>
-            <input type='text' name='test.data.threshold' dtype="number" size='3' maxlength='3'
+            <input type='number' name='test.data.threshold' dtype="number" size='3' maxlength='3'
                    value='{{test.threshold.value}}'
                    data-dtype="Number"/>
         </div>

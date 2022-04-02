@@ -35936,8 +35936,6 @@ class SuccessTest {
      */
     applyPoolModifiers() {
         const modifiers = Object.values(this.data.modifiers);
-        console.error(modifiers);
-        // if (!modifiers.length === 0) return;
         const pool = new PartsList_1.PartsList(this.pool.mod);
         for (const modifier of modifiers) {
             pool.addUniquePart(modifier.label, modifier.total, true);
