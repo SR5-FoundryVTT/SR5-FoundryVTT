@@ -21,13 +21,13 @@
     </div>
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.OpposedTest"}}
+            {{localize "SR5.Labels.Action.OpposedTest"}}
         </div>
         <div class="inputs">
             <select name="data.action.opposed.test">
                 {{#select data.action.opposed.test}}
                 <option value=""></option>
-                {{#each tests}}
+                {{#each opposedTests}}
                 <option value="{{this.name}}">{{localize this.label}}</option>
                 {{/each}}
                 {{/select}}

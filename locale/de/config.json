@@ -25,14 +25,12 @@
   "ITEM.TypeSprite_power": "Spritekraft",
   "ITEM.TypeWeapon": "Waffe",
   "ITEM.TypeHost": "Host",
-
   "SR5.FOUNDRY": {
     "Actor": "Akteur",
     "Scene": "Szene",
     "Item": "Gegenstand",
     "Token": "Token"
   },
-
   "SR5.SheetActor": "Actor Bogen",
   "SR5.SheetItem": "Item Bogen",
   "SR5.ItemTypes": {
@@ -63,6 +61,10 @@
     "Vehicle": "Fahrzeug",
     "Critter": "Critter",
     "IC": "IC"
+  },
+  "SR5.ModifierTypes": {
+    "Environmental": "Umgebung",
+    "Wounds": "Wunden"
   },
   "SR5.ActiveSkills": "Aktive Fertigkeiten",
   "SR5.Specializations": "Spezialisierungen",
@@ -570,7 +572,6 @@
   "SR5.Help": "Hilfe",
   "SR5.ManualOverride": "Manualle Eingabe",
   "SR5.Details": "Details",
-
   "SETTINGS": {
     "DiagonalMovementName": "Diagonale Bewegung",
     "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
@@ -634,6 +635,12 @@
       "SetMonitor": "Monitor muss manuell gesetzt werden",
       "PersonalInventory": "Am Körper",
       "CreateInventory": "Erstelle Inventar Ort"
+    },
+    "Action": {
+      "ActiveTest": "Probe",
+      "OpposedTest": "Vergleichsprobe",
+      "Modifiers": "Modifikatoren",
+      "Modifier": "Modifikator"
     },
     "Inventory": {
       "OpenInventory": "Inventar",
@@ -884,7 +891,7 @@
     "Total": "Ergebnis",
     "ClearModifiers": "Entferne eigene Modifikatoren"
   },
-  "SR5.MoveInventoryDialog" : {
+  "SR5.MoveInventoryDialog": {
     "Title": "Inventar auswählen",
     "Move": "Übertragen",
     "Cancel": "Abbrechen"
@@ -906,8 +913,8 @@
     }
   },
   "SR5.Tests": {
-    "SuccessTest": "Erfolg Probe",
-    "OpposedTest": "Vergleichende Probe",
+    "SuccessTest": "Erfolgsprobe",
+    "OpposedTest": "Vergleichsprobe",
     "ExtendedTest": "Ausgedehnte Probe",
     "PhysicalDefenseTest": "Physische Verteidigung",
     "RangedAttackTest": "Fernkampf Angriff",

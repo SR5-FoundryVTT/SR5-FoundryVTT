@@ -1113,6 +1113,9 @@
                         "radius": 0,
                         "dropoff": 0
                     }
+                },
+                "action": {
+                    "modifiers": ["environmental", "wounds"]
                 }
             },
             "technology": {
@@ -1186,7 +1189,8 @@
                         "skill": "",
                         "mod": 0,
                         "description": ""
-                    }
+                    },
+                    "modifiers": []
                 }
             },
             "action_result": {

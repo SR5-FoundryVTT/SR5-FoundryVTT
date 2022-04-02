@@ -1,16 +1,18 @@
 import {SR5Actor} from "../actor/SR5Actor";
-import {SR, SYSTEM_NAME, FLAGS, CORE_NAME, CORE_FLAGS} from "../constants";
+import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from "../constants";
 import {DefaultValues} from "../data/DataDefaults";
 import {Helpers} from "../helpers";
 import {SR5Item} from "../item/SR5Item";
 import {SR5Roll} from "../rolls/SR5Roll";
-import ValueField = Shadowrun.ValueField;
-import DamageData = Shadowrun.DamageData;
-import OpposedTestData = Shadowrun.OpposedTestData;
 import {PartsList} from "../parts/PartsList";
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 import {OpposedTest} from "./OpposedTest";
 import {TestDialog} from "../apps/dialogs/TestDialog";
+import ValueField = Shadowrun.ValueField;
+import DamageData = Shadowrun.DamageData;
+import OpposedTestData = Shadowrun.OpposedTestData;
+import ModifierTypes = Shadowrun.ModifierTypes;
+import {SR5} from "../config";
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -28,6 +30,15 @@ export interface SuccessTestValues extends TestValues {
     glitches: ValueField
 }
 
+interface TestModifier {
+    type: ModifierTypes
+    label: string
+    total: number
+}
+
+/**
+ * Contain all data necessary to handle an action based test.
+ */
 export interface TestData {
     title?: string
     // TODO: implement typing method to apply effects to and for ations.
@@ -44,6 +55,10 @@ export interface TestData {
     values: TestValues
 
     damage: DamageData
+
+    // A list of modifier descriptions to be used for this test.
+    // These are designed to work with SR5Actor.getModifier()
+    modifiers: Record<ModifierTypes, TestModifier>
 
     // Documents the test might has been derived from.
     sourceItemUuid?: string
@@ -149,8 +164,9 @@ export class SuccessTest {
         data.threshold = data.threshold || DefaultValues.valueData({label: 'SR5.Threshold'});
         data.limit = data.limit || DefaultValues.valueData({label: 'SR5.Limit'});
 
-        data.values = data.values || {}
+        data.values = data.values || {};
         data.opposed = data.opposed || undefined;
+        data.modfiers = data.modfiers || {};
 
         return data;
     }
@@ -190,9 +206,9 @@ export class SuccessTest {
         // Any action item will return a list of values to create the test pool from.
         // @ts-ignore // Get test class from registry to allow custom module tests.
         const cls = game.shadowrun5e.tests[action.test];
-        const data = await cls.getItemActionTestData(item, actor);
-
-        return new cls(data, {item, actor}, options);
+        const data = await cls._getItemActionTestData(item, actor);
+        const documents = {item, actor};
+        return new cls(data, documents, options);
     }
 
     /**
@@ -363,19 +379,20 @@ export class SuccessTest {
     /**
      * Test Data is structured around Values that can be modified.
      */
-    static async getItemActionTestData(item: SR5Item, actor: SR5Actor): Promise<SuccessTestData> {
+    static async _getItemActionTestData(item: SR5Item, actor: SR5Actor) {
         // Prepare general data structure with labeling.
         const data = {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
             damage: DefaultValues.damageData(),
+            modifiers: {},
             opposed: {}
         };
 
         // Try fetching the items action data.
         const action = item.getAction();
-        if (!action || !actor) return data as SuccessTestData;
+        if (!action || !actor) return data;
 
         // Prepare pool values.
         // TODO: Check if knowledge / language skills can be used for actions.
@@ -414,6 +431,16 @@ export class SuccessTest {
             data.threshold.base = Number(action.threshold.base);
         }
 
+        // Prepare modifier values.
+        if (action.modifiers || Array.isArray(action.modifiers)) {
+            for (const type of action.modifiers) {
+                const modifiers = await actor.getModifiers();
+                const total = modifiers.getTotalForType(type);
+                const label = SR5.modifierTypes[type];
+                data.modifiers[type] = {total, type, label}
+            }
+        }
+
         // Prepare general damage values...
         if (action.damage.base) {
             // TODO: Actual damage value calculation from actor to a numerical value.
@@ -430,7 +457,7 @@ export class SuccessTest {
             data.opposed = action.opposed;
         }
 
-        return data as SuccessTestData;
+        return data;
     }
 
     /**
@@ -561,7 +588,25 @@ export class SuccessTest {
     /**
      * Overwrite this method if you need to alter base values.
      */
-    prepareBaseValues() {}
+    prepareBaseValues() {
+        this.applyPushTheLimit();
+        this.applyPoolModifiers();
+    }
+
+    /**
+     * Handle chosen modifier types and apply them to the pool modifiers.
+     */
+    applyPoolModifiers() {
+        const modifiers = Object.values(this.data.modifiers);
+        console.error(modifiers);
+        // if (!modifiers.length === 0) return;
+
+        const pool = new PartsList(this.pool.mod);
+
+        for (const modifier of modifiers) {
+            pool.addUniquePart(modifier.label, modifier.total, true);
+        }
+    }
 
     /**
      * Calculate only the base test that can be calculated before the test has been evaluated.
@@ -860,6 +905,10 @@ export class SuccessTest {
         await this.populateDocuments();
         await this.prepareDocumentData();
 
+        // Initial base value preparation will show default result without any user input.
+        this.prepareBaseValues();
+        this.calculateBaseValues();
+
         // Allow user to change details.
         const userConsented = await this.showDialog();
         if (!userConsented) return this;
@@ -868,9 +917,10 @@ export class SuccessTest {
         const actorConsumedResources = await this.consumeActorResources();
         if (!actorConsumedResources) return this;
 
-        this.applyPushTheLimit();
+        // Second base value preparation will show changes due to user input.
         this.prepareBaseValues();
         this.calculateBaseValues();
+
         this.createRoll();
 
         await this.evaluate();

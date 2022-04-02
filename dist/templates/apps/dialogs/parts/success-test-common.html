@@ -28,6 +28,16 @@
     </div>
     {{/if}}
 
+    {{#if test.actor}}
+    <div class="sunken">
+        {{#each test.data.modifiers}}
+        <div class="form-group">
+            <label>{{localize this.label}}</label>
+            <input type="number" name="{{'test.data.modifiers.environmental.total'}}" data-dtype="number" value="{{this.total}}"/>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
     <div class="sunken">
         <div class="form-group">
             <label>{{localize "SR5.DicePool"}}</label>

@@ -342,6 +342,16 @@ export const SR5 = {
         global: 'SR5.Global',
     },
 
+    /**
+     * Modification types used for actions and general success tests.
+     *
+     * These are meant to be used with the Modifiers class and SR5Actor.getModifiers()
+     */
+    modifierTypes: {
+        'environmental': 'SR5.ModifierTypes.Environmental',
+        'wounds': 'SR5.ModifierTypes.Wounds'
+    },
+
     programTypes: {
         common_program: 'SR5.CommonProgram',
         hacking_program: 'SR5.HackingProgram',

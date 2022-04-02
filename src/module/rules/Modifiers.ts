@@ -3,9 +3,8 @@ import SituationModifiers = Shadowrun.SituationModifiers;
 import EnvironmentalModifiers = Shadowrun.EnvironmentalModifiers;
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
-import {Document} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/module.mjs";
-import {SR5Actor} from "../actor/SR5Actor";
 import {ModifiableDocumentTypes} from "../apps/EnvModifiersApplication";
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 export class Modifiers {
     data: SituationModifiers;
@@ -32,6 +31,15 @@ export class Modifiers {
 
     set modifiers(modifiers: SituationModifiers) {
         this.data = modifiers;
+    }
+
+    /**
+     *
+     * @param type
+     */
+    getTotalForType(type: ModifierTypes): number {
+        const modifier = this.modifiers[type] || {total: 0};
+        return modifier.total;
     }
 
     get environmental(): EnvironmentalModifiers {
@@ -215,8 +223,8 @@ export class Modifiers {
     }
 
     static async setModifiersOnEntity(document: ModifiableDocumentTypes, modifiers: SituationModifiers) {
-        // TODO: Ask league about unsetFlag behavoir...
-        // NOTE: Check if JSON stringifier works or not.
+        // Removing unsetFlag causes strange update behaviour...
+        // ...this behaviour has been observed at other updates on flags.
         await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
         await document.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
     }

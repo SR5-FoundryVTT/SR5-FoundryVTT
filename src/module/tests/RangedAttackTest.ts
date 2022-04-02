@@ -140,22 +140,23 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     prepareBaseValues() {
+        super.prepareBaseValues();
         // Apply recoil modification
         // TODO: Actual recoil calculation with consumption of recoil compensation.
         const {fireMode, recoilCompensation} = this.data;
 
         const recoil = recoilCompensation - fireMode.value;
-        const parts = new PartsList(this.data.pool.mod);
+        const pool = new PartsList(this.data.pool.mod);
         if (recoil < 0)
-            parts.addUniquePart('SR5.Recoil', recoil);
+            pool.addUniquePart('SR5.Recoil', recoil);
         else
-            parts.removePart('SR5.Recoil');
+            pool.removePart('SR5.Recoil');
 
         // Apply weapon range modification
         if (this.data.range < 0)
-            parts.addUniquePart('SR5.Range', this.data.range);
+            pool.addUniquePart('SR5.Range', this.data.range);
         else
-            parts.removePart('SR5.Range');
+            pool.removePart('SR5.Range');
     }
 
     async processResults() {

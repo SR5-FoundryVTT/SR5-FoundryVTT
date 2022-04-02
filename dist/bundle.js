@@ -23498,6 +23498,15 @@ exports.SR5 = {
         fade: 'SR5.RollFade',
         global: 'SR5.Global',
     },
+    /**
+     * Modification types used for actions and general success tests.
+     *
+     * These are meant to be used with the Modifiers class and SR5Actor.getModifiers()
+     */
+    modifierTypes: {
+        'environmental': 'SR5.ModifierTypes.Environmental',
+        'wounds': 'SR5.ModifierTypes.Wounds'
+    },
     programTypes: {
         common_program: 'SR5.CommonProgram',
         hacking_program: 'SR5.HackingProgram',
@@ -24983,6 +24992,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/action.html',
         'systems/shadowrun5e/dist/templates/item/parts/action_results.html',
+        'systems/shadowrun5e/dist/templates/item/parts/modifier.html',
         'systems/shadowrun5e/dist/templates/item/parts/damage.html',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.html',
         'systems/shadowrun5e/dist/templates/item/parts/spell.html',
@@ -26665,6 +26675,24 @@ ___________________
                 SuccessTest: SuccessTest_1.SuccessTest,
                 OpposedTest: OpposedTest_1.OpposedTest,
                 RangedAttackTest: RangedAttackTest_1.RangedAttackTest,
+                PhysicalDefenseTest: PhysicalDefenseTest_1.PhysicalDefenseTest
+            },
+            /**
+             * Subset of tests meant to be used as the main, active test.
+             *
+             * These will show up on actions when defining the main test to be used.
+             */
+            activeTests: {
+                SuccessTest: SuccessTest_1.SuccessTest,
+                RangedAttackTest: RangedAttackTest_1.RangedAttackTest
+            },
+            /**
+             * Subset of tests meant to be used as opposed tests.
+             *
+             * These will show up on actions when defining an opposed test.
+             */
+            opposedTests: {
+                OpposedTest: OpposedTest_1.OpposedTest,
                 PhysicalDefenseTest: PhysicalDefenseTest_1.PhysicalDefenseTest
             }
         };
@@ -31649,8 +31677,13 @@ class SR5ItemSheet extends ItemSheet {
         if (this.item.canBeNetworkDevice) {
             data['networkController'] = this.item.networkController;
         }
+        // Provide action parts with all test variantes.
         // @ts-ignore // TODO: put 'opposed test types' into config (see data.config)
         data.tests = game.shadowrun5e.tests;
+        // @ts-ignore
+        data.opposedTests = game.shadowrun5e.opposedTests;
+        // @ts-ignore
+        data.activeTests = game.shadowrun5e.activeTests;
         return data;
     }
     /**
@@ -31951,6 +31984,7 @@ class SR5ItemSheet extends ItemSheet {
     _onOwnedItemRemove(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
+            1;
             const userConsented = yield helpers_1.Helpers.confirmDeletion();
             if (!userConsented)
                 return;
@@ -34416,6 +34450,14 @@ class Modifiers {
     set modifiers(modifiers) {
         this.data = modifiers;
     }
+    /**
+     *
+     * @param type
+     */
+    getTotalForType(type) {
+        const modifier = this.modifiers[type] || { total: 0 };
+        return modifier.total;
+    }
     get environmental() {
         return this.data.environmental;
     }
@@ -34571,8 +34613,8 @@ class Modifiers {
     }
     static setModifiersOnEntity(document, modifiers) {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: Ask league about unsetFlag behavoir...
-            // NOTE: Check if JSON stringifier works or not.
+            // Removing unsetFlag causes strange update behaviour...
+            // ...this behaviour has been observed at other updates on flags.
             yield document.unsetFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Modifier);
             yield document.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Modifier, modifiers);
         });
@@ -35379,20 +35421,21 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
         });
     }
     prepareBaseValues() {
+        super.prepareBaseValues();
         // Apply recoil modification
         // TODO: Actual recoil calculation with consumption of recoil compensation.
         const { fireMode, recoilCompensation } = this.data;
         const recoil = recoilCompensation - fireMode.value;
-        const parts = new PartsList_1.PartsList(this.data.pool.mod);
+        const pool = new PartsList_1.PartsList(this.data.pool.mod);
         if (recoil < 0)
-            parts.addUniquePart('SR5.Recoil', recoil);
+            pool.addUniquePart('SR5.Recoil', recoil);
         else
-            parts.removePart('SR5.Recoil');
+            pool.removePart('SR5.Recoil');
         // Apply weapon range modification
         if (this.data.range < 0)
-            parts.addUniquePart('SR5.Range', this.data.range);
+            pool.addUniquePart('SR5.Range', this.data.range);
         else
-            parts.removePart('SR5.Range');
+            pool.removePart('SR5.Range');
     }
     processResults() {
         const _super = Object.create(null, {
@@ -35432,6 +35475,7 @@ const SR5Roll_1 = require("../rolls/SR5Roll");
 const PartsList_1 = require("../parts/PartsList");
 const ShadowrunTestDialog_1 = require("../apps/dialogs/ShadowrunTestDialog");
 const TestDialog_1 = require("../apps/dialogs/TestDialog");
+const config_1 = require("../config");
 /**
  * General handling of Shadowrun 5e success tests.
  *
@@ -35488,6 +35532,7 @@ class SuccessTest {
         data.limit = data.limit || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' });
         data.values = data.values || {};
         data.opposed = data.opposed || undefined;
+        data.modfiers = data.modfiers || {};
         return data;
     }
     /**
@@ -35525,8 +35570,9 @@ class SuccessTest {
             // Any action item will return a list of values to create the test pool from.
             // @ts-ignore // Get test class from registry to allow custom module tests.
             const cls = game.shadowrun5e.tests[action.test];
-            const data = yield cls.getItemActionTestData(item, actor);
-            return new cls(data, { item, actor }, options);
+            const data = yield cls._getItemActionTestData(item, actor);
+            const documents = { item, actor };
+            return new cls(data, documents, options);
         });
     }
     /**
@@ -35680,7 +35726,7 @@ class SuccessTest {
     /**
      * Test Data is structured around Values that can be modified.
      */
-    static getItemActionTestData(item, actor) {
+    static _getItemActionTestData(item, actor) {
         return __awaiter(this, void 0, void 0, function* () {
             // Prepare general data structure with labeling.
             const data = {
@@ -35688,6 +35734,7 @@ class SuccessTest {
                 limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
                 threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
                 damage: DataDefaults_1.DefaultValues.damageData(),
+                modifiers: {},
                 opposed: {}
             };
             // Try fetching the items action data.
@@ -35732,6 +35779,15 @@ class SuccessTest {
             // Prepare threshold values...
             if (action.threshold.base) {
                 data.threshold.base = Number(action.threshold.base);
+            }
+            // Prepare modifier values.
+            if (action.modifiers || Array.isArray(action.modifiers)) {
+                for (const type of action.modifiers) {
+                    const modifiers = yield actor.getModifiers();
+                    const total = modifiers.getTotalForType(type);
+                    const label = config_1.SR5.modifierTypes[type];
+                    data.modifiers[type] = { total, type, label };
+                }
             }
             // Prepare general damage values...
             if (action.damage.base) {
@@ -35871,7 +35927,22 @@ class SuccessTest {
     /**
      * Overwrite this method if you need to alter base values.
      */
-    prepareBaseValues() { }
+    prepareBaseValues() {
+        this.applyPushTheLimit();
+        this.applyPoolModifiers();
+    }
+    /**
+     * Handle chosen modifier types and apply them to the pool modifiers.
+     */
+    applyPoolModifiers() {
+        const modifiers = Object.values(this.data.modifiers);
+        console.error(modifiers);
+        // if (!modifiers.length === 0) return;
+        const pool = new PartsList_1.PartsList(this.pool.mod);
+        for (const modifier of modifiers) {
+            pool.addUniquePart(modifier.label, modifier.total, true);
+        }
+    }
     /**
      * Calculate only the base test that can be calculated before the test has been evaluated.
      */
@@ -36144,6 +36215,9 @@ class SuccessTest {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.populateDocuments();
             yield this.prepareDocumentData();
+            // Initial base value preparation will show default result without any user input.
+            this.prepareBaseValues();
+            this.calculateBaseValues();
             // Allow user to change details.
             const userConsented = yield this.showDialog();
             if (!userConsented)
@@ -36152,7 +36226,7 @@ class SuccessTest {
             const actorConsumedResources = yield this.consumeActorResources();
             if (!actorConsumedResources)
                 return this;
-            this.applyPushTheLimit();
+            // Second base value preparation will show changes due to user input.
             this.prepareBaseValues();
             this.calculateBaseValues();
             this.createRoll();
@@ -36397,7 +36471,7 @@ class SuccessTest {
 }
 exports.SuccessTest = SuccessTest;
 SuccessTest.CHAT_TEMPLATE = 'systems/shadowrun5e/dist/templates/rolls/success-test.html';
-},{"../actor/SR5Actor":86,"../apps/dialogs/ShadowrunTestDialog":142,"../apps/dialogs/TestDialog":143,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221}],235:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../apps/dialogs/ShadowrunTestDialog":142,"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221}],235:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -37479,7 +37553,7 @@ const shadowrunTesting = context => {
                 'data.attributes.body.base': 5,
                 'data.skills.active.automatics.base': 45 };
             const actor = yield testActor.create(actorData);
-            const test = SuccessTest_1.SuccessTest.fromAction(action, actor);
+            const test = yield SuccessTest_1.SuccessTest.fromAction(action, actor);
             // For a broken test just fail.v
             if (!test)
                 assert.strictEqual(true, false);

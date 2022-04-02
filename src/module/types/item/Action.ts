@@ -8,7 +8,8 @@ declare namespace Shadowrun {
     }
 
     export interface ActionRollData {
-        // The test class used for this action.
+        // Test test class used for the active action test
+        // Should be defined in game.shadowrun5e.activeTests
         test: string
         // The type of combat action to be performed.
         type: string
@@ -22,6 +23,7 @@ declare namespace Shadowrun {
         limit: LimitData
         threshold: BaseValuePair<number>
         extended: boolean
+        modifiers: ModifierTypes[]
         damage: DamageData
         opposed: OpposedTestData
         alt_mod: number
@@ -64,7 +66,7 @@ declare namespace Shadowrun {
      */
     export interface OpposedTestData {
         type: OpposedType
-        // TODO: Add test string type SuccessTest|OpposedTest
+        // Should match game.shadowrun5e.opposedTests
         test: string
         attribute: ActorAttribute
         attribute2: ActorAttribute

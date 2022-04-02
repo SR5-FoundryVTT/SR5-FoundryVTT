@@ -62,6 +62,10 @@
     "Critter": "Critter",
     "IC": "IC"
   },
+  "SR5.ModifierTypes": {
+    "Environmental": "Environmental",
+    "Wounds": "Wounds"
+  },
   "SR5.ActiveSkills": "Active Skills",
   "SR5.Specializations": "Specializations",
   "SR5.Specialization": "Specialization",
@@ -647,6 +651,12 @@
       "PersonalInventory": "On Person",
       "CreateInventory": "Create inventory place"
     },
+    "Action": {
+      "ActiveTest": "Test",
+      "OpposedTest": "Opposed Test",
+      "Modifiers": "Modifiers",
+      "Modifier": "Modifier"
+    },
     "Inventory": {
       "OpenInventory": "Inventory",
       "Carried": "Carried"
@@ -916,7 +926,7 @@
     "Total": "Result",
     "ClearModifiers": "Clear personal modifiers"
   },
-  "SR5.MoveInventoryDialog" : {
+  "SR5.MoveInventoryDialog": {
     "Title": "Choose an inventory",
     "Move": "Move",
     "Cancel": "Cancel"

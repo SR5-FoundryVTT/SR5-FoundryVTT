@@ -108,6 +108,24 @@ ___________________
                 OpposedTest,
                 RangedAttackTest,
                 PhysicalDefenseTest
+            },
+            /**
+             * Subset of tests meant to be used as the main, active test.
+             *
+             * These will show up on actions when defining the main test to be used.
+             */
+            activeTests: {
+                SuccessTest,
+                RangedAttackTest
+            },
+            /**
+             * Subset of tests meant to be used as opposed tests.
+             *
+             * These will show up on actions when defining an opposed test.
+             */
+            opposedTests: {
+                OpposedTest,
+                PhysicalDefenseTest
             }
         };
 

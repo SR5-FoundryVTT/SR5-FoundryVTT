@@ -4,6 +4,21 @@
     </div>
     <div class="form-line">
         <div class="label">
+            {{localize "SR5.Labels.Action.ActiveTest"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.test">
+                {{#select data.action.test}}
+                <option value=""></option>
+                {{#each activeTests}}
+                <option value="{{this.name}}">{{localize this.label}}</option>
+                {{/each}}
+                {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
             {{localize "SR5.ActionType"}}
         </div>
         <div class="inputs">
