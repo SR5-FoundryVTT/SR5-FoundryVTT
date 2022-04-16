@@ -537,6 +537,7 @@
   "SR5.WoundModifier": "Wound Mod",
   "SR5.ExtendedTest": "Extended Test",
   "SR5.IncomingDamage": "Incoming Damage",
+  "SR5.ModifiedDamage": "Mod. Damage",
   "SR5.Temporary": "Temporary",
   "SR5.SelectedTargets": "Selected Targets",
   "SR5.ApplyWounds": "Apply Wounds",

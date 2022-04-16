@@ -95,42 +95,23 @@ export class TestDialog extends FormDialog {
     _updateData(data) {
         // First, apply changes to ValueField style values in a way that makes sense.
         Object.entries(data).forEach(([key, value]) => {
+            // key is expected to be relative from TestDialog.data and begin with 'test'
             // @ts-ignore
             const valueField = foundry.utils.getProperty(this.data, key);
             if (foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
 
-            // This data point will be manually handled.
+            // Remove from further automatic data merging.
             delete data[key]
 
-            // No changes been made from default calculation.
+            // Don't apply an unneeded override.
             if (valueField.value === value) return;
 
-            // Override calculation path but keep parts, as to keep the original test code (Automatics + Agility)
-            const valueType = foundry.utils.getType(value);
-
-            // Determine correct 'no value' value to be used.
-            let zeroValue: any;
-            switch (valueType) {
-                case "boolean":
-                    zeroValue = false;
-                    break;
-                default:
-                    zeroValue = 0;
-            }
-
-            // Reset calculation while keeping all values for transparency.
-            valueField.base = zeroValue;
-            valueField.mod = valueField.mod.map(mod => {
-                mod.value = zeroValue;
-                return mod;
-            });
-            // Adding the manual override as only value.
-            valueField.mod = PartsList.AddUniquePart(valueField.mod, 'SR5.ManualOverride', value);
+            valueField.override = {name: 'SR5.ManualOverride', value};
         });
 
         // Second, apply generic values.
         // @ts-ignore
-        foundry.utils.mergeObject(this.data, data)
+        foundry.utils.mergeObject(this.data, data);
 
         this.data.test.prepareBaseValues();
         this.data.test.calculateBaseValues();

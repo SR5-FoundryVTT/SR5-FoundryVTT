@@ -3,7 +3,6 @@ import DamageData = Shadowrun.DamageData;
 import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import { Helpers } from "../helpers";
-import {TestDialog} from "../apps/dialogs/TestDialog";
 import FireModeData = Shadowrun.FireModeData;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
 import {SR} from "../constants";
@@ -19,6 +18,9 @@ export interface RangedAttackTestData extends SuccessTestData {
     range: number
 }
 
+/**
+ * TODO: Handle near misses (3 hits attacker, 3 hits defender) => No hit, but also no failure.
+ */
 export class RangedAttackTest extends SuccessTest {
     public data: RangedAttackTestData;
 
@@ -95,20 +97,20 @@ export class RangedAttackTest extends SuccessTest {
     async prepareDocumentData(){
         await super.prepareDocumentData();
 
-        this._prepareFireMode();
         await this._prepareWeaponRanges();
+        this._prepareFireMode();
         this._prepareRecoilCompensation();
     }
 
-    _createTestDialog(): TestDialog {
-        return new TestDialog({templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html',
-                                     test: this});
+    get _dialogTemplate(): string {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html';
     }
 
     async _alterTestDataFromDialogData() {
         // TODO: structure the resulting modifiers of these into this.data.Modifiers
         // Alter data related to fire modes.
         const {fireMode, fireModes} = this.data;
+
         // Store current firemode for next test.
         fireMode.value = Number(fireMode.value || 0);
         const fireModeName = fireModes[fireMode.value];
@@ -123,10 +125,9 @@ export class RangedAttackTest extends SuccessTest {
         // Store for next usage.
         await this.item?.setLastFireMode(this.data.fireMode);
 
-        // alter data related to weapon ranges.
+        // Alter test data for range.
         this.data.range = Number(this.data.range);
 
-        // Store for next usage;
         const actor = this.actor;
         if (!actor) return;
 
@@ -143,6 +144,7 @@ export class RangedAttackTest extends SuccessTest {
         super.prepareBaseValues();
         // Apply recoil modification
         // TODO: Actual recoil calculation with consumption of recoil compensation.
+        // TODO: Recoil Modifier handling should go through ModifierFlow and / or Modifiers
         const {fireMode, recoilCompensation} = this.data;
 
         const recoil = recoilCompensation - fireMode.value;
@@ -151,16 +153,6 @@ export class RangedAttackTest extends SuccessTest {
             pool.addUniquePart('SR5.Recoil', recoil);
         else
             pool.removePart('SR5.Recoil');
-
-        // Apply weapon range modification
-        if (this.data.range < 0)
-            pool.addUniquePart('SR5.Range', this.data.range);
-        else
-            pool.removePart('SR5.Range');
-    }
-
-    async processResults() {
-        await super.processResults();
     }
 
     async processSuccess(): Promise<void> {

@@ -184,9 +184,12 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         return html;
     }
 
+    /**
+     * Based on FormDialog.options configuration apply changes to data.
+     */
     async _onChangeInput(event) {
         const el = event.target;
-        // Maybe submit the form
+
         if ( this.options.applyFormChangesOnSubmit ) {
             this.applyFormData();
             this.render();

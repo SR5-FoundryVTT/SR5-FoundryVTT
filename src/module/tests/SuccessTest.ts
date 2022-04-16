@@ -13,6 +13,7 @@ import DamageData = Shadowrun.DamageData;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import {SR5} from "../config";
+import ActionData = Shadowrun.ActionData;
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -104,8 +105,6 @@ export class SuccessTest {
     public rolls: SR5Roll[];
 
     public targets: TokenDocument[]
-
-    static CHAT_TEMPLATE = 'systems/shadowrun5e/dist/templates/rolls/success-test.html';
 
     // TODO: include modifiers
     // TODO: store options in data for later re roll with same options?
@@ -505,14 +504,16 @@ export class SuccessTest {
 
     /**
      * Give a representation of this success test in the common Shadowrun 5 description style.
+     * The code given is meant to provide information about value sources. Should a user overwrite
+     * these values during dialog review, keep those hidden.
      *
      * Automatics + Agility + 3 (3) [2 + Physical]
      */
     get code(): string {
         // Add action dynamic value sources as labels.
-        const pool = this.pool.mod.map(mod => game.i18n.localize(mod.name));
-        const threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name));
-        const limit = this.limit.mod.map(mod => game.i18n.localize(mod.name));
+        let pool = this.pool.mod.map(mod => game.i18n.localize(mod.name));
+        let threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name));
+        let limit = this.limit.mod.map(mod => game.i18n.localize(mod.name));
 
         // Add action static value modifiers as numbers.
         if (this.pool.base > 0) pool.push(String(this.pool.base));
@@ -520,11 +521,11 @@ export class SuccessTest {
         if (this.limit.base > 0) limit.push(String(this.limit.base));
 
         // Pool portion can be dynamic or static.
-        let code = pool.join(' + ') || `${this.pool.value}`;
+        let code = pool.join(' + ').trim() || `${this.pool.value}`;
 
         // Only add threshold / limit portions when appropriate.
-        if (this.threshold.value > 0) code = `${code} (${threshold.join(' + ')})`;
-        if (this.limit.value > 0) code = `${code} [${limit.join(' + ')}]`;
+        if (threshold.length > 0 && this.threshold.value > 0) code = `${code} (${threshold.join(' + ').trim()})`;
+        if (limit.length > 0 && this.limit.value > 0) code = `${code} [${limit.join(' + ').trim()}]`;
 
         return code;
     }
@@ -557,13 +558,21 @@ export class SuccessTest {
         return roll;
     }
 
+    get _dialogTemplate(): string {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
+    }
+
+    get _chatMessageTemplate(): string {
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.html';
+    }
+
     /**
      * What TestDialog class to use for this test type?
      *
      * @override This method if you want to use a different TestDialog.
      */
     _createTestDialog() {
-        return new TestDialog({test: this});
+        return new TestDialog({test: this, template: this._dialogTemplate});
     }
 
     /**
@@ -601,11 +610,10 @@ export class SuccessTest {
      * Handle chosen modifier types and apply them to the pool modifiers.
      */
     applyPoolModifiers() {
-        if (!this.data.modifiers) return;
-
-        const modifiers = Object.values(this.data.modifiers);
-
         const pool = new PartsList(this.pool.mod);
+
+        // Apply modifiers configured for this test.
+        const modifiers = Object.values(this.data.modifiers || {});
         for (const modifier of modifiers) {
             // A modifier might have been asked for, but not given by the actor.
             if (!modifier) {
@@ -623,6 +631,8 @@ export class SuccessTest {
         this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
+
+        console.log(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
 
     /**
@@ -663,6 +673,13 @@ export class SuccessTest {
      * Prepare missing data based on this tests Documents before anything else is done.
      */
     async prepareDocumentData() {
+        await this.prepareActorModifiers();
+    }
+
+    /**
+     * Prepare modifiers based on the Actor document.
+     */
+    async prepareActorModifiers()  {
         if (!this.actor) return;
 
         for (const type of Object.keys(this.data.modifiers) as string[]) {
@@ -680,6 +697,8 @@ export class SuccessTest {
         this.data.values.hits = this.calculateHits();
         this.data.values.netHits = this.calculateNetHits();
         this.data.values.glitches = this.calculateGlitches();
+
+                console.log(`Shadowrun 5e | Calculated derived values for ${this.constructor.name}`, this.data);
     }
 
     /**
@@ -813,12 +832,9 @@ export class SuccessTest {
 
     /**
      * Helper to check if the current test state is unsuccessful.
-     *
-     * Since a test can only really be a failure when some threshold isn't met,
-     * only support failure when there is one.
      */
     get failure(): boolean {
-        return this.hasThreshold && this.netHits.value === 0;
+        return !this.success;
     }
 
     /**
@@ -906,7 +922,7 @@ export class SuccessTest {
             if (this.actor.getEdge().uses <= 0) {
                 ui.notifications?.error(game.i18n.localize('SR5.MissingResource.Edge'));
                 return false;
-            };
+            }
             await this.actor.useEdge();
         }
 
@@ -971,7 +987,7 @@ export class SuccessTest {
 
         // Prepare message content.
         const templateData = this._prepareTemplateData();
-        const content = await renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);
+        const content = await renderTemplate(this._chatMessageTemplate, templateData);
         // Prepare the actual message.
         const messageData = this._prepareMessageData(content);
         const message = await ChatMessage.create(messageData);
@@ -1034,16 +1050,6 @@ export class SuccessTest {
         };
 
         const {opposed} = this.data;
-
-        // if (opposed.type !== 'custom') {
-        //     action.label = testCls.label;
-        // } else if (opposed.skill) {
-        //     action.label = `${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
-        // } else if (opposed.attribute2) {
-        //     action.label = `${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
-        // } else if (opposed.attribute) {
-        //     action.label = `${Helpers.label(opposed.attribute)}`;
-        // }
 
         if (this.data.opposed.mod) {
             action.label += ` ${this.data.opposed.mod}`;

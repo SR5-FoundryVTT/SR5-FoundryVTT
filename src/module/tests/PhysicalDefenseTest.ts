@@ -3,17 +3,10 @@ import { Helpers } from "../helpers";
 import { PartsList } from "../parts/PartsList";
 import {OpposedTest, OpposedTestData, OpposedTestValues} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
-import {PhysicalDefenseDialog} from "../apps/dialogs/PhysicalDefenseDialog";
-
-
-interface PhysicalDefenseTestValues extends OpposedTestValues {
-    damage: Shadowrun.DamageData
-}
 
 export interface PhysicalDefenseTestData extends OpposedTestData {
-    values: PhysicalDefenseTestValues
+    modDamage: DamageData
 }
-
 
 export class PhysicalDefenseTest extends OpposedTest {
     public data: PhysicalDefenseTestData;
@@ -21,30 +14,33 @@ export class PhysicalDefenseTest extends OpposedTest {
     _prepareData(data, options?): any {
         data = super._prepareData(data, options);
 
-        data.values.damage = DefaultValues.damageData();
-        data.modifiers = {
-            'wounds': null
-        }
+        // Copy incoming damage to have a later display of both incoming and modified damage.
+        data.modDamage = foundry.utils.duplicate(data.against.damage);
 
         return data;
     }
 
-    _createTestDialog() {
-        return new PhysicalDefenseDialog({test: this});
+    get _chatMessageTemplate() {
+        return 'systems/shadowrun5e/dist/templates/rolls/physical-defense-test-message.html'
     }
 
-     async processSuccess() {
-
-        // TODO: Move this into a rules file.
-        const parts = new PartsList(this.damage.mod);
-        parts.addPart('SR5.AttackHits', this.against.hits.value);
-        parts.addPart('SR5.DefenderHits', -this.netHits.value);
-
-        Helpers.calcTotal(this.damage, {min: 0});
-
+    /**
+     * A DefenseTest is successful not when there are any netHits but as soon as the hits cross
+     * the threshold.
+     */
+    get success() {
+        return this.hits.value >= this.threshold.value;
     }
 
-    get damage(): DamageData {
-        return this.data.values.damage;
+    async processSuccess() {
+        // Don't
+        if (this.netHits.value > 0) {
+            // TODO: Move this into a rules file.
+            const parts = new PartsList(this.data.modDamage.mod);
+            // parts.addPart('SR5.AttackHits', this.against.hits.value);
+            parts.addPart('SR5.DefenderHits', -this.netHits.value);
+
+            Helpers.calcTotal(this.data.modDamage, {min: 0});
+        }
     }
 }

@@ -136,10 +136,10 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html',
 
-        // Tests
-        'systems/shadowrun5e/dist/templates/rolls/success-test.html',
+        // Test chat messages and their parts
+        'systems/shadowrun5e/dist/templates/rolls/success-test-message.html',
+        'systems/shadowrun5e/dist/templates/rolls/physical-defense-test-message.html',
 
-        // Rolls
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
     ];
 
