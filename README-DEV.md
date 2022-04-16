@@ -23,7 +23,7 @@ There are multiple gulp tasks available to help development:
 In general the application within FoundryVTT will use what's the build process puts into _dist/_, while most else isn't needed to function but only to provide sources.
 
 ## Unittesting
-Since 0.7.13 there is unit testing support using the FVTT Quench module (https://github.com/schultzcole/FVTT-Quench). This module isn't available on the Foundry VTT module store and needs to be manually installed by developers in order to run unittests within a Foundry environment. It's encouraged to do some unit testing where possible. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules.
+There is unit testing support using the FVTT Quench module. It's encouraged to do some unit testing where possible but it's not mandatory. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules. 
 
 ### Linking the dev and system folder
 It's helpful, but not strictly necessary, to place your development folder separate from the FoundryVTT system folder as a system update will overwrite your development folder otherwise. This can be done with linking the two.
