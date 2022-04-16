@@ -1,7 +1,6 @@
-import { DefaultValues } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
 import { PartsList } from "../parts/PartsList";
-import {OpposedTest, OpposedTestData, OpposedTestValues} from "./OpposedTest";
+import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
 
 export interface PhysicalDefenseTestData extends OpposedTestData {
@@ -33,7 +32,6 @@ export class PhysicalDefenseTest extends OpposedTest {
     }
 
     async processSuccess() {
-        // Don't
         if (this.netHits.value > 0) {
             // TODO: Move this into a rules file.
             const parts = new PartsList(this.data.modDamage.mod);
@@ -42,5 +40,9 @@ export class PhysicalDefenseTest extends OpposedTest {
 
             Helpers.calcTotal(this.data.modDamage, {min: 0});
         }
+    }
+
+    async processFailure() {
+
     }
 }

@@ -349,7 +349,24 @@ export const SR5 = {
      */
     modifierTypes: {
         'environmental': 'SR5.ModifierTypes.Environmental',
-        'wounds': 'SR5.ModifierTypes.Wounds'
+        'wounds': 'SR5.ModifierTypes.Wounds',
+        'global': 'SR5.Global',
+        'soak': 'SR5.Soak',
+    },
+
+    /**
+     * What modifiers should be used for each test type.
+     *
+     * NOTE: These modifiers are routed through ModifierFlow.totalFor()
+     * NOTE: Each key should be found within game.shadowrun5e.tests and match a SuccessTest subclass.
+     */
+    testModifiers: {
+        // TODO: Define test types.
+        // TODO: Add default modifiers for all test types.
+        'SuccessTest': ['global'],
+        'RangedAttackTest': ['global', 'wounds', 'environmental'],
+        'PhysicalDefenseTest': ['global', 'wounds'],
+        'PhysicalResistTest': ['global', 'soak']
     },
 
     programTypes: {

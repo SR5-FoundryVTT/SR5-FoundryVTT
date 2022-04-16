@@ -1115,7 +1115,9 @@
                     }
                 },
                 "action": {
-                    "modifiers": ["environmental", "wounds"]
+                    "opposed": {
+                        "test": "PhysicalDefenseTest"
+                    }
                 }
             },
             "technology": {

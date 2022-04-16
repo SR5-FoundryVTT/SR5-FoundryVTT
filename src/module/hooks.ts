@@ -34,6 +34,7 @@ import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
 import {RangedAttackTest} from "./tests/RangedAttackTest";
 import {SuccessTest} from "./tests/SuccessTest";
 import {OpposedTest} from "./tests/OpposedTest";
+import {PhysicalResistTest} from "./tests/PhysicalResistTest";
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -101,13 +102,14 @@ ___________________
             /**
              * .tests define what test implementation to use for each test type (key).
              * Should you want to override default behaviour for SuccessTest types, overwrite
-             * the SuccessTest class reference here.
+             * the SuccessTest class reference here
              */
             tests: {
                 SuccessTest,
                 OpposedTest,
                 RangedAttackTest,
-                PhysicalDefenseTest
+                PhysicalDefenseTest,
+                PhysicalResistTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -126,6 +128,14 @@ ___________________
             opposedTests: {
                 OpposedTest,
                 PhysicalDefenseTest
+            },
+            /**
+             * Subset of tests meant to be used as resist tests.
+             *
+             * Instead of showing on the action configuration these are connected to active or opposed test.
+             */
+            resistTests: {
+                PhysicalResistTest
             }
         };
 

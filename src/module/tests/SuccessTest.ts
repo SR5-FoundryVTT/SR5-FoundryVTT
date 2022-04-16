@@ -65,6 +65,9 @@ export interface TestData {
     sourceItemUuid?: string
     sourceActorUuid?: string
 
+    // Message the test has been represented with.
+    messageUuid?: string
+
     // Options the test was created with.
     options?: TestOptions
 }
@@ -133,7 +136,7 @@ export class SuccessTest {
      * @param options
      */
     _prepareData(data, options: TestOptions) {
-        data.type = data.type || this.constructor.name;
+        data.type = data.type || this.type;
 
         // Store the current users targeted token ids for later use.
         // @ts-ignore // undefined isn't allowed but it's excluded.
@@ -165,9 +168,27 @@ export class SuccessTest {
 
         data.values = data.values || {};
         data.opposed = data.opposed || undefined;
-        data.modifiers = data.modifiers || {};
+        data.modifiers = this._prepareModifiers(data.modifiers);
 
         return data;
+    }
+
+    /**
+     * Prepare a default modifier object.
+     *
+     * This should be used for whenever a Test doesn't modifiers specified externally.
+     */
+    _prepareModifiers(modifiers = {}) {
+        const testModifiers = SR5.testModifiers[this.constructor.name] || [];
+        testModifiers.forEach(modifier => {
+            if (!modifiers.hasOwnProperty(modifier))
+                modifiers[modifier] = null
+        });
+        return modifiers;
+    }
+
+    get type(): string {
+        return this.constructor.name;
     }
 
     /**
@@ -992,8 +1013,13 @@ export class SuccessTest {
         const messageData = this._prepareMessageData(content);
         const message = await ChatMessage.create(messageData);
 
+        if (!message) return;
+
+        // Store message id for future use.
+        this.data.messageUuid = message.uuid;
+
         // Prepare reuse of test data on subsequent tests after this one.
-        await message?.setFlag(SYSTEM_NAME, FLAGS.Test, this.toJSON());
+        await message.setFlag(SYSTEM_NAME, FLAGS.Test, this.toJSON());
 
         return message;
     }

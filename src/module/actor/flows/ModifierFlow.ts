@@ -16,7 +16,7 @@ export class ModifierFlow {
 
     async totalFor(type: string): Promise<number> {
         // Get special cases that need local handling.
-        if (this.hasOwnProperty(type)) return this[type];
+        if (this[type] !== undefined) return this[type];
 
         // Get global modifiers that can come from the general modifier system.
         const modifiers = await this.document.getModifiers();
