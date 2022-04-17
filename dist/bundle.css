@@ -566,195 +566,170 @@
   cursor: pointer;
   color: #6495ed; }
 
-.flexrow {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start; }
-
-.nowrap {
-  flex-wrap: nowrap; }
-
-.align-start {
-  align-items: flex-start; }
-
-.center {
-  justify-content: center; }
-
-.flex-end {
-  justify-content: flex-end; }
-
-.space-between {
-  justify-content: space-between; }
-
-.space-around {
-  justify-content: space-around; }
-
-.align-center {
-  align-items: center; }
-
-.flexcol-rev {
-  display: flex;
-  flex-direction: column-reverse;
-  flex-wrap: nowrap; }
-  .flexcol-rev > * {
-    flex: 0; }
-
-.flexcol {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap; }
-  .flexcol > * {
-    flex: 0; }
-
-.align-items-center {
-  align-items: center; }
-
-.align-content-center {
-  align-content: center; }
-
-.flex0 {
-  flex: 0; }
-
-.flex1 {
-  flex: 1; }
-
-.flex2 {
-  flex: 2; }
-
-.flex3 {
-  flex: 3; }
-
-.flex4 {
-  flex: 4; }
-
-.input {
-  position: relative; }
-  .input .unit {
-    color: white;
-    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-    position: absolute;
-    display: block;
-    left: 5px;
-    top: 2px;
-    z-index: 9; }
-
-label.checkbox {
-  display: block;
-  position: relative;
-  top: 0;
-  left: 0;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none; }
-  label.checkbox:hover input ~ .checkmark {
-    text-shadow: 0 0 0.2em darkblue; }
-  label.checkbox.init-edge-label {
-    margin-right: 1.75em;
-    font-size: 0.75em;
-    top: 0.95em;
-    left: -0.5em; }
-  label.checkbox input {
-    cursor: pointer; }
-  label.checkbox input.hidden {
-    position: absolute;
-    opacity: 0;
-    height: 0;
-    width: 0; }
-  label.checkbox .checkmark {
-    position: absolute;
-    font-size: 1.25em;
-    top: -0.5em;
-    left: 0.8em; }
-
-button.plus1_button {
-  padding: 2px;
-  color: black;
-  line-height: 0;
-  flex: 0;
-  background: rgba(230, 230, 230, 0.1);
-  border-radius: 0.3em;
-  text-align: center; }
-  button.plus1_button:hover {
-    cursor: pointer; }
-
-input[type='checkbox'].hidden {
-  display: none; }
-
-input[type='checkbox'].display {
-  background: transparent;
-  color: white;
-  border: none;
-  text-align: center;
-  font-size: 1em; }
-  input[type='checkbox'].display:hover {
-    background: transparent;
-    border: 1px solid #4d4d4d; }
-
-input[type='text'].disabled-for-display {
-  color: black;
-  background-color: rgba(0, 0, 0, 0); }
-
-input[type='text'].display {
-  color: white;
-  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-  background: rgba(230, 230, 230, 0.1);
-  color: white;
-  border-radius: 0.3em;
-  border-color: black;
-  text-align: center;
-  min-height: 1em; }
-  input[type='text'].display::placeholder {
-    color: #b3b3b3; }
-  input[type='text'].display.short {
-    font-size: 0.75em;
-    background: rgba(77, 77, 77, 0.1); }
-  input[type='text'].display.text {
-    background: rgba(77, 77, 77, 0.1);
-    border-radius: 0; }
-  input[type='text'].display.right {
-    text-align: right; }
-  input[type='text'].display.left {
-    text-align: left; }
-  input[type='text'].display:disabled {
-    color: white;
-    background: transparent;
-    border-color: transparent;
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: 0;
-    margin-right: 0; }
-
-.invisible {
-  visibility: hidden; }
-
-.show-child-on-hover .child-on-hover {
-  visibility: hidden; }
-
-.show-child-on-hover:hover .child-on-hover {
-  visibility: visible; }
-
-select.display {
-  color: white;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 0.3em;
-  border-color: #4d4d4d; }
-  select.display > option {
-    background-color: #4d4d4d; }
-
 .sr5 {
   /**
-     * Elements used for inline editing
-     */
+   * Change global foundry classes only in shadowrun5e applications.
+   */
   /**
-     * Elements used for linkable documents / entities.
-     */
+   * Elements used for inline editing
+   */
+  /**
+   * Elements used for linkable documents / entities.
+   */
   /** CSS for the Environmental Modifier Application Window
-     *
-     */
+   *
+   */
   /** Input element for inventory name editing */ }
+  .sr5 .flexrow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start; }
+  .sr5 .nowrap {
+    flex-wrap: nowrap; }
+  .sr5 .align-start {
+    align-items: flex-start; }
+  .sr5 .center {
+    justify-content: center; }
+  .sr5 .flex-end {
+    justify-content: flex-end; }
+  .sr5 .space-between {
+    justify-content: space-between; }
+  .sr5 .space-around {
+    justify-content: space-around; }
+  .sr5 .align-center {
+    align-items: center; }
+  .sr5 .flexcol-rev {
+    display: flex;
+    flex-direction: column-reverse;
+    flex-wrap: nowrap; }
+    .sr5 .flexcol-rev > * {
+      flex: 0; }
+  .sr5 .flexcol {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap; }
+    .sr5 .flexcol > * {
+      flex: 0; }
+  .sr5 .align-items-center {
+    align-items: center; }
+  .sr5 .align-content-center {
+    align-content: center; }
+  .sr5 .flex0 {
+    flex: 0; }
+  .sr5 .flex1 {
+    flex: 1; }
+  .sr5 .flex2 {
+    flex: 2; }
+  .sr5 .flex3 {
+    flex: 3; }
+  .sr5 .flex4 {
+    flex: 4; }
+  .sr5 .input {
+    position: relative; }
+    .sr5 .input .unit {
+      color: white;
+      text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+      position: absolute;
+      display: block;
+      left: 5px;
+      top: 2px;
+      z-index: 9; }
+  .sr5 label.checkbox {
+    display: block;
+    position: relative;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none; }
+    .sr5 label.checkbox:hover input ~ .checkmark {
+      text-shadow: 0 0 0.2em darkblue; }
+    .sr5 label.checkbox.init-edge-label {
+      margin-right: 1.75em;
+      font-size: 0.75em;
+      top: 0.95em;
+      left: -0.5em; }
+    .sr5 label.checkbox input {
+      cursor: pointer; }
+    .sr5 label.checkbox input.hidden {
+      position: absolute;
+      opacity: 0;
+      height: 0;
+      width: 0; }
+    .sr5 label.checkbox .checkmark {
+      position: absolute;
+      font-size: 1.25em;
+      top: -0.5em;
+      left: 0.8em; }
+  .sr5 button.plus1_button {
+    padding: 2px;
+    color: black;
+    line-height: 0;
+    flex: 0;
+    background: rgba(230, 230, 230, 0.1);
+    border-radius: 0.3em;
+    text-align: center; }
+    .sr5 button.plus1_button:hover {
+      cursor: pointer; }
+  .sr5 input[type='checkbox'].hidden {
+    display: none; }
+  .sr5 input[type='checkbox'].display {
+    background: transparent;
+    color: white;
+    border: none;
+    text-align: center;
+    font-size: 1em; }
+    .sr5 input[type='checkbox'].display:hover {
+      background: transparent;
+      border: 1px solid #4d4d4d; }
+  .sr5 input[type='text'].disabled-for-display {
+    color: black;
+    background-color: rgba(0, 0, 0, 0); }
+  .sr5 input[type='text'].display {
+    color: white;
+    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+    background: rgba(230, 230, 230, 0.1);
+    color: white;
+    border-radius: 0.3em;
+    border-color: black;
+    text-align: center;
+    min-height: 1em; }
+    .sr5 input[type='text'].display::placeholder {
+      color: #b3b3b3; }
+    .sr5 input[type='text'].display.short {
+      font-size: 0.75em;
+      background: rgba(77, 77, 77, 0.1); }
+    .sr5 input[type='text'].display.text {
+      background: rgba(77, 77, 77, 0.1);
+      border-radius: 0; }
+    .sr5 input[type='text'].display.right {
+      text-align: right; }
+    .sr5 input[type='text'].display.left {
+      text-align: left; }
+    .sr5 input[type='text'].display:disabled {
+      color: white;
+      background: transparent;
+      border-color: transparent;
+      padding-left: 0;
+      padding-right: 0;
+      margin-left: 0;
+      margin-right: 0; }
+  .sr5 .invisible {
+    visibility: hidden; }
+  .sr5 .show-child-on-hover .child-on-hover {
+    visibility: hidden; }
+  .sr5 .show-child-on-hover:hover .child-on-hover {
+    visibility: visible; }
+  .sr5 select.display {
+    color: white;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 0.3em;
+    border-color: #4d4d4d; }
+    .sr5 select.display > option {
+      background-color: #4d4d4d; }
   .sr5 .inline-input-inventory {
     display: none; }
   .sr5 .entity-link {
@@ -1013,6 +988,9 @@ select.display {
       .sr5 .list-item .item-desc .description {
         margin: 0.5em 0.25em;
         padding: 0.5em; }
+    .sr5 .list-item .action-icon {
+      padding-left: 3px;
+      padding-right: 3px; }
     .sr5 .list-item .item-icons {
       display: flex;
       flex-flow: row nowrap;
