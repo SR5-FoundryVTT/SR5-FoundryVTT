@@ -4,96 +4,118 @@
 @import 'chat';
 
 @font-face {
-    font-family: 'Nodesto';
-    src: url('assets/fonts/NodestoCapsCondensed.otf');
+  font-family: 'Nodesto';
+  src: url('assets/fonts/NodestoCapsCondensed.otf');
 }
 
 // .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
 .Roll {
-    @include rollable;
+  @include rollable;
 }
 
-.flexrow {
+
+.sr5 {
+  /**
+   * Change global foundry classes only in shadowrun5e applications.
+   */
+  .flexrow {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
-}
-.nowrap {
+  }
+
+  .nowrap {
     flex-wrap: nowrap;
-}
-.align-start {
+  }
+
+  .align-start {
     align-items: flex-start;
-}
-.center {
+  }
+
+  .center {
     justify-content: center;
-}
-.flex-end {
+  }
+
+  .flex-end {
     justify-content: flex-end;
-}
-.space-between {
+  }
+
+  .space-between {
     justify-content: space-between;
-}
-.space-around {
+  }
+
+  .space-around {
     justify-content: space-around;
-}
-.align-center {
+  }
+
+  .align-center {
     align-items: center;
-}
-.flexcol-rev {
+  }
+
+  .flexcol-rev {
     display: flex;
     flex-direction: column-reverse;
     flex-wrap: nowrap;
 
     > * {
-        flex: 0;
+      flex: 0;
     }
-}
-.flexcol {
+  }
+
+  .flexcol {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
 
     > * {
-        flex: 0;
+      flex: 0;
     }
-}
-.align-items-center {
+  }
+
+  .align-items-center {
     align-items: center;
-}
-.align-content-center {
-    align-content: center;
-}
-.flex0 {
-    flex: 0;
-}
-.flex1 {
-    flex: 1;
-}
-.flex2 {
-    flex: 2;
-}
-.flex3 {
-    flex: 3;
-}
-.flex4 {
-    flex: 4;
-}
+  }
 
-.input {
+  .align-content-center {
+    align-content: center;
+  }
+
+  .flex0 {
+    flex: 0;
+  }
+
+  .flex1 {
+    flex: 1;
+  }
+
+  .flex2 {
+    flex: 2;
+  }
+
+  .flex3 {
+    flex: 3;
+  }
+
+  .flex4 {
+    flex: 4;
+  }
+
+  .input {
     position: relative;
+
     .unit {
-        @include textOutline;
-        position: absolute;
-        display: block;
-        left: 5px;
-        top: 2px;
-        z-index: 9;
+      @include textOutline;
+      position: absolute;
+      display: block;
+      left: 5px;
+      top: 2px;
+      z-index: 9;
     }
 
-}
+  }
 
-label.checkbox {
+  label.checkbox {
     display: block;
     position: relative;
     top: 0;
@@ -103,36 +125,38 @@ label.checkbox {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+
     &:hover input ~ .checkmark {
-        text-shadow: 0 0 0.2em $rollcolor;
+      text-shadow: 0 0 0.2em $rollcolor;
     }
+
     &.init-edge-label {
-        margin-right: 1.75em;
-        font-size: 0.75em;
-        top: 0.95em;
-        left: -0.5em;
+      margin-right: 1.75em;
+      font-size: 0.75em;
+      top: 0.95em;
+      left: -0.5em;
     }
 
     input {
-        cursor: pointer;
+      cursor: pointer;
     }
 
     input.hidden {
-        position: absolute;
-        opacity: 0;
-        height: 0;
-        width: 0;
+      position: absolute;
+      opacity: 0;
+      height: 0;
+      width: 0;
     }
 
     .checkmark {
-        position: absolute;
-        font-size: 1.25em;
-        top: -0.5em;
-        left: 0.8em;
+      position: absolute;
+      font-size: 1.25em;
+      top: -0.5em;
+      left: 0.8em;
     }
-}
+  }
 
-button.plus1_button {
+  button.plus1_button {
     padding: 2px;
     color: $black;
     line-height: 0;
@@ -140,33 +164,35 @@ button.plus1_button {
     background: rgba($light, 0.1);
     border-radius: 0.3em;
     text-align: center;
+
     &:hover {
-        cursor: pointer;
+      cursor: pointer;
     }
-}
+  }
 
-input[type='checkbox'].hidden {
+  input[type='checkbox'].hidden {
     display: none;
-}
+  }
 
-input[type='checkbox'].display {
+  input[type='checkbox'].display {
     background: transparent;
     color: $color;
     border: none;
     text-align: center;
     font-size: 1em;
-    &:hover {
-        background: transparent;
-        border: $groove;
-    }
-}
 
-input[type='text'].disabled-for-display {
+    &:hover {
+      background: transparent;
+      border: $groove;
+    }
+  }
+
+  input[type='text'].disabled-for-display {
     color: $black;
     background-color: rgba(0, 0, 0, 0);
-}
+  }
 
-input[type='text'].display {
+  input[type='text'].display {
     @include textOutline;
     background: rgba($light, 0.1);
     color: $color;
@@ -174,606 +200,699 @@ input[type='text'].display {
     border-color: $black;
     text-align: center;
     min-height: 1em;
+
     &::placeholder {
-        color: $light-2;
+      color: $light-2;
     }
+
     &.short {
-        font-size: 0.75em;
-        background: rgba($dark, 0.1);
+      font-size: 0.75em;
+      background: rgba($dark, 0.1);
     }
+
     &.text {
-        background: rgba($dark, 0.1);
-        border-radius: 0;
+      background: rgba($dark, 0.1);
+      border-radius: 0;
     }
+
     &.right {
-        text-align: right;
+      text-align: right;
     }
+
     &.left {
-        text-align: left;
+      text-align: left;
     }
+
     &:disabled {
-        color: $color;
-        background: transparent;
-        border-color: transparent;
-        padding-left: 0;
-        padding-right: 0;
-        margin-left: 0;
-        margin-right: 0;
+      color: $color;
+      background: transparent;
+      border-color: transparent;
+      padding-left: 0;
+      padding-right: 0;
+      margin-left: 0;
+      margin-right: 0;
     }
-}
+  }
 
-.invisible {
+  .invisible {
     visibility: hidden;
-}
+  }
 
-.show-child-on-hover {
+  .show-child-on-hover {
     .child-on-hover {
-        visibility: hidden;
+      visibility: hidden;
     }
-    &:hover {
-        .child-on-hover {
-            visibility: visible;
-        }
-    }
-}
 
-select.display {
+    &:hover {
+      .child-on-hover {
+        visibility: visible;
+      }
+    }
+  }
+
+  select.display {
     color: $color;
     background: rgba($black, 0.05);
     border-radius: 0.3em;
     border-color: $dark;
+
     > option {
-        background-color: $dark;
+      background-color: $dark;
     }
-}
+  }
 
-.sr5 {
-    /**
-     * Elements used for inline editing
-     */
-    .inline-input-inventory {
-        display: none;
+  /**
+   * Elements used for inline editing
+   */
+  .inline-input-inventory {
+    display: none;
+  }
+
+  /**
+   * Elements used for linkable documents / entities.
+   */
+  .entity-link {
+    color: $black;
+  }
+
+  // An origin link is a uuid based entity link, without drag support.
+  .origin-link {
+    background: #DDD;
+    padding: 1px 4px;
+    border: 1px solid #4b4a44;
+    border-radius: 2px;
+    white-space: nowrap;
+    word-break: break-all;
+    color: $black;
+  }
+
+  .roll {
+    @include rollable;
+  }
+
+  .editor {
+    height: 95%;
+    width: 100%;
+  }
+
+  .editor .tox-edit-area {
+    background: $mce-background;
+  }
+
+
+  .parts-list {
+    font-size: 12px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+
+    &.vertical {
+      flex-flow: column nowrap;
+      justify-content: flex-end;
+      align-items: flex-end;
     }
 
-    /**
-     * Elements used for linkable documents / entities.
-     */
-    .entity-link {
-        color: $black;
+    .part {
+      white-space: nowrap;
+
+      .value {
+        font-weight: bold;
+      }
+
+      &.underline {
+        text-decoration: underline;
+      }
     }
 
-    // An origin link is a uuid based entity link, without drag support.
-    .origin-link {
-          background: #DDD;
-          padding: 1px 4px;
-          border: 1px solid #4b4a44;
-          border-radius: 2px;
-          white-space: nowrap;
-          word-break: break-all;
-          color: $black;
+    > * {
+      margin: 0 0.5em;
+    }
+  }
+
+  .no-break {
+    white-space: nowrap;
+  }
+
+  .window-content {
+    font-size: 115%;
+    background: $sheetbackground;
+    color: $color;
+    overflow: hidden;
+  }
+
+  // Only alter editor height scaling for item descriptions, not actor bio where space is needed.
+  .description > .editor {
+    height: 15em;
+    width: 100%;
+    color: $color;
+  }
+
+  .border-right {
+    border-right: $groove;
+  }
+
+  .scroll-area {
+    height: 100%;
+    margin-bottom: 0.5em;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .profile-img {
+    padding: 0.25em;
+    max-width: 100px;
+    //border-right: $groove;
+    //border-bottom: $groove;
+  }
+
+  .tabs {
+    flex: 0;
+    margin: 0.25em;
+    margin-bottom: -5px;
+    border-bottom: 1px solid $light-border;
+    align-items: stretch; // Make tabs stretch instead of space horizontally.
+
+    > a {
+      margin: 0.25em;
+      padding: 0.25em;
+      margin-bottom: 0;
+      position: relative;
+      font-size: 1.15em;
+      border: 1px solid $light-border;
+      border-top-left-radius: 0.25em;
+      border-top-right-radius: 0.25em;
+      border-bottom: none;
+      @include rollable;
+
+      &.active {
+        @include rolloutline;
+        background-color: rgba($black, 0.4);
+      }
+    }
+
+    > .item { // Make tabs stretch across horizontally.
+      flex: 1;
+      text-align: center;
+    }
+  }
+
+  .tab {
+    border-radius: $radius;
+    margin-top: 0.25em;
+    height: 100%;
+
+    .tabbody {
+      height: 100%;
+      display: flex;
+      flex-flow: column nowrap;
+
+      > * {
+        flex: 0;
+      }
+
+      > .inventory {
+        flex: 1;
+      }
+    }
+  }
+
+  .split-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: stretch;
+    align-content: stretch;
+    height: 100%;
+
+    > * {
+      flex: 1;
+      width: 100%;
+    }
+
+    > *:not(:first-child) {
+      margin-left: 0.25em;
+    }
+
+    > *:not(:last-child) {
+      border-right: $groove;
+      padding-right: 0.25em;
+    }
+  }
+
+  .block {
+    display: flex;
+    flex-flow: column;
+    padding: 2px 4px;
+    justify-content: space-around;
+
+    &:not(:last-child) {
+      border-right: $groove;
+    }
+
+    .block-line {
+      display: flex;
+      flex-flow: row nowrap;
+      padding: 4px;
+
+      &.center {
+        justify-content: center;
+      }
+
+      &.border-bottom {
+        border-bottom: $groove;
+      }
+
+      &.gap-4 {
+        > :not(:first-child) {
+          margin-left: 4px;
+        }
+
+        > :not(:last-child) {
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+
+  .horizontal-cell-input {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: start;
+    padding: 4px;
+
+    &.stun .cell {
+      box-shadow: 0 0 5px 1px rgba($stun, 0.5);
+    }
+
+    &.physical .cell {
+      box-shadow: 0 0 5px 1px rgba($physical, 0.5);
+    }
+
+    &.edge .cell {
+      box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+    }
+
+    &.matrix .cell {
+      box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
     }
 
     .roll {
-        @include rollable;
-    }
-    .editor {
-        height: 95%;
-        width: 100%;
-    }
-    .editor .tox-edit-area {
-        background: $mce-background;
+      width: 60px;
+      margin-right: 8px;
     }
 
+    .cell-container {
+      display: flex;
+      flex-flow: row;
+      justify-content: stretch;
 
-    .parts-list {
-        font-size: 12px;
-        display: flex;
-        flex-flow: row wrap;
-        justify-content: center;
-        align-items: center;
-        &.vertical {
-            flex-flow: column nowrap;
-            justify-content: flex-end;
-            align-items: flex-end;
-        }
-        .part {
-            white-space: nowrap;
-            .value {
-                font-weight: bold;
-            }
-            &.underline {
-                text-decoration: underline;
-            }
-        }
-        > * {
-            margin: 0 0.5em;
-        }
-    }
-    .no-break {
-        white-space: nowrap;
-    }
-    .window-content {
-        font-size: 115%;
-        background: $sheetbackground;
-        color: $color;
-        overflow: hidden;
-    }
-    // Only alter editor height scaling for item descriptions, not actor bio where space is needed.
-    .description > .editor {
-        height: 15em;
-        width: 100%;
-        color: $color;
-    }
-    .border-right {
-        border-right: $groove;
-    }
-    .scroll-area {
-        height: 100%;
-        margin-bottom: 0.5em;
-        flex: 1;
-        overflow-y: auto;
-    }
+      .cell {
+        cursor: pointer;
+        text-align: center;
+        font-size: 80%;
+        border: $groove;
+        color: $light-2;
+        border-radius: 4px;
+        background: $black;
+        min-width: 26px;
+        height: 18px;
 
-    .profile-img {
-        padding: 0.25em;
-        max-width: 100px;
-        //border-right: $groove;
-        //border-bottom: $groove;
-    }
-    .tabs {
-        flex: 0;
-        margin: 0.25em;
-        margin-bottom: -5px;
-        border-bottom: 1px solid $light-border;
-        align-items: stretch; // Make tabs stretch instead of space horizontally.
+        &:not(:first-child) {
+          margin-left: 2px;
+        }
 
-        > a {
-            margin: 0.25em;
-            padding: 0.25em;
-            margin-bottom: 0;
-            position: relative;
-            font-size: 1.15em;
-            border: 1px solid $light-border;
-            border-top-left-radius: 0.25em;
-            border-top-right-radius: 0.25em;
-            border-bottom: none;
-            @include rollable;
-            &.active {
-                @include rolloutline;
-                background-color: rgba($black, 0.4);
-            }
-        }
-        > .item { // Make tabs stretch across horizontally.
-            flex: 1;
-            text-align: center;
-        }
-    }
-    .tab {
-        border-radius: $radius;
-        margin-top: 0.25em;
-        height: 100%;
-        .tabbody {
-            height: 100%;
-            display: flex;
-            flex-flow: column nowrap;
-
-            > * {
-                flex: 0;
-            }
-            > .inventory {
-                flex: 1;
-            }
-        }
-    }
-    .split-container {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: center;
-        align-items: stretch;
-        align-content: stretch;
-        height: 100%;
-        > * {
-            flex: 1;
-            width: 100%;
-        }
-        > *:not(:first-child) {
-            margin-left: 0.25em;
-        }
-        > *:not(:last-child) {
-            border-right: $groove;
-            padding-right: 0.25em;
-        }
-    }
-    .block {
-        display: flex;
-        flex-flow: column;
-        padding: 2px 4px;
-        justify-content: space-around;
         &:not(:last-child) {
-            border-right: $groove;
+          margin-right: 2px;
         }
-        .block-line {
-            display: flex;
-            flex-flow: row nowrap;
-            padding: 4px;
-            &.center {
-                justify-content: center;
-            }
-            &.border-bottom {
-                border-bottom: $groove;
-            }
-            &.gap-4 {
-                > :not(:first-child) {
-                    margin-left: 4px;
-                }
-                > :not(:last-child) {
-                    margin-right: 4px;
-                }
-            }
+
+        &.filled {
+          background: $light-2;
+          border-color: $black;
+          color: $black;
         }
+
+        &:hover {
+          border-color: $light;
+        }
+      }
     }
-    .horizontal-cell-input {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: start;
-        padding: 4px;
-        &.stun .cell {
-            box-shadow: 0 0 5px 1px rgba($stun, 0.5);
-        }
-        &.physical .cell {
-            box-shadow: 0 0 5px 1px rgba($physical, 0.5);
-        }
-        &.edge .cell {
-            box-shadow: 0 0 5px 1px rgba($edge, 0.5);
-        }
-        &.matrix .cell {
-            box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
-        }
-        .roll {
-            width: 60px;
-            margin-right: 8px;
-        }
-        .cell-container {
-            display: flex;
-            flex-flow: row;
-            justify-content: stretch;
-            .cell {
-                cursor: pointer;
-                text-align: center;
-                font-size: 80%;
-                border: $groove;
-                color: $light-2;
-                border-radius: 4px;
-                background: $black;
-                min-width: 26px;
-                height: 18px;
-                &:not(:first-child) {
-                    margin-left: 2px;
-                }
-                &:not(:last-child) {
-                    margin-right: 2px;
-                }
-                &.filled {
-                    background: $light-2;
-                    border-color: $black;
-                    color: $black;
-                }
-                &:hover {
-                    border-color: $light;
-                }
-            }
-        }
+  }
+
+  .inventory {
+    overflow-y: hidden;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+  }
+
+  .list-item {
+    font-size: 85%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    padding: 0.1em 0.25em;
+    min-height: 26px;
+    margin: 0.1em;
+    margin-right: $groove-width;
+    margin-left: $groove-width;
+    border-bottom: 1px solid $grey;
+
+    .has-desc {
+      @include rollable;
     }
-    .inventory {
-        overflow-y: hidden;
-        height: 100%;
-        width: 100%;
-        display: flex;
-        flex-flow: column nowrap;
+
+    &.no-border {
+      border-bottom: none;
     }
-    .list-item {
-        font-size: 85%;
+
+    &.center {
+      justify-content: center;
+    }
+
+    &.space-evenly {
+      justify-content: space-evenly;
+    }
+
+    &.item-section {
+      border: $groove-width solid $black;
+      margin-right: 0;
+      margin-left: 0;
+      background: rgba($grey, 0.2);
+      padding: 0.25em;
+      border-radius: 0.2em;
+    }
+
+    .item-center {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      align-self: center;
+    }
+
+    .item-left {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .item-right {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .item-img {
+      padding-right: 0.25em;
+      max-width: 50px;
+
+      &.item-roll {
+        @include rollable;
+
+        &:hover {
+          > img {
+            content: url('assets/dice-solid.svg');
+            filter: invert(1);
+          }
+        }
+      }
+
+      > img {
+        margin: 0;
+        transform: translateY(10%);
+      }
+
+      & + .item-name {
+        border-left: none !important;
+      }
+    }
+
+    .item-input {
+      width: 9.5em;
+    }
+
+    .item-desc {
+      padding: 0.25em;
+      font-size: 1em;
+      width: 100%;
+
+      .props {
         display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
+        flex-flow: wrap row;
+        padding: 0.25em 0;
+
+        > * {
+          flex-shrink: 0;
+          border-right: $groove;
+          border-bottom: $groove;
+          padding: 0.25em 0.5em;
+          margin: 0.1em 0.25em;
+          box-shadow: 0.2em 0.2em 0.3em $black;
+        }
+      }
+
+      .description {
+        //border-right: $light 2px solid;
+        // border-top: $light 2px solid;
+        margin: 0.5em 0.25em;
+        padding: 0.5em;
+        // margin-right: 0.5em;
+        //padding-right: 0.5em;
+      }
+    }
+
+    .item-icons {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-evenly;
+      align-items: center;
+      color: $grey;
+      font-size: 12px;
+      height: 100%;
+    }
+
+    .item-text {
+      width: 5em;
+      margin: 0 0.1rem;
+      flex: 1 0 auto;
+      text-align: center;
+      height: 100%;
+      border: $light;
+
+      &.faded {
+        color: $grey;
+      }
+
+      &.center {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-around;
         align-items: center;
         align-content: center;
-        padding: 0.1em 0.25em;
-        min-height: 26px;
-        margin: 0.1em;
-        margin-right: $groove-width;
-        margin-left: $groove-width;
-        border-bottom: 1px solid $grey;
-        .has-desc {
-            @include rollable;
-        }
-        &.no-border {
-            border-bottom: none;
-        }
-        &.center {
-            justify-content: center;
-        }
-        &.space-evenly {
-            justify-content: space-evenly;
-        }
-        &.item-section {
-            border: $groove-width solid $black;
-            margin-right: 0;
-            margin-left: 0;
-            background: rgba($grey, 0.2);
-            padding: 0.25em;
-            border-radius: 0.2em;
-        }
-        .item-center {
-            display: flex;
-            flex-flow: row nowrap;
-            align-items: center;
-            align-self: center;
-        }
-        .item-left {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: flex-start;
-            align-items: center;
-        }
-        .item-right {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: flex-end;
-            align-items: center;
-        }
-        .item-img {
-            padding-right: 0.25em;
-            max-width: 50px;
-            &.item-roll {
-                @include rollable;
-                &:hover {
-                    > img {
-                        content: url('assets/dice-solid.svg');
-                        filter: invert(1);
-                    }
-                }
-            }
-            > img {
-                margin: 0;
-                transform: translateY(10%);
-            }
-            & + .item-name {
-                border-left: none !important;
-            }
-        }
-        .item-input {
-            width: 9.5em;
-        }
-        .item-desc {
-            padding: 0.25em;
-            font-size: 1em;
-            width: 100%;
-            .props {
-                display: flex;
-                flex-flow: wrap row;
-                padding: 0.25em 0;
-                > * {
-                    flex-shrink: 0;
-                    border-right: $groove;
-                    border-bottom: $groove;
-                    padding: 0.25em 0.5em;
-                    margin: 0.1em 0.25em;
-                    box-shadow: 0.2em 0.2em 0.3em $black;
-                }
-            }
-            .description {
-                //border-right: $light 2px solid;
-                // border-top: $light 2px solid;
-                margin: 0.5em 0.25em;
-                padding: 0.5em;
-                // margin-right: 0.5em;
-                //padding-right: 0.5em;
-            }
-        }
-        .item-icons {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: space-evenly;
-            align-items: center;
-            color: $grey;
-            font-size: 12px;
-            height: 100%;
-        }
-        .item-text {
-            width: 5em;
-            margin: 0 0.1rem;
-            flex: 1 0 auto;
-            text-align: center;
-            height: 100%;
-            border: $light;
-            &.faded {
-                color: $grey;
-            }
-            &.center {
-                display: flex;
-                flex-flow: row;
-                justify-content: space-around;
-                align-items: center;
-                align-content: center;
-            }
-            &.item-name {
-                text-align: left;
-                width: auto;
-            }
-            &.element {
-                width: 7em;
-            }
-            &.radius {
-                width: 4em;
-            }
-            &.dropoff {
-                width: 4em;
-            }
-            &.rtg {
-                width: 3em;
-                &.active-skills-rating {
-                    padding-right: 1em;
-                }
-            }
-            &.input {
-                text-align: right;
-                width: 9.5em;
-            }
-            &.desc {
-                width: 16em;
-            }
-        }
-        .item-create,
-        .add-new-ammo,
-        .add-new-mod,
-        .add-new-license {
-            color: $color;
-        }
-        .skill-item {
-            width: 8em;
-        }
-        .skill-spec-item {
-            width: 15em;
-        }
-        &.skill-header {
-            @include rollable;
-        }
-    }
+      }
 
-    .sunken {
-        box-shadow: $dark-sunken-box-shadow;
-        padding: $medium-distance;
-        background-color: $dark-sunken;
-    }
-    .modified-target-damage {
-        margin-top: $large-distance;
-        margin-bottom: $large-distance;
-        display: grid;
-        grid-template-columns: 40px auto auto;
-
-        .modified-target-damage-cell {
-            display:flex;
-            align-items:center;
-            margin-bottom: $small-distance;
-        }
-    }
-
-    .important {
-        font-weight: bold;
-    }
-
-    button,
-    button.display {
-        color: $color;
-        border-color: $black;
-        background: rgba($light, 0.1);
-        border-radius: 0.3em;
-        text-align: center;
-        &:hover {
-            cursor: pointer;
-        }
-        &.short {
-            line-height: 1.3em;
-        }
-        &.light {
-            color: $black;
-            background: $light;
-        }
-    }
-
-    /** CSS for the Environmental Modifier Application Window
-     *
-     */
-    button.env-modifier {
+      &.item-name {
         text-align: left;
-    }
-    .env-modifier-active {
-        box-shadow: 0 0 0.25em 0.15em $white;
-        border-radius: 8px;
-    }
-    .env-modifier-total {
-        font-weight: bold;
-    }
-    tr.env-modifier-category {
-        height: 45px;
-    }
-    td.env-modifier-level {
-        padding-right: 6px;
-    }
-
-    .skill-roll-not-defaultable {
-        font-style: italic;
-    }
-
-    /** Input element for inventory name editing */
-    input#input-inventory {
-        // Otherwise the other classes used will break styling.
         width: auto;
+      }
+
+      &.element {
+        width: 7em;
+      }
+
+      &.radius {
+        width: 4em;
+      }
+
+      &.dropoff {
+        width: 4em;
+      }
+
+      &.rtg {
+        width: 3em;
+
+        &.active-skills-rating {
+          padding-right: 1em;
+        }
+      }
+
+      &.input {
+        text-align: right;
+        width: 9.5em;
+      }
+
+      &.desc {
+        width: 16em;
+      }
     }
+
+    .item-create,
+    .add-new-ammo,
+    .add-new-mod,
+    .add-new-license {
+      color: $color;
+    }
+
+    .skill-item {
+      width: 8em;
+    }
+
+    .skill-spec-item {
+      width: 15em;
+    }
+
+    &.skill-header {
+      @include rollable;
+    }
+  }
+
+  .sunken {
+    box-shadow: $dark-sunken-box-shadow;
+    padding: $medium-distance;
+    background-color: $dark-sunken;
+  }
+
+  .modified-target-damage {
+    margin-top: $large-distance;
+    margin-bottom: $large-distance;
+    display: grid;
+    grid-template-columns: 40px auto auto;
+
+    .modified-target-damage-cell {
+      display: flex;
+      align-items: center;
+      margin-bottom: $small-distance;
+    }
+  }
+
+  .important {
+    font-weight: bold;
+  }
+
+  button,
+  button.display {
+    color: $color;
+    border-color: $black;
+    background: rgba($light, 0.1);
+    border-radius: 0.3em;
+    text-align: center;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &.short {
+      line-height: 1.3em;
+    }
+
+    &.light {
+      color: $black;
+      background: $light;
+    }
+  }
+
+  /** CSS for the Environmental Modifier Application Window
+   *
+   */
+  button.env-modifier {
+    text-align: left;
+  }
+
+  .env-modifier-active {
+    box-shadow: 0 0 0.25em 0.15em $white;
+    border-radius: 8px;
+  }
+
+  .env-modifier-total {
+    font-weight: bold;
+  }
+
+  tr.env-modifier-category {
+    height: 45px;
+  }
+
+  td.env-modifier-level {
+    padding-right: 6px;
+  }
+
+  .skill-roll-not-defaultable {
+    font-style: italic;
+  }
+
+  /** Input element for inventory name editing */
+  input#input-inventory {
+    // Otherwise the other classes used will break styling.
+    width: auto;
+  }
 }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
  * otherwise cause issues with custom button styling.
  */
 .form-dialog .window-content .dialog-buttons {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
+
 .form-dialog .window-content .dialog-buttons > * {
-    flex: 1;
+  flex: 1;
 }
 
 .far-right {
-    justify-content: center;
-    right: -150px;
+  justify-content: center;
+  right: -150px;
 }
 
 .sr-modifier-container {
-    .modifier-column {
-        padding-top: 66px;
-        // Stop flexing.
-        display: block;
-        font-weight: bold;
-        font-size: 18px;
-        // Render below the open/closable token hud actions.
-        z-index: -1;
+  .modifier-column {
+    padding-top: 66px;
+    // Stop flexing.
+    display: block;
+    font-weight: bold;
+    font-size: 18px;
+    // Render below the open/closable token hud actions.
+    z-index: -1;
+  }
+
+  .modifier-row {
+    position: relative;
+    display: grid;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 160px;
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 15px #000;
+    border: 1px solid #333;
+    color: #DDD;
+    height: 40px;
+    line-height: 40px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    pointer-events: all;
+    grid-template-columns: 36px auto;
+    overflow: hidden;
+
+    .modifier-value {
     }
 
-    .modifier-row {
-        position: relative;
-        display: grid;
-        flex-wrap: wrap;
-        align-items: stretch;
-        width: 160px;
-        background: rgba(0, 0, 0, 0.6);
-        box-shadow: 0 0 15px #000;
-        border: 1px solid #333;
-        color: #DDD;
-        height: 40px;
-        line-height: 40px;
-        margin-bottom: 18px;
+    .modifier-description {
+      text-overflow: clip;
+      white-space: nowrap;
+    }
+
+    .open-environmental-modifier {
+      cursor: pointer;
+
+      &:hover {
+        box-shadow: 0 0 0.25em 0.15em $white;
         border-radius: 8px;
-        pointer-events: all;
-        grid-template-columns: 36px auto;
-        overflow: hidden;
-
-        .modifier-value {
-        }
-
-        .modifier-description {
-            text-overflow: clip;
-            white-space: nowrap;
-        }
-
-        .open-environmental-modifier {
-            cursor: pointer;
-
-            &:hover {
-                box-shadow: 0 0 0.25em 0.15em $white;
-                border-radius: 8px;
-            }
-        }
+      }
     }
+  }
 }
