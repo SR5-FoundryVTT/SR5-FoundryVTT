@@ -35345,17 +35345,20 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     }
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.netHits.value > 0) {
-                // TODO: Move this into a rules file.
-                const parts = new PartsList_1.PartsList(this.data.modDamage.mod);
-                // parts.addPart('SR5.AttackHits', this.against.hits.value);
-                parts.addPart('SR5.DefenderHits', -this.netHits.value);
-                helpers_1.Helpers.calcTotal(this.data.modDamage, { min: 0 });
-            }
+            // A successful defense will result in no damage taken.
+            // TODO: Move this into a rules file.
+            this.data.modDamage.override = { name: 'SR5.Success', value: 0 };
+            helpers_1.Helpers.calcTotal(this.data.modDamage, { min: 0 });
         });
     }
     processFailure() {
         return __awaiter(this, void 0, void 0, function* () {
+            // TODO: Move this into a rules file.
+            // A failed defense will result in damage taken.
+            const parts = new PartsList_1.PartsList(this.data.modDamage.mod);
+            if (this.hits.value > 0)
+                parts.addPart('SR5.DefenderHits', -this.hits.value);
+            helpers_1.Helpers.calcTotal(this.data.modDamage, { min: 0 });
         });
     }
 }
