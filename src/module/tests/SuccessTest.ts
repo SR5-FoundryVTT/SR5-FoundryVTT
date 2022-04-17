@@ -590,10 +590,11 @@ export class SuccessTest {
     /**
      * What TestDialog class to use for this test type?
      *
+     * If you only need to display differing data you can also only define a different _dialogTemplate
      * @override This method if you want to use a different TestDialog.
      */
     _createTestDialog() {
-        return new TestDialog({test: this, template: this._dialogTemplate});
+        return new TestDialog({test: this, templatePath: this._dialogTemplate});
     }
 
     /**
