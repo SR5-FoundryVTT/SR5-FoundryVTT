@@ -144,10 +144,10 @@ export class EnvModifiersApplication extends Application {
 
     _getTargetTypeLabel(): string {
         if (this.target instanceof Scene) {
-            return game.i18n.localize('ENTITY.Scene');
+            return game.i18n.localize('DOCUMENT.Scene');
         }
         if (this.target instanceof SR5Actor) {
-            return game.i18n.localize('ENTITY.Actor');
+            return game.i18n.localize('DOCUMENT.Actor');
         }
 
         return '';

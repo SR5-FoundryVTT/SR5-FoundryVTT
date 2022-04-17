@@ -9,19 +9,19 @@
                         <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>
                         {{/each}}
                     </select>
-                    <a class="inventory-edit roll">
+                    <a class="inventory-edit action-icon roll">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <a class="inventory-remove roll">
+                    <a class="inventory-remove action-icon roll">
                         <i class="fas fa-trash"></i>
                     </a>
                 </span>
                 <span class="inline-input-inventory">
                     <input type="text" id="input-inventory" class="display text left" value="{{inventory.name}}"/>
-                    <a class="roll inventory-input-save">
+                    <a class="roll action-icon inventory-input-save">
                         <i class="fas fa-check"></i>
                     </a>
-                    <a class="roll inventory-input-cancel">
+                    <a class="roll action-icon inventory-input-cancel">
                         <i class="fas fa-times"></i>
                     </a>
                 </span>

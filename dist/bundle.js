@@ -19302,10 +19302,10 @@ class EnvModifiersApplication extends Application {
     }
     _getTargetTypeLabel() {
         if (this.target instanceof Scene) {
-            return game.i18n.localize('ENTITY.Scene');
+            return game.i18n.localize('DOCUMENT.Scene');
         }
         if (this.target instanceof SR5Actor_1.SR5Actor) {
-            return game.i18n.localize('ENTITY.Actor');
+            return game.i18n.localize('DOCUMENT.Actor');
         }
         return '';
     }
@@ -26896,7 +26896,7 @@ ___________________
         Hooks.on('renderChatMessage', OpposedTest_1.OpposedTest.chatMessageListeners);
     }
     static renderItemDirectory(app, html) {
-        const button = $('<button>Import Chummer Data</button>');
+        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
         html.find('footer').before(button);
         button.on('click', (event) => {
             new import_form_1.Import().render(true);
@@ -30792,7 +30792,8 @@ class SR5Item extends Item {
             // Merge and overwrite existing owned items with new changes.
             this.items = items.map((item) => {
                 // Set user permissions to owner, to allow none-GM users to edit their own nested items.
-                const data = game.user ? { permission: { [game.user.id]: CONST.ENTITY_PERMISSIONS.OWNER } } :
+                // @ts-ignore // TODO: foundry-vtt-types v10
+                const data = game.user ? { permission: { [game.user.id]: CONST.DOCUMENT_PERMISSION_LEVELS.OWNER } } :
                     {};
                 // Case: MODIFY => Update existing item.
                 if (item._id in existing) {

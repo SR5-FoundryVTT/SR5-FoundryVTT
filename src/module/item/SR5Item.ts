@@ -980,7 +980,8 @@ export class SR5Item extends Item {
             // Merge and overwrite existing owned items with new changes.
             this.items = items.map((item) => {
                 // Set user permissions to owner, to allow none-GM users to edit their own nested items.
-                const data = game.user ? {permission: {[game.user.id]: CONST.ENTITY_PERMISSIONS.OWNER}} :
+                // @ts-ignore // TODO: foundry-vtt-types v10
+                const data = game.user ? {permission: {[game.user.id]: CONST.DOCUMENT_PERMISSION_LEVELS.OWNER}} :
                                           {};
 
                 // Case: MODIFY => Update existing item.

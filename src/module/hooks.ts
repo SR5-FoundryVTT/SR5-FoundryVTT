@@ -293,7 +293,7 @@ ___________________
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {
-        const button = $('<button>Import Chummer Data</button>');
+        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
         html.find('footer').before(button);
         button.on('click', (event) => {
             new Import().render(true);
