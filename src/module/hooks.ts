@@ -35,6 +35,7 @@ import {RangedAttackTest} from "./tests/RangedAttackTest";
 import {SuccessTest} from "./tests/SuccessTest";
 import {OpposedTest} from "./tests/OpposedTest";
 import {PhysicalResistTest} from "./tests/PhysicalResistTest";
+import {handleRenderChatMessage} from "./chat";
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -290,6 +291,7 @@ ___________________
     static renderChatMessage() {
         Hooks.on('renderChatMessage', SuccessTest.chatMessageListeners);
         Hooks.on('renderChatMessage', OpposedTest.chatMessageListeners);
+        Hooks.on('renderChatMessage', handleRenderChatMessage);
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {

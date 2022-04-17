@@ -410,50 +410,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
     /** Apply damage to the actor speaking the chat card.
      */
-    html.on('click', '.apply-damage', async event => {
-        event.stopPropagation();
-        const applyDamage = $(event.currentTarget);
-
-        const value = Number(applyDamage.data('damageValue'));
-        const type = String(applyDamage.data('damageType')) as DamageType;
-        const ap = Number(applyDamage.data('damageAp'));
-        const element = String(applyDamage.data('damageElement')) as DamageElement;
-        let damage = Helpers.createDamageData(value, type, ap, element);
-
-        let actors = Helpers.getSelectedActorsOrCharacter();
-
-        // Should no selection be available try guessing.
-        if (actors.length === 0) {
-            const messageId = html.data('messageId');
-            const message = game.messages?.get(messageId);
-            if (!message) return;
-            const targetIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
-
-            // If targeting is available, use that.
-            if (targetIds) {
-                targetIds.forEach(targetId => {
-                    const actor = Helpers.getSceneTokenActor(targetId);
-                    if (!actor) return;
-                    actors.push(actor);
-                });
-
-                // Otherwise apply to the actor casting the damage.
-            } else {
-                const sceneTokenId = html.find('.chat-card').data('tokenId');
-                const actor = Helpers.getSceneTokenActor(sceneTokenId)
-                if (actor) {
-                    actors.push(actor);
-                }
-            }
-
-            if (actors.length === 0) {
-                ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
-                return;
-            }
-        }
-
-        await new DamageApplicationFlow().runApplyDamage(actors, damage);
-    });
+    html.on('click', '.apply-damage', async event => await chatMessageActionApplyDamage(html, event));
 
     /**
      * Apply action results onto targets or selections.
@@ -502,3 +459,60 @@ export const addRollListeners = (app: ChatMessage, html) => {
         }
     });
 };
+
+export const handleRenderChatMessage = async (app: ChatMessage, html) => {
+    /**
+     * Apply damage to the actor speaking the chat card.
+     */
+    html.on('click', '.apply-damage', async event => await chatMessageActionApplyDamage(html, event));
+}
+
+/**
+ * Clicking on a damage number within any chat message will trigger damage application.
+ * @param event
+ */
+export const chatMessageActionApplyDamage = async (html, event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const applyDamage = $(event.currentTarget);
+
+    const value = Number(applyDamage.data('damageValue'));
+    const type = String(applyDamage.data('damageType')) as DamageType;
+    const ap = Number(applyDamage.data('damageAp'));
+    const element = String(applyDamage.data('damageElement')) as DamageElement;
+    let damage = Helpers.createDamageData(value, type, ap, element);
+
+    let actors = Helpers.getSelectedActorsOrCharacter();
+
+    // Should no selection be available try guessing.
+    if (actors.length === 0) {
+        const messageId = html.data('messageId');
+        const message = game.messages?.get(messageId);
+        if (!message) return;
+        const targetIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
+
+        // If targeting is available, use that.
+        if (targetIds) {
+            targetIds.forEach(targetId => {
+                const actor = Helpers.getSceneTokenActor(targetId);
+                if (!actor) return;
+                actors.push(actor);
+            });
+
+            // Otherwise apply to the actor casting the damage.
+        } else {
+            const sceneTokenId = html.find('.chat-card').data('tokenId');
+            const actor = Helpers.getSceneTokenActor(sceneTokenId)
+            if (actor) {
+                actors.push(actor);
+            }
+        }
+
+        if (actors.length === 0) {
+            ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+            return;
+        }
+    }
+
+    await new DamageApplicationFlow().runApplyDamage(actors, damage);
+}

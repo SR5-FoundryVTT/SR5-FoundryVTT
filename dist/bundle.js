@@ -22408,7 +22408,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addRollListeners = exports.addChatMessageContextOptions = exports.createRollChatMessage = exports.createItemChatMessage = exports.createTargetChatMessage = exports.ifConfiguredCreateDefaultChatMessage = void 0;
+exports.chatMessageActionApplyDamage = exports.handleRenderChatMessage = exports.addRollListeners = exports.addChatMessageContextOptions = exports.createRollChatMessage = exports.createItemChatMessage = exports.createTargetChatMessage = exports.ifConfiguredCreateDefaultChatMessage = void 0;
 const SR5Actor_1 = require("./actor/SR5Actor");
 const SR5Item_1 = require("./item/SR5Item");
 const template_1 = require("./template");
@@ -22712,55 +22712,15 @@ const addRollListeners = (app, html) => {
     });
     /** Apply damage to the actor speaking the chat card.
      */
-    html.on('click', '.apply-damage', (event) => __awaiter(void 0, void 0, void 0, function* () {
-        var _c, _d;
-        event.stopPropagation();
-        const applyDamage = $(event.currentTarget);
-        const value = Number(applyDamage.data('damageValue'));
-        const type = String(applyDamage.data('damageType'));
-        const ap = Number(applyDamage.data('damageAp'));
-        const element = String(applyDamage.data('damageElement'));
-        let damage = helpers_1.Helpers.createDamageData(value, type, ap, element);
-        let actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
-        // Should no selection be available try guessing.
-        if (actors.length === 0) {
-            const messageId = html.data('messageId');
-            const message = (_c = game.messages) === null || _c === void 0 ? void 0 : _c.get(messageId);
-            if (!message)
-                return;
-            const targetIds = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.TargetsSceneTokenIds);
-            // If targeting is available, use that.
-            if (targetIds) {
-                targetIds.forEach(targetId => {
-                    const actor = helpers_1.Helpers.getSceneTokenActor(targetId);
-                    if (!actor)
-                        return;
-                    actors.push(actor);
-                });
-                // Otherwise apply to the actor casting the damage.
-            }
-            else {
-                const sceneTokenId = html.find('.chat-card').data('tokenId');
-                const actor = helpers_1.Helpers.getSceneTokenActor(sceneTokenId);
-                if (actor) {
-                    actors.push(actor);
-                }
-            }
-            if (actors.length === 0) {
-                (_d = ui.notifications) === null || _d === void 0 ? void 0 : _d.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
-                return;
-            }
-        }
-        yield new DamageApplicationFlow_1.DamageApplicationFlow().runApplyDamage(actors, damage);
-    }));
+    html.on('click', '.apply-damage', (event) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.chatMessageActionApplyDamage)(html, event); }));
     /**
      * Apply action results onto targets or selections.
      */
     html.on('click', '.result', (event) => __awaiter(void 0, void 0, void 0, function* () {
-        var _e, _f;
+        var _c, _d;
         event.stopPropagation();
         const messageId = html.data('messageId');
-        const message = (_e = game.messages) === null || _e === void 0 ? void 0 : _e.get(messageId);
+        const message = (_c = game.messages) === null || _c === void 0 ? void 0 : _c.get(messageId);
         if (!message)
             return;
         const actionTestData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.ActionTestData);
@@ -22786,7 +22746,7 @@ const addRollListeners = (app, html) => {
                 });
             }
             if (targets.length === 0) {
-                return (_f = ui.notifications) === null || _f === void 0 ? void 0 : _f.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+                return (_d = ui.notifications) === null || _d === void 0 ? void 0 : _d.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
             }
             const { marks } = actionTestData.matrix;
             yield ActionResultFlow_1.ActionResultFlow.placeMatrixMarks(actor, targets, marks);
@@ -22794,6 +22754,60 @@ const addRollListeners = (app, html) => {
     }));
 };
 exports.addRollListeners = addRollListeners;
+const handleRenderChatMessage = (app, html) => __awaiter(void 0, void 0, void 0, function* () {
+    /**
+     * Apply damage to the actor speaking the chat card.
+     */
+    html.on('click', '.apply-damage', (event) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.chatMessageActionApplyDamage)(html, event); }));
+});
+exports.handleRenderChatMessage = handleRenderChatMessage;
+/**
+ * Clicking on a damage number within any chat message will trigger damage application.
+ * @param event
+ */
+const chatMessageActionApplyDamage = (html, event) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d, _e;
+    event.stopPropagation();
+    event.preventDefault();
+    const applyDamage = $(event.currentTarget);
+    const value = Number(applyDamage.data('damageValue'));
+    const type = String(applyDamage.data('damageType'));
+    const ap = Number(applyDamage.data('damageAp'));
+    const element = String(applyDamage.data('damageElement'));
+    let damage = helpers_1.Helpers.createDamageData(value, type, ap, element);
+    let actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
+    // Should no selection be available try guessing.
+    if (actors.length === 0) {
+        const messageId = html.data('messageId');
+        const message = (_d = game.messages) === null || _d === void 0 ? void 0 : _d.get(messageId);
+        if (!message)
+            return;
+        const targetIds = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.TargetsSceneTokenIds);
+        // If targeting is available, use that.
+        if (targetIds) {
+            targetIds.forEach(targetId => {
+                const actor = helpers_1.Helpers.getSceneTokenActor(targetId);
+                if (!actor)
+                    return;
+                actors.push(actor);
+            });
+            // Otherwise apply to the actor casting the damage.
+        }
+        else {
+            const sceneTokenId = html.find('.chat-card').data('tokenId');
+            const actor = helpers_1.Helpers.getSceneTokenActor(sceneTokenId);
+            if (actor) {
+                actors.push(actor);
+            }
+        }
+        if (actors.length === 0) {
+            (_e = ui.notifications) === null || _e === void 0 ? void 0 : _e.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+            return;
+        }
+    }
+    yield new DamageApplicationFlow_1.DamageApplicationFlow().runApplyDamage(actors, damage);
+});
+exports.chatMessageActionApplyDamage = chatMessageActionApplyDamage;
 },{"./actor/SR5Actor":86,"./actor/flows/DamageApplicationFlow":87,"./constants":152,"./helpers":166,"./item/SR5Item":206,"./item/flows/ActionResultFlow":209,"./template":230}],150:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -26658,6 +26672,7 @@ const RangedAttackTest_1 = require("./tests/RangedAttackTest");
 const SuccessTest_1 = require("./tests/SuccessTest");
 const OpposedTest_1 = require("./tests/OpposedTest");
 const PhysicalResistTest_1 = require("./tests/PhysicalResistTest");
+const chat_1 = require("./chat");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 exports.SR5CONFIG = config_1.SR5;
 class HooksManager {
@@ -26894,6 +26909,7 @@ ___________________
     static renderChatMessage() {
         Hooks.on('renderChatMessage', SuccessTest_1.SuccessTest.chatMessageListeners);
         Hooks.on('renderChatMessage', OpposedTest_1.OpposedTest.chatMessageListeners);
+        Hooks.on('renderChatMessage', chat_1.handleRenderChatMessage);
     }
     static renderItemDirectory(app, html) {
         const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
@@ -27003,7 +27019,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":237,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":228,"./tests/OpposedTest":231,"./tests/PhysicalDefenseTest":232,"./tests/PhysicalResistTest":233,"./tests/RangedAttackTest":234,"./tests/SuccessTest":235,"./token/SR5Token":236}],168:[function(require,module,exports){
+},{"../test/quench":237,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./chat":149,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":228,"./tests/OpposedTest":231,"./tests/PhysicalDefenseTest":232,"./tests/PhysicalResistTest":233,"./tests/RangedAttackTest":234,"./tests/SuccessTest":235,"./token/SR5Token":236}],168:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
