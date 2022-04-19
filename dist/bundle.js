@@ -25093,6 +25093,8 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html',
         'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html',
         // Test chat messages and their parts
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.html',
         'systems/shadowrun5e/dist/templates/rolls/physical-defense-test-message.html',
@@ -26683,7 +26685,6 @@ class HooksManager {
         Hooks.once('setup', HooksManager.setupAutocompleteInlinePropertiesSupport);
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        console.warn('Shadowrun 5e | Legacy Chat Message Handling is active');
         // Hooks.on('renderChatMessage', chat.addRollListeners)
         // Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
@@ -26848,6 +26849,7 @@ ___________________
             if (!test)
                 console.warn('Didnt work');
             yield (test === null || test === void 0 ? void 0 : test.execute());
+            $(document).find('.message');
         });
     }
     static canvasInit() {
@@ -35352,6 +35354,17 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     get _chatMessageTemplate() {
         return 'systems/shadowrun5e/dist/templates/rolls/physical-defense-test-message.html';
     }
+    get _dialogTemplate() {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
+    }
+    prepareDocumentData() {
+        const _super = Object.create(null, {
+            prepareDocumentData: { get: () => super.prepareDocumentData }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            yield _super.prepareDocumentData.call(this);
+        });
+    }
     /**
      * A DefenseTest is successful not when there are any netHits but as soon as the hits cross
      * the threshold.
@@ -35550,7 +35563,7 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
         // TODO: Recoil Modifier handling should go through ModifierFlow and / or Modifiers
         const { fireMode, recoilCompensation } = this.data;
         const recoil = recoilCompensation - fireMode.value;
-        const pool = new PartsList_1.PartsList(this.data.pool.mod);
+        const pool = new PartsList_1.PartsList(this.data.modifiers.mod);
         if (recoil < 0)
             pool.addUniquePart('SR5.Recoil', recoil);
         else
@@ -35651,13 +35664,8 @@ class SuccessTest {
      *
      * This should be used for whenever a Test doesn't modifiers specified externally.
      */
-    _prepareModifiers(modifiers = {}) {
-        const testModifiers = config_1.SR5.testModifiers[this.constructor.name] || [];
-        testModifiers.forEach(modifier => {
-            if (!modifiers.hasOwnProperty(modifier))
-                modifiers[modifier] = null;
-        });
-        return modifiers;
+    _prepareModifiers(modifiers) {
+        return modifiers || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Labels.Action.Modifiers' });
     }
     get type() {
         return this.constructor.name;
@@ -35861,7 +35869,7 @@ class SuccessTest {
                 limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
                 threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
                 damage: DataDefaults_1.DefaultValues.damageData(),
-                modifiers: {},
+                modifiers: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Labels.Action.Modifiers' }),
                 opposed: {}
             };
             // Try fetching the items action data.
@@ -35954,7 +35962,7 @@ class SuccessTest {
      * Determine if this test has any kind of modifier types active
      */
     get hasModifiers() {
-        return Object.values(this.data.modifiers).length > 0;
+        return this.data.modifiers.mod.length > 0;
     }
     /**
      * Create a Shadowrun 5 pool formula which will count all hits.
@@ -36075,21 +36083,22 @@ class SuccessTest {
      */
     applyPoolModifiers() {
         const pool = new PartsList_1.PartsList(this.pool.mod);
-        // Apply modifiers configured for this test.
-        const modifiers = Object.values(this.data.modifiers || {});
-        for (const modifier of modifiers) {
+        // If the user overwrote the modifiers only apply that value
+        if (this.data.modifiers.override) {
+            pool.addUniquePart('SR5.Labels.Action.Modifiers', this.data.modifiers.override.value);
+            return;
+        }
+        // Apply all modifiers configured for this test.
+        for (const modifier of this.data.modifiers.mod) {
             // A modifier might have been asked for, but not given by the actor.
-            if (!modifier) {
-                console.warn(`Shadowrun 5e | ${this.constructor.name} has defined a modifier type which wasn't given by it's actor.`);
-                continue;
-            }
-            pool.addUniquePart(modifier.label, modifier.total, true);
+            pool.addUniquePart(modifier.name, modifier.value);
         }
     }
     /**
      * Calculate only the base test that can be calculated before the test has been evaluated.
      */
     calculateBaseValues() {
+        this.data.modifiers.value = helpers_1.Helpers.calcTotal(this.data.modifiers);
         this.data.pool.value = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
         this.data.threshold.value = helpers_1.Helpers.calcTotal(this.data.threshold, { min: 0 });
         this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
@@ -36144,10 +36153,12 @@ class SuccessTest {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.actor)
                 return;
-            for (const type of Object.keys(this.data.modifiers)) {
-                const total = yield this.actor.modifiers.totalFor(type);
-                const label = config_1.SR5.modifierTypes[type];
-                this.data.modifiers[type] = { type, label, total };
+            // These modifier types will apply for this test type.
+            const testModifiers = config_1.SR5.testModifiers[this.constructor.name] || [];
+            for (const type of testModifiers) {
+                const value = yield this.actor.modifiers.totalFor(type);
+                const name = config_1.SR5.modifierTypes[type];
+                PartsList_1.PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
             }
         });
     }

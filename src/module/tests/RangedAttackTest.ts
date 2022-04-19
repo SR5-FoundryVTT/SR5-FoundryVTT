@@ -148,7 +148,7 @@ export class RangedAttackTest extends SuccessTest {
         const {fireMode, recoilCompensation} = this.data;
 
         const recoil = recoilCompensation - fireMode.value;
-        const pool = new PartsList(this.data.pool.mod);
+        const pool = new PartsList(this.data.modifiers.mod);
         if (recoil < 0)
             pool.addUniquePart('SR5.Recoil', recoil);
         else

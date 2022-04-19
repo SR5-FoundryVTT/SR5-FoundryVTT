@@ -59,7 +59,8 @@ export interface TestData {
 
     // A list of modifier descriptions to be used for this test.
     // These are designed to work with SR5Actor.getModifier()
-    modifiers: Record<ModifierTypes, TestModifier>
+    // modifiers: Record<ModifierTypes, TestModifier>
+    modifiers: ValueField
 
     // Documents the test might has been derived from.
     sourceItemUuid?: string
@@ -178,13 +179,8 @@ export class SuccessTest {
      *
      * This should be used for whenever a Test doesn't modifiers specified externally.
      */
-    _prepareModifiers(modifiers = {}) {
-        const testModifiers = SR5.testModifiers[this.constructor.name] || [];
-        testModifiers.forEach(modifier => {
-            if (!modifiers.hasOwnProperty(modifier))
-                modifiers[modifier] = null
-        });
-        return modifiers;
+    _prepareModifiers(modifiers?: ValueField) {
+        return modifiers || DefaultValues.valueData({label: 'SR5.Labels.Action.Modifiers'});
     }
 
     get type(): string {
@@ -406,7 +402,7 @@ export class SuccessTest {
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
             damage: DefaultValues.damageData(),
-            modifiers: {},
+            modifiers: DefaultValues.valueData({label: 'SR5.Labels.Action.Modifiers'}),
             opposed: {}
         };
 
@@ -503,7 +499,7 @@ export class SuccessTest {
      * Determine if this test has any kind of modifier types active
      */
     get hasModifiers(): boolean {
-        return Object.values(this.data.modifiers).length > 0;
+        return this.data.modifiers.mod.length > 0;
     }
 
     /**
@@ -634,15 +630,16 @@ export class SuccessTest {
     applyPoolModifiers() {
         const pool = new PartsList(this.pool.mod);
 
-        // Apply modifiers configured for this test.
-        const modifiers = Object.values(this.data.modifiers || {});
-        for (const modifier of modifiers) {
+        // If the user overwrote the modifiers only apply that value
+        if (this.data.modifiers.override) {
+            pool.addUniquePart('SR5.Labels.Action.Modifiers', this.data.modifiers.override.value)
+            return;
+        }
+
+        // Apply all modifiers configured for this test.
+        for (const modifier of this.data.modifiers.mod) {
             // A modifier might have been asked for, but not given by the actor.
-            if (!modifier) {
-                console.warn(`Shadowrun 5e | ${this.constructor.name} has defined a modifier type which wasn't given by it's actor.`);
-                continue;
-            }
-            pool.addUniquePart(modifier.label, modifier.total, true);
+            pool.addUniquePart(modifier.name, modifier.value);
         }
     }
 
@@ -650,6 +647,8 @@ export class SuccessTest {
      * Calculate only the base test that can be calculated before the test has been evaluated.
      */
     calculateBaseValues() {
+        this.data.modifiers.value = Helpers.calcTotal(this.data.modifiers);
+
         this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
@@ -704,10 +703,14 @@ export class SuccessTest {
     async prepareActorModifiers()  {
         if (!this.actor) return;
 
-        for (const type of Object.keys(this.data.modifiers) as string[]) {
-            const total = await this.actor.modifiers.totalFor(type);
-            const label = SR5.modifierTypes[type];
-            this.data.modifiers[type] = {type, label, total};
+        // These modifier types will apply for this test type.
+        const testModifiers = SR5.testModifiers[this.constructor.name] || [];
+
+        for (const type of testModifiers) {
+            const value = await this.actor.modifiers.totalFor(type);
+            const name = SR5.modifierTypes[type];
+
+            PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
         }
     }
 

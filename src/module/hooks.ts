@@ -51,7 +51,6 @@ export class HooksManager {
 
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        console.warn('Shadowrun 5e | Legacy Chat Message Handling is active');
         // Hooks.on('renderChatMessage', chat.addRollListeners)
         // Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
@@ -228,6 +227,8 @@ ___________________
         const test = await SuccessTest.fromAction(item, actor);
         if (!test) console.warn('Didnt work');
         await test?.execute();
+
+        $(document).find('.message')
     }
 
     static canvasInit() {

@@ -23,6 +23,14 @@ export class PhysicalDefenseTest extends OpposedTest {
         return 'systems/shadowrun5e/dist/templates/rolls/physical-defense-test-message.html'
     }
 
+    get _dialogTemplate(): string {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
+    }
+
+    async prepareDocumentData() {
+        await super.prepareDocumentData();
+    }
+
     /**
      * A DefenseTest is successful not when there are any netHits but as soon as the hits cross
      * the threshold.

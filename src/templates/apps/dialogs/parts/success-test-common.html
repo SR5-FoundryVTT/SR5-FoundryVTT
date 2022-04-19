@@ -28,16 +28,12 @@
     </div>
     {{/if}}
 
-    {{#if test.hasModifiers}}
     <div class="sunken">
-        {{#each test.data.modifiers}}
         <div class="form-group">
-            <label>{{localize this.label}}</label>
-            <input type="number" name="{{concatStrings 'test.data.modifiers.' this.type '.total'}}" data-dtype="number" value="{{this.total}}"/>
+            <label>{{localize test.data.modifiers.label}}</label>
+            <input type="number" name="test.data.modifiers" data-dtype="number" value="{{test.data.modifiers.value}}"/>
         </div>
-        {{/each}}
     </div>
-    {{/if}}
     <div class="sunken">
         <div class="form-group">
             <label>{{localize "SR5.DicePool"}}</label>
