@@ -35443,6 +35443,10 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
         data.modifiedDamage = foundry.utils.duplicate(data.against.damage);
         // TODO: this should be stored on actor flag and fetched in populateActorModifiers
         data.cover = 0;
+        data.activeDefense = '';
+        data.activeDefenses = {};
+        data.isMeleeAttack = false;
+        data.defenseReach = 0;
         return data;
     }
     get _chatMessageTemplate() {
@@ -35454,6 +35458,7 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     prepareDocumentData() {
         return __awaiter(this, void 0, void 0, function* () {
             this.prepareActiveDefense();
+            this.prepareMeleeReach();
         });
     }
     prepareActiveDefense() {
@@ -35492,9 +35497,25 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
             };
         });
     }
+    prepareMeleeReach() {
+        if (!this.against.item)
+            return;
+        this.data.isMeleeAttack = this.against.item.isMeleeWeapon();
+        if (!this.data.isMeleeAttack)
+            return;
+        if (!this.actor)
+            return;
+        // Take the highest equipped melee reach to defend with...
+        // NOTE: ... this should be a choice be the player
+        const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+        equippedMeleeWeapons.forEach(weapon => {
+            this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());
+        });
+    }
     applyPoolModifiers() {
         this.applyPoolCoverModifier();
         this.applyPoolActiveDefenseModifier();
+        this.applyPoolMeleeReachModifier();
         super.applyPoolModifiers();
     }
     applyPoolCoverModifier() {
@@ -35510,6 +35531,11 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
         PartsList_1.PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.ActiveDefense', defense.value);
         // TODO: Use defense.init to modify Combat initiative value.
+    }
+    applyPoolMeleeReachModifier() {
+        if (!this.data.isMeleeAttack)
+            return;
+        PartsList_1.PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.WeaponReach', this.data.defenseReach);
     }
     get success() {
         return CombatRules_1.CombatRules.attackMisses(this.against.hits.value, this.hits.value);
