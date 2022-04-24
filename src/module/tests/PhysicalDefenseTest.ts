@@ -161,15 +161,12 @@ export class PhysicalDefenseTest extends OpposedTest {
     }
 
     async afterFailure() {
-        setTimeout(async () => {
-            const {test} = this.against.data.opposed.resist;
-            // @ts-ignore
-            const resistTestCls = game.shadowrun5e.tests[test];
-            const resistTest = await resistTestCls.resistAgainstOpposed(this, this.data.options);
+        const {test} = this.against.data.opposed.resist;
+        // @ts-ignore
+        const resistTestCls = game.shadowrun5e.tests[test];
+        const resistTest = await resistTestCls.resistAgainstOpposed(this, this.data.options);
 
-            console.error('resistTest', resistTest);
-            await resistTest.execute();
-        }, 300);
-
+        console.error('resistTest', resistTest);
+        await resistTest.execute();
     }
 }

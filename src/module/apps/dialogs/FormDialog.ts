@@ -45,14 +45,14 @@ export class FormDialog extends Dialog<FormDialogOptions> {
             // Reject is stored, but never used in favor of FormDialog.canceled
             this._selectionReject = reject;
         });
-
     }
 
     async close() {
         await super.close();
 
         if (this.canceled) {
-            this._selectionResolve(this.selection);
+            // Delay resolving the dialog promise to avoid Foundry calling this.element.remove(), removing all open dialogs.
+            setTimeout(() => this._selectionResolve(this.selection), 250);
         }
     }
 
@@ -76,7 +76,9 @@ export class FormDialog extends Dialog<FormDialogOptions> {
     async afterSubmit(html: JQuery) {
         // Await in case of a possible async handler.
         this.selection = await this._onAfterClose(html, this.selectedButton);
-        this._selectionResolve(this.selection);
+
+        // Delay resolving the dialog promise to avoid Foundry calling this.element.remove(), removing all open dialogs.
+        setTimeout(() => this._selectionResolve(this.selection), 250);
     }
 
     /**

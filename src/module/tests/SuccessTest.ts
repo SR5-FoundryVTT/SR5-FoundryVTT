@@ -388,8 +388,10 @@ export class SuccessTest {
 
             const documents = {actor};
             const test = new testClass(data, documents);
+
             // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
-            test.execute();
+            // Await test chain resolution for each actor, to avoid dialog spam.
+            await test.execute();
         }
     }
 

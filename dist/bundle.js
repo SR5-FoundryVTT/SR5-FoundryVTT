@@ -21258,7 +21258,8 @@ class FormDialog extends Dialog {
         return __awaiter(this, void 0, void 0, function* () {
             yield _super.close.call(this);
             if (this.canceled) {
-                this._selectionResolve(this.selection);
+                // Delay resolving the dialog promise to avoid Foundry calling this.element.remove(), removing all open dialogs.
+                setTimeout(() => this._selectionResolve(this.selection), 250);
             }
         });
     }
@@ -21283,7 +21284,8 @@ class FormDialog extends Dialog {
         return __awaiter(this, void 0, void 0, function* () {
             // Await in case of a possible async handler.
             this.selection = yield this._onAfterClose(html, this.selectedButton);
-            this._selectionResolve(this.selection);
+            // Delay resolving the dialog promise to avoid Foundry calling this.element.remove(), removing all open dialogs.
+            setTimeout(() => this._selectionResolve(this.selection), 250);
         });
     }
     /**
@@ -35635,13 +35637,11 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     afterFailure() {
         return __awaiter(this, void 0, void 0, function* () {
             const { test } = this.against.data.opposed.resist;
-            setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore
-                const resistTestCls = game.shadowrun5e.tests[test];
-                const resistTest = yield resistTestCls.resistAgainstOpposed(this, this.data.options);
-                console.error('resistTest', resistTest);
-                yield resistTest.execute();
-            }), 300);
+            // @ts-ignore
+            const resistTestCls = game.shadowrun5e.tests[test];
+            const resistTest = yield resistTestCls.resistAgainstOpposed(this, this.data.options);
+            console.error('resistTest', resistTest);
+            yield resistTest.execute();
         });
     }
 }
@@ -36106,7 +36106,8 @@ class SuccessTest {
                 const documents = { actor };
                 const test = new testClass(data, documents);
                 // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
-                test.execute();
+                // Await test chain resolution for each actor, to avoid dialog spam.
+                yield test.execute();
             }
         });
     }
