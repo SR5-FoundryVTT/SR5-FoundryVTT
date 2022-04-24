@@ -1,4 +1,9 @@
 import {SR} from "../constants";
+import {PartsList} from "../parts/PartsList";
+import {Helpers} from "../helpers";
+import DamageData = Shadowrun.DamageData;
+import ArmorData = Shadowrun.ArmorData;
+import ValueField = Shadowrun.ValueField;
 
 export class CombatRules {
     static iniOrderCanDoAnotherPass(scores: number[]): boolean {
@@ -37,5 +42,83 @@ export class CombatRules {
         // Reduce the new score according to. NOTE: Modifier is negative
         const reducedScore = score + pass * SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
         return Math.max(reducedScore, 0);
+    }
+
+    /**
+     * Determine if an attack hits the defender based on their hits.
+     *
+     * According to combat sequence (SR5#173) part defend.
+     *
+     * @param attackerHits
+     * @param defenderHits
+     * @returns true, when the attack hits.
+     */
+    static attackHits(attackerHits: number, defenderHits: number): boolean {
+        return attackerHits > defenderHits;
+    }
+
+    /**
+     * Determine if an attack grazes the defender.
+     *
+     * According to combat sequence (SR5#173) part defend.
+     *
+     * @param attackerHits
+     * @param defenderHits
+     * @returns true, when the attack grazes.
+     */
+    static attackGrazes(attackerHits: number, defenderHits: number): boolean {
+        return attackerHits === defenderHits;
+    }
+
+    /**
+     * Determine if an attack misses the defender based on their hits.
+     *
+     * According to combat sequence (SR5#173) part defend.
+     *
+     * @param attackerHits
+     * @param defenderHits
+     * @returns true, when the attack hits.
+     */
+    static attackMisses(attackerHits: number, defenderHits: number): boolean {
+        return CombatRules.attackHits(attackerHits, defenderHits);
+    }
+
+    /**
+     * Modify Damage according to combat sequence (SR5#173) part defend.
+     *
+     * @param attackerNetHits The attackers hits, reduced by the defenders hits. Should be a positive number.
+     * @param damage Incoming damage to be modified
+     * @return A new damage object for modified damage.
+     */
+    static modifyDamageAfterHit(attackerNetHits: number, damage: DamageData): DamageData {
+        const modifiedDamage = foundry.utils.duplicate(damage);
+
+        // netHits should never be below zero...
+        if (attackerNetHits <= 0) return damage;
+
+        PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.AttackerNetHits', attackerNetHits);
+        modifiedDamage.value = Helpers.calcTotal(modifiedDamage, {min: 0});
+
+        return modifiedDamage;
+    }
+
+    /**
+     * Modify amor according to combat sequence (SR5#173) part defend.
+     *
+     * @param armor An armor value to be modified.
+     * @param damage The damage containing the armor penetration to be applied.
+     * @returns A new armor value for modified armor
+     */
+    static modifyArmorAfterHit(armor: ValueField, damage: DamageData): ValueField {
+        const modifiedArmor = foundry.utils.duplicate(armor);
+
+        // ignore ap without effect
+        if (damage.ap.value <= 0) return modifiedArmor;
+
+        console.error('Check if ap is a negative value or positive value during weapon item configuration');
+        PartsList.AddUniquePart(modifiedArmor.mod, 'SR5.AP', damage.ap.value);
+        modifiedArmor.value = Helpers.calcTotal(modifiedArmor, {min: 0});
+
+        return modifiedArmor;
     }
 }
