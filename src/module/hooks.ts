@@ -36,6 +36,7 @@ import {SuccessTest} from "./tests/SuccessTest";
 import {OpposedTest} from "./tests/OpposedTest";
 import {PhysicalResistTest} from "./tests/PhysicalResistTest";
 import {handleRenderChatMessage} from "./chat";
+import {MeleeAttackTest} from "./tests/MeleeAttackTest";
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -107,6 +108,7 @@ ___________________
             tests: {
                 SuccessTest,
                 OpposedTest,
+                MeleeAttackTest,
                 RangedAttackTest,
                 PhysicalDefenseTest,
                 PhysicalResistTest
@@ -118,6 +120,7 @@ ___________________
              */
             activeTests: {
                 SuccessTest,
+                MeleeAttackTest,
                 RangedAttackTest
             },
             /**
@@ -221,7 +224,7 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
         HooksManager.renderChatMessage();
-        const item = game.items?.getName('Weapon (Ranged)');
+        const item = game.items?.getName('Weapon (Melee)');
         const actor = game.actors?.getName('Char Linked');
         if (!item || !actor) return;
         const test = await SuccessTest.fromAction(item, actor);

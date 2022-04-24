@@ -352,6 +352,7 @@ export const SR5 = {
         'wounds': 'SR5.ModifierTypes.Wounds',
         'global': 'SR5.Global',
         'soak': 'SR5.Soak',
+        'defense': 'SR5.Defense'
     },
 
     /**
@@ -365,7 +366,8 @@ export const SR5 = {
         // TODO: Add default modifiers for all test types.
         'SuccessTest': ['global'],
         'RangedAttackTest': ['global', 'wounds', 'environmental'],
-        'PhysicalDefenseTest': ['global', 'wounds'],
+        'MeleeAttackTest': ['global', 'wounds', 'environmental'],
+        'PhysicalDefenseTest': ['global', 'wounds', 'defense'],
         'PhysicalResistTest': ['global', 'soak']
     },
 

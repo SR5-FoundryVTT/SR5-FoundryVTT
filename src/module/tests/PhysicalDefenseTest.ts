@@ -3,6 +3,8 @@ import {PartsList} from "../parts/PartsList";
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
 import {CombatRules} from "../rules/CombatRules";
+import {MeleeRules} from "../rules/MeleeRules";
+import {MeleeAttackData} from "./MeleeAttackTest";
 
 // TODO: reach
 export interface PhysicalDefenseTestData extends OpposedTestData {
@@ -102,6 +104,11 @@ export class PhysicalDefenseTest extends OpposedTest {
         equippedMeleeWeapons.forEach(weapon => {
             this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());
         });
+
+        const attackData = this.against.data as MeleeAttackData;
+        const incomingReach = attackData.reach || 0;
+        const defenseReach = this.data.defenseReach;
+        this.data.defenseReach = MeleeRules.defenseReachModifier(incomingReach, defenseReach);
     }
 
     applyPoolModifiers() {
