@@ -34379,6 +34379,8 @@ exports.ShadowrunRoller = ShadowrunRoller;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
 const constants_1 = require("../constants");
+const PartsList_1 = require("../parts/PartsList");
+const helpers_1 = require("../helpers");
 class CombatRules {
     static iniOrderCanDoAnotherPass(scores) {
         for (const score of scores) {
@@ -34416,9 +34418,94 @@ class CombatRules {
         const reducedScore = score + pass * constants_1.SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
         return Math.max(reducedScore, 0);
     }
+    /**
+     * Determine if an attack hits the defender based on their hits.
+     *
+     * According to combat sequence (SR5#173) part defend.
+     *
+     * @param attackerHits
+     * @param defenderHits
+     * @returns true, when the attack hits.
+     */
+    static attackHits(attackerHits, defenderHits) {
+        return attackerHits > defenderHits;
+    }
+    /**
+     * Determine if an attack grazes the defender.
+     *
+     * According to combat sequence (SR5#173) part defend.
+     *
+     * @param attackerHits
+     * @param defenderHits
+     * @returns true, when the attack grazes.
+     */
+    static attackGrazes(attackerHits, defenderHits) {
+        return attackerHits === defenderHits;
+    }
+    /**
+     * Determine if an attack misses the defender based on their hits.
+     *
+     * According to combat sequence (SR5#173) part defend.
+     *
+     * @param attackerHits
+     * @param defenderHits
+     * @returns true, when the attack hits.
+     */
+    static attackMisses(attackerHits, defenderHits) {
+        return !CombatRules.attackHits(attackerHits, defenderHits);
+    }
+    /**
+     * Modify Damage according to combat sequence (SR5#173) part defend. Successfull attack.
+     *
+     * @param attackerHits The attackers hits. Should be a positive number.
+     * @param defenderHits The attackers hits. Should be a positive number.
+     * @param damage Incoming damage to be modified
+     * @return A new damage object for modified damage.
+     */
+    static modifyDamageAfterHit(attackerHits, defenderHits, damage) {
+        const modifiedDamage = foundry.utils.duplicate(damage);
+        // netHits should never be below zero...
+        if (attackerHits < 0)
+            attackerHits = 0;
+        if (defenderHits < 0)
+            defenderHits = 0;
+        PartsList_1.PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Attacker', attackerHits);
+        PartsList_1.PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Defender', -defenderHits);
+        modifiedDamage.value = helpers_1.Helpers.calcTotal(modifiedDamage, { min: 0 });
+        return modifiedDamage;
+    }
+    /**
+     * Modify damage according to combat sequence (SR5#173 part defend. Missing attack.
+     * @param damage Incoming damage to be modified
+     * @return A new damage object for modified damage.
+     */
+    static modifyDamageAfterMiss(damage) {
+        const modifiedDamage = foundry.utils.duplicate(damage);
+        // Keep base amd modification intact, only overwriting the result.
+        modifiedDamage.override = { name: 'SR5.Success', value: 0 };
+        helpers_1.Helpers.calcTotal(modifiedDamage, { min: 0 });
+        return modifiedDamage;
+    }
+    /**
+     * Modify amor according to combat sequence (SR5#173) part defend.
+     *
+     * @param armor An armor value to be modified.
+     * @param damage The damage containing the armor penetration to be applied.
+     * @returns A new armor value for modified armor
+     */
+    static modifyArmorAfterHit(armor, damage) {
+        const modifiedArmor = foundry.utils.duplicate(armor);
+        // ignore ap without effect
+        if (damage.ap.value <= 0)
+            return modifiedArmor;
+        console.error('Check if ap is a negative value or positive value during weapon item configuration');
+        PartsList_1.PartsList.AddUniquePart(modifiedArmor.mod, 'SR5.AP', damage.ap.value);
+        modifiedArmor.value = helpers_1.Helpers.calcTotal(modifiedArmor, { min: 0 });
+        return modifiedArmor;
+    }
 }
 exports.CombatRules = CombatRules;
-},{"../constants":152}],224:[function(require,module,exports){
+},{"../constants":152,"../helpers":166,"../parts/PartsList":220}],224:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixRules = void 0;
@@ -35341,14 +35428,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PhysicalDefenseTest = void 0;
-const helpers_1 = require("../helpers");
-const PartsList_1 = require("../parts/PartsList");
 const OpposedTest_1 = require("./OpposedTest");
+const CombatRules_1 = require("../rules/CombatRules");
 class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     _prepareData(data, options) {
         data = super._prepareData(data, options);
-        // Copy incoming damage to have a later display of both incoming and modified damage.
-        data.modDamage = foundry.utils.duplicate(data.against.damage);
+        data.incomingDamage = foundry.utils.duplicate(data.against.damage);
+        data.modifiedDamage = foundry.utils.duplicate(data.against.damage);
         return data;
     }
     get _chatMessageTemplate() {
@@ -35365,34 +35451,25 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
             yield _super.prepareDocumentData.call(this);
         });
     }
-    /**
-     * A DefenseTest is successful not when there are any netHits but as soon as the hits cross
-     * the threshold.
-     */
     get success() {
-        return this.hits.value >= this.threshold.value;
+        return CombatRules_1.CombatRules.attackMisses(this.against.hits.value, this.hits.value);
+    }
+    get failure() {
+        return CombatRules_1.CombatRules.attackHits(this.against.hits.value, this.hits.value);
     }
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
-            // A successful defense will result in no damage taken.
-            // TODO: Move this into a rules file.
-            this.data.modDamage.override = { name: 'SR5.Success', value: 0 };
-            helpers_1.Helpers.calcTotal(this.data.modDamage, { min: 0 });
+            this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
         });
     }
     processFailure() {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: Move this into a rules file.
-            // A failed defense will result in damage taken.
-            const parts = new PartsList_1.PartsList(this.data.modDamage.mod);
-            if (this.hits.value > 0)
-                parts.addPart('SR5.DefenderHits', -this.hits.value);
-            helpers_1.Helpers.calcTotal(this.data.modDamage, { min: 0 });
+            this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
         });
     }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
-},{"../helpers":166,"../parts/PartsList":220,"./OpposedTest":231}],233:[function(require,module,exports){
+},{"../rules/CombatRules":223,"./OpposedTest":231}],233:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35442,6 +35519,7 @@ const constants_1 = require("../constants");
 const config_1 = require("../config");
 /**
  * TODO: Handle near misses (3 hits attacker, 3 hits defender) => No hit, but also no failure.
+ * TODO: Move rules into CombatRules
  */
 class RangedAttackTest extends SuccessTest_1.SuccessTest {
     _prepareData(data, options) {
@@ -35568,13 +35646,6 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
             pool.addUniquePart('SR5.Recoil', recoil);
         else
             pool.removePart('SR5.Recoil');
-    }
-    processSuccess() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const parts = new PartsList_1.PartsList(this.data.damage.mod);
-            parts.addUniquePart('SR5.NetHits', this.netHits.value);
-            this.data.damage.value = helpers_1.Helpers.calcTotal(this.data.damage, { min: 0 });
-        });
     }
 }
 exports.RangedAttackTest = RangedAttackTest;

@@ -2,9 +2,13 @@ import { Helpers } from "../helpers";
 import { PartsList } from "../parts/PartsList";
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
+import {CombatRules} from "../rules/CombatRules";
 
 export interface PhysicalDefenseTestData extends OpposedTestData {
-    modDamage: DamageData
+    // Damage value of the attack
+    incomingDamage: DamageData
+    // Modified damage value of the attack after this defense (success or failure)
+    modifiedDamage: DamageData
 }
 
 export class PhysicalDefenseTest extends OpposedTest {
@@ -13,8 +17,8 @@ export class PhysicalDefenseTest extends OpposedTest {
     _prepareData(data, options?): any {
         data = super._prepareData(data, options);
 
-        // Copy incoming damage to have a later display of both incoming and modified damage.
-        data.modDamage = foundry.utils.duplicate(data.against.damage);
+        data.incomingDamage = foundry.utils.duplicate(data.against.damage);
+        data.modifiedDamage = foundry.utils.duplicate(data.against.damage);
 
         return data;
     }
@@ -31,28 +35,19 @@ export class PhysicalDefenseTest extends OpposedTest {
         await super.prepareDocumentData();
     }
 
-    /**
-     * A DefenseTest is successful not when there are any netHits but as soon as the hits cross
-     * the threshold.
-     */
     get success() {
-        return this.hits.value >= this.threshold.value;
+        return CombatRules.attackMisses(this.against.hits.value, this.hits.value);
+    }
+
+    get failure() {
+        return CombatRules.attackHits(this.against.hits.value, this.hits.value)
     }
 
     async processSuccess() {
-        // A successful defense will result in no damage taken.
-        // TODO: Move this into a rules file.
-        this.data.modDamage.override = {name: 'SR5.Success', value: 0};
-        Helpers.calcTotal(this.data.modDamage, {min: 0});
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
     }
 
     async processFailure() {
-        // TODO: Move this into a rules file.
-        // A failed defense will result in damage taken.
-        const parts = new PartsList(this.data.modDamage.mod);
-        if (this.hits.value > 0)
-            parts.addPart('SR5.DefenderHits', -this.hits.value);
-
-        Helpers.calcTotal(this.data.modDamage, {min: 0});
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
     }
 }

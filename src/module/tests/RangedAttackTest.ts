@@ -20,6 +20,7 @@ export interface RangedAttackTestData extends SuccessTestData {
 
 /**
  * TODO: Handle near misses (3 hits attacker, 3 hits defender) => No hit, but also no failure.
+ * TODO: Move rules into CombatRules
  */
 export class RangedAttackTest extends SuccessTest {
     public data: RangedAttackTestData;
@@ -155,9 +156,9 @@ export class RangedAttackTest extends SuccessTest {
             pool.removePart('SR5.Recoil');
     }
 
-    async processSuccess(): Promise<void> {
-        const parts = new PartsList(this.data.damage.mod);
-        parts.addUniquePart('SR5.NetHits', this.netHits.value);
-        this.data.damage.value = Helpers.calcTotal(this.data.damage, {min: 0});
-    }
+    // async processSuccess(): Promise<void> {
+    //     const parts = new PartsList(this.data.damage.mod);
+    //     parts.addUniquePart('SR5.NetHits', this.netHits.value);
+    //     this.data.damage.value = Helpers.calcTotal(this.data.damage, {min: 0});
+    // }
 }

@@ -41,8 +41,8 @@
             </div>
             <div class="right-side">
                 <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span>{{test.pool.value}}</span></div>
-                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span>{{test.netHits.value}}</span></div>
-                {{else}}<div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span>{{test.hits.value}}</span></div>{{/if}}
+                <div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span>{{test.hits.value}}</span></div>
+                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span>{{test.netHits.value}}</span></div>{{/if}}
             </div>
         </div>
         <div class="card-test-content">

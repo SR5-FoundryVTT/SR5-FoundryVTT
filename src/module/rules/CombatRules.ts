@@ -80,24 +80,42 @@ export class CombatRules {
      * @returns true, when the attack hits.
      */
     static attackMisses(attackerHits: number, defenderHits: number): boolean {
-        return CombatRules.attackHits(attackerHits, defenderHits);
+        return !CombatRules.attackHits(attackerHits, defenderHits);
     }
 
     /**
-     * Modify Damage according to combat sequence (SR5#173) part defend.
+     * Modify Damage according to combat sequence (SR5#173) part defend. Successfull attack.
      *
-     * @param attackerNetHits The attackers hits, reduced by the defenders hits. Should be a positive number.
+     * @param attackerHits The attackers hits. Should be a positive number.
+     * @param defenderHits The attackers hits. Should be a positive number.
      * @param damage Incoming damage to be modified
      * @return A new damage object for modified damage.
      */
-    static modifyDamageAfterHit(attackerNetHits: number, damage: DamageData): DamageData {
+    static modifyDamageAfterHit(attackerHits: number, defenderHits: number, damage: DamageData): DamageData {
         const modifiedDamage = foundry.utils.duplicate(damage);
 
         // netHits should never be below zero...
-        if (attackerNetHits <= 0) return damage;
+        if (attackerHits < 0) attackerHits = 0;
+        if (defenderHits < 0) defenderHits = 0;
 
-        PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.AttackerNetHits', attackerNetHits);
+        PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Attacker', attackerHits);
+        PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Defender', -defenderHits);
         modifiedDamage.value = Helpers.calcTotal(modifiedDamage, {min: 0});
+
+        return modifiedDamage;
+    }
+
+    /**
+     * Modify damage according to combat sequence (SR5#173 part defend. Missing attack.
+     * @param damage Incoming damage to be modified
+     * @return A new damage object for modified damage.
+     */
+    static modifyDamageAfterMiss(damage: DamageData) {
+        const modifiedDamage = foundry.utils.duplicate(damage);
+
+        // Keep base amd modification intact, only overwriting the result.
+        modifiedDamage.override = {name: 'SR5.Success', value: 0};
+        Helpers.calcTotal(modifiedDamage, {min: 0});
 
         return modifiedDamage;
     }
