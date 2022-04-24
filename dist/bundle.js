@@ -33884,6 +33884,11 @@ class PartsList {
         parts.addUniquePart(name, value, overwrite);
         return parts._list;
     }
+    static RemovePart(list, name) {
+        const parts = new PartsList(list);
+        parts.removePart(name);
+        return parts._list;
+    }
     static Total(list) {
         const parts = new PartsList(list);
         return parts.total;
@@ -35428,6 +35433,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PhysicalDefenseTest = void 0;
+const PartsList_1 = require("../parts/PartsList");
 const OpposedTest_1 = require("./OpposedTest");
 const CombatRules_1 = require("../rules/CombatRules");
 class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
@@ -35435,6 +35441,8 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
         data = super._prepareData(data, options);
         data.incomingDamage = foundry.utils.duplicate(data.against.damage);
         data.modifiedDamage = foundry.utils.duplicate(data.against.damage);
+        // TODO: this should be stored on actor flag and fetched in populateActorModifiers
+        data.cover = 0;
         return data;
     }
     get _chatMessageTemplate() {
@@ -35444,12 +35452,20 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
     }
     prepareDocumentData() {
-        const _super = Object.create(null, {
-            prepareDocumentData: { get: () => super.prepareDocumentData }
-        });
         return __awaiter(this, void 0, void 0, function* () {
-            yield _super.prepareDocumentData.call(this);
         });
+    }
+    applyPoolModifiers() {
+        this.applyPoolCoverModifier();
+        super.applyPoolModifiers();
+    }
+    applyPoolCoverModifier() {
+        // Cast dialog selection to number, when necessary.
+        this.data.cover = foundry.utils.getType(this.data.cover) === 'string' ?
+            Number(this.data.cover) :
+            this.data.cover;
+        // Apply zero modifier also, to sync pool.mod and modifiers.mod
+        PartsList_1.PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.Cover', this.data.cover);
     }
     get success() {
         return CombatRules_1.CombatRules.attackMisses(this.against.hits.value, this.hits.value);
@@ -35469,7 +35485,7 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
-},{"../rules/CombatRules":223,"./OpposedTest":231}],233:[function(require,module,exports){
+},{"../parts/PartsList":220,"../rules/CombatRules":223,"./OpposedTest":231}],233:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35589,11 +35605,7 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
         this.data.recoilCompensation = ((_a = this.item) === null || _a === void 0 ? void 0 : _a.getRecoilCompensation(true)) || 0;
     }
     prepareDocumentData() {
-        const _super = Object.create(null, {
-            prepareDocumentData: { get: () => super.prepareDocumentData }
-        });
         return __awaiter(this, void 0, void 0, function* () {
-            yield _super.prepareDocumentData.call(this);
             yield this._prepareWeaponRanges();
             this._prepareFireMode();
             this._prepareRecoilCompensation();
@@ -36213,14 +36225,14 @@ class SuccessTest {
      * Prepare missing data based on this tests Documents before anything else is done.
      */
     prepareDocumentData() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.prepareActorModifiers();
-        });
+        return __awaiter(this, void 0, void 0, function* () { });
     }
     /**
-     * Prepare modifiers based on the Actor document.
+     * Prepare modifiers based on connected documents.
+     *
+     * Main purpose is to populate the configured modifiers for this test based on actor / items used.
      */
-    prepareActorModifiers() {
+    prepareDocumentModifiers() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.actor)
                 return;
@@ -36453,6 +36465,7 @@ class SuccessTest {
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.populateDocuments();
+            yield this.prepareDocumentModifiers();
             yield this.prepareDocumentData();
             // Initial base value preparation will show default result without any user input.
             this.prepareBaseValues();

@@ -1,14 +1,18 @@
-import { Helpers } from "../helpers";
-import { PartsList } from "../parts/PartsList";
+import {Helpers} from "../helpers";
+import {PartsList} from "../parts/PartsList";
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
 import {CombatRules} from "../rules/CombatRules";
 
+// TODO: reach
 export interface PhysicalDefenseTestData extends OpposedTestData {
     // Damage value of the attack
     incomingDamage: DamageData
     // Modified damage value of the attack after this defense (success or failure)
     modifiedDamage: DamageData
+
+    // Dialog input for cover modifier
+    cover: number
 }
 
 export class PhysicalDefenseTest extends OpposedTest {
@@ -19,6 +23,9 @@ export class PhysicalDefenseTest extends OpposedTest {
 
         data.incomingDamage = foundry.utils.duplicate(data.against.damage);
         data.modifiedDamage = foundry.utils.duplicate(data.against.damage);
+
+        // TODO: this should be stored on actor flag and fetched in populateActorModifiers
+        data.cover = 0;
 
         return data;
     }
@@ -32,7 +39,22 @@ export class PhysicalDefenseTest extends OpposedTest {
     }
 
     async prepareDocumentData() {
-        await super.prepareDocumentData();
+
+    }
+
+    applyPoolModifiers() {
+        this.applyPoolCoverModifier();
+        super.applyPoolModifiers();
+    }
+
+    applyPoolCoverModifier() {
+        // Cast dialog selection to number, when necessary.
+        this.data.cover = foundry.utils.getType(this.data.cover) === 'string' ?
+            Number(this.data.cover) :
+            this.data.cover;
+
+        // Apply zero modifier also, to sync pool.mod and modifiers.mod
+        PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.Cover', this.data.cover);
     }
 
     get success() {

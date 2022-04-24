@@ -96,8 +96,6 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     async prepareDocumentData(){
-        await super.prepareDocumentData();
-
         await this._prepareWeaponRanges();
         this._prepareFireMode();
         this._prepareRecoilCompensation();

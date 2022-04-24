@@ -119,6 +119,12 @@ export class PartsList<TType> {
         return parts._list;
     }
 
+    static RemovePart<TType>(list: ModList<TType>, name: string) {
+        const parts = new PartsList(list);
+        parts.removePart(name);
+        return parts._list;
+    }
+
     static Total(list: ModList<number>) {
         const parts = new PartsList(list);
         return parts.total;

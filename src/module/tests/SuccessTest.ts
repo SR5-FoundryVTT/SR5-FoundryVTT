@@ -693,14 +693,14 @@ export class SuccessTest {
     /**
      * Prepare missing data based on this tests Documents before anything else is done.
      */
-    async prepareDocumentData() {
-        await this.prepareActorModifiers();
-    }
+    async prepareDocumentData() {}
 
     /**
-     * Prepare modifiers based on the Actor document.
+     * Prepare modifiers based on connected documents.
+     *
+     * Main purpose is to populate the configured modifiers for this test based on actor / items used.
      */
-    async prepareActorModifiers()  {
+    async prepareDocumentModifiers()  {
         if (!this.actor) return;
 
         // These modifier types will apply for this test type.
@@ -960,6 +960,7 @@ export class SuccessTest {
      */
     async execute(): Promise<this> {
         await this.populateDocuments();
+        await this.prepareDocumentModifiers();
         await this.prepareDocumentData();
 
         // Initial base value preparation will show default result without any user input.
