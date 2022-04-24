@@ -1,3 +1,9 @@
+/**
+ * Shadowrun 5 configuration for static values.
+ *
+ * NOTE: Do NOT import code into this file, as this might cause circular imports.
+ */
+
 export const SR5 = {
     itemTypes: {
         action: 'SR5.ItemTypes.Action',
@@ -369,6 +375,21 @@ export const SR5 = {
         'MeleeAttackTest': ['global', 'wounds', 'environmental'],
         'PhysicalDefenseTest': ['global', 'wounds', 'defense'],
         'PhysicalResistTest': ['global', 'soak']
+    },
+
+    /**
+     * Default action values for different tests. Should be used if an action doesn't provide values OR as default values
+     * for when this test is chosen for its role on an action sheet.
+     */
+    testDefaultAction: {
+        'PhysicalDefenseTest': {
+            'attribute': 'reaction',
+            'attribute2': 'intuition'
+        },
+        'PhysicalResistTest': {
+            'attribute': 'body',
+            'armor': true
+        }
     },
 
     programTypes: {

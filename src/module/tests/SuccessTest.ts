@@ -6,14 +6,13 @@ import {SR5Item} from "../item/SR5Item";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {PartsList} from "../parts/PartsList";
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
-import {OpposedTest} from "./OpposedTest";
 import {TestDialog} from "../apps/dialogs/TestDialog";
 import ValueField = Shadowrun.ValueField;
 import DamageData = Shadowrun.DamageData;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import ActionRollData = Shadowrun.ActionRollData;
 import {SR5} from "../config";
-import ActionData = Shadowrun.ActionData;
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -152,12 +151,12 @@ export class SuccessTest {
         data.title = data.title || this.constructor.label;
 
         // @ts-ignore // In FoundryVTT core settings we shall trust.
-        options.rollMode = options.rollMode || game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
-        options.showDialog = options.showDialog || true;
-        options.showMessage = options.showMessage || true;
+        options.rollMode = options.rollMode !== undefined ? options.rollMode : game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+        options.showDialog = options.showDialog !== undefined ? options.showDialog : true;
+        options.showMessage = options.showMessage !== undefined ? options.showMessage : true;
 
-        options.pushTheLimit = options.pushTheLimit || false;
-        options.secondChance = options.secondChance || false;
+        options.pushTheLimit = options.pushTheLimit !== undefined ? options.pushTheLimit : false;
+        options.secondChance = options.secondChance !== undefined ? options.secondChance : false;
 
         // Options will be used when a test is reused further on.
         data.options = options;
@@ -224,6 +223,31 @@ export class SuccessTest {
         const cls = game.shadowrun5e.tests[action.test];
         const data = await cls._getItemActionTestData(item, actor);
         const documents = {item, actor};
+        return new cls(data, documents, options);
+    }
+
+    /**
+     * Instead of user configured values from the action, use default action values given by SR5CONFIG for
+     * this test class.
+     *
+     * @param actor The actor to cast the test.
+     * @param options See SuccessTestOptions documentation.
+     */
+    static async fromDefaultAction(actor: SR5Actor, options?: TestOptions) {
+        if (!(actor instanceof SR5Actor)) {
+            console.error("Shadowrun 5e | A test can only be created with an explicit Actor or Item with an actor parent.")
+            return;
+        }
+
+        if (!SR5.testDefaultAction[this.name]) {
+            console.error("Shadowrun 5e | A test can only use default action when they're configured within SR5CONFIG.");
+            return;
+        }
+
+        // @ts-ignore // TODO: Typing
+        const cls = game.shadowrun5e.tests[this.name];
+        const data = await cls._getDefaultActionTestData(actor);
+        const documents = {actor};
         return new cls(data, documents, options);
     }
 
@@ -365,8 +389,22 @@ export class SuccessTest {
             const documents = {actor};
             const test = new testClass(data, documents);
             // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
-            await test.execute();
+            test.execute();
         }
+    }
+
+    static async resistAgainstOpposed(test, options?: TestOptions) {
+        if (!test) return console.error(`Shadowrun 5e | A ${this.name} against an opposed action was given a none opposed test type`, test);
+        if (!test.actor) return console.error(`Shadowrun 5e | A ${this.name} can't operate without an actor given`);
+
+        const data = await this.getResistActionTestData(test.data, test.actor, test.data.messageUuid);
+        const documents = {actor: test.actor};
+        return new this(data, documents, options);
+    }
+
+    static async getResistActionTestData(testData, actor: SR5Actor, previousMessageId: string) {
+        console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resisting opposed actions`);
+        return;
     }
 
     toJSON() {
@@ -410,33 +448,62 @@ export class SuccessTest {
         const action = item.getAction();
         if (!action || !actor) return data;
 
+        return this._prepareActionTestData(action, actor, data);
+    }
+
+    static async _getDefaultActionTestData(actor: SR5Actor) {
+        // Prepare general data structure with labeling.
+        const data = {
+            pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
+            limit: DefaultValues.valueData({label: 'SR5.Limit'}),
+            threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
+            damage: DefaultValues.damageData(),
+            modifiers: DefaultValues.valueData({label: 'SR5.Labels.Action.Modifiers'}),
+            opposed: {}
+        };
+
+        // Try fetching the items action data.
+        const defaultAction = SR5.testDefaultAction[this.name];
+        const action = DefaultValues.actionData(defaultAction);
+        if (!action) return data;
+
+        return await this._prepareActionTestData(action, actor, data);
+    }
+
+    static async _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {
         // Prepare pool values.
         // TODO: Check if knowledge / language skills can be used for actions.
         if (action.skill) {
             const skill = actor.getSkill(action.skill);
-            if (skill) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
+            if (skill) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value);
             // TODO: Check if this is actuall skill specialization and for a +2 config for it instead of MagicValue.
             if (action.spec) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', 2);
         }
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
             const attribute = actor.getAttribute(action.attribute);
-            if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+            if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
         }
         // The second attribute is only used for attribute only tests.
         // TODO: Handle skill improvisation.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2);
-            if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+            if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
         }
         if (action.mod) {
             data.pool.base = Number(action.mod);
         }
 
+        // The actors armor can be used for damage resistance tests.
+        if (action.armor) {
+            const armor = actor.getArmor();
+            if (armor) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, 'SR5.Armor', armor.value)
+        }
+
         // Prepare limit values...
         if (action.limit.attribute) {
             const limit = actor.getLimit(action.limit.attribute);
-            if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value, false);
+            if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
         }
         if (action.limit.base || action.limit.value) {
             data.limit.base = Number(action.limit.value);
@@ -447,13 +514,6 @@ export class SuccessTest {
             data.threshold.base = Number(action.threshold.base);
         }
 
-        // Prepare modifier values.
-        if (action.modifiers || Array.isArray(action.modifiers)) {
-            for (const type of action.modifiers) {
-                data.modifiers[type] = null
-            }
-        }
-
         // Prepare general damage values...
         if (action.damage.base) {
             // TODO: Actual damage value calculation from actor to a numerical value.
@@ -461,11 +521,10 @@ export class SuccessTest {
         }
         if (action.damage.attribute) {
             const attribute = actor.getAttribute(action.damage.attribute);
-            console.error('Do attribute modification');
             data.damage.mod = PartsList.AddUniquePart(data.damage.mod, attribute.label, attribute.value);
         }
 
-        // Prepare opposed tests...
+        // Prepare opposed and resist tests...
         if (action.opposed.test) {
             data.opposed = action.opposed;
         }
@@ -512,7 +571,7 @@ export class SuccessTest {
      *
      */
     get formula(): string {
-        const pool = Helpers.calcTotal(this.data.pool);
+        const pool = Helpers.calcTotal(this.data.pool, {min: 0});
         // Apply dice explosion, removing the limit is done outside the roll.
         const explode = this.hasPushTheLimit ? 'x6' : '';
 
@@ -671,6 +730,8 @@ export class SuccessTest {
 
         return this;
     }
+
+    async populateTests() {}
 
     /**
      * Rehydrate this test with Documents, should they be missing.
@@ -917,7 +978,7 @@ export class SuccessTest {
         // Only count last roll as there might be multiple second chances already
         const lastRoll = this.rolls[this.rolls.length - 1];
         const dice = lastRoll.pool - lastRoll.hits;
-        if (dice === 0) return; // TODO: User info about no dice.;
+        if (dice <= 0) return; // TODO: User info about no dice.;
 
         // Alter dice pool value for overall glitch calculation.
         const parts = new PartsList(this.pool.mod);
@@ -959,6 +1020,7 @@ export class SuccessTest {
      * TODO: Documentation.
      */
     async execute(): Promise<this> {
+        await this.populateTests();
         await this.populateDocuments();
         await this.prepareDocumentModifiers();
         await this.prepareDocumentData();
@@ -985,12 +1047,17 @@ export class SuccessTest {
         await this.processResults();
         await this.toMessage();
 
+        await this.afterTestComplete();
+
         return this;
     }
 
     async processResults() {
-        if (this.success) await this.processSuccess();
-        else await this.processFailure();
+        if (this.success) {
+            await this.processSuccess();
+        } else {
+            await this.processFailure();
+        }
     }
 
     /**
@@ -1004,6 +1071,26 @@ export class SuccessTest {
      * @override
      */
     async processFailure() {}
+
+    async afterTestComplete() {
+        if (this.success) {
+            await this.afterSuccess();
+        } else {
+            await this.afterFailure();
+        }
+    }
+
+    /**
+     * Allow subclasses to override followup behavior after a successful test result
+     * @override
+     */
+    async afterSuccess()  {}
+
+    /**
+     * Allow subclasses to override followup behavior after a failed test result
+     * @override
+     */
+    async afterFailure() {}
 
     /**
      * Post this success test as a message to the chat log.

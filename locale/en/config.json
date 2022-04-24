@@ -563,7 +563,6 @@
   "SR5.IsCritter": "Critter",
   "SR5.Blackmail": "Blackmail",
   "SR5.Family": "Family",
-  "SR5.DamageResistanceTest": "Damage Resistance Test",
   "SR5.Success": "Success!",
   "SR5.Glitch": "Glitch!",
   "SR5.GlitchCritical": "Critical Glitch!",
@@ -659,6 +658,7 @@
     "Action": {
       "ActiveTest": "Test",
       "OpposedTest": "Opposed Test",
+      "DamageResistanceTest": "Damage Resistance Test",
       "Modifiers": "Modifiers",
       "Modifier": "Modifier"
     },
@@ -961,7 +961,8 @@
     "ExtendedTest": "Extended Test",
     "PhysicalDefenseTest": "Physical Defense",
     "RangedAttackTest": "Ranged Weapon Attack",
-    "MeleeAttackTest": "Melee Weapon Attack"
+    "MeleeAttackTest": "Melee Weapon Attack",
+    "PhysicalResistTest": "Physical Damage Resist"
   },
   "SR5.MissingResource": {
     "Edge": "No Edge left to consume"

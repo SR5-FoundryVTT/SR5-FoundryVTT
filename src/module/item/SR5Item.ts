@@ -60,7 +60,7 @@ import ActionResultData = Shadowrun.ActionResultData;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
-import {SuccessTest, SuccessTestData} from "../tests/SuccessTest";
+import {SuccessTest} from "../tests/SuccessTest";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).

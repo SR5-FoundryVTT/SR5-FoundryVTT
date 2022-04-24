@@ -564,7 +564,6 @@
   "SR5.RunningSpeed": "Rennen",
   "SR5.Blackmail": "Erpressung",
   "SR5.Family": "Familie",
-  "SR5.DamageResistanceTest": "Schadenswiderstandsprobe",
   "SR5.Success": "Erfolg!",
   "SR5.Glitch": "Patzer!",
   "SR5.GlitchCritical": "Kritischer Patzer!",
@@ -644,6 +643,7 @@
     "Action": {
       "ActiveTest": "Probe",
       "OpposedTest": "Vergleichsprobe",
+      "DamageResistanceTest": "Schadenswiderstandsprobe",
       "Modifiers": "Modifikatoren",
       "Modifier": "Modifikator"
     },
@@ -923,7 +923,8 @@
     "ExtendedTest": "Ausgedehnte Probe",
     "PhysicalDefenseTest": "Physische Verteidigung",
     "RangedAttackTest": "Fernkampf Angriff",
-    "MeleeAttackTest": "Nahkampf Angriff"
+    "MeleeAttackTest": "Nahkampf Angriff",
+    "PhysicalResistTest": "Physischer Schadenswiderstand"
   },
   "SR5.MissingResource": {
     "Edge": "Kein Edge übrig"

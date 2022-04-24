@@ -1,16 +1,26 @@
-import {SuccessTest} from "./SuccessTest";
+import {SuccessTest, SuccessTestData, TestDocuments, TestOptions} from "./SuccessTest";
+import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {SR5Actor} from "../actor/SR5Actor";
 
+export interface PhysicalResistTestData extends SuccessTestData {
+    resisting: OpposedTestData
+}
 
 export class PhysicalResistTest extends SuccessTest {
-    static async fromTest(test: SuccessTest) {
-        await test.populateDocuments();
-        if (!test.actor) return console.error(`Shadowrun 5e | ${test.constructor.name} couldn't load it's documents.`);
+    public resisting: OpposedTest
 
-        const data = this.getResistActionTestData(test, test.actor);
+    constructor(data, documents?: TestDocuments, options?: TestOptions) {
+        super(data, documents, options);
     }
 
-    static async getResistActionTestData(test: SuccessTest, actor: SR5Actor)  {
+    static async getResistActionTestData(testData, actor: SR5Actor, previousMessageId: string) {
+        const data = await this._getDefaultActionTestData(actor);
+        data.previousMessageId = previousMessageId;
+        data.resisting = testData;
+        return data;
+    }
 
+    async populateTests() {
+        // this.resisting =
     }
 }

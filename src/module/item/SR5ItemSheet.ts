@@ -119,6 +119,8 @@ export class SR5ItemSheet extends ItemSheet {
         data.opposedTests = game.shadowrun5e.opposedTests;
         // @ts-ignore
         data.activeTests = game.shadowrun5e.activeTests;
+        // @ts-ignore
+        data.resistTests = game.shadowrun5e.resistTests;
 
         return data;
     }

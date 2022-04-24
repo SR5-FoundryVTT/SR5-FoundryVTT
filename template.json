@@ -1116,7 +1116,10 @@
                 },
                 "action": {
                     "opposed": {
-                        "test": "PhysicalDefenseTest"
+                        "test": "PhysicalDefenseTest",
+                        "resist": {
+                            "test": "PhysicalResistTest"
+                        }
                     }
                 }
             },
@@ -1190,7 +1193,10 @@
                         "attribute2": "",
                         "skill": "",
                         "mod": 0,
-                        "description": ""
+                        "description": "",
+                        "resist": {
+                            "test": ""
+                        }
                     },
                     "modifiers": []
                 }

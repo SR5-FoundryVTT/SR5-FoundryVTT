@@ -23231,6 +23231,11 @@ function _combatantGetInitiativeFormula() {
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
 },{"../constants":152,"../rules/CombatRules":223,"../sockets":230}],151:[function(require,module,exports){
 "use strict";
+/**
+ * Shadowrun 5 configuration for static values.
+ *
+ * NOTE: Do NOT import code into this file, as this might cause circular imports.
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
 exports.SR5 = {
@@ -23571,6 +23576,20 @@ exports.SR5 = {
         'PhysicalDefenseTest': ['global', 'wounds', 'defense'],
         'PhysicalResistTest': ['global', 'soak']
     },
+    /**
+     * Default action values for different tests. Should be used if an action doesn't provide values OR as default values
+     * for when this test is chosen for its role on an action sheet.
+     */
+    testDefaultAction: {
+        'PhysicalDefenseTest': {
+            'attribute': 'reaction',
+            'attribute2': 'intuition'
+        },
+        'PhysicalResistTest': {
+            'attribute': 'body',
+            'armor': true
+        }
+    },
     programTypes: {
         common_program: 'SR5.CommonProgram',
         hacking_program: 'SR5.HackingProgram',
@@ -23867,7 +23886,6 @@ exports.SR = {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataDefaults = exports.DefaultValues = void 0;
 const constants_1 = require("../constants");
-const SuccessTest_1 = require("../tests/SuccessTest");
 class DefaultValues {
     /**
      *
@@ -24104,7 +24122,7 @@ class DefaultValues {
     }
     static actionData(partialActionData = {}) {
         return mergeObject({
-            test: SuccessTest_1.SuccessTest.name,
+            test: "SuccessTest",
             type: '',
             category: '',
             attribute: '',
@@ -24187,7 +24205,7 @@ exports.DataDefaults = {
     },
     damage: DefaultValues.damageData({ type: { base: '', value: '' } }),
 };
-},{"../constants":152,"../tests/SuccessTest":237}],154:[function(require,module,exports){
+},{"../constants":152}],154:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -31766,6 +31784,8 @@ class SR5ItemSheet extends ItemSheet {
         data.opposedTests = game.shadowrun5e.opposedTests;
         // @ts-ignore
         data.activeTests = game.shadowrun5e.activeTests;
+        // @ts-ignore
+        data.resistTests = game.shadowrun5e.resistTests;
         return data;
     }
     /**
@@ -35612,6 +35632,18 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
             this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
         });
     }
+    afterFailure() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { test } = this.against.data.opposed.resist;
+            setTimeout(() => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const resistTestCls = game.shadowrun5e.tests[test];
+                const resistTest = yield resistTestCls.resistAgainstOpposed(this, this.data.options);
+                console.error('resistTest', resistTest);
+                yield resistTest.execute();
+            }), 300);
+        });
+    }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
 },{"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":225,"./OpposedTest":233}],235:[function(require,module,exports){
@@ -35629,16 +35661,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PhysicalResistTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
 class PhysicalResistTest extends SuccessTest_1.SuccessTest {
-    static fromTest(test) {
+    constructor(data, documents, options) {
+        super(data, documents, options);
+    }
+    static getResistActionTestData(testData, actor, previousMessageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield test.populateDocuments();
-            if (!test.actor)
-                return console.error(`Shadowrun 5e | ${test.constructor.name} couldn't load it's documents.`);
-            const data = this.getResistActionTestData(test, test.actor);
+            const data = yield this._getDefaultActionTestData(actor);
+            data.previousMessageId = previousMessageId;
+            data.resisting = testData;
+            return data;
         });
     }
-    static getResistActionTestData(test, actor) {
+    populateTests() {
         return __awaiter(this, void 0, void 0, function* () {
+            // this.resisting =
         });
     }
 }
@@ -35855,11 +35891,11 @@ class SuccessTest {
         // @ts-ignore // Prepare general test information.
         data.title = data.title || this.constructor.label;
         // @ts-ignore // In FoundryVTT core settings we shall trust.
-        options.rollMode = options.rollMode || game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
-        options.showDialog = options.showDialog || true;
-        options.showMessage = options.showMessage || true;
-        options.pushTheLimit = options.pushTheLimit || false;
-        options.secondChance = options.secondChance || false;
+        options.rollMode = options.rollMode !== undefined ? options.rollMode : game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
+        options.showDialog = options.showDialog !== undefined ? options.showDialog : true;
+        options.showMessage = options.showMessage !== undefined ? options.showMessage : true;
+        options.pushTheLimit = options.pushTheLimit !== undefined ? options.pushTheLimit : false;
+        options.secondChance = options.secondChance !== undefined ? options.secondChance : false;
         // Options will be used when a test is reused further on.
         data.options = options;
         // Set possible missing values.
@@ -35919,6 +35955,30 @@ class SuccessTest {
             const cls = game.shadowrun5e.tests[action.test];
             const data = yield cls._getItemActionTestData(item, actor);
             const documents = { item, actor };
+            return new cls(data, documents, options);
+        });
+    }
+    /**
+     * Instead of user configured values from the action, use default action values given by SR5CONFIG for
+     * this test class.
+     *
+     * @param actor The actor to cast the test.
+     * @param options See SuccessTestOptions documentation.
+     */
+    static fromDefaultAction(actor, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!(actor instanceof SR5Actor_1.SR5Actor)) {
+                console.error("Shadowrun 5e | A test can only be created with an explicit Actor or Item with an actor parent.");
+                return;
+            }
+            if (!config_1.SR5.testDefaultAction[this.name]) {
+                console.error("Shadowrun 5e | A test can only use default action when they're configured within SR5CONFIG.");
+                return;
+            }
+            // @ts-ignore // TODO: Typing
+            const cls = game.shadowrun5e.tests[this.name];
+            const data = yield cls._getDefaultActionTestData(actor);
+            const documents = { actor };
             return new cls(data, documents, options);
         });
     }
@@ -36046,8 +36106,25 @@ class SuccessTest {
                 const documents = { actor };
                 const test = new testClass(data, documents);
                 // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
-                yield test.execute();
+                test.execute();
             }
+        });
+    }
+    static resistAgainstOpposed(test, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!test)
+                return console.error(`Shadowrun 5e | A ${this.name} against an opposed action was given a none opposed test type`, test);
+            if (!test.actor)
+                return console.error(`Shadowrun 5e | A ${this.name} can't operate without an actor given`);
+            const data = yield this.getResistActionTestData(test.data, test.actor, test.data.messageUuid);
+            const documents = { actor: test.actor };
+            return new this(data, documents, options);
+        });
+    }
+    static getResistActionTestData(testData, actor, previousMessageId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resisting opposed actions`);
+            return;
         });
     }
     toJSON() {
@@ -36088,12 +36165,36 @@ class SuccessTest {
             const action = item.getAction();
             if (!action || !actor)
                 return data;
+            return this._prepareActionTestData(action, actor, data);
+        });
+    }
+    static _getDefaultActionTestData(actor) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Prepare general data structure with labeling.
+            const data = {
+                pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
+                limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
+                threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
+                damage: DataDefaults_1.DefaultValues.damageData(),
+                modifiers: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Labels.Action.Modifiers' }),
+                opposed: {}
+            };
+            // Try fetching the items action data.
+            const defaultAction = config_1.SR5.testDefaultAction[this.name];
+            const action = DataDefaults_1.DefaultValues.actionData(defaultAction);
+            if (!action)
+                return data;
+            return yield this._prepareActionTestData(action, actor, data);
+        });
+    }
+    static _prepareActionTestData(action, actor, data) {
+        return __awaiter(this, void 0, void 0, function* () {
             // Prepare pool values.
             // TODO: Check if knowledge / language skills can be used for actions.
             if (action.skill) {
                 const skill = actor.getSkill(action.skill);
                 if (skill)
-                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
+                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value);
                 // TODO: Check if this is actuall skill specialization and for a +2 config for it instead of MagicValue.
                 if (action.spec)
                     data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', 2);
@@ -36102,23 +36203,29 @@ class SuccessTest {
             if (action.attribute) {
                 const attribute = actor.getAttribute(action.attribute);
                 if (attribute)
-                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
             }
             // The second attribute is only used for attribute only tests.
             // TODO: Handle skill improvisation.
             if (!action.skill && action.attribute2) {
                 const attribute = actor.getAttribute(action.attribute2);
                 if (attribute)
-                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
             }
             if (action.mod) {
                 data.pool.base = Number(action.mod);
+            }
+            // The actors armor can be used for damage resistance tests.
+            if (action.armor) {
+                const armor = actor.getArmor();
+                if (armor)
+                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.Armor', armor.value);
             }
             // Prepare limit values...
             if (action.limit.attribute) {
                 const limit = actor.getLimit(action.limit.attribute);
                 if (limit)
-                    data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value, false);
+                    data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
             }
             if (action.limit.base || action.limit.value) {
                 data.limit.base = Number(action.limit.value);
@@ -36127,12 +36234,6 @@ class SuccessTest {
             if (action.threshold.base) {
                 data.threshold.base = Number(action.threshold.base);
             }
-            // Prepare modifier values.
-            if (action.modifiers || Array.isArray(action.modifiers)) {
-                for (const type of action.modifiers) {
-                    data.modifiers[type] = null;
-                }
-            }
             // Prepare general damage values...
             if (action.damage.base) {
                 // TODO: Actual damage value calculation from actor to a numerical value.
@@ -36140,10 +36241,9 @@ class SuccessTest {
             }
             if (action.damage.attribute) {
                 const attribute = actor.getAttribute(action.damage.attribute);
-                console.error('Do attribute modification');
                 data.damage.mod = PartsList_1.PartsList.AddUniquePart(data.damage.mod, attribute.label, attribute.value);
             }
-            // Prepare opposed tests...
+            // Prepare opposed and resist tests...
             if (action.opposed.test) {
                 data.opposed = action.opposed;
             }
@@ -36186,7 +36286,7 @@ class SuccessTest {
      *
      */
     get formula() {
-        const pool = helpers_1.Helpers.calcTotal(this.data.pool);
+        const pool = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
         // Apply dice explosion, removing the limit is done outside the roll.
         const explode = this.hasPushTheLimit ? 'x6' : '';
         return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}${explode}`;
@@ -36330,6 +36430,9 @@ class SuccessTest {
             this.calculateDerivedValues();
             return this;
         });
+    }
+    populateTests() {
+        return __awaiter(this, void 0, void 0, function* () { });
     }
     /**
      * Rehydrate this test with Documents, should they be missing.
@@ -36552,7 +36655,7 @@ class SuccessTest {
             // Only count last roll as there might be multiple second chances already
             const lastRoll = this.rolls[this.rolls.length - 1];
             const dice = lastRoll.pool - lastRoll.hits;
-            if (dice === 0)
+            if (dice <= 0)
                 return; // TODO: User info about no dice.;
             // Alter dice pool value for overall glitch calculation.
             const parts = new PartsList_1.PartsList(this.pool.mod);
@@ -36593,6 +36696,7 @@ class SuccessTest {
      */
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.populateTests();
             yield this.populateDocuments();
             yield this.prepareDocumentModifiers();
             yield this.prepareDocumentData();
@@ -36614,15 +36718,18 @@ class SuccessTest {
             yield this.evaluate();
             yield this.processResults();
             yield this.toMessage();
+            yield this.afterTestComplete();
             return this;
         });
     }
     processResults() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.success)
+            if (this.success) {
                 yield this.processSuccess();
-            else
+            }
+            else {
                 yield this.processFailure();
+            }
         });
     }
     /**
@@ -36637,6 +36744,30 @@ class SuccessTest {
      * @override
      */
     processFailure() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    afterTestComplete() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.success) {
+                yield this.afterSuccess();
+            }
+            else {
+                yield this.afterFailure();
+            }
+        });
+    }
+    /**
+     * Allow subclasses to override followup behavior after a successful test result
+     * @override
+     */
+    afterSuccess() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * Allow subclasses to override followup behavior after a failed test result
+     * @override
+     */
+    afterFailure() {
         return __awaiter(this, void 0, void 0, function* () { });
     }
     /**

@@ -73,4 +73,59 @@
             {{/unless}}
         </div>
     </div>
+
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Labels.Action.DamageResistanceTest"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.opposed.resist.test">
+                {{#select data.action.opposed.resist.test}}
+                <option value=""></option>
+                {{#each resistTests}}
+                <option value="{{this.name}}">{{localize this.label}}</option>
+                {{/each}}
+                {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Skill"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.opposed.skill">
+                {{#select data.action.opposed.resist.skill}}
+                <option value=""></option>
+                {{#each config.activeSkills as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Attribute"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.opposed.attribute">
+                {{#select data.action.opposed.resist.attribute}}
+                <option value=""></option>
+                {{#each config.attributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            {{#unless data.action.opposed.resist.skill}}
+            <select name="data.action.opposed.attribute2">
+                {{#select data.action.opposed.resist.attribute2}}
+                <option value=""></option>
+                {{#each config.attributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            {{/unless}}
+        </div>
+    </div>
 </div>

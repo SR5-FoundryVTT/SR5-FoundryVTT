@@ -18,7 +18,6 @@ import DeviceData = Shadowrun.DeviceData;
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import DeviceItemData = Shadowrun.DeviceItemData;
 import ValueField = Shadowrun.ValueField;
-import {SuccessTest} from "../tests/SuccessTest";
 import GenericValueField = Shadowrun.GenericValueField;
 
 
@@ -283,7 +282,7 @@ export class DefaultValues {
 
     static actionData(partialActionData: Partial<ActionRollData> = {}) {
         return mergeObject({
-            test: SuccessTest.name,
+            test: "SuccessTest",
             type: '',
             category: '',
             attribute: '',

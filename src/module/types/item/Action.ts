@@ -16,10 +16,12 @@ declare namespace Shadowrun {
         category: string
         attribute: ActorAttribute
         attribute2: ActorAttribute
+        armor: boolean
         skill: SkillName
         spec: boolean
         mod: number
         mod_description: string
+        // Use actor armor as part of pool
         limit: LimitData
         threshold: BaseValuePair<number>
         extended: boolean
@@ -72,7 +74,12 @@ declare namespace Shadowrun {
         attribute2: ActorAttribute
         skill: SkillName
         mod: number
-        description: string
+        description: string,
+        resist: ResistTestData
+    }
+
+    export interface ResistTestData {
+        test: string
     }
 
     export interface ActionResultData {
