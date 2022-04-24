@@ -13,6 +13,9 @@ export interface PhysicalDefenseTestData extends OpposedTestData {
 
     // Dialog input for cover modifier
     cover: number
+    // Dialog input for active defense modifier
+    activeDefense: string
+    activeDefenses: Record<string, any> // TODO: Propper typing...
 }
 
 export class PhysicalDefenseTest extends OpposedTest {
@@ -39,11 +42,48 @@ export class PhysicalDefenseTest extends OpposedTest {
     }
 
     async prepareDocumentData() {
+        this.prepareActiveDefense();
+    }
 
+    prepareActiveDefense() {
+        if (!this.actor) return;
+        const actor = this.actor;
+
+        // Default active defenses.
+        this.data.activeDefenses = {
+            full_defense: {
+                label: 'SR5.FullDefense',
+                value: actor.getFullDefenseAttribute()?.value,
+                initMod: -10,
+            },
+            dodge: {
+                label: 'SR5.Dodge',
+                value: actor.findActiveSkill('gymnastics')?.value,
+                initMod: -5,
+            },
+            block: {
+                label: 'SR5.Block',
+                value: actor.findActiveSkill('unarmed_combat')?.value,
+                initMod: -5,
+            }
+        };
+
+        // Collect weapon based defense options.
+        // NOTE: This would be way better if the current weapon (this.item) would be used.
+        const equippedMeleeWeapons = actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+        equippedMeleeWeapons.forEach((weapon) => {
+            this.data.activeDefenses[`parry-${weapon.name}`] = {
+                label: 'SR5.Parry',
+                weapon: weapon.name,
+                value: actor.findActiveSkill(weapon.getActionSkill())?.value,
+                init: -5,
+            };
+        });
     }
 
     applyPoolModifiers() {
         this.applyPoolCoverModifier();
+        this.applyPoolActiveDefenseModifier();
         super.applyPoolModifiers();
     }
 
@@ -55,6 +95,15 @@ export class PhysicalDefenseTest extends OpposedTest {
 
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
         PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.Cover', this.data.cover);
+    }
+
+    applyPoolActiveDefenseModifier() {
+        const defense = this.data.activeDefenses[this.data.activeDefense] || {label: 'SR5.ActiveDefense', value: 0, init: 0};
+
+        // Apply zero modifier also, to sync pool.mod and modifiers.mod
+        PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.ActiveDefense', defense.value);
+
+        // TODO: Use defense.init to modify Combat initiative value.
     }
 
     get success() {

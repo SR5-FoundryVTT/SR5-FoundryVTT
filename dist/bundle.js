@@ -35453,10 +35453,48 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     }
     prepareDocumentData() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.prepareActiveDefense();
+        });
+    }
+    prepareActiveDefense() {
+        var _a, _b, _c;
+        if (!this.actor)
+            return;
+        const actor = this.actor;
+        // Default active defenses.
+        this.data.activeDefenses = {
+            full_defense: {
+                label: 'SR5.FullDefense',
+                value: (_a = actor.getFullDefenseAttribute()) === null || _a === void 0 ? void 0 : _a.value,
+                initMod: -10,
+            },
+            dodge: {
+                label: 'SR5.Dodge',
+                value: (_b = actor.findActiveSkill('gymnastics')) === null || _b === void 0 ? void 0 : _b.value,
+                initMod: -5,
+            },
+            block: {
+                label: 'SR5.Block',
+                value: (_c = actor.findActiveSkill('unarmed_combat')) === null || _c === void 0 ? void 0 : _c.value,
+                initMod: -5,
+            }
+        };
+        // Collect weapon based defense options.
+        // NOTE: This would be way better if the current weapon (this.item) would be used.
+        const equippedMeleeWeapons = actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+        equippedMeleeWeapons.forEach((weapon) => {
+            var _a;
+            this.data.activeDefenses[`parry-${weapon.name}`] = {
+                label: 'SR5.Parry',
+                weapon: weapon.name,
+                value: (_a = actor.findActiveSkill(weapon.getActionSkill())) === null || _a === void 0 ? void 0 : _a.value,
+                init: -5,
+            };
         });
     }
     applyPoolModifiers() {
         this.applyPoolCoverModifier();
+        this.applyPoolActiveDefenseModifier();
         super.applyPoolModifiers();
     }
     applyPoolCoverModifier() {
@@ -35466,6 +35504,12 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
             this.data.cover;
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
         PartsList_1.PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.Cover', this.data.cover);
+    }
+    applyPoolActiveDefenseModifier() {
+        const defense = this.data.activeDefenses[this.data.activeDefense] || { label: 'SR5.ActiveDefense', value: 0, init: 0 };
+        // Apply zero modifier also, to sync pool.mod and modifiers.mod
+        PartsList_1.PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.ActiveDefense', defense.value);
+        // TODO: Use defense.init to modify Combat initiative value.
     }
     get success() {
         return CombatRules_1.CombatRules.attackMisses(this.against.hits.value, this.hits.value);
