@@ -23576,7 +23576,7 @@ exports.SR5 = {
         'RangedAttackTest': ['global', 'wounds', 'environmental'],
         'MeleeAttackTest': ['global', 'wounds', 'environmental'],
         'PhysicalDefenseTest': ['global', 'wounds', 'defense'],
-        'PhysicalResistTest': ['global', 'soak']
+        'PhysicalResistTest': ['soak']
     },
     /**
      * Default action values for different tests. Should be used if an action doesn't provide values OR as default values
@@ -25121,6 +25121,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.html',
         'systems/shadowrun5e/dist/templates/rolls/physical-defense-test-message.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
+        'systems/shadowrun5e/dist/templates/rolls/parts/test-opposed-resist.html',
     ];
     return loadTemplates(templatePaths);
 });
@@ -26866,7 +26867,7 @@ ___________________
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
             $(document).on('click', diceIconSelectorNew, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
             HooksManager.renderChatMessage();
-            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Weapon (Melee)');
+            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Weapon (Ranged)');
             const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked');
             if (!item || !actor)
                 return;
@@ -34513,8 +34514,23 @@ class CombatRules {
      */
     static modifyDamageAfterMiss(damage) {
         const modifiedDamage = foundry.utils.duplicate(damage);
-        // Keep base amd modification intact, only overwriting the result.
+        // Keep base and modification intact, only overwriting the result.
         modifiedDamage.override = { name: 'SR5.Success', value: 0 };
+        helpers_1.Helpers.calcTotal(modifiedDamage, { min: 0 });
+        return modifiedDamage;
+    }
+    /**
+     * Modify damage according to combat sequenec (SR5#173 part defende B). Damage resistance.
+     *
+     * @param damage Incoming damage tobe modified.
+     * @param hits The resisting tests hits
+     * @return A new damage object for modified damage.
+     */
+    static modifyDamageAfterResist(damage, hits) {
+        const modifiedDamage = foundry.utils.duplicate(damage);
+        if (hits < 0)
+            hits = 0;
+        modifiedDamage.mod = PartsList_1.PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
         helpers_1.Helpers.calcTotal(modifiedDamage, { min: 0 });
         return modifiedDamage;
     }
@@ -35491,6 +35507,12 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
         }
         return data;
     }
+    /**
+     * Overwrite SuccessTest#opposed behavior as an OpposedTest can't have another opposed test.
+     */
+    get opposed() {
+        return false;
+    }
     static chatMessageListeners(message, html, data) {
         html.find('.opposed-action').on('click', (event) => OpposedTest._castOpposedAction(event, html));
     }
@@ -35640,7 +35662,6 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
             // @ts-ignore
             const resistTestCls = game.shadowrun5e.tests[test];
             const resistTest = yield resistTestCls.resistAgainstOpposed(this, this.data.options);
-            console.error('resistTest', resistTest);
             yield resistTest.execute();
         });
     }
@@ -35660,10 +35681,52 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PhysicalResistTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
+const DataDefaults_1 = require("../data/DataDefaults");
+const PartsList_1 = require("../parts/PartsList");
+const CombatRules_1 = require("../rules/CombatRules");
+const helpers_1 = require("../helpers");
+/**
+ * A physical resist test handles SR5#173 Defend B
+ *
+ * Physical resist specifically handles physical damage dealt by ranged, melee and physical spell attacks.
+ */
 class PhysicalResistTest extends SuccessTest_1.SuccessTest {
-    constructor(data, documents, options) {
-        super(data, documents, options);
+    _prepareData(data, options) {
+        data = super._prepareData(data, options);
+        // Get damage after it's been modified by previous defense.
+        const incomingModifiedDamage = foundry.utils.duplicate(data.resisting.modifiedDamage);
+        data.damage = data.damage ? incomingModifiedDamage : DataDefaults_1.DefaultValues.damageData();
+        // NOTE: this is dev testing... should be removed
+        data.opposed = {};
+        return data;
     }
+    applyPoolModifiers() {
+        super.applyPoolModifiers();
+        console.error('pool modifier', this.data);
+        if (this.data.action.armor) {
+            if (this.actor) {
+                const armor = foundry.utils.duplicate(this.actor.getArmor());
+                armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, 'SR5.AP', this.data.damage.ap.value);
+                helpers_1.Helpers.calcTotal(armor, { min: 0 });
+                this.data.pool.mod = PartsList_1.PartsList.AddUniquePart(this.data.pool.mod, 'SR5.Armor', armor.value);
+            }
+        }
+        console.error(this.data.pool);
+    }
+    execute() {
+        const _super = Object.create(null, {
+            execute: { get: () => super.execute }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            return _super.execute.call(this);
+        });
+    }
+    /**
+     * TODO: This is complicated and confusing. Maybe have a TestCreation handler for SuccessTest, OpposedTest, ResistTest, TeamTest and so forth
+     * @param testData The original test that we're resisting against.
+     * @param actor
+     * @param previousMessageId
+     */
     static getResistActionTestData(testData, actor, previousMessageId) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = yield this._getDefaultActionTestData(actor);
@@ -35672,14 +35735,14 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
             return data;
         });
     }
-    populateTests() {
+    processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
-            // this.resisting =
+            this.data.damage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.damage, this.hits.value);
         });
     }
 }
 exports.PhysicalResistTest = PhysicalResistTest;
-},{"./SuccessTest":237}],236:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/CombatRules":223,"./SuccessTest":237}],236:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36117,8 +36180,12 @@ class SuccessTest {
                 return console.error(`Shadowrun 5e | A ${this.name} against an opposed action was given a none opposed test type`, test);
             if (!test.actor)
                 return console.error(`Shadowrun 5e | A ${this.name} can't operate without an actor given`);
-            const data = yield this.getResistActionTestData(test.data, test.actor, test.data.messageUuid);
+            // Don't change the data's source.
+            const testData = foundry.utils.duplicate(test.data);
+            // Prepare the resist test.
+            const data = yield this.getResistActionTestData(testData, test.actor, test.data.messageUuid);
             const documents = { actor: test.actor };
+            // Initialize a new test of the current testing class.
             return new this(data, documents, options);
         });
     }
@@ -36190,6 +36257,8 @@ class SuccessTest {
     }
     static _prepareActionTestData(action, actor, data) {
         return __awaiter(this, void 0, void 0, function* () {
+            // Store the action for later use.
+            data.action = action;
             // Prepare pool values.
             // TODO: Check if knowledge / language skills can be used for actions.
             if (action.skill) {
@@ -36215,12 +36284,6 @@ class SuccessTest {
             }
             if (action.mod) {
                 data.pool.base = Number(action.mod);
-            }
-            // The actors armor can be used for damage resistance tests.
-            if (action.armor) {
-                const armor = actor.getArmor();
-                if (armor)
-                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.Armor', armor.value);
             }
             // Prepare limit values...
             if (action.limit.attribute) {
@@ -36432,6 +36495,9 @@ class SuccessTest {
             return this;
         });
     }
+    /**
+     * Allow subclasses to populate a test before execution and any other steps.
+     */
     populateTests() {
         return __awaiter(this, void 0, void 0, function* () { });
     }
@@ -36608,7 +36674,7 @@ class SuccessTest {
      * Helper to check if opposing tests exist for this test.
      */
     get opposed() {
-        return this.data.opposed !== undefined;
+        return !!this.data.opposed && this.data.opposed.test !== '';
     }
     /**
      * TODO: This method results in an ugly description.
@@ -36829,9 +36895,8 @@ class SuccessTest {
         if (!this.data.opposed)
             return [];
         if (!this.data.opposed.test) {
-            // Be carefull not to reference the OpposedTest class due to circular imports.
-            console.warn(`Shadowrun 5e | An opposed action without a defined test handler defaulted to ${'OpposedTest'}`);
-            this.data.opposed.test = 'OpposedTest';
+            console.error(`Shadowrun 5e | An opposed action without a defined test handler defaulted to ${'OpposedTest'}`);
+            return;
         }
         // @ts-ignore TODO: Move this into a helper
         const testCls = game.shadowrun5e.tests[this.data.opposed.test];

@@ -110,11 +110,29 @@ export class CombatRules {
      * @param damage Incoming damage to be modified
      * @return A new damage object for modified damage.
      */
-    static modifyDamageAfterMiss(damage: DamageData) {
+    static modifyDamageAfterMiss(damage: DamageData): DamageData {
         const modifiedDamage = foundry.utils.duplicate(damage);
 
-        // Keep base amd modification intact, only overwriting the result.
+        // Keep base and modification intact, only overwriting the result.
         modifiedDamage.override = {name: 'SR5.Success', value: 0};
+        Helpers.calcTotal(modifiedDamage, {min: 0});
+
+        return modifiedDamage;
+    }
+
+    /**
+     * Modify damage according to combat sequenec (SR5#173 part defende B). Damage resistance.
+     *
+     * @param damage Incoming damage tobe modified.
+     * @param hits The resisting tests hits
+     * @return A new damage object for modified damage.
+     */
+    static modifyDamageAfterResist(damage: DamageData, hits: number): DamageData {
+        const modifiedDamage = foundry.utils.duplicate(damage);
+
+        if (hits < 0) hits = 0;
+
+        modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
         Helpers.calcTotal(modifiedDamage, {min: 0});
 
         return modifiedDamage;

@@ -1,11 +1,9 @@
-import {Helpers} from "../helpers";
 import {PartsList} from "../parts/PartsList";
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
 import {CombatRules} from "../rules/CombatRules";
 import {MeleeRules} from "../rules/MeleeRules";
 import {MeleeAttackData} from "./MeleeAttackTest";
-import {SuccessTest} from "./SuccessTest";
 
 // TODO: reach
 export interface PhysicalDefenseTestData extends OpposedTestData {
@@ -23,6 +21,7 @@ export interface PhysicalDefenseTestData extends OpposedTestData {
     isMeleeAttack: boolean
     defenseReach: number
 }
+
 
 export class PhysicalDefenseTest extends OpposedTest {
     public data: PhysicalDefenseTestData;
@@ -166,7 +165,6 @@ export class PhysicalDefenseTest extends OpposedTest {
         const resistTestCls = game.shadowrun5e.tests[test];
         const resistTest = await resistTestCls.resistAgainstOpposed(this, this.data.options);
 
-        console.error('resistTest', resistTest);
         await resistTest.execute();
     }
 }

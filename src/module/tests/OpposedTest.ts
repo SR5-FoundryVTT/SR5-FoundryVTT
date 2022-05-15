@@ -17,6 +17,7 @@ export interface OpposedTestValues extends SuccessTestValues {
 
 export interface OpposedTestData extends
     TestData,
+    // Remove unnecessary data points.
     Omit<SuccessTestData, 'opposed'>,
     Omit<SuccessTestData, 'targetActorsUuid'> {
 
@@ -114,6 +115,13 @@ export class OpposedTest extends SuccessTest {
         }
 
         return data as OpposedTestData;
+    }
+
+    /**
+     * Overwrite SuccessTest#opposed behavior as an OpposedTest can't have another opposed test.
+     */
+    get opposed() {
+        return false;
     }
 
     static chatMessageListeners(message: ChatMessage, html, data) {

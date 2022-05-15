@@ -224,7 +224,7 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
         HooksManager.renderChatMessage();
-        const item = game.items?.getName('Weapon (Melee)');
+        const item = game.items?.getName('Weapon (Ranged)');
         const actor = game.actors?.getName('Char Linked');
         if (!item || !actor) return;
         const test = await SuccessTest.fromAction(item, actor);

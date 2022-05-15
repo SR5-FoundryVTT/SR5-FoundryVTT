@@ -143,6 +143,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/rolls/physical-defense-test-message.html',
 
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
+        'systems/shadowrun5e/dist/templates/rolls/parts/test-opposed-resist.html',
     ];
 
     return loadTemplates(templatePaths);

@@ -61,6 +61,9 @@ export interface TestData {
     // modifiers: Record<ModifierTypes, TestModifier>
     modifiers: ValueField
 
+    // The source action this test is derived from.
+    action: ActionRollData
+
     // Documents the test might has been derived from.
     sourceItemUuid?: string
     sourceActorUuid?: string
@@ -399,8 +402,14 @@ export class SuccessTest {
         if (!test) return console.error(`Shadowrun 5e | A ${this.name} against an opposed action was given a none opposed test type`, test);
         if (!test.actor) return console.error(`Shadowrun 5e | A ${this.name} can't operate without an actor given`);
 
-        const data = await this.getResistActionTestData(test.data, test.actor, test.data.messageUuid);
+        // Don't change the data's source.
+        const testData = foundry.utils.duplicate(test.data);
+
+        // Prepare the resist test.
+        const data = await this.getResistActionTestData(testData, test.actor, test.data.messageUuid);
         const documents = {actor: test.actor};
+
+        // Initialize a new test of the current testing class.
         return new this(data, documents, options);
     }
 
@@ -473,6 +482,9 @@ export class SuccessTest {
     }
 
     static async _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {
+        // Store the action for later use.
+        data.action = action;
+
         // Prepare pool values.
         // TODO: Check if knowledge / language skills can be used for actions.
         if (action.skill) {
@@ -494,12 +506,6 @@ export class SuccessTest {
         }
         if (action.mod) {
             data.pool.base = Number(action.mod);
-        }
-
-        // The actors armor can be used for damage resistance tests.
-        if (action.armor) {
-            const armor = actor.getArmor();
-            if (armor) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, 'SR5.Armor', armor.value)
         }
 
         // Prepare limit values...
@@ -733,6 +739,9 @@ export class SuccessTest {
         return this;
     }
 
+    /**
+     * Allow subclasses to populate a test before execution and any other steps.
+     */
     async populateTests() {}
 
     /**
@@ -929,7 +938,7 @@ export class SuccessTest {
      * Helper to check if opposing tests exist for this test.
      */
     get opposed(): boolean {
-        return this.data.opposed !== undefined;
+        return !!this.data.opposed && this.data.opposed.test !== '';
     }
 
     /**
@@ -1047,6 +1056,7 @@ export class SuccessTest {
 
         await this.evaluate();
         await this.processResults();
+
         await this.toMessage();
 
         await this.afterTestComplete();
@@ -1154,9 +1164,8 @@ export class SuccessTest {
         if (!this.data.opposed) return [];
 
         if (!this.data.opposed.test) {
-            // Be carefull not to reference the OpposedTest class due to circular imports.
-            console.warn(`Shadowrun 5e | An opposed action without a defined test handler defaulted to ${'OpposedTest'}`);
-            this.data.opposed.test = 'OpposedTest';
+            console.error(`Shadowrun 5e | An opposed action without a defined test handler defaulted to ${'OpposedTest'}`);
+            return;
         }
         // @ts-ignore TODO: Move this into a helper
         const testCls = game.shadowrun5e.tests[this.data.opposed.test];

@@ -374,7 +374,7 @@ export const SR5 = {
         'RangedAttackTest': ['global', 'wounds', 'environmental'],
         'MeleeAttackTest': ['global', 'wounds', 'environmental'],
         'PhysicalDefenseTest': ['global', 'wounds', 'defense'],
-        'PhysicalResistTest': ['global', 'soak']
+        'PhysicalResistTest': ['soak']
     },
 
     /**
