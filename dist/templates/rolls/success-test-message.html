@@ -49,7 +49,7 @@
             {{#if test.success}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Success'}}" {{/if}}>
-                    {{localize "SR5.Success"}}
+                    {{localize test.successLabel}}
                 </div>
             </div>
                 {{#if test.glitched}}
@@ -63,7 +63,7 @@
             {{#if test.failure}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Failure'}}" {{/if}}>
-                    {{localize "SR5.Failure"}}
+                    {{localize test.failureLabel}}
                 </div>
             </div>
             {{/if}}

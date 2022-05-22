@@ -370,7 +370,7 @@ export class SR5Item extends Item {
 
         const test = await SuccessTest.fromAction(this, this.actor);
         if (!test) return;
-        await test.toMessage();
+        await test.execute();
 
         // const dontRollTest = event?.shiftKey || !this.hasRoll;
         // if (dontRollTest) return await this.postItemCard();

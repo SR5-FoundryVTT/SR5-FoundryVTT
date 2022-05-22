@@ -30278,7 +30278,7 @@ class SR5Item extends Item {
             const test = yield SuccessTest_1.SuccessTest.fromAction(this, this.actor);
             if (!test)
                 return;
-            yield test.toMessage();
+            yield test.execute();
             // const dontRollTest = event?.shiftKey || !this.hasRoll;
             // if (dontRollTest) return await this.postItemCard();
             //
