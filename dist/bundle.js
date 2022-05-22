@@ -35646,6 +35646,12 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     get failure() {
         return CombatRules_1.CombatRules.attackHits(this.against.hits.value, this.hits.value);
     }
+    get successLabel() {
+        return 'SR5.AttackDodged';
+    }
+    get failureLabel() {
+        return 'SR5.AttackHits';
+    }
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
             this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
@@ -35702,7 +35708,6 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
     }
     applyPoolModifiers() {
         super.applyPoolModifiers();
-        console.error('pool modifier', this.data);
         if (this.data.action.armor) {
             if (this.actor) {
                 const armor = foundry.utils.duplicate(this.actor.getArmor());
@@ -36669,6 +36674,18 @@ class SuccessTest {
      */
     get failure() {
         return !this.success;
+    }
+    /**
+     * How to call a successful test of this type.
+     */
+    get successLabel() {
+        return 'SR5.Success';
+    }
+    /**
+     * How to call a failed test of this type.
+     */
+    get failureLabel() {
+        return 'SR5.Failure';
     }
     /**
      * Helper to check if opposing tests exist for this test.

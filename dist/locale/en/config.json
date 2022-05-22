@@ -479,6 +479,8 @@
   "SR5.Attacker": "Attacker",
   "SR5.Defender": "Defender",
   "SR5.DefenderNetHits": "Defender Net Hits",
+  "SR5.AttackDodged": "Attack Dodged",
+  "SR5.AttackHits": "Attack Hits",
   "SR5.Incoming": "Incoming",
   "SR5.Modified": "Modified",
   "SR5.Resist": "Resist",

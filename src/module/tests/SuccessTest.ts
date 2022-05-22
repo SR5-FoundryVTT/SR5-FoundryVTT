@@ -935,6 +935,20 @@ export class SuccessTest {
     }
 
     /**
+     * How to call a successful test of this type.
+     */
+    get successLabel(): string {
+        return 'SR5.Success';
+    }
+
+    /**
+     * How to call a failed test of this type.
+     */
+    get failureLabel(): string {
+        return 'SR5.Failure';
+    }
+
+    /**
      * Helper to check if opposing tests exist for this test.
      */
     get opposed(): boolean {

@@ -35,8 +35,6 @@ export class PhysicalResistTest extends SuccessTest {
     applyPoolModifiers() {
         super.applyPoolModifiers();
 
-        console.error('pool modifier', this.data);
-
         if (this.data.action.armor) {
             if (this.actor) {
                 const armor = foundry.utils.duplicate(this.actor.getArmor());

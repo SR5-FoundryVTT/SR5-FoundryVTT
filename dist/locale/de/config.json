@@ -479,6 +479,8 @@
   "SR5.Attacker": "Angreifer",
   "SR5.Defender": "Verteidiger",
   "SR5.DefenderNetHits": "Verteidiger Netto-Erfolge",
+  "SR5.AttackDodged": "Ausgewichen",
+  "SR5.AttackHits": "Treffer",
   "SR5.Incoming": "Kommend",
   "SR5.Modified": "Modifiziert",
   "SR5.Resist": "Widerstehen",
