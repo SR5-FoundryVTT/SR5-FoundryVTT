@@ -386,7 +386,7 @@ export class SuccessTest {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
 
         for (const actor of actors) {
-            const data = testClass.getMessageActionTestData(testData.data, actor, id);
+            const data = await testClass.getMessageActionTestData(testData.data, actor, id);
             if (!data) return;
 
             const documents = {actor};
@@ -413,9 +413,20 @@ export class SuccessTest {
         return new this(data, documents, options);
     }
 
+    /**
+     * TODO: This is complicated and confusing. Maybe have a TestCreation handler for SuccessTest, OpposedTest, ResistTest, TeamTest and so forth
+     *
+     * @param testData The original test that we're resisting against.
+     * @param actor The actor to get values from to resist damage
+     * @param previousMessageId The previous message id in the test chain
+     */
     static async getResistActionTestData(testData, actor: SR5Actor, previousMessageId: string) {
-        console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resisting opposed actions`);
-        return;
+        const data = await this._getDefaultActionTestData(actor);
+
+        data.previousMessageId = previousMessageId;
+        data.resisting = testData;
+
+        return data;
     }
 
     toJSON() {
@@ -455,11 +466,11 @@ export class SuccessTest {
             opposed: {}
         };
 
-        // Try fetching the items action data.
+        // Get user defined action configuration.
         const action = item.getAction();
         if (!action || !actor) return data;
 
-        return this._prepareActionTestData(action, actor, data);
+        return await this._prepareActionTestData(action, actor, data);
     }
 
     static async _getDefaultActionTestData(actor: SR5Actor) {
@@ -473,16 +484,19 @@ export class SuccessTest {
             opposed: {}
         };
 
-        // Try fetching the items action data.
+        // TODO: Build this similar to opposed test flow to allow for custom resist attributs / skills.
+
+        // Provide default action information.
         const defaultAction = SR5.testDefaultAction[this.name];
         const action = DefaultValues.actionData(defaultAction);
         if (!action) return data;
 
+        // Alter default action information with user defined information.
         return await this._prepareActionTestData(action, actor, data);
     }
 
     static async _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {
-        // Store the action for later use.
+        // Action values might be needed later to redo the same test.
         data.action = action;
 
         // Prepare pool values.
@@ -553,7 +567,7 @@ export class SuccessTest {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
-    static getMessageActionTestData(testData, actor: SR5Actor, previousMessageId: string): SuccessTestData | undefined {
+    static async getMessageActionTestData(testData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
         return;
     }
@@ -595,7 +609,7 @@ export class SuccessTest {
      */
     get code(): string {
         // Add action dynamic value sources as labels.
-        let pool = this.pool.mod.map(mod => game.i18n.localize(mod.name));
+        let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
         let threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name));
         let limit = this.limit.mod.map(mod => game.i18n.localize(mod.name));
 

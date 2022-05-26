@@ -153,10 +153,4 @@ export class RangedAttackTest extends SuccessTest {
         else
             pool.removePart('SR5.Recoil');
     }
-
-    // async processSuccess(): Promise<void> {
-    //     const parts = new PartsList(this.data.damage.mod);
-    //     parts.addUniquePart('SR5.NetHits', this.netHits.value);
-    //     this.data.damage.value = Helpers.calcTotal(this.data.damage, {min: 0});
-    // }
 }

@@ -1,4 +1,3 @@
-import { SR5Actor } from "../actor/SR5Actor";
 import {
     SuccessTest,
     SuccessTestData,
@@ -7,9 +6,9 @@ import {
     TestDocuments,
     TestData
 } from "./SuccessTest";
-import ValueField = Shadowrun.ValueField;
 import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
+import {SR5} from "../config";
 
 
 export interface OpposedTestValues extends SuccessTestValues {
@@ -55,7 +54,7 @@ export class OpposedTest extends SuccessTest {
         await this.against.populateDocuments();
     }
 
-    static getMessageActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): OpposedTestData|undefined {
+    static async getMessageActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData);
             return;
@@ -90,9 +89,19 @@ export class OpposedTest extends SuccessTest {
         // and calculate netHits accordingly.
         data.threshold.base = againstData.values.netHits.value;
 
-        // Try fetching the opposed action data.
-        const {opposed} = againstData;
+        // Don't alter original opposed data in place.
+        const opposed = foundry.utils.duplicate(againstData.opposed);
 
+        // Use default values, where defined.
+        const defaultAction = SR5.testDefaultAction[this.name];
+        opposed.skill = opposed.skill || defaultAction.skill;
+        opposed.attribute = opposed.attribute || defaultAction.attribute;
+        opposed.attribute2 = opposed.attribute2 || defaultAction.attribute2;
+        opposed.mod = opposed.mod || defaultAction.mod;
+
+        // TODO: Check if this approach can be replaced by creating a parial action and using getMessageActionTestData
+
+        // Get all value sources to be used for this test.
         if (opposed.skill && opposed.attribute) {
             // TODO: Handle skill testing rules.
             const skill = actor.getSkill(opposed.skill);

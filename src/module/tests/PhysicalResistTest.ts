@@ -44,27 +44,6 @@ export class PhysicalResistTest extends SuccessTest {
             }
 
         }
-
-        console.error(this.data.pool);
-    }
-
-    async execute(): Promise<this> {
-        return super.execute();
-    }
-
-    /**
-     * TODO: This is complicated and confusing. Maybe have a TestCreation handler for SuccessTest, OpposedTest, ResistTest, TeamTest and so forth
-     * @param testData The original test that we're resisting against.
-     * @param actor
-     * @param previousMessageId
-     */
-    static async getResistActionTestData(testData, actor: SR5Actor, previousMessageId: string) {
-        const data = await this._getDefaultActionTestData(actor);
-
-        data.previousMessageId = previousMessageId;
-        data.resisting = testData;
-
-        return data;
     }
 
     async processSuccess() {

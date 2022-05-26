@@ -1870,4 +1870,20 @@ export class SR5Item extends Item {
         if (this.canBeNetworkController) await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
         if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
     }
+
+    protected _preUpdate(changed, options, user) {
+        if (this.isWeapon()) {
+            switch (changed?.data?.category) {
+                case 'range':
+                    foundry.utils.mergeObject(changed, {data: {action: {test: 'RangedAttackTest'}}});
+                    break;
+                case 'melee':
+                    foundry.utils.mergeObject(changed, {data: {action: {test: 'MeleeAttackTest'}}});
+                    break;
+            }
+        }
+        console.error(this, changed, options, user);
+
+        return super._preUpdate(changed, options, user);
+    }
 }
