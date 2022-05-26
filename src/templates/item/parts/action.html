@@ -98,7 +98,7 @@
             <input
                 size="4"
                 maxlength="3"
-                type="text"
+                type="number"
                 name="data.action.mod"
                 value="{{data.action.mod}}"
                 data-dtype="Number"
@@ -115,7 +115,7 @@
             <input
                 size="4"
                 maxlength="3"
-                type="text"
+                type="number"
                 name="data.action.limit.base"
                 value="{{data.action.limit.base}}"
                 data-dtype="Number"
@@ -124,7 +124,7 @@
             <div>
                 +
             </div>
-            <select name="data.action.limit.attribute">
+            <select name="data.action.limit.attribute" data-dtype="Text">
                 {{#select data.action.limit.attribute}}
                 <option value=""></option>
                 {{#each limits as |name type|}}
@@ -142,7 +142,7 @@
             <input
                 size="4"
                 maxlength="3"
-                type="text"
+                type="number"
                 name="data.action.threshold.base"
                 value="{{data.action.threshold.base}}"
                 data-dtype="Number"

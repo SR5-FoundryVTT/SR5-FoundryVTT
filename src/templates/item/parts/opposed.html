@@ -94,7 +94,7 @@
             {{localize "SR5.Skill"}}
         </div>
         <div class="inputs">
-            <select name="data.action.opposed.skill">
+            <select name="data.action.opposed.resist.skill">
                 {{#select data.action.opposed.resist.skill}}
                 <option value=""></option>
                 {{#each config.activeSkills as |name type|}}
@@ -108,7 +108,7 @@
             {{localize "SR5.Attribute"}}
         </div>
         <div class="inputs">
-            <select name="data.action.opposed.attribute">
+            <select name="data.action.opposed.resist.attribute">
                 {{#select data.action.opposed.resist.attribute}}
                 <option value=""></option>
                 {{#each config.attributes as |name type|}}
@@ -116,7 +116,7 @@
                 {{/each}} {{/select}}
             </select>
             {{#unless data.action.opposed.resist.skill}}
-            <select name="data.action.opposed.attribute2">
+            <select name="data.action.opposed.resist.attribute2">
                 {{#select data.action.opposed.resist.attribute2}}
                 <option value=""></option>
                 {{#each config.attributes as |name type|}}
