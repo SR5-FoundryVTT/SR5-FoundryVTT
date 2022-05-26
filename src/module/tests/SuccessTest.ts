@@ -388,7 +388,7 @@ export class SuccessTest {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
 
         for (const actor of actors) {
-            const data = await testClass._getOpposedTestData(testData.data, actor, id);
+            const data = await testClass._getOpposedActionTestData(testData.data, actor, id);
             if (!data) return;
 
             const documents = {actor};
@@ -592,7 +592,7 @@ export class SuccessTest {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
-    static async _getOpposedTestData(testData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getOpposedActionTestData(testData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
         return;
     }
@@ -1228,12 +1228,8 @@ export class SuccessTest {
      * is prepared to support multiple action buttons.
      */
     _prepareOpposedActionsTemplateData() {
-        if (!this.data.opposed) return [];
+        if (!this.data.opposed || !this.data.opposed.test) return [];
 
-        if (!this.data.opposed.test) {
-            console.error(`Shadowrun 5e | An opposed action without a defined test handler defaulted to ${'OpposedTest'}`);
-            return;
-        }
         // @ts-ignore TODO: Move this into a helper
         const testCls = game.shadowrun5e.tests[this.data.opposed.test];
         if (!testCls) return console.error('Shadowrun 5e | Opposed Action has no test class registered.')
@@ -1241,8 +1237,7 @@ export class SuccessTest {
         const action = {
             // Store the test implementation registration name.
             test: this.data.opposed.test,
-            // Use test implementation label or sensible default.
-            label: testCls.label || 'SR5.Tests.SuccessTest'
+            label: testCls.label
         };
 
         const {opposed} = this.data;

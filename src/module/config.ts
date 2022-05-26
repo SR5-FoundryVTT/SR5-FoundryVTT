@@ -393,6 +393,15 @@ export const SR5 = {
         }
     },
 
+    /**
+     * Define here what kind of active test is to be used for the different weapon categories as a main action test.
+     */
+    weaponCategoryActiveTests: {
+        'range': 'RangedAttackTest',
+        'melee': 'MeleeAttackTest',
+        'thrown': 'ThrownAttackTest'
+    },
+
     programTypes: {
         common_program: 'SR5.CommonProgram',
         hacking_program: 'SR5.HackingProgram',

@@ -23593,6 +23593,14 @@ exports.SR5 = {
             'armor': true
         }
     },
+    /**
+     * Define here what kind of active test is to be used for the different weapon categories as a main action test.
+     */
+    weaponCategoryActiveTests: {
+        'range': 'RangedAttackTest',
+        'melee': 'MeleeAttackTest',
+        'thrown': 'ThrownAttackTest'
+    },
     programTypes: {
         common_program: 'SR5.CommonProgram',
         hacking_program: 'SR5.HackingProgram',
@@ -31655,19 +31663,23 @@ class SR5Item extends Item {
                 yield NetworkDeviceFlow_1.NetworkDeviceFlow.removeDeviceFromController(this);
         });
     }
+    /**
+     * Make sure all item data is in a persistent and valid status.
+     *
+     * This is preferred to altering data on the fly in the prepareData methods flow.
+     */
     _preUpdate(changed, options, user) {
         var _a;
+        // Make sure weapon actions are in a valid state for different weapon categories.
         if (this.isWeapon()) {
-            switch ((_a = changed === null || changed === void 0 ? void 0 : changed.data) === null || _a === void 0 ? void 0 : _a.category) {
-                case 'range':
-                    foundry.utils.mergeObject(changed, { data: { action: { test: 'RangedAttackTest' } } });
-                    break;
-                case 'melee':
-                    foundry.utils.mergeObject(changed, { data: { action: { test: 'MeleeAttackTest' } } });
-                    break;
+            // Make sure a matching active test for the configured weapons category is used.
+            if (((_a = changed === null || changed === void 0 ? void 0 : changed.data) === null || _a === void 0 ? void 0 : _a.category) && changed.data.category !== '') {
+                const test = config_1.SR5.weaponCategoryActiveTests[changed.data.category];
+                if (!test)
+                    console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changed.data.category}.`, this);
+                foundry.utils.mergeObject(changed, { data: { action: { test } } });
             }
         }
-        console.error(this, changed, options, user);
         return super._preUpdate(changed, options, user);
     }
 }
@@ -36175,7 +36187,7 @@ class SuccessTest {
             if (actors.length === 0)
                 (_b = ui.notifications) === null || _b === void 0 ? void 0 : _b.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
             for (const actor of actors) {
-                const data = yield testClass._getOpposedTestData(testData.data, actor, id);
+                const data = yield testClass._getOpposedActionTestData(testData.data, actor, id);
                 if (!data)
                     return;
                 const documents = { actor };
@@ -36372,7 +36384,7 @@ class SuccessTest {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
-    static _getOpposedTestData(testData, actor, previousMessageId) {
+    static _getOpposedActionTestData(testData, actor, previousMessageId) {
         return __awaiter(this, void 0, void 0, function* () {
             console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
             return;
@@ -36963,12 +36975,8 @@ class SuccessTest {
      * is prepared to support multiple action buttons.
      */
     _prepareOpposedActionsTemplateData() {
-        if (!this.data.opposed)
+        if (!this.data.opposed || !this.data.opposed.test)
             return [];
-        if (!this.data.opposed.test) {
-            console.error(`Shadowrun 5e | An opposed action without a defined test handler defaulted to ${'OpposedTest'}`);
-            return;
-        }
         // @ts-ignore TODO: Move this into a helper
         const testCls = game.shadowrun5e.tests[this.data.opposed.test];
         if (!testCls)
@@ -36976,8 +36984,7 @@ class SuccessTest {
         const action = {
             // Store the test implementation registration name.
             test: this.data.opposed.test,
-            // Use test implementation label or sensible default.
-            label: testCls.label || 'SR5.Tests.SuccessTest'
+            label: testCls.label
         };
         const { opposed } = this.data;
         if (this.data.opposed.mod) {

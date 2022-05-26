@@ -1871,18 +1871,21 @@ export class SR5Item extends Item {
         if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
     }
 
+    /**
+     * Make sure all item data is in a persistent and valid status.
+     *
+     * This is preferred to altering data on the fly in the prepareData methods flow.
+     */
     protected _preUpdate(changed, options, user) {
+        // Make sure weapon actions are in a valid state for different weapon categories.
         if (this.isWeapon()) {
-            switch (changed?.data?.category) {
-                case 'range':
-                    foundry.utils.mergeObject(changed, {data: {action: {test: 'RangedAttackTest'}}});
-                    break;
-                case 'melee':
-                    foundry.utils.mergeObject(changed, {data: {action: {test: 'MeleeAttackTest'}}});
-                    break;
+            // Make sure a matching active test for the configured weapons category is used.
+            if (changed?.data?.category && changed.data.category !== '') {
+                const test = SR5.weaponCategoryActiveTests[changed.data.category];
+                if (!test) console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changed.data.category}.`, this);
+                foundry.utils.mergeObject(changed, {data: {action: {test}}});
             }
         }
-        console.error(this, changed, options, user);
 
         return super._preUpdate(changed, options, user);
     }
