@@ -7,19 +7,15 @@ declare namespace Shadowrun {
         result: ActionResultData
     }
 
-    export interface ActionRollData {
+    export interface ActionRollData extends MinimalActionData {
         // Test test class used for the active action test
         // Should be defined in game.shadowrun5e.activeTests
         test: string
         // The type of combat action to be performed.
         type: string
         category: string
-        attribute: ActorAttribute
-        attribute2: ActorAttribute
         armor: boolean
-        skill: SkillName
         spec: boolean
-        mod: number
         mod_description: string
         // Use actor armor as part of pool
         limit: LimitData
@@ -63,22 +59,25 @@ declare namespace Shadowrun {
         source?: DamageSource;
     }
 
+    export interface MinimalActionData {
+        skill: SkillName
+        attribute: ActorAttribute
+        attribute2: ActorAttribute
+        mod: number
+    }
+
     /**
      * Action opposed test data.
      */
-    export interface OpposedTestData {
+    export interface OpposedTestData extends MinimalActionData{
         type: OpposedType
         // Should match game.shadowrun5e.opposedTests
         test: string
-        attribute: ActorAttribute
-        attribute2: ActorAttribute
-        skill: SkillName
-        mod: number
         description: string,
         resist: ResistTestData
     }
 
-    export interface ResistTestData {
+    export interface ResistTestData extends MinimalActionData {
         test: string
     }
 

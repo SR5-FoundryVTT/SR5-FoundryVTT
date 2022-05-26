@@ -23554,7 +23554,7 @@ exports.SR5 = {
     /**
      * Modification types used for actions and general success tests.
      *
-     * These are meant to be used with the Modifiers class and SR5Actor.getModifiers()
+     * These are meant to be used with the Modifiers class and SR5Actor.getModifiers('wounds').
      */
     modifierTypes: {
         'environmental': 'SR5.ModifierTypes.Environmental',
@@ -23562,9 +23562,10 @@ exports.SR5 = {
         'global': 'SR5.Global',
         'soak': 'SR5.Soak',
         'defense': 'SR5.Defense'
+        // TODO: Add ActorData.modifiers to this list
     },
     /**
-     * What modifiers should be used for each test type.
+     * What modifiers should be used for each test type by default.
      *
      * NOTE: These modifiers are routed through ModifierFlow.totalFor()
      * NOTE: Each key should be found within game.shadowrun5e.tests and match a SuccessTest subclass.
@@ -34908,6 +34909,9 @@ class SkillRules {
     static getDefaultingModifier() {
         return constants_1.SR.skill.DEFAULTING_MODIFIER;
     }
+    static get SpecializationModifier() {
+        return constants_1.SR.skill.SPECIALIZATION_MODIFIER;
+    }
 }
 exports.SkillRules = SkillRules;
 },{"../constants":152}],228:[function(require,module,exports){
@@ -35442,7 +35446,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpposedTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
 const DataDefaults_1 = require("../data/DataDefaults");
-const PartsList_1 = require("../parts/PartsList");
 const config_1 = require("../config");
 /**
  * An opposed test results from a normal success test as an opposed action.
@@ -35468,19 +35471,19 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
             yield this.against.populateDocuments();
         });
     }
-    static getMessageActionTestData(againstData, actor, previousMessageId) {
+    static _getOpposedActionTestData(againstData, actor, previousMessageId) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!againstData.opposed) {
-                console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData);
+                console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
                 return;
             }
             // @ts-ignore // TODO: Typing here get's confused between boolean when it should be string.
             if (againstData.opposed.type !== '') {
-                console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`);
+                console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
                 return;
             }
             if (!actor) {
-                console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`);
+                console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
                 return;
             }
             // Prepare testing data.
@@ -35498,39 +35501,36 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
             // Register these as a threshold, which will trigger success/failure status
             // and calculate netHits accordingly.
             data.threshold.base = againstData.values.netHits.value;
-            // Don't alter original opposed data in place.
-            const opposed = foundry.utils.duplicate(againstData.opposed);
-            // Use default values, where defined.
-            const defaultAction = config_1.SR5.testDefaultAction[this.name];
-            opposed.skill = opposed.skill || defaultAction.skill;
-            opposed.attribute = opposed.attribute || defaultAction.attribute;
-            opposed.attribute2 = opposed.attribute2 || defaultAction.attribute2;
-            opposed.mod = opposed.mod || defaultAction.mod;
-            // TODO: Check if this approach can be replaced by creating a parial action and using getMessageActionTestData
+            // Build the opposed action data
+            const action = DataDefaults_1.DefaultValues.actionData(config_1.SR5.testDefaultAction[this.name]);
+            // Overwrite defaults with user defined action data.
+            action.skill = againstData.opposed.skill || action.skill;
+            action.attribute = againstData.opposed.attribute || action.attribute;
+            action.attribute2 = againstData.opposed.attribute2 || action.attribute2;
+            action.mod = againstData.opposed.mod || action.mod;
             // Get all value sources to be used for this test.
-            if (opposed.skill && opposed.attribute) {
-                // TODO: Handle skill testing rules.
-                const skill = actor.getSkill(opposed.skill);
-                if (skill)
-                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
-                const attribute = actor.getAttribute(opposed.attribute);
-                if (attribute)
-                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-            }
-            if (!opposed.skill && opposed.attribute) {
-                const attribute = actor.getAttribute(opposed.attribute);
-                if (attribute)
-                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-            }
-            if (!opposed.skill && opposed.attribute2) {
-                const attribute = actor.getAttribute(opposed.attribute2);
-                if (attribute)
-                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-            }
-            if (opposed.mod) {
-                data.pool.base = Number(opposed.mod);
-            }
-            return data;
+            // if (opposed.skill && opposed.attribute) {
+            //     // TODO: Handle skill testing rules.
+            //     const skill = actor.getSkill(opposed.skill);
+            //     if (skill) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
+            //
+            //     const attribute = actor.getAttribute(opposed.attribute);
+            //     if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+            // }
+            //
+            // if (!opposed.skill && opposed.attribute) {
+            //     const attribute = actor.getAttribute(opposed.attribute);
+            //     if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+            // }
+            // if (!opposed.skill && opposed.attribute2) {
+            //     const attribute = actor.getAttribute(opposed.attribute2);
+            //     if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+            // }
+            // if (opposed.mod) {
+            //     data.pool.base = Number(opposed.mod);
+            // }
+            return yield this._prepareActionTestData(action, actor, data);
+            // return data as OpposedTestData;
         });
     }
     /**
@@ -35544,7 +35544,7 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.OpposedTest = OpposedTest;
-},{"../config":151,"../data/DataDefaults":153,"../parts/PartsList":220,"./SuccessTest":237}],234:[function(require,module,exports){
+},{"../config":151,"../data/DataDefaults":153,"./SuccessTest":237}],234:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35743,6 +35743,9 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
             }
         }
     }
+    get canSucceed() {
+        return false;
+    }
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
             this.data.damage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.damage, this.hits.value);
@@ -35919,6 +35922,7 @@ const PartsList_1 = require("../parts/PartsList");
 const ShadowrunTestDialog_1 = require("../apps/dialogs/ShadowrunTestDialog");
 const TestDialog_1 = require("../apps/dialogs/TestDialog");
 const config_1 = require("../config");
+const SkillRules_1 = require("../rules/SkillRules");
 /**
  * General handling of Shadowrun 5e success tests.
  *
@@ -36171,7 +36175,7 @@ class SuccessTest {
             if (actors.length === 0)
                 (_b = ui.notifications) === null || _b === void 0 ? void 0 : _b.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
             for (const actor of actors) {
-                const data = yield testClass.getMessageActionTestData(testData.data, actor, id);
+                const data = yield testClass._getOpposedTestData(testData.data, actor, id);
                 if (!data)
                     return;
                 const documents = { actor };
@@ -36191,23 +36195,22 @@ class SuccessTest {
             // Don't change the data's source.
             const testData = foundry.utils.duplicate(test.data);
             // Prepare the resist test.
-            const data = yield this.getResistActionTestData(testData, test.actor, test.data.messageUuid);
+            const data = yield this.getOpposedResistActionTestData(testData, test.actor, test.data.messageUuid);
             const documents = { actor: test.actor };
             // Initialize a new test of the current testing class.
             return new this(data, documents, options);
         });
     }
     /**
-     * TODO: This is complicated and confusing. Maybe have a TestCreation handler for SuccessTest, OpposedTest, ResistTest, TeamTest and so forth
+     * Create a resist test after an opposed test has been completed.
      *
-     * @param testData The original test that we're resisting against.
+     * @param testData The opposed test from which the resisting test starts from. It includes the original success test.
      * @param actor The actor to get values from to resist damage
      * @param previousMessageId The previous message id in the test chain
      */
-    static getResistActionTestData(testData, actor, previousMessageId) {
+    static getOpposedResistActionTestData(testData, actor, previousMessageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const data = yield this._getDefaultActionTestData(actor);
-            data.previousMessageId = previousMessageId;
+            const data = yield this._getOpposedResistTestData(testData.against, actor, previousMessageId);
             data.resisting = testData;
             return data;
         });
@@ -36253,8 +36256,25 @@ class SuccessTest {
             return yield this._prepareActionTestData(action, actor, data);
         });
     }
-    static _getDefaultActionTestData(actor) {
+    /**
+     * An opposed resist test is related to results of an opposed test.
+     *
+     * This can be a physical damage resist test and will be derived from configuration
+     * of the original test that's being opposed.
+     *
+     * @param againstData The original test that's being opposed. Not the opposed test itself.
+     * @param actor The actor doing the testing.
+     * @param previousMessageId The Message id of the originating opposing test.
+     */
+    static _getOpposedResistTestData(againstData, actor, previousMessageId) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!againstData.opposed.resist.test) {
+                console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, againstData, this);
+                return;
+            }
+            if (!actor) {
+                console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
+            }
             // Prepare general data structure with labeling.
             const data = {
                 pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
@@ -36262,14 +36282,19 @@ class SuccessTest {
                 threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
                 damage: DataDefaults_1.DefaultValues.damageData(),
                 modifiers: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Labels.Action.Modifiers' }),
-                opposed: {}
+                opposed: {},
+                previousMessageId
             };
-            // TODO: Build this similar to opposed test flow to allow for custom resist attributs / skills.
             // Provide default action information.
             const defaultAction = config_1.SR5.testDefaultAction[this.name];
             const action = DataDefaults_1.DefaultValues.actionData(defaultAction);
             if (!action)
                 return data;
+            // Override defaults with user defined action data.
+            action.skill = againstData.opposed.resist.skill || action.skill;
+            action.attribute = againstData.opposed.resist.attribute || action.attribute;
+            action.attribute2 = againstData.opposed.resist.attribute2 || action.attribute2;
+            action.mod = againstData.opposed.resist.mod || action.mod;
             // Alter default action information with user defined information.
             return yield this._prepareActionTestData(action, actor, data);
         });
@@ -36280,13 +36305,14 @@ class SuccessTest {
             data.action = action;
             // Prepare pool values.
             // TODO: Check if knowledge / language skills can be used for actions.
+            // TODO: Handle skill improvisation.
             if (action.skill) {
                 const skill = actor.getSkill(action.skill);
                 if (skill)
                     data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value);
-                // TODO: Check if this is actuall skill specialization and for a +2 config for it instead of MagicValue.
+                // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
                 if (action.spec)
-                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', 2);
+                    data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', SkillRules_1.SkillRules.SpecializationModifier);
             }
             // The first attribute is either used for skill or attribute only tests.
             if (action.attribute) {
@@ -36295,12 +36321,12 @@ class SuccessTest {
                     data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
             }
             // The second attribute is only used for attribute only tests.
-            // TODO: Handle skill improvisation.
             if (!action.skill && action.attribute2) {
                 const attribute = actor.getAttribute(action.attribute2);
                 if (attribute)
                     data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
             }
+            // A general pool modifier will be used as a base value.
             if (action.mod) {
                 data.pool.base = Number(action.mod);
             }
@@ -36346,7 +36372,7 @@ class SuccessTest {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
-    static getMessageActionTestData(testData, actor, previousMessageId) {
+    static _getOpposedTestData(testData, actor, previousMessageId) {
         return __awaiter(this, void 0, void 0, function* () {
             console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
             return;
@@ -36690,6 +36716,18 @@ class SuccessTest {
      */
     get failure() {
         return !this.success;
+    }
+    /**
+     * Use this method for subclasses which can't reasonably be successful.
+     */
+    get canSucceed() {
+        return true;
+    }
+    /**
+     * Use this method for subclasses which can't reasonably fail.
+     */
+    get canFail() {
+        return true;
     }
     /**
      * How to call a successful test of this type.
@@ -37076,7 +37114,7 @@ class SuccessTest {
     }
 }
 exports.SuccessTest = SuccessTest;
-},{"../actor/SR5Actor":86,"../apps/dialogs/ShadowrunTestDialog":142,"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221}],238:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../apps/dialogs/ShadowrunTestDialog":142,"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":227}],238:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;

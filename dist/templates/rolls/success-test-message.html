@@ -46,21 +46,20 @@
             </div>
         </div>
         <div class="card-test-content">
-            {{#if test.success}}
+            {{#if test.canSucceed}} {{#if test.success}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Success'}}" {{/if}}>
                     {{localize test.successLabel}}
                 </div>
             </div>
-                {{#if test.glitched}}
+            {{#if test.glitched}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
                     {{localize "SR5.Glitch"}}
                 </div>
             </div>
-                {{/if}}
-            {{/if}}
-            {{#if test.failure}}
+            {{/if}} {{/if}} {{/if}}
+            {{#if test.canFail}}{{#if test.failure}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Failure'}}" {{/if}}>
                     {{localize test.failureLabel}}
@@ -73,7 +72,7 @@
                     {{localize "SR5.GlitchCritical"}}
                 </div>
             </div>
-            {{/if}}
+            {{/if}}{{/if}}
         </div>
     </div>
     <div class="card-rolls">

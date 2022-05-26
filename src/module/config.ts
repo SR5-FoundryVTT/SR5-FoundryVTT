@@ -351,7 +351,7 @@ export const SR5 = {
     /**
      * Modification types used for actions and general success tests.
      *
-     * These are meant to be used with the Modifiers class and SR5Actor.getModifiers()
+     * These are meant to be used with the Modifiers class and SR5Actor.getModifiers('wounds').
      */
     modifierTypes: {
         'environmental': 'SR5.ModifierTypes.Environmental',
@@ -359,10 +359,11 @@ export const SR5 = {
         'global': 'SR5.Global',
         'soak': 'SR5.Soak',
         'defense': 'SR5.Defense'
+        // TODO: Add ActorData.modifiers to this list
     },
 
     /**
-     * What modifiers should be used for each test type.
+     * What modifiers should be used for each test type by default.
      *
      * NOTE: These modifiers are routed through ModifierFlow.totalFor()
      * NOTE: Each key should be found within game.shadowrun5e.tests and match a SuccessTest subclass.

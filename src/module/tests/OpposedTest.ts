@@ -7,7 +7,6 @@ import {
     TestData
 } from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
-import {PartsList} from "../parts/PartsList";
 import {SR5} from "../config";
 
 
@@ -54,18 +53,18 @@ export class OpposedTest extends SuccessTest {
         await this.against.populateDocuments();
     }
 
-    static async getMessageActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
+    static async _getOpposedActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
         if (!againstData.opposed) {
-            console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData);
+            console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;
         }
         // @ts-ignore // TODO: Typing here get's confused between boolean when it should be string.
         if (againstData.opposed.type !== '') {
-            console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`);
+            console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
             return;
         }
         if (!actor) {
-            console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`);
+            console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
             return;
         }
 
@@ -89,41 +88,39 @@ export class OpposedTest extends SuccessTest {
         // and calculate netHits accordingly.
         data.threshold.base = againstData.values.netHits.value;
 
-        // Don't alter original opposed data in place.
-        const opposed = foundry.utils.duplicate(againstData.opposed);
+        // Build the opposed action data
+        const action = DefaultValues.actionData(SR5.testDefaultAction[this.name]);
 
-        // Use default values, where defined.
-        const defaultAction = SR5.testDefaultAction[this.name];
-        opposed.skill = opposed.skill || defaultAction.skill;
-        opposed.attribute = opposed.attribute || defaultAction.attribute;
-        opposed.attribute2 = opposed.attribute2 || defaultAction.attribute2;
-        opposed.mod = opposed.mod || defaultAction.mod;
-
-        // TODO: Check if this approach can be replaced by creating a parial action and using getMessageActionTestData
+        // Overwrite defaults with user defined action data.
+        action.skill = againstData.opposed.skill || action.skill;
+        action.attribute = againstData.opposed.attribute || action.attribute;
+        action.attribute2 = againstData.opposed.attribute2 || action.attribute2;
+        action.mod = againstData.opposed.mod || action.mod;
 
         // Get all value sources to be used for this test.
-        if (opposed.skill && opposed.attribute) {
-            // TODO: Handle skill testing rules.
-            const skill = actor.getSkill(opposed.skill);
-            if (skill) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
+        // if (opposed.skill && opposed.attribute) {
+        //     // TODO: Handle skill testing rules.
+        //     const skill = actor.getSkill(opposed.skill);
+        //     if (skill) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
+        //
+        //     const attribute = actor.getAttribute(opposed.attribute);
+        //     if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+        // }
+        //
+        // if (!opposed.skill && opposed.attribute) {
+        //     const attribute = actor.getAttribute(opposed.attribute);
+        //     if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+        // }
+        // if (!opposed.skill && opposed.attribute2) {
+        //     const attribute = actor.getAttribute(opposed.attribute2);
+        //     if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+        // }
+        // if (opposed.mod) {
+        //     data.pool.base = Number(opposed.mod);
+        // }
 
-            const attribute = actor.getAttribute(opposed.attribute);
-            if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-        }
-
-        if (!opposed.skill && opposed.attribute) {
-            const attribute = actor.getAttribute(opposed.attribute);
-            if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-        }
-        if (!opposed.skill && opposed.attribute2) {
-            const attribute = actor.getAttribute(opposed.attribute2);
-            if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-        }
-        if (opposed.mod) {
-            data.pool.base = Number(opposed.mod);
-        }
-
-        return data as OpposedTestData;
+        return await this._prepareActionTestData(action, actor, data);
+        // return data as OpposedTestData;
     }
 
     /**

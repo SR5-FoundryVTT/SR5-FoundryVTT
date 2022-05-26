@@ -41,4 +41,8 @@ export class SkillRules {
     static getDefaultingModifier(): number {
         return SR.skill.DEFAULTING_MODIFIER;
     }
+
+    static get SpecializationModifier(): number {
+        return SR.skill.SPECIALIZATION_MODIFIER;
+    }
 }

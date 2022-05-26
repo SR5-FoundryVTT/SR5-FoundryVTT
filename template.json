@@ -1195,7 +1195,11 @@
                         "mod": 0,
                         "description": "",
                         "resist": {
-                            "test": ""
+                            "test": "",
+                            "skill": "",
+                            "attribute": "",
+                            "attribute2": "",
+                            "mod": 0
                         }
                     },
                     "modifiers": []

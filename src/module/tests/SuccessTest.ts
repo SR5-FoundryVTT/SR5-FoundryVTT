@@ -13,6 +13,8 @@ import OpposedTestData = Shadowrun.OpposedTestData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import ActionRollData = Shadowrun.ActionRollData;
 import {SR5} from "../config";
+import {SkillRules} from "../rules/SkillRules";
+import {OpposedTest} from "./OpposedTest";
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -386,7 +388,7 @@ export class SuccessTest {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
 
         for (const actor of actors) {
-            const data = await testClass.getMessageActionTestData(testData.data, actor, id);
+            const data = await testClass._getOpposedTestData(testData.data, actor, id);
             if (!data) return;
 
             const documents = {actor};
@@ -406,7 +408,7 @@ export class SuccessTest {
         const testData = foundry.utils.duplicate(test.data);
 
         // Prepare the resist test.
-        const data = await this.getResistActionTestData(testData, test.actor, test.data.messageUuid);
+        const data = await this.getOpposedResistActionTestData(testData, test.actor, test.data.messageUuid);
         const documents = {actor: test.actor};
 
         // Initialize a new test of the current testing class.
@@ -414,16 +416,15 @@ export class SuccessTest {
     }
 
     /**
-     * TODO: This is complicated and confusing. Maybe have a TestCreation handler for SuccessTest, OpposedTest, ResistTest, TeamTest and so forth
+     * Create a resist test after an opposed test has been completed.
      *
-     * @param testData The original test that we're resisting against.
+     * @param testData The opposed test from which the resisting test starts from. It includes the original success test.
      * @param actor The actor to get values from to resist damage
      * @param previousMessageId The previous message id in the test chain
      */
-    static async getResistActionTestData(testData, actor: SR5Actor, previousMessageId: string) {
-        const data = await this._getDefaultActionTestData(actor);
+    static async getOpposedResistActionTestData(testData, actor: SR5Actor, previousMessageId: string) {
+        const data = await this._getOpposedResistTestData(testData.against, actor, previousMessageId);
 
-        data.previousMessageId = previousMessageId;
         data.resisting = testData;
 
         return data;
@@ -473,7 +474,25 @@ export class SuccessTest {
         return await this._prepareActionTestData(action, actor, data);
     }
 
-    static async _getDefaultActionTestData(actor: SR5Actor) {
+    /**
+     * An opposed resist test is related to results of an opposed test.
+     *
+     * This can be a physical damage resist test and will be derived from configuration
+     * of the original test that's being opposed.
+     *
+     * @param againstData The original test that's being opposed. Not the opposed test itself.
+     * @param actor The actor doing the testing.
+     * @param previousMessageId The Message id of the originating opposing test.
+     */
+    static async _getOpposedResistTestData(againstData: SuccessTestData, actor: SR5Actor, previousMessageId: string) {
+        if (!againstData.opposed.resist.test) {
+            console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, againstData, this);
+            return;
+        }
+        if (!actor) {
+            console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
+        }
+
         // Prepare general data structure with labeling.
         const data = {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
@@ -481,15 +500,20 @@ export class SuccessTest {
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
             damage: DefaultValues.damageData(),
             modifiers: DefaultValues.valueData({label: 'SR5.Labels.Action.Modifiers'}),
-            opposed: {}
+            opposed: {},
+            previousMessageId
         };
-
-        // TODO: Build this similar to opposed test flow to allow for custom resist attributs / skills.
 
         // Provide default action information.
         const defaultAction = SR5.testDefaultAction[this.name];
         const action = DefaultValues.actionData(defaultAction);
         if (!action) return data;
+
+        // Override defaults with user defined action data.
+        action.skill = againstData.opposed.resist.skill || action.skill;
+        action.attribute = againstData.opposed.resist.attribute || action.attribute;
+        action.attribute2 = againstData.opposed.resist.attribute2 || action.attribute2;
+        action.mod = againstData.opposed.resist.mod || action.mod;
 
         // Alter default action information with user defined information.
         return await this._prepareActionTestData(action, actor, data);
@@ -501,11 +525,12 @@ export class SuccessTest {
 
         // Prepare pool values.
         // TODO: Check if knowledge / language skills can be used for actions.
+        // TODO: Handle skill improvisation.
         if (action.skill) {
             const skill = actor.getSkill(action.skill);
             if (skill) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value);
-            // TODO: Check if this is actuall skill specialization and for a +2 config for it instead of MagicValue.
-            if (action.spec) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', 2);
+            // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
+            if (action.spec) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', SkillRules.SpecializationModifier);
         }
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
@@ -513,11 +538,11 @@ export class SuccessTest {
             if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
         }
         // The second attribute is only used for attribute only tests.
-        // TODO: Handle skill improvisation.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2);
             if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
         }
+        // A general pool modifier will be used as a base value.
         if (action.mod) {
             data.pool.base = Number(action.mod);
         }
@@ -567,7 +592,7 @@ export class SuccessTest {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
-    static async getMessageActionTestData(testData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getOpposedTestData(testData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
         return;
     }
@@ -946,6 +971,20 @@ export class SuccessTest {
      */
     get failure(): boolean {
         return !this.success;
+    }
+
+    /**
+     * Use this method for subclasses which can't reasonably be successful.
+     */
+    get canSucceed(): boolean {
+        return true;
+    }
+
+    /**
+     * Use this method for subclasses which can't reasonably fail.
+     */
+    get canFail(): boolean {
+        return true;
     }
 
     /**

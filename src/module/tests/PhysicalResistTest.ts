@@ -46,6 +46,10 @@ export class PhysicalResistTest extends SuccessTest {
         }
     }
 
+    get canSucceed() {
+        return false;
+    }
+
     async processSuccess() {
         this.data.damage = CombatRules.modifyDamageAfterResist(this.data.damage, this.hits.value);
     }
