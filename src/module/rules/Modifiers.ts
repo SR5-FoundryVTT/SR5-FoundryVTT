@@ -220,11 +220,11 @@ export class Modifiers {
         return SR.combat.environmental.levels;
     }
 
-    static async getModifiersFromEntity(document: ModifiableDocumentTypes): Promise<Modifiers> {
+    static getModifiersFromEntity(document: ModifiableDocumentTypes): Modifiers {
         // It's possible for scene modifiers to chosen, while no scene is actually opened.
         // if (!document) return new Modifiers(Modifiers.getDefaultModifiers());
 
-        const data = await document.getFlag(SYSTEM_NAME, FLAGS.Modifier) as SituationModifiers;
+        const data = document.getFlag(SYSTEM_NAME, FLAGS.Modifier) as SituationModifiers;
         return new Modifiers(data);
     }
 

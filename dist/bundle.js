@@ -15129,7 +15129,7 @@ class SR5Actor extends Actor {
     // @ts-ignore
     getModifiers(ignoreScene = false, scene = canvas.scene) {
         return __awaiter(this, void 0, void 0, function* () {
-            const onActor = yield Modifiers_1.Modifiers.getModifiersFromEntity(this);
+            const onActor = Modifiers_1.Modifiers.getModifiersFromEntity(this);
             if (onActor.hasActiveEnvironmental) {
                 return onActor;
                 // No open scene, or scene ignored.
@@ -15138,7 +15138,7 @@ class SR5Actor extends Actor {
                 return new Modifiers_1.Modifiers(Modifiers_1.Modifiers.getDefaultModifiers());
             }
             else {
-                return yield Modifiers_1.Modifiers.getModifiersFromEntity(scene);
+                return Modifiers_1.Modifiers.getModifiersFromEntity(scene);
             }
         });
     }
@@ -19270,7 +19270,7 @@ class EnvModifiersApplication extends Application {
                 return yield this.target.getModifiers();
             }
             // All other types are handled without special cases.
-            return yield Modifiers_1.Modifiers.getModifiersFromEntity(this.target);
+            return Modifiers_1.Modifiers.getModifiersFromEntity(this.target);
         });
     }
     _storeModifiersOnTarget() {
@@ -19289,7 +19289,7 @@ class EnvModifiersApplication extends Application {
     }
     _targetHasEnvironmentalModifiers() {
         return __awaiter(this, void 0, void 0, function* () {
-            const modifiers = yield Modifiers_1.Modifiers.getModifiersFromEntity(this.target);
+            const modifiers = Modifiers_1.Modifiers.getModifiersFromEntity(this.target);
             return !!modifiers.environmental;
         });
     }
@@ -21881,6 +21881,7 @@ class TestDialog extends FormDialog_1.FormDialog {
         // Second, apply generic values.
         // @ts-ignore
         foundry.utils.mergeObject(this.data, data);
+        // Give tests opportunity to change resulting values on the fly.
         this.data.test.prepareBaseValues();
         this.data.test.calculateBaseValues();
     }
@@ -23497,6 +23498,7 @@ exports.SR5 = {
         astral: 'SR5.InitCatAstral',
         matrix: 'SR5.InitCatMatrix',
     },
+    // Gear modification types. :) Not modifiers.
     modificationTypes: {
         weapon: 'SR5.Weapon',
         armor: 'SR5.Armor',
@@ -26862,7 +26864,7 @@ ___________________
         HandlebarManager_1.HandlebarManager.loadTemplates();
     }
     static ready() {
-        var _a, _b, _c;
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if ((_a = game.user) === null || _a === void 0 ? void 0 : _a.isGM) {
                 yield Migrator_1.Migrator.BeginMigration();
@@ -26876,15 +26878,6 @@ ___________________
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
             $(document).on('click', diceIconSelectorNew, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
             HooksManager.renderChatMessage();
-            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Weapon (Ranged)');
-            const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked');
-            if (!item || !actor)
-                return;
-            const test = yield SuccessTest_1.SuccessTest.fromAction(item, actor);
-            if (!test)
-                console.warn('Didnt work');
-            yield (test === null || test === void 0 ? void 0 : test.execute());
-            $(document).find('.message');
         });
     }
     static canvasInit() {
@@ -34865,12 +34858,10 @@ class Modifiers {
         return constants_1.SR.combat.environmental.levels;
     }
     static getModifiersFromEntity(document) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // It's possible for scene modifiers to chosen, while no scene is actually opened.
-            // if (!document) return new Modifiers(Modifiers.getDefaultModifiers());
-            const data = yield document.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Modifier);
-            return new Modifiers(data);
-        });
+        // It's possible for scene modifiers to chosen, while no scene is actually opened.
+        // if (!document) return new Modifiers(Modifiers.getDefaultModifiers());
+        const data = document.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Modifier);
+        return new Modifiers(data);
     }
     static setModifiersOnEntity(document, modifiers) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -35784,6 +35775,7 @@ const PartsList_1 = require("../parts/PartsList");
 const helpers_1 = require("../helpers");
 const constants_1 = require("../constants");
 const config_1 = require("../config");
+const Modifiers_1 = require("../rules/Modifiers");
 /**
  * TODO: Handle near misses (3 hits attacker, 3 hits defender) => No hit, but also no failure.
  * TODO: Move rules into CombatRules
@@ -35888,31 +35880,38 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
             if (!actor)
                 return;
             const modifiers = yield actor.getModifiers();
-            if (!modifiers.hasActiveEnvironmentalOverwrite) {
-                modifiers.activateEnvironmentalCategory('range', this.data.range);
-                yield actor.setModifiers(modifiers);
-            }
-            else {
-                console.error('The actor has an active environmental overwrite, yet could define a manual range selection.');
-            }
+            modifiers.activateEnvironmentalCategory('range', this.data.range);
+            yield actor.setModifiers(modifiers);
         });
     }
     prepareBaseValues() {
-        super.prepareBaseValues();
-        // Apply recoil modification
+        const poolMods = new PartsList_1.PartsList(this.data.modifiers.mod);
+        // Apply recoil modification to general modifiers before calculating base values.
         // TODO: Actual recoil calculation with consumption of recoil compensation.
         // TODO: Recoil Modifier handling should go through ModifierFlow and / or Modifiers
         const { fireMode, recoilCompensation } = this.data;
         const recoil = recoilCompensation - fireMode.value;
-        const pool = new PartsList_1.PartsList(this.data.modifiers.mod);
         if (recoil < 0)
-            pool.addUniquePart('SR5.Recoil', recoil);
+            poolMods.addUniquePart('SR5.Recoil', recoil);
         else
-            pool.removePart('SR5.Recoil');
+            poolMods.removePart('SR5.Recoil');
+        // Apply altered environmental modifers
+        if (this.actor) {
+            const modifiers = Modifiers_1.Modifiers.getModifiersFromEntity(this.actor);
+            modifiers.activateEnvironmentalCategory('range', Number(this.data.range));
+            const environmental = modifiers.environmental.total;
+            if (environmental !== 0) {
+                poolMods.addUniquePart(config_1.SR5.modifierTypes.environmental, environmental);
+            }
+            else {
+                poolMods.removePart(config_1.SR5.modifierTypes.environmental);
+            }
+        }
+        super.prepareBaseValues();
     }
 }
 exports.RangedAttackTest = RangedAttackTest;
-},{"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"./SuccessTest":237}],237:[function(require,module,exports){
+},{"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/Modifiers":226,"./SuccessTest":237}],237:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

@@ -2008,7 +2008,7 @@ export class SR5Actor extends Actor {
      */
     // @ts-ignore
     async getModifiers(ignoreScene: boolean = false, scene: Scene = canvas.scene): Promise<Modifiers> {
-        const onActor = await Modifiers.getModifiersFromEntity(this);
+        const onActor = Modifiers.getModifiersFromEntity(this);
 
         if (onActor.hasActiveEnvironmental) {
             return onActor;
@@ -2016,7 +2016,7 @@ export class SR5Actor extends Actor {
         } else if (ignoreScene || scene === null) {
             return new Modifiers(Modifiers.getDefaultModifiers());
         } else {
-            return await Modifiers.getModifiersFromEntity(scene);
+            return Modifiers.getModifiersFromEntity(scene);
         }
     }
 

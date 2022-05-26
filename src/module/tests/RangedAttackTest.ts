@@ -1,13 +1,14 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import DamageData = Shadowrun.DamageData;
-import {DefaultValues} from "../data/DataDefaults";
-import {PartsList} from "../parts/PartsList";
-import { Helpers } from "../helpers";
 import FireModeData = Shadowrun.FireModeData;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
+import RangesTemplateData = Shadowrun.RangesTemplateData;
+import {DefaultValues} from "../data/DataDefaults";
+import {PartsList} from "../parts/PartsList";
+import {Helpers} from "../helpers";
 import {SR} from "../constants";
 import {SR5} from "../config";
-import RangesTemplateData = Shadowrun.RangesTemplateData;
+import {Modifiers} from "../rules/Modifiers";
 
 export interface RangedAttackTestData extends SuccessTestData {
     damage: DamageData
@@ -131,26 +132,36 @@ export class RangedAttackTest extends SuccessTest {
         if (!actor) return;
 
         const modifiers = await actor.getModifiers();
-        if (!modifiers.hasActiveEnvironmentalOverwrite) {
-            modifiers.activateEnvironmentalCategory('range', this.data.range);
-            await actor.setModifiers(modifiers)
-        } else {
-            console.error('The actor has an active environmental overwrite, yet could define a manual range selection.');
-        }
+        modifiers.activateEnvironmentalCategory('range', this.data.range);
+        await actor.setModifiers(modifiers);
     }
 
     prepareBaseValues() {
-        super.prepareBaseValues();
-        // Apply recoil modification
+        const poolMods = new PartsList(this.data.modifiers.mod);
+
+        // Apply recoil modification to general modifiers before calculating base values.
         // TODO: Actual recoil calculation with consumption of recoil compensation.
         // TODO: Recoil Modifier handling should go through ModifierFlow and / or Modifiers
         const {fireMode, recoilCompensation} = this.data;
-
         const recoil = recoilCompensation - fireMode.value;
-        const pool = new PartsList(this.data.modifiers.mod);
+
         if (recoil < 0)
-            pool.addUniquePart('SR5.Recoil', recoil);
+            poolMods.addUniquePart('SR5.Recoil', recoil);
         else
-            pool.removePart('SR5.Recoil');
+            poolMods.removePart('SR5.Recoil');
+
+        // Apply altered environmental modifers
+        if (this.actor) {
+            const modifiers = Modifiers.getModifiersFromEntity(this.actor);
+            modifiers.activateEnvironmentalCategory('range', Number(this.data.range));
+            const environmental = modifiers.environmental.total;
+            if (environmental !== 0) {
+                poolMods.addUniquePart(SR5.modifierTypes.environmental, environmental);
+            } else {
+                poolMods.removePart(SR5.modifierTypes.environmental);
+            }
+        }
+
+        super.prepareBaseValues();
     }
 }

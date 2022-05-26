@@ -289,6 +289,7 @@ export const SR5 = {
         matrix: 'SR5.InitCatMatrix',
     },
 
+    // Gear modification types. :) Not modifiers.
     modificationTypes: {
         weapon: 'SR5.Weapon',
         armor: 'SR5.Armor',

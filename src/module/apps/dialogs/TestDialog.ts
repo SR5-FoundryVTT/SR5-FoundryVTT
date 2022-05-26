@@ -113,6 +113,7 @@ export class TestDialog extends FormDialog {
         // @ts-ignore
         foundry.utils.mergeObject(this.data, data);
 
+        // Give tests opportunity to change resulting values on the fly.
         this.data.test.prepareBaseValues();
         this.data.test.calculateBaseValues();
     }

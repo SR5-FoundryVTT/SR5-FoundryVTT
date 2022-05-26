@@ -224,14 +224,14 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
         HooksManager.renderChatMessage();
-        const item = game.items?.getName('Weapon (Ranged)');
-        const actor = game.actors?.getName('Char Linked');
-        if (!item || !actor) return;
-        const test = await SuccessTest.fromAction(item, actor);
-        if (!test) console.warn('Didnt work');
-        await test?.execute();
+        // const item = game.items?.getName('Weapon (Ranged)');
+        // const actor = game.actors?.getName('Char Linked');
+        // if (!item || !actor) return;
+        // const test = await SuccessTest.fromAction(item, actor);
+        // if (!test) console.warn('Didnt work');
+        // await test?.execute();
 
-        $(document).find('.message')
+        // $(document).find('.message')
     }
 
     static canvasInit() {
