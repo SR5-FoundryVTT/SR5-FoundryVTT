@@ -1298,7 +1298,13 @@
                 "mental": false,
                 "environmental": false,
                 "physical": false
-            }
+            },
+            "action": {
+                    "test": "SpellcastingTest",
+                    "opposed": {
+                        "test": ""
+                    }
+                }
         },
         "critter_power": {
             "templates": ["description", "action", "armor"],

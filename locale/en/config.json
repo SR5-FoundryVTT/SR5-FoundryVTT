@@ -966,7 +966,8 @@
     "PhysicalDefenseTest": "Physical Defense",
     "RangedAttackTest": "Ranged Weapon Attack",
     "MeleeAttackTest": "Melee Weapon Attack",
-    "PhysicalResistTest": "Physical Damage Resist"
+    "PhysicalResistTest": "Physical Damage Resist",
+    "SpellcastingTest": "Spellcasting Test"
   },
   "SR5.MissingResource": {
     "Edge": "No Edge left to consume"

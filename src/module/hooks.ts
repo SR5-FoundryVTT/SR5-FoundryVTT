@@ -37,6 +37,7 @@ import {OpposedTest} from "./tests/OpposedTest";
 import {PhysicalResistTest} from "./tests/PhysicalResistTest";
 import {handleRenderChatMessage} from "./chat";
 import {MeleeAttackTest} from "./tests/MeleeAttackTest";
+import {SpellcastingTest} from "./tests/SpellcastingTest";
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -111,7 +112,8 @@ ___________________
                 MeleeAttackTest,
                 RangedAttackTest,
                 PhysicalDefenseTest,
-                PhysicalResistTest
+                PhysicalResistTest,
+                SpellcastingTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -121,7 +123,8 @@ ___________________
             activeTests: {
                 SuccessTest,
                 MeleeAttackTest,
-                RangedAttackTest
+                RangedAttackTest,
+                SpellcastingTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -214,7 +217,6 @@ ___________________
             if (ChangelogApplication.showApplication) {
                 await new ChangelogApplication().render(true);
             }
-
         }
 
         // Connect chat dice icon to shadowrun basic success test roll.
@@ -225,11 +227,11 @@ ___________________
 
         HooksManager.renderChatMessage();
         // const item = game.items?.getName('Weapon (Ranged)');
-        // const actor = game.actors?.getName('Char Linked');
-        // if (!item || !actor) return;
-        // const test = await SuccessTest.fromAction(item, actor);
-        // if (!test) console.warn('Didnt work');
-        // await test?.execute();
+        const item = game.items?.getName('Spell');
+        const actor = game.actors?.getName('Char Linked');
+        if (!item || !actor) return;
+        const test = await SuccessTest.fromAction(item, actor);
+        if (test) await test.execute();
 
         // $(document).find('.message')
     }

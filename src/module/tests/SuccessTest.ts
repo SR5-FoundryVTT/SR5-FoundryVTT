@@ -471,6 +471,15 @@ export class SuccessTest {
         const action = item.getAction();
         if (!action || !actor) return data;
 
+        // Get default configuration.
+        const defaultAction = SR5.testDefaultAction[this.name];
+
+        // Override defaults with user defined action data.
+        action.skill = action.skill || defaultAction.skill;
+        action.attribute = action.attribute || defaultAction.attribute;
+        action.attribute2 = action.attribute2 || defaultAction.attribute2;
+        action.mod = action.mod || defaultAction.mod;
+
         return await this._prepareActionTestData(action, actor, data);
     }
 
@@ -523,24 +532,30 @@ export class SuccessTest {
         // Action values might be needed later to redo the same test.
         data.action = action;
 
+        const pool = new PartsList(data.pool.mod);
+
         // Prepare pool values.
         // TODO: Check if knowledge / language skills can be used for actions.
         // TODO: Handle skill improvisation.
         if (action.skill) {
             const skill = actor.getSkill(action.skill);
-            if (skill) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value);
+
+            // Notify user about their sins.
+            if (skill && !SkillRules.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
+
+            if (skill) pool.addUniquePart(skill.label, SkillRules.level(skill));
             // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
-            if (action.spec) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', SkillRules.SpecializationModifier);
+            if (action.spec) pool.addUniquePart('SR5.Specialization', SkillRules.SpecializationModifier);
         }
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
             const attribute = actor.getAttribute(action.attribute);
-            if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
+            if (attribute) pool.addUniquePart(attribute.label, attribute.value);
         }
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2);
-            if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value);
+            if (attribute) pool.addUniquePart(attribute.label, attribute.value);
         }
         // A general pool modifier will be used as a base value.
         if (action.mod) {
@@ -634,7 +649,8 @@ export class SuccessTest {
      */
     get code(): string {
         // Add action dynamic value sources as labels.
-        let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
+        // let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
+        let pool = this.pool.mod.map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
         let threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name));
         let limit = this.limit.mod.map(mod => game.i18n.localize(mod.name));
 

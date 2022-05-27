@@ -376,7 +376,8 @@ export const SR5 = {
         'RangedAttackTest': ['global', 'wounds', 'environmental'],
         'MeleeAttackTest': ['global', 'wounds', 'environmental'],
         'PhysicalDefenseTest': ['global', 'wounds', 'defense'],
-        'PhysicalResistTest': ['soak']
+        'PhysicalResistTest': ['soak'],
+        'SpellcastingTest': ['global', 'wounds']
     },
 
     /**
@@ -391,6 +392,10 @@ export const SR5 = {
         'PhysicalResistTest': {
             'attribute': 'body',
             'armor': true
+        },
+        'SpellcastingTest': {
+            'skill': 'spellcasting',
+            'attribute': 'magic'
         }
     },
 

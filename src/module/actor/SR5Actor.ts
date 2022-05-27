@@ -554,7 +554,7 @@ export class SR5Actor extends Actor {
         const skillValue = typeof skill.value === 'number' ? skill.value : 0;
 
         if (SkillRules.mustDefaultToRoll(skill) && SkillRules.allowDefaultingRoll(skill)) {
-            return SkillRules.getDefaultingModifier() + attributeValue;
+            return SkillRules.defaultingModifier + attributeValue;
         }
 
         const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
