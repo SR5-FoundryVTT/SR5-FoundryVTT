@@ -43,7 +43,7 @@ export class PhysicalDefenseTest extends OpposedTest {
     }
 
     get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/physical-defense-test-message.html'
+        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html'
     }
 
     get _dialogTemplate(): string {

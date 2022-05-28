@@ -377,7 +377,8 @@ export const SR5 = {
         'MeleeAttackTest': ['global', 'wounds', 'environmental'],
         'PhysicalDefenseTest': ['global', 'wounds', 'defense'],
         'PhysicalResistTest': ['soak'],
-        'SpellcastingTest': ['global', 'wounds']
+        'SpellcastingTest': ['global', 'wounds'],
+        'CombatSpellDefenseTest': ['global']
     },
 
     /**
@@ -396,6 +397,12 @@ export const SR5 = {
         'SpellcastingTest': {
             'skill': 'spellcasting',
             'attribute': 'magic'
+        },
+        'DirectManaCombatSpellDefenseTest': {
+            'attribute': 'willpower'
+        },
+        'DirectPhysicalCombatSpellDefenseTest': {
+            'attribute': 'body'
         }
     },
 
@@ -406,6 +413,23 @@ export const SR5 = {
         'range': 'RangedAttackTest',
         'melee': 'MeleeAttackTest',
         'thrown': 'ThrownAttackTest'
+    },
+
+    spellCategoryActiveTests: {
+        'combat': 'SpellcastingTest'
+    },
+
+    spellOpposedTests: {
+        'combat': {
+            'direct': {
+                'mana': 'DirectManaCombatSpellDefenseTest',
+                'physical': 'DirectPhysicalCombatSpellDefenseTest'
+            },
+            'indirect': {
+                'mana': 'IndirectCombatSpellDefenseTest',
+                'physical': 'IndirectCombatSpellDefenseTest'
+            }
+        }
     },
 
     programTypes: {
