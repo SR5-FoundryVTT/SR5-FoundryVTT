@@ -35164,16 +35164,26 @@ class SpellcastingRules {
      *
      * @param force The force the spell is cast with.
      * @param drainModifier The drain modifier defined within the spells action configuration.
+     * @param reckless Set this to true should the spell be cast recklessly as defined in SR5#281 Cast Spell.
      */
-    static calculateDrain(force, drainModifier) {
-        const drain = force - drainModifier;
-        return drain < this.minimalDrain ? this.minimalDrain : drain;
+    static calculateDrain(force, drainModifier, reckless = false) {
+        const recklessModifier = reckless ? this.recklessDrainModifier : 0;
+        const drain = force + drainModifier + recklessModifier;
+        return Math.max(this.minimalDrain, drain);
     }
     /**
      * As defined in SR5#282 - Step 6 Resist Drain
      */
     static get minimalDrain() {
         return 2;
+    }
+    /**
+     * As defined in SR5#281 - Step 4 Cast Spell.
+     *
+     * Reckless spellcasting will alter drain damage.
+     */
+    static get recklessDrainModifier() {
+        return 3;
     }
     /**
      * Based on the minimal drain value use this as the minimal usable force value.
@@ -36001,6 +36011,7 @@ class SpellcastingTest extends SuccessTest_1.SuccessTest {
         data = super._prepareData(data, options);
         data.force = 0;
         data.drain = 0;
+        data.reckless = false;
         return data;
     }
     get _dialogTemplate() {
@@ -36031,7 +36042,10 @@ class SpellcastingTest extends SuccessTest_1.SuccessTest {
      */
     calculateDrainValue() {
         var _a;
-        this.data.drain = SpellcastingRules_1.SpellcastingRules.calculateDrain(Number(this.data.force), Number(((_a = this.item) === null || _a === void 0 ? void 0 : _a.getDrain()) || 0));
+        const force = Number(this.data.force);
+        const drain = Number(((_a = this.item) === null || _a === void 0 ? void 0 : _a.getDrain()) || 0);
+        const reckless = this.data.reckless;
+        this.data.drain = SpellcastingRules_1.SpellcastingRules.calculateDrain(force, drain, reckless);
     }
     processResults() {
         const _super = Object.create(null, {

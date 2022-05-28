@@ -9,10 +9,12 @@ export class SpellcastingRules {
      *
      * @param force The force the spell is cast with.
      * @param drainModifier The drain modifier defined within the spells action configuration.
+     * @param reckless Set this to true should the spell be cast recklessly as defined in SR5#281 Cast Spell.
      */
-    static calculateDrain(force: number, drainModifier: number): number {
-        const drain = force - drainModifier;
-        return drain < this.minimalDrain ? this.minimalDrain : drain
+    static calculateDrain(force: number, drainModifier: number, reckless: boolean = false): number {
+        const recklessModifier = reckless ? this.recklessDrainModifier : 0;
+        const drain = force + drainModifier + recklessModifier;
+        return Math.max(this.minimalDrain, drain);
     }
 
     /**
@@ -20,6 +22,15 @@ export class SpellcastingRules {
      */
     static get minimalDrain(): number {
         return 2;
+    }
+
+    /**
+     * As defined in SR5#281 - Step 4 Cast Spell.
+     *
+     * Reckless spellcasting will alter drain damage.
+     */
+    static get recklessDrainModifier(): number {
+        return 3;
     }
 
     /**

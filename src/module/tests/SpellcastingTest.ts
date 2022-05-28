@@ -5,6 +5,7 @@ import {SpellcastingRules} from "../rules/SpellcastingRules";
 export interface SpellcastingTestData extends SuccessTestData {
     force: number
     drain: number
+    reckless: boolean
 }
 
 
@@ -19,6 +20,7 @@ export class SpellcastingTest extends SuccessTest {
 
         data.force = 0;
         data.drain = 0;
+        data.reckless = false;
 
         return data;
     }
@@ -52,7 +54,10 @@ export class SpellcastingTest extends SuccessTest {
      * Precalculate drain for user display.
      */
     calculateDrainValue() {
-        this.data.drain = SpellcastingRules.calculateDrain(Number(this.data.force), Number(this.item?.getDrain() || 0));
+        const force = Number(this.data.force);
+        const drain = Number(this.item?.getDrain() || 0);
+        const reckless = this.data.reckless;
+        this.data.drain = SpellcastingRules.calculateDrain(force, drain, reckless);
     }
 
     async processResults(): Promise<void> {
