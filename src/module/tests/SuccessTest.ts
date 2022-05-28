@@ -15,6 +15,7 @@ import ActionRollData = Shadowrun.ActionRollData;
 import {SR5} from "../config";
 import {SkillRules} from "../rules/SkillRules";
 import {OpposedTest} from "./OpposedTest";
+import {ActionFlow} from "../item/flows/ActionFlow";
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -472,9 +473,9 @@ export class SuccessTest {
         if (!action || !actor) return data;
 
         // Get default configuration.
-        const defaultAction = SR5.testDefaultAction[this.name];
+        const defaultAction = this._defaultTestAction;
 
-        // Override defaults with user defined action data.
+        // Override defaults with user defined action data or nothing.
         action.skill = action.skill || defaultAction.skill;
         action.attribute = action.attribute || defaultAction.attribute;
         action.attribute2 = action.attribute2 || defaultAction.attribute2;
@@ -514,7 +515,7 @@ export class SuccessTest {
         };
 
         // Provide default action information.
-        const defaultAction = SR5.testDefaultAction[this.name];
+        const defaultAction = this._defaultTestAction;
         const action = DefaultValues.actionData(defaultAction);
         if (!action) return data;
 
@@ -774,6 +775,10 @@ export class SuccessTest {
         this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
+
+        // Without further rules applied just use the general action damage configuration.
+        // This damage can be further altered using process* methods.
+        this.data.damage = ActionFlow.calcDamage(this.data.action.damage, this.actor);
 
         console.log(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
@@ -1147,6 +1152,11 @@ export class SuccessTest {
         return this;
     }
 
+    /**
+     * Allow subclasses to override behaviour after a test has finished.
+     *
+     * This can be used to alter values after a test is over.
+     */
     async processResults() {
         if (this.success) {
             await this.processSuccess();
@@ -1157,16 +1167,26 @@ export class SuccessTest {
 
     /**
      * Allow subclasses to override behaviour after a successful test result.
+     *
+     * This can be used to alter values after a test succeeded.
      * @override
      */
     async processSuccess() {}
 
     /**
      * Allow subclasses to override behaviour after a failure test result
+     *
+     * This can be used to alter values after a test failed.
      * @override
      */
     async processFailure() {}
 
+    /**
+     * Allow subclasses to override behaviour after a test is fully done. This will be called after processResults
+     * and allows for additional processes to be triggered that don't affect this test itself.
+     *
+     * This can be used to trigger other processes like followup tests or saving values.
+     */
     async afterTestComplete() {
         if (this.success) {
             await this.afterSuccess();
@@ -1394,5 +1414,12 @@ export class SuccessTest {
         const opposedActionTest = $(event.currentTarget).data('action');
 
         await this.fromMessageAction(messageId, opposedActionTest);
+    }
+
+    /**
+     * Get a possible globally defined default action set for this test class.
+     */
+    static get _defaultTestAction() {
+        return SR5.testDefaultAction[this.name] || {};
     }
 }

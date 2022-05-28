@@ -7,12 +7,19 @@ import {Helpers} from "../../helpers";
 import FormulaOperator = Shadowrun.FormulaOperator;
 
 export class ActionFlow {
-    static calcDamage(damage: DamageData, actor: SR5Actor): DamageData {
+    /**
+     * Calculate action damage configuration based on flat damage field and possible dynamic attribute modification.
+     *
+     * @param damage The damage field as defined within the ActionData
+     * @param actor The actor to use should a dynamic calculation be needed.
+     */
+    static calcDamage(damage: DamageData, actor: SR5Actor|undefined): DamageData {
         // Avoid manipulation on original data, which might come from database values.
         damage = duplicate(damage) as DamageData;
 
-        const attribute = actor.findAttribute(damage.attribute);
+        if (!actor) return damage;
 
+        const attribute = actor.findAttribute(damage.attribute);
         if (!attribute) return damage;
 
         damage.base = ActionFlow._applyFormulaOperatorToValues(damage.base, attribute.value, damage.base_formula_operator);

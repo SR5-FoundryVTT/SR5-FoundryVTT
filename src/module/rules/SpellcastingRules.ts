@@ -40,4 +40,16 @@ export class SpellcastingRules {
     static calculateMinimalForce(drainModifier: number): number {
         return Math.max(1, this.minimalDrain - drainModifier);
     }
+
+    /**
+     * Calculate spell casting limit based on the force chosen.
+     *
+     * As defined in SR5#281 - Step 3 Choose Spell Force
+     *
+     * @param force The spell force chosen by test configuration.
+     * @returns The limit value to be applied.
+     */
+    static calculateLimit(force: number): number {
+        return force;
+    }
 }

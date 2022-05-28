@@ -1887,6 +1887,37 @@ export class SR5Item extends Item {
             }
         }
 
+        // Make sure spell actions are in a valid state for different spell categories and configurations.
+        const spellData = this.asSpellData();
+        if (spellData) {
+            const futureData = foundry.utils.mergeObject(spellData, changed);
+
+            switch (futureData.data.category) {
+                case 'combat': {
+                    const combatOpposedTests = SR5.spellOpposedTests[futureData.data.category] || {};
+                    const combatTypeOpposedTests = combatOpposedTests[futureData.data.combat.type] || {};
+                    const opposedTest = combatTypeOpposedTests[futureData.data.type] || '';
+                    const resistTest = '';
+
+                    foundry.utils.mergeObject(changed, {data: {action: {
+                        test: 'SpellcastingTest',
+                        opposed: {test: opposedTest,
+                                  resist:  {test: resistTest}}}}});
+                    break;
+                }
+                default: {
+                    foundry.utils.mergeObject(changed, {
+                        data: {
+                            action: {
+                                test: '',
+                                opposed: {test: '', resist: {test: ''}}
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
         return super._preUpdate(changed, options, user);
     }
 }

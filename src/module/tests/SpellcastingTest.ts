@@ -1,5 +1,7 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellcastingRules} from "../rules/SpellcastingRules";
+import {PartsList} from "../parts/PartsList";
+import {CombatSpellRules} from "../rules/CombatSpellRules";
 
 
 export interface SpellcastingTestData extends SuccessTestData {
@@ -11,6 +13,7 @@ export interface SpellcastingTestData extends SuccessTestData {
 
 /**
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
+ *
  */
 export class SpellcastingTest extends SuccessTest {
     data: SpellcastingTestData
@@ -45,6 +48,19 @@ export class SpellcastingTest extends SuccessTest {
         this.data.force = lastUsedForce.value || suggestedForce;
     }
 
+    prepareBaseValues() {
+        super.prepareBaseValues();
+        this.prepareLimitValue();
+    }
+
+    prepareLimitValue() {
+        const force = Number(this.data.force);
+        this.data.limit.mod = PartsList.AddUniquePart(
+            this.data.limit.mod,
+            'SR5.Force',
+            SpellcastingRules.calculateLimit(force));
+    }
+
     calculateBaseValues() {
         super.calculateBaseValues();
         this.calculateDrainValue()
@@ -60,8 +76,25 @@ export class SpellcastingTest extends SuccessTest {
         this.data.drain = SpellcastingRules.calculateDrain(force, drain, reckless);
     }
 
-    async processResults(): Promise<void> {
-        await super.processResults();
+    async processSuccess(): Promise<void> {
+        await super.processSuccess();
+
+        if (this.item && this.item.isCombatSpell())
+            this.calculateCombatSpellDamage();
+    }
+
+    calculateCombatSpellDamage() {
+        if (!this.item) return;
+
+        if (this.item.isDirectCombatSpell())
+            this.data.damage = CombatSpellRules.calculateDirectDamage(this.data.damage);
+
+        if (this.item.isIndirectCombatSpell())
+            this.data.damage = CombatSpellRules.calculateIndirectDamage(this.data.damage, this.data.force);
+    }
+
+    async afterTestComplete(): Promise<void> {
+        await super.afterTestComplete();
         await this.saveLastUsedForce();
     }
 
@@ -71,7 +104,6 @@ export class SpellcastingTest extends SuccessTest {
     async saveLastUsedForce() {
         if (!this.item) return;
 
-        console.error('implement reckless spellcasting');
         await this.item.setLastSpellForce({value: this.data.force, reckless: false});
     }
 }

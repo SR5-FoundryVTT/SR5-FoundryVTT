@@ -38,6 +38,9 @@ import {PhysicalResistTest} from "./tests/PhysicalResistTest";
 import {handleRenderChatMessage} from "./chat";
 import {MeleeAttackTest} from "./tests/MeleeAttackTest";
 import {SpellcastingTest} from "./tests/SpellcastingTest";
+import {DirectManaCombatSpellDefenseTest} from "./tests/DirectManaCombatSpellDefenseTest";
+import {DirectPhysicalCombatSpellDefenseTest} from "./tests/DirectPhysicalCombatSpellDefenseTest";
+import {IndirectCombatSpellDefenseTest} from "./tests/IndirectCombatSpellDefenseTest";
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -113,7 +116,10 @@ ___________________
                 RangedAttackTest,
                 PhysicalDefenseTest,
                 PhysicalResistTest,
-                SpellcastingTest
+                SpellcastingTest,
+                DirectManaCombatSpellDefenseTest,
+                DirectPhysicalCombatSpellDefenseTest,
+                IndirectCombatSpellDefenseTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -133,7 +139,10 @@ ___________________
              */
             opposedTests: {
                 OpposedTest,
-                PhysicalDefenseTest
+                PhysicalDefenseTest,
+                DirectManaCombatSpellDefenseTest,
+                DirectPhysicalCombatSpellDefenseTest,
+                IndirectCombatSpellDefenseTest
             },
             /**
              * Subset of tests meant to be used as resist tests.
@@ -226,8 +235,10 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
         HooksManager.renderChatMessage();
+        // const item = game.items?.getName('Weapon (Melee)');
         // const item = game.items?.getName('Weapon (Ranged)');
-        const item = game.items?.getName('Spell');
+        // const item = game.items?.getName('Spell (Direct Combat)');
+        const item = game.items?.getName('Spell (Indirect Combat)');
         const actor = game.actors?.getName('Char Linked');
         if (!item || !actor) return;
         const test = await SuccessTest.fromAction(item, actor);
