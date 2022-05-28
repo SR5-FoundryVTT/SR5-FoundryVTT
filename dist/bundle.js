@@ -23581,9 +23581,7 @@ exports.SR5 = {
         'PhysicalDefenseTest': ['global', 'wounds', 'defense'],
         'PhysicalResistTest': ['soak'],
         'SpellcastingTest': ['global', 'wounds'],
-        'DirectManaCombatSpellDefenseTest': ['global'],
-        'DirectPhysicalCombatSpellDefenseTest': ['global'],
-        'IndirectCombatSpellDefenseTest': ['global', 'defense', 'wounds']
+        'CombatSpellDefenseTest': ['global']
     },
     /**
      * Default action values for different tests. Should be used if an action doesn't provide values OR as default values
@@ -26922,8 +26920,7 @@ ___________________
             HooksManager.renderChatMessage();
             // const item = game.items?.getName('Weapon (Melee)');
             // const item = game.items?.getName('Weapon (Ranged)');
-            // const item = game.items?.getName('Spell (Direct Combat)');
-            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Spell (Indirect Combat)');
+            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Spell (Direct Combat)');
             const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked');
             if (!item || !actor)
                 return;
