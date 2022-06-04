@@ -400,6 +400,9 @@ export const SR5 = {
             'skill': 'spellcasting',
             'attribute': 'magic'
         },
+        'DrainTest': {
+            'attribute2': 'willpower'
+        },
         'DirectManaCombatSpellDefenseTest': {
             'attribute': 'willpower'
         },

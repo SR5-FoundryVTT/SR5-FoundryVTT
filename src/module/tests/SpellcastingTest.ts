@@ -94,8 +94,9 @@ export class SpellcastingTest extends SuccessTest {
     }
 
     async afterTestComplete(): Promise<void> {
-        await super.afterTestComplete();
         await this.saveLastUsedForce();
+
+        await super.afterTestComplete();
     }
 
     /**

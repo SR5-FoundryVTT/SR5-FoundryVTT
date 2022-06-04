@@ -1,7 +1,5 @@
-import {SuccessTest, SuccessTestData, TestDocuments, TestOptions} from "./SuccessTest";
-import {OpposedTest, OpposedTestData} from "./OpposedTest";
-import {SR5Actor} from "../actor/SR5Actor";
-import DamageData = Shadowrun.DamageData;
+import {SuccessTest, SuccessTestData, TestOptions} from "./SuccessTest";
+import {OpposedTestData} from "./OpposedTest";
 import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {CombatRules} from "../rules/CombatRules";

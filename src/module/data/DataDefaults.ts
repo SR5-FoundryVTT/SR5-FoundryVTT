@@ -282,7 +282,7 @@ export class DefaultValues {
 
     static actionData(partialActionData: Partial<ActionRollData> = {}) {
         return mergeObject({
-            test: "SuccessTest",
+            test: "",
             type: '',
             category: '',
             attribute: '',
@@ -304,13 +304,20 @@ export class DefaultValues {
             },
             extended: false,
             opposed: {
-                type: 'defense',
+                type: '',
                 test: '',
                 attribute: '',
                 attribute2: '',
                 skill: '',
                 mod: 0,
                 description: '',
+            },
+            followed: {
+                test: '',
+                attribute: '',
+                attribute2: '',
+                skill: '',
+                mod: 0,
             },
             alt_mod: 0,
             dice_pool_mod: []

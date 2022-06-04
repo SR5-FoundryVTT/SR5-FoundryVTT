@@ -1202,6 +1202,13 @@
                             "mod": 0
                         }
                     },
+                    "followed": {
+                        "test": "",
+                        "attribute": "",
+                        "attribute2": "",
+                        "skill": "",
+                        "mod": 0
+                    },
                     "modifiers": []
                 }
             },

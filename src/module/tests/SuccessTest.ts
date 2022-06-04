@@ -7,15 +7,15 @@ import {SR5Roll} from "../rolls/SR5Roll";
 import {PartsList} from "../parts/PartsList";
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 import {TestDialog} from "../apps/dialogs/TestDialog";
+import {SR5} from "../config";
+import {SkillRules} from "../rules/SkillRules";
+import {ActionFlow} from "../item/flows/ActionFlow";
 import ValueField = Shadowrun.ValueField;
 import DamageData = Shadowrun.DamageData;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import ActionRollData = Shadowrun.ActionRollData;
-import {SR5} from "../config";
-import {SkillRules} from "../rules/SkillRules";
-import {OpposedTest} from "./OpposedTest";
-import {ActionFlow} from "../item/flows/ActionFlow";
+import MinimalActionData = Shadowrun.MinimalActionData;
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -455,6 +455,26 @@ export class SuccessTest {
     }
 
     /**
+     * Get a possible globally defined default action set for this test class.
+     */
+    static _getDefaultTestAction() {
+        return SR5.testDefaultAction[this.name] || {};
+    }
+
+    /**
+     * Get a document defined action set for this test class.
+     *
+     * Subclasses can use this to provide actor or item based action configurations that aren't
+     * directly part of the action template.
+     *
+     * @param item The item holding the action configuration.
+     * @param actor The actor used for value calculation.
+     */
+    static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<Partial<MinimalActionData>> {
+        return {};
+    }
+
+    /**
      * Test Data is structured around Values that can be modified.
      */
     static async _getItemActionTestData(item: SR5Item, actor: SR5Actor) {
@@ -473,13 +493,15 @@ export class SuccessTest {
         if (!action || !actor) return data;
 
         // Get default configuration.
-        const defaultAction = this._defaultTestAction;
+        const defaultAction = this._getDefaultTestAction();
+        const documentAction = await this._getDocumentTestAction(item, actor);
 
         // Override defaults with user defined action data or nothing.
-        action.skill = action.skill || defaultAction.skill;
-        action.attribute = action.attribute || defaultAction.attribute;
-        action.attribute2 = action.attribute2 || defaultAction.attribute2;
-        action.mod = action.mod || defaultAction.mod;
+        // NOTE: Don't use mergeObject as action is field complete and it's values are preferred.
+        action.skill = action.skill || documentAction.skill || defaultAction.skill;
+        action.attribute = action.attribute || documentAction.attribute || defaultAction.attribute;
+        action.attribute2 = action.attribute2 || documentAction.attribute2 || defaultAction.attribute2;
+        action.mod = action.mod || documentAction.mod || defaultAction.mod;
 
         return await this._prepareActionTestData(action, actor, data);
     }
@@ -515,7 +537,8 @@ export class SuccessTest {
         };
 
         // Provide default action information.
-        const defaultAction = this._defaultTestAction;
+        const defaultAction = this._getDefaultTestAction();
+
         const action = DefaultValues.actionData(defaultAction);
         if (!action) return data;
 
@@ -1193,6 +1216,8 @@ export class SuccessTest {
         } else {
             await this.afterFailure();
         }
+
+        await this.executeFollowUp();
     }
 
     /**
@@ -1206,6 +1231,52 @@ export class SuccessTest {
      * @override
      */
     async afterFailure() {}
+
+    /**
+     * Depending on the action configuration execute a followup test.
+     */
+    async executeFollowUp() {
+        if (!this.data.action.followed.test) return;
+        if (!this.item) return;
+        if (!this.actor) return;
+
+        // @ts-ignore // TODO: Type merging
+        const testCls = game.shadowrun5e.tests[this.data.action.followed.test];
+        if (!testCls) return console.error(`Shadowrun 5e | A ${this.constructor.name} has a unregistered follow up test configured`, this);
+
+        const data = {
+            title: testCls.title,
+            previousMessageId: this.data.messageUuid,
+
+            pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
+            limit: DefaultValues.valueData({label: 'SR5.Limit'}),
+            threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
+            values: {},
+
+            against: this.data
+        }
+
+        const action = DefaultValues.actionData({test: testCls.name});
+        const defaultAction = testCls._getDefaultTestAction();
+        const documentAction = await testCls._getDocumentTestAction(this.item, this.actor);
+
+        // Override defaults with user defined action data or nothing.
+        // NOTE: Don't use mergeObject as action is field complete and it's values are preferred.
+        action.skill = this.data.action.followed.skill || documentAction.skill || defaultAction.skill;
+        action.attribute = this.data.action.followed.attribute || documentAction.attribute || defaultAction.attribute;
+        action.attribute2 = this.data.action.followed.attribute2 || documentAction.attribute2 || defaultAction.attribute2;
+        action.mod = this.data.action.followed.mod || documentAction.mod || defaultAction.mod;
+
+        const testData = await testCls._prepareActionTestData(action, this.actor, data);
+
+        // Create the followup test based on this tests documents and options.
+        const documents = {item: this.item, actor: this.actor};
+        const options = this.data.options;
+        // TODO: pushTheLimit / second chance shouldn't be part of options...
+        const test = new testCls(testData, documents, options);
+
+        await test.execute();
+    }
 
     /**
      * Post this success test as a message to the chat log.
@@ -1414,12 +1485,5 @@ export class SuccessTest {
         const opposedActionTest = $(event.currentTarget).data('action');
 
         await this.fromMessageAction(messageId, opposedActionTest);
-    }
-
-    /**
-     * Get a possible globally defined default action set for this test class.
-     */
-    static get _defaultTestAction() {
-        return SR5.testDefaultAction[this.name] || {};
     }
 }

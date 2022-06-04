@@ -1,26 +1,23 @@
-import { SR5 } from './config';
-import { Migrator } from './migrator/Migrator';
-import { registerSystemSettings } from './settings';
+import {SR5} from './config';
+import {Migrator} from './migrator/Migrator';
+import {registerSystemSettings} from './settings';
 import {FLAGS, SYSTEM_NAME, SYSTEM_SOCKET} from './constants';
-import { SR5Actor } from './actor/SR5Actor';
-import { SR5Item } from './item/SR5Item';
-import { SR5ItemSheet } from './item/SR5ItemSheet';
-import { SR5Token } from './token/SR5Token';
-import { ShadowrunRoller } from './rolls/ShadowrunRoller';
-import { HandlebarManager } from './handlebars/HandlebarManager';
-import { measureDistance } from './canvas';
+import {SR5Actor} from './actor/SR5Actor';
+import {SR5Item} from './item/SR5Item';
+import {SR5ItemSheet} from './item/SR5ItemSheet';
+import {SR5Token} from './token/SR5Token';
+import {ShadowrunRoller} from './rolls/ShadowrunRoller';
+import {HandlebarManager} from './handlebars/HandlebarManager';
+import {measureDistance} from './canvas';
 import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
 
-import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
 import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
-import { Import } from './importer/apps/import-form';
+import {Import} from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 import {quenchRegister} from "../test/quench";
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
-import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
-import SocketMessageHooks = Shadowrun.SocketMessageHooks;
-import SocketMessage = Shadowrun.SocketMessageData;
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
 import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
@@ -41,6 +38,10 @@ import {SpellcastingTest} from "./tests/SpellcastingTest";
 import {DirectManaCombatSpellDefenseTest} from "./tests/DirectManaCombatSpellDefenseTest";
 import {DirectPhysicalCombatSpellDefenseTest} from "./tests/DirectPhysicalCombatSpellDefenseTest";
 import {IndirectCombatSpellDefenseTest} from "./tests/IndirectCombatSpellDefenseTest";
+import {DrainTest} from "./tests/DrainTest";
+import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
+import SocketMessageHooks = Shadowrun.SocketMessageHooks;
+import SocketMessage = Shadowrun.SocketMessageData;
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -119,7 +120,8 @@ ___________________
                 SpellcastingTest,
                 DirectManaCombatSpellDefenseTest,
                 DirectPhysicalCombatSpellDefenseTest,
-                IndirectCombatSpellDefenseTest
+                IndirectCombatSpellDefenseTest,
+                DrainTest,
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -130,7 +132,8 @@ ___________________
                 SuccessTest,
                 MeleeAttackTest,
                 RangedAttackTest,
-                SpellcastingTest
+                SpellcastingTest,
+                DrainTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -151,6 +154,12 @@ ___________________
              */
             resistTests: {
                 PhysicalResistTest
+            },
+            /**
+             * Subset of tests meant to follow a main active test
+             */
+            followedTests: {
+                DrainTest
             }
         };
 
@@ -237,8 +246,9 @@ ___________________
         HooksManager.renderChatMessage();
         // const item = game.items?.getName('Weapon (Melee)');
         // const item = game.items?.getName('Weapon (Ranged)');
-        // const item = game.items?.getName('Spell (Direct Combat)');
-        const item = game.items?.getName('Spell (Indirect Combat)');
+        const item = game.items?.getName('Spell (Direct Combat)');
+        // const item = game.items?.getName('Spell (Indirect Combat)');
+        // const item = game.items?.getName('Drain');
         const actor = game.actors?.getName('Char Linked');
         if (!item || !actor) return;
         const test = await SuccessTest.fromAction(item, actor);

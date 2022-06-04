@@ -1,13 +1,5 @@
-import {
-    SuccessTest,
-    SuccessTestData,
-    TestOptions,
-    SuccessTestValues,
-    TestDocuments,
-    TestData
-} from "./SuccessTest";
+import {SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments, TestOptions} from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
-import {SR5} from "../config";
 
 
 export interface OpposedTestValues extends SuccessTestValues {
@@ -89,7 +81,7 @@ export class OpposedTest extends SuccessTest {
         data.threshold.base = againstData.values.netHits.value;
 
         // Build the opposed action data
-        const action = DefaultValues.actionData(SR5.testDefaultAction[this.name]);
+        const action = DefaultValues.actionData(this._getDefaultTestAction());
 
         // Overwrite defaults with user defined action data.
         action.skill = againstData.opposed.skill || action.skill;

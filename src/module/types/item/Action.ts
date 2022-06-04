@@ -24,6 +24,7 @@ declare namespace Shadowrun {
         modifiers: ModifierTypes[]
         damage: DamageData
         opposed: OpposedTestData
+        followed: TestData
         alt_mod: number
         dice_pool_mod: ModList<number>
     }
@@ -69,15 +70,17 @@ declare namespace Shadowrun {
     /**
      * Action opposed test data.
      */
-    export interface OpposedTestData extends MinimalActionData{
+    export interface OpposedTestData extends TestData {
         type: OpposedType
         // Should match game.shadowrun5e.opposedTests
-        test: string
         description: string,
-        resist: ResistTestData
+        resist: TestData
     }
 
-    export interface ResistTestData extends MinimalActionData {
+    /**
+     * Minimal data necessary to execute a SuccessTest implementation.
+     */
+    export interface TestData extends MinimalActionData {
         test: string
     }
 
