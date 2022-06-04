@@ -535,6 +535,13 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Determine if an actor is awakened / magical in some kind.
+     */
+    get isAwakened(): boolean {
+        return this.data.data.special === 'magic';
+    }
+
+    /**
      * Return the full pool of a skill including attribute and possible specialization bonus.
      * @param skillId The ID of the skill. Note that this can differ from what is shown in the skill list. If you're
      *                unsure about the id and want to search

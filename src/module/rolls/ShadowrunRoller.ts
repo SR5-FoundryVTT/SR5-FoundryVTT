@@ -23,6 +23,7 @@ import LimitField = Shadowrun.LimitField;
 import CombatData = Shadowrun.CombatData;
 import {SR5Roll} from "./SR5Roll";
 import {SuccessTest} from "../tests/SuccessTest";
+import {TestCreator} from "../tests/TestCreator";
 
 // item, actor, dicePool, attack, defense, spell, form
 export type Test =  {
@@ -379,15 +380,22 @@ export class ShadowrunRoller {
     }
 
     /*
-     * Flow should be handled by Roll class
-     * - dialog
-     * - roll
-     * - message
+     * Prompt the user for a default SuccessTest
      */
     static async promptSuccessTest() {
-        // TODO: Handle dialog system.
-        const test = await SuccessTest.fromDialog();
-        if (test) await test.toMessage();
+        const data = TestCreator._minimalTestData();
+
+        // Get the last used pool size for simple SuccessTestDialogs
+        const lastPoolValue = game.user?.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue) || 0;
+        PartsList.AddUniquePart(data.pool.mod, 'SR5.LastRoll', lastPoolValue);
+
+        const test = await TestCreator.fromTestData(data);
+        await test.execute();
+
+        if (test.evaluated) {
+            // Store the last used pool size for the next simple SuccessTest
+            await game.user?.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, test.pool.value);
+        }
     }
 
     /**

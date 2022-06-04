@@ -42,6 +42,7 @@ import {DrainTest} from "./tests/DrainTest";
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import SocketMessage = Shadowrun.SocketMessageData;
+import {TestCreator} from "./tests/TestCreator";
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -105,6 +106,13 @@ ___________________
              * check the Test implementations.
              */
             SR5Roll,
+
+            /**
+             * You want to create a test from whatever source?
+             * Use this.
+             */
+            test: TestCreator,
+
             /**
              * .tests define what test implementation to use for each test type (key).
              * Should you want to override default behaviour for SuccessTest types, overwrite
@@ -251,7 +259,7 @@ ___________________
         // const item = game.items?.getName('Drain');
         const actor = game.actors?.getName('Char Linked');
         if (!item || !actor) return;
-        const test = await SuccessTest.fromAction(item, actor);
+        const test = await TestCreator.fromAction(item, actor);
         if (test) await test.execute();
 
         // $(document).find('.message')

@@ -61,6 +61,7 @@ import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
 import {SuccessTest} from "../tests/SuccessTest";
+import {TestCreator} from "../tests/TestCreator";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -368,7 +369,7 @@ export class SR5Item extends Item {
     async castAction(event?) {
         if (!this.actor) return;
 
-        const test = await SuccessTest.fromAction(this, this.actor);
+        const test = await TestCreator.fromAction(this, this.actor);
         if (!test) return;
         await test.execute();
 

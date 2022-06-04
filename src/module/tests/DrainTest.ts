@@ -27,7 +27,7 @@ export class DrainTest extends SuccessTest {
     static async _getDocumentTestAction(item, actor) {
         const documentAction = await super._getDocumentTestAction(item, actor);
 
-        if (!actor.hasMagic()) {
+        if (!actor.isAwakened) {
             console.error(`Shadowrun 5e | A ${this.name} expected an awakened actor but got this`, actor);
             return documentAction;
         }

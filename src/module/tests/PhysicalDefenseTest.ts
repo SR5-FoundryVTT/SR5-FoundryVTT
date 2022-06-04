@@ -4,6 +4,7 @@ import DamageData = Shadowrun.DamageData;
 import {CombatRules} from "../rules/CombatRules";
 import {MeleeRules} from "../rules/MeleeRules";
 import {MeleeAttackData} from "./MeleeAttackTest";
+import {TestCreator} from "./TestCreator";
 
 // TODO: reach
 export interface PhysicalDefenseTestData extends OpposedTestData {
@@ -168,11 +169,8 @@ export class PhysicalDefenseTest extends OpposedTest {
     }
 
     async afterFailure() {
-        const {test} = this.against.data.opposed.resist;
-        // @ts-ignore
-        const resistTestCls = game.shadowrun5e.tests[test];
-        const resistTest = await resistTestCls.resistAgainstOpposed(this, this.data.options);
-
-        await resistTest.execute();
+        const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
+        if (!test) return;
+        await test.execute();
     }
 }

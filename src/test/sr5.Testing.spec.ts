@@ -2,6 +2,7 @@ import {SR5TestingDocuments} from "./utils";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
 import {SuccessTest} from "../module/tests/SuccessTest";
+import {TestCreator} from "../module/tests/TestCreator";
 
 export const shadowrunTesting = context => {
     const {describe, it, assert, before, after} = context;
@@ -76,7 +77,7 @@ export const shadowrunTesting = context => {
                                'data.skills.active.automatics.base': 45};
             const actor = await testActor.create(actorData);
 
-            const test = await SuccessTest.fromAction(action, actor);
+            const test = await TestCreator.fromAction(action, actor);
 
             // For a broken test just fail.v
             if (!test) assert.strictEqual(true, false);
@@ -99,7 +100,7 @@ export const shadowrunTesting = context => {
         });
 
         it('evaluate a roll from simple pool data', async () => {
-            const test = SuccessTest.fromPool({pool: 10});
+            const test = TestCreator.fromPool({pool: 10});
             await test.evaluate();
 
             assert.strictEqual(test.pool.value, 10);
@@ -141,7 +142,7 @@ export const shadowrunTesting = context => {
                                'data.skills.active.automatics.base': 45};
             const actor = await testActor.create(actorData);
 
-            const test = await SuccessTest.fromAction(action, actor);
+            const test = await TestCreator.fromAction(action, actor);
 
             if (test) {
                 await test.toMessage();

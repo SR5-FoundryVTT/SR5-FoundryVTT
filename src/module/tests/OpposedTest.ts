@@ -1,5 +1,6 @@
 import {SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments, TestOptions} from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
+import {TestCreator} from "./TestCreator";
 
 
 export interface OpposedTestValues extends SuccessTestValues {
@@ -120,6 +121,19 @@ export class OpposedTest extends SuccessTest {
      */
     get opposed() {
         return false;
+    }
+
+    /**
+     * Using a message action cast an opposed test to that messages active test.
+     */
+    static async _castOpposedAction(event, cardHtml) {
+        event.preventDefault();
+
+        // Collect information needed to create the opposed action test.
+        const messageId = cardHtml.data('messageId');
+        const opposedActionTest = $(event.currentTarget).data('action');
+
+        await TestCreator.fromMessageAction(messageId, opposedActionTest);
     }
 
     static chatMessageListeners(message: ChatMessage, html, data) {

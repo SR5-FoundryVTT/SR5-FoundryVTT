@@ -13731,6 +13731,12 @@ class SR5Actor extends Actor {
         return ['character', 'vehicle', 'sprite', 'spirit', 'critter'].includes(this.data.type);
     }
     /**
+     * Determine if an actor is awakened / magical in some kind.
+     */
+    get isAwakened() {
+        return this.data.data.special === 'magic';
+    }
+    /**
      * Return the full pool of a skill including attribute and possible specialization bonus.
      * @param skillId The ID of the skill. Note that this can differ from what is shown in the skill list. If you're
      *                unsure about the id and want to search
@@ -26755,6 +26761,7 @@ const DirectManaCombatSpellDefenseTest_1 = require("./tests/DirectManaCombatSpel
 const DirectPhysicalCombatSpellDefenseTest_1 = require("./tests/DirectPhysicalCombatSpellDefenseTest");
 const IndirectCombatSpellDefenseTest_1 = require("./tests/IndirectCombatSpellDefenseTest");
 const DrainTest_1 = require("./tests/DrainTest");
+const TestCreator_1 = require("./tests/TestCreator");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 exports.SR5CONFIG = config_1.SR5;
 class HooksManager {
@@ -26811,6 +26818,11 @@ ___________________
              * check the Test implementations.
              */
             SR5Roll: SR5Roll_1.SR5Roll,
+            /**
+             * You want to create a test from whatever source?
+             * Use this.
+             */
+            test: TestCreator_1.TestCreator,
             /**
              * .tests define what test implementation to use for each test type (key).
              * Should you want to override default behaviour for SuccessTest types, overwrite
@@ -26947,7 +26959,7 @@ ___________________
             const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked');
             if (!item || !actor)
                 return;
-            const test = yield SuccessTest_1.SuccessTest.fromAction(item, actor);
+            const test = yield TestCreator_1.TestCreator.fromAction(item, actor);
             if (test)
                 yield test.execute();
         });
@@ -27121,7 +27133,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":247,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./chat":149,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":232,"./tests/DirectManaCombatSpellDefenseTest":235,"./tests/DirectPhysicalCombatSpellDefenseTest":236,"./tests/DrainTest":237,"./tests/IndirectCombatSpellDefenseTest":238,"./tests/MeleeAttackTest":239,"./tests/OpposedTest":240,"./tests/PhysicalDefenseTest":241,"./tests/PhysicalResistTest":242,"./tests/RangedAttackTest":243,"./tests/SpellcastingTest":244,"./tests/SuccessTest":245,"./token/SR5Token":246}],168:[function(require,module,exports){
+},{"../test/quench":248,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./chat":149,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":232,"./tests/DirectManaCombatSpellDefenseTest":235,"./tests/DirectPhysicalCombatSpellDefenseTest":236,"./tests/DrainTest":237,"./tests/IndirectCombatSpellDefenseTest":238,"./tests/MeleeAttackTest":239,"./tests/OpposedTest":240,"./tests/PhysicalDefenseTest":241,"./tests/PhysicalResistTest":242,"./tests/RangedAttackTest":243,"./tests/SpellcastingTest":244,"./tests/SuccessTest":245,"./tests/TestCreator":246,"./token/SR5Token":247}],168:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30056,7 +30068,7 @@ const DataDefaults_1 = require("../data/DataDefaults");
 const HostPrep_1 = require("./prep/HostPrep");
 const MatrixRules_1 = require("../rules/MatrixRules");
 const NetworkDeviceFlow_1 = require("./flows/NetworkDeviceFlow");
-const SuccessTest_1 = require("../tests/SuccessTest");
+const TestCreator_1 = require("../tests/TestCreator");
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
  *
@@ -30349,7 +30361,7 @@ class SR5Item extends Item {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.actor)
                 return;
-            const test = yield SuccessTest_1.SuccessTest.fromAction(this, this.actor);
+            const test = yield TestCreator_1.TestCreator.fromAction(this, this.actor);
             if (!test)
                 return;
             yield test.execute();
@@ -31778,7 +31790,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":226,"../tests/SuccessTest":245,"./ChatData":205,"./flows/ActionFlow":208,"./flows/NetworkDeviceFlow":210,"./prep/HostPrep":211}],207:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":226,"../tests/TestCreator":246,"./ChatData":205,"./flows/ActionFlow":208,"./flows/NetworkDeviceFlow":210,"./prep/HostPrep":211}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34145,7 +34157,7 @@ const chat_1 = require("../chat");
 const constants_1 = require("../constants");
 const PartsList_1 = require("../parts/PartsList");
 const ShadowrunTestDialog_1 = require("../apps/dialogs/ShadowrunTestDialog");
-const SuccessTest_1 = require("../tests/SuccessTest");
+const TestCreator_1 = require("../tests/TestCreator");
 class ShadowrunRoll extends Roll {
     // add class Roll to the json so dice-so-nice works
     toJSON() {
@@ -34380,17 +34392,21 @@ class ShadowrunRoller {
         return ShadowrunRoller.advancedRoll(advancedRollProps, dialogOptions);
     }
     /*
-     * Flow should be handled by Roll class
-     * - dialog
-     * - roll
-     * - message
+     * Prompt the user for a default SuccessTest
      */
     static promptSuccessTest() {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: Handle dialog system.
-            const test = yield SuccessTest_1.SuccessTest.fromDialog();
-            if (test)
-                yield test.toMessage();
+            const data = TestCreator_1.TestCreator._minimalTestData();
+            // Get the last used pool size for simple SuccessTestDialogs
+            const lastPoolValue = ((_a = game.user) === null || _a === void 0 ? void 0 : _a.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue)) || 0;
+            PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.LastRoll', lastPoolValue);
+            const test = yield TestCreator_1.TestCreator.fromTestData(data);
+            yield test.execute();
+            if (test.evaluated) {
+                // Store the last used pool size for the next simple SuccessTest
+                yield ((_b = game.user) === null || _b === void 0 ? void 0 : _b.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue, test.pool.value));
+            }
         });
     }
     /**
@@ -34537,7 +34553,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../apps/dialogs/ShadowrunTestDialog":142,"../chat":149,"../constants":152,"../helpers":166,"../parts/PartsList":220,"../tests/SuccessTest":245}],223:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":142,"../chat":149,"../constants":152,"../helpers":166,"../parts/PartsList":220,"../tests/TestCreator":246}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -35764,7 +35780,7 @@ class DrainTest extends SuccessTest_1.SuccessTest {
         });
         return __awaiter(this, void 0, void 0, function* () {
             const documentAction = yield _super._getDocumentTestAction.call(this, item, actor);
-            if (!actor.hasMagic()) {
+            if (!actor.isAwakened) {
                 console.error(`Shadowrun 5e | A ${this.name} expected an awakened actor but got this`, actor);
                 return documentAction;
             }
@@ -35890,7 +35906,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpposedTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
 const DataDefaults_1 = require("../data/DataDefaults");
-const config_1 = require("../config");
+const TestCreator_1 = require("./TestCreator");
 /**
  * An opposed test results from a normal success test as an opposed action.
  */
@@ -35946,7 +35962,7 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
             // and calculate netHits accordingly.
             data.threshold.base = againstData.values.netHits.value;
             // Build the opposed action data
-            const action = DataDefaults_1.DefaultValues.actionData(config_1.SR5.testDefaultAction[this.name]);
+            const action = DataDefaults_1.DefaultValues.actionData(this._getDefaultTestAction());
             // Overwrite defaults with user defined action data.
             action.skill = againstData.opposed.skill || action.skill;
             action.attribute = againstData.opposed.attribute || action.attribute;
@@ -35983,12 +35999,24 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     get opposed() {
         return false;
     }
+    /**
+     * Using a message action cast an opposed test to that messages active test.
+     */
+    static _castOpposedAction(event, cardHtml) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            // Collect information needed to create the opposed action test.
+            const messageId = cardHtml.data('messageId');
+            const opposedActionTest = $(event.currentTarget).data('action');
+            yield TestCreator_1.TestCreator.fromMessageAction(messageId, opposedActionTest);
+        });
+    }
     static chatMessageListeners(message, html, data) {
         html.find('.opposed-action').on('click', (event) => OpposedTest._castOpposedAction(event, html));
     }
 }
 exports.OpposedTest = OpposedTest;
-},{"../config":151,"../data/DataDefaults":153,"./SuccessTest":245}],241:[function(require,module,exports){
+},{"../data/DataDefaults":153,"./SuccessTest":245,"./TestCreator":246}],241:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36005,6 +36033,7 @@ const PartsList_1 = require("../parts/PartsList");
 const OpposedTest_1 = require("./OpposedTest");
 const CombatRules_1 = require("../rules/CombatRules");
 const MeleeRules_1 = require("../rules/MeleeRules");
+const TestCreator_1 = require("./TestCreator");
 class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     _prepareData(data, options) {
         data = super._prepareData(data, options);
@@ -36134,16 +36163,15 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     }
     afterFailure() {
         return __awaiter(this, void 0, void 0, function* () {
-            const { test } = this.against.data.opposed.resist;
-            // @ts-ignore
-            const resistTestCls = game.shadowrun5e.tests[test];
-            const resistTest = yield resistTestCls.resistAgainstOpposed(this, this.data.options);
-            yield resistTest.execute();
+            const test = yield TestCreator_1.TestCreator.fromOpposedTestResistTest(this, this.data.options);
+            if (!test)
+                return;
+            yield test.execute();
         });
     }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
-},{"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":227,"./OpposedTest":240}],242:[function(require,module,exports){
+},{"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":227,"./OpposedTest":240,"./TestCreator":246}],242:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36474,17 +36502,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SuccessTest = void 0;
-const SR5Actor_1 = require("../actor/SR5Actor");
 const constants_1 = require("../constants");
 const DataDefaults_1 = require("../data/DataDefaults");
 const helpers_1 = require("../helpers");
 const SR5Roll_1 = require("../rolls/SR5Roll");
 const PartsList_1 = require("../parts/PartsList");
-const ShadowrunTestDialog_1 = require("../apps/dialogs/ShadowrunTestDialog");
 const TestDialog_1 = require("../apps/dialogs/TestDialog");
 const config_1 = require("../config");
-const SkillRules_1 = require("../rules/SkillRules");
 const ActionFlow_1 = require("../item/flows/ActionFlow");
+const TestCreator_1 = require("./TestCreator");
 /**
  * General handling of Shadowrun 5e success tests.
  *
@@ -36493,10 +36519,9 @@ const ActionFlow_1 = require("../item/flows/ActionFlow");
  *
  * TODO: Check if Actor.getRollData() can be used to better implement this
  * TODO: Add unittesting.
+ * TODO: Remove edge related data from options. Only use options for general test related handling, not shadowrun interal stuff.
  */
 class SuccessTest {
-    // TODO: include modifiers
-    // TODO: store options in data for later re roll with same options?
     constructor(data, documents, options) {
         // TODO: Move roll to documents (or name it context)
         // Store given documents to avoid later fetching.
@@ -36504,6 +36529,7 @@ class SuccessTest {
         this.item = documents === null || documents === void 0 ? void 0 : documents.item;
         this.rolls = (documents === null || documents === void 0 ? void 0 : documents.rolls) || [];
         this.targets = [];
+        this.evaluated = false;
         options = options || {};
         this.data = this._prepareData(data, options);
         this.calculateBaseValues();
@@ -36555,228 +36581,6 @@ class SuccessTest {
     get type() {
         return this.constructor.name;
     }
-    /**
-     * A helper method to create a SuccessTest from action items.
-     *
-     * @param item Any item type that defines an action.
-     * @param actor The actor to use for the resulting SR5Roll,
-     *              will default to the items parent otherwise.
-     * @param options See SuccessTestOptions documentation.
-     *
-     * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
-     */
-    static fromAction(item, actor, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            //@ts-ignore
-            if (!actor)
-                actor = item.parent;
-            if (!(actor instanceof SR5Actor_1.SR5Actor)) {
-                console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.");
-                return;
-            }
-            const action = item.getAction();
-            if (!action)
-                return;
-            // Determine what initial test type to use.
-            if (!action.test) {
-                action.test = 'SuccessTest';
-                console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
-            }
-            // @ts-ignore // Check for test class registration.
-            if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
-                console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
-                return;
-            }
-            // Any action item will return a list of values to create the test pool from.
-            // @ts-ignore // Get test class from registry to allow custom module tests.
-            const cls = game.shadowrun5e.tests[action.test];
-            const data = yield cls._getItemActionTestData(item, actor);
-            const documents = { item, actor };
-            return new cls(data, documents, options);
-        });
-    }
-    /**
-     * Instead of user configured values from the action, use default action values given by SR5CONFIG for
-     * this test class.
-     *
-     * @param actor The actor to cast the test.
-     * @param options See SuccessTestOptions documentation.
-     */
-    static fromDefaultAction(actor, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!(actor instanceof SR5Actor_1.SR5Actor)) {
-                console.error("Shadowrun 5e | A test can only be created with an explicit Actor or Item with an actor parent.");
-                return;
-            }
-            if (!config_1.SR5.testDefaultAction[this.name]) {
-                console.error("Shadowrun 5e | A test can only use default action when they're configured within SR5CONFIG.");
-                return;
-            }
-            // @ts-ignore // TODO: Typing
-            const cls = game.shadowrun5e.tests[this.name];
-            const data = yield cls._getDefaultActionTestData(actor);
-            const documents = { actor };
-            return new cls(data, documents, options);
-        });
-    }
-    /**
-     * Helper method to create a SuccessTest from given data.
-     *
-     * TODO: Rework this method to restore test based on test type.
-     *
-     * @param data
-     * @param documents
-     * @param options
-     */
-    static fromTestData(data, documents, options) {
-        const type = data.type || 'SuccessTest';
-        // @ts-ignore
-        const cls = game.shadowrun5e.tests[type];
-        // Before used documents would be fetched during evaluation.
-        return new cls(data, documents, options);
-    }
-    /**
-     * A helper method to create a SuccessTest from a simple pool value, without
-     * actor / item involvement.
-     *
-     * TODO: fromPool as a name for 'from values' doesn't quite describe the method anymore, since a pool doesn't need to be given.
-     * @param values
-     * @param options
-     */
-    static fromPool(values, options) {
-        const testData = {
-            pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool', base: (values === null || values === void 0 ? void 0 : values.pool) || 0 }),
-            threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold', base: (values === null || values === void 0 ? void 0 : values.threshold) || 0 }),
-            limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit', base: (values === null || values === void 0 ? void 0 : values.limit) || 0 }),
-        };
-        return new SuccessTest(testData, undefined, options);
-    }
-    /**
-     *
-     * @param id
-     */
-    static fromMessage(id) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
-            if (!message) {
-                console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
-                return;
-            }
-            const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
-            if (!testData) {
-                console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
-                return;
-            }
-            const rolls = testData.rolls.map(roll => SR5Roll_1.SR5Roll.fromData(roll));
-            const documents = { rolls };
-            return this.fromTestData(testData.data, documents, testData.data.options);
-        });
-    }
-    /**
-     * TODO: Check if this method is still usefull when a dialog is an inbetween and not an initator of a test.
-     */
-    static fromDialog() {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            // Ask user for additional, general success test role modifiers.
-            const testDialogOptions = {
-                // TODO: move to SuccessTest.label
-                title: game.i18n.localize('SR5.Tests.SuccessTest'),
-                limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit', value: 1 }),
-                threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold', value: 1 }),
-            };
-            // Get the last used pool size for simple SuccessTestDialogs
-            const lastPoolValue = ((_a = game.user) === null || _a === void 0 ? void 0 : _a.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue)) || 0;
-            // Prepare any predefined pool values.
-            const pool = DataDefaults_1.DefaultValues.valueData();
-            // @ts-ignore // unkown[] vs number[]
-            pool.mod = PartsList_1.PartsList.AddUniquePart(pool.mod, 'SR5.LastRoll', lastPoolValue);
-            const testDialog = yield ShadowrunTestDialog_1.ShadowrunTestDialog.create(undefined, testDialogOptions, pool.mod);
-            const dialogData = yield testDialog.select();
-            if (testDialog.canceled)
-                return;
-            // Extract simple test data from dialog user selection.
-            pool.mod = dialogData.parts.list;
-            pool.value = helpers_1.Helpers.calcTotal(pool, { min: 0 });
-            const thresholdValue = dialogData.threshold.value || 0;
-            const limitValue = dialogData.limit.value || 0;
-            // Create and display SuccessTest.
-            const test = SuccessTest.fromPool({
-                pool: pool.value,
-                threshold: thresholdValue,
-                limit: limitValue
-            }, { showDialog: false });
-            yield test.execute();
-            // Store the last used pool size for the next simple SuccessTest
-            yield ((_b = game.user) === null || _b === void 0 ? void 0 : _b.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue, pool.value));
-            return test;
-        });
-    }
-    static fromMessageAction(id, test) {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
-            if (!message) {
-                console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
-                return;
-            }
-            const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
-            if (!testData || !testData.data || !testData.rolls) {
-                console.error(`Shadowrun 5e | Message with id ${id} doesn't have valid test data in it's flags.`);
-                return;
-            }
-            // @ts-ignore // TODO: Add typing by declaration merging
-            const testClass = game.shadowrun5e.tests[test];
-            if (!testClass) {
-                console.error(`Shadowrun 5e | Couldn't find a registered test implementation for ${test}`);
-                return;
-            }
-            // TODO: Handle token selection as target override.
-            const actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
-            if (actors.length === 0)
-                (_b = ui.notifications) === null || _b === void 0 ? void 0 : _b.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
-            for (const actor of actors) {
-                const data = yield testClass._getOpposedActionTestData(testData.data, actor, id);
-                if (!data)
-                    return;
-                const documents = { actor };
-                const test = new testClass(data, documents);
-                // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
-                // Await test chain resolution for each actor, to avoid dialog spam.
-                yield test.execute();
-            }
-        });
-    }
-    static resistAgainstOpposed(test, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!test)
-                return console.error(`Shadowrun 5e | A ${this.name} against an opposed action was given a none opposed test type`, test);
-            if (!test.actor)
-                return console.error(`Shadowrun 5e | A ${this.name} can't operate without an actor given`);
-            // Don't change the data's source.
-            const testData = foundry.utils.duplicate(test.data);
-            // Prepare the resist test.
-            const data = yield this.getOpposedResistActionTestData(testData, test.actor, test.data.messageUuid);
-            const documents = { actor: test.actor };
-            // Initialize a new test of the current testing class.
-            return new this(data, documents, options);
-        });
-    }
-    /**
-     * Create a resist test after an opposed test has been completed.
-     *
-     * @param testData The opposed test from which the resisting test starts from. It includes the original success test.
-     * @param actor The actor to get values from to resist damage
-     * @param previousMessageId The previous message id in the test chain
-     */
-    static getOpposedResistActionTestData(testData, actor, previousMessageId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const data = yield this._getOpposedResistTestData(testData.against, actor, previousMessageId);
-            data.resisting = testData;
-            return data;
-        });
-    }
     toJSON() {
         return {
             data: this.data,
@@ -36817,142 +36621,9 @@ class SuccessTest {
             return {};
         });
     }
-    /**
-     * Test Data is structured around Values that can be modified.
-     */
-    static _getItemActionTestData(item, actor) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Prepare general data structure with labeling.
-            const data = {
-                pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
-                limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
-                threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
-                damage: DataDefaults_1.DefaultValues.damageData(),
-                modifiers: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Labels.Action.Modifiers' }),
-                opposed: {}
-            };
-            // Get user defined action configuration.
-            const action = item.getAction();
-            if (!action || !actor)
-                return data;
-            // Get default configuration.
-            const defaultAction = this._getDefaultTestAction();
-            const documentAction = yield this._getDocumentTestAction(item, actor);
-            // Override defaults with user defined action data or nothing.
-            // NOTE: Don't use mergeObject as action is field complete and it's values are preferred.
-            action.skill = action.skill || documentAction.skill || defaultAction.skill;
-            action.attribute = action.attribute || documentAction.attribute || defaultAction.attribute;
-            action.attribute2 = action.attribute2 || documentAction.attribute2 || defaultAction.attribute2;
-            action.mod = action.mod || documentAction.mod || defaultAction.mod;
-            return yield this._prepareActionTestData(action, actor, data);
-        });
-    }
-    /**
-     * An opposed resist test is related to results of an opposed test.
-     *
-     * This can be a physical damage resist test and will be derived from configuration
-     * of the original test that's being opposed.
-     *
-     * @param againstData The original test that's being opposed. Not the opposed test itself.
-     * @param actor The actor doing the testing.
-     * @param previousMessageId The Message id of the originating opposing test.
-     */
-    static _getOpposedResistTestData(againstData, actor, previousMessageId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!againstData.opposed.resist.test) {
-                console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, againstData, this);
-                return;
-            }
-            if (!actor) {
-                console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
-            }
-            // Prepare general data structure with labeling.
-            const data = {
-                pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
-                limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
-                threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
-                damage: DataDefaults_1.DefaultValues.damageData(),
-                modifiers: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Labels.Action.Modifiers' }),
-                opposed: {},
-                previousMessageId
-            };
-            // Provide default action information.
-            const defaultAction = this._getDefaultTestAction();
-            const action = DataDefaults_1.DefaultValues.actionData(defaultAction);
-            if (!action)
-                return data;
-            // Override defaults with user defined action data.
-            action.skill = againstData.opposed.resist.skill || action.skill;
-            action.attribute = againstData.opposed.resist.attribute || action.attribute;
-            action.attribute2 = againstData.opposed.resist.attribute2 || action.attribute2;
-            action.mod = againstData.opposed.resist.mod || action.mod;
-            // Alter default action information with user defined information.
-            return yield this._prepareActionTestData(action, actor, data);
-        });
-    }
     static _prepareActionTestData(action, actor, data) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            // Action values might be needed later to redo the same test.
-            data.action = action;
-            const pool = new PartsList_1.PartsList(data.pool.mod);
-            // Prepare pool values.
-            // TODO: Check if knowledge / language skills can be used for actions.
-            // TODO: Handle skill improvisation.
-            if (action.skill) {
-                const skill = actor.getSkill(action.skill);
-                // Notify user about their sins.
-                if (skill && !SkillRules_1.SkillRules.allowRoll(skill))
-                    (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn('SR5.Warnings.SkillCantBeDefault', { localize: true });
-                if (skill)
-                    pool.addUniquePart(skill.label, SkillRules_1.SkillRules.level(skill));
-                // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
-                if (action.spec)
-                    pool.addUniquePart('SR5.Specialization', SkillRules_1.SkillRules.SpecializationModifier);
-            }
-            // The first attribute is either used for skill or attribute only tests.
-            if (action.attribute) {
-                const attribute = actor.getAttribute(action.attribute);
-                if (attribute)
-                    pool.addUniquePart(attribute.label, attribute.value);
-            }
-            // The second attribute is only used for attribute only tests.
-            if (!action.skill && action.attribute2) {
-                const attribute = actor.getAttribute(action.attribute2);
-                if (attribute)
-                    pool.addUniquePart(attribute.label, attribute.value);
-            }
-            // A general pool modifier will be used as a base value.
-            if (action.mod) {
-                data.pool.base = Number(action.mod);
-            }
-            // Prepare limit values...
-            if (action.limit.attribute) {
-                const limit = actor.getLimit(action.limit.attribute);
-                if (limit)
-                    data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
-            }
-            if (action.limit.base || action.limit.value) {
-                data.limit.base = Number(action.limit.value);
-            }
-            // Prepare threshold values...
-            if (action.threshold.base) {
-                data.threshold.base = Number(action.threshold.base);
-            }
-            // Prepare general damage values...
-            if (action.damage.base) {
-                // TODO: Actual damage value calculation from actor to a numerical value.
-                data.damage = action.damage;
-            }
-            if (action.damage.attribute) {
-                const attribute = actor.getAttribute(action.damage.attribute);
-                data.damage.mod = PartsList_1.PartsList.AddUniquePart(data.damage.mod, attribute.label, attribute.value);
-            }
-            // Prepare opposed and resist tests...
-            if (action.opposed.test) {
-                data.opposed = action.opposed;
-            }
-            return data;
+            return TestCreator_1.TestCreator._prepareTestDataWithAction(action, actor, data);
         });
     }
     /**
@@ -37138,6 +36809,7 @@ class SuccessTest {
                 if (!roll._evaluated)
                     yield roll.evaluate({ async: true });
             }
+            this.evaluated = true;
             this.calculateDerivedValues();
             return this;
         });
@@ -37529,40 +37201,9 @@ class SuccessTest {
      */
     executeFollowUp() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.data.action.followed.test)
+            const test = yield TestCreator_1.TestCreator.fromActiveTestFollowupTest(this, this.data.options);
+            if (!test)
                 return;
-            if (!this.item)
-                return;
-            if (!this.actor)
-                return;
-            // @ts-ignore // TODO: Type merging
-            const testCls = game.shadowrun5e.tests[this.data.action.followed.test];
-            if (!testCls)
-                return console.error(`Shadowrun 5e | A ${this.constructor.name} has a unregistered follow up test configured`, this);
-            const data = {
-                title: testCls.title,
-                previousMessageId: this.data.messageUuid,
-                pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
-                limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
-                threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
-                values: {},
-                against: this.data
-            };
-            const action = DataDefaults_1.DefaultValues.actionData({ test: testCls.name });
-            const defaultAction = testCls._getDefaultTestAction();
-            const documentAction = yield testCls._getDocumentTestAction(this.item, this.actor);
-            // Override defaults with user defined action data or nothing.
-            // NOTE: Don't use mergeObject as action is field complete and it's values are preferred.
-            action.skill = this.data.action.followed.skill || documentAction.skill || defaultAction.skill;
-            action.attribute = this.data.action.followed.attribute || documentAction.attribute || defaultAction.attribute;
-            action.attribute2 = this.data.action.followed.attribute2 || documentAction.attribute2 || defaultAction.attribute2;
-            action.mod = this.data.action.followed.mod || documentAction.mod || defaultAction.mod;
-            const testData = yield testCls._prepareActionTestData(action, this.actor, data);
-            // Create the followup test based on this tests documents and options.
-            const documents = { item: this.item, actor: this.actor };
-            const options = this.data.options;
-            // TODO: pushTheLimit / second chance shouldn't be part of options...
-            const test = new testCls(testData, documents, options);
             yield test.execute();
         });
     }
@@ -37706,7 +37347,7 @@ class SuccessTest {
     static chatMessageContextOptions(html, options) {
         const secondChance = (li) => __awaiter(this, void 0, void 0, function* () {
             const messageId = li.data().messageId;
-            const test = yield SuccessTest.fromMessage(messageId);
+            const test = yield TestCreator_1.TestCreator.fromMessage(messageId);
             if (!test)
                 return console.error('Shadowrun 5e | Could not restore test from message');
             yield test.applySecondChance();
@@ -37756,18 +37397,403 @@ class SuccessTest {
             yield (document === null || document === void 0 ? void 0 : document.sheet.render(true));
         });
     }
-    static _castOpposedAction(event, cardHtml) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            // Collect information needed to create the opposed action test.
-            const messageId = cardHtml.data('messageId');
-            const opposedActionTest = $(event.currentTarget).data('action');
-            yield this.fromMessageAction(messageId, opposedActionTest);
-        });
-    }
 }
 exports.SuccessTest = SuccessTest;
-},{"../actor/SR5Actor":86,"../apps/dialogs/ShadowrunTestDialog":142,"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../item/flows/ActionFlow":208,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":229}],246:[function(require,module,exports){
+},{"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../item/flows/ActionFlow":208,"../parts/PartsList":220,"../rolls/SR5Roll":221,"./TestCreator":246}],246:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TestCreator = void 0;
+const SR5Actor_1 = require("../actor/SR5Actor");
+const DataDefaults_1 = require("../data/DataDefaults");
+const PartsList_1 = require("../parts/PartsList");
+const SkillRules_1 = require("../rules/SkillRules");
+const constants_1 = require("../constants");
+const SR5Roll_1 = require("../rolls/SR5Roll");
+const helpers_1 = require("../helpers");
+/**
+ * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
+ *
+ * see from* functions for different
+ */
+exports.TestCreator = {
+    /**
+     * A helper method to create a SuccessTest from a simple pool value, without
+     * actor / item involvement.
+     *
+     * TODO: fromPool as a name for 'from values' doesn't quite describe the method anymore, since a pool doesn't need to be given.
+     * @param values
+     * @param options
+     */
+    fromPool: function (values = { pool: 0, limit: 0, threshold: 0 }, options) {
+        const data = exports.TestCreator._minimalTestData();
+        data.pool.base = values.pool;
+        data.threshold.base = values.threshold || 0;
+        data.limit.base = values.limit || 0;
+        // Use the registered SuccessTest implementation.
+        const successTestCls = exports.TestCreator._getTestClass('SuccessTest');
+        return new successTestCls(data, undefined, options);
+    },
+    /**
+     * Create a Test from action item configuration.
+     *
+     * @param item Any item type that defines an action.
+     * @param actor The actor to use for the resulting SR5Roll,
+     *              will default to the items parent otherwise.
+     * @param options See SuccessTestOptions documentation.
+     *
+     * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
+     */
+    fromAction: function (item, actor, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            //@ts-ignore
+            if (!actor)
+                actor = item.parent;
+            if (!(actor instanceof SR5Actor_1.SR5Actor)) {
+                console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.");
+                return;
+            }
+            const action = item.getAction();
+            if (!action)
+                return;
+            // Determine what initial test type to use.
+            if (!action.test) {
+                action.test = 'SuccessTest';
+                console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
+            }
+            // @ts-ignore // Check for test class registration.
+            if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
+                console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
+                return;
+            }
+            // Any action item will return a list of values to create the test pool from.
+            // @ts-ignore // Get test class from registry to allow custom module tests.
+            const cls = exports.TestCreator._getTestClass(action.test);
+            const data = yield exports.TestCreator._getTestDataFromItemAction(cls, item, actor);
+            const documents = { item, actor };
+            return new cls(data, documents, options);
+        });
+    },
+    /**
+     * Create a test implementation from a past test included within a message
+     * @param id
+     */
+    fromMessage: function (id) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
+            if (!message) {
+                console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
+                return;
+            }
+            const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
+            if (!testData) {
+                console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
+                return;
+            }
+            const rolls = testData.rolls.map(roll => SR5Roll_1.SR5Roll.fromData(roll));
+            const documents = { rolls };
+            return exports.TestCreator.fromTestData(testData.data, documents, testData.data.options);
+        });
+    },
+    /**
+     * Create a test implementation for a specific action on a message.
+     *
+     * This can be an opposed test, resist or followup test.
+     *
+     * @param id The id of the to be used message.
+     * @param testClsName The test class name to be used with the message test data.
+     */
+    fromMessageAction: function (id, testClsName) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
+            if (!message) {
+                console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
+                return;
+            }
+            const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
+            if (!testData || !testData.data || !testData.rolls) {
+                console.error(`Shadowrun 5e | Message with id ${id} doesn't have valid test data in it's flags.`);
+                return;
+            }
+            // @ts-ignore // TODO: Add typing by declaration merging
+            const testClass = exports.TestCreator._getTestClass(testClsName);
+            if (!testClass) {
+                console.error(`Shadowrun 5e | Couldn't find a registered test implementation for ${testClsName}`);
+                return;
+            }
+            // TODO: Handle token selection as target override.
+            const actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
+            if (actors.length === 0)
+                (_b = ui.notifications) === null || _b === void 0 ? void 0 : _b.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
+            for (const actor of actors) {
+                const data = yield testClass._getOpposedActionTestData(testData.data, actor, id);
+                if (!data)
+                    return;
+                const documents = { actor };
+                const test = new testClass(data, documents);
+                // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
+                // Await test chain resolution for each actor, to avoid dialog spam.
+                yield test.execute();
+            }
+        });
+    },
+    /**
+     * Helper method to create a SuccessTest from given data.
+     *
+     * TODO: Rework this method to restore test based on test type.
+     *
+     * @param data The TestData of some test implementation
+     * @param documents Documents to create test with. These don't have to match the ones originally used.
+     * @param options Optional test options.
+     */
+    fromTestData: function (data, documents, options) {
+        const type = data.type || 'SuccessTest';
+        // @ts-ignore
+        const cls = exports.TestCreator._getTestClass(type);
+        // Before used documents would be fetched during evaluation.
+        return new cls(data, documents, options);
+    },
+    /**
+     * Use any kind of opposed test to create a resist test based on that
+     *
+     * @param opposed
+     * @param options
+     */
+    fromOpposedTestResistTest: function (opposed, options) {
+        var _a, _b, _c, _d;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!((_d = (_c = (_b = (_a = opposed === null || opposed === void 0 ? void 0 : opposed.against) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.opposed) === null || _c === void 0 ? void 0 : _c.resist) === null || _d === void 0 ? void 0 : _d.test))
+                return console.error(`Shadowrun 5e | Given test doesn't define an opposed resist test`, opposed);
+            if (!opposed.actor)
+                return console.error(`Shadowrun 5e | A ${opposed.title} can't operate without a populated actor given`);
+            const resistTestCls = exports.TestCreator._getTestClass(opposed.against.data.opposed.resist.test);
+            // Don't change the data's source.
+            const testData = foundry.utils.duplicate(opposed.data);
+            // Prepare the resist test.
+            const data = yield exports.TestCreator._getOpposedResistTestData(resistTestCls, testData, opposed.actor, opposed.data.messageUuid);
+            const documents = { actor: opposed.actor };
+            // Initialize a new test of the current testing class.
+            return new resistTestCls(data, documents, options);
+        });
+    },
+    /**
+     * Create a followup test using a given active test.
+     * This can be used for drain tests on spellcasting tests.
+     *
+     * @param test Any SuccessTest implementation with a followup.
+     * @param options Optional test options.
+     */
+    fromActiveTestFollowupTest: function (test, options) {
+        var _a, _b, _c;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!((_c = (_b = (_a = test === null || test === void 0 ? void 0 : test.data) === null || _a === void 0 ? void 0 : _a.action) === null || _b === void 0 ? void 0 : _b.followed) === null || _c === void 0 ? void 0 : _c.test))
+                return console.error(`Shadowrun 5e | Test doesn't define a follow up test`, test);
+            if (!test.item)
+                return console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
+            if (!test.actor)
+                return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
+            // @ts-ignore // TODO: Type merging
+            const testCls = exports.TestCreator._getTestClass(test.data.action.followed.test);
+            if (!testCls)
+                return console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
+            const data = exports.TestCreator._minimalTestData();
+            data.title = testCls.title;
+            data.previousMessageId = test.data.messageUuid;
+            data.against = test.data;
+            const action = DataDefaults_1.DefaultValues.actionData({ test: testCls.name });
+            const defaultAction = testCls._getDefaultTestAction();
+            const documentAction = yield testCls._getDocumentTestAction(test.item, test.actor);
+            // Override defaults with user defined action data or nothing.
+            // NOTE: Don't use mergeObject as action is field complete and it's values are preferred.
+            action.skill = test.data.action.followed.skill || documentAction.skill || defaultAction.skill;
+            action.attribute = test.data.action.followed.attribute || documentAction.attribute || defaultAction.attribute;
+            action.attribute2 = test.data.action.followed.attribute2 || documentAction.attribute2 || defaultAction.attribute2;
+            action.mod = test.data.action.followed.mod || documentAction.mod || defaultAction.mod;
+            const testData = yield testCls._prepareActionTestData(action, test.actor, data);
+            // Create the followup test based on this tests documents and options.
+            const documents = { item: test.item, actor: test.actor };
+            // TODO: pushTheLimit / second chance shouldn't be part of options...
+            return new testCls(testData, documents, options);
+        });
+    },
+    /** Internal helpers */
+    /**
+     * Return a test class from the global registry.
+     *
+     * @param testName A Test class constructor name registered as a test.
+     */
+    _getTestClass: function (testName) {
+        //@ts-ignore
+        if (!game.shadowrun5e.tests.hasOwnProperty(testName)) { //@ts-ignore
+            console.error(`Shadowrun 5e | Tried getting a Test Class ${testName}, which isn't registered in: `, game.shadowrun5e.tests);
+            return;
+        } //@ts-ignore
+        return game.shadowrun5e.tests[testName];
+    },
+    /**
+     * Return test data based on an items action.
+     *
+     * @param testCls
+     * @param item
+     * @param actor
+     */
+    _getTestDataFromItemAction: function (testCls, item, actor) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Prepare general data structure with labeling.
+            const data = exports.TestCreator._minimalTestData();
+            // Get user defined action configuration.
+            const action = item.getAction();
+            if (!action || !actor)
+                return data;
+            // Get default configuration.
+            const defaultAction = testCls._getDefaultTestAction();
+            const documentAction = yield testCls._getDocumentTestAction(item, actor);
+            // Override defaults with user defined action data or nothing.
+            // NOTE: Don't use mergeObject as action is field complete and it's values are preferred.
+            action.skill = action.skill || documentAction.skill || defaultAction.skill;
+            action.attribute = action.attribute || documentAction.attribute || defaultAction.attribute;
+            action.attribute2 = action.attribute2 || documentAction.attribute2 || defaultAction.attribute2;
+            action.mod = action.mod || documentAction.mod || defaultAction.mod;
+            return yield exports.TestCreator._prepareTestDataWithAction(action, actor, data);
+        });
+    },
+    /**
+     * Prepare values as configured in an actions roll data using the given actor for dynamic parts and
+     * modifying the given data to create a valid SuccessTestData.
+     *
+     * @param action An action configuration.
+     * @param actor Any type of actor.
+     * @param data A SuccessTestData or any subclass implementing
+     */
+    _prepareTestDataWithAction: function (action, actor, data) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            // Action values might be needed later to redo the same test.
+            data.action = action;
+            const pool = new PartsList_1.PartsList(data.pool.mod);
+            // Prepare pool values.
+            // TODO: Check if knowledge / language skills can be used for actions.
+            // TODO: Handle skill improvisation.
+            if (action.skill) {
+                const skill = actor.getSkill(action.skill);
+                // Notify user about their sins.
+                if (skill && !SkillRules_1.SkillRules.allowRoll(skill))
+                    (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn('SR5.Warnings.SkillCantBeDefault', { localize: true });
+                if (skill)
+                    pool.addUniquePart(skill.label, SkillRules_1.SkillRules.level(skill));
+                // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
+                if (action.spec)
+                    pool.addUniquePart('SR5.Specialization', SkillRules_1.SkillRules.SpecializationModifier);
+            }
+            // The first attribute is either used for skill or attribute only tests.
+            if (action.attribute) {
+                const attribute = actor.getAttribute(action.attribute);
+                if (attribute)
+                    pool.addUniquePart(attribute.label, attribute.value);
+            }
+            // The second attribute is only used for attribute only tests.
+            if (!action.skill && action.attribute2) {
+                const attribute = actor.getAttribute(action.attribute2);
+                if (attribute)
+                    pool.addUniquePart(attribute.label, attribute.value);
+            }
+            // A general pool modifier will be used as a base value.
+            if (action.mod) {
+                data.pool.base = Number(action.mod);
+            }
+            // Prepare limit values...
+            if (action.limit.attribute) {
+                const limit = actor.getLimit(action.limit.attribute);
+                if (limit)
+                    data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
+            }
+            if (action.limit.base || action.limit.value) {
+                data.limit.base = Number(action.limit.value);
+            }
+            // Prepare threshold values...
+            if (action.threshold.base) {
+                data.threshold.base = Number(action.threshold.base);
+            }
+            // Prepare general damage values...
+            if (action.damage.base) {
+                // TODO: Actual damage value calculation from actor to a numerical value.
+                data.damage = action.damage;
+            }
+            if (action.damage.attribute) {
+                const attribute = actor.getAttribute(action.damage.attribute);
+                data.damage.mod = PartsList_1.PartsList.AddUniquePart(data.damage.mod, attribute.label, attribute.value);
+            }
+            // Prepare opposed and resist tests...
+            if (action.opposed.test) {
+                data.opposed = action.opposed;
+            }
+            return data;
+        });
+    },
+    /**
+     * An opposed resist test is related to the result of an opposed test.
+     *
+     * This can be a physical damage resist test and will be derived from configuration
+     * of the original test that's being opposed.
+     *
+     * @param resistTestCls
+     * @param againstData The original test that's being opposed. Not the opposed test itself.
+     * @param actor The actor doing the testing.
+     * @param previousMessageId The Message id of the originating opposing test.
+     */
+    _getOpposedResistTestData: function (resistTestCls, againstData, actor, previousMessageId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!againstData.opposed.resist.test) {
+                console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, againstData, this);
+                return;
+            }
+            if (!actor) {
+                console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, resistTestCls);
+            }
+            // Prepare general data structure with labeling.
+            const data = exports.TestCreator._minimalTestData();
+            data.previousMessageId = previousMessageId;
+            // Provide default action information.
+            const defaultAction = resistTestCls._getDefaultTestAction();
+            const action = DataDefaults_1.DefaultValues.actionData(defaultAction);
+            if (!action)
+                return data;
+            // Override defaults with user defined action data.
+            action.skill = againstData.opposed.resist.skill || action.skill;
+            action.attribute = againstData.opposed.resist.attribute || action.attribute;
+            action.attribute2 = againstData.opposed.resist.attribute2 || action.attribute2;
+            action.mod = againstData.opposed.resist.mod || action.mod;
+            // Alter default action information with user defined information.
+            return yield exports.TestCreator._prepareTestDataWithAction(action, actor, data);
+        });
+    },
+    /**
+     * Return the minimal viable test data without test specific customization.
+     */
+    _minimalTestData: function () {
+        return {
+            pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
+            limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
+            threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
+            damage: DataDefaults_1.DefaultValues.damageData(),
+            modifiers: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Labels.Action.Modifiers' }),
+            values: {},
+            action: DataDefaults_1.DefaultValues.actionData(),
+            opposed: {}
+        };
+    }
+};
+},{"../actor/SR5Actor":86,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":229}],247:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -37788,7 +37814,7 @@ class SR5Token extends Token {
     }
 }
 exports.SR5Token = SR5Token;
-},{"../constants":152}],247:[function(require,module,exports){
+},{"../constants":152}],248:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
@@ -37821,7 +37847,7 @@ const quenchRegister = () => {
     quench.registerBatch("shadowrun5e.flow.tests", sr5_Testing_spec_1.shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
 };
 exports.quenchRegister = quenchRegister;
-},{"./sr5.ActiveEffect.spec":248,"./sr5.ActorDataPrep.spec":249,"./sr5.Inventory.spec":250,"./sr5.Matrix.spec":251,"./sr5.Modifiers.spec":252,"./sr5.NetworkDevices.spec":253,"./sr5.SR5Actor.spec":254,"./sr5.SR5Item.spec":255,"./sr5.Testing.spec":256}],248:[function(require,module,exports){
+},{"./sr5.ActiveEffect.spec":249,"./sr5.ActorDataPrep.spec":250,"./sr5.Inventory.spec":251,"./sr5.Matrix.spec":252,"./sr5.Modifiers.spec":253,"./sr5.NetworkDevices.spec":254,"./sr5.SR5Actor.spec":255,"./sr5.SR5Item.spec":256,"./sr5.Testing.spec":257}],249:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37943,7 +37969,7 @@ const shadowrunSR5ActiveEffect = context => {
     });
 };
 exports.shadowrunSR5ActiveEffect = shadowrunSR5ActiveEffect;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":257}],249:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":258}],250:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38156,7 +38182,7 @@ const shadowrunSR5ActorDataPrep = context => {
     });
 };
 exports.shadowrunSR5ActorDataPrep = shadowrunSR5ActorDataPrep;
-},{"../module/actor/SR5Actor":86,"../module/constants":152,"../module/item/SR5Item":206,"./utils":257}],250:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/constants":152,"../module/item/SR5Item":206,"./utils":258}],251:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38228,7 +38254,7 @@ const shadowrunInventoryFlow = context => {
     });
 };
 exports.shadowrunInventoryFlow = shadowrunInventoryFlow;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":257}],251:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":258}],252:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunMatrix = void 0;
@@ -38300,7 +38326,7 @@ const shadowrunMatrix = context => {
     });
 };
 exports.shadowrunMatrix = shadowrunMatrix;
-},{"../module/rules/MatrixRules":226}],252:[function(require,module,exports){
+},{"../module/rules/MatrixRules":226}],253:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -38468,7 +38494,7 @@ const shadowrunRulesModifiers = context => {
     });
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
-},{"../module/rules/Modifiers":228}],253:[function(require,module,exports){
+},{"../module/rules/Modifiers":228}],254:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38623,7 +38649,7 @@ const shadowrunNetworkDevices = context => {
     });
 };
 exports.shadowrunNetworkDevices = shadowrunNetworkDevices;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/item/flows/NetworkDeviceFlow":210,"./utils":257}],254:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/item/flows/NetworkDeviceFlow":210,"./utils":258}],255:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38688,7 +38714,7 @@ const shadowrunSR5Actor = context => {
     });
 };
 exports.shadowrunSR5Actor = shadowrunSR5Actor;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":257}],255:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":258}],256:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38771,7 +38797,7 @@ const shadowrunSR5Item = context => {
     });
 };
 exports.shadowrunSR5Item = shadowrunSR5Item;
-},{"../module/item/SR5Item":206,"./utils":257}],256:[function(require,module,exports){
+},{"../module/item/SR5Item":206,"./utils":258}],257:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38787,7 +38813,7 @@ exports.shadowrunTesting = void 0;
 const utils_1 = require("./utils");
 const SR5Actor_1 = require("../module/actor/SR5Actor");
 const SR5Item_1 = require("../module/item/SR5Item");
-const SuccessTest_1 = require("../module/tests/SuccessTest");
+const TestCreator_1 = require("../module/tests/TestCreator");
 const shadowrunTesting = context => {
     const { describe, it, assert, before, after } = context;
     let testActor;
@@ -38852,7 +38878,7 @@ const shadowrunTesting = context => {
                 'data.attributes.body.base': 5,
                 'data.skills.active.automatics.base': 45 };
             const actor = yield testActor.create(actorData);
-            const test = yield SuccessTest_1.SuccessTest.fromAction(action, actor);
+            const test = yield TestCreator_1.TestCreator.fromAction(action, actor);
             // For a broken test just fail.v
             if (!test)
                 assert.strictEqual(true, false);
@@ -38870,7 +38896,7 @@ const shadowrunTesting = context => {
             }
         }));
         it('evaluate a roll from simple pool data', () => __awaiter(void 0, void 0, void 0, function* () {
-            const test = SuccessTest_1.SuccessTest.fromPool({ pool: 10 });
+            const test = TestCreator_1.TestCreator.fromPool({ pool: 10 });
             yield test.evaluate();
             assert.strictEqual(test.pool.value, 10);
         }));
@@ -38907,7 +38933,7 @@ const shadowrunTesting = context => {
                 'data.attributes.body.base': 5,
                 'data.skills.active.automatics.base': 45 };
             const actor = yield testActor.create(actorData);
-            const test = yield SuccessTest_1.SuccessTest.fromAction(action, actor);
+            const test = yield TestCreator_1.TestCreator.fromAction(action, actor);
             if (test) {
                 yield test.toMessage();
             }
@@ -38917,7 +38943,7 @@ const shadowrunTesting = context => {
     });
 };
 exports.shadowrunTesting = shadowrunTesting;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/tests/SuccessTest":245,"./utils":257}],257:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/tests/TestCreator":246,"./utils":258}],258:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
