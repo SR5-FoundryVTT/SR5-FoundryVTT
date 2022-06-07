@@ -27,6 +27,16 @@ export class DirectManaCombatSpellDefenseTest extends OpposedTest {
         return data;
     }
 
+    static _getDefaultTestAction() {
+        return {
+            'attribute': 'willpower'
+        };
+    }
+
+    get testModifiers() {
+        return ['global'];
+    }
+
     async processSuccess() {
         await super.processSuccess();
 

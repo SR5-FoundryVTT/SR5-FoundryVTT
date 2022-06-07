@@ -221,7 +221,7 @@ export class SuccessTest {
      * Get a possible globally defined default action set for this test class.
      */
     static _getDefaultTestAction() {
-        return SR5.testDefaultAction[this.name] || {};
+        return {};
     }
 
     /**
@@ -475,6 +475,15 @@ export class SuccessTest {
     async prepareDocumentData() {}
 
     /**
+     * What modifiers should be used for this test type by default.
+     *
+     * NOTE: These modifiers are routed through ModifierFlow.totalFor()
+     */
+    get testModifiers() {
+        return ['global', 'wounds'];
+    }
+
+    /**
      * Prepare modifiers based on connected documents.
      *
      * Main purpose is to populate the configured modifiers for this test based on actor / items used.
@@ -482,10 +491,7 @@ export class SuccessTest {
     async prepareDocumentModifiers()  {
         if (!this.actor) return;
 
-        // These modifier types will apply for this test type.
-        const testModifiers = SR5.testModifiers[this.constructor.name] || [];
-
-        for (const type of testModifiers) {
+        for (const type of this.testModifiers) {
             const value = await this.actor.modifiers.totalFor(type);
             const name = SR5.modifierTypes[type];
 
@@ -934,8 +940,6 @@ export class SuccessTest {
             label: testCls.label
         };
 
-        const {opposed} = this.data;
-
         if (this.data.opposed.mod) {
             action.label += ` ${this.data.opposed.mod}`;
         }
@@ -979,15 +983,6 @@ export class SuccessTest {
         ChatMessage.applyRollMode(messageData, this.data.options?.rollMode);
 
         return messageData;
-    }
-
-    static async _testDataFromMessage(id: string): Promise<SuccessTestData | undefined> {
-        const message = game.messages?.get(id);
-        if (!message) return;
-
-        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestData;
-        if (!testData) return;
-        else return testData;
     }
 
     /**

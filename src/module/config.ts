@@ -364,54 +364,6 @@ export const SR5 = {
     },
 
     /**
-     * What modifiers should be used for each test type by default.
-     *
-     * NOTE: These modifiers are routed through ModifierFlow.totalFor()
-     * NOTE: Each key should be found within game.shadowrun5e.tests and match a SuccessTest subclass.
-     */
-    testModifiers: {
-        // TODO: Define test types.
-        // TODO: Add default modifiers for all test types.
-        'SuccessTest': ['global'],
-        'RangedAttackTest': ['global', 'wounds', 'environmental'],
-        'MeleeAttackTest': ['global', 'wounds', 'environmental'],
-        'PhysicalDefenseTest': ['global', 'wounds', 'defense'],
-        'PhysicalResistTest': ['soak'],
-        'SpellcastingTest': ['global', 'wounds'],
-        'DirectManaCombatSpellDefenseTest': ['global'],
-        'DirectPhysicalCombatSpellDefenseTest': ['global'],
-        'IndirectCombatSpellDefenseTest': ['global', 'defense', 'wounds']
-    },
-
-    /**
-     * Default action values for different tests. Should be used if an action doesn't provide values OR as default values
-     * for when this test is chosen for its role on an action sheet.
-     */
-    testDefaultAction: {
-        'PhysicalDefenseTest': {
-            'attribute': 'reaction',
-            'attribute2': 'intuition'
-        },
-        'PhysicalResistTest': {
-            'attribute': 'body',
-            'armor': true
-        },
-        'SpellcastingTest': {
-            'skill': 'spellcasting',
-            'attribute': 'magic'
-        },
-        'DrainTest': {
-            'attribute2': 'willpower'
-        },
-        'DirectManaCombatSpellDefenseTest': {
-            'attribute': 'willpower'
-        },
-        'DirectPhysicalCombatSpellDefenseTest': {
-            'attribute': 'body'
-        }
-    },
-
-    /**
      * Define here what kind of active test is to be used for the different weapon categories as a main action test.
      */
     weaponCategoryActiveTests: {

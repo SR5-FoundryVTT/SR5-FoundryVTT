@@ -30,6 +30,17 @@ export class PhysicalResistTest extends SuccessTest {
         return data;
     }
 
+    static _getDefaultTestAction() {
+        return {
+            'attribute': 'body',
+            'armor': true
+        };
+    }
+
+    get testModifiers() {
+        return ['soak'];
+    }
+
     applyPoolModifiers() {
         super.applyPoolModifiers();
 

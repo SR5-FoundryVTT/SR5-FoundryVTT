@@ -32,6 +32,17 @@ export class SpellcastingTest extends SuccessTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
     }
 
+    static _getDefaultTestAction() {
+        return {
+            'skill': 'spellcasting',
+            'attribute': 'magic'
+        };
+    }
+
+    get testModifiers() {
+        return ['global', 'wounds'];
+    }
+
     async prepareDocumentData() {
         this.prepareInitialForceValue();
     }

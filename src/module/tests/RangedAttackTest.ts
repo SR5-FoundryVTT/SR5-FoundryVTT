@@ -96,6 +96,10 @@ export class RangedAttackTest extends SuccessTest {
         this.data.recoilCompensation = this.item?.getRecoilCompensation(true) || 0;
     }
 
+    get testModifiers() {
+        return ['global', 'wounds', 'environmental'];
+    }
+
     async prepareDocumentData(){
         await this._prepareWeaponRanges();
         this._prepareFireMode();

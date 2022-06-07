@@ -16,6 +16,10 @@ export class MeleeAttackTest extends SuccessTest {
         return data;
     }
 
+     get testModifiers() {
+        return ['global', 'wounds', 'environmental'];
+    }
+
      get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.html';
     }

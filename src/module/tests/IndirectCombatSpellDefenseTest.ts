@@ -27,6 +27,16 @@ export class IndirectCombatSpellDefenseTest extends OpposedTest {
         return data;
     }
 
+    static _getDefaultTestAction() {
+        return {
+            'attribute': 'body'
+        };
+    }
+
+    get testModifiers() {
+        return ['global', 'defense', 'wounds'];
+    }
+
     async processSuccess() {
         await super.processSuccess();
 

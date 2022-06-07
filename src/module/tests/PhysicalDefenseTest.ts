@@ -51,6 +51,17 @@ export class PhysicalDefenseTest extends OpposedTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
     }
 
+    static _getDefaultTestAction() {
+        return {
+            'attribute': 'reaction',
+            'attribute2': 'intuition'
+        };
+    }
+
+    get testModifiers() {
+        return ['global', 'wounds', 'defense'];
+    }
+
     async prepareDocumentData() {
         this.prepareActiveDefense();
         this.prepareMeleeReach();

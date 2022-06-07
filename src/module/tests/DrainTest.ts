@@ -24,6 +24,16 @@ export class DrainTest extends SuccessTest {
         return data;
     }
 
+    static _getDefaultTestAction() {
+        return {
+            'attribute2': 'willpower'
+        };
+    }
+
+    get testModifiers() {
+        return []
+    }
+
     static async _getDocumentTestAction(item, actor) {
         const documentAction = await super._getDocumentTestAction(item, actor);
 
