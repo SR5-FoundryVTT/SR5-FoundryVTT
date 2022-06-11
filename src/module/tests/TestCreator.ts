@@ -13,16 +13,14 @@ import {
     TestOptions
 } from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
-import {SR5} from "../config";
-import MinimalActionData = Shadowrun.MinimalActionData;
 import {PartsList} from "../parts/PartsList";
 import {SkillRules} from "../rules/SkillRules";
-import ActionRollData = Shadowrun.ActionRollData;
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {Helpers} from "../helpers";
 import {OpposedTest} from "./OpposedTest";
-import {Test} from "../rolls/ShadowrunRoller";
+import MinimalActionData = Shadowrun.MinimalActionData;
+import ActionRollData = Shadowrun.ActionRollData;
 
 /**
  * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
@@ -199,13 +197,13 @@ export const TestCreator = {
     },
 
     /**
-     * Create a followup test using a given active test.
-     * This can be used for drain tests on spellcasting tests.
+     * Create a followup test using a test.
+     * This can be used for drain tests on spellcasting tests or for resist tests on defense tests
      *
      * @param test Any SuccessTest implementation with a followup.
      * @param options Optional test options.
      */
-    fromActiveTestFollowupTest: async function(test: SuccessTest, options?: TestOptions): Promise<SuccessTest  | void> {
+    fromFollowupTest: async function(test: SuccessTest, options?: TestOptions): Promise<SuccessTest  | void> {
         if (!test?.data?.action?.followed?.test) return;
         if (!test.item) return console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
         if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
@@ -219,18 +217,16 @@ export const TestCreator = {
         data.previousMessageId = test.data.messageUuid;
         data.against = test.data;
 
-        const action = DefaultValues.actionData({test: testCls.name});
         const defaultAction = testCls._getDefaultTestAction();
         const documentAction = await testCls._getDocumentTestAction(test.item, test.actor);
 
-        // Override defaults with user defined action data or nothing.
-        // NOTE: Don't use mergeObject as action is field complete and it's values are preferred.
-        action.skill = test.data.action.followed.skill || documentAction.skill || defaultAction.skill;
-        action.attribute = test.data.action.followed.attribute || documentAction.attribute || defaultAction.attribute;
-        action.attribute2 = test.data.action.followed.attribute2 || documentAction.attribute2 || defaultAction.attribute2;
-        action.mod = test.data.action.followed.mod || documentAction.mod || defaultAction.mod;
+        const action = TestCreator._applyMinimalActionDataInOrder(
+            DefaultValues.actionData({test: testCls.name}),
+            documentAction,
+            defaultAction);
 
         const testData = await testCls._prepareActionTestData(action, test.actor, data);
+        testData.following = test.data;
 
         // Create the followup test based on this tests documents and options.
         const documents = {item: test.item, actor: test.actor};
@@ -411,5 +407,21 @@ export const TestCreator = {
             action: DefaultValues.actionData(),
             opposed: {}
         };
+    },
+
+    _applyMinimalActionDataInOrder: function(action, ...minimalActions: MinimalActionData[]): ActionRollData {
+        // Overwrite keys from second action on forward in indexed order.
+        for (const minimalAction of minimalActions) {
+             for (const key of Object.keys(DefaultValues.minimalActionData())) {
+                 if (!minimalAction.hasOwnProperty(key)) continue;
+
+                 action[key] = minimalAction[key] || action[key];
+             }
+
+             // false Armor will not behave as a boolean with the || operator.
+             action.armor = minimalAction.armor;
+        }
+
+        return action;
     }
 };

@@ -7,7 +7,7 @@ import {Helpers} from "../helpers";
 
 export interface PhysicalResistTestData extends SuccessTestData {
     // The original test this resistance is taking its data from.
-    resisting: OpposedTestData
+    following: OpposedTestData
 }
 
 
@@ -21,7 +21,7 @@ export class PhysicalResistTest extends SuccessTest {
         data = super._prepareData(data, options);
 
         // Get damage after it's been modified by previous defense.
-        const incomingModifiedDamage = foundry.utils.duplicate(data.resisting.modifiedDamage);
+        const incomingModifiedDamage = foundry.utils.duplicate(data.following.modifiedDamage);
         data.damage = data.damage ? incomingModifiedDamage : DefaultValues.damageData();
 
         // NOTE: this is dev testing... should be removed

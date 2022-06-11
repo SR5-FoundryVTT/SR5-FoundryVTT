@@ -117,6 +117,7 @@ export class SuccessTest {
     public evaluated: boolean;
 
     public targets: TokenDocument[]
+    public following: SuccessTest | undefined;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // TODO: Move roll to documents (or name it context)
@@ -866,7 +867,7 @@ export class SuccessTest {
      * Depending on the action configuration execute a followup test.
      */
     async executeFollowUp() {
-        const test = await TestCreator.fromActiveTestFollowupTest(this, this.data.options);
+        const test = await TestCreator.fromFollowupTest(this, this.data.options);
         if (!test) return;
         await test.execute();
     }

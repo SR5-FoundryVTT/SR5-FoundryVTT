@@ -38,6 +38,11 @@ export class OpposedTest extends SuccessTest {
         // Get opposed item reference as sometimes opposed test details depend on the item used for the active test.
         data.sourceItemUuid = data.against.sourceItemUuid;
 
+        // Whatever the active test defined for it's opposed test as a followup test.
+        // TODO: Maybe this resist should just be a general followup.
+        data.action.followed = data.against.action.opposed.resist;
+
+        // TODO: this isn't needed if opposed is always taken from data.action.opposed
         delete data.opposed;
         delete data.targetActorsUuid;
 

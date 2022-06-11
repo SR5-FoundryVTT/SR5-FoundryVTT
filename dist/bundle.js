@@ -24131,7 +24131,8 @@ class DefaultValues {
             attribute: '',
             attribute2: '',
             skill: '',
-            mod: 0
+            mod: 0,
+            armor: false
         }, partialActionData);
     }
     static actionData(partialActionData = {}) {
@@ -34659,6 +34660,7 @@ const PartsList_1 = require("../parts/PartsList");
 const helpers_1 = require("../helpers");
 const CombatRules_1 = require("./CombatRules");
 const constants_1 = require("../constants");
+const DataDefaults_1 = require("../data/DataDefaults");
 class CombatSpellRules {
     /**
      * Calculate combat spell damage as defined in SR5#283 Combat Spells Direct section.
@@ -34706,16 +34708,13 @@ class CombatSpellRules {
         return CombatRules_1.CombatRules.modifyDamageAfterMiss(damage);
     }
     static directCombatDefenseAction() {
-        return {
-            skill: '',
+        return DataDefaults_1.DefaultValues.minimalActionData({
             attribute: constants_1.SR.defense.spell.direct.mana,
-            attribute2: '',
-            mod: 0
-        };
+        });
     }
 }
 exports.CombatSpellRules = CombatSpellRules;
-},{"../constants":152,"../helpers":166,"../parts/PartsList":220,"./CombatRules":223}],225:[function(require,module,exports){
+},{"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"./CombatRules":223}],225:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DrainRules = void 0;
@@ -35900,6 +35899,10 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
         data = super._prepareData(data, options);
         // Get opposed item reference as sometimes opposed test details depend on the item used for the active test.
         data.sourceItemUuid = data.against.sourceItemUuid;
+        // Whatever the active test defined for it's opposed test as a followup test.
+        // TODO: Maybe this resist should just be a general followup.
+        data.action.followed = data.against.action.opposed.resist;
+        // TODO: this isn't needed if opposed is always taken from data.action.opposed
         delete data.opposed;
         delete data.targetActorsUuid;
         return data;
@@ -35995,15 +35998,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PhysicalDefenseTest = void 0;
 const PartsList_1 = require("../parts/PartsList");
-const OpposedTest_1 = require("./OpposedTest");
 const CombatRules_1 = require("../rules/CombatRules");
 const MeleeRules_1 = require("../rules/MeleeRules");
 const TestCreator_1 = require("./TestCreator");
-class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
+const DefenseTest_1 = require("./DefenseTest");
+const DataDefaults_1 = require("../data/DataDefaults");
+class PhysicalDefenseTest extends DefenseTest_1.DefenseTest {
     _prepareData(data, options) {
         data = super._prepareData(data, options);
-        data.incomingDamage = foundry.utils.duplicate(data.against.damage);
-        data.modifiedDamage = foundry.utils.duplicate(data.against.damage);
         // TODO: this should be stored on actor flag and fetched in populateActorModifiers
         data.cover = 0;
         data.activeDefense = '';
@@ -36019,10 +36021,10 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
     }
     static _getDefaultTestAction() {
-        return {
+        return DataDefaults_1.DefaultValues.minimalActionData({
             'attribute': 'reaction',
             'attribute2': 'intuition'
-        };
+        });
     }
     get testModifiers() {
         return ['global', 'wounds', 'defense'];
@@ -36145,7 +36147,7 @@ class PhysicalDefenseTest extends OpposedTest_1.OpposedTest {
     }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
-},{"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":227,"./OpposedTest":239,"./TestCreator":245}],241:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":227,"./DefenseTest":236,"./TestCreator":245}],241:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36172,17 +36174,17 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
     _prepareData(data, options) {
         data = super._prepareData(data, options);
         // Get damage after it's been modified by previous defense.
-        const incomingModifiedDamage = foundry.utils.duplicate(data.resisting.modifiedDamage);
+        const incomingModifiedDamage = foundry.utils.duplicate(data.following.modifiedDamage);
         data.damage = data.damage ? incomingModifiedDamage : DataDefaults_1.DefaultValues.damageData();
         // NOTE: this is dev testing... should be removed
         data.opposed = {};
         return data;
     }
     static _getDefaultTestAction() {
-        return {
+        return DataDefaults_1.DefaultValues.minimalActionData({
             'attribute': 'body',
             'armor': true
-        };
+        });
     }
     get testModifiers() {
         return ['soak'];
@@ -36383,6 +36385,7 @@ const SuccessTest_1 = require("./SuccessTest");
 const SpellcastingRules_1 = require("../rules/SpellcastingRules");
 const PartsList_1 = require("../parts/PartsList");
 const CombatSpellRules_1 = require("../rules/CombatSpellRules");
+const DataDefaults_1 = require("../data/DataDefaults");
 /**
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
  *
@@ -36399,10 +36402,10 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
     }
     static _getDefaultTestAction() {
-        return {
+        return DataDefaults_1.DefaultValues.minimalActionData({
             skill: 'spellcasting',
             attribute: 'magic'
-        };
+        });
     }
     get testModifiers() {
         return ['global', 'wounds'];
@@ -36484,7 +36487,7 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.SpellCastingTest = SpellCastingTest;
-},{"../parts/PartsList":220,"../rules/CombatSpellRules":224,"../rules/SpellcastingRules":231,"./SuccessTest":244}],244:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatSpellRules":224,"../rules/SpellcastingRules":231,"./SuccessTest":244}],244:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37202,7 +37205,7 @@ class SuccessTest {
      */
     executeFollowUp() {
         return __awaiter(this, void 0, void 0, function* () {
-            const test = yield TestCreator_1.TestCreator.fromActiveTestFollowupTest(this, this.data.options);
+            const test = yield TestCreator_1.TestCreator.fromFollowupTest(this, this.data.options);
             if (!test)
                 return;
             yield test.execute();
@@ -37574,13 +37577,13 @@ exports.TestCreator = {
         });
     },
     /**
-     * Create a followup test using a given active test.
-     * This can be used for drain tests on spellcasting tests.
+     * Create a followup test using a test.
+     * This can be used for drain tests on spellcasting tests or for resist tests on defense tests
      *
      * @param test Any SuccessTest implementation with a followup.
      * @param options Optional test options.
      */
-    fromActiveTestFollowupTest: function (test, options) {
+    fromFollowupTest: function (test, options) {
         var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
             if (!((_c = (_b = (_a = test === null || test === void 0 ? void 0 : test.data) === null || _a === void 0 ? void 0 : _a.action) === null || _b === void 0 ? void 0 : _b.followed) === null || _c === void 0 ? void 0 : _c.test))
@@ -37597,16 +37600,11 @@ exports.TestCreator = {
             data.title = testCls.title;
             data.previousMessageId = test.data.messageUuid;
             data.against = test.data;
-            const action = DataDefaults_1.DefaultValues.actionData({ test: testCls.name });
             const defaultAction = testCls._getDefaultTestAction();
             const documentAction = yield testCls._getDocumentTestAction(test.item, test.actor);
-            // Override defaults with user defined action data or nothing.
-            // NOTE: Don't use mergeObject as action is field complete and it's values are preferred.
-            action.skill = test.data.action.followed.skill || documentAction.skill || defaultAction.skill;
-            action.attribute = test.data.action.followed.attribute || documentAction.attribute || defaultAction.attribute;
-            action.attribute2 = test.data.action.followed.attribute2 || documentAction.attribute2 || defaultAction.attribute2;
-            action.mod = test.data.action.followed.mod || documentAction.mod || defaultAction.mod;
+            const action = exports.TestCreator._applyMinimalActionDataInOrder(DataDefaults_1.DefaultValues.actionData({ test: testCls.name }), documentAction, defaultAction);
             const testData = yield testCls._prepareActionTestData(action, test.actor, data);
+            testData.following = test.data;
             // Create the followup test based on this tests documents and options.
             const documents = { item: test.item, actor: test.actor };
             // TODO: pushTheLimit / second chance shouldn't be part of options...
@@ -37778,6 +37776,19 @@ exports.TestCreator = {
             action: DataDefaults_1.DefaultValues.actionData(),
             opposed: {}
         };
+    },
+    _applyMinimalActionDataInOrder: function (action, ...minimalActions) {
+        // Overwrite keys from second action on forward in indexed order.
+        for (const minimalAction of minimalActions) {
+            for (const key of Object.keys(DataDefaults_1.DefaultValues.minimalActionData())) {
+                if (!minimalAction.hasOwnProperty(key))
+                    continue;
+                action[key] = minimalAction[key] || action[key];
+            }
+            // false Armor will not behave as a boolean with the || operator.
+            action.armor = minimalAction.armor;
+        }
+        return action;
     }
 };
 },{"../actor/SR5Actor":86,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":229}],246:[function(require,module,exports){
