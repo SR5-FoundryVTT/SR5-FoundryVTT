@@ -19,6 +19,7 @@ import EquipmentItemData = Shadowrun.EquipmentItemData;
 import DeviceItemData = Shadowrun.DeviceItemData;
 import ValueField = Shadowrun.ValueField;
 import GenericValueField = Shadowrun.GenericValueField;
+import MinimalActionData = Shadowrun.MinimalActionData;
 
 
 export class DefaultValues {
@@ -278,6 +279,15 @@ export class DefaultValues {
             mod: [],
             label: ''
         }, partialGenericValueData) as GenericValueField;
+    }
+
+    static minimalActionData(partialActionData: Partial<MinimalActionData> = {}) {
+        return mergeObject({
+            attribute: '',
+            attribute2: '',
+            skill: '',
+            mod: 0
+        }, partialActionData) as MinimalActionData;
     }
 
     static actionData(partialActionData: Partial<ActionRollData> = {}) {

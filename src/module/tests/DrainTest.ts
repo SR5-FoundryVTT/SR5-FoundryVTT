@@ -1,5 +1,5 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {SpellcastingTestData} from "./SpellcastingTest";
+import {SpellCastingTestData} from "./SpellCastingTest";
 import {DefaultValues} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
@@ -8,7 +8,7 @@ export interface DrainTestData extends SuccessTestData {
     incomingDrain: DamageData
     modifiedDrain: DamageData
 
-    against: SpellcastingTestData
+    against: SpellCastingTestData
 }
 
 

@@ -206,7 +206,7 @@ export const TestCreator = {
      * @param options Optional test options.
      */
     fromActiveTestFollowupTest: async function(test: SuccessTest, options?: TestOptions): Promise<SuccessTest  | void> {
-        if (!test?.data?.action?.followed?.test) return console.error(`Shadowrun 5e | Test doesn't define a follow up test`, test);
+        if (!test?.data?.action?.followed?.test) return;
         if (!test.item) return console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
         if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
 

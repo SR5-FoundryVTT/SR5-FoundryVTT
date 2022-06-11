@@ -372,20 +372,23 @@ export const SR5 = {
         'thrown': 'ThrownAttackTest'
     },
 
-    spellCategoryActiveTests: {
-        'combat': 'SpellcastingTest'
+    spellOpposedTests: {
+        'combat': 'CombatSpellDefenseTest'
     },
 
-    spellOpposedTests: {
-        'combat': {
-            'direct': {
-                'mana': 'DirectManaCombatSpellDefenseTest',
-                'physical': 'DirectPhysicalCombatSpellDefenseTest'
-            },
-            'indirect': {
-                'mana': 'IndirectCombatSpellDefenseTest',
-                'physical': 'IndirectCombatSpellDefenseTest'
-            }
+    activeTests: {
+        'spell': 'SpellCastingTest'
+    },
+
+    opposedTests: {
+        'spell': {
+            'combat': 'CombatSpellDefenseTest'
+        }
+    },
+
+    opposedResistTests: {
+        'spell': {
+            'combat': 'PhysicalResistTest'
         }
     },
 

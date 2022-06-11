@@ -1,6 +1,7 @@
 import {SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments, TestOptions} from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
 import {TestCreator} from "./TestCreator";
+import {SR5Item} from "../item/SR5Item";
 
 
 export interface OpposedTestValues extends SuccessTestValues {
@@ -22,7 +23,7 @@ export interface OpposedTestData extends
  */
 export class OpposedTest extends SuccessTest {
     public data: OpposedTestData;
-    public against: SuccessTest
+    public against: SuccessTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         super(data, documents, options);
@@ -33,6 +34,9 @@ export class OpposedTest extends SuccessTest {
     // TODO: This could also be done with _prepareTypeData for only type specific fields.
     _prepareData(data, options?): any {
         data = super._prepareData(data, options);
+
+        // Get opposed item reference as sometimes opposed test details depend on the item used for the active test.
+        data.sourceItemUuid = data.against.sourceItemUuid;
 
         delete data.opposed;
         delete data.targetActorsUuid;
@@ -83,37 +87,19 @@ export class OpposedTest extends SuccessTest {
 
         // Build the opposed action data
         const action = DefaultValues.actionData(this._getDefaultTestAction());
+        let documentAction = DefaultValues.minimalActionData();
+        if (againstData.sourceItemUuid) {
+            const item = await fromUuid(againstData.sourceItemUuid) as SR5Item;
+            documentAction = await this._getDocumentTestAction(item, actor);
+        }
 
         // Overwrite defaults with user defined action data.
-        action.skill = againstData.opposed.skill || action.skill;
-        action.attribute = againstData.opposed.attribute || action.attribute;
-        action.attribute2 = againstData.opposed.attribute2 || action.attribute2;
-        action.mod = againstData.opposed.mod || action.mod;
-
-        // Get all value sources to be used for this test.
-        // if (opposed.skill && opposed.attribute) {
-        //     // TODO: Handle skill testing rules.
-        //     const skill = actor.getSkill(opposed.skill);
-        //     if (skill) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
-        //
-        //     const attribute = actor.getAttribute(opposed.attribute);
-        //     if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-        // }
-        //
-        // if (!opposed.skill && opposed.attribute) {
-        //     const attribute = actor.getAttribute(opposed.attribute);
-        //     if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-        // }
-        // if (!opposed.skill && opposed.attribute2) {
-        //     const attribute = actor.getAttribute(opposed.attribute2);
-        //     if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
-        // }
-        // if (opposed.mod) {
-        //     data.pool.base = Number(opposed.mod);
-        // }
+        action.skill = againstData.opposed.skill ||  documentAction.skill || action.skill;
+        action.attribute = againstData.opposed.attribute || documentAction.attribute || action.attribute;
+        action.attribute2 = againstData.opposed.attribute2 || documentAction.attribute2 || action.attribute2;
+        action.mod = againstData.opposed.mod || documentAction.mod || action.mod;
 
         return await this._prepareActionTestData(action, actor, data);
-        // return data as OpposedTestData;
     }
 
     /**

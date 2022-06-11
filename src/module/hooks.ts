@@ -34,15 +34,13 @@ import {OpposedTest} from "./tests/OpposedTest";
 import {PhysicalResistTest} from "./tests/PhysicalResistTest";
 import {handleRenderChatMessage} from "./chat";
 import {MeleeAttackTest} from "./tests/MeleeAttackTest";
-import {SpellcastingTest} from "./tests/SpellcastingTest";
-import {DirectManaCombatSpellDefenseTest} from "./tests/DirectManaCombatSpellDefenseTest";
-import {DirectPhysicalCombatSpellDefenseTest} from "./tests/DirectPhysicalCombatSpellDefenseTest";
-import {IndirectCombatSpellDefenseTest} from "./tests/IndirectCombatSpellDefenseTest";
+import {SpellCastingTest} from "./tests/SpellCastingTest";
 import {DrainTest} from "./tests/DrainTest";
+import {TestCreator} from "./tests/TestCreator";
+import {CombatSpellDefenseTest} from "./tests/CombatSpellDefenseTest";
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import SocketMessage = Shadowrun.SocketMessageData;
-import {TestCreator} from "./tests/TestCreator";
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -125,10 +123,8 @@ ___________________
                 RangedAttackTest,
                 PhysicalDefenseTest,
                 PhysicalResistTest,
-                SpellcastingTest,
-                DirectManaCombatSpellDefenseTest,
-                DirectPhysicalCombatSpellDefenseTest,
-                IndirectCombatSpellDefenseTest,
+                SpellCastingTest,
+                CombatSpellDefenseTest,
                 DrainTest,
             },
             /**
@@ -140,8 +136,7 @@ ___________________
                 SuccessTest,
                 MeleeAttackTest,
                 RangedAttackTest,
-                SpellcastingTest,
-                DrainTest
+                SpellCastingTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -151,9 +146,7 @@ ___________________
             opposedTests: {
                 OpposedTest,
                 PhysicalDefenseTest,
-                DirectManaCombatSpellDefenseTest,
-                DirectPhysicalCombatSpellDefenseTest,
-                IndirectCombatSpellDefenseTest
+                CombatSpellDefenseTest
             },
             /**
              * Subset of tests meant to be used as resist tests.

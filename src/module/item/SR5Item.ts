@@ -62,6 +62,7 @@ import MarkedDocument = Shadowrun.MarkedDocument;
 import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
 import {SuccessTest} from "../tests/SuccessTest";
 import {TestCreator} from "../tests/TestCreator";
+import {PhysicalResistTest} from "../tests/PhysicalResistTest";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -1894,27 +1895,22 @@ export class SR5Item extends Item {
             const futureData = foundry.utils.mergeObject(spellData, changed);
 
             switch (futureData.data.category) {
-                case 'combat': {
-                    const combatOpposedTests = SR5.spellOpposedTests[futureData.data.category] || {};
-                    const combatTypeOpposedTests = combatOpposedTests[futureData.data.combat.type] || {};
-                    const opposedTest = combatTypeOpposedTests[futureData.data.type] || '';
-                    const resistTest = '';
-
-                    foundry.utils.mergeObject(changed, {data: {action: {
-                        test: 'SpellcastingTest',
-                        opposed: {test: opposedTest,
-                                  resist:  {test: resistTest}}}}});
+                case '': {
+                    foundry.utils.mergeObject(changed, {data: {
+                            action: {test: '', opposed: {test: '', resist: {test: ''}}}}
+                    });
                     break;
                 }
                 default: {
-                    foundry.utils.mergeObject(changed, {
-                        data: {
-                            action: {
-                                test: '',
-                                opposed: {test: '', resist: {test: ''}}
-                            }
-                        }
-                    });
+                    const activeTest = SR5.activeTests[this.data.type];
+                    const opposedTest = SR5.opposedTests[this.data.type][futureData.data.category];
+                    const resistTest = SR5.opposedResistTests[this.data.type][futureData.data.category];
+
+                    foundry.utils.mergeObject(changed, {data: {action: {
+                        test: activeTest,
+                        opposed: {test: opposedTest,
+                                  resist:  {test: resistTest}}}}});
+                    break;
                 }
             }
         }
