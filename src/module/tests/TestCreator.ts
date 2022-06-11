@@ -217,13 +217,10 @@ export const TestCreator = {
         data.previousMessageId = test.data.messageUuid;
         data.against = test.data;
 
-        const defaultAction = testCls._getDefaultTestAction();
-        const documentAction = await testCls._getDocumentTestAction(test.item, test.actor);
-
         const action = TestCreator._applyMinimalActionDataInOrder(
             DefaultValues.actionData({test: testCls.name}),
-            documentAction,
-            defaultAction);
+            await testCls._getDocumentTestAction(test.item, test.actor),
+            testCls._getDefaultTestAction());
 
         const testData = await testCls._prepareActionTestData(action, test.actor, data);
         testData.following = test.data;
@@ -262,19 +259,13 @@ export const TestCreator = {
         const data = TestCreator._minimalTestData();
 
         // Get user defined action configuration.
-        const action = item.getAction();
+        let action = item.getAction();
         if (!action || !actor) return data;
 
-        // Get default configuration.
-        const defaultAction = testCls._getDefaultTestAction();
-        const documentAction = await testCls._getDocumentTestAction(item, actor);
-
-        // Override defaults with user defined action data or nothing.
-        // NOTE: Don't use mergeObject as action is field complete and it's values are preferred.
-        action.skill = action.skill || documentAction.skill || defaultAction.skill;
-        action.attribute = action.attribute || documentAction.attribute || defaultAction.attribute;
-        action.attribute2 = action.attribute2 || documentAction.attribute2 || defaultAction.attribute2;
-        action.mod = action.mod || documentAction.mod || defaultAction.mod;
+        action = TestCreator._applyMinimalActionDataInOrder(
+            action,
+            await testCls._getDocumentTestAction(item, actor),
+            testCls._getDefaultTestAction());
 
         return await TestCreator._prepareTestDataWithAction(action, actor, data);
     },
@@ -378,16 +369,11 @@ export const TestCreator = {
         data.previousMessageId = previousMessageId;
 
         // Provide default action information.
-        const defaultAction = resistTestCls._getDefaultTestAction();
-
-        const action = DefaultValues.actionData(defaultAction);
-        if (!action) return data;
-
-        // Override defaults with user defined action data.
-        action.skill = againstData.opposed.resist.skill || action.skill;
-        action.attribute = againstData.opposed.resist.attribute || action.attribute;
-        action.attribute2 = againstData.opposed.resist.attribute2 || action.attribute2;
-        action.mod = againstData.opposed.resist.mod || action.mod;
+        const action = TestCreator._applyMinimalActionDataInOrder(
+            DefaultValues.actionData({test: resistTestCls.name}),
+            againstData.opposed.resist,
+            resistTestCls._getDefaultTestAction()
+        );
 
         // Alter default action information with user defined information.
         return await TestCreator._prepareTestDataWithAction(action, actor, data);
