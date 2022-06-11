@@ -5,14 +5,11 @@ import {CombatRules} from "../rules/CombatRules";
 import {MeleeRules} from "../rules/MeleeRules";
 import {MeleeAttackData} from "./MeleeAttackTest";
 import {TestCreator} from "./TestCreator";
+import {DefenseTest, DefenseTestData} from "./DefenseTest";
+import {DefaultValues} from "../data/DataDefaults";
 
 // TODO: reach
-export interface PhysicalDefenseTestData extends OpposedTestData {
-    // Damage value of the attack
-    incomingDamage: DamageData
-    // Modified damage value of the attack after this defense (success or failure)
-    modifiedDamage: DamageData
-
+export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
     cover: number
     // Dialog input for active defense modifier
@@ -24,14 +21,11 @@ export interface PhysicalDefenseTestData extends OpposedTestData {
 }
 
 
-export class PhysicalDefenseTest extends OpposedTest {
+export class PhysicalDefenseTest extends DefenseTest {
     public data: PhysicalDefenseTestData;
 
     _prepareData(data, options?): any {
         data = super._prepareData(data, options);
-
-        data.incomingDamage = foundry.utils.duplicate(data.against.damage);
-        data.modifiedDamage = foundry.utils.duplicate(data.against.damage);
 
         // TODO: this should be stored on actor flag and fetched in populateActorModifiers
         data.cover = 0;
@@ -52,10 +46,10 @@ export class PhysicalDefenseTest extends OpposedTest {
     }
 
     static _getDefaultTestAction() {
-        return {
+        return DefaultValues.minimalActionData({
             'attribute': 'reaction',
             'attribute2': 'intuition'
-        };
+        });
     }
 
     get testModifiers() {

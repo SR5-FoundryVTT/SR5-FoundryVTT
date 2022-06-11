@@ -65,6 +65,7 @@ declare namespace Shadowrun {
         attribute: ActorAttribute
         attribute2: ActorAttribute
         mod: number
+        armor: boolean
     }
 
     /**

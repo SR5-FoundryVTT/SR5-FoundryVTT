@@ -31,10 +31,10 @@ export class PhysicalResistTest extends SuccessTest {
     }
 
     static _getDefaultTestAction() {
-        return {
+        return DefaultValues.minimalActionData({
             'attribute': 'body',
             'armor': true
-        };
+        });
     }
 
     get testModifiers() {

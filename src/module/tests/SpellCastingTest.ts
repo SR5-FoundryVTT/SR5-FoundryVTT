@@ -2,6 +2,7 @@ import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellcastingRules} from "../rules/SpellcastingRules";
 import {PartsList} from "../parts/PartsList";
 import {CombatSpellRules} from "../rules/CombatSpellRules";
+import {DefaultValues} from "../data/DataDefaults";
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -33,10 +34,10 @@ export class SpellCastingTest extends SuccessTest {
     }
 
     static _getDefaultTestAction() {
-        return {
+        return DefaultValues.minimalActionData({
             skill: 'spellcasting',
             attribute: 'magic'
-        };
+        });
     }
 
     get testModifiers() {

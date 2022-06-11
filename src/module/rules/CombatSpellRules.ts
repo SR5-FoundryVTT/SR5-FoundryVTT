@@ -5,6 +5,7 @@ import {CombatRules} from "./CombatRules";
 import MinimalActionData = Shadowrun.MinimalActionData;
 import {SR} from "../constants";
 import ActorAttribute = Shadowrun.ActorAttribute;
+import {DefaultValues} from "../data/DataDefaults";
 
 export class CombatSpellRules {
     /**
@@ -60,11 +61,8 @@ export class CombatSpellRules {
     }
 
     static directCombatDefenseAction(): MinimalActionData {
-        return {
-            skill: '',
+        return DefaultValues.minimalActionData({
             attribute: SR.defense.spell.direct.mana as ActorAttribute,
-            attribute2: '',
-            mod: 0
-        }
+        });
     }
 }
