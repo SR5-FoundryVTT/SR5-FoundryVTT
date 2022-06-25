@@ -967,7 +967,8 @@
     "RangedAttackTest": "Ranged Weapon Attack",
     "MeleeAttackTest": "Melee Weapon Attack",
     "PhysicalResistTest": "Physical Damage Resist",
-    "SpellcastingTest": "Spellcasting Test"
+    "SpellCastingTest": "Spellcasting",
+    "ComplexFormTest": "Threading Complex Form"
   },
   "SR5.MissingResource": {
     "Edge": "No Edge left to consume"

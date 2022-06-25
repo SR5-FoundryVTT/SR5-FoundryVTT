@@ -22,9 +22,9 @@ export class SpellCastingTest extends SuccessTest {
     _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
-        data.force = 0;
-        data.drain = 0;
-        data.reckless = false;
+        data.force = data.force || 0;
+        data.drain = data.drain || 0;
+        data.reckless = data.reckless || false;
 
         return data;
     }
@@ -54,7 +54,6 @@ export class SpellCastingTest extends SuccessTest {
     prepareInitialForceValue() {
         if (!this.item) return;
 
-        // Either use the last used spell force OR suggest a minimal viable force.
         const lastUsedForce = this.item.getLastSpellForce();
         const suggestedForce = SpellcastingRules.calculateMinimalForce(this.item.getDrain());
         this.data.force = lastUsedForce.value || suggestedForce;

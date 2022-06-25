@@ -929,7 +929,8 @@
     "RangedAttackTest": "Fernkampf Angriffsprobe",
     "MeleeAttackTest": "Nahkampf Angriffsprobe",
     "PhysicalResistTest": "Physische Schadenswiderstandsprobe",
-    "SpellcastingTest": "Spruchzaubereiprobe"
+    "SpellcastingTest": "Spruchzaubereiprobe",
+    "ComplexFormTest": "Komplexe Form Weben"
   },
   "SR5.MissingResource": {
     "Edge": "Kein Edge übrig"

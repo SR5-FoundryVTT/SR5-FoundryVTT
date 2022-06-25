@@ -41,6 +41,7 @@ import {CombatSpellDefenseTest} from "./tests/CombatSpellDefenseTest";
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import SocketMessage = Shadowrun.SocketMessageData;
+import {ComplexFormTest} from "./tests/ComplexFormTest";
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -126,6 +127,7 @@ ___________________
                 SpellCastingTest,
                 CombatSpellDefenseTest,
                 DrainTest,
+                ComplexFormTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -136,7 +138,8 @@ ___________________
                 SuccessTest,
                 MeleeAttackTest,
                 RangedAttackTest,
-                SpellCastingTest
+                SpellCastingTest,
+                ComplexFormTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -247,9 +250,10 @@ ___________________
         HooksManager.renderChatMessage();
         // const item = game.items?.getName('Weapon (Melee)');
         // const item = game.items?.getName('Weapon (Ranged)');
-        const item = game.items?.getName('Spell (Direct Combat)');
+        // const item = game.items?.getName('Spell (Direct Combat)');
         // const item = game.items?.getName('Spell (Indirect Combat)');
         // const item = game.items?.getName('Drain');
+        const item = game.items?.getName('Complex Form');
         const actor = game.actors?.getName('Char Linked');
         if (!item || !actor) return;
         const test = await TestCreator.fromAction(item, actor);

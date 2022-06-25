@@ -1915,6 +1915,16 @@ export class SR5Item extends Item {
             }
         }
 
+        const complexFormData = this.asComplexFormData();
+        if (complexFormData) {
+            const futureData = foundry.utils.mergeObject(complexFormData, changed);
+
+            const activeTest = SR5.activeTests[this.data.type];
+
+            foundry.utils.mergeObject(changed, {data: {action: {
+                test: activeTest}}});
+        }
+
         return super._preUpdate(changed, options, user);
     }
 }
