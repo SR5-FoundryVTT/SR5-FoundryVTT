@@ -17,6 +17,9 @@ import Skills = Shadowrun.Skills;
 import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
 import {DataDefaults} from "./data/DataDefaults";
 import TargetedDocument = Shadowrun.TargetedDocument;
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+import ActionItemData = Shadowrun.ActionItemData;
+import ActionRollData = Shadowrun.ActionRollData;
 
 interface CalcTotalOptions {
     min?: number,
@@ -818,5 +821,28 @@ export class Helpers {
         }
 
         return true;
+    }
+
+    /**
+     * Check packs for a given action.
+     *
+     * @param packName The metadata name of the pack
+     * @param actionName The name of the action within that pack
+     */
+    static getPackAction(packName, actionName): ActionRollData|undefined {
+        // TODO: collection item type validation
+        const pack = game.packs.find(pack =>
+                pack.metadata.system === SYSTEM_NAME &&
+                pack.metadata.name === packName);
+        if (!pack) return;
+
+        const packEntry = pack.index.find(data => data.name?.toLowerCase() === actionName);
+        if (!packEntry) return;
+
+        const item = pack.getDocument(packEntry._id) as unknown as SR5Item;
+        if (!item || item.type !== 'action') return;
+
+        console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
+        return item.getAction();
     }
 }

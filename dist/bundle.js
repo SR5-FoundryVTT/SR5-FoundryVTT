@@ -13307,6 +13307,7 @@ const MatrixRules_1 = require("../rules/MatrixRules");
 const ICPrep_1 = require("./prep/ICPrep");
 const InventoryFlow_1 = require("./flows/InventoryFlow");
 const ModifierFlow_1 = require("./flows/ModifierFlow");
+const TestCreator_1 = require("../tests/TestCreator");
 function getGame() {
     if (!(game instanceof Game)) {
         throw new Error('game is not initialized yet!');
@@ -14305,41 +14306,50 @@ class SR5Actor extends Actor {
             actor: this,
         });
     }
+    /**
+     * Roll an attribute tests as defined in SR5#152 section Attribute-Only Tests
+     *
+     * @param rollId The internal attribute action id
+     * @param options Success Test options
+     */
     rollAttributesTest(rollId, options) {
-        const title = game.i18n.localize(config_1.SR5.attributeRolls[rollId]);
-        const atts = this.data.data.attributes;
-        const modifiers = this.data.data.modifiers;
-        const parts = new PartsList_1.PartsList();
-        if (rollId === 'composure') {
-            parts.addUniquePart(atts.charisma.label, atts.charisma.value);
-            parts.addUniquePart(atts.willpower.label, atts.willpower.value);
-            if (modifiers.composure)
-                parts.addUniquePart('SR5.Bonus', modifiers.composure);
-        }
-        else if (rollId === 'judge_intentions') {
-            parts.addUniquePart(atts.charisma.label, atts.charisma.value);
-            parts.addUniquePart(atts.intuition.label, atts.intuition.value);
-            if (modifiers.judge_intentions)
-                parts.addUniquePart('SR5.Bonus', modifiers.judge_intentions);
-        }
-        else if (rollId === 'lift_carry') {
-            parts.addUniquePart(atts.strength.label, atts.strength.value);
-            parts.addUniquePart(atts.body.label, atts.body.value);
-            if (modifiers.lift_carry)
-                parts.addUniquePart('SR5.Bonus', modifiers.lift_carry);
-        }
-        else if (rollId === 'memory') {
-            parts.addUniquePart(atts.willpower.label, atts.willpower.value);
-            parts.addUniquePart(atts.logic.label, atts.logic.value);
-            if (modifiers.memory)
-                parts.addUniquePart('SR5.Bonus', modifiers.memory);
-        }
-        this._addGlobalParts(parts);
-        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-            event: options === null || options === void 0 ? void 0 : options.event,
-            actor: this,
-            parts: parts.list,
-            title: `${title} Test`,
+        return __awaiter(this, void 0, void 0, function* () {
+            const actionData = helpers_1.Helpers.getPackAction(config_1.SR5.packNames.attributeActions, rollId);
+            if (!actionData)
+                return console.error(`Shadowrun 5e | Couldn't roll attribute test ${rollId}`);
+            const test = yield TestCreator_1.TestCreator.fromAction(actionData.data.action, this, options);
+            if (!test)
+                return;
+            yield test.execute();
+            // const title = game.i18n.localize(SR5.attributeRolls[rollId]);
+            // const atts = this.data.data.attributes;
+            // const modifiers = this.data.data.modifiers;
+            // const parts = new PartsList<number>();
+            // if (rollId === 'composure') {
+            //     parts.addUniquePart(atts.charisma.label, atts.charisma.value);
+            //     parts.addUniquePart(atts.willpower.label, atts.willpower.value);
+            //     if (modifiers.composure) parts.addUniquePart('SR5.Bonus', modifiers.composure);
+            // } else if (rollId === 'judge_intentions') {
+            //     parts.addUniquePart(atts.charisma.label, atts.charisma.value);
+            //     parts.addUniquePart(atts.intuition.label, atts.intuition.value);
+            //     if (modifiers.judge_intentions) parts.addUniquePart('SR5.Bonus', modifiers.judge_intentions);
+            // } else if (rollId === 'lift_carry') {
+            //     parts.addUniquePart(atts.strength.label, atts.strength.value);
+            //     parts.addUniquePart(atts.body.label, atts.body.value);
+            //     if (modifiers.lift_carry) parts.addUniquePart('SR5.Bonus', modifiers.lift_carry);
+            // } else if (rollId === 'memory') {
+            //     parts.addUniquePart(atts.willpower.label, atts.willpower.value);
+            //     parts.addUniquePart(atts.logic.label, atts.logic.value);
+            //     if (modifiers.memory) parts.addUniquePart('SR5.Bonus', modifiers.memory);
+            // }
+            //
+            // this._addGlobalParts(parts);
+            // return ShadowrunRoller.advancedRoll({
+            //     event: options?.event,
+            //     actor: this,
+            //     parts: parts.list,
+            //     title: `${title} Test`,
+            // });
         });
     }
     rollSkill(skill, options) {
@@ -15306,7 +15316,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../apps/dialogs/ShadowrunActorDialogs":141,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../item/SR5Item":206,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/SkillRules":230,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./flows/SoakFlow":91,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":141,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../item/SR5Item":206,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/SkillRules":230,"../tests/TestCreator":246,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./flows/SoakFlow":91,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23569,7 +23579,11 @@ exports.SR5 = {
         'wounds': 'SR5.ModifierTypes.Wounds',
         'global': 'SR5.Global',
         'soak': 'SR5.Soak',
-        'defense': 'SR5.Defense'
+        'defense': 'SR5.Defense',
+        'composure': 'SR5.RollComposure',
+        'judge_intentions': 'SR5.RollJudgeIntentions',
+        'lift_carry': 'SR5.RollLiftCarry',
+        'memory': 'SR5.memory'
         // TODO: Add ActorData.modifiers to this list
     },
     /**
@@ -23596,6 +23610,15 @@ exports.SR5 = {
         'spell': {
             'combat': 'PhysicalResistTest'
         }
+    },
+    packNames: {
+        'attributeActions': 'Attribute Actions'
+    },
+    attributeActionIds: {
+        'composure': '',
+        'judge_intentions': '',
+        'lift_carry': '',
+        'memory': ''
     },
     programTypes: {
         common_program: 'SR5.CommonProgram',
@@ -26673,6 +26696,23 @@ class Helpers {
         }
         return true;
     }
+    /**
+     * Check packs for a given action.
+     *
+     * @param packName The metadata name of the pack
+     * @param actionName The name of the action within that pack
+     */
+    static getPackAction(packName, actionName) {
+        const pack = game.packs.find(pack => pack.metadata.system === constants_1.SYSTEM_NAME &&
+            pack.metadata.name === packName);
+        if (!pack)
+            return;
+        const actionData = pack.index.find(data => { var _a; return ((_a = data.name) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === actionName; });
+        console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, actionData);
+        if ((actionData === null || actionData === void 0 ? void 0 : actionData.type) !== 'action')
+            return;
+        return actionData;
+    }
 }
 exports.Helpers = Helpers;
 },{"./apps/dialogs/DeleteConfirmationDialog":138,"./constants":152,"./data/DataDefaults":153,"./parts/PartsList":220}],167:[function(require,module,exports){
@@ -26899,7 +26939,7 @@ ___________________
         HandlebarManager_1.HandlebarManager.loadTemplates();
     }
     static ready() {
-        var _a, _b;
+        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
             if ((_a = game.user) === null || _a === void 0 ? void 0 : _a.isGM) {
                 yield Migrator_1.Migrator.BeginMigration();
@@ -26918,11 +26958,11 @@ ___________________
             // const item = game.items?.getName('Spell (Direct Combat)');
             // const item = game.items?.getName('Spell (Indirect Combat)');
             // const item = game.items?.getName('Drain');
-            const item = game.items.getName('Complex Form');
-            const actor = (_b = game.actors) === null || _b === void 0 ? void 0 : _b.getName('Char Linked');
+            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Complex Form');
+            const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked');
             if (!item || !actor)
                 return;
-            const test = yield TestCreator_1.TestCreator.fromAction(item, actor);
+            const test = yield TestCreator_1.TestCreator.fromItem(item, actor);
             if (test)
                 yield test.execute();
         });
@@ -30324,7 +30364,7 @@ class SR5Item extends Item {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.actor)
                 return;
-            const test = yield TestCreator_1.TestCreator.fromAction(this, this.actor);
+            const test = yield TestCreator_1.TestCreator.fromItem(this, this.actor);
             if (!test)
                 return;
             yield test.execute();
@@ -37423,7 +37463,7 @@ exports.TestCreator = {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    fromAction: function (item, actor, options) {
+    fromItem: function (item, actor, options) {
         return __awaiter(this, void 0, void 0, function* () {
             //@ts-ignore
             if (!actor)
@@ -37450,6 +37490,32 @@ exports.TestCreator = {
             const cls = exports.TestCreator._getTestClass(action.test);
             const data = yield exports.TestCreator._getTestDataFromItemAction(cls, item, actor);
             const documents = { item, actor };
+            return new cls(data, documents, options);
+        });
+    },
+    /**
+     * Create a test from action data only.
+     *
+     * @param action
+     * @param actor
+     * @param options
+     */
+    fromAction: function (action, actor, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!action.test) {
+                action.test = 'SuccessTest';
+                console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
+            }
+            // @ts-ignore // Check for test class registration.
+            if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
+                console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
+                return;
+            }
+            // Any action item will return a list of values to create the test pool from.
+            // @ts-ignore // Get test class from registry to allow custom module tests.
+            const cls = exports.TestCreator._getTestClass(action.test);
+            const data = exports.TestCreator._prepareTestDataWithAction(action, actor, exports.TestCreator._minimalTestData());
+            const documents = { actor };
             return new cls(data, documents, options);
         });
     },
@@ -38839,7 +38905,7 @@ const shadowrunTesting = context => {
                 'data.attributes.body.base': 5,
                 'data.skills.active.automatics.base': 45 };
             const actor = yield testActor.create(actorData);
-            const test = yield TestCreator_1.TestCreator.fromAction(action, actor);
+            const test = yield TestCreator_1.TestCreator.fromItem(action, actor);
             // For a broken test just fail.v
             if (!test)
                 assert.strictEqual(true, false);
@@ -38894,7 +38960,7 @@ const shadowrunTesting = context => {
                 'data.attributes.body.base': 5,
                 'data.skills.active.automatics.base': 45 };
             const actor = yield testActor.create(actorData);
-            const test = yield TestCreator_1.TestCreator.fromAction(action, actor);
+            const test = yield TestCreator_1.TestCreator.fromItem(action, actor);
             if (test) {
                 yield test.toMessage();
             }

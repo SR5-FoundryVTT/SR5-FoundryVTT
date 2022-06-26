@@ -370,7 +370,7 @@ export class SR5Item extends Item {
     async castAction(event?) {
         if (!this.actor) return;
 
-        const test = await TestCreator.fromAction(this, this.actor);
+        const test = await TestCreator.fromItem(this, this.actor);
         if (!test) return;
         await test.execute();
 

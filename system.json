@@ -48,17 +48,17 @@
   ],
   "packs": [
     {
-      "name": "Roles",
-      "label": "SR5e NPCs",
-      "path": "./packs/sr5e-npcs.db",
-      "private": false,
-      "entity": "Actor",
-      "system": "shadowrun5e"
-    },
-    {
       "name": "Matrix Actions",
       "label": "SR5e Matrix Actions",
       "path": "./packs/sr5e-matrix-actions.db",
+      "private": false,
+      "entity": "Item",
+      "system": "shadowrun5e"
+    },
+    {
+      "name": "Attribute Actions",
+      "label": "SR5e Attribute Actions",
+      "path": "./packs/sr5e-attribute-actions.db",
       "private": false,
       "entity": "Item",
       "system": "shadowrun5e"

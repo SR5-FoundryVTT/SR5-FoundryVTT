@@ -61,6 +61,8 @@ import InventoryData = Shadowrun.InventoryData;
 import InventoriesData = Shadowrun.InventoriesData;
 import {InventoryFlow} from "./flows/InventoryFlow";
 import {ModifierFlow} from "./flows/ModifierFlow";
+import {TestOptions} from "../tests/SuccessTest";
+import {TestCreator} from "../tests/TestCreator";
 
 function getGame(): Game {
     if (!(game instanceof Game)) {
@@ -1151,36 +1153,50 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollAttributesTest(rollId, options?: ActorRollOptions) {
-        const title = game.i18n.localize(SR5.attributeRolls[rollId]);
-        const atts = this.data.data.attributes;
-        const modifiers = this.data.data.modifiers;
-        const parts = new PartsList<number>();
-        if (rollId === 'composure') {
-            parts.addUniquePart(atts.charisma.label, atts.charisma.value);
-            parts.addUniquePart(atts.willpower.label, atts.willpower.value);
-            if (modifiers.composure) parts.addUniquePart('SR5.Bonus', modifiers.composure);
-        } else if (rollId === 'judge_intentions') {
-            parts.addUniquePart(atts.charisma.label, atts.charisma.value);
-            parts.addUniquePart(atts.intuition.label, atts.intuition.value);
-            if (modifiers.judge_intentions) parts.addUniquePart('SR5.Bonus', modifiers.judge_intentions);
-        } else if (rollId === 'lift_carry') {
-            parts.addUniquePart(atts.strength.label, atts.strength.value);
-            parts.addUniquePart(atts.body.label, atts.body.value);
-            if (modifiers.lift_carry) parts.addUniquePart('SR5.Bonus', modifiers.lift_carry);
-        } else if (rollId === 'memory') {
-            parts.addUniquePart(atts.willpower.label, atts.willpower.value);
-            parts.addUniquePart(atts.logic.label, atts.logic.value);
-            if (modifiers.memory) parts.addUniquePart('SR5.Bonus', modifiers.memory);
-        }
+    /**
+     * Roll an attribute tests as defined in SR5#152 section Attribute-Only Tests
+     *
+     * @param rollId The internal attribute action id
+     * @param options Success Test options
+     */
+    async rollAttributesTest(rollId: 'composure'|'judge_intentions'|'lift_carry'|'memory', options?: TestOptions) {
+        const actionData = Helpers.getPackAction(SR5.packNames.attributeActions, rollId);
+        if (!actionData) return console.error(`Shadowrun 5e | Couldn't roll attribute test ${rollId}`);
 
-        this._addGlobalParts(parts);
-        return ShadowrunRoller.advancedRoll({
-            event: options?.event,
-            actor: this,
-            parts: parts.list,
-            title: `${title} Test`,
-        });
+        const test = await TestCreator.fromAction(actionData.data.action, this, options);
+        if (!test) return;
+
+        await test.execute();
+
+        // const title = game.i18n.localize(SR5.attributeRolls[rollId]);
+        // const atts = this.data.data.attributes;
+        // const modifiers = this.data.data.modifiers;
+        // const parts = new PartsList<number>();
+        // if (rollId === 'composure') {
+        //     parts.addUniquePart(atts.charisma.label, atts.charisma.value);
+        //     parts.addUniquePart(atts.willpower.label, atts.willpower.value);
+        //     if (modifiers.composure) parts.addUniquePart('SR5.Bonus', modifiers.composure);
+        // } else if (rollId === 'judge_intentions') {
+        //     parts.addUniquePart(atts.charisma.label, atts.charisma.value);
+        //     parts.addUniquePart(atts.intuition.label, atts.intuition.value);
+        //     if (modifiers.judge_intentions) parts.addUniquePart('SR5.Bonus', modifiers.judge_intentions);
+        // } else if (rollId === 'lift_carry') {
+        //     parts.addUniquePart(atts.strength.label, atts.strength.value);
+        //     parts.addUniquePart(atts.body.label, atts.body.value);
+        //     if (modifiers.lift_carry) parts.addUniquePart('SR5.Bonus', modifiers.lift_carry);
+        // } else if (rollId === 'memory') {
+        //     parts.addUniquePart(atts.willpower.label, atts.willpower.value);
+        //     parts.addUniquePart(atts.logic.label, atts.logic.value);
+        //     if (modifiers.memory) parts.addUniquePart('SR5.Bonus', modifiers.memory);
+        // }
+        //
+        // this._addGlobalParts(parts);
+        // return ShadowrunRoller.advancedRoll({
+        //     event: options?.event,
+        //     actor: this,
+        //     parts: parts.list,
+        //     title: `${title} Test`,
+        // });
     }
 
     async rollSkill(skill: SkillField, options?: SkillRollOptions) {

@@ -256,7 +256,7 @@ ___________________
         const item = game.items?.getName('Complex Form');
         const actor = game.actors?.getName('Char Linked');
         if (!item || !actor) return;
-        const test = await TestCreator.fromAction(item, actor);
+        const test = await TestCreator.fromItem(item, actor);
         if (test) await test.execute();
 
         // $(document).find('.message')

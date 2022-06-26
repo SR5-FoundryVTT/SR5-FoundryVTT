@@ -12,7 +12,7 @@ import {
     TestDocuments,
     TestOptions
 } from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults, DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
@@ -21,6 +21,7 @@ import {Helpers} from "../helpers";
 import {OpposedTest} from "./OpposedTest";
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ActionRollData = Shadowrun.ActionRollData;
+import ActionItemData = Shadowrun.ActionItemData;
 
 /**
  * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
@@ -57,7 +58,7 @@ export const TestCreator = {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    fromAction: async function(item: SR5Item, actor?: SR5Actor, options?: TestOptions): Promise<any | undefined> {
+    fromItem: async function(item: SR5Item, actor?: SR5Actor, options?: TestOptions): Promise<any | undefined> {
         //@ts-ignore
         if (!actor) actor = item.parent;
         if (!(actor instanceof SR5Actor)) {
@@ -84,6 +85,34 @@ export const TestCreator = {
         const cls = TestCreator._getTestClass(action.test);
         const data = await TestCreator._getTestDataFromItemAction(cls, item, actor);
         const documents = {item, actor};
+        return new cls(data, documents, options);
+    },
+
+    /**
+     * Create a test from action data only.
+     *
+     * @param action
+     * @param actor
+     * @param options
+     */
+    fromAction: async function(action: ActionRollData, actor: SR5Actor, options?: TestOptions): Promise<any | undefined> {
+        if (!action.test) {
+            action.test = 'SuccessTest';
+            console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
+        }
+
+        // @ts-ignore // Check for test class registration.
+        if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
+            console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
+            return;
+        }
+
+        // Any action item will return a list of values to create the test pool from.
+        // @ts-ignore // Get test class from registry to allow custom module tests.
+        const cls = TestCreator._getTestClass(action.test);
+        const data = TestCreator._prepareTestDataWithAction(action, actor, TestCreator._minimalTestData());
+        const documents = {actor};
+
         return new cls(data, documents, options);
     },
 

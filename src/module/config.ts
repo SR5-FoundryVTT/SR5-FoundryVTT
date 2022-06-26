@@ -359,7 +359,11 @@ export const SR5 = {
         'wounds': 'SR5.ModifierTypes.Wounds',
         'global': 'SR5.Global',
         'soak': 'SR5.Soak',
-        'defense': 'SR5.Defense'
+        'defense': 'SR5.Defense',
+        'composure': 'SR5.RollComposure',
+        'judge_intentions': 'SR5.RollJudgeIntentions',
+        'lift_carry': 'SR5.RollLiftCarry',
+        'memory': 'SR5.memory'
         // TODO: Add ActorData.modifiers to this list
     },
 
@@ -391,6 +395,17 @@ export const SR5 = {
         'spell': {
             'combat': 'PhysicalResistTest'
         }
+    },
+
+    packNames: {
+        'attributeActions': 'Attribute Actions'
+    },
+
+    attributeActionIds: {
+        'composure': '',
+        'judge_intentions': '',
+        'lift_carry': '',
+        'memory': ''
     },
 
     programTypes: {
