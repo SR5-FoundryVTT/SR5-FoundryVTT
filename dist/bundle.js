@@ -14314,10 +14314,11 @@ class SR5Actor extends Actor {
      */
     rollAttributesTest(rollId, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            const actionData = helpers_1.Helpers.getPackAction(config_1.SR5.packNames.attributeActions, rollId);
-            if (!actionData)
-                return console.error(`Shadowrun 5e | Couldn't roll attribute test ${rollId}`);
-            const test = yield TestCreator_1.TestCreator.fromAction(actionData.data.action, this, options);
+            const action = yield helpers_1.Helpers.getPackAction(config_1.SR5.packNames.attributeActions, rollId);
+            if (!action)
+                return;
+            const test = yield TestCreator_1.TestCreator.fromItem(action, this, options);
+            test.data.title = rollId;
             if (!test)
                 return;
             yield test.execute();
@@ -15316,7 +15317,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../apps/dialogs/ShadowrunActorDialogs":141,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../item/SR5Item":206,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/SkillRules":230,"../tests/TestCreator":246,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./flows/SoakFlow":91,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":141,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../item/SR5Item":206,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/SkillRules":230,"../tests/TestCreator":247,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./flows/SoakFlow":91,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22827,7 +22828,7 @@ const chatMessageActionApplyDamage = (html, event) => __awaiter(void 0, void 0, 
     yield new DamageApplicationFlow_1.DamageApplicationFlow().runApplyDamage(actors, damage);
 });
 exports.chatMessageActionApplyDamage = chatMessageActionApplyDamage;
-},{"./actor/SR5Actor":86,"./actor/flows/DamageApplicationFlow":87,"./constants":152,"./helpers":166,"./item/SR5Item":206,"./item/flows/ActionResultFlow":209,"./template":234}],150:[function(require,module,exports){
+},{"./actor/SR5Actor":86,"./actor/flows/DamageApplicationFlow":87,"./constants":152,"./helpers":166,"./item/SR5Item":206,"./item/flows/ActionResultFlow":209,"./template":235}],150:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23248,7 +23249,7 @@ function _combatantGetInitiativeFormula() {
     return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
-},{"../constants":152,"../rules/CombatRules":223,"../sockets":233}],151:[function(require,module,exports){
+},{"../constants":152,"../rules/CombatRules":223,"../sockets":234}],151:[function(require,module,exports){
 "use strict";
 /**
  * Shadowrun 5 configuration for static values.
@@ -26703,15 +26704,21 @@ class Helpers {
      * @param actionName The name of the action within that pack
      */
     static getPackAction(packName, actionName) {
-        const pack = game.packs.find(pack => pack.metadata.system === constants_1.SYSTEM_NAME &&
-            pack.metadata.name === packName);
-        if (!pack)
-            return;
-        const actionData = pack.index.find(data => { var _a; return ((_a = data.name) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === actionName; });
-        console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, actionData);
-        if ((actionData === null || actionData === void 0 ? void 0 : actionData.type) !== 'action')
-            return;
-        return actionData;
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: collection item type validation
+            const pack = game.packs.find(pack => pack.metadata.system === constants_1.SYSTEM_NAME &&
+                pack.metadata.name === packName);
+            if (!pack)
+                return;
+            const packEntry = pack.index.find(data => { var _a; return ((_a = data.name) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === actionName; });
+            if (!packEntry)
+                return;
+            const item = yield pack.getDocument(packEntry._id);
+            if (!item || item.type !== 'action')
+                return;
+            console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
+            return item;
+        });
     }
 }
 exports.Helpers = Helpers;
@@ -27136,7 +27143,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":248,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./chat":149,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":232,"./tests/CombatSpellDefenseTest":235,"./tests/ComplexFormTest":236,"./tests/DrainTest":238,"./tests/MeleeAttackTest":239,"./tests/OpposedTest":240,"./tests/PhysicalDefenseTest":241,"./tests/PhysicalResistTest":242,"./tests/RangedAttackTest":243,"./tests/SpellCastingTest":244,"./tests/SuccessTest":245,"./tests/TestCreator":246,"./token/SR5Token":247}],168:[function(require,module,exports){
+},{"../test/quench":249,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./chat":149,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":233,"./tests/CombatSpellDefenseTest":236,"./tests/ComplexFormTest":237,"./tests/DrainTest":239,"./tests/MeleeAttackTest":240,"./tests/OpposedTest":241,"./tests/PhysicalDefenseTest":242,"./tests/PhysicalResistTest":243,"./tests/RangedAttackTest":244,"./tests/SpellCastingTest":245,"./tests/SuccessTest":246,"./tests/TestCreator":247,"./token/SR5Token":248}],168:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31797,7 +31804,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../tests/TestCreator":246,"./ChatData":205,"./flows/ActionFlow":208,"./flows/NetworkDeviceFlow":210,"./prep/HostPrep":211}],207:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../tests/TestCreator":247,"./ChatData":205,"./flows/ActionFlow":208,"./flows/NetworkDeviceFlow":210,"./prep/HostPrep":211}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32786,7 +32793,7 @@ class NetworkDeviceFlow {
     }
 }
 exports.NetworkDeviceFlow = NetworkDeviceFlow;
-},{"../../constants":152,"../../sockets":233}],211:[function(require,module,exports){
+},{"../../constants":152,"../../sockets":234}],211:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostPrep = exports.HostDataPreparation = void 0;
@@ -34560,7 +34567,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../apps/dialogs/ShadowrunTestDialog":142,"../chat":149,"../constants":152,"../helpers":166,"../parts/PartsList":220,"../tests/TestCreator":246}],223:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":142,"../chat":149,"../constants":152,"../helpers":166,"../parts/PartsList":220,"../tests/TestCreator":247}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -35405,6 +35412,62 @@ class SoakRules {
 exports.SoakRules = SoakRules;
 },{"../config":151,"../helpers":166}],232:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SpellcastingRules = void 0;
+/**
+ * Shadowrun 5 rules related to magic / spellcasting.
+ */
+class SpellcastingRules {
+    /**
+     * Calculate spellcasting drain value without its damage type
+     *
+     * As defined in SR5#282 - Step 6 Resist Drain.
+     *
+     * @param force The force the spell is cast with.
+     * @param drainModifier The drain modifier defined within the spells action configuration.
+     * @param reckless Set this to true should the spell be cast recklessly as defined in SR5#281 Cast Spell.
+     */
+    static calculateDrain(force, drainModifier, reckless = false) {
+        const recklessModifier = reckless ? this.recklessDrainModifier : 0;
+        const drain = force + drainModifier + recklessModifier;
+        return Math.max(this.minimalDrain, drain);
+    }
+    /**
+     * As defined in SR5#282 - Step 6 Resist Drain
+     */
+    static get minimalDrain() {
+        return 2;
+    }
+    /**
+     * As defined in SR5#281 - Step 4 Cast Spell.
+     *
+     * Reckless spellcasting will alter drain damage.
+     */
+    static get recklessDrainModifier() {
+        return 3;
+    }
+    /**
+     * Based on the minimal drain value use this as the minimal usable force value.
+     * @param drainModifier The drain modifier defined within the spells action configuration.
+     */
+    static calculateMinimalForce(drainModifier) {
+        return Math.max(1, this.minimalDrain - drainModifier);
+    }
+    /**
+     * Calculate spell casting limit based on the force chosen.
+     *
+     * As defined in SR5#281 - Step 3 Choose Spell Force
+     *
+     * @param force The spell force chosen by test configuration.
+     * @returns The limit value to be applied.
+     */
+    static calculateLimit(force) {
+        return force;
+    }
+}
+exports.SpellcastingRules = SpellcastingRules;
+},{}],233:[function(require,module,exports){
+"use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSystemSettings = void 0;
@@ -35520,7 +35583,7 @@ const registerSystemSettings = () => {
     });
 };
 exports.registerSystemSettings = registerSystemSettings;
-},{"./constants":152,"./migrator/VersionMigration":215}],233:[function(require,module,exports){
+},{"./constants":152,"./migrator/VersionMigration":215}],234:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35571,7 +35634,7 @@ class SocketMessage {
     }
 }
 exports.SocketMessage = SocketMessage;
-},{"./constants":152}],234:[function(require,module,exports){
+},{"./constants":152}],235:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35687,7 +35750,7 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-},{}],235:[function(require,module,exports){
+},{}],236:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35782,7 +35845,7 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
     }
 }
 exports.CombatSpellDefenseTest = CombatSpellDefenseTest;
-},{"../data/DataDefaults":153,"../rules/CombatSpellRules":224,"./DefenseTest":237}],236:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../rules/CombatSpellRules":224,"./DefenseTest":238}],237:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35866,8 +35929,12 @@ class ComplexFormTest extends SuccessTest_1.SuccessTest {
         this.data.fade = ComplexFormRules_1.ComplexFormRules.calculateFade(level, fade);
     }
     afterTestComplete() {
+        const _super = Object.create(null, {
+            afterTestComplete: { get: () => super.afterTestComplete }
+        });
         return __awaiter(this, void 0, void 0, function* () {
             yield this.saveLastUsedLevel();
+            yield _super.afterTestComplete.call(this);
         });
     }
     /**
@@ -35882,7 +35949,7 @@ class ComplexFormTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.ComplexFormTest = ComplexFormTest;
-},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/ComplexFormRules":225,"./SuccessTest":245}],237:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/ComplexFormRules":225,"./SuccessTest":246}],238:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DefenseTest = void 0;
@@ -35902,7 +35969,7 @@ class DefenseTest extends OpposedTest_1.OpposedTest {
     }
 }
 exports.DefenseTest = DefenseTest;
-},{"./OpposedTest":240}],238:[function(require,module,exports){
+},{"./OpposedTest":241}],239:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35972,7 +36039,7 @@ class DrainTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.DrainTest = DrainTest;
-},{"../data/DataDefaults":153,"../rules/DrainRules":226,"./SuccessTest":245}],239:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../rules/DrainRules":226,"./SuccessTest":246}],240:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36008,7 +36075,7 @@ class MeleeAttackTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.MeleeAttackTest = MeleeAttackTest;
-},{"../data/DataDefaults":153,"./SuccessTest":245}],240:[function(require,module,exports){
+},{"../data/DataDefaults":153,"./SuccessTest":246}],241:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36122,7 +36189,7 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.OpposedTest = OpposedTest;
-},{"../data/DataDefaults":153,"./SuccessTest":245,"./TestCreator":246}],241:[function(require,module,exports){
+},{"../data/DataDefaults":153,"./SuccessTest":246,"./TestCreator":247}],242:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36285,7 +36352,7 @@ class PhysicalDefenseTest extends DefenseTest_1.DefenseTest {
     }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
-},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":228,"./DefenseTest":237,"./TestCreator":246}],242:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":228,"./DefenseTest":238,"./TestCreator":247}],243:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36348,7 +36415,7 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.PhysicalResistTest = PhysicalResistTest;
-},{"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/CombatRules":223,"./SuccessTest":245}],243:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/CombatRules":223,"./SuccessTest":246}],244:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36506,9 +36573,125 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.RangedAttackTest = RangedAttackTest;
-},{"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/Modifiers":229,"./SuccessTest":245}],244:[function(require,module,exports){
-arguments[4][16][0].apply(exports,arguments)
-},{"dup":16}],245:[function(require,module,exports){
+},{"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/Modifiers":229,"./SuccessTest":246}],245:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SpellCastingTest = void 0;
+const SuccessTest_1 = require("./SuccessTest");
+const SpellcastingRules_1 = require("../rules/SpellcastingRules");
+const PartsList_1 = require("../parts/PartsList");
+const CombatSpellRules_1 = require("../rules/CombatSpellRules");
+const DataDefaults_1 = require("../data/DataDefaults");
+/**
+ * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
+ *
+ */
+class SpellCastingTest extends SuccessTest_1.SuccessTest {
+    _prepareData(data, options) {
+        data = super._prepareData(data, options);
+        data.force = data.force || 0;
+        data.drain = data.drain || 0;
+        data.reckless = data.reckless || false;
+        return data;
+    }
+    get _dialogTemplate() {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
+    }
+    static _getDefaultTestAction() {
+        return DataDefaults_1.DefaultValues.minimalActionData({
+            skill: 'spellcasting',
+            attribute: 'magic'
+        });
+    }
+    get testModifiers() {
+        return ['global', 'wounds'];
+    }
+    prepareDocumentData() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.prepareInitialForceValue();
+        });
+    }
+    /**
+     * Set a force value based on the items history or viable suggestions.
+     */
+    prepareInitialForceValue() {
+        if (!this.item)
+            return;
+        const lastUsedForce = this.item.getLastSpellForce();
+        const suggestedForce = SpellcastingRules_1.SpellcastingRules.calculateMinimalForce(this.item.getDrain());
+        this.data.force = lastUsedForce.value || suggestedForce;
+    }
+    prepareBaseValues() {
+        super.prepareBaseValues();
+        this.prepareLimitValue();
+    }
+    prepareLimitValue() {
+        const force = Number(this.data.force);
+        this.data.limit.mod = PartsList_1.PartsList.AddUniquePart(this.data.limit.mod, 'SR5.Force', SpellcastingRules_1.SpellcastingRules.calculateLimit(force));
+    }
+    calculateBaseValues() {
+        super.calculateBaseValues();
+        this.calculateDrainValue();
+    }
+    /**
+     * Precalculate drain for user display.
+     */
+    calculateDrainValue() {
+        var _a;
+        const force = Number(this.data.force);
+        const drain = Number(((_a = this.item) === null || _a === void 0 ? void 0 : _a.getDrain()) || 0);
+        const reckless = this.data.reckless;
+        this.data.drain = SpellcastingRules_1.SpellcastingRules.calculateDrain(force, drain, reckless);
+    }
+    processSuccess() {
+        const _super = Object.create(null, {
+            processSuccess: { get: () => super.processSuccess }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            yield _super.processSuccess.call(this);
+            if (this.item && this.item.isCombatSpell())
+                this.calculateCombatSpellDamage();
+        });
+    }
+    calculateCombatSpellDamage() {
+        if (!this.item)
+            return;
+        if (this.item.isDirectCombatSpell())
+            this.data.damage = CombatSpellRules_1.CombatSpellRules.calculateDirectDamage(this.data.damage);
+        if (this.item.isIndirectCombatSpell())
+            this.data.damage = CombatSpellRules_1.CombatSpellRules.calculateIndirectDamage(this.data.damage, this.data.force);
+    }
+    afterTestComplete() {
+        const _super = Object.create(null, {
+            afterTestComplete: { get: () => super.afterTestComplete }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.saveLastUsedForce();
+            yield _super.afterTestComplete.call(this);
+        });
+    }
+    /**
+     * Allow the currently used force value of this spell item to be reused next time.
+     */
+    saveLastUsedForce() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.item)
+                return;
+            yield this.item.setLastSpellForce({ value: this.data.force, reckless: false });
+        });
+    }
+}
+exports.SpellCastingTest = SpellCastingTest;
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatSpellRules":224,"../rules/SpellcastingRules":232,"./SuccessTest":246}],246:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37410,7 +37593,7 @@ class SuccessTest {
     }
 }
 exports.SuccessTest = SuccessTest;
-},{"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../item/flows/ActionFlow":208,"../parts/PartsList":220,"../rolls/SR5Roll":221,"./TestCreator":246}],246:[function(require,module,exports){
+},{"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../item/flows/ActionFlow":208,"../parts/PartsList":220,"../rolls/SR5Roll":221,"./TestCreator":247}],247:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37820,7 +38003,7 @@ exports.TestCreator = {
         return action;
     }
 };
-},{"../actor/SR5Actor":86,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":230}],247:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":230}],248:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -37841,7 +38024,7 @@ class SR5Token extends Token {
     }
 }
 exports.SR5Token = SR5Token;
-},{"../constants":152}],248:[function(require,module,exports){
+},{"../constants":152}],249:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
@@ -37874,7 +38057,7 @@ const quenchRegister = () => {
     quench.registerBatch("shadowrun5e.flow.tests", sr5_Testing_spec_1.shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
 };
 exports.quenchRegister = quenchRegister;
-},{"./sr5.ActiveEffect.spec":249,"./sr5.ActorDataPrep.spec":250,"./sr5.Inventory.spec":251,"./sr5.Matrix.spec":252,"./sr5.Modifiers.spec":253,"./sr5.NetworkDevices.spec":254,"./sr5.SR5Actor.spec":255,"./sr5.SR5Item.spec":256,"./sr5.Testing.spec":257}],249:[function(require,module,exports){
+},{"./sr5.ActiveEffect.spec":250,"./sr5.ActorDataPrep.spec":251,"./sr5.Inventory.spec":252,"./sr5.Matrix.spec":253,"./sr5.Modifiers.spec":254,"./sr5.NetworkDevices.spec":255,"./sr5.SR5Actor.spec":256,"./sr5.SR5Item.spec":257,"./sr5.Testing.spec":258}],250:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37996,7 +38179,7 @@ const shadowrunSR5ActiveEffect = context => {
     });
 };
 exports.shadowrunSR5ActiveEffect = shadowrunSR5ActiveEffect;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":258}],250:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":259}],251:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38209,7 +38392,7 @@ const shadowrunSR5ActorDataPrep = context => {
     });
 };
 exports.shadowrunSR5ActorDataPrep = shadowrunSR5ActorDataPrep;
-},{"../module/actor/SR5Actor":86,"../module/constants":152,"../module/item/SR5Item":206,"./utils":258}],251:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/constants":152,"../module/item/SR5Item":206,"./utils":259}],252:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38281,7 +38464,7 @@ const shadowrunInventoryFlow = context => {
     });
 };
 exports.shadowrunInventoryFlow = shadowrunInventoryFlow;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":258}],252:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":259}],253:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunMatrix = void 0;
@@ -38353,7 +38536,7 @@ const shadowrunMatrix = context => {
     });
 };
 exports.shadowrunMatrix = shadowrunMatrix;
-},{"../module/rules/MatrixRules":227}],253:[function(require,module,exports){
+},{"../module/rules/MatrixRules":227}],254:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -38521,7 +38704,7 @@ const shadowrunRulesModifiers = context => {
     });
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
-},{"../module/rules/Modifiers":229}],254:[function(require,module,exports){
+},{"../module/rules/Modifiers":229}],255:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38676,7 +38859,7 @@ const shadowrunNetworkDevices = context => {
     });
 };
 exports.shadowrunNetworkDevices = shadowrunNetworkDevices;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/item/flows/NetworkDeviceFlow":210,"./utils":258}],255:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/item/flows/NetworkDeviceFlow":210,"./utils":259}],256:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38741,7 +38924,7 @@ const shadowrunSR5Actor = context => {
     });
 };
 exports.shadowrunSR5Actor = shadowrunSR5Actor;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":258}],256:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":259}],257:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38824,7 +39007,7 @@ const shadowrunSR5Item = context => {
     });
 };
 exports.shadowrunSR5Item = shadowrunSR5Item;
-},{"../module/item/SR5Item":206,"./utils":258}],257:[function(require,module,exports){
+},{"../module/item/SR5Item":206,"./utils":259}],258:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38970,7 +39153,7 @@ const shadowrunTesting = context => {
     });
 };
 exports.shadowrunTesting = shadowrunTesting;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/tests/TestCreator":246,"./utils":258}],258:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/tests/TestCreator":247,"./utils":259}],259:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

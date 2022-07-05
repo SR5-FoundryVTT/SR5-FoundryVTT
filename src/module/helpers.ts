@@ -829,7 +829,7 @@ export class Helpers {
      * @param packName The metadata name of the pack
      * @param actionName The name of the action within that pack
      */
-    static getPackAction(packName, actionName): ActionRollData|undefined {
+    static async getPackAction(packName, actionName): Promise<SR5Item | undefined> {
         // TODO: collection item type validation
         const pack = game.packs.find(pack =>
                 pack.metadata.system === SYSTEM_NAME &&
@@ -839,10 +839,10 @@ export class Helpers {
         const packEntry = pack.index.find(data => data.name?.toLowerCase() === actionName);
         if (!packEntry) return;
 
-        const item = pack.getDocument(packEntry._id) as unknown as SR5Item;
+        const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
         if (!item || item.type !== 'action') return;
 
         console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
-        return item.getAction();
+        return item;
     }
 }

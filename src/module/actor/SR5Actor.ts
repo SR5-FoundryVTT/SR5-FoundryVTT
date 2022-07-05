@@ -1160,10 +1160,10 @@ export class SR5Actor extends Actor {
      * @param options Success Test options
      */
     async rollAttributesTest(rollId: 'composure'|'judge_intentions'|'lift_carry'|'memory', options?: TestOptions) {
-        const actionData = Helpers.getPackAction(SR5.packNames.attributeActions, rollId);
-        if (!actionData) return console.error(`Shadowrun 5e | Couldn't roll attribute test ${rollId}`);
-
-        const test = await TestCreator.fromAction(actionData.data.action, this, options);
+        const action = await Helpers.getPackAction(SR5.packNames.attributeActions, rollId);
+        if (!action) return;
+        const test = await TestCreator.fromItem(action, this, options);
+        test.data.title = rollId;
         if (!test) return;
 
         await test.execute();
