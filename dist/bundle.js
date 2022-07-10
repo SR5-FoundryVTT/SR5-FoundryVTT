@@ -37349,7 +37349,7 @@ class SuccessTest {
         html.find('.chat-document-link').on('click', SuccessTest._chatOpenDocumentLink);
     }
     /**
-     *
+     * Foundry ChatMessage context options (right click) used for all test types.
      * @param html
      * @param options
      */
