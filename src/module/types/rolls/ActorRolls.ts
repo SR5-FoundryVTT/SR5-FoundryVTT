@@ -54,7 +54,8 @@ declare namespace Shadowrun {
     };
 
     type SkillRollOptions = ActorRollOptions & {
-        attribute?: ActorAttribute
+        // Search not by skill id but by it's label.
+        attribute?: string
     };
 
     type SkillDialogOptions = {

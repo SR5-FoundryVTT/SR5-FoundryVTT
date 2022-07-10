@@ -323,7 +323,10 @@ export const TestCreator = {
             // Notify user about their sins.
             if (skill && !SkillRules.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
 
-            if (skill) pool.addUniquePart(skill.label, SkillRules.level(skill));
+            // Custom skills don't have a label, but a name.
+            // Legacy skill don't have a name, but have a label.
+            // Your mind is like this water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.
+            if (skill) pool.addUniquePart(skill.label || skill.name, SkillRules.level(skill));
             // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
             if (action.spec) pool.addUniquePart('SR5.Specialization', SkillRules.SpecializationModifier);
         }
@@ -346,7 +349,10 @@ export const TestCreator = {
 
         // Prepare limit values...
         if (action.limit.attribute) {
-            const limit = actor.getLimit(action.limit.attribute);
+            // Get the limit connected to the defined attribute.
+            // NOTE: This might differ from the USED attribute...
+            const attribute = actor.getAttribute(action.limit.attribute);
+            const limit = actor.getLimit(attribute.limit as string);
             if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
         }
         if (action.limit.base || action.limit.value) {

@@ -272,9 +272,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
 
         // Skill test rolling...
-        html.find('.skill-roll').on('click', this._onRollActiveSkill.bind(this));
-        html.find('.knowledge-skill').on('click', this._onRollKnowledgeSkill.bind(this));
-        html.find('.language-skill').on('click', this._onRollLanguageSkill.bind(this));
+        html.find('.skill-roll').on('click', this._onRollSkill.bind(this));
+        html.find('.knowledge-skill').on('click', this._onRollSkill.bind(this));
+        html.find('.language-skill').on('click', this._onRollSkill.bind(this));
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
@@ -592,36 +592,20 @@ export class SR5BaseActorSheet extends ActorSheet {
                 break;
             // end drone
 
-            case 'attribute':
+            case 'attribute': {
                 const attribute = split[1];
                 if (attribute) {
                     await this.actor.rollAttribute(attribute, options);
                 }
                 break;
-            // end attribute
+            }
 
-            case 'skill':
+            case 'skill': {
                 const skillType = split[1];
-                switch (skillType) {
-                    case 'active': {
-                        const skillId = split[2];
-                        await this.actor.rollActiveSkill(skillId, options);
-                        break;
-                    }
-                    case 'language': {
-                        const skillId = split[2];
-                        await this.actor.rollLanguageSkill(skillId, options);
-                        break;
-                    }
-                    case 'knowledge': {
-                        const category = split[2];
-                        const skillId = split[3];
-                        await this.actor.rollKnowledgeSkill(category, skillId, options);
-                        break;
-                    }
-                }
+                const skillId = split[2];
+                await this.actor.rollSkill(skillId, options);
                 break;
-            // end skill
+            }
 
             case 'matrix':
                 const matrixRoll = split[1];
@@ -1116,10 +1100,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.render();
     }
 
-    async _onRollActiveSkill(event) {
+    async _onRollSkill(event) {
         event.preventDefault();
-        const skill = Helpers.listItemId(event);
-        return this.actor.rollActiveSkill(skill, { event: event });
+        const skillId = Helpers.listItemId(event);
+        return this.actor.rollSkill(skillId, { event: event });
     }
 
     async _onShowEditSkill(event) {
@@ -1234,19 +1218,6 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const skillId = Helpers.listItemId(event);
         await this.actor.removeActiveSkill(skillId);
-    }
-
-    async _onRollKnowledgeSkill(event) {
-        event.preventDefault();
-        const id = Helpers.listItemId(event);
-        const [skill, category] = id.split('.');
-        return this.actor.rollKnowledgeSkill(category, skill, { event: event });
-    }
-
-    async _onRollLanguageSkill(event) {
-        event.preventDefault();
-        const skill = Helpers.listItemId(event);
-        return this.actor.rollLanguageSkill(skill, { event: event });
     }
 
     async _onRollAttribute(event) {

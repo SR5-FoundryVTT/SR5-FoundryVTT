@@ -61,7 +61,7 @@ import InventoryData = Shadowrun.InventoryData;
 import InventoriesData = Shadowrun.InventoriesData;
 import {InventoryFlow} from "./flows/InventoryFlow";
 import {ModifierFlow} from "./flows/ModifierFlow";
-import {TestOptions} from "../tests/SuccessTest";
+import {SuccessTest, TestOptions} from "../tests/SuccessTest";
 import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 
@@ -1163,6 +1163,8 @@ export class SR5Actor extends Actor {
     async rollAttributesTest(rollId: 'composure'|'judge_intentions'|'lift_carry'|'memory', options?: TestOptions) {
         const action = await Helpers.getPackAction(SR5.packNames.attributeActions, rollId);
         if (!action) return;
+
+        // TODO: Add/test options.
         const test = await TestCreator.fromItem(action, this, options);
 
         // Overwriting localization here is just easier...
@@ -1173,65 +1175,43 @@ export class SR5Actor extends Actor {
         await test.execute();
     }
 
-    async rollSkill(skill: SkillField, options?: SkillRollOptions) {
-        // NOTE: Currently defaulting happens at multiple places, which is why SkillFlow.handleDefaulting isn't used
-        //       here, yet. A general skill usage clean up between Skill, Attribute and Item action handling is needed.
+    async rollSkill(skillId: string, options?: SkillRollOptions) {
+        console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
+
+        const skill = this.getSkill(skillId);
+        if (!skill) return console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
         if (!SkillFlow.allowRoll(skill)) {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
             return;
         }
 
-        // Legacy skills have a label, but no name. Custom skills have a name but no label.
-        const label = skill.label ? game.i18n.localize(skill.label) : skill.name;
-        const title = label;
-
-        // Since options can provide an attribute, ignore incomplete sill attribute configuration.
-        const attributeName = options?.attribute ? options.attribute : skill.attribute;
-        const attribute = this.getAttribute(attributeName);
-        if (!attribute) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.SkillWithoutAttribute'));
-            return;
-        }
-        let limit = attribute.limit ? this.getLimit(attribute.limit) : undefined;
-
-        // Initialize parts with always needed skill data.
-        const parts = new PartsList<number>();
-        parts.addUniquePart(label, skill.value);
-        this._addMatrixParts(parts, [attribute, skill]);
-        this._addGlobalParts(parts);
+        // Add matrix modifiers when a matrix attribute is used.
+        // this._addMatrixParts(parts, [attribute, skill]);
 
         // Directly test, without further skill dialog.
-        if (options?.event && Helpers.hasModifiers(options?.event)) {
-            parts.addUniquePart(attribute.label, attribute.value);
-            if (options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
+        // if (options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
 
-            return await ShadowrunRoller.advancedRoll({
-                event: options.event,
-                actor: this,
-                parts: parts.list,
-                limit,
-                title: `${title} ${game.i18n.localize('SR5.Test')}`,
-            });
-        }
+        // const skillDialog = await ShadowrunActorDialogs.createSkillDialog(this, skillRollDialogOptions, parts);
 
-        // First ask user about skill details.
-        const skillRollDialogOptions = {
-            skill,
-            attribute: attributeName
-        }
+        // TODO: add spec usage
+        const action = DefaultValues.actionData({
+            // TODO: test custom skills.
+            skill: skillId,
 
-        const skillDialog = await ShadowrunActorDialogs.createSkillDialog(this, skillRollDialogOptions, parts);
-        const skillActionData = await skillDialog.select();
+            attribute: skill.attribute,
+            limit: {
+                base: 0, value: 0, mod: [],
+                attribute: skill.attribute
+            },
 
-        if (skillDialog.canceled) return;
-
-        return await ShadowrunRoller.advancedRoll({
-            event: options?.event,
-            actor: this,
-            parts: skillActionData.parts.list,
-            limit: skillActionData.limit,
-            title: skillActionData.title,
+            test: SuccessTest.name
         });
+
+        // TODO: Add options.
+        const test = await TestCreator.fromAction(action, this);
+        if (!test) return;
+
+        await test.execute();
     }
 
     async rollDronePerception(options?: ActorRollOptions) {
@@ -1262,7 +1242,7 @@ export class SR5Actor extends Actor {
                 });
             }
         } else {
-            await this.rollActiveSkill('perception', options);
+            await this.rollSkill('perception', options);
         }
     }
 
@@ -1297,7 +1277,7 @@ export class SR5Actor extends Actor {
         } else {
             const skillName = this.getVehicleTypeSkillName();
             if (!skillName) return;
-            return await this.rollActiveSkill(skillName, options);
+            return await this.rollSkill(skillName, options);
         }
     }
 
@@ -1329,28 +1309,20 @@ export class SR5Actor extends Actor {
                 });
             }
         } else {
-            await this.rollActiveSkill('sneaking', options);
+            await this.rollSkill('sneaking', options);
         }
     }
 
-    rollKnowledgeSkill(catId: string, skillId: string, options?: SkillRollOptions) {
-        const category = duplicate(this.data.data.skills.knowledge[catId]);
-        const skill = duplicate(category.value[skillId]) as SkillField;
-        skill.attribute = category.attribute;
-        skill.label = skill.name;
-        return this.rollSkill(skill, options);
-    }
-
-    rollLanguageSkill(skillId: string, options?: SkillRollOptions) {
-        const skill = duplicate(this.data.data.skills.language.value[skillId]) as SkillField;
-        skill.attribute = 'intuition';
-        skill.label = skill.name;
-        return this.rollSkill(skill, options);
-    }
-
-    rollActiveSkill(skillId: string, options?: SkillRollOptions) {
-        const skill = duplicate(this.data.data.skills.active[skillId]) as SkillField;
-        return this.rollSkill(skill, options);
+    /**
+     * Helper function for rolling active skills similar to rollLanguageSkill.
+     *
+     * Doesn't actually do anything more than rollSkill. :)
+     *
+     * @param skillId
+     * @param options
+     */
+    rollActiveSkill(skillId: string, options: SkillRollOptions = {}) {
+        return this.rollSkill(skillId, options);
     }
 
     /**

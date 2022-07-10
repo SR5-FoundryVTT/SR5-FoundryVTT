@@ -95,10 +95,6 @@ export async function rollSkillMacro(skillLabel) {
     const actor =  (game.actors.tokens[speaker.token as string] || game.actors.get(speaker.actor as string)) as SR5Actor
 
     if (!actor) return;
-
-    const skill = actor.getSkill(skillLabel, {byLabel: true});
-
-    if (!skill) return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.MissingSkillOnActor'))
-
-    await actor.rollSkill(skill);
+    // await actor.rollSkill(skillLabel);
+    // TODO: Macro for skills may need their own TestCreate.fromSkillMacro... as they need getSkill('Label', {byLabel: true});
 }

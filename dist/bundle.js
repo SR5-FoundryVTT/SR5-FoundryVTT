@@ -13307,6 +13307,7 @@ const MatrixRules_1 = require("../rules/MatrixRules");
 const ICPrep_1 = require("./prep/ICPrep");
 const InventoryFlow_1 = require("./flows/InventoryFlow");
 const ModifierFlow_1 = require("./flows/ModifierFlow");
+const SuccessTest_1 = require("../tests/SuccessTest");
 const TestCreator_1 = require("../tests/TestCreator");
 const AttributeOnlyTest_1 = require("../tests/AttributeOnlyTest");
 function getGame() {
@@ -14318,6 +14319,7 @@ class SR5Actor extends Actor {
             const action = yield helpers_1.Helpers.getPackAction(config_1.SR5.packNames.attributeActions, rollId);
             if (!action)
                 return;
+            // TODO: Add/test options.
             const test = yield TestCreator_1.TestCreator.fromItem(action, this, options);
             // Overwriting localization here is just easier...
             test.data.title = game.i18n.localize(config_1.SR5.modifierTypes[rollId]);
@@ -14326,60 +14328,38 @@ class SR5Actor extends Actor {
             yield test.execute();
         });
     }
-    rollSkill(skill, options) {
-        var _a, _b;
+    rollSkill(skillId, options) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            // NOTE: Currently defaulting happens at multiple places, which is why SkillFlow.handleDefaulting isn't used
-            //       here, yet. A general skill usage clean up between Skill, Attribute and Item action handling is needed.
+            console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
+            const skill = this.getSkill(skillId);
+            if (!skill)
+                return console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
             if (!SkillFlow_1.SkillFlow.allowRoll(skill)) {
                 (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
                 return;
             }
-            // Legacy skills have a label, but no name. Custom skills have a name but no label.
-            const label = skill.label ? game.i18n.localize(skill.label) : skill.name;
-            const title = label;
-            // Since options can provide an attribute, ignore incomplete sill attribute configuration.
-            const attributeName = (options === null || options === void 0 ? void 0 : options.attribute) ? options.attribute : skill.attribute;
-            const attribute = this.getAttribute(attributeName);
-            if (!attribute) {
-                (_b = ui.notifications) === null || _b === void 0 ? void 0 : _b.error(game.i18n.localize('SR5.Errors.SkillWithoutAttribute'));
-                return;
-            }
-            let limit = attribute.limit ? this.getLimit(attribute.limit) : undefined;
-            // Initialize parts with always needed skill data.
-            const parts = new PartsList_1.PartsList();
-            parts.addUniquePart(label, skill.value);
-            this._addMatrixParts(parts, [attribute, skill]);
-            this._addGlobalParts(parts);
+            // Add matrix modifiers when a matrix attribute is used.
+            // this._addMatrixParts(parts, [attribute, skill]);
             // Directly test, without further skill dialog.
-            if ((options === null || options === void 0 ? void 0 : options.event) && helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
-                parts.addUniquePart(attribute.label, attribute.value);
-                if (options.event[config_1.SR5.kbmod.SPEC])
-                    parts.addUniquePart('SR5.Specialization', 2);
-                return yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                    event: options.event,
-                    actor: this,
-                    parts: parts.list,
-                    limit,
-                    title: `${title} ${game.i18n.localize('SR5.Test')}`,
-                });
-            }
-            // First ask user about skill details.
-            const skillRollDialogOptions = {
-                skill,
-                attribute: attributeName
-            };
-            const skillDialog = yield ShadowrunActorDialogs_1.ShadowrunActorDialogs.createSkillDialog(this, skillRollDialogOptions, parts);
-            const skillActionData = yield skillDialog.select();
-            if (skillDialog.canceled)
-                return;
-            return yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                event: options === null || options === void 0 ? void 0 : options.event,
-                actor: this,
-                parts: skillActionData.parts.list,
-                limit: skillActionData.limit,
-                title: skillActionData.title,
+            // if (options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
+            // const skillDialog = await ShadowrunActorDialogs.createSkillDialog(this, skillRollDialogOptions, parts);
+            // TODO: add spec usage
+            const action = DataDefaults_1.DefaultValues.actionData({
+                // TODO: test custom skills.
+                skill: skillId,
+                attribute: skill.attribute,
+                limit: {
+                    base: 0, value: 0, mod: [],
+                    attribute: skill.attribute
+                },
+                test: SuccessTest_1.SuccessTest.name
             });
+            // TODO: Add options.
+            const test = yield TestCreator_1.TestCreator.fromAction(action, this);
+            if (!test)
+                return;
+            yield test.execute();
         });
     }
     rollDronePerception(options) {
@@ -14407,7 +14387,7 @@ class SR5Actor extends Actor {
                 }
             }
             else {
-                yield this.rollActiveSkill('perception', options);
+                yield this.rollSkill('perception', options);
             }
         });
     }
@@ -14441,7 +14421,7 @@ class SR5Actor extends Actor {
                 const skillName = this.getVehicleTypeSkillName();
                 if (!skillName)
                     return;
-                return yield this.rollActiveSkill(skillName, options);
+                return yield this.rollSkill(skillName, options);
             }
         });
     }
@@ -14471,26 +14451,20 @@ class SR5Actor extends Actor {
                 }
             }
             else {
-                yield this.rollActiveSkill('sneaking', options);
+                yield this.rollSkill('sneaking', options);
             }
         });
     }
-    rollKnowledgeSkill(catId, skillId, options) {
-        const category = duplicate(this.data.data.skills.knowledge[catId]);
-        const skill = duplicate(category.value[skillId]);
-        skill.attribute = category.attribute;
-        skill.label = skill.name;
-        return this.rollSkill(skill, options);
-    }
-    rollLanguageSkill(skillId, options) {
-        const skill = duplicate(this.data.data.skills.language.value[skillId]);
-        skill.attribute = 'intuition';
-        skill.label = skill.name;
-        return this.rollSkill(skill, options);
-    }
-    rollActiveSkill(skillId, options) {
-        const skill = duplicate(this.data.data.skills.active[skillId]);
-        return this.rollSkill(skill, options);
+    /**
+     * Helper function for rolling active skills similar to rollLanguageSkill.
+     *
+     * Doesn't actually do anything more than rollSkill. :)
+     *
+     * @param skillId
+     * @param options
+     */
+    rollActiveSkill(skillId, options = {}) {
+        return this.rollSkill(skillId, options);
     }
     /**
      * Roll a general attribute test with one or two attributes.
@@ -15251,7 +15225,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../apps/dialogs/ShadowrunActorDialogs":141,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../item/SR5Item":206,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/SkillRules":230,"../tests/AttributeOnlyTest":236,"../tests/TestCreator":248,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./flows/SoakFlow":91,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":141,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../item/SR5Item":206,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/SkillRules":230,"../tests/AttributeOnlyTest":236,"../tests/SuccessTest":247,"../tests/TestCreator":248,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./flows/SoakFlow":91,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -17522,9 +17496,9 @@ class SR5BaseActorSheet extends ActorSheet {
         // Conditon monitor test rolling...
         html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
         // Skill test rolling...
-        html.find('.skill-roll').on('click', this._onRollActiveSkill.bind(this));
-        html.find('.knowledge-skill').on('click', this._onRollKnowledgeSkill.bind(this));
-        html.find('.language-skill').on('click', this._onRollLanguageSkill.bind(this));
+        html.find('.skill-roll').on('click', this._onRollSkill.bind(this));
+        html.find('.knowledge-skill').on('click', this._onRollSkill.bind(this));
+        html.find('.language-skill').on('click', this._onRollSkill.bind(this));
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
         html.find('.open-source-pdf').on('click', this._onOpenSourcePDF.bind(this));
@@ -17832,35 +17806,19 @@ class SR5BaseActorSheet extends ActorSheet {
                     }
                     break;
                 // end drone
-                case 'attribute':
+                case 'attribute': {
                     const attribute = split[1];
                     if (attribute) {
                         yield this.actor.rollAttribute(attribute, options);
                     }
                     break;
-                // end attribute
-                case 'skill':
+                }
+                case 'skill': {
                     const skillType = split[1];
-                    switch (skillType) {
-                        case 'active': {
-                            const skillId = split[2];
-                            yield this.actor.rollActiveSkill(skillId, options);
-                            break;
-                        }
-                        case 'language': {
-                            const skillId = split[2];
-                            yield this.actor.rollLanguageSkill(skillId, options);
-                            break;
-                        }
-                        case 'knowledge': {
-                            const category = split[2];
-                            const skillId = split[3];
-                            yield this.actor.rollKnowledgeSkill(category, skillId, options);
-                            break;
-                        }
-                    }
+                    const skillId = split[2];
+                    yield this.actor.rollSkill(skillId, options);
                     break;
-                // end skill
+                }
                 case 'matrix':
                     const matrixRoll = split[1];
                     switch (matrixRoll) {
@@ -18315,11 +18273,11 @@ class SR5BaseActorSheet extends ActorSheet {
             yield this.render();
         });
     }
-    _onRollActiveSkill(event) {
+    _onRollSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const skill = helpers_1.Helpers.listItemId(event);
-            return this.actor.rollActiveSkill(skill, { event: event });
+            const skillId = helpers_1.Helpers.listItemId(event);
+            return this.actor.rollSkill(skillId, { event: event });
         });
     }
     _onShowEditSkill(event) {
@@ -18432,21 +18390,6 @@ class SR5BaseActorSheet extends ActorSheet {
                 return;
             const skillId = helpers_1.Helpers.listItemId(event);
             yield this.actor.removeActiveSkill(skillId);
-        });
-    }
-    _onRollKnowledgeSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const id = helpers_1.Helpers.listItemId(event);
-            const [skill, category] = id.split('.');
-            return this.actor.rollKnowledgeSkill(category, skill, { event: event });
-        });
-    }
-    _onRollLanguageSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const skill = helpers_1.Helpers.listItemId(event);
-            return this.actor.rollLanguageSkill(skill, { event: event });
         });
     }
     _onRollAttribute(event) {
@@ -30708,44 +30651,53 @@ class SR5Item extends Item {
         }
     }
     rollOpposedTest(target, attack, event) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const options = {
-                event,
-                fireModeDefense: 0,
-                cover: false,
-                attack
-            };
-            const parts = this.getOpposedTestMod();
-            const action = this.getAction();
-            if (!action)
-                return;
-            const { opposed } = action;
-            if (opposed.type === 'defense') {
-                return yield this.rollDefense(target, options);
-            }
-            else if (opposed.type === 'soak') {
-                options['damage'] = attack === null || attack === void 0 ? void 0 : attack.damage;
-                options['attackerHits'] = attack === null || attack === void 0 ? void 0 : attack.hits;
-                return yield target.rollSoak(options, parts.list);
-            }
-            else if (opposed.type === 'armor') {
-                return target.rollArmor(options);
-            }
-            else if (opposed.skill && opposed.attribute) {
-                const skill = target.getSkill(opposed.skill);
-                if (!skill) {
-                    (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error(game.i18n.localize("SR5.Errors.MissingSkill"));
-                    return;
-                }
-                return target.rollSkill(skill, Object.assign(Object.assign({}, options), { attribute: opposed.attribute }));
-            }
-            else if (opposed.attribute && opposed.attribute2) {
-                return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
-            }
-            else if (opposed.attribute) {
-                return target.rollSingleAttribute(opposed.attribute, options);
-            }
+            console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
+            return;
+            // const options = {
+            //     event,
+            //     fireModeDefense: 0,
+            //     cover: false,
+            //     attack
+            // };
+            //
+            // const parts = this.getOpposedTestMod();
+            // const action = this.getAction();
+            // if (!action) return;
+            //
+            // const { opposed } = action;
+            //
+            // if (opposed.type === 'defense') {
+            //     return await this.rollDefense(target, options);
+            //
+            // } else if (opposed.type === 'soak') {
+            //     options['damage'] = attack?.damage;
+            //     options['attackerHits'] = attack?.hits;
+            //     return await target.rollSoak(options, parts.list);
+            //
+            // } else if (opposed.type === 'armor') {
+            //     return target.rollArmor(options);
+            //
+            // } else if (opposed.skill && opposed.attribute) {
+            //     const skill = target.getSkill(opposed.skill);
+            //
+            //     if (!skill) {
+            //         ui.notifications?.error(game.i18n.localize("SR5.Errors.MissingSkill"));
+            //         return;
+            //     }
+            //
+            //     return target.rollSkill(skill, {
+            //         ...options,
+            //         attribute: opposed.attribute,
+            //     });
+            //
+            // } else if (opposed.attribute && opposed.attribute2) {
+            //     return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
+            //
+            // } else if (opposed.attribute) {
+            //     return target.rollSingleAttribute(opposed.attribute, options);
+            //
+            // }
         });
     }
     rollTestType(type, attack, event, target) {
@@ -32871,7 +32823,6 @@ exports.createSkillMacro = createSkillMacro;
  * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
  */
 function rollSkillMacro(skillLabel) {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         if (!game || !game.actors)
             return;
@@ -32884,10 +32835,8 @@ function rollSkillMacro(skillLabel) {
         const actor = (game.actors.tokens[speaker.token] || game.actors.get(speaker.actor));
         if (!actor)
             return;
-        const skill = actor.getSkill(skillLabel, { byLabel: true });
-        if (!skill)
-            return (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Warnings.MissingSkillOnActor'));
-        yield actor.rollSkill(skill);
+        // await actor.rollSkill(skillLabel);
+        // TODO: Macro for skills may need their own TestCreate.fromSkillMacro... as they need getSkill('Label', {byLabel: true});
     });
 }
 exports.rollSkillMacro = rollSkillMacro;
@@ -37884,8 +37833,11 @@ exports.TestCreator = {
                 // Notify user about their sins.
                 if (skill && !SkillRules_1.SkillRules.allowRoll(skill))
                     (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn('SR5.Warnings.SkillCantBeDefault', { localize: true });
+                // Custom skills don't have a label, but a name.
+                // Legacy skill don't have a name, but have a label.
+                // Your mind is like this water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.
                 if (skill)
-                    pool.addUniquePart(skill.label, SkillRules_1.SkillRules.level(skill));
+                    pool.addUniquePart(skill.label || skill.name, SkillRules_1.SkillRules.level(skill));
                 // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
                 if (action.spec)
                     pool.addUniquePart('SR5.Specialization', SkillRules_1.SkillRules.SpecializationModifier);
@@ -37910,7 +37862,10 @@ exports.TestCreator = {
             }
             // Prepare limit values...
             if (action.limit.attribute) {
-                const limit = actor.getLimit(action.limit.attribute);
+                // Get the limit connected to the defined attribute.
+                // NOTE: This might differ from the USED attribute...
+                const attribute = actor.getAttribute(action.limit.attribute);
+                const limit = actor.getLimit(attribute.limit);
                 if (limit)
                     data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
             }

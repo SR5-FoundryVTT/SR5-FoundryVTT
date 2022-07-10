@@ -804,50 +804,52 @@ export class SR5Item extends Item {
 
 
     async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<ShadowrunRoll | undefined> {
-        const options = {
-            event,
-            fireModeDefense: 0,
-            cover: false,
-            attack
-        };
-
-        const parts = this.getOpposedTestMod();
-        const action = this.getAction();
-        if (!action) return;
-
-        const { opposed } = action;
-
-        if (opposed.type === 'defense') {
-            return await this.rollDefense(target, options);
-
-        } else if (opposed.type === 'soak') {
-            options['damage'] = attack?.damage;
-            options['attackerHits'] = attack?.hits;
-            return await target.rollSoak(options, parts.list);
-
-        } else if (opposed.type === 'armor') {
-            return target.rollArmor(options);
-
-        } else if (opposed.skill && opposed.attribute) {
-            const skill = target.getSkill(opposed.skill);
-
-            if (!skill) {
-                ui.notifications?.error(game.i18n.localize("SR5.Errors.MissingSkill"));
-                return;
-            }
-
-            return target.rollSkill(skill, {
-                ...options,
-                attribute: opposed.attribute,
-            });
-
-        } else if (opposed.attribute && opposed.attribute2) {
-            return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
-
-        } else if (opposed.attribute) {
-            return target.rollSingleAttribute(opposed.attribute, options);
-
-        }
+        console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
+        return;
+        // const options = {
+        //     event,
+        //     fireModeDefense: 0,
+        //     cover: false,
+        //     attack
+        // };
+        //
+        // const parts = this.getOpposedTestMod();
+        // const action = this.getAction();
+        // if (!action) return;
+        //
+        // const { opposed } = action;
+        //
+        // if (opposed.type === 'defense') {
+        //     return await this.rollDefense(target, options);
+        //
+        // } else if (opposed.type === 'soak') {
+        //     options['damage'] = attack?.damage;
+        //     options['attackerHits'] = attack?.hits;
+        //     return await target.rollSoak(options, parts.list);
+        //
+        // } else if (opposed.type === 'armor') {
+        //     return target.rollArmor(options);
+        //
+        // } else if (opposed.skill && opposed.attribute) {
+        //     const skill = target.getSkill(opposed.skill);
+        //
+        //     if (!skill) {
+        //         ui.notifications?.error(game.i18n.localize("SR5.Errors.MissingSkill"));
+        //         return;
+        //     }
+        //
+        //     return target.rollSkill(skill, {
+        //         ...options,
+        //         attribute: opposed.attribute,
+        //     });
+        //
+        // } else if (opposed.attribute && opposed.attribute2) {
+        //     return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
+        //
+        // } else if (opposed.attribute) {
+        //     return target.rollSingleAttribute(opposed.attribute, options);
+        //
+        // }
     }
 
     async rollTestType(type: string, attack: AttackData, event, target: SR5Actor) {
