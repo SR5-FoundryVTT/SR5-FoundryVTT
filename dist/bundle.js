@@ -23584,7 +23584,7 @@ exports.SR5 = {
         'composure': 'SR5.RollComposure',
         'judge_intentions': 'SR5.RollJudgeIntentions',
         'lift_carry': 'SR5.RollLiftCarry',
-        'memory': 'SR5.memory'
+        'memory': 'SR5.RollMemory'
         // TODO: Add ActorData.modifiers to this list
     },
     /**
@@ -26700,17 +26700,22 @@ class Helpers {
     /**
      * Check packs for a given action.
      *
+     * TODO: Use pack and action ids to avoid polluted user namespaces
+     * TODO: Allow for i18n to fetch a label from an action? Or predefine the title?
+     *
      * @param packName The metadata name of the pack
      * @param actionName The name of the action within that pack
      */
     static getPackAction(packName, actionName) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.info(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
             // TODO: collection item type validation
             const pack = game.packs.find(pack => pack.metadata.system === constants_1.SYSTEM_NAME &&
                 pack.metadata.name === packName);
             if (!pack)
                 return;
-            const packEntry = pack.index.find(data => { var _a; return ((_a = data.name) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === actionName; });
+            // TODO: Use predefined ids instead of names...
+            const packEntry = pack.index.find(data => { var _a; return ((_a = data.name) === null || _a === void 0 ? void 0 : _a.toLowerCase().replace(' ', '_')) === actionName; });
             if (!packEntry)
                 return;
             const item = yield pack.getDocument(packEntry._id);

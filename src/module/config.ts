@@ -363,7 +363,7 @@ export const SR5 = {
         'composure': 'SR5.RollComposure',
         'judge_intentions': 'SR5.RollJudgeIntentions',
         'lift_carry': 'SR5.RollLiftCarry',
-        'memory': 'SR5.memory'
+        'memory': 'SR5.RollMemory'
         // TODO: Add ActorData.modifiers to this list
     },
 

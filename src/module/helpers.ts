@@ -826,17 +826,22 @@ export class Helpers {
     /**
      * Check packs for a given action.
      *
+     * TODO: Use pack and action ids to avoid polluted user namespaces
+     * TODO: Allow for i18n to fetch a label from an action? Or predefine the title?
+     *
      * @param packName The metadata name of the pack
      * @param actionName The name of the action within that pack
      */
     static async getPackAction(packName, actionName): Promise<SR5Item | undefined> {
+        console.info(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
         // TODO: collection item type validation
         const pack = game.packs.find(pack =>
                 pack.metadata.system === SYSTEM_NAME &&
                 pack.metadata.name === packName);
         if (!pack) return;
 
-        const packEntry = pack.index.find(data => data.name?.toLowerCase() === actionName);
+        // TODO: Use predefined ids instead of names...
+        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(' ', '_') === actionName);
         if (!packEntry) return;
 
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
