@@ -14517,94 +14517,6 @@ class SR5Actor extends Actor {
             }
         }
     }
-    static pushTheLimit(li) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            let msg = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(li.data().messageId);
-            if (!msg || !msg.user)
-                return;
-            if (msg.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll)) {
-                let actor = msg.user.character;
-                if (!actor) {
-                    const tokens = helpers_1.Helpers.getControlledTokens();
-                    if (tokens.length > 0) {
-                        for (let token of tokens) {
-                            if (token.actor && token.actor.isOwner) {
-                                actor = token.actor;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (actor) {
-                    const parts = new PartsList_1.PartsList();
-                    parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
-                    ShadowrunRoller_1.ShadowrunRoller.basicRoll({
-                        title: ` - ${game.i18n.localize('SR5.PushTheLimit')}`,
-                        parts: parts.list,
-                        actor: actor,
-                    }).then(() => {
-                        // @ts-ignore
-                        actor.update({
-                            'data.attributes.edge.uses': actor.getEdge().uses - 1,
-                        });
-                    });
-                }
-                else {
-                    // @ts-ignore
-                    ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
-                }
-            }
-        });
-    }
-    static secondChance(li) {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            let msg = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(li.data().messageId);
-            if (!msg || !msg.user)
-                return;
-            // @ts-ignore
-            let roll = JSON.parse((_b = msg.data) === null || _b === void 0 ? void 0 : _b.roll);
-            let formula = roll.formula;
-            let hits = roll.total || 0;
-            let re = /(\d+)d6/;
-            let matches = formula.match(re);
-            if (matches && matches[1]) {
-                let match = matches[1];
-                let pool = parseInt(match.replace('d6', ''));
-                if (!isNaN(pool) && !isNaN(hits)) {
-                    let actor = msg.user.character;
-                    if (!actor) {
-                        const tokens = helpers_1.Helpers.getControlledTokens();
-                        if (tokens.length > 0) {
-                            for (let token of tokens) {
-                                if (token.actor && token.actor.isOwner) {
-                                    actor = token.actor;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if (actor) {
-                        const parts = new PartsList_1.PartsList();
-                        parts.addUniquePart('SR5.OriginalDicePool', pool);
-                        parts.addUniquePart('SR5.Successes', -hits);
-                        return ShadowrunRoller_1.ShadowrunRoller.basicRoll({
-                            title: ` - Second Chance`,
-                            parts: parts.list,
-                            actor: actor,
-                        }).then(() => {
-                            actor.useEdge();
-                        });
-                    }
-                    else {
-                        // @ts-ignore
-                        ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
-                    }
-                }
-            }
-        });
-    }
     /**
      * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
      * @param scope
@@ -22299,8 +22211,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.chatMessageActionApplyDamage = exports.handleRenderChatMessage = exports.addRollListeners = exports.addChatMessageContextOptions = exports.createRollChatMessage = exports.createItemChatMessage = exports.createTargetChatMessage = exports.ifConfiguredCreateDefaultChatMessage = void 0;
-const SR5Actor_1 = require("./actor/SR5Actor");
+exports.chatMessageActionApplyDamage = exports.handleRenderChatMessage = exports.addRollListeners = exports.createRollChatMessage = exports.createItemChatMessage = exports.createTargetChatMessage = exports.ifConfiguredCreateDefaultChatMessage = void 0;
 const SR5Item_1 = require("./item/SR5Item");
 const template_1 = require("./template");
 const constants_1 = require("./constants");
@@ -22468,28 +22379,6 @@ function getTokenSceneId(token) {
         return;
     return `${scene.id}.${token.id}`;
 }
-const addChatMessageContextOptions = (html, options) => {
-    const canRoll = (li) => {
-        var _a;
-        const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(li.data().messageId);
-        if (!message)
-            return;
-        return message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll);
-    };
-    options.push({
-        name: game.i18n.localize('SR5.PushTheLimit'),
-        callback: (li) => SR5Actor_1.SR5Actor.pushTheLimit(li),
-        condition: canRoll,
-        icon: '<i class="fas fa-meteor"></i>',
-    }, {
-        name: game.i18n.localize('SR5.SecondChange'),
-        callback: (li) => SR5Actor_1.SR5Actor.secondChance(li),
-        condition: canRoll,
-        icon: '<i class="fas fa-dice-d6"></i>',
-    });
-    return options;
-};
-exports.addChatMessageContextOptions = addChatMessageContextOptions;
 const addRollListeners = (app, html) => {
     if (!app.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll)) {
         return;
@@ -22699,7 +22588,7 @@ const chatMessageActionApplyDamage = (html, event) => __awaiter(void 0, void 0, 
     yield new DamageApplicationFlow_1.DamageApplicationFlow().runApplyDamage(actors, damage);
 });
 exports.chatMessageActionApplyDamage = chatMessageActionApplyDamage;
-},{"./actor/SR5Actor":86,"./actor/flows/DamageApplicationFlow":87,"./constants":152,"./helpers":166,"./item/SR5Item":206,"./item/flows/ActionResultFlow":209,"./template":235}],150:[function(require,module,exports){
+},{"./actor/flows/DamageApplicationFlow":87,"./constants":152,"./helpers":166,"./item/SR5Item":206,"./item/flows/ActionResultFlow":209,"./template":235}],150:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36686,10 +36575,10 @@ class SuccessTest {
         options.rollMode = options.rollMode !== undefined ? options.rollMode : game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
         options.showDialog = options.showDialog !== undefined ? options.showDialog : true;
         options.showMessage = options.showMessage !== undefined ? options.showMessage : true;
-        options.pushTheLimit = options.pushTheLimit !== undefined ? options.pushTheLimit : false;
-        options.secondChance = options.secondChance !== undefined ? options.secondChance : false;
         // Options will be used when a test is reused further on.
         data.options = options;
+        data.pushTheLimit = data.pushTheLimit !== undefined ? data.pushTheLimit : false;
+        data.secondChance = data.secondChance !== undefined ? data.secondChance : false;
         // Set possible missing values.
         data.pool = data.pool || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' });
         data.threshold = data.threshold || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' });
@@ -37165,12 +37054,10 @@ class SuccessTest {
         return `${poolPart} ${thresholdPart} ${limitPart}`;
     }
     get hasPushTheLimit() {
-        var _a;
-        return ((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.pushTheLimit) === true;
+        return this.data.pushTheLimit;
     }
     get hasSecondChance() {
-        var _a;
-        return ((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.secondChance) === true;
+        return this.data.secondChance;
     }
     /**
      * Handle Edge rule 'push the limit' within this test.

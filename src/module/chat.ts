@@ -263,32 +263,6 @@ function getTokenSceneId(token: TokenDocument | undefined | null): string | unde
     return `${scene.id}.${token.id}`;
 }
 
-export const addChatMessageContextOptions = (html, options) => {
-    const canRoll = (li) => {
-        const message = game.messages?.get(li.data().messageId);
-
-        if (!message) return;
-
-        return message.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll);
-    };
-
-    options.push(
-        {
-            name: game.i18n.localize('SR5.PushTheLimit'),
-            callback: (li) => SR5Actor.pushTheLimit(li),
-            condition: canRoll,
-            icon: '<i class="fas fa-meteor"></i>',
-        },
-        {
-            name: game.i18n.localize('SR5.SecondChange'),
-            callback: (li) => SR5Actor.secondChance(li),
-            condition: canRoll,
-            icon: '<i class="fas fa-dice-d6"></i>',
-        }
-    );
-    return options;
-};
-
 export const addRollListeners = (app: ChatMessage, html) => {
     if (!app.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll)) {
         return

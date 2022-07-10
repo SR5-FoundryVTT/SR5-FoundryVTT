@@ -65,6 +65,10 @@ export interface TestData {
     // modifiers: Record<ModifierTypes, TestModifier>
     modifiers: ValueField
 
+    // Edge related triggers
+    pushTheLimit: boolean
+    secondChance: boolean
+
     // The source action this test is derived from.
     action: ActionRollData
 
@@ -90,8 +94,6 @@ export interface TestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     showMessage?: boolean // Show message when defined as true.
     rollMode?: keyof typeof CONFIG.Dice.rollModes
-    pushTheLimit?: boolean
-    secondChance?: boolean
 }
 
 export interface SuccessTestMessageData {
@@ -164,11 +166,11 @@ export class SuccessTest {
         options.showDialog = options.showDialog !== undefined ? options.showDialog : true;
         options.showMessage = options.showMessage !== undefined ? options.showMessage : true;
 
-        options.pushTheLimit = options.pushTheLimit !== undefined ? options.pushTheLimit : false;
-        options.secondChance = options.secondChance !== undefined ? options.secondChance : false;
-
         // Options will be used when a test is reused further on.
         data.options = options;
+
+        data.pushTheLimit = data.pushTheLimit !== undefined ? data.pushTheLimit : false;
+        data.secondChance = data.secondChance !== undefined ? data.secondChance : false;
 
         // Set possible missing values.
         data.pool = data.pool || DefaultValues.valueData({label: 'SR5.DicePool'});
@@ -695,11 +697,11 @@ export class SuccessTest {
     }
 
     get hasPushTheLimit(): boolean {
-        return this.data.options?.pushTheLimit === true;
+        return this.data.pushTheLimit;
     }
 
     get hasSecondChance(): boolean {
-        return this.data.options?.secondChance === true;
+        return this.data.secondChance;
     }
 
     /**
