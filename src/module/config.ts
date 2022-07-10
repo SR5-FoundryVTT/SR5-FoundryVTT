@@ -26,23 +26,24 @@ export const SR5 = {
         host: 'SR5.ItemTypes.Host'
     },
 
+    // All available character attributes. Sorted alphabetically. :-)
     attributes: {
-        body: 'SR5.AttrBody',
         agility: 'SR5.AttrAgility',
-        reaction: 'SR5.AttrReaction',
-        strength: 'SR5.AttrStrength',
-        willpower: 'SR5.AttrWillpower',
-        logic: 'SR5.AttrLogic',
-        intuition: 'SR5.AttrIntuition',
+        attack: 'SR5.MatrixAttrAttack',
+        body: 'SR5.AttrBody',
         charisma: 'SR5.AttrCharisma',
-        magic: 'SR5.AttrMagic',
-        resonance: 'SR5.AttrResonance',
+        data_processing: 'SR5.MatrixAttrDataProc',
         edge: 'SR5.AttrEdge',
         essence: 'SR5.AttrEssence',
-        attack: 'SR5.MatrixAttrAttack',
-        sleaze: 'SR5.MatrixAttrSleaze',
-        data_processing: 'SR5.MatrixAttrDataProc',
         firewall: 'SR5.MatrixAttrFirewall',
+        intuition: 'SR5.AttrIntuition',
+        logic: 'SR5.AttrLogic',
+        magic: 'SR5.AttrMagic',
+        reaction: 'SR5.AttrReaction',
+        resonance: 'SR5.AttrResonance',
+        sleaze: 'SR5.MatrixAttrSleaze',
+        strength: 'SR5.AttrStrength',
+        willpower: 'SR5.AttrWillpower',
     },
 
     limits: {

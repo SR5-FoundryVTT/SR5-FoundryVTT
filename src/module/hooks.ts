@@ -42,6 +42,7 @@ import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import SocketMessage = Shadowrun.SocketMessageData;
 import {ComplexFormTest} from "./tests/ComplexFormTest";
+import {AttributeOnlyTest} from "./tests/AttributeOnlyTest";
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -127,7 +128,8 @@ ___________________
                 SpellCastingTest,
                 CombatSpellDefenseTest,
                 DrainTest,
-                ComplexFormTest
+                ComplexFormTest,
+                AttributeOnlyTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.

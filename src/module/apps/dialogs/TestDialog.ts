@@ -1,13 +1,14 @@
 import {FormDialog, FormDialogData, FormDialogOptions} from "./FormDialog";
 import {SuccessTest} from "../../tests/SuccessTest";
-import { PartsList } from "../../parts/PartsList";
 import { SuccessTestData } from './../../tests/SuccessTest';
+import {SR5} from "../../config";
 
 
 export interface TestDialogData extends FormDialogData {
     test: SuccessTest
     rollMode: string
     rollModes: CONFIG.Dice.RollModes
+    config: typeof SR5
 }
 
 /**
@@ -51,6 +52,9 @@ export class TestDialog extends FormDialog {
         data.rollMode = data.test.data.options?.rollMode;
         data.rollModes = CONFIG.Dice.rollModes;
         data.default = 'roll';
+
+        // Add in general SR5 config to allow access to general values.
+        data.config = SR5;
 
         return data;
     }

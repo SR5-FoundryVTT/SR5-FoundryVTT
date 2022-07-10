@@ -13308,6 +13308,7 @@ const ICPrep_1 = require("./prep/ICPrep");
 const InventoryFlow_1 = require("./flows/InventoryFlow");
 const ModifierFlow_1 = require("./flows/ModifierFlow");
 const TestCreator_1 = require("../tests/TestCreator");
+const AttributeOnlyTest_1 = require("../tests/AttributeOnlyTest");
 function getGame() {
     if (!(game instanceof Game)) {
         throw new Error('game is not initialized yet!');
@@ -14318,39 +14319,11 @@ class SR5Actor extends Actor {
             if (!action)
                 return;
             const test = yield TestCreator_1.TestCreator.fromItem(action, this, options);
-            test.data.title = rollId;
+            // Overwriting localization here is just easier...
+            test.data.title = game.i18n.localize(config_1.SR5.modifierTypes[rollId]);
             if (!test)
                 return;
             yield test.execute();
-            // const title = game.i18n.localize(SR5.attributeRolls[rollId]);
-            // const atts = this.data.data.attributes;
-            // const modifiers = this.data.data.modifiers;
-            // const parts = new PartsList<number>();
-            // if (rollId === 'composure') {
-            //     parts.addUniquePart(atts.charisma.label, atts.charisma.value);
-            //     parts.addUniquePart(atts.willpower.label, atts.willpower.value);
-            //     if (modifiers.composure) parts.addUniquePart('SR5.Bonus', modifiers.composure);
-            // } else if (rollId === 'judge_intentions') {
-            //     parts.addUniquePart(atts.charisma.label, atts.charisma.value);
-            //     parts.addUniquePart(atts.intuition.label, atts.intuition.value);
-            //     if (modifiers.judge_intentions) parts.addUniquePart('SR5.Bonus', modifiers.judge_intentions);
-            // } else if (rollId === 'lift_carry') {
-            //     parts.addUniquePart(atts.strength.label, atts.strength.value);
-            //     parts.addUniquePart(atts.body.label, atts.body.value);
-            //     if (modifiers.lift_carry) parts.addUniquePart('SR5.Bonus', modifiers.lift_carry);
-            // } else if (rollId === 'memory') {
-            //     parts.addUniquePart(atts.willpower.label, atts.willpower.value);
-            //     parts.addUniquePart(atts.logic.label, atts.logic.value);
-            //     if (modifiers.memory) parts.addUniquePart('SR5.Bonus', modifiers.memory);
-            // }
-            //
-            // this._addGlobalParts(parts);
-            // return ShadowrunRoller.advancedRoll({
-            //     event: options?.event,
-            //     actor: this,
-            //     parts: parts.list,
-            //     title: `${title} Test`,
-            // });
         });
     }
     rollSkill(skill, options) {
@@ -14526,53 +14499,14 @@ class SR5Actor extends Actor {
      * @param options Change general roll options.
      */
     rollAttribute(name, options) {
-        let title = game.i18n.localize(config_1.SR5.attributes[name]);
-        const attribute = duplicate(this.data.data.attributes[name]);
-        const attributes = duplicate(this.data.data.attributes);
-        const parts = new PartsList_1.PartsList();
-        parts.addPart(attribute.label, attribute.value);
-        let dialogData = {
-            attribute: attribute,
-            attributes: attributes,
-        };
-        let cancel = true;
-        renderTemplate('systems/shadowrun5e/dist/templates/rolls/single-attribute.html', dialogData).then((dlg) => {
-            new Dialog({
-                title: `${title} Attribute Test`,
-                content: dlg,
-                buttons: {
-                    roll: {
-                        label: 'Continue',
-                        callback: () => (cancel = false),
-                    },
-                },
-                default: 'roll',
-                close: (html) => __awaiter(this, void 0, void 0, function* () {
-                    if (cancel)
-                        return;
-                    const attribute2Id = helpers_1.Helpers.parseInputToString($(html).find('[name=attribute2]').val());
-                    let attribute2 = undefined;
-                    if (attribute2Id !== 'none') {
-                        attribute2 = attributes[attribute2Id];
-                        if (attribute2 === null || attribute2 === void 0 ? void 0 : attribute2.label) {
-                            parts.addPart(attribute2.label, attribute2.value);
-                            const att2IdLabel = game.i18n.localize(config_1.SR5.attributes[attribute2Id]);
-                            title += ` + ${att2IdLabel}`;
-                        }
-                    }
-                    if (attribute2Id === 'default') {
-                        parts.addUniquePart('SR5.Defaulting', -1);
-                    }
-                    this._addMatrixParts(parts, [attribute, attribute2]);
-                    this._addGlobalParts(parts);
-                    return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                        event: options === null || options === void 0 ? void 0 : options.event,
-                        title: `${title} Test`,
-                        actor: this,
-                        parts: parts.list,
-                    });
-                }),
-            }).render(true);
+        return __awaiter(this, void 0, void 0, function* () {
+            console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
+            // Prepare test from action.
+            const action = DataDefaults_1.DefaultValues.actionData({ attribute: name, test: AttributeOnlyTest_1.AttributeOnlyTest.name });
+            const test = yield TestCreator_1.TestCreator.fromAction(action, this);
+            if (!test)
+                return;
+            yield test.execute();
         });
     }
     _addMatrixParts(parts, atts) {
@@ -15317,7 +15251,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../apps/dialogs/ShadowrunActorDialogs":141,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../item/SR5Item":206,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/SkillRules":230,"../tests/TestCreator":247,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./flows/SoakFlow":91,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":141,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../item/SR5Item":206,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/SkillRules":230,"../tests/AttributeOnlyTest":236,"../tests/TestCreator":248,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./flows/SoakFlow":91,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21808,6 +21742,7 @@ exports.ShadowrunTestDialog = ShadowrunTestDialog;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestDialog = void 0;
 const FormDialog_1 = require("./FormDialog");
+const config_1 = require("../../config");
 /**
  * TODO: Add TestDialog JSDoc
  */
@@ -21844,6 +21779,8 @@ class TestDialog extends FormDialog_1.FormDialog {
         data.rollMode = (_a = data.test.data.options) === null || _a === void 0 ? void 0 : _a.rollMode;
         data.rollModes = CONFIG.Dice.rollModes;
         data.default = 'roll';
+        // Add in general SR5 config to allow access to general values.
+        data.config = config_1.SR5;
         return data;
     }
     /**
@@ -21904,7 +21841,7 @@ class TestDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.TestDialog = TestDialog;
-},{"./FormDialog":139}],144:[function(require,module,exports){
+},{"../../config":151,"./FormDialog":139}],144:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -23279,23 +23216,24 @@ exports.SR5 = {
         weapon: 'SR5.ItemTypes.Weapon',
         host: 'SR5.ItemTypes.Host'
     },
+    // All available character attributes. Sorted alphabetically. :-)
     attributes: {
-        body: 'SR5.AttrBody',
         agility: 'SR5.AttrAgility',
-        reaction: 'SR5.AttrReaction',
-        strength: 'SR5.AttrStrength',
-        willpower: 'SR5.AttrWillpower',
-        logic: 'SR5.AttrLogic',
-        intuition: 'SR5.AttrIntuition',
+        attack: 'SR5.MatrixAttrAttack',
+        body: 'SR5.AttrBody',
         charisma: 'SR5.AttrCharisma',
-        magic: 'SR5.AttrMagic',
-        resonance: 'SR5.AttrResonance',
+        data_processing: 'SR5.MatrixAttrDataProc',
         edge: 'SR5.AttrEdge',
         essence: 'SR5.AttrEssence',
-        attack: 'SR5.MatrixAttrAttack',
-        sleaze: 'SR5.MatrixAttrSleaze',
-        data_processing: 'SR5.MatrixAttrDataProc',
         firewall: 'SR5.MatrixAttrFirewall',
+        intuition: 'SR5.AttrIntuition',
+        logic: 'SR5.AttrLogic',
+        magic: 'SR5.AttrMagic',
+        reaction: 'SR5.AttrReaction',
+        resonance: 'SR5.AttrResonance',
+        sleaze: 'SR5.MatrixAttrSleaze',
+        strength: 'SR5.AttrStrength',
+        willpower: 'SR5.AttrWillpower',
     },
     limits: {
         physical: 'SR5.LimitPhysical',
@@ -24172,6 +24110,7 @@ class DefaultValues {
             mod: 0,
             mod_description: '',
             damage: DefaultValues.damageData(),
+            modifiers: [],
             limit: {
                 value: 0,
                 attribute: '',
@@ -26779,6 +26718,7 @@ const DrainTest_1 = require("./tests/DrainTest");
 const TestCreator_1 = require("./tests/TestCreator");
 const CombatSpellDefenseTest_1 = require("./tests/CombatSpellDefenseTest");
 const ComplexFormTest_1 = require("./tests/ComplexFormTest");
+const AttributeOnlyTest_1 = require("./tests/AttributeOnlyTest");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 exports.SR5CONFIG = config_1.SR5;
 class HooksManager {
@@ -26855,7 +26795,8 @@ ___________________
                 SpellCastingTest: SpellCastingTest_1.SpellCastingTest,
                 CombatSpellDefenseTest: CombatSpellDefenseTest_1.CombatSpellDefenseTest,
                 DrainTest: DrainTest_1.DrainTest,
-                ComplexFormTest: ComplexFormTest_1.ComplexFormTest
+                ComplexFormTest: ComplexFormTest_1.ComplexFormTest,
+                AttributeOnlyTest: AttributeOnlyTest_1.AttributeOnlyTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -27148,7 +27089,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":249,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./chat":149,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":233,"./tests/CombatSpellDefenseTest":236,"./tests/ComplexFormTest":237,"./tests/DrainTest":239,"./tests/MeleeAttackTest":240,"./tests/OpposedTest":241,"./tests/PhysicalDefenseTest":242,"./tests/PhysicalResistTest":243,"./tests/RangedAttackTest":244,"./tests/SpellCastingTest":245,"./tests/SuccessTest":246,"./tests/TestCreator":247,"./token/SR5Token":248}],168:[function(require,module,exports){
+},{"../test/quench":250,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":144,"./canvas":148,"./chat":149,"./combat/SR5Combat":150,"./config":151,"./constants":152,"./effect/SR5ActiveEffect":156,"./effect/SR5ActiveEffectSheet":157,"./handlebars/HandlebarManager":161,"./importer/apps/import-form":168,"./item/SR5Item":206,"./item/SR5ItemSheet":207,"./item/flows/NetworkDeviceFlow":210,"./macros":212,"./migrator/Migrator":214,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":233,"./tests/AttributeOnlyTest":236,"./tests/CombatSpellDefenseTest":237,"./tests/ComplexFormTest":238,"./tests/DrainTest":240,"./tests/MeleeAttackTest":241,"./tests/OpposedTest":242,"./tests/PhysicalDefenseTest":243,"./tests/PhysicalResistTest":244,"./tests/RangedAttackTest":245,"./tests/SpellCastingTest":246,"./tests/SuccessTest":247,"./tests/TestCreator":248,"./token/SR5Token":249}],168:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31809,7 +31750,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../tests/TestCreator":247,"./ChatData":205,"./flows/ActionFlow":208,"./flows/NetworkDeviceFlow":210,"./prep/HostPrep":211}],207:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":149,"../config":151,"../constants":152,"../data/DataDefaults":153,"../data/SR5ItemDataWrapper":155,"../helpers":166,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../tests/TestCreator":248,"./ChatData":205,"./flows/ActionFlow":208,"./flows/NetworkDeviceFlow":210,"./prep/HostPrep":211}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34572,7 +34513,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../apps/dialogs/ShadowrunTestDialog":142,"../chat":149,"../constants":152,"../helpers":166,"../parts/PartsList":220,"../tests/TestCreator":247}],223:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":142,"../chat":149,"../constants":152,"../helpers":166,"../parts/PartsList":220,"../tests/TestCreator":248}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -35757,6 +35698,49 @@ class Template extends MeasuredTemplate {
 exports.default = Template;
 },{}],236:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AttributeOnlyTest = void 0;
+const SuccessTest_1 = require("./SuccessTest");
+const PartsList_1 = require("../parts/PartsList");
+/**
+ * Handle custom attribute-only tests as defined in SR5#152.
+ *
+ * Attribute-Only Tests don't alter default SuccessTests rule wise but only Foundry behaviour wise.
+ * Main difference is the user ability to change attributes before rolling dice.
+ */
+class AttributeOnlyTest extends SuccessTest_1.SuccessTest {
+    get _dialogTemplate() {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/attribute-only-test-dialog.html';
+    }
+    _prepareData(data, options) {
+        data = super._prepareData(data, options);
+        // Preset attribute selection with action attributes.
+        data.attribute1 = data.action.attribute;
+        data.attribute2 = data.action.attribute2;
+        return data;
+    }
+    prepareBaseValues() {
+        this.prepareAttributeSelection();
+        super.prepareBaseValues();
+    }
+    prepareAttributeSelection() {
+        if (!this.actor)
+            return;
+        // Clear everything. This way we don't have to track previous / current attributes and remove accordingly.
+        this.data.pool.mod = [];
+        const attribute1 = this.actor.getAttribute(this.data.attribute1);
+        const attribute2 = this.actor.getAttribute(this.data.attribute2);
+        // Re-build base pool values first. Other modifiers will be added within prepareBaseValues
+        const pool = new PartsList_1.PartsList(this.pool.mod);
+        if (attribute1)
+            pool.addPart(attribute1.label, attribute1.value);
+        if (attribute2)
+            pool.addPart(attribute2.label, attribute2.value);
+    }
+}
+exports.AttributeOnlyTest = AttributeOnlyTest;
+},{"../parts/PartsList":220,"./SuccessTest":247}],237:[function(require,module,exports){
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35850,7 +35834,7 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
     }
 }
 exports.CombatSpellDefenseTest = CombatSpellDefenseTest;
-},{"../data/DataDefaults":153,"../rules/CombatSpellRules":224,"./DefenseTest":238}],237:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../rules/CombatSpellRules":224,"./DefenseTest":239}],238:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35954,7 +35938,7 @@ class ComplexFormTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.ComplexFormTest = ComplexFormTest;
-},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/ComplexFormRules":225,"./SuccessTest":246}],238:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/ComplexFormRules":225,"./SuccessTest":247}],239:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DefenseTest = void 0;
@@ -35974,7 +35958,7 @@ class DefenseTest extends OpposedTest_1.OpposedTest {
     }
 }
 exports.DefenseTest = DefenseTest;
-},{"./OpposedTest":241}],239:[function(require,module,exports){
+},{"./OpposedTest":242}],240:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36044,7 +36028,7 @@ class DrainTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.DrainTest = DrainTest;
-},{"../data/DataDefaults":153,"../rules/DrainRules":226,"./SuccessTest":246}],240:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../rules/DrainRules":226,"./SuccessTest":247}],241:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36080,7 +36064,7 @@ class MeleeAttackTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.MeleeAttackTest = MeleeAttackTest;
-},{"../data/DataDefaults":153,"./SuccessTest":246}],241:[function(require,module,exports){
+},{"../data/DataDefaults":153,"./SuccessTest":247}],242:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36194,7 +36178,7 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.OpposedTest = OpposedTest;
-},{"../data/DataDefaults":153,"./SuccessTest":246,"./TestCreator":247}],242:[function(require,module,exports){
+},{"../data/DataDefaults":153,"./SuccessTest":247,"./TestCreator":248}],243:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36357,7 +36341,7 @@ class PhysicalDefenseTest extends DefenseTest_1.DefenseTest {
     }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
-},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":228,"./DefenseTest":238,"./TestCreator":247}],243:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":228,"./DefenseTest":239,"./TestCreator":248}],244:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36420,7 +36404,7 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.PhysicalResistTest = PhysicalResistTest;
-},{"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/CombatRules":223,"./SuccessTest":246}],244:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/CombatRules":223,"./SuccessTest":247}],245:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36578,7 +36562,7 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.RangedAttackTest = RangedAttackTest;
-},{"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/Modifiers":229,"./SuccessTest":246}],245:[function(require,module,exports){
+},{"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rules/Modifiers":229,"./SuccessTest":247}],246:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36696,7 +36680,7 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.SpellCastingTest = SpellCastingTest;
-},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatSpellRules":224,"../rules/SpellcastingRules":232,"./SuccessTest":246}],246:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatSpellRules":224,"../rules/SpellcastingRules":232,"./SuccessTest":247}],247:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37598,7 +37582,7 @@ class SuccessTest {
     }
 }
 exports.SuccessTest = SuccessTest;
-},{"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../item/flows/ActionFlow":208,"../parts/PartsList":220,"../rolls/SR5Roll":221,"./TestCreator":247}],247:[function(require,module,exports){
+},{"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../item/flows/ActionFlow":208,"../parts/PartsList":220,"../rolls/SR5Roll":221,"./TestCreator":248}],248:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37618,6 +37602,7 @@ const SkillRules_1 = require("../rules/SkillRules");
 const constants_1 = require("../constants");
 const SR5Roll_1 = require("../rolls/SR5Roll");
 const helpers_1 = require("../helpers");
+const config_1 = require("../config");
 /**
  * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
  *
@@ -37702,7 +37687,7 @@ exports.TestCreator = {
             // Any action item will return a list of values to create the test pool from.
             // @ts-ignore // Get test class from registry to allow custom module tests.
             const cls = exports.TestCreator._getTestClass(action.test);
-            const data = exports.TestCreator._prepareTestDataWithAction(action, actor, exports.TestCreator._minimalTestData());
+            const data = yield exports.TestCreator._prepareTestDataWithAction(action, actor, exports.TestCreator._minimalTestData());
             const documents = { actor };
             return new cls(data, documents, options);
         });
@@ -37908,14 +37893,16 @@ exports.TestCreator = {
             // The first attribute is either used for skill or attribute only tests.
             if (action.attribute) {
                 const attribute = actor.getAttribute(action.attribute);
+                // Don't use addUniquePart as one attribute might be used twice.
                 if (attribute)
-                    pool.addUniquePart(attribute.label, attribute.value);
+                    pool.addPart(attribute.label, attribute.value);
             }
             // The second attribute is only used for attribute only tests.
             if (!action.skill && action.attribute2) {
                 const attribute = actor.getAttribute(action.attribute2);
+                // Don't use addUniquePart as one attribute might be used twice.
                 if (attribute)
-                    pool.addUniquePart(attribute.label, attribute.value);
+                    pool.addPart(attribute.label, attribute.value);
             }
             // A general pool modifier will be used as a base value.
             if (action.mod) {
@@ -37946,6 +37933,12 @@ exports.TestCreator = {
             // Prepare opposed and resist tests...
             if (action.opposed.test) {
                 data.opposed = action.opposed;
+            }
+            // Prepare modifier value based on action modifiers
+            for (const modifier of data.action.modifiers) {
+                const label = config_1.SR5.modifierTypes[modifier];
+                const value = yield actor.modifiers.totalFor(modifier);
+                data.modifiers.mod = PartsList_1.PartsList.AddUniquePart(data.modifiers.mod, label, value);
             }
             return data;
         });
@@ -38008,7 +38001,7 @@ exports.TestCreator = {
         return action;
     }
 };
-},{"../actor/SR5Actor":86,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":230}],248:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":230}],249:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -38029,7 +38022,7 @@ class SR5Token extends Token {
     }
 }
 exports.SR5Token = SR5Token;
-},{"../constants":152}],249:[function(require,module,exports){
+},{"../constants":152}],250:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
@@ -38062,7 +38055,7 @@ const quenchRegister = () => {
     quench.registerBatch("shadowrun5e.flow.tests", sr5_Testing_spec_1.shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
 };
 exports.quenchRegister = quenchRegister;
-},{"./sr5.ActiveEffect.spec":250,"./sr5.ActorDataPrep.spec":251,"./sr5.Inventory.spec":252,"./sr5.Matrix.spec":253,"./sr5.Modifiers.spec":254,"./sr5.NetworkDevices.spec":255,"./sr5.SR5Actor.spec":256,"./sr5.SR5Item.spec":257,"./sr5.Testing.spec":258}],250:[function(require,module,exports){
+},{"./sr5.ActiveEffect.spec":251,"./sr5.ActorDataPrep.spec":252,"./sr5.Inventory.spec":253,"./sr5.Matrix.spec":254,"./sr5.Modifiers.spec":255,"./sr5.NetworkDevices.spec":256,"./sr5.SR5Actor.spec":257,"./sr5.SR5Item.spec":258,"./sr5.Testing.spec":259}],251:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38184,7 +38177,7 @@ const shadowrunSR5ActiveEffect = context => {
     });
 };
 exports.shadowrunSR5ActiveEffect = shadowrunSR5ActiveEffect;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":259}],251:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":260}],252:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38397,7 +38390,7 @@ const shadowrunSR5ActorDataPrep = context => {
     });
 };
 exports.shadowrunSR5ActorDataPrep = shadowrunSR5ActorDataPrep;
-},{"../module/actor/SR5Actor":86,"../module/constants":152,"../module/item/SR5Item":206,"./utils":259}],252:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/constants":152,"../module/item/SR5Item":206,"./utils":260}],253:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38469,7 +38462,7 @@ const shadowrunInventoryFlow = context => {
     });
 };
 exports.shadowrunInventoryFlow = shadowrunInventoryFlow;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":259}],253:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":260}],254:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunMatrix = void 0;
@@ -38541,7 +38534,7 @@ const shadowrunMatrix = context => {
     });
 };
 exports.shadowrunMatrix = shadowrunMatrix;
-},{"../module/rules/MatrixRules":227}],254:[function(require,module,exports){
+},{"../module/rules/MatrixRules":227}],255:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -38709,7 +38702,7 @@ const shadowrunRulesModifiers = context => {
     });
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
-},{"../module/rules/Modifiers":229}],255:[function(require,module,exports){
+},{"../module/rules/Modifiers":229}],256:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38864,7 +38857,7 @@ const shadowrunNetworkDevices = context => {
     });
 };
 exports.shadowrunNetworkDevices = shadowrunNetworkDevices;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/item/flows/NetworkDeviceFlow":210,"./utils":259}],256:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/item/flows/NetworkDeviceFlow":210,"./utils":260}],257:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38929,7 +38922,7 @@ const shadowrunSR5Actor = context => {
     });
 };
 exports.shadowrunSR5Actor = shadowrunSR5Actor;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":259}],257:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"./utils":260}],258:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -39012,7 +39005,7 @@ const shadowrunSR5Item = context => {
     });
 };
 exports.shadowrunSR5Item = shadowrunSR5Item;
-},{"../module/item/SR5Item":206,"./utils":259}],258:[function(require,module,exports){
+},{"../module/item/SR5Item":206,"./utils":260}],259:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -39158,7 +39151,7 @@ const shadowrunTesting = context => {
     });
 };
 exports.shadowrunTesting = shadowrunTesting;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/tests/TestCreator":247,"./utils":259}],259:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":206,"../module/tests/TestCreator":248,"./utils":260}],260:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

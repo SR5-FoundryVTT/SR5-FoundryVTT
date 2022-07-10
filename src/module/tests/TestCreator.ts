@@ -22,6 +22,7 @@ import {OpposedTest} from "./OpposedTest";
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ActionRollData = Shadowrun.ActionRollData;
 import ActionItemData = Shadowrun.ActionItemData;
+import {SR5} from "../config";
 
 /**
  * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
@@ -95,7 +96,7 @@ export const TestCreator = {
      * @param actor
      * @param options
      */
-    fromAction: async function(action: ActionRollData, actor: SR5Actor, options?: TestOptions): Promise<any | undefined> {
+    fromAction: async function(action: ActionRollData, actor: SR5Actor, options?: TestOptions): Promise<SuccessTest | undefined> {
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
@@ -110,7 +111,7 @@ export const TestCreator = {
         // Any action item will return a list of values to create the test pool from.
         // @ts-ignore // Get test class from registry to allow custom module tests.
         const cls = TestCreator._getTestClass(action.test);
-        const data = TestCreator._prepareTestDataWithAction(action, actor, TestCreator._minimalTestData());
+        const data = await TestCreator._prepareTestDataWithAction(action, actor, TestCreator._minimalTestData());
         const documents = {actor};
 
         return new cls(data, documents, options);
@@ -329,12 +330,14 @@ export const TestCreator = {
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
             const attribute = actor.getAttribute(action.attribute);
-            if (attribute) pool.addUniquePart(attribute.label, attribute.value);
+            // Don't use addUniquePart as one attribute might be used twice.
+            if (attribute) pool.addPart(attribute.label, attribute.value);
         }
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2);
-            if (attribute) pool.addUniquePart(attribute.label, attribute.value);
+            // Don't use addUniquePart as one attribute might be used twice.
+            if (attribute) pool.addPart(attribute.label, attribute.value);
         }
         // A general pool modifier will be used as a base value.
         if (action.mod) {
@@ -369,6 +372,14 @@ export const TestCreator = {
         if (action.opposed.test) {
             data.opposed = action.opposed;
         }
+
+        // Prepare modifier value based on action modifiers
+        for (const modifier of data.action.modifiers) {
+            const label = SR5.modifierTypes[modifier];
+            const value = await actor.modifiers.totalFor(modifier);
+            data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
+        }
+
 
         return data;
     },

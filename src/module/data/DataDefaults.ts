@@ -303,6 +303,7 @@ export class DefaultValues {
             mod: 0,
             mod_description: '',
             damage: DefaultValues.damageData(),
+            modifiers: [],
             limit: {
                 value: 0,
                 attribute: '',

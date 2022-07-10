@@ -63,6 +63,7 @@ import {InventoryFlow} from "./flows/InventoryFlow";
 import {ModifierFlow} from "./flows/ModifierFlow";
 import {TestOptions} from "../tests/SuccessTest";
 import {TestCreator} from "../tests/TestCreator";
+import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 
 function getGame(): Game {
     if (!(game instanceof Game)) {
@@ -1163,40 +1164,13 @@ export class SR5Actor extends Actor {
         const action = await Helpers.getPackAction(SR5.packNames.attributeActions, rollId);
         if (!action) return;
         const test = await TestCreator.fromItem(action, this, options);
-        test.data.title = rollId;
+
+        // Overwriting localization here is just easier...
+        test.data.title = game.i18n.localize(SR5.modifierTypes[rollId]);
+
         if (!test) return;
 
         await test.execute();
-
-        // const title = game.i18n.localize(SR5.attributeRolls[rollId]);
-        // const atts = this.data.data.attributes;
-        // const modifiers = this.data.data.modifiers;
-        // const parts = new PartsList<number>();
-        // if (rollId === 'composure') {
-        //     parts.addUniquePart(atts.charisma.label, atts.charisma.value);
-        //     parts.addUniquePart(atts.willpower.label, atts.willpower.value);
-        //     if (modifiers.composure) parts.addUniquePart('SR5.Bonus', modifiers.composure);
-        // } else if (rollId === 'judge_intentions') {
-        //     parts.addUniquePart(atts.charisma.label, atts.charisma.value);
-        //     parts.addUniquePart(atts.intuition.label, atts.intuition.value);
-        //     if (modifiers.judge_intentions) parts.addUniquePart('SR5.Bonus', modifiers.judge_intentions);
-        // } else if (rollId === 'lift_carry') {
-        //     parts.addUniquePart(atts.strength.label, atts.strength.value);
-        //     parts.addUniquePart(atts.body.label, atts.body.value);
-        //     if (modifiers.lift_carry) parts.addUniquePart('SR5.Bonus', modifiers.lift_carry);
-        // } else if (rollId === 'memory') {
-        //     parts.addUniquePart(atts.willpower.label, atts.willpower.value);
-        //     parts.addUniquePart(atts.logic.label, atts.logic.value);
-        //     if (modifiers.memory) parts.addUniquePart('SR5.Bonus', modifiers.memory);
-        // }
-        //
-        // this._addGlobalParts(parts);
-        // return ShadowrunRoller.advancedRoll({
-        //     event: options?.event,
-        //     actor: this,
-        //     parts: parts.list,
-        //     title: `${title} Test`,
-        // });
     }
 
     async rollSkill(skill: SkillField, options?: SkillRollOptions) {
@@ -1385,55 +1359,15 @@ export class SR5Actor extends Actor {
      * @param name The attributes name as defined within data
      * @param options Change general roll options.
      */
-    rollAttribute(name, options?: ActorRollOptions) {
-        let title = game.i18n.localize(SR5.attributes[name]);
-        const attribute = duplicate(this.data.data.attributes[name]);
-        const attributes = duplicate(this.data.data.attributes) as Attributes;
-        const parts = new PartsList<number>();
-        parts.addPart(attribute.label, attribute.value);
-        let dialogData = {
-            attribute: attribute,
-            attributes: attributes,
-        };
-        let cancel = true;
-        renderTemplate('systems/shadowrun5e/dist/templates/rolls/single-attribute.html', dialogData).then((dlg) => {
-            new Dialog({
-                title: `${title} Attribute Test`,
-                content: dlg,
-                buttons: {
-                    roll: {
-                        label: 'Continue',
-                        callback: () => (cancel = false),
-                    },
-                },
-                default: 'roll',
-                close: async (html) => {
-                    if (cancel) return;
+    async rollAttribute(name, options?: ActorRollOptions) {
+        console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
-                    const attribute2Id: string = Helpers.parseInputToString($(html).find('[name=attribute2]').val());
-                    let attribute2: AttributeField | undefined = undefined;
-                    if (attribute2Id !== 'none') {
-                        attribute2 = attributes[attribute2Id];
-                        if (attribute2?.label) {
-                            parts.addPart(attribute2.label, attribute2.value);
-                            const att2IdLabel = game.i18n.localize(SR5.attributes[attribute2Id]);
-                            title += ` + ${att2IdLabel}`;
-                        }
-                    }
-                    if (attribute2Id === 'default') {
-                        parts.addUniquePart('SR5.Defaulting', -1);
-                    }
-                    this._addMatrixParts(parts, [attribute, attribute2]);
-                    this._addGlobalParts(parts);
-                    return ShadowrunRoller.advancedRoll({
-                        event: options?.event,
-                        title: `${title} Test`,
-                        actor: this,
-                        parts: parts.list,
-                    });
-                },
-            }).render(true);
-        });
+        // Prepare test from action.
+        const action = DefaultValues.actionData({attribute: name, test: AttributeOnlyTest.name});
+        const test = await TestCreator.fromAction(action, this);
+        if (!test) return;
+
+        await test.execute();
     }
 
     _addMatrixParts(parts: PartsList<number>, atts) {

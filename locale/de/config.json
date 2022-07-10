@@ -930,7 +930,8 @@
     "MeleeAttackTest": "Nahkampf Angriffsprobe",
     "PhysicalResistTest": "Physische Schadenswiderstandsprobe",
     "SpellcastingTest": "Spruchzaubereiprobe",
-    "ComplexFormTest": "Komplexe Form Weben"
+    "ComplexFormTest": "Komplexe Form Weben",
+    "AttributeOnlyTest": "Attributsprobe"
   },
   "SR5.MissingResource": {
     "Edge": "Kein Edge übrig"
