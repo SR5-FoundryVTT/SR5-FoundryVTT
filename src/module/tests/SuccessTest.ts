@@ -755,7 +755,8 @@ export class SuccessTest {
      * TODO: Maybe make this a hook and transfer resources to consume (edge, ammo)
      */
     async consumeActorResources(): Promise<boolean> {
-        if (!this.actor) return false;
+        // No actor present? Nothing to consume...
+        if (!this.actor) return true;
 
         if (this.hasPushTheLimit) {
             if (this.actor.getEdge().uses <= 0) {

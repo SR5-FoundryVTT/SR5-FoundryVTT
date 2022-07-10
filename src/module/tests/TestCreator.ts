@@ -36,6 +36,7 @@ export const TestCreator = {
      *
      * TODO: fromPool as a name for 'from values' doesn't quite describe the method anymore, since a pool doesn't need to be given.
      * @param values
+     * @param actor
      * @param options
      */
     fromPool: function(values: { pool: number, limit?: number, threshold?: number }={pool: 0, limit: 0, threshold: 0}, options?: TestOptions): SuccessTest {

@@ -14281,17 +14281,10 @@ class SR5Actor extends Actor {
             });
         });
     }
-    promptRoll(options) {
-        const rollProps = {
-            event: options === null || options === void 0 ? void 0 : options.event,
-            title: 'Roll',
-            parts: [],
-            actor: this
-        };
-        const dialogOptions = {
-            pool: true
-        };
-        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll(rollProps, dialogOptions);
+    promptRoll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest();
+        });
     }
     rollDeviceRating(options) {
         const title = game.i18n.localize('SR5.Labels.ActorSheet.DeviceRating');
@@ -14455,17 +14448,6 @@ class SR5Actor extends Actor {
                 yield this.rollSkill('sneaking', options);
             }
         });
-    }
-    /**
-     * Helper function for rolling active skills similar to rollLanguageSkill.
-     *
-     * Doesn't actually do anything more than rollSkill. :)
-     *
-     * @param skillId
-     * @param options
-     */
-    rollActiveSkill(skillId, options = {}) {
-        return this.rollSkill(skillId, options);
     }
     /**
      * Roll a general attribute test with one or two attributes.
@@ -17760,7 +17742,7 @@ class SR5BaseActorSheet extends ActorSheet {
             const options = { event };
             switch (split[0]) {
                 case 'prompt-roll':
-                    yield this.actor.promptRoll(options);
+                    yield this.actor.promptRoll();
                     break;
                 case 'armor':
                     yield this.actor.rollArmor(options);
@@ -34316,9 +34298,8 @@ class ShadowrunRoller {
         return __awaiter(this, void 0, void 0, function* () {
             const data = TestCreator_1.TestCreator._minimalTestData();
             // Get the last used pool size for simple SuccessTestDialogs
-            const lastPoolValue = ((_a = game.user) === null || _a === void 0 ? void 0 : _a.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue)) || 0;
-            PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.LastRoll', lastPoolValue);
-            const test = yield TestCreator_1.TestCreator.fromTestData(data);
+            const lastPoolValue = Number((_a = game.user) === null || _a === void 0 ? void 0 : _a.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue)) || 0;
+            const test = yield TestCreator_1.TestCreator.fromPool({ pool: lastPoolValue });
             yield test.execute();
             if (test.evaluated) {
                 // Store the last used pool size for the next simple SuccessTest
@@ -37242,8 +37223,9 @@ class SuccessTest {
     consumeActorResources() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            // No actor present? Nothing to consume...
             if (!this.actor)
-                return false;
+                return true;
             if (this.hasPushTheLimit) {
                 if (this.actor.getEdge().uses <= 0) {
                     (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error(game.i18n.localize('SR5.MissingResource.Edge'));
@@ -37572,6 +37554,7 @@ exports.TestCreator = {
      *
      * TODO: fromPool as a name for 'from values' doesn't quite describe the method anymore, since a pool doesn't need to be given.
      * @param values
+     * @param actor
      * @param options
      */
     fromPool: function (values = { pool: 0, limit: 0, threshold: 0 }, options) {

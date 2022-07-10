@@ -24,6 +24,7 @@ import CombatData = Shadowrun.CombatData;
 import {SR5Roll} from "./SR5Roll";
 import {SuccessTest} from "../tests/SuccessTest";
 import {TestCreator} from "../tests/TestCreator";
+import ActorRollOptions = Shadowrun.ActorRollOptions;
 
 // item, actor, dicePool, attack, defense, spell, form
 export type Test =  {
@@ -385,11 +386,11 @@ export class ShadowrunRoller {
     static async promptSuccessTest() {
         const data = TestCreator._minimalTestData();
 
-        // Get the last used pool size for simple SuccessTestDialogs
-        const lastPoolValue = game.user?.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue) || 0;
-        PartsList.AddUniquePart(data.pool.mod, 'SR5.LastRoll', lastPoolValue);
 
-        const test = await TestCreator.fromTestData(data);
+        // Get the last used pool size for simple SuccessTestDialogs
+        const lastPoolValue = Number(game.user?.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue)) || 0;
+
+        const test = await TestCreator.fromPool({pool: lastPoolValue});
         await test.execute();
 
         if (test.evaluated) {

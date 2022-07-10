@@ -541,7 +541,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const options = { event };
         switch (split[0]) {
             case 'prompt-roll':
-                await this.actor.promptRoll(options);
+                await this.actor.promptRoll();
                 break;
             case 'armor':
                 await this.actor.rollArmor(options);

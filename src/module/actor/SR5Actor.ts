@@ -1125,17 +1125,8 @@ export class SR5Actor extends Actor {
         });
     }
 
-    promptRoll(options?: ActorRollOptions) {
-        const rollProps = {
-            event: options?.event,
-            title: 'Roll',
-            parts: [],
-            actor: this
-        };
-        const dialogOptions = {
-            pool: true
-        }
-        return ShadowrunRoller.advancedRoll(rollProps, dialogOptions);
+    async promptRoll() {
+        await ShadowrunRoller.promptSuccessTest();
     }
 
     rollDeviceRating(options?: ActorRollOptions) {
@@ -1311,18 +1302,6 @@ export class SR5Actor extends Actor {
         } else {
             await this.rollSkill('sneaking', options);
         }
-    }
-
-    /**
-     * Helper function for rolling active skills similar to rollLanguageSkill.
-     *
-     * Doesn't actually do anything more than rollSkill. :)
-     *
-     * @param skillId
-     * @param options
-     */
-    rollActiveSkill(skillId: string, options: SkillRollOptions = {}) {
-        return this.rollSkill(skillId, options);
     }
 
     /**
