@@ -275,6 +275,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.skill-roll').on('click', this._onRollSkill.bind(this));
         html.find('.knowledge-skill').on('click', this._onRollSkill.bind(this));
         html.find('.language-skill').on('click', this._onRollSkill.bind(this));
+        html.find('.skill-spec-roll').on('click', this._onRollSkillSpec.bind(this));
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
@@ -1103,7 +1104,13 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onRollSkill(event) {
         event.preventDefault();
         const skillId = Helpers.listItemId(event);
-        return this.actor.rollSkill(skillId, { event: event });
+        return this.actor.rollSkill(skillId, {event});
+    }
+
+    async _onRollSkillSpec(event) {
+        event.preventDefault();
+        const skillId = Helpers.listItemId(event);
+        return this.actor.rollSkill(skillId, {event, specialization: true})
     }
 
     async _onShowEditSkill(event) {

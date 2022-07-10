@@ -14348,6 +14348,7 @@ class SR5Actor extends Actor {
             const action = DataDefaults_1.DefaultValues.actionData({
                 // TODO: test custom skills.
                 skill: skillId,
+                spec: (options === null || options === void 0 ? void 0 : options.specialization) || false,
                 attribute: skill.attribute,
                 limit: {
                     base: 0, value: 0, mod: [],
@@ -17499,6 +17500,7 @@ class SR5BaseActorSheet extends ActorSheet {
         html.find('.skill-roll').on('click', this._onRollSkill.bind(this));
         html.find('.knowledge-skill').on('click', this._onRollSkill.bind(this));
         html.find('.language-skill').on('click', this._onRollSkill.bind(this));
+        html.find('.skill-spec-roll').on('click', this._onRollSkillSpec.bind(this));
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
         html.find('.open-source-pdf').on('click', this._onOpenSourcePDF.bind(this));
@@ -18277,7 +18279,14 @@ class SR5BaseActorSheet extends ActorSheet {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             const skillId = helpers_1.Helpers.listItemId(event);
-            return this.actor.rollSkill(skillId, { event: event });
+            return this.actor.rollSkill(skillId, { event });
+        });
+    }
+    _onRollSkillSpec(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skillId = helpers_1.Helpers.listItemId(event);
+            return this.actor.rollSkill(skillId, { event, specialization: true });
         });
     }
     _onShowEditSkill(event) {
@@ -25760,14 +25769,13 @@ const registerSkillLineHelpers = () => {
         }
     });
     Handlebars.registerHelper('SkillRightSide', function (skillType, skill) {
-        var _a;
         const specs = Array.isArray(skill.specs) ? skill.specs : [skill.specs];
         return [
             {
-                text: {
-                    text: (_a = specs.join(', ')) !== null && _a !== void 0 ? _a : '',
+                html: {
+                    text: specs.map(spec => `<span class="roll skill-spec-roll">${spec}</span>`).join(', '),
                     cssClass: 'skill-spec-item',
-                },
+                }
             },
             {
                 text: {

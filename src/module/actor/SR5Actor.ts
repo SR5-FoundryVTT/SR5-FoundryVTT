@@ -1197,7 +1197,7 @@ export class SR5Actor extends Actor {
         const action = DefaultValues.actionData({
             // TODO: test custom skills.
             skill: skillId,
-
+            spec: options?.specialization || false,
             attribute: skill.attribute,
             limit: {
                 base: 0, value: 0, mod: [],

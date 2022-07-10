@@ -45,6 +45,11 @@
                     </div>
                 {{/ife}}
             {{/if}}
+            {{#if option.html}}
+                <div class="item-text {{option.html.cssClass}}">
+                    {{{option.html.text}}}
+                </div>
+            {{/if}}
         {{/each}}
         {{#if icons}}
             <div class="item-text item-icons">
