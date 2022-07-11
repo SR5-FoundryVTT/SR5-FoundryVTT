@@ -6,7 +6,6 @@ import {SR5Item} from "../item/SR5Item";
 import {SR5Actor} from "../actor/SR5Actor";
 import {
     SuccessTest,
-    SuccessTestData,
     SuccessTestMessageData,
     TestData,
     TestDocuments,
@@ -18,10 +17,9 @@ import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {Helpers} from "../helpers";
-import {OpposedTest} from "./OpposedTest";
+import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ActionRollData = Shadowrun.ActionRollData;
-import ActionItemData = Shadowrun.ActionItemData;
 import {SR5} from "../config";
 
 /**
@@ -211,16 +209,16 @@ export const TestCreator = {
      * @param options
      */
     fromOpposedTestResistTest: async function(opposed: OpposedTest, options?: TestOptions): Promise<SuccessTest | void> {
-        if (!opposed?.against?.data?.opposed?.resist?.test) return console.error(`Shadowrun 5e | Given test doesn't define an opposed resist test`, opposed);
+        // Don't change the data's source.
+        const opposedData = foundry.utils.duplicate(opposed.data);
+
+        if (!opposedData?.against?.opposed?.resist?.test) return console.error(`Shadowrun 5e | Given test doesn't define an opposed resist test`, opposed);
         if (!opposed.actor) return console.error(`Shadowrun 5e | A ${opposed.title} can't operate without a populated actor given`);
 
-        const resistTestCls = TestCreator._getTestClass(opposed.against.data.opposed.resist.test);
-
-        // Don't change the data's source.
-        const testData = foundry.utils.duplicate(opposed.data);
+        const resistTestCls = TestCreator._getTestClass(opposedData.against.opposed.resist.test);
 
         // Prepare the resist test.
-        const data = await TestCreator._getOpposedResistTestData(resistTestCls, testData, opposed.actor, opposed.data.messageUuid);
+        const data = await TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.actor, opposed.data.messageUuid);
         const documents = {actor: opposed.actor};
 
         // Initialize a new test of the current testing class.
@@ -258,7 +256,6 @@ export const TestCreator = {
 
         // Create the followup test based on this tests documents and options.
         const documents = {item: test.item, actor: test.actor};
-        // TODO: pushTheLimit / second chance shouldn't be part of options...
         return new testCls(testData, documents, options);
     },
 
@@ -398,13 +395,13 @@ export const TestCreator = {
      * of the original test that's being opposed.
      *
      * @param resistTestCls
-     * @param againstData The original test that's being opposed. Not the opposed test itself.
+     * @param opposedData The opposing test, including the original test being opposed.
      * @param actor The actor doing the testing.
      * @param previousMessageId The Message id of the originating opposing test.
      */
-    _getOpposedResistTestData: async function(resistTestCls, againstData: SuccessTestData, actor: SR5Actor, previousMessageId?: string) {
-        if (!againstData.opposed.resist.test) {
-            console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, againstData, this);
+    _getOpposedResistTestData: async function(resistTestCls, opposedData: OpposedTestData, actor: SR5Actor, previousMessageId?: string) {
+        if (!opposedData.against.opposed.resist.test) {
+            console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, opposedData, this);
             return;
         }
         if (!actor) {
@@ -414,11 +411,12 @@ export const TestCreator = {
         // Prepare general data structure with labeling.
         const data = TestCreator._minimalTestData();
         data.previousMessageId = previousMessageId;
+        data.following = opposedData;
 
         // Provide default action information.
         const action = TestCreator._applyMinimalActionDataInOrder(
             DefaultValues.actionData({test: resistTestCls.name}),
-            againstData.opposed.resist,
+            opposedData.against.opposed.resist,
             resistTestCls._getDefaultTestAction()
         );
 

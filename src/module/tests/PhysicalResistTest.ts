@@ -1,13 +1,19 @@
-import {SuccessTest, SuccessTestData, TestOptions} from "./SuccessTest";
-import {OpposedTestData} from "./OpposedTest";
+import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {CombatRules} from "../rules/CombatRules";
 import {Helpers} from "../helpers";
+import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
+import DamageData = Shadowrun.DamageData;
+
 
 export interface PhysicalResistTestData extends SuccessTestData {
     // The original test this resistance is taking its data from.
-    following: OpposedTestData
+    following: PhysicalDefenseTestData
+    // The damage BEFORE this test is done.
+    incomingDamage: DamageData
+    // The damage AFTER this test is done.
+    modifiedDamage: DamageData
 }
 
 
@@ -17,17 +23,19 @@ export interface PhysicalResistTestData extends SuccessTestData {
  * Physical resist specifically handles physical damage dealt by ranged, melee and physical spell attacks.
  */
 export class PhysicalResistTest extends SuccessTest {
-    _prepareData(data, options: TestOptions): any {
+    data: PhysicalResistTestData
+
+    _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
-        // Get damage after it's been modified by previous defense.
-        const incomingModifiedDamage = foundry.utils.duplicate(data.following.modifiedDamage);
-        data.damage = data.damage ? incomingModifiedDamage : DefaultValues.damageData();
-
-        // NOTE: this is dev testing... should be removed
-        data.opposed = {};
+        data.incomingDamage = foundry.utils.duplicate(data.following.modifiedDamage);
+        data.modifiedDamage = duplicate(data.incomingDamage);
 
         return data;
+    }
+
+    get _chatMessageTemplate() {
+        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
     }
 
     static _getDefaultTestAction() {
@@ -47,7 +55,7 @@ export class PhysicalResistTest extends SuccessTest {
         if (this.data.action.armor) {
             if (this.actor) {
                 const armor = foundry.utils.duplicate(this.actor.getArmor());
-                armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.AP', this.data.damage.ap.value);
+                armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.AP', this.data.incomingDamage.ap.value);
                 Helpers.calcTotal(armor, {min: 0});
                 this.data.pool.mod = PartsList.AddUniquePart(this.data.pool.mod,'SR5.Armor', armor.value);
             }
@@ -60,6 +68,6 @@ export class PhysicalResistTest extends SuccessTest {
     }
 
     async processSuccess() {
-        this.data.damage = CombatRules.modifyDamageAfterResist(this.data.damage, this.hits.value);
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterResist(this.data.incomingDamage, this.hits.value);
     }
 }

@@ -5,10 +5,8 @@ import {Helpers} from "../helpers";
 import {SR5Item} from "../item/SR5Item";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {PartsList} from "../parts/PartsList";
-import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 import {TestDialog} from "../apps/dialogs/TestDialog";
 import {SR5} from "../config";
-import {SkillRules} from "../rules/SkillRules";
 import {ActionFlow} from "../item/flows/ActionFlow";
 import ValueField = Shadowrun.ValueField;
 import DamageData = Shadowrun.DamageData;
@@ -118,7 +116,7 @@ export class SuccessTest {
     public rolls: SR5Roll[];
     public evaluated: boolean;
 
-    public targets: TokenDocument[]
+    public targets: TokenDocument[];
     public following: SuccessTest | undefined;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
@@ -1038,12 +1036,14 @@ export class SuccessTest {
      * This will hide / show them, when called with a card event.
      *
      * @param event Called from within a card html element.
-     * @param cardHtml A chat card html element.
+     * @param html A chat card html element.
      */
-    static async _chatToggleCardRolls(event, cardHtml) {
+    static async _chatToggleCardRolls(event, html) {
         event.preventDefault();
 
-        const element = cardHtml.find('.dice-rolls');
+        const header = event.currentTarget;
+        const card = $(header.closest('.chat-card'));
+        const element = card.find('.dice-rolls');
         if (element.is(':visible')) element.slideUp(200);
         else element.slideDown(200);
     }

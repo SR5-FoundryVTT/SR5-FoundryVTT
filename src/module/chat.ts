@@ -434,11 +434,11 @@ export const addRollListeners = (app: ChatMessage, html) => {
     });
 };
 
-export const handleRenderChatMessage = async (app: ChatMessage, html) => {
+export const handleRenderChatMessage = (app: ChatMessage, html, data) => {
     /**
      * Apply damage to the actor speaking the chat card.
      */
-    html.on('click', '.apply-damage', async event => await chatMessageActionApplyDamage(html, event));
+    html.on('click', '.apply-damage', event => chatMessageActionApplyDamage(html, event));
 }
 
 /**

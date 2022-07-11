@@ -22534,12 +22534,12 @@ const addRollListeners = (app, html) => {
     }));
 };
 exports.addRollListeners = addRollListeners;
-const handleRenderChatMessage = (app, html) => __awaiter(void 0, void 0, void 0, function* () {
+const handleRenderChatMessage = (app, html, data) => {
     /**
      * Apply damage to the actor speaking the chat card.
      */
-    html.on('click', '.apply-damage', (event) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.chatMessageActionApplyDamage)(html, event); }));
-});
+    html.on('click', '.apply-damage', event => (0, exports.chatMessageActionApplyDamage)(html, event));
+};
 exports.handleRenderChatMessage = handleRenderChatMessage;
 /**
  * Clicking on a damage number within any chat message will trigger damage application.
@@ -26541,6 +26541,11 @@ const TestCreator_1 = require("./tests/TestCreator");
 const CombatSpellDefenseTest_1 = require("./tests/CombatSpellDefenseTest");
 const ComplexFormTest_1 = require("./tests/ComplexFormTest");
 const AttributeOnlyTest_1 = require("./tests/AttributeOnlyTest");
+const chatMessageListeners = (message, html, data) => {
+    SuccessTest_1.SuccessTest.chatMessageListeners(message, html, data);
+    OpposedTest_1.OpposedTest.chatMessageListeners(message, html, data);
+    (0, chat_1.handleRenderChatMessage)(message, html, data);
+};
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 exports.SR5CONFIG = config_1.SR5;
 class HooksManager {
@@ -26562,6 +26567,8 @@ class HooksManager {
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
         Hooks.on('getChatLogEntryContext', SuccessTest_1.SuccessTest.chatMessageContextOptions);
+        Hooks.on("renderChatLog", chatMessageListeners);
+        // Hooks.on("renderChatPopout", chatMessageListeners);
         Hooks.on('init', quench_1.quenchRegister);
     }
     static init() {
@@ -26714,7 +26721,7 @@ ___________________
         HandlebarManager_1.HandlebarManager.loadTemplates();
     }
     static ready() {
-        var _a, _b, _c;
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if ((_a = game.user) === null || _a === void 0 ? void 0 : _a.isGM) {
                 yield Migrator_1.Migrator.BeginMigration();
@@ -26727,19 +26734,18 @@ ___________________
             $(document).on('click', diceIconSelector, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
             $(document).on('click', diceIconSelectorNew, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
-            HooksManager.renderChatMessage();
             // const item = game.items?.getName('Weapon (Melee)');
             // const item = game.items?.getName('Weapon (Ranged)');
             // const item = game.items?.getName('Spell (Direct Combat)');
             // const item = game.items?.getName('Spell (Indirect Combat)');
             // const item = game.items?.getName('Drain');
-            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Complex Form');
-            const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked');
-            if (!item || !actor)
-                return;
-            const test = yield TestCreator_1.TestCreator.fromItem(item, actor);
-            if (test)
-                yield test.execute();
+            // const item = game.items?.getName('Complex Form');
+            // const actor = game.actors?.getName('Char Linked');
+            // if (!item || !actor) return;
+            // const test = await TestCreator.fromItem(item, actor);
+            // if (test) await test.execute();
+            // $(document).find('.message')
+            Hooks.on('renderChatMessage', chatMessageListeners);
         });
     }
     static canvasInit() {
@@ -26799,9 +26805,7 @@ ___________________
      * Must be called on 'ready' or after game.shadowrun is registered.
      */
     static renderChatMessage() {
-        Hooks.on('renderChatMessage', SuccessTest_1.SuccessTest.chatMessageListeners);
-        Hooks.on('renderChatMessage', OpposedTest_1.OpposedTest.chatMessageListeners);
-        Hooks.on('renderChatMessage', chat_1.handleRenderChatMessage);
+        console.debug('Shadowrun5e | Registering new chat messages related hooks');
     }
     static renderItemDirectory(app, html) {
         const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
@@ -35915,14 +35919,10 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
         super(data, documents, options);
         this.against = new SuccessTest_1.SuccessTest(this.data.against);
     }
-    // TODO: This could also be done with _prepareTypeData for only type specific fields.
     _prepareData(data, options) {
         data = super._prepareData(data, options);
         // Get opposed item reference as sometimes opposed test details depend on the item used for the active test.
         data.sourceItemUuid = data.against.sourceItemUuid;
-        // Whatever the active test defined for it's opposed test as a followup test.
-        // TODO: Maybe this resist should just be a general followup.
-        data.action.followed = data.against.action.opposed.resist;
         // TODO: this isn't needed if opposed is always taken from data.action.opposed
         delete data.opposed;
         delete data.targetActorsUuid;
@@ -35991,17 +35991,19 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     /**
      * Using a message action cast an opposed test to that messages active test.
      */
-    static _castOpposedAction(event, cardHtml) {
+    static _castOpposedAction(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
+            const button = $(event.currentTarget);
+            const card = button.closest('.chat-message');
             // Collect information needed to create the opposed action test.
-            const messageId = cardHtml.data('messageId');
-            const opposedActionTest = $(event.currentTarget).data('action');
+            const messageId = card.data('messageId');
+            const opposedActionTest = button.data('action');
             yield TestCreator_1.TestCreator.fromMessageAction(messageId, opposedActionTest);
         });
     }
     static chatMessageListeners(message, html, data) {
-        html.find('.opposed-action').on('click', (event) => OpposedTest._castOpposedAction(event, html));
+        html.find('.opposed-action').on('click', (event) => OpposedTest._castOpposedAction(event));
     }
 }
 exports.OpposedTest = OpposedTest;
@@ -36194,12 +36196,12 @@ const helpers_1 = require("../helpers");
 class PhysicalResistTest extends SuccessTest_1.SuccessTest {
     _prepareData(data, options) {
         data = super._prepareData(data, options);
-        // Get damage after it's been modified by previous defense.
-        const incomingModifiedDamage = foundry.utils.duplicate(data.following.modifiedDamage);
-        data.damage = data.damage ? incomingModifiedDamage : DataDefaults_1.DefaultValues.damageData();
-        // NOTE: this is dev testing... should be removed
-        data.opposed = {};
+        data.incomingDamage = foundry.utils.duplicate(data.following.modifiedDamage);
+        data.modifiedDamage = duplicate(data.incomingDamage);
         return data;
+    }
+    get _chatMessageTemplate() {
+        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
     }
     static _getDefaultTestAction() {
         return DataDefaults_1.DefaultValues.minimalActionData({
@@ -36215,7 +36217,7 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
         if (this.data.action.armor) {
             if (this.actor) {
                 const armor = foundry.utils.duplicate(this.actor.getArmor());
-                armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, 'SR5.AP', this.data.damage.ap.value);
+                armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, 'SR5.AP', this.data.incomingDamage.ap.value);
                 helpers_1.Helpers.calcTotal(armor, { min: 0 });
                 this.data.pool.mod = PartsList_1.PartsList.AddUniquePart(this.data.pool.mod, 'SR5.Armor', armor.value);
             }
@@ -36226,7 +36228,7 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
     }
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.data.damage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.damage, this.hits.value);
+            this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.incomingDamage, this.hits.value);
         });
     }
 }
@@ -37377,12 +37379,14 @@ class SuccessTest {
      * This will hide / show them, when called with a card event.
      *
      * @param event Called from within a card html element.
-     * @param cardHtml A chat card html element.
+     * @param html A chat card html element.
      */
-    static _chatToggleCardRolls(event, cardHtml) {
+    static _chatToggleCardRolls(event, html) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const element = cardHtml.find('.dice-rolls');
+            const header = event.currentTarget;
+            const card = $(header.closest('.chat-card'));
+            const element = card.find('.dice-rolls');
             if (element.is(':visible'))
                 element.slideUp(200);
             else
@@ -37607,17 +37611,17 @@ exports.TestCreator = {
      * @param options
      */
     fromOpposedTestResistTest: function (opposed, options) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
-            if (!((_d = (_c = (_b = (_a = opposed === null || opposed === void 0 ? void 0 : opposed.against) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.opposed) === null || _c === void 0 ? void 0 : _c.resist) === null || _d === void 0 ? void 0 : _d.test))
+            // Don't change the data's source.
+            const opposedData = foundry.utils.duplicate(opposed.data);
+            if (!((_c = (_b = (_a = opposedData === null || opposedData === void 0 ? void 0 : opposedData.against) === null || _a === void 0 ? void 0 : _a.opposed) === null || _b === void 0 ? void 0 : _b.resist) === null || _c === void 0 ? void 0 : _c.test))
                 return console.error(`Shadowrun 5e | Given test doesn't define an opposed resist test`, opposed);
             if (!opposed.actor)
                 return console.error(`Shadowrun 5e | A ${opposed.title} can't operate without a populated actor given`);
-            const resistTestCls = exports.TestCreator._getTestClass(opposed.against.data.opposed.resist.test);
-            // Don't change the data's source.
-            const testData = foundry.utils.duplicate(opposed.data);
+            const resistTestCls = exports.TestCreator._getTestClass(opposedData.against.opposed.resist.test);
             // Prepare the resist test.
-            const data = yield exports.TestCreator._getOpposedResistTestData(resistTestCls, testData, opposed.actor, opposed.data.messageUuid);
+            const data = yield exports.TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.actor, opposed.data.messageUuid);
             const documents = { actor: opposed.actor };
             // Initialize a new test of the current testing class.
             return new resistTestCls(data, documents, options);
@@ -37652,7 +37656,6 @@ exports.TestCreator = {
             testData.following = test.data;
             // Create the followup test based on this tests documents and options.
             const documents = { item: test.item, actor: test.actor };
-            // TODO: pushTheLimit / second chance shouldn't be part of options...
             return new testCls(testData, documents, options);
         });
     },
@@ -37783,14 +37786,14 @@ exports.TestCreator = {
      * of the original test that's being opposed.
      *
      * @param resistTestCls
-     * @param againstData The original test that's being opposed. Not the opposed test itself.
+     * @param opposedData The opposing test, including the original test being opposed.
      * @param actor The actor doing the testing.
      * @param previousMessageId The Message id of the originating opposing test.
      */
-    _getOpposedResistTestData: function (resistTestCls, againstData, actor, previousMessageId) {
+    _getOpposedResistTestData: function (resistTestCls, opposedData, actor, previousMessageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!againstData.opposed.resist.test) {
-                console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, againstData, this);
+            if (!opposedData.against.opposed.resist.test) {
+                console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, opposedData, this);
                 return;
             }
             if (!actor) {
@@ -37799,8 +37802,9 @@ exports.TestCreator = {
             // Prepare general data structure with labeling.
             const data = exports.TestCreator._minimalTestData();
             data.previousMessageId = previousMessageId;
+            data.following = opposedData;
             // Provide default action information.
-            const action = exports.TestCreator._applyMinimalActionDataInOrder(DataDefaults_1.DefaultValues.actionData({ test: resistTestCls.name }), againstData.opposed.resist, resistTestCls._getDefaultTestAction());
+            const action = exports.TestCreator._applyMinimalActionDataInOrder(DataDefaults_1.DefaultValues.actionData({ test: resistTestCls.name }), opposedData.against.opposed.resist, resistTestCls._getDefaultTestAction());
             // Alter default action information with user defined information.
             return yield exports.TestCreator._prepareTestDataWithAction(action, actor, data);
         });

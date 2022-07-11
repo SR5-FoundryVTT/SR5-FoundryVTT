@@ -108,7 +108,7 @@
 <div class="sr5 chat-card roll-card">
     <div class="card-content">
         {{#if test.data.damage}}
-            <div class="left-side">{{localize 'SR5.IncomingDamage'}}</div>
+        {{#ifgt test.data.damage.base 0}}
             <div class="right-side">
             {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
                     name=(localize "SR5.Incoming")
@@ -116,6 +116,7 @@
                     showAP=true
             }}
             </div>
+        {{/ifgt}}
         {{/if}}
     </div>
 </div>

@@ -38,7 +38,7 @@ export class PhysicalDefenseTest extends DefenseTest {
     }
 
     get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html'
+        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
     }
 
     get _dialogTemplate(): string {
@@ -162,7 +162,7 @@ export class PhysicalDefenseTest extends DefenseTest {
     }
 
     get failureLabel() {
-        return 'SR5.AttackHits'
+        return 'SR5.AttackHits';
     }
 
     async processSuccess() {

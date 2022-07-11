@@ -31,16 +31,11 @@ export class OpposedTest extends SuccessTest {
         this.against = new SuccessTest(this.data.against);
     }
 
-    // TODO: This could also be done with _prepareTypeData for only type specific fields.
     _prepareData(data, options?): any {
         data = super._prepareData(data, options);
 
         // Get opposed item reference as sometimes opposed test details depend on the item used for the active test.
         data.sourceItemUuid = data.against.sourceItemUuid;
-
-        // Whatever the active test defined for it's opposed test as a followup test.
-        // TODO: Maybe this resist should just be a general followup.
-        data.action.followed = data.against.action.opposed.resist;
 
         // TODO: this isn't needed if opposed is always taken from data.action.opposed
         delete data.opposed;
@@ -117,17 +112,20 @@ export class OpposedTest extends SuccessTest {
     /**
      * Using a message action cast an opposed test to that messages active test.
      */
-    static async _castOpposedAction(event, cardHtml) {
+    static async _castOpposedAction(event) {
         event.preventDefault();
 
+        const button = $(event.currentTarget);
+        const card = button.closest('.chat-message');
+
         // Collect information needed to create the opposed action test.
-        const messageId = cardHtml.data('messageId');
-        const opposedActionTest = $(event.currentTarget).data('action');
+        const messageId = card.data('messageId');
+        const opposedActionTest = button.data('action');
 
         await TestCreator.fromMessageAction(messageId, opposedActionTest);
     }
 
     static chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.opposed-action').on('click', (event) => OpposedTest._castOpposedAction(event, html));
+        html.find('.opposed-action').on('click', (event) => OpposedTest._castOpposedAction(event));
     }
 }
