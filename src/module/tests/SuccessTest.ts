@@ -997,9 +997,9 @@ export class SuccessTest {
      * @param data
      */
     static chatMessageListeners(message: ChatMessage, html, data) {
-        // TODO: This only works in the current sessions but will break on refresh, since registered events aren't persistent.
         html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
         html.find('.chat-document-link').on('click', SuccessTest._chatOpenDocumentLink);
+        html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet);
     }
 
     /**

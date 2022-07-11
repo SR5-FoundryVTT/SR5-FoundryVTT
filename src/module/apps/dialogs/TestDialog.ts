@@ -2,6 +2,7 @@ import {FormDialog, FormDialogData, FormDialogOptions} from "./FormDialog";
 import {SuccessTest} from "../../tests/SuccessTest";
 import { SuccessTestData } from './../../tests/SuccessTest';
 import {SR5} from "../../config";
+import {Helpers} from "../../helpers";
 
 
 export interface TestDialogData extends FormDialogData {
@@ -34,6 +35,13 @@ export class TestDialog extends FormDialog {
         // @ts-ignore
         options.width = 'auto';
         return options;
+    }
+
+    activateListeners(html: JQuery) {
+        super.activateListeners(html);
+
+        // Handle in-dialog entity links to render the respective sheets.
+        html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet)
     }
 
     /**

@@ -44,13 +44,6 @@ import SocketMessage = Shadowrun.SocketMessageData;
 import {ComplexFormTest} from "./tests/ComplexFormTest";
 import {AttributeOnlyTest} from "./tests/AttributeOnlyTest";
 
-const chatMessageListeners = (message: ChatMessage, html, data) => {
-            SuccessTest.chatMessageListeners(message, html, data);
-            OpposedTest.chatMessageListeners(message, html, data);
-            handleRenderChatMessage(message, html, data);
-        }
-
-
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
 
@@ -76,7 +69,7 @@ export class HooksManager {
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
         Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
 
-        Hooks.on("renderChatLog", chatMessageListeners);
+        Hooks.on("renderChatLog", HooksManager.chatMessageListeners);
         // Hooks.on("renderChatPopout", chatMessageListeners);
 
         Hooks.on('init', quenchRegister);
@@ -257,20 +250,8 @@ ___________________
         $(document).on('click', diceIconSelector, async () => await ShadowrunRoller.promptSuccessTest());
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
-        // const item = game.items?.getName('Weapon (Melee)');
-        // const item = game.items?.getName('Weapon (Ranged)');
-        // const item = game.items?.getName('Spell (Direct Combat)');
-        // const item = game.items?.getName('Spell (Indirect Combat)');
-        // const item = game.items?.getName('Drain');
-        // const item = game.items?.getName('Complex Form');
-        // const actor = game.actors?.getName('Char Linked');
-        // if (!item || !actor) return;
-        // const test = await TestCreator.fromItem(item, actor);
-        // if (test) await test.execute();
 
-        // $(document).find('.message')
-
-        Hooks.on('renderChatMessage', chatMessageListeners);
+        Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
     }
 
     static canvasInit() {
@@ -438,5 +419,11 @@ ___________________
 
         // @ts-ignore
         api.PACKAGE_CONFIG.push(config);
+    }
+
+    static chatMessageListeners(message: ChatMessage, html, data) {
+        SuccessTest.chatMessageListeners(message, html, data);
+        OpposedTest.chatMessageListeners(message, html, data);
+        handleRenderChatMessage(message, html, data);
     }
 }
