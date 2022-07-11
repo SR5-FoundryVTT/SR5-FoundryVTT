@@ -21,6 +21,7 @@ import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ActionRollData = Shadowrun.ActionRollData;
 import {SR5} from "../config";
+import RollEvent = Shadowrun.RollEvent;
 
 /**
  * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
@@ -145,8 +146,9 @@ export const TestCreator = {
      *
      * @param id The id of the to be used message.
      * @param testClsName The test class name to be used with the message test data.
+     * @param options
      */
-    fromMessageAction: async function(id: string, testClsName: string): Promise<SuccessTest | undefined> {
+    fromMessageAction: async function(id: string, testClsName: string, options?: TestOptions): Promise<SuccessTest | undefined> {
         const message = game.messages?.get(id);
         if (!message) {
             console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
@@ -177,7 +179,7 @@ export const TestCreator = {
             if (!data) return;
 
             const documents = {actor};
-            const test = new testClass(data, documents);
+            const test = new testClass(data, documents, options);
 
             // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
             // Await test chain resolution for each actor, to avoid dialog spam.
@@ -454,5 +456,14 @@ export const TestCreator = {
         }
 
         return action;
+    },
+
+    /**
+     * A helper to define the modifier key for all sheet test interactions to cause a test to not show its dialog.
+     * @param event
+     */
+    shouldHideDialog(event: RollEvent|undefined): boolean {
+        if (!event) return false;
+        return event[SR5.kbmod.HIDE_DIALOG] === true;
     }
 };

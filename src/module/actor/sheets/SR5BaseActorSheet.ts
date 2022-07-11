@@ -561,16 +561,16 @@ export class SR5BaseActorSheet extends ActorSheet {
 
             // attribute only rolls
             case 'composure':
-                await this.actor.rollAttributesTest('composure');
+                await this.actor.rollAttributeOnlyTest('composure', options);
                 break;
             case 'judge-intentions':
-                await this.actor.rollAttributesTest('judge_intentions');
+                await this.actor.rollAttributeOnlyTest('judge_intentions', options);
                 break;
             case 'lift-carry':
-                await this.actor.rollAttributesTest('lift_carry');
+                await this.actor.rollAttributeOnlyTest('lift_carry', options);
                 break;
             case 'memory':
-                await this.actor.rollAttributesTest('memory');
+                await this.actor.rollAttributeOnlyTest('memory', options);
                 break;
 
             case 'vehicle-stat':

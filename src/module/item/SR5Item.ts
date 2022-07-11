@@ -63,6 +63,7 @@ import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
 import {SuccessTest} from "../tests/SuccessTest";
 import {TestCreator} from "../tests/TestCreator";
 import {PhysicalResistTest} from "../tests/PhysicalResistTest";
+import RollEvent = Shadowrun.RollEvent;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -367,24 +368,22 @@ export class SR5Item extends Item {
         return await createItemChatMessage(options);
     }
 
-    async castAction(event?) {
+    /**
+     * Cast the action of this item as a Test.
+     *
+     * @param event A PointerEvent by user interaction.
+     */
+    async castAction(event?: RollEvent) {
+        // Only show the item's description by user intention or by lack of testability.
+        const dontRollTest = event?.shiftKey || !this.hasRoll;
+        if (dontRollTest) return await this.postItemCard();
+
         if (!this.actor) return;
 
-        const test = await TestCreator.fromItem(this, this.actor);
+        const showDialog = !TestCreator.shouldHideDialog(event);
+        const test = await TestCreator.fromItem(this, this.actor, {showDialog});
         if (!test) return;
         await test.execute();
-
-        // const dontRollTest = event?.shiftKey || !this.hasRoll;
-        // if (dontRollTest) return await this.postItemCard();
-        //
-        // const dialog = await ShadowrunItemDialog.create(this, event);
-        // // Some items might not have an additional dialog.
-        // if (!dialog) return await this.rollTest(event);
-        //
-        // const actionTestData = await dialog.select();
-        // if (dialog.canceled) return;
-        //
-        // return await this.rollTest(event, actionTestData);
 }
 
     getChatData(htmlOptions?) {

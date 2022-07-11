@@ -111,6 +111,8 @@ export class OpposedTest extends SuccessTest {
 
     /**
      * Using a message action cast an opposed test to that messages active test.
+     *
+     * @param event A PointerEvent by user interaction to trigger the test action.
      */
     static async _castOpposedAction(event) {
         event.preventDefault();
@@ -122,10 +124,11 @@ export class OpposedTest extends SuccessTest {
         const messageId = card.data('messageId');
         const opposedActionTest = button.data('action');
 
-        await TestCreator.fromMessageAction(messageId, opposedActionTest);
+        const showDialog = !TestCreator.shouldHideDialog(event);
+        await TestCreator.fromMessageAction(messageId, opposedActionTest, {showDialog});
     }
 
     static chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.opposed-action').on('click', (event) => OpposedTest._castOpposedAction(event));
+        html.find('.opposed-action').on('click', OpposedTest._castOpposedAction);
     }
 }

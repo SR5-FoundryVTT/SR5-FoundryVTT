@@ -318,7 +318,7 @@ export const SR5 = {
     kbmod: {
         STANDARD: 'shiftKey',
         EDGE: 'altKey',
-        SPEC: 'ctrlKey',
+        HIDE_DIALOG: 'ctrlKey',
     },
 
     actorModifiers: {

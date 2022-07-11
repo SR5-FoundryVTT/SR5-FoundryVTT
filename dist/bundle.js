@@ -14155,25 +14155,6 @@ class SR5Actor extends Actor {
             hideRollMessage: options.hideRollMessage
         });
     }
-    rollTwoAttributes([id1, id2], options) {
-        var _a;
-        const attr1 = duplicate(this.data.data.attributes[id1]);
-        const attr2 = duplicate(this.data.data.attributes[id2]);
-        const label1 = helpers_1.Helpers.label(id1);
-        const label2 = helpers_1.Helpers.label(id2);
-        const parts = new PartsList_1.PartsList();
-        parts.addPart(attr1.label, attr1.value);
-        parts.addPart(attr2.label, attr2.value);
-        this._addMatrixParts(parts, [attr1, attr2]);
-        this._addGlobalParts(parts);
-        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-            actor: this,
-            parts: parts.list,
-            event: options === null || options === void 0 ? void 0 : options.event,
-            title: (_a = options.title) !== null && _a !== void 0 ? _a : `${label1} + ${label2}`,
-            hideRollMessage: options.hideRollMessage
-        });
-    }
     /**
      * Roll a recovery test appropriate for this actor type and condition track.
      *
@@ -14226,7 +14207,7 @@ class SR5Actor extends Actor {
             let title = game.i18n.localize(config_1.SR5.matrixAttributes[attr]);
             const parts = new PartsList_1.PartsList();
             parts.addPart(config_1.SR5.matrixAttributes[attr], matrix_att.value);
-            if (options && options.event && options.event[config_1.SR5.kbmod.SPEC])
+            if (options && options.event && options.event[config_1.SR5.kbmod.HIDE_DIALOG])
                 parts.addUniquePart('SR5.Specialization', 2);
             if (helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
                 return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
@@ -14307,13 +14288,13 @@ class SR5Actor extends Actor {
      * @param rollId The internal attribute action id
      * @param options Success Test options
      */
-    rollAttributesTest(rollId, options) {
+    rollAttributeOnlyTest(rollId, options) {
         return __awaiter(this, void 0, void 0, function* () {
             const action = yield helpers_1.Helpers.getPackAction(config_1.SR5.packNames.attributeActions, rollId);
             if (!action)
                 return;
-            // TODO: Add/test options.
-            const test = yield TestCreator_1.TestCreator.fromItem(action, this, options);
+            const showDialog = !TestCreator_1.TestCreator.shouldHideDialog(options === null || options === void 0 ? void 0 : options.event);
+            const test = yield TestCreator_1.TestCreator.fromItem(action, this, { showDialog });
             // Overwriting localization here is just easier...
             test.data.title = game.i18n.localize(config_1.SR5.modifierTypes[rollId]);
             if (!test)
@@ -14349,8 +14330,9 @@ class SR5Actor extends Actor {
                 },
                 test: SuccessTest_1.SuccessTest.name
             });
-            // TODO: Add options.
-            const test = yield TestCreator_1.TestCreator.fromAction(action, this);
+            // TODO: Make key configurable and allow for global setting.
+            const showDialog = !TestCreator_1.TestCreator.shouldHideDialog(options === null || options === void 0 ? void 0 : options.event);
+            const test = yield TestCreator_1.TestCreator.fromAction(action, this, { showDialog });
             if (!test)
                 return;
             yield test.execute();
@@ -17673,16 +17655,16 @@ class SR5BaseActorSheet extends ActorSheet {
                     break;
                 // attribute only rolls
                 case 'composure':
-                    yield this.actor.rollAttributesTest('composure');
+                    yield this.actor.rollAttributeOnlyTest('composure', options);
                     break;
                 case 'judge-intentions':
-                    yield this.actor.rollAttributesTest('judge_intentions');
+                    yield this.actor.rollAttributeOnlyTest('judge_intentions', options);
                     break;
                 case 'lift-carry':
-                    yield this.actor.rollAttributesTest('lift_carry');
+                    yield this.actor.rollAttributeOnlyTest('lift_carry', options);
                     break;
                 case 'memory':
-                    yield this.actor.rollAttributesTest('memory');
+                    yield this.actor.rollAttributeOnlyTest('memory', options);
                     break;
                 case 'vehicle-stat':
                     console.log('roll vehicle stat', rollId);
@@ -23301,7 +23283,7 @@ exports.SR5 = {
     kbmod: {
         STANDARD: 'shiftKey',
         EDGE: 'altKey',
-        SPEC: 'ctrlKey',
+        HIDE_DIALOG: 'ctrlKey',
     },
     actorModifiers: {
         soak: 'SR5.RollSoak',
@@ -30139,25 +30121,24 @@ class SR5Item extends Item {
             return yield (0, chat_1.createItemChatMessage)(options);
         });
     }
+    /**
+     * Cast the action of this item as a Test.
+     *
+     * @param event A PointerEvent by user interaction.
+     */
     castAction(event) {
         return __awaiter(this, void 0, void 0, function* () {
+            // Only show the item's description by user intention or by lack of testability.
+            const dontRollTest = (event === null || event === void 0 ? void 0 : event.shiftKey) || !this.hasRoll;
+            if (dontRollTest)
+                return yield this.postItemCard();
             if (!this.actor)
                 return;
-            const test = yield TestCreator_1.TestCreator.fromItem(this, this.actor);
+            const showDialog = !TestCreator_1.TestCreator.shouldHideDialog(event);
+            const test = yield TestCreator_1.TestCreator.fromItem(this, this.actor, { showDialog });
             if (!test)
                 return;
             yield test.execute();
-            // const dontRollTest = event?.shiftKey || !this.hasRoll;
-            // if (dontRollTest) return await this.postItemCard();
-            //
-            // const dialog = await ShadowrunItemDialog.create(this, event);
-            // // Some items might not have an additional dialog.
-            // if (!dialog) return await this.rollTest(event);
-            //
-            // const actionTestData = await dialog.select();
-            // if (dialog.canceled) return;
-            //
-            // return await this.rollTest(event, actionTestData);
         });
     }
     getChatData(htmlOptions) {
@@ -35990,6 +35971,8 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     }
     /**
      * Using a message action cast an opposed test to that messages active test.
+     *
+     * @param event A PointerEvent by user interaction to trigger the test action.
      */
     static _castOpposedAction(event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -35999,11 +35982,12 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
             // Collect information needed to create the opposed action test.
             const messageId = card.data('messageId');
             const opposedActionTest = button.data('action');
-            yield TestCreator_1.TestCreator.fromMessageAction(messageId, opposedActionTest);
+            const showDialog = !TestCreator_1.TestCreator.shouldHideDialog(event);
+            yield TestCreator_1.TestCreator.fromMessageAction(messageId, opposedActionTest, { showDialog });
         });
     }
     static chatMessageListeners(message, html, data) {
-        html.find('.opposed-action').on('click', (event) => OpposedTest._castOpposedAction(event));
+        html.find('.opposed-action').on('click', OpposedTest._castOpposedAction);
     }
 }
 exports.OpposedTest = OpposedTest;
@@ -37552,8 +37536,9 @@ exports.TestCreator = {
      *
      * @param id The id of the to be used message.
      * @param testClsName The test class name to be used with the message test data.
+     * @param options
      */
-    fromMessageAction: function (id, testClsName) {
+    fromMessageAction: function (id, testClsName, options) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
@@ -37581,7 +37566,7 @@ exports.TestCreator = {
                 if (!data)
                     return;
                 const documents = { actor };
-                const test = new testClass(data, documents);
+                const test = new testClass(data, documents, options);
                 // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
                 // Await test chain resolution for each actor, to avoid dialog spam.
                 yield test.execute();
@@ -37836,6 +37821,15 @@ exports.TestCreator = {
             action.armor = minimalAction.armor;
         }
         return action;
+    },
+    /**
+     * A helper to define the modifier key for all sheet test interactions to cause a test to not show its dialog.
+     * @param event
+     */
+    shouldHideDialog(event) {
+        if (!event)
+            return false;
+        return event[config_1.SR5.kbmod.HIDE_DIALOG] === true;
     }
 };
 },{"../actor/SR5Actor":86,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":230}],249:[function(require,module,exports){

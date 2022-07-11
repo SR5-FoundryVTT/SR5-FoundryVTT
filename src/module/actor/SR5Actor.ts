@@ -995,26 +995,6 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollTwoAttributes([id1, id2], options: ActorRollOptions) {
-        const attr1 = duplicate(this.data.data.attributes[id1]);
-        const attr2 = duplicate(this.data.data.attributes[id2]);
-        const label1 = Helpers.label(id1);
-        const label2 = Helpers.label(id2);
-        const parts = new PartsList<number>();
-        parts.addPart(attr1.label, attr1.value);
-        parts.addPart(attr2.label, attr2.value);
-        this._addMatrixParts(parts, [attr1, attr2]);
-        this._addGlobalParts(parts);
-
-        return ShadowrunRoller.advancedRoll({
-            actor: this,
-            parts: parts.list,
-            event: options?.event,
-            title: options.title ?? `${label1} + ${label2}`,
-            hideRollMessage: options.hideRollMessage
-        });
-    }
-
     /**
      * Roll a recovery test appropriate for this actor type and condition track.
      *
@@ -1071,7 +1051,7 @@ export class SR5Actor extends Actor {
         const parts = new PartsList<number>();
         parts.addPart(SR5.matrixAttributes[attr], matrix_att.value);
 
-        if (options && options.event && options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
+        if (options && options.event && options.event[SR5.kbmod.HIDE_DIALOG]) parts.addUniquePart('SR5.Specialization', 2);
         if (Helpers.hasModifiers(options?.event)) {
             return ShadowrunRoller.advancedRoll({
                 event: options?.event,
@@ -1151,12 +1131,12 @@ export class SR5Actor extends Actor {
      * @param rollId The internal attribute action id
      * @param options Success Test options
      */
-    async rollAttributesTest(rollId: 'composure'|'judge_intentions'|'lift_carry'|'memory', options?: TestOptions) {
+    async rollAttributeOnlyTest(rollId: 'composure'|'judge_intentions'|'lift_carry'|'memory', options?: ActorRollOptions) {
         const action = await Helpers.getPackAction(SR5.packNames.attributeActions, rollId);
         if (!action) return;
 
-        // TODO: Add/test options.
-        const test = await TestCreator.fromItem(action, this, options);
+        const showDialog = !TestCreator.shouldHideDialog(options?.event);
+        const test = await TestCreator.fromItem(action, this, {showDialog});
 
         // Overwriting localization here is just easier...
         test.data.title = game.i18n.localize(SR5.modifierTypes[rollId]);
@@ -1198,8 +1178,8 @@ export class SR5Actor extends Actor {
             test: SuccessTest.name
         });
 
-        // TODO: Add options.
-        const test = await TestCreator.fromAction(action, this);
+        const showDialog = !TestCreator.shouldHideDialog(options?.event);
+        const test = await TestCreator.fromAction(action, this, {showDialog});
         if (!test) return;
 
         await test.execute();
