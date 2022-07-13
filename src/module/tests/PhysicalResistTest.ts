@@ -28,7 +28,8 @@ export class PhysicalResistTest extends SuccessTest {
     _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
-        data.incomingDamage = foundry.utils.duplicate(data.following.modifiedDamage);
+        // Get incoming damage from test before or default.
+        data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DefaultValues.damageData());
         data.modifiedDamage = duplicate(data.incomingDamage);
 
         return data;
@@ -36,6 +37,10 @@ export class PhysicalResistTest extends SuccessTest {
 
     get _chatMessageTemplate() {
         return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
+    }
+
+    get _dialogTemplate(): string {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-resist-test-dialog.html';
     }
 
     static _getDefaultTestAction() {

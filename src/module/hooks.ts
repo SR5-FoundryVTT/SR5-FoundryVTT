@@ -143,7 +143,8 @@ ___________________
                 MeleeAttackTest,
                 RangedAttackTest,
                 SpellCastingTest,
-                ComplexFormTest
+                ComplexFormTest,
+                PhysicalDefenseTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.

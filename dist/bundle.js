@@ -17647,7 +17647,8 @@ class SR5BaseActorSheet extends ActorSheet {
                     yield this.actor.rollDrain(options);
                     break;
                 case 'defense':
-                    yield this.actor.rollAttackDefense(options);
+                    // await this.actor.rollAttackDefense(options);
+                    yield this.actor.rollAttributeOnlyTest('physical_defense', options);
                     break;
                 case 'damage-resist':
                     yield this.actor.rollSoak(options);
@@ -26650,7 +26651,8 @@ ___________________
                 MeleeAttackTest: MeleeAttackTest_1.MeleeAttackTest,
                 RangedAttackTest: RangedAttackTest_1.RangedAttackTest,
                 SpellCastingTest: SpellCastingTest_1.SpellCastingTest,
-                ComplexFormTest: ComplexFormTest_1.ComplexFormTest
+                ComplexFormTest: ComplexFormTest_1.ComplexFormTest,
+                PhysicalDefenseTest: PhysicalDefenseTest_1.PhysicalDefenseTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -36204,13 +36206,18 @@ const helpers_1 = require("../helpers");
  */
 class PhysicalResistTest extends SuccessTest_1.SuccessTest {
     _prepareData(data, options) {
+        var _a;
         data = super._prepareData(data, options);
-        data.incomingDamage = foundry.utils.duplicate(data.following.modifiedDamage);
+        // Get incoming damage from test before or default.
+        data.incomingDamage = foundry.utils.duplicate(((_a = data.following) === null || _a === void 0 ? void 0 : _a.modifiedDamage) || DataDefaults_1.DefaultValues.damageData());
         data.modifiedDamage = duplicate(data.incomingDamage);
         return data;
     }
     get _chatMessageTemplate() {
         return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
+    }
+    get _dialogTemplate() {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-resist-test-dialog.html';
     }
     static _getDefaultTestAction() {
         return DataDefaults_1.DefaultValues.minimalActionData({

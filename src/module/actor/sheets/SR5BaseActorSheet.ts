@@ -553,7 +553,8 @@ export class SR5BaseActorSheet extends ActorSheet {
                 await this.actor.rollDrain(options);
                 break;
             case 'defense':
-                await this.actor.rollAttackDefense(options);
+                // await this.actor.rollAttackDefense(options);
+                await this.actor.rollAttributeOnlyTest('physical_defense', options);
                 break;
             case 'damage-resist':
                 await this.actor.rollSoak(options);
