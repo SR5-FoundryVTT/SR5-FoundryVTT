@@ -52,10 +52,9 @@ export class OpposedTest extends SuccessTest {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;
         }
-        // @ts-ignore // TODO: Typing here get's confused between boolean when it should be string.
+        // @ts-ignore // TODO: Typing expects a boolean, though OpposedTestData defines it as string. Odd.
         if (againstData.opposed.type !== '') {
-            console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
-            return;
+            console.warn(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
         }
         if (!actor) {
             console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);

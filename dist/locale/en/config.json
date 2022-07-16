@@ -969,7 +969,8 @@
     "PhysicalResistTest": "Physical Damage Resist",
     "SpellCastingTest": "Spellcasting",
     "ComplexFormTest": "Threading Complex Form",
-    "AttributeOnlyTest": "Attribute-Only Test"
+    "AttributeOnlyTest": "Attribute-Only Test",
+    "CombatSpellDefenseTest": "Combat Spell Defense"
   },
   "SR5.MissingResource": {
     "Edge": "No Edge left to consume"

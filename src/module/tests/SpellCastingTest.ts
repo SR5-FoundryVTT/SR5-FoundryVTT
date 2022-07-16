@@ -87,26 +87,8 @@ export class SpellCastingTest extends SuccessTest {
         this.data.drain = SpellcastingRules.calculateDrain(force, drain, reckless);
     }
 
-    async processSuccess(): Promise<void> {
-        await super.processSuccess();
-
-        if (this.item && this.item.isCombatSpell())
-            this.calculateCombatSpellDamage();
-    }
-
-    calculateCombatSpellDamage() {
-        if (!this.item) return;
-
-        if (this.item.isDirectCombatSpell())
-            this.data.damage = CombatSpellRules.calculateDirectDamage(this.data.damage);
-
-        if (this.item.isIndirectCombatSpell())
-            this.data.damage = CombatSpellRules.calculateIndirectDamage(this.data.damage, this.data.force);
-    }
-
     async afterTestComplete(): Promise<void> {
         await this.saveLastUsedForce();
-
         await super.afterTestComplete();
     }
 

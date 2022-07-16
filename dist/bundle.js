@@ -31573,8 +31573,8 @@ class SR5Item extends Item {
                 }
                 default: {
                     const activeTest = config_1.SR5.activeTests[this.data.type];
-                    const opposedTest = config_1.SR5.opposedTests[this.data.type][futureData.data.category];
-                    const resistTest = config_1.SR5.opposedResistTests[this.data.type][futureData.data.category];
+                    const opposedTest = config_1.SR5.opposedTests[this.data.type][futureData.data.category] || 'OpposedTest';
+                    const resistTest = config_1.SR5.opposedResistTests[this.data.type][futureData.data.category] || '';
                     foundry.utils.mergeObject(changed, { data: { action: {
                                 test: activeTest,
                                 opposed: { test: opposedTest,
@@ -34508,7 +34508,6 @@ exports.CombatSpellRules = void 0;
 const PartsList_1 = require("../parts/PartsList");
 const helpers_1 = require("../helpers");
 const CombatRules_1 = require("./CombatRules");
-const constants_1 = require("../constants");
 const DataDefaults_1 = require("../data/DataDefaults");
 class CombatSpellRules {
     /**
@@ -34519,9 +34518,7 @@ class CombatSpellRules {
      * @param damage The DamageData so far.
      */
     static calculateDirectDamage(damage) {
-        // damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.AttackerHits', attackerHits);
-        // Helpers.calcTotal(damage, {min: 0});
-        return damage;
+        return foundry.utils.duplicate(damage);
     }
     /**
      * Calculate combat spell damage as defined in SR5#283 Combat Spells Indirect section.
@@ -34532,6 +34529,7 @@ class CombatSpellRules {
      * @param force The force used during combat spell.
      */
     static calculateIndirectDamage(damage, force) {
+        damage = foundry.utils.duplicate(damage);
         const ap = -force;
         damage.ap.mod = PartsList_1.PartsList.AddUniquePart(damage.ap.mod, 'SR5.Force', ap);
         damage.mod = PartsList_1.PartsList.AddUniquePart(damage.mod, 'SR5.Force', force);
@@ -34556,14 +34554,58 @@ class CombatSpellRules {
     static modifyDamageAfterMiss(damage) {
         return CombatRules_1.CombatRules.modifyDamageAfterMiss(damage);
     }
-    static directCombatDefenseAction() {
-        return DataDefaults_1.DefaultValues.minimalActionData({
-            attribute: constants_1.SR.defense.spell.direct.mana,
-        });
+    /**
+     * Should a damage resist test be allowed according to SR5#283 section 'Combat Spells'
+     * @param type The general combat spell type.
+     * @returns When true, a damage resist test should be cast.
+     */
+    static allowDamageResist(type) {
+        return type === 'indirect';
+    }
+    /**
+     * Calculate base damage for all combat spell types.
+     *
+     * This will not include net hits after defense.
+     *
+     * @param type The combat spell type
+     * @param damage The incoming damage
+     * @param force Used force value during original spellcasting
+     * @returns A modified damage resulting
+     */
+    static calculateBaseDamage(type, damage, force) {
+        switch (type) {
+            case 'indirect':
+                return CombatSpellRules.calculateIndirectDamage(damage, force);
+            case 'direct':
+                return CombatSpellRules.calculateDirectDamage(damage);
+        }
+        return foundry.utils.duplicate(damage);
+    }
+    /**
+     * Return a testable action for combat spell defense based on SR5#283 Section 'Combat Defense'
+     *
+     * @param spellType The general spell type.
+     * @param combatType The combat spell type.
+     */
+    static defenseTestAction(spellType, combatType) {
+        if (spellType === '' || combatType === '')
+            console.warn(`Shadowrun5e | The given spell or combat spell types are empty and won't form a complete defense test action`);
+        const itemAction = DataDefaults_1.DefaultValues.minimalActionData();
+        if (spellType === 'mana' && combatType === 'direct') {
+            itemAction.attribute = 'willpower';
+        }
+        if (spellType === 'physical' && combatType === 'direct') {
+            itemAction.attribute = 'body';
+        }
+        if (combatType === 'indirect') {
+            itemAction.attribute = 'reaction';
+            itemAction.attribute2 = 'intuition';
+        }
+        return itemAction;
     }
 }
 exports.CombatSpellRules = CombatSpellRules;
-},{"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"./CombatRules":223}],225:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":220,"./CombatRules":223}],225:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComplexFormRules = void 0;
@@ -35597,7 +35639,14 @@ exports.CombatSpellDefenseTest = void 0;
 const DefenseTest_1 = require("./DefenseTest");
 const DataDefaults_1 = require("../data/DataDefaults");
 const CombatSpellRules_1 = require("../rules/CombatSpellRules");
+const TestCreator_1 = require("./TestCreator");
 class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
+    /**
+     * A combat spell defense test changes it's behaviour based on the spell it's defending against.
+     *
+     * @param item A spell item.
+     * @param actor The actor to defend with.
+     */
     static _getDocumentTestAction(item, actor) {
         const _super = Object.create(null, {
             _getDocumentTestAction: { get: () => super._getDocumentTestAction }
@@ -35607,20 +35656,13 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
             const spellData = item.asSpellData();
             if (!spellData)
                 return action;
-            const itemAction = DataDefaults_1.DefaultValues.minimalActionData();
-            // TODO: Add some kind of rule related section.?
-            if (spellData.data.type === 'mana' && spellData.data.combat.type === 'direct') {
-                itemAction.attribute = 'willpower';
-            }
-            if (spellData.data.type === 'physical' && spellData.data.combat.type === 'direct') {
-                itemAction.attribute = 'body';
-            }
-            if (spellData.data.combat.type === 'indirect') {
-                itemAction.attribute = 'reaction';
-                itemAction.attribute2 = 'intuition';
-            }
-            return foundry.utils.mergeObject(action, itemAction);
+            const itemAction = CombatSpellRules_1.CombatSpellRules.defenseTestAction(spellData.data.type, spellData.data.combat.type);
+            return TestCreator_1.TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
         });
+    }
+    prepareBaseValues() {
+        super.prepareBaseValues();
+        this.calculateCombatSpellDamage();
     }
     get testModifiers() {
         var _a;
@@ -35639,6 +35681,16 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
         return ['global'];
     }
     /**
+     * A combat spells damage depends on
+     */
+    calculateCombatSpellDamage() {
+        var _a;
+        const spellData = (_a = this.item) === null || _a === void 0 ? void 0 : _a.asSpellData();
+        if (!spellData)
+            return;
+        this.data.incomingDamage = CombatSpellRules_1.CombatSpellRules.calculateBaseDamage(spellData.data.combat.type, this.data.incomingDamage, this.data.against.force);
+    }
+    /**
      * A success on a defense test is a MISS on the initial attack.
      */
     processSuccess() {
@@ -35647,7 +35699,7 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
         });
         return __awaiter(this, void 0, void 0, function* () {
             yield _super.processSuccess.call(this);
-            this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDamageAfterMiss(this.data.modifiedDamage);
+            this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDamageAfterMiss(this.data.incomingDamage);
         });
     }
     /**
@@ -35664,19 +35716,37 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
             if (!spellData)
                 return;
             if (spellData.data.type === 'mana' && spellData.data.combat.type === 'direct') {
-                this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDirectDamageAfterHit(this.data.modifiedDamage, this.against.hits.value, this.hits.value);
+                this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDirectDamageAfterHit(this.data.incomingDamage, this.against.hits.value, this.hits.value);
             }
             if (spellData.data.type === 'physical' && spellData.data.combat.type === 'direct') {
-                this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDirectDamageAfterHit(this.data.modifiedDamage, this.against.hits.value, this.hits.value);
+                this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDirectDamageAfterHit(this.data.incomingDamage, this.against.hits.value, this.hits.value);
             }
             if (spellData.data.combat.type === 'indirect') {
-                this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyIndirectDamageAfterHit(this.data.modifiedDamage, this.against.hits.value, this.hits.value);
+                this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyIndirectDamageAfterHit(this.data.incomingDamage, this.against.hits.value, this.hits.value);
+            }
+        });
+    }
+    /**
+     * Combat Spell Defense allows a resist test for the defending actor.
+     */
+    afterFailure() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const spellData = (_a = this.item) === null || _a === void 0 ? void 0 : _a.asSpellData();
+            if (!spellData)
+                return;
+            // Only allow a defense test for in
+            if (CombatSpellRules_1.CombatSpellRules.allowDamageResist(spellData.data.combat.type)) {
+                const test = yield TestCreator_1.TestCreator.fromOpposedTestResistTest(this, this.data.options);
+                if (!test)
+                    return;
+                yield test.execute();
             }
         });
     }
 }
 exports.CombatSpellDefenseTest = CombatSpellDefenseTest;
-},{"../data/DataDefaults":153,"../rules/CombatSpellRules":224,"./DefenseTest":239}],238:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../rules/CombatSpellRules":224,"./DefenseTest":239,"./TestCreator":248}],238:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35797,6 +35867,12 @@ class DefenseTest extends OpposedTest_1.OpposedTest {
     }
     get _chatMessageTemplate() {
         return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
+    }
+    get successLabel() {
+        return 'SR5.AttackDodged';
+    }
+    get failureLabel() {
+        return 'SR5.AttackHits';
     }
 }
 exports.DefenseTest = DefenseTest;
@@ -35952,10 +36028,9 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
                 console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
                 return;
             }
-            // @ts-ignore // TODO: Typing here get's confused between boolean when it should be string.
+            // @ts-ignore // TODO: Typing expects a boolean, though OpposedTestData defines it as string. Odd.
             if (againstData.opposed.type !== '') {
-                console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
-                return;
+                console.warn(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
             }
             if (!actor) {
                 console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
@@ -36161,12 +36236,6 @@ class PhysicalDefenseTest extends DefenseTest_1.DefenseTest {
     }
     get failure() {
         return CombatRules_1.CombatRules.attackHits(this.against.hits.value, this.hits.value);
-    }
-    get successLabel() {
-        return 'SR5.AttackDodged';
-    }
-    get failureLabel() {
-        return 'SR5.AttackHits';
     }
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -36430,7 +36499,6 @@ exports.SpellCastingTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
 const SpellcastingRules_1 = require("../rules/SpellcastingRules");
 const PartsList_1 = require("../parts/PartsList");
-const CombatSpellRules_1 = require("../rules/CombatSpellRules");
 const DataDefaults_1 = require("../data/DataDefaults");
 /**
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
@@ -36493,24 +36561,6 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
         const reckless = this.data.reckless;
         this.data.drain = SpellcastingRules_1.SpellcastingRules.calculateDrain(force, drain, reckless);
     }
-    processSuccess() {
-        const _super = Object.create(null, {
-            processSuccess: { get: () => super.processSuccess }
-        });
-        return __awaiter(this, void 0, void 0, function* () {
-            yield _super.processSuccess.call(this);
-            if (this.item && this.item.isCombatSpell())
-                this.calculateCombatSpellDamage();
-        });
-    }
-    calculateCombatSpellDamage() {
-        if (!this.item)
-            return;
-        if (this.item.isDirectCombatSpell())
-            this.data.damage = CombatSpellRules_1.CombatSpellRules.calculateDirectDamage(this.data.damage);
-        if (this.item.isIndirectCombatSpell())
-            this.data.damage = CombatSpellRules_1.CombatSpellRules.calculateIndirectDamage(this.data.damage, this.data.force);
-    }
     afterTestComplete() {
         const _super = Object.create(null, {
             afterTestComplete: { get: () => super.afterTestComplete }
@@ -36532,7 +36582,7 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.SpellCastingTest = SpellCastingTest;
-},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/CombatSpellRules":224,"../rules/SpellcastingRules":232,"./SuccessTest":247}],247:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../parts/PartsList":220,"../rules/SpellcastingRules":232,"./SuccessTest":247}],247:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

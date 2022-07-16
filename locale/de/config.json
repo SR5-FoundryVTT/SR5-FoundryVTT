@@ -931,7 +931,8 @@
     "PhysicalResistTest": "Physische Schadenswiderstandsprobe",
     "SpellcastingTest": "Spruchzaubereiprobe",
     "ComplexFormTest": "Komplexe Form Weben",
-    "AttributeOnlyTest": "Attributsprobe"
+    "AttributeOnlyTest": "Attributsprobe",
+    "CombatSpellDefenseTest": "Kampfzauber Verteidigung"
   },
   "SR5.MissingResource": {
     "Edge": "Kein Edge übrig"

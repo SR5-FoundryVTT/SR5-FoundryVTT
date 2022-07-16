@@ -157,14 +157,6 @@ export class PhysicalDefenseTest extends DefenseTest {
         return CombatRules.attackHits(this.against.hits.value, this.hits.value)
     }
 
-    get successLabel() {
-        return 'SR5.AttackDodged';
-    }
-
-    get failureLabel() {
-        return 'SR5.AttackHits';
-    }
-
     async processSuccess() {
         this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
     }

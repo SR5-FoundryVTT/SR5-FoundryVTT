@@ -2,9 +2,9 @@ import DamageData = Shadowrun.DamageData;
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import {CombatRules} from "./CombatRules";
+import CombatSpellType = Shadowrun.CombatSpellType;
+import SpellType = Shadowrun.SpellType;
 import MinimalActionData = Shadowrun.MinimalActionData;
-import {SR} from "../constants";
-import ActorAttribute = Shadowrun.ActorAttribute;
 import {DefaultValues} from "../data/DataDefaults";
 
 export class CombatSpellRules {
@@ -16,9 +16,7 @@ export class CombatSpellRules {
      * @param damage The DamageData so far.
      */
     static calculateDirectDamage(damage: DamageData): DamageData {
-        // damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.AttackerHits', attackerHits);
-        // Helpers.calcTotal(damage, {min: 0});
-        return damage;
+        return foundry.utils.duplicate(damage);
     }
 
     /**
@@ -30,6 +28,8 @@ export class CombatSpellRules {
      * @param force The force used during combat spell.
      */
     static calculateIndirectDamage(damage: DamageData, force: number): DamageData {
+        damage = foundry.utils.duplicate(damage);
+
         const ap = -force;
         damage.ap.mod = PartsList.AddUniquePart(damage.ap.mod, 'SR5.Force', ap);
         damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.Force', force);
@@ -60,9 +60,59 @@ export class CombatSpellRules {
         return CombatRules.modifyDamageAfterMiss(damage);
     }
 
-    static directCombatDefenseAction(): MinimalActionData {
-        return DefaultValues.minimalActionData({
-            attribute: SR.defense.spell.direct.mana as ActorAttribute,
-        });
+    /**
+     * Should a damage resist test be allowed according to SR5#283 section 'Combat Spells'
+     * @param type The general combat spell type.
+     * @returns When true, a damage resist test should be cast.
+     */
+    static allowDamageResist(type: CombatSpellType): boolean {
+        return type === 'indirect';
+    }
+
+    /**
+     * Calculate base damage for all combat spell types.
+     *
+     * This will not include net hits after defense.
+     *
+     * @param type The combat spell type
+     * @param damage The incoming damage
+     * @param force Used force value during original spellcasting
+     * @returns A modified damage resulting
+     */
+    static calculateBaseDamage(type: CombatSpellType, damage: DamageData, force: number): DamageData {
+        switch (type) {
+            case 'indirect':
+                return CombatSpellRules.calculateIndirectDamage(damage, force);
+            case 'direct':
+                return CombatSpellRules.calculateDirectDamage(damage);
+        }
+
+        return foundry.utils.duplicate(damage);
+    }
+
+    /**
+     * Return a testable action for combat spell defense based on SR5#283 Section 'Combat Defense'
+     *
+     * @param spellType The general spell type.
+     * @param combatType The combat spell type.
+     */
+    static defenseTestAction(spellType: SpellType, combatType: CombatSpellType): MinimalActionData {
+        if (spellType === '' || combatType === '')
+            console.warn(`Shadowrun5e | The given spell or combat spell types are empty and won't form a complete defense test action`);
+
+        const itemAction = DefaultValues.minimalActionData();
+
+        if (spellType === 'mana' && combatType === 'direct') {
+            itemAction.attribute = 'willpower';
+        }
+        if (spellType === 'physical' && combatType === 'direct') {
+            itemAction.attribute = 'body';
+        }
+        if (combatType === 'indirect') {
+            itemAction.attribute = 'reaction';
+            itemAction.attribute2 = 'intuition';
+        }
+
+        return itemAction;
     }
 }

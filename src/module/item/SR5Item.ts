@@ -1904,8 +1904,8 @@ export class SR5Item extends Item {
                 }
                 default: {
                     const activeTest = SR5.activeTests[this.data.type];
-                    const opposedTest = SR5.opposedTests[this.data.type][futureData.data.category];
-                    const resistTest = SR5.opposedResistTests[this.data.type][futureData.data.category];
+                    const opposedTest = SR5.opposedTests[this.data.type][futureData.data.category] || 'OpposedTest';
+                    const resistTest = SR5.opposedResistTests[this.data.type][futureData.data.category] || '';
 
                     foundry.utils.mergeObject(changed, {data: {action: {
                         test: activeTest,

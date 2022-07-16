@@ -28,4 +28,12 @@ export class DefenseTest extends OpposedTest {
     get _chatMessageTemplate() {
         return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html'
     }
+
+    get successLabel() {
+        return 'SR5.AttackDodged';
+    }
+
+    get failureLabel() {
+        return 'SR5.AttackHits';
+    }
 }
