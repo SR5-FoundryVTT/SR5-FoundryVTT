@@ -56,6 +56,19 @@
             {{/unless}}
         </div>
     </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Armor"}}
+        </div>
+        <div class="inputs">
+            <input
+                    title="{{localize SR5.Armor}}"
+                    type="checkbox"
+                    name="data.action.opposed.armor"
+                    {{checked data.action.opposed.armor}}
+            />
+        </div>
+    </div>
 
     <div class="form-line">
         <div class="label">
@@ -109,6 +122,19 @@
                 {{/each}} {{/select}}
             </select>
             {{/unless}}
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Armor"}}
+        </div>
+        <div class="inputs">
+            <input
+                    title="{{localize SR5.Armor}}"
+                    type="checkbox"
+                    name="data.action.opposed.resist.armor"
+                    {{checked data.action.opposed.resist.armor}}
+            />
         </div>
     </div>
 </div>

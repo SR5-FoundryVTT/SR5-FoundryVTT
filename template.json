@@ -1149,6 +1149,7 @@
                     "attribute": "",
                     "attribute2": "",
                     "skill": "",
+                    "armor": false,
                     "spec": "",
                     "mod": 0,
                     "mod_description": "",
@@ -1192,6 +1193,7 @@
                         "attribute": "",
                         "attribute2": "",
                         "skill": "",
+                        "armor": false,
                         "mod": 0,
                         "description": "",
                         "resist": {
@@ -1199,6 +1201,7 @@
                             "skill": "",
                             "attribute": "",
                             "attribute2": "",
+                            "armor": false,
                             "mod": 0
                         }
                     },
@@ -1207,6 +1210,7 @@
                         "attribute": "",
                         "attribute2": "",
                         "skill": "",
+                        "armor": false,
                         "mod": 0
                     },
                     "modifiers": []

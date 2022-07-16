@@ -356,15 +356,18 @@ export const SR5 = {
      * These are meant to be used with the Modifiers class and SR5Actor.getModifiers('wounds').
      */
     modifierTypes: {
-        'environmental': 'SR5.ModifierTypes.Environmental',
-        'wounds': 'SR5.ModifierTypes.Wounds',
-        'global': 'SR5.Global',
-        'soak': 'SR5.Soak',
-        'defense': 'SR5.Defense',
-        'composure': 'SR5.RollComposure',
-        'judge_intentions': 'SR5.RollJudgeIntentions',
-        'lift_carry': 'SR5.RollLiftCarry',
-        'memory': 'SR5.RollMemory'
+        armor: 'SR5.Armor',
+        composure: 'SR5.RollComposure',
+        defense: 'SR5.RollDefense',
+        drain: 'SR5.Drain',
+        environmental: 'SR5.ModifierTypes.Environmental',
+        fade: 'SR5.RollFade',
+        global: 'SR5.Global',
+        judge_intentions: 'SR5.RollJudgeIntentions',
+        lift_carry: 'SR5.RollLiftCarry',
+        memory: 'SR5.RollMemory',
+        soak: 'SR5.RollSoak',
+        wounds: 'SR5.ModifierTypes.Wounds',
         // TODO: Add ActorData.modifiers to this list
     },
 

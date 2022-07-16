@@ -17638,10 +17638,10 @@ class SR5BaseActorSheet extends ActorSheet {
                     yield this.actor.promptRoll();
                     break;
                 case 'armor':
-                    yield this.actor.rollArmor(options);
+                    yield this.actor.rollAttributeOnlyTest('armor', options);
                     break;
                 case 'fade':
-                    yield this.actor.rollFade(options);
+                    yield this.actor.rollAttributeOnlyTest('fade', options);
                     break;
                 case 'drain':
                     yield this.actor.rollDrain(options);
@@ -23325,15 +23325,18 @@ exports.SR5 = {
      * These are meant to be used with the Modifiers class and SR5Actor.getModifiers('wounds').
      */
     modifierTypes: {
-        'environmental': 'SR5.ModifierTypes.Environmental',
-        'wounds': 'SR5.ModifierTypes.Wounds',
-        'global': 'SR5.Global',
-        'soak': 'SR5.Soak',
-        'defense': 'SR5.Defense',
-        'composure': 'SR5.RollComposure',
-        'judge_intentions': 'SR5.RollJudgeIntentions',
-        'lift_carry': 'SR5.RollLiftCarry',
-        'memory': 'SR5.RollMemory'
+        armor: 'SR5.Armor',
+        composure: 'SR5.RollComposure',
+        defense: 'SR5.RollDefense',
+        drain: 'SR5.Drain',
+        environmental: 'SR5.ModifierTypes.Environmental',
+        fade: 'SR5.RollFade',
+        global: 'SR5.Global',
+        judge_intentions: 'SR5.RollJudgeIntentions',
+        lift_carry: 'SR5.RollLiftCarry',
+        memory: 'SR5.RollMemory',
+        soak: 'SR5.RollSoak',
+        wounds: 'SR5.ModifierTypes.Wounds',
         // TODO: Add ActorData.modifiers to this list
     },
     /**
@@ -35600,7 +35603,7 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
             _getDocumentTestAction: { get: () => super._getDocumentTestAction }
         });
         return __awaiter(this, void 0, void 0, function* () {
-            const action = yield _super._getDocumentTestAction.call(this, item, actor);
+            const action = DataDefaults_1.DefaultValues.minimalActionData(yield _super._getDocumentTestAction.call(this, item, actor));
             const spellData = item.asSpellData();
             if (!spellData)
                 return action;
@@ -35929,8 +35932,6 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     }
     _prepareData(data, options) {
         data = super._prepareData(data, options);
-        // Get opposed item reference as sometimes opposed test details depend on the item used for the active test.
-        data.sourceItemUuid = data.against.sourceItemUuid;
         // TODO: this isn't needed if opposed is always taken from data.action.opposed
         delete data.opposed;
         delete data.targetActorsUuid;
@@ -35969,24 +35970,30 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
                 limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
                 threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
                 values: {},
+                sourceItemUuid: againstData.sourceItemUuid,
                 against: againstData
             };
-            // An opposing test will oppose net hits of the opposed test.
+            // An opposing test will oppose net hits of the original / success test.
             // Register these as a threshold, which will trigger success/failure status
             // and calculate netHits accordingly.
             data.threshold.base = againstData.values.netHits.value;
-            // Build the opposed action data
-            const action = DataDefaults_1.DefaultValues.actionData(this._getDefaultTestAction());
-            let documentAction = DataDefaults_1.DefaultValues.minimalActionData();
+            // Casting an opposed action doesn't give as complete ActionData from the original.
+            // Therefore we must create an empty dummy action.
+            let action = DataDefaults_1.DefaultValues.actionData();
+            // Allow the OpposedTest to overwrite action data using its class default action.
+            action = TestCreator_1.TestCreator._mergeMinimalActionDataInOrder(action, 
+            // Use action data from the original action at first.
+            againstData.opposed, 
+            // Overwrite with the OpposedTest class default action, if any.
+            this._getDefaultTestAction());
+            // Allow the OpposedTest to overwrite action data dynamically based on item data.
             if (againstData.sourceItemUuid) {
                 const item = yield fromUuid(againstData.sourceItemUuid);
-                documentAction = yield this._getDocumentTestAction(item, actor);
+                if (item) {
+                    const itemAction = yield this._getDocumentTestAction(item, actor);
+                    action = TestCreator_1.TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
+                }
             }
-            // Overwrite defaults with user defined action data.
-            action.skill = againstData.opposed.skill || documentAction.skill || action.skill;
-            action.attribute = againstData.opposed.attribute || documentAction.attribute || action.attribute;
-            action.attribute2 = againstData.opposed.attribute2 || documentAction.attribute2 || action.attribute2;
-            action.mod = againstData.opposed.mod || documentAction.mod || action.mod;
             return yield this._prepareActionTestData(action, actor, data);
         });
     }
@@ -36654,7 +36661,7 @@ class SuccessTest {
      */
     static _getDocumentTestAction(item, actor) {
         return __awaiter(this, void 0, void 0, function* () {
-            return DataDefaults_1.DefaultValues.minimalActionData();
+            return {};
         });
     }
     static _prepareActionTestData(action, actor, data) {
@@ -37668,7 +37675,7 @@ exports.TestCreator = {
             data.title = testCls.title;
             data.previousMessageId = test.data.messageUuid;
             data.against = test.data;
-            const action = exports.TestCreator._applyMinimalActionDataInOrder(DataDefaults_1.DefaultValues.actionData({ test: testCls.name }), yield testCls._getDocumentTestAction(test.item, test.actor), testCls._getDefaultTestAction());
+            const action = exports.TestCreator._mergeMinimalActionDataInOrder(DataDefaults_1.DefaultValues.actionData({ test: testCls.name }), yield testCls._getDocumentTestAction(test.item, test.actor), testCls._getDefaultTestAction());
             const testData = yield testCls._prepareActionTestData(action, test.actor, data);
             testData.following = test.data;
             // Create the followup test based on this tests documents and options.
@@ -37705,7 +37712,7 @@ exports.TestCreator = {
             let action = item.getAction();
             if (!action || !actor)
                 return data;
-            action = exports.TestCreator._applyMinimalActionDataInOrder(action, yield testCls._getDocumentTestAction(item, actor), testCls._getDefaultTestAction());
+            action = exports.TestCreator._mergeMinimalActionDataInOrder(action, yield testCls._getDocumentTestAction(item, actor), testCls._getDefaultTestAction());
             return yield exports.TestCreator._prepareTestDataWithAction(action, actor, data);
         });
     },
@@ -37757,6 +37764,11 @@ exports.TestCreator = {
             // A general pool modifier will be used as a base value.
             if (action.mod) {
                 data.pool.base = Number(action.mod);
+            }
+            // Add the armor value as a pool modifier
+            if (action.armor) {
+                const armor = actor.getArmor();
+                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.Armor', armor.value);
             }
             // Prepare limit values...
             if (action.limit.attribute) {
@@ -37821,7 +37833,7 @@ exports.TestCreator = {
             data.previousMessageId = previousMessageId;
             data.following = opposedData;
             // Provide default action information.
-            const action = exports.TestCreator._applyMinimalActionDataInOrder(DataDefaults_1.DefaultValues.actionData({ test: resistTestCls.name }), opposedData.against.opposed.resist, resistTestCls._getDefaultTestAction());
+            const action = exports.TestCreator._mergeMinimalActionDataInOrder(DataDefaults_1.DefaultValues.actionData({ test: resistTestCls.name }), opposedData.against.opposed.resist, resistTestCls._getDefaultTestAction());
             // Alter default action information with user defined information.
             return yield exports.TestCreator._prepareTestDataWithAction(action, actor, data);
         });
@@ -37841,16 +37853,27 @@ exports.TestCreator = {
             opposed: {}
         };
     },
-    _applyMinimalActionDataInOrder: function (action, ...minimalActions) {
+    /**
+     * Merge multiple MinimalActionData objects into one action object. This will only look at keys within a minimal action,
+     * not all action keys.
+     *
+     * Each MinimalActionData can contain only a partial, and an existing property will always overwrite either the
+     * main action or previously set values of this property from other MinimalActionDatas.
+     *
+     * @param action The main action
+     * @param minimalActions A list of partial action properties.
+     * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
+     */
+    _mergeMinimalActionDataInOrder: function (action, ...minimalActions) {
+        // This action might be taken from ItemData, causing changes to be reflected upstream.
+        action = duplicate(action);
         // Overwrite keys from second action on forward in indexed order.
         for (const minimalAction of minimalActions) {
             for (const key of Object.keys(DataDefaults_1.DefaultValues.minimalActionData())) {
                 if (!minimalAction.hasOwnProperty(key))
                     continue;
-                action[key] = minimalAction[key] || action[key];
+                action[key] = minimalAction[key];
             }
-            // false Armor will not behave as a boolean with the || operator.
-            action.armor = minimalAction.armor;
         }
         return action;
     },

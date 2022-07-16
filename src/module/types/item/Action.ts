@@ -73,7 +73,7 @@ declare namespace Shadowrun {
      */
     export interface OpposedTestData extends TestData {
         type: OpposedType
-        // Should match game.shadowrun5e.opposedTests
+        // NOTE: This description is not used anywhere. Legacy.
         description: string,
         resist: TestData
     }

@@ -12,7 +12,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
     against: SpellCastingTest
 
     static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<MinimalActionData> {
-        const action = await super._getDocumentTestAction(item, actor);
+        const action = DefaultValues.minimalActionData(await super._getDocumentTestAction(item, actor));
 
         const spellData = item.asSpellData();
         if (!spellData) return action;

@@ -221,7 +221,7 @@ export class SuccessTest {
     /**
      * Get a possible globally defined default action set for this test class.
      */
-    static _getDefaultTestAction() {
+    static _getDefaultTestAction(): Partial<MinimalActionData> {
         return {};
     }
 
@@ -234,8 +234,8 @@ export class SuccessTest {
      * @param item The item holding the action configuration.
      * @param actor The actor used for value calculation.
      */
-    static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<MinimalActionData> {
-        return DefaultValues.minimalActionData();
+    static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<Partial<MinimalActionData>> {
+        return {};
     }
 
     static async _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {

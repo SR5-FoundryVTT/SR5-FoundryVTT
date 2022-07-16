@@ -248,7 +248,7 @@ export const TestCreator = {
         data.previousMessageId = test.data.messageUuid;
         data.against = test.data;
 
-        const action = TestCreator._applyMinimalActionDataInOrder(
+        const action = TestCreator._mergeMinimalActionDataInOrder(
             DefaultValues.actionData({test: testCls.name}),
             await testCls._getDocumentTestAction(test.item, test.actor),
             testCls._getDefaultTestAction());
@@ -292,7 +292,7 @@ export const TestCreator = {
         let action = item.getAction();
         if (!action || !actor) return data;
 
-        action = TestCreator._applyMinimalActionDataInOrder(
+        action = TestCreator._mergeMinimalActionDataInOrder(
             action,
             await testCls._getDocumentTestAction(item, actor),
             testCls._getDefaultTestAction());
@@ -345,6 +345,11 @@ export const TestCreator = {
         // A general pool modifier will be used as a base value.
         if (action.mod) {
             data.pool.base = Number(action.mod);
+        }
+        // Add the armor value as a pool modifier
+        if (action.armor) {
+            const armor = actor.getArmor();
+            data.pool.mod = PartsList.AddUniquePart(data.pool.mod,'SR5.Armor', armor.value);
         }
 
         // Prepare limit values...
@@ -416,7 +421,7 @@ export const TestCreator = {
         data.following = opposedData;
 
         // Provide default action information.
-        const action = TestCreator._applyMinimalActionDataInOrder(
+        const action = TestCreator._mergeMinimalActionDataInOrder(
             DefaultValues.actionData({test: resistTestCls.name}),
             opposedData.against.opposed.resist,
             resistTestCls._getDefaultTestAction()
@@ -442,17 +447,27 @@ export const TestCreator = {
         };
     },
 
-    _applyMinimalActionDataInOrder: function(action, ...minimalActions: MinimalActionData[]): ActionRollData {
+    /**
+     * Merge multiple MinimalActionData objects into one action object. This will only look at keys within a minimal action,
+     * not all action keys.
+     *
+     * Each MinimalActionData can contain only a partial, and an existing property will always overwrite either the
+     * main action or previously set values of this property from other MinimalActionDatas.
+     *
+     * @param action The main action
+     * @param minimalActions A list of partial action properties.
+     * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
+     */
+    _mergeMinimalActionDataInOrder: function(action, ...minimalActions: Partial<MinimalActionData>[]): ActionRollData {
+        // This action might be taken from ItemData, causing changes to be reflected upstream.
+        action = duplicate(action);
+
         // Overwrite keys from second action on forward in indexed order.
         for (const minimalAction of minimalActions) {
              for (const key of Object.keys(DefaultValues.minimalActionData())) {
                  if (!minimalAction.hasOwnProperty(key)) continue;
-
-                 action[key] = minimalAction[key] || action[key];
+                 action[key] = minimalAction[key];
              }
-
-             // false Armor will not behave as a boolean with the || operator.
-             action.armor = minimalAction.armor;
         }
 
         return action;

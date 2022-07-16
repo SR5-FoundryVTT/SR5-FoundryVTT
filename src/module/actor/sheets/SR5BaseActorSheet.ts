@@ -544,10 +544,10 @@ export class SR5BaseActorSheet extends ActorSheet {
                 await this.actor.promptRoll();
                 break;
             case 'armor':
-                await this.actor.rollArmor(options);
+                await this.actor.rollAttributeOnlyTest('armor', options);
                 break;
             case 'fade':
-                await this.actor.rollFade(options);
+                await this.actor.rollAttributeOnlyTest('fade', options);
                 break;
             case 'drain':
                 await this.actor.rollDrain(options);

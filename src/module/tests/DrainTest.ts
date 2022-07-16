@@ -3,6 +3,7 @@ import {SpellCastingTestData} from "./SpellCastingTest";
 import {DefaultValues} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
+import MinimalActionData = Shadowrun.MinimalActionData;
 
 export interface DrainTestData extends SuccessTestData {
     incomingDrain: DamageData
@@ -24,7 +25,7 @@ export class DrainTest extends SuccessTest {
         return data;
     }
 
-    static _getDefaultTestAction() {
+    static _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
             'attribute2': 'willpower'
         };

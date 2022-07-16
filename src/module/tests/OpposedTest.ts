@@ -34,9 +34,6 @@ export class OpposedTest extends SuccessTest {
     _prepareData(data, options?): any {
         data = super._prepareData(data, options);
 
-        // Get opposed item reference as sometimes opposed test details depend on the item used for the active test.
-        data.sourceItemUuid = data.against.sourceItemUuid;
-
         // TODO: this isn't needed if opposed is always taken from data.action.opposed
         delete data.opposed;
         delete data.targetActorsUuid;
@@ -77,27 +74,35 @@ export class OpposedTest extends SuccessTest {
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
             values: {},
 
+            sourceItemUuid: againstData.sourceItemUuid,
             against: againstData
         }
 
-        // An opposing test will oppose net hits of the opposed test.
+        // An opposing test will oppose net hits of the original / success test.
         // Register these as a threshold, which will trigger success/failure status
         // and calculate netHits accordingly.
         data.threshold.base = againstData.values.netHits.value;
 
-        // Build the opposed action data
-        const action = DefaultValues.actionData(this._getDefaultTestAction());
-        let documentAction = DefaultValues.minimalActionData();
+        // Casting an opposed action doesn't give as complete ActionData from the original.
+        // Therefore we must create an empty dummy action.
+        let action = DefaultValues.actionData();
+
+        // Allow the OpposedTest to overwrite action data using its class default action.
+        action = TestCreator._mergeMinimalActionDataInOrder(action,
+            // Use action data from the original action at first.
+            againstData.opposed,
+            // Overwrite with the OpposedTest class default action, if any.
+            this._getDefaultTestAction()
+        );
+
+        // Allow the OpposedTest to overwrite action data dynamically based on item data.
         if (againstData.sourceItemUuid) {
             const item = await fromUuid(againstData.sourceItemUuid) as SR5Item;
-            documentAction = await this._getDocumentTestAction(item, actor);
+            if (item) {
+                const itemAction = await this._getDocumentTestAction(item, actor);
+                action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
+            }
         }
-
-        // Overwrite defaults with user defined action data.
-        action.skill = againstData.opposed.skill ||  documentAction.skill || action.skill;
-        action.attribute = againstData.opposed.attribute || documentAction.attribute || action.attribute;
-        action.attribute2 = againstData.opposed.attribute2 || documentAction.attribute2 || action.attribute2;
-        action.mod = againstData.opposed.mod || documentAction.mod || action.mod;
 
         return await this._prepareActionTestData(action, actor, data);
     }
