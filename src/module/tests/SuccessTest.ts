@@ -117,7 +117,6 @@ export class SuccessTest {
     public evaluated: boolean;
 
     public targets: TokenDocument[];
-    public following: SuccessTest | undefined;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // TODO: Move roll to documents (or name it context)

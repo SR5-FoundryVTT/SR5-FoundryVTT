@@ -1145,6 +1145,7 @@
             "action": {
                 "action": {
                     "type": "",
+                    "test": "SuccessTest",
                     "category": "",
                     "attribute": "",
                     "attribute2": "",
@@ -1189,7 +1190,7 @@
                     },
                     "opposed": {
                         "type": "",
-                        "test": "",
+                        "test": "OpposedTest",
                         "attribute": "",
                         "attribute2": "",
                         "skill": "",
@@ -1311,11 +1312,12 @@
                 "physical": false
             },
             "action": {
-                    "test": "SpellcastingTest",
-                    "opposed": {
-                        "test": ""
-                    }
+                "test": "SpellcastingTest",
+                "opposed": {
+                    "test": "",
+                    "resist": {"test": ""}
                 }
+            }
         },
         "critter_power": {
             "templates": ["description", "action", "armor"],
@@ -1327,7 +1329,17 @@
             "templates": ["description", "action"],
             "target": "",
             "duration": "",
-            "fade": 0
+            "fade": 0,
+            "action": {
+                "test": "ComplexFormTest",
+                "opposed": {
+                    "test": "OpposedTest",
+                    "resist": {"test": ""}
+                },
+                "followed": {
+                    "test": "DrainTest"
+                }
+            }
         },
         "weapon": {
             "templates": ["description", "action", "technology", "weapon"]
