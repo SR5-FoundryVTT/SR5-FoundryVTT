@@ -91,6 +91,39 @@ export class CombatSpellRules {
     }
 
     /**
+     * Modify incoming damage for a combat spell after the spell hit the defending target according to SR5#283 Section 'Combat Defense'
+     *
+     * @param spellType The general spell type.
+     * @param combatType The combat spell type.
+     * @param damage The incoming damage.
+     * @param attackerHits Hits achieved by the spell attack aster.
+     * @param defenderHits Hits achieved by the defender against the spell attack.
+     */
+    static modifyDamageAfterHit(spellType: SpellType, combatType: CombatSpellType, damage: DamageData, attackerHits: number, defenderHits: number): DamageData {
+
+        if (spellType === 'mana' && combatType === 'direct') {
+            return CombatSpellRules.modifyDirectDamageAfterHit(
+                damage,
+                attackerHits,
+                defenderHits);
+        }
+        if (spellType === 'physical' && combatType === 'direct') {
+            return CombatSpellRules.modifyDirectDamageAfterHit(
+                damage,
+                attackerHits,
+                defenderHits);
+        }
+        if (combatType === 'indirect') {
+            return CombatSpellRules.modifyIndirectDamageAfterHit(
+                damage,
+                attackerHits,
+                defenderHits);
+        }
+
+        return foundry.utils.duplicate(damage);
+    }
+
+    /**
      * Return a testable action for combat spell defense based on SR5#283 Section 'Combat Defense'
      *
      * @param spellType The general spell type.

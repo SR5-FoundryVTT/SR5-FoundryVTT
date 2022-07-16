@@ -34582,6 +34582,27 @@ class CombatSpellRules {
         return foundry.utils.duplicate(damage);
     }
     /**
+     * Modify incoming damage for a combat spell after the spell hit the defending target according to SR5#283 Section 'Combat Defense'
+     *
+     * @param spellType The general spell type.
+     * @param combatType The combat spell type.
+     * @param damage The incoming damage.
+     * @param attackerHits Hits achieved by the spell attack aster.
+     * @param defenderHits Hits achieved by the defender against the spell attack.
+     */
+    static modifyDamageAfterHit(spellType, combatType, damage, attackerHits, defenderHits) {
+        if (spellType === 'mana' && combatType === 'direct') {
+            return CombatSpellRules.modifyDirectDamageAfterHit(damage, attackerHits, defenderHits);
+        }
+        if (spellType === 'physical' && combatType === 'direct') {
+            return CombatSpellRules.modifyDirectDamageAfterHit(damage, attackerHits, defenderHits);
+        }
+        if (combatType === 'indirect') {
+            return CombatSpellRules.modifyIndirectDamageAfterHit(damage, attackerHits, defenderHits);
+        }
+        return foundry.utils.duplicate(damage);
+    }
+    /**
      * Return a testable action for combat spell defense based on SR5#283 Section 'Combat Defense'
      *
      * @param spellType The general spell type.
@@ -35715,15 +35736,7 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
             const spellData = (_a = this.item) === null || _a === void 0 ? void 0 : _a.asSpellData();
             if (!spellData)
                 return;
-            if (spellData.data.type === 'mana' && spellData.data.combat.type === 'direct') {
-                this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDirectDamageAfterHit(this.data.incomingDamage, this.against.hits.value, this.hits.value);
-            }
-            if (spellData.data.type === 'physical' && spellData.data.combat.type === 'direct') {
-                this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDirectDamageAfterHit(this.data.incomingDamage, this.against.hits.value, this.hits.value);
-            }
-            if (spellData.data.combat.type === 'indirect') {
-                this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyIndirectDamageAfterHit(this.data.incomingDamage, this.against.hits.value, this.hits.value);
-            }
+            this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDamageAfterHit(spellData.data.type, spellData.data.combat.type, this.data.incomingDamage, this.against.hits.value, this.hits.value);
         });
     }
     /**
@@ -36004,7 +36017,9 @@ const TestCreator_1 = require("./TestCreator");
 class OpposedTest extends SuccessTest_1.SuccessTest {
     constructor(data, documents, options) {
         super(data, documents, options);
-        this.against = new SuccessTest_1.SuccessTest(this.data.against);
+        // @ts-ignore // Feed original / active test data into the class originally used for ease of access.
+        const AgainstCls = new TestCreator_1.TestCreator._getTestClass(this.data.against.type) || SuccessTest_1.SuccessTest;
+        this.against = new AgainstCls(this.data.against);
     }
     _prepareData(data, options) {
         data = super._prepareData(data, options);

@@ -82,24 +82,8 @@ export class CombatSpellDefenseTest extends DefenseTest {
         const spellData = this.item?.asSpellData();
         if (!spellData) return;
 
-        if (spellData.data.type === 'mana' && spellData.data.combat.type === 'direct') {
-            this.data.modifiedDamage = CombatSpellRules.modifyDirectDamageAfterHit(
-                this.data.incomingDamage,
-                this.against.hits.value,
-                this.hits.value);
-        }
-        if (spellData.data.type === 'physical' && spellData.data.combat.type === 'direct') {
-            this.data.modifiedDamage = CombatSpellRules.modifyDirectDamageAfterHit(
-                this.data.incomingDamage,
-                this.against.hits.value,
-                this.hits.value);
-        }
-        if (spellData.data.combat.type === 'indirect') {
-            this.data.modifiedDamage = CombatSpellRules.modifyIndirectDamageAfterHit(
-                this.data.incomingDamage,
-                this.against.hits.value,
-                this.hits.value);
-        }
+        this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(spellData.data.type, spellData.data.combat.type,
+            this.data.incomingDamage, this.against.hits.value, this.hits.value);
     }
 
     /**
