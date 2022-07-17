@@ -108,7 +108,7 @@ export abstract class VersionMigration {
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
                 // @ts-ignore
-                await actor.updateEmbeddedDocuments('Item', [embeddedItems]);
+                await actor.updateEmbeddedDocuments('Item', embeddedItems);
             }
             await entity.update(updateData, { enforceTypes: false });
         }
@@ -261,7 +261,7 @@ export abstract class VersionMigration {
             const items = await Promise.all(
                 // @ts-ignore
                 actorData.items.map(async (item) => {
-                    let itemUpdate = await this.MigrateItemData(item.data);
+                    let itemUpdate = await this.MigrateItemData(item);
 
                     if (!isObjectEmpty(itemUpdate)) {
                         hasItemUpdates = true;
