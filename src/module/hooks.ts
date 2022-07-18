@@ -43,6 +43,8 @@ import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import SocketMessage = Shadowrun.SocketMessageData;
 import {ComplexFormTest} from "./tests/ComplexFormTest";
 import {AttributeOnlyTest} from "./tests/AttributeOnlyTest";
+import {NaturalRecoveryStunTest} from "./tests/NaturalRecoveryStunTest";
+import {NaturalRecoveryPhysicalTest} from "./tests/NaturalRecoveryPhysicalTest";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -131,7 +133,9 @@ ___________________
                 CombatSpellDefenseTest,
                 DrainTest,
                 ComplexFormTest,
-                AttributeOnlyTest
+                AttributeOnlyTest,
+                NaturalRecoveryStunTest,
+                NaturalRecoveryPhysicalTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -144,7 +148,9 @@ ___________________
                 RangedAttackTest,
                 SpellCastingTest,
                 ComplexFormTest,
-                PhysicalDefenseTest
+                PhysicalDefenseTest,
+                NaturalRecoveryStunTest,
+                NaturalRecoveryPhysicalTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.

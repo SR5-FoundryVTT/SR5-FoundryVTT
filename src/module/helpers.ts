@@ -841,7 +841,7 @@ export class Helpers {
         if (!pack) return;
 
         // TODO: Use predefined ids instead of names...
-        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(' ', '_') === actionName);
+        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(new RegExp(' ', 'g'), '_') === actionName.toLowerCase());
         if (!packEntry) return;
 
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;

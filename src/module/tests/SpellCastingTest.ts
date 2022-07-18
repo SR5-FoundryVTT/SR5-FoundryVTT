@@ -33,6 +33,13 @@ export class SpellCastingTest extends SuccessTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
     }
 
+    /**
+     * This test type can't be extended.
+     */
+    get canBeExtended() {
+        return false;
+    }
+
     static _getDefaultTestAction() {
         return DefaultValues.minimalActionData({
             skill: 'spellcasting',

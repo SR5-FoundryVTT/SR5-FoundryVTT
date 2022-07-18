@@ -1241,10 +1241,17 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onRollCellInput(event) {
         event.preventDefault();
         let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
-        if (track === 'stun' || track === 'physical') {
-            await this.actor.rollNaturalRecovery(track, event);
-        } else if (track === 'edge') {
-            await this.actor.rollAttribute('edge');
+
+        switch (track) {
+            case 'stun':
+                await this.actor.rollAttributeOnlyTest('natural_recovery_stun', {event});
+                break;
+            case 'physical':
+                await this.actor.rollAttributeOnlyTest('natural_recovery_physical', {event});
+                break;
+            case 'edge':
+                await this.actor.rollAttribute('edge', {event});
+                break;
         }
     }
 

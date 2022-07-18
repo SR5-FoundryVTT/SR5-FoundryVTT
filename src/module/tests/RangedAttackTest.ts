@@ -38,6 +38,13 @@ export class RangedAttackTest extends SuccessTest {
         return data;
     }
 
+    /**
+     * This test type can't be extended.
+     */
+    get canBeExtended() {
+        return false;
+    }
+
     _prepareFireMode() {
         // No firemodes selectable on dialog for invalid item provided.
         const weaponData = this.item?.asWeaponData();

@@ -834,7 +834,8 @@
     "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
     "InvalidMarksCount": "You've trying to place a strange number of marks",
     "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
-    "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden"
+    "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
+    "CantRecoverPhysicalWithStunDamage": "Solange geistiger Schaden ungeheilt bleibt kann kein physischer Schaden kuriert werden"
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
@@ -933,7 +934,9 @@
     "SpellcastingTest": "Spruchzaubereiprobe",
     "ComplexFormTest": "Komplexe Form Weben",
     "AttributeOnlyTest": "Attributsprobe",
-    "CombatSpellDefenseTest": "Kampfzauber Verteidigung"
+    "CombatSpellDefenseTest": "Kampfzauber Verteidigung",
+    "NaturalRecoveryStunTest": "Natürliche Genesung Geistig",
+    "NaturalRecoveryPhysicalTest": "Natürliche Genesung Körperlich"
   },
   "SR5.MissingResource": {
     "Edge": "Kein Edge übrig"

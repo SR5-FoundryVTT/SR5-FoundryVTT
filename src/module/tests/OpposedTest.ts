@@ -116,6 +116,13 @@ export class OpposedTest extends SuccessTest {
     }
 
     /**
+     * This test type can't be extended.
+     */
+    get canBeExtended() {
+        return false;
+    }
+
+    /**
      * Opposed tests shouldn't show item description from the active tests source item.
      */
     get _canShowDescription(): boolean {

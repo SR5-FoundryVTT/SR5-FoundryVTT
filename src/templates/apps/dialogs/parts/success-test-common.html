@@ -63,6 +63,12 @@
     </div>
     {{/if}}
     <div class="sunken">
+        {{#if test.canBeExtended}}
+        <div class="form-group">
+            <label>{{localize "SR5.Extended"}}</label>
+            <input type="checkbox" name="test.data.extended" {{#if test.extended}}checked{{/if}} />
+        </div>
+        {{/if}}
         <div class="form-group">
             <label>{{ localize "SR5.RollMode" }}</label>
             <select style="color: white" name="test.data.options.rollMode">

@@ -869,7 +869,8 @@
     "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
     "InvalidMarksCount": "You've trying to place a strange number of marks",
     "AlreadyExistingInventory": "An inventory with this name alreayd exists",
-    "CantEditDefaultInventory": "The default inventory can't be renamed"
+    "CantEditDefaultInventory": "The default inventory can't be renamed",
+    "CantRecoverPhysicalWithStunDamage": "Cant recover from physical damage with stun damage still present"
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
@@ -971,7 +972,9 @@
     "SpellCastingTest": "Spellcasting",
     "ComplexFormTest": "Threading Complex Form",
     "AttributeOnlyTest": "Attribute-Only Test",
-    "CombatSpellDefenseTest": "Combat Spell Defense"
+    "CombatSpellDefenseTest": "Combat Spell Defense",
+    "NaturalRecoveryStunTest": "Natural Recovery Stun",
+    "NaturalRecoveryPhysicalTest": "Natural Recovery Physical"
   },
   "SR5.MissingResource": {
     "Edge": "No Edge left to consume"

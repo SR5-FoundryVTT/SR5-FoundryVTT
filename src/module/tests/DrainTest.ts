@@ -31,6 +31,13 @@ export class DrainTest extends SuccessTest {
         };
     }
 
+    /**
+     * This test type can't be extended.
+     */
+    get canBeExtended() {
+        return false;
+    }
+
     get testModifiers() {
         return []
     }

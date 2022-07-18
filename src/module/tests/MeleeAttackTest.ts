@@ -16,6 +16,13 @@ export class MeleeAttackTest extends SuccessTest {
         return data;
     }
 
+    /**
+     * This test type can't be extended.
+     */
+    get canBeExtended() {
+        return false;
+    }
+
      get testModifiers() {
         return ['global', 'wounds', 'environmental'];
     }

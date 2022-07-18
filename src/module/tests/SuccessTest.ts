@@ -645,7 +645,16 @@ export class SuccessTest {
      * Helper to check if this test is currently being extended.
      */
     get extended(): boolean {
-        return this.data.extended;
+        return this.canBeExtended && this.data.extended;
+    }
+
+    /**
+     * Can this test type be extended or not?
+     *
+     * If false, will hide extended dialog settings.
+     */
+    get canBeExtended(): boolean {
+        return true;
     }
 
     get glitches(): ValueField {

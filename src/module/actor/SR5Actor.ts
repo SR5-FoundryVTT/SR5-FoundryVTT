@@ -64,6 +64,8 @@ import {ModifierFlow} from "./flows/ModifierFlow";
 import {SuccessTest, TestOptions} from "../tests/SuccessTest";
 import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
+import DamageType = Shadowrun.DamageType;
+import {RecoveryRules} from "../rules/RecoveryRules";
 
 function getGame(): Game {
     if (!(game instanceof Game)) {
@@ -1131,7 +1133,7 @@ export class SR5Actor extends Actor {
      * @param rollId The internal attribute action id
      * @param options Success Test options
      */
-    async rollAttributeOnlyTest(rollId: 'armor'|'fade'|'composure'|'judge_intentions'|'lift_carry'|'memory'|'physical_defense', options?: ActorRollOptions) {
+    async rollAttributeOnlyTest(rollId: 'natural_recovery_stun'|'natural_recovery_physical'|'armor'|'fade'|'composure'|'judge_intentions'|'lift_carry'|'memory'|'physical_defense', options?: ActorRollOptions) {
         const action = await Helpers.getPackAction(SR5.packNames.attributeActions, rollId);
         if (!action) return;
 
@@ -1497,6 +1499,39 @@ export class SR5Actor extends Actor {
 
         const data = {[`data.track.${damage.type.value}.overflow`]: overflow};
         await this.update(data);
+    }
+
+    /**
+     * Heal damage on a given damage track. Be aware that healing damage doesn't equate to recovering damage
+     * and will not adhere to the recovery rules.
+     *
+     * @param track What track should be healed?
+     * @param healing How many boxes of healing should be done?
+     */
+    async healDamage(track: DamageType, healing: number) {
+        console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
+
+        // @ts-ignore
+        if (!this.data.data?.track.hasOwnProperty(track)) return
+
+        // @ts-ignore
+        const current = Math.max(this.data.data.track[track].value - healing, 0);
+
+        await this.update({[`data.track.${track}.value`]: current});
+    }
+
+    async healStunDamage(healing: number) {
+        await this.healDamage('stun', healing);
+    }
+
+    async healPhysicalDamage(healing: number) {
+        await this.healDamage('physical', healing);
+    }
+
+    get canRecoverPhysicalDamage(): boolean {
+        const stun = this.getStunTrack();
+        if (!stun) return false
+        return RecoveryRules.canHealPhysicalDamage(stun.value);
     }
 
     /** Apply damage to the stun track and get overflow damage for the physical track.
