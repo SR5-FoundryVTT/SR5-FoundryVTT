@@ -356,10 +356,16 @@ export const TestCreator = {
         if (action.limit.attribute) {
             // Get the limit connected to the defined attribute.
             // NOTE: This might differ from the USED attribute...
-            const attribute = actor.getAttribute(action.limit.attribute);
+            const limit = actor.getLimit(action.limit.attribute);
+            if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
+        }
+        // No explicit limit set, maybe derive from used skill / action
+        else if (action.skill && action.attribute) {
+            const attribute = actor.getAttribute(action.attribute);
             const limit = actor.getLimit(attribute.limit as string);
             if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
         }
+
         if (action.limit.base || action.limit.value) {
             data.limit.base = Number(action.limit.value);
         }
@@ -391,6 +397,8 @@ export const TestCreator = {
             data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
         }
 
+        // Mark test as extended.
+        data.extended = action.extended;
 
         return data;
     },

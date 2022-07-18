@@ -16,6 +16,7 @@ import ActionRollData = Shadowrun.ActionRollData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import {TestCreator} from "./TestCreator";
 import Template from "../template";
+import {TestRules} from "../rules/TestRules";
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -31,6 +32,7 @@ export interface SuccessTestValues extends TestValues {
     hits: ValueField
     netHits: ValueField
     glitches: ValueField
+    extendedHits: ValueField
 }
 
 interface TestModifier {
@@ -67,6 +69,9 @@ export interface TestData {
     // Edge related triggers
     pushTheLimit: boolean
     secondChance: boolean
+
+    // When true this test is an extended test
+    extended: boolean
 
     // The source action this test is derived from.
     action: ActionRollData
@@ -504,12 +509,13 @@ export class SuccessTest {
      * Calculate the total of all values.
      */
     calculateDerivedValues() {
-        // Calculate all derived / static values.
+        // Calculate all derived / static values. Order is important.
         this.data.values.hits = this.calculateHits();
+        this.data.values.extendedHits = this.calculateExtendedHits();
         this.data.values.netHits = this.calculateNetHits();
         this.data.values.glitches = this.calculateGlitches();
 
-                console.log(`Shadowrun 5e | Calculated derived values for ${this.constructor.name}`, this.data);
+        console.log(`Shadowrun 5e | Calculated derived values for ${this.constructor.name}`, this.data);
     }
 
     /**
@@ -560,10 +566,13 @@ export class SuccessTest {
      * Helper to get the net hits value for this success test with a possible threshold.
      */
     calculateNetHits(): ValueField {
+        // An extended test will use summed up extended hit, while a normal test will use its own hits.
+        const hits = this.extended ? this.extendedHits : this.hits;
+
         // Maybe lower hits by threshold to get the actual net hits.
         const base = this.hasThreshold ?
-            Math.max(this.hits.value - this.threshold.value, 0) :
-            this.hits.value;
+            Math.max(hits.value - this.threshold.value, 0) :
+            hits.value;
 
         // Calculate a ValueField for standardisation.
         const netHits = DefaultValues.valueData({
@@ -599,6 +608,11 @@ export class SuccessTest {
         return this.data.values.hits;
     }
 
+    get extendedHits(): ValueField {
+        // Return a default value field, for when no extended hits have been derived yet (or ever).
+        return this.data.values.extendedHits || DefaultValues.valueData({label: 'SR5.ExtendedHits'});
+    }
+
     /**
      * Helper to get the glitches values for this success test.
      */
@@ -613,6 +627,27 @@ export class SuccessTest {
         return glitches;
     }
 
+    /**
+     * Gather hits across multiple extended test executions.
+     */
+    calculateExtendedHits(): ValueField {
+        if (!this.extended) return DefaultValues.valueData();
+
+        const extendedHits = this.extendedHits;
+        extendedHits.mod = PartsList.AddPart(extendedHits.mod, 'SR5.Hits', this.hits.value);
+
+        Helpers.calcTotal(extendedHits, {min: 0});
+
+        return extendedHits;
+    }
+
+    /**
+     * Helper to check if this test is currently being extended.
+     */
+    get extended(): boolean {
+        return this.data.extended;
+    }
+
     get glitches(): ValueField {
         return this.data.values.glitches;
     }
@@ -621,14 +656,14 @@ export class SuccessTest {
      * Helper to check if the current test state is glitched.
      */
     get glitched(): boolean {
-        return this.glitches.value > Math.floor(this.pool.value / 2);
+        return TestRules.glitched(this.glitches.value, this.pool.value);
     }
 
     /**
      * Helper to check if the current test state is critically glitched.
      */
     get criticalGlitched(): boolean {
-        return !this.success && this.glitched;
+        return TestRules.criticalGlitched(this.success, this.glitched);
     }
 
     /**
@@ -638,7 +673,9 @@ export class SuccessTest {
      * only report success when there is one.
      */
     get success(): boolean {
-        return this.netHits.value > 0;
+        // Either use this tests current hits or use the extended tests summed up hits.
+        const hits = this.extended ? this.extendedHits : this.hits;
+        return TestRules.success(hits.value, this.threshold.value);
     }
 
     /**
@@ -850,6 +887,10 @@ export class SuccessTest {
         }
 
         await this.executeFollowUp();
+
+        if (this.extended) {
+            await this.extendCurrentTest();
+        }
     }
 
     /**
@@ -871,6 +912,32 @@ export class SuccessTest {
         const test = await TestCreator.fromFollowupTest(this, this.data.options);
         if (!test) return;
         await test.execute();
+    }
+
+    /**
+     * Should this test be an extended test, re-execute it until it can't be anymore.
+     */
+    async extendCurrentTest() {
+        const data = foundry.utils.duplicate(this.data);
+        // No extension possible, if test type / class is unknown.
+        if (!data.type) return;
+
+        // Apply the extended modifier according the current iteration
+        const pool = new PartsList(data.pool.mod);
+
+        const currentModifierValue = pool.getPartValue('SR5.ExtendedTest') || 0;
+        const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
+
+        pool.addUniquePart('SR5.ExtendedTest', nextModifierValue);
+
+        Helpers.calcTotal(data.pool, {min: 0});
+
+        if (TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
+            const testCls = TestCreator._getTestClass(data.type);
+            if (!testCls) return;
+            const test = new testCls(data, {actor: this.actor, item: this.item}, this.data.options);
+            await test.execute();
+        }
     }
 
     /**

@@ -544,6 +544,7 @@
   "SR5.EnvironmentVeryHigh": "Very High",
   "SR5.WoundModifier": "Wound Mod",
   "SR5.ExtendedTest": "Extended Test",
+  "SR5.ExtendedHits": "Extended Hits",
   "SR5.IncomingDamage": "Incoming Damage",
   "SR5.ModifiedDamage": "Mod. Damage",
   "SR5.Temporary": "Temporary",

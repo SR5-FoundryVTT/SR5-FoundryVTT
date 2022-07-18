@@ -113,6 +113,12 @@ export class PartsList<TType> {
         return this.list;
     }
 
+    static AddPart<TType>(list: ModList<TType>, name: string, value: TType): ModList<TType> {
+        const parts = new PartsList(list);
+        parts.addPart(name, value);
+        return parts._list;
+    }
+
     static AddUniquePart<TType>(list: ModList<TType>, name: string, value: TType, overwrite = true): ModList<TType> {
         const parts = new PartsList(list);
         parts.addUniquePart(name, value, overwrite);

@@ -42,6 +42,7 @@
             <div class="right-side">
                 <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span>{{test.pool.value}}</span></div>
                 <div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span>{{test.hits.value}}</span></div>
+                {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span>{{test.extendedHits.value}}</span></div>{{/if}}
                 {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span>{{test.netHits.value}}</span></div>{{/if}}
                 {{#if previewTemplate}}
                 <div class="test-value">
