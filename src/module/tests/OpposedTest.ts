@@ -116,6 +116,20 @@ export class OpposedTest extends SuccessTest {
     }
 
     /**
+     * Opposed tests shouldn't show item description from the active tests source item.
+     */
+    get _canShowDescription(): boolean {
+        return false;
+    }
+
+    /**
+     * Opposed tests can't cause any blast template.
+     */
+    get _canPlaceBlastTemplate(): boolean {
+        return false;
+    }
+
+    /**
      * Using a message action cast an opposed test to that messages active test.
      *
      * @param event A PointerEvent by user interaction to trigger the test action.

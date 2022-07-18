@@ -30,7 +30,7 @@
                 <div><span class="test-code">{{test.code}}</span></div>
             </div>
         </div>
-        <div class="card-content clickable show-description">
+        <div class="card-content {{#if showDescription}}clickable show-description{{/if}}">
             <div class="left-side">
                 {{#if test.hasLimit}}
                 <div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span>{{test.limit.value}}</span></div>
@@ -50,7 +50,7 @@
                 {{/if}}
             </div>
         </div>
-        {{#if description}}
+        {{#if showDescription}}
          <div class="card-description">
             {{#if description.description.value}}
             <div class="card-description-content">

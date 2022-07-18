@@ -36192,6 +36192,18 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
         return false;
     }
     /**
+     * Opposed tests shouldn't show item description from the active tests source item.
+     */
+    get _canShowDescription() {
+        return false;
+    }
+    /**
+     * Opposed tests can't cause any blast template.
+     */
+    get _canPlaceBlastTemplate() {
+        return false;
+    }
+    /**
      * Using a message action cast an opposed test to that messages active test.
      *
      * @param event A PointerEvent by user interaction to trigger the test action.
@@ -37450,7 +37462,7 @@ class SuccessTest {
      * TODO: Add template data typing.
      */
     _prepareMessageTemplateData() {
-        var _a, _b, _c;
+        var _a, _b;
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.getActiveTokens(true)) || [];
@@ -37465,9 +37477,26 @@ class SuccessTest {
             },
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
-            previewTemplate: ((_b = this.item) === null || _b === void 0 ? void 0 : _b.hasTemplate) || false,
-            description: ((_c = this.item) === null || _c === void 0 ? void 0 : _c.getChatData()) || ''
+            previewTemplate: this._canPlaceBlastTemplate,
+            showDescription: this._canShowDescription,
+            description: ((_b = this.item) === null || _b === void 0 ? void 0 : _b.getChatData()) || ''
         };
+    }
+    /**
+     * Indicate if this test can be used to show the item description.
+     */
+    get _canShowDescription() {
+        return true;
+    }
+    /**
+     * Indicate if this test can be used to place a blast template using the shown chat message.
+     *
+     * This is indicated by the source items ability to cause an area of effect blast and which kind
+     * of test is used.
+     */
+    get _canPlaceBlastTemplate() {
+        var _a;
+        return ((_a = this.item) === null || _a === void 0 ? void 0 : _a.hasTemplate) || false;
     }
     /**
      * Prepare opposed test action buttons.

@@ -920,9 +920,27 @@ export class SuccessTest {
             },
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
-            previewTemplate: this.item?.hasTemplate || false,
+            previewTemplate: this._canPlaceBlastTemplate,
+            showDescription: this._canShowDescription,
             description: this.item?.getChatData() || ''
         }
+    }
+
+    /**
+     * Indicate if this test can be used to show the item description.
+     */
+    get _canShowDescription(): boolean {
+        return true;
+    }
+
+    /**
+     * Indicate if this test can be used to place a blast template using the shown chat message.
+     *
+     * This is indicated by the source items ability to cause an area of effect blast and which kind
+     * of test is used.
+     */
+    get _canPlaceBlastTemplate(): boolean {
+        return this.item?.hasTemplate || false;
     }
 
     /**
