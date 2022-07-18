@@ -17680,7 +17680,7 @@ class SR5BaseActorSheet extends ActorSheet {
                     yield this.actor.rollAttributeOnlyTest('fade', options);
                     break;
                 case 'drain':
-                    yield this.actor.rollDrain(options);
+                    yield this.actor.rollAttributeOnlyTest('drain', options);
                     break;
                 case 'defense':
                     // await this.actor.rollAttackDefense(options);
@@ -26702,7 +26702,8 @@ ___________________
                 ComplexFormTest: ComplexFormTest_1.ComplexFormTest,
                 PhysicalDefenseTest: PhysicalDefenseTest_1.PhysicalDefenseTest,
                 NaturalRecoveryStunTest: NaturalRecoveryStunTest_1.NaturalRecoveryStunTest,
-                NaturalRecoveryPhysicalTest: NaturalRecoveryPhysicalTest_1.NaturalRecoveryPhysicalTest
+                NaturalRecoveryPhysicalTest: NaturalRecoveryPhysicalTest_1.NaturalRecoveryPhysicalTest,
+                DrainTest: DrainTest_1.DrainTest,
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -36138,11 +36139,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DrainTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
+const SpellCastingTest_1 = require("./SpellCastingTest");
 const DataDefaults_1 = require("../data/DataDefaults");
 const DrainRules_1 = require("../rules/DrainRules");
 class DrainTest extends SuccessTest_1.SuccessTest {
     _prepareData(data, options) {
         data = super._prepareData(data, options);
+        data.against = data.against || new SpellCastingTest_1.SpellCastingTest({}, {}, options).data;
         data.incomingDrain = DataDefaults_1.DefaultValues.damageData();
         data.modifiedDrain = DataDefaults_1.DefaultValues.damageData();
         return data;
@@ -36194,13 +36197,11 @@ class DrainTest extends SuccessTest_1.SuccessTest {
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
             DrainRules_1.DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
-            console.error('Incoming', this.data.incomingDrain);
-            console.error('Modified', this.data.modifiedDrain);
         });
     }
 }
 exports.DrainTest = DrainTest;
-},{"../data/DataDefaults":153,"../rules/DrainRules":227,"./SuccessTest":252}],244:[function(require,module,exports){
+},{"../data/DataDefaults":153,"../rules/DrainRules":227,"./SpellCastingTest":251,"./SuccessTest":252}],244:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37297,7 +37298,8 @@ class SuccessTest {
         this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
         // Without further rules applied just use the general action damage configuration.
         // This damage can be further altered using process* methods.
-        this.data.damage = ActionFlow_1.ActionFlow.calcDamage(this.data.action.damage, this.actor);
+        const damage = this.data.action ? this.data.action.damage : DataDefaults_1.DefaultValues.damageData();
+        this.data.damage = ActionFlow_1.ActionFlow.calcDamage(damage, this.actor);
         console.log(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
     /**

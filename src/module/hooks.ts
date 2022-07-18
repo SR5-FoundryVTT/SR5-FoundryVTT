@@ -150,7 +150,8 @@ ___________________
                 ComplexFormTest,
                 PhysicalDefenseTest,
                 NaturalRecoveryStunTest,
-                NaturalRecoveryPhysicalTest
+                NaturalRecoveryPhysicalTest,
+                DrainTest,
             },
             /**
              * Subset of tests meant to be used as opposed tests.

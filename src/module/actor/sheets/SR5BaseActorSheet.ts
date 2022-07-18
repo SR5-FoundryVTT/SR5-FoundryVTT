@@ -550,7 +550,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 await this.actor.rollAttributeOnlyTest('fade', options);
                 break;
             case 'drain':
-                await this.actor.rollDrain(options);
+                await this.actor.rollAttributeOnlyTest('drain', options);
                 break;
             case 'defense':
                 // await this.actor.rollAttackDefense(options);

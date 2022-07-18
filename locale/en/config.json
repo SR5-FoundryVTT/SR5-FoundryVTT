@@ -974,7 +974,8 @@
     "AttributeOnlyTest": "Attribute-Only Test",
     "CombatSpellDefenseTest": "Combat Spell Defense",
     "NaturalRecoveryStunTest": "Natural Recovery Stun",
-    "NaturalRecoveryPhysicalTest": "Natural Recovery Physical"
+    "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
+    "DrainTest": "Drain Test"
   },
   "SR5.MissingResource": {
     "Edge": "No Edge left to consume"

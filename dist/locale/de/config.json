@@ -936,7 +936,8 @@
     "AttributeOnlyTest": "Attributsprobe",
     "CombatSpellDefenseTest": "Kampfzauber Verteidigung",
     "NaturalRecoveryStunTest": "Natürliche Genesung Geistig",
-    "NaturalRecoveryPhysicalTest": "Natürliche Genesung Körperlich"
+    "NaturalRecoveryPhysicalTest": "Natürliche Genesung Körperlich",
+    "DrainTest": "Entzugswiderstand"
   },
   "SR5.MissingResource": {
     "Edge": "Kein Edge übrig"

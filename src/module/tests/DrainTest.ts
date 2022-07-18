@@ -1,5 +1,5 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {SpellCastingTestData} from "./SpellCastingTest";
+import {SpellCastingTest, SpellCastingTestData} from "./SpellCastingTest";
 import {DefaultValues} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
@@ -18,6 +18,8 @@ export class DrainTest extends SuccessTest {
 
     _prepareData(data, options): any {
         data = super._prepareData(data, options);
+
+        data.against = data.against || new SpellCastingTest({}, {}, options).data;
 
         data.incomingDrain = DefaultValues.damageData();
         data.modifiedDrain = DefaultValues.damageData();
@@ -76,8 +78,5 @@ export class DrainTest extends SuccessTest {
 
     async processSuccess() {
         DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
-
-        console.error('Incoming', this.data.incomingDrain);
-        console.error('Modified', this.data.modifiedDrain);
     }
 }

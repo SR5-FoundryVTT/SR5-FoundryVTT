@@ -1133,7 +1133,7 @@ export class SR5Actor extends Actor {
      * @param rollId The internal attribute action id
      * @param options Success Test options
      */
-    async rollAttributeOnlyTest(rollId: 'natural_recovery_stun'|'natural_recovery_physical'|'armor'|'fade'|'composure'|'judge_intentions'|'lift_carry'|'memory'|'physical_defense', options?: ActorRollOptions) {
+    async rollAttributeOnlyTest(rollId: 'drain'|'natural_recovery_stun'|'natural_recovery_physical'|'armor'|'fade'|'composure'|'judge_intentions'|'lift_carry'|'memory'|'physical_defense', options?: ActorRollOptions) {
         const action = await Helpers.getPackAction(SR5.packNames.attributeActions, rollId);
         if (!action) return;
 

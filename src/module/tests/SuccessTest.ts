@@ -430,7 +430,8 @@ export class SuccessTest {
 
         // Without further rules applied just use the general action damage configuration.
         // This damage can be further altered using process* methods.
-        this.data.damage = ActionFlow.calcDamage(this.data.action.damage, this.actor);
+        const damage = this.data.action ? this.data.action.damage : DefaultValues.damageData();
+        this.data.damage = ActionFlow.calcDamage(damage, this.actor);
 
         console.log(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
