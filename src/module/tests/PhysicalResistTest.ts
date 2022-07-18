@@ -75,11 +75,31 @@ export class PhysicalResistTest extends SuccessTest {
         }
     }
 
+    calculateBaseValues() {
+        super.calculateBaseValues();
+
+        // Calculate damage values in case of user dialog interaction.
+        Helpers.calcTotal(this.data.incomingDamage, {min: 0});
+        Helpers.calcTotal(this.data.incomingDamage.ap);
+
+        // Remove user override and resulting incoming damage as base.
+        this.data.modifiedDamage = foundry.utils.duplicate(this.data.incomingDamage);
+        this.data.modifiedDamage.base = this.data.incomingDamage.value;
+        this.data.modifiedDamage.mod = [];
+        delete this.data.modifiedDamage.override;
+        this.data.modifiedDamage.ap.base = this.data.incomingDamage.value;
+        this.data.modifiedDamage.ap.mod = [];
+        delete this.data.modifiedDamage.ap.override;
+
+        Helpers.calcTotal(this.data.modifiedDamage);
+        Helpers.calcTotal(this.data.modifiedDamage.ap);
+    }
+
     get canSucceed() {
         return false;
     }
 
     async processSuccess() {
-        this.data.modifiedDamage = CombatRules.modifyDamageAfterResist(this.data.incomingDamage, this.hits.value);
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
     }
 }

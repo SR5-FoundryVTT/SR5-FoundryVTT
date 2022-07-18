@@ -146,6 +146,7 @@ ___________________
                 SuccessTest,
                 MeleeAttackTest,
                 RangedAttackTest,
+                PhysicalResistTest,
                 SpellCastingTest,
                 ComplexFormTest,
                 PhysicalDefenseTest,

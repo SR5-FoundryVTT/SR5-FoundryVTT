@@ -17687,7 +17687,7 @@ class SR5BaseActorSheet extends ActorSheet {
                     yield this.actor.rollAttributeOnlyTest('physical_defense', options);
                     break;
                 case 'damage-resist':
-                    yield this.actor.rollSoak(options);
+                    yield this.actor.rollAttributeOnlyTest('physical_damage_resist', options);
                     break;
                 // attribute only rolls
                 case 'composure':
@@ -26698,6 +26698,7 @@ ___________________
                 SuccessTest: SuccessTest_1.SuccessTest,
                 MeleeAttackTest: MeleeAttackTest_1.MeleeAttackTest,
                 RangedAttackTest: RangedAttackTest_1.RangedAttackTest,
+                PhysicalResistTest: PhysicalResistTest_1.PhysicalResistTest,
                 SpellCastingTest: SpellCastingTest_1.SpellCastingTest,
                 ComplexFormTest: ComplexFormTest_1.ComplexFormTest,
                 PhysicalDefenseTest: PhysicalDefenseTest_1.PhysicalDefenseTest,
@@ -36717,12 +36718,28 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
             }
         }
     }
+    calculateBaseValues() {
+        super.calculateBaseValues();
+        // Calculate damage values in case of user dialog interaction.
+        helpers_1.Helpers.calcTotal(this.data.incomingDamage, { min: 0 });
+        helpers_1.Helpers.calcTotal(this.data.incomingDamage.ap);
+        // Remove user override and resulting incoming damage as base.
+        this.data.modifiedDamage = foundry.utils.duplicate(this.data.incomingDamage);
+        this.data.modifiedDamage.base = this.data.incomingDamage.value;
+        this.data.modifiedDamage.mod = [];
+        delete this.data.modifiedDamage.override;
+        this.data.modifiedDamage.ap.base = this.data.incomingDamage.value;
+        this.data.modifiedDamage.ap.mod = [];
+        delete this.data.modifiedDamage.ap.override;
+        helpers_1.Helpers.calcTotal(this.data.modifiedDamage);
+        helpers_1.Helpers.calcTotal(this.data.modifiedDamage.ap);
+    }
     get canSucceed() {
         return false;
     }
     processSuccess() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.incomingDamage, this.hits.value);
+            this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
         });
     }
 }
