@@ -32977,8 +32977,7 @@ class VersionMigration {
             }
             // Apply the updates, this should *always* work, now that parsing is complete.
             yield this.Apply(entityUpdates);
-            // TODO: Uncomment this to set migration version.
-            // await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
+            yield game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
             (_c = ui.notifications) === null || _c === void 0 ? void 0 : _c.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
         });
     }
@@ -36718,6 +36717,7 @@ const TestDialog_1 = require("../apps/dialogs/TestDialog");
 const config_1 = require("../config");
 const ActionFlow_1 = require("../item/flows/ActionFlow");
 const TestCreator_1 = require("./TestCreator");
+const template_1 = require("../template");
 /**
  * General handling of Shadowrun 5e success tests.
  *
@@ -37450,7 +37450,7 @@ class SuccessTest {
      * TODO: Add template data typing.
      */
     _prepareTemplateData() {
-        var _a;
+        var _a, _b;
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.getActiveTokens(true)) || [];
@@ -37464,7 +37464,8 @@ class SuccessTest {
                 token: token
             },
             item: this.item,
-            opposedActions: this._prepareOpposedActionsTemplateData()
+            opposedActions: this._prepareOpposedActionsTemplateData(),
+            previewTemplate: ((_b = this.item) === null || _b === void 0 ? void 0 : _b.hasTemplate) || false
         };
     }
     /**
@@ -37533,9 +37534,31 @@ class SuccessTest {
      * @param data
      */
     static chatMessageListeners(message, html, data) {
-        html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
-        html.find('.chat-document-link').on('click', SuccessTest._chatOpenDocumentLink);
+        html.find('.card-main-content').on('click', event => this._chatToggleCardRolls(event, html));
+        html.find('.chat-document-link').on('click', this._chatOpenDocumentLink);
         html.find('.entity-link').on('click', helpers_1.Helpers.renderEntityLinkSheet);
+        html.find('.place-template').on('click', this.placeItemBlastZoneTemplate);
+    }
+    static placeItemBlastZoneTemplate(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            // Get test data from message.
+            const element = $(event.currentTarget);
+            const card = element.closest('.chat-message');
+            const messageId = card.data('messageId');
+            const test = yield TestCreator_1.TestCreator.fromMessage(messageId);
+            if (!test)
+                return;
+            // Get item used in test
+            yield test.populateDocuments();
+            // Place template based on last used spell force for the item.
+            if (!test.item)
+                return;
+            const template = template_1.default.fromItem(test.item);
+            if (!template)
+                return;
+            yield template.drawPreview();
+        });
     }
     /**
      * Foundry ChatMessage context options (right click) used for all test types.
@@ -37599,7 +37622,7 @@ class SuccessTest {
     }
 }
 exports.SuccessTest = SuccessTest;
-},{"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../item/flows/ActionFlow":208,"../parts/PartsList":221,"../rolls/SR5Roll":222,"./TestCreator":249}],249:[function(require,module,exports){
+},{"../apps/dialogs/TestDialog":143,"../config":151,"../constants":152,"../data/DataDefaults":153,"../helpers":166,"../item/flows/ActionFlow":208,"../parts/PartsList":221,"../rolls/SR5Roll":222,"../template":236,"./TestCreator":249}],249:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

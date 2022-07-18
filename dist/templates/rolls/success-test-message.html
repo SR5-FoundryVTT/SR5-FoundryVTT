@@ -43,6 +43,11 @@
                 <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span>{{test.pool.value}}</span></div>
                 <div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span>{{test.hits.value}}</span></div>
                 {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span>{{test.netHits.value}}</span></div>{{/if}}
+                {{#if previewTemplate}}
+                <div class="test-value">
+                    <span class="value" title="{{localize 'SR5.PlaceTemplate'}}">{{localize "SR5.PlaceTemplate"}}:</span> <span><i class="fas fa-bullseye roll place-template"></i></span>
+                </div>
+                {{/if}}
             </div>
         </div>
         <div class="card-test-content">

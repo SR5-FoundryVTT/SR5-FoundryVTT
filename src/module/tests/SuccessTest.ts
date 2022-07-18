@@ -15,6 +15,7 @@ import ModifierTypes = Shadowrun.ModifierTypes;
 import ActionRollData = Shadowrun.ActionRollData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import {TestCreator} from "./TestCreator";
+import Template from "../template";
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -918,7 +919,8 @@ export class SuccessTest {
                 token: token
             },
             item: this.item,
-            opposedActions: this._prepareOpposedActionsTemplateData()
+            opposedActions: this._prepareOpposedActionsTemplateData(),
+            previewTemplate: this.item?.hasTemplate || false
         }
     }
 
@@ -996,9 +998,29 @@ export class SuccessTest {
      * @param data
      */
     static chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
-        html.find('.chat-document-link').on('click', SuccessTest._chatOpenDocumentLink);
+        html.find('.card-main-content').on('click', event => this._chatToggleCardRolls(event, html));
+        html.find('.chat-document-link').on('click', this._chatOpenDocumentLink);
         html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet);
+        html.find('.place-template').on('click', this.placeItemBlastZoneTemplate);
+    }
+
+    static async placeItemBlastZoneTemplate(event) {
+        event.preventDefault();
+        // Get test data from message.
+        const element = $(event.currentTarget);
+        const card = element.closest('.chat-message');
+        const messageId = card.data('messageId');
+        const test = await TestCreator.fromMessage(messageId);
+        if (!test) return;
+
+        // Get item used in test
+        await test.populateDocuments();
+
+        // Place template based on last used spell force for the item.
+        if (!test.item) return;
+        const template = Template.fromItem(test.item);
+        if (!template) return;
+        await template.drawPreview();
     }
 
     /**
