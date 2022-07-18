@@ -1,5 +1,6 @@
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
+import {DefaultValues} from "../data/DataDefaults";
 
 
 export interface DefenseTestData extends OpposedTestData {
@@ -19,8 +20,10 @@ export class DefenseTest extends OpposedTest {
     _prepareData(data, options?) {
         data = super._prepareData(data, options);
 
-        data.incomingDamage = foundry.utils.duplicate(data.against.damage);
-        data.modifiedDamage = foundry.utils.duplicate(data.against.damage);
+        const damage = data.against ? data.against.damage : DefaultValues.damageData();
+
+        data.incomingDamage = foundry.utils.duplicate(damage);
+        data.modifiedDamage = foundry.utils.duplicate(damage);
 
         return data;
     }

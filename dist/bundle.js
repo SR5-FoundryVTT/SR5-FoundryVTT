@@ -36105,14 +36105,16 @@ exports.ComplexFormTest = ComplexFormTest;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DefenseTest = void 0;
 const OpposedTest_1 = require("./OpposedTest");
+const DataDefaults_1 = require("../data/DataDefaults");
 /**
  * A semi-mostly abstract class to be used by other classes as a common extension interface.
  */
 class DefenseTest extends OpposedTest_1.OpposedTest {
     _prepareData(data, options) {
         data = super._prepareData(data, options);
-        data.incomingDamage = foundry.utils.duplicate(data.against.damage);
-        data.modifiedDamage = foundry.utils.duplicate(data.against.damage);
+        const damage = data.against ? data.against.damage : DataDefaults_1.DefaultValues.damageData();
+        data.incomingDamage = foundry.utils.duplicate(damage);
+        data.modifiedDamage = foundry.utils.duplicate(damage);
         return data;
     }
     get _chatMessageTemplate() {
@@ -36126,7 +36128,7 @@ class DefenseTest extends OpposedTest_1.OpposedTest {
     }
 }
 exports.DefenseTest = DefenseTest;
-},{"./OpposedTest":247}],243:[function(require,module,exports){
+},{"../data/DataDefaults":153,"./OpposedTest":247}],243:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36381,9 +36383,11 @@ const TestCreator_1 = require("./TestCreator");
 class OpposedTest extends SuccessTest_1.SuccessTest {
     constructor(data, documents, options) {
         super(data, documents, options);
+        // Use the supplied original active test to create a reference.
+        // If nothing was given create a default placeholder
         // @ts-ignore // Feed original / active test data into the class originally used for ease of access.
-        const AgainstCls = new TestCreator_1.TestCreator._getTestClass(this.data.against.type) || SuccessTest_1.SuccessTest;
-        this.against = new AgainstCls(this.data.against);
+        const AgainstCls = this.data.against ? TestCreator_1.TestCreator._getTestClass(this.data.against.type) : SuccessTest_1.SuccessTest;
+        this.against = new AgainstCls(this.data.against || {});
     }
     _prepareData(data, options) {
         data = super._prepareData(data, options);
@@ -37053,6 +37057,7 @@ class SuccessTest {
         options = options || {};
         this.data = this._prepareData(data, options);
         this.calculateBaseValues();
+        this.calculateDerivedValues();
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
     /**

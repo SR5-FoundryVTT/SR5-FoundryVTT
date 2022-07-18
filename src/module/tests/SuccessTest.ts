@@ -139,6 +139,7 @@ export class SuccessTest {
         this.data = this._prepareData(data, options);
 
         this.calculateBaseValues();
+        this.calculateDerivedValues();
 
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
