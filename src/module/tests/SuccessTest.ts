@@ -880,7 +880,7 @@ export class SuccessTest {
         if (!this.data.options?.showMessage) return;
 
         // Prepare message content.
-        const templateData = this._prepareTemplateData();
+        const templateData = this._prepareMessageTemplateData();
         const content = await renderTemplate(this._chatMessageTemplate, templateData);
         // Prepare the actual message.
         const messageData = this._prepareMessageData(content);
@@ -904,7 +904,7 @@ export class SuccessTest {
      *
      * TODO: Add template data typing.
      */
-    _prepareTemplateData() {
+    _prepareMessageTemplateData() {
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = this.actor?.getActiveTokens(true) || [];
@@ -920,7 +920,8 @@ export class SuccessTest {
             },
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
-            previewTemplate: this.item?.hasTemplate || false
+            previewTemplate: this.item?.hasTemplate || false,
+            description: this.item?.getChatData() || ''
         }
     }
 
@@ -998,14 +999,22 @@ export class SuccessTest {
      * @param data
      */
     static chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.card-main-content').on('click', event => this._chatToggleCardRolls(event, html));
+        html.find('.show-roll').on('click', this._chatToggleCardRolls);
+        html.find('.show-description').on('click', this._chatToggleCardDescription);
         html.find('.chat-document-link').on('click', this._chatOpenDocumentLink);
         html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet);
-        html.find('.place-template').on('click', this.placeItemBlastZoneTemplate);
+        html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
     }
 
-    static async placeItemBlastZoneTemplate(event) {
+    /**
+     * Items with an area of effect will allow users to place a measuring template matching the items blast values.
+     *
+     * @param event A PointerEvent triggered from anywhere within the chat-card
+     */
+    static async _placeItemBlastZoneTemplate(event) {
         event.preventDefault();
+        event.stopPropagation();
+
         // Get test data from message.
         const element = $(event.currentTarget);
         const card = element.closest('.chat-message');
@@ -1052,19 +1061,34 @@ export class SuccessTest {
     }
 
     /**
-     * By default roll results are hidden in a chat card.
+     * By default, roll results are hidden in a chat card.
      *
      * This will hide / show them, when called with a card event.
      *
      * @param event Called from within a card html element.
-     * @param html A chat card html element.
      */
-    static async _chatToggleCardRolls(event, html) {
+    static async _chatToggleCardRolls(event) {
         event.preventDefault();
+        event.stopPropagation();
 
-        const header = event.currentTarget;
-        const card = $(header.closest('.chat-card'));
+        const card = $(event.currentTarget).closest('.chat-card');
         const element = card.find('.dice-rolls');
+        if (element.is(':visible')) element.slideUp(200);
+        else element.slideDown(200);
+    }
+
+    /**
+     * By default, item descriptions are hidden in a chat card.
+     *
+     * This will hide / show them, when called with a card event.
+     * @param event A PointerEvent triggered anywhere from within a chat-card
+     */
+    static async _chatToggleCardDescription(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const card = $(event.currentTarget).closest('.chat-card');
+        const element = card.find('.card-description');
         if (element.is(':visible')) element.slideUp(200);
         else element.slideDown(200);
     }
@@ -1074,6 +1098,9 @@ export class SuccessTest {
      * This is custom from FoundryVTT document links for mostly styling reasons (legacy).
      */
     static async _chatOpenDocumentLink(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         const element = $(event.currentTarget);
         const uuid = element.data('uuid');
         if (!uuid) return console.error("Shadowrun 5e | A chat document link didn't provide a document UUID.");

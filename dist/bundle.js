@@ -37428,7 +37428,7 @@ class SuccessTest {
             if (!((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.showMessage))
                 return;
             // Prepare message content.
-            const templateData = this._prepareTemplateData();
+            const templateData = this._prepareMessageTemplateData();
             const content = yield renderTemplate(this._chatMessageTemplate, templateData);
             // Prepare the actual message.
             const messageData = this._prepareMessageData(content);
@@ -37449,8 +37449,8 @@ class SuccessTest {
      *
      * TODO: Add template data typing.
      */
-    _prepareTemplateData() {
-        var _a, _b;
+    _prepareMessageTemplateData() {
+        var _a, _b, _c;
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.getActiveTokens(true)) || [];
@@ -37465,7 +37465,8 @@ class SuccessTest {
             },
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
-            previewTemplate: ((_b = this.item) === null || _b === void 0 ? void 0 : _b.hasTemplate) || false
+            previewTemplate: ((_b = this.item) === null || _b === void 0 ? void 0 : _b.hasTemplate) || false,
+            description: ((_c = this.item) === null || _c === void 0 ? void 0 : _c.getChatData()) || ''
         };
     }
     /**
@@ -37534,14 +37535,21 @@ class SuccessTest {
      * @param data
      */
     static chatMessageListeners(message, html, data) {
-        html.find('.card-main-content').on('click', event => this._chatToggleCardRolls(event, html));
+        html.find('.show-roll').on('click', this._chatToggleCardRolls);
+        html.find('.show-description').on('click', this._chatToggleCardDescription);
         html.find('.chat-document-link').on('click', this._chatOpenDocumentLink);
         html.find('.entity-link').on('click', helpers_1.Helpers.renderEntityLinkSheet);
-        html.find('.place-template').on('click', this.placeItemBlastZoneTemplate);
+        html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
     }
-    static placeItemBlastZoneTemplate(event) {
+    /**
+     * Items with an area of effect will allow users to place a measuring template matching the items blast values.
+     *
+     * @param event A PointerEvent triggered from anywhere within the chat-card
+     */
+    static _placeItemBlastZoneTemplate(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
+            event.stopPropagation();
             // Get test data from message.
             const element = $(event.currentTarget);
             const card = element.closest('.chat-message');
@@ -37584,19 +37592,36 @@ class SuccessTest {
         return options;
     }
     /**
-     * By default roll results are hidden in a chat card.
+     * By default, roll results are hidden in a chat card.
      *
      * This will hide / show them, when called with a card event.
      *
      * @param event Called from within a card html element.
-     * @param html A chat card html element.
      */
-    static _chatToggleCardRolls(event, html) {
+    static _chatToggleCardRolls(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const header = event.currentTarget;
-            const card = $(header.closest('.chat-card'));
+            event.stopPropagation();
+            const card = $(event.currentTarget).closest('.chat-card');
             const element = card.find('.dice-rolls');
+            if (element.is(':visible'))
+                element.slideUp(200);
+            else
+                element.slideDown(200);
+        });
+    }
+    /**
+     * By default, item descriptions are hidden in a chat card.
+     *
+     * This will hide / show them, when called with a card event.
+     * @param event A PointerEvent triggered anywhere from within a chat-card
+     */
+    static _chatToggleCardDescription(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            event.stopPropagation();
+            const card = $(event.currentTarget).closest('.chat-card');
+            const element = card.find('.card-description');
             if (element.is(':visible'))
                 element.slideUp(200);
             else
@@ -37609,6 +37634,8 @@ class SuccessTest {
      */
     static _chatOpenDocumentLink(event) {
         return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            event.stopPropagation();
             const element = $(event.currentTarget);
             const uuid = element.data('uuid');
             if (!uuid)

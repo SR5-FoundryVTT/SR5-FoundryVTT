@@ -5,6 +5,12 @@
         font-style: normal;
         font-size: 1rem;
 
+        .clickable:hover {
+            cursor: pointer;
+            background: #4b4a44;
+            color: $white;
+        }
+
         .card-header {
             padding: 0.25em 0;
             border-bottom: $groove;
@@ -28,9 +34,6 @@
         }
         .card-header:first-of-type {
             border-top: $groove;
-        }
-        .card-main-content {
-            cursor: pointer;
         }
         .card-buttons {
             .button {
@@ -160,12 +163,8 @@
         }
         .card-description {
             padding: 0.25em;
-            font-size: 14px;
             border-bottom: $groove;
             display: none;
-        }
-        .show-card-description {
-            display: block;
         }
         .card-content {
             border-bottom: $groove;
@@ -277,6 +276,7 @@
             display: flex;
             flex-flow: column;
             border-bottom: $groove;
+
             .glitch {
                 position: relative;
                 text-decoration: none;

@@ -306,6 +306,10 @@
 .sr5.chat-card {
   font-style: normal;
   font-size: 1rem; }
+  .sr5.chat-card .clickable:hover {
+    cursor: pointer;
+    background: #4b4a44;
+    color: white; }
   .sr5.chat-card .card-header {
     padding: 0.25em 0;
     border-bottom: 1px solid #4d4d4d; }
@@ -324,8 +328,6 @@
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
   .sr5.chat-card .card-header:first-of-type {
     border-top: 1px solid #4d4d4d; }
-  .sr5.chat-card .card-main-content {
-    cursor: pointer; }
   .sr5.chat-card .card-buttons .button {
     box-shadow: 0 0 0.25em 0.15em #4d4d4d;
     cursor: pointer;
@@ -419,11 +421,8 @@
       flex: 0; }
   .sr5.roll-card .card-description {
     padding: 0.25em;
-    font-size: 14px;
     border-bottom: 1px solid #4d4d4d;
     display: none; }
-  .sr5.roll-card .show-card-description {
-    display: block; }
   .sr5.roll-card .card-content {
     border-bottom: 1px solid #4d4d4d;
     padding: 0.25em 0.25em 0.25em;
