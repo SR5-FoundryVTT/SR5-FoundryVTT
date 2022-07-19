@@ -36754,19 +36754,26 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
         this.data.modifiedDamage.base = this.data.incomingDamage.value;
         this.data.modifiedDamage.mod = [];
         delete this.data.modifiedDamage.override;
-        this.data.modifiedDamage.ap.base = this.data.incomingDamage.value;
+        this.data.modifiedDamage.ap.base = this.data.incomingDamage.ap.value;
         this.data.modifiedDamage.ap.mod = [];
         delete this.data.modifiedDamage.ap.override;
         helpers_1.Helpers.calcTotal(this.data.modifiedDamage);
         helpers_1.Helpers.calcTotal(this.data.modifiedDamage.ap);
     }
     get canSucceed() {
-        return false;
+        return true;
     }
-    processSuccess() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
-        });
+    /**
+     * Resist Test success means ALL damage has been soaked.
+     */
+    get success() {
+        return this.data.incomingDamage.value <= this.hits.value;
+    }
+    get successLabel() {
+        return 'SR5.ResistedAllDamage';
+    }
+    get failureLabel() {
+        return 'SR5.ResistedSomeDamage';
     }
     processResults() {
         const _super = Object.create(null, {
@@ -36776,6 +36783,8 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
             yield _super.processResults.call(this);
             if (!this.actor)
                 return;
+            // Handle damage modification.
+            this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
             // Handle Knock Down Rules with legacy flow handling.
             this.data.knockedDown = new SoakFlow_1.SoakFlow().knocksDown(this.data.modifiedDamage, this.actor);
         });

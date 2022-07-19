@@ -32,7 +32,7 @@
         </div>
         <div class="card-content {{#if showDescription}}clickable show-description{{/if}}">
             <div class="left-side">
-                {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.AttackerHits"}}:</span> <span>{{test.against.netHits.value}}</span></div>{{/if}}
+                {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.OpposingHits"}}:</span> <span>{{test.against.netHits.value}}</span></div>{{/if}}
                 {{#if test.hasLimit}}<div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span>{{test.limit.value}}</span></div>{{/if}}
                 {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.threshold.label}}:</span> <span>{{test.threshold.value}}</span></span></div>{{/if}}
             </div>
@@ -120,18 +120,16 @@
     </div>
     {{/if}}
 </div>
+{{#if test.data.damage}}{{#ifgt test.data.damage.base 0}}
 <div class="sr5 chat-card roll-card">
     <div class="card-content">
-        {{#if test.data.damage}}
-        {{#ifgt test.data.damage.base 0}}
-            <div class="right-side">
-            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
-                    name=(localize "SR5.Incoming")
-                    damage=test.data.damage
-                    showAP=true
-            }}
-            </div>
-        {{/ifgt}}
-        {{/if}}
+        <div class="right-side">
+        {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
+                name=(localize "SR5.Incoming")
+                damage=test.data.damage
+                showAP=true
+        }}
+        </div>
     </div>
 </div>
+{{/ifgt}}{{/if}}

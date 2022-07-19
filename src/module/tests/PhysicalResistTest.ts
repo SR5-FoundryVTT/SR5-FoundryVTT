@@ -90,7 +90,7 @@ export class PhysicalResistTest extends SuccessTest {
         this.data.modifiedDamage.base = this.data.incomingDamage.value;
         this.data.modifiedDamage.mod = [];
         delete this.data.modifiedDamage.override;
-        this.data.modifiedDamage.ap.base = this.data.incomingDamage.value;
+        this.data.modifiedDamage.ap.base = this.data.incomingDamage.ap.value;
         this.data.modifiedDamage.ap.mod = [];
         delete this.data.modifiedDamage.ap.override;
 
@@ -99,17 +99,32 @@ export class PhysicalResistTest extends SuccessTest {
     }
 
     get canSucceed() {
-        return false;
+        return true;
     }
 
-    async processSuccess() {
-        this.data.modifiedDamage = CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
+    /**
+     * Resist Test success means ALL damage has been soaked.
+     */
+    get success() {
+        return this.data.incomingDamage.value <= this.hits.value;
+    }
+
+    get successLabel() {
+        return 'SR5.ResistedAllDamage';
+    }
+
+    get failureLabel() {
+        return 'SR5.ResistedSomeDamage';
     }
 
     async processResults() {
         await super.processResults();
 
         if (!this.actor) return;
+
+        // Handle damage modification.
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
+
         // Handle Knock Down Rules with legacy flow handling.
         this.data.knockedDown = new SoakFlow().knocksDown(this.data.modifiedDamage, this.actor);
     }
