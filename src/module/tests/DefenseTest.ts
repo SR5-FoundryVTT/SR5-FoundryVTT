@@ -1,6 +1,7 @@
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
 import {DefaultValues} from "../data/DataDefaults";
+import {SoakFlow} from "../actor/flows/SoakFlow";
 
 
 export interface DefenseTestData extends OpposedTestData {
@@ -12,7 +13,9 @@ export interface DefenseTestData extends OpposedTestData {
 
 
 /**
- * A semi-mostly abstract class to be used by other classes as a common extension interface.
+ * A semi abstract class to be used by other classes as a common extension interface.
+ *
+ * Handle general damage data as well as general defense rules.
  */
 export class DefenseTest extends OpposedTest {
     data: DefenseTestData

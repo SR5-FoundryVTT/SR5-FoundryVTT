@@ -16,5 +16,15 @@
             }}
         </div>
     </div>
+    <div class="card-content">
+        <div class="left-side">
+            {{#if test.data.knockedDown}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Target"}}: </span>
+                <span class="value">{{localize "SR5.KnockedDown"}}</span>
+            </div>
+            {{/if}}
+        </div>
+    </div>
 </div>
 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-opposed-resist.html'}}

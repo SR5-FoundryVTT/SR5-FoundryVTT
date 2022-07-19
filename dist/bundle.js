@@ -15584,7 +15584,9 @@ class SoakFlow {
         const limit = actor.getLimit('physical');
         const effectiveLimit = limit.value + gelRoundsEffect + impactDispersionEffect;
         // SR5 194
-        return damage.value > effectiveLimit || damage.value >= 10;
+        const knockedDown = damage.value > effectiveLimit || damage.value >= 10;
+        console.log(`Shadowrun5e | Determined target ${actor.id} knocked down status as: ${knockedDown}`, damage, actor);
+        return knockedDown;
     }
     isDamageFromGelRounds(damage) {
         var _a;
@@ -35950,8 +35952,8 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
             processSuccess: { get: () => super.processSuccess }
         });
         return __awaiter(this, void 0, void 0, function* () {
-            yield _super.processSuccess.call(this);
             this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDamageAfterMiss(this.data.incomingDamage);
+            yield _super.processSuccess.call(this);
         });
     }
     /**
@@ -35963,11 +35965,11 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
         });
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            yield _super.processFailure.call(this);
             const spellData = (_a = this.item) === null || _a === void 0 ? void 0 : _a.asSpellData();
             if (!spellData)
                 return;
             this.data.modifiedDamage = CombatSpellRules_1.CombatSpellRules.modifyDamageAfterHit(spellData.data.type, spellData.data.combat.type, this.data.incomingDamage, this.against.hits.value, this.hits.value);
+            yield _super.processFailure.call(this);
         });
     }
     /**
@@ -36107,7 +36109,9 @@ exports.DefenseTest = void 0;
 const OpposedTest_1 = require("./OpposedTest");
 const DataDefaults_1 = require("../data/DataDefaults");
 /**
- * A semi-mostly abstract class to be used by other classes as a common extension interface.
+ * A semi abstract class to be used by other classes as a common extension interface.
+ *
+ * Handle general damage data as well as general defense rules.
  */
 class DefenseTest extends OpposedTest_1.OpposedTest {
     _prepareData(data, options) {
@@ -36225,6 +36229,12 @@ class MeleeAttackTest extends SuccessTest_1.SuccessTest {
         data.damage = data.damage || DataDefaults_1.DefaultValues.damageData();
         return data;
     }
+    /**
+     * This test type can't be extended.
+     */
+    get canBeExtended() {
+        return false;
+    }
     get testModifiers() {
         return ['global', 'wounds', 'environmental'];
     }
@@ -36335,9 +36345,9 @@ class NaturalRecoveryStunTest extends SuccessTest_1.SuccessTest {
         if (!this.actor)
             return;
         const track = this.actor.getStunTrack();
-        const stunBoxes = (track === null || track === void 0 ? void 0 : track.value) || 0;
+        const boxes = (track === null || track === void 0 ? void 0 : track.value) || 0;
         const threshold = new PartsList_1.PartsList(this.threshold.mod);
-        threshold.addUniquePart('SR5.StunTrack', stunBoxes);
+        threshold.addUniquePart('SR5.StunTrack', boxes);
     }
     /**
      * A recovery test will heal on each test iteration
@@ -36386,8 +36396,8 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
         // Use the supplied original active test to create a reference.
         // If nothing was given create a default placeholder
         // @ts-ignore // Feed original / active test data into the class originally used for ease of access.
-        const AgainstCls = this.data.against ? TestCreator_1.TestCreator._getTestClass(this.data.against.type) : SuccessTest_1.SuccessTest;
-        this.against = new AgainstCls(this.data.against || {});
+        const AgainstCls = data.against ? TestCreator_1.TestCreator._getTestClass(data.against.type) : SuccessTest_1.SuccessTest;
+        this.against = new AgainstCls(data.against || {});
     }
     _prepareData(data, options) {
         data = super._prepareData(data, options);
@@ -36531,9 +36541,6 @@ class PhysicalDefenseTest extends DefenseTest_1.DefenseTest {
         data.defenseReach = 0;
         return data;
     }
-    get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
-    }
     get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
     }
@@ -36639,13 +36646,21 @@ class PhysicalDefenseTest extends DefenseTest_1.DefenseTest {
         return CombatRules_1.CombatRules.attackHits(this.against.hits.value, this.hits.value);
     }
     processSuccess() {
+        const _super = Object.create(null, {
+            processSuccess: { get: () => super.processSuccess }
+        });
         return __awaiter(this, void 0, void 0, function* () {
             this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
+            yield _super.processSuccess.call(this);
         });
     }
     processFailure() {
+        const _super = Object.create(null, {
+            processFailure: { get: () => super.processFailure }
+        });
         return __awaiter(this, void 0, void 0, function* () {
             this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
+            yield _super.processFailure.call(this);
         });
     }
     afterFailure() {
@@ -36676,6 +36691,7 @@ const DataDefaults_1 = require("../data/DataDefaults");
 const PartsList_1 = require("../parts/PartsList");
 const CombatRules_1 = require("../rules/CombatRules");
 const helpers_1 = require("../helpers");
+const SoakFlow_1 = require("../actor/flows/SoakFlow");
 /**
  * A physical resist test handles SR5#173 Defend B
  *
@@ -36746,9 +36762,21 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
             this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
         });
     }
+    processResults() {
+        const _super = Object.create(null, {
+            processResults: { get: () => super.processResults }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            yield _super.processResults.call(this);
+            if (!this.actor)
+                return;
+            // Handle Knock Down Rules with legacy flow handling.
+            this.data.knockedDown = new SoakFlow_1.SoakFlow().knocksDown(this.data.modifiedDamage, this.actor);
+        });
+    }
 }
 exports.PhysicalResistTest = PhysicalResistTest;
-},{"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":221,"../rules/CombatRules":224,"./SuccessTest":252}],250:[function(require,module,exports){
+},{"../actor/flows/SoakFlow":91,"../data/DataDefaults":153,"../helpers":166,"../parts/PartsList":221,"../rules/CombatRules":224,"./SuccessTest":252}],250:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36944,6 +36972,12 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
     get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
     }
+    /**
+     * This test type can't be extended.
+     */
+    get canBeExtended() {
+        return false;
+    }
     static _getDefaultTestAction() {
         return DataDefaults_1.DefaultValues.minimalActionData({
             skill: 'spellcasting',
@@ -37047,7 +37081,6 @@ const TestRules_1 = require("../rules/TestRules");
  */
 class SuccessTest {
     constructor(data, documents, options) {
-        // TODO: Move roll to documents (or name it context)
         // Store given documents to avoid later fetching.
         this.actor = documents === null || documents === void 0 ? void 0 : documents.actor;
         this.item = documents === null || documents === void 0 ? void 0 : documents.item;
@@ -37057,11 +37090,12 @@ class SuccessTest {
         options = options || {};
         this.data = this._prepareData(data, options);
         this.calculateBaseValues();
-        this.calculateDerivedValues();
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
     /**
-     * Prepare TestData
+     * Make sure a test has a complete data structure, even if supplied data doesn't fully provide that.
+     *
+     * Any Test should be usable simply by instantiating it with empty TestData
      *
      * @param data
      * @param options
@@ -37091,6 +37125,12 @@ class SuccessTest {
         data.threshold = data.threshold || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' });
         data.limit = data.limit || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' });
         data.values = data.values || {};
+        // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
+        // active tests.
+        data.values.hits = data.values.hits || DataDefaults_1.DefaultValues.valueData({ label: "SR5.Hits" });
+        data.values.extendedHits = data.values.extendedHits || DataDefaults_1.DefaultValues.valueData({ label: "SR5.ExtendedHits" });
+        data.values.netHits = data.values.netHits || DataDefaults_1.DefaultValues.valueData({ label: "SR5.NetHits" });
+        data.values.glitches = data.values.glitches || DataDefaults_1.DefaultValues.valueData({ label: "SR5.Glitches" });
         data.opposed = data.opposed || undefined;
         data.modifiers = this._prepareModifiers(data.modifiers);
         return data;
@@ -37503,7 +37543,7 @@ class SuccessTest {
      */
     calculateExtendedHits() {
         if (!this.extended)
-            return DataDefaults_1.DefaultValues.valueData();
+            return DataDefaults_1.DefaultValues.valueData({ label: 'SR5.ExtendedHits' });
         const extendedHits = this.extendedHits;
         extendedHits.mod = PartsList_1.PartsList.AddPart(extendedHits.mod, 'SR5.Hits', this.hits.value);
         helpers_1.Helpers.calcTotal(extendedHits, { min: 0 });
@@ -37738,6 +37778,7 @@ class SuccessTest {
      */
     afterTestComplete() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun5e | Test ${this.constructor.name} completed.`, this);
             if (this.success) {
                 yield this.afterSuccess();
             }
@@ -38196,7 +38237,8 @@ exports.TestCreator = {
                 console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
                 return;
             }
-            const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
+            // Avoid altering test in flag.
+            const testData = foundry.utils.duplicate(message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test));
             if (!testData || !testData.data || !testData.rolls) {
                 console.error(`Shadowrun 5e | Message with id ${id} doesn't have valid test data in it's flags.`);
                 return;

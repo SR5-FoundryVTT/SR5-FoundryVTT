@@ -65,17 +65,22 @@ export class SoakFlow {
         return roll;
     }
 
-    private knocksDown(damage: DamageData, actor:SR5Actor) {
+
+    knocksDown(damage: DamageData, actor:SR5Actor) {
         // TODO: SR5 195 Called Shot Knock Down (Melee Only), requires attacker STR and actually announcing that called shot.
         const gelRoundsEffect = this.isDamageFromGelRounds(damage) ? -2 : 0;  // SR5 434
         const impactDispersionEffect = this.isDamageFromImpactDispersion(damage) ? -2 : 0  // FA 52
         const limit = actor.getLimit('physical');
         const effectiveLimit = limit.value + gelRoundsEffect + impactDispersionEffect
         // SR5 194
-        return damage.value > effectiveLimit || damage.value >= 10;
+        const knockedDown = damage.value > effectiveLimit || damage.value >= 10;
+
+        console.log(`Shadowrun5e | Determined target ${actor.id} knocked down status as: ${knockedDown}`, damage, actor);
+
+        return knockedDown;
     }
 
-    private isDamageFromGelRounds(damage: DamageData) {
+    isDamageFromGelRounds(damage: DamageData) {
         if (damage.source && damage.source.actorId && damage.source.itemId) {
             const attacker = game.actors?.find(actor => actor.id == damage.source?.actorId);
             if (attacker) {
@@ -90,7 +95,7 @@ export class SoakFlow {
         return false;
     }
 
-    private isDamageFromImpactDispersion(damage: DamageData) {
+    isDamageFromImpactDispersion(damage: DamageData) {
         // TODO: FA 52. Ammo currently cannot have mods, so not sure how to implement Alter Ballistics idiomatically.
         return false;
     }

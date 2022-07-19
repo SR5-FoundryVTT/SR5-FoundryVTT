@@ -125,8 +125,6 @@ export class SuccessTest {
     public targets: TokenDocument[];
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
-        // TODO: Move roll to documents (or name it context)
-
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
         this.item = documents?.item;
@@ -139,13 +137,14 @@ export class SuccessTest {
         this.data = this._prepareData(data, options);
 
         this.calculateBaseValues();
-        this.calculateDerivedValues();
 
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
 
     /**
-     * Prepare TestData
+     * Make sure a test has a complete data structure, even if supplied data doesn't fully provide that.
+     *
+     * Any Test should be usable simply by instantiating it with empty TestData
      *
      * @param data
      * @param options
@@ -182,8 +181,17 @@ export class SuccessTest {
         data.limit = data.limit || DefaultValues.valueData({label: 'SR5.Limit'});
 
         data.values = data.values || {};
+
+        // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
+        // active tests.
+        data.values.hits = data.values.hits || DefaultValues.valueData({label: "SR5.Hits"});
+        data.values.extendedHits = data.values.extendedHits || DefaultValues.valueData({label: "SR5.ExtendedHits"});
+        data.values.netHits = data.values.netHits || DefaultValues.valueData({label: "SR5.NetHits"});
+        data.values.glitches = data.values.glitches || DefaultValues.valueData({label: "SR5.Glitches"});
+
         data.opposed = data.opposed || undefined;
         data.modifiers = this._prepareModifiers(data.modifiers);
+
 
         return data;
     }
@@ -633,7 +641,7 @@ export class SuccessTest {
      * Gather hits across multiple extended test executions.
      */
     calculateExtendedHits(): ValueField {
-        if (!this.extended) return DefaultValues.valueData();
+        if (!this.extended) return DefaultValues.valueData({label: 'SR5.ExtendedHits'});
 
         const extendedHits = this.extendedHits;
         extendedHits.mod = PartsList.AddPart(extendedHits.mod, 'SR5.Hits', this.hits.value);
@@ -891,6 +899,8 @@ export class SuccessTest {
      * This can be used to trigger other processes like followup tests or saving values.
      */
     async afterTestComplete() {
+        console.log(`Shadowrun5e | Test ${this.constructor.name} completed.`, this);
+
         if (this.success) {
             await this.afterSuccess();
         } else {

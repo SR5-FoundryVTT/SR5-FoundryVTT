@@ -31,8 +31,8 @@ export class OpposedTest extends SuccessTest {
         // Use the supplied original active test to create a reference.
         // If nothing was given create a default placeholder
         // @ts-ignore // Feed original / active test data into the class originally used for ease of access.
-        const AgainstCls = this.data.against ? TestCreator._getTestClass(this.data.against.type) : SuccessTest;
-        this.against = new AgainstCls(this.data.against || {});
+        const AgainstCls = data.against ? TestCreator._getTestClass(data.against.type) : SuccessTest;
+        this.against = new AgainstCls(data.against || {});
     }
 
     _prepareData(data, options?): any {
@@ -47,7 +47,6 @@ export class OpposedTest extends SuccessTest {
 
     async populateDocuments() {
         await super.populateDocuments();
-
         await this.against.populateDocuments();
     }
 

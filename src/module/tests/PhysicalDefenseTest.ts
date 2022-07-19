@@ -37,10 +37,6 @@ export class PhysicalDefenseTest extends DefenseTest {
         return data;
     }
 
-    get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
-    }
-
     get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
     }
@@ -159,10 +155,14 @@ export class PhysicalDefenseTest extends DefenseTest {
 
     async processSuccess() {
         this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
+
+        await super.processSuccess();
     }
 
     async processFailure() {
         this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
+
+        await super.processFailure();
     }
 
     async afterFailure() {

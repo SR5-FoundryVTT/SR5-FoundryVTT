@@ -68,22 +68,22 @@ export class CombatSpellDefenseTest extends DefenseTest {
      * A success on a defense test is a MISS on the initial attack.
      */
     async processSuccess() {
-        await super.processSuccess();
-
         this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterMiss(this.data.incomingDamage);
+
+        await super.processSuccess();
     }
 
     /**
      * A failure on a defense test is a HIT on the initial attack.
      */
     async processFailure() {
-        await super.processFailure();
-
         const spellData = this.item?.asSpellData();
         if (!spellData) return;
 
         this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(spellData.data.type, spellData.data.combat.type,
             this.data.incomingDamage, this.against.hits.value, this.hits.value);
+
+        await super.processFailure();
     }
 
     /**

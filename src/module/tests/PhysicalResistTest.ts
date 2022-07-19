@@ -5,6 +5,7 @@ import {CombatRules} from "../rules/CombatRules";
 import {Helpers} from "../helpers";
 import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
 import DamageData = Shadowrun.DamageData;
+import {SoakFlow} from "../actor/flows/SoakFlow";
 
 
 export interface PhysicalResistTestData extends SuccessTestData {
@@ -14,6 +15,8 @@ export interface PhysicalResistTestData extends SuccessTestData {
     incomingDamage: DamageData
     // The damage AFTER this test is done.
     modifiedDamage: DamageData
+    // Determine if an actor should be knockedDown after a defense.
+    knockedDown: boolean
 }
 
 
@@ -101,5 +104,13 @@ export class PhysicalResistTest extends SuccessTest {
 
     async processSuccess() {
         this.data.modifiedDamage = CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
+    }
+
+    async processResults() {
+        await super.processResults();
+
+        if (!this.actor) return;
+        // Handle Knock Down Rules with legacy flow handling.
+        this.data.knockedDown = new SoakFlow().knocksDown(this.data.modifiedDamage, this.actor);
     }
 }
