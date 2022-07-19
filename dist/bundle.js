@@ -37258,8 +37258,8 @@ class SuccessTest {
      */
     get code() {
         // Add action dynamic value sources as labels.
-        // let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
-        let pool = this.pool.mod.map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
+        let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
+        // let pool = this.pool.mod.map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
         let threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name));
         let limit = this.limit.mod.map(mod => game.i18n.localize(mod.name));
         // Add action static value modifiers as numbers.
