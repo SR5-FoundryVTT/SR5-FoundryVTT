@@ -848,7 +848,8 @@ select.display {
   .sr5 .window-content {
     background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/brushed_metal.jpg") repeat;
     color: white;
-    overflow: hidden; }
+    overflow: hidden;
+    font-size: 115%; }
   .sr5 .description > .editor {
     height: 15em;
     width: 100%;

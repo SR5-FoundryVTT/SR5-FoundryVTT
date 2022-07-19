@@ -14200,87 +14200,32 @@ class SR5Actor extends Actor {
             }),
         });
     }
-    rollMatrixAttribute(attr, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!("matrix" in this.data.data))
-                return;
-            let matrix_att = duplicate(this.data.data.matrix[attr]);
-            let title = game.i18n.localize(config_1.SR5.matrixAttributes[attr]);
-            const parts = new PartsList_1.PartsList();
-            parts.addPart(config_1.SR5.matrixAttributes[attr], matrix_att.value);
-            if (options && options.event && options.event[config_1.SR5.kbmod.HIDE_DIALOG])
-                parts.addUniquePart('SR5.Specialization', 2);
-            if (helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
-                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                    event: options === null || options === void 0 ? void 0 : options.event,
-                    actor: this,
-                    parts: parts.list,
-                    title: title,
-                });
-            }
-            const attributes = helpers_1.Helpers.filter(this.data.data.attributes, ([, value]) => value.value > 0);
-            const attribute = 'willpower';
-            let dialogData = {
-                attribute: attribute,
-                attributes: attributes,
-            };
-            const buttons = {
-                roll: {
-                    label: 'Continue',
-                    callback: () => (cancel = false),
-                },
-            };
-            let cancel = true;
-            renderTemplate('systems/shadowrun5e/dist/templates/rolls/matrix-roll.html', dialogData).then((dlg) => {
-                // @ts-ignore
-                new Dialog({
-                    title: `${title} Test`,
-                    content: dlg,
-                    buttons: buttons,
-                    close: (html) => __awaiter(this, void 0, void 0, function* () {
-                        if (cancel)
-                            return;
-                        const newAtt = helpers_1.Helpers.parseInputToString($(html).find('[name=attribute]').val());
-                        let att = undefined;
-                        if (newAtt) {
-                            att = this.data.data.attributes[newAtt];
-                            title += ` + ${game.i18n.localize(config_1.SR5.attributes[newAtt])}`;
-                        }
-                        if (att !== undefined) {
-                            if (att.value && att.label)
-                                parts.addPart(att.label, att.value);
-                            this._addMatrixParts(parts, true);
-                            this._addGlobalParts(parts);
-                            return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                                event: options === null || options === void 0 ? void 0 : options.event,
-                                actor: this,
-                                parts: parts.list,
-                                title: title,
-                            });
-                        }
-                    }),
-                }).render(true);
-            });
-        });
-    }
     promptRoll() {
         return __awaiter(this, void 0, void 0, function* () {
             yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest();
         });
     }
+    /**
+     * The general action process has currently good way of injecting device ratings into the mix.
+     * So, let's trick a bit.
+     *
+     * @param options
+     */
     rollDeviceRating(options) {
-        const title = game.i18n.localize('SR5.Labels.ActorSheet.DeviceRating');
-        const parts = new PartsList_1.PartsList();
-        const rating = this.getDeviceRating();
-        // add device rating twice as this is the most common roll
-        parts.addPart(title, rating);
-        parts.addPart(title, rating);
-        this._addGlobalParts(parts);
-        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-            event: options === null || options === void 0 ? void 0 : options.event,
-            title,
-            parts: parts.list,
-            actor: this,
+        return __awaiter(this, void 0, void 0, function* () {
+            const rating = this.getDeviceRating();
+            const showDialog = !TestCreator_1.TestCreator.shouldHideDialog(options === null || options === void 0 ? void 0 : options.event);
+            const testCls = TestCreator_1.TestCreator._getTestClass('SuccessTest');
+            const test = new testCls({}, { actor: this }, { showDialog });
+            // Build pool values.
+            const pool = new PartsList_1.PartsList(test.pool.mod);
+            pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
+            pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
+            // Build modifiers values.
+            const mods = new PartsList_1.PartsList();
+            this._addGlobalParts(mods);
+            test.data.modifiers.mod = mods.list;
+            yield test.execute();
         });
     }
     /**
@@ -17737,7 +17682,6 @@ class SR5BaseActorSheet extends ActorSheet {
                     break;
                 }
                 case 'skill': {
-                    const skillType = split[1];
                     const skillId = split[2];
                     yield this.actor.rollSkill(skillId, options);
                     break;

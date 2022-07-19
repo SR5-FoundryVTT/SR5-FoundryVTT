@@ -603,7 +603,6 @@ export class SR5BaseActorSheet extends ActorSheet {
             }
 
             case 'skill': {
-                const skillType = split[1];
                 const skillId = split[2];
                 await this.actor.rollSkill(skillId, options);
                 break;

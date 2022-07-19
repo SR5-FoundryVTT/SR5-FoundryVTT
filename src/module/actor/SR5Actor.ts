@@ -1045,86 +1045,34 @@ export class SR5Actor extends Actor {
         });
     }
 
-    async rollMatrixAttribute(attr, options?: ActorRollOptions) {
-        if (!("matrix" in this.data.data)) return;
-
-        let matrix_att = duplicate(this.data.data.matrix[attr]);
-        let title = game.i18n.localize(SR5.matrixAttributes[attr]);
-        const parts = new PartsList<number>();
-        parts.addPart(SR5.matrixAttributes[attr], matrix_att.value);
-
-        if (options && options.event && options.event[SR5.kbmod.HIDE_DIALOG]) parts.addUniquePart('SR5.Specialization', 2);
-        if (Helpers.hasModifiers(options?.event)) {
-            return ShadowrunRoller.advancedRoll({
-                event: options?.event,
-                actor: this,
-                parts: parts.list,
-                title: title,
-            });
-        }
-        const attributes = Helpers.filter(this.data.data.attributes, ([, value]) => value.value > 0);
-        const attribute = 'willpower';
-
-        let dialogData = {
-            attribute: attribute,
-            attributes: attributes,
-        };
-        const buttons = {
-            roll: {
-                label: 'Continue',
-                callback: () => (cancel = false),
-            },
-        };
-
-        let cancel = true;
-        renderTemplate('systems/shadowrun5e/dist/templates/rolls/matrix-roll.html', dialogData).then((dlg) => {
-            // @ts-ignore
-            new Dialog({
-                title: `${title} Test`,
-                content: dlg,
-                buttons: buttons,
-                close: async (html) => {
-                    if (cancel) return;
-                    const newAtt = Helpers.parseInputToString($(html).find('[name=attribute]').val());
-                    let att: AttributeField | undefined = undefined;
-                    if (newAtt) {
-                        att = this.data.data.attributes[newAtt];
-                        title += ` + ${game.i18n.localize(SR5.attributes[newAtt])}`;
-                    }
-                    if (att !== undefined) {
-                        if (att.value && att.label) parts.addPart(att.label, att.value);
-                        this._addMatrixParts(parts, true);
-                        this._addGlobalParts(parts);
-                        return ShadowrunRoller.advancedRoll({
-                            event: options?.event,
-                            actor: this,
-                            parts: parts.list,
-                            title: title,
-                        });
-                    }
-                },
-            }).render(true);
-        });
-    }
-
     async promptRoll() {
         await ShadowrunRoller.promptSuccessTest();
     }
 
-    rollDeviceRating(options?: ActorRollOptions) {
-        const title = game.i18n.localize('SR5.Labels.ActorSheet.DeviceRating');
-        const parts = new PartsList<number>();
+    /**
+     * The general action process has currently good way of injecting device ratings into the mix.
+     * So, let's trick a bit.
+     *
+     * @param options
+     */
+    async rollDeviceRating(options?: ActorRollOptions) {
         const rating = this.getDeviceRating();
-        // add device rating twice as this is the most common roll
-        parts.addPart(title, rating);
-        parts.addPart(title, rating);
-        this._addGlobalParts(parts);
-        return ShadowrunRoller.advancedRoll({
-            event: options?.event,
-            title,
-            parts: parts.list,
-            actor: this,
-        });
+
+        const showDialog = !TestCreator.shouldHideDialog(options?.event);
+        const testCls = TestCreator._getTestClass('SuccessTest');
+        const test = new testCls({}, {actor: this}, {showDialog});
+
+        // Build pool values.
+        const pool = new PartsList<number>(test.pool.mod);
+        pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
+        pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
+
+        // Build modifiers values.
+        const mods = new PartsList<number>();
+        this._addGlobalParts(mods);
+        test.data.modifiers.mod = mods.list;
+
+        await test.execute();
     }
 
     /**

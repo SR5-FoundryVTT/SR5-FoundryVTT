@@ -308,6 +308,7 @@ select.display {
         background: $sheetbackground;
         color: $color;
         overflow: hidden;
+        font-size: 115%;
     }
     // Only alter editor height scaling for item descriptions, not actor bio where space is needed.
     .description > .editor {
