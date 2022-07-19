@@ -1312,10 +1312,13 @@
                 "physical": false
             },
             "action": {
-                "test": "SpellcastingTest",
+                "test": "SpellCastingTest",
                 "opposed": {
                     "test": "",
                     "resist": {"test": ""}
+                },
+                "followed": {
+                    "test": "DrainTest"
                 }
             }
         },
@@ -1333,16 +1336,24 @@
             "action": {
                 "test": "ComplexFormTest",
                 "opposed": {
-                    "test": "OpposedTest",
-                    "resist": {"test": ""}
+                    "test": "OpposedTest"
                 },
                 "followed": {
-                    "test": "DrainTest"
+                    "test": "FadeTest"
                 }
             }
         },
         "weapon": {
-            "templates": ["description", "action", "technology", "weapon"]
+            "templates": ["description", "action", "technology", "weapon"],
+            "action": {
+                "test": "",
+                "opposed": {
+                    "test": "PhysicalDefenseTest",
+                    "resist": {
+                        "test": "PhysicalResistTest"
+                    }
+                }
+            }
         },
         "bioware": {
             "templates": ["description", "technology", "action", "armor"],

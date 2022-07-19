@@ -95,7 +95,7 @@ export abstract class VersionMigration {
         // Apply the updates, this should *always* work, now that parsing is complete.
         await this.Apply(entityUpdates);
 
-        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
+        // await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
         ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
@@ -260,19 +260,17 @@ export abstract class VersionMigration {
         if (actorData.items !== undefined) {
             const items = await Promise.all(
                 // @ts-ignore
-                actorData.items.map(async (item) => {
-                    let itemUpdate = await this.MigrateItemData(item);
+                actorData.items.map(async (itemData) => {
+                    if (!await this.ShouldMigrateItemData(itemData)) return itemData;
+                    let itemUpdate = await this.MigrateItemData(itemData);
 
-                    if (!isObjectEmpty(itemUpdate)) {
-                        hasItemUpdates = true;
-                        itemUpdate['_id'] = item._id;
-                        return await mergeObject(item, itemUpdate, {
-                            enforceTypes: false,
-                            inplace: false,
-                        });
-                    } else {
-                        return item;
-                    }
+                    hasItemUpdates = true;
+                    itemUpdate['_id'] = itemData._id;
+
+                    return mergeObject(itemData, itemUpdate.data, {
+                        enforceTypes: false,
+                        inplace: false,
+                    });
                 }),
             );
             if (hasItemUpdates) {
@@ -375,55 +373,69 @@ export abstract class VersionMigration {
      * @param pack
      */
     public async MigrateCompendiumPack(pack: CompendiumCollection<CompendiumCollection.Metadata>) {
-        const entity = pack.metadata.entity;
-        if (!['Actor', 'Item', 'Scene'].includes(entity)) return;
+        if (!['Actor', 'Item', 'Scene'].includes(pack.metadata.type)) return;
 
         // Begin by requesting server-side data model migration and get the migrated content
         await pack.migrate({});
-        const documents = await pack.contents;
+        const documents = await pack.getDocuments();
 
         // Iterate over compendium entries - applying fine-tuned migration functions
         for (let document of documents) {
             try {
                 let updateData: any = null;
-                // @ts-ignore // TODO: vtt-types v9 ?.type should work, but doesn't?
-                if (pack.metadata.entity === 'Item' && document.data?.type === 'Item') {
+                if (pack.metadata.type === 'Item') {
                     // @ts-ignore // TODO: vtt-types v9 document.data.type check added to type gate... but didn't work
-                    updateData = await this.MigrateItemData(document.data);
+                    updateData = await this.MigrateItemData(foundry.utils.duplicate(document.data));
 
                     if (isObjectEmpty(updateData)) {
                         continue;
                     }
 
-                    expandObject(updateData);
-                    updateData['_id'] = document.id;
-                    await pack.updateAll(updateData);
+                    if (updateData.data) {
+                        expandObject(updateData.data);
+                        document.update(updateData.data);
+                    }
+
                     // TODO: Uncomment when foundry allows embeddeds to be updated in packs
-                    // } else if (document === 'Actor') {
-                    //     updateData = await this.MigrateActorData(ent.data);
-                    //
-                    //     if (isObjectEmpty(updateData)) {
-                    //         continue;
-                    //     }
-                    //
-                    //     updateData['_id'] = ent._id;
-                    //     await pack.updateEntity(updateData);
-                } else if (entity === 'Scene') {
-                    updateData = await this.MigrateSceneData(document.data);
+                //@ts-ignore
+                } else if (pack.metadata.type === 'Actor') {
+                    // @ts-ignore
+                    updateData = await this.MigrateActorData(foundry.utils.duplicate(document.data));
 
                     if (isObjectEmpty(updateData)) {
                         continue;
                     }
 
-                    expandObject(updateData);
-                    updateData['_id'] = document.id;
-                    await pack.updateAll(updateData);
+                    if (updateData.items) {
+                        await document.updateEmbeddedDocuments('Item', updateData.items);
+                    }
+
+                    if (updateData.effects) {
+                        await document.updateEmbeddedDocuments('Effect', updateData.effects);
+                    }
+
+                    if (updateData.data) {
+                        expandObject(updateData.data);
+                        await document.update(updateData.data);
+                    }
+
+                } else if (pack.metadata.type === 'Scene') {
+                    updateData = await this.MigrateSceneData(foundry.utils.duplicate(document.data));
+
+                    if (isObjectEmpty(updateData)) {
+                        continue;
+                    }
+
+                    if (updateData.data) {
+                        expandObject(updateData.data);
+                        await document.update(updateData.data);
+                    }
                 }
             } catch (err) {
                 console.error(err);
             }
         }
-        console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
+        console.log(`Migrated all ${pack.metadata.type} entities from Compendium ${pack.collection}`);
     }
 }
 

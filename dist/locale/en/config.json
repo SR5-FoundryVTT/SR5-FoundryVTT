@@ -978,7 +978,8 @@
     "CombatSpellDefenseTest": "Combat Spell Defense",
     "NaturalRecoveryStunTest": "Natural Recovery Stun",
     "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
-    "DrainTest": "Drain Test"
+    "DrainTest": "Drain Test",
+    "FadeTest": "Fade Test"
   },
   "SR5.MissingResource": {
     "Edge": "No Edge left to consume"

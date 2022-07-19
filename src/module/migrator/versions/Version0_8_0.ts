@@ -28,7 +28,7 @@ export class Version0_8_0 extends VersionMigration {
     }
 
     protected _ShouldMigrateItemData(data: ShadowrunItemData): boolean {
-        return ['weapon'].includes(data.type);
+        return ['weapon', 'spell'].includes(data.type);
     }
 
     protected async MigrateItemData(data: ShadowrunItemData) {
@@ -37,17 +37,23 @@ export class Version0_8_0 extends VersionMigration {
         } = {};
 
         switch (data.type) {
-            // Opposed And Resist will be handled by Foundry template migration.
+            /**
+             * Weapons depend on their category on what's supposed to happen when attacking.
+             */
             case 'weapon': {
                 // Some weapons might not have category set yet, so leave them.
                 if (data.data.category) {
                     const test = SR5.weaponCategoryActiveTests[data.data.category];
+                    // Opposed And Resist will be handled by Foundry template migration.
                     updateData.data = {action: {test}};
                 }
 
                 break;
             }
 
+            /**
+             * Spells depend greatly on their category on what's supposed to happen when defending.
+             */
             case 'spell': {
                 switch (data.data.category) {
                     case '': {
