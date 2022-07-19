@@ -29390,7 +29390,6 @@ const chat_1 = require("../chat");
 const constants_1 = require("../constants");
 const SR5ItemDataWrapper_1 = require("../data/SR5ItemDataWrapper");
 const PartsList_1 = require("../parts/PartsList");
-const ActionFlow_1 = require("./flows/ActionFlow");
 const SkillFlow_1 = require("../actor/flows/SkillFlow");
 const config_1 = require("../config");
 const DataDefaults_1 = require("../data/DataDefaults");
@@ -29730,29 +29729,6 @@ class SR5Item extends Item {
         const testName = this.getRollName();
         return testName ? testName : game.i18n.localize('SR5.Action');
     }
-    getOpposedTestName() {
-        let name = '';
-        const action = this.getAction();
-        if (action && action.opposed.type) {
-            const { opposed } = action;
-            if (opposed.type !== 'custom') {
-                name = `${helpers_1.Helpers.label(opposed.type)}`;
-            }
-            else if (opposed.skill) {
-                name = `${helpers_1.Helpers.label(opposed.skill)}+${helpers_1.Helpers.label(opposed.attribute)}`;
-            }
-            else if (opposed.attribute2) {
-                name = `${helpers_1.Helpers.label(opposed.attribute)}+${helpers_1.Helpers.label(opposed.attribute2)}`;
-            }
-            else if (opposed.attribute) {
-                name = `${helpers_1.Helpers.label(opposed.attribute)}`;
-            }
-        }
-        const mod = this.getOpposedTestModifier();
-        if (mod)
-            name += ` ${mod}`;
-        return name;
-    }
     getOpposedTestMod() {
         const parts = new PartsList_1.PartsList();
         if (this.hasDefenseTest()) {
@@ -29770,23 +29746,6 @@ class SR5Item extends Item {
             }
         }
         return parts;
-    }
-    getOpposedTestModifier() {
-        const testMod = this.getOpposedTestMod();
-        const total = testMod.total;
-        if (total)
-            return `(${total})`;
-        else {
-            if (this.isRangedWeapon()) {
-                const fireModeData = this.getLastFireMode();
-                if (fireModeData === null || fireModeData === void 0 ? void 0 : fireModeData.defense) {
-                    if (fireModeData.defense === 'SR5.DuckOrCover') {
-                        return game.i18n.localize('SR5.DuckOrCover');
-                    }
-                }
-            }
-        }
-        return '';
     }
     getBlastData(actionTestData) {
         if (this.isSpell() && this.isAreaOfEffect()) {
@@ -30375,48 +30334,6 @@ class SR5Item extends Item {
         if (this.isRangedWeapon())
             return this.getRange();
     }
-    getAttackData(hits, actionTestData) {
-        var _a;
-        if (!this._canDealDamage()) {
-            return;
-        }
-        const action = this.getAction();
-        if (!action)
-            return;
-        const damage = ActionFlow_1.ActionFlow.calcDamage(action.damage, this.actor);
-        const data = {
-            hits,
-            damage,
-        };
-        // Modify action damage by spell damage.
-        if (this.isCombatSpell() && (actionTestData === null || actionTestData === void 0 ? void 0 : actionTestData.spell)) {
-            const force = actionTestData.spell.force;
-            const damageParts = new PartsList_1.PartsList(data.damage.mod);
-            const spellDamage = this.getSpellDamage(force, hits);
-            if (spellDamage) {
-                data.force = force;
-                data.damage.base = spellDamage.base;
-                data.damage.value = spellDamage.base + damageParts.total;
-                data.damage.ap.value = -spellDamage.ap.value + damageParts.total;
-                data.damage.ap.base = -spellDamage.ap.value;
-            }
-        }
-        if (this.isComplexForm() && (actionTestData === null || actionTestData === void 0 ? void 0 : actionTestData.complexForm)) {
-            data.level = actionTestData.complexForm.level;
-        }
-        if (this.isMeleeWeapon()) {
-            data.reach = this.getReach();
-            data.accuracy = this.getActionLimit();
-        }
-        if (this.isRangedWeapon()) {
-            data.fireMode = (_a = actionTestData === null || actionTestData === void 0 ? void 0 : actionTestData.rangedWeapon) === null || _a === void 0 ? void 0 : _a.fireMode;
-            data.accuracy = this.getActionLimit();
-        }
-        const blastData = this.getBlastData(actionTestData);
-        if (blastData)
-            data.blast = blastData;
-        return data;
-    }
     getRollName() {
         if (this.isRangedWeapon()) {
             return game.i18n.localize('SR5.RangeWeaponAttack');
@@ -30434,40 +30351,6 @@ class SR5Item extends Item {
             return this.name;
         }
         return constants_1.DEFAULT_ROLL_NAME;
-    }
-    getLimit() {
-        var _a;
-        // @ts-ignore // TODO: This should use this.getAction(). However action.limit doesn't contain label field.
-        const limit = duplicate((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.limit);
-        if (!limit)
-            return undefined;
-        // go through and set the label correctly
-        if (this.data.type === 'weapon') {
-            limit.label = 'SR5.Accuracy';
-        }
-        else if (limit === null || limit === void 0 ? void 0 : limit.attribute) {
-            limit.label = config_1.SR5.limits[limit.attribute];
-        }
-        else if (this.isSpell()) {
-            limit.value = this.getLastSpellForce().value;
-            limit.label = 'SR5.Force';
-        }
-        else if (this.isComplexForm()) {
-            limit.value = this.getLastComplexFormLevel().value;
-            limit.label = 'SR5.Level';
-        }
-        else {
-            limit.label = 'SR5.Limit';
-        }
-        // adjust limit value for actor data
-        if (limit.attribute) {
-            const att = this.actor.findLimit(limit.attribute);
-            if (att) {
-                limit.mod = PartsList_1.PartsList.AddUniquePart(limit.mod, att.label, att.value);
-                helpers_1.Helpers.calcTotal(limit);
-            }
-        }
-        return limit;
     }
     /**
      * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
@@ -30655,19 +30538,6 @@ class SR5Item extends Item {
     getActionAttribute2() {
         return this.wrapper.getActionAttribute2();
     }
-    getActionLimit() {
-        let limit = this.wrapper.getActionLimit();
-        // get the limit modifiers from the actor if we have them
-        const action = this.wrapper.getAction();
-        if ((action === null || action === void 0 ? void 0 : action.limit.attribute) && limit && this.actor) {
-            const { attribute } = action.limit;
-            const att = this.actor.findAttribute(attribute);
-            if (att) {
-                limit += att.value;
-            }
-        }
-        return limit;
-    }
     getModifierList() {
         return this.wrapper.getModifierList();
     }
@@ -30707,37 +30577,6 @@ class SR5Item extends Item {
         if (!action)
             return false;
         return action.opposed.type === 'defense';
-    }
-    /** Use this method to get the base damage of spell, before any opposing action
-     *
-     * NOTE: This will NOT give you modified damage for direct combat spells
-     */
-    getSpellDamage(force, hits) {
-        if (!this.isCombatSpell())
-            return;
-        const action = this.getAction();
-        if (!action)
-            return;
-        if (this.isDirectCombatSpell()) {
-            const damage = hits;
-            return helpers_1.Helpers.createDamageData(damage, action.damage.type.value, 0, '', this);
-        }
-        else if (this.isIndirectCombatSpell()) {
-            const damage = force;
-            const ap = -force;
-            return helpers_1.Helpers.createDamageData(damage, action.damage.type.value, -ap, '', this);
-        }
-    }
-    /** Should environmental modifiers apply an action by this item?
-     */
-    applyEnvironmentalModifiers() {
-        if (this.isRangedWeapon())
-            return true;
-        if (this.isMeleeWeapon())
-            return true;
-        if (this.isIndirectCombatSpell())
-            return true;
-        return false;
     }
     /**
      * A host type item can store IC actors to spawn in order, use this method to add into that.
@@ -31083,7 +30922,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":148,"../config":150,"../constants":151,"../data/DataDefaults":152,"../data/SR5ItemDataWrapper":154,"../helpers":165,"../parts/PartsList":220,"../rules/MatrixRules":227,"../tests/TestCreator":251,"./ChatData":204,"./flows/ActionFlow":207,"./flows/NetworkDeviceFlow":209,"./prep/HostPrep":210}],206:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":148,"../config":150,"../constants":151,"../data/DataDefaults":152,"../data/SR5ItemDataWrapper":154,"../helpers":165,"../parts/PartsList":220,"../rules/MatrixRules":227,"../tests/TestCreator":251,"./ChatData":204,"./flows/NetworkDeviceFlow":209,"./prep/HostPrep":210}],206:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
