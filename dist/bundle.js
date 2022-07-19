@@ -36472,6 +36472,12 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
         return false;
     }
     /**
+     * Overwrite SuccessTest#opposing behavior as an OpposedTest is opposing another test.
+     */
+    get opposing() {
+        return true;
+    }
+    /**
      * This test type can't be extended.
      */
     get canBeExtended() {
@@ -37624,6 +37630,12 @@ class SuccessTest {
      */
     get opposed() {
         return !!this.data.opposed && this.data.opposed.test !== '';
+    }
+    /**
+     * Determine if this test is opposing another test.
+     */
+    get opposing() {
+        return false;
     }
     /**
      * TODO: This method results in an ugly description.

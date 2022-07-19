@@ -117,6 +117,13 @@ export class OpposedTest extends SuccessTest {
     }
 
     /**
+     * Overwrite SuccessTest#opposing behavior as an OpposedTest is opposing another test.
+     */
+    get opposing() {
+        return true;
+    }
+
+    /**
      * This test type can't be extended.
      */
     get canBeExtended() {

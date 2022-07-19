@@ -740,6 +740,13 @@ export class SuccessTest {
     }
 
     /**
+     * Determine if this test is opposing another test.
+     */
+    get opposing(): boolean {
+        return false;
+    }
+
+    /**
      * TODO: This method results in an ugly description.
      *
      */

@@ -32,12 +32,9 @@
         </div>
         <div class="card-content {{#if showDescription}}clickable show-description{{/if}}">
             <div class="left-side">
-                {{#if test.hasLimit}}
-                <div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span>{{test.limit.value}}</span></div>
-                {{/if}}
-                {{#if test.hasThreshold}}
-                <div class="test-value"><span class="value">{{localize test.threshold.label}}:</span> <span>{{test.threshold.value}}</span></span></div>
-                {{/if}}
+                {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.AttackerHits"}}:</span> <span>{{test.against.netHits.value}}</span></div>{{/if}}
+                {{#if test.hasLimit}}<div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span>{{test.limit.value}}</span></div>{{/if}}
+                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.threshold.label}}:</span> <span>{{test.threshold.value}}</span></span></div>{{/if}}
             </div>
             <div class="right-side">
                 <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span>{{test.pool.value}}</span></div>
