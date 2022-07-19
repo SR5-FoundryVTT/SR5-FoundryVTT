@@ -41,13 +41,17 @@ export class AttributeOnlyTest extends SuccessTest {
 
         // Clear everything. This way we don't have to track previous / current attributes and remove accordingly.
         this.data.pool.mod = [];
+        const pool = new PartsList(this.pool.mod);
 
         const attribute1 = this.actor.getAttribute(this.data.attribute1);
         const attribute2 = this.actor.getAttribute(this.data.attribute2);
 
         // Re-build base pool values first. Other modifiers will be added within prepareBaseValues
-        const pool = new PartsList(this.pool.mod);
         if (attribute1) pool.addPart(attribute1.label, attribute1.value);
         if (attribute2) pool.addPart(attribute2.label, attribute2.value);
+
+        // Rebuild attribute specific modifiers previously added in TestCreate#_prepareTestDataWithAction
+        if (attribute1 && this.actor._isMatrixAttribute(this.data.attribute1)) this.actor._addMatrixParts(pool, true);
+        if (attribute2 && this.actor._isMatrixAttribute(this.data.attribute2)) this.actor._addMatrixParts(pool, true);
     }
 }

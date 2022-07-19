@@ -1303,6 +1303,14 @@ export class SR5Actor extends Actor {
         await test.execute();
     }
 
+    /**
+     * Is the given attribute id a matrix attribute
+     * @param attribute
+     */
+    _isMatrixAttribute(attribute: string): boolean {
+        return SR5.matrixAttributes.hasOwnProperty(attribute);
+    }
+
     _addMatrixParts(parts: PartsList<number>, atts) {
         if (Helpers.isMatrix(atts)) {
             if (!("matrix" in this.data.data)) return;

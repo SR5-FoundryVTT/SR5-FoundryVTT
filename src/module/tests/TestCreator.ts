@@ -313,7 +313,7 @@ export const TestCreator = {
         // Action values might be needed later to redo the same test.
         data.action = action;
 
-        const pool = new PartsList(data.pool.mod);
+        const pool = new PartsList<number>(data.pool.mod);
 
         // Prepare pool values.
         // TODO: Check if knowledge / language skills can be used for actions.
@@ -336,12 +336,16 @@ export const TestCreator = {
             const attribute = actor.getAttribute(action.attribute);
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
+            // Apply matrix modifiers, when applicable
+            if (attribute && actor._isMatrixAttribute(action.attribute)) actor._addMatrixParts(pool, true);
         }
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2);
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
+            // Apply matrix modifiers, when applicable
+            if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
         }
         // A general pool modifier will be used as a base value.
         if (action.mod) {

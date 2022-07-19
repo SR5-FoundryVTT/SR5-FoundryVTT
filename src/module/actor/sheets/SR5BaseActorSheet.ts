@@ -614,7 +614,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 switch (matrixRoll) {
                     case 'attribute':
                         const attr = split[2];
-                        await this.actor.rollMatrixAttribute(attr, options);
+                        await this.actor.rollAttribute(attr, options);
                         break;
                     case 'device-rating':
                         await this.actor.rollDeviceRating(options);

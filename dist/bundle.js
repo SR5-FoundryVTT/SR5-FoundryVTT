@@ -14448,6 +14448,13 @@ class SR5Actor extends Actor {
             yield test.execute();
         });
     }
+    /**
+     * Is the given attribute id a matrix attribute
+     * @param attribute
+     */
+    _isMatrixAttribute(attribute) {
+        return config_1.SR5.matrixAttributes.hasOwnProperty(attribute);
+    }
     _addMatrixParts(parts, atts) {
         if (helpers_1.Helpers.isMatrix(atts)) {
             if (!("matrix" in this.data.data))
@@ -17740,7 +17747,7 @@ class SR5BaseActorSheet extends ActorSheet {
                     switch (matrixRoll) {
                         case 'attribute':
                             const attr = split[2];
-                            yield this.actor.rollMatrixAttribute(attr, options);
+                            yield this.actor.rollAttribute(attr, options);
                             break;
                         case 'device-rating':
                             yield this.actor.rollDeviceRating(options);
@@ -35869,14 +35876,19 @@ class AttributeOnlyTest extends SuccessTest_1.SuccessTest {
             return;
         // Clear everything. This way we don't have to track previous / current attributes and remove accordingly.
         this.data.pool.mod = [];
+        const pool = new PartsList_1.PartsList(this.pool.mod);
         const attribute1 = this.actor.getAttribute(this.data.attribute1);
         const attribute2 = this.actor.getAttribute(this.data.attribute2);
         // Re-build base pool values first. Other modifiers will be added within prepareBaseValues
-        const pool = new PartsList_1.PartsList(this.pool.mod);
         if (attribute1)
             pool.addPart(attribute1.label, attribute1.value);
         if (attribute2)
             pool.addPart(attribute2.label, attribute2.value);
+        // Rebuild attribute specific modifiers previously added in TestCreate#_prepareTestDataWithAction
+        if (attribute1 && this.actor._isMatrixAttribute(this.data.attribute1))
+            this.actor._addMatrixParts(pool, true);
+        if (attribute2 && this.actor._isMatrixAttribute(this.data.attribute2))
+            this.actor._addMatrixParts(pool, true);
     }
 }
 exports.AttributeOnlyTest = AttributeOnlyTest;
@@ -38436,6 +38448,9 @@ exports.TestCreator = {
                 // Don't use addUniquePart as one attribute might be used twice.
                 if (attribute)
                     pool.addPart(attribute.label, attribute.value);
+                // Apply matrix modifiers, when applicable
+                if (attribute && actor._isMatrixAttribute(action.attribute))
+                    actor._addMatrixParts(pool, true);
             }
             // The second attribute is only used for attribute only tests.
             if (!action.skill && action.attribute2) {
@@ -38443,6 +38458,9 @@ exports.TestCreator = {
                 // Don't use addUniquePart as one attribute might be used twice.
                 if (attribute)
                     pool.addPart(attribute.label, attribute.value);
+                // Apply matrix modifiers, when applicable
+                if (attribute && actor._isMatrixAttribute(action.attribute2))
+                    actor._addMatrixParts(pool, true);
             }
             // A general pool modifier will be used as a base value.
             if (action.mod) {
