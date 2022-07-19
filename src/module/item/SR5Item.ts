@@ -2,7 +2,6 @@ import {Helpers} from '../helpers';
 import {SR5Actor} from '../actor/SR5Actor';
 import {ActionTestData} from '../apps/dialogs/ShadowrunItemDialog';
 import {ChatData} from './ChatData';
-import {ShadowrunRoll, ShadowrunRoller, Test} from '../rolls/ShadowrunRoller';
 import {createItemChatMessage} from '../chat';
 import {DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME} from '../constants';
 import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
@@ -15,6 +14,7 @@ import {HostDataPreparation} from "./prep/HostPrep";
 import {MatrixRules} from "../rules/MatrixRules";
 import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
 import {TestCreator} from "../tests/TestCreator";
+import {Test} from "../rolls/ShadowrunRoller";
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
 import AttributeField = Shadowrun.AttributeField;
@@ -28,8 +28,6 @@ import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import ActionRollData = Shadowrun.ActionRollData;
 import DamageData = Shadowrun.DamageData;
-import DefenseRollOptions = Shadowrun.DefenseRollOptions;
-import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 import SpellData = Shadowrun.SpellData;
 import WeaponData = Shadowrun.WeaponData;
 import AmmoData = Shadowrun.AmmoData;
@@ -800,7 +798,7 @@ export class SR5Item extends Item {
 
 
 
-    async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<ShadowrunRoll | undefined> {
+    async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<void> {
         console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
         return;
         // const options = {
@@ -859,21 +857,6 @@ export class SR5Item extends Item {
     }
 
     /**
-     * Rolls a test using the latest stored data on the item (force, fireMode, level)
-     * @param event - mouse event
-     * @param actionTestData
-     */
-    async rollTest(event, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
-
-        const roll = await ShadowrunRoller.itemRoll(event, this, actionTestData);
-        if (!roll) return;
-
-        await ShadowrunRoller.resultingItemRolls(event, this, actionTestData);
-
-        return roll;
-    }
-
-    /**
      * The item can be stored on a token on the current or another, given, scene.
      *
      * The chat message must contain a data attribute containing a 'SceneId.TokenId' mapping.
@@ -920,16 +903,6 @@ export class SR5Item extends Item {
         if (!this.isAction()) return;
 
         return this.wrapper.getActionResult();
-    }
-
-    getOpposedTests(): Test[] {
-        if (!this.hasOpposedRoll) {
-            return [];
-        }
-        return [{
-            label: this.getOpposedTestName(),
-            type: 'opposed',
-        }];
     }
 
     /**
@@ -1538,33 +1511,6 @@ export class SR5Item extends Item {
             const ap = -force;
 
             return Helpers.createDamageData(damage, action.damage.type.value, -ap, '', this);
-        }
-    }
-
-    // TODO: Move into a rule section.
-    async rollDefense(target: SR5Actor, options: DefenseRollOptions): Promise<ShadowrunRoll | undefined> {
-        if (!target) {
-            console.error("The targeted actor couldn't be fetched.");
-            return;
-        }
-        // TODO: Maybe move into defense methods and give the actor access to the item.
-        const opposedParts = this.getOpposedTestMod();
-
-        if (this.isWeapon()) {
-            options.cover = true;
-            if (options.attack?.fireMode?.defense) {
-                options.fireModeDefense = +options.attack.fireMode.defense;
-            }
-
-            return await target.rollAttackDefense(options, opposedParts.list);
-        }
-
-        if (this.isDirectCombatSpell()) {
-            return await target.rollDirectSpellDefense(this, options as SpellDefenseOptions);
-        }
-
-        if (this.isIndirectCombatSpell()) {
-            return await target.rollIndirectSpellDefense(this, options as SpellDefenseOptions);
         }
     }
 

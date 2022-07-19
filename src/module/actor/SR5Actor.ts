@@ -1,12 +1,9 @@
-import {ShadowrunRoll, ShadowrunRoller} from '../rolls/ShadowrunRoller';
+import {ShadowrunRoller} from '../rolls/ShadowrunRoller';
 import {Helpers} from '../helpers';
 import {SR5Item} from '../item/SR5Item';
-import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
+import {SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
 import {PartsList} from '../parts/PartsList';
-import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
-import {createRollChatMessage} from "../chat";
 import {SR5Combat} from "../combat/SR5Combat";
-import {SoakFlow} from './flows/SoakFlow';
 import {DefaultValues} from '../data/DataDefaults';
 import {SkillFlow} from "./flows/SkillFlow";
 import {SR5} from "../config";
@@ -23,13 +20,16 @@ import {ICPrep} from "./prep/ICPrep";
 import {
     EffectChangeData
 } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
+import {InventoryFlow} from "./flows/InventoryFlow";
+import {ModifierFlow} from "./flows/ModifierFlow";
+import {SuccessTest} from "../tests/SuccessTest";
+import {TestCreator} from "../tests/TestCreator";
+import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
+import {RecoveryRules} from "../rules/RecoveryRules";
 import ActorRollOptions = Shadowrun.ActorRollOptions;
-import DefenseRollOptions = Shadowrun.DefenseRollOptions;
-import SoakRollOptions = Shadowrun.SoakRollOptions;
 import AttributeField = Shadowrun.AttributeField;
 import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillField = Shadowrun.SkillField;
-import ModList = Shadowrun.ModList;
 import LimitField = Shadowrun.LimitField;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleStat = Shadowrun.VehicleStat;
@@ -38,7 +38,6 @@ import Limits = Shadowrun.Limits;
 import DamageData = Shadowrun.DamageData;
 import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
-import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 import NumberOrEmpty = Shadowrun.NumberOrEmpty;
 import VehicleStats = Shadowrun.VehicleStats;
 import ActorArmorData = Shadowrun.ActorArmorData;
@@ -46,7 +45,6 @@ import ConditionData = Shadowrun.ConditionData;
 import Skills = Shadowrun.Skills;
 import CharacterSkills = Shadowrun.CharacterSkills;
 import SpiritActorData = Shadowrun.SpiritActorData;
-import CharacterData = Shadowrun.CharacterData;
 import CharacterActorData = Shadowrun.CharacterActorData;
 import SpriteActorData = Shadowrun.SpriteActorData;
 import VehicleData = Shadowrun.VehicleData;
@@ -58,14 +56,7 @@ import HostItemData = Shadowrun.HostItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import InventoryData = Shadowrun.InventoryData;
-import InventoriesData = Shadowrun.InventoriesData;
-import {InventoryFlow} from "./flows/InventoryFlow";
-import {ModifierFlow} from "./flows/ModifierFlow";
-import {SuccessTest, TestOptions} from "../tests/SuccessTest";
-import {TestCreator} from "../tests/TestCreator";
-import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import DamageType = Shadowrun.DamageType;
-import {RecoveryRules} from "../rules/RecoveryRules";
 
 function getGame(): Game {
     if (!(game instanceof Game)) {
@@ -810,241 +801,6 @@ export class SR5Actor extends Actor {
             await this.sheet?.render();
     }
 
-    async rollFade(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll | undefined> {
-        const wil = duplicate(this.data.data.attributes.willpower);
-        const res = duplicate(this.data.data.attributes.resonance);
-        const data = this.data.data;
-
-        const parts = new PartsList<number>();
-        parts.addUniquePart(wil.label, wil.value);
-        parts.addUniquePart(res.label, res.value);
-        if (data.modifiers.fade) parts.addUniquePart('SR5.Bonus', data.modifiers.fade);
-
-        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Fade')}`;
-
-        const actor = this;
-        const roll = await ShadowrunRoller.advancedRoll({
-            parts: parts.list,
-            actor,
-            title: title,
-            wounds: false,
-            hideRollMessage: true
-        });
-
-        if (!roll) return;
-
-        // Reduce damage by soak roll and inform user.
-        const incomingDamage = Helpers.createDamageData(incoming, 'stun');
-        const damage = Helpers.reduceDamageByHits(incomingDamage, roll.hits, 'SR5.Fade');
-
-        await createRollChatMessage({title, roll, actor, damage});
-
-        return roll;
-    }
-
-    async rollDrain(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll | undefined> {
-        if (!this.isCharacter()) return;
-
-        const data = this.data.data as CharacterData;
-
-        const wil = duplicate(data.attributes.willpower);
-        const drainAtt = duplicate(data.attributes[data.magic.attribute]);
-
-        const parts = new PartsList<number>();
-        parts.addPart(wil.label, wil.value);
-        parts.addPart(drainAtt.label, drainAtt.value);
-        if (data.modifiers.drain) parts.addUniquePart('SR5.Bonus', data.modifiers.drain);
-
-        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
-        const actor = this;
-        const roll = await ShadowrunRoller.advancedRoll({
-            parts: parts.list,
-            title,
-            actor,
-            wounds: false,
-            hideRollMessage: true
-        });
-
-        if (!roll) return;
-
-        // Reduce damage by soak roll and inform user.
-        const incomingDamage = Helpers.createDamageData(incoming, 'stun');
-        const damage = Helpers.reduceDamageByHits(incomingDamage, roll.hits, 'SR5.Drain');
-
-        await createRollChatMessage({title, roll, actor, damage});
-
-        return roll;
-    }
-
-    rollArmor(options: ActorRollOptions = {}, partsProps: ModList<number> = []) {
-        const parts = new PartsList(partsProps);
-        this._addArmorParts(parts);
-        return ShadowrunRoller.advancedRoll({
-            event: options.event,
-            actor: this,
-            parts: parts.list,
-            title: game.i18n.localize('SR5.Armor'),
-            wounds: false,
-        });
-    }
-
-    /** A attack defense is anything against visible attacks (ranged weapons, melee weapons, indirect spell attacks, ...)
-     */
-    async rollAttackDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []): Promise<ShadowrunRoll | undefined> {
-        const {attack} = options;
-
-        const defenseDialog = await ShadowrunActorDialogs.createDefenseDialog(this, options, partsProps);
-        const defenseActionData = await defenseDialog.select();
-
-        if (defenseDialog.canceled) return;
-
-        const roll = await ShadowrunRoller.advancedRoll({
-            event: options.event,
-            actor: this,
-            parts: defenseActionData.parts.list,
-            title: game.i18n.localize('SR5.DefenseTest'),
-            incomingAttack: attack,
-            combat: defenseActionData.combat
-        });
-
-        if (!roll) return;
-
-        // Reduce initiative after a successful roll, but before attack handling, to allow for the standalone sheet
-        // defense action to still reduce the initiative.
-        if (defenseActionData.combat.initiative) {
-            await this.changeCombatInitiative(defenseActionData.combat.initiative);
-        }
-
-        if (!attack) return;
-
-        // Collect defense information.
-        let defenderHits = roll.total || 0;
-        let attackerHits = attack.hits || 0;
-        let netHits = Math.max(attackerHits - defenderHits, 0);
-
-        // Reduce damage flow.
-        let damage = attack.damage;
-
-        // modified damage value by netHits.
-        if (netHits > 0) {
-            const {modified} = Helpers.modifyDamageByHits(damage, netHits, "SR5.NetHits");
-            damage = modified;
-        }
-
-        const soakRollOptions = {
-            event: options.event,
-            damage,
-        };
-
-        await this.rollSoak(soakRollOptions);
-    }
-
-    async rollDirectSpellDefense(spell: SR5Item, options: SpellDefenseOptions): Promise<ShadowrunRoll | undefined> {
-        if (!spell.isDirectCombatSpell()) return;
-
-        // Prepare the actual roll.
-        options.hideRollMessage = options.hideRollMessage ?? true;
-        const attribute = spell.isManaSpell() ?
-            SR.defense.spell.direct.mana :
-            SR.defense.spell.direct.physical;
-
-        const roll = await this.rollSingleAttribute(attribute, options);
-
-        if (!roll) return;
-
-        // Prepare the resulting damage message.
-        const title = spell.isManaSpell() ?
-            game.i18n.localize('SR5.SpellDefenseDirectMana') :
-            game.i18n.localize('SR5.SpellDefenseDirectPhysical');
-        const modificationLabel = 'SR5.SpellDefense';
-        const actor = this;
-        const damage = Helpers.reduceDamageByHits(options.attack.damage, roll.hits, modificationLabel);
-
-        await createRollChatMessage({title, roll, actor, damage});
-
-        return roll;
-    }
-
-    async rollIndirectSpellDefense(spell: SR5Item, options: SpellDefenseOptions): Promise<ShadowrunRoll | undefined> {
-        if (!spell.isIndirectCombatSpell()) return;
-
-        const opposedParts = spell.getOpposedTestMod();
-
-        // TODO: indirect LOS spell defense works like a ranged weapon defense, but indirect LOS(A) spell defense
-        //       work like grenade attack (no defense, but soak, with the threshold net hits modifying damage.)
-        //       Grenades: SR5#181 Combat Spells: SR5#283
-        return await this.rollAttackDefense(options, opposedParts.list);
-    }
-
-    // TODO: Abstract handling of const damage : ModifiedDamageData
-    async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []): Promise<ShadowrunRoll | undefined> {
-        return new SoakFlow().runSoakTest(this, options, partsProps);
-    }
-
-    rollSingleAttribute(attId, options: ActorRollOptions) {
-        const attr = duplicate(this.data.data.attributes[attId]);
-        const parts = new PartsList<number>();
-        parts.addUniquePart(attr.label, attr.value);
-        this._addMatrixParts(parts, attr);
-        this._addGlobalParts(parts);
-
-        return ShadowrunRoller.advancedRoll({
-            actor: this,
-            parts: parts.list,
-            event: options?.event,
-            title: options.title ?? Helpers.label(attId),
-            hideRollMessage: options.hideRollMessage
-        });
-    }
-
-    /**
-     * Roll a recovery test appropriate for this actor type and condition track.
-     *
-     * @param track Condition Track/Monitor name to recover with
-     * @param options Change roll behaviour.
-     */
-    rollNaturalRecovery(track, options?: ActorRollOptions) {
-        if (!this.hasNaturalRecovery) return;
-
-        let attributeNameA = 'body';
-        let attributeNameB = 'willpower';
-        let title = 'Natural Recover';
-        if (track === 'physical') {
-            attributeNameB = 'body';
-            title += ' - Physical - 1 Day';
-        } else {
-            title += ' - Stun - 1 Hour';
-        }
-        let attributeA = duplicate(this.data.data.attributes[attributeNameA]);
-        let attributeB = duplicate(this.data.data.attributes[attributeNameB]);
-
-        const parts = new PartsList<number>();
-        parts.addPart(attributeA.label, attributeA.value);
-        parts.addPart(attributeB.label, attributeB.value);
-
-        return ShadowrunRoller.advancedRoll({
-            event: options?.event,
-            actor: this,
-            parts: parts.list,
-            title: title,
-            extended: true,
-            after: async (roll: ShadowrunRoll | undefined) => {
-                if (!roll) return;
-                let hits = roll.total || 0;
-                const data = this.data.data as CharacterData;
-                let current = data.track[track].value;
-
-                current = Math.max(current - hits, 0);
-
-                let key = `data.track.${track}.value`;
-
-                let u = {};
-                u[key] = current;
-                await this.update(u);
-            },
-        });
-    }
-
     async promptRoll() {
         await ShadowrunRoller.promptSuccessTest();
     }
@@ -1078,18 +834,18 @@ export class SR5Actor extends Actor {
     /**
      * Roll an attribute tests as defined in SR5#152 section Attribute-Only Tests
      *
-     * @param rollId The internal attribute action id
+     * @param actionName The internal attribute action id
      * @param options Success Test options
      */
-    async rollAttributeOnlyTest(rollId: 'physical_damage_resist'|'drain'|'natural_recovery_stun'|'natural_recovery_physical'|'armor'|'fade'|'composure'|'judge_intentions'|'lift_carry'|'memory'|'physical_defense', options?: ActorRollOptions) {
-        const action = await Helpers.getPackAction(SR5.packNames.attributeActions, rollId);
+    async rollPackAction(actionName: 'physical_damage_resist'|'drain'|'natural_recovery_stun'|'natural_recovery_physical'|'armor'|'fade'|'composure'|'judge_intentions'|'lift_carry'|'memory'|'physical_defense', options?: ActorRollOptions) {
+        const action = await Helpers.getPackAction(SR5.packNames.attributeActions, actionName);
         if (!action) return;
 
         const showDialog = !TestCreator.shouldHideDialog(options?.event);
         const test = await TestCreator.fromItem(action, this, {showDialog});
 
         // Overwriting localization here is just easier...
-        test.data.title = game.i18n.localize(SR5.modifierTypes[rollId]);
+        test.data.title = game.i18n.localize(SR5.modifierTypes[actionName]);
 
         if (!test) return;
 

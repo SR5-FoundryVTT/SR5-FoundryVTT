@@ -1,6 +1,5 @@
 import {SR5Actor} from './actor/SR5Actor';
 import {SR5Item} from './item/SR5Item';
-import Template from './template';
 import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
 import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import {Helpers} from "./helpers";
@@ -166,26 +165,8 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         chatData['whisper'] = ChatMessage.getWhisperRecipients(options.whisperTo.name as string);
     }
 
-
-
     return chatData;
 };
-
-
-export async function ifConfiguredCreateDefaultChatMessage({
-                                                               roll,
-                                                               actor,
-                                                               title,
-                                                               rollMode
-                                                           }: Partial<RollChatMessageOptions>) {
-    if (game.settings.get(SYSTEM_NAME, FLAGS.DisplayDefaultRollCard) && roll) {
-        await roll.toMessage({
-            speaker: ChatMessage.getSpeaker({actor: actor}),
-            flavor: title,
-            rollMode: rollMode,
-        });
-    }
-}
 
 export async function createTargetChatMessage(options: TargetChatMessageOptions) {
     const rollChatOptions = {...options};
@@ -218,15 +199,6 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
         tests
     }
 }
-
-export async function createRollChatMessage(options: RollChatMessageOptions): Promise<ChatMessage|null> {
-    await ifConfiguredCreateDefaultChatMessage(options);
-
-    const templateData = getRollChatTemplateData(options);
-    const chatOptions = {roll: options.roll};
-    return await createChatMessage(templateData, chatOptions);
-}
-
 
 function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTemplateData {
     const token = options.actor?.getToken();
@@ -264,127 +236,6 @@ function getTokenSceneId(token: TokenDocument | undefined | null): string | unde
 }
 
 export const addRollListeners = (app: ChatMessage, html) => {
-    if (!app.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll)) {
-        return
-    }
-
-    console.error('Registering message', app, html);
-
-    html.on('click', '.test', async (event) => {
-        event.preventDefault();
-        if (!game || !game.ready) return;
-
-        const messageId = html.data('messageId');
-        const message = game.messages?.get(messageId);
-        if (!message) return;
-        const attack = message.getFlag(SYSTEM_NAME, FLAGS.Attack) as AttackData;
-        const item = SR5Item.getItemFromMessage(html);
-
-        const type = event.currentTarget.dataset.action;
-        if (!item) {
-            ui.notifications?.error(game.i18n.localize('SR5.MissingItemForOpposedTest'));
-            return;
-        }
-
-        // Selection will overwrite chat specific targeting
-        const actors = Helpers.getSelectedActorsOrCharacter();
-
-        // No selection, fall back to targeting.
-        if (actors.length === 0) {
-            const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
-
-            for (const targetSceneId of targetSceneIds) {
-                const actor = Helpers.getSceneTokenActor(targetSceneId)
-                if (!actor) continue;
-
-                actors.push(actor);
-            }
-        }
-
-        if (!actors) return;
-
-        for (const actor of actors) {
-            await item.rollTestType(type, attack, event, actor);
-        }
-    });
-    html.on('click', '.place-template', (event) => {
-        event.preventDefault();
-        const item = SR5Item.getItemFromMessage(html);
-
-        if (item) {
-            const template = Template.fromItem(item);
-            template?.drawPreview();
-        }
-    });
-
-    html.on('click', '.card-main-content', event => {
-        event.preventDefault();
-        // NOTE: This depends on the exact card template HTML structure.
-        const card = $(event.currentTarget).closest('.chat-card');
-        card.children('.dice-rolls').toggle();
-        card.children('.card-description').toggle();
-    });
-
-
-    /** Open the sheets of different document types based on the chat card.
-     */
-    html.on('click', '.chat-document-link', event => {
-        event.preventDefault();
-        if (!game || !game.ready || !canvas || !canvas.ready) return;
-
-        const documentLink = $(event.currentTarget);
-        const id = documentLink.data('id');
-        const type = documentLink.data('entity');
-
-        if (!id) return;
-
-        if (type === 'Token') {
-            const token = canvas.tokens?.get(id);
-            if (!token) return;
-            // @ts-ignore
-            token.actor.sheet.render(true, {token});
-        } else if (type === 'Actor') {
-            const actor = game.actors?.get(id);
-            if (!actor) return;
-            // @ts-ignore
-            actor.sheet.render(true);
-        } else if (type === 'Item') {
-            const card = documentLink.closest('.chat-card');
-
-            // The item can either be owned by a Token actor or a Collection actor.
-            const sceneTokenId = card.data('tokenId');
-            const actorId = card.data('actorId');
-
-            const actor = sceneTokenId ?
-                Helpers.getSceneTokenActor(sceneTokenId) :
-                game.actors?.get(actorId) as SR5Actor;
-            const item = actor?.items.get(id);
-            if (!item) return;
-            item.sheet?.render(true);
-        }
-    });
-
-    /** Select a Token on the current scene based on the link id.
-     */
-    html.on('click', '.chat-select-link', event => {
-        event.preventDefault();
-
-        if (!game || !game.ready || !canvas || !canvas.ready) return;
-
-        const selectLink = $(event.currentTarget);
-        const tokenId = selectLink.data('tokenId');
-        const token = canvas.tokens?.get(tokenId);
-
-        if (token) {
-            token.control();
-        } else {
-            ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
-        }
-    });
-
-    /** Apply damage to the actor speaking the chat card.
-     */
-    html.on('click', '.apply-damage', async event => await chatMessageActionApplyDamage(html, event));
 
     /**
      * Apply action results onto targets or selections.
