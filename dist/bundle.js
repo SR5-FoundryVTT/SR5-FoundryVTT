@@ -21707,7 +21707,10 @@ class TestDialog extends FormDialog_1.FormDialog {
             // Don't apply an unneeded override.
             if (valueField.value === value)
                 return;
-            valueField.override = { name: 'SR5.ManualOverride', value };
+            if (value === null || value === '')
+                delete valueField.override;
+            else
+                valueField.override = { name: 'SR5.ManualOverride', value };
         });
         // Second, apply generic values.
         // @ts-ignore
@@ -37354,12 +37357,18 @@ class SuccessTest {
      */
     applyPoolModifiers() {
         const pool = new PartsList_1.PartsList(this.pool.mod);
-        // If the user overwrote the modifiers only apply that value
+        // Remove override modifier from pool.
+        pool.removePart('SR5.Labels.Action.Modifiers');
+        // If applicable apply only override to pool. (User interaction)
         if (this.data.modifiers.override) {
+            // Remove all modifiers and only apply override.
+            for (const modifier of this.data.modifiers.mod) {
+                pool.removePart(modifier.name);
+            }
             pool.addUniquePart('SR5.Labels.Action.Modifiers', this.data.modifiers.override.value);
             return;
         }
-        // Apply all modifiers configured for this test.
+        // Otherwise apply automated modifiers to pool.
         for (const modifier of this.data.modifiers.mod) {
             // A modifier might have been asked for, but not given by the actor.
             pool.addUniquePart(modifier.name, modifier.value);

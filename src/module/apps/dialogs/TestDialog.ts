@@ -118,7 +118,10 @@ export class TestDialog extends FormDialog {
             // Don't apply an unneeded override.
             if (valueField.value === value) return;
 
-            valueField.override = {name: 'SR5.ManualOverride', value};
+            if (value === null || value === '')
+                delete valueField.override
+            else
+                valueField.override = {name: 'SR5.ManualOverride', value};
         });
 
         // Second, apply generic values.
