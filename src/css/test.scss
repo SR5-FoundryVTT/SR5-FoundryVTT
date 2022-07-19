@@ -4,9 +4,22 @@
 @import 'config';
 
 .sr5 {
-  .dialog-content-common {
+  .dialog-title {
+      font-weight: bold;
+      height: 30px;
+    }
 
+  .dialog-content-common {
+    h2 {
+      text-underline: none;
+      border: none;
+      margin: 0;
+    }
+    .sunken {
+      padding: 0.5em;
+    }
   }
+
   .dialog-content-column {
     width: 300px;
   }

@@ -150,6 +150,8 @@
   .sr5.actor .sheetbody {
     overflow: hidden;
     flex: 1; }
+  .sr5.actor .limit-title {
+    font-size: 115%; }
   .sr5.actor .attributes {
     border-top: 1px solid #4d4d4d;
     display: flex;
@@ -576,6 +578,18 @@
 /**
  * CSS for Test Dialog styling.
  */
+.sr5 .dialog-title {
+  font-weight: bold;
+  height: 30px; }
+
+.sr5 .dialog-content-common h2 {
+  text-underline: none;
+  border: none;
+  margin: 0; }
+
+.sr5 .dialog-content-common .sunken {
+  padding: 0.5em; }
+
 .sr5 .dialog-content-column {
   width: 300px; }
 
@@ -832,7 +846,6 @@ select.display {
   .sr5 .no-break {
     white-space: nowrap; }
   .sr5 .window-content {
-    font-size: 115%;
     background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/brushed_metal.jpg") repeat;
     color: white;
     overflow: hidden; }
@@ -1165,9 +1178,7 @@ select.display {
   .sr5 .sunken {
     box-shadow: inset 0 0 3px 0 #000, 0 -2px 2px -1px #000, -2px 0 2px -2px #28221f, -2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 0 3px 3px -3px #8f8c8b, 0 2px 2px -2px #8f8c8b, 0 1px 1px -1px #8f8c8b;
     padding: 0.25em;
-    background-color: #414040;
-    margin-top: 10px;
-    margin-bottom: 10px; }
+    background-color: #414040; }
   .sr5 .modified-target-damage {
     margin-top: 0.5em;
     margin-bottom: 0.5em;

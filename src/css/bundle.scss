@@ -305,7 +305,6 @@ select.display {
         white-space: nowrap;
     }
     .window-content {
-        font-size: 115%;
         background: $sheetbackground;
         color: $color;
         overflow: hidden;
@@ -707,9 +706,6 @@ select.display {
         box-shadow: $dark-sunken-box-shadow;
         padding: $medium-distance;
         background-color: $dark-sunken;
-
-        margin-top: 10px;
-        margin-bottom: 10px;
     }
 
     .modified-target-damage {

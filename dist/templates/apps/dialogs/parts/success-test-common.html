@@ -1,7 +1,7 @@
 {{#if test.actor}}
-<div class="dialog-content-common">
-    <div class="container container--fluid sunken">
-        <div class="container__row">
+<div class="dialog-content-common sunken">
+    <div class="container container--fluid">
+        <div class="container__row dialog-title">
             <div class="container__col-half">
                 <div class="document">
                     <img src="{{test.actor.img}}"/>
@@ -23,18 +23,20 @@
     {{/if}}
 
     {{#if test.hasCode}}
-    <div class="sunken" style="margin-bottom: 4px; margin-top: 4px;">
+    <hr/>
+    <div style="margin-bottom: 4px; margin-top: 4px;">
         {{test.code}}
     </div>
     {{/if}}
 
-    <div class="sunken">
+    <hr/>
+    <div>
         <div class="form-group">
             <label>{{localize test.data.modifiers.label}}</label>
             <input type="number" name="test.data.modifiers" data-dtype="number" value="{{test.data.modifiers.value}}"/>
         </div>
     </div>
-    <div class="sunken">
+    <div>
         <div class="form-group">
             <label>{{localize "SR5.DicePool"}}</label>
             <input type='number' name='test.data.pool' dtype="number" size='3' maxlength='3' value='{{test.pool.value}}'
@@ -53,7 +55,8 @@
         </div>
     </div>
     {{#if test.actor}}
-    <div class="sunken">
+    <hr/>
+    <div>
         <div class="form-group">
             <label>{{localize "SR5.PushTheLimit"}}
                 ({{test.actor.data.data.attributes.edge.uses}}/{{test.actor.data.data.attributes.edge.value}})</label>
@@ -62,7 +65,8 @@
         </div>
     </div>
     {{/if}}
-    <div class="sunken">
+    <hr/>
+    <div>
         {{#if test.canBeExtended}}
         <div class="form-group">
             <label>{{localize "SR5.Extended"}}</label>
@@ -79,9 +83,10 @@
         </div>
     </div>
     {{#if test.targets}}
-    <div class="sunken">
+    <hr/>
+    <div>
         Targets:
-        <div class="sunken">
+        <div>
             <div class="form-group">
                 <img src="{{actor.img}}" width="36" height="36"/>
                 <a class="entity-link content-link" data-type="Actor" data-id="{{actor.id}}">{{actor.name}}</a>
