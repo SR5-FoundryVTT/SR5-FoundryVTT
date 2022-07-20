@@ -488,7 +488,13 @@ export class SuccessTest {
         if (this.targets.length === 0 && this.data.targetActorsUuid) {
             this.targets = [];
             for (const uuid of this.data.targetActorsUuid) {
-                this.targets.push(await fromUuid(uuid) as TokenDocument);
+                const document = await fromUuid(uuid);
+                if (!document) continue;
+
+                const token = document instanceof SR5Actor ? document.getToken() : document;
+                if (!(token instanceof TokenDocument)) continue;
+
+                this.targets.push(token as TokenDocument);
             }
         }
     }
@@ -752,6 +758,13 @@ export class SuccessTest {
      */
     get opposing(): boolean {
         return false;
+    }
+
+    /**
+     * Determine if this test has any targets selected using FoundryVTT targeting.
+     */
+    get hasTargets(): boolean {
+        return this.targets.length > 0;
     }
 
     /**

@@ -343,7 +343,7 @@ export class Helpers {
         return user.targets.size > 0;
     }
 
-    static measureTokenDistance(tokenOrigin: Token, tokenDest: Token): number {
+    static measureTokenDistance(tokenOrigin: TokenDocument, tokenDest: TokenDocument): number {
         if (!canvas || !canvas.ready || !canvas.scene || !canvas.grid) return 0;
 
         if (!tokenOrigin || !tokenDest) return 0;

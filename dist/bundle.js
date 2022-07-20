@@ -35709,6 +35709,9 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
         data.fireModes = {};
         data.fireMode = { value: 0, defense: 0, label: '' };
         data.ranges = {};
+        data.range = 0;
+        data.targetRanges = [];
+        data.targetRangesSelected = 0;
         data.recoilCompensation = 0;
         data.damage = data.damage || DataDefaults_1.DefaultValues.damageData();
         return data;
@@ -35753,7 +35756,7 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
             const itemData = (_a = this.item) === null || _a === void 0 ? void 0 : _a.asWeaponData();
             if (!itemData)
                 return;
-            // Transform weapon ranges to something useable
+            // Transform weapon ranges to something usable
             const { ranges } = itemData.data.range;
             const { range_modifiers } = constants_1.SR.combat.environmental;
             const newRanges = {};
@@ -35772,6 +35775,49 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
             this.data.range = modifiers.environmental.active.range || 0;
         });
     }
+    /**
+     * Prepare distances between attacker and targeted tokens.
+     */
+    _prepareTargetRanges() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (foundry.utils.isObjectEmpty(this.data.ranges))
+                return;
+            if (!this.actor)
+                return;
+            if (!this.hasTargets)
+                return;
+            const attacker = this.actor.getToken();
+            if (!attacker) {
+                (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
+                return [];
+            }
+            console.log('asd');
+            // Build target ranges for template display.
+            this.data.targetRanges = this.targets.map(target => {
+                const distance = helpers_1.Helpers.measureTokenDistance(attacker, target);
+                const range = helpers_1.Helpers.getWeaponRange(distance, this.data.ranges);
+                return {
+                    uuid: target.uuid,
+                    name: target.name || '',
+                    unit: constants_1.LENGTH_UNIT,
+                    range,
+                    distance,
+                };
+            });
+            // Sort targets by ascending distance from attacker.
+            this.data.targetRanges = this.data.targetRanges.sort((a, b) => {
+                if (a.distance < b.distance)
+                    return -1;
+                if (a.distance > b.distance)
+                    return 1;
+                return 0;
+            });
+            // if no range is active, set to first target selected.
+            const modifiers = yield this.actor.getModifiers();
+            this.data.range = modifiers.environmental.active.range || this.data.targetRanges[0].range.modifier;
+        });
+    }
     _prepareRecoilCompensation() {
         var _a;
         this.data.recoilCompensation = ((_a = this.item) === null || _a === void 0 ? void 0 : _a.getRecoilCompensation(true)) || 0;
@@ -35782,6 +35828,7 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
     prepareDocumentData() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this._prepareWeaponRanges();
+            yield this._prepareTargetRanges();
             this._prepareFireMode();
             this._prepareRecoilCompensation();
         });
@@ -35806,6 +35853,11 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
             };
             // Store for next usage.
             yield ((_a = this.item) === null || _a === void 0 ? void 0 : _a.setLastFireMode(this.data.fireMode));
+            // Get range modifier from selected target instead of selected range.
+            if (this.hasTargets) {
+                const target = this.data.targetRanges[this.data.targetRangesSelected];
+                this.data.range = target.range.modifier;
+            }
             // Alter test data for range.
             this.data.range = Number(this.data.range);
             const actor = this.actor;
@@ -35817,6 +35869,8 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
         });
     }
     prepareBaseValues() {
+        if (!this.actor)
+            return;
         const poolMods = new PartsList_1.PartsList(this.data.modifiers.mod);
         // Apply recoil modification to general modifiers before calculating base values.
         // TODO: Actual recoil calculation with consumption of recoil compensation.
@@ -35827,18 +35881,12 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
             poolMods.addUniquePart('SR5.Recoil', recoil);
         else
             poolMods.removePart('SR5.Recoil');
-        // Apply altered environmental modifers
-        if (this.actor) {
-            const modifiers = Modifiers_1.Modifiers.getModifiersFromEntity(this.actor);
-            modifiers.activateEnvironmentalCategory('range', Number(this.data.range));
-            const environmental = modifiers.environmental.total;
-            if (environmental !== 0) {
-                poolMods.addUniquePart(config_1.SR5.modifierTypes.environmental, environmental);
-            }
-            else {
-                poolMods.removePart(config_1.SR5.modifierTypes.environmental);
-            }
-        }
+        // Apply altered environmental modifiers
+        const range = this.hasTargets ? this.data.targetRanges[this.data.targetRangesSelected].range.modifier : this.data.range;
+        const modifiers = Modifiers_1.Modifiers.getModifiersFromEntity(this.actor);
+        modifiers.activateEnvironmentalCategory('range', Number(range));
+        const environmental = modifiers.environmental.total;
+        poolMods.addUniquePart(config_1.SR5.modifierTypes.environmental, environmental);
         super.prepareBaseValues();
     }
 }
@@ -35961,6 +36009,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SuccessTest = void 0;
+const SR5Actor_1 = require("../actor/SR5Actor");
 const constants_1 = require("../constants");
 const DataDefaults_1 = require("../data/DataDefaults");
 const helpers_1 = require("../helpers");
@@ -36309,7 +36358,13 @@ class SuccessTest {
             if (this.targets.length === 0 && this.data.targetActorsUuid) {
                 this.targets = [];
                 for (const uuid of this.data.targetActorsUuid) {
-                    this.targets.push(yield fromUuid(uuid));
+                    const document = yield fromUuid(uuid);
+                    if (!document)
+                        continue;
+                    const token = document instanceof SR5Actor_1.SR5Actor ? document.getToken() : document;
+                    if (!(token instanceof TokenDocument))
+                        continue;
+                    this.targets.push(token);
                 }
             }
         });
@@ -36539,6 +36594,12 @@ class SuccessTest {
      */
     get opposing() {
         return false;
+    }
+    /**
+     * Determine if this test has any targets selected using FoundryVTT targeting.
+     */
+    get hasTargets() {
+        return this.targets.length > 0;
     }
     /**
      * TODO: This method results in an ugly description.
@@ -37002,7 +37063,7 @@ class SuccessTest {
     }
 }
 exports.SuccessTest = SuccessTest;
-},{"../apps/dialogs/TestDialog":142,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../item/flows/ActionFlow":207,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/TestRules":233,"../template":236,"./TestCreator":252}],252:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../apps/dialogs/TestDialog":142,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../item/flows/ActionFlow":207,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/TestRules":233,"../template":236,"./TestCreator":252}],252:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

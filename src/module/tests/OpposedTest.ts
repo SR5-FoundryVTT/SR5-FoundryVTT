@@ -11,7 +11,7 @@ export interface OpposedTestData extends
     TestData,
     // Remove unnecessary data points.
     Omit<SuccessTestData, 'opposed'>,
-    Omit<SuccessTestData, 'targetActorsUuid'> {
+    Omit<SuccessTestData, 'targetTokensUuid'> {
 
     // The message id of the opposed test.
     previousMessageId: string

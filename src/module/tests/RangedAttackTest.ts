@@ -1,22 +1,25 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import DamageData = Shadowrun.DamageData;
-import FireModeData = Shadowrun.FireModeData;
-import RangeTemplateData = Shadowrun.RangeTemplateData;
-import RangesTemplateData = Shadowrun.RangesTemplateData;
 import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
-import {SR} from "../constants";
+import {LENGTH_UNIT, SR} from "../constants";
 import {SR5} from "../config";
 import {Modifiers} from "../rules/Modifiers";
+import DamageData = Shadowrun.DamageData;
+import FireModeData = Shadowrun.FireModeData;
+import RangesTemplateData = Shadowrun.RangesTemplateData;
+import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
 
 export interface RangedAttackTestData extends SuccessTestData {
     damage: DamageData
     fireModes: Record<string, string>
     fireMode: FireModeData
     recoilCompensation: number
-    ranges: Record<string, RangeTemplateData>
+    ranges: RangesTemplateData
     range: number
+    targetRanges: TargetRangeTemplateData[]
+    // index of selected targetRanges
+    targetRangesSelected: number
 }
 
 /**
@@ -32,6 +35,9 @@ export class RangedAttackTest extends SuccessTest {
         data.fireModes = {};
         data.fireMode = {value: 0, defense: 0, label: ''};
         data.ranges = {};
+        data.range = 0;
+        data.targetRanges = [];
+        data.targetRangesSelected = 0;
         data.recoilCompensation = 0;
         data.damage = data.damage || DefaultValues.damageData();
 
@@ -79,7 +85,7 @@ export class RangedAttackTest extends SuccessTest {
         const itemData = this.item?.asWeaponData();
         if (!itemData) return;
 
-        // Transform weapon ranges to something useable
+        // Transform weapon ranges to something usable
         const {ranges} = itemData.data.range;
         const {range_modifiers} = SR.combat.environmental;
         const newRanges = {} as RangesTemplateData;
@@ -99,6 +105,48 @@ export class RangedAttackTest extends SuccessTest {
         this.data.range = modifiers.environmental.active.range || 0;
     }
 
+    /**
+     * Prepare distances between attacker and targeted tokens.
+     */
+    async _prepareTargetRanges() {
+        if (foundry.utils.isObjectEmpty(this.data.ranges)) return;
+        if (!this.actor) return;
+        if (!this.hasTargets) return;
+
+        const attacker = this.actor.getToken();
+
+        if (!attacker) {
+            ui.notifications?.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
+            return [];
+        }
+
+        console.log('asd')
+
+        // Build target ranges for template display.
+        this.data.targetRanges = this.targets.map(target => {
+            const distance = Helpers.measureTokenDistance(attacker, target);
+            const range = Helpers.getWeaponRange(distance, this.data.ranges);
+            return {
+                uuid: target.uuid,
+                name: target.name || '',
+                unit: LENGTH_UNIT,
+                range,
+                distance,
+            };
+        });
+
+        // Sort targets by ascending distance from attacker.
+        this.data.targetRanges = this.data.targetRanges.sort((a, b) => {
+            if (a.distance < b.distance) return -1;
+            if (a.distance > b.distance) return 1;
+            return 0;
+        });
+
+        // if no range is active, set to first target selected.
+        const modifiers = await this.actor.getModifiers();
+        this.data.range = modifiers.environmental.active.range || this.data.targetRanges[0].range.modifier;
+    }
+
     _prepareRecoilCompensation() {
         this.data.recoilCompensation = this.item?.getRecoilCompensation(true) || 0;
     }
@@ -109,6 +157,7 @@ export class RangedAttackTest extends SuccessTest {
 
     async prepareDocumentData(){
         await this._prepareWeaponRanges();
+        await this._prepareTargetRanges();
         this._prepareFireMode();
         this._prepareRecoilCompensation();
     }
@@ -136,6 +185,12 @@ export class RangedAttackTest extends SuccessTest {
         // Store for next usage.
         await this.item?.setLastFireMode(this.data.fireMode);
 
+        // Get range modifier from selected target instead of selected range.
+        if (this.hasTargets) {
+            const target = this.data.targetRanges[this.data.targetRangesSelected];
+            this.data.range = target.range.modifier;
+        }
+
         // Alter test data for range.
         this.data.range = Number(this.data.range);
 
@@ -148,6 +203,8 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     prepareBaseValues() {
+        if (!this.actor) return;
+
         const poolMods = new PartsList(this.data.modifiers.mod);
 
         // Apply recoil modification to general modifiers before calculating base values.
@@ -161,17 +218,13 @@ export class RangedAttackTest extends SuccessTest {
         else
             poolMods.removePart('SR5.Recoil');
 
-        // Apply altered environmental modifers
-        if (this.actor) {
-            const modifiers = Modifiers.getModifiersFromEntity(this.actor);
-            modifiers.activateEnvironmentalCategory('range', Number(this.data.range));
-            const environmental = modifiers.environmental.total;
-            if (environmental !== 0) {
-                poolMods.addUniquePart(SR5.modifierTypes.environmental, environmental);
-            } else {
-                poolMods.removePart(SR5.modifierTypes.environmental);
-            }
-        }
+        // Apply altered environmental modifiers
+        const range = this.hasTargets ? this.data.targetRanges[this.data.targetRangesSelected].range.modifier : this.data.range;
+        const modifiers = Modifiers.getModifiersFromEntity(this.actor);
+        modifiers.activateEnvironmentalCategory('range', Number(range));
+        const environmental = modifiers.environmental.total;
+
+        poolMods.addUniquePart(SR5.modifierTypes.environmental, environmental);
 
         super.prepareBaseValues();
     }
