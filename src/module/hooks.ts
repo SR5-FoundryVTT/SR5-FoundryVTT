@@ -72,7 +72,7 @@ export class HooksManager {
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
         Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
 
-        Hooks.on("renderChatLog", HooksManager.chatMessageListeners);
+        Hooks.on("renderChatLog", HooksManager.chatLogListeners);
         // Hooks.on("renderChatPopout", chatMessageListeners);
 
         Hooks.on('init', quenchRegister);
@@ -434,9 +434,15 @@ ___________________
         api.PACKAGE_CONFIG.push(config);
     }
 
-    static chatMessageListeners(message: ChatMessage, html, data) {
-        SuccessTest.chatMessageListeners(message, html, data);
-        OpposedTest.chatMessageListeners(message, html, data);
+    static async chatMessageListeners(message: ChatMessage, html, data) {
+        await SuccessTest.chatMessageListeners(message, html, data);
+        await OpposedTest.chatMessageListeners(message, html, data);
         handleRenderChatMessage(message, html, data);
     }
+
+    static async chatLogListeners(chatLog: ChatLog, html, data) {
+        await SuccessTest.chatLogListeners(chatLog, html, data);
+        await OpposedTest.chatLogListeners(chatLog, html, data);
+    }
+
 }

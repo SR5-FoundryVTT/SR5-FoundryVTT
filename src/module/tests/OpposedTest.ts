@@ -163,7 +163,7 @@ export class OpposedTest extends SuccessTest {
         await TestCreator.fromMessageAction(messageId, opposedActionTest, {showDialog});
     }
 
-    static chatMessageListeners(message: ChatMessage, html, data) {
+    static async chatMessageListeners(message: ChatMessage, html, data) {
         html.find('.opposed-action').on('click', OpposedTest._castOpposedAction);
     }
 }

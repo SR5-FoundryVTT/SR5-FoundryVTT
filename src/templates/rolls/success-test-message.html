@@ -25,12 +25,12 @@
     </div>
     {{/if}}
     <div class="card-main-content">
-        <div class="card-content">
+        <div class="card-content {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <div class="test-line">
                 <div><span class="test-code">{{test.code}}</span></div>
             </div>
         </div>
-        <div class="card-content {{#if showDescription}}clickable show-description{{/if}}">
+        <div class="card-content {{#if showDescription}}clickable show-description{{/if}}  {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <div class="left-side">
                 {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.OpposingHits"}}:</span> <span>{{test.against.netHits.value}}</span></div>{{/if}}
                 {{#if test.hasLimit}}<div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span>{{test.limit.value}}</span></div>{{/if}}
@@ -90,7 +90,7 @@
             {{/if}}{{/if}}
         </div>
     </div>
-    <div class="card-rolls">
+    <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
         {{#each test.rolls}}
             {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'
                 roll=this

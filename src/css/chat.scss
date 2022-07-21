@@ -5,6 +5,14 @@
         font-style: normal;
         font-size: 1rem;
 
+        /**
+         * Content with this class should be hidden from players eyes
+         * Check SuccessTest._showGmOnlyContent for when to show it to users.
+         */
+        .gm-only-content {
+            display: none !important;
+        }
+
         .clickable:hover {
             cursor: pointer;
             background: #4b4a44;

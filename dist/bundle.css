@@ -307,7 +307,13 @@
 
 .sr5.chat-card {
   font-style: normal;
-  font-size: 1rem; }
+  font-size: 1rem;
+  /**
+         * Content with this class should be hidden from players eyes
+         * Check SuccessTest._showGmOnlyContent for when to show it to users.
+         */ }
+  .sr5.chat-card .gm-only-content {
+    display: none !important; }
   .sr5.chat-card .clickable:hover {
     cursor: pointer;
     background: #4b4a44;

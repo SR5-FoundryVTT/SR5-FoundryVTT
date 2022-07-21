@@ -481,8 +481,14 @@ export class SuccessTest {
      */
     async populateDocuments() {
         // Fetch documents, when no reference has been made yet.
-        if (!this.actor && this.data.sourceActorUuid)
-            this.actor = await fromUuid(this.data.sourceActorUuid) as SR5Actor || undefined;
+        if (!this.actor && this.data.sourceActorUuid) {
+            // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
+            const document = await fromUuid(this.data.sourceActorUuid) || undefined;
+            // @ts-ignore
+            this.actor = document instanceof TokenDocument ?
+                document.actor :
+                document as SR5Actor;
+        }
         if (!this.item && this.data.sourceItemUuid)
             this.item = await fromUuid(this.data.sourceItemUuid) as SR5Item || undefined;
         if (this.targets.length === 0 && this.data.targetActorsUuid) {
@@ -1007,9 +1013,6 @@ export class SuccessTest {
         // Store message id for future use.
         this.data.messageUuid = message.uuid;
 
-        // Prepare reuse of test data on subsequent tests after this one.
-        await message.setFlag(SYSTEM_NAME, FLAGS.Test, this.toJSON());
-
         return message;
     }
 
@@ -1038,7 +1041,9 @@ export class SuccessTest {
             opposedActions: this._prepareOpposedActionsTemplateData(),
             previewTemplate: this._canPlaceBlastTemplate,
             showDescription: this._canShowDescription,
-            description: this.item?.getChatData() || ''
+            description: this.item?.getChatData() || '',
+            // Some message segments are only meant for the gm, when the gm is the one creating the message.
+            applyGmOnlyContent: game.user?.isGM,
         }
     }
 
@@ -1112,8 +1117,12 @@ export class SuccessTest {
             type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             roll,
             content,
-            // TODO: Do we need this roll serialization since test is serialized into the message flat?
-            rollMode: this.data.options?.rollMode
+            rollMode: this.data.options?.rollMode,
+            // Manually build flag data to give renderChatMessage hook flag access.
+            // This test data is needed for all subsequent testing based on this chat messages.
+            flags: {
+                [SYSTEM_NAME]: {[FLAGS.Test]: this.toJSON()}
+            }
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
@@ -1132,12 +1141,36 @@ export class SuccessTest {
      * @param html
      * @param data
      */
-    static chatMessageListeners(message: ChatMessage, html, data) {
+    static async chatMessageListeners(message: ChatMessage, html, data) {
         html.find('.show-roll').on('click', this._chatToggleCardRolls);
         html.find('.show-description').on('click', this._chatToggleCardDescription);
-        html.find('.chat-document-link').on('click', this._chatOpenDocumentLink);
-        html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet);
+        html.find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
         html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
+
+        await this._showGmOnlyContent(message, html, data)
+    }
+
+    static async _showGmOnlyContent(message: ChatMessage, html, data) {
+        const test = await TestCreator.fromMessage(message.id as string);
+        if (!test) return;
+        await test.populateDocuments();
+        if (!test.actor || !game.user) return;
+
+        if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
+            html.find('.gm-only-content').removeClass('gm-only-content');
+        }
+    }
+
+    static async chatLogListeners(chatLog: ChatLog, html, data) {
+        // setup chat listener messages for each message as some need the message context instead of chatlog context.
+        html.find('.chat-message').each(async (index, element) => {
+            element = $(element);
+            const id = element.data('messageId');
+            const message = game.messages?.get(id);
+            if (!message) return;
+
+            await this.chatMessageListeners(message, element, message.toObject())
+        });
     }
 
     /**
