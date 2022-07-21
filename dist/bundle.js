@@ -37147,6 +37147,7 @@ const constants_1 = require("../constants");
 const SR5Roll_1 = require("../rolls/SR5Roll");
 const helpers_1 = require("../helpers");
 const config_1 = require("../config");
+const SkillFlow_1 = require("../actor/flows/SkillFlow");
 /**
  * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
  *
@@ -37428,7 +37429,7 @@ exports.TestCreator = {
             if (action.skill) {
                 const skill = actor.getSkill(action.skill);
                 // Notify user about their sins.
-                if (skill && !SkillRules_1.SkillRules.allowRoll(skill))
+                if (skill && !SkillFlow_1.SkillFlow.allowRoll(skill))
                     (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn('SR5.Warnings.SkillCantBeDefault', { localize: true });
                 // Custom skills don't have a label, but a name.
                 // Legacy skill don't have a name, but have a label.
@@ -37593,7 +37594,7 @@ exports.TestCreator = {
         return event[config_1.SR5.kbmod.HIDE_DIALOG] === true;
     }
 };
-},{"../actor/SR5Actor":86,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":231}],253:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":231}],253:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;

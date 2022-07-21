@@ -22,6 +22,7 @@ import MinimalActionData = Shadowrun.MinimalActionData;
 import ActionRollData = Shadowrun.ActionRollData;
 import {SR5} from "../config";
 import RollEvent = Shadowrun.RollEvent;
+import {SkillFlow} from "../actor/flows/SkillFlow";
 
 /**
  * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
@@ -322,7 +323,7 @@ export const TestCreator = {
             const skill = actor.getSkill(action.skill);
 
             // Notify user about their sins.
-            if (skill && !SkillRules.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
+            if (skill && !SkillFlow.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
 
             // Custom skills don't have a label, but a name.
             // Legacy skill don't have a name, but have a label.
