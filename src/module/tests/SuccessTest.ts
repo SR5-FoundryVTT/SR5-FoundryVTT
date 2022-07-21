@@ -564,9 +564,12 @@ export class SuccessTest {
 
     /**
      * Helper to determine if this success test uses a limit.
+     *
+     * NOTE: Limits will NEVER apply when the ApplyLimit setting is set accordingly.
      */
     get hasLimit(): boolean {
-        return !this.hasPushTheLimit && this.limit.value > 0;
+        const applyLimit = game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits) as boolean;
+        return applyLimit && !this.hasPushTheLimit && this.limit.value > 0;
     }
 
     /**

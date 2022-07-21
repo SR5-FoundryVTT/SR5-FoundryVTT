@@ -34465,14 +34465,14 @@ const registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
-    game.settings.register(constants_1.SYSTEM_NAME, 'displayDefaultRollCard', {
-        name: 'SETTINGS.DisplayDefaultRollCardName',
-        hint: 'SETTINGS.DisplayDefaultRollCardDescription',
-        scope: 'user',
-        config: true,
-        type: Boolean,
-        default: false,
-    });
+    // game.settings.register(SYSTEM_NAME, 'displayDefaultRollCard', {
+    //     name: 'SETTINGS.DisplayDefaultRollCardName',
+    //     hint: 'SETTINGS.DisplayDefaultRollCardDescription',
+    //     scope: 'user',
+    //     config: true,
+    //     type: Boolean,
+    //     default: false,
+    // });
     /**
      * Track system version upon which a migration was last applied
      */
@@ -34499,14 +34499,14 @@ const registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
-    game.settings.register(constants_1.SYSTEM_NAME, constants_1.FLAGS.WhisperOpposedTestsToTargetedPlayers, {
-        name: 'SETTINGS.WhisperOpposedTestsToTargetedPlayers',
-        hint: 'SETTINGS.WhisperOpposedTestsToTargetedPlayersDescription',
-        scope: 'world',
-        config: true,
-        type: Boolean,
-        default: true,
-    });
+    // game.settings.register(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers, {
+    //     name: 'SETTINGS.WhisperOpposedTestsToTargetedPlayers',
+    //     hint: 'SETTINGS.WhisperOpposedTestsToTargetedPlayersDescription',
+    //     scope: 'world',
+    //     config: true,
+    //     type: Boolean,
+    //     default: true,
+    // });
     game.settings.register(constants_1.SYSTEM_NAME, constants_1.FLAGS.OnlyAllowRollOnDefaultableSkills, {
         name: 'SETTINGS.OnlyAllowRollOnDefaultableSkills',
         hint: 'SETTINGS.OnlyAllowRollOnDefaultableSkillsDescription',
@@ -36445,7 +36445,8 @@ class SuccessTest {
      * Helper to determine if this success test uses a limit.
      */
     get hasLimit() {
-        return !this.hasPushTheLimit && this.limit.value > 0;
+        const applyLimit = game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ApplyLimits);
+        return applyLimit && !this.hasPushTheLimit && this.limit.value > 0;
     }
     /**
      * Helper to determine if the hits have been lowered by the limit.
