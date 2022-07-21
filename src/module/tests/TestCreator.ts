@@ -364,6 +364,7 @@ export const TestCreator = {
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
             if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
+            if (limit && actor._isMatrixAttribute(action.limit.attribute)) actor._addMatrixParts(pool, true);
         }
         // No explicit limit set, maybe derive from used skill / action
         else if (action.skill && action.attribute) {

@@ -25996,7 +25996,6 @@ class Helpers {
     static getPackAction(packName, actionName) {
         return __awaiter(this, void 0, void 0, function* () {
             console.info(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
-            // TODO: collection item type validation
             const pack = game.packs.find(pack => pack.metadata.system === constants_1.SYSTEM_NAME &&
                 pack.metadata.name === packName);
             if (!pack)
@@ -36450,6 +36449,8 @@ class SuccessTest {
     }
     /**
      * Helper to determine if this success test uses a limit.
+     *
+     * NOTE: Limits will NEVER apply when the ApplyLimit setting is set accordingly.
      */
     get hasLimit() {
         const applyLimit = game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ApplyLimits);
@@ -37474,6 +37475,8 @@ exports.TestCreator = {
                 const limit = actor.getLimit(action.limit.attribute);
                 if (limit)
                     data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
+                if (limit && actor._isMatrixAttribute(action.limit.attribute))
+                    actor._addMatrixParts(pool, true);
             }
             // No explicit limit set, maybe derive from used skill / action
             else if (action.skill && action.attribute) {
