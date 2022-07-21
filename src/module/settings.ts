@@ -39,14 +39,14 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
-    game.settings.register(SYSTEM_NAME, 'displayDefaultRollCard', {
-        name: 'SETTINGS.DisplayDefaultRollCardName',
-        hint: 'SETTINGS.DisplayDefaultRollCardDescription',
-        scope: 'user',
-        config: true,
-        type: Boolean,
-        default: false,
-    });
+    // game.settings.register(SYSTEM_NAME, 'displayDefaultRollCard', {
+    //     name: 'SETTINGS.DisplayDefaultRollCardName',
+    //     hint: 'SETTINGS.DisplayDefaultRollCardDescription',
+    //     scope: 'user',
+    //     config: true,
+    //     type: Boolean,
+    //     default: false,
+    // });
 
     /**
      * Track system version upon which a migration was last applied
@@ -77,14 +77,14 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
-    game.settings.register(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers, {
-        name: 'SETTINGS.WhisperOpposedTestsToTargetedPlayers',
-        hint: 'SETTINGS.WhisperOpposedTestsToTargetedPlayersDescription',
-        scope: 'world',
-        config: true,
-        type: Boolean,
-        default: true,
-    });
+    // game.settings.register(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers, {
+    //     name: 'SETTINGS.WhisperOpposedTestsToTargetedPlayers',
+    //     hint: 'SETTINGS.WhisperOpposedTestsToTargetedPlayersDescription',
+    //     scope: 'world',
+    //     config: true,
+    //     type: Boolean,
+    //     default: true,
+    // });
 
     game.settings.register(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills, {
          name: 'SETTINGS.OnlyAllowRollOnDefaultableSkills',
