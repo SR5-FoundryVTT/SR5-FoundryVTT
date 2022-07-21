@@ -25611,6 +25611,15 @@ class Helpers {
             return indexedObject[index];
         });
     }
+    /**
+     * Depending on the system setting allow GMs to define if they want to always display the name within the actor
+     * or within the token.
+     *
+     * This can be relevant for when GMs either manually or by module change the tokens name, while the actors name
+     * is untouched and might even be detrimental to share with players.
+     *
+     * @param actor
+     */
     static getChatSpeakerName(actor) {
         if (!actor)
             return '';
