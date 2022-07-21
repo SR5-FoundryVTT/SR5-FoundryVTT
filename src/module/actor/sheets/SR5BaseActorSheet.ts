@@ -544,34 +544,34 @@ export class SR5BaseActorSheet extends ActorSheet {
                 await this.actor.promptRoll();
                 break;
             case 'armor':
-                await this.actor.rollPackAction('armor', options);
+                await this.actor.rollGeneralAction('armor', options);
                 break;
             case 'fade':
-                await this.actor.rollPackAction('fade', options);
+                await this.actor.rollGeneralAction('fade', options);
                 break;
             case 'drain':
-                await this.actor.rollPackAction('drain', options);
+                await this.actor.rollGeneralAction('drain', options);
                 break;
             case 'defense':
                 // await this.actor.rollAttackDefense(options);
-                await this.actor.rollPackAction('physical_defense', options);
+                await this.actor.rollGeneralAction('physical_defense', options);
                 break;
             case 'damage-resist':
-                await this.actor.rollPackAction('physical_damage_resist', options);
+                await this.actor.rollGeneralAction('physical_damage_resist', options);
                 break;
 
             // attribute only rolls
             case 'composure':
-                await this.actor.rollPackAction('composure', options);
+                await this.actor.rollGeneralAction('composure', options);
                 break;
             case 'judge-intentions':
-                await this.actor.rollPackAction('judge_intentions', options);
+                await this.actor.rollGeneralAction('judge_intentions', options);
                 break;
             case 'lift-carry':
-                await this.actor.rollPackAction('lift_carry', options);
+                await this.actor.rollGeneralAction('lift_carry', options);
                 break;
             case 'memory':
-                await this.actor.rollPackAction('memory', options);
+                await this.actor.rollGeneralAction('memory', options);
                 break;
 
             case 'vehicle-stat':
@@ -1243,10 +1243,10 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         switch (track) {
             case 'stun':
-                await this.actor.rollPackAction('natural_recovery_stun', {event});
+                await this.actor.rollGeneralAction('natural_recovery_stun', {event});
                 break;
             case 'physical':
-                await this.actor.rollPackAction('natural_recovery_physical', {event});
+                await this.actor.rollGeneralAction('natural_recovery_physical', {event});
                 break;
             case 'edge':
                 await this.actor.rollAttribute('edge', {event});

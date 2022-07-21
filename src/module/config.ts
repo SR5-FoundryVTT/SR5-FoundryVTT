@@ -401,15 +401,12 @@ export const SR5 = {
         }
     },
 
+    /**
+     * Names of FoundryVTT packs supplied by the system to be used as action sources.
+     */
     packNames: {
-        'attributeActions': 'Attribute Actions'
-    },
-
-    attributeActionIds: {
-        'composure': '',
-        'judge_intentions': '',
-        'lift_carry': '',
-        'memory': ''
+        'generalActions': 'General Actions',
+        'matrixActions': 'Matrix Actions'
     },
 
     programTypes: {

@@ -14018,9 +14018,9 @@ class SR5Actor extends Actor {
      * @param actionName The internal attribute action id
      * @param options Success Test options
      */
-    rollPackAction(actionName, options) {
+    rollGeneralAction(actionName, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            const action = yield helpers_1.Helpers.getPackAction(config_1.SR5.packNames.attributeActions, actionName);
+            const action = yield helpers_1.Helpers.getPackAction(config_1.SR5.packNames.generalActions, actionName);
             if (!action)
                 return;
             const showDialog = !TestCreator_1.TestCreator.shouldHideDialog(options === null || options === void 0 ? void 0 : options.event);
@@ -17412,33 +17412,33 @@ class SR5BaseActorSheet extends ActorSheet {
                     yield this.actor.promptRoll();
                     break;
                 case 'armor':
-                    yield this.actor.rollPackAction('armor', options);
+                    yield this.actor.rollGeneralAction('armor', options);
                     break;
                 case 'fade':
-                    yield this.actor.rollPackAction('fade', options);
+                    yield this.actor.rollGeneralAction('fade', options);
                     break;
                 case 'drain':
-                    yield this.actor.rollPackAction('drain', options);
+                    yield this.actor.rollGeneralAction('drain', options);
                     break;
                 case 'defense':
                     // await this.actor.rollAttackDefense(options);
-                    yield this.actor.rollPackAction('physical_defense', options);
+                    yield this.actor.rollGeneralAction('physical_defense', options);
                     break;
                 case 'damage-resist':
-                    yield this.actor.rollPackAction('physical_damage_resist', options);
+                    yield this.actor.rollGeneralAction('physical_damage_resist', options);
                     break;
                 // attribute only rolls
                 case 'composure':
-                    yield this.actor.rollPackAction('composure', options);
+                    yield this.actor.rollGeneralAction('composure', options);
                     break;
                 case 'judge-intentions':
-                    yield this.actor.rollPackAction('judge_intentions', options);
+                    yield this.actor.rollGeneralAction('judge_intentions', options);
                     break;
                 case 'lift-carry':
-                    yield this.actor.rollPackAction('lift_carry', options);
+                    yield this.actor.rollGeneralAction('lift_carry', options);
                     break;
                 case 'memory':
-                    yield this.actor.rollPackAction('memory', options);
+                    yield this.actor.rollGeneralAction('memory', options);
                     break;
                 case 'vehicle-stat':
                     console.log('roll vehicle stat', rollId);
@@ -18067,10 +18067,10 @@ class SR5BaseActorSheet extends ActorSheet {
             let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
             switch (track) {
                 case 'stun':
-                    yield this.actor.rollPackAction('natural_recovery_stun', { event });
+                    yield this.actor.rollGeneralAction('natural_recovery_stun', { event });
                     break;
                 case 'physical':
-                    yield this.actor.rollPackAction('natural_recovery_physical', { event });
+                    yield this.actor.rollGeneralAction('natural_recovery_physical', { event });
                     break;
                 case 'edge':
                     yield this.actor.rollAttribute('edge', { event });
@@ -22892,14 +22892,12 @@ exports.SR5 = {
             'combat': 'PhysicalResistTest'
         }
     },
+    /**
+     * Names of FoundryVTT packs supplied by the system to be used as action sources.
+     */
     packNames: {
-        'attributeActions': 'Attribute Actions'
-    },
-    attributeActionIds: {
-        'composure': '',
-        'judge_intentions': '',
-        'lift_carry': '',
-        'memory': ''
+        'generalActions': 'General Actions',
+        'matrixActions': 'Matrix Actions'
     },
     programTypes: {
         common_program: 'SR5.CommonProgram',

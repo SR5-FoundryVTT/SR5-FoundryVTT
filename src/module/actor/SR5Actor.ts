@@ -837,8 +837,8 @@ export class SR5Actor extends Actor {
      * @param actionName The internal attribute action id
      * @param options Success Test options
      */
-    async rollPackAction(actionName: 'physical_damage_resist'|'drain'|'natural_recovery_stun'|'natural_recovery_physical'|'armor'|'fade'|'composure'|'judge_intentions'|'lift_carry'|'memory'|'physical_defense', options?: ActorRollOptions) {
-        const action = await Helpers.getPackAction(SR5.packNames.attributeActions, actionName);
+    async rollGeneralAction(actionName: 'physical_damage_resist'|'drain'|'natural_recovery_stun'|'natural_recovery_physical'|'armor'|'fade'|'composure'|'judge_intentions'|'lift_carry'|'memory'|'physical_defense', options?: ActorRollOptions) {
+        const action = await Helpers.getPackAction(SR5.packNames.generalActions, actionName);
         if (!action) return;
 
         const showDialog = !TestCreator.shouldHideDialog(options?.event);

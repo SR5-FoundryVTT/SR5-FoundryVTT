@@ -843,7 +843,6 @@ export class Helpers {
      */
     static async getPackAction(packName, actionName): Promise<SR5Item | undefined> {
         console.info(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
-        // TODO: collection item type validation
         const pack = game.packs.find(pack =>
                 pack.metadata.system === SYSTEM_NAME &&
                 pack.metadata.name === packName);

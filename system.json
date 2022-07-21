@@ -56,9 +56,9 @@
       "system": "shadowrun5e"
     },
     {
-      "name": "Attribute Actions",
-      "label": "SR5e Attribute Actions",
-      "path": "./packs/sr5e-attribute-actions.db",
+      "name": "General Actions",
+      "label": "SR5e General Actions",
+      "path": "./packs/sr5e-general-actions.db",
       "private": false,
       "entity": "Item",
       "system": "shadowrun5e"
