@@ -1,6 +1,4 @@
 import {PartsList} from "../parts/PartsList";
-import {OpposedTest, OpposedTestData} from "./OpposedTest";
-import DamageData = Shadowrun.DamageData;
 import {CombatRules} from "../rules/CombatRules";
 import {MeleeRules} from "../rules/MeleeRules";
 import {MeleeAttackData} from "./MeleeAttackTest";

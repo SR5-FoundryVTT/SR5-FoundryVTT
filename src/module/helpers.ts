@@ -477,9 +477,7 @@ export class Helpers {
         }
 
         const actorId = damageData.source.actorId;
-        const actorSource = game.actors.find(
-            actor => actor.id === actorId
-            );
+        const actorSource = game.actors.get(actorId)
 
         if (!actorSource) {
             return;
@@ -487,9 +485,8 @@ export class Helpers {
 
         // First search the actor itself for the item
         const itemId = damageData.source.itemId;
-        const actorItem = actorSource.items.get(itemId) as unknown as SR5Item;
-        if (actorItem)
-        {
+        const actorItem = actorSource.items.get(itemId);
+        if (actorItem) {
             return actorItem;
         }
 
@@ -501,7 +498,7 @@ export class Helpers {
         tokens.forEach(token => {
             if (!token.actor) return;
 
-            const foundItem = token.actor.items.find(i => i.id === itemId);
+            const foundItem = token.actor.items.get(itemId);
             if (foundItem) {
                 tokenItem = foundItem as unknown as SR5Item;
             }
@@ -539,9 +536,7 @@ export class Helpers {
      * @param modificationLabel The translatable label for the modification
      */
     static reduceDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
-        if (hits < 0) {
-            console.warn('Helpers.reduceDamageByHits should only be called with positive hits values to avoid confusion');
-        }
+        if (hits < 0) hits = 0;
         return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
 

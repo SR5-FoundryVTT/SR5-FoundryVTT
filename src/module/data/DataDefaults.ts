@@ -22,13 +22,14 @@ import GenericValueField = Shadowrun.GenericValueField;
 import MinimalActionData = Shadowrun.MinimalActionData;
 
 
+// TODO: reimplemented methods based on .damageData or use template data somehow
 export class DefaultValues {
     /**
      *
      * @param partialDamageData give partial DamageData fields to overwrite default values
      */
     static damageData(partialDamageData: Partial<DamageData> = {}): DamageData {
-        return mergeObject({
+        const data: DamageData = {
             type: {
                 base: 'physical',
                 value: 'physical',
@@ -53,7 +54,8 @@ export class DefaultValues {
                 itemType: '',
                 itemName: ''
             }
-        }, partialDamageData) as DamageData;
+        }
+        return mergeObject(data, partialDamageData) as DamageData;
     }
 
     static actorArmorData(partialActorArmorData: Partial<ActorArmorData> = {}): ActorArmorData {

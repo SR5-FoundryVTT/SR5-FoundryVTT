@@ -4,6 +4,8 @@ import {Helpers} from "../helpers";
 import DamageData = Shadowrun.DamageData;
 import ArmorData = Shadowrun.ArmorData;
 import ValueField = Shadowrun.ValueField;
+import {SoakRules} from "./SoakRules";
+import {SR5Actor} from "../actor/SR5Actor";
 
 export class CombatRules {
     static iniOrderCanDoAnotherPass(scores: number[]): boolean {
@@ -121,21 +123,23 @@ export class CombatRules {
     }
 
     /**
-     * Modify damage according to combat sequenec (SR5#173 part defende B). Damage resistance.
+     * Modify damage according to combat sequence (SR5#173 part defend B). Damage resistance.
      *
+     * @param actor The actor resisting the damage
      * @param damage Incoming damage tobe modified.
      * @param hits The resisting tests hits
      * @return A new damage object for modified damage.
      */
-    static modifyDamageAfterResist(damage: DamageData, hits: number): DamageData {
-        const modifiedDamage = foundry.utils.duplicate(damage);
-
+    static modifyDamageAfterResist(actor: SR5Actor, damage: DamageData, hits: number): DamageData {
         if (hits < 0) hits = 0;
 
-        modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
-        Helpers.calcTotal(modifiedDamage, {min: 0});
+        // modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
+        let {modified} = SoakRules.reduceDamage(actor, damage, hits);
+        modified = SoakRules.modifyDamageType(modified, actor);
 
-        return modifiedDamage;
+        Helpers.calcTotal(modified, {min: 0});
+
+        return modified;
     }
 
     /**

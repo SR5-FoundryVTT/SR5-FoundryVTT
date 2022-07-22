@@ -14873,7 +14873,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../config":150,"../constants":151,"../data/DataDefaults":152,"../data/SR5ItemDataWrapper":154,"../helpers":165,"../item/SR5Item":205,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/RecoveryRules":230,"../rules/SkillRules":231,"../tests/AttributeOnlyTest":237,"../tests/SuccessTest":251,"../tests/TestCreator":252,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
+},{"../config":150,"../constants":151,"../data/DataDefaults":152,"../data/SR5ItemDataWrapper":154,"../helpers":165,"../item/SR5Item":205,"../parts/PartsList":220,"../rolls/ShadowrunRoller":222,"../rules/MatrixRules":227,"../rules/Modifiers":229,"../rules/RecoveryRules":230,"../rules/SkillRules":231,"../tests/AttributeOnlyTest":238,"../tests/SuccessTest":252,"../tests/TestCreator":253,"./flows/InventoryFlow":88,"./flows/ModifierFlow":89,"./flows/SkillFlow":90,"./prep/CharacterPrep":92,"./prep/CritterPrep":93,"./prep/ICPrep":94,"./prep/SpiritPrep":95,"./prep/SpritePrep":96,"./prep/VehiclePrep":97}],87:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22525,7 +22525,7 @@ function _combatantGetInitiativeFormula() {
     return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
-},{"../constants":151,"../rules/CombatRules":223,"../sockets":235}],150:[function(require,module,exports){
+},{"../constants":151,"../rules/CombatRules":223,"../sockets":236}],150:[function(require,module,exports){
 "use strict";
 /**
  * Shadowrun 5 configuration for static values.
@@ -23195,13 +23195,14 @@ exports.SR = {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataDefaults = exports.DefaultValues = void 0;
 const constants_1 = require("../constants");
+// TODO: reimplemented methods based on .damageData or use template data somehow
 class DefaultValues {
     /**
      *
      * @param partialDamageData give partial DamageData fields to overwrite default values
      */
     static damageData(partialDamageData = {}) {
-        return mergeObject({
+        const data = {
             type: {
                 base: 'physical',
                 value: 'physical',
@@ -23226,7 +23227,8 @@ class DefaultValues {
                 itemType: '',
                 itemName: ''
             }
-        }, partialDamageData);
+        };
+        return mergeObject(data, partialDamageData);
     }
     static actorArmorData(partialActorArmorData = {}) {
         return mergeObject({
@@ -25658,7 +25660,7 @@ class Helpers {
             return;
         }
         const actorId = damageData.source.actorId;
-        const actorSource = game.actors.find(actor => actor.id === actorId);
+        const actorSource = game.actors.get(actorId);
         if (!actorSource) {
             return;
         }
@@ -25676,7 +25678,7 @@ class Helpers {
         tokens.forEach(token => {
             if (!token.actor)
                 return;
-            const foundItem = token.actor.items.find(i => i.id === itemId);
+            const foundItem = token.actor.items.get(itemId);
             if (foundItem) {
                 tokenItem = foundItem;
             }
@@ -25710,9 +25712,8 @@ class Helpers {
      * @param modificationLabel The translatable label for the modification
      */
     static reduceDamageByHits(incoming, hits, modificationLabel) {
-        if (hits < 0) {
-            console.warn('Helpers.reduceDamageByHits should only be called with positive hits values to avoid confusion');
-        }
+        if (hits < 0)
+            hits = 0;
         return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
     static confirmDeletion() {
@@ -26484,7 +26485,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":254,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":143,"./canvas":147,"./chat":148,"./combat/SR5Combat":149,"./config":150,"./constants":151,"./effect/SR5ActiveEffect":155,"./effect/SR5ActiveEffectSheet":156,"./handlebars/HandlebarManager":160,"./importer/apps/import-form":167,"./item/SR5Item":205,"./item/SR5ItemSheet":206,"./item/flows/NetworkDeviceFlow":209,"./macros":211,"./migrator/Migrator":213,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":234,"./tests/AttributeOnlyTest":237,"./tests/CombatSpellDefenseTest":238,"./tests/ComplexFormTest":239,"./tests/DrainTest":241,"./tests/FadeTest":242,"./tests/MeleeAttackTest":243,"./tests/NaturalRecoveryPhysicalTest":244,"./tests/NaturalRecoveryStunTest":245,"./tests/OpposedTest":246,"./tests/PhysicalDefenseTest":247,"./tests/PhysicalResistTest":248,"./tests/RangedAttackTest":249,"./tests/SpellCastingTest":250,"./tests/SuccessTest":251,"./tests/TestCreator":252,"./token/SR5Token":253}],167:[function(require,module,exports){
+},{"../test/quench":255,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":110,"./actor/sheets/SR5ICActorSheet":111,"./actor/sheets/SR5SpiritActorSheet":112,"./actor/sheets/SR5SpriteActorSheet":113,"./actor/sheets/SR5VehicleActorSheet":114,"./apps/ChangelogApplication":115,"./apps/EnvModifiersApplication":116,"./apps/gmtools/OverwatchScoreTracker":143,"./canvas":147,"./chat":148,"./combat/SR5Combat":149,"./config":150,"./constants":151,"./effect/SR5ActiveEffect":155,"./effect/SR5ActiveEffectSheet":156,"./handlebars/HandlebarManager":160,"./importer/apps/import-form":167,"./item/SR5Item":205,"./item/SR5ItemSheet":206,"./item/flows/NetworkDeviceFlow":209,"./macros":211,"./migrator/Migrator":213,"./rolls/SR5Roll":221,"./rolls/ShadowrunRoller":222,"./settings":235,"./tests/AttributeOnlyTest":238,"./tests/CombatSpellDefenseTest":239,"./tests/ComplexFormTest":240,"./tests/DrainTest":242,"./tests/FadeTest":243,"./tests/MeleeAttackTest":244,"./tests/NaturalRecoveryPhysicalTest":245,"./tests/NaturalRecoveryStunTest":246,"./tests/OpposedTest":247,"./tests/PhysicalDefenseTest":248,"./tests/PhysicalResistTest":249,"./tests/RangedAttackTest":250,"./tests/SpellCastingTest":251,"./tests/SuccessTest":252,"./tests/TestCreator":253,"./token/SR5Token":254}],167:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30943,7 +30944,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":148,"../config":150,"../constants":151,"../data/DataDefaults":152,"../data/SR5ItemDataWrapper":154,"../helpers":165,"../parts/PartsList":220,"../rules/MatrixRules":227,"../tests/TestCreator":252,"./ChatData":204,"./flows/NetworkDeviceFlow":209,"./prep/HostPrep":210}],206:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../chat":148,"../config":150,"../constants":151,"../data/DataDefaults":152,"../data/SR5ItemDataWrapper":154,"../helpers":165,"../parts/PartsList":220,"../rules/MatrixRules":227,"../tests/TestCreator":253,"./ChatData":204,"./flows/NetworkDeviceFlow":209,"./prep/HostPrep":210}],206:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31546,12 +31547,16 @@ class ActionFlow {
      *
      * @param damage The damage field as defined within the ActionData
      * @param actor The actor to use should a dynamic calculation be needed.
+     * @param item
      */
-    static calcDamage(damage, actor) {
+    static calcDamage(damage, actor, item) {
         // Avoid manipulation on original data, which might come from database values.
         damage = duplicate(damage);
         if (!actor)
             return damage;
+        if (item) {
+            damage.source = ActionFlow._damageSource(actor, item);
+        }
         const attribute = actor.findAttribute(damage.attribute);
         if (!attribute)
             return damage;
@@ -31581,6 +31586,20 @@ class ActionFlow {
                 console.error(`Unsupported base damage formula operator: '${operator}' used. Falling back to 'add'.`);
                 return base + value;
         }
+    }
+    /**
+     * Damage that's caused by an item can later be used to determine how that damage should be applied
+     *
+     * @param actor The actor used to determine damage
+     * @param item The item from which damage's been determined from.
+     */
+    static _damageSource(actor, item) {
+        return {
+            actorId: actor.id || '',
+            itemId: item.id || '',
+            itemName: item.name || '',
+            itemType: item.type
+        };
     }
 }
 exports.ActionFlow = ActionFlow;
@@ -31932,7 +31951,7 @@ class NetworkDeviceFlow {
     }
 }
 exports.NetworkDeviceFlow = NetworkDeviceFlow;
-},{"../../constants":151,"../../sockets":235}],210:[function(require,module,exports){
+},{"../../constants":151,"../../sockets":236}],210:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostPrep = exports.HostDataPreparation = void 0;
@@ -33589,13 +33608,14 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../chat":148,"../constants":151,"../parts/PartsList":220,"../tests/TestCreator":252}],223:[function(require,module,exports){
+},{"../chat":148,"../constants":151,"../parts/PartsList":220,"../tests/TestCreator":253}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
 const constants_1 = require("../constants");
 const PartsList_1 = require("../parts/PartsList");
 const helpers_1 = require("../helpers");
+const SoakRules_1 = require("./SoakRules");
 class CombatRules {
     static iniOrderCanDoAnotherPass(scores) {
         for (const score of scores) {
@@ -33702,19 +33722,21 @@ class CombatRules {
         return modifiedDamage;
     }
     /**
-     * Modify damage according to combat sequenec (SR5#173 part defende B). Damage resistance.
+     * Modify damage according to combat sequence (SR5#173 part defend B). Damage resistance.
      *
+     * @param actor The actor resisting the damage
      * @param damage Incoming damage tobe modified.
      * @param hits The resisting tests hits
      * @return A new damage object for modified damage.
      */
-    static modifyDamageAfterResist(damage, hits) {
-        const modifiedDamage = foundry.utils.duplicate(damage);
+    static modifyDamageAfterResist(actor, damage, hits) {
         if (hits < 0)
             hits = 0;
-        modifiedDamage.mod = PartsList_1.PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
-        helpers_1.Helpers.calcTotal(modifiedDamage, { min: 0 });
-        return modifiedDamage;
+        // modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
+        let { modified } = SoakRules_1.SoakRules.reduceDamage(actor, damage, hits);
+        modified = SoakRules_1.SoakRules.modifyDamageType(modified, actor);
+        helpers_1.Helpers.calcTotal(modified, { min: 0 });
+        return modified;
     }
     /**
      * Modify amor according to combat sequence (SR5#173) part defend.
@@ -33735,7 +33757,7 @@ class CombatRules {
     }
 }
 exports.CombatRules = CombatRules;
-},{"../constants":151,"../helpers":165,"../parts/PartsList":220}],224:[function(require,module,exports){
+},{"../constants":151,"../helpers":165,"../parts/PartsList":220,"./SoakRules":232}],224:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatSpellRules = void 0;
@@ -34312,6 +34334,206 @@ exports.SkillRules = SkillRules;
 },{"../constants":151}],232:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SoakRules = void 0;
+const config_1 = require("../config");
+const helpers_1 = require("../helpers");
+/**
+ * Soaking rules for actors
+ */
+class SoakRules {
+    /**
+     * Determines the soak parts based on the damage and the actor type
+     * @param soakParts List of (potentially prefilled) soak parts
+     * @param actor The actor affected by the damage
+     * @param damageData The damage
+     */
+    static applyAllSoakParts(soakParts, actor, damageData) {
+        if (damageData.type.base !== 'matrix') {
+            SoakRules.applyPhysicalAndStunSoakParts(soakParts, actor, damageData);
+        }
+        else {
+            SoakRules.applyMatrixSoakParts(soakParts, actor);
+        }
+    }
+    static applyPhysicalAndStunSoakParts(soakParts, actor, damageData) {
+        // Apply special rules for direct combat spells
+        const damageSourceItem = helpers_1.Helpers.findDamageSource(damageData);
+        if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
+            return SoakRules.applyDirectCombatSpellParts(damageSourceItem.data, soakParts, actor);
+        }
+        SoakRules.applyBodyAndArmorParts(soakParts, actor);
+        const armor = actor.getArmor();
+        SoakRules.applyArmorPenetration(soakParts, armor, damageData);
+        SoakRules.applyElementalArmor(soakParts, armor, damageData.element.base);
+    }
+    static applyDirectCombatSpellParts(spellItem, soakParts, actor) {
+        if (spellItem.data.type === 'mana') {
+            SoakRules.addUniquePart(soakParts, actor.getAttribute('willpower'), config_1.SR5.attributes.willpower);
+        }
+        else {
+            SoakRules.addUniquePart(soakParts, actor.getAttribute('body'), config_1.SR5.attributes.body);
+        }
+        return;
+    }
+    static applyBodyAndArmorParts(soakParts, actor) {
+        const body = actor.findAttribute('body');
+        if (body) {
+            soakParts.addUniquePart(body.label || 'SR5.Body', body.value);
+        }
+        const mod = actor.getModifier('soak');
+        if (mod) {
+            soakParts.addUniquePart('SR5.Bonus', mod);
+        }
+        actor._addArmorParts(soakParts);
+    }
+    static applyArmorPenetration(soakParts, armor, damageData) {
+        var _a;
+        const bonusArmor = (_a = armor[damageData.element.value]) !== null && _a !== void 0 ? _a : 0;
+        const totalArmor = armor.value + bonusArmor;
+        const ap = helpers_1.Helpers.calcTotal(damageData.ap);
+        soakParts.addUniquePart('SR5.AP', Math.max(ap, -totalArmor));
+    }
+    static applyElementalArmor(soakParts, armor, element) {
+        var _a;
+        const bonusArmor = (_a = armor[element]) !== null && _a !== void 0 ? _a : 0;
+        if (bonusArmor) {
+            soakParts.addUniquePart(config_1.SR5.elementTypes[element], bonusArmor);
+        }
+    }
+    static applyMatrixSoakParts(soakParts, actor) {
+        const actorData = actor.data.data;
+        // All actors have the same soak rules when they are not active in the matrix
+        // TODO Technomancer and Sprites special rules?
+        if (actorData.initiative.perception === 'matrix') {
+            if (actor.isVehicle()) {
+                // Vehicles can have a matrix initiative but do not take biofeedback
+                SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
+            }
+            else {
+                SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
+            }
+        }
+        else {
+            SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
+        }
+    }
+    static applyBiofeedbackParts(soakParts, actor, actorData) {
+        SoakRules.addUniquePart(soakParts, actor.getAttribute('willpower'), config_1.SR5.attributes.willpower);
+        if (!actorData.matrix) {
+            return;
+        }
+        SoakRules.addUniquePart(soakParts, actorData.matrix.firewall, config_1.SR5.matrixAttributes.firewall);
+    }
+    static applyRatingAndFirewallParts(actorData, soakParts) {
+        if (!actorData.matrix) {
+            return;
+        }
+        const deviceRating = actorData.matrix.rating;
+        if (deviceRating) {
+            soakParts.addUniquePart('SR5.Labels.ActorSheet.DeviceRating', deviceRating);
+        }
+        this.addUniquePart(soakParts, actorData.matrix.firewall, config_1.SR5.matrixAttributes.firewall);
+    }
+    static addUniquePart(partsList, modifiableValue, label) {
+        const totalValue = helpers_1.Helpers.calcTotal(modifiableValue);
+        partsList.addUniquePart(label, totalValue);
+    }
+    /**
+     * Reduces the damage value based on net hits and damage data and actor special rules
+     *
+     * @remarks
+     * Make sure that you first call modifyDamageType before you call this method
+     * to determine the correct damage type (physical, stun, matrix)
+     *
+     * @param damageData The incoming damage
+     * @param hits The number of hits on the soak tests
+     * @returns The updated damage data
+     */
+    static reduceDamage(actor, damageData, hits) {
+        // Vehicles are immune to stun damage (electricity stun damage is handled in a different place)
+        // Note: This also takes care of the vehicle immunity, since physical damage that does not exceed armor
+        // will be converted to stun damage and then reduced to 0. This does not work with drones wearing armor
+        // but we do not support this.
+        if (damageData.type.value === 'stun' && actor.isVehicle()) {
+            return helpers_1.Helpers.reduceDamageByHits(damageData, damageData.value, 'SR5.VehicleStunImmunity');
+        }
+        return helpers_1.Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
+    }
+    /**
+     * Changes the damage type based on the incoming damage type and the actor state (armor, matrix perception..)
+     * @param damage The incoming damage
+     * @param actor The actor affected by the damage
+     * @returns The updated damage data
+     */
+    static modifyDamageType(damage, actor) {
+        // Careful, order of damage conversion is very important
+        // Electricity stun damage is considered physical for vehicles
+        let updatedDamage = duplicate(damage);
+        if (actor.isVehicle() && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
+            updatedDamage.type.value = 'physical';
+        }
+        const damageSourceItem = helpers_1.Helpers.findDamageSource(damage);
+        if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
+            // Damage from direct combat spells is never converted
+            return updatedDamage;
+        }
+        updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
+        return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
+    }
+    /**
+     * Turns physical damage to stun damage based on the damage and armor
+     * @param damage The incoming damage
+     * @param actor The actor affected by the damage
+     * @returns The updated damage data
+     */
+    static modifyPhysicalDamageForArmor(damage, actor) {
+        const updatedDamage = duplicate(damage);
+        if (damage.type.value === 'physical') {
+            // Physical damage is only transformed for some actors
+            if (!actor.isCharacter() && !actor.isSpirit() && !actor.isCritter() && !actor.isVehicle()) {
+                return updatedDamage;
+            }
+            const modifiedArmor = actor.getModifiedArmor(damage);
+            if (modifiedArmor) {
+                const armorWillChangeDamageType = modifiedArmor.value > damage.value;
+                if (armorWillChangeDamageType) {
+                    updatedDamage.type.value = 'stun';
+                }
+            }
+        }
+        return updatedDamage;
+    }
+    /**
+     * Turns matrix damage to biofeedback based on the actor state
+     * @param damage The incoming damage
+     * @param actor The actor affected by the damage
+     * @returns The updated damage data
+     */
+    static modifyMatrixDamageForBiofeedback(damage, actor) {
+        const updatedDamage = duplicate(damage);
+        if (damage.type.value === 'matrix') {
+            const actorData = actor.data.data;
+            // Only characters can receive biofeedback damage at the moment.
+            // TODO Technomancer and Sprites special rules?
+            if (!actor.isCharacter()) {
+                return updatedDamage;
+            }
+            if (actorData.initiative.perception === 'matrix') {
+                if (actorData.matrix.hot_sim) {
+                    updatedDamage.type.value = 'physical';
+                }
+                else {
+                    updatedDamage.type.value = 'stun';
+                }
+            }
+        }
+        return updatedDamage;
+    }
+}
+exports.SoakRules = SoakRules;
+},{"../config":150,"../helpers":165}],233:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpellcastingRules = void 0;
 /**
  * Shadowrun 5 rules related to magic / spellcasting.
@@ -34365,7 +34587,7 @@ class SpellcastingRules {
     }
 }
 exports.SpellcastingRules = SpellcastingRules;
-},{}],233:[function(require,module,exports){
+},{}],234:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestRules = void 0;
@@ -34430,7 +34652,7 @@ exports.TestRules = {
         return !success && glitched;
     }
 };
-},{}],234:[function(require,module,exports){
+},{}],235:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -34547,7 +34769,7 @@ const registerSystemSettings = () => {
     });
 };
 exports.registerSystemSettings = registerSystemSettings;
-},{"./constants":151,"./migrator/VersionMigration":214}],235:[function(require,module,exports){
+},{"./constants":151,"./migrator/VersionMigration":214}],236:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34598,7 +34820,7 @@ class SocketMessage {
     }
 }
 exports.SocketMessage = SocketMessage;
-},{"./constants":151}],236:[function(require,module,exports){
+},{"./constants":151}],237:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34714,7 +34936,7 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-},{}],237:[function(require,module,exports){
+},{}],238:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributeOnlyTest = void 0;
@@ -34762,7 +34984,7 @@ class AttributeOnlyTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.AttributeOnlyTest = AttributeOnlyTest;
-},{"../parts/PartsList":220,"./SuccessTest":251}],238:[function(require,module,exports){
+},{"../parts/PartsList":220,"./SuccessTest":252}],239:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34877,7 +35099,7 @@ class CombatSpellDefenseTest extends DefenseTest_1.DefenseTest {
     }
 }
 exports.CombatSpellDefenseTest = CombatSpellDefenseTest;
-},{"../data/DataDefaults":152,"../rules/CombatSpellRules":224,"./DefenseTest":240,"./TestCreator":252}],239:[function(require,module,exports){
+},{"../data/DataDefaults":152,"../rules/CombatSpellRules":224,"./DefenseTest":241,"./TestCreator":253}],240:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34987,7 +35209,7 @@ class ComplexFormTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.ComplexFormTest = ComplexFormTest;
-},{"../data/DataDefaults":152,"../parts/PartsList":220,"../rules/ComplexFormRules":225,"./SuccessTest":251}],240:[function(require,module,exports){
+},{"../data/DataDefaults":152,"../parts/PartsList":220,"../rules/ComplexFormRules":225,"./SuccessTest":252}],241:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DefenseTest = void 0;
@@ -35017,7 +35239,7 @@ class DefenseTest extends OpposedTest_1.OpposedTest {
     }
 }
 exports.DefenseTest = DefenseTest;
-},{"../data/DataDefaults":152,"./OpposedTest":246}],241:[function(require,module,exports){
+},{"../data/DataDefaults":152,"./OpposedTest":247}],242:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35093,7 +35315,7 @@ class DrainTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.DrainTest = DrainTest;
-},{"../data/DataDefaults":152,"../rules/DrainRules":226,"./SpellCastingTest":250,"./SuccessTest":251}],242:[function(require,module,exports){
+},{"../data/DataDefaults":152,"../rules/DrainRules":226,"./SpellCastingTest":251,"./SuccessTest":252}],243:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FadeTest = void 0;
@@ -35113,7 +35335,7 @@ class FadeTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.FadeTest = FadeTest;
-},{"../data/DataDefaults":152,"./ComplexFormTest":239,"./SuccessTest":251}],243:[function(require,module,exports){
+},{"../data/DataDefaults":152,"./ComplexFormTest":240,"./SuccessTest":252}],244:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35155,7 +35377,7 @@ class MeleeAttackTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.MeleeAttackTest = MeleeAttackTest;
-},{"../data/DataDefaults":152,"./SuccessTest":251}],244:[function(require,module,exports){
+},{"../data/DataDefaults":152,"./SuccessTest":252}],245:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35223,7 +35445,7 @@ class NaturalRecoveryPhysicalTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.NaturalRecoveryPhysicalTest = NaturalRecoveryPhysicalTest;
-},{"../parts/PartsList":220,"./SuccessTest":251}],245:[function(require,module,exports){
+},{"../parts/PartsList":220,"./SuccessTest":252}],246:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35276,7 +35498,7 @@ class NaturalRecoveryStunTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.NaturalRecoveryStunTest = NaturalRecoveryStunTest;
-},{"../parts/PartsList":220,"./SuccessTest":251}],246:[function(require,module,exports){
+},{"../parts/PartsList":220,"./SuccessTest":252}],247:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35424,7 +35646,7 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.OpposedTest = OpposedTest;
-},{"../data/DataDefaults":152,"./SuccessTest":251,"./TestCreator":252}],247:[function(require,module,exports){
+},{"../data/DataDefaults":152,"./SuccessTest":252,"./TestCreator":253}],248:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35586,7 +35808,7 @@ class PhysicalDefenseTest extends DefenseTest_1.DefenseTest {
     }
 }
 exports.PhysicalDefenseTest = PhysicalDefenseTest;
-},{"../data/DataDefaults":152,"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":228,"./DefenseTest":240,"./TestCreator":252}],248:[function(require,module,exports){
+},{"../data/DataDefaults":152,"../parts/PartsList":220,"../rules/CombatRules":223,"../rules/MeleeRules":228,"./DefenseTest":241,"./TestCreator":253}],249:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35691,14 +35913,14 @@ class PhysicalResistTest extends SuccessTest_1.SuccessTest {
             if (!this.actor)
                 return;
             // Handle damage modification.
-            this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
+            this.data.modifiedDamage = CombatRules_1.CombatRules.modifyDamageAfterResist(this.actor, this.data.modifiedDamage, this.hits.value);
             // Handle Knock Down Rules with legacy flow handling.
             this.data.knockedDown = new SoakFlow_1.SoakFlow().knocksDown(this.data.modifiedDamage, this.actor);
         });
     }
 }
 exports.PhysicalResistTest = PhysicalResistTest;
-},{"../actor/flows/SoakFlow":91,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":220,"../rules/CombatRules":223,"./SuccessTest":251}],249:[function(require,module,exports){
+},{"../actor/flows/SoakFlow":91,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":220,"../rules/CombatRules":223,"./SuccessTest":252}],250:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35910,7 +36132,7 @@ class RangedAttackTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.RangedAttackTest = RangedAttackTest;
-},{"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":220,"../rules/Modifiers":229,"./SuccessTest":251}],250:[function(require,module,exports){
+},{"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":220,"../rules/Modifiers":229,"./SuccessTest":252}],251:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36015,7 +36237,7 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.SpellCastingTest = SpellCastingTest;
-},{"../data/DataDefaults":152,"../parts/PartsList":220,"../rules/SpellcastingRules":232,"./SuccessTest":251}],251:[function(require,module,exports){
+},{"../data/DataDefaults":152,"../parts/PartsList":220,"../rules/SpellcastingRules":233,"./SuccessTest":252}],252:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37125,7 +37347,7 @@ class SuccessTest {
     }
 }
 exports.SuccessTest = SuccessTest;
-},{"../actor/SR5Actor":86,"../apps/dialogs/TestDialog":142,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../item/flows/ActionFlow":207,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/TestRules":233,"../template":236,"./TestCreator":252}],252:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../apps/dialogs/TestDialog":142,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../item/flows/ActionFlow":207,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/TestRules":234,"../template":237,"./TestCreator":253}],253:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37595,7 +37817,7 @@ exports.TestCreator = {
         return event[config_1.SR5.kbmod.HIDE_DIALOG] === true;
     }
 };
-},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":231}],253:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":231}],254:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -37616,7 +37838,7 @@ class SR5Token extends Token {
     }
 }
 exports.SR5Token = SR5Token;
-},{"../constants":151}],254:[function(require,module,exports){
+},{"../constants":151}],255:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
@@ -37649,7 +37871,7 @@ const quenchRegister = () => {
     quench.registerBatch("shadowrun5e.flow.tests", sr5_Testing_spec_1.shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
 };
 exports.quenchRegister = quenchRegister;
-},{"./sr5.ActiveEffect.spec":255,"./sr5.ActorDataPrep.spec":256,"./sr5.Inventory.spec":257,"./sr5.Matrix.spec":258,"./sr5.Modifiers.spec":259,"./sr5.NetworkDevices.spec":260,"./sr5.SR5Actor.spec":261,"./sr5.SR5Item.spec":262,"./sr5.Testing.spec":263}],255:[function(require,module,exports){
+},{"./sr5.ActiveEffect.spec":256,"./sr5.ActorDataPrep.spec":257,"./sr5.Inventory.spec":258,"./sr5.Matrix.spec":259,"./sr5.Modifiers.spec":260,"./sr5.NetworkDevices.spec":261,"./sr5.SR5Actor.spec":262,"./sr5.SR5Item.spec":263,"./sr5.Testing.spec":264}],256:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37771,7 +37993,7 @@ const shadowrunSR5ActiveEffect = context => {
     });
 };
 exports.shadowrunSR5ActiveEffect = shadowrunSR5ActiveEffect;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":264}],256:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":265}],257:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -37984,7 +38206,7 @@ const shadowrunSR5ActorDataPrep = context => {
     });
 };
 exports.shadowrunSR5ActorDataPrep = shadowrunSR5ActorDataPrep;
-},{"../module/actor/SR5Actor":86,"../module/constants":151,"../module/item/SR5Item":205,"./utils":264}],257:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/constants":151,"../module/item/SR5Item":205,"./utils":265}],258:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38056,7 +38278,7 @@ const shadowrunInventoryFlow = context => {
     });
 };
 exports.shadowrunInventoryFlow = shadowrunInventoryFlow;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":264}],258:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":265}],259:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunMatrix = void 0;
@@ -38128,7 +38350,7 @@ const shadowrunMatrix = context => {
     });
 };
 exports.shadowrunMatrix = shadowrunMatrix;
-},{"../module/rules/MatrixRules":227}],259:[function(require,module,exports){
+},{"../module/rules/MatrixRules":227}],260:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -38296,7 +38518,7 @@ const shadowrunRulesModifiers = context => {
     });
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
-},{"../module/rules/Modifiers":229}],260:[function(require,module,exports){
+},{"../module/rules/Modifiers":229}],261:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38451,7 +38673,7 @@ const shadowrunNetworkDevices = context => {
     });
 };
 exports.shadowrunNetworkDevices = shadowrunNetworkDevices;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"../module/item/flows/NetworkDeviceFlow":209,"./utils":264}],261:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"../module/item/flows/NetworkDeviceFlow":209,"./utils":265}],262:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38516,7 +38738,7 @@ const shadowrunSR5Actor = context => {
     });
 };
 exports.shadowrunSR5Actor = shadowrunSR5Actor;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":264}],262:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"./utils":265}],263:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38599,7 +38821,7 @@ const shadowrunSR5Item = context => {
     });
 };
 exports.shadowrunSR5Item = shadowrunSR5Item;
-},{"../module/item/SR5Item":205,"./utils":264}],263:[function(require,module,exports){
+},{"../module/item/SR5Item":205,"./utils":265}],264:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -38745,7 +38967,7 @@ const shadowrunTesting = context => {
     });
 };
 exports.shadowrunTesting = shadowrunTesting;
-},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"../module/tests/TestCreator":252,"./utils":264}],264:[function(require,module,exports){
+},{"../module/actor/SR5Actor":86,"../module/item/SR5Item":205,"../module/tests/TestCreator":253,"./utils":265}],265:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

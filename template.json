@@ -1181,7 +1181,7 @@
                         },
                         "base_formula_operator": "add",
                         "attribute": "",
-                        "itemSource": {
+                        "source": {
                             "actorId": "",
                             "itemId": "",
                             "itemType": "",

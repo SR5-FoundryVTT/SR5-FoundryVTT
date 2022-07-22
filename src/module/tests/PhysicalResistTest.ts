@@ -6,6 +6,7 @@ import {Helpers} from "../helpers";
 import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
 import DamageData = Shadowrun.DamageData;
 import {SoakFlow} from "../actor/flows/SoakFlow";
+import {SoakRules} from "../rules/SoakRules";
 
 
 export interface PhysicalResistTestData extends SuccessTestData {
@@ -123,7 +124,7 @@ export class PhysicalResistTest extends SuccessTest {
         if (!this.actor) return;
 
         // Handle damage modification.
-        this.data.modifiedDamage = CombatRules.modifyDamageAfterResist(this.data.modifiedDamage, this.hits.value);
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterResist(this.actor, this.data.modifiedDamage, this.hits.value);
 
         // Handle Knock Down Rules with legacy flow handling.
         this.data.knockedDown = new SoakFlow().knocksDown(this.data.modifiedDamage, this.actor);
