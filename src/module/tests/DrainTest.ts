@@ -27,6 +27,10 @@ export class DrainTest extends SuccessTest {
         return data;
     }
 
+    get _chatMessageTemplate(): string {
+        return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.html';
+    }
+
     static _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
             'attribute2': 'willpower'
@@ -60,6 +64,21 @@ export class DrainTest extends SuccessTest {
         return documentAction;
     }
 
+    /**
+     * A drain test is successful whenever it has more hits than drain damage
+     */
+    get success(): boolean {
+        return this.data.modifiedDrain.value <= 0;
+    }
+
+    get successLabel(): string {
+        return 'SR5.ResistedAllDamage';
+    }
+
+    get failureLabel(): string {
+        return 'SR5.ResistedSomeDamage'
+    }
+
     prepareBaseValues() {
         super.prepareBaseValues();
         this.prepareDrain();
@@ -68,15 +87,13 @@ export class DrainTest extends SuccessTest {
     prepareDrain() {
         if (!this.actor) return;
 
-        const drain = this.data.against.drain;
-        const force = this.data.against.force;
-        const magic = this.actor.getAttribute('magic').value;
-
-        this.data.incomingDrain = DrainRules.calcDrainDamage(drain, force, magic);
+        this.data.incomingDrain = foundry.utils.duplicate(this.data.against.damage);
         this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain);
     }
 
-    async processSuccess() {
-        DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
+    async processResults() {
+        this.data.modifiedDrain = DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
+
+        await super.processResults();
     }
 }

@@ -32362,7 +32362,7 @@ class VersionMigration {
             }
             // Apply the updates, this should *always* work, now that parsing is complete.
             yield this.Apply(entityUpdates);
-            // await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
+            yield game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
             (_c = ui.notifications) === null || _c === void 0 ? void 0 : _c.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
         });
     }
@@ -33890,8 +33890,15 @@ const DataDefaults_1 = require("../data/DataDefaults");
 const helpers_1 = require("../helpers");
 const PartsList_1 = require("../parts/PartsList");
 class DrainRules {
-    static calcDrainDamage(drain, force, magic) {
-        console.error("Add rules reference");
+    /**
+     * Calculate spell casting drain damage according to SR5#281-282
+     *
+     * @param drain The drain value
+     * @param force The force value used to cast
+     * @param magic The magic attribute level of the caster
+     * @param hits Spellcasting test hits
+     */
+    static calcDrainDamage(drain, force, magic, hits) {
         if (force < 0)
             force = 1;
         if (magic < 0)
@@ -33899,23 +33906,33 @@ class DrainRules {
         const damage = DataDefaults_1.DefaultValues.damageData();
         damage.base = drain;
         helpers_1.Helpers.calcTotal(damage, { min: 0 });
-        damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(force, magic);
+        damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);
         return damage;
     }
-    static calcDrainDamageType(force, magic) {
-        console.error("Add rules reference");
-        if (force < 0)
-            force = 1;
+    /**
+     * Get the drain damage type according to SR5#281 'Step 3'
+     * @param hits The spell casting test hits
+     * @param magic The magic attribute level of the caster
+     */
+    static calcDrainDamageType(hits, magic) {
+        if (hits < 0)
+            hits = 1;
         if (magic < 0)
             magic = 1;
-        return force > magic ? 'physical' : 'stun';
+        return hits > magic ? 'physical' : 'stun';
     }
+    /**
+     * Modify the drain damage after the spell casting test has been completed.
+     *
+     * @param drainDamage The base drain damage after force / drain has been chosen.
+     * @param hits The spell casting test hits
+     */
     static modifyDrainDamage(drainDamage, hits) {
-        console.error("Add rules reference");
         if (hits < 0)
             hits = 0;
         PartsList_1.PartsList.AddUniquePart(drainDamage.mod, 'SR5.Hits', -hits);
         helpers_1.Helpers.calcTotal(drainDamage, { min: 0 });
+        return drainDamage;
     }
 }
 exports.DrainRules = DrainRules;
@@ -35224,6 +35241,9 @@ class DrainTest extends SuccessTest_1.SuccessTest {
         data.modifiedDrain = DataDefaults_1.DefaultValues.damageData();
         return data;
     }
+    get _chatMessageTemplate() {
+        return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.html';
+    }
     static _getDefaultTestAction() {
         return {
             'attribute2': 'willpower'
@@ -35255,6 +35275,18 @@ class DrainTest extends SuccessTest_1.SuccessTest {
             return documentAction;
         });
     }
+    /**
+     * A drain test is successful whenever it has more hits than drain damage
+     */
+    get success() {
+        return this.data.modifiedDrain.value <= 0;
+    }
+    get successLabel() {
+        return 'SR5.ResistedAllDamage';
+    }
+    get failureLabel() {
+        return 'SR5.ResistedSomeDamage';
+    }
     prepareBaseValues() {
         super.prepareBaseValues();
         this.prepareDrain();
@@ -35262,15 +35294,16 @@ class DrainTest extends SuccessTest_1.SuccessTest {
     prepareDrain() {
         if (!this.actor)
             return;
-        const drain = this.data.against.drain;
-        const force = this.data.against.force;
-        const magic = this.actor.getAttribute('magic').value;
-        this.data.incomingDrain = DrainRules_1.DrainRules.calcDrainDamage(drain, force, magic);
+        this.data.incomingDrain = foundry.utils.duplicate(this.data.against.damage);
         this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain);
     }
-    processSuccess() {
+    processResults() {
+        const _super = Object.create(null, {
+            processResults: { get: () => super.processResults }
+        });
         return __awaiter(this, void 0, void 0, function* () {
-            DrainRules_1.DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
+            this.data.modifiedDrain = DrainRules_1.DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
+            yield _super.processResults.call(this);
         });
     }
 }
@@ -36109,6 +36142,7 @@ const SuccessTest_1 = require("./SuccessTest");
 const SpellcastingRules_1 = require("../rules/SpellcastingRules");
 const PartsList_1 = require("../parts/PartsList");
 const DataDefaults_1 = require("../data/DataDefaults");
+const DrainRules_1 = require("../rules/DrainRules");
 /**
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
  *
@@ -36119,10 +36153,14 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
         data.force = data.force || 0;
         data.drain = data.drain || 0;
         data.reckless = data.reckless || false;
+        data.drainDamage = data.drainDamage || DataDefaults_1.DefaultValues.damageData();
         return data;
     }
     get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
+    }
+    get _chatMessageTemplate() {
+        return 'systems/shadowrun5e/dist/templates/rolls/spellcasting-test-message.html';
     }
     /**
      * This test type can't be extended.
@@ -36176,6 +36214,26 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
         const reckless = this.data.reckless;
         this.data.drain = SpellcastingRules_1.SpellcastingRules.calculateDrain(force, drain, reckless);
     }
+    /**
+     * Derive the actual drain damage from spellcasting values.
+     */
+    calcDrainDamage() {
+        if (!this.actor)
+            return DataDefaults_1.DefaultValues.damageData();
+        const force = Number(this.data.force);
+        const drain = Number(this.data.drain);
+        const magic = this.actor.getAttribute('magic').value;
+        this.data.drainDamage = DrainRules_1.DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
+    }
+    processSuccess() {
+        const _super = Object.create(null, {
+            processSuccess: { get: () => super.processSuccess }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            yield _super.processSuccess.call(this);
+            this.calcDrainDamage();
+        });
+    }
     afterTestComplete() {
         const _super = Object.create(null, {
             afterTestComplete: { get: () => super.afterTestComplete }
@@ -36197,7 +36255,7 @@ class SpellCastingTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.SpellCastingTest = SpellCastingTest;
-},{"../data/DataDefaults":152,"../parts/PartsList":220,"../rules/SpellcastingRules":233,"./SuccessTest":252}],252:[function(require,module,exports){
+},{"../data/DataDefaults":152,"../parts/PartsList":220,"../rules/DrainRules":226,"../rules/SpellcastingRules":233,"./SuccessTest":252}],252:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

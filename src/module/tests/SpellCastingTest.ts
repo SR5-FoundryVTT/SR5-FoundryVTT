@@ -1,14 +1,18 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellcastingRules} from "../rules/SpellcastingRules";
 import {PartsList} from "../parts/PartsList";
-import {CombatSpellRules} from "../rules/CombatSpellRules";
 import {DefaultValues} from "../data/DataDefaults";
+import DamageData = Shadowrun.DamageData;
+import {Helpers} from "../helpers";
+import {DrainRules} from "../rules/DrainRules";
 
 
 export interface SpellCastingTestData extends SuccessTestData {
     force: number
     drain: number
     reckless: boolean
+
+    drainDamage: DamageData
 }
 
 
@@ -25,12 +29,17 @@ export class SpellCastingTest extends SuccessTest {
         data.force = data.force || 0;
         data.drain = data.drain || 0;
         data.reckless = data.reckless || false;
+        data.drainDamage = data.drainDamage || DefaultValues.damageData();
 
         return data;
     }
 
     get _dialogTemplate()  {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
+    }
+
+    get _chatMessageTemplate(): string {
+        return 'systems/shadowrun5e/dist/templates/rolls/spellcasting-test-message.html';
     }
 
     /**
@@ -81,7 +90,7 @@ export class SpellCastingTest extends SuccessTest {
 
     calculateBaseValues() {
         super.calculateBaseValues();
-        this.calculateDrainValue()
+        this.calculateDrainValue();
     }
 
     /**
@@ -92,6 +101,24 @@ export class SpellCastingTest extends SuccessTest {
         const drain = Number(this.item?.getDrain() || 0);
         const reckless = this.data.reckless;
         this.data.drain = SpellcastingRules.calculateDrain(force, drain, reckless);
+    }
+
+    /**
+     * Derive the actual drain damage from spellcasting values.
+     */
+    calcDrainDamage() {
+        if (!this.actor) return DefaultValues.damageData();
+
+        const force = Number(this.data.force);
+        const drain = Number(this.data.drain);
+        const magic = this.actor.getAttribute('magic').value;
+
+        this.data.drainDamage = DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
+    }
+
+    async processSuccess() {
+        await super.processSuccess();
+        this.calcDrainDamage();
     }
 
     async afterTestComplete(): Promise<void> {

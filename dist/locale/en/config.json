@@ -548,6 +548,8 @@
   "SR5.ExtendedHits": "Extended Hits",
   "SR5.IncomingDamage": "Incoming Damage",
   "SR5.ModifiedDamage": "Mod. Damage",
+  "SR5.IncomingDrain": "Incoming Drain",
+  "SR5.ModifiedDrain": "Mod. Drain",
   "SR5.Temporary": "Temporary",
   "SR5.SelectedTargets": "Selected Targets",
   "SR5.ApplyWounds": "Apply Wounds",
