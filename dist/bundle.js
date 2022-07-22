@@ -22815,9 +22815,9 @@ exports.SR5 = {
         other: 'SR5.LifestyleOther',
     },
     kbmod: {
-        STANDARD: 'shiftKey',
+        ITEM_DESCR: 'ctrlKey',
         EDGE: 'altKey',
-        HIDE_DIALOG: 'ctrlKey',
+        HIDE_DIALOG: 'shiftKey',
     },
     actorModifiers: {
         soak: 'SR5.RollSoak',
@@ -29715,7 +29715,7 @@ class SR5Item extends Item {
     castAction(event) {
         return __awaiter(this, void 0, void 0, function* () {
             // Only show the item's description by user intention or by lack of testability.
-            const dontRollTest = (event === null || event === void 0 ? void 0 : event.shiftKey) || !this.hasRoll;
+            const dontRollTest = TestCreator_1.TestCreator.shouldPostItemDescription(event) || !this.hasRoll;
             if (dontRollTest)
                 return yield this.postItemCard();
             if (!this.actor)
@@ -37997,12 +37997,21 @@ exports.TestCreator = {
     },
     /**
      * A helper to define the modifier key for all sheet test interactions to cause a test to not show its dialog.
-     * @param event
+     * @param event A PointerEvent by user interaction
      */
     shouldHideDialog(event) {
         if (!event)
             return false;
         return event[config_1.SR5.kbmod.HIDE_DIALOG] === true;
+    },
+    /**
+     * A helper to define the modifier key for all sheet test interactions to cause a test to not show its dialog.
+     * @param event A PointerEvent by user interaction
+     */
+    shouldPostItemDescription(event) {
+        if (!event)
+            return false;
+        return event[config_1.SR5.kbmod.ITEM_DESCR] === true;
     }
 };
 },{"../actor/SR5Actor":86,"../actor/flows/SkillFlow":90,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/SkillRules":232}],255:[function(require,module,exports){

@@ -491,10 +491,19 @@ export const TestCreator = {
 
     /**
      * A helper to define the modifier key for all sheet test interactions to cause a test to not show its dialog.
-     * @param event
+     * @param event A PointerEvent by user interaction
      */
     shouldHideDialog(event: RollEvent|undefined): boolean {
         if (!event) return false;
         return event[SR5.kbmod.HIDE_DIALOG] === true;
+    },
+
+    /**
+     * A helper to define the modifier key for all sheet test interactions to cause a test to not show its dialog.
+     * @param event A PointerEvent by user interaction
+     */
+    shouldPostItemDescription(event: RollEvent|undefined): boolean {
+        if (!event) return false;
+        return event[SR5.kbmod.ITEM_DESCR] === true;
     }
 };

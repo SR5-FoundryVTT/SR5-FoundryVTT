@@ -371,7 +371,7 @@ export class SR5Item extends Item {
      */
     async castAction(event?: RollEvent) {
         // Only show the item's description by user intention or by lack of testability.
-        const dontRollTest = event?.shiftKey || !this.hasRoll;
+        const dontRollTest = TestCreator.shouldPostItemDescription(event) || !this.hasRoll;
         if (dontRollTest) return await this.postItemCard();
 
         if (!this.actor) return;
