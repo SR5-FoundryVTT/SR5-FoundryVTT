@@ -2,10 +2,15 @@ import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
 import {ComplexFormRules} from "../rules/ComplexFormRules";
 import {PartsList} from "../parts/PartsList";
+import DamageData = Shadowrun.DamageData;
+import {DrainRules} from "../rules/DrainRules";
+import {FadeRules} from "../rules/FadeRules";
 
 export interface ComplexFormTestData extends SuccessTestData {
     level: number
     fade: number
+
+    fadeDamage: DamageData
 }
 
 /**
@@ -19,12 +24,17 @@ export class ComplexFormTest extends SuccessTest {
 
         data.level =  data.level || 0;
         data.fade = data.face || 0;
+        data.fadeDamage = DefaultValues.damageData();
 
         return data;
     }
 
     get _dialogTemplate()  {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/complexform-test-dialog.html';
+    }
+
+    get _chatMessageTemplate(): string {
+        return 'systems/shadowrun5e/dist/templates/rolls/complexform-test-message.html';
     }
 
     /**
@@ -95,6 +105,21 @@ export class ComplexFormTest extends SuccessTest {
         const level = Number(this.data.level);
         const fade = Number(this.item?.getFade() || 0);
         this.data.fade = ComplexFormRules.calculateFade(level, fade);
+    }
+
+    calculateFadeDamage() {
+        if (!this.actor) return DefaultValues.valueData();
+
+        const fade = Number(this.data.fade);
+        const resonance = this.actor.getAttribute('resonance').value;
+
+        this.data.fadeDamage = FadeRules.calcFadeDamage(fade, this.hits.value, resonance);
+    }
+
+    async processResults() {
+        this.calculateFadeDamage();
+
+        await super.processResults();
     }
 
     async afterTestComplete() {

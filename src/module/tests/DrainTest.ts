@@ -50,7 +50,7 @@ export class DrainTest extends SuccessTest {
     }
 
     get testModifiers() {
-        return []
+        return ['global', 'drain']
     }
 
     static async _getDocumentTestAction(item, actor) {
@@ -69,6 +69,9 @@ export class DrainTest extends SuccessTest {
         return documentAction;
     }
 
+    /**
+     * Re-calculate incomingDrain in case of user input
+     */
     calculateBaseValues() {
         super.calculateBaseValues();
 

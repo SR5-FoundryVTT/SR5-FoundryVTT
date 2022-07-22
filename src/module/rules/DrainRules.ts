@@ -19,6 +19,7 @@ export class DrainRules {
     static calcDrainDamage(drain: number, force: number, magic: number, hits: number): DamageData {
         if (force < 0) force = 1;
         if (magic < 0) magic = 1;
+        if (hits < 0) hits = 0;
 
         const damage = DefaultValues.damageData();
         damage.base = drain;
@@ -34,7 +35,7 @@ export class DrainRules {
      * @param magic The magic attribute level of the caster
      */
     static calcDrainDamageType(hits: number, magic: number): DamageType {
-        if (hits < 0) hits = 1;
+        if (hits < 0) hits = 0;
         if (magic < 0) magic = 1;
         return hits > magic ? 'physical' : 'stun';
     }

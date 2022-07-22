@@ -116,9 +116,10 @@ export class SpellCastingTest extends SuccessTest {
         this.data.drainDamage = DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
     }
 
-    async processSuccess() {
-        await super.processSuccess();
+    async processResults() {
         this.calcDrainDamage();
+
+        await super.processResults();
     }
 
     async afterTestComplete(): Promise<void> {
