@@ -975,6 +975,7 @@
     "PhysicalDefenseTest": "Physical Defense",
     "RangedAttackTest": "Ranged Weapon Attack",
     "MeleeAttackTest": "Melee Weapon Attack",
+    "ThrownAttackTest": "Thrown Weapon Attack",
     "PhysicalResistTest": "Physical Damage Resist",
     "SpellCastingTest": "Spellcasting",
     "ComplexFormTest": "Threading Complex Form",

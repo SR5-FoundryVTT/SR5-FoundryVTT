@@ -46,6 +46,7 @@ import {AttributeOnlyTest} from "./tests/AttributeOnlyTest";
 import {NaturalRecoveryStunTest} from "./tests/NaturalRecoveryStunTest";
 import {NaturalRecoveryPhysicalTest} from "./tests/NaturalRecoveryPhysicalTest";
 import {FadeTest} from "./tests/FadeTest";
+import {ThrownAttackTest} from "./tests/ThrownAttackTest";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -128,6 +129,7 @@ ___________________
                 OpposedTest,
                 MeleeAttackTest,
                 RangedAttackTest,
+                ThrownAttackTest,
                 PhysicalDefenseTest,
                 PhysicalResistTest,
                 SpellCastingTest,
@@ -148,6 +150,7 @@ ___________________
                 SuccessTest,
                 MeleeAttackTest,
                 RangedAttackTest,
+                ThrownAttackTest,
                 PhysicalResistTest,
                 SpellCastingTest,
                 ComplexFormTest,

@@ -937,6 +937,7 @@
     "PhysicalDefenseTest": "Physische Verteidigung",
     "RangedAttackTest": "Fernkampf Angriff",
     "MeleeAttackTest": "Nahkampf Angriff",
+    "ThrownAttackTest": "Wurfwaffen Angriff",
     "PhysicalResistTest": "Physischer Schadenswiderstand",
     "SpellcastingTest": "Spruchzauberei",
     "ComplexFormTest": "Komplexe Form weben",
