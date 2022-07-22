@@ -31619,6 +31619,25 @@ exports.ActionResultFlow = void 0;
 const MatrixRules_1 = require("../../rules/MatrixRules");
 class ActionResultFlow {
     /**
+     * Handle execution of any action result action. :)
+     *
+     * NOTE: This is a horrible system and likely to be replaced someday...
+     *
+     * @param resultAction The action descriptor based on SuccessTest#_prepareResultActionsTemplateData.
+     * @param test The SuccessTest subclass the action has been emitted from.
+     */
+    static executeResult(resultAction, test) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            switch (resultAction) {
+                case 'placeMarks': {
+                    (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error('Placing marks currently isnt suported. Sorry!');
+                    break;
+                }
+            }
+        });
+    }
+    /**
      * Matrix Marks are placed on either actors (persona, ic) or items (device, host, technology).
      */
     static placeMatrixMarks(active, targets, marks) {
@@ -36203,6 +36222,7 @@ const ActionFlow_1 = require("../item/flows/ActionFlow");
 const TestCreator_1 = require("./TestCreator");
 const template_1 = require("../template");
 const TestRules_1 = require("../rules/TestRules");
+const ActionResultFlow_1 = require("../item/flows/ActionResultFlow");
 /**
  * General handling of Shadowrun 5e success tests.
  *
@@ -36787,6 +36807,25 @@ class SuccessTest {
         return false;
     }
     /**
+     * Determine if this test provides any results
+     */
+    get hasResults() {
+        if (!this.item)
+            return false;
+        const actionResultData = this.item.getActionResult();
+        if (!actionResultData)
+            return false;
+        return !foundry.utils.isObjectEmpty(actionResultData);
+    }
+    /**
+     * Helper to get an items action result information.
+     */
+    get results() {
+        if (!this.item)
+            return;
+        return this.item.getActionResult();
+    }
+    /**
      * Determine if this test has any targets selected using FoundryVTT targeting.
      */
     get hasTargets() {
@@ -37053,6 +37092,7 @@ class SuccessTest {
             },
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
+            resultActions: this._prepareResultActionsTemplateData(),
             previewTemplate: this._canPlaceBlastTemplate,
             showDescription: this._canShowDescription,
             description: ((_b = this.item) === null || _b === void 0 ? void 0 : _b.getChatData()) || '',
@@ -37098,6 +37138,22 @@ class SuccessTest {
             action.label += ` ${this.data.opposed.mod}`;
         }
         return [action];
+    }
+    /**
+     * Prepare result action buttons
+     */
+    _prepareResultActionsTemplateData() {
+        const actions = [];
+        const actionResultData = this.results;
+        if (!actionResultData)
+            return actions;
+        if (actionResultData.success.matrix.placeMarks) {
+            actions.push({
+                action: 'placeMarks',
+                label: 'SR5.PlaceMarks'
+            });
+        }
+        return actions;
     }
     /**
      * Prepare chat message data for this success test card.
@@ -37151,6 +37207,7 @@ class SuccessTest {
             html.find('.show-description').on('click', this._chatToggleCardDescription);
             html.find('.chat-document-link').on('click', helpers_1.Helpers.renderEntityLinkSheet);
             html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
+            html.find('.result-action').on('click', this._castResultAction);
             yield this._showGmOnlyContent(message, html, data);
         });
     }
@@ -37270,27 +37327,26 @@ class SuccessTest {
         });
     }
     /**
-     * Open a documents sheet when clicking on it's link.
-     * This is custom from FoundryVTT document links for mostly styling reasons (legacy).
+     * A test message initiated an action for a test result, extract information from message and execute action.
+     *
+     * @param event A PointerEvent by user-interaction
      */
-    static _chatOpenDocumentLink(event) {
+    static _castResultAction(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             event.stopPropagation();
             const element = $(event.currentTarget);
-            const uuid = element.data('uuid');
-            if (!uuid)
-                return console.error("Shadowrun 5e | A chat document link didn't provide a document UUID.");
-            const document = yield fromUuid(uuid);
-            if (!document)
-                return console.error("Shadowrun 5e | A chat document links UUID couldn't be resolved to a document.");
-            // @ts-ignore
-            yield (document === null || document === void 0 ? void 0 : document.sheet.render(true));
+            const resultAction = element.data('action');
+            const messageId = element.closest('.chat-message').data('messageId');
+            const test = yield TestCreator_1.TestCreator.fromMessage(messageId);
+            if (!test)
+                return console.error(`Shadowrun5e | Couldn't find both a result action ('${resultAction}') and extract test from message ('${messageId}')`);
+            yield ActionResultFlow_1.ActionResultFlow.executeResult(resultAction, test);
         });
     }
 }
 exports.SuccessTest = SuccessTest;
-},{"../actor/SR5Actor":86,"../apps/dialogs/TestDialog":142,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../item/flows/ActionFlow":207,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/TestRules":234,"../template":237,"./TestCreator":253}],253:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../apps/dialogs/TestDialog":142,"../config":150,"../constants":151,"../data/DataDefaults":152,"../helpers":165,"../item/flows/ActionFlow":207,"../item/flows/ActionResultFlow":208,"../parts/PartsList":220,"../rolls/SR5Roll":221,"../rules/TestRules":234,"../template":237,"./TestCreator":253}],253:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

@@ -17,6 +17,8 @@ import MinimalActionData = Shadowrun.MinimalActionData;
 import {TestCreator} from "./TestCreator";
 import Template from "../template";
 import {TestRules} from "../rules/TestRules";
+import ActionResultData = Shadowrun.ActionResultData;
+import {ActionResultFlow} from "../item/flows/ActionResultFlow";
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -770,6 +772,24 @@ export class SuccessTest {
     }
 
     /**
+     * Determine if this test provides any results
+     */
+    get hasResults(): boolean {
+        if (!this.item) return false;
+        const actionResultData = this.item.getActionResult();
+        if (!actionResultData) return false;
+        return !foundry.utils.isObjectEmpty(actionResultData);
+    }
+
+    /**
+     * Helper to get an items action result information.
+     */
+    get results(): ActionResultData|undefined {
+        if (!this.item) return;
+        return this.item.getActionResult();
+    }
+
+    /**
      * Determine if this test has any targets selected using FoundryVTT targeting.
      */
     get hasTargets(): boolean {
@@ -1042,6 +1062,7 @@ export class SuccessTest {
             },
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
+            resultActions: this._prepareResultActionsTemplateData(),
             previewTemplate: this._canPlaceBlastTemplate,
             showDescription: this._canShowDescription,
             description: this.item?.getChatData() || '',
@@ -1091,6 +1112,24 @@ export class SuccessTest {
         }
 
         return [action]
+    }
+
+    /**
+     * Prepare result action buttons
+     */
+    _prepareResultActionsTemplateData(): {action: string, label: string}[] {
+        const actions: {action: string, label: string}[] = [];
+        const actionResultData = this.results;
+        if (!actionResultData) return actions;
+
+        if (actionResultData.success.matrix.placeMarks) {
+            actions.push({
+                action: 'placeMarks',
+                label: 'SR5.PlaceMarks'
+            });
+        }
+
+        return actions;
     }
 
     /**
@@ -1149,6 +1188,7 @@ export class SuccessTest {
         html.find('.show-description').on('click', this._chatToggleCardDescription);
         html.find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
         html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
+        html.find('.result-action').on('click', this._castResultAction);
 
         await this._showGmOnlyContent(message, html, data)
     }
@@ -1264,20 +1304,22 @@ export class SuccessTest {
     }
 
     /**
-     * Open a documents sheet when clicking on it's link.
-     * This is custom from FoundryVTT document links for mostly styling reasons (legacy).
+     * A test message initiated an action for a test result, extract information from message and execute action.
+     *
+     * @param event A PointerEvent by user-interaction
      */
-    static async _chatOpenDocumentLink(event) {
+    static async _castResultAction(event) {
         event.preventDefault();
         event.stopPropagation();
 
-        const element = $(event.currentTarget);
-        const uuid = element.data('uuid');
-        if (!uuid) return console.error("Shadowrun 5e | A chat document link didn't provide a document UUID.");
-        const document = await fromUuid(uuid);
-        if (!document) return console.error("Shadowrun 5e | A chat document links UUID couldn't be resolved to a document.")
+        const element = $(event.currentTarget)
+        const resultAction = element.data('action');
 
-        // @ts-ignore
-        await document?.sheet.render(true);
+        const messageId = element.closest('.chat-message').data('messageId');
+        const test = await TestCreator.fromMessage(messageId);
+
+        if (!test) return console.error(`Shadowrun5e | Couldn't find both a result action ('${resultAction}') and extract test from message ('${messageId}')`);
+
+        await ActionResultFlow.executeResult(resultAction, test);
     }
 }

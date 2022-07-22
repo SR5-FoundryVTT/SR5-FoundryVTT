@@ -119,6 +119,15 @@
         {{/each}}
     </div>
     {{/if}}
+    {{#if test.hasResults}}
+    <div class="card-buttons">
+        {{#each resultActions}}
+        <div class="button result-action" data-action="{{this.action}}">
+            {{localize "SR5.PlaceMarks"}} {{actionTestData.matrix.marks}}
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
 </div>
 {{#if test.data.damage}}{{#ifgt test.data.damage.base 0}}
 <div class="sr5 chat-card roll-card">
