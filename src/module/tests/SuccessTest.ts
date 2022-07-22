@@ -816,7 +816,7 @@ export class SuccessTest {
     /**
      * Handle Edge rule 'second chance' within this test.
      */
-    async applySecondChance() {
+    async executeSecondChance() {
         console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
 
         if (!this.data.sourceActorUuid) return;
@@ -841,6 +841,7 @@ export class SuccessTest {
         await this.evaluate();
         await this.processResults();
         await this.toMessage();
+        await this.afterTestComplete();
     }
 
     /**
@@ -893,9 +894,7 @@ export class SuccessTest {
 
         await this.evaluate();
         await this.processResults();
-
         await this.toMessage();
-
         await this.afterTestComplete();
 
         return this;
@@ -1214,7 +1213,7 @@ export class SuccessTest {
             const test = await TestCreator.fromMessage(messageId);
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 
-            await test.applySecondChance();
+            await test.executeSecondChance();
         };
 
         const deleteOption = options.pop();

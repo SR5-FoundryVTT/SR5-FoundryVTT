@@ -31601,17 +31601,6 @@ class ActionFlow {
             itemType: item.type
         };
     }
-    /**
-     * Inform user about an invalid limit set.
-     *
-     * @param limit The limit value to be checked.
-     */
-    static _warnOnInvalidLimit(limit) {
-        var _a;
-        if (limit && limit.value < 0) {
-            (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
-        }
-    }
 }
 exports.ActionFlow = ActionFlow;
 },{"../../helpers":165}],208:[function(require,module,exports){
@@ -36509,7 +36498,6 @@ class SuccessTest {
         this.data.pool.value = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
         this.data.threshold.value = helpers_1.Helpers.calcTotal(this.data.threshold, { min: 0 });
         this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
-        ActionFlow_1.ActionFlow._warnOnInvalidLimit(this.data.limit);
         // Without further rules applied just use the general action damage configuration.
         // This damage can be further altered using process* methods.
         const damage = this.data.action ? this.data.action.damage : DataDefaults_1.DefaultValues.damageData();
@@ -36840,7 +36828,7 @@ class SuccessTest {
     /**
      * Handle Edge rule 'second chance' within this test.
      */
-    applySecondChance() {
+    executeSecondChance() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
             if (!this.data.sourceActorUuid)
@@ -36862,6 +36850,7 @@ class SuccessTest {
             yield this.evaluate();
             yield this.processResults();
             yield this.toMessage();
+            yield this.afterTestComplete();
         });
     }
     /**
@@ -37231,7 +37220,7 @@ class SuccessTest {
             const test = yield TestCreator_1.TestCreator.fromMessage(messageId);
             if (!test)
                 return console.error('Shadowrun 5e | Could not restore test from message');
-            yield test.applySecondChance();
+            yield test.executeSecondChance();
         });
         const deleteOption = options.pop();
         options.push({
