@@ -29550,7 +29550,7 @@ class SR5Item extends Item {
         const action = this.getAction();
         if (!action)
             return false;
-        return !!action.opposed.type;
+        return !!action.opposed.test;
     }
     get hasRoll() {
         const action = this.getAction();
@@ -29752,20 +29752,16 @@ class SR5Item extends Item {
         const testName = this.getRollName();
         return testName ? testName : game.i18n.localize('SR5.Action');
     }
+    /**
+     * Any item implementation can define a set of modifiers to be applied when used within an opposed test.
+     *
+     * NOTE: This is a legacy method of applied modifiers to opposed tests but works fine for now.
+     */
     getOpposedTestMod() {
         const parts = new PartsList_1.PartsList();
-        if (this.hasDefenseTest()) {
+        if (this.hasOpposedTest()) {
             if (this.isAreaOfEffect()) {
                 parts.addUniquePart('SR5.Aoe', -2);
-            }
-            if (this.isRangedWeapon()) {
-                const fireModeData = this.getLastFireMode();
-                if (fireModeData === null || fireModeData === void 0 ? void 0 : fireModeData.defense) {
-                    if (fireModeData.defense !== 'SR5.DuckOrCover') {
-                        const fireMode = +fireModeData.defense;
-                        parts.addUniquePart('SR5.FireMode', fireMode);
-                    }
-                }
             }
         }
         return parts;
@@ -30593,13 +30589,13 @@ class SR5Item extends Item {
         if (technology && "condition_monitor" in technology)
             return technology.condition_monitor;
     }
-    hasDefenseTest() {
+    hasOpposedTest() {
         if (!this.hasOpposedRoll)
             return false;
         const action = this.getAction();
         if (!action)
             return false;
-        return action.opposed.type === 'defense';
+        return action.opposed.test !== '';
     }
     /**
      * A host type item can store IC actors to spawn in order, use this method to add into that.
@@ -35648,6 +35644,7 @@ exports.OpposedTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
 const DataDefaults_1 = require("../data/DataDefaults");
 const TestCreator_1 = require("./TestCreator");
+const PartsList_1 = require("../parts/PartsList");
 /**
  * An opposed test results from a normal success test as an opposed action.
  */
@@ -35757,6 +35754,21 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
         return false;
     }
     /**
+     * Apply opposed test modifiers based on the item implementation
+     */
+    prepareItemModifiers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.item)
+                return;
+            // NOTE: This is a legacy method for applying item data based modifiers, but it will do.
+            const opposedMod = this.item.getOpposedTestMod();
+            // Do not simply concat list to avoid double applying an otherwise unique test modifier.
+            for (const modifier of opposedMod.list) {
+                PartsList_1.PartsList.AddUniquePart(this.data.modifiers.mod, modifier.name, modifier.value, true);
+            }
+        });
+    }
+    /**
      * Using a message action cast an opposed test to that messages active test.
      *
      * @param event A PointerEvent by user interaction to trigger the test action.
@@ -35780,7 +35792,7 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
     }
 }
 exports.OpposedTest = OpposedTest;
-},{"../data/DataDefaults":152,"./SuccessTest":253,"./TestCreator":254}],249:[function(require,module,exports){
+},{"../data/DataDefaults":152,"../parts/PartsList":220,"./SuccessTest":253,"./TestCreator":254}],249:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36824,6 +36836,15 @@ class SuccessTest {
      */
     prepareDocumentModifiers() {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.prepareActorModifiers();
+            yield this.prepareItemModifiers();
+        });
+    }
+    /**
+     * Prepare general modifiers based on the actor, as defined within the action or test implementation.
+     */
+    prepareActorModifiers() {
+        return __awaiter(this, void 0, void 0, function* () {
             if (!this.actor)
                 return;
             for (const type of this.testModifiers) {
@@ -36832,6 +36853,12 @@ class SuccessTest {
                 PartsList_1.PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
             }
         });
+    }
+    /**
+     * Allow subclasses to alter test modifiers based on the item used for casting.
+     */
+    prepareItemModifiers() {
+        return __awaiter(this, void 0, void 0, function* () { });
     }
     /**
      * Calculate the total of all values.

@@ -527,6 +527,14 @@ export class SuccessTest {
      * Main purpose is to populate the configured modifiers for this test based on actor / items used.
      */
     async prepareDocumentModifiers()  {
+        await this.prepareActorModifiers();
+        await this.prepareItemModifiers();
+    }
+
+    /**
+     * Prepare general modifiers based on the actor, as defined within the action or test implementation.
+     */
+    async prepareActorModifiers() {
         if (!this.actor) return;
 
         for (const type of this.testModifiers) {
@@ -536,6 +544,11 @@ export class SuccessTest {
             PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
         }
     }
+
+    /**
+     * Allow subclasses to alter test modifiers based on the item used for casting.
+     */
+    async prepareItemModifiers() {}
 
     /**
      * Calculate the total of all values.

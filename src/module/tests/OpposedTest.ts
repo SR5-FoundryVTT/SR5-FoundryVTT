@@ -2,6 +2,7 @@ import {SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments
 import {DefaultValues} from "../data/DataDefaults";
 import {TestCreator} from "./TestCreator";
 import {SR5Item} from "../item/SR5Item";
+import {PartsList} from "../parts/PartsList";
 
 
 export interface OpposedTestValues extends SuccessTestValues {
@@ -142,6 +143,21 @@ export class OpposedTest extends SuccessTest {
      */
     get _canPlaceBlastTemplate(): boolean {
         return false;
+    }
+
+    /**
+     * Apply opposed test modifiers based on the item implementation
+     */
+    async prepareItemModifiers() {
+        if (!this.item) return;
+
+        // NOTE: This is a legacy method for applying item data based modifiers, but it will do.
+        const opposedMod = this.item.getOpposedTestMod();
+
+        // Do not simply concat list to avoid double applying an otherwise unique test modifier.
+        for (const modifier of opposedMod.list) {
+            PartsList.AddUniquePart(this.data.modifiers.mod, modifier.name, modifier.value, true);
+        }
     }
 
     /**

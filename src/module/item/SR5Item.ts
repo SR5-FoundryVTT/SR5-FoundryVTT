@@ -190,7 +190,7 @@ export class SR5Item extends Item {
     get hasOpposedRoll(): boolean {
         const action = this.getAction();
         if (!action) return false;
-        return !!action.opposed.type;
+        return !!action.opposed.test;
     }
 
     get hasRoll(): boolean {
@@ -409,24 +409,24 @@ export class SR5Item extends Item {
         return testName ? testName :  game.i18n.localize('SR5.Action');
     }
 
+    /**
+     * Any item implementation can define a set of modifiers to be applied when used within an opposed test.
+     *
+     * NOTE: This is a legacy method of applied modifiers to opposed tests but works fine for now.
+     */
     getOpposedTestMod(): PartsList<number> {
         const parts = new PartsList<number>();
-        if (this.hasDefenseTest()) {
+
+        if (this.hasOpposedTest()) {
             if (this.isAreaOfEffect()) {
                 parts.addUniquePart('SR5.Aoe', -2);
             }
-            if (this.isRangedWeapon()) {
-                const fireModeData = this.getLastFireMode();
-                if (fireModeData?.defense) {
-                    if (fireModeData.defense !== 'SR5.DuckOrCover') {
-                        const fireMode = +fireModeData.defense;
-                        parts.addUniquePart('SR5.FireMode', fireMode);
-                    }
-                }
-            }
         }
+
         return parts;
     }
+
+
 
      getBlastData(actionTestData?: ActionTestData): BlastData | undefined {
         if (this.isSpell() && this.isAreaOfEffect()) {
@@ -1352,11 +1352,11 @@ export class SR5Item extends Item {
             return technology.condition_monitor;
     }
 
-    hasDefenseTest(): boolean {
+    hasOpposedTest(): boolean {
         if (!this.hasOpposedRoll) return false;
         const action = this.getAction();
         if (!action) return false;
-        return action.opposed.type === 'defense';
+        return action.opposed.test !== '';
     }
 
     /**
