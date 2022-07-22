@@ -7,6 +7,8 @@ import {Helpers} from "../../helpers";
 import FormulaOperator = Shadowrun.FormulaOperator;
 import {SR5Item} from "../SR5Item";
 import DamageSource = Shadowrun.DamageSource;
+import LimitField = Shadowrun.LimitField;
+import ValueField = Shadowrun.ValueField;
 
 export class ActionFlow {
     /**

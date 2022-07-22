@@ -25250,8 +25250,8 @@ class Helpers {
         value.base = value.base !== undefined ? value.base : 0;
         // If the given value has an override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {
-            value.value = value.override.value;
-            return value.override.value;
+            value.value = Helpers.applyValueRange(value.override.value, options);
+            return value.value;
         }
         // Base on type change calculation behaviour.
         switch (getType(value.base)) {
@@ -31601,6 +31601,17 @@ class ActionFlow {
             itemType: item.type
         };
     }
+    /**
+     * Inform user about an invalid limit set.
+     *
+     * @param limit The limit value to be checked.
+     */
+    static _warnOnInvalidLimit(limit) {
+        var _a;
+        if (limit && limit.value < 0) {
+            (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
+        }
+    }
 }
 exports.ActionFlow = ActionFlow;
 },{"../../helpers":165}],208:[function(require,module,exports){
@@ -33435,7 +33446,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShadowrunRoller = exports.ShadowrunRoll = void 0;
-const chat_1 = require("../chat");
 const constants_1 = require("../constants");
 const PartsList_1 = require("../parts/PartsList");
 const TestCreator_1 = require("../tests/TestCreator");
@@ -33548,67 +33558,9 @@ class ShadowrunRoller {
             // const testDialog = await ShadowrunTestDialog.create(props.actor, testDialogOptions, props.parts);
         });
     }
-    /** Send a message to the specific targeted player given.
-     *
-     * Use targetsChatMessages for a simple way to send to all active player targets.
-     *
-     * Should a target have multiple user owners, each will get a message.
-     *
-     * @param options
-     */
-    static targetChatMessage(options) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.WhisperOpposedTestsToTargetedPlayers))
-                return;
-            const rollMode = (_a = options.rollMode) !== null && _a !== void 0 ? _a : game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
-            if (rollMode === 'roll')
-                return;
-            // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
-            const users = options.target.actor.getActivePlayerOwners();
-            for (const user of users) {
-                if (user.isGM)
-                    continue;
-                if (user === game.user)
-                    continue;
-                const targetChatMessage = {
-                    actor: options.actor, target: options.target, targets: [options.target], item: options.item,
-                    tests: options.tests, whisperTo: user, attack: options.attack
-                };
-                yield (0, chat_1.createTargetChatMessage)(targetChatMessage);
-            }
-        });
-    }
-    /** Send messages to ALL targets, no matter if specifically targeted in a action dialog.
-     *
-     * This can cause for multiple target whispers to happen, even if the active player only selected one
-     * during, for example, the ranged weapon dialog (which gives a selection and returns one)
-     *
-     *
-     * @param options
-     */
-    static targetsChatMessages(targets, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.WhisperOpposedTestsToTargetedPlayers))
-                return;
-            targets.forEach(target => {
-                // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
-                if (!target.actor.hasActivePlayerOwner())
-                    return;
-                options = Object.assign(Object.assign({}, options), { target });
-                ShadowrunRoller.targetChatMessage(options);
-            });
-        });
-    }
-    static _errorOnInvalidLimit(limit) {
-        var _a;
-        if (limit && limit.value < 0) {
-            (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
-        }
-    }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../chat":148,"../constants":151,"../parts/PartsList":220,"../tests/TestCreator":253}],223:[function(require,module,exports){
+},{"../constants":151,"../parts/PartsList":220,"../tests/TestCreator":253}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -36557,6 +36509,7 @@ class SuccessTest {
         this.data.pool.value = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
         this.data.threshold.value = helpers_1.Helpers.calcTotal(this.data.threshold, { min: 0 });
         this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
+        ActionFlow_1.ActionFlow._warnOnInvalidLimit(this.data.limit);
         // Without further rules applied just use the general action damage configuration.
         // This damage can be further altered using process* methods.
         const damage = this.data.action ? this.data.action.damage : DataDefaults_1.DefaultValues.damageData();

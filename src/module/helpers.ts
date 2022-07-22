@@ -48,8 +48,9 @@ export class Helpers {
 
         // If the given value has an override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {
-            value.value = value.override.value;
-            return value.override.value;
+            // Still apply a possible value range, even if override says otherwise.
+            value.value = Helpers.applyValueRange(value.override.value, options);
+            return value.value;
         }
 
         // Base on type change calculation behaviour.
