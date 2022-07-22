@@ -9,6 +9,10 @@ export interface DefenseTestData extends OpposedTestData {
     incomingDamage: DamageData
     // Modified damage value of the attack after this defense (success or failure)
     modifiedDamage: DamageData
+
+    // Should this defense test cause an initiative modifier to be applied, use this value
+    // It's also used for display in chat.
+    iniMod: number|undefined
 }
 
 
@@ -41,5 +45,16 @@ export class DefenseTest extends OpposedTest {
 
     get failureLabel() {
         return 'SR5.AttackHits';
+    }
+
+    /**
+     * This test has changed the initiative score of its caster.
+     */
+    get hasChangedInitiative(): boolean {
+        return this.data.iniMod !== undefined;
+    }
+
+    get initiativeModifier(): number {
+        return this.data.iniMod || 0;
     }
 }

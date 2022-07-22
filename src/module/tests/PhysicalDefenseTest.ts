@@ -12,7 +12,7 @@ export interface PhysicalDefenseTestData extends DefenseTestData {
     cover: number
     // Dialog input for active defense modifier
     activeDefense: string
-    activeDefenses: Record<string, any> // TODO: Propper typing...
+    activeDefenses: Record<string, { label: string, value: number|undefined, initMod: number, weapon?: string }>
     // Melee weapon reach modification.
     isMeleeAttack: boolean
     defenseReach: number
@@ -84,9 +84,9 @@ export class PhysicalDefenseTest extends DefenseTest {
         equippedMeleeWeapons.forEach((weapon) => {
             this.data.activeDefenses[`parry-${weapon.name}`] = {
                 label: 'SR5.Parry',
-                weapon: weapon.name,
+                weapon: weapon.name || '',
                 value: actor.findActiveSkill(weapon.getActionSkill())?.value,
-                init: -5,
+                initMod: -5,
             };
         });
     }
@@ -133,8 +133,6 @@ export class PhysicalDefenseTest extends DefenseTest {
 
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
         PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.ActiveDefense', defense.value);
-
-        // TODO: Use defense.init to modify Combat initiative value.
     }
 
     applyPoolMeleeReachModifier() {
@@ -167,5 +165,27 @@ export class PhysicalDefenseTest extends DefenseTest {
         const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
         if (!test) return;
         await test.execute();
+    }
+
+    async processResults() {
+        await this.applyIniModFromActiveDefense();
+        await super.processResults();
+    }
+
+    /**
+     * Should an active defense be selected apply the initiative modifier to the defenders combat initiative.
+     */
+    async applyIniModFromActiveDefense() {
+        if (!this.actor) return;
+        if (!this.data.activeDefense) return;
+
+        const activeDefense = this.data.activeDefenses[this.data.activeDefense];
+        if (!activeDefense) return;
+
+        // Change this casting actors combat ini.
+        await this.actor.changeCombatInitiative(activeDefense.initMod);
+
+        // Use DefenseTest general iniMod behaviour.
+        this.data.iniMod = activeDefense.initMod;
     }
 }

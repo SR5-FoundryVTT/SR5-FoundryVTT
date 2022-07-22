@@ -25250,6 +25250,7 @@ class Helpers {
         value.base = value.base !== undefined ? value.base : 0;
         // If the given value has an override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {
+            // Still apply a possible value range, even if override says otherwise.
             value.value = Helpers.applyValueRange(value.override.value, options);
             return value.value;
         }
@@ -35288,6 +35289,15 @@ class DefenseTest extends OpposedTest_1.OpposedTest {
     get failureLabel() {
         return 'SR5.AttackHits';
     }
+    /**
+     * This test has changed the initiative score of its caster.
+     */
+    get hasChangedInitiative() {
+        return this.data.iniMod !== undefined;
+    }
+    get initiativeModifier() {
+        return this.data.iniMod || 0;
+    }
 }
 exports.DefenseTest = DefenseTest;
 },{"../data/DataDefaults":152,"./OpposedTest":248}],243:[function(require,module,exports){
@@ -35848,9 +35858,9 @@ class PhysicalDefenseTest extends DefenseTest_1.DefenseTest {
             var _a;
             this.data.activeDefenses[`parry-${weapon.name}`] = {
                 label: 'SR5.Parry',
-                weapon: weapon.name,
+                weapon: weapon.name || '',
                 value: (_a = actor.findActiveSkill(weapon.getActionSkill())) === null || _a === void 0 ? void 0 : _a.value,
-                init: -5,
+                initMod: -5,
             };
         });
     }
@@ -35928,6 +35938,33 @@ class PhysicalDefenseTest extends DefenseTest_1.DefenseTest {
             if (!test)
                 return;
             yield test.execute();
+        });
+    }
+    processResults() {
+        const _super = Object.create(null, {
+            processResults: { get: () => super.processResults }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.applyIniModFromActiveDefense();
+            yield _super.processResults.call(this);
+        });
+    }
+    /**
+     * Should an active defense be selected apply the initiative modifier to the defenders combat initiative.
+     */
+    applyIniModFromActiveDefense() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.actor)
+                return;
+            if (!this.data.activeDefense)
+                return;
+            const activeDefense = this.data.activeDefenses[this.data.activeDefense];
+            if (!activeDefense)
+                return;
+            // Change this casting actors combat ini.
+            yield this.actor.changeCombatInitiative(activeDefense.initMod);
+            // Use DefenseTest general iniMod behaviour.
+            this.data.iniMod = activeDefense.initMod;
         });
     }
 }
