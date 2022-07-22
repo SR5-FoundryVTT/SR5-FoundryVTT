@@ -2,9 +2,8 @@ import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
 import {ComplexFormRules} from "../rules/ComplexFormRules";
 import {PartsList} from "../parts/PartsList";
-import DamageData = Shadowrun.DamageData;
-import {DrainRules} from "../rules/DrainRules";
 import {FadeRules} from "../rules/FadeRules";
+import DamageData = Shadowrun.DamageData;
 
 export interface ComplexFormTestData extends SuccessTestData {
     level: number

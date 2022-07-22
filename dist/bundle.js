@@ -37888,13 +37888,13 @@ exports.TestCreator = {
                 if (limit && actor._isMatrixAttribute(action.limit.attribute))
                     actor._addMatrixParts(pool, true);
             }
-            // No explicit limit set, maybe derive from used skill / action
-            else if (action.skill && action.attribute) {
-                const attribute = actor.getAttribute(action.attribute);
-                const limit = actor.getLimit(attribute.limit);
-                if (limit)
-                    data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
-            }
+            // // No explicit limit set, maybe derive from used skill / action
+            // NOTE: This is an issue for spell/complex form as they don't define a limit within the action but their test implementation.
+            // else if (action.skill && action.attribute) {
+            //     const attribute = actor.getAttribute(action.attribute);
+            //     const limit = actor.getLimit(attribute.limit as string);
+            //     if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
+            // }
             if (action.limit.base || action.limit.value) {
                 data.limit.base = Number(action.limit.value);
             }
