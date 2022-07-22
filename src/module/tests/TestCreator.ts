@@ -129,7 +129,7 @@ export const TestCreator = {
             return;
         }
 
-        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestMessageData;
+        const testData = foundry.utils.duplicate(message.getFlag(SYSTEM_NAME, FLAGS.Test)) as SuccessTestMessageData;
         if (!testData) {
             console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
             return;

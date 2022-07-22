@@ -831,6 +831,7 @@ export class SuccessTest {
         // Second chance can stack, so don't add it as unique.
         parts.addPart('SR5.SecondChange', dice);
 
+        await this.populateDocuments();
         this.calculateBaseValues();
 
         const formula = `${dice}d6`;

@@ -36901,6 +36901,7 @@ class SuccessTest {
             const parts = new PartsList_1.PartsList(this.pool.mod);
             // Second chance can stack, so don't add it as unique.
             parts.addPart('SR5.SecondChange', dice);
+            yield this.populateDocuments();
             this.calculateBaseValues();
             const formula = `${dice}d6`;
             const roll = new SR5Roll_1.SR5Roll(formula);
@@ -37471,7 +37472,7 @@ exports.TestCreator = {
                 console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
                 return;
             }
-            const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
+            const testData = foundry.utils.duplicate(message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test));
             if (!testData) {
                 console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
                 return;
