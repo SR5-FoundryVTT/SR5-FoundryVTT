@@ -4,6 +4,7 @@ import {DefaultValues} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
+import {Helpers} from "../helpers";
 
 export interface DrainTestData extends SuccessTestData {
     incomingDrain: DamageData
@@ -21,10 +22,14 @@ export class DrainTest extends SuccessTest {
 
         data.against = data.against || new SpellCastingTest({}, {}, options).data;
 
-        data.incomingDrain = DefaultValues.damageData();
-        data.modifiedDrain = DefaultValues.damageData();
+        data.incomingDrain = foundry.utils.duplicate(data.against.drainDamage);
+        data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
 
         return data;
+    }
+
+    get _dialogTemplate(): string {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/drain-test-dialog.html';
     }
 
     get _chatMessageTemplate(): string {
@@ -64,6 +69,13 @@ export class DrainTest extends SuccessTest {
         return documentAction;
     }
 
+    calculateBaseValues() {
+        super.calculateBaseValues();
+
+        // Avoid using a user defined value override.
+        this.data.modifiedDrain.base = Helpers.calcTotal(this.data.incomingDrain, {min: 0});
+    }
+
     /**
      * A drain test is successful whenever it has more hits than drain damage
      */
@@ -79,19 +91,8 @@ export class DrainTest extends SuccessTest {
         return 'SR5.ResistedSomeDamage'
     }
 
-    prepareBaseValues() {
-        super.prepareBaseValues();
-        this.prepareDrain();
-    }
-
-    prepareDrain() {
-        if (!this.actor) return;
-
-        this.data.incomingDrain = foundry.utils.duplicate(this.data.against.damage);
-        this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain);
-    }
-
     async processResults() {
+        // Don't use incomingDrain as it might have a user value override applied.
         this.data.modifiedDrain = DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
 
         await super.processResults();

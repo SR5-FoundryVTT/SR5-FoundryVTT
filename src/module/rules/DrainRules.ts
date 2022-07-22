@@ -48,6 +48,8 @@ export class DrainRules {
     static modifyDrainDamage(drainDamage: DamageData, hits: number) {
         if (hits < 0) hits = 0;
 
+        drainDamage = foundry.utils.duplicate(drainDamage);
+
         PartsList.AddUniquePart(drainDamage.mod, 'SR5.Hits', -hits);
         Helpers.calcTotal(drainDamage, {min: 0});
 

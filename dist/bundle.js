@@ -33911,7 +33911,7 @@ class DrainRules {
     }
     /**
      * Get the drain damage type according to SR5#281 'Step 3'
-     * @param hits The spell casting test hits
+     * @param hits The spell casting test hits AFTER limit
      * @param magic The magic attribute level of the caster
      */
     static calcDrainDamageType(hits, magic) {
@@ -33930,6 +33930,7 @@ class DrainRules {
     static modifyDrainDamage(drainDamage, hits) {
         if (hits < 0)
             hits = 0;
+        drainDamage = foundry.utils.duplicate(drainDamage);
         PartsList_1.PartsList.AddUniquePart(drainDamage.mod, 'SR5.Hits', -hits);
         helpers_1.Helpers.calcTotal(drainDamage, { min: 0 });
         return drainDamage;
@@ -35231,15 +35232,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DrainTest = void 0;
 const SuccessTest_1 = require("./SuccessTest");
 const SpellCastingTest_1 = require("./SpellCastingTest");
-const DataDefaults_1 = require("../data/DataDefaults");
 const DrainRules_1 = require("../rules/DrainRules");
+const helpers_1 = require("../helpers");
 class DrainTest extends SuccessTest_1.SuccessTest {
     _prepareData(data, options) {
         data = super._prepareData(data, options);
         data.against = data.against || new SpellCastingTest_1.SpellCastingTest({}, {}, options).data;
-        data.incomingDrain = DataDefaults_1.DefaultValues.damageData();
-        data.modifiedDrain = DataDefaults_1.DefaultValues.damageData();
+        data.incomingDrain = foundry.utils.duplicate(data.against.drainDamage);
+        data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
         return data;
+    }
+    get _dialogTemplate() {
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/drain-test-dialog.html';
     }
     get _chatMessageTemplate() {
         return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.html';
@@ -35275,6 +35279,11 @@ class DrainTest extends SuccessTest_1.SuccessTest {
             return documentAction;
         });
     }
+    calculateBaseValues() {
+        super.calculateBaseValues();
+        // Avoid using a user defined value override.
+        this.data.modifiedDrain.base = helpers_1.Helpers.calcTotal(this.data.incomingDrain, { min: 0 });
+    }
     /**
      * A drain test is successful whenever it has more hits than drain damage
      */
@@ -35287,28 +35296,19 @@ class DrainTest extends SuccessTest_1.SuccessTest {
     get failureLabel() {
         return 'SR5.ResistedSomeDamage';
     }
-    prepareBaseValues() {
-        super.prepareBaseValues();
-        this.prepareDrain();
-    }
-    prepareDrain() {
-        if (!this.actor)
-            return;
-        this.data.incomingDrain = foundry.utils.duplicate(this.data.against.damage);
-        this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain);
-    }
     processResults() {
         const _super = Object.create(null, {
             processResults: { get: () => super.processResults }
         });
         return __awaiter(this, void 0, void 0, function* () {
+            // Don't use incomingDrain as it might have a user value override applied.
             this.data.modifiedDrain = DrainRules_1.DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
             yield _super.processResults.call(this);
         });
     }
 }
 exports.DrainTest = DrainTest;
-},{"../data/DataDefaults":152,"../rules/DrainRules":226,"./SpellCastingTest":251,"./SuccessTest":252}],243:[function(require,module,exports){
+},{"../helpers":165,"../rules/DrainRules":226,"./SpellCastingTest":251,"./SuccessTest":252}],243:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FadeTest = void 0;
