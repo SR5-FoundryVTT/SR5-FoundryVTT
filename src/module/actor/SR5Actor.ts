@@ -862,17 +862,7 @@ export class SR5Actor extends Actor {
             return;
         }
 
-        // Add matrix modifiers when a matrix attribute is used.
-        // this._addMatrixParts(parts, [attribute, skill]);
-
-        // Directly test, without further skill dialog.
-        // if (options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
-
-        // const skillDialog = await ShadowrunActorDialogs.createSkillDialog(this, skillRollDialogOptions, parts);
-
-        // TODO: add spec usage
         const action = DefaultValues.actionData({
-            // TODO: test custom skills.
             skill: skillId,
             spec: options?.specialization || false,
             attribute: skill.attribute,

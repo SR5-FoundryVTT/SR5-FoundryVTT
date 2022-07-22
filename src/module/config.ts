@@ -368,7 +368,6 @@ export const SR5 = {
         memory: 'SR5.RollMemory',
         soak: 'SR5.RollSoak',
         wounds: 'SR5.ModifierTypes.Wounds',
-        // TODO: Add ActorData.modifiers to this list
     },
 
     /**
