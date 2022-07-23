@@ -1,9 +1,8 @@
 import {SR5Actor} from "../actor/SR5Actor";
-import {FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET} from "../constants";
+import {FLAGS, SR, SYSTEM_NAME} from "../constants";
 import {CombatRules} from "../rules/CombatRules";
 import {SocketMessage} from "../sockets";
 import SocketMessageData = Shadowrun.SocketMessageData;
-import {InitiativeOptions} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/foundry.js/clientDocuments/combat";
 
 /**
  * Foundry combat implementation for Shadowrun5 rules.

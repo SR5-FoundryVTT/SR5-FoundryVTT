@@ -1,6 +1,7 @@
 {
     "devDependencies": {
-        "@league-of-foundry-developers/foundry-vtt-types": "^0.8.8-9",
+        "@ethaks/fvtt-quench": "^0.7.0",
+        "@league-of-foundry-developers/foundry-vtt-types": "^9.269.0",
         "@types/node": "^14.17.2",
         "buffer": "^6.0.3",
         "chalk": "^4.1.1",

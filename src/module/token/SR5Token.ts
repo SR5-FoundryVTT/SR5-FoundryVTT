@@ -2,6 +2,7 @@ import {FLAGS, SYSTEM_NAME} from "../constants";
 import TrackType = Shadowrun.TrackType;
 
 export class SR5Token extends Token {
+    // @ts-ignore Ignore getBarAttribute from Token
     override _drawBar(number: number, bar: PIXI.Graphics, data: ReturnType<Token['getBarAttribute']>){
         const tokenHealthBars = game.settings.get(SYSTEM_NAME, FLAGS.TokenHealthBars);
         // FoundryVTT draws resource bars as full/good when the value is the

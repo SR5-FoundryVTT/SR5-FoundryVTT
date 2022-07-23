@@ -4,7 +4,7 @@ export interface FormDialogData extends Dialog.Data{
 	onAfterClose?: Function;
 }
 
-export interface FormDialogOptions extends Dialog.Options {
+export interface FormDialogOptions extends DialogOptions {
     // When true, will apply dialog form element inputs to this.data.
     applyFormChangesOnSubmit: boolean | null
 }

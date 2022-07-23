@@ -4,6 +4,7 @@ import { VersionMigration } from './migrator/VersionMigration';
 import { FLAGS, SYSTEM_NAME } from './constants';
 
 export const registerSystemSettings = () => {
+
     /**
      * Register diagonal movement rule setting
      */
@@ -14,6 +15,7 @@ export const registerSystemSettings = () => {
         config: true,
         type: String,
         default: '1-2-1',
+        // @ts-ignore
         choices: {
             '1-1-1': 'SETTINGS.IgnoreDiagonal',
             '1-2-1': 'SETTINGS.EstimateDiagonal',
@@ -62,7 +64,7 @@ export const registerSystemSettings = () => {
     game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
         name: 'SETTINGS.ShowGlitchAnimationName',
         hint: 'SETTINGS.ShowGlitchAnimationDescription',
-        scope: 'user',
+        scope: 'client',
         config: true,
         type: Boolean,
         default: true,
@@ -96,9 +98,9 @@ export const registerSystemSettings = () => {
     });
 
     game.settings.register(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails, {
-         name: 'SETTINGS.ShowSkillsWithDetails',
+        name: 'SETTINGS.ShowSkillsWithDetails',
         hint: 'SETTINGS.ShowSkillsWithDetailsDescription',
-        scope: 'user',
+        scope: 'client',
         config: true,
         type: Boolean,
         default: true,

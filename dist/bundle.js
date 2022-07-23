@@ -18723,7 +18723,7 @@ var registerSystemSettings = () => {
   game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
     name: "SETTINGS.ShowGlitchAnimationName",
     hint: "SETTINGS.ShowGlitchAnimationDescription",
-    scope: "user",
+    scope: "client",
     config: true,
     type: Boolean,
     default: true
@@ -18747,7 +18747,7 @@ var registerSystemSettings = () => {
   game.settings.register(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails, {
     name: "SETTINGS.ShowSkillsWithDetails",
     hint: "SETTINGS.ShowSkillsWithDetailsDescription",
-    scope: "user",
+    scope: "client",
     config: true,
     type: Boolean,
     default: true
