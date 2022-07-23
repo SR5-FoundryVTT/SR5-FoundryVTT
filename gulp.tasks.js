@@ -42,6 +42,7 @@ async function buildJS() {
         bundle: true,
         minify: false, // BEWARE: minify: true will break the system as class names are used as string references
         sourcemap: true,
+        format: 'esm',
         outfile: path.resolve(destFolder, jsBundle)
     }).catch((err) => {
         console.log(err)
@@ -77,6 +78,7 @@ async function watch() {
         bundle: true,
         minify: false, // BEWARE: minify: true will break the system as class names are used as string references
         sourcemap: true,
+        format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
         watch: {
             onRebuild(error, result) {
