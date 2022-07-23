@@ -9,10 +9,10 @@
     "module": "commonjs",
     "types": [
       "@league-of-foundry-developers/foundry-vtt-types",
-      "@ethaks/fvtt-quench",
-      "node"
+      "@ethaks/fvtt-quench"
     ],
     "moduleResolution": "node",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "skipLibCheck": true
   }
 }

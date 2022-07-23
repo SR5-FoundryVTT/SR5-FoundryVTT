@@ -12,6 +12,7 @@ gulpsass.compiler = require('node-sass');
 const gulp = require('gulp');
 const sourcemaps = require('gulp-sourcemaps');
 const esbuild = require('esbuild');
+const {typecheckPlugin} = require("@jgoz/esbuild-plugin-typecheck");
 
 // Config
 const distName = 'dist';
@@ -43,7 +44,8 @@ async function buildJS() {
         minify: false, // BEWARE: minify: true will break the system as class names are used as string references
         sourcemap: true,
         format: 'esm',
-        outfile: path.resolve(destFolder, jsBundle)
+        outfile: path.resolve(destFolder, jsBundle),
+        plugins: [typecheckPlugin()],
     }).catch((err) => {
         console.log(err)
     })
@@ -80,6 +82,7 @@ async function watch() {
         sourcemap: true,
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
+        plugins: [typecheckPlugin()],
         watch: {
             onRebuild(error, result) {
                 if (error) console.error('watch build failed:', error)
@@ -137,7 +140,7 @@ exports.sass = buildSass;
 exports.assets = copyAssets;
 // exports.build = gulp.series(copyAssets, buildSass, buildJS);
 exports.build = gulp.series(copyAssets, buildSass, buildJS);
-exports.watch = gulp.series(exports.build, watch);
+exports.watch = gulp.series(watch);
 // exports.watch = gulp.series(exports.build, watch);
 exports.rebuild = gulp.series(cleanDist, exports.build);
 exports.link = linkUserData;
