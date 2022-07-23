@@ -14,7 +14,7 @@ import {shadowrunInventoryFlow} from "./sr5.Inventory.spec";
  *
  * https://github.com/Ethaks/FVTT-Quench
  */
-export const quenchRegister = () => {
+export const quenchRegister = (quench) => {
     if (!quench) return;
 
     console.warn('Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)');
