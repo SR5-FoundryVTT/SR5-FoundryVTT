@@ -40,7 +40,7 @@ async function buildJS() {
     esbuild.build({
         entryPoints: [entryPoint],
         bundle: true,
-        minify: true,
+        minify: false, // BEWARE: minify: true will break the system as class names are used as string references
         sourcemap: true,
         outfile: path.resolve(destFolder, jsBundle)
     }).catch((err) => {
@@ -75,7 +75,7 @@ async function watch() {
     esbuild.build({
         entryPoints: [entryPoint],
         bundle: true,
-        minify: true,
+        minify: false, // BEWARE: minify: true will break the system as class names are used as string references
         sourcemap: true,
         outfile: path.resolve(destFolder, jsBundle),
         watch: {
