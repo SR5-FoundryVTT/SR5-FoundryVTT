@@ -351,9 +351,11 @@ export const SR5 = {
     },
 
     /**
-     * Modification types used for actions and general success tests.
+     * Modification types used for actions and general success tests, based on actors.
      *
      * These are meant to be used with the Modifiers class and SR5Actor.getModifiers('wounds').
+     *
+     * There are additional item based modifiers that aren't present here.
      */
     modifierTypes: {
         armor: 'SR5.Armor',

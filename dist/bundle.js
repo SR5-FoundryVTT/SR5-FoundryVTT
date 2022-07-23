@@ -14043,14 +14043,7 @@ class SR5Actor extends Actor {
                 (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
                 return;
             }
-            // Add matrix modifiers when a matrix attribute is used.
-            // this._addMatrixParts(parts, [attribute, skill]);
-            // Directly test, without further skill dialog.
-            // if (options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
-            // const skillDialog = await ShadowrunActorDialogs.createSkillDialog(this, skillRollDialogOptions, parts);
-            // TODO: add spec usage
             const action = DataDefaults_1.DefaultValues.actionData({
-                // TODO: test custom skills.
                 skill: skillId,
                 spec: (options === null || options === void 0 ? void 0 : options.specialization) || false,
                 attribute: skill.attribute,
