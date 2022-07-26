@@ -17980,7 +17980,9 @@ var VersionMigration = class {
           const actor = entity;
           yield actor.updateEmbeddedDocuments("Item", embeddedItems);
         }
-        yield entity.update(updateData, { enforceTypes: false });
+        if (updateData !== null) {
+          yield entity.update(updateData, { enforceTypes: false });
+        }
       }
     });
   }
@@ -17993,26 +17995,23 @@ var VersionMigration = class {
           }
           console.log(`Migrating Scene entity ${scene.name}`);
           const updateData = yield this.MigrateSceneData(duplicate(scene.data));
-          let hasTokenUpdates = false;
-          updateData.tokens = yield Promise.all(scene.data.tokens.map((token) => __async(this, null, function* () {
-            if (!token.actor)
-              return token;
+          expandObject(updateData);
+          entityUpdates.set(scene, {
+            updateData,
+            embeddedItems: null
+          });
+          for (const token of scene.data.tokens) {
+            if (!token.actor || token.data.actorLink)
+              continue;
             if (isObjectEmpty(token.actor.data))
-              return token;
-            let tokenDataUpdate = yield this.MigrateActorData(token.actor.data);
-            if (!isObjectEmpty(tokenDataUpdate)) {
-              hasTokenUpdates = true;
-              tokenDataUpdate["_id"] = token.id;
-              const newToken = duplicate(token);
-              newToken.actorData = yield mergeObject(token.actor.data, tokenDataUpdate, {
-                enforceTypes: false,
-                inplace: false
-              });
-              return newToken;
-            } else {
-              return token;
-            }
-          })));
+              continue;
+            const updateData2 = yield this.MigrateActorData(foundry.utils.duplicate(token.actor.data));
+            expandObject(updateData2);
+            entityUpdates.set(token.actor, {
+              updateData: updateData2.data || null,
+              embeddedItems: updateData2.items || null
+            });
+          }
           if (isObjectEmpty(updateData)) {
             continue;
           }
@@ -18085,6 +18084,8 @@ var VersionMigration = class {
       let hasItemUpdates = false;
       if (actorData.items !== void 0) {
         const items = yield Promise.all(actorData.items.map((itemData) => __async(this, null, function* () {
+          if (itemData instanceof SR5Item)
+            console.error("Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object");
           if (!(yield this.ShouldMigrateItemData(itemData)))
             return itemData;
           let itemUpdate = yield this.MigrateItemData(itemData);
@@ -18530,7 +18531,7 @@ var Version0_8_0 = class extends VersionMigration {
   }
   ShouldMigrateSceneData(scene) {
     return __async(this, null, function* () {
-      return false;
+      return scene.tokens.size > 0;
     });
   }
   ShouldMigrateActorData(data) {
@@ -18580,10 +18581,15 @@ var Version0_8_0 = class extends VersionMigration {
   }
   MigrateActorData(data) {
     return __async(this, null, function* () {
+      var _a;
       let updateData = {
         items: []
       };
       updateData = yield this.IterateActorItems(data, updateData);
+      if (updateData.data && foundry.utils.isObjectEmpty(updateData.data))
+        delete updateData.data;
+      if (((_a = updateData.items) == null ? void 0 : _a.length) === 0)
+        delete updateData.items;
       return updateData;
     });
   }

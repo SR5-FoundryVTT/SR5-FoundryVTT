@@ -32,7 +32,7 @@ export class Version0_8_0 extends VersionMigration {
     }
 
     protected async ShouldMigrateSceneData(scene: Scene) {
-        return false;
+        return scene.tokens.size > 0;
     }
 
     protected async ShouldMigrateActorData(data: ShadowrunActorData) {
@@ -98,6 +98,11 @@ export class Version0_8_0 extends VersionMigration {
         };
 
         updateData = await this.IterateActorItems(data, updateData);
+
+        // @ts-ignore
+        if (updateData.data && foundry.utils.isObjectEmpty(updateData.data)) delete updateData.data;
+        // @ts-ignore
+        if (updateData.items?.length === 0) delete updateData.items;
 
         return updateData;
     }

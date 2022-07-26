@@ -105,12 +105,16 @@ export abstract class VersionMigration {
      */
     protected async Apply(documentUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of documentUpdates) {
+
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
                 // @ts-ignore
                 await actor.updateEmbeddedDocuments('Item', embeddedItems);
             }
-            await entity.update(updateData, { enforceTypes: false });
+
+            if (updateData !== null ) {
+                await entity.update(updateData, { enforceTypes: false });
+            }
         }
     }
 
@@ -127,33 +131,46 @@ export abstract class VersionMigration {
                     continue;
                 }
 
+                // Migrate SceneData itself.
                 console.log(`Migrating Scene entity ${scene.name}`);
                 const updateData = await this.MigrateSceneData(duplicate(scene.data));
 
-                let hasTokenUpdates = false;
-                updateData.tokens = await Promise.all(
+                expandObject(updateData);
+                entityUpdates.set(scene, {
+                    updateData,
+                    embeddedItems: null,
+                });
+
+                // Migrate embedded TokenDocument / ActorData within SceneData
+                for (const token of scene.data.tokens) {
+                    // Don't migrate tokens without or a linked actor.
+                    if (!token.actor || token.data.actorLink) continue;
+                    if (isObjectEmpty(token.actor.data)) continue;
+
                     // @ts-ignore
-                    scene.data.tokens.map(async (token) => {
-                        if (!token.actor) return token;
-                        if (isObjectEmpty(token.actor.data)) return token;
+                    const updateData = await this.MigrateActorData(foundry.utils.duplicate(token.actor.data));
 
-                        // @ts-ignore
-                        let tokenDataUpdate = await this.MigrateActorData(token.actor.data);
-                        if (!isObjectEmpty(tokenDataUpdate)) {
-                            hasTokenUpdates = true;
-                            tokenDataUpdate['_id'] = token.id;
+                    expandObject(updateData);
+                    entityUpdates.set(token.actor, {
+                        updateData: updateData.data || null,
+                        embeddedItems: updateData.items || null
+                    });
 
-                            const newToken = duplicate(token);
-                            newToken.actorData = await mergeObject(token.actor.data, tokenDataUpdate, {
-                                enforceTypes: false,
-                                inplace: false,
-                            });
-                            return newToken;
-                        } else {
-                            return token;
-                        }
-                    }),
-                );
+                    // if (!isObjectEmpty(tokenDataUpdate)) {
+                    //     hasTokenUpdates = true;
+                    //     tokenDataUpdate['_id'] = token.id;
+                    //
+                    //     const newToken = duplicate(token);
+                    //     newToken.actorData = await mergeObject(token.actor.data, tokenDataUpdate, {
+                    //         enforceTypes: false,
+                    //         inplace: false,
+                    //     });
+                    //     return newToken;
+                    // } else {
+                    //     return token;
+                    // }
+                }
+
 
                 if (isObjectEmpty(updateData)) {
                     continue;
@@ -251,6 +268,7 @@ export abstract class VersionMigration {
             const items = await Promise.all(
                 // @ts-ignore
                 actorData.items.map(async (itemData) => {
+                    if (itemData instanceof SR5Item) console.error('Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object');
                     if (!await this.ShouldMigrateItemData(itemData)) return itemData;
                     let itemUpdate = await this.MigrateItemData(itemData);
 
