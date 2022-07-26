@@ -16200,6 +16200,9 @@ var SuccessTest = class {
   get hasTargets() {
     return this.targets.length > 0;
   }
+  get hasAction() {
+    return !!this.item && !!this.item.getAction();
+  }
   get description() {
     const poolPart = this.pool.value;
     const thresholdPart = this.hasThreshold ? `(${this.threshold.value})` : "";
@@ -16382,7 +16385,7 @@ var SuccessTest = class {
       previewTemplate: this._canPlaceBlastTemplate,
       showDescription: this._canShowDescription,
       description: ((_b = this.item) == null ? void 0 : _b.getChatData()) || "",
-      applyGmOnlyContent: (_c = game.user) == null ? void 0 : _c.isGM
+      applyGmOnlyContent: ((_c = game.user) == null ? void 0 : _c.isGM) && this.actor
     };
   }
   get _canShowDescription() {
@@ -16462,9 +16465,9 @@ var SuccessTest = class {
       if (!test)
         return;
       yield test.populateDocuments();
-      if (!test.actor || !game.user)
-        return;
-      if (game.user.isGM || game.user.isTrusted || ((_a = test.actor) == null ? void 0 : _a.isOwner)) {
+      if (!test.actor || !game.user) {
+        html.find(".gm-only-content").removeClass("gm-only-content");
+      } else if (game.user.isGM || game.user.isTrusted || ((_a = test.actor) == null ? void 0 : _a.isOwner)) {
         html.find(".gm-only-content").removeClass("gm-only-content");
       }
     });
@@ -26126,9 +26129,6 @@ var RangedAttackTest = class extends SuccessTest {
   get canBeExtended() {
     return false;
   }
-  get successLabel() {
-    return "SR5.Results";
-  }
   _prepareFireMode() {
     var _a, _b;
     const weaponData = (_a = this.item) == null ? void 0 : _a.asWeaponData();
@@ -26621,9 +26621,6 @@ var MeleeAttackTest = class extends SuccessTest {
   }
   get canBeExtended() {
     return false;
-  }
-  get successLabel() {
-    return "SR5.Results";
   }
   get testModifiers() {
     return ["global", "wounds", "environmental"];
@@ -27233,9 +27230,6 @@ var FadeTest = class extends SuccessTest {
 var ThrownAttackTest = class extends SuccessTest {
   get canBeExtended() {
     return false;
-  }
-  get successLabel() {
-    return "SR5.Results";
   }
 };
 

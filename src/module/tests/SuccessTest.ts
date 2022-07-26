@@ -819,6 +819,13 @@ export class SuccessTest {
     }
 
     /**
+     * Has this test been derived from an action?
+     */
+    get hasAction(): boolean {
+        return !!this.item && !!this.item.getAction();
+    }
+
+    /**
      * TODO: This method results in an ugly description.
      *
      */
@@ -1089,7 +1096,8 @@ export class SuccessTest {
             showDescription: this._canShowDescription,
             description: this.item?.getChatData() || '',
             // Some message segments are only meant for the gm, when the gm is the one creating the message.
-            applyGmOnlyContent: game.user?.isGM,
+            // When this test doesn't use an actor, don't worry about hiding anything.
+            applyGmOnlyContent: game.user?.isGM && this.actor,
         }
     }
 
@@ -1219,9 +1227,12 @@ export class SuccessTest {
         const test = await TestCreator.fromMessage(message.id as string);
         if (!test) return;
         await test.populateDocuments();
-        if (!test.actor || !game.user) return;
 
-        if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
+        // SuccessTest doesn't NEED an actor, if one is cast that way: show gm-only-content
+        if (!test.actor || !game.user) {
+            html.find('.gm-only-content').removeClass('gm-only-content');
+        }
+        else if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
             html.find('.gm-only-content').removeClass('gm-only-content');
         }
     }
