@@ -209,6 +209,9 @@
                 font-weight: bold;
                 align-self: flex-end;
             }
+            .value-result {
+                text-align: right;
+            }
             .limit-line {
                 display: flex;
                 flex-flow: nowrap row;
@@ -243,9 +246,14 @@
             }
             .test-value {
                 display: flex;
-                span {
-                    flex: 1;
+                span.value {
+                    flex: auto;
                     text-align: left;
+                }
+                span.value-result {
+                    flex: auto;
+                    text-align: right;
+                    padding-right: 8px;
                 }
             }
             .test-code {

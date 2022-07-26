@@ -32,18 +32,18 @@
         </div>
         <div class="card-content {{#if showDescription}}clickable show-description{{/if}}  {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <div class="left-side">
-                {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.OpposingHits"}}:</span> <span>{{test.against.netHits.value}}</span></div>{{/if}}
-                {{#if test.hasLimit}}<div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span>{{test.limit.value}}</span></div>{{/if}}
-                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.threshold.label}}:</span> <span>{{test.threshold.value}}</span></span></div>{{/if}}
+                {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.OpposingHits"}}:</span> <span class="value-result">{{test.against.netHits.value}}</span></div>{{/if}}
+                {{#if test.hasLimit}}<div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span class="value-result">{{test.limit.value}}</span></div>{{/if}}
+                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.threshold.label}}:</span> <span class="value-result">{{test.threshold.value}}</span></span></div>{{/if}}
             </div>
             <div class="right-side">
-                <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span>{{test.pool.value}}</span></div>
-                <div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span>{{test.hits.value}}</span></div>
-                {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span>{{test.extendedHits.value}}</span></div>{{/if}}
-                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span>{{test.netHits.value}}</span></div>{{/if}}
+                <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span class="value-result">{{test.pool.value}}</span></div>
+                <div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span class="value-result">{{test.hits.value}}</span></div>
+                {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span class="value-result">{{test.extendedHits.value}}</span></div>{{/if}}
+                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span class="value-result">{{test.netHits.value}}</span></div>{{/if}}
                 {{#if previewTemplate}}
                 <div class="test-value">
-                    <span class="value" title="{{localize 'SR5.PlaceTemplate'}}">{{localize "SR5.PlaceTemplate"}}:</span> <span><i class="fas fa-bullseye roll place-template"></i></span>
+                    <span class="value" title="{{localize 'SR5.PlaceTemplate'}}">{{localize "SR5.PlaceTemplate"}}:</span> <span class="value-result"><i class="fas fa-bullseye roll place-template"></i></span>
                 </div>
                 {{/if}}
             </div>
