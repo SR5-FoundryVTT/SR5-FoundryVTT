@@ -103,12 +103,20 @@
             {{localize "SR5.SelectedTargets"}}
         </span>
     </div>
-    {{#each test.targets}}
     <div class="card-title card-header">
-         <a class="chat-select-link" data-token-id="{{this.id}}"><img src="{{this.data.img}}" title="{{this.name}}"/></a>
-        <h3 class="header-name"><a class="chat-document-link" draggable="false" data-entity="Token" data-id="{{this.id}}" data-uuid="{{this.uuid}}">{{this.name}}</a></h3>
+        <div class="container container--fluid">
+            {{#each test.targets}}
+            <div class="container__row">
+                <div class="container__col">
+                    <div class="document">
+                        <a class="chat-select-link" data-token-id="{{this.id}}"><img src="{{this.data.img}}" class="entity-selectable" title="{{speakerName this.actor}}"/></a>
+                         <h3 class="header-name"><a class="chat-document-link" data-uuid="{{this.uuid}}">{{speakerName this.actor}}</a></h3>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
     </div>
-    {{/each}}
     {{/if}}
     {{#if test.opposed}}
     <div class="card-buttons">
