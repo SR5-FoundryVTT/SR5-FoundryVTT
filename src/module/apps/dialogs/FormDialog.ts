@@ -9,12 +9,11 @@ export interface FormDialogOptions extends DialogOptions {
     applyFormChangesOnSubmit: boolean | null
 }
 
-/** TODO: Documentation with usage example
- *  TODO: Rework getDialogData approach with the general getData Application style,
- *        to allow rerender from within the Dialog instance without external data
- *        reinitialization.
- *        This would for things like updating a dialog based on currently selected tokens
- *        without reopening.
+/**
+ * A FormDialog is the FormApplication equivalent for Dialogs.
+ *
+ * It will look for form elements and apply value changes to the local data property according to the name attribute
+ * of the form element. This works the same as it does with general FoundryVTT Applications.
  */
 export class FormDialog extends Dialog<FormDialogOptions> {
     selection: object;
