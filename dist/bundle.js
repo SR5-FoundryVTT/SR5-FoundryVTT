@@ -16356,6 +16356,24 @@ var SuccessTest = class {
       }
     });
   }
+  rollDiceSoNice() {
+    return __async(this, null, function* () {
+      var _a;
+      if (!game.dice3d || !game.user || !game.users)
+        return;
+      console.log("Shadowrun5e | Initiating DiceSoNice throw");
+      const roll = this.rolls[this.rolls.length - 1];
+      let whisper = null;
+      if (this._applyGmOnlyContent && this.actor) {
+        whisper = game.users.filter((user) => {
+          var _a2;
+          return (_a2 = this.actor) == null ? void 0 : _a2.testUserPermission(user, "OWNER");
+        });
+      }
+      const blind = ((_a = this.data.options) == null ? void 0 : _a.rollMode) === "blindroll";
+      game.dice3d.showForRoll(roll, game.user, true, whisper, blind, this.data.messageUuid);
+    });
+  }
   toMessage() {
     return __async(this, null, function* () {
       var _a;
@@ -16368,11 +16386,12 @@ var SuccessTest = class {
       if (!message)
         return;
       this.data.messageUuid = message.uuid;
+      yield this.rollDiceSoNice();
       return message;
     });
   }
   _prepareMessageTemplateData() {
-    var _a, _b, _c;
+    var _a, _b;
     const linkedTokens = ((_a = this.actor) == null ? void 0 : _a.getActiveTokens(true)) || [];
     const token = linkedTokens.length === 1 ? linkedTokens[0].id : void 0;
     return {
@@ -16388,7 +16407,7 @@ var SuccessTest = class {
       previewTemplate: this._canPlaceBlastTemplate,
       showDescription: this._canShowDescription,
       description: ((_b = this.item) == null ? void 0 : _b.getChatData()) || "",
-      applyGmOnlyContent: ((_c = game.user) == null ? void 0 : _c.isGM) && this.actor
+      applyGmOnlyContent: this._applyGmOnlyContent
     };
   }
   get _canShowDescription() {
@@ -16397,6 +16416,9 @@ var SuccessTest = class {
   get _canPlaceBlastTemplate() {
     var _a;
     return ((_a = this.item) == null ? void 0 : _a.hasTemplate) || false;
+  }
+  get _applyGmOnlyContent() {
+    return !!game.user && game.user.isGM && !!this.actor;
   }
   _prepareOpposedActionsTemplateData() {
     if (!this.data.opposed || !this.data.opposed.test)
@@ -16432,7 +16454,8 @@ var SuccessTest = class {
     const token = linkedTokens.length === 1 ? linkedTokens[0].id : void 0;
     const actor = (_b = this.actor) == null ? void 0 : _b.id;
     const alias = (_c = game.user) == null ? void 0 : _c.name;
-    const roll = this.rolls[this.rolls.length - 1];
+    const formula = `0d6`;
+    const roll = new SR5Roll(formula);
     const messageData = {
       user: (_d = game.user) == null ? void 0 : _d.id,
       speaker: {

@@ -1048,6 +1048,35 @@ export class SuccessTest {
     }
 
     /**
+     * DiceSoNice must be implemented locally to avoid showing dice on gmOnlyContent throws while also using
+     * FoundryVTT ChatMessage of type roll for their content visibility behaviour.
+     */
+    async rollDiceSoNice() {
+        // @ts-ignore
+        if (!game.dice3d || !game.user || !game.users) return;
+
+        console.log('Shadowrun5e | Initiating DiceSoNice throw');
+
+        // Only roll the last dice rolled.
+        // This necessary when a test has been recast with second chance, and should only the re-rolled dice instead
+        // of all.
+        const roll = this.rolls[this.rolls.length - 1];
+
+        // Only show dice to users with permissions, when the GM  cast the test.
+        let whisper: User[]|null = null;
+        if (this._applyGmOnlyContent && this.actor) {
+            // @ts-ignore
+            whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER'));
+        }
+
+        // Don't show dice to a user casting blind.
+        const blind = this.data.options?.rollMode === 'blindroll';
+
+        // @ts-ignore
+        game.dice3d.showForRoll(roll, game.user, true, whisper, blind, this.data.messageUuid);
+    }
+
+    /**
      * Post this success test as a message to the chat log.
      */
     async toMessage(): Promise<ChatMessage | undefined> {
@@ -1064,6 +1093,8 @@ export class SuccessTest {
 
         // Store message id for future use.
         this.data.messageUuid = message.uuid;
+
+        await this.rollDiceSoNice();
 
         return message;
     }
@@ -1097,7 +1128,7 @@ export class SuccessTest {
             description: this.item?.getChatData() || '',
             // Some message segments are only meant for the gm, when the gm is the one creating the message.
             // When this test doesn't use an actor, don't worry about hiding anything.
-            applyGmOnlyContent: game.user?.isGM && this.actor,
+            applyGmOnlyContent: this._applyGmOnlyContent
         }
     }
 
@@ -1116,6 +1147,13 @@ export class SuccessTest {
      */
     get _canPlaceBlastTemplate(): boolean {
         return this.item?.hasTemplate || false;
+    }
+
+    /**
+     * This test should hide information / rolls / dice for when cast by the GM.
+     */
+    get _applyGmOnlyContent(): boolean {
+        return !!game.user && game.user.isGM && !!this.actor;
     }
 
     /**
@@ -1176,8 +1214,8 @@ export class SuccessTest {
         const actor = this.actor?.id;
         const alias = game.user?.name;
 
-        // const roll = SR5Roll.fromTerms([PoolTerm.fromRolls(this.rolls)]);
-        const roll = this.rolls[this.rolls.length - 1];
+        const formula = `0d6`;
+        const roll = new SR5Roll(formula);
 
         const messageData = {
             user: game.user?.id,
@@ -1186,6 +1224,7 @@ export class SuccessTest {
                 alias,
                 token
             },
+            // Use type roll with an empty roll for FoundryVTT ChatMessage of type role visibility behaviour.
             type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             roll,
             content,
