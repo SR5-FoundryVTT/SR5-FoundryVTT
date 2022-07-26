@@ -11754,7 +11754,10 @@ var TestCreator = {
         console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
         return;
       }
-      const testData = foundry.utils.duplicate(message.getFlag(SYSTEM_NAME, FLAGS.Test));
+      const flagData = message.getFlag(SYSTEM_NAME, FLAGS.Test);
+      if (!flagData)
+        return;
+      const testData = foundry.utils.duplicate(flagData);
       if (!testData) {
         console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
         return;
