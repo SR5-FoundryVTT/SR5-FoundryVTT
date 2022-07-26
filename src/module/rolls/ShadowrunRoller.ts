@@ -9,12 +9,10 @@ import LimitField = Shadowrun.LimitField;
 import CombatData = Shadowrun.CombatData;
 import {SR5Actor} from '../actor/SR5Actor';
 import {SR5Item} from '../item/SR5Item';
-import {createTargetChatMessage, RollTargetChatMessage, TargetChatMessageOptions} from '../chat';
-import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
+import {FLAGS, SR, SYSTEM_NAME} from '../constants';
 import {PartsList} from '../parts/PartsList';
 import {TestCreator} from "../tests/TestCreator";
 
-// item, actor, dicePool, attack, defense, spell, form
 export type Test =  {
     label: string;
     type: string;

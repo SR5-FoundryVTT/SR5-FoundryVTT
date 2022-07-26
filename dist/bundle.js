@@ -17992,10 +17992,6 @@ var _VersionMigration = class {
           if (!(yield this.ShouldMigrateSceneData(scene))) {
             continue;
           }
-          if (scene.id === "MAwSFhlXRipixOWw") {
-            console.log("Scene Pre-Update");
-            console.log(scene);
-          }
           console.log(`Migrating Scene entity ${scene.name}`);
           const updateData = yield this.MigrateSceneData(duplicate(scene.data));
           let hasTokenUpdates = false;
@@ -18013,16 +18009,11 @@ var _VersionMigration = class {
                 enforceTypes: false,
                 inplace: false
               });
-              console.log(newToken);
               return newToken;
             } else {
               return token;
             }
           })));
-          if (scene.id === "MAwSFhlXRipixOWw") {
-            console.log("Scene Pre-Update");
-            console.log(scene);
-          }
           if (isObjectEmpty(updateData)) {
             continue;
           }
@@ -18539,6 +18530,16 @@ var Version0_8_0 = class extends VersionMigration {
   _ShouldMigrateItemData(data) {
     return ["weapon", "spell"].includes(data.type);
   }
+  ShouldMigrateSceneData(scene) {
+    return __async(this, null, function* () {
+      return false;
+    });
+  }
+  ShouldMigrateActorData(data) {
+    return __async(this, null, function* () {
+      return data.items.contents.filter((i) => this._ShouldMigrateItemData(i.data)).length > 0;
+    });
+  }
   MigrateItemData(data) {
     return __async(this, null, function* () {
       const updateData = {};
@@ -18577,11 +18578,6 @@ var Version0_8_0 = class extends VersionMigration {
         }
       }
       return updateData;
-    });
-  }
-  ShouldMigrateActorData(data) {
-    return __async(this, null, function* () {
-      return data.items.contents.filter((i) => this._ShouldMigrateItemData(i.data)).length > 0;
     });
   }
   MigrateActorData(data) {

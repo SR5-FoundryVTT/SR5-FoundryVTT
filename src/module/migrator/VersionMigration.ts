@@ -127,11 +127,6 @@ export abstract class VersionMigration {
                     continue;
                 }
 
-                if (scene.id === 'MAwSFhlXRipixOWw') {
-                    console.log('Scene Pre-Update');
-                    console.log(scene);
-                }
-
                 console.log(`Migrating Scene entity ${scene.name}`);
                 const updateData = await this.MigrateSceneData(duplicate(scene.data));
 
@@ -153,17 +148,12 @@ export abstract class VersionMigration {
                                 enforceTypes: false,
                                 inplace: false,
                             });
-                            console.log(newToken);
                             return newToken;
                         } else {
                             return token;
                         }
                     }),
                 );
-                if (scene.id === 'MAwSFhlXRipixOWw') {
-                    console.log('Scene Pre-Update');
-                    console.log(scene);
-                }
 
                 if (isObjectEmpty(updateData)) {
                     continue;

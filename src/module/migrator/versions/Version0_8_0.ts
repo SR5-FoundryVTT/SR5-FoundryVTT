@@ -31,6 +31,15 @@ export class Version0_8_0 extends VersionMigration {
         return ['weapon', 'spell'].includes(data.type);
     }
 
+    protected async ShouldMigrateSceneData(scene: Scene) {
+        return false;
+    }
+
+    protected async ShouldMigrateActorData(data: ShadowrunActorData) {
+        // @ts-ignore
+        return data.items.contents.filter(i => this._ShouldMigrateItemData(i.data)).length > 0;
+    }
+
     protected async MigrateItemData(data: ShadowrunItemData) {
         const updateData: {
             data?: object
@@ -78,11 +87,6 @@ export class Version0_8_0 extends VersionMigration {
         }
 
         return updateData;
-    }
-
-    protected async ShouldMigrateActorData(data: ShadowrunActorData) {
-        // @ts-ignore
-        return data.items.contents.filter(i => this._ShouldMigrateItemData(i.data)).length > 0;
     }
 
     protected async MigrateActorData(data: ShadowrunActorData) {
