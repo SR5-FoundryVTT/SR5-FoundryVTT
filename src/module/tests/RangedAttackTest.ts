@@ -120,8 +120,6 @@ export class RangedAttackTest extends SuccessTest {
             return [];
         }
 
-        console.log('asd')
-
         // Build target ranges for template display.
         this.data.targetRanges = this.targets.map(target => {
             const distance = Helpers.measureTokenDistance(attacker, target);
