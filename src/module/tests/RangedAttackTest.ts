@@ -187,6 +187,10 @@ export class RangedAttackTest extends SuccessTest {
         if (this.hasTargets) {
             const target = this.data.targetRanges[this.data.targetRangesSelected];
             this.data.range = target.range.modifier;
+
+            // Only use selected target as this tests target list. Otherwise, opposed test will use all targets.
+            this.targets = this.targets.filter(tokenDoc => tokenDoc.uuid === target.uuid);
+            this.data.targetActorsUuid = this.data.targetActorsUuid.filter(uuid => uuid === target.uuid);
         }
 
         // Alter test data for range.

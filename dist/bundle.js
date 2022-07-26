@@ -26182,7 +26182,6 @@ var RangedAttackTest = class extends SuccessTest {
         (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.TargetingNeedsActorWithToken"));
         return [];
       }
-      console.log("asd");
       this.data.targetRanges = this.targets.map((target) => {
         const distance = Helpers.measureTokenDistance(attacker, target);
         const range = Helpers.getWeaponRange(distance, this.data.ranges);
@@ -26239,6 +26238,8 @@ var RangedAttackTest = class extends SuccessTest {
       if (this.hasTargets) {
         const target = this.data.targetRanges[this.data.targetRangesSelected];
         this.data.range = target.range.modifier;
+        this.targets = this.targets.filter((tokenDoc) => tokenDoc.uuid === target.uuid);
+        this.data.targetActorsUuid = this.data.targetActorsUuid.filter((uuid) => uuid === target.uuid);
       }
       this.data.range = Number(this.data.range);
       const actor = this.actor;
