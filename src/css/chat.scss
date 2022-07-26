@@ -374,6 +374,11 @@
             }
         }
     }
+    &.item-card {
+        .card-description {
+            display: block;
+        }
+    }
     .chat-select-link img:hover {
         padding: 0;
         border: $groove;

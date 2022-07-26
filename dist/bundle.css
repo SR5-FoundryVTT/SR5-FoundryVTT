@@ -583,6 +583,9 @@
   to {
     transform: translate(0); } }
 
+.sr5.item-card .card-description {
+  display: block; }
+
 .sr5 .chat-select-link img:hover {
   padding: 0;
   border: 1px solid #4d4d4d; }

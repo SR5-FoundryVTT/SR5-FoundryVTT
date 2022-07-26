@@ -12526,88 +12526,50 @@ var ActionResultFlow = class {
 };
 
 // src/module/chat.ts
-function createChatMessage(templateData, options) {
+function createChatMessage(template, templateData) {
   return __async(this, null, function* () {
-    const chatData = yield createChatData(templateData, options);
+    const chatData = yield createChatData(template, templateData);
     const message = yield ChatMessage.create(chatData);
     if (!message)
       return null;
-    if (game.dice3d && options.roll) {
-      Helpers.showDiceSoNice(options.roll, chatData.whisper, chatData.blind);
-    }
-    if (templateData.roll)
-      yield message.setFlag(SYSTEM_NAME, FLAGS.Roll, templateData.roll);
-    if (templateData.attack)
-      yield message.setFlag(SYSTEM_NAME, FLAGS.Attack, templateData.attack);
-    if (templateData.targets)
-      yield message.setFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds, templateData.targets.map((target) => getTokenSceneId(target.document)));
-    if (templateData.actionTestData)
-      yield message.setFlag(SYSTEM_NAME, FLAGS.ActionTestData, templateData.actionTestData);
     return message;
   });
 }
-var createChatData = (templateData, options) => __async(void 0, null, function* () {
-  var _a, _b, _c;
-  const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
-  const actor = templateData.actor;
-  const token = actor == null ? void 0 : actor.getToken();
-  const enhancedTemplateData = __spreadProps(__spreadValues({}, templateData), {
-    speaker: {
-      actor,
-      token
-    },
-    showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation)
-  });
-  const html = yield renderTemplate(template, enhancedTemplateData);
+var createChatData = (template, templateData) => __async(void 0, null, function* () {
+  var _a, _b, _c, _d;
+  const html = yield renderTemplate(template, templateData);
   const chatData = {
     user: (_a = game.user) == null ? void 0 : _a.id,
-    sound: (options == null ? void 0 : options.roll) ? CONFIG.sounds.dice : void 0,
-    content: html,
-    roll: (options == null ? void 0 : options.roll) ? JSON.stringify(options == null ? void 0 : options.roll) : void 0,
     speaker: {
-      actor: actor == null ? void 0 : actor.id,
-      token: token == null ? void 0 : token.id,
-      alias: (_b = game.user) == null ? void 0 : _b.name
+      actor: (_b = templateData.actor) == null ? void 0 : _b.id,
+      token: (_c = templateData.token) == null ? void 0 : _c.id,
+      alias: (_d = game.user) == null ? void 0 : _d.name
     },
-    flags: {
-      shadowrun5e: {
-        customRoll: true
-      }
-    }
+    item: templateData.item,
+    content: html,
+    rollMode: game.settings.get(CORE_NAME, CORE_FLAGS.RollMode)
   };
-  const rollMode = (_c = templateData.rollMode) != null ? _c : game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
-  ChatMessage.applyRollMode(chatData, rollMode);
-  chatData.rollMode = rollMode;
-  if (options == null ? void 0 : options.whisperTo) {
-    chatData["whisper"] = ChatMessage.getWhisperRecipients(options.whisperTo.name);
-  }
+  ChatMessage.applyRollMode(chatData, chatData.rollMode);
   return chatData;
 });
 function createItemChatMessage(options) {
   return __async(this, null, function* () {
     const templateData = createChatTemplateData(options);
-    return yield createChatMessage(templateData);
+    return yield createChatMessage("systems/shadowrun5e/dist/templates/rolls/item-card.html", templateData);
   });
 }
 function createChatTemplateData(options) {
   let { actor, item, description, tests } = options;
   const token = actor == null ? void 0 : actor.getToken();
-  const tokenId = getTokenSceneId(token);
   const title = game.i18n.localize("SR5.Description");
   return {
     title,
     actor,
-    tokenId,
+    token,
     item,
     description,
     tests
   };
-}
-function getTokenSceneId(token) {
-  const scene = token == null ? void 0 : token.parent;
-  if (!token || !scene)
-    return;
-  return `${scene.id}.${token.id}`;
 }
 var handleRenderChatMessage = (app, html, data) => {
   html.on("click", ".apply-damage", (event) => chatMessageActionApplyDamage(html, event));
@@ -16469,7 +16431,8 @@ var SuccessTest = class {
       rollMode: (_e = this.data.options) == null ? void 0 : _e.rollMode,
       flags: {
         [SYSTEM_NAME]: { [FLAGS.Test]: this.toJSON() }
-      }
+      },
+      sound: CONFIG.sounds.dice
     };
     ChatMessage.applyRollMode(messageData, (_f = this.data.options) == null ? void 0 : _f.rollMode);
     return messageData;

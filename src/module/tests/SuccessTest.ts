@@ -1233,7 +1233,8 @@ export class SuccessTest {
             // This test data is needed for all subsequent testing based on this chat messages.
             flags: {
                 [SYSTEM_NAME]: {[FLAGS.Test]: this.toJSON()}
-            }
+            },
+            sound: CONFIG.sounds.dice
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
