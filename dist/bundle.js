@@ -13803,7 +13803,7 @@ var SR5Item = class extends Item {
   getActionSpecialization() {
     return this.wrapper.getActionSpecialization();
   }
-  getDrain() {
+  get getDrain() {
     return this.wrapper.getDrain();
   }
   getFade() {
@@ -26703,7 +26703,7 @@ var SpellCastingTest = class extends SuccessTest {
     if (!this.item)
       return;
     const lastUsedForce = this.item.getLastSpellForce();
-    const suggestedForce = SpellcastingRules.calculateMinimalForce(this.item.getDrain());
+    const suggestedForce = SpellcastingRules.calculateMinimalForce(this.item.getDrain);
     this.data.force = lastUsedForce.value || suggestedForce;
   }
   prepareBaseValues() {
@@ -26721,7 +26721,7 @@ var SpellCastingTest = class extends SuccessTest {
   calculateDrainValue() {
     var _a;
     const force = Number(this.data.force);
-    const drain = Number(((_a = this.item) == null ? void 0 : _a.getDrain()) || 0);
+    const drain = Number((_a = this.item) == null ? void 0 : _a.getDrain);
     const reckless = this.data.reckless;
     this.data.drain = SpellcastingRules.calculateDrain(force, drain, reckless);
   }

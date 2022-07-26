@@ -71,7 +71,7 @@ export class SpellCastingTest extends SuccessTest {
         if (!this.item) return;
 
         const lastUsedForce = this.item.getLastSpellForce();
-        const suggestedForce = SpellcastingRules.calculateMinimalForce(this.item.getDrain());
+        const suggestedForce = SpellcastingRules.calculateMinimalForce(this.item.getDrain);
         this.data.force = lastUsedForce.value || suggestedForce;
     }
 
@@ -98,7 +98,7 @@ export class SpellCastingTest extends SuccessTest {
      */
     calculateDrainValue() {
         const force = Number(this.data.force);
-        const drain = Number(this.item?.getDrain() || 0);
+        const drain = Number(this.item?.getDrain);
         const reckless = this.data.reckless;
         this.data.drain = SpellcastingRules.calculateDrain(force, drain, reckless);
     }

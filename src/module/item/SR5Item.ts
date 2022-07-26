@@ -1322,7 +1322,7 @@ export class SR5Item extends Item {
         return this.wrapper.getActionSpecialization();
     }
 
-    getDrain(): number {
+    get getDrain(): number {
         return this.wrapper.getDrain();
     }
 
