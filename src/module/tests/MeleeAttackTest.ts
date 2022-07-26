@@ -23,6 +23,13 @@ export class MeleeAttackTest extends SuccessTest {
         return false;
     }
 
+    /**
+     * While an attack can succeed,it's not really successful until defense.
+     */
+    get successLabel() {
+        return "SR5.Results";
+    }
+
      get testModifiers() {
         return ['global', 'wounds', 'environmental'];
     }

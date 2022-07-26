@@ -38,7 +38,7 @@ export const TestRules = {
 
         // Either check against meeting the threshold or simply any hits.
         if (threshold > 0) return hits >= threshold;
-        else return hits >= 0;
+        else return hits > 0;
     },
 
     /**

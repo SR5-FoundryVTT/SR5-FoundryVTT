@@ -51,6 +51,13 @@ export class RangedAttackTest extends SuccessTest {
         return false;
     }
 
+    /**
+     * While an attack can succeed,it's not really successful until defense.
+     */
+    get successLabel() {
+        return "SR5.Results";
+    }
+
     _prepareFireMode() {
         // No firemodes selectable on dialog for invalid item provided.
         const weaponData = this.item?.asWeaponData();

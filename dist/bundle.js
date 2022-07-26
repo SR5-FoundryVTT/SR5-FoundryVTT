@@ -15823,7 +15823,7 @@ var TestRules = {
     if (threshold > 0)
       return hits >= threshold;
     else
-      return hits >= 0;
+      return hits > 0;
   },
   glitched: (glitches, pool) => {
     glitches = Math.max(glitches, 0);
@@ -26124,6 +26124,9 @@ var RangedAttackTest = class extends SuccessTest {
   get canBeExtended() {
     return false;
   }
+  get successLabel() {
+    return "SR5.Results";
+  }
   _prepareFireMode() {
     var _a, _b;
     const weaponData = (_a = this.item) == null ? void 0 : _a.asWeaponData();
@@ -26616,6 +26619,9 @@ var MeleeAttackTest = class extends SuccessTest {
   }
   get canBeExtended() {
     return false;
+  }
+  get successLabel() {
+    return "SR5.Results";
   }
   get testModifiers() {
     return ["global", "wounds", "environmental"];
@@ -27223,6 +27229,12 @@ var FadeTest = class extends SuccessTest {
 
 // src/module/tests/ThrownAttackTest.ts
 var ThrownAttackTest = class extends SuccessTest {
+  get canBeExtended() {
+    return false;
+  }
+  get successLabel() {
+    return "SR5.Results";
+  }
 };
 
 // src/module/hooks.ts
