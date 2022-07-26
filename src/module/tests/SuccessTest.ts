@@ -315,13 +315,20 @@ export class SuccessTest {
         // Add action dynamic value sources as labels.
         let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
         // let pool = this.pool.mod.map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
-        let threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name));
-        let limit = this.limit.mod.map(mod => game.i18n.localize(mod.name));
+
+        // Threshold and Limit are values that can be overwritten.
+        let threshold = this.threshold.override
+            ? [game.i18n.localize(this.threshold.override.name)]
+            : this.threshold.mod.map(mod => game.i18n.localize(mod.name));
+        let limit = this.limit.override
+            ? [game.i18n.localize(this.limit.override.name)]
+            : this.limit.mod.map(mod => game.i18n.localize(mod.name));
+
 
         // Add action static value modifiers as numbers.
         if (this.pool.base > 0) pool.push(String(this.pool.base));
-        if (this.threshold.base > 0) threshold.push(String(this.threshold.base));
-        if (this.limit.base > 0) limit.push(String(this.limit.base));
+        if (this.threshold.base > 0 && !this.threshold.override) threshold.push(String(this.threshold.base));
+        if (this.limit.base > 0 && !this.limit.override) limit.push(String(this.limit.base));
 
         // Pool portion can be dynamic or static.
         let code = pool.join(' + ').trim() || `${this.pool.value}`;

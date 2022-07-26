@@ -15926,13 +15926,13 @@ var SuccessTest = class {
   }
   get code() {
     let pool = this.pool.mod.filter((mod) => mod.value !== 0).map((mod) => `${game.i18n.localize(mod.name)} (${mod.value})`);
-    let threshold = this.threshold.mod.map((mod) => game.i18n.localize(mod.name));
-    let limit = this.limit.mod.map((mod) => game.i18n.localize(mod.name));
+    let threshold = this.threshold.override ? [game.i18n.localize(this.threshold.override.name)] : this.threshold.mod.map((mod) => game.i18n.localize(mod.name));
+    let limit = this.limit.override ? [game.i18n.localize(this.limit.override.name)] : this.limit.mod.map((mod) => game.i18n.localize(mod.name));
     if (this.pool.base > 0)
       pool.push(String(this.pool.base));
-    if (this.threshold.base > 0)
+    if (this.threshold.base > 0 && !this.threshold.override)
       threshold.push(String(this.threshold.base));
-    if (this.limit.base > 0)
+    if (this.limit.base > 0 && !this.limit.override)
       limit.push(String(this.limit.base));
     let code = pool.join(" + ").trim() || `${this.pool.value}`;
     if (threshold.length > 0 && this.threshold.value > 0)
