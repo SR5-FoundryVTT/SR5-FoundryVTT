@@ -16060,6 +16060,8 @@ var SuccessTest = class {
     return __async(this, null, function* () {
       if (!this.actor)
         return;
+      if (this.data.action.modifiers.length > 0)
+        return;
       for (const type of this.testModifiers) {
         const value = yield this.actor.modifiers.totalFor(type);
         const name = SR5.modifierTypes[type];

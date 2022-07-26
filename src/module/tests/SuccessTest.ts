@@ -543,6 +543,8 @@ export class SuccessTest {
      */
     async prepareActorModifiers() {
         if (!this.actor) return;
+        // Don't use default test actions when source action provides modifiers.
+        if (this.data.action.modifiers.length > 0) return;
 
         for (const type of this.testModifiers) {
             const value = await this.actor.modifiers.totalFor(type);
