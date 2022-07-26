@@ -11934,6 +11934,7 @@ var TestCreator = {
       const data = TestCreator._minimalTestData();
       data.previousMessageId = previousMessageId;
       data.following = opposedData;
+      data.targetActorsUuid = [];
       const action = TestCreator._mergeMinimalActionDataInOrder(DefaultValues.actionData({ test: resistTestCls.name }), opposedData.against.opposed.resist, resistTestCls._getDefaultTestAction());
       return yield TestCreator._prepareTestDataWithAction(action, actor, data);
     });
@@ -16306,7 +16307,7 @@ var SuccessTest = class {
       } else {
         yield this.afterFailure();
       }
-      yield this.executeFollowUp();
+      yield this.executeFollowUpTest();
       if (this.extended) {
         yield this.extendCurrentTest();
       }
@@ -16320,7 +16321,7 @@ var SuccessTest = class {
     return __async(this, null, function* () {
     });
   }
-  executeFollowUp() {
+  executeFollowUpTest() {
     return __async(this, null, function* () {
       const test = yield TestCreator.fromFollowupTest(this, this.data.options);
       if (!test)

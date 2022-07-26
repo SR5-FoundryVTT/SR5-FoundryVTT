@@ -977,7 +977,7 @@ export class SuccessTest {
             await this.afterFailure();
         }
 
-        await this.executeFollowUp();
+        await this.executeFollowUpTest();
 
         if (this.extended) {
             await this.extendCurrentTest();
@@ -999,7 +999,7 @@ export class SuccessTest {
     /**
      * Depending on the action configuration execute a followup test.
      */
-    async executeFollowUp() {
+    async executeFollowUpTest() {
         const test = await TestCreator.fromFollowupTest(this, this.data.options);
         if (!test) return;
         await test.execute();

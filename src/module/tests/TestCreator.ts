@@ -259,7 +259,7 @@ export const TestCreator = {
         const testData = await testCls._prepareActionTestData(action, test.actor, data);
         testData.following = test.data;
 
-        // Create the followup test based on this tests documents and options.
+        // Create the followup test based on tests documents and options.
         const documents = {item: test.item, actor: test.actor};
         return new testCls(testData, documents, options);
     },
@@ -436,6 +436,8 @@ export const TestCreator = {
         const data = TestCreator._minimalTestData();
         data.previousMessageId = previousMessageId;
         data.following = opposedData;
+        // Make sure to give NO target actors. Otherwise, user selection will be used.
+        data.targetActorsUuid = [];
 
         // Provide default action information.
         const action = TestCreator._mergeMinimalActionDataInOrder(
