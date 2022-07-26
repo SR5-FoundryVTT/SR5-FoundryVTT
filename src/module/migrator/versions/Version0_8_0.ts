@@ -54,7 +54,7 @@ export class Version0_8_0 extends VersionMigration {
                 if (data.data.category) {
                     const test = SR5.weaponCategoryActiveTests[data.data.category];
                     // Opposed And Resist will be handled by Foundry template migration.
-                    updateData.data = {action: {test}};
+                    updateData.data = {data: {action: {test}}};
                 }
 
                 break;

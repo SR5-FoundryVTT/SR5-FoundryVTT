@@ -17918,7 +17918,7 @@ var HandlebarManager = class {
 };
 
 // src/module/migrator/VersionMigration.ts
-var _VersionMigration = class {
+var VersionMigration = class {
   constructor() {
     this.m_Abort = false;
   }
@@ -17970,7 +17970,6 @@ var _VersionMigration = class {
         return Promise.reject(this.m_AbortReason);
       }
       yield this.Apply(entityUpdates);
-      yield game2.settings.set(_VersionMigration.MODULE_NAME, _VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
       (_c = ui.notifications) == null ? void 0 : _c.info(`${game2.i18n.localize("SR5.MIGRATION.SuccessNotification")} ${this.TargetVersion}.`, { permanent: true });
     });
   }
@@ -18208,7 +18207,6 @@ var _VersionMigration = class {
     });
   }
 };
-var VersionMigration = _VersionMigration;
 VersionMigration.MODULE_NAME = "shadowrun5e";
 VersionMigration.KEY_DATA_VERSION = "systemMigrationVersion";
 VersionMigration.NO_VERSION = "0";
@@ -18547,7 +18545,7 @@ var Version0_8_0 = class extends VersionMigration {
         case "weapon": {
           if (data.data.category) {
             const test = SR5.weaponCategoryActiveTests[data.data.category];
-            updateData.data = { action: { test } };
+            updateData.data = { data: { action: { test } } };
           }
           break;
         }
