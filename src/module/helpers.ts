@@ -20,6 +20,7 @@ import TargetedDocument = Shadowrun.TargetedDocument;
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ActionItemData = Shadowrun.ActionItemData;
 import ActionRollData = Shadowrun.ActionRollData;
+import {SuccessTestData} from "./tests/SuccessTest";
 
 interface CalcTotalOptions {
     min?: number,
@@ -407,6 +408,26 @@ export class Helpers {
         }
 
         return actors as SR5Actor[];
+    }
+
+    /**
+     * Given a SuccessTestData subset fetch all target TokenDocument actors
+     *
+     * @param testData A SuccessTest.data property
+     */
+    static async getTestTargetActors(testData: SuccessTestData): Promise<SR5Actor[]> {
+        const actors: SR5Actor[] = [];
+        for (const uuid of testData.targetActorsUuid) {
+            const tokenDoc = await fromUuid(uuid);
+            if (!(tokenDoc instanceof TokenDocument)) {
+                console.error(`Shadowrun5e | Been given testData with targets. UUID ${uuid} should point to a TokenDocument but doesn't`, tokenDoc);
+                continue;
+            }
+            if (!tokenDoc.actor) continue;
+
+            actors.push(tokenDoc.actor);
+        }
+        return actors;
     }
 
     static createRangeDescription(label: string, distance: number, modifier: number): RangeTemplateData {

@@ -9774,6 +9774,22 @@ var Helpers = class {
     }
     return actors;
   }
+  static getTestTargetActors(testData) {
+    return __async(this, null, function* () {
+      const actors = [];
+      for (const uuid of testData.targetActorsUuid) {
+        const tokenDoc = yield fromUuid(uuid);
+        if (!(tokenDoc instanceof TokenDocument)) {
+          console.error(`Shadowrun5e | Been given testData with targets. UUID ${uuid} should point to a TokenDocument but doesn't`, tokenDoc);
+          continue;
+        }
+        if (!tokenDoc.actor)
+          continue;
+        actors.push(tokenDoc.actor);
+      }
+      return actors;
+    });
+  }
   static createRangeDescription(label, distance, modifier) {
     label = game.i18n.localize(label);
     return { label, distance, modifier };
@@ -11766,7 +11782,8 @@ var TestCreator = {
         console.error(`Shadowrun 5e | Couldn't find a registered test implementation for ${testClsName}`);
         return;
       }
-      const actors = Helpers.getSelectedActorsOrCharacter();
+      const targets = yield Helpers.getTestTargetActors(testData.data);
+      const actors = targets || Helpers.getSelectedActorsOrCharacter();
       if (actors.length === 0)
         (_b = ui.notifications) == null ? void 0 : _b.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
       for (const actor of actors) {

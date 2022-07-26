@@ -170,8 +170,9 @@ export const TestCreator = {
             return;
         }
 
-        // TODO: Handle token selection as target override.
-        const actors = Helpers.getSelectedActorsOrCharacter();
+
+        const targets = await Helpers.getTestTargetActors(testData.data);
+        const actors = targets || Helpers.getSelectedActorsOrCharacter();
 
         if (actors.length === 0)
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
