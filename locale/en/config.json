@@ -666,7 +666,8 @@
       "ICConfiguration": "IC Configuration",
       "SetMonitor": "Monitor must be set manually.",
       "PersonalInventory": "On Person",
-      "CreateInventory": "Create inventory place"
+      "CreateInventory": "Create inventory place",
+      "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description."
     },
     "Action": {
       "ActiveTest": "Test",

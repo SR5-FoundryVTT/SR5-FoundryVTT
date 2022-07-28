@@ -652,7 +652,8 @@
       "ICConfiguration": "IC Configuration",
       "SetMonitor": "Monitor muss manuell gesetzt werden",
       "PersonalInventory": "Am Körper",
-      "CreateInventory": "Erstelle Inventar Ort"
+      "CreateInventory": "Erstelle Inventar Ort",
+      "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung."
     },
     "Action": {
       "ActiveTest": "Probe",
