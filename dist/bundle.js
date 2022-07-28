@@ -17949,7 +17949,7 @@ var HandlebarManager = class {
 };
 
 // src/module/migrator/VersionMigration.ts
-var VersionMigration = class {
+var _VersionMigration = class {
   constructor() {
     this.m_Abort = false;
   }
@@ -18001,6 +18001,7 @@ var VersionMigration = class {
         return Promise.reject(this.m_AbortReason);
       }
       yield this.Apply(entityUpdates);
+      yield game2.settings.set(_VersionMigration.MODULE_NAME, _VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
       (_c = ui.notifications) == null ? void 0 : _c.info(`${game2.i18n.localize("SR5.MIGRATION.SuccessNotification")} ${this.TargetVersion}.`, { permanent: true });
     });
   }
@@ -18239,6 +18240,7 @@ var VersionMigration = class {
     });
   }
 };
+var VersionMigration = _VersionMigration;
 VersionMigration.MODULE_NAME = "shadowrun5e";
 VersionMigration.KEY_DATA_VERSION = "systemMigrationVersion";
 VersionMigration.NO_VERSION = "0";
