@@ -155,20 +155,6 @@ export abstract class VersionMigration {
                         updateData: updateData.data || null,
                         embeddedItems: updateData.items || null
                     });
-
-                    // if (!isObjectEmpty(tokenDataUpdate)) {
-                    //     hasTokenUpdates = true;
-                    //     tokenDataUpdate['_id'] = token.id;
-                    //
-                    //     const newToken = duplicate(token);
-                    //     newToken.actorData = await mergeObject(token.actor.data, tokenDataUpdate, {
-                    //         enforceTypes: false,
-                    //         inplace: false,
-                    //     });
-                    //     return newToken;
-                    // } else {
-                    //     return token;
-                    // }
                 }
 
 
