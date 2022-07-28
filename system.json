@@ -10,7 +10,7 @@
     "allowBugReporter": true
   },
   "version": "0.8.0",
-  "minimumCoreVersion": "0.8.6",
+  "minimumCoreVersion": "9",
   "compatibleCoreVersion": "9",
   "scripts": [],
   "esmodules": [
