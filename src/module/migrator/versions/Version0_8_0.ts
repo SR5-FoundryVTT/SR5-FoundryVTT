@@ -9,6 +9,7 @@ import {VersionMigration} from "../VersionMigration";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import {SR5} from "../../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+import {Helpers} from "../../helpers";
 
 export class Version0_8_0 extends VersionMigration {
     get SourceVersion(): string {
@@ -45,46 +46,48 @@ export class Version0_8_0 extends VersionMigration {
             data?: object
         } = {};
 
-        switch (data.type) {
-            /**
-             * Weapons depend on their category on what's supposed to happen when attacking.
-             */
-            case 'weapon': {
-                // Some weapons might not have category set yet, so leave them.
-                if (data.data.category) {
-                    const test = SR5.weaponCategoryActiveTests[data.data.category];
-                    // Opposed And Resist will be handled by Foundry template migration.
-                    updateData.data = {data: {action: {test}}};
-                }
+        Helpers.injectActionTestsIntoChangeData(data.type, data);
 
-                break;
-            }
-
-            /**
-             * Spells depend greatly on their category on what's supposed to happen when defending.
-             */
-            case 'spell': {
-                switch (data.data.category) {
-                    case '': {
-                    updateData.data = {data: {
-                            action: {test: '', opposed: {test: '', resist: {test: ''}}}}
-                    };
-                    break;
-                }
-                default: {
-                    const activeTest = SR5.activeTests[data.type];
-                    const opposedTest = SR5.opposedTests[data.type][data.data.category] || 'OpposedTest';
-                    const resistTest = SR5.opposedResistTests[data.type][data.data.category] || '';
-
-                    updateData.data = {data: {action: {
-                        test: activeTest,
-                        opposed: {test: opposedTest,
-                                  resist:  {test: resistTest}}}}};
-                    break;
-                }
-                }
-            }
-        }
+        // switch (data.type) {
+        //     /**
+        //      * Weapons depend on their category on what's supposed to happen when attacking.
+        //      */
+        //     case 'weapon': {
+        //         // Some weapons might not have category set yet, so leave them.
+        //         if (data.data.category) {
+        //             const test = SR5.weaponCategoryActiveTests[data.data.category];
+        //             // Opposed And Resist will be handled by Foundry template migration.
+        //             updateData.data = {data: {action: {test}}};
+        //         }
+        //
+        //         break;
+        //     }
+        //
+        //     /**
+        //      * Spells depend greatly on their category on what's supposed to happen when defending.
+        //      */
+        //     case 'spell': {
+        //         switch (data.data.category) {
+        //             case '': {
+        //             updateData.data = {data: {
+        //                     action: {test: '', opposed: {test: '', resist: {test: ''}}}}
+        //             };
+        //             break;
+        //         }
+        //         default: {
+        //             const activeTest = SR5.activeTests[data.type];
+        //             const opposedTest = SR5.opposedTests[data.type][data.data.category] || 'OpposedTest';
+        //             const resistTest = SR5.opposedResistTests[data.type][data.data.category] || '';
+        //
+        //             updateData.data = {data: {action: {
+        //                 test: activeTest,
+        //                 opposed: {test: opposedTest,
+        //                           resist:  {test: resistTest}}}}};
+        //             break;
+        //         }
+        //         }
+        //     }
+        // }
 
         return updateData;
     }

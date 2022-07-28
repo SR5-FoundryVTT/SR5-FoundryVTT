@@ -911,19 +911,10 @@ export class Helpers {
         // Make sure weapon actions are in a valid state for different weapon categories.
         switch (type) {
             case 'weapon': {
-                if (changeData?.data?.category === undefined || changeData.data.category === '') return;
-
-                //@ts-ignore Make sure a matching active test for the configured weapons category is used.
-                const test = SR5.weaponCategoryActiveTests[changeData.data.category];
-                if (!test) console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`);
-                foundry.utils.mergeObject(changeData, {data: {action: {test}}});
-                break;
-            }
-
-            case 'spell': {
                 if (changeData?.data?.category === undefined) return;
 
                 switch (changeData.data.category) {
+                    // Reset test selection on empty category.
                     case '': {
                         foundry.utils.mergeObject(changeData, {
                             data: {
@@ -932,6 +923,35 @@ export class Helpers {
                         });
                         break;
                     }
+
+                    default: {
+                        //@ts-ignore Make sure a matching active test for the configured weapons category is used.
+                        const test = SR5.weaponCategoryActiveTests[changeData.data.category];
+                        if (!test) {
+                            console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
+                        }
+                        foundry.utils.mergeObject(changeData, {data: {action: {test}}});
+                        break;
+                    }
+                }
+
+                break;
+            }
+
+            case 'spell': {
+                if (changeData?.data?.category === undefined) return;
+
+                switch (changeData.data.category) {
+                    // Reset test selection on empty category.
+                    case '': {
+                        foundry.utils.mergeObject(changeData, {
+                            data: {
+                                action: {test: '', opposed: {test: '', resist: {test: ''}}}
+                            }
+                        });
+                        break;
+                    }
+
                     default: {
                         const activeTest = SR5.activeTests[type];
                         const opposedTest = SR5.opposedTests[type][changeData.data.category] || 'OpposedTest';
@@ -951,6 +971,7 @@ export class Helpers {
                         break;
                     }
                 }
+
                 break;
             }
 

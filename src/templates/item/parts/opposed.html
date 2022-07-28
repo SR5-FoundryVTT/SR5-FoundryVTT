@@ -7,7 +7,7 @@
             {{localize "SR5.Labels.Action.OpposedTest"}}
         </div>
         <div class="inputs">
-            <select name="data.action.opposed.test">
+            <select name="data.action.opposed.test" {{#if disableTestSelection}}disabled{{/if}}>
                 {{#select data.action.opposed.test}}
                 <option value=""></option>
                 {{#each opposedTests}}
@@ -17,6 +17,7 @@
             </select>
         </div>
     </div>
+    {{#if data.action.opposed.test}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.Skill"}}
@@ -69,13 +70,16 @@
             />
         </div>
     </div>
-
+    {{/if}}
+    <div class="header">
+        {{localize "SR5.Labels.Action.DamageResistanceTest"}}
+    </div>
     <div class="form-line">
         <div class="label">
             {{localize "SR5.Labels.Action.DamageResistanceTest"}}
         </div>
         <div class="inputs">
-            <select name="data.action.opposed.resist.test">
+            <select name="data.action.opposed.resist.test" {{#if disableTestSelection}}disabled{{/if}}>
                 {{#select data.action.opposed.resist.test}}
                 <option value=""></option>
                 {{#each resistTests}}
@@ -85,6 +89,7 @@
             </select>
         </div>
     </div>
+    {{#if data.action.opposed.resist.test}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.Skill"}}
@@ -137,4 +142,5 @@
             />
         </div>
     </div>
+    {{/if}}
 </div>

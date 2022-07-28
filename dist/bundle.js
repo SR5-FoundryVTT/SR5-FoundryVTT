@@ -10558,12 +10558,26 @@ var Helpers = class {
       return changeData;
     switch (type) {
       case "weapon": {
-        if (((_a = changeData == null ? void 0 : changeData.data) == null ? void 0 : _a.category) === void 0 || changeData.data.category === "")
+        if (((_a = changeData == null ? void 0 : changeData.data) == null ? void 0 : _a.category) === void 0)
           return;
-        const test = SR5.weaponCategoryActiveTests[changeData.data.category];
-        if (!test)
-          console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`);
-        foundry.utils.mergeObject(changeData, { data: { action: { test } } });
+        switch (changeData.data.category) {
+          case "": {
+            foundry.utils.mergeObject(changeData, {
+              data: {
+                action: { test: "", opposed: { test: "", resist: { test: "" } } }
+              }
+            });
+            break;
+          }
+          default: {
+            const test = SR5.weaponCategoryActiveTests[changeData.data.category];
+            if (!test) {
+              console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
+            }
+            foundry.utils.mergeObject(changeData, { data: { action: { test } } });
+            break;
+          }
+        }
         break;
       }
       case "spell": {
@@ -18559,40 +18573,7 @@ var Version0_8_0 = class extends VersionMigration {
   MigrateItemData(data) {
     return __async(this, null, function* () {
       const updateData = {};
-      switch (data.type) {
-        case "weapon": {
-          if (data.data.category) {
-            const test = SR5.weaponCategoryActiveTests[data.data.category];
-            updateData.data = { data: { action: { test } } };
-          }
-          break;
-        }
-        case "spell": {
-          switch (data.data.category) {
-            case "": {
-              updateData.data = {
-                data: {
-                  action: { test: "", opposed: { test: "", resist: { test: "" } } }
-                }
-              };
-              break;
-            }
-            default: {
-              const activeTest = SR5.activeTests[data.type];
-              const opposedTest = SR5.opposedTests[data.type][data.data.category] || "OpposedTest";
-              const resistTest = SR5.opposedResistTests[data.type][data.data.category] || "";
-              updateData.data = { data: { action: {
-                test: activeTest,
-                opposed: {
-                  test: opposedTest,
-                  resist: { test: resistTest }
-                }
-              } } };
-              break;
-            }
-          }
-        }
-      }
+      Helpers.injectActionTestsIntoChangeData(data.type, data);
       return updateData;
     });
   }
