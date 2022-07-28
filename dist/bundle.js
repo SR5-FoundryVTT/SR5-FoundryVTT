@@ -17184,33 +17184,6 @@ var SR5Actor = class extends Actor {
       yield test.execute();
     });
   }
-  rollDronePerception(options) {
-    return __async(this, null, function* () {
-      if (!this.isVehicle())
-        return;
-      const actorData = duplicate(this.data.data);
-      if (actorData.controlMode === "autopilot") {
-        const parts = new PartsList();
-        const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
-        const perception = this.findActiveSkill("perception");
-        const limit = this.findLimit("sensor");
-        if (perception && limit) {
-          parts.addPart("SR5.Vehicle.Clearsight", Helpers.calcTotal(perception));
-          parts.addPart("SR5.Vehicle.Stats.Pilot", pilot);
-          this._addGlobalParts(parts);
-          return ShadowrunRoller.advancedRoll({
-            event: options == null ? void 0 : options.event,
-            actor: this,
-            parts: parts.list,
-            limit,
-            title: game.i18n.localize("SR5.Labels.ActorSheet.RollDronePerception")
-          });
-        }
-      } else {
-        yield this.rollSkill("perception", options);
-      }
-    });
-  }
   rollDroneInfiltration(options) {
     return __async(this, null, function* () {
       if (!this.isVehicle()) {
@@ -24825,7 +24798,7 @@ var SR5BaseActorSheet = class extends ActorSheet {
               yield this.actor.rollGeneralAction("drone_perception", options);
               break;
             case "infiltration":
-              yield this.actor.rollDroneInfiltration(options);
+              yield this.actor.rollGeneralAction("drone_infiltration", options);
               break;
             case "pilot-vehicle":
               yield this.actor.rollGeneralAction("drone_pilot_vehicle", options);
@@ -27274,6 +27247,32 @@ var DronePerceptionTest = class extends SuccessTest {
   }
 };
 
+// src/module/tests/DroneInfiltrationTest.ts
+var DroneInfiltrationTest = class extends SuccessTest {
+  static _getDocumentTestAction(item, actor) {
+    return __async(this, null, function* () {
+      var _a;
+      if (!item || !actor)
+        return {};
+      const vehicleData = actor.asVehicleData();
+      if (!vehicleData) {
+        yield (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.ERROR.TestExpectsVehicleOnly"));
+        return {};
+      }
+      switch (vehicleData.data.controlMode) {
+        case "autopilot": {
+          const attribute = "pilot";
+          const skill = "sneaking";
+          const limit = "sensor";
+          return { attribute, skill, limit };
+        }
+        default:
+          return actor.skillActionData("perception");
+      }
+    });
+  }
+};
+
 // src/module/hooks.ts
 var HooksManager = class {
   static registerHooks() {
@@ -27331,7 +27330,8 @@ ___________________
         NaturalRecoveryStunTest,
         NaturalRecoveryPhysicalTest,
         PilotVehicleTest,
-        DronePerceptionTest
+        DronePerceptionTest,
+        DroneInfiltrationTest
       },
       activeTests: {
         SuccessTest,
@@ -27347,7 +27347,8 @@ ___________________
         DrainTest,
         FadeTest,
         PilotVehicleTest,
-        DronePerceptionTest
+        DronePerceptionTest,
+        DroneInfiltrationTest
       },
       opposedTests: {
         OpposedTest,

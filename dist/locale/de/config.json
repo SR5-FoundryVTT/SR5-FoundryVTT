@@ -951,8 +951,9 @@
     "NaturalRecoveryPhysicalTest": "Natürliche Genesung Körperlich",
     "DrainTest": "Entzugswiderstand",
     "FadeTest": "Schwundwiderstand",
-    "PilotVehicleTest": "Fahrzeug steuern",
-    "DronePerceptionTest": "Fahrzeug Wahrnehmung"
+    "PilotVehicleTest": "Fahrzeug Manövrieren",
+    "DronePerceptionTest": "Fahrzeug Clearsight",
+    "DroneInfiltrationTest": "Fahrzeug Stealth"
   },
   "SR5.MissingResource": {
     "Edge": "Kein Edge übrig"

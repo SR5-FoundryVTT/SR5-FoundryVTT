@@ -119,5 +119,6 @@ declare namespace Shadowrun {
         | 'memory'
         | 'physical_defense'
         | 'drone_pilot_vehicle'
-        | 'drone_perception';
+        | 'drone_perception'
+        | 'drone_infiltration';
 }
