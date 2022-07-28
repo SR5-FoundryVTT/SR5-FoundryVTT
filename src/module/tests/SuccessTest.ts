@@ -369,7 +369,7 @@ export class SuccessTest {
     }
 
     get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html';
     }
 
     get _chatMessageTemplate(): string {

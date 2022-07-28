@@ -50,7 +50,7 @@ export class TestDialog extends FormDialog {
      * data.templatePath work's the same and can be used as well.
      */
     get templateContent(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html';
     }
 
     getData() {

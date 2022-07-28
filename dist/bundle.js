@@ -8720,12 +8720,7 @@ var preloadHandlebarsTemplates = () => __async(void 0, null, function* () {
     "systems/shadowrun5e/dist/templates/common/List/ListEntityItem.html",
     "systems/shadowrun5e/dist/templates/common/List/ListHeader.html",
     "systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html",
-    "systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html",
     "systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html",
-    "systems/shadowrun5e/dist/templates/apps/dialogs/defense-test-dialog.html",
-    "systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html",
-    "systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html",
-    "systems/shadowrun5e/dist/templates/apps/dialogs/complexform-test-dialog.html",
     "systems/shadowrun5e/dist/templates/rolls/success-test-message.html",
     "systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html",
     "systems/shadowrun5e/dist/templates/rolls/parts/test-opposed-resist.html"
@@ -15621,7 +15616,7 @@ var TestDialog = class extends FormDialog {
     html.find(".entity-link").on("click", Helpers.renderEntityLinkSheet);
   }
   get templateContent() {
-    return "systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html";
+    return "systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html";
   }
   getData() {
     var _a;
@@ -15949,7 +15944,7 @@ var SuccessTest = class {
     return roll;
   }
   get _dialogTemplate() {
-    return "systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html";
+    return "systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html";
   }
   get _chatMessageTemplate() {
     return "systems/shadowrun5e/dist/templates/rolls/success-test-message.html";
@@ -17949,7 +17944,7 @@ var HandlebarManager = class {
 };
 
 // src/module/migrator/VersionMigration.ts
-var VersionMigration = class {
+var _VersionMigration = class {
   constructor() {
     this.m_Abort = false;
   }
@@ -18001,6 +17996,7 @@ var VersionMigration = class {
         return Promise.reject(this.m_AbortReason);
       }
       yield this.Apply(entityUpdates);
+      yield game2.settings.set(_VersionMigration.MODULE_NAME, _VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
       (_c = ui.notifications) == null ? void 0 : _c.info(`${game2.i18n.localize("SR5.MIGRATION.SuccessNotification")} ${this.TargetVersion}.`, { permanent: true });
     });
   }
@@ -18239,6 +18235,7 @@ var VersionMigration = class {
     });
   }
 };
+var VersionMigration = _VersionMigration;
 VersionMigration.MODULE_NAME = "shadowrun5e";
 VersionMigration.KEY_DATA_VERSION = "systemMigrationVersion";
 VersionMigration.NO_VERSION = "0";
