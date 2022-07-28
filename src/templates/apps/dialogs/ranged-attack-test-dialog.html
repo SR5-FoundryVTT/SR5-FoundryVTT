@@ -1,0 +1,57 @@
+<form>
+    <div class="container container--fluid dialog-content-common">
+        <div class="container__row">
+            <div class="container__col-half dialog-content-column sunken">
+                <h2>{{localize test.title}}</h2>
+                <hr/>
+                <div>
+                    <div class="form-group">
+                        <label>{{localize "ITEM.TypeAmmo"}}</label>
+                        <input type="text" class="disabled-for-display" disabled
+                               value="{{test.item.data.data.ammo.current.value}}/{{test.item.data.data.ammo.current.max}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'SR5.RecoilCompensation'}}</label>
+                        <input type="text" class="disabled-for-display" disabled
+                               value="{{test.data.recoilCompensation}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'SR5.FireMode'}}</label>
+                        <select name="test.data.fireMode.value">
+                            {{#select test.data.fireMode.value}} {{#each test.data.fireModes as |description count|}}
+                            <option value="{{count}}">
+                                {{description}} - {{count}} {{#ifgt count 1}}{{localize
+                                "SR5.Bullets"}}{{else}}{{localize "SR5.Bullet"}}{{/ifgt}}
+                            </option>
+                            {{/each}} {{/select}}
+                        </select>
+                    </div>
+                    {{#if test.hasTargets}}
+                    <div class="form-group">
+                        <label>{{localize 'SR5.SelectedTargets'}}</label>
+                        <select name="test.data.targetRangesSelected">
+                            {{#select test.data.targetRangesSelected}}
+                            {{#each test.data.targetRanges as |target|}}
+                                <option value="{{@index}}">{{target.name}} [{{localize target.range.label}} ({{target.range.distance}}/{{target.distance}}{{target.unit}})]</option>
+                            {{/each}}
+                            {{/select}}
+                        </select>
+                    </div>
+                    {{else}}
+                    <div class="form-group">
+                        <label>{{localize 'SR5.Range'}}</label>
+                        <select name="test.data.range">
+                            {{#select test.data.range}} {{#each test.data.ranges as |range key|}}
+                            <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
+                            {{/each}} {{/select}}
+                        </select>
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+             <div class="container__col-half dialog-content-column">
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
+            </div>
+        </div>
+    </div>
+</form>

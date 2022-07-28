@@ -10,6 +10,11 @@ export class PartsList<TType> {
         return this._list.length;
     }
 
+    /**
+     * Return the sum total of the list.
+     *
+     * This can be used for numerical lists, that need the sum of all their list elements.
+     */
     get total(): number {
         let total = 0;
         for (const part of this._list) {
@@ -18,6 +23,15 @@ export class PartsList<TType> {
             }
         }
         return total;
+    }
+
+    /**
+     * Return the last element in the list.
+     *
+     * This can be used for none numerical parts lists, in which the latest value would be whatever the value is.
+     */
+    get last(): any {
+        return this._list[this._list.length - 1];
     }
 
     get isEmpty(): boolean {
@@ -79,8 +93,10 @@ export class PartsList<TType> {
             if (value === undefined || value === null) return;
             // recursively go through until we no longer have a part of this name
             this.addUniquePart(name, value);
-        } else if (value) {
+        } else if (value !== undefined) {
             this.addPart(name, value);
+        } else {
+            console.warn('Shadowrun 5e | PartsList cant add a none-numerical modifier.', name, value);
         }
     }
 
@@ -97,9 +113,21 @@ export class PartsList<TType> {
         return this.list;
     }
 
+    static AddPart<TType>(list: ModList<TType>, name: string, value: TType): ModList<TType> {
+        const parts = new PartsList(list);
+        parts.addPart(name, value);
+        return parts._list;
+    }
+
     static AddUniquePart<TType>(list: ModList<TType>, name: string, value: TType, overwrite = true): ModList<TType> {
         const parts = new PartsList(list);
         parts.addUniquePart(name, value, overwrite);
+        return parts._list;
+    }
+
+    static RemovePart<TType>(list: ModList<TType>, name: string) {
+        const parts = new PartsList(list);
+        parts.removePart(name);
         return parts._list;
     }
 

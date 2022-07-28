@@ -1,4 +1,4 @@
-import {FormDialog} from "./FormDialog";
+import {FormDialog, FormDialogData} from "./FormDialog";
 import {SR5Actor} from "../../actor/SR5Actor";
 
 /**
@@ -12,8 +12,8 @@ export class MoveInventoryDialog extends FormDialog {
      * @param sourceInventory The currently selected inventory, which won't be displayed.
      * @param options
      */
-    constructor(actor: SR5Actor, sourceInventory: string, options?: Application.Options) {
-        const dialogData = MoveInventoryDialog.getDialogData(actor, sourceInventory);
+    constructor(actor: SR5Actor, sourceInventory: string, options?) {
+        const dialogData = MoveInventoryDialog.getDialogData(actor, sourceInventory) as unknown as FormDialogData;
 
         super(dialogData, options);
     }

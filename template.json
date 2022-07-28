@@ -1113,6 +1113,14 @@
                         "radius": 0,
                         "dropoff": 0
                     }
+                },
+                "action": {
+                    "opposed": {
+                        "test": "PhysicalDefenseTest",
+                        "resist": {
+                            "test": "PhysicalResistTest"
+                        }
+                    }
                 }
             },
             "technology": {
@@ -1137,10 +1145,12 @@
             "action": {
                 "action": {
                     "type": "",
+                    "test": "SuccessTest",
                     "category": "",
                     "attribute": "",
                     "attribute2": "",
                     "skill": "",
+                    "armor": false,
                     "spec": "",
                     "mod": 0,
                     "mod_description": "",
@@ -1148,6 +1158,10 @@
                         "value": 0,
                         "base": 0,
                         "attribute": ""
+                    },
+                    "threshold": {
+                        "value": 0,
+                        "base": 0
                     },
                     "extended": false,
                     "damage": {
@@ -1167,7 +1181,7 @@
                         },
                         "base_formula_operator": "add",
                         "attribute": "",
-                        "itemSource": {
+                        "source": {
                             "actorId": "",
                             "itemId": "",
                             "itemType": "",
@@ -1176,12 +1190,31 @@
                     },
                     "opposed": {
                         "type": "",
+                        "test": "OpposedTest",
                         "attribute": "",
                         "attribute2": "",
                         "skill": "",
+                        "armor": false,
                         "mod": 0,
-                        "description": ""
-                    }
+                        "description": "",
+                        "resist": {
+                            "test": "",
+                            "skill": "",
+                            "attribute": "",
+                            "attribute2": "",
+                            "armor": false,
+                            "mod": 0
+                        }
+                    },
+                    "followed": {
+                        "test": "",
+                        "attribute": "",
+                        "attribute2": "",
+                        "skill": "",
+                        "armor": false,
+                        "mod": 0
+                    },
+                    "modifiers": []
                 }
             },
             "action_result": {
@@ -1277,6 +1310,16 @@
                 "mental": false,
                 "environmental": false,
                 "physical": false
+            },
+            "action": {
+                "test": "SpellCastingTest",
+                "opposed": {
+                    "test": "",
+                    "resist": {"test": ""}
+                },
+                "followed": {
+                    "test": "DrainTest"
+                }
             }
         },
         "critter_power": {
@@ -1289,10 +1332,28 @@
             "templates": ["description", "action"],
             "target": "",
             "duration": "",
-            "fade": 0
+            "fade": 0,
+            "action": {
+                "test": "ComplexFormTest",
+                "opposed": {
+                    "test": "OpposedTest"
+                },
+                "followed": {
+                    "test": "FadeTest"
+                }
+            }
         },
         "weapon": {
-            "templates": ["description", "action", "technology", "weapon"]
+            "templates": ["description", "action", "technology", "weapon"],
+            "action": {
+                "test": "",
+                "opposed": {
+                    "test": "PhysicalDefenseTest",
+                    "resist": {
+                        "test": "PhysicalResistTest"
+                    }
+                }
+            }
         },
         "bioware": {
             "templates": ["description", "technology", "action", "armor"],

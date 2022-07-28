@@ -1,20 +1,43 @@
-<div class="sr5 chat-card item-card" data-actor-id='{{actor._id}}' data-item-id='{{item._id}}' {{#if tokenId}}data-token-id='{{tokenId}}'{{/if}}>
-  <header class='card-header flexrow'>
-    <img src='{{item.img}}' title='{{item.name}}' width='36' height='36'>
-    <h3>{{item.name}}</h3>
-  </header>
-
-  <div class="card-content">
-    {{{data.description.value}}}
-  </div>
-
-  <div class="card-buttons">
-    {{#if hasRoll}}<div class="button" data-action='roll'>{{labels.roll}}</div>{{/if}}
-  </div>
-
-  <footer class='card-footer'>
-    {{#each data.properties}}
-    <span style="white-space: nowrap">{{this}}</span>
-    {{/each}}
-  </footer>
+<div class="sr5 chat-card roll-card item-card">
+    <div class="card-title card-header">
+        {{title}}
+    </div>
+    {{#if actor}}
+    <div class="card-title card-header">
+        <div class="container container--fluid">
+            <div class="container__row">
+                <div class="container__col-half">
+                    <div class="document">
+                        <a class="chat-select-link" data-token-id="{{token.id}}"><img
+                                src="{{actor.img}}" class="entity-selectable"
+                                title="{{speakerName actor}}"/></a>
+                        <h3 class="header-name"><a class="chat-document-link" data-uuid="{{actor.uuid}}">{{speakerName
+                            actor}}</a></h3>
+                    </div>
+                </div>
+                {{#if item}}
+                <div class="container__col-half">
+                    <div class="document">
+                        <img src="{{item.data.img}}" title="{{item.data.name}}"/>
+                        <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}"
+                                                   data-uuid="{{item.uuid}}">{{item.data.name}}</a></h3>
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+    {{/if}}
+    <div class="card-main-content">
+        <div class="card-description">
+            {{#if description.description.value}}
+            <div class="card-description-content">
+                {{{description.description.value}}}
+            </div>
+            {{/if}}
+            {{#each description.properties}}
+            <span style="white-space: nowrap;">{{this}}</span>
+            {{/each}}
+        </div>
+    </div>
 </div>

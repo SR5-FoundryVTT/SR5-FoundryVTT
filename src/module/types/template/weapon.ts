@@ -11,4 +11,15 @@ declare namespace Shadowrun {
         ModifierField & {
         distance: number
     }
+
+    /**
+     * Ranges of targeted TokenDocuments.
+     */
+    export interface TargetRangeTemplateData {
+        uuid: string
+        name: string
+        distance: number
+        unit: string
+        range: RangeTemplateData
+    }
 }

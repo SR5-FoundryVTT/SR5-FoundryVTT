@@ -3,6 +3,7 @@ import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import {DefaultValues} from "../../data/DataDefaults";
+import {Helpers} from "../../helpers";
 
 export class EquipmentImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -48,6 +49,9 @@ export class EquipmentImporter extends DataImporter {
 
             //@ts-ignore
             data.folder = categoryFolder.id;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
+
             //@ts-ignore
             entries.push(data);
         }

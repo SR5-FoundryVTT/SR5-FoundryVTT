@@ -4,6 +4,7 @@ import { Constants } from './Constants';
 import WeaponData = Shadowrun.WeaponData;
 import AmmoItemData = Shadowrun.AmmoItemData;
 import {DefaultValues} from "../../data/DataDefaults";
+import {Helpers} from "../../helpers";
 
 export class AmmoImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -107,6 +108,8 @@ export class AmmoImporter extends DataImporter {
             // ammo doesn't have conceal rating from looking at the data
             // data.data.technology.conceal.base = ImportHelper.intValue(jsonData, "conceal");
             data.data.technology.conceal.base = 0;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             ammoDatas.push(data);
         }

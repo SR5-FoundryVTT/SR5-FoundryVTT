@@ -3,6 +3,7 @@ import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
 import DeviceItemData = Shadowrun.DeviceItemData;
 import {DefaultValues} from "../../data/DataDefaults";
+import {Helpers} from "../../helpers";
 
 export class DeviceImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -46,6 +47,9 @@ export class DeviceImporter extends DataImporter {
 
             //@ts-ignore
             data.folder = folder.id;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
+
             //@ts-ignore
             entries.push(data);
         }
@@ -95,6 +99,9 @@ export class DeviceImporter extends DataImporter {
 
             //@ts-ignore
             data.folder = folder.id;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
+
             //@ts-ignore
             entries.push(data);
         }

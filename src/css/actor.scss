@@ -29,6 +29,9 @@
         overflow: hidden;
         flex: 1;
     }
+    .limit-title {
+        font-size: 115%;
+    }
     .attributes {
         border-top: $groove;
         display: flex;

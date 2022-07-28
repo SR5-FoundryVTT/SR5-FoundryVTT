@@ -8,6 +8,7 @@ import { ParserMap } from '../parser/ParserMap';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import {DefaultValues} from "../../data/DataDefaults";
 import WeaponItemData = Shadowrun.WeaponItemData;
+import {Helpers} from "../../helpers";
 
 export class WeaponImporter extends DataImporter {
     public categoryTranslations: any;
@@ -28,34 +29,7 @@ export class WeaponImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
-                    type: 'varies',
-                    category: '',
-                    attribute: 'agility',
-                    attribute2: '',
-                    skill: '',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DefaultValues.damageData(),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: 'defense',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: []
-                },
+                action: DefaultValues.actionData({type: 'varies', attribute: 'agility'}),
                 technology: DefaultValues.technologyData({rating: 1}),
                 ammo: {
                     spare_clips: {
@@ -143,6 +117,8 @@ export class WeaponImporter extends DataImporter {
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
             data.folder = folders[data.data.subcategory].id;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

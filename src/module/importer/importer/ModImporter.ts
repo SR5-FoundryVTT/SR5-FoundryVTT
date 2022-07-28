@@ -4,6 +4,7 @@ import { Constants } from './Constants';
 import { ModParserBase } from '../parser/mod/ModParserBase';
 import ModificationItemData = Shadowrun.ModificationItemData;
 import {DefaultValues} from "../../data/DataDefaults";
+import {Helpers} from "../../helpers";
 
 export class ModImporter extends DataImporter {
     public categoryTranslations: any;
@@ -70,6 +71,8 @@ export class ModImporter extends DataImporter {
             let folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Mods/${folderName}`, true);
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folder.id;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

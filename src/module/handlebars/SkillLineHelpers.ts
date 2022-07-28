@@ -59,10 +59,10 @@ export const registerSkillLineHelpers = () => {
         const specs = Array.isArray(skill.specs) ? skill.specs : [skill.specs];
         return [
             {
-                text: {
-                    text: specs.join(', ') ?? '',
+                html: {
+                    text: specs.map(spec => `<span class="roll skill-spec-roll">${spec}</span>`).join(', '),
                     cssClass: 'skill-spec-item',
-                },
+                }
             },
             {
                 text: {

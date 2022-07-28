@@ -1,36 +1,52 @@
-import { SR5 } from './config';
-import { Migrator } from './migrator/Migrator';
-import { registerSystemSettings } from './settings';
+import {SR5} from './config';
+import {Migrator} from './migrator/Migrator';
+import {registerSystemSettings} from './settings';
 import {FLAGS, SYSTEM_NAME, SYSTEM_SOCKET} from './constants';
-import { SR5Actor } from './actor/SR5Actor';
-import { SR5Item } from './item/SR5Item';
-import { SR5ItemSheet } from './item/SR5ItemSheet';
-import { SR5Token } from './token/SR5Token';
-import { ShadowrunRoller } from './rolls/ShadowrunRoller';
-import { Helpers } from './helpers';
-import { HandlebarManager } from './handlebars/HandlebarManager';
-import { measureDistance } from './canvas';
-import * as chat from './chat';
+import {SR5Actor} from './actor/SR5Actor';
+import {SR5Item} from './item/SR5Item';
+import {SR5ItemSheet} from './item/SR5ItemSheet';
+import {SR5Token} from './token/SR5Token';
+import {ShadowrunRoller} from './rolls/ShadowrunRoller';
+import {HandlebarManager} from './handlebars/HandlebarManager';
+import {measureDistance} from './canvas';
 import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
 
-import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
 import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
-import { Import } from './importer/apps/import-form';
+import {Import} from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 import {quenchRegister} from "../test/quench";
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
-import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
-import SocketMessageHooks = Shadowrun.SocketMessageHooks;
-import SocketMessage = Shadowrun.SocketMessageData;
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
 import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
 import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
 import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
-import {SR5BaseActorSheet} from "./actor/sheets/SR5BaseActorSheet";
 import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
+
+import {SR5Roll} from "./rolls/SR5Roll";
+import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
+import {RangedAttackTest} from "./tests/RangedAttackTest";
+import {SuccessTest} from "./tests/SuccessTest";
+import {OpposedTest} from "./tests/OpposedTest";
+import {PhysicalResistTest} from "./tests/PhysicalResistTest";
+import {handleRenderChatMessage} from "./chat";
+import {MeleeAttackTest} from "./tests/MeleeAttackTest";
+import {SpellCastingTest} from "./tests/SpellCastingTest";
+import {DrainTest} from "./tests/DrainTest";
+import {TestCreator} from "./tests/TestCreator";
+import {CombatSpellDefenseTest} from "./tests/CombatSpellDefenseTest";
+import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
+import SocketMessageHooks = Shadowrun.SocketMessageHooks;
+import SocketMessage = Shadowrun.SocketMessageData;
+import {ComplexFormTest} from "./tests/ComplexFormTest";
+import {AttributeOnlyTest} from "./tests/AttributeOnlyTest";
+import {NaturalRecoveryStunTest} from "./tests/NaturalRecoveryStunTest";
+import {NaturalRecoveryPhysicalTest} from "./tests/NaturalRecoveryPhysicalTest";
+import {FadeTest} from "./tests/FadeTest";
+import {ThrownAttackTest} from "./tests/ThrownAttackTest";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -45,8 +61,8 @@ export class HooksManager {
 
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        Hooks.on('renderChatMessage', HooksManager.renderChatMessage);
-        Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
+        // Hooks.on('renderChatMessage', chat.addRollListeners)
+        // Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
@@ -55,9 +71,12 @@ export class HooksManager {
         Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
+        Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
 
-        // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
-        Hooks.on('quenchReady', quenchRegister);
+        Hooks.on("renderChatLog", HooksManager.chatLogListeners);
+        // Hooks.on("renderChatPopout", chatMessageListeners);
+
+        Hooks.on('init', quenchRegister);
     }
 
     static init() {
@@ -73,11 +92,99 @@ ___________________
 `);
         // Create a shadowrun5e namespace within the game global
         game['shadowrun5e'] = {
+            /**
+             * System level Document implementations.
+             */
             SR5Actor,
-            ShadowrunRoller,
             SR5Item,
+            SR5ActiveEffect,
+            /**
+             * Macro hooks used when something's dropped onto the hotbar.
+             */
             rollItemMacro,
-            rollSkillMacro
+            rollSkillMacro,
+            /**
+             * Complex test support (legacy).
+             */
+            ShadowrunRoller,
+            /**
+             * Should you only really need dice handling, use this. If you need more complex testing behaviour,
+             * check the Test implementations.
+             */
+            SR5Roll,
+
+            /**
+             * You want to create a test from whatever source?
+             * Use this.
+             */
+            test: TestCreator,
+
+            /**
+             * .tests define what test implementation to use for each test type (key).
+             * Should you want to override default behaviour for SuccessTest types, overwrite
+             * the SuccessTest class reference here
+             */
+            tests: {
+                SuccessTest,
+                OpposedTest,
+                MeleeAttackTest,
+                RangedAttackTest,
+                ThrownAttackTest,
+                PhysicalDefenseTest,
+                PhysicalResistTest,
+                SpellCastingTest,
+                CombatSpellDefenseTest,
+                DrainTest,
+                FadeTest,
+                ComplexFormTest,
+                AttributeOnlyTest,
+                NaturalRecoveryStunTest,
+                NaturalRecoveryPhysicalTest
+            },
+            /**
+             * Subset of tests meant to be used as the main, active test.
+             *
+             * These will show up on actions when defining the main test to be used.
+             */
+            activeTests: {
+                SuccessTest,
+                MeleeAttackTest,
+                RangedAttackTest,
+                ThrownAttackTest,
+                PhysicalResistTest,
+                SpellCastingTest,
+                ComplexFormTest,
+                PhysicalDefenseTest,
+                NaturalRecoveryStunTest,
+                NaturalRecoveryPhysicalTest,
+                DrainTest,
+                FadeTest
+            },
+            /**
+             * Subset of tests meant to be used as opposed tests.
+             *
+             * These will show up on actions when defining an opposed test.
+             */
+            opposedTests: {
+                OpposedTest,
+                PhysicalDefenseTest,
+                CombatSpellDefenseTest
+            },
+            /**
+             * Subset of tests meant to be used as resist tests.
+             *
+             * Instead of showing on the action configuration these are connected to active or opposed test.
+             */
+            resistTests: {
+                PhysicalResistTest
+            },
+            /**
+             * Subset of tests meant to follow a main active test
+             */
+            followedTests: {
+                DrainTest,
+                FadeTest
+            }
         };
 
         CONFIG.Actor.documentClass = SR5Actor;
@@ -85,12 +192,18 @@ ___________________
         // @ts-ignore // TODO: Compare Combat/SR5Combat typing.
         CONFIG.Combat.documentClass = SR5Combat;
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
+        // @ts-ignore // ActiveEffect.sheetClass might be an old approach, since DnD5e isn't using it anymore.
         CONFIG.ActiveEffect.sheetClass = SR5ActiveEffectSheet;
         CONFIG.Token.objectClass = SR5Token;
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-ignore
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
+
+        // Register general SR5Roll for JSON serialization support.
+        CONFIG.Dice.rolls.push(SR5Roll);
+        // @ts-ignore // Register the SR5Roll dnd5e style.
+        CONFIG.Dice.SR5oll = SR5Roll;
 
         // Add Shadowrun configuration onto general Foundry config for module access.
         // @ts-ignore // TODO: Add declaration merging
@@ -146,14 +259,15 @@ ___________________
             if (ChangelogApplication.showApplication) {
                 await new ChangelogApplication().render(true);
             }
-
         }
 
-        // TODO make based on foundry version
+        // Connect chat dice icon to shadowrun basic success test roll.
         const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-        $(document).on('click', diceIconSelector, () => ShadowrunRoller.promptRoll());
+        $(document).on('click', diceIconSelector, async () => await ShadowrunRoller.promptSuccessTest());
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
-        $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller.promptRoll());
+        $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
+
+        Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
     }
 
     static canvasInit() {
@@ -207,8 +321,15 @@ ___________________
         tokenControls.tools.push(EnvModifiersApplication.getControl());
     }
 
-    static renderChatMessage(message, html, data) {
-        chat.addRollListeners(message, html);
+    /**
+     * Register renderChatMessage Hooks using FoundryVTT Hooks.on for each registered test type.
+     *
+     * This will avoid calling the same method on different types twice.
+     *
+     * Must be called on 'ready' or after game.shadowrun is registered.
+     */
+    static renderChatMessage() {
+        console.debug('Shadowrun5e | Registering new chat messages related hooks');
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {
@@ -315,4 +436,16 @@ ___________________
         // @ts-ignore
         api.PACKAGE_CONFIG.push(config);
     }
+
+    static async chatMessageListeners(message: ChatMessage, html, data) {
+        await SuccessTest.chatMessageListeners(message, html, data);
+        await OpposedTest.chatMessageListeners(message, html, data);
+        handleRenderChatMessage(message, html, data);
+    }
+
+    static async chatLogListeners(chatLog: ChatLog, html, data) {
+        await SuccessTest.chatLogListeners(chatLog, html, data);
+        await OpposedTest.chatLogListeners(chatLog, html, data);
+    }
+
 }

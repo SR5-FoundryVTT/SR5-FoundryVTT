@@ -5,19 +5,35 @@
         font-style: normal;
         font-size: 1rem;
 
+        /**
+         * Content with this class should be hidden from players eyes
+         * Check SuccessTest._showGmOnlyContent for when to show it to users.
+         */
+        .gm-only-content {
+            display: none !important;
+        }
+
+        .clickable:hover {
+            cursor: pointer;
+            background: #4b4a44;
+            color: $white;
+        }
+
         .card-header {
             padding: 0.25em 0;
             border-bottom: $groove;
 
             img {
-                flex: 0 0 36px;
+                flex: 0 0;
                 margin-right: 0.5em;
                 padding: 1px 1px 1px 1px;
                 border: 0;
+                height: 28px;
+                width: 28px;
             }
 
             h3 {
-                font-size: 1.75em;
+                font-size: 1.5em;
                 align-self: center;
                 flex: 1;
                 margin: 0;
@@ -27,23 +43,6 @@
         .card-header:first-of-type {
             border-top: $groove;
         }
-        .card-main-content {
-            cursor: pointer;
-        }
-        .card-content {
-            padding: 0.5em 0;
-            border-bottom: $groove;
-
-            p {
-                font-size: 0.8em;
-            }
-            h3 {
-                font-size: 1em;
-                margin: 0;
-                font-weight: bold;
-            }
-        }
-
         .card-buttons {
             .button {
                 box-shadow: 0 0 0.25em 0.15em $dark;
@@ -62,7 +61,6 @@
                 font-weight: bold;
             }
         }
-
         .card-description {
             span {
                 border-right: $groove;
@@ -79,7 +77,6 @@
                 border-bottom: $groove;
             }
         }
-
         .damage-line {
             margin-top: 0.25em;
 
@@ -95,12 +92,17 @@
                 font-weight: bold;
             }
         }
+        .reducedResult {
+            color: #aa0200;
+            filter: sepia(0.5) hue-rotate(-60deg);
+        }
     }
     &.roll-card {
         margin: 0.15em;
+        font-size: 12px;
+
         .card-title {
             display: flex;
-            font-size: 14px;
             border-bottom: $groove;
             justify-content: flex-start;
             align-content: center;
@@ -109,6 +111,18 @@
             > * {
                 margin-left: 0.15em;
                 margin-right: 0.15em;
+                width: 100%;
+            }
+
+            .document {
+                overflow: hidden;
+                white-space: nowrap;
+                display: flex;
+                align-content: center;
+
+                * {
+                    display: inline-block;
+                }
             }
 
             .header-name {
@@ -157,16 +171,13 @@
         }
         .card-description {
             padding: 0.25em;
-            font-size: 14px;
             border-bottom: $groove;
             display: none;
         }
-        .show-card-description {
-            display: block;
-        }
         .card-content {
-            font-size: 14px;
-            padding: 0 0.25em;
+            border-bottom: $groove;
+
+            padding: 0.25em 0.25em 0.25em;
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
@@ -179,7 +190,6 @@
                 display: flex;
                 flex: 1;
                 flex-flow: column;
-                font-size: 12px;
                 text-align: right;
                 align-content: flex-end;
                 .limit-line {
@@ -198,6 +208,9 @@
             .value {
                 font-weight: bold;
                 align-self: flex-end;
+            }
+            .value-result {
+                text-align: right;
             }
             .limit-line {
                 display: flex;
@@ -222,6 +235,30 @@
                 .icon {
                     font-style: italic;
                 }
+            }
+            p {
+                font-size: 0.8em;
+            }
+            h3 {
+                font-size: 1em;
+                margin: 0;
+                font-weight: bold;
+            }
+            .test-value {
+                display: flex;
+                span.value {
+                    flex: auto;
+                    text-align: left;
+                }
+                span.value-result {
+                    flex: auto;
+                    text-align: right;
+                    padding-right: 8px;
+                }
+            }
+            .test-code {
+                font-family: $nodesto;
+                font-size: 1.5em;
             }
         }
         .dice-rolls {
@@ -255,6 +292,7 @@
             display: flex;
             flex-flow: column;
             border-bottom: $groove;
+
             .glitch {
                 position: relative;
                 text-decoration: none;
@@ -334,6 +372,11 @@
                     transform: translate(0);
                 }
             }
+        }
+    }
+    &.item-card {
+        .card-description {
+            display: block;
         }
     }
     .chat-select-link img:hover {

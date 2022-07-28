@@ -88,6 +88,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/action.html',
         'systems/shadowrun5e/dist/templates/item/parts/action_results.html',
+        'systems/shadowrun5e/dist/templates/item/parts/modifier.html',
         'systems/shadowrun5e/dist/templates/item/parts/damage.html',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.html',
         'systems/shadowrun5e/dist/templates/item/parts/spell.html',
@@ -132,6 +133,18 @@ export const preloadHandlebarsTemplates = async () => {
 
         // dialogs
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/defense-test-dialog.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/complexform-test-dialog.html',
+
+        // Test chat messages and their parts
+        'systems/shadowrun5e/dist/templates/rolls/success-test-message.html',
+
+        'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
+        'systems/shadowrun5e/dist/templates/rolls/parts/test-opposed-resist.html',
     ];
 
     return loadTemplates(templatePaths);

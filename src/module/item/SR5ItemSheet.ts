@@ -2,9 +2,7 @@ import {Helpers} from '../helpers';
 import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
-import {SR5Actor} from "../actor/SR5Actor";
 import {ItemData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
-import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -113,6 +111,16 @@ export class SR5ItemSheet extends ItemSheet {
         if (this.item.canBeNetworkDevice) {
             data['networkController'] = this.item.networkController;
         }
+
+        // Provide action parts with all test variantes.
+        // @ts-ignore // TODO: put 'opposed test types' into config (see data.config)
+        data.tests = game.shadowrun5e.tests;
+        // @ts-ignore
+        data.opposedTests = game.shadowrun5e.opposedTests;
+        // @ts-ignore
+        data.activeTests = game.shadowrun5e.activeTests;
+        // @ts-ignore
+        data.resistTests = game.shadowrun5e.resistTests;
 
         return data;
     }
@@ -253,9 +261,8 @@ export class SR5ItemSheet extends ItemSheet {
             let item;
             // Case 1 - Data explicitly provided
             if (data.data) {
-                // TODO test
-                if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
-                    return console.warn('Shadowrun 5e | Cant drop items onto themselfs');
+                if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
+                    return console.warn('Shadowrun 5e | Cant drop items onto themself');
                 }
                 item = data;
             // Case 2 - From a Compendium Pack
@@ -416,7 +423,7 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onOwnedItemRemove(event) {
-         event.preventDefault();
+         event.preventDefault();1
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;

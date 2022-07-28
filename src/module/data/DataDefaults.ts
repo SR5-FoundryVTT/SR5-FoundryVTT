@@ -17,15 +17,19 @@ import {SKILL_DEFAULT_NAME} from "../constants";
 import DeviceData = Shadowrun.DeviceData;
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import DeviceItemData = Shadowrun.DeviceItemData;
+import ValueField = Shadowrun.ValueField;
+import GenericValueField = Shadowrun.GenericValueField;
+import MinimalActionData = Shadowrun.MinimalActionData;
 
 
+// TODO: reimplemented methods based on .damageData or use template data somehow
 export class DefaultValues {
     /**
      *
      * @param partialDamageData give partial DamageData fields to overwrite default values
      */
     static damageData(partialDamageData: Partial<DamageData> = {}): DamageData {
-        return mergeObject({
+        const data: DamageData = {
             type: {
                 base: 'physical',
                 value: 'physical',
@@ -50,7 +54,8 @@ export class DefaultValues {
                 itemType: '',
                 itemName: ''
             }
-        }, partialDamageData) as DamageData;
+        }
+        return mergeObject(data, partialDamageData) as DamageData;
     }
 
     static actorArmorData(partialActorArmorData: Partial<ActorArmorData> = {}): ActorArmorData {
@@ -256,6 +261,81 @@ export class DefaultValues {
                 ...DefaultValues.matrixData({category: partialDeviceItemData.data?.category, atts: partialDeviceItemData.data?.atts}),
             }
         }, partialDeviceItemData) as DeviceItemData;
+    }
+
+    static valueData(partialValueData: Partial<ValueField> = {}) {
+        return mergeObject({
+            base: 0,
+            value: 0,
+            temp: 0,
+            mod: [],
+            label: ''
+        }, partialValueData) as ValueField;
+    }
+
+    static genericValueData(partialGenericValueData: Partial<GenericValueField> = {}) {
+        return mergeObject({
+            base: 0,
+            value: 0,
+            temp: 0,
+            mod: [],
+            label: ''
+        }, partialGenericValueData) as GenericValueField;
+    }
+
+    static minimalActionData(partialActionData: Partial<MinimalActionData> = {}) {
+        return mergeObject({
+            attribute: '',
+            attribute2: '',
+            skill: '',
+            mod: 0,
+            armor: false
+        }, partialActionData) as MinimalActionData;
+    }
+
+    static actionData(partialActionData: Partial<ActionRollData> = {}) {
+        return mergeObject({
+            test: "",
+            type: '',
+            category: '',
+            attribute: '',
+            attribute2: '',
+            skill: '',
+            spec: false,
+            mod: 0,
+            mod_description: '',
+            damage: DefaultValues.damageData(),
+            modifiers: [],
+            limit: {
+                value: 0,
+                attribute: '',
+                mod: [],
+                base: 0,
+            },
+            threshold: {
+                value: 0,
+                base: 0
+            },
+            extended: false,
+            opposed: {
+                type: '',
+                test: '',
+                attribute: '',
+                attribute2: '',
+                skill: '',
+                mod: 0,
+                description: '',
+            },
+            followed: {
+                test: '',
+                attribute: '',
+                attribute2: '',
+                skill: '',
+                mod: 0,
+            },
+            alt_mod: 0,
+            dice_pool_mod: []
+        }, partialActionData) as ActionRollData;
     }
 }
 

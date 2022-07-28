@@ -38,7 +38,8 @@ export const FLAGS = {
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
     addNetworkController: 'addNetworkController',
-    TokenHealthBars: 'tokenHealthBars'
+    TokenHealthBars: 'tokenHealthBars',
+    Test: 'TestData'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
