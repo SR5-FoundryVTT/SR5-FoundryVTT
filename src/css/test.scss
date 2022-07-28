@@ -3,11 +3,22 @@
  */
 @import 'config';
 
-.sr5 {
+.sr5.form-dialog {
   .dialog-title {
-      font-weight: bold;
-      height: 30px;
+    font-weight: bold;
+    height: 30px;
+  }
+
+  .form-group {
+    label {
+      font-weight: normal;
     }
+
+    input {
+      color: $white;
+    }
+  }
+
 
   .dialog-content-common {
     h2 {
@@ -15,9 +26,12 @@
       border: none;
       margin: 0;
     }
+
     .sunken {
       padding: 0.5em;
     }
+
+
   }
 
   .dialog-content-column {
@@ -27,6 +41,7 @@
   .sunken select {
     color: white;
   }
+
   .sunken select option {
     background-color: $dark-sunken;
   }

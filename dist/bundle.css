@@ -593,25 +593,31 @@
 /**
  * CSS for Test Dialog styling.
  */
-.sr5 .dialog-title {
+.sr5.form-dialog .dialog-title {
   font-weight: bold;
   height: 30px; }
 
-.sr5 .dialog-content-common h2 {
+.sr5.form-dialog .form-group label {
+  font-weight: normal; }
+
+.sr5.form-dialog .form-group input {
+  color: white; }
+
+.sr5.form-dialog .dialog-content-common h2 {
   text-underline: none;
   border: none;
   margin: 0; }
 
-.sr5 .dialog-content-common .sunken {
+.sr5.form-dialog .dialog-content-common .sunken {
   padding: 0.5em; }
 
-.sr5 .dialog-content-column {
+.sr5.form-dialog .dialog-content-column {
   width: 300px; }
 
-.sr5 .sunken select {
+.sr5.form-dialog .sunken select {
   color: white; }
 
-.sr5 .sunken select option {
+.sr5.form-dialog .sunken select option {
   background-color: #414040; }
 
 @font-face {
