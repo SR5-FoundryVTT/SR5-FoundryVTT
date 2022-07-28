@@ -11855,7 +11855,7 @@ var TestCreator = {
         return;
       }
       const targets = yield Helpers.getTestTargetActors(testData.data);
-      const actors = targets || Helpers.getSelectedActorsOrCharacter();
+      const actors = targets.length > 0 ? targets : Helpers.getSelectedActorsOrCharacter();
       if (actors.length === 0)
         (_b = ui.notifications) == null ? void 0 : _b.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
       for (const actor of actors) {

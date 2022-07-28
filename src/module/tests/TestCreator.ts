@@ -177,7 +177,7 @@ export const TestCreator = {
 
 
         const targets = await Helpers.getTestTargetActors(testData.data);
-        const actors = targets || Helpers.getSelectedActorsOrCharacter();
+        const actors = targets.length > 0 ? targets : Helpers.getSelectedActorsOrCharacter();
 
         if (actors.length === 0)
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
