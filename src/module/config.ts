@@ -46,6 +46,9 @@ export const SR5 = {
         willpower: 'SR5.AttrWillpower',
     },
 
+    /**
+     * All labels for all limits used across all actor and item types.
+     */
     limits: {
         physical: 'SR5.LimitPhysical',
         social: 'SR5.LimitSocial',
@@ -54,6 +57,9 @@ export const SR5 = {
         sleaze: 'SR5.MatrixAttrSleaze',
         data_processing: 'SR5.MatrixAttrDataProc',
         firewall: 'SR5.MatrixAttrFirewall',
+        speed: 'SR5.Vehicle.Stats.Speed',
+        sensor: 'SR5.Vehicle.Stats.Sensor',
+        handling: 'SR5.Vehicle.Stats.Handling'
     },
 
     specialTypes: {

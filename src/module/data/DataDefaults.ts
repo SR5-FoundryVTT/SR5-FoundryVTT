@@ -289,7 +289,13 @@ export class DefaultValues {
             attribute2: '',
             skill: '',
             mod: 0,
-            armor: false
+            armor: false,
+            limit: {
+                value: 0,
+                attribute: '',
+                mod: [],
+                base: 0,
+            }
         }, partialActionData) as MinimalActionData;
     }
 

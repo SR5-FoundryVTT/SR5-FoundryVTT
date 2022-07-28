@@ -1,3 +1,4 @@
+
 declare namespace Shadowrun {
 
 
@@ -66,6 +67,7 @@ declare namespace Shadowrun {
         attribute2: ActorAttribute
         mod: number
         armor: boolean
+        limit: LimitData
     }
 
     /**
@@ -92,4 +94,29 @@ declare namespace Shadowrun {
             }
         }
     }
+
+    /**
+     * A list of pack names defined within the system.
+     *
+     * Mainly here to prohibit using missing packs in code.
+     */
+    export type PackName = 'Matrix Actions'|'General Actions';
+    /**
+     * A list of action names defined in any system pack.
+     *
+     * Mainly here to prohibit using missing actions in code.
+     */
+    export type PackActionName =
+        'physical_damage_resist'
+        | 'drain'
+        | 'natural_recovery_stun'
+        | 'natural_recovery_physical'
+        | 'armor'
+        | 'fade'
+        | 'composure'
+        | 'judge_intentions'
+        | 'lift_carry'
+        | 'memory'
+        | 'physical_defense'
+        | 'drone_pilot_vehicle';
 }

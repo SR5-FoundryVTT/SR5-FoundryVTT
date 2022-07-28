@@ -47,6 +47,7 @@ import {NaturalRecoveryStunTest} from "./tests/NaturalRecoveryStunTest";
 import {NaturalRecoveryPhysicalTest} from "./tests/NaturalRecoveryPhysicalTest";
 import {FadeTest} from "./tests/FadeTest";
 import {ThrownAttackTest} from "./tests/ThrownAttackTest";
+import {PilotVehicleTest} from "./tests/PilotVehicleTest";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -139,7 +140,8 @@ ___________________
                 ComplexFormTest,
                 AttributeOnlyTest,
                 NaturalRecoveryStunTest,
-                NaturalRecoveryPhysicalTest
+                NaturalRecoveryPhysicalTest,
+                PilotVehicleTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -158,7 +160,8 @@ ___________________
                 NaturalRecoveryStunTest,
                 NaturalRecoveryPhysicalTest,
                 DrainTest,
-                FadeTest
+                FadeTest,
+                PilotVehicleTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.

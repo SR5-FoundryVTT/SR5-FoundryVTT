@@ -588,7 +588,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                         await this.actor.rollDroneInfiltration(options);
                         break;
                     case 'pilot-vehicle':
-                        await this.actor.rollPilotVehicle(options);
+                        await this.actor.rollGeneralAction('drone_pilot_vehicle', options);
                         break;
                 }
                 break;
