@@ -988,7 +988,8 @@
     "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
     "DrainTest": "Drain Test",
     "FadeTest": "Fade Test",
-    "PilotVehicleTest": "Pilot Vehicle Test"
+    "PilotVehicleTest": "Pilot Vehicle Test",
+    "DronePerceptionTest": "Drone Perception Test"
   },
   "SR5.MissingResource": {
     "Edge": "No Edge left to consume"

@@ -17168,7 +17168,7 @@ var SR5Actor = class extends Actor {
   }
   rollGeneralAction(actionName, options) {
     return __async(this, null, function* () {
-      yield this.rollPackAction(SR5.packNames.generalActions, actionName);
+      yield this.rollPackAction(SR5.packNames.generalActions, actionName, options);
     });
   }
   rollSkill(skillId, options) {
@@ -24822,7 +24822,7 @@ var SR5BaseActorSheet = class extends ActorSheet {
           const droneRoll = split[1];
           switch (droneRoll) {
             case "perception":
-              yield this.actor.rollDronePerception(options);
+              yield this.actor.rollGeneralAction("drone_perception", options);
               break;
             case "infiltration":
               yield this.actor.rollDroneInfiltration(options);
@@ -27248,6 +27248,32 @@ var PilotVehicleTest = class extends SuccessTest {
   }
 };
 
+// src/module/tests/DronePerceptionTest.ts
+var DronePerceptionTest = class extends SuccessTest {
+  static _getDocumentTestAction(item, actor) {
+    return __async(this, null, function* () {
+      var _a;
+      if (!item || !actor)
+        return {};
+      const vehicleData = actor.asVehicleData();
+      if (!vehicleData) {
+        yield (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.ERROR.TestExpectsVehicleOnly"));
+        return {};
+      }
+      switch (vehicleData.data.controlMode) {
+        case "autopilot": {
+          const attribute = "pilot";
+          const skill = "perception";
+          const limit = "sensor";
+          return { attribute, skill, limit };
+        }
+        default:
+          return actor.skillActionData("perception");
+      }
+    });
+  }
+};
+
 // src/module/hooks.ts
 var HooksManager = class {
   static registerHooks() {
@@ -27304,7 +27330,8 @@ ___________________
         AttributeOnlyTest,
         NaturalRecoveryStunTest,
         NaturalRecoveryPhysicalTest,
-        PilotVehicleTest
+        PilotVehicleTest,
+        DronePerceptionTest
       },
       activeTests: {
         SuccessTest,
@@ -27319,7 +27346,8 @@ ___________________
         NaturalRecoveryPhysicalTest,
         DrainTest,
         FadeTest,
-        PilotVehicleTest
+        PilotVehicleTest,
+        DronePerceptionTest
       },
       opposedTests: {
         OpposedTest,

@@ -118,5 +118,6 @@ declare namespace Shadowrun {
         | 'lift_carry'
         | 'memory'
         | 'physical_defense'
-        | 'drone_pilot_vehicle';
+        | 'drone_pilot_vehicle'
+        | 'drone_perception';
 }

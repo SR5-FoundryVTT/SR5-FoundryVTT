@@ -877,7 +877,7 @@ export class SR5Actor extends Actor {
      * @param options Success Test options
      */
     async rollGeneralAction(actionName: PackActionName, options?: ActorRollOptions) {
-        await this.rollPackAction(SR5.packNames.generalActions as PackName, actionName);
+        await this.rollPackAction(SR5.packNames.generalActions as PackName, actionName, options);
     }
 
     async rollSkill(skillId: string, options?: SkillRollOptions) {
@@ -891,38 +891,6 @@ export class SR5Actor extends Actor {
         if (!test) return;
 
         await test.execute();
-    }
-
-    async rollDronePerception(options?: ActorRollOptions) {
-        if (!this.isVehicle())
-            return;
-
-        const actorData = duplicate(this.data.data) as VehicleData;
-        if (actorData.controlMode === 'autopilot') {
-            const parts = new PartsList<number>();
-
-            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
-            // TODO possibly look for autosoft item level?
-            const perception = this.findActiveSkill('perception');
-            const limit = this.findLimit('sensor');
-
-            if (perception && limit) {
-                parts.addPart('SR5.Vehicle.Clearsight', Helpers.calcTotal(perception));
-                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
-
-                this._addGlobalParts(parts);
-
-                return ShadowrunRoller.advancedRoll({
-                    event: options?.event,
-                    actor: this,
-                    parts: parts.list,
-                    limit,
-                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDronePerception'),
-                });
-            }
-        } else {
-            await this.rollSkill('perception', options);
-        }
     }
 
     async rollDroneInfiltration(options?: ActorRollOptions) {

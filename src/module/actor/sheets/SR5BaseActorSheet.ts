@@ -582,7 +582,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 const droneRoll = split[1];
                 switch (droneRoll) {
                     case 'perception':
-                        await this.actor.rollDronePerception(options);
+                        await this.actor.rollGeneralAction('drone_perception', options);
                         break;
                     case 'infiltration':
                         await this.actor.rollDroneInfiltration(options);
