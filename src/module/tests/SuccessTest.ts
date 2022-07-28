@@ -19,6 +19,7 @@ import Template from "../template";
 import {TestRules} from "../rules/TestRules";
 import ActionResultData = Shadowrun.ActionResultData;
 import {ActionResultFlow} from "../item/flows/ActionResultFlow";
+import {handleRenderChatMessage} from "../chat";
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -1259,6 +1260,8 @@ export class SuccessTest {
         html.find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
         html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
         html.find('.result-action').on('click', this._castResultAction);
+
+        handleRenderChatMessage(message, html, data);
 
         await this._showGmOnlyContent(message, html, data)
     }

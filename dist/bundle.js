@@ -12654,6 +12654,7 @@ var chatMessageActionApplyDamage = (html, event) => __async(void 0, null, functi
   const element = String(applyDamage.data("damageElement"));
   let damage = Helpers.createDamageData(value, type, ap, element);
   let actors = Helpers.getSelectedActorsOrCharacter();
+  console.error("damage application");
   if (actors.length === 0) {
     const messageId = html.data("messageId");
     const message = (_a = game.messages) == null ? void 0 : _a.get(messageId);
@@ -16470,6 +16471,7 @@ var SuccessTest = class {
       html.find(".chat-document-link").on("click", Helpers.renderEntityLinkSheet);
       html.find(".place-template").on("click", this._placeItemBlastZoneTemplate);
       html.find(".result-action").on("click", this._castResultAction);
+      handleRenderChatMessage(message, html, data);
       yield this._showGmOnlyContent(message, html, data);
     });
   }
@@ -27504,7 +27506,6 @@ ___________________
     return __async(this, null, function* () {
       yield SuccessTest.chatMessageListeners(message, html, data);
       yield OpposedTest.chatMessageListeners(message, html, data);
-      handleRenderChatMessage(message, html, data);
     });
   }
   static chatLogListeners(chatLog, html, data) {

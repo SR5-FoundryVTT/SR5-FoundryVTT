@@ -440,7 +440,6 @@ ___________________
     static async chatMessageListeners(message: ChatMessage, html, data) {
         await SuccessTest.chatMessageListeners(message, html, data);
         await OpposedTest.chatMessageListeners(message, html, data);
-        handleRenderChatMessage(message, html, data);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
