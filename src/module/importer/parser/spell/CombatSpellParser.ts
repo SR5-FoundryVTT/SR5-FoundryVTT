@@ -17,8 +17,6 @@ export class CombatSpellParser extends SpellParserBase {
 
         // Lower case is needed for the system.
         data.data.combat.type = descriptor.includes('Indirect') ? 'indirect' : 'direct';
-        // Set up automatic spell defense support.
-        data.data.action.opposed.type = 'defense';
 
         return data;
     }

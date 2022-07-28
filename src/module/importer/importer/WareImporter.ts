@@ -4,6 +4,7 @@ import { CyberwareParser } from '../parser/ware/CyberwareParser';
 import Ware = Shadowrun.WareItemData;
 import {DefaultValues} from "../../data/DataDefaults";
 import CyberwareItemData = Shadowrun.CyberwareItemData;
+import {Helpers} from "../../helpers";
 
 export class WareImporter extends DataImporter {
     public categoryTranslations: any;
@@ -96,6 +97,7 @@ export class WareImporter extends DataImporter {
 
             // // TODO: Follow ComplexFormParserBase approach.
             // data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

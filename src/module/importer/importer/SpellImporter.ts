@@ -8,6 +8,7 @@ import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
 import {DefaultValues} from "../../data/DataDefaults";
 import SpellItemData = Shadowrun.SpellItemData;
+import {Helpers} from "../../helpers";
 
 export class SpellImporter extends DataImporter {
     public categoryTranslations: any;
@@ -95,6 +96,9 @@ export class SpellImporter extends DataImporter {
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folders[data.data.category].id;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
+
             datas.push(data);
         }
 

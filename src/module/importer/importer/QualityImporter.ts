@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
 import {DefaultValues} from "../../data/DataDefaults";
 import QualityItemData = Shadowrun.QualityItemData;
+import {Helpers} from "../../helpers";
 
 export class QualityImporter extends DataImporter {
     public categoryTranslations: any;
@@ -62,6 +63,8 @@ export class QualityImporter extends DataImporter {
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folders[category.toLowerCase()].id;
             data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

@@ -4,6 +4,7 @@ import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParser
 import {Constants} from './Constants';
 import {DefaultValues} from "../../data/DataDefaults";
 import CritterPowerItemData = Shadowrun.CritterPowerItemData;
+import {Helpers} from "../../helpers";
 
 export class CritterPowerImporter extends DataImporter {
     public categoryTranslations: any;
@@ -69,6 +70,8 @@ export class CritterPowerImporter extends DataImporter {
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folder.id;
             data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

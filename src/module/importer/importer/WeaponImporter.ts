@@ -8,6 +8,7 @@ import { ParserMap } from '../parser/ParserMap';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import {DefaultValues} from "../../data/DataDefaults";
 import WeaponItemData = Shadowrun.WeaponItemData;
+import {Helpers} from "../../helpers";
 
 export class WeaponImporter extends DataImporter {
     public categoryTranslations: any;
@@ -116,6 +117,8 @@ export class WeaponImporter extends DataImporter {
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
             data.folder = folders[data.data.subcategory].id;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

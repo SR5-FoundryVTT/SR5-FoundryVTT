@@ -1658,51 +1658,8 @@ export class SR5Item extends Item {
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
     protected _preUpdate(changed, options, user) {
-        // Make sure weapon actions are in a valid state for different weapon categories.
-        if (this.isWeapon()) {
-            // Make sure a matching active test for the configured weapons category is used.
-            if (changed?.data?.category && changed.data.category !== '') {
-                const test = SR5.weaponCategoryActiveTests[changed.data.category];
-                if (!test) console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changed.data.category}.`, this);
-                foundry.utils.mergeObject(changed, {data: {action: {test}}});
-            }
-        }
-
-        // Make sure spell actions are in a valid state for different spell categories and configurations.
-        const spellData = this.asSpellData();
-        if (spellData) {
-            const futureData = foundry.utils.mergeObject(spellData, changed);
-
-            switch (futureData.data.category) {
-                case '': {
-                    foundry.utils.mergeObject(changed, {data: {
-                            action: {test: '', opposed: {test: '', resist: {test: ''}}}}
-                    });
-                    break;
-                }
-                default: {
-                    const activeTest = SR5.activeTests[this.data.type];
-                    const opposedTest = SR5.opposedTests[this.data.type][futureData.data.category] || 'OpposedTest';
-                    const resistTest = SR5.opposedResistTests[this.data.type][futureData.data.category] || '';
-
-                    foundry.utils.mergeObject(changed, {data: {action: {
-                        test: activeTest,
-                        opposed: {test: opposedTest,
-                                  resist:  {test: resistTest}}}}});
-                    break;
-                }
-            }
-        }
-
-        const complexFormData = this.asComplexFormData();
-        if (complexFormData) {
-            const futureData = foundry.utils.mergeObject(complexFormData, changed);
-
-            const activeTest = SR5.activeTests[this.data.type];
-
-            foundry.utils.mergeObject(changed, {data: {action: {
-                test: activeTest}}});
-        }
+        // Change used action test implementation when necessary.
+        changed = Helpers.injectActionTestsIntoChangeData(this.type, changed);
 
         return super._preUpdate(changed, options, user);
     }
