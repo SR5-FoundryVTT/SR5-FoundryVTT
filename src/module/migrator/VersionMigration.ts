@@ -105,12 +105,16 @@ export abstract class VersionMigration {
      */
     protected async Apply(documentUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of documentUpdates) {
+
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
                 // @ts-ignore
-                await actor.updateEmbeddedDocuments('Item', [embeddedItems]);
+                await actor.updateEmbeddedDocuments('Item', embeddedItems);
             }
-            await entity.update(updateData, { enforceTypes: false });
+
+            if (updateData !== null ) {
+                await entity.update(updateData, { enforceTypes: false });
+            }
         }
     }
 
@@ -127,43 +131,32 @@ export abstract class VersionMigration {
                     continue;
                 }
 
-                if (scene.id === 'MAwSFhlXRipixOWw') {
-                    console.log('Scene Pre-Update');
-                    console.log(scene);
-                }
-
+                // Migrate SceneData itself.
                 console.log(`Migrating Scene entity ${scene.name}`);
                 const updateData = await this.MigrateSceneData(duplicate(scene.data));
 
-                let hasTokenUpdates = false;
-                updateData.tokens = await Promise.all(
+                expandObject(updateData);
+                entityUpdates.set(scene, {
+                    updateData,
+                    embeddedItems: null,
+                });
+
+                // Migrate embedded TokenDocument / ActorData within SceneData
+                for (const token of scene.data.tokens) {
+                    // Don't migrate tokens without or a linked actor.
+                    if (!token.actor || token.data.actorLink) continue;
+                    if (isObjectEmpty(token.actor.data)) continue;
+
                     // @ts-ignore
-                    scene.data.tokens.map(async (token) => {
-                        if (!token.actor) return token;
-                        if (isObjectEmpty(token.actor.data)) return token;
+                    const updateData = await this.MigrateActorData(foundry.utils.duplicate(token.actor.data));
 
-                        // @ts-ignore
-                        let tokenDataUpdate = await this.MigrateActorData(token.actor.data);
-                        if (!isObjectEmpty(tokenDataUpdate)) {
-                            hasTokenUpdates = true;
-                            tokenDataUpdate['_id'] = token.id;
-
-                            const newToken = duplicate(token);
-                            newToken.actorData = await mergeObject(token.actor.data, tokenDataUpdate, {
-                                enforceTypes: false,
-                                inplace: false,
-                            });
-                            console.log(newToken);
-                            return newToken;
-                        } else {
-                            return token;
-                        }
-                    }),
-                );
-                if (scene.id === 'MAwSFhlXRipixOWw') {
-                    console.log('Scene Pre-Update');
-                    console.log(scene);
+                    expandObject(updateData);
+                    entityUpdates.set(token.actor, {
+                        updateData: updateData.data || null,
+                        embeddedItems: updateData.items || null
+                    });
                 }
+
 
                 if (isObjectEmpty(updateData)) {
                     continue;
@@ -260,19 +253,18 @@ export abstract class VersionMigration {
         if (actorData.items !== undefined) {
             const items = await Promise.all(
                 // @ts-ignore
-                actorData.items.map(async (item) => {
-                    let itemUpdate = await this.MigrateItemData(item.data);
+                actorData.items.map(async (itemData) => {
+                    if (itemData instanceof SR5Item) console.error('Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object');
+                    if (!await this.ShouldMigrateItemData(itemData)) return itemData;
+                    let itemUpdate = await this.MigrateItemData(itemData);
 
-                    if (!isObjectEmpty(itemUpdate)) {
-                        hasItemUpdates = true;
-                        itemUpdate['_id'] = item._id;
-                        return await mergeObject(item, itemUpdate, {
-                            enforceTypes: false,
-                            inplace: false,
-                        });
-                    } else {
-                        return item;
-                    }
+                    hasItemUpdates = true;
+                    itemUpdate['_id'] = itemData._id;
+
+                    return mergeObject(itemData, itemUpdate.data, {
+                        enforceTypes: false,
+                        inplace: false,
+                    });
                 }),
             );
             if (hasItemUpdates) {
@@ -375,53 +367,69 @@ export abstract class VersionMigration {
      * @param pack
      */
     public async MigrateCompendiumPack(pack: CompendiumCollection<CompendiumCollection.Metadata>) {
-        const entity = pack.metadata.entity;
-        if (!['Actor', 'Item', 'Scene'].includes(entity)) return;
+        if (!['Actor', 'Item', 'Scene'].includes(pack.metadata.type)) return;
 
         // Begin by requesting server-side data model migration and get the migrated content
         await pack.migrate({});
-        const content = await pack.getContent();
+        const documents = await pack.getDocuments();
 
         // Iterate over compendium entries - applying fine-tuned migration functions
-        for (let ent of content) {
+        for (let document of documents) {
             try {
                 let updateData: any = null;
-                if (entity === 'Item') {
-                    updateData = await this.MigrateItemData(ent.data);
+                if (pack.metadata.type === 'Item') {
+                    // @ts-ignore // TODO: vtt-types v9 document.data.type check added to type gate... but didn't work
+                    updateData = await this.MigrateItemData(foundry.utils.duplicate(document.data));
 
                     if (isObjectEmpty(updateData)) {
                         continue;
                     }
 
-                    expandObject(updateData);
-                    updateData['_id'] = ent.id;
-                    await pack.updateEntity(updateData);
+                    if (updateData.data) {
+                        expandObject(updateData.data);
+                        document.update(updateData.data);
+                    }
+
                     // TODO: Uncomment when foundry allows embeddeds to be updated in packs
-                    // } else if (document === 'Actor') {
-                    //     updateData = await this.MigrateActorData(ent.data);
-                    //
-                    //     if (isObjectEmpty(updateData)) {
-                    //         continue;
-                    //     }
-                    //
-                    //     updateData['_id'] = ent._id;
-                    //     await pack.updateEntity(updateData);
-                } else if (entity === 'Scene') {
-                    updateData = await this.MigrateSceneData(ent.data);
+                //@ts-ignore
+                } else if (pack.metadata.type === 'Actor') {
+                    // @ts-ignore
+                    updateData = await this.MigrateActorData(foundry.utils.duplicate(document.data));
 
                     if (isObjectEmpty(updateData)) {
                         continue;
                     }
 
-                    expandObject(updateData);
-                    updateData['_id'] = ent.id;
-                    await pack.updateEntity(updateData);
+                    if (updateData.items) {
+                        await document.updateEmbeddedDocuments('Item', updateData.items);
+                    }
+
+                    if (updateData.effects) {
+                        await document.updateEmbeddedDocuments('Effect', updateData.effects);
+                    }
+
+                    if (updateData.data) {
+                        expandObject(updateData.data);
+                        await document.update(updateData.data);
+                    }
+
+                } else if (pack.metadata.type === 'Scene') {
+                    updateData = await this.MigrateSceneData(foundry.utils.duplicate(document.data));
+
+                    if (isObjectEmpty(updateData)) {
+                        continue;
+                    }
+
+                    if (updateData.data) {
+                        expandObject(updateData.data);
+                        await document.update(updateData.data);
+                    }
                 }
             } catch (err) {
                 console.error(err);
             }
         }
-        console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
+        console.log(`Migrated all ${pack.metadata.type} entities from Compendium ${pack.collection}`);
     }
 }
 

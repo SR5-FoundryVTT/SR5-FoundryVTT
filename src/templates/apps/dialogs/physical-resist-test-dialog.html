@@ -1,0 +1,44 @@
+<form>
+     <div class="container container--fluid dialog-content-common">
+        <div class="container__row">
+            <div class="container__col-half dialog-content-column sunken">
+                <h2>{{localize test.title}}</h2>
+                <hr/>
+                <div>
+                    <div class="form-group">
+                        <label>{{localize 'SR5.IncomingDamage'}}</label>
+                        <input type="number" value="{{test.data.incomingDamage.value}}" name="test.data.incomingDamage"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'SR5.DamageType'}}</label>
+                        <select name="test.data.incomingDamage.type.value">
+                            {{#select test.data.incomingDamage.type.value}}
+                            {{#each config.damageTypes as |val key|}}
+                            <option value="{{key}}">{{localize val}}</option>
+                            {{/each}}
+                            {{/select}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'SR5.AP'}}</label>
+                        <input type="number" value="{{test.data.incomingDamage.ap.value}}" name="test.data.incomingDamage.ap" data-dtype="Number"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'SR5.Element'}}</label>
+                        <select name="test.data.incomingDamage.element.value">
+                            {{#select test.data.incomingDamage.element.value}}
+                            <option value="">{{localize "SR5.None"}}</option>
+                            {{#each config.elementTypes as |val key|}}
+                            <option value="{{key}}">{{localize val}}</option>
+                            {{/each}}
+                            {{/select}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="container__col-half dialog-content-column sunken">
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,16 @@
+<div class="item-form">
+    <div class="header">
+        {{localize header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Labels.Action.Modifier"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.modifiers" multiple>
+                {{selectOptions config.modifierTypes selected=data.action.modifiers localize=true}}
+            </select>
+        </div>
+    </div>
+
+</div>

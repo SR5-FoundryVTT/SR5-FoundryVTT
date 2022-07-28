@@ -3,9 +3,8 @@ import SituationModifiers = Shadowrun.SituationModifiers;
 import EnvironmentalModifiers = Shadowrun.EnvironmentalModifiers;
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
-import {Document} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/module.mjs";
-import {SR5Actor} from "../actor/SR5Actor";
 import {ModifiableDocumentTypes} from "../apps/EnvModifiersApplication";
+import Modifier = Shadowrun.Modifier;
 
 export class Modifiers {
     data: SituationModifiers;
@@ -32,6 +31,15 @@ export class Modifiers {
 
     set modifiers(modifiers: SituationModifiers) {
         this.data = modifiers;
+    }
+
+    /**
+     *
+     * @param type A string which SHOULD be of type ModifierTypes
+     */
+    getTotalForType(type: string): number {
+        const modifier = this.modifiers[type] || {total: 0};
+        return modifier.total;
     }
 
     get environmental(): EnvironmentalModifiers {
@@ -196,6 +204,12 @@ export class Modifiers {
         }
     }
 
+    static getDefaultModifier(): Modifier {
+        return {
+            total: 0
+        }
+    }
+
     static getDefaultModifiers(): SituationModifiers {
         return {
             environmental: Modifiers.getDefaultEnvironmentalModifiers()
@@ -206,17 +220,17 @@ export class Modifiers {
         return SR.combat.environmental.levels;
     }
 
-    static async getModifiersFromEntity(document: ModifiableDocumentTypes): Promise<Modifiers> {
+    static getModifiersFromEntity(document: ModifiableDocumentTypes): Modifiers {
         // It's possible for scene modifiers to chosen, while no scene is actually opened.
         // if (!document) return new Modifiers(Modifiers.getDefaultModifiers());
 
-        const data = await document.getFlag(SYSTEM_NAME, FLAGS.Modifier) as SituationModifiers;
+        const data = document.getFlag(SYSTEM_NAME, FLAGS.Modifier) as SituationModifiers;
         return new Modifiers(data);
     }
 
     static async setModifiersOnEntity(document: ModifiableDocumentTypes, modifiers: SituationModifiers) {
-        // TODO: Ask league about unsetFlag behavoir...
-        // NOTE: Check if JSON stringifier works or not.
+        // Removing unsetFlag causes strange update behaviour...
+        // ...this behaviour has been observed at other updates on flags.
         await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
         await document.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
     }

@@ -1,17 +1,14 @@
-import {ShadowrunRoll, ShadowrunRoller} from '../../rolls/ShadowrunRoller';
 import {SR5Actor} from "../SR5Actor";
-import {SoakRules} from "../../rules/SoakRules";
-import { Helpers } from '../../helpers';
+import {Helpers} from '../../helpers';
+import {PartsList} from "../../parts/PartsList";
+import {DefaultValues} from "../../data/DataDefaults";
+import {ShadowrunActorDialogs} from '../../apps/dialogs/ShadowrunActorDialogs';
+import {SR5Item} from '../../item/SR5Item';
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import ModList = Shadowrun.ModList;
-import {createRollChatMessage} from "../../chat";
 import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
 import DamageType = Shadowrun.DamageType;
-import {PartsList} from "../../parts/PartsList";
-import {DefaultValues} from "../../data/DataDefaults";
-import { ShadowrunActorDialogs } from '../../apps/dialogs/ShadowrunActorDialogs';
-import {SR5Item} from '../../item/SR5Item';
 
 export class SoakFlow {
 
@@ -21,61 +18,66 @@ export class SoakFlow {
      * @param soakRollOptions Information about the incoming damage (if it is already known)
      * @param partsProps Optional modifiers for the soak test
      */
-    async runSoakTest(actor: SR5Actor, soakRollOptions: SoakRollOptions, partsProps: ModList<number> = []): Promise<ShadowrunRoll|undefined> {
-        const initialDamageData = soakRollOptions.damage ? soakRollOptions.damage : DefaultValues.damageData();
-        const previewSoakDefenseParts = new PartsList<number>(duplicate(partsProps) as ModList<number>);
-        SoakRules.applyAllSoakParts(previewSoakDefenseParts, actor, initialDamageData);
-
-        // Ask the user for the damage data / update the incoming damage data
-        const damageDataOrUndef = await this.promptDamageData(soakRollOptions, previewSoakDefenseParts);
-        if (!damageDataOrUndef) {
-            return;
-        }
-
-        const damageData = damageDataOrUndef;
-        const finalSoakDefenseParts = new PartsList<number>(duplicate(partsProps) as ModList<number>);
-        SoakRules.applyAllSoakParts(finalSoakDefenseParts, actor, damageData);
+    async runSoakTest(actor: SR5Actor, soakRollOptions: SoakRollOptions, partsProps: ModList<number> = []): Promise<void> {
+        // const initialDamageData = soakRollOptions.damage ? soakRollOptions.damage : DefaultValues.damageData();
+        // const previewSoakDefenseParts = new PartsList<number>(duplicate(partsProps) as ModList<number>);
+        // SoakRules.applyAllSoakParts(previewSoakDefenseParts, actor, initialDamageData);
+        //
+        // // Ask the user for the damage data / update the incoming damage data
+        // const damageDataOrUndef = await this.promptDamageData(soakRollOptions, previewSoakDefenseParts);
+        // if (!damageDataOrUndef) {
+        //     return;
+        // }
+        //
+        // const damageData = damageDataOrUndef;
+        // const finalSoakDefenseParts = new PartsList<number>(duplicate(partsProps) as ModList<number>);
+        // SoakRules.applyAllSoakParts(finalSoakDefenseParts, actor, damageData);
 
         // Query user for roll options and do the actual soak test.
-        const title = game.i18n.localize('SR5.SoakTest');
-        const roll = await ShadowrunRoller.advancedRoll({
-            event: soakRollOptions?.event,
-            extended: false,
-            actor,
-            parts: finalSoakDefenseParts.list,
-            title,
-            wounds: false,
-            hideRollMessage: true
-        });
+        // const title = game.i18n.localize('SR5.SoakTest');
+        // const roll = await ShadowrunRoller.advancedRoll({
+        //     event: soakRollOptions?.event,
+        //     extended: false,
+        //     actor,
+        //     parts: finalSoakDefenseParts.list,
+        //     title,
+        //     wounds: false,
+        //     hideRollMessage: true
+        // });
 
-        if (!roll) return;
+        // if (!roll) return;
 
         // Modify damage and reduce damage by net hits and show result
-        const incoming = duplicate(damageData) as DamageData;
-        let modified = SoakRules.modifyDamageType(incoming, actor);
-        modified = SoakRules.reduceDamage(actor, modified, roll.hits).modified;
-        const incAndModDamage = {incoming, modified};
-
-        const options = {title, roll, actor, damage: incAndModDamage};
-        if (this.knocksDown(modified, actor)) {
-            options["knockedDown"] = true;
-        }
-        await createRollChatMessage(options);
-
-        return roll;
+        // const incoming = duplicate(damageData) as DamageData;
+        // let modified = SoakRules.modifyDamageType(incoming, actor);
+        // modified = SoakRules.reduceDamage(actor, modified, roll.hits).modified;
+        // const incAndModDamage = {incoming, modified};
+        //
+        // const options = {title, roll, actor, damage: incAndModDamage};
+        // if (this.knocksDown(modified, actor)) {
+        //     options["knockedDown"] = true;
+        // }
+        // await createRollChatMessage(options);
+        //
+        // return roll;
     }
 
-    private knocksDown(damage: DamageData, actor:SR5Actor) {
+
+    knocksDown(damage: DamageData, actor:SR5Actor) {
         // TODO: SR5 195 Called Shot Knock Down (Melee Only), requires attacker STR and actually announcing that called shot.
         const gelRoundsEffect = this.isDamageFromGelRounds(damage) ? -2 : 0;  // SR5 434
         const impactDispersionEffect = this.isDamageFromImpactDispersion(damage) ? -2 : 0  // FA 52
         const limit = actor.getLimit('physical');
         const effectiveLimit = limit.value + gelRoundsEffect + impactDispersionEffect
         // SR5 194
-        return damage.value > effectiveLimit || damage.value >= 10;
+        const knockedDown = damage.value > effectiveLimit || damage.value >= 10;
+
+        console.log(`Shadowrun5e | Determined target ${actor.id} knocked down status as: ${knockedDown}`, damage, actor);
+
+        return knockedDown;
     }
 
-    private isDamageFromGelRounds(damage: DamageData) {
+    isDamageFromGelRounds(damage: DamageData) {
         if (damage.source && damage.source.actorId && damage.source.itemId) {
             const attacker = game.actors?.find(actor => actor.id == damage.source?.actorId);
             if (attacker) {
@@ -90,7 +92,7 @@ export class SoakFlow {
         return false;
     }
 
-    private isDamageFromImpactDispersion(damage: DamageData) {
+    isDamageFromImpactDispersion(damage: DamageData) {
         // TODO: FA 52. Ammo currently cannot have mods, so not sure how to implement Alter Ballistics idiomatically.
         return false;
     }

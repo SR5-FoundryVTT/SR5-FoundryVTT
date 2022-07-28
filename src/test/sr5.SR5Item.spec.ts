@@ -17,7 +17,7 @@ export const shadowrunSR5Item = context => {
     })
 
     describe('SR5Items', () => {
-        it('Should create a naked item of any type', async () => {
+        it('create a naked item of any type', async () => {
             const item = await testItem.create({type: 'action'});
 
             // Check basic foundry data integrity
@@ -31,7 +31,7 @@ export const shadowrunSR5Item = context => {
             assert.strictEqual(item.id, itemFromCollection?.id);
         });
 
-        it('Should update an item of any type', async () => {
+        it('update an item of any type', async () => {
             const item = await testItem.create({type: 'action'});
 
             assert.notProperty(item.data.data, 'test');
@@ -41,7 +41,7 @@ export const shadowrunSR5Item = context => {
             assert.propertyVal(item.data.data, 'test', true);
         });
 
-        it('Should embedd a ammo into a weapon and not the global item collection', async () => {
+        it('embedd a ammo into a weapon and not the global item collection', async () => {
             const weapon = await testItem.create({type: 'weapon'}) as SR5Item;
             const ammo = await testItem.create({type: 'ammo'}) as SR5Item;
 
@@ -59,7 +59,7 @@ export const shadowrunSR5Item = context => {
             assert.strictEqual(embeddedAmmoInCollection, undefined);
         });
 
-        it('Should update an embedded ammo', async () => {
+        it('update an embedded ammo', async () => {
             const weapon = await testItem.create({type: 'weapon'}) as SR5Item;
             const ammo = await testItem.create({type: 'ammo'}) as SR5Item;
 

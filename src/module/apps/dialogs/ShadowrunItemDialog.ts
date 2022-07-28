@@ -179,7 +179,7 @@ export class ShadowrunItemDialog {
 
     static addSpellData(templateData: object, dialogData: Dialog.Data, item: SR5Item): Function {
         const title = `${Helpers.label(item.name)} Force`;
-        const drain = item.getDrain();
+        const drain = item.getDrain;
 
         const force = item.getLastSpellForce()?.value || 2 - drain;
 

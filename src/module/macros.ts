@@ -15,7 +15,7 @@ export async function createItemMacro(item, slot) {
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
     let macro = game.macros.contents.find((m) => m.name === item.name);
     if (!macro) {
-        macro = (await Macro.create(
+        macro = await Macro.create(
             {
                 name: item.name,
                 type: 'script',
@@ -24,7 +24,7 @@ export async function createItemMacro(item, slot) {
                 flags: { 'shadowrun5e.itemMacro': true },
             },
             { renderSheet: false },
-        )) as Macro;
+        );
     }
 
     if (macro) game.user?.assignHotbarMacro(macro, slot);
@@ -95,10 +95,6 @@ export async function rollSkillMacro(skillLabel) {
     const actor =  (game.actors.tokens[speaker.token as string] || game.actors.get(speaker.actor as string)) as SR5Actor
 
     if (!actor) return;
-
-    const skill = actor.getSkill(skillLabel, {byLabel: true});
-
-    if (!skill) return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.MissingSkillOnActor'))
-
-    await actor.rollSkill(skill);
+    // await actor.rollSkill(skillLabel);
+    // TODO: Macro for skills may need their own TestCreate.fromSkillMacro... as they need getSkill('Label', {byLabel: true});
 }

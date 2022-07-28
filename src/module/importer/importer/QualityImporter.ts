@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
 import {DefaultValues} from "../../data/DataDefaults";
 import QualityItemData = Shadowrun.QualityItemData;
+import {Helpers} from "../../helpers";
 
 export class QualityImporter extends DataImporter {
     public categoryTranslations: any;
@@ -15,7 +16,7 @@ export class QualityImporter extends DataImporter {
 
     GetDefaultData(): QualityItemData {
         return {
-            name: 'Unnamed Armor',
+            name: 'Unnamed Quality',
             type: 'quality',
             data: {
                 description: {
@@ -23,34 +24,9 @@ export class QualityImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
-                    type: '',
-                    category: '',
-                    attribute: '',
-                    attribute2: '',
-                    skill: '',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
+                action: DefaultValues.actionData({
                     damage: DefaultValues.damageData({type: {base: '', value: ''}}),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: [],
-                },
+                }),
                 type: '',
             },
         };
@@ -87,6 +63,8 @@ export class QualityImporter extends DataImporter {
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folders[category.toLowerCase()].id;
             data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

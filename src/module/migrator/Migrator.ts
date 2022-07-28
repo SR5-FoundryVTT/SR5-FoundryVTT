@@ -3,6 +3,7 @@ import { LegacyMigration } from './versions/LegacyMigration';
 import { Version0_6_5 } from './versions/Version0_6_5';
 import { Version0_6_10 } from './versions/Version0_6_10';
 import {Version0_7_2} from "./versions/Version0_7_2";
+import {Version0_8_0} from "./versions/Version0_8_0";
 
 type VersionDefinition = {
     versionNumber: string;
@@ -15,6 +16,7 @@ export class Migrator {
         { versionNumber: Version0_6_5.TargetVersion, migration: new Version0_6_5() },
         { versionNumber: Version0_6_10.TargetVersion, migration: new Version0_6_10() },
         { versionNumber: Version0_7_2.TargetVersion, migration: new Version0_7_2() },
+        { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
     ];
 
     public static async BeginMigration() {
@@ -108,7 +110,7 @@ export class Migrator {
      */
     private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
         // Migrate World Compendium Packs
-        const packs = game.packs?.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity));
+        const packs = game.packs?.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
 
         if (!packs) return;
 

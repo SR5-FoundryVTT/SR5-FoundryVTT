@@ -5,17 +5,20 @@
     <div class="attributes center">
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                 cssClass='no-grow'
+                rollId="attribute.edge"
                 attributeId='edge'
                 attribute=data.attributes.edge
         }}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                 cssClass='no-grow'
+                rollId="attribute.essence"
                 attributeId='essence'
                 attribute=data.attributes.essence
         }}
             {{#if awakened}}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                 cssClass='no-grow'
+                rollId="attribute.magic"
                 attributeId='magic'
                 attribute=data.attributes.magic
                 disableBase=(not awakened)
@@ -25,6 +28,7 @@
             {{#if emerged}}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                 cssClass='no-grow'
+                rollId="attribute.resonance"
                 attributeId='resonance'
                 attribute=data.attributes.resonance
                 disableBase=(not emerged)

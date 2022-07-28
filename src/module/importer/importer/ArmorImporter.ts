@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
 import ArmorItemData = Shadowrun.ArmorItemData;
 import {DefaultValues} from "../../data/DataDefaults";
+import {Helpers} from "../../helpers";
 
 export class ArmorImporter extends DataImporter {
     public armorTranslations: any;
@@ -65,6 +66,8 @@ export class ArmorImporter extends DataImporter {
             data.name = ImportHelper.MapNameToTranslation(this.armorTranslations, data.name);
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folders[category].id;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

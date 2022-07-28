@@ -2,7 +2,7 @@
     <div class="item-left">
         {{#if img}}
             <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">
-                <img src="{{img}}" title="{{name}}" height="24px" width="24px" />
+                <img src="{{img}}" title="{{name}}" height="24px" width="24px"/>
             </div>
         {{/if}}
         <div class="item-text item-name
@@ -44,6 +44,11 @@
                         }}
                     </div>
                 {{/ife}}
+            {{/if}}
+            {{#if option.html}}
+                <div class="item-text {{option.html.cssClass}}">
+                    {{{option.html.text}}}
+                </div>
             {{/if}}
         {{/each}}
         {{#if icons}}

@@ -4,7 +4,7 @@ export const shadowrunMatrix = context => {
     const {describe, it, assert, before, after} = context;
 
     describe('Matrix Rules', () => {
-        it('Should calculate IC device rating', () => {
+        it('calculate IC device rating', () => {
             let hostRating = 5;
             assert.strictEqual(MatrixRules.getICDeviceRating(hostRating), hostRating);
             // Negative values shouldn't break the system.
@@ -12,7 +12,7 @@ export const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules.getICDeviceRating(hostRating), 0);
         });
 
-        it('Should calculate IC condition monitor', () => {
+        it('calculate IC condition monitor', () => {
             // 8 is the minimum value possible
             assert.strictEqual(MatrixRules.getConditionMonitor(0), 8);
             // Check round up
@@ -23,7 +23,7 @@ export const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules.getConditionMonitor(-1), 8);
         });
 
-        it('Should calculate IC matrix initiative base', () => {
+        it('calculate IC matrix initiative base', () => {
             // 0 is the minimum value possible
             assert.strictEqual(MatrixRules.getICInitiativeBase(0), 0);
             assert.strictEqual(MatrixRules.getICInitiativeBase(-3), 0);
@@ -34,12 +34,12 @@ export const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules.getICInitiativeBase(12), 24);
         });
 
-        it('Should calculate IC matrix initiative dice', () => {
+        it('calculate IC matrix initiative dice', () => {
             // 4 is the only value possible
             assert.strictEqual(MatrixRules.getICInitiativeDice(), 4);
         });
 
-        it('Should calculate meat attribute base with the host rating', () => {
+        it('calculate meat attribute base with the host rating', () => {
             // 0 is the minimum value possible
             assert.strictEqual(MatrixRules.getICMeatAttributeBase(0), 0);
             assert.strictEqual(MatrixRules.getICMeatAttributeBase(-3), 0);
@@ -49,7 +49,7 @@ export const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules.getICMeatAttributeBase(27), 27);
         });
 
-        it('Should disallow invalid marks counters', () => {
+        it('disallow invalid marks counters', () => {
             assert.isTrue(MatrixRules.isValidMarksCount(0));
             assert.isTrue(MatrixRules.isValidMarksCount(1));
             assert.isTrue(MatrixRules.isValidMarksCount(2));
@@ -61,7 +61,7 @@ export const shadowrunMatrix = context => {
             assert.isFalse(MatrixRules.isValidMarksCount(1.5));
         });
 
-        it('Should return valid marks counts', () => {
+        it('return valid marks counts', () => {
             assert.strictEqual(MatrixRules.getValidMarksCount(-1), MatrixRules.minMarksCount());
             assert.strictEqual(MatrixRules.getValidMarksCount(0), 0);
             assert.strictEqual(MatrixRules.getValidMarksCount(1), 1);
@@ -70,7 +70,7 @@ export const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules.getValidMarksCount(4), MatrixRules.maxMarksCount());
         });
 
-        it('Should return expected host matrix attribute ratings', () => {
+        it('return expected host matrix attribute ratings', () => {
             assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
             assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
             assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);

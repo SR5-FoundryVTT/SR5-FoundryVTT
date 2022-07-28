@@ -8,6 +8,7 @@ import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
 import {DefaultValues} from "../../data/DataDefaults";
 import SpellItemData = Shadowrun.SpellItemData;
+import {Helpers} from "../../helpers";
 
 export class SpellImporter extends DataImporter {
     public categoryTranslations: any;
@@ -28,34 +29,11 @@ export class SpellImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
+                action: DefaultValues.actionData({
                     type: 'varies',
-                    category: '',
                     attribute: 'magic',
-                    attribute2: '',
                     skill: 'spellcasting',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DefaultValues.damageData({type: {base: '', value: ''}}),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: []
-                },
+                    damage: DefaultValues.damageData({type: {base: '', value: ''}})}),
                 drain: 0,
                 category: '',
                 type: '',
@@ -118,6 +96,9 @@ export class SpellImporter extends DataImporter {
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folders[data.data.category].id;
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
+
             datas.push(data);
         }
 

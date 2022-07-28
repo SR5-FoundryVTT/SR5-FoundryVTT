@@ -1,0 +1,85 @@
+{{#if test.actor}}
+<div class="dialog-content-common">
+    <div class="container container--fluid">
+        <div class="container__row dialog-title">
+            <div class="container__col-half">
+                <div class="document">
+                    <img src="{{test.actor.img}}"/>
+                    <a class="entity-link content-link" data-type="Actor"
+                       data-id="{{test.actor.id}}" data-uuid="{{test.actor.uuid}}">{{speakerName test.actor}}</a>
+                </div>
+            </div>
+            {{#if test.item}}
+            <div class="container__col-half">
+                <div class="document">
+                    <img src="{{test.item.img}}"/>
+                    <a class="entity-link content-link" data-type="Item"
+                       data-id="{{test.item.id}}" data-uuid="{{test.item.uuid}}">{{test.item.name}}</a>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+    {{/if}}
+
+    {{#if test.hasCode}}
+    <hr/>
+    <div style="margin-bottom: 4px; margin-top: 4px;">
+        {{test.code}}
+    </div>
+    {{/if}}
+
+    <hr/>
+    <div>
+        <div class="form-group">
+            <label>{{localize test.data.modifiers.label}}</label>
+            <input type="number" name="test.data.modifiers" data-dtype="number" value="{{test.data.modifiers.value}}"/>
+        </div>
+    </div>
+    <div>
+        <div class="form-group">
+            <label>{{localize "SR5.DicePool"}}</label>
+            <input type='number' name='test.data.pool' dtype="number" size='3' maxlength='3' value='{{test.pool.value}}'
+                   data-dtype="Number"/>
+        </div>
+        <div class="form-group">
+            <label>{{localize "SR5.Limit"}}</label>
+            <input type='number' name='test.data.limit' dtype="number" size='3' maxlength='3' value='{{test.limit.value}}'
+                   data-dtype="Number"/>
+        </div>
+        <div class="form-group">
+            <label>{{localize "SR5.Threshold"}}</label>
+            <input type='number' name='test.data.threshold' dtype="number" size='3' maxlength='3'
+                   value='{{test.threshold.value}}'
+                   data-dtype="Number"/>
+        </div>
+    </div>
+    {{#if test.actor}}
+    <hr/>
+    <div>
+        <div class="form-group">
+            <label>{{localize "SR5.PushTheLimit"}}
+                ({{test.actor.data.data.attributes.edge.uses}}/{{test.actor.data.data.attributes.edge.value}})</label>
+            <input type="checkbox" name="test.data.pushTheLimit" {{#if test.hasPushTheLimit}}checked{{/if}}
+            data-dtype="boolean"/>
+        </div>
+    </div>
+    {{/if}}
+    <hr/>
+    <div>
+        {{#if test.canBeExtended}}
+        <div class="form-group">
+            <label>{{localize "SR5.Extended"}}</label>
+            <input type="checkbox" name="test.data.extended" {{#if test.extended}}checked{{/if}} />
+        </div>
+        {{/if}}
+        <div class="form-group">
+            <label>{{ localize "SR5.RollMode" }}</label>
+            <select style="color: white" name="test.data.options.rollMode">
+                {{#select rollMode}} {{#each rollModes as |label mode|}}
+                <option value="{{mode}}">{{localize label}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+</div>
