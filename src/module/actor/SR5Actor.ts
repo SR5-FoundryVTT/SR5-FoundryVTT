@@ -57,6 +57,9 @@ import MarkedDocument = Shadowrun.MarkedDocument;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import InventoryData = Shadowrun.InventoryData;
 import DamageType = Shadowrun.DamageType;
+import PackActionName = Shadowrun.PackActionName;
+import PackName = Shadowrun.PackName;
+import ActionRollData = Shadowrun.ActionRollData;
 
 function getGame(): Game {
     if (!(game instanceof Game)) {
@@ -417,7 +420,21 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes;
     }
 
+    /**
+     * Return the given attribute, no matter its source.
+     *
+     * For characters and similar this will only return their attributes.
+     * For vehicles this will also return their vehicle stats.
+
+     * @param name An attribute or other stats name.
+     * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
+     */
     getAttribute(name: string): AttributeField {
+        // First check vehicle stats, as they don't always exist.
+        const stats = this.getVehicleStats();
+        if (stats && stats[name]) return stats[name];
+
+        // Second check general attributes.
         const attributes = this.getAttributes();
         return attributes[name];
     }
@@ -498,7 +515,7 @@ export class SR5Actor extends Actor {
     }
 
     getVehicleTypeSkill(): SkillField | undefined {
-        if (this.isVehicle()) return;
+        if (!this.isVehicle()) return;
 
         const name = this.getVehicleTypeSkillName();
         return this.findActiveSkill(name);
@@ -832,13 +849,14 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Roll an attribute tests as defined in SR5#152 section Attribute-Only Tests
+     * Roll an action from any pack with the given name.
      *
-     * @param actionName The internal attribute action id
+     * @param packName The name of the item pack to search.
+     * @param actionName The name within that pack.
      * @param options Success Test options
      */
-    async rollGeneralAction(actionName: 'physical_damage_resist'|'drain'|'natural_recovery_stun'|'natural_recovery_physical'|'armor'|'fade'|'composure'|'judge_intentions'|'lift_carry'|'memory'|'physical_defense', options?: ActorRollOptions) {
-        const action = await Helpers.getPackAction(SR5.packNames.generalActions, actionName);
+    async rollPackAction(packName: PackName, actionName: PackActionName, options?: ActorRollOptions) {
+        const action = await Helpers.getPackAction(packName, actionName);
         if (!action) return;
 
         const showDialog = !TestCreator.shouldHideDialog(options?.event);
@@ -852,100 +870,27 @@ export class SR5Actor extends Actor {
         await test.execute();
     }
 
+    /**
+     * Roll an attribute tests as defined within the systems general action pack.
+     *
+     * @param actionName The internal attribute action id
+     * @param options Success Test options
+     */
+    async rollGeneralAction(actionName: PackActionName, options?: ActorRollOptions) {
+        await this.rollPackAction(SR5.packNames.generalActions as PackName, actionName, options);
+    }
+
     async rollSkill(skillId: string, options?: SkillRollOptions) {
         console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
 
-        const skill = this.getSkill(skillId);
-        if (!skill) return console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
-        if (!SkillFlow.allowRoll(skill)) {
-            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
-            return;
-        }
-
-        const action = DefaultValues.actionData({
-            skill: skillId,
-            spec: options?.specialization || false,
-            attribute: skill.attribute,
-            limit: {
-                base: 0, value: 0, mod: [],
-                attribute: skill.attribute
-            },
-
-            test: SuccessTest.name
-        });
+        const action = this.skillActionData(skillId);
+        if (!action) return;
 
         const showDialog = !TestCreator.shouldHideDialog(options?.event);
         const test = await TestCreator.fromAction(action, this, {showDialog});
         if (!test) return;
 
         await test.execute();
-    }
-
-    async rollDronePerception(options?: ActorRollOptions) {
-        if (!this.isVehicle())
-            return;
-
-        const actorData = duplicate(this.data.data) as VehicleData;
-        if (actorData.controlMode === 'autopilot') {
-            const parts = new PartsList<number>();
-
-            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
-            // TODO possibly look for autosoft item level?
-            const perception = this.findActiveSkill('perception');
-            const limit = this.findLimit('sensor');
-
-            if (perception && limit) {
-                parts.addPart('SR5.Vehicle.Clearsight', Helpers.calcTotal(perception));
-                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
-
-                this._addGlobalParts(parts);
-
-                return ShadowrunRoller.advancedRoll({
-                    event: options?.event,
-                    actor: this,
-                    parts: parts.list,
-                    limit,
-                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDronePerception'),
-                });
-            }
-        } else {
-            await this.rollSkill('perception', options);
-        }
-    }
-
-    async rollPilotVehicle(options?: ActorRollOptions) {
-        if (!this.isVehicle()) {
-            return undefined;
-        }
-        const actorData = duplicate(this.data.data) as VehicleData;
-        if (actorData.controlMode === 'autopilot') {
-            const parts = new PartsList<number>();
-
-            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
-            let skill: SkillField | undefined = this.getVehicleTypeSkill();
-            const environment = actorData.environment;
-            const limit = this.findLimit(environment);
-
-            if (skill && limit) {
-                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
-                // TODO possibly look for autosoft item level?
-                parts.addPart('SR5.Vehicle.Maneuvering', Helpers.calcTotal(skill));
-
-                this._addGlobalParts(parts);
-
-                return await ShadowrunRoller.advancedRoll({
-                    event: options?.event,
-                    actor: this,
-                    parts: parts.list,
-                    limit,
-                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollPilotVehicleTest'),
-                });
-            }
-        } else {
-            const skillName = this.getVehicleTypeSkillName();
-            if (!skillName) return;
-            return await this.rollSkill(skillName, options);
-        }
     }
 
     async rollDroneInfiltration(options?: ActorRollOptions) {
@@ -1057,6 +1002,36 @@ export class SR5Actor extends Actor {
                 parts.addUniquePart(part.name, part.value);
             }
         }
+    }
+
+    /**
+     * Build an action for the given skill id based on it's configured values.
+     *
+     * @param skillId Any skill, no matter if active, knowledge or language
+     * @param options
+     */
+    skillActionData(skillId: string, options?: SkillRollOptions): ActionRollData|undefined {
+        const skill = this.getSkill(skillId);
+        if (!skill) {
+            console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
+            return;
+        }
+
+        if (!SkillFlow.allowRoll(skill)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
+        }
+
+        return DefaultValues.actionData({
+            skill: skillId,
+            spec: options?.specialization || false,
+            attribute: skill.attribute,
+            limit: {
+                base: 0, value: 0, mod: [],
+                attribute: skill.attribute
+            },
+
+            test: SuccessTest.name
+        });
     }
 
     /**

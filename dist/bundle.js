@@ -9351,7 +9351,13 @@ var DefaultValues = class {
       attribute2: "",
       skill: "",
       mod: 0,
-      armor: false
+      armor: false,
+      limit: {
+        value: 0,
+        attribute: "",
+        mod: [],
+        base: 0
+      }
     }, partialActionData);
   }
   static actionData(partialActionData = {}) {
@@ -9493,7 +9499,10 @@ var SR5 = {
     attack: "SR5.MatrixAttrAttack",
     sleaze: "SR5.MatrixAttrSleaze",
     data_processing: "SR5.MatrixAttrDataProc",
-    firewall: "SR5.MatrixAttrFirewall"
+    firewall: "SR5.MatrixAttrFirewall",
+    speed: "SR5.Vehicle.Stats.Speed",
+    sensor: "SR5.Vehicle.Stats.Sensor",
+    handling: "SR5.Vehicle.Stats.Handling"
   },
   specialTypes: {
     mundane: "SR5.Mundane",
@@ -16849,6 +16858,9 @@ var SR5Actor = class extends Actor {
     return this.data.data.attributes;
   }
   getAttribute(name) {
+    const stats = this.getVehicleStats();
+    if (stats && stats[name])
+      return stats[name];
     const attributes = this.getAttributes();
     return attributes[name];
   }
@@ -16909,7 +16921,7 @@ var SR5Actor = class extends Actor {
     }
   }
   getVehicleTypeSkill() {
-    if (this.isVehicle())
+    if (!this.isVehicle())
       return;
     const name = this.getVehicleTypeSkillName();
     return this.findActiveSkill(name);
@@ -17141,9 +17153,9 @@ var SR5Actor = class extends Actor {
       yield test.execute();
     });
   }
-  rollGeneralAction(actionName, options) {
+  rollPackAction(packName, actionName, options) {
     return __async(this, null, function* () {
-      const action = yield Helpers.getPackAction(SR5.packNames.generalActions, actionName);
+      const action = yield Helpers.getPackAction(packName, actionName);
       if (!action)
         return;
       const showDialog = !TestCreator.shouldHideDialog(options == null ? void 0 : options.event);
@@ -17154,93 +17166,22 @@ var SR5Actor = class extends Actor {
       yield test.execute();
     });
   }
+  rollGeneralAction(actionName, options) {
+    return __async(this, null, function* () {
+      yield this.rollPackAction(SR5.packNames.generalActions, actionName, options);
+    });
+  }
   rollSkill(skillId, options) {
     return __async(this, null, function* () {
-      var _a;
       console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
-      const skill = this.getSkill(skillId);
-      if (!skill)
-        return console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
-      if (!SkillFlow.allowRoll(skill)) {
-        (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.SkillCantBeDefault"));
+      const action = this.skillActionData(skillId);
+      if (!action)
         return;
-      }
-      const action = DefaultValues.actionData({
-        skill: skillId,
-        spec: (options == null ? void 0 : options.specialization) || false,
-        attribute: skill.attribute,
-        limit: {
-          base: 0,
-          value: 0,
-          mod: [],
-          attribute: skill.attribute
-        },
-        test: SuccessTest.name
-      });
       const showDialog = !TestCreator.shouldHideDialog(options == null ? void 0 : options.event);
       const test = yield TestCreator.fromAction(action, this, { showDialog });
       if (!test)
         return;
       yield test.execute();
-    });
-  }
-  rollDronePerception(options) {
-    return __async(this, null, function* () {
-      if (!this.isVehicle())
-        return;
-      const actorData = duplicate(this.data.data);
-      if (actorData.controlMode === "autopilot") {
-        const parts = new PartsList();
-        const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
-        const perception = this.findActiveSkill("perception");
-        const limit = this.findLimit("sensor");
-        if (perception && limit) {
-          parts.addPart("SR5.Vehicle.Clearsight", Helpers.calcTotal(perception));
-          parts.addPart("SR5.Vehicle.Stats.Pilot", pilot);
-          this._addGlobalParts(parts);
-          return ShadowrunRoller.advancedRoll({
-            event: options == null ? void 0 : options.event,
-            actor: this,
-            parts: parts.list,
-            limit,
-            title: game.i18n.localize("SR5.Labels.ActorSheet.RollDronePerception")
-          });
-        }
-      } else {
-        yield this.rollSkill("perception", options);
-      }
-    });
-  }
-  rollPilotVehicle(options) {
-    return __async(this, null, function* () {
-      if (!this.isVehicle()) {
-        return void 0;
-      }
-      const actorData = duplicate(this.data.data);
-      if (actorData.controlMode === "autopilot") {
-        const parts = new PartsList();
-        const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
-        let skill = this.getVehicleTypeSkill();
-        const environment = actorData.environment;
-        const limit = this.findLimit(environment);
-        if (skill && limit) {
-          parts.addPart("SR5.Vehicle.Stats.Pilot", pilot);
-          parts.addPart("SR5.Vehicle.Maneuvering", Helpers.calcTotal(skill));
-          this._addGlobalParts(parts);
-          return yield ShadowrunRoller.advancedRoll({
-            event: options == null ? void 0 : options.event,
-            actor: this,
-            parts: parts.list,
-            limit,
-            title: game.i18n.localize("SR5.Labels.ActorSheet.RollPilotVehicleTest")
-          });
-        }
-      } else {
-        const skillName = this.getVehicleTypeSkillName();
-        if (!skillName)
-          return;
-        return yield this.rollSkill(skillName, options);
-      }
     });
   }
   rollDroneInfiltration(options) {
@@ -17333,6 +17274,29 @@ var SR5Actor = class extends Actor {
         parts.addUniquePart(part.name, part.value);
       }
     }
+  }
+  skillActionData(skillId, options) {
+    var _a;
+    const skill = this.getSkill(skillId);
+    if (!skill) {
+      console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
+      return;
+    }
+    if (!SkillFlow.allowRoll(skill)) {
+      (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.SkillCantBeDefault"));
+    }
+    return DefaultValues.actionData({
+      skill: skillId,
+      spec: (options == null ? void 0 : options.specialization) || false,
+      attribute: skill.attribute,
+      limit: {
+        base: 0,
+        value: 0,
+        mod: [],
+        attribute: skill.attribute
+      },
+      test: SuccessTest.name
+    });
   }
   setFlag(scope, key, value) {
     const newValue = Helpers.onSetFlag(value);
@@ -24831,13 +24795,13 @@ var SR5BaseActorSheet = class extends ActorSheet {
           const droneRoll = split[1];
           switch (droneRoll) {
             case "perception":
-              yield this.actor.rollDronePerception(options);
+              yield this.actor.rollGeneralAction("drone_perception", options);
               break;
             case "infiltration":
-              yield this.actor.rollDroneInfiltration(options);
+              yield this.actor.rollGeneralAction("drone_infiltration", options);
               break;
             case "pilot-vehicle":
-              yield this.actor.rollPilotVehicle(options);
+              yield this.actor.rollGeneralAction("drone_pilot_vehicle", options);
               break;
           }
           break;
@@ -27230,6 +27194,85 @@ var ThrownAttackTest = class extends SuccessTest {
   }
 };
 
+// src/module/tests/PilotVehicleTest.ts
+var PilotVehicleTest = class extends SuccessTest {
+  static _getDocumentTestAction(item, actor) {
+    return __async(this, null, function* () {
+      var _a;
+      if (!item || !actor)
+        return {};
+      const vehicleData = actor.asVehicleData();
+      if (!vehicleData) {
+        yield (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.ERROR.TestExpectsVehicleOnly"));
+        return {};
+      }
+      switch (vehicleData.data.controlMode) {
+        case "autopilot": {
+          const attribute = "pilot";
+          const skill = actor.getVehicleTypeSkillName();
+          const limit = { attribute: vehicleData.data.environment };
+          return { attribute, skill, limit };
+        }
+        default:
+          const skillId = actor.getVehicleTypeSkillName();
+          return actor.skillActionData(skillId);
+      }
+    });
+  }
+};
+
+// src/module/tests/DronePerceptionTest.ts
+var DronePerceptionTest = class extends SuccessTest {
+  static _getDocumentTestAction(item, actor) {
+    return __async(this, null, function* () {
+      var _a;
+      if (!item || !actor)
+        return {};
+      const vehicleData = actor.asVehicleData();
+      if (!vehicleData) {
+        yield (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.ERROR.TestExpectsVehicleOnly"));
+        return {};
+      }
+      switch (vehicleData.data.controlMode) {
+        case "autopilot": {
+          const attribute = "pilot";
+          const skill = "perception";
+          const limit = "sensor";
+          return { attribute, skill, limit };
+        }
+        default:
+          return actor.skillActionData("perception");
+      }
+    });
+  }
+};
+
+// src/module/tests/DroneInfiltrationTest.ts
+var DroneInfiltrationTest = class extends SuccessTest {
+  static _getDocumentTestAction(item, actor) {
+    return __async(this, null, function* () {
+      var _a;
+      if (!item || !actor)
+        return {};
+      const vehicleData = actor.asVehicleData();
+      if (!vehicleData) {
+        yield (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.ERROR.TestExpectsVehicleOnly"));
+        return {};
+      }
+      switch (vehicleData.data.controlMode) {
+        case "autopilot": {
+          const attribute = "pilot";
+          const skill = "sneaking";
+          const limit = "sensor";
+          return { attribute, skill, limit };
+        }
+        default:
+          return actor.skillActionData("perception");
+      }
+    });
+  }
+};
+
 // src/module/hooks.ts
 var HooksManager = class {
   static registerHooks() {
@@ -27285,7 +27328,10 @@ ___________________
         ComplexFormTest,
         AttributeOnlyTest,
         NaturalRecoveryStunTest,
-        NaturalRecoveryPhysicalTest
+        NaturalRecoveryPhysicalTest,
+        PilotVehicleTest,
+        DronePerceptionTest,
+        DroneInfiltrationTest
       },
       activeTests: {
         SuccessTest,
@@ -27299,7 +27345,10 @@ ___________________
         NaturalRecoveryStunTest,
         NaturalRecoveryPhysicalTest,
         DrainTest,
-        FadeTest
+        FadeTest,
+        PilotVehicleTest,
+        DronePerceptionTest,
+        DroneInfiltrationTest
       },
       opposedTests: {
         OpposedTest,

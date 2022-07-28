@@ -652,7 +652,8 @@
       "ICConfiguration": "IC Configuration",
       "SetMonitor": "Monitor muss manuell gesetzt werden",
       "PersonalInventory": "Am Körper",
-      "CreateInventory": "Erstelle Inventar Ort"
+      "CreateInventory": "Erstelle Inventar Ort",
+      "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung."
     },
     "Action": {
       "ActiveTest": "Probe",
@@ -856,7 +857,8 @@
     "KeyNotModifyableByActiveEffect": "Aktiver Effekt Modus Modifizieren kann nur auf mod Felder angewendet werden.",
     "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden.",
     "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
-    "DefaultInventoryCantBeRemoved": "The default inventory can't be removed"
+    "DefaultInventoryCantBeRemoved": "The default inventory can't be removed",
+    "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug Akteur geworfen werden"
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
@@ -948,7 +950,10 @@
     "NaturalRecoveryStunTest": "Natürliche Genesung Geistig",
     "NaturalRecoveryPhysicalTest": "Natürliche Genesung Körperlich",
     "DrainTest": "Entzugswiderstand",
-    "FadeTest": "Schwundwiderstand"
+    "FadeTest": "Schwundwiderstand",
+    "PilotVehicleTest": "Fahrzeug Manövrieren",
+    "DronePerceptionTest": "Fahrzeug Clearsight",
+    "DroneInfiltrationTest": "Fahrzeug Stealth"
   },
   "SR5.MissingResource": {
     "Edge": "Kein Edge übrig"
