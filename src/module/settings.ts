@@ -123,4 +123,19 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: false,
     });
+
+    /**
+     * Control if GM triggered chat messages should hide critical message parts.
+     *
+     * These parts will only show to players that have appropriate permissions on the used
+     * actor for testing.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.HideGMOnlyChatContent, {
+        name: 'SETTINGS.HideGMOnlyChatContent',
+        hint: 'SETTINGS.HideGMOnlyChatContentDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false
+    });
 };

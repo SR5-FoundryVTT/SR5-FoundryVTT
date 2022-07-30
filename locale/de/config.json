@@ -609,7 +609,9 @@
     "OnlyAllowRollOnDefaultableSkillsDescription": "Wenn deaktiviert, können unbekannte Fertigkeiten auch getestet werden, wenn sie nicht improvisierbar sind",
     "Euclidean": "Euklidisch",
     "TokenHealthBars": "Token Lebensbalken",
-    "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige"
+    "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige",
+    "HideGMOnlyChatContent": "Verstecke GM Informationen in Proben Chat Nachrichten",
+    "HideGMOnlyChatContentDescription": "Nachrichten durch GM Proben zeigen kritische Informationen nur Spielern mit Besitzer Rechten für den genutzten Akteur"
   },
   "SR5.MIGRATION.WarningTitle": "Alarm",
   "SR5.MIGRATION.WarningHeader": "Migrationswarnung",

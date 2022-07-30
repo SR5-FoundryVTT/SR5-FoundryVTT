@@ -39,7 +39,8 @@ export const FLAGS = {
     DoNextRound: 'doNextRound',
     addNetworkController: 'addNetworkController',
     TokenHealthBars: 'tokenHealthBars',
-    Test: 'TestData'
+    Test: 'TestData',
+    HideGMOnlyChatContent: 'HideGMOnlyChatContent'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

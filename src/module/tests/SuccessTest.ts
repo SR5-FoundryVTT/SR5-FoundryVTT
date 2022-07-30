@@ -1154,7 +1154,10 @@ export class SuccessTest {
      * This test should hide information / rolls / dice for when cast by the GM.
      */
     get _applyGmOnlyContent(): boolean {
-        return !!game.user && game.user.isGM && !!this.actor;
+        // Enable GM only content only when the global setting is set.
+        const enableFeature = game.settings.get(SYSTEM_NAME, FLAGS.HideGMOnlyChatContent) as boolean;
+
+        return enableFeature && !!game.user && game.user.isGM && !!this.actor;
     }
 
     /**

@@ -8866,7 +8866,8 @@ var FLAGS = {
   DoNextRound: "doNextRound",
   addNetworkController: "addNetworkController",
   TokenHealthBars: "tokenHealthBars",
-  Test: "TestData"
+  Test: "TestData",
+  HideGMOnlyChatContent: "HideGMOnlyChatContent"
 };
 var CORE_NAME = "core";
 var CORE_FLAGS = {
@@ -16416,7 +16417,8 @@ var SuccessTest = class {
     return ((_a = this.item) == null ? void 0 : _a.hasTemplate) || false;
   }
   get _applyGmOnlyContent() {
-    return !!game.user && game.user.isGM && !!this.actor;
+    const enableFeature = game.settings.get(SYSTEM_NAME, FLAGS.HideGMOnlyChatContent);
+    return enableFeature && !!game.user && game.user.isGM && !!this.actor;
   }
   _prepareOpposedActionsTemplateData() {
     if (!this.data.opposed || !this.data.opposed.test)
@@ -18736,6 +18738,14 @@ var registerSystemSettings = () => {
   game.settings.register(SYSTEM_NAME, FLAGS.TokenHealthBars, {
     name: "SETTINGS.TokenHealthBars",
     hint: "SETTINGS.TokenHealthBarsDescription",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false
+  });
+  game.settings.register(SYSTEM_NAME, FLAGS.HideGMOnlyChatContent, {
+    name: "SETTINGS.HideGMOnlyChatContent",
+    hint: "SETTINGS.HideGMOnlyChatContentDescription",
     scope: "world",
     config: true,
     type: Boolean,

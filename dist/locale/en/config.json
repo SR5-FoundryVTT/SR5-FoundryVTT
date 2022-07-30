@@ -618,7 +618,9 @@
     "OnlyAutoRollNPCInCombatDescription": "Wen unset players must manually roll their ini on each new pass / round",
     "Euclidean": "Euclidean",
     "TokenHealthBars": "Token health bars",
-    "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring."
+    "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring.",
+    "HideGMOnlyChatContent": "Hide critical information on GM test",
+    "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor"
   },
   "SR5.COMBAT": {
     "ReduceInitByOne": "Initiative -1",
