@@ -19654,7 +19654,10 @@ var CombatRules = class {
     pass = Math.max(pass - 1, 0);
     score = Math.max(score, 0);
     const reducedScore = score + pass * SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
-    return Math.max(reducedScore, 0);
+    return CombatRules.getValidInitiativeScore(reducedScore);
+  }
+  static getValidInitiativeScore(score) {
+    return Math.max(score, 0);
   }
   static attackHits(attackerHits, defenderHits) {
     return attackerHits > defenderHits;
@@ -19931,6 +19934,11 @@ var SR5Combat = class extends Combat {
         yield combat.update({ turn: 0 });
       return combat;
     });
+  }
+  static onPreUpdateCombatant(combatant, changed, options, id) {
+    console.log("Shadowrun5e | Handle preUpdateCombatant to apply system rules", combatant, changed);
+    if (changed.initiative)
+      changed.initiative = CombatRules.getValidInitiativeScore(changed.initiative);
   }
   _getInitiativeFormula(combatant) {
     if (this.initiativePass === SR.combat.INITIAL_INI_PASS) {
@@ -27301,6 +27309,7 @@ var HooksManager = class {
     Hooks.on("deleteItem", HooksManager.removeDeletedItemsFromNetworks);
     Hooks.on("getChatLogEntryContext", SuccessTest.chatMessageContextOptions);
     Hooks.on("renderChatLog", HooksManager.chatLogListeners);
+    Hooks.on("preUpdateCombatant", SR5Combat.onPreUpdateCombatant);
     Hooks.on("init", quenchRegister);
   }
   static init() {

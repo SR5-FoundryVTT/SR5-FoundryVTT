@@ -78,6 +78,7 @@ export class HooksManager {
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners);
         // Hooks.on("renderChatPopout", chatMessageListeners);
+        Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
 
         Hooks.on('init', quenchRegister);
     }

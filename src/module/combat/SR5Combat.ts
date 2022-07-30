@@ -336,6 +336,21 @@ export class SR5Combat extends Combat {
     }
 
     /**
+     * This handler handles FoundryVTT hook preUpdateCombatant
+     *
+     * @param combatant The Combatant to update
+     * @param changed The changedData (tends to a diff)
+     * @param options
+     * @param id
+     */
+    static onPreUpdateCombatant(combatant: Combatant, changed, options, id) {
+        console.log('Shadowrun5e | Handle preUpdateCombatant to apply system rules', combatant, changed);
+
+        // Disallow invalid ini scores to be applied by any source.
+        if (changed.initiative) changed.initiative = CombatRules.getValidInitiativeScore(changed.initiative);
+    }
+
+    /**
      * Alter initiative formula to include initiative pass reduction.
      *
      * NOTE: Should this here fail or be buggy, there always is SR5Combat.updateNewCombatants which can be uncommented in SR5Combat.rollInitiative

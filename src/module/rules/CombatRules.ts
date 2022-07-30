@@ -43,7 +43,17 @@ export class CombatRules {
 
         // Reduce the new score according to. NOTE: Modifier is negative
         const reducedScore = score + pass * SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
-        return Math.max(reducedScore, 0);
+        return CombatRules.getValidInitiativeScore(reducedScore);
+    }
+
+    /**
+     * Return a valid initiative score on updates or score changes
+     *
+     * @param score The initiative score after it's been updated.
+     * @returns A valid initiative score
+     */
+    static getValidInitiativeScore(score: number): number {
+        return Math.max(score, 0);
     }
 
     /**
