@@ -27416,7 +27416,6 @@ ___________________
       label: "SR5.SheetItem",
       makeDefault: true
     });
-    HooksManager.registerSocketListeners();
     HandlebarManager.loadTemplates();
   }
   static ready() {
@@ -27437,6 +27436,7 @@ ___________________
         return yield ShadowrunRoller.promptSuccessTest();
       }));
       Hooks.on("renderChatMessage", HooksManager.chatMessageListeners);
+      HooksManager.registerSocketListeners();
     });
   }
   static canvasInit() {

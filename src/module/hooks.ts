@@ -257,7 +257,6 @@ ___________________
             makeDefault: true
         });
 
-        HooksManager.registerSocketListeners();
         HandlebarManager.loadTemplates();
     }
 
@@ -277,6 +276,7 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
+        HooksManager.registerSocketListeners();
     }
 
     static canvasInit() {
