@@ -17287,6 +17287,8 @@ var SR5Actor = class extends Actor {
     if (!SkillFlow.allowRoll(skill)) {
       (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.SkillCantBeDefault"));
     }
+    const attribute = this.getAttribute(skill.attribute);
+    const limit = attribute.limit || "";
     return DefaultValues.actionData({
       skill: skillId,
       spec: (options == null ? void 0 : options.specialization) || false,
@@ -17295,7 +17297,7 @@ var SR5Actor = class extends Actor {
         base: 0,
         value: 0,
         mod: [],
-        attribute: skill.attribute
+        attribute: limit
       },
       test: SuccessTest.name
     });

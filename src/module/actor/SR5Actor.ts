@@ -60,6 +60,7 @@ import DamageType = Shadowrun.DamageType;
 import PackActionName = Shadowrun.PackActionName;
 import PackName = Shadowrun.PackName;
 import ActionRollData = Shadowrun.ActionRollData;
+import ActorAttribute = Shadowrun.ActorAttribute;
 
 function getGame(): Game {
     if (!(game instanceof Game)) {
@@ -1021,13 +1022,18 @@ export class SR5Actor extends Actor {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
         }
 
+        // Derive limit from skill attribute.
+        const attribute = this.getAttribute(skill.attribute);
+        // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
+        const limit = attribute.limit as ActorAttribute|| '';
+
         return DefaultValues.actionData({
             skill: skillId,
             spec: options?.specialization || false,
             attribute: skill.attribute,
             limit: {
                 base: 0, value: 0, mod: [],
-                attribute: skill.attribute
+                attribute: limit
             },
 
             test: SuccessTest.name
