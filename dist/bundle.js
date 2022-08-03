@@ -16203,7 +16203,7 @@ var SuccessTest = class {
     return this.targets.length > 0;
   }
   get hasAction() {
-    return !!this.item && !!this.item.getAction();
+    return !foundry.utils.isObjectEmpty(this.data.action);
   }
   get description() {
     const poolPart = this.pool.value;

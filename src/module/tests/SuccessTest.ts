@@ -821,9 +821,11 @@ export class SuccessTest {
 
     /**
      * Has this test been derived from an action?
+     *
+     * This can either be from an items action or a pre-configured action.
      */
     get hasAction(): boolean {
-        return !!this.item && !!this.item.getAction();
+        return !foundry.utils.isObjectEmpty(this.data.action);
     }
 
     /**
