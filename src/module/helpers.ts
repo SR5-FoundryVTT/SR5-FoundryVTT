@@ -462,6 +462,24 @@ export class Helpers {
         return actor.name as string;
     }
 
+    /**
+     * Given an actor this will display either the actor or token name, when there is any.
+     *
+     * The use token name setting is also respected.
+     *
+     * @param actor Either an actual or a virtual actor, taken from a token.
+     * @returns A path pointing to an image.
+     */
+    static getChatSpeakerImg(actor: SR5Actor): string {
+        if (!actor) return '';
+
+        const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+        const token = actor.getToken();
+
+        if (useTokenForChatOutput && token) return token.data.img || '';
+        return actor.img || '';
+    }
+
     static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem?: SR5Item): DamageData {
         const damage = duplicate(DataDefaults.damage) as DamageData;
         damage.base = value;

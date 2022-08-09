@@ -14,51 +14,68 @@
     @include rollable;
 }
 
-.flexrow {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-}
-.nowrap {
-    flex-wrap: nowrap;
-}
-.align-start {
-    align-items: flex-start;
-}
-.center {
-    justify-content: center;
-}
-.flex-end {
-    justify-content: flex-end;
-}
-.space-between {
-    justify-content: space-between;
-}
-.space-around {
-    justify-content: space-around;
-}
-.align-center {
-    align-items: center;
-}
-.flexcol-rev {
-    display: flex;
-    flex-direction: column-reverse;
-    flex-wrap: nowrap;
+/**
+ * These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
+ * TODO: This is abusing default FoundryVTT CSS classing, which often can cause default FoundryVTT styling to break.
+ */
+.sr5 {
+    .flexcol {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
 
-    > * {
-        flex: 0;
+        > * {
+            flex: 0;
+        }
+    }
+
+    .flexcol-rev {
+        display: flex;
+        flex-direction: column-reverse;
+        flex-wrap: nowrap;
+
+        > * {
+            flex: 0;
+        }
+    }
+
+    .flexrow {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+
+    .nowrap {
+        flex-wrap: nowrap;
+    }
+
+    .align-start {
+        align-items: flex-start;
+    }
+
+    .center {
+        justify-content: center;
+    }
+
+    .flex-end {
+        justify-content: flex-end;
+    }
+
+    .space-between {
+        justify-content: space-between;
+    }
+
+    .space-around {
+        justify-content: space-around;
+    }
+
+    .align-center {
+        align-items: center;
     }
 }
-.flexcol {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
 
-    > * {
-        flex: 0;
-    }
-}
 .align-items-center {
     align-items: center;
 }
