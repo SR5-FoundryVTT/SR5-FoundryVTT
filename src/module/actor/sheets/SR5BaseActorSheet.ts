@@ -646,15 +646,8 @@ export class SR5BaseActorSheet extends ActorSheet {
             const property = 'data.track.physical.overflow.value';
             data[property] = value;
         } else if (cmId === 'matrix') {
-            const matrixDevice = this.actor.getMatrixDevice();
-            if (matrixDevice && !isNaN(value)) {
-                const updateData = {};
-                updateData['data.technology.condition_monitor.value'] = value;
-                await matrixDevice.update(updateData);
-            } else {
-                const property = `data.track.matrix.value`;
-                data[property] = value;
-            }
+            // Sprites don't have a matrix device, but still use the matrix condition monitor, not matrix track.
+            return await this.actor.setMatrixDamage(value);
         }
         await this.actor.update(data);
     }
@@ -683,16 +676,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             data['data.track.physical.overflow.value'] = 0;
 
         } else if (cmId === 'matrix') {
-            const matrixDevice = this.actor.getMatrixDevice();
-
-            if (matrixDevice) {
-                const updateData = {};
-                updateData['data.technology.condition_monitor.value'] = 0;
-                await matrixDevice.update(updateData);
-
-            } else {
-                data['data.track.matrix.value'] = 0;
-            }
+            await this.actor.setMatrixDamage(0);
         }
 
         await this.actor.update(data);

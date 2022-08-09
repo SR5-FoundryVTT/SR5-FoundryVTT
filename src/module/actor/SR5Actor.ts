@@ -556,6 +556,17 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * This actor is emerged as a matrix native actor (Technomancers, Sprites)
+     *
+     */
+    get isEmerged(): boolean {
+        if (this.isSprite()) return true;
+        if (this.isCharacter() && this.data.data.special === 'resonance') return true;
+
+        return false;
+    }
+
+    /**
      * Return the full pool of a skill including attribute and possible specialization bonus.
      * @param skillId The ID of the skill. Note that this can differ from what is shown in the skill list. If you're
      *                unsure about the id and want to search
@@ -1155,16 +1166,6 @@ export class SR5Actor extends Actor {
         if (track.value === track.max) return;
 
         track = this.__addDamageToTrackValue(damage, track);
-        // //  Avoid cross referencing.
-        // track = duplicate(track);
-        //
-        // track.value += damage.value;
-        // if (track.value > track.max) {
-        //     // dev error, not really meant to be ever seen by users. Therefore no localization.
-        //     console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.")
-        //     track.value = track.max;
-        // }
-
         const data = {[`data.track.${damage.type.value}`]: track};
         await this.update(data);
     }
@@ -1270,13 +1271,59 @@ export class SR5Actor extends Actor {
         if (device) {
             await this._addDamageToDeviceTrack(rest, device);
         }
-        if (this.isIC()) {
+        if (this.isIC() || this.isSprite()) {
             await this._addDamageToTrack(rest, track);
         }
 
 
         // Return overflow for consistency, yet nothing will take overflowing matrix damage.
         return overflow;
+    }
+
+    /**
+     * Directly set the matrix damage track of this actor to a set amount.
+     *
+     * This is mainly used for manual user input on an actor sheet.
+     *
+     * This is done by resetting all tracked damage and applying one manual damage set.
+     *
+     * @param value The matrix damage to be applied.
+     */
+    async setMatrixDamage(value: number) {
+        // Disallow negative values.
+        value = Math.max(value, 0);
+
+        // Use artificial damage to be consistent across other damage application Actor methods.
+        const damage = DefaultValues.damageData({
+            type: {base: 'matrix', value: 'matrix'},
+            base: value,
+            value: value
+        });
+
+        let track = this.getMatrixTrack();
+        if (!track) return;
+
+        // Reduce track to minimal value and simply add new damage.
+        track.value = 0;
+        // As track has been reduced to zero already, setting it to zero is already done.
+        if (value > 0)
+            track = this.__addDamageToTrackValue(damage, track);
+
+        // If a matrix device is used, damage that instead of the actor.
+        const device = this.getMatrixDevice();
+        if (device) {
+            return await device.update({'data.technology.condition_monitor': track});
+        }
+
+        // IC actors use a matrix track.
+        if (this.isIC()) {
+            return await this.update({'data.track.matrix': track});
+        }
+
+        // Emerged actors use a personal device like condition monitor.
+        if (this.isMatrixActor) {
+            return await this.update({'data.matrix.condition_monitor': track});
+        }
     }
 
     /** Calculate damage overflow only based on max and current track values.
@@ -1312,11 +1359,18 @@ export class SR5Actor extends Actor {
     /**
      * The matrix depends on actor type and possibly equipped matrix device.
      *
+     * Use this method for whenever you need to access this actors matrix damage track as it's source might differ.
      */
     getMatrixTrack(): ConditionData | undefined {
         // Some actors will have a direct matrix track.
         if ("track" in this.data.data && "matrix" in this.data.data.track) {
             return this.data.data.track.matrix;
+        }
+
+        // Some actors will have a personal matrix condition monitor, like a device condition monitor.
+        if (this.isMatrixActor) {
+            // @ts-ignore isMatrixActor checks for the matrix attribute
+            return this.data.data.matrix.condition_monitor;
         }
 
         // Fallback to equipped matrix device.
