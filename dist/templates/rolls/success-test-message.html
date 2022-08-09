@@ -8,7 +8,7 @@
             <div class="container__row">
                 <div class="container__col-half">
                     <div class="document">
-                        <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speaker.actor.img}}" class="entity-selectable" title="{{speakerName speaker.actor}}"/></a>
+                        <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speakerImg speaker.actor}}" class="entity-selectable" title="{{speakerName speaker.actor}}"/></a>
                          <h3 class="header-name"><a class="chat-document-link" data-uuid="{{speaker.actor.uuid}}">{{speakerName speaker.actor}}</a></h3>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
             <div class="container__row">
                 <div class="container__col">
                     <div class="document">
-                        <a class="chat-select-link" data-token-id="{{this.id}}"><img src="{{this.data.img}}" class="entity-selectable" title="{{speakerName this.actor}}"/></a>
+                        <a class="chat-select-link" data-token-id="{{this.id}}"><img src="{{speakerImg this.actor}}" class="entity-selectable" title="{{speakerName this.actor}}"/></a>
                          <h3 class="header-name"><a class="chat-document-link" data-uuid="{{this.uuid}}">{{speakerName this.actor}}</a></h3>
                     </div>
                 </div>

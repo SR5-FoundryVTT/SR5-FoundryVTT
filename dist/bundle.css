@@ -629,46 +629,50 @@
   cursor: pointer;
   color: #6495ed; }
 
-.flexrow {
+/**
+ * These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
+ * TODO: This is abusing default FoundryVTT CSS classing, which often can cause default FoundryVTT styling to break.
+ */
+.sr5 .flexcol {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap; }
+  .sr5 .flexcol > * {
+    flex: 0; }
+
+.sr5 .flexcol-rev {
+  display: flex;
+  flex-direction: column-reverse;
+  flex-wrap: nowrap; }
+  .sr5 .flexcol-rev > * {
+    flex: 0; }
+
+.sr5 .flexrow {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start; }
 
-.nowrap {
+.sr5 .nowrap {
   flex-wrap: nowrap; }
 
-.align-start {
+.sr5 .align-start {
   align-items: flex-start; }
 
-.center {
+.sr5 .center {
   justify-content: center; }
 
-.flex-end {
+.sr5 .flex-end {
   justify-content: flex-end; }
 
-.space-between {
+.sr5 .space-between {
   justify-content: space-between; }
 
-.space-around {
+.sr5 .space-around {
   justify-content: space-around; }
 
-.align-center {
+.sr5 .align-center {
   align-items: center; }
-
-.flexcol-rev {
-  display: flex;
-  flex-direction: column-reverse;
-  flex-wrap: nowrap; }
-  .flexcol-rev > * {
-    flex: 0; }
-
-.flexcol {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap; }
-  .flexcol > * {
-    flex: 0; }
 
 .align-items-center {
   align-items: center; }

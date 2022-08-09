@@ -10308,6 +10308,15 @@ var Helpers = class {
       return token.data.name;
     return actor.name;
   }
+  static getChatSpeakerImg(actor) {
+    if (!actor)
+      return "";
+    const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+    const token = actor.getToken();
+    if (useTokenForChatOutput && token)
+      return token.data.img || "";
+    return actor.img || "";
+  }
   static createDamageData(value, type, ap = 0, element = "", sourceItem) {
     const damage = duplicate(DataDefaults.damage);
     damage.base = value;
@@ -10690,6 +10699,7 @@ var registerRollAndLabelHelpers = () => {
     return value > 0 ? `+${value}` : `${value}`;
   });
   Handlebars.registerHelper("speakerName", Helpers.getChatSpeakerName);
+  Handlebars.registerHelper("speakerImg", Helpers.getChatSpeakerImg);
 };
 
 // src/module/data/DataWrapper.ts
@@ -16946,6 +16956,13 @@ var SR5Actor = class extends Actor {
   get isAwakened() {
     return this.data.data.special === "magic";
   }
+  get isEmerged() {
+    if (this.isSprite())
+      return true;
+    if (this.isCharacter() && this.data.data.special === "resonance")
+      return true;
+    return false;
+  }
   getPool(skillId, options = { specialization: false, byLabel: false }) {
     const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
     if (!skill || !skill.attribute)
@@ -17466,10 +17483,36 @@ var SR5Actor = class extends Actor {
       if (device) {
         yield this._addDamageToDeviceTrack(rest, device);
       }
-      if (this.isIC()) {
+      if (this.isIC() || this.isSprite()) {
         yield this._addDamageToTrack(rest, track);
       }
       return overflow;
+    });
+  }
+  setMatrixDamage(value) {
+    return __async(this, null, function* () {
+      value = Math.max(value, 0);
+      const damage = DefaultValues.damageData({
+        type: { base: "matrix", value: "matrix" },
+        base: value,
+        value
+      });
+      let track = this.getMatrixTrack();
+      if (!track)
+        return;
+      track.value = 0;
+      if (value > 0)
+        track = this.__addDamageToTrackValue(damage, track);
+      const device = this.getMatrixDevice();
+      if (device) {
+        return yield device.update({ "data.technology.condition_monitor": track });
+      }
+      if (this.isIC()) {
+        return yield this.update({ "data.track.matrix": track });
+      }
+      if (this.isMatrixActor) {
+        return yield this.update({ "data.matrix.condition_monitor": track });
+      }
     });
   }
   _calcDamageOverflow(damage, track) {
@@ -17493,6 +17536,9 @@ var SR5Actor = class extends Actor {
   getMatrixTrack() {
     if ("track" in this.data.data && "matrix" in this.data.data.track) {
       return this.data.data.track.matrix;
+    }
+    if (this.isMatrixActor) {
+      return this.data.data.matrix.condition_monitor;
     }
     const device = this.getMatrixDevice();
     if (!device)
@@ -24868,15 +24914,7 @@ var SR5BaseActorSheet = class extends ActorSheet {
         const property = "data.track.physical.overflow.value";
         data[property] = value;
       } else if (cmId === "matrix") {
-        const matrixDevice = this.actor.getMatrixDevice();
-        if (matrixDevice && !isNaN(value)) {
-          const updateData = {};
-          updateData["data.technology.condition_monitor.value"] = value;
-          yield matrixDevice.update(updateData);
-        } else {
-          const property = `data.track.matrix.value`;
-          data[property] = value;
-        }
+        return yield this.actor.setMatrixDamage(value);
       }
       yield this.actor.update(data);
     });
@@ -24896,14 +24934,7 @@ var SR5BaseActorSheet = class extends ActorSheet {
       } else if (cmId === "overflow") {
         data["data.track.physical.overflow.value"] = 0;
       } else if (cmId === "matrix") {
-        const matrixDevice = this.actor.getMatrixDevice();
-        if (matrixDevice) {
-          const updateData = {};
-          updateData["data.technology.condition_monitor.value"] = 0;
-          yield matrixDevice.update(updateData);
-        } else {
-          data["data.track.matrix.value"] = 0;
-        }
+        yield this.actor.setMatrixDamage(0);
       }
       yield this.actor.update(data);
     });
