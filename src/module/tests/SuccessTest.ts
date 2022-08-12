@@ -156,11 +156,10 @@ export class SuccessTest {
         data.type = data.type || this.type;
 
         // Store the current users targeted token ids for later use.
-        // @ts-ignore // undefined isn't allowed but it's excluded.
+        // @ts-ignore // undefined isn't allowed but excluded.
         data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
 
         // Store given document uuids to be fetched during evaluation.
-        // TODO: Include all necessary sepaker / token info in SuccessTestData to allow items to be deleted.
         data.sourceActorUuid = data.sourceActorUuid || this.actor?.uuid;
         data.sourceItemUuid = data.sourceItemUuid || this.item?.uuid;
 
@@ -195,6 +194,7 @@ export class SuccessTest {
         data.opposed = data.opposed || undefined;
         data.modifiers = this._prepareModifiers(data.modifiers);
 
+        data.damage = data.damage || DefaultValues.damageData();
 
         return data;
     }
@@ -455,11 +455,6 @@ export class SuccessTest {
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
 
-        // Without further rules applied just use the general action damage configuration.
-        // This damage can be further altered using process* methods.
-        const damage = this.data.action ? this.data.action.damage : DefaultValues.damageData();
-        this.data.damage = ActionFlow.calcDamage(damage, this.actor);
-
         console.log(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
 
@@ -516,9 +511,12 @@ export class SuccessTest {
     }
 
     /**
-     * Prepare missing data based on this tests Documents before anything else is done.
+     * Prepare missing data based on tests Documents before anything else is done.
      */
-    async prepareDocumentData() {}
+    async prepareDocumentData() {
+        // Calculate damage here to have access to actor AND item used.
+        this.data.damage = ActionFlow.calcDamage(this.data.damage, this.actor, this.item);
+    }
 
     /**
      * What modifiers should be used for this test type by default.

@@ -158,6 +158,8 @@ export class RangedAttackTest extends SuccessTest {
         await this._prepareTargetRanges();
         this._prepareFireMode();
         this._prepareRecoilCompensation();
+
+        await super.prepareDocumentData();
     }
 
     get _dialogTemplate(): string {

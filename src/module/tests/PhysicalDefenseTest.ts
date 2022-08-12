@@ -6,7 +6,7 @@ import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import {DefaultValues} from "../data/DataDefaults";
 
-// TODO: reach
+
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
     cover: number
@@ -25,7 +25,6 @@ export class PhysicalDefenseTest extends DefenseTest {
     _prepareData(data, options?): any {
         data = super._prepareData(data, options);
 
-        // TODO: this should be stored on actor flag and fetched in populateActorModifiers
         data.cover = 0;
         data.activeDefense = '';
         data.activeDefenses = {};
@@ -53,6 +52,7 @@ export class PhysicalDefenseTest extends DefenseTest {
     async prepareDocumentData() {
         this.prepareActiveDefense();
         this.prepareMeleeReach();
+        await super.prepareDocumentData();
     }
 
     prepareActiveDefense() {
@@ -99,7 +99,9 @@ export class PhysicalDefenseTest extends DefenseTest {
         if (!this.actor) return;
 
         // Take the highest equipped melee reach to defend with...
-        // NOTE: ... this should be a choice be the player
+        // NOTE: ... this should be a choice of the player
+        // TODO: This is a legacy selection approach as there wasn't a way to access to used item in the original attack test.
+        //       Instead this might be replaced with a direct reference with this.against.item.data.defenseReach?
         const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
         equippedMeleeWeapons.forEach(weapon => {
             this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());

@@ -62,6 +62,8 @@ export class SpellCastingTest extends SuccessTest {
 
     async prepareDocumentData() {
         this.prepareInitialForceValue();
+
+        await super.prepareDocumentData();
     }
 
     /**

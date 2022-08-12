@@ -57,6 +57,7 @@ export class ComplexFormTest extends SuccessTest {
 
     async prepareDocumentData() {
         this.prepareInitialLevelValue();
+        await super.prepareDocumentData();
     }
 
     /**

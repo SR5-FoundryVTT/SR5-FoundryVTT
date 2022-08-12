@@ -9,6 +9,7 @@ import {SR5Item} from "../SR5Item";
 import DamageSource = Shadowrun.DamageSource;
 import LimitField = Shadowrun.LimitField;
 import ValueField = Shadowrun.ValueField;
+import {PartsList} from "../../parts/PartsList";
 
 export class ActionFlow {
     /**
@@ -20,7 +21,7 @@ export class ActionFlow {
      */
     static calcDamage(damage: DamageData, actor?: SR5Actor, item?: SR5Item): DamageData {
         // Avoid manipulation on original data, which might come from database values.
-        damage = duplicate(damage) as DamageData;
+        damage = duplicate(damage);
 
         if (!actor) return damage;
 
@@ -31,37 +32,34 @@ export class ActionFlow {
         const attribute = actor.findAttribute(damage.attribute);
         if (!attribute) return damage;
 
-        damage.base = ActionFlow._applyFormulaOperatorToValues(damage.base, attribute.value, damage.base_formula_operator);
+        if (!damage.base_formula_operator) {
+            console.error(`Unsupported base damage formula operator: '${damage.base_formula_operator}' used. Falling back to 'add'.`);
+            damage.base_formula_operator = 'add';
+        }
 
-        // Rather reduce damage to the next full decimal.
-        damage.base = Helpers.applyValueRange(Math.floor(damage.base), {min: 0});
-        damage.value = damage.base;
+        // Avoid altering base OR value fields and raising the resulting damage on multiple function calls.
+        switch (damage.base_formula_operator) {
+            case "add":
+                PartsList.AddUniquePart(damage.mod, attribute.label, attribute.value);
+                break;
+            case "subtract":
+                PartsList.AddUniquePart(damage.mod, attribute.label, -attribute.value);
+                break;
+            case "multiply":
+                PartsList.AddUniquePart(damage.mod, 'SR5.Value', (damage.base * attribute.value) - damage.base);
+                break;
+            case "divide":
+                // Remove base from value by modifying.
+                PartsList.AddUniquePart(damage.mod, 'SR5.BaseValue', damage.base * -1);
+                // Add division result as modifier on zero.
+                const denominator = attribute.value === 0 ? 1 : attribute.value;
+                PartsList.AddUniquePart(damage.mod, 'SR5.Value', Math.floor(damage.base / denominator));
+                break;
+        }
 
-
+        damage.value = Helpers.calcTotal(damage, {min: 0});
 
         return damage;
-    }
-
-    /** Calculate the result of operating on two values with basic formula operators.
-     *
-     * @param base The basic value operated opon.
-     * @param value The value doing the operation with. If order is important, this value will be after the operator.
-     * @param operator A formula operator (basic) to be used within a simple calculation.
-     */
-    static _applyFormulaOperatorToValues(base: number, value: number, operator:FormulaOperator): number {
-        switch (operator) {
-            case "add":
-                return base + value;
-            case "subtract":
-                return base - value;
-            case "multiply":
-                return base * value;
-            case "divide":
-                return base / value;
-            default:
-                console.error(`Unsupported base damage formula operator: '${operator}' used. Falling back to 'add'.`);
-                return base + value;
-        }
     }
 
     /**

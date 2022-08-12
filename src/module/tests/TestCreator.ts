@@ -23,6 +23,7 @@ import ActionRollData = Shadowrun.ActionRollData;
 import {SR5} from "../config";
 import RollEvent = Shadowrun.RollEvent;
 import {SkillFlow} from "../actor/flows/SkillFlow";
+import {ActionFlow} from "../item/flows/ActionFlow";
 
 /**
  * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
@@ -390,13 +391,8 @@ export const TestCreator = {
         }
 
         // Prepare general damage values...
-        if (action.damage.base) {
-            // TODO: Actual damage value calculation from actor to a numerical value.
-            data.damage = action.damage;
-        }
-        if (action.damage.attribute) {
-            const attribute = actor.getAttribute(action.damage.attribute);
-            data.damage.mod = PartsList.AddUniquePart(data.damage.mod, attribute.label, attribute.value);
+        if (action.damage.base || action.damage.attribute) {
+            data.damage = foundry.utils.duplicate(action.damage);
         }
 
         // Prepare opposed and resist tests...
