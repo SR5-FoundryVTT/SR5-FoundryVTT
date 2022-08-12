@@ -5,6 +5,7 @@ import {MeleeAttackData} from "./MeleeAttackTest";
 import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import {DefaultValues} from "../data/DataDefaults";
+import {RangedAttackTestData} from "./RangedAttackTest";
 
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
@@ -117,6 +118,7 @@ export class PhysicalDefenseTest extends DefenseTest {
         this.applyPoolCoverModifier();
         this.applyPoolActiveDefenseModifier();
         this.applyPoolMeleeReachModifier();
+        this.applyPoolRangedFireModModifier();
         super.applyPoolModifiers();
     }
 
@@ -141,6 +143,20 @@ export class PhysicalDefenseTest extends DefenseTest {
         if (!this.data.isMeleeAttack) return;
 
         PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.WeaponReach', this.data.defenseReach);
+    }
+
+    /**
+     * When defending against a ranged attack, see if any fire mode defense modifiers must be applied
+     */
+    applyPoolRangedFireModModifier() {
+        if (!this.against.item) return;
+        if (!this.against.item.isRangedWeapon()) return;
+
+        const fireMode = this.against.item.getLastFireMode();
+
+        if (!fireMode.defense) return;
+
+        PartsList.AddUniquePart(this.data.modifiers.mod, fireMode.label, Number(fireMode.defense));
     }
 
     get success() {

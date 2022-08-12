@@ -125,7 +125,7 @@ export class SR5Item extends Item {
 
     // Flag Functions
     getLastFireMode(): FireModeData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || { value: 0, defense: 0, label: 'SR5.FireMode' };
     }
     async setLastFireMode(fireMode: FireModeData) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);

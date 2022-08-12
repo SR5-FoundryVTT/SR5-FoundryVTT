@@ -167,14 +167,13 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     async _alterTestDataFromDialogData() {
-        // TODO: structure the resulting modifiers of these into this.data.Modifiers
         // Alter data related to fire modes.
         const {fireMode, fireModes} = this.data;
 
         // Store current firemode for next test.
         fireMode.value = Number(fireMode.value || 0);
         const fireModeName = fireModes[fireMode.value];
-        const defenseModifier = Helpers.mapRoundsToDefenseDesc(fireMode.value);
+        const defenseModifier = Helpers.mapRoundsToDefenseMod(fireMode.value);
 
         this.data.fireMode = {
             label: fireModeName,
