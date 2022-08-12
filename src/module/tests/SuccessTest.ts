@@ -916,7 +916,19 @@ export class SuccessTest {
     }
 
     /**
-     * TODO: Documentation.
+     * Executing a test will start all behaviours necessary to:
+     * - Calculate its values
+     * - Show and handle a user facing test dialog
+     * - Render and show a resulting test message
+     * - Evaluate all it's roles and consumption of items used
+     * - Trigger resulting methods for all results, including success and failure
+     *
+     * Implementing classes should seek to change out methods used here, or within those methods, to alter test
+     * behaviour to their needs.
+     *
+     * When execute methods promise resolves this test and its chain is completed.
+     *
+     * NOTE: Currently none of these methods trigger Foundry hooks.
      */
     async execute(): Promise<this> {
         await this.populateTests();
