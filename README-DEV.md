@@ -81,20 +81,19 @@ docker-compose up
 # System Architecture
 
 ## Folder structure
-The system in general lives under 
-* src\module
-* src\css
-* src\templates
+Everything needed to execute the system within foundry must live under 
+* dist\
 
-The systems tests live under 
-* src\test
+All other folders are used during development.
 
 ## Design
-More and more parts of the system move to separtate modules organized into these broad layers:
+More and more parts of the system move to separate modules organized into these broad layers:
+All following folder reference are relative to src\module\*
 * Rules layer. Shouldn't contain any references to Foundry objects. At best system objects should be used (like a PartsList)
   These live in the rules\ folder
 * Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects. These live in item\flows and actor\flows.
 * Application layer. Handle interface operations. Dialogs. Application windows. Chat Message creation and so forth.
+* Tests layer. Whenever any Shadowrun test is implemented it should extend the SuccessTest class. All tests live in the tests\ folder.   
 
 Additional separations are made for
 * Initial data generation of items or template partials
