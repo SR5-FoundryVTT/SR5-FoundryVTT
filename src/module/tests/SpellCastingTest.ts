@@ -124,15 +124,10 @@ export class SpellCastingTest extends SuccessTest {
         await super.processResults();
     }
 
-    async afterTestComplete(): Promise<void> {
-        await this.saveLastUsedForce();
-        await super.afterTestComplete();
-    }
-
     /**
      * Allow the currently used force value of this spell item to be reused next time.
      */
-    async saveLastUsedForce() {
+    async saveUserSelectionAfterDialog() {
         if (!this.item) return;
 
         await this.item.setLastSpellForce({value: this.data.force, reckless: false});
