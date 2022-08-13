@@ -23,7 +23,11 @@ export const TestRules = {
      * @returns When true, test can be extended.
      */
     canExtendTest: (pool: number, threshold: number, extendedHits: number): boolean => {
-        return extendedHits < threshold && pool > 0;
+        // An extended test without a threshold set can extend until no pool is left.
+        if (threshold > 0)
+            return extendedHits < threshold && pool > 0;
+
+        return pool > 0;
     },
 
     /**

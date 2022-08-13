@@ -752,6 +752,9 @@ export class SuccessTest {
      * Helper to check if the current test state is unsuccessful.
      */
     get failure(): boolean {
+        if (this.extended && this.threshold.value === 0) return true;
+        if (this.extendedHits && this.threshold.value > 0) return this.extendedHits.value < this.threshold.value;
+
         return !this.success;
     }
 
@@ -759,7 +762,11 @@ export class SuccessTest {
      * Use this method for subclasses which can't reasonably be successful.
      */
     get canSucceed(): boolean {
-        return true;
+        // Not extended tests can succeed normally.
+        if (!this.extended) return true;
+
+        // Extended tests can only succeed when a threshold is set.
+        return this.extended && this.hasThreshold;
     }
 
     /**
@@ -780,6 +787,7 @@ export class SuccessTest {
      * How to call a failed test of this type.
      */
     get failureLabel(): string {
+        if (this.extended) return 'SR5.Results';
         return 'SR5.Failure';
     }
 
@@ -1039,6 +1047,8 @@ export class SuccessTest {
      * Should this test be an extended test, re-execute it until it can't be anymore.
      */
     async extendCurrentTest() {
+        if (!this.canBeExtended) return;
+
         const data = foundry.utils.duplicate(this.data);
         // No extension possible, if test type / class is unknown.
         if (!data.type) return;
@@ -1049,16 +1059,30 @@ export class SuccessTest {
         const currentModifierValue = pool.getPartValue('SR5.ExtendedTest') || 0;
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
 
-        pool.addUniquePart('SR5.ExtendedTest', nextModifierValue);
+        // Reduce either user override or default value.
+        if (data.pool.override) {
+            data.pool.override.value = Math.max(data.pool.override.value - 1, 0);
+        } else {
+            pool.addUniquePart('SR5.ExtendedTest', nextModifierValue);
+        }
 
         Helpers.calcTotal(data.pool, {min: 0});
 
-        if (TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
-            const testCls = TestCreator._getTestClass(data.type);
-            if (!testCls) return;
-            const test = new testCls(data, {actor: this.actor, item: this.item}, this.data.options);
-            await test.execute();
+        if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
+            return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', {localize: true});
         }
+
+        const testCls = TestCreator._getTestClass(data.type);
+        if (!testCls) return;
+        const test = new testCls(data, {actor: this.actor, item: this.item}, this.data.options);
+
+        // Should this test not have been extended yet, prepare it to be an extended test.
+        if (!test.extended) {
+            test.data.extended = true;
+            test.calculateExtendedHits();
+        }
+
+        await test.execute();
     }
 
     /**
@@ -1348,13 +1372,33 @@ export class SuccessTest {
             await test.executeSecondChance();
         };
 
+        const extendTest = async (li) => {
+            const messageId = li.data().messageId;
+            const test = await TestCreator.fromMessage(messageId);
+            if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
+
+            // @ts-ignore
+            if (!test.canBeExtended) {
+                return ui.notifications?.warn('SR5.Warnings.CantExtendTest', {localize: true});
+            }
+
+            await test.extendCurrentTest();
+        };
+
         const deleteOption = options.pop();
 
         options.push({
             name: game.i18n.localize('SR5.SecondChange'),
             callback: secondChance,
-            condition: true, // TODO: Disable when second chance has been used.
+            condition: true,
             icon: '<i class="fas fa-meteor"></i>'
+        });
+
+        options.push({
+            name: game.i18n.localize('SR5.Extend'),
+            callback: extendTest,
+            condition: true,
+            icon: '<i class="fas fa-clock"></i>'
         })
 
         options.push(deleteOption);
