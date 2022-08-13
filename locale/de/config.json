@@ -958,6 +958,7 @@
     "DroneInfiltrationTest": "Fahrzeug Stealth"
   },
   "SR5.MissingResource": {
-    "Edge": "Kein Edge übrig"
+    "Edge": "Kein Edge übrig",
+    "Ammo": "Nicht genug Munition für Feuer Modus"
   }
 }

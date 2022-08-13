@@ -400,15 +400,20 @@ export class SuccessTest {
 
         // Overwrite current test state with whatever the dialog gives.
         this.data = data;
-        await this._alterTestDataFromDialogData();
+        await this.saveUserSelectionAfterDialog();
+
+        // Second base value preparation will show changes due to user input.
+        this.prepareBaseValues();
+        this.calculateBaseValues();
 
         return true;
     }
 
     /**
-     * Overwrite this method if you want to alter test data after dialog user selections been done.
+     * Override this method if you want to save any document data after a user has selected values
+     * during user facing dialog.
      */
-    async _alterTestDataFromDialogData() {}
+    async saveUserSelectionAfterDialog() {}
 
     /**
      * Overwrite this method if you need to alter base values.
@@ -947,10 +952,6 @@ export class SuccessTest {
         // Check if actor has all needed resources to even test.
         const actorConsumedResources = await this.consumeActorResources();
         if (!actorConsumedResources) return this;
-
-        // Second base value preparation will show changes due to user input.
-        this.prepareBaseValues();
-        this.calculateBaseValues();
 
         this.createRoll();
 

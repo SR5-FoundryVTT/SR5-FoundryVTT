@@ -60,6 +60,7 @@ import ActionResultData = Shadowrun.ActionResultData;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
+import AmmunitionData = Shadowrun.AmmunitionData;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -508,8 +509,24 @@ export class SR5Item extends Item {
         }
     }
 
-    hasAmmo(): boolean {
-        return this.wrapper.hasAmmo();
+    /**
+     * Check if weapon has enough ammunition.
+     *
+     * @param rounds The amount of rounds to be fired
+     * @returns Either the weapon has no ammo at all or not enough.
+     */
+    hasAmmo(rounds: number=0): boolean {
+        return this.ammoLeft >= rounds;
+    }
+
+    /**
+     * Amount of ammunition this weapon has currently available
+     */
+    get ammoLeft(): number {
+        const ammo = this.wrapper.getAmmo();
+        if (!ammo) return 0;
+
+        return ammo.current.value;
     }
 
     /**

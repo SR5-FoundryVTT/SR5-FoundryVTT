@@ -9,6 +9,7 @@ import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
+import {RangedRules} from "../rules/RangedRules";
 
 export interface RangedAttackTestData extends SuccessTestData {
     damage: DamageData
@@ -58,6 +59,8 @@ export class RangedAttackTest extends SuccessTest {
 
         // Firemodes selection.
         const {modes} = weaponData.data.range;
+
+        // TODO: Remove fire modes unavailable due to missing ammunition.
 
          if (modes.single_shot) {
             this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
@@ -166,14 +169,37 @@ export class RangedAttackTest extends SuccessTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html';
     }
 
-    async _alterTestDataFromDialogData() {
-        // Alter data related to fire modes.
-        const {fireMode, fireModes} = this.data;
+    async saveUserSelectionAfterDialog() {
+        if (!this.item) return;
 
-        // Store current firemode for next test.
+        // Store for next usage.
+        await this.item.setLastFireMode(this.data.fireMode);
+
+        /**
+         * RANGE
+         */
+
+        if (!this.actor) return;
+
+        const modifiers = await this.actor.getModifiers();
+        modifiers.activateEnvironmentalCategory('range', this.data.range);
+        await this.actor.setModifiers(modifiers);
+    }
+
+    prepareBaseValues() {
+        if (!this.actor) return;
+        if (!this.item) return;
+
+        const poolMods = new PartsList(this.data.modifiers.mod);
+
+        // Apply recoil modification to general modifiers before calculating base values.
+        // TODO: Actual recoil calculation with consumption of recoil compensation.
+        const {fireMode, fireModes, recoilCompensation} = this.data;
+
+        // Alter fire mode by ammunition constraints.
         fireMode.value = Number(fireMode.value || 0);
         const fireModeName = fireModes[fireMode.value];
-        const defenseModifier = Helpers.mapRoundsToDefenseMod(fireMode.value);
+        const defenseModifier = RangedRules.fireModeDefenseModifier(fireMode.value, this.item.ammoLeft);
 
         this.data.fireMode = {
             label: fireModeName,
@@ -181,8 +207,18 @@ export class RangedAttackTest extends SuccessTest {
             defense: defenseModifier,
         };
 
-        // Store for next usage.
-        await this.item?.setLastFireMode(this.data.fireMode);
+        // Alter recoil modifier by ammunition constraints.
+        const {recoilModifier} = RangedRules.recoilAttackModifier(recoilCompensation, Number(fireMode.value), this.item.ammoLeft);
+
+        // Inform user about insufficient ammunition for fire mode selected
+        if (fireMode.value > this.item.ammoLeft) {
+            ui.notifications?.warn('SR5.MissingResource.Ammo');
+        }
+
+        if (recoilModifier < 0)
+            poolMods.addUniquePart('SR5.Recoil', recoilModifier);
+        else
+            poolMods.removePart('SR5.Recoil');
 
         // Get range modifier from selected target instead of selected range.
         if (this.hasTargets) {
@@ -197,30 +233,6 @@ export class RangedAttackTest extends SuccessTest {
         // Alter test data for range.
         this.data.range = Number(this.data.range);
 
-        const actor = this.actor;
-        if (!actor) return;
-
-        const modifiers = await actor.getModifiers();
-        modifiers.activateEnvironmentalCategory('range', this.data.range);
-        await actor.setModifiers(modifiers);
-    }
-
-    prepareBaseValues() {
-        if (!this.actor) return;
-
-        const poolMods = new PartsList(this.data.modifiers.mod);
-
-        // Apply recoil modification to general modifiers before calculating base values.
-        // TODO: Actual recoil calculation with consumption of recoil compensation.
-        // TODO: Recoil Modifier handling should go through ModifierFlow and / or Modifiers
-        const {fireMode, recoilCompensation} = this.data;
-        const recoil = recoilCompensation - fireMode.value;
-
-        if (recoil < 0)
-            poolMods.addUniquePart('SR5.Recoil', recoil);
-        else
-            poolMods.removePart('SR5.Recoil');
-
         // Apply altered environmental modifiers
         const range = this.hasTargets ? this.data.targetRanges[this.data.targetRangesSelected].range.modifier : this.data.range;
         const modifiers = Modifiers.getModifiersFromEntity(this.actor);
@@ -230,5 +242,36 @@ export class RangedAttackTest extends SuccessTest {
         poolMods.addUniquePart(SR5.modifierTypes.environmental, environmental);
 
         super.prepareBaseValues();
+    }
+
+    /**
+     * Ranged Attacks not only can consume edge but also reduce ammunition.
+     */
+    async consumeActorResources() {
+        if (!await super.consumeActorResources()) return false;
+        if (!await this.consumeWeaponAmmo()) return false;
+
+        return true;
+    }
+
+    /**
+     * Reduce ranged weapon ammunition according to the fire mode used.
+     */
+    async consumeWeaponAmmo(): Promise<boolean> {
+        if (!this.item) return true;
+        if (!this.item.isRangedWeapon()) return true;
+
+        const fireMode = this.data.fireMode;
+        if (fireMode.value === 0) return true;
+
+        // Abort if the weapon doesn't even contain at least one round.
+        if (!this.item.hasAmmo(1)) {
+            await ui.notifications?.warn('SR5.MissingResource.Ammo', {localize: true});
+            return false;
+        }
+
+        await this.item.useAmmo(fireMode.value)
+
+        return true;
     }
 }

@@ -11,6 +11,7 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import ModificationItemData = Shadowrun.ModificationItemData;
 import ActionResultData = Shadowrun.ActionResultData;
+import AmmunitionData = Shadowrun.AmmunitionData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
@@ -226,7 +227,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData()?.essence ?? 0;
     }
 
-    getAmmo() {
+    getAmmo(): AmmunitionData|undefined {
         return this.getData().ammo;
     }
 
