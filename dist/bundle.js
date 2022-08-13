@@ -11995,12 +11995,8 @@ var TestCreator = {
       if (action.threshold.base) {
         data.threshold.base = Number(action.threshold.base);
       }
-      if (action.damage.base) {
-        data.damage = action.damage;
-      }
-      if (action.damage.attribute) {
-        const attribute = actor.getAttribute(action.damage.attribute);
-        data.damage.mod = PartsList.AddUniquePart(data.damage.mod, attribute.label, attribute.value);
+      if (action.damage.base || action.damage.attribute) {
+        data.damage = foundry.utils.duplicate(action.damage);
       }
       if (action.opposed.test) {
         data.opposed = action.opposed;
@@ -12988,7 +12984,7 @@ var SR5Item = class extends Item {
     return new SR5ItemDataWrapper(this.data);
   }
   getLastFireMode() {
-    return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || { value: 0 };
+    return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || { value: 0, defense: 0, label: "SR5.FireMode" };
   }
   setLastFireMode(fireMode) {
     return __async(this, null, function* () {
@@ -13277,8 +13273,14 @@ var SR5Item = class extends Item {
       }
     });
   }
-  hasAmmo() {
-    return this.wrapper.hasAmmo();
+  hasAmmo(rounds = 0) {
+    return this.ammoLeft >= rounds;
+  }
+  get ammoLeft() {
+    const ammo = this.wrapper.getAmmo();
+    if (!ammo)
+      return 0;
+    return ammo.current.value;
   }
   useAmmo(fired) {
     return __async(this, null, function* () {
@@ -15697,25 +15699,28 @@ var ActionFlow = class {
     const attribute = actor.findAttribute(damage.attribute);
     if (!attribute)
       return damage;
-    damage.base = ActionFlow._applyFormulaOperatorToValues(damage.base, attribute.value, damage.base_formula_operator);
-    damage.base = Helpers.applyValueRange(Math.floor(damage.base), { min: 0 });
-    damage.value = damage.base;
-    return damage;
-  }
-  static _applyFormulaOperatorToValues(base, value, operator) {
-    switch (operator) {
-      case "add":
-        return base + value;
-      case "subtract":
-        return base - value;
-      case "multiply":
-        return base * value;
-      case "divide":
-        return base / value;
-      default:
-        console.error(`Unsupported base damage formula operator: '${operator}' used. Falling back to 'add'.`);
-        return base + value;
+    if (!damage.base_formula_operator) {
+      console.error(`Unsupported base damage formula operator: '${damage.base_formula_operator}' used. Falling back to 'add'.`);
+      damage.base_formula_operator = "add";
     }
+    switch (damage.base_formula_operator) {
+      case "add":
+        PartsList.AddUniquePart(damage.mod, attribute.label, attribute.value);
+        break;
+      case "subtract":
+        PartsList.AddUniquePart(damage.mod, attribute.label, -attribute.value);
+        break;
+      case "multiply":
+        PartsList.AddUniquePart(damage.mod, "SR5.Value", damage.base * attribute.value - damage.base);
+        break;
+      case "divide":
+        PartsList.AddUniquePart(damage.mod, "SR5.BaseValue", damage.base * -1);
+        const denominator = attribute.value === 0 ? 1 : attribute.value;
+        PartsList.AddUniquePart(damage.mod, "SR5.Value", Math.floor(damage.base / denominator));
+        break;
+    }
+    damage.value = Helpers.calcTotal(damage, { min: 0 });
+    return damage;
   }
   static _damageSource(actor, item) {
     return {
@@ -15886,6 +15891,7 @@ var SuccessTest = class {
     data.values.glitches = data.values.glitches || DefaultValues.valueData({ label: "SR5.Glitches" });
     data.opposed = data.opposed || void 0;
     data.modifiers = this._prepareModifiers(data.modifiers);
+    data.damage = data.damage || DefaultValues.damageData();
     return data;
   }
   _prepareModifiers(modifiers) {
@@ -15983,11 +15989,13 @@ var SuccessTest = class {
       if (dialog.canceled)
         return false;
       this.data = data;
-      yield this._alterTestDataFromDialogData();
+      yield this.saveUserSelectionAfterDialog();
+      this.prepareBaseValues();
+      this.calculateBaseValues();
       return true;
     });
   }
-  _alterTestDataFromDialogData() {
+  saveUserSelectionAfterDialog() {
     return __async(this, null, function* () {
     });
   }
@@ -16014,8 +16022,6 @@ var SuccessTest = class {
     this.data.pool.value = Helpers.calcTotal(this.data.pool, { min: 0 });
     this.data.threshold.value = Helpers.calcTotal(this.data.threshold, { min: 0 });
     this.data.limit.value = Helpers.calcTotal(this.data.limit, { min: 0 });
-    const damage = this.data.action ? this.data.action.damage : DefaultValues.damageData();
-    this.data.damage = ActionFlow.calcDamage(damage, this.actor);
     console.log(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
   }
   evaluate() {
@@ -16057,6 +16063,7 @@ var SuccessTest = class {
   }
   prepareDocumentData() {
     return __async(this, null, function* () {
+      this.data.damage = ActionFlow.calcDamage(this.data.damage, this.actor, this.item);
     });
   }
   get testModifiers() {
@@ -16289,8 +16296,6 @@ var SuccessTest = class {
       const actorConsumedResources = yield this.consumeActorResources();
       if (!actorConsumedResources)
         return this;
-      this.prepareBaseValues();
-      this.calculateBaseValues();
       this.createRoll();
       yield this.evaluate();
       yield this.processResults();
@@ -26006,6 +26011,7 @@ var PhysicalDefenseTest = class extends DefenseTest {
     return __async(this, null, function* () {
       this.prepareActiveDefense();
       this.prepareMeleeReach();
+      yield __superGet(PhysicalDefenseTest.prototype, this, "prepareDocumentData").call(this);
     });
   }
   prepareActiveDefense() {
@@ -26062,6 +26068,7 @@ var PhysicalDefenseTest = class extends DefenseTest {
     this.applyPoolCoverModifier();
     this.applyPoolActiveDefenseModifier();
     this.applyPoolMeleeReachModifier();
+    this.applyPoolRangedFireModModifier();
     super.applyPoolModifiers();
   }
   applyPoolCoverModifier() {
@@ -26076,6 +26083,16 @@ var PhysicalDefenseTest = class extends DefenseTest {
     if (!this.data.isMeleeAttack)
       return;
     PartsList.AddUniquePart(this.data.modifiers.mod, "SR5.WeaponReach", this.data.defenseReach);
+  }
+  applyPoolRangedFireModModifier() {
+    if (!this.against.item)
+      return;
+    if (!this.against.item.isRangedWeapon())
+      return;
+    const fireMode = this.against.item.getLastFireMode();
+    if (!fireMode.defense)
+      return;
+    PartsList.AddUniquePart(this.data.modifiers.mod, fireMode.label, Number(fireMode.defense));
   }
   get success() {
     return CombatRules.attackMisses(this.against.hits.value, this.hits.value);
@@ -26121,6 +26138,29 @@ var PhysicalDefenseTest = class extends DefenseTest {
       yield this.actor.changeCombatInitiative(activeDefense.initMod);
       this.data.iniMod = activeDefense.initMod;
     });
+  }
+};
+
+// src/module/rules/RangedRules.ts
+var RangedRules = {
+  fireModeDefenseModifier: function(rounds, ammo = 0) {
+    rounds = rounds < 0 ? rounds * -1 : rounds;
+    let modifier = Helpers.mapRoundsToDefenseMod(rounds);
+    if (modifier === 0)
+      return 0;
+    if (ammo <= 0)
+      ammo = rounds;
+    if (ammo >= rounds)
+      return modifier;
+    return Math.min(modifier + rounds - ammo, 0);
+  },
+  recoilAttackModifier: function(compensation, rounds, ammo = 0) {
+    if (ammo <= 0)
+      ammo = rounds;
+    rounds = Math.min(rounds, ammo);
+    const recoilModifier = Math.min(compensation - rounds, 0);
+    compensation = Math.max(compensation - rounds, 0);
+    return { compensation, recoilModifier };
   }
 };
 
@@ -26235,55 +26275,88 @@ var RangedAttackTest = class extends SuccessTest {
       yield this._prepareTargetRanges();
       this._prepareFireMode();
       this._prepareRecoilCompensation();
+      yield __superGet(RangedAttackTest.prototype, this, "prepareDocumentData").call(this);
     });
   }
   get _dialogTemplate() {
     return "systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html";
   }
-  _alterTestDataFromDialogData() {
+  saveUserSelectionAfterDialog() {
     return __async(this, null, function* () {
-      var _a;
-      const { fireMode, fireModes } = this.data;
-      fireMode.value = Number(fireMode.value || 0);
-      const fireModeName = fireModes[fireMode.value];
-      const defenseModifier = Helpers.mapRoundsToDefenseDesc(fireMode.value);
-      this.data.fireMode = {
-        label: fireModeName,
-        value: fireMode.value,
-        defense: defenseModifier
-      };
-      yield (_a = this.item) == null ? void 0 : _a.setLastFireMode(this.data.fireMode);
-      if (this.hasTargets) {
-        const target = this.data.targetRanges[this.data.targetRangesSelected];
-        this.data.range = target.range.modifier;
-        this.targets = this.targets.filter((tokenDoc) => tokenDoc.uuid === target.uuid);
-        this.data.targetActorsUuid = this.data.targetActorsUuid.filter((uuid) => uuid === target.uuid);
-      }
-      this.data.range = Number(this.data.range);
-      const actor = this.actor;
-      if (!actor)
+      if (!this.item)
         return;
-      const modifiers = yield actor.getModifiers();
+      yield this.item.setLastFireMode(this.data.fireMode);
+      if (!this.actor)
+        return;
+      const modifiers = yield this.actor.getModifiers();
       modifiers.activateEnvironmentalCategory("range", this.data.range);
-      yield actor.setModifiers(modifiers);
+      yield this.actor.setModifiers(modifiers);
     });
   }
   prepareBaseValues() {
+    var _a;
     if (!this.actor)
       return;
+    if (!this.item)
+      return;
     const poolMods = new PartsList(this.data.modifiers.mod);
-    const { fireMode, recoilCompensation } = this.data;
-    const recoil = recoilCompensation - fireMode.value;
-    if (recoil < 0)
-      poolMods.addUniquePart("SR5.Recoil", recoil);
+    const { fireMode, fireModes, recoilCompensation } = this.data;
+    fireMode.value = Number(fireMode.value || 0);
+    const fireModeName = fireModes[fireMode.value];
+    const defenseModifier = RangedRules.fireModeDefenseModifier(fireMode.value, this.item.ammoLeft);
+    this.data.fireMode = {
+      label: fireModeName,
+      value: fireMode.value,
+      defense: defenseModifier
+    };
+    const { recoilModifier } = RangedRules.recoilAttackModifier(recoilCompensation, Number(fireMode.value), this.item.ammoLeft);
+    if (fireMode.value > this.item.ammoLeft) {
+      (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.MissingResource.Ammo");
+    }
+    if (recoilModifier < 0)
+      poolMods.addUniquePart("SR5.Recoil", recoilModifier);
     else
       poolMods.removePart("SR5.Recoil");
+    if (this.hasTargets) {
+      const target = this.data.targetRanges[this.data.targetRangesSelected];
+      this.data.range = target.range.modifier;
+      this.targets = this.targets.filter((tokenDoc) => tokenDoc.uuid === target.uuid);
+      this.data.targetActorsUuid = this.data.targetActorsUuid.filter((uuid) => uuid === target.uuid);
+    }
+    this.data.range = Number(this.data.range);
     const range = this.hasTargets ? this.data.targetRanges[this.data.targetRangesSelected].range.modifier : this.data.range;
     const modifiers = Modifiers.getModifiersFromEntity(this.actor);
     modifiers.activateEnvironmentalCategory("range", Number(range));
     const environmental = modifiers.environmental.total;
     poolMods.addUniquePart(SR5.modifierTypes.environmental, environmental);
     super.prepareBaseValues();
+  }
+  consumeActorResources() {
+    return __async(this, null, function* () {
+      if (!(yield __superGet(RangedAttackTest.prototype, this, "consumeActorResources").call(this)))
+        return false;
+      if (!(yield this.consumeWeaponAmmo()))
+        return false;
+      return true;
+    });
+  }
+  consumeWeaponAmmo() {
+    return __async(this, null, function* () {
+      var _a;
+      if (!this.item)
+        return true;
+      if (!this.item.isRangedWeapon())
+        return true;
+      const fireMode = this.data.fireMode;
+      if (fireMode.value === 0)
+        return true;
+      if (!this.item.hasAmmo(1)) {
+        yield (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.MissingResource.Ammo", { localize: true });
+        return false;
+      }
+      yield this.item.useAmmo(fireMode.value);
+      return true;
+    });
   }
 };
 
@@ -26645,6 +26718,7 @@ var MeleeAttackTest = class extends SuccessTest {
       if (!this.item || !this.item.isMeleeWeapon())
         return;
       this.data.reach = this.item.getReach();
+      yield __superGet(MeleeAttackTest.prototype, this, "prepareDocumentData").call(this);
     });
   }
 };
@@ -26733,6 +26807,7 @@ var SpellCastingTest = class extends SuccessTest {
   prepareDocumentData() {
     return __async(this, null, function* () {
       this.prepareInitialForceValue();
+      yield __superGet(SpellCastingTest.prototype, this, "prepareDocumentData").call(this);
     });
   }
   prepareInitialForceValue() {
@@ -26775,13 +26850,7 @@ var SpellCastingTest = class extends SuccessTest {
       yield __superGet(SpellCastingTest.prototype, this, "processResults").call(this);
     });
   }
-  afterTestComplete() {
-    return __async(this, null, function* () {
-      yield this.saveLastUsedForce();
-      yield __superGet(SpellCastingTest.prototype, this, "afterTestComplete").call(this);
-    });
-  }
-  saveLastUsedForce() {
+  saveUserSelectionAfterDialog() {
     return __async(this, null, function* () {
       if (!this.item)
         return;
@@ -27063,6 +27132,7 @@ var ComplexFormTest = class extends SuccessTest {
   prepareDocumentData() {
     return __async(this, null, function* () {
       this.prepareInitialLevelValue();
+      yield __superGet(ComplexFormTest.prototype, this, "prepareDocumentData").call(this);
     });
   }
   prepareInitialLevelValue() {

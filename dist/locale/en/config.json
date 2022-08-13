@@ -995,6 +995,7 @@
     "DroneInfiltrationTest": "Drone Infiltration Test"
   },
   "SR5.MissingResource": {
-    "Edge": "No Edge left to consume"
+    "Edge": "No Edge left to consume",
+    "Ammo": "Not enough ammunition left for fire mode"
   }
 }
