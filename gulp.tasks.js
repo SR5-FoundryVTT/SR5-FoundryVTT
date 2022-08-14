@@ -47,7 +47,7 @@ async function buildJS() {
         outfile: path.resolve(destFolder, jsBundle),
         plugins: [typecheckPlugin()],
     }).catch((err) => {
-        console.log(err)
+        console.error(err)
     })
 }
 
@@ -138,9 +138,7 @@ async function linkUserData() {
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
-// exports.build = gulp.series(copyAssets, buildSass, buildJS);
 exports.build = gulp.series(copyAssets, buildSass, buildJS);
 exports.watch = gulp.series(watch);
-// exports.watch = gulp.series(exports.build, watch);
 exports.rebuild = gulp.series(cleanDist, exports.build);
 exports.link = linkUserData;
