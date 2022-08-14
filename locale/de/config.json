@@ -850,7 +850,9 @@
     "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
     "CantRecoverPhysicalWithStunDamage": "Solange geistiger Schaden ungeheilt bleibt kann kein physischer Schaden kuriert werden",
     "CantExtendTestFurther": "Probe kann nicht weiter ausgedehnt werden. Zu wenige Würfel übrig oder Schwellenwert erreicht",
-    "CantExtendTest": "Probenart kann nicht ausgedehnt werden."
+    "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",
+    "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
+    "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Glitch."
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",

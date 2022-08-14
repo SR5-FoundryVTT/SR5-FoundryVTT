@@ -877,23 +877,33 @@ export class SuccessTest {
     }
 
     /**
-     * Handle Edge rule 'second chance' within this test.
+     * Handle Edge rule 'second chance' within this test according to SR5#56
      */
-    async executeSecondChance() {
+    async executeSecondChance(): Promise<this> {
         console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
 
-        if (!this.data.sourceActorUuid) return;
+        if (!this.data.sourceActorUuid) return this;
+
+        // According to rules, second chance can't be used on glitched tests.
+        if (this.glitched) {
+            ui.notifications?.warn('SR5.Warnings.CantSecondChanceAGlitch', {localize: true});
+            return this;
+        }
 
         // Only count last roll as there might be multiple second chances already
         const lastRoll = this.rolls[this.rolls.length - 1];
         const dice = lastRoll.pool - lastRoll.hits;
-        if (dice <= 0) return; // TODO: User info about no dice.;
+        if (dice <= 0) {
+            ui.notifications?.warn('SR5.Warnings.CantSecondChanceWithoutNoneHits', {localize: true});
+            return this;
+        }
 
-        // Alter dice pool value for overall glitch calculation.
+        // Apply second chance modifiers.
         const parts = new PartsList(this.pool.mod);
         // Second chance can stack, so don't add it as unique.
         parts.addPart('SR5.SecondChange', dice);
 
+        // Can't use normal #execute as not all parts are needed.
         await this.populateDocuments();
         this.calculateBaseValues();
 
@@ -901,30 +911,37 @@ export class SuccessTest {
         const roll = new SR5Roll(formula);
         this.rolls.push(roll);
 
+        //  Trigger edge consumption.
+        this.data.secondChance = true;
+        const actorConsumedResources = await this.consumeDocumentResources();
+        if (!actorConsumedResources) return this;
+        // Remove second chance to avoid edge consumption on any kind of re-rolls.
+        this.data.secondChance = false;
+
         await this.evaluate();
         await this.processResults();
         await this.toMessage();
         await this.afterTestComplete();
+
+        return this;
     }
 
     /**
-     * Handle resulting actor resource consumption after this test.
-     *
-     * TODO: Maybe make this a hook and transfer resources to consume (edge, ammo)
+     * Handle resulting resource consumption caused by this test.
      */
-    async consumeActorResources(): Promise<boolean> {
+    async consumeDocumentResources(): Promise<boolean> {
         // No actor present? Nothing to consume...
         if (!this.actor) return true;
 
-        if (this.hasPushTheLimit) {
+        // EDGE CONSUMPTION.
+        if (this.hasPushTheLimit || this.hasSecondChance) {
             if (this.actor.getEdge().uses <= 0) {
-                ui.notifications?.error(game.i18n.localize('SR5.MissingResource.Edge'));
+                ui.notifications?.warn(game.i18n.localize('SR5.MissingResource.Edge'));
                 return false;
             }
             await this.actor.useEdge();
         }
 
-        // TODO: Add second chance consumption
         return true;
     }
 
@@ -958,7 +975,7 @@ export class SuccessTest {
         if (!userConsented) return this;
 
         // Check if actor has all needed resources to even test.
-        const actorConsumedResources = await this.consumeActorResources();
+        const actorConsumedResources = await this.consumeDocumentResources();
         if (!actorConsumedResources) return this;
 
         this.createRoll();

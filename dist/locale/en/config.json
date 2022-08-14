@@ -175,6 +175,7 @@
   "SR5.AP": "AP",
   "SR5.OpposedType": "Type",
   "SR5.Extended": "Extended",
+  "SR5.Extend": "Extend",
   "SR5.Test": "Test",
   "SR5.CreateItem": "Create Item",
   "SR5.CreateItemWeapon": "Create Weapon",
@@ -881,7 +882,11 @@
     "InvalidMarksCount": "You've trying to place a strange number of marks",
     "AlreadyExistingInventory": "An inventory with this name alreayd exists",
     "CantEditDefaultInventory": "The default inventory can't be renamed",
-    "CantRecoverPhysicalWithStunDamage": "Cant recover from physical damage with stun damage still present"
+    "CantRecoverPhysicalWithStunDamage": "Cant recover from physical damage with stun damage still present",
+    "CantExtendTestFurther": "Test can't be extended either by dice left or threshold reached",
+    "CantExtendTest": "Test type can't be extended.",
+    "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
+    "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched."
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",

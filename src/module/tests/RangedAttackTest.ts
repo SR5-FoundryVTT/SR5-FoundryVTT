@@ -247,8 +247,8 @@ export class RangedAttackTest extends SuccessTest {
     /**
      * Ranged Attacks not only can consume edge but also reduce ammunition.
      */
-    async consumeActorResources() {
-        if (!await super.consumeActorResources()) return false;
+    async consumeDocumentResources() {
+        if (!await super.consumeDocumentResources()) return false;
         if (!await this.consumeWeaponAmmo()) return false;
 
         return true;

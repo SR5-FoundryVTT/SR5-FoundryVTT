@@ -15832,7 +15832,9 @@ var TestRules = {
     return current + TestRules.extendedModifierValue;
   },
   canExtendTest: (pool, threshold, extendedHits) => {
-    return extendedHits < threshold && pool > 0;
+    if (threshold > 0)
+      return extendedHits < threshold && pool > 0;
+    return pool > 0;
   },
   success: (hits, threshold) => {
     hits = Math.max(hits, 0);
@@ -16183,10 +16185,16 @@ var SuccessTest = class {
     return TestRules.success(hits.value, this.threshold.value);
   }
   get failure() {
+    if (this.extended && this.threshold.value === 0)
+      return true;
+    if (this.extendedHits && this.threshold.value > 0)
+      return this.extendedHits.value < this.threshold.value;
     return !this.success;
   }
   get canSucceed() {
-    return true;
+    if (!this.extended)
+      return true;
+    return this.extended && this.hasThreshold;
   }
   get canFail() {
     return true;
@@ -16195,6 +16203,8 @@ var SuccessTest = class {
     return "SR5.Success";
   }
   get failureLabel() {
+    if (this.extended)
+      return "SR5.Results";
     return "SR5.Failure";
   }
   get opposed() {
@@ -16247,13 +16257,20 @@ var SuccessTest = class {
   }
   executeSecondChance() {
     return __async(this, null, function* () {
+      var _a, _b;
       console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
       if (!this.data.sourceActorUuid)
-        return;
+        return this;
+      if (this.glitched) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
+        return this;
+      }
       const lastRoll = this.rolls[this.rolls.length - 1];
       const dice = lastRoll.pool - lastRoll.hits;
-      if (dice <= 0)
-        return;
+      if (dice <= 0) {
+        (_b = ui.notifications) == null ? void 0 : _b.warn("SR5.Warnings.CantSecondChanceWithoutNoneHits", { localize: true });
+        return this;
+      }
       const parts = new PartsList(this.pool.mod);
       parts.addPart("SR5.SecondChange", dice);
       yield this.populateDocuments();
@@ -16261,20 +16278,26 @@ var SuccessTest = class {
       const formula = `${dice}d6`;
       const roll = new SR5Roll(formula);
       this.rolls.push(roll);
+      this.data.secondChance = true;
+      const actorConsumedResources = yield this.consumeDocumentResources();
+      if (!actorConsumedResources)
+        return this;
+      this.data.secondChance = false;
       yield this.evaluate();
       yield this.processResults();
       yield this.toMessage();
       yield this.afterTestComplete();
+      return this;
     });
   }
-  consumeActorResources() {
+  consumeDocumentResources() {
     return __async(this, null, function* () {
       var _a;
       if (!this.actor)
         return true;
-      if (this.hasPushTheLimit) {
+      if (this.hasPushTheLimit || this.hasSecondChance) {
         if (this.actor.getEdge().uses <= 0) {
-          (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.MissingResource.Edge"));
+          (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.MissingResource.Edge"));
           return false;
         }
         yield this.actor.useEdge();
@@ -16293,7 +16316,7 @@ var SuccessTest = class {
       const userConsented = yield this.showDialog();
       if (!userConsented)
         return this;
-      const actorConsumedResources = yield this.consumeActorResources();
+      const actorConsumedResources = yield this.consumeDocumentResources();
       if (!actorConsumedResources)
         return this;
       this.createRoll();
@@ -16353,21 +16376,33 @@ var SuccessTest = class {
   }
   extendCurrentTest() {
     return __async(this, null, function* () {
+      var _a;
+      if (!this.canBeExtended)
+        return;
       const data = foundry.utils.duplicate(this.data);
       if (!data.type)
         return;
       const pool = new PartsList(data.pool.mod);
       const currentModifierValue = pool.getPartValue("SR5.ExtendedTest") || 0;
       const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
-      pool.addUniquePart("SR5.ExtendedTest", nextModifierValue);
-      Helpers.calcTotal(data.pool, { min: 0 });
-      if (TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
-        const testCls = TestCreator._getTestClass(data.type);
-        if (!testCls)
-          return;
-        const test = new testCls(data, { actor: this.actor, item: this.item }, this.data.options);
-        yield test.execute();
+      if (data.pool.override) {
+        data.pool.override.value = Math.max(data.pool.override.value - 1, 0);
+      } else {
+        pool.addUniquePart("SR5.ExtendedTest", nextModifierValue);
       }
+      Helpers.calcTotal(data.pool, { min: 0 });
+      if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
+        return (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantExtendTestFurther", { localize: true });
+      }
+      const testCls = TestCreator._getTestClass(data.type);
+      if (!testCls)
+        return;
+      const test = new testCls(data, { actor: this.actor, item: this.item }, this.data.options);
+      if (!test.extended) {
+        test.data.extended = true;
+        test.calculateExtendedHits();
+      }
+      yield test.execute();
     });
   }
   rollDiceSoNice() {
@@ -16555,12 +16590,29 @@ var SuccessTest = class {
         return console.error("Shadowrun 5e | Could not restore test from message");
       yield test.executeSecondChance();
     });
+    const extendTest = (li) => __async(this, null, function* () {
+      var _a;
+      const messageId = li.data().messageId;
+      const test = yield TestCreator.fromMessage(messageId);
+      if (!test)
+        return console.error("Shadowrun 5e | Could not restore test from message");
+      if (!test.canBeExtended) {
+        return (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantExtendTest", { localize: true });
+      }
+      yield test.extendCurrentTest();
+    });
     const deleteOption = options.pop();
     options.push({
       name: game.i18n.localize("SR5.SecondChange"),
       callback: secondChance,
       condition: true,
       icon: '<i class="fas fa-meteor"></i>'
+    });
+    options.push({
+      name: game.i18n.localize("SR5.Extend"),
+      callback: extendTest,
+      condition: true,
+      icon: '<i class="fas fa-clock"></i>'
     });
     options.push(deleteOption);
     return options;
@@ -26331,9 +26383,9 @@ var RangedAttackTest = class extends SuccessTest {
     poolMods.addUniquePart(SR5.modifierTypes.environmental, environmental);
     super.prepareBaseValues();
   }
-  consumeActorResources() {
+  consumeDocumentResources() {
     return __async(this, null, function* () {
-      if (!(yield __superGet(RangedAttackTest.prototype, this, "consumeActorResources").call(this)))
+      if (!(yield __superGet(RangedAttackTest.prototype, this, "consumeDocumentResources").call(this)))
         return false;
       if (!(yield this.consumeWeaponAmmo()))
         return false;

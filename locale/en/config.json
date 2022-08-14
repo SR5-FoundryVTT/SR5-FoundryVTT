@@ -884,7 +884,9 @@
     "CantEditDefaultInventory": "The default inventory can't be renamed",
     "CantRecoverPhysicalWithStunDamage": "Cant recover from physical damage with stun damage still present",
     "CantExtendTestFurther": "Test can't be extended either by dice left or threshold reached",
-    "CantExtendTest": "Test type can't be extended."
+    "CantExtendTest": "Test type can't be extended.",
+    "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
+    "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched."
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
