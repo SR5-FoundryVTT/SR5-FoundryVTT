@@ -868,16 +868,10 @@ export class SR5Actor extends Actor {
      * @param options Success Test options
      */
     async rollPackAction(packName: PackName, actionName: PackActionName, options?: ActorRollOptions) {
-        const action = await Helpers.getPackAction(packName, actionName);
-        if (!action) return;
-
         const showDialog = !TestCreator.shouldHideDialog(options?.event);
-        const test = await TestCreator.fromItem(action, this, {showDialog});
+        const test = await TestCreator.fromPackAction(packName, actionName, this, {showDialog});
 
-        // Overwriting localization here is just easier...
-        test.data.title = game.i18n.localize(SR5.modifierTypes[actionName]);
-
-        if (!test) return;
+        if (!test) return console.error('Shadowrun 5e | Rolling pack action failed');
 
         await test.execute();
     }

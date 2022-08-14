@@ -11835,6 +11835,16 @@ var TestCreator = {
       return new cls(data, documents, options);
     });
   },
+  fromPackAction: function(packName, actionName, actor, options) {
+    return __async(this, null, function* () {
+      const item = yield Helpers.getPackAction(packName, actionName);
+      if (!item) {
+        console.error(`Shadowrun5 | The pack ${packName} doesn't include an item ${actionName}`);
+        return;
+      }
+      return TestCreator.fromItem(item, actor, options);
+    });
+  },
   fromMessage: function(id) {
     return __async(this, null, function* () {
       var _a;
@@ -17231,14 +17241,10 @@ var SR5Actor = class extends Actor {
   }
   rollPackAction(packName, actionName, options) {
     return __async(this, null, function* () {
-      const action = yield Helpers.getPackAction(packName, actionName);
-      if (!action)
-        return;
       const showDialog = !TestCreator.shouldHideDialog(options == null ? void 0 : options.event);
-      const test = yield TestCreator.fromItem(action, this, { showDialog });
-      test.data.title = game.i18n.localize(SR5.modifierTypes[actionName]);
+      const test = yield TestCreator.fromPackAction(packName, actionName, this, { showDialog });
       if (!test)
-        return;
+        return console.error("Shadowrun 5e | Rolling pack action failed");
       yield test.execute();
     });
   }

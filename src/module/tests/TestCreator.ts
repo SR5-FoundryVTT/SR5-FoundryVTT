@@ -62,7 +62,7 @@ export const TestCreator = {
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
     fromItem: async function(item: SR5Item, actor?: SR5Actor, options?: TestOptions): Promise<any | undefined> {
-        //@ts-ignore
+        //@ts-ignore Default to item parent actor, if none given.
         if (!actor) actor = item.parent;
         if (!(actor instanceof SR5Actor)) {
             console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
@@ -117,6 +117,23 @@ export const TestCreator = {
         const documents = {actor};
 
         return new cls(data, documents, options);
+    },
+
+    /**
+     * Create a test using an Action item stored in any collection
+     * @param packName The package / compendium name to search for the action
+     * @param actionName The items name within the given packName
+     * @param actor The actor used to roll the test with
+     * @param options General TestOptions
+     */
+    fromPackAction: async function(packName: string, actionName: string, actor: SR5Actor, options?: TestOptions): Promise<SuccessTest|undefined> {
+        const item = await Helpers.getPackAction(packName, actionName);
+        if (!item) {
+            console.error(`Shadowrun5 | The pack ${packName} doesn't include an item ${actionName}`);
+            return;
+        }
+
+        return TestCreator.fromItem(item, actor, options);
     },
 
     /**
