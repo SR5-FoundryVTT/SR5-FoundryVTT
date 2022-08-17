@@ -1094,7 +1094,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onRollSkillSpec(event) {
         event.preventDefault();
         const skillId = Helpers.listItemId(event);
-        return this.actor.rollSkill(skillId, {event, specialization: true})
+        return this.actor.rollSkill(skillId, {event, specialization: true});
     }
 
     async _onShowEditSkill(event) {

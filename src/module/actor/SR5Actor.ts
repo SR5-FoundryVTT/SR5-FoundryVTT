@@ -889,7 +889,7 @@ export class SR5Actor extends Actor {
     async rollSkill(skillId: string, options?: SkillRollOptions) {
         console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
 
-        const action = this.skillActionData(skillId);
+        const action = this.skillActionData(skillId, options);
         if (!action) return;
 
         const showDialog = !TestCreator.shouldHideDialog(options?.event);
@@ -1031,10 +1031,12 @@ export class SR5Actor extends Actor {
         const attribute = this.getAttribute(skill.attribute);
         // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
         const limit = attribute.limit as ActorAttribute|| '';
+        // Should a specialization be used?
+        const spec = options?.specialization || false;
 
         return DefaultValues.actionData({
             skill: skillId,
-            spec: options?.specialization || false,
+            spec,
             attribute: skill.attribute,
             limit: {
                 base: 0, value: 0, mod: [],
