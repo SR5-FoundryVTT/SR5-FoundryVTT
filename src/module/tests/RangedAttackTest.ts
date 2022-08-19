@@ -10,6 +10,7 @@ import FireModeData = Shadowrun.FireModeData;
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
 import {RangedRules} from "../rules/RangedRules";
+import { SR5Item } from "../item/SR5Item";
 
 export interface RangedAttackTestData extends SuccessTestData {
     damage: DamageData
@@ -29,6 +30,7 @@ export interface RangedAttackTestData extends SuccessTestData {
  */
 export class RangedAttackTest extends SuccessTest {
     public data: RangedAttackTestData;
+    public item: SR5Item;
 
     _prepareData(data, options): RangedAttackTestData {
         data = super._prepareData(data, options);
@@ -52,9 +54,9 @@ export class RangedAttackTest extends SuccessTest {
         return false;
     }
 
-    _prepareFireMode() {
+    _prepareFireMode() {        
         // No firemodes selectable on dialog for invalid item provided.
-        const weaponData = this.item?.asWeaponData();
+        const weaponData = this.item.asWeaponData();
         if (!weaponData) return;
 
         // Firemodes selection.
@@ -80,7 +82,7 @@ export class RangedAttackTest extends SuccessTest {
         }
 
         // Current firemode selected
-        this.data.fireMode = this.item?.getLastFireMode() || {value: 0, defense: 0, label: ''};
+        this.data.fireMode = this.item.getLastFireMode() || {value: 0, defense: 0, label: ''};
     }
 
     async _prepareWeaponRanges() {
@@ -210,11 +212,6 @@ export class RangedAttackTest extends SuccessTest {
         // Alter recoil modifier by ammunition constraints.
         const {recoilModifier} = RangedRules.recoilAttackModifier(recoilCompensation, Number(fireMode.value), this.item.ammoLeft);
 
-        // Inform user about insufficient ammunition for fire mode selected
-        if (fireMode.value > this.item.ammoLeft) {
-            ui.notifications?.warn('SR5.MissingResource.Ammo');
-        }
-
         if (recoilModifier < 0)
             poolMods.addUniquePart('SR5.Recoil', recoilModifier);
         else
@@ -245,10 +242,34 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     /**
-     * Ranged Attacks not only can consume edge but also reduce ammunition.
+     * Ennough ressources according to test configuration?
+     * 
+     * Ranged weapons need ammunition in enough quantity.
+     * 
+     * NOTE: In this case it's only checked if at least ONE bullet exists.
+     *       It's done this way as no matter the fire mode, you can fire it.
      */
-    async consumeDocumentResources() {
-        if (!await super.consumeDocumentResources()) return false;
+    canConsumeDocumentRessources() {
+        if (!this.item.isRangedWeapon()) return true;
+        
+        // Ammo consumption
+        const fireMode = this.data.fireMode;
+        if (fireMode.value === 0) return true;
+
+        if (!this.item.hasAmmo(1)) {
+            ui.notifications?.error('SR5.MissingRessource.Ammo', {localize: true});
+            return false;
+        }
+
+        return super.canConsumeDocumentRessources();
+    }
+
+    /**
+     * Ranged Attacks not only can consume edge but also reduce ammunition.
+     * 
+     */
+    async consumeDocumentRessources() {        
+        if (!await super.consumeDocumentRessources()) return false;
         if (!await this.consumeWeaponAmmo()) return false;
 
         return true;
@@ -266,7 +287,7 @@ export class RangedAttackTest extends SuccessTest {
 
         // Abort if the weapon doesn't even contain at least one round.
         if (!this.item.hasAmmo(1)) {
-            await ui.notifications?.warn('SR5.MissingResource.Ammo', {localize: true});
+            await ui.notifications?.warn('SR5.MissingRessource.Ammo', {localize: true});
             return false;
         }
 

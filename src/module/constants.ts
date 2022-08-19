@@ -40,7 +40,8 @@ export const FLAGS = {
     addNetworkController: 'addNetworkController',
     TokenHealthBars: 'tokenHealthBars',
     Test: 'TestData',
-    HideGMOnlyChatContent: 'HideGMOnlyChatContent'
+    HideGMOnlyChatContent: 'HideGMOnlyChatContent',
+    MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

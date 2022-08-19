@@ -138,4 +138,21 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: false
     });
+
+    /**
+     * Control Test behaviour and consumption of necessary ressources for it.
+     * 
+     * When set to true tests will NOT roll should one ressource be missing.
+     * 
+     * This can be used to prevent edge rules to be used, when an actor doesn't have edge
+     * and other ressources.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest, {
+        name: 'SETTINGS.MustHaveRessourcesOnTest',
+        hint: 'SETTINGS.MustHaveRessourcesOnTestDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false
+    })
 };

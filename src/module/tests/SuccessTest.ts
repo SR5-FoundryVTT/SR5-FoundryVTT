@@ -913,7 +913,7 @@ export class SuccessTest {
 
         //  Trigger edge consumption.
         this.data.secondChance = true;
-        const actorConsumedResources = await this.consumeDocumentResources();
+        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
         if (!actorConsumedResources) return this;
         // Remove second chance to avoid edge consumption on any kind of re-rolls.
         this.data.secondChance = false;
@@ -927,22 +927,56 @@ export class SuccessTest {
     }
 
     /**
-     * Handle resulting resource consumption caused by this test.
+     * Make sure ALL ressources needed are available.
+     * 
+     * This is checked before any ressources are consumed.
+     * 
+     * @returns true when enough ressources are available to consume
      */
-    async consumeDocumentResources(): Promise<boolean> {
+    canConsumeDocumentRessources(): boolean {
         // No actor present? Nothing to consume...
         if (!this.actor) return true;
-
-        // EDGE CONSUMPTION.
-        if (this.hasPushTheLimit || this.hasSecondChance) {
+        
+        // Edge consumption.
+        if (this.hasPushTheLimit || this.hasSecondChance) {      
             if (this.actor.getEdge().uses <= 0) {
-                ui.notifications?.warn(game.i18n.localize('SR5.MissingResource.Edge'));
+                ui.notifications?.error(game.i18n.localize('SR5.MissingResource.Edge'));
                 return false;
             }
+        }
+
+        return true;
+    }
+
+    /**
+     * Handle resulting resource consumption caused by this test.
+     * 
+     * @return true when the ressources could be consumed in appropriate ammounts.
+     */
+    async consumeDocumentRessources(): Promise<boolean> {
+        if (!this.actor) return true;
+
+        if (!this.canConsumeDocumentRessources()) return false;
+
+        // Edge consumption.
+        if (this.hasPushTheLimit || this.hasSecondChance) {            
             await this.actor.useEdge();
         }
 
         return true;
+    }
+
+    /**
+     * Consume ressources according to whats configured for this world.
+     
+    * @returns true when the test can process
+     */
+    async consumeDocumentRessoucesWhenNeeded(): Promise<boolean> {
+        // Only check for ressources according to setting.
+        const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
+        if (!mustHaveRessouces) return true;
+
+        return await this.consumeDocumentRessources();
     }
 
     /**
@@ -975,7 +1009,7 @@ export class SuccessTest {
         if (!userConsented) return this;
 
         // Check if actor has all needed resources to even test.
-        const actorConsumedResources = await this.consumeDocumentResources();
+        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
         if (!actorConsumedResources) return this;
 
         this.createRoll();

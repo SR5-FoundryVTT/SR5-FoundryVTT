@@ -105,6 +105,9 @@ export class TestDialog extends FormDialog {
      * @param data An object with keys in Foundry UpdateData style {'key.key.key': value}
      */
     _updateData(data) {
+        // The user canceled their interaction by cancenling, don't apply form changes.
+        if (this.selectedButton === 'cancel') return;
+
         // First, apply changes to ValueField style values in a way that makes sense.
         Object.entries(data).forEach(([key, value]) => {
             // key is expected to be relative from TestDialog.data and begin with 'test'
