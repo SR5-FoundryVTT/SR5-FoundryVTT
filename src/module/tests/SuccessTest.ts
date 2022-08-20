@@ -737,24 +737,27 @@ export class SuccessTest {
     }
 
     /**
-     * Helper to check if the current test state is successful.
-     *
-     * Since a test can only really be a success when some threshold is met,
-     * only report success when there is one.
+     * Check if the current test state is successful.
+     * 
+     * @returns true on a successful test
      */
     get success(): boolean {
-        // Either use this tests current hits or use the extended tests summed up hits.
+        // Extended tests use the sum of all extended hits.
         const hits = this.extended ? this.extendedHits : this.hits;
         return TestRules.success(hits.value, this.threshold.value);
     }
 
     /**
-     * Helper to check if the current test state is unsuccessful.
+     * Check if the current test state is unsuccessful.
+     * 
+     * @returns true on a failed test
      */
     get failure(): boolean {
+        // Allow extended tests without a threshold and avoid 'failure' confusion.
         if (this.extended && this.threshold.value === 0) return true;
-        if (this.extendedHits && this.threshold.value > 0) return this.extendedHits.value < this.threshold.value;
-
+        // When extendedHits have been collected, check against threshold.
+        if (this.extendedHits.value > 0 && this.threshold.value > 0) return this.extendedHits.value < this.threshold.value;
+        // Otherwise fall back to 'whatever is not a success.
         return !this.success;
     }
 
