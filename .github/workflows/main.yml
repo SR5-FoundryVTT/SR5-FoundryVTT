@@ -25,17 +25,4 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: gulp build
-      - uses: EndBug/add-and-commit@v4 # You can change this to use a specific version
-        with:
-          # The arguments for the `git add` command (see the paragraph below for more info)
-          # Default: '.'
-          add: 'dist'
-
-          # The message for the commit
-          # Default: 'Commit from GitHub Actions'
-          message: 'Automatic build of bundle'
-
-        env:
-          # This is necessary in order to push a commit to the repo
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
+        run: npm test
