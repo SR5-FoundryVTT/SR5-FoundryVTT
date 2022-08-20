@@ -644,14 +644,14 @@ export class SR5Actor extends Actor {
 
         const skills = this.getSkills();
 
-        for (const skill of Object.values(skills.active)) {
+        for (const [id, skill] of Object.entries(skills.active)) {
             if (searchedFor === possibleMatch(skill))
-                return skill;
+                return {...skill, id};
         }
 
-        for (const skill of Object.values(skills.language.value)) {
+        for (const [id, skill] of Object.entries(skills.language.value)) {
             if (searchedFor === possibleMatch(skill))
-                return skill;
+                return {...skill, id};
         }
 
         // Iterate over all different knowledge skill categories
@@ -659,9 +659,9 @@ export class SR5Actor extends Actor {
             if (!skills.knowledge.hasOwnProperty(categoryKey)) continue;
             // Typescript can't follow the flow here...
             const categorySkills = skills.knowledge[categoryKey].value as SkillField[];
-            for (const skill of Object.values(categorySkills)) {
+            for (const [id, skill] of Object.entries(categorySkills)) {
                 if (searchedFor === possibleMatch(skill))
-                    return skill;
+                    return {...skill, id};
             }
         }
     }
@@ -886,13 +886,20 @@ export class SR5Actor extends Actor {
         await this.rollPackAction(SR5.packNames.generalActions as PackName, actionName, options);
     }
 
-    async rollSkill(skillId: string, options?: SkillRollOptions) {
+    /**
+     * Roll a skill test for a specific skill
+     * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
+     * @param options Optional options to configure the roll.
+     * @param options.byLabel true to search the skill by label as displayed on the sheet.
+     * @param options.specialization true to configure the skill test to use a specialization.
+     */
+    async rollSkill(skillId: string, options: SkillRollOptions={}) {
         console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
 
-        const action = this.skillActionData(skillId);
+        const action = this.skillActionData(skillId, options);
         if (!action) return;
 
-        const showDialog = !TestCreator.shouldHideDialog(options?.event);
+        const showDialog = !TestCreator.shouldHideDialog(options.event);
         const test = await TestCreator.fromAction(action, this, {showDialog});
         if (!test) return;
 
@@ -1016,8 +1023,9 @@ export class SR5Actor extends Actor {
      * @param skillId Any skill, no matter if active, knowledge or language
      * @param options
      */
-    skillActionData(skillId: string, options?: SkillRollOptions): ActionRollData|undefined {
-        const skill = this.getSkill(skillId);
+    skillActionData(skillId: string, options: SkillRollOptions = {}): ActionRollData|undefined {
+        const byLabel = options.byLabel || false;
+        const skill = this.getSkill(skillId, {byLabel});
         if (!skill) {
             console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
             return;
@@ -1027,14 +1035,19 @@ export class SR5Actor extends Actor {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
         }
 
+        // When fetched by label, getSkillByLabel will inject the id into SkillField.
+        skillId = skill.id || skillId;
+
         // Derive limit from skill attribute.
         const attribute = this.getAttribute(skill.attribute);
         // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
         const limit = attribute.limit as ActorAttribute|| '';
+        // Should a specialization be used?
+        const spec = options.specialization || false;
 
         return DefaultValues.actionData({
             skill: skillId,
-            spec: options?.specialization || false,
+            spec,
             attribute: skill.attribute,
             limit: {
                 base: 0, value: 0, mod: [],

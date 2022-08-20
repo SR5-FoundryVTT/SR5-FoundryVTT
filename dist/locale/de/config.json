@@ -545,8 +545,8 @@
   "SR5.EnvironmentHigh": "Stark",
   "SR5.EnvironmentVeryHigh": "Extrem",
   "SR5.WoundModifier": "Verletzungsmodi",
-  "SR5.ExtendedTest": "Ausgedehnte Probe",
-  "SR5.ExtendedHits": "Ausgedehnte Erfolge",
+  "SR5.ExtendedTest": "Ausged. Probe",
+  "SR5.ExtendedHits": "Ausged. Erfolge",
   "SR5.IncomingDamage": "Schaden",
   "SR5.ModifiedDamage": "Modifiziert",
   "SR5.IncomingDrain": "Entzug",
@@ -612,7 +612,9 @@
     "TokenHealthBars": "Token Lebensbalken",
     "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige",
     "HideGMOnlyChatContent": "Verstecke GM Informationen in Proben Chat Nachrichten",
-    "HideGMOnlyChatContentDescription": "Nachrichten durch GM Proben zeigen kritische Informationen nur Spielern mit Besitzer Rechten für den genutzten Akteur"
+    "HideGMOnlyChatContentDescription": "Nachrichten durch GM Proben zeigen kritische Informationen nur Spielern mit Besitzer Rechten für den genutzten Akteur",
+    "MustHaveRessourcesOnTest": "Proben nur mit außreichenden Ressourcen",
+    "MustHaveRessourcesOnTestDescription": "Eine Probe kann nur durchgeführt werden wenn alle Ressourcen dafür vorhadnen sind"
   },
   "SR5.MIGRATION.WarningTitle": "Alarm",
   "SR5.MIGRATION.WarningHeader": "Migrationswarnung",
@@ -962,8 +964,8 @@
     "DronePerceptionTest": "Fahrzeug Clearsight",
     "DroneInfiltrationTest": "Fahrzeug Stealth"
   },
-  "SR5.MissingResource": {
+  "SR5.MissingRessource": {
     "Edge": "Kein Edge übrig",
-    "Ammo": "Nicht genug Munition für Feuer Modus"
+    "Ammo": "Nicht genug Munition für ausgewählten Feuer Modus"
   }
 }

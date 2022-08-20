@@ -737,24 +737,27 @@ export class SuccessTest {
     }
 
     /**
-     * Helper to check if the current test state is successful.
-     *
-     * Since a test can only really be a success when some threshold is met,
-     * only report success when there is one.
+     * Check if the current test state is successful.
+     * 
+     * @returns true on a successful test
      */
     get success(): boolean {
-        // Either use this tests current hits or use the extended tests summed up hits.
+        // Extended tests use the sum of all extended hits.
         const hits = this.extended ? this.extendedHits : this.hits;
         return TestRules.success(hits.value, this.threshold.value);
     }
 
     /**
-     * Helper to check if the current test state is unsuccessful.
+     * Check if the current test state is unsuccessful.
+     * 
+     * @returns true on a failed test
      */
     get failure(): boolean {
+        // Allow extended tests without a threshold and avoid 'failure' confusion.
         if (this.extended && this.threshold.value === 0) return true;
-        if (this.extendedHits && this.threshold.value > 0) return this.extendedHits.value < this.threshold.value;
-
+        // When extendedHits have been collected, check against threshold.
+        if (this.extendedHits.value > 0 && this.threshold.value > 0) return this.extendedHits.value < this.threshold.value;
+        // Otherwise fall back to 'whatever is not a success.
         return !this.success;
     }
 
@@ -913,7 +916,7 @@ export class SuccessTest {
 
         //  Trigger edge consumption.
         this.data.secondChance = true;
-        const actorConsumedResources = await this.consumeDocumentResources();
+        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
         if (!actorConsumedResources) return this;
         // Remove second chance to avoid edge consumption on any kind of re-rolls.
         this.data.secondChance = false;
@@ -927,22 +930,56 @@ export class SuccessTest {
     }
 
     /**
-     * Handle resulting resource consumption caused by this test.
+     * Make sure ALL ressources needed are available.
+     * 
+     * This is checked before any ressources are consumed.
+     * 
+     * @returns true when enough ressources are available to consume
      */
-    async consumeDocumentResources(): Promise<boolean> {
+    canConsumeDocumentRessources(): boolean {
         // No actor present? Nothing to consume...
         if (!this.actor) return true;
-
-        // EDGE CONSUMPTION.
-        if (this.hasPushTheLimit || this.hasSecondChance) {
+        
+        // Edge consumption.
+        if (this.hasPushTheLimit || this.hasSecondChance) {      
             if (this.actor.getEdge().uses <= 0) {
-                ui.notifications?.warn(game.i18n.localize('SR5.MissingResource.Edge'));
+                ui.notifications?.error(game.i18n.localize('SR5.MissingResource.Edge'));
                 return false;
             }
+        }
+
+        return true;
+    }
+
+    /**
+     * Handle resulting resource consumption caused by this test.
+     * 
+     * @return true when the ressources could be consumed in appropriate ammounts.
+     */
+    async consumeDocumentRessources(): Promise<boolean> {
+        if (!this.actor) return true;
+
+        if (!this.canConsumeDocumentRessources()) return false;
+
+        // Edge consumption.
+        if (this.hasPushTheLimit || this.hasSecondChance) {            
             await this.actor.useEdge();
         }
 
         return true;
+    }
+
+    /**
+     * Consume ressources according to whats configured for this world.
+     
+    * @returns true when the test can process
+     */
+    async consumeDocumentRessoucesWhenNeeded(): Promise<boolean> {
+        // Only check for ressources according to setting.
+        const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
+        if (!mustHaveRessouces) return true;
+
+        return await this.consumeDocumentRessources();
     }
 
     /**
@@ -975,7 +1012,7 @@ export class SuccessTest {
         if (!userConsented) return this;
 
         // Check if actor has all needed resources to even test.
-        const actorConsumedResources = await this.consumeDocumentResources();
+        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
         if (!actorConsumedResources) return this;
 
         this.createRoll();
@@ -1105,6 +1142,8 @@ export class SuccessTest {
     /**
      * DiceSoNice must be implemented locally to avoid showing dice on gmOnlyContent throws while also using
      * FoundryVTT ChatMessage of type roll for their content visibility behaviour.
+     * 
+     * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
     async rollDiceSoNice() {
         // @ts-ignore
@@ -1117,18 +1156,25 @@ export class SuccessTest {
         // of all.
         const roll = this.rolls[this.rolls.length - 1];
 
-        // Only show dice to users with permissions, when the GM  cast the test.
+        // Limit users to show dice to...
         let whisper: User[]|null = null;
+        // ...for gmOnlyContent check permissions
         if (this._applyGmOnlyContent && this.actor) {
             // @ts-ignore
             whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER'));
         }
+        // ...for rollMode include GM when GM roll
+        if (this.data.options?.rollMode === 'gmroll' || this.data.options?.rollMode === "blindroll") {
+            whisper = whisper || [];
+            whisper = [...game.users.filter(user => user.isGM), ...whisper];
+        }
 
         // Don't show dice to a user casting blind.
         const blind = this.data.options?.rollMode === 'blindroll';
+        const synchronize = this.data.options?.rollMode === 'publicroll';
 
         // @ts-ignore
-        game.dice3d.showForRoll(roll, game.user, true, whisper, blind, this.data.messageUuid);
+        game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
     /**
@@ -1282,7 +1328,8 @@ export class SuccessTest {
                 alias,
                 token
             },
-            // Use type roll with an empty roll for FoundryVTT ChatMessage of type role visibility behaviour.
+            // Use type roll with an empty roll for FoundryVTT ChatMessage visibility behaviour.
+            // This doesn't include DiceSoNice rolls.
             type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             roll,
             content,
