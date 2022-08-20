@@ -1139,6 +1139,8 @@ export class SuccessTest {
     /**
      * DiceSoNice must be implemented locally to avoid showing dice on gmOnlyContent throws while also using
      * FoundryVTT ChatMessage of type roll for their content visibility behaviour.
+     * 
+     * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
     async rollDiceSoNice() {
         // @ts-ignore
@@ -1151,18 +1153,25 @@ export class SuccessTest {
         // of all.
         const roll = this.rolls[this.rolls.length - 1];
 
-        // Only show dice to users with permissions, when the GM  cast the test.
+        // Limit users to show dice to...
         let whisper: User[]|null = null;
+        // ...for gmOnlyContent check permissions
         if (this._applyGmOnlyContent && this.actor) {
             // @ts-ignore
             whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER'));
         }
+        // ...for rollMode include GM when GM roll
+        if (this.data.options?.rollMode === 'gmroll' || this.data.options?.rollMode === "blindroll") {
+            whisper = whisper || [];
+            whisper = [...game.users.filter(user => user.isGM), ...whisper];
+        }
 
         // Don't show dice to a user casting blind.
         const blind = this.data.options?.rollMode === 'blindroll';
+        const synchronize = this.data.options?.rollMode === 'publicroll';
 
         // @ts-ignore
-        game.dice3d.showForRoll(roll, game.user, true, whisper, blind, this.data.messageUuid);
+        game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
     /**
@@ -1316,7 +1325,8 @@ export class SuccessTest {
                 alias,
                 token
             },
-            // Use type roll with an empty roll for FoundryVTT ChatMessage of type role visibility behaviour.
+            // Use type roll with an empty roll for FoundryVTT ChatMessage visibility behaviour.
+            // This doesn't include DiceSoNice rolls.
             type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             roll,
             content,
