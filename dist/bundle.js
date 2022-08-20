@@ -8867,7 +8867,8 @@ var FLAGS = {
   addNetworkController: "addNetworkController",
   TokenHealthBars: "tokenHealthBars",
   Test: "TestData",
-  HideGMOnlyChatContent: "HideGMOnlyChatContent"
+  HideGMOnlyChatContent: "HideGMOnlyChatContent",
+  MustHaveRessourcesOnTest: "MustConsumeRessourcesOnTest"
 };
 var CORE_NAME = "core";
 var CORE_FLAGS = {
@@ -15679,6 +15680,8 @@ var TestDialog = class extends FormDialog {
     return this.data.test.data;
   }
   _updateData(data) {
+    if (this.selectedButton === "cancel")
+      return;
     Object.entries(data).forEach(([key, value]) => {
       const valueField = foundry.utils.getProperty(this.data, key);
       if (foundry.utils.getType(valueField) !== "Object" || !valueField.hasOwnProperty("mod"))
@@ -16197,7 +16200,7 @@ var SuccessTest = class {
   get failure() {
     if (this.extended && this.threshold.value === 0)
       return true;
-    if (this.extendedHits && this.threshold.value > 0)
+    if (this.extendedHits.value > 0 && this.threshold.value > 0)
       return this.extendedHits.value < this.threshold.value;
     return !this.success;
   }
@@ -16289,7 +16292,7 @@ var SuccessTest = class {
       const roll = new SR5Roll(formula);
       this.rolls.push(roll);
       this.data.secondChance = true;
-      const actorConsumedResources = yield this.consumeDocumentResources();
+      const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
       if (!actorConsumedResources)
         return this;
       this.data.secondChance = false;
@@ -16300,19 +16303,36 @@ var SuccessTest = class {
       return this;
     });
   }
-  consumeDocumentResources() {
+  canConsumeDocumentRessources() {
+    var _a;
+    if (!this.actor)
+      return true;
+    if (this.hasPushTheLimit || this.hasSecondChance) {
+      if (this.actor.getEdge().uses <= 0) {
+        (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.MissingResource.Edge"));
+        return false;
+      }
+    }
+    return true;
+  }
+  consumeDocumentRessources() {
     return __async(this, null, function* () {
-      var _a;
       if (!this.actor)
         return true;
+      if (!this.canConsumeDocumentRessources())
+        return false;
       if (this.hasPushTheLimit || this.hasSecondChance) {
-        if (this.actor.getEdge().uses <= 0) {
-          (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.MissingResource.Edge"));
-          return false;
-        }
         yield this.actor.useEdge();
       }
       return true;
+    });
+  }
+  consumeDocumentRessoucesWhenNeeded() {
+    return __async(this, null, function* () {
+      const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
+      if (!mustHaveRessouces)
+        return true;
+      return yield this.consumeDocumentRessources();
     });
   }
   execute() {
@@ -16326,7 +16346,7 @@ var SuccessTest = class {
       const userConsented = yield this.showDialog();
       if (!userConsented)
         return this;
-      const actorConsumedResources = yield this.consumeDocumentResources();
+      const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
       if (!actorConsumedResources)
         return this;
       this.createRoll();
@@ -16417,7 +16437,7 @@ var SuccessTest = class {
   }
   rollDiceSoNice() {
     return __async(this, null, function* () {
-      var _a;
+      var _a, _b, _c, _d;
       if (!game.dice3d || !game.user || !game.users)
         return;
       console.log("Shadowrun5e | Initiating DiceSoNice throw");
@@ -16429,8 +16449,13 @@ var SuccessTest = class {
           return (_a2 = this.actor) == null ? void 0 : _a2.testUserPermission(user, "OWNER");
         });
       }
-      const blind = ((_a = this.data.options) == null ? void 0 : _a.rollMode) === "blindroll";
-      game.dice3d.showForRoll(roll, game.user, true, whisper, blind, this.data.messageUuid);
+      if (((_a = this.data.options) == null ? void 0 : _a.rollMode) === "gmroll" || ((_b = this.data.options) == null ? void 0 : _b.rollMode) === "blindroll") {
+        whisper = whisper || [];
+        whisper = [...game.users.filter((user) => user.isGM), ...whisper];
+      }
+      const blind = ((_c = this.data.options) == null ? void 0 : _c.rollMode) === "blindroll";
+      const synchronize = ((_d = this.data.options) == null ? void 0 : _d.rollMode) === "publicroll";
+      game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     });
   }
   toMessage() {
@@ -17069,21 +17094,21 @@ var SR5Actor = class extends Actor {
       return;
     const possibleMatch = (skill) => skill.label ? game.i18n.localize(skill.label) : skill.name;
     const skills = this.getSkills();
-    for (const skill of Object.values(skills.active)) {
+    for (const [id, skill] of Object.entries(skills.active)) {
       if (searchedFor === possibleMatch(skill))
-        return skill;
+        return __spreadProps(__spreadValues({}, skill), { id });
     }
-    for (const skill of Object.values(skills.language.value)) {
+    for (const [id, skill] of Object.entries(skills.language.value)) {
       if (searchedFor === possibleMatch(skill))
-        return skill;
+        return __spreadProps(__spreadValues({}, skill), { id });
     }
     for (const categoryKey in skills.knowledge) {
       if (!skills.knowledge.hasOwnProperty(categoryKey))
         continue;
       const categorySkills = skills.knowledge[categoryKey].value;
-      for (const skill of Object.values(categorySkills)) {
+      for (const [id, skill] of Object.entries(categorySkills)) {
         if (searchedFor === possibleMatch(skill))
-          return skill;
+          return __spreadProps(__spreadValues({}, skill), { id });
       }
     }
   }
@@ -17253,13 +17278,13 @@ var SR5Actor = class extends Actor {
       yield this.rollPackAction(SR5.packNames.generalActions, actionName, options);
     });
   }
-  rollSkill(skillId, options) {
-    return __async(this, null, function* () {
+  rollSkill(_0) {
+    return __async(this, arguments, function* (skillId, options = {}) {
       console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
-      const action = this.skillActionData(skillId);
+      const action = this.skillActionData(skillId, options);
       if (!action)
         return;
-      const showDialog = !TestCreator.shouldHideDialog(options == null ? void 0 : options.event);
+      const showDialog = !TestCreator.shouldHideDialog(options.event);
       const test = yield TestCreator.fromAction(action, this, { showDialog });
       if (!test)
         return;
@@ -17357,9 +17382,10 @@ var SR5Actor = class extends Actor {
       }
     }
   }
-  skillActionData(skillId, options) {
+  skillActionData(skillId, options = {}) {
     var _a;
-    const skill = this.getSkill(skillId);
+    const byLabel = options.byLabel || false;
+    const skill = this.getSkill(skillId, { byLabel });
     if (!skill) {
       console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
       return;
@@ -17367,11 +17393,13 @@ var SR5Actor = class extends Actor {
     if (!SkillFlow.allowRoll(skill)) {
       (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.SkillCantBeDefault"));
     }
+    skillId = skill.id || skillId;
     const attribute = this.getAttribute(skill.attribute);
     const limit = attribute.limit || "";
+    const spec = options.specialization || false;
     return DefaultValues.actionData({
       skill: skillId,
-      spec: (options == null ? void 0 : options.specialization) || false,
+      spec,
       attribute: skill.attribute,
       limit: {
         base: 0,
@@ -18862,6 +18890,14 @@ var registerSystemSettings = () => {
     type: Boolean,
     default: false
   });
+  game.settings.register(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest, {
+    name: "SETTINGS.MustHaveRessourcesOnTest",
+    hint: "SETTINGS.MustHaveRessourcesOnTestDescription",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false
+  });
 };
 
 // src/module/effects.ts
@@ -19496,6 +19532,7 @@ function rollSkillMacro(skillLabel) {
     const actor = game.actors.tokens[speaker.token] || game.actors.get(speaker.actor);
     if (!actor)
       return;
+    yield actor.rollSkill(skillLabel, { byLabel: true });
   });
 }
 
@@ -26240,8 +26277,7 @@ var RangedAttackTest = class extends SuccessTest {
     return false;
   }
   _prepareFireMode() {
-    var _a, _b;
-    const weaponData = (_a = this.item) == null ? void 0 : _a.asWeaponData();
+    const weaponData = this.item.asWeaponData();
     if (!weaponData)
       return;
     const { modes } = weaponData.data.range;
@@ -26261,7 +26297,7 @@ var RangedAttackTest = class extends SuccessTest {
       this.data.fireModes["10"] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
       this.data.fireModes["20"] = game.i18n.localize("SR5.Suppressing");
     }
-    this.data.fireMode = ((_b = this.item) == null ? void 0 : _b.getLastFireMode()) || { value: 0, defense: 0, label: "" };
+    this.data.fireMode = this.item.getLastFireMode() || { value: 0, defense: 0, label: "" };
   }
   _prepareWeaponRanges() {
     return __async(this, null, function* () {
@@ -26352,7 +26388,6 @@ var RangedAttackTest = class extends SuccessTest {
     });
   }
   prepareBaseValues() {
-    var _a;
     if (!this.actor)
       return;
     if (!this.item)
@@ -26368,9 +26403,6 @@ var RangedAttackTest = class extends SuccessTest {
       defense: defenseModifier
     };
     const { recoilModifier } = RangedRules.recoilAttackModifier(recoilCompensation, Number(fireMode.value), this.item.ammoLeft);
-    if (fireMode.value > this.item.ammoLeft) {
-      (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.MissingResource.Ammo");
-    }
     if (recoilModifier < 0)
       poolMods.addUniquePart("SR5.Recoil", recoilModifier);
     else
@@ -26389,9 +26421,22 @@ var RangedAttackTest = class extends SuccessTest {
     poolMods.addUniquePart(SR5.modifierTypes.environmental, environmental);
     super.prepareBaseValues();
   }
-  consumeDocumentResources() {
+  canConsumeDocumentRessources() {
+    var _a;
+    if (!this.item.isRangedWeapon())
+      return true;
+    const fireMode = this.data.fireMode;
+    if (fireMode.value === 0)
+      return true;
+    if (!this.item.hasAmmo(1)) {
+      (_a = ui.notifications) == null ? void 0 : _a.error("SR5.MissingRessource.Ammo", { localize: true });
+      return false;
+    }
+    return super.canConsumeDocumentRessources();
+  }
+  consumeDocumentRessources() {
     return __async(this, null, function* () {
-      if (!(yield __superGet(RangedAttackTest.prototype, this, "consumeDocumentResources").call(this)))
+      if (!(yield __superGet(RangedAttackTest.prototype, this, "consumeDocumentRessources").call(this)))
         return false;
       if (!(yield this.consumeWeaponAmmo()))
         return false;
@@ -26409,7 +26454,7 @@ var RangedAttackTest = class extends SuccessTest {
       if (fireMode.value === 0)
         return true;
       if (!this.item.hasAmmo(1)) {
-        yield (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.MissingResource.Ammo", { localize: true });
+        yield (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.MissingRessource.Ammo", { localize: true });
         return false;
       }
       yield this.item.useAmmo(fireMode.value);
