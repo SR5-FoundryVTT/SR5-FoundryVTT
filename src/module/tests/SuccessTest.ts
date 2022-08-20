@@ -142,8 +142,6 @@ export class SuccessTest {
         this.calculateBaseValues();
 
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
-
-        this.fisch = 'asd'
     }
 
     /**
