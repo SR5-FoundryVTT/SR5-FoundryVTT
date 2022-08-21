@@ -9,6 +9,12 @@
         <label>{{localize "SR5.SituationalModifier"}}</label>
         <input style="flex: 1;" type="text" name="dp_mod" size="3" maxlength="10" value="{{dp_mod}}" data-dtype="Number" placeholder="+/- mod" />
     </div>
+    {{#if thresholdValue}}
+    <div class="form-group">
+        <label>{{localize 'SR5.Threshold'}}</label>
+        <input style="flex: 1;" type="text" name="thresholdValue" size="3" maxlength="3" value="{{thresholdValue}}" data-dtype="Number" />
+    </div>
+    {{/if}}
     {{#if limitValue}}
     <div class="form-group">
         <label>{{localize 'SR5.Limit'}}</label>

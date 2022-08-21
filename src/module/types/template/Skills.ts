@@ -13,9 +13,12 @@ declare namespace Shadowrun {
         LabelField &
         HasBonus &
         HasAttribute &
-        RemovableField &{
+        RemovableField & {
             specs: string[];
             canDefault: boolean
+            // Optional id field not defined within template.json
+            // Use to identify a skill when fetched by its label.
+            id?: string
         };
 
     export type HasAttribute = {

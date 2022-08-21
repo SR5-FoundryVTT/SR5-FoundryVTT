@@ -62,6 +62,10 @@
     "Critter": "Critter",
     "IC": "IC"
   },
+  "SR5.ModifierTypes": {
+    "Environmental": "Environmental",
+    "Wounds": "Wounds"
+  },
   "SR5.ActiveSkills": "Active Skills",
   "SR5.Specializations": "Specializations",
   "SR5.Specialization": "Specialization",
@@ -78,6 +82,7 @@
   "SR5.Skill": "Skill",
   "SR5.Attribute": "Attribute",
   "SR5.Limit": "Limit",
+  "SR5.Threshold": "Threshold",
   "SR5.Modifier": "Modifier",
   "SR5.Wounds": "Wounds",
   "SR5.Filter": "Filter",
@@ -170,6 +175,7 @@
   "SR5.AP": "AP",
   "SR5.OpposedType": "Type",
   "SR5.Extended": "Extended",
+  "SR5.Extend": "Extend",
   "SR5.Test": "Test",
   "SR5.CreateItem": "Create Item",
   "SR5.CreateItemWeapon": "Create Weapon",
@@ -400,7 +406,7 @@
   "SR5.Capacity": "Capacity",
   "SR5.Base": "Base",
   "SR5.Bonus": "Bonus",
-  "SR5.DicePool": "Dice Pool",
+  "SR5.DicePool": "Pool",
   "SR5.SituationalModifier": "Situational Mod",
   "SR5.ItemMod": "Item Mod",
   "SR5.Suppressing": "Suppressing",
@@ -470,6 +476,13 @@
   "SR5.DefenseTest": "Defense Test",
   "SR5.SoakTest": "Damage Resist Test",
   "SR5.AttackerHits": "Attacker Hits",
+  "SR5.AttackerNetHits": "Attacker Net Hits",
+  "SR5.OpposingHits": "Opposing Hits",
+  "SR5.Attacker": "Attacker",
+  "SR5.Defender": "Defender",
+  "SR5.DefenderNetHits": "Defender Net Hits",
+  "SR5.AttackDodged": "Attack Dodged",
+  "SR5.AttackHits": "Attack Hits",
   "SR5.Incoming": "Incoming",
   "SR5.Modified": "Modified",
   "SR5.Resist": "Resist",
@@ -511,6 +524,7 @@
   "SR5.Load": "Load",
   "SR5.Normal": "Normal",
   "SR5.Defense": "Defense",
+  "SR5.Soak": "Soak",
   "SR5.LastRoll": "Last Prompted Roll",
   "SR5.OriginalDicePool": "Original Dice Pool",
   "SR5.Successes": "Successes",
@@ -532,7 +546,13 @@
   "SR5.EnvironmentVeryHigh": "Very High",
   "SR5.WoundModifier": "Wound Mod",
   "SR5.ExtendedTest": "Extended Test",
+  "SR5.ExtendedHits": "Extended Hits",
   "SR5.IncomingDamage": "Incoming Damage",
+  "SR5.ModifiedDamage": "Mod. Damage",
+  "SR5.IncomingDrain": "Incoming Drain",
+  "SR5.ModifiedDrain": "Mod. Drain",
+  "SR5.IncomingFade": "Incoming Fade",
+  "SR5.ModifiedFade": "Mod. Fade",
   "SR5.Temporary": "Temporary",
   "SR5.SelectedTargets": "Selected Targets",
   "SR5.ApplyWounds": "Apply Wounds",
@@ -554,8 +574,14 @@
   "SR5.IsCritter": "Critter",
   "SR5.Blackmail": "Blackmail",
   "SR5.Family": "Family",
-  "SR5.DamageResistanceTest": "Damage Resistance Test",
+  "SR5.Success": "Success!",
   "SR5.Glitch": "Glitch!",
+  "SR5.GlitchCritical": "Critical Glitch!",
+  "SR5.Failure": "Failure!",
+  "SR5.Results": "Results",
+  "SR5.ResistedAllDamage": "No Damage taken!",
+  "SR5.ResistedSomeDamage": "Damage taken!",
+  "SR5.Glitches": "Glitches:",
   "SR5.RollMode": "Roll Mode",
   "SR5.SIN": "SIN",
   "SR5.OpenSourcePdf": "Open Source PDF to the item",
@@ -568,6 +594,8 @@
   "SR5.WalkingSpeed": "Walking",
   "SR5.RunningSpeed": "Running",
   "SR5.Help": "Help",
+  "SR5.ManualOverride": "Manual Override",
+  "SR5.Details": "Details",
   "SETTINGS": {
     "DiagonalMovementName": "Diagonal Movement",
     "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
@@ -591,7 +619,11 @@
     "OnlyAutoRollNPCInCombatDescription": "Wen unset players must manually roll their ini on each new pass / round",
     "Euclidean": "Euclidean",
     "TokenHealthBars": "Token health bars",
-    "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring."
+    "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring.",
+    "HideGMOnlyChatContent": "Hide critical information on GM test",
+    "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
+    "MustHaveRessourcesOnTest": "Stop Tests with missing ressouces",
+    "MustHaveRessourcesOnTestDescription": "Only allow actors with all ressources needed to roll a test"
   },
   "SR5.COMBAT": {
     "ReduceInitByOne": "Initiative -1",
@@ -639,7 +671,15 @@
       "ICConfiguration": "IC Configuration",
       "SetMonitor": "Monitor must be set manually.",
       "PersonalInventory": "On Person",
-      "CreateInventory": "Create inventory place"
+      "CreateInventory": "Create inventory place",
+      "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description."
+    },
+    "Action": {
+      "ActiveTest": "Test",
+      "OpposedTest": "Opposed Test",
+      "DamageResistanceTest": "Damage Resistance Test",
+      "Modifiers": "Modifiers",
+      "Modifier": "Modifier"
     },
     "Inventory": {
       "OpenInventory": "Inventory",
@@ -843,7 +883,12 @@
     "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
     "InvalidMarksCount": "You've trying to place a strange number of marks",
     "AlreadyExistingInventory": "An inventory with this name alreayd exists",
-    "CantEditDefaultInventory": "The default inventory can't be renamed"
+    "CantEditDefaultInventory": "The default inventory can't be renamed",
+    "CantRecoverPhysicalWithStunDamage": "Cant recover from physical damage with stun damage still present",
+    "CantExtendTestFurther": "Test can't be extended either by dice left or threshold reached",
+    "CantExtendTest": "Test type can't be extended.",
+    "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
+    "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched."
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
@@ -855,7 +900,8 @@
     "KeyNotModifyableByActiveEffect": "The active effect mode modify can only affect mod properties.",
     "CanOnlyAddTechnologyItemsToANetwork": "Only technology items can be added to a network.",
     "InventoryAlreadyExists": "An inventory with this name already exists.",
-    "DefaultInventoryCantBeRemoved": "The default inventory can't be removed"
+    "DefaultInventoryCantBeRemoved": "The default inventory can't be removed",
+    "TestExpectsVehicleOnly": "This test can only be cast with a vehicle type actor"
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
@@ -910,7 +956,7 @@
     "Total": "Result",
     "ClearModifiers": "Clear personal modifiers"
   },
-  "SR5.MoveInventoryDialog" : {
+  "SR5.MoveInventoryDialog": {
     "Title": "Choose an inventory",
     "Move": "Move",
     "Cancel": "Cancel"
@@ -918,6 +964,9 @@
   "SR5.Dialogs": {
     "RangedWeaponTest": {
       "EnvironmentalOverwriteSet": "Environmental modifiers have been manually set to a fixed value!"
+    },
+    "Common": {
+      "Cancel": "Cancel"
     }
   },
   "SR5.ActiveEffect": {
@@ -930,5 +979,30 @@
     "Modes": {
       "Modify": "Modify"
     }
+  },
+  "SR5.Tests": {
+    "SuccessTest": "Success Test",
+    "OpposedTest": "Opposed Test",
+    "ExtendedTest": "Extended Test",
+    "PhysicalDefenseTest": "Physical Defense",
+    "RangedAttackTest": "Ranged Weapon Attack",
+    "MeleeAttackTest": "Melee Weapon Attack",
+    "ThrownAttackTest": "Thrown Weapon Attack",
+    "PhysicalResistTest": "Physical Damage Resist",
+    "SpellCastingTest": "Spellcasting",
+    "ComplexFormTest": "Threading Complex Form",
+    "AttributeOnlyTest": "Attribute-Only Test",
+    "CombatSpellDefenseTest": "Combat Spell Defense",
+    "NaturalRecoveryStunTest": "Natural Recovery Stun",
+    "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
+    "DrainTest": "Drain Test",
+    "FadeTest": "Fade Test",
+    "PilotVehicleTest": "Pilot Vehicle Test",
+    "DronePerceptionTest": "Drone Perception Test",
+    "DroneInfiltrationTest": "Drone Infiltration Test"
+  },
+  "SR5.MissingRessource": {
+    "Edge": "No Edge left to consume",
+    "Ammo": "Not enough ammunition to fire using selected mode"
   }
 }

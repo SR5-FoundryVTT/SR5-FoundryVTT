@@ -116,7 +116,7 @@ export class EnvModifiersApplication extends Application {
             return await this.target.getModifiers();
         }
         // All other types are handled without special cases.
-        return await Modifiers.getModifiersFromEntity(this.target);
+        return Modifiers.getModifiersFromEntity(this.target);
     }
 
     async _storeModifiersOnTarget() {
@@ -132,7 +132,7 @@ export class EnvModifiersApplication extends Application {
     }
 
     async _targetHasEnvironmentalModifiers() {
-        const modifiers = await Modifiers.getModifiersFromEntity(this.target);
+        const modifiers = Modifiers.getModifiersFromEntity(this.target);
         return !!modifiers.environmental;
     }
 
@@ -157,8 +157,8 @@ export class EnvModifiersApplication extends Application {
      *
      */
     _disableInputsForUser(): boolean {
-        const entity = this.target instanceof SR5Actor ? this.target : this.target;
-        return !(game.user?.isGM || entity.owner);
+        if (!game.user) return false;
+        return !(game.user?.isGM || this.target.testUserPermission(game.user, 'OWNER'));
     }
 
     static async openForCurrentScene() {

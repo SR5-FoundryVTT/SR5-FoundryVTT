@@ -38,7 +38,10 @@ export const FLAGS = {
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
     addNetworkController: 'addNetworkController',
-    TokenHealthBars: 'tokenHealthBars'
+    TokenHealthBars: 'tokenHealthBars',
+    Test: 'TestData',
+    HideGMOnlyChatContent: 'HideGMOnlyChatContent',
+    MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

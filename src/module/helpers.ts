@@ -8,15 +8,17 @@ import DamageData = Shadowrun.DamageData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
+import Skills = Shadowrun.Skills;
+import TargetedDocument = Shadowrun.TargetedDocument;
 import {PartsList} from './parts/PartsList';
 import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
 import {SR5Actor} from "./actor/SR5Actor";
 import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
-import { SR5Item } from './item/SR5Item';
-import Skills = Shadowrun.Skills;
+import {SR5Item} from './item/SR5Item';
 import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
 import {DataDefaults} from "./data/DataDefaults";
-import TargetedDocument = Shadowrun.TargetedDocument;
+import {SuccessTestData} from "./tests/SuccessTest";
+import {SR5} from "./config";
 
 interface CalcTotalOptions {
     min?: number,
@@ -35,21 +37,32 @@ export class Helpers {
 
         const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (!isNaN(value.temp as number)) {
+        if (!isNaN(value.temp as number) && Number(value.temp) > 0) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
         // On some values base might be undefined...
-        value.base = value.base || 0;
+        // Check for undefined, as some Values might be none numerical / boolean.
+        value.base = value.base !== undefined ? value.base : 0;
 
-        // If the given value has a override defined, use that as a value, while keeping the base and mod values.
+        // If the given value has an override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {
-            value.value = value.override.value;
-            return value.override.value;
+            // Still apply a possible value range, even if override says otherwise.
+            value.value = Helpers.applyValueRange(value.override.value, options);
+            return value.value;
         }
 
-        value.value = Helpers.roundTo(parts.total + value.base, 3);
-        value.value = Helpers.applyValueRange(value.value, options);
+        // Base on type change calculation behaviour.
+        switch (getType(value.base)) {
+            case 'number':
+                value.value = Helpers.roundTo(parts.total + value.base, 3);
+                value.value = Helpers.applyValueRange(value.value, options);
+                break;
+            // boolean / string values should be applied
+            default:
+                value.value = parts.last === undefined ? value.base : parts.last;
+                break;
+        }
 
         value.mod = parts.list;
 
@@ -304,7 +317,7 @@ export class Helpers {
         return sceneTokenId.split('.') as [sceneId: string, tokenId: string];
     }
 
-    static getSceneTokenDocument(sceneId, tokenId): TokenDocument|undefined {
+    static getSceneTokenDocument(sceneId, tokenId): TokenDocument | undefined {
         const scene = game.scenes?.get(sceneId);
         if (!scene) return;
         // @ts-ignore
@@ -314,7 +327,7 @@ export class Helpers {
         return token;
     }
 
-    static getUserTargets(user?: User|null): Token[] {
+    static getUserTargets(user?: User | null): Token[] {
         user = user ? user : game.user;
 
         if (!user) return []
@@ -322,7 +335,7 @@ export class Helpers {
         return Array.from(user.targets);
     }
 
-    static userHasTargets(user?: User|null): boolean {
+    static userHasTargets(user?: User | null): boolean {
         user = user ? user : game.user;
 
         if (!user) return false;
@@ -330,7 +343,7 @@ export class Helpers {
         return user.targets.size > 0;
     }
 
-    static measureTokenDistance(tokenOrigin: Token, tokenDest: Token): number {
+    static measureTokenDistance(tokenOrigin: TokenDocument, tokenDest: TokenDocument): number {
         if (!canvas || !canvas.ready || !canvas.scene || !canvas.grid) return 0;
 
         if (!tokenOrigin || !tokenDest) return 0;
@@ -395,6 +408,26 @@ export class Helpers {
         return actors as SR5Actor[];
     }
 
+    /**
+     * Given a SuccessTestData subset fetch all target TokenDocument actors
+     *
+     * @param testData A SuccessTest.data property
+     */
+    static async getTestTargetActors(testData: SuccessTestData): Promise<SR5Actor[]> {
+        const actors: SR5Actor[] = [];
+        for (const uuid of testData.targetActorsUuid) {
+            const tokenDoc = await fromUuid(uuid);
+            if (!(tokenDoc instanceof TokenDocument)) {
+                console.error(`Shadowrun5e | Been given testData with targets. UUID ${uuid} should point to a TokenDocument but doesn't`, tokenDoc);
+                continue;
+            }
+            if (!tokenDoc.actor) continue;
+
+            actors.push(tokenDoc.actor);
+        }
+        return actors;
+    }
+
     static createRangeDescription(label: string, distance: number, modifier: number): RangeTemplateData {
         label = game.i18n.localize(label);
         return {label, distance, modifier}
@@ -409,6 +442,15 @@ export class Helpers {
         });
     }
 
+    /**
+     * Depending on the system setting allow GMs to define if they want to always display the name within the actor
+     * or within the token.
+     *
+     * This can be relevant for when GMs either manually or by module change the tokens name, while the actors name
+     * is untouched and might even be detrimental to share with players.
+     *
+     * @param actor
+     */
     static getChatSpeakerName(actor: SR5Actor): string {
         if (!actor) return '';
 
@@ -420,7 +462,25 @@ export class Helpers {
         return actor.name as string;
     }
 
-    static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem? : SR5Item): DamageData {
+    /**
+     * Given an actor this will display either the actor or token name, when there is any.
+     *
+     * The use token name setting is also respected.
+     *
+     * @param actor Either an actual or a virtual actor, taken from a token.
+     * @returns A path pointing to an image.
+     */
+    static getChatSpeakerImg(actor: SR5Actor): string {
+        if (!actor) return '';
+
+        const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+        const token = actor.getToken();
+
+        if (useTokenForChatOutput && token) return token.data.img || '';
+        return actor.img || '';
+    }
+
+    static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem?: SR5Item): DamageData {
         const damage = duplicate(DataDefaults.damage) as DamageData;
         damage.base = value;
         damage.value = value;
@@ -447,7 +507,7 @@ export class Helpers {
      * Retrieves the item causing the damage, if there is any.
      * This only works for embedded items at the moment
      */
-    static findDamageSource(damageData : DamageData) : SR5Item | undefined{
+    static findDamageSource(damageData: DamageData): SR5Item | undefined {
         if (!game.actors) return;
 
         if (!damageData.source) {
@@ -455,9 +515,7 @@ export class Helpers {
         }
 
         const actorId = damageData.source.actorId;
-        const actorSource = game.actors.find(
-            actor => actor.id === actorId
-            );
+        const actorSource = game.actors.get(actorId)
 
         if (!actorSource) {
             return;
@@ -465,9 +523,8 @@ export class Helpers {
 
         // First search the actor itself for the item
         const itemId = damageData.source.itemId;
-        const actorItem = actorSource.items.get(itemId) as unknown as SR5Item;
-        if (actorItem)
-        {
+        const actorItem = actorSource.items.get(itemId);
+        if (actorItem) {
             return actorItem;
         }
 
@@ -475,11 +532,11 @@ export class Helpers {
         // This will not work if we are on a different scene or the token got deleted, which is expected when you put an
         // item on a token without linking it.
         const tokens = actorSource.getActiveTokens();
-        let tokenItem : SR5Item | undefined;
+        let tokenItem: SR5Item | undefined;
         tokens.forEach(token => {
             if (!token.actor) return;
 
-            const foundItem = token.actor.items.find(i => i.id === itemId);
+            const foundItem = token.actor.items.get(itemId);
             if (foundItem) {
                 tokenItem = foundItem as unknown as SR5Item;
             }
@@ -517,9 +574,7 @@ export class Helpers {
      * @param modificationLabel The translatable label for the modification
      */
     static reduceDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
-        if (hits < 0) {
-            console.warn('Helpers.reduceDamageByHits should only be called with positive hits values to avoid confusion');
-        }
+        if (hits < 0) hits = 0;
         return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
 
@@ -557,9 +612,10 @@ export class Helpers {
      * @param value Whatever needs to be stored.
      *
      */
-    static getUpdateDataEntry(path: string, value: any): {[path: string]: any} {
+    static getUpdateDataEntry(path: string, value: any): { [path: string]: any } {
         return {[path]: value};
     }
+
     /**
      * A simple helper to delete existing document data keys with Entity.update
      *
@@ -569,7 +625,7 @@ export class Helpers {
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
      *         remove the Pistols key from the 'data.skills.active' path within Entity.data.data.skills.active.
      */
-    static getDeleteKeyUpdateData(path: string, key: string): {[path: string]: {[key: string]: null}} {
+    static getDeleteKeyUpdateData(path: string, key: string): { [path: string]: { [key: string]: null } } {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
         return {[path]: {[`-=${key}`]: null}};
@@ -589,7 +645,7 @@ export class Helpers {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted Skills given by the skills parameter
      */
-    static sortSkills(skills: Skills, asc: boolean=true): Skills {
+    static sortSkills(skills: Skills, asc: boolean = true): Skills {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
             const comparatorA = Helpers.localizeSkill(a) || aId;
@@ -619,7 +675,7 @@ export class Helpers {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted config values given by the configValues parameter
      */
-    static sortConfigValuesByTranslation(configValues: Record<string, string>, asc: boolean=true): Record<string, string> {
+    static sortConfigValuesByTranslation(configValues: Record<string, string>, asc: boolean = true): Record<string, string> {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
             const comparatorA = game.i18n.localize(a);
@@ -691,6 +747,9 @@ export class Helpers {
         whisper = whisper?.length > 0 ? whisper : null;
         // @ts-ignore
         await game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind);
+
+        //@ts-ignore
+        console.error(game.dice3d);
     }
 
 
@@ -698,7 +757,7 @@ export class Helpers {
      * Fetch entities from global or pack collections using data acquired by Foundry Drag&Drop process
      * @param data Foundry Drop Data
      */
-    static async getEntityFromDropData(data: {type: 'Actor'|'Item', pack: string, id: string}): Promise<SR5Actor | SR5Item | undefined> {
+    static async getEntityFromDropData(data: { type: 'Actor' | 'Item', pack: string, id: string }): Promise<SR5Actor | SR5Item | undefined> {
         if (!game.actors || !game.items) return;
 
         if (data.pack && data.type === 'Actor')
@@ -757,7 +816,7 @@ export class Helpers {
      * @param itemId Optional id in a markId
      * @param separator Should you want to change the default separator used. Make sure not to use a . since Foundry will split the key into objects.
      */
-    static buildMarkId(sceneId: string, targetId: string, itemId: string|undefined, separator='/'): string {
+    static buildMarkId(sceneId: string, targetId: string, itemId: string | undefined, separator = '/'): string {
         return [sceneId, targetId, itemId || ''].join(separator);
     }
 
@@ -767,7 +826,7 @@ export class Helpers {
      * @param markId 'sceneId.targetId.itemId' with itemId being optional
      * @param separator Should you want to change the default separator used
      */
-    static deconstructMarkId(markId: string, separator='/'): [sceneId: string, targetId: string, itemId: string] {
+    static deconstructMarkId(markId: string, separator = '/'): [sceneId: string, targetId: string, itemId: string] {
         const ids = markId.split(separator);
 
         if (ids.length !== 3) {
@@ -777,7 +836,7 @@ export class Helpers {
         return ids as [string, string, string];
     }
 
-    static getMarkIdDocuments(markId: string): TargetedDocument|undefined {
+    static getMarkIdDocuments(markId: string): TargetedDocument | undefined {
         if (!game.scenes || !game.items) return;
 
         const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
@@ -805,5 +864,149 @@ export class Helpers {
         }
 
         return true;
+    }
+
+    /**
+     * Check packs for a given action.
+     *
+     * TODO: Use pack and action ids to avoid polluted user namespaces
+     * TODO: Allow for i18n to fetch a label from an action? Or predefine the title?
+     *
+     * @param packName The metadata name of the pack
+     * @param actionName The name of the action within that pack
+     */
+    static async getPackAction(packName, actionName): Promise<SR5Item | undefined> {
+        console.info(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
+        const pack = game.packs.find(pack =>
+            pack.metadata.system === SYSTEM_NAME &&
+            pack.metadata.name === packName);
+        if (!pack) return;
+
+        // TODO: Use predefined ids instead of names...
+        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(new RegExp(' ', 'g'), '_') === actionName.toLowerCase());
+        if (!packEntry) return;
+
+        const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
+        if (!item || item.type !== 'action') return;
+
+        console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
+        return item;
+    }
+
+    /**
+     * Show the DocumentSheet of whatever entity link uuid.
+     *
+     * This function is designed to work in cojunction with the content-link CSS-class used by Foundry opening
+     * the given id. Because of this only entity-links with uuid dataset entries should trigger.
+     *
+     * @param event A PointerEvent by user interaction.
+     */
+    static async renderEntityLinkSheet(event) {
+        const element = $(event.currentTarget);
+        const uuid = element.data('uuid');
+        await Helpers.renderDocumentSheet(uuid);
+    }
+
+    /**
+     * Fetch a Document using the FoundryVTT UUID and render it's connected sheet.
+     *
+     * @param uuid Generated by Document.uuid property.
+     * @param resolveTokenToActor Should the uuid resolve to a TokenDocument, rather render it's actor.
+     */
+    static async renderDocumentSheet(uuid: string, resolveTokenToActor = true) {
+        if (!uuid) return;
+        let document = await fromUuid(uuid);
+        if (!document) return;
+        if (document instanceof TokenDocument && resolveTokenToActor && document.actor)
+            document = document.actor;
+        // @ts-ignore
+        await document.sheet.render(true);
+    }
+
+    static injectActionTestsIntoChangeData(type: string, changeData) {
+        if (!changeData) return changeData;
+
+        // Make sure weapon actions are in a valid state for different weapon categories.
+        switch (type) {
+            case 'weapon': {
+                if (changeData?.data?.category === undefined) return;
+
+                switch (changeData.data.category) {
+                    // Reset test selection on empty category.
+                    case '': {
+                        foundry.utils.mergeObject(changeData, {
+                            data: {
+                                action: {test: '', opposed: {test: '', resist: {test: ''}}}
+                            }
+                        });
+                        break;
+                    }
+
+                    default: {
+                        //@ts-ignore Make sure a matching active test for the configured weapons category is used.
+                        const test = SR5.weaponCategoryActiveTests[changeData.data.category];
+                        if (!test) {
+                            console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
+                        }
+                        foundry.utils.mergeObject(changeData, {data: {action: {test}}});
+                        break;
+                    }
+                }
+
+                break;
+            }
+
+            case 'spell': {
+                if (changeData?.data?.category === undefined) return;
+
+                switch (changeData.data.category) {
+                    // Reset test selection on empty category.
+                    case '': {
+                        foundry.utils.mergeObject(changeData, {
+                            data: {
+                                action: {test: '', opposed: {test: '', resist: {test: ''}}}
+                            }
+                        });
+                        break;
+                    }
+
+                    default: {
+                        const activeTest = SR5.activeTests[type];
+                        const opposedTest = SR5.opposedTests[type][changeData.data.category] || 'OpposedTest';
+                        const resistTest = SR5.opposedResistTests[type][changeData.data.category] || '';
+
+                        foundry.utils.mergeObject(changeData, {
+                            data: {
+                                action: {
+                                    test: activeTest,
+                                    opposed: {
+                                        test: opposedTest,
+                                        resist: {test: resistTest}
+                                    }
+                                }
+                            }
+                        });
+                        break;
+                    }
+                }
+
+                break;
+            }
+
+            case 'complex_form': {
+                const activeTest = SR5.activeTests[type];
+
+                foundry.utils.mergeObject(changeData, {
+                    data: {
+                        action: {
+                            test: activeTest
+                        }
+                    }
+                });
+                break;
+            }
+        }
+
+        return changeData;
     }
 }

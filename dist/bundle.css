@@ -150,6 +150,8 @@
   .sr5.actor .sheetbody {
     overflow: hidden;
     flex: 1; }
+  .sr5.actor .limit-title {
+    font-size: 115%; }
   .sr5.actor .attributes {
     border-top: 1px solid #4d4d4d;
     display: flex;
@@ -305,34 +307,35 @@
 
 .sr5.chat-card {
   font-style: normal;
-  font-size: 1rem; }
+  font-size: 1rem;
+  /**
+         * Content with this class should be hidden from players eyes
+         * Check SuccessTest._showGmOnlyContent for when to show it to users.
+         */ }
+  .sr5.chat-card .gm-only-content {
+    display: none !important; }
+  .sr5.chat-card .clickable:hover {
+    cursor: pointer;
+    background: #4b4a44;
+    color: white; }
   .sr5.chat-card .card-header {
     padding: 0.25em 0;
     border-bottom: 1px solid #4d4d4d; }
     .sr5.chat-card .card-header img {
-      flex: 0 0 36px;
+      flex: 0 0;
       margin-right: 0.5em;
       padding: 1px 1px 1px 1px;
-      border: 0; }
+      border: 0;
+      height: 28px;
+      width: 28px; }
     .sr5.chat-card .card-header h3 {
-      font-size: 1.75em;
+      font-size: 1.5em;
       align-self: center;
       flex: 1;
       margin: 0;
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
   .sr5.chat-card .card-header:first-of-type {
     border-top: 1px solid #4d4d4d; }
-  .sr5.chat-card .card-main-content {
-    cursor: pointer; }
-  .sr5.chat-card .card-content {
-    padding: 0.5em 0;
-    border-bottom: 1px solid #4d4d4d; }
-    .sr5.chat-card .card-content p {
-      font-size: 0.8em; }
-    .sr5.chat-card .card-content h3 {
-      font-size: 1em;
-      margin: 0;
-      font-weight: bold; }
   .sr5.chat-card .card-buttons .button {
     box-shadow: 0 0 0.25em 0.15em #4d4d4d;
     cursor: pointer;
@@ -368,19 +371,30 @@
       font-weight: bold; }
       .sr5.chat-card .damage-line .button:hover {
         box-shadow: 0 0 0.25em 0.15em black; }
+  .sr5.chat-card .reducedResult {
+    color: #aa0200;
+    filter: sepia(0.5) hue-rotate(-60deg); }
 
 .sr5.roll-card {
-  margin: 0.15em; }
+  margin: 0.15em;
+  font-size: 12px; }
   .sr5.roll-card .card-title {
     display: flex;
-    font-size: 14px;
     border-bottom: 1px solid #4d4d4d;
     justify-content: flex-start;
     align-content: center;
     align-items: flex-end; }
     .sr5.roll-card .card-title > * {
       margin-left: 0.15em;
-      margin-right: 0.15em; }
+      margin-right: 0.15em;
+      width: 100%; }
+    .sr5.roll-card .card-title .document {
+      overflow: hidden;
+      white-space: nowrap;
+      display: flex;
+      align-content: center; }
+      .sr5.roll-card .card-title .document * {
+        display: inline-block; }
     .sr5.roll-card .card-title .header-name {
       text-overflow: ellipsis;
       overflow: hidden;
@@ -415,14 +429,11 @@
       flex: 0; }
   .sr5.roll-card .card-description {
     padding: 0.25em;
-    font-size: 14px;
     border-bottom: 1px solid #4d4d4d;
     display: none; }
-  .sr5.roll-card .show-card-description {
-    display: block; }
   .sr5.roll-card .card-content {
-    font-size: 14px;
-    padding: 0 0.25em;
+    border-bottom: 1px solid #4d4d4d;
+    padding: 0.25em 0.25em 0.25em;
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between; }
@@ -434,7 +445,6 @@
       display: flex;
       flex: 1;
       flex-flow: column;
-      font-size: 12px;
       text-align: right;
       align-content: flex-end; }
       .sr5.roll-card .card-content .right-side .limit-line {
@@ -449,6 +459,8 @@
     .sr5.roll-card .card-content .value {
       font-weight: bold;
       align-self: flex-end; }
+    .sr5.roll-card .card-content .value-result {
+      text-align: right; }
     .sr5.roll-card .card-content .limit-line {
       display: flex;
       flex-flow: nowrap row;
@@ -467,6 +479,25 @@
         margin-right: 0.1em; }
       .sr5.roll-card .card-content .damage-line .icon {
         font-style: italic; }
+    .sr5.roll-card .card-content p {
+      font-size: 0.8em; }
+    .sr5.roll-card .card-content h3 {
+      font-size: 1em;
+      margin: 0;
+      font-weight: bold; }
+    .sr5.roll-card .card-content .test-value {
+      display: flex; }
+      .sr5.roll-card .card-content .test-value span.value {
+        flex: auto;
+        text-align: left; }
+      .sr5.roll-card .card-content .test-value span.value-result {
+        flex: auto;
+        text-align: right;
+        padding-right: 8px;
+        white-space: nowrap; }
+    .sr5.roll-card .card-content .test-code {
+      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+      font-size: 1.5em; }
   .sr5.roll-card .dice-rolls {
     display: none;
     border-bottom: 1px solid #4d4d4d; }
@@ -553,9 +584,42 @@
   to {
     transform: translate(0); } }
 
+.sr5.item-card .card-description {
+  display: block; }
+
 .sr5 .chat-select-link img:hover {
   padding: 0;
   border: 1px solid #4d4d4d; }
+
+/**
+ * CSS for Test Dialog styling.
+ */
+.sr5.form-dialog .dialog-title {
+  font-weight: bold;
+  height: 30px; }
+
+.sr5.form-dialog .form-group label {
+  font-weight: normal; }
+
+.sr5.form-dialog .form-group input {
+  color: white; }
+
+.sr5.form-dialog .dialog-content-common h2 {
+  text-underline: none;
+  border: none;
+  margin: 0; }
+
+.sr5.form-dialog .dialog-content-common .sunken {
+  padding: 0.5em; }
+
+.sr5.form-dialog .dialog-content-column {
+  width: 300px; }
+
+.sr5.form-dialog .sunken select {
+  color: white; }
+
+.sr5.form-dialog .sunken select option {
+  background-color: #414040; }
 
 @font-face {
   font-family: 'Nodesto';
@@ -566,170 +630,206 @@
   cursor: pointer;
   color: #6495ed; }
 
-.sr5 {
-  /**
-   * Change global foundry classes only in shadowrun5e applications.
-   */
-  /**
-   * Elements used for inline editing
-   */
-  /**
-   * Elements used for linkable documents / entities.
-   */
-  /** CSS for the Environmental Modifier Application Window
-   *
-   */
-  /** Input element for inventory name editing */ }
-  .sr5 .flexrow {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start; }
-  .sr5 .nowrap {
-    flex-wrap: nowrap; }
-  .sr5 .align-start {
-    align-items: flex-start; }
-  .sr5 .center {
-    justify-content: center; }
-  .sr5 .flex-end {
-    justify-content: flex-end; }
-  .sr5 .space-between {
-    justify-content: space-between; }
-  .sr5 .space-around {
-    justify-content: space-around; }
-  .sr5 .align-center {
-    align-items: center; }
-  .sr5 .flexcol-rev {
-    display: flex;
-    flex-direction: column-reverse;
-    flex-wrap: nowrap; }
-    .sr5 .flexcol-rev > * {
-      flex: 0; }
-  .sr5 .flexcol {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap; }
-    .sr5 .flexcol > * {
-      flex: 0; }
-  .sr5 .align-items-center {
-    align-items: center; }
-  .sr5 .align-content-center {
-    align-content: center; }
-  .sr5 .flex0 {
+/**
+ * These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
+ * TODO: This is abusing default FoundryVTT CSS classing, which often can cause default FoundryVTT styling to break.
+ */
+.sr5 .flexcol {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap; }
+  .sr5 .flexcol > * {
     flex: 0; }
-  .sr5 .flex1 {
-    flex: 1; }
-  .sr5 .flex2 {
-    flex: 2; }
-  .sr5 .flex3 {
-    flex: 3; }
-  .sr5 .flex4 {
-    flex: 4; }
-  .sr5 .input {
-    position: relative; }
-    .sr5 .input .unit {
-      color: white;
-      text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-      position: absolute;
-      display: block;
-      left: 5px;
-      top: 2px;
-      z-index: 9; }
-  .sr5 label.checkbox {
-    display: block;
-    position: relative;
-    top: 0;
-    left: 0;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none; }
-    .sr5 label.checkbox:hover input ~ .checkmark {
-      text-shadow: 0 0 0.2em darkblue; }
-    .sr5 label.checkbox.init-edge-label {
-      margin-right: 1.75em;
-      font-size: 0.75em;
-      top: 0.95em;
-      left: -0.5em; }
-    .sr5 label.checkbox input {
-      cursor: pointer; }
-    .sr5 label.checkbox input.hidden {
-      position: absolute;
-      opacity: 0;
-      height: 0;
-      width: 0; }
-    .sr5 label.checkbox .checkmark {
-      position: absolute;
-      font-size: 1.25em;
-      top: -0.5em;
-      left: 0.8em; }
-  .sr5 button.plus1_button {
-    padding: 2px;
-    color: black;
-    line-height: 0;
-    flex: 0;
-    background: rgba(230, 230, 230, 0.1);
-    border-radius: 0.3em;
-    text-align: center; }
-    .sr5 button.plus1_button:hover {
-      cursor: pointer; }
-  .sr5 input[type='checkbox'].hidden {
-    display: none; }
-  .sr5 input[type='checkbox'].display {
-    background: transparent;
-    color: white;
-    border: none;
-    text-align: center;
-    font-size: 1em; }
-    .sr5 input[type='checkbox'].display:hover {
-      background: transparent;
-      border: 1px solid #4d4d4d; }
-  .sr5 input[type='text'].disabled-for-display {
-    color: black;
-    background-color: rgba(0, 0, 0, 0); }
-  .sr5 input[type='text'].display {
+
+.sr5 .flexcol-rev {
+  display: flex;
+  flex-direction: column-reverse;
+  flex-wrap: nowrap; }
+  .sr5 .flexcol-rev > * {
+    flex: 0; }
+
+.sr5 .flexrow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start; }
+
+.sr5 .nowrap {
+  flex-wrap: nowrap; }
+
+.sr5 .align-start {
+  align-items: flex-start; }
+
+.sr5 .center {
+  justify-content: center; }
+
+.sr5 .flex-end {
+  justify-content: flex-end; }
+
+.sr5 .space-between {
+  justify-content: space-between; }
+
+.sr5 .space-around {
+  justify-content: space-around; }
+
+.sr5 .align-center {
+  align-items: center; }
+
+.align-items-center {
+  align-items: center; }
+
+.align-content-center {
+  align-content: center; }
+
+.flex0 {
+  flex: 0; }
+
+.flex1 {
+  flex: 1; }
+
+.flex2 {
+  flex: 2; }
+
+.flex3 {
+  flex: 3; }
+
+.flex4 {
+  flex: 4; }
+
+.input {
+  position: relative; }
+  .input .unit {
     color: white;
     text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-    background: rgba(230, 230, 230, 0.1);
+    position: absolute;
+    display: block;
+    left: 5px;
+    top: 2px;
+    z-index: 9; }
+
+label.checkbox {
+  display: block;
+  position: relative;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none; }
+  label.checkbox:hover input ~ .checkmark {
+    text-shadow: 0 0 0.2em darkblue; }
+  label.checkbox.init-edge-label {
+    margin-right: 1.75em;
+    font-size: 0.75em;
+    top: 0.95em;
+    left: -0.5em; }
+  label.checkbox input {
+    cursor: pointer; }
+  label.checkbox input.hidden {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0; }
+  label.checkbox .checkmark {
+    position: absolute;
+    font-size: 1.25em;
+    top: -0.5em;
+    left: 0.8em; }
+
+button.plus1_button {
+  padding: 2px;
+  color: black;
+  line-height: 0;
+  flex: 0;
+  background: rgba(230, 230, 230, 0.1);
+  border-radius: 0.3em;
+  text-align: center; }
+  button.plus1_button:hover {
+    cursor: pointer; }
+
+input[type='checkbox'].hidden {
+  display: none; }
+
+input[type='checkbox'].display {
+  background: transparent;
+  color: white;
+  border: none;
+  text-align: center;
+  font-size: 1em; }
+  input[type='checkbox'].display:hover {
+    background: transparent;
+    border: 1px solid #4d4d4d; }
+
+input[type='text'].disabled-for-display {
+  color: black;
+  background-color: rgba(0, 0, 0, 0); }
+
+input[type='text'].display {
+  color: white;
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+  background: rgba(230, 230, 230, 0.1);
+  color: white;
+  border-radius: 0.3em;
+  border-color: black;
+  text-align: center;
+  min-height: 1em; }
+  input[type='text'].display::placeholder {
+    color: #b3b3b3; }
+  input[type='text'].display.short {
+    font-size: 0.75em;
+    background: rgba(77, 77, 77, 0.1); }
+  input[type='text'].display.text {
+    background: rgba(77, 77, 77, 0.1);
+    border-radius: 0; }
+  input[type='text'].display.right {
+    text-align: right; }
+  input[type='text'].display.left {
+    text-align: left; }
+  input[type='text'].display:disabled {
     color: white;
-    border-radius: 0.3em;
-    border-color: black;
-    text-align: center;
-    min-height: 1em; }
-    .sr5 input[type='text'].display::placeholder {
-      color: #b3b3b3; }
-    .sr5 input[type='text'].display.short {
-      font-size: 0.75em;
-      background: rgba(77, 77, 77, 0.1); }
-    .sr5 input[type='text'].display.text {
-      background: rgba(77, 77, 77, 0.1);
-      border-radius: 0; }
-    .sr5 input[type='text'].display.right {
-      text-align: right; }
-    .sr5 input[type='text'].display.left {
-      text-align: left; }
-    .sr5 input[type='text'].display:disabled {
-      color: white;
-      background: transparent;
-      border-color: transparent;
-      padding-left: 0;
-      padding-right: 0;
-      margin-left: 0;
-      margin-right: 0; }
-  .sr5 .invisible {
-    visibility: hidden; }
-  .sr5 .show-child-on-hover .child-on-hover {
-    visibility: hidden; }
-  .sr5 .show-child-on-hover:hover .child-on-hover {
-    visibility: visible; }
-  .sr5 select.display {
-    color: white;
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 0.3em;
-    border-color: #4d4d4d; }
-    .sr5 select.display > option {
-      background-color: #4d4d4d; }
+    background: transparent;
+    border-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0; }
+
+.invisible {
+  visibility: hidden; }
+
+.show-child-on-hover .child-on-hover {
+  visibility: hidden; }
+
+.show-child-on-hover:hover .child-on-hover {
+  visibility: visible; }
+
+select.display {
+  color: white;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 0.3em;
+  border-color: #4d4d4d; }
+  select.display > option {
+    background-color: #4d4d4d; }
+
+.sr5 {
+  /**
+     * Overwrite FoundryVTT default styling within sheets.
+     */
+  /**
+     * Elements used for inline editing
+     */
+  /**
+     * Elements used for linkable documents / entities.
+     */
+  /** CSS for the Environmental Modifier Application Window
+     *
+     */
+  /** Input element for inventory name editing */ }
+  .sr5 .form-group label {
+    font-weight: bold; }
+  .sr5 .form-group input {
+    color: white; }
   .sr5 .inline-input-inventory {
     display: none; }
   .sr5 .entity-link {
@@ -772,10 +872,10 @@
   .sr5 .no-break {
     white-space: nowrap; }
   .sr5 .window-content {
-    font-size: 115%;
     background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/brushed_metal.jpg") repeat;
     color: white;
-    overflow: hidden; }
+    overflow: hidden;
+    font-size: 115%; }
   .sr5 .description > .editor {
     height: 15em;
     width: 100%;
@@ -843,6 +943,66 @@
     .sr5 .split-container > *:not(:last-child) {
       border-right: 1px solid #4d4d4d;
       padding-right: 0.25em; }
+  .sr5 .container {
+    max-width: 690px;
+    margin: 0 auto; }
+    .sr5 .container--fluid {
+      margin: 0;
+      max-width: 100%; }
+    .sr5 .container__row {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%; }
+    .sr5 .container__col-1 {
+      flex-basis: 8.33333%;
+      overflow: hidden; }
+    .sr5 .container__col-2 {
+      flex-basis: 16.66667%;
+      overflow: hidden; }
+    .sr5 .container__col-3 {
+      flex-basis: 25%;
+      overflow: hidden; }
+    .sr5 .container__col-4 {
+      flex-basis: 33.33333%;
+      overflow: hidden; }
+    .sr5 .container__col-5 {
+      flex-basis: 41.66667%;
+      overflow: hidden; }
+    .sr5 .container__col-6 {
+      flex-basis: 50%;
+      overflow: hidden; }
+    .sr5 .container__col-7 {
+      flex-basis: 58.33333%;
+      overflow: hidden; }
+    .sr5 .container__col-8 {
+      flex-basis: 66.66667%;
+      overflow: hidden; }
+    .sr5 .container__col-9 {
+      flex-basis: 75%;
+      overflow: hidden; }
+    .sr5 .container__col-10 {
+      flex-basis: 83.33333%;
+      overflow: hidden; }
+    .sr5 .container__col-11 {
+      flex-basis: 91.66667%;
+      overflow: hidden; }
+    .sr5 .container__col-12 {
+      flex-basis: 100%;
+      overflow: hidden; }
+    .sr5 .container__col-half {
+      flex-basis: 50%;
+      overflow: hidden; }
+    .sr5 .container .element {
+      padding: 4px; }
+  .sr5 .document {
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    align-content: center; }
+    .sr5 .document img {
+      height: 34px; }
+    .sr5 .document * {
+      display: inline-block; }
   .sr5 .block {
     display: flex;
     flex-flow: column;
@@ -988,9 +1148,6 @@
       .sr5 .list-item .item-desc .description {
         margin: 0.5em 0.25em;
         padding: 0.5em; }
-    .sr5 .list-item .action-icon {
-      padding-left: 3px;
-      padding-right: 3px; }
     .sr5 .list-item .item-icons {
       display: flex;
       flex-flow: row nowrap;

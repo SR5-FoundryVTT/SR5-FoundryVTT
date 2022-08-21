@@ -1,6 +1,6 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type RollEvent = MouseEvent | { shiftKey?: boolean; altKey?: boolean };
+    export type RollEvent = PointerEvent & { shiftKey?: boolean; altKey?: boolean; ctrlKey?: boolean };
 
     type ActorRollOptions = {
         event?: RollEvent
@@ -54,7 +54,10 @@ declare namespace Shadowrun {
     };
 
     type SkillRollOptions = ActorRollOptions & {
-        attribute?: ActorAttribute
+        // A specialization should be used.
+        specialization?: boolean
+        // Skills should be searched not by id but their label.
+        byLabel?: boolean
     };
 
     type SkillDialogOptions = {

@@ -272,9 +272,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
 
         // Skill test rolling...
-        html.find('.skill-roll').on('click', this._onRollActiveSkill.bind(this));
-        html.find('.knowledge-skill').on('click', this._onRollKnowledgeSkill.bind(this));
-        html.find('.language-skill').on('click', this._onRollLanguageSkill.bind(this));
+        html.find('.skill-roll').on('click', this._onRollSkill.bind(this));
+        html.find('.knowledge-skill').on('click', this._onRollSkill.bind(this));
+        html.find('.language-skill').on('click', this._onRollSkill.bind(this));
+        html.find('.skill-spec-roll').on('click', this._onRollSkillSpec.bind(this));
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
@@ -540,36 +541,37 @@ export class SR5BaseActorSheet extends ActorSheet {
         const options = { event };
         switch (split[0]) {
             case 'prompt-roll':
-                await this.actor.promptRoll(options);
+                await this.actor.promptRoll();
                 break;
             case 'armor':
-                await this.actor.rollArmor(options);
+                await this.actor.rollGeneralAction('armor', options);
                 break;
             case 'fade':
-                await this.actor.rollFade(options);
+                await this.actor.rollGeneralAction('fade', options);
                 break;
             case 'drain':
-                await this.actor.rollDrain(options);
+                await this.actor.rollGeneralAction('drain', options);
                 break;
             case 'defense':
-                await this.actor.rollAttackDefense(options);
+                // await this.actor.rollAttackDefense(options);
+                await this.actor.rollGeneralAction('physical_defense', options);
                 break;
             case 'damage-resist':
-                await this.actor.rollSoak(options);
+                await this.actor.rollGeneralAction('physical_damage_resist', options);
                 break;
 
             // attribute only rolls
             case 'composure':
-                await this.actor.rollAttributesTest('composure');
+                await this.actor.rollGeneralAction('composure', options);
                 break;
             case 'judge-intentions':
-                await this.actor.rollAttributesTest('judge_intentions');
+                await this.actor.rollGeneralAction('judge_intentions', options);
                 break;
             case 'lift-carry':
-                await this.actor.rollAttributesTest('lift_carry');
+                await this.actor.rollGeneralAction('lift_carry', options);
                 break;
             case 'memory':
-                await this.actor.rollAttributesTest('memory');
+                await this.actor.rollGeneralAction('memory', options);
                 break;
 
             case 'vehicle-stat':
@@ -580,55 +582,38 @@ export class SR5BaseActorSheet extends ActorSheet {
                 const droneRoll = split[1];
                 switch (droneRoll) {
                     case 'perception':
-                        await this.actor.rollDronePerception(options);
+                        await this.actor.rollGeneralAction('drone_perception', options);
                         break;
                     case 'infiltration':
-                        await this.actor.rollDroneInfiltration(options);
+                        await this.actor.rollGeneralAction('drone_infiltration', options);
                         break;
                     case 'pilot-vehicle':
-                        await this.actor.rollPilotVehicle(options);
+                        await this.actor.rollGeneralAction('drone_pilot_vehicle', options);
                         break;
                 }
                 break;
             // end drone
 
-            case 'attribute':
+            case 'attribute': {
                 const attribute = split[1];
                 if (attribute) {
                     await this.actor.rollAttribute(attribute, options);
                 }
                 break;
-            // end attribute
+            }
 
-            case 'skill':
-                const skillType = split[1];
-                switch (skillType) {
-                    case 'active': {
-                        const skillId = split[2];
-                        await this.actor.rollActiveSkill(skillId, options);
-                        break;
-                    }
-                    case 'language': {
-                        const skillId = split[2];
-                        await this.actor.rollLanguageSkill(skillId, options);
-                        break;
-                    }
-                    case 'knowledge': {
-                        const category = split[2];
-                        const skillId = split[3];
-                        await this.actor.rollKnowledgeSkill(category, skillId, options);
-                        break;
-                    }
-                }
+            case 'skill': {
+                const skillId = split[2];
+                await this.actor.rollSkill(skillId, options);
                 break;
-            // end skill
+            }
 
             case 'matrix':
                 const matrixRoll = split[1];
                 switch (matrixRoll) {
                     case 'attribute':
                         const attr = split[2];
-                        await this.actor.rollMatrixAttribute(attr, options);
+                        await this.actor.rollAttribute(attr, options);
                         break;
                     case 'device-rating':
                         await this.actor.rollDeviceRating(options);
@@ -661,15 +646,8 @@ export class SR5BaseActorSheet extends ActorSheet {
             const property = 'data.track.physical.overflow.value';
             data[property] = value;
         } else if (cmId === 'matrix') {
-            const matrixDevice = this.actor.getMatrixDevice();
-            if (matrixDevice && !isNaN(value)) {
-                const updateData = {};
-                updateData['data.technology.condition_monitor.value'] = value;
-                await matrixDevice.update(updateData);
-            } else {
-                const property = `data.track.matrix.value`;
-                data[property] = value;
-            }
+            // Sprites don't have a matrix device, but still use the matrix condition monitor, not matrix track.
+            return await this.actor.setMatrixDamage(value);
         }
         await this.actor.update(data);
     }
@@ -698,16 +676,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             data['data.track.physical.overflow.value'] = 0;
 
         } else if (cmId === 'matrix') {
-            const matrixDevice = this.actor.getMatrixDevice();
-
-            if (matrixDevice) {
-                const updateData = {};
-                updateData['data.technology.condition_monitor.value'] = 0;
-                await matrixDevice.update(updateData);
-
-            } else {
-                data['data.track.matrix.value'] = 0;
-            }
+            await this.actor.setMatrixDamage(0);
         }
 
         await this.actor.update(data);
@@ -1116,10 +1085,16 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.render();
     }
 
-    async _onRollActiveSkill(event) {
+    async _onRollSkill(event) {
         event.preventDefault();
-        const skill = Helpers.listItemId(event);
-        return this.actor.rollActiveSkill(skill, { event: event });
+        const skillId = Helpers.listItemId(event);
+        return this.actor.rollSkill(skillId, {event});
+    }
+
+    async _onRollSkillSpec(event) {
+        event.preventDefault();
+        const skillId = Helpers.listItemId(event);
+        return this.actor.rollSkill(skillId, {event, specialization: true});
     }
 
     async _onShowEditSkill(event) {
@@ -1236,19 +1211,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.actor.removeActiveSkill(skillId);
     }
 
-    async _onRollKnowledgeSkill(event) {
-        event.preventDefault();
-        const id = Helpers.listItemId(event);
-        const [skill, category] = id.split('.');
-        return this.actor.rollKnowledgeSkill(category, skill, { event: event });
-    }
-
-    async _onRollLanguageSkill(event) {
-        event.preventDefault();
-        const skill = Helpers.listItemId(event);
-        return this.actor.rollLanguageSkill(skill, { event: event });
-    }
-
     async _onRollAttribute(event) {
         event.preventDefault();
         const attribute = event.currentTarget.closest('.attribute').dataset.attribute;
@@ -1262,10 +1224,17 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onRollCellInput(event) {
         event.preventDefault();
         let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
-        if (track === 'stun' || track === 'physical') {
-            await this.actor.rollNaturalRecovery(track, event);
-        } else if (track === 'edge') {
-            await this.actor.rollAttribute('edge');
+
+        switch (track) {
+            case 'stun':
+                await this.actor.rollGeneralAction('natural_recovery_stun', {event});
+                break;
+            case 'physical':
+                await this.actor.rollGeneralAction('natural_recovery_physical', {event});
+                break;
+            case 'edge':
+                await this.actor.rollAttribute('edge', {event});
+                break;
         }
     }
 

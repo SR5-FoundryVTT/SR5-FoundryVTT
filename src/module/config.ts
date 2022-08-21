@@ -1,3 +1,9 @@
+/**
+ * Shadowrun 5 configuration for static values.
+ *
+ * NOTE: Do NOT import code into this file, as this might cause circular imports.
+ */
+
 export const SR5 = {
     itemTypes: {
         action: 'SR5.ItemTypes.Action',
@@ -20,25 +26,29 @@ export const SR5 = {
         host: 'SR5.ItemTypes.Host'
     },
 
+    // All available character attributes. Sorted alphabetically. :-)
     attributes: {
-        body: 'SR5.AttrBody',
         agility: 'SR5.AttrAgility',
-        reaction: 'SR5.AttrReaction',
-        strength: 'SR5.AttrStrength',
-        willpower: 'SR5.AttrWillpower',
-        logic: 'SR5.AttrLogic',
-        intuition: 'SR5.AttrIntuition',
+        attack: 'SR5.MatrixAttrAttack',
+        body: 'SR5.AttrBody',
         charisma: 'SR5.AttrCharisma',
-        magic: 'SR5.AttrMagic',
-        resonance: 'SR5.AttrResonance',
+        data_processing: 'SR5.MatrixAttrDataProc',
         edge: 'SR5.AttrEdge',
         essence: 'SR5.AttrEssence',
-        attack: 'SR5.MatrixAttrAttack',
-        sleaze: 'SR5.MatrixAttrSleaze',
-        data_processing: 'SR5.MatrixAttrDataProc',
         firewall: 'SR5.MatrixAttrFirewall',
+        intuition: 'SR5.AttrIntuition',
+        logic: 'SR5.AttrLogic',
+        magic: 'SR5.AttrMagic',
+        reaction: 'SR5.AttrReaction',
+        resonance: 'SR5.AttrResonance',
+        sleaze: 'SR5.MatrixAttrSleaze',
+        strength: 'SR5.AttrStrength',
+        willpower: 'SR5.AttrWillpower',
     },
 
+    /**
+     * All labels for all limits used across all actor and item types.
+     */
     limits: {
         physical: 'SR5.LimitPhysical',
         social: 'SR5.LimitSocial',
@@ -47,6 +57,9 @@ export const SR5 = {
         sleaze: 'SR5.MatrixAttrSleaze',
         data_processing: 'SR5.MatrixAttrDataProc',
         firewall: 'SR5.MatrixAttrFirewall',
+        speed: 'SR5.Vehicle.Stats.Speed',
+        sensor: 'SR5.Vehicle.Stats.Sensor',
+        handling: 'SR5.Vehicle.Stats.Handling'
     },
 
     specialTypes: {
@@ -283,6 +296,7 @@ export const SR5 = {
         matrix: 'SR5.InitCatMatrix',
     },
 
+    // Gear modification types. :) Not modifiers.
     modificationTypes: {
         weapon: 'SR5.Weapon',
         armor: 'SR5.Armor',
@@ -308,9 +322,9 @@ export const SR5 = {
     },
 
     kbmod: {
-        STANDARD: 'shiftKey',
+        ITEM_DESCR: 'ctrlKey',
         EDGE: 'altKey',
-        SPEC: 'ctrlKey',
+        HIDE_DIALOG: 'shiftKey',
     },
 
     actorModifiers: {
@@ -340,6 +354,66 @@ export const SR5 = {
         essence: 'SR5.AttrEssence',
         fade: 'SR5.RollFade',
         global: 'SR5.Global',
+    },
+
+    /**
+     * Modification types used for actions and general success tests, based on actors.
+     *
+     * These are meant to be used with the Modifiers class and SR5Actor.getModifiers('wounds').
+     *
+     * There are additional item based modifiers that aren't present here.
+     */
+    modifierTypes: {
+        armor: 'SR5.Armor',
+        composure: 'SR5.RollComposure',
+        defense: 'SR5.RollDefense',
+        drain: 'SR5.Drain',
+        environmental: 'SR5.ModifierTypes.Environmental',
+        fade: 'SR5.RollFade',
+        global: 'SR5.Global',
+        judge_intentions: 'SR5.RollJudgeIntentions',
+        lift_carry: 'SR5.RollLiftCarry',
+        memory: 'SR5.RollMemory',
+        soak: 'SR5.RollSoak',
+        wounds: 'SR5.ModifierTypes.Wounds',
+    },
+
+    /**
+     * Define here what kind of active test is to be used for the different weapon categories as a main action test.
+     */
+    weaponCategoryActiveTests: {
+        'range': 'RangedAttackTest',
+        'melee': 'MeleeAttackTest',
+        'thrown': 'ThrownAttackTest'
+    },
+
+    spellOpposedTests: {
+        'combat': 'CombatSpellDefenseTest'
+    },
+
+    activeTests: {
+        'spell': 'SpellCastingTest',
+        'complexForm': 'ComplexFormTest'
+    },
+
+    opposedTests: {
+        'spell': {
+            'combat': 'CombatSpellDefenseTest'
+        }
+    },
+
+    opposedResistTests: {
+        'spell': {
+            'combat': 'PhysicalResistTest'
+        }
+    },
+
+    /**
+     * Names of FoundryVTT packs supplied by the system to be used as action sources.
+     */
+    packNames: {
+        'generalActions': 'General Actions',
+        'matrixActions': 'Matrix Actions'
     },
 
     programTypes: {

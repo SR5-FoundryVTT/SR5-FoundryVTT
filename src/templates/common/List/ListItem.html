@@ -2,7 +2,7 @@
     <div class="item-left">
         {{#if img}}
             <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">
-                <img src="{{img}}" title="{{name}}" height="24px" width="24px" />
+                <img src="{{img}}" title="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip='SHIFT' descr='CTRL'}}" height="24px" width="24px"/>
             </div>
         {{/if}}
         <div class="item-text item-name
@@ -10,6 +10,7 @@
             {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}}
             {{#each additionalCssClass}}{{this }}{{/each}}
             {{#unless img}}{{#if hasRoll}}roll{{/if}}{{/unless}}"
+            {{#unless img}}{{#if hasRoll}}title="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip='SHIFT' descr='CTRL'}}"{{/if}}{{/unless}}
         >
             {{name}}
         </div>
@@ -44,6 +45,11 @@
                         }}
                     </div>
                 {{/ife}}
+            {{/if}}
+            {{#if option.html}}
+                <div class="item-text {{option.html.cssClass}}">
+                    {{{option.html.text}}}
+                </div>
             {{/if}}
         {{/each}}
         {{#if icons}}

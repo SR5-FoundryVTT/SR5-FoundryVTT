@@ -4,6 +4,21 @@
     </div>
     <div class="form-line">
         <div class="label">
+            {{localize "SR5.Labels.Action.ActiveTest"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.test" disabled>
+                {{#select data.action.test}}
+                <option value=""></option>
+                {{#each activeTests}}
+                <option value="{{this.name}}">{{localize this.label}}</option>
+                {{/each}}
+                {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
             {{localize "SR5.ActionType"}}
         </div>
         <div class="inputs">
@@ -77,13 +92,26 @@
     </div>
     <div class="form-line">
         <div class="label">
+            {{localize "SR5.Armor"}}
+        </div>
+        <div class="inputs">
+            <input
+                    title="{{localize SR5.Armor}}"
+                    type="checkbox"
+                    name="data.action.armor"
+                    {{checked data.action.armor}}
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
             {{localize "SR5.DicePoolModifier"}}
         </div>
         <div class="inputs">
             <input
                 size="4"
                 maxlength="3"
-                type="text"
+                type="number"
                 name="data.action.mod"
                 value="{{data.action.mod}}"
                 data-dtype="Number"
@@ -100,7 +128,7 @@
             <input
                 size="4"
                 maxlength="3"
-                type="text"
+                type="number"
                 name="data.action.limit.base"
                 value="{{data.action.limit.base}}"
                 data-dtype="Number"
@@ -109,7 +137,7 @@
             <div>
                 +
             </div>
-            <select name="data.action.limit.attribute">
+            <select name="data.action.limit.attribute" data-dtype="Text">
                 {{#select data.action.limit.attribute}}
                 <option value=""></option>
                 {{#each limits as |name type|}}
@@ -117,6 +145,22 @@
                 {{/each}}
                 {{/select}}
             </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Threshold"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="4"
+                maxlength="3"
+                type="number"
+                name="data.action.threshold.base"
+                value="{{data.action.threshold.base}}"
+                data-dtype="Number"
+                placeholder=""
+            />
         </div>
     </div>
     {{/ifne}} {{/ifne}} {{/if}}

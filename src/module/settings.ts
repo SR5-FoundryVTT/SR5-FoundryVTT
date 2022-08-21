@@ -4,6 +4,7 @@ import { VersionMigration } from './migrator/VersionMigration';
 import { FLAGS, SYSTEM_NAME } from './constants';
 
 export const registerSystemSettings = () => {
+
     /**
      * Register diagonal movement rule setting
      */
@@ -14,6 +15,7 @@ export const registerSystemSettings = () => {
         config: true,
         type: String,
         default: '1-2-1',
+        // @ts-ignore
         choices: {
             '1-1-1': 'SETTINGS.IgnoreDiagonal',
             '1-2-1': 'SETTINGS.EstimateDiagonal',
@@ -39,14 +41,14 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
-    game.settings.register(SYSTEM_NAME, 'displayDefaultRollCard', {
-        name: 'SETTINGS.DisplayDefaultRollCardName',
-        hint: 'SETTINGS.DisplayDefaultRollCardDescription',
-        scope: 'user',
-        config: true,
-        type: Boolean,
-        default: false,
-    });
+    // game.settings.register(SYSTEM_NAME, 'displayDefaultRollCard', {
+    //     name: 'SETTINGS.DisplayDefaultRollCardName',
+    //     hint: 'SETTINGS.DisplayDefaultRollCardDescription',
+    //     scope: 'user',
+    //     config: true,
+    //     type: Boolean,
+    //     default: false,
+    // });
 
     /**
      * Track system version upon which a migration was last applied
@@ -62,7 +64,7 @@ export const registerSystemSettings = () => {
     game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
         name: 'SETTINGS.ShowGlitchAnimationName',
         hint: 'SETTINGS.ShowGlitchAnimationDescription',
-        scope: 'user',
+        scope: 'client',
         config: true,
         type: Boolean,
         default: true,
@@ -77,14 +79,14 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
-    game.settings.register(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers, {
-        name: 'SETTINGS.WhisperOpposedTestsToTargetedPlayers',
-        hint: 'SETTINGS.WhisperOpposedTestsToTargetedPlayersDescription',
-        scope: 'world',
-        config: true,
-        type: Boolean,
-        default: true,
-    });
+    // game.settings.register(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers, {
+    //     name: 'SETTINGS.WhisperOpposedTestsToTargetedPlayers',
+    //     hint: 'SETTINGS.WhisperOpposedTestsToTargetedPlayersDescription',
+    //     scope: 'world',
+    //     config: true,
+    //     type: Boolean,
+    //     default: true,
+    // });
 
     game.settings.register(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills, {
          name: 'SETTINGS.OnlyAllowRollOnDefaultableSkills',
@@ -96,9 +98,9 @@ export const registerSystemSettings = () => {
     });
 
     game.settings.register(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails, {
-         name: 'SETTINGS.ShowSkillsWithDetails',
+        name: 'SETTINGS.ShowSkillsWithDetails',
         hint: 'SETTINGS.ShowSkillsWithDetailsDescription',
-        scope: 'user',
+        scope: 'client',
         config: true,
         type: Boolean,
         default: true,
@@ -121,4 +123,36 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: false,
     });
+
+    /**
+     * Control if GM triggered chat messages should hide critical message parts.
+     *
+     * These parts will only show to players that have appropriate permissions on the used
+     * actor for testing.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.HideGMOnlyChatContent, {
+        name: 'SETTINGS.HideGMOnlyChatContent',
+        hint: 'SETTINGS.HideGMOnlyChatContentDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false
+    });
+
+    /**
+     * Control Test behaviour and consumption of necessary ressources for it.
+     * 
+     * When set to true tests will NOT roll should one ressource be missing.
+     * 
+     * This can be used to prevent edge rules to be used, when an actor doesn't have edge
+     * and other ressources.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest, {
+        name: 'SETTINGS.MustHaveRessourcesOnTest',
+        hint: 'SETTINGS.MustHaveRessourcesOnTestDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false
+    })
 };

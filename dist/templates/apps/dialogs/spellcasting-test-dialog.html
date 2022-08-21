@@ -1,0 +1,28 @@
+<form>
+    <div class="container container--fluid dialog-content-common">
+        <div class="container__row">
+            <div class="container__col-half dialog-content-column sunken">
+                <h2>{{localize test.title}}</h2>
+                <hr/>
+                <div>
+                    <div class="form-group">
+                        <label>{{localize "SR5.RecklessSpellButton"}}</label>
+                        <input type="checkbox" name="test.data.reckless" {{#if test.data.reckless}}checked{{/if}}/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize "SR5.Force"}}</label>
+                        <input name="test.data.force" type="number" class="disabled-for-display"
+                               value="{{test.data.force}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize "SR5.Drain"}} ({{test.item.getDrain}})</label>
+                        <input disabled type="number" class="disabled-for-display" value="{{test.data.drain}}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="container__col-half dialog-content-column sunken">
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
+            </div>
+        </div>
+    </div>
+</form>

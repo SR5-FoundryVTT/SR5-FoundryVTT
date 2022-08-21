@@ -4,3 +4,4 @@ node_modules
 foundryconfig.json
 .vscode
 shadowrun5e.lock
+*.code-workspace

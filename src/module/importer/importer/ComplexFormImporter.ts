@@ -4,6 +4,7 @@ import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
 import {DefaultValues} from "../../data/DataDefaults";
 import ComplexFormItemData = Shadowrun.ComplexFormItemData;
+import {Helpers} from "../../helpers";
 
 export class ComplexFormImporter extends DataImporter {
     public categoryTranslations: any;
@@ -24,34 +25,11 @@ export class ComplexFormImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
+                action: DefaultValues.actionData({
                     type: 'complex',
-                    category: '',
                     attribute: 'resonance',
-                    attribute2: '',
-                    skill: 'compiling',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DefaultValues.damageData(),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: 'defense',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: [],
-                },
+                    skill: 'compiling'
+                }),
                 target: '',
                 duration: '',
                 fade: 0,
@@ -88,6 +66,8 @@ export class ComplexFormImporter extends DataImporter {
 
             // TODO: Follow ComplexFormParserBase approach.
             data.name = ImportHelper.MapNameToTranslation(this.nameTranslations, data.name);
+
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

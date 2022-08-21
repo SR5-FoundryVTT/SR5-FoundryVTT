@@ -25,14 +25,12 @@
   "ITEM.TypeSprite_power": "Spritekraft",
   "ITEM.TypeWeapon": "Waffe",
   "ITEM.TypeHost": "Host",
-
   "SR5.FOUNDRY": {
     "Actor": "Akteur",
     "Scene": "Szene",
     "Item": "Gegenstand",
     "Token": "Token"
   },
-
   "SR5.SheetActor": "Actor Bogen",
   "SR5.SheetItem": "Item Bogen",
   "SR5.ItemTypes": {
@@ -64,6 +62,10 @@
     "Critter": "Critter",
     "IC": "IC"
   },
+  "SR5.ModifierTypes": {
+    "Environmental": "Umgebung",
+    "Wounds": "Wunden"
+  },
   "SR5.ActiveSkills": "Aktive Fertigkeiten",
   "SR5.Specializations": "Spezialisierungen",
   "SR5.Specialization": "Spezialisierung",
@@ -80,6 +82,7 @@
   "SR5.Skill": "Fertigkeit",
   "SR5.Attribute": "Attribute",
   "SR5.Limit": "Limit",
+  "SR5.Threshold": "Schwellenwert",
   "SR5.Modifier": "Modifikatoren",
   "SR5.Wounds": "Wunden",
   "SR5.Filter": "Filter",
@@ -114,7 +117,7 @@
   "SR5.RunningSilent": "Auf Schleichfahrt",
   "SR5.ConditionMonitor": "Monitor",
   "SR5.ComplexForms": "Komplexe Formen",
-  "SR5.Target": "Zielen",
+  "SR5.Target": "Ziel",
   "SR5.Fade": "Schwund",
   "SR5.Duration": "Dauer",
   "SR5.Powers": "Kräfte",
@@ -172,6 +175,7 @@
   "SR5.AP": "DK",
   "SR5.OpposedType": "Typ",
   "SR5.Extended": "Ausgedehnt",
+  "SR5.Extend": "Ausdehnen",
   "SR5.Test": "Probe",
   "SR5.CreateItem": "Erstelle Item",
   "SR5.CreateItemWeapon": "Erstelle Waffe",
@@ -472,6 +476,13 @@
   "SR5.DefenseTest": "Verteidigungsprobe",
   "SR5.SoakTest": "Schadenswiderstandsprobe",
   "SR5.AttackerHits": "Angreifer Erfolge",
+  "SR5.AttackerNetHits": "Angreifer Netto-Erfolge",
+  "SR5.OpposingHits": "Gegenüber Erfolge",
+  "SR5.Attacker": "Angreifer",
+  "SR5.Defender": "Verteidiger",
+  "SR5.DefenderNetHits": "Verteidiger Netto-Erfolge",
+  "SR5.AttackDodged": "Ausgewichen",
+  "SR5.AttackHits": "Treffer",
   "SR5.Incoming": "Kommend",
   "SR5.Modified": "Modifiziert",
   "SR5.Resist": "Widerstehen",
@@ -480,6 +491,7 @@
   "SR5.Aoe": "Fläche",
   "SR5.Level": "Stufe",
   "SR5.Override": "Override",
+  "SR5.KnockedDown": "Niedergeschlagen",
   "SR5.Item": "Item",
   "SR5.Bonuses": "Boni",
   "SR5.EditSkill": "Fertigkeit anpassen",
@@ -512,6 +524,7 @@
   "SR5.Load": "Laden",
   "SR5.Normal": "Normal",
   "SR5.Defense": "Verteidigung",
+  "SR5.Soak": "Widerstand",
   "SR5.LastRoll": "Letzter Wurf",
   "SR5.OriginalDicePool": "Originaler Würfelpool",
   "SR5.Successes": "Erfolge",
@@ -532,8 +545,14 @@
   "SR5.EnvironmentHigh": "Stark",
   "SR5.EnvironmentVeryHigh": "Extrem",
   "SR5.WoundModifier": "Verletzungsmodi",
-  "SR5.ExtendedTest": "Ausgedehnte Probe",
-  "SR5.IncomingDamage": "Kommender Schaden",
+  "SR5.ExtendedTest": "Ausged. Probe",
+  "SR5.ExtendedHits": "Ausged. Erfolge",
+  "SR5.IncomingDamage": "Schaden",
+  "SR5.ModifiedDamage": "Modifiziert",
+  "SR5.IncomingDrain": "Entzug",
+  "SR5.ModifiedDrain": "Modifiziert",
+  "SR5.IncomingFade": "Schwund",
+  "SR5.ModifiedFade": "Mod. Schwund",
   "SR5.Temporary": "Temporär",
   "SR5.SelectedTargets": "Ausgew. Ziele",
   "SR5.ApplyWounds": "Anwenden",
@@ -557,14 +576,21 @@
   "SR5.RunningSpeed": "Rennen",
   "SR5.Blackmail": "Erpressung",
   "SR5.Family": "Familie",
-  "SR5.DamageResistanceTest": "Schadenswiderstandsprobe",
+  "SR5.Success": "Erfolg!",
   "SR5.Glitch": "Patzer!",
+  "SR5.GlitchCritical": "Kritischer Patzer!",
+  "SR5.Glitches": "Patzer:",
+  "SR5.Failure": "Misserfolg!",
+  "SR5.Results": "Ergebnis",
+  "SR5.ResistedAllDamage": "Kein Schaden!",
+  "SR5.ResistedSomeDamage": "Schaden!",
   "SR5.RollMode": "Würfelmodus",
   "SR5.OpenSourcePdf": "Öffne PDF-Quelle für Objekt",
   "SR5.OpenOrigin": "Öffne Gegenstand",
   "SR5.SourceFieldEmptyError": "Es wurde keine PDF-Quelle angegeben",
   "SR5.Help": "Hilfe",
-
+  "SR5.ManualOverride": "Manualle Eingabe",
+  "SR5.Details": "Details",
   "SETTINGS": {
     "DiagonalMovementName": "Diagonale Bewegung",
     "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
@@ -584,7 +610,11 @@
     "OnlyAllowRollOnDefaultableSkillsDescription": "Wenn deaktiviert, können unbekannte Fertigkeiten auch getestet werden, wenn sie nicht improvisierbar sind",
     "Euclidean": "Euklidisch",
     "TokenHealthBars": "Token Lebensbalken",
-    "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige"
+    "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige",
+    "HideGMOnlyChatContent": "Verstecke GM Informationen in Proben Chat Nachrichten",
+    "HideGMOnlyChatContentDescription": "Nachrichten durch GM Proben zeigen kritische Informationen nur Spielern mit Besitzer Rechten für den genutzten Akteur",
+    "MustHaveRessourcesOnTest": "Proben nur mit außreichenden Ressourcen",
+    "MustHaveRessourcesOnTestDescription": "Eine Probe kann nur durchgeführt werden wenn alle Ressourcen dafür vorhadnen sind"
   },
   "SR5.MIGRATION.WarningTitle": "Alarm",
   "SR5.MIGRATION.WarningHeader": "Migrationswarnung",
@@ -627,7 +657,15 @@
       "ICConfiguration": "IC Configuration",
       "SetMonitor": "Monitor muss manuell gesetzt werden",
       "PersonalInventory": "Am Körper",
-      "CreateInventory": "Erstelle Inventar Ort"
+      "CreateInventory": "Erstelle Inventar Ort",
+      "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung."
+    },
+    "Action": {
+      "ActiveTest": "Probe",
+      "OpposedTest": "Vergleichsprobe",
+      "DamageResistanceTest": "Schadenswiderstandsprobe",
+      "Modifiers": "Modifikatoren",
+      "Modifier": "Modifikator"
     },
     "Inventory": {
       "OpenInventory": "Inventar",
@@ -811,7 +849,12 @@
     "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
     "InvalidMarksCount": "You've trying to place a strange number of marks",
     "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
-    "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden"
+    "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
+    "CantRecoverPhysicalWithStunDamage": "Solange geistiger Schaden ungeheilt bleibt kann kein physischer Schaden kuriert werden",
+    "CantExtendTestFurther": "Probe kann nicht weiter ausgedehnt werden. Zu wenige Würfel übrig oder Schwellenwert erreicht",
+    "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",
+    "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
+    "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Glitch."
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
@@ -823,7 +866,8 @@
     "KeyNotModifyableByActiveEffect": "Aktiver Effekt Modus Modifizieren kann nur auf mod Felder angewendet werden.",
     "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden.",
     "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
-    "DefaultInventoryCantBeRemoved": "The default inventory can't be removed"
+    "DefaultInventoryCantBeRemoved": "The default inventory can't be removed",
+    "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug Akteur geworfen werden"
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
@@ -878,7 +922,7 @@
     "Total": "Ergebnis",
     "ClearModifiers": "Entferne eigene Modifikatoren"
   },
-  "SR5.MoveInventoryDialog" : {
+  "SR5.MoveInventoryDialog": {
     "Title": "Inventar auswählen",
     "Move": "Übertragen",
     "Cancel": "Abbrechen"
@@ -889,14 +933,39 @@
     }
   },
   "SR5.ActiveEffect": {
-      "New": "New Effect",
-      "Types": {
-        "Temporary": "Temporary Effects",
-        "Passive": "Passive Effects",
-        "Inactive": "Inactive Effects"
-      },
-      "Modes": {
-        "Modify": "Modifizieren"
-      }
+    "New": "New Effect",
+    "Types": {
+      "Temporary": "Temporary Effects",
+      "Passive": "Passive Effects",
+      "Inactive": "Inactive Effects"
+    },
+    "Modes": {
+      "Modify": "Modifizieren"
     }
+  },
+  "SR5.Tests": {
+    "SuccessTest": "Erfolgsprobe",
+    "OpposedTest": "Vergleichsprobe",
+    "ExtendedTest": "Ausgedehnte Probe",
+    "PhysicalDefenseTest": "Physische Verteidigung",
+    "RangedAttackTest": "Fernkampf Angriff",
+    "MeleeAttackTest": "Nahkampf Angriff",
+    "ThrownAttackTest": "Wurfwaffen Angriff",
+    "PhysicalResistTest": "Physischer Schadenswiderstand",
+    "SpellcastingTest": "Spruchzauberei",
+    "ComplexFormTest": "Komplexe Form weben",
+    "AttributeOnlyTest": "Attributsprobe",
+    "CombatSpellDefenseTest": "Kampfzauber Verteidigung",
+    "NaturalRecoveryStunTest": "Natürliche Genesung Geistig",
+    "NaturalRecoveryPhysicalTest": "Natürliche Genesung Körperlich",
+    "DrainTest": "Entzugswiderstand",
+    "FadeTest": "Schwundwiderstand",
+    "PilotVehicleTest": "Fahrzeug Manövrieren",
+    "DronePerceptionTest": "Fahrzeug Clearsight",
+    "DroneInfiltrationTest": "Fahrzeug Stealth"
+  },
+  "SR5.MissingRessource": {
+    "Edge": "Kein Edge übrig",
+    "Ammo": "Nicht genug Munition für ausgewählten Feuer Modus"
+  }
 }

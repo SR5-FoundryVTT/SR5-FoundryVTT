@@ -1,14 +1,18 @@
 {
-  "include": ["src/**/*", "src/module/types/global.d.ts"],
+  "include": [
+    "src/**/*",
+    "src/module/types/global.d.ts"
+  ],
   "exclude": ["node_modules", "**/*.spec.ts"],
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
     "types": [
       "@league-of-foundry-developers/foundry-vtt-types",
-      "node"
+      "@ethaks/fvtt-quench"
     ],
     "moduleResolution": "node",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "skipLibCheck": true
   }
 }

@@ -4,6 +4,7 @@ import { CyberwareParser } from '../parser/ware/CyberwareParser';
 import Ware = Shadowrun.WareItemData;
 import {DefaultValues} from "../../data/DataDefaults";
 import CyberwareItemData = Shadowrun.CyberwareItemData;
+import {Helpers} from "../../helpers";
 
 export class WareImporter extends DataImporter {
     public categoryTranslations: any;
@@ -45,34 +46,7 @@ export class WareImporter extends DataImporter {
                     electricity: 0,
                     radiation: 0,
                 },
-                action: {
-                    type: '',
-                    category: '',
-                    attribute: '',
-                    attribute2: '',
-                    skill: '',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DefaultValues.damageData({type: {base: '', value: ''}}),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: []
-                },
+                action: DefaultValues.actionData(),
                 grade: 'standard',
                 essence: 0,
                 capacity: 0,
@@ -123,6 +97,7 @@ export class WareImporter extends DataImporter {
 
             // // TODO: Follow ComplexFormParserBase approach.
             // data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+            Helpers.injectActionTestsIntoChangeData(data.type, data);
 
             datas.push(data);
         }

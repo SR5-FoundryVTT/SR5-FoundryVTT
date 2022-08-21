@@ -115,7 +115,7 @@ export class ShadowrunActorDialogs {
             templatePath,
             buttons,
             onAfterClose
-        }
+        } as unknown as FormDialogData;
     }
 
 
@@ -152,7 +152,7 @@ export class ShadowrunActorDialogs {
             templateData,
             buttons,
             onAfterClose
-        }
+        } as unknown as FormDialogData;
     }
 
     static getSkillDialogData(actor: SR5Actor, options: SkillDialogOptions, partsProps: PartsList<number>): FormDialogData {
@@ -225,6 +225,6 @@ export class ShadowrunActorDialogs {
             templateData,
             buttons,
             onAfterClose
-        }
+        } as unknown as FormDialogData;
     }
 }
