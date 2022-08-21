@@ -972,7 +972,7 @@ export class SuccessTest {
         // Edge consumption.
         if (this.hasPushTheLimit || this.hasSecondChance) {      
             if (this.actor.getEdge().uses <= 0) {
-                ui.notifications?.error(game.i18n.localize('SR5.MissingResource.Edge'));
+                ui.notifications?.error(game.i18n.localize('SR5.MissingRessource.Edge'));
                 return false;
             }
         }

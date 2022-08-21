@@ -285,12 +285,6 @@ export class RangedAttackTest extends SuccessTest {
         const fireMode = this.data.fireMode;
         if (fireMode.value === 0) return true;
 
-        // Abort if the weapon doesn't even contain at least one round.
-        if (!this.item.hasAmmo(1)) {
-            await ui.notifications?.warn('SR5.MissingRessource.Ammo', {localize: true});
-            return false;
-        }
-
         await this.item.useAmmo(fireMode.value)
 
         return true;
