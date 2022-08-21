@@ -966,6 +966,7 @@
   },
   "SR5.MissingRessource": {
     "Edge": "Kein Edge übrig",
-    "Ammo": "Nicht genug Munition für ausgewählten Feuer Modus"
+    "Ammo": "Nicht genug Munition zum Feuern",
+    "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, entstehenden Modifikatoren werden reduziert"
   }
 }
