@@ -83,6 +83,13 @@ export class SR5Roll extends Roll {
                                  0);
     }
 
+
+    /**
+     * The amount of dice going into the throw (the pool used).
+     * 
+     * NOTE: this can be different from the amount of dice actually thown.
+     *       Use SR5Roll#diceThrown instead
+     */
     get pool(): number {
         // 0.7.x > FoundryVTT
         if (this.terms) {
@@ -93,6 +100,13 @@ export class SR5Roll extends Roll {
         //@ts-ignore
         // till 0.6.x FoundryVTT
         return this.parts[0].rolls.length;
+    }
+
+    /**
+     * The amount of dice actually thrown after all dice explosions have been resolved.
+     */
+    get poolThrown(): number {
+        return this.dice[0].results.length;
     }
 
     get glitched(): boolean {
