@@ -357,7 +357,8 @@ export class SR5Actor extends Actor {
         const edge = this.getEdge();
         if (edge && edge.value === 0) return;
         // NOTE: There used to be a bug which could lower edge usage below zero. Let's quietly ignore and reset. :)
-        const usesLeft = edge.uses > 0 ? edge.uses : 0;
+        const usesLeft = edge.uses > 0 ? edge.uses : by * -1;
+
         const uses = Math.min(edge.value, usesLeft + by);
 
         // @ts-ignore
