@@ -988,8 +988,6 @@ export class SuccessTest {
     async consumeDocumentRessources(): Promise<boolean> {
         if (!this.actor) return true;
 
-        if (!this.canConsumeDocumentRessources()) return false;
-
         // Edge consumption.
         if (this.hasPushTheLimit || this.hasSecondChance) {            
             await this.actor.useEdge();
@@ -1004,9 +1002,11 @@ export class SuccessTest {
     * @returns true when the test can process
      */
     async consumeDocumentRessoucesWhenNeeded(): Promise<boolean> {
-        // Only check for ressources according to setting.
         const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
-        if (!mustHaveRessouces) return true;
+        // Make sure to nest canConsume to avoid unneccessary warnings.
+        if (mustHaveRessouces) {
+            if (!this.canConsumeDocumentRessources()) return false;
+        }
 
         return await this.consumeDocumentRessources();
     }
