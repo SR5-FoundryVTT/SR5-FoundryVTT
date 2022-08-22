@@ -684,6 +684,9 @@
     "Inventory": {
       "OpenInventory": "Inventory",
       "Carried": "Carried"
+    },
+    "Message": {
+      "ClickToSelect": "Click to select on scene"
     }
   },
   "SR5.Spirit": {

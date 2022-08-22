@@ -670,6 +670,9 @@
     "Inventory": {
       "OpenInventory": "Inventar",
       "Carried": "Mitgeführt"
+    },
+    "Message": {
+      "ClickToSelect": "Klicke um auf Szene auzuwählen"
     }
   },
   "SR5.Spirit": {
