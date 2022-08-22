@@ -373,11 +373,33 @@ export class SR5Actor extends Actor {
         return "armor" in this.data.data;
     }
 
-    getArmor(): ActorArmorData {
-        if ("armor" in this.data.data)
-            return this.data.data.armor;
+    /**
+     * Return 
+     * @param damage 
+     * @returns 
+     */
+    getArmor(damage?:DamageData): ActorArmorData {
+        // Prepare base armor data.
+        const armor = "armor" in this.data.data ? 
+            foundry.utils.duplicate(this.data.data.armor) : 
+            DefaultValues.actorArmorData();
+        // Prepare damage to apply to armor.
+        damage = damage || DefaultValues.damageData();
 
-        return DefaultValues.actorArmorData();
+        // Modify by penetration
+        if (damage.ap.value !== 0)
+            PartsList.AddUniquePart(armor.mod, 'SR5.AP', damage.ap.value);
+                
+        // Modify by element
+        if (damage.element.value !== '') {
+            const armorForDamageElement = armor[damage.element.value] || 0;
+            if (armorForDamageElement > 0)
+                PartsList.AddUniquePart(armor.mod, 'SR5.Element', armorForDamageElement);
+        }
+        
+        Helpers.calcTotal(armor, {min: 0});
+
+        return armor;
     }
 
     getMatrixDevice(): SR5Item | undefined {
