@@ -408,7 +408,8 @@ export const TestCreator = {
         }
 
         // Prepare general damage values...
-        if (action.damage.base || action.damage.attribute) {
+        // ...a test without damage, shouldn't contain any damage information.
+        if (ActionFlow.hasDamage(action.damage)) {
             data.damage = foundry.utils.duplicate(action.damage);
         }
 
