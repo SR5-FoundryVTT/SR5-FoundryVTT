@@ -1250,7 +1250,7 @@ export class SuccessTest {
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = this.actor?.getActiveTokens(true) || [];
-        const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
+        const token = linkedTokens.length === 1 ? linkedTokens[0] : undefined;
 
         return {
             title: this.data.title,
@@ -1403,6 +1403,7 @@ export class SuccessTest {
         html.find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
         html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
         html.find('.result-action').on('click', this._castResultAction);
+        html.find('.chat-select-link').on('click', this._selectSceneToken);
 
         handleRenderChatMessage(message, html, data);
 
@@ -1420,6 +1421,27 @@ export class SuccessTest {
         }
         else if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
             html.find('.gm-only-content').removeClass('gm-only-content');
+        }
+    }
+
+    /** 
+     * Select a Token on the current scene based on the link id.
+     * @params event Any user PointerEvent
+    */
+    static _selectSceneToken(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!game || !game.ready || !canvas || !canvas.ready) return;
+
+        const selectLink = $(event.currentTarget);
+        const tokenId = selectLink.data('tokenId');
+        const token = canvas.tokens?.get(tokenId);
+
+        if (token) {
+            token.control();
+        } else {
+            ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
         }
     }
 
