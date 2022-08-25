@@ -945,7 +945,12 @@ export class Helpers {
         if (!test) {
             console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
         }
-        foundry.utils.mergeObject(itemData, {data: {action: {test}}});
+        foundry.utils.mergeObject(itemData, {data: {action: {
+            test,
+            opposed: {
+                test: 'PhysicalDefenseTest',
+                resist: {test: 'PhysicalResistTest'}}
+        }}});
         return;
     }
 
@@ -999,7 +1004,7 @@ export class Helpers {
             'spell': Helpers.injectSpellTestIntoChangeData
         };
 
-        const handler = type[type];
+        const handler = typeHandler[type];
         if (!handler) return;
 
         handler(type, changeData, itemData);
