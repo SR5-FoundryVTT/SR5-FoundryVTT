@@ -109,7 +109,7 @@ export class AmmoImporter extends DataImporter {
             // data.data.technology.conceal.base = ImportHelper.intValue(jsonData, "conceal");
             data.data.technology.conceal.base = 0;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data);
+            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
             ammoDatas.push(data);
         }

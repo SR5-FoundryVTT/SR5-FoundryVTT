@@ -1791,4 +1791,17 @@ export class SR5Actor extends Actor {
                 markId
             }))
     }
+
+    _preCreateEmbeddedDocuments(embeddedName, result, options, userId) {
+        // Importing embedded documents using Chummer char generator does overwrite test values during
+        // creation, even though values are set... this causes the SR5Item#_preCreate/_onCreate changes to
+        // be overwritten again with template.json default values for .action
+        // To test this issue import a character using Chummer JSON export with weapons/spells/complex form
+        if (embeddedName === 'Item') {
+            for (const data of result) {
+                Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            }
+        }
+        
+    }
 }
