@@ -4,11 +4,15 @@
  *
  */
 declare namespace Shadowrun {
-    export type FireModeData = {
-        value: number;
-        label: string;
-        defense?: number | string;
-    };
+    
+    export interface FireModeData {
+        value: number
+        label: string
+        defense: number | string
+        recoil: boolean
+        mode: RangedWeaponMode
+        action: ActionType
+    }
 
     export type SpellForceData = {
         value: number;

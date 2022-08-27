@@ -54,7 +54,7 @@ declare namespace Shadowrun {
         attribute?: ActorAttribute;
     }
     /**
-     * Valid firing modes data.
+     * Selection of what reanged weapon modes are available
      */
     export interface FiringModeData  {
         single_shot: boolean;
@@ -62,6 +62,11 @@ declare namespace Shadowrun {
         burst_fire: boolean;
         full_auto: boolean;
     }
+    
+    /**
+     * Possible firing modes for a ranged weapon.
+     */
+    export type RangedWeaponMode = keyof FiringModeData;
 
     /**
      * Melee weapon specific data.

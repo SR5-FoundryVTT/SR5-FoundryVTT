@@ -1,6 +1,9 @@
-import {Helpers} from "../helpers";
+import FireModeData = Shadowrun.FireModeData;
+import FiringModeData = Shadowrun.FiringModeData;
+import { SR5 } from "../config";
+import { Helpers } from "../helpers";
 
-export const RangedRules = {
+export const FireModeRules = {
     /**
      * Give a defense modifier according to rounds consumed and SR5#180.
      *
@@ -51,5 +54,34 @@ export const RangedRules = {
         compensation = Math.max(compensation - rounds, 0);
 
         return {compensation, recoilModifier};
+    },
+
+    /**
+     * Available firemodes for a weapon
+     * @param rangedWeaponModes The weapon modes on the actual gun 
+     * @param rounds The amount of rounds left. If not given, all firemodes will returned.
+     * 
+     * @returns A list of firemodes sorted by weapon mode and rounds necessary.
+     */
+    availableFireModes: function (rangedWeaponModes: FiringModeData, rounds?: number): FireModeData[] {
+        // Reduce all fire modes to what's available on weapon
+        const available = SR5.fireModes.filter(fireMode => {
+            // TODO: rounds check
+            const isAvailable = rangedWeaponModes[fireMode.mode];
+            if (!isAvailable) return false;
+        });
+
+        //@ts-ignore
+        available.sort((modeA, modeB) => {
+            // Same modes, ascending spent rounds.
+            if (modeA.mode === modeB.mode) {
+                // Numerical values can be substracted to 1 / -1 aprox.
+                return modeA.value - modeB.value;
+            }
+            // Alphabetical sort by comparing.
+            return modeA.mode > modeB.mode ? 1 : -1;
+        });
+
+        return available;
     }
 }

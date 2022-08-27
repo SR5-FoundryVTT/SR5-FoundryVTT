@@ -1,5 +1,5 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults, DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import {LENGTH_UNIT, SR} from "../constants";
@@ -9,7 +9,8 @@ import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
-import {RangedRules} from "../rules/RangedRules";
+import RangedWeaponMode = Shadowrun.RangedWeaponMode;
+import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
 
 export interface RangedAttackTestData extends SuccessTestData {
@@ -80,6 +81,9 @@ export class RangedAttackTest extends SuccessTest {
             this.data.fireModes['10'] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
             this.data.fireModes['20'] = game.i18n.localize('SR5.Suppressing');
         }
+
+        // TODO: Add rounds based on consumption setting.
+        console.error('available modes', FireModeRules.availableFireModes(modes));
 
         // Current firemode selected
         this.data.fireMode = this.item.getLastFireMode() || {value: 0, defense: 0, label: ''};
@@ -201,16 +205,23 @@ export class RangedAttackTest extends SuccessTest {
         // Alter fire mode by ammunition constraints.
         fireMode.value = Number(fireMode.value || 0);
         const fireModeName = fireModes[fireMode.value];
-        const defenseModifier = RangedRules.fireModeDefenseModifier(fireMode.value, this.item.ammoLeft);
+        const defenseModifier = FireModeRules.fireModeDefenseModifier(fireMode.value, this.item.ammoLeft);
 
-        this.data.fireMode = {
+        // this.data.fireMode = {
+        //     label: fireModeName,
+        //     value: fireMode.value,
+        //     defense: defenseModifier,
+            
+        // };
+
+        this.data.fireMode = DefaultValues.fireModeData({
             label: fireModeName,
             value: fireMode.value,
             defense: defenseModifier,
-        };
+        });
 
         // Alter recoil modifier by ammunition constraints.
-        const {recoilModifier} = RangedRules.recoilAttackModifier(recoilCompensation, Number(fireMode.value), this.item.ammoLeft);
+        const {recoilModifier} = FireModeRules.recoilAttackModifier(recoilCompensation, Number(fireMode.value), this.item.ammoLeft);
 
         if (recoilModifier < 0)
             poolMods.addUniquePart('SR5.Recoil', recoilModifier);
