@@ -65,10 +65,11 @@ export class RangedAttackTest extends SuccessTest {
 
         this.data.fireModes = FireModeRules.availableFireModes(weaponData.data.range.modes);
         // Current firemode selected
-        this.data.fireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
-        // Preselect based on label
-        this.data.fireModeSelected = this.data.fireModes.findIndex(available => this.data.fireMode.label === available.label);
+        const lastFireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
+        // Try pre-selection based on last fire mode.
+        this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
         if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;
+        this.data.fireMode = this.data.fireModes[this.data.fireModeSelected];
     }
 
     async _prepareWeaponRanges() {
