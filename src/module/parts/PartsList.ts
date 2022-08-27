@@ -100,13 +100,22 @@ export class PartsList<TType> {
         }
     }
 
+    /**
+     * Remove all occurences of the given part modifier.
+     * 
+     * @param name Search parts for this name (exactly)
+     * @returns true for when all parts have been removed, otherwise falls.
+     */
     removePart(name: string): boolean {
-        const index = this._list.findIndex((part) => part.name === name);
-        if (index > -1) {
+        let index = this._list.findIndex((part) => part.name === name);
+        let removed = false;
+        while (index > -1) {
+            removed = true;
             this._list.splice(index, 1);
-            return true;
+            index = this._list.findIndex((part) => part.name === name);
         }
-        return false;
+        
+        return removed;
     }
 
     getMessageOutput() {

@@ -48,7 +48,7 @@ export class DeviceImporter extends DataImporter {
             //@ts-ignore
             data.folder = folder.id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data);
+            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
             //@ts-ignore
             entries.push(data);
@@ -100,7 +100,7 @@ export class DeviceImporter extends DataImporter {
             //@ts-ignore
             data.folder = folder.id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data);
+            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
             //@ts-ignore
             entries.push(data);

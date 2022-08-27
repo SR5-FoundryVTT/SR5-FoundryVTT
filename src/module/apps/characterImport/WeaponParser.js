@@ -77,9 +77,6 @@ export class WeaponParser {
         action.limit = {
             base: parseInt(getValues(chummerWeapon.accuracy)[0])
         };
-        action.opposed = {
-            type: 'defense',
-        };
 
         if (chummerWeapon.type.toLowerCase() === 'melee') {
             action.type = 'complex';

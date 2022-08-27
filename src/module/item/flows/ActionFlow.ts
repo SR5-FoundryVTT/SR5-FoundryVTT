@@ -76,4 +76,20 @@ export class ActionFlow {
             itemType: item.type
         }
     }
+
+    /**
+     * Does an action based damage contain any damaging content.
+     * 
+     * @param damage Any DamageData taken from an template action section
+     * 
+     * @returns true, when the user configured damage contains any parts.
+     */
+    static hasDamage(damage: DamageData): boolean {
+        if (damage.base !== 0) return true;
+        if (damage.attribute) return true;
+        if (damage.type) return true;
+        if (damage.element) return true;
+
+        return false;
+    }
 }

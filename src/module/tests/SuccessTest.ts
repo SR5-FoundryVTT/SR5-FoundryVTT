@@ -862,8 +862,9 @@ export class SuccessTest {
     }
 
     /**
-     * Handle Edge rule 'push the limit' within this test.
-     * TODO: Is this actually pushTheLimit or is it 'explode sixes?'
+     * Handle Edge rule 'push the limit'.
+     * 
+     * If called without push the limit, all modifiers for it will be removed.
      */
     applyPushTheLimit() {
         if (!this.actor) return;
@@ -876,6 +877,46 @@ export class SuccessTest {
             parts.addUniquePart('SR5.PushTheLimit', edge, true);
         } else {
             parts.removePart('SR5.PushTheLimit');
+        }
+    }
+
+    /**
+     * Handle Edge rules for 'second chance'.
+     * 
+     * If called without second chance, all modifiers for it will be removed.
+     */
+    applySecondChance() {
+        if (!this.actor) return;
+
+        const parts = new PartsList(this.pool.mod);
+
+        if (this.hasSecondChance) {
+            // According to rules, second chance can't be used on glitched tests.
+            if (this.glitched) {
+                ui.notifications?.warn('SR5.Warnings.CantSecondChanceAGlitch', {localize: true});
+                return this;
+            }
+
+            // Only count last roll as there might be multiple second chances already
+            const lastRoll = this.rolls[this.rolls.length - 1];
+            const dice = lastRoll.poolThrown - lastRoll.hits;
+            if (dice <= 0) {
+                ui.notifications?.warn('SR5.Warnings.CantSecondChanceWithoutNoneHits', {localize: true});
+                return this;
+            }
+
+            // Apply second chance modifiers.
+            const parts = new PartsList(this.pool.mod);
+            // Second chance can stack, so don't add it as unique.
+            parts.addPart('SR5.SecondChance', dice);
+
+            // Add new dice as fully separate Roll.
+            const formula = `${dice}d6`;
+            const roll = new SR5Roll(formula);
+            this.rolls.push(roll);
+
+        } else {
+            parts.removePart('SR5.SecondChance');
         }
     }
 
@@ -893,31 +934,19 @@ export class SuccessTest {
             return this;
         }
 
-        // Only count last roll as there might be multiple second chances already
-        const lastRoll = this.rolls[this.rolls.length - 1];
-        const dice = lastRoll.pool - lastRoll.hits;
-        if (dice <= 0) {
-            ui.notifications?.warn('SR5.Warnings.CantSecondChanceWithoutNoneHits', {localize: true});
-            return this;
-        }
-
-        // Apply second chance modifiers.
-        const parts = new PartsList(this.pool.mod);
-        // Second chance can stack, so don't add it as unique.
-        parts.addPart('SR5.SecondChange', dice);
-
-        // Can't use normal #execute as not all parts are needed.
+        // Fetch documents.
         await this.populateDocuments();
-        this.calculateBaseValues();
-
-        const formula = `${dice}d6`;
-        const roll = new SR5Roll(formula);
-        this.rolls.push(roll);
 
         //  Trigger edge consumption.
         this.data.secondChance = true;
+        this.applySecondChance();
+
+        // Can't use normal #execute as not all parts are needed.        
+        this.calculateBaseValues();
+
         const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
         if (!actorConsumedResources) return this;
+        
         // Remove second chance to avoid edge consumption on any kind of re-rolls.
         this.data.secondChance = false;
 
@@ -943,7 +972,7 @@ export class SuccessTest {
         // Edge consumption.
         if (this.hasPushTheLimit || this.hasSecondChance) {      
             if (this.actor.getEdge().uses <= 0) {
-                ui.notifications?.error(game.i18n.localize('SR5.MissingResource.Edge'));
+                ui.notifications?.error(game.i18n.localize('SR5.MissingRessource.Edge'));
                 return false;
             }
         }
@@ -959,8 +988,6 @@ export class SuccessTest {
     async consumeDocumentRessources(): Promise<boolean> {
         if (!this.actor) return true;
 
-        if (!this.canConsumeDocumentRessources()) return false;
-
         // Edge consumption.
         if (this.hasPushTheLimit || this.hasSecondChance) {            
             await this.actor.useEdge();
@@ -975,9 +1002,11 @@ export class SuccessTest {
     * @returns true when the test can process
      */
     async consumeDocumentRessoucesWhenNeeded(): Promise<boolean> {
-        // Only check for ressources according to setting.
         const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
-        if (!mustHaveRessouces) return true;
+        // Make sure to nest canConsume to avoid unneccessary warnings.
+        if (mustHaveRessouces) {
+            if (!this.canConsumeDocumentRessources()) return false;
+        }
 
         return await this.consumeDocumentRessources();
     }
@@ -1130,11 +1159,21 @@ export class SuccessTest {
         if (!testCls) return;
         const test = new testCls(data, {actor: this.actor, item: this.item}, this.data.options);
 
+        await this.populateDocuments();
+
+        // Remove previous edge usage.
+        test.data.pushTheLimit = false;
+        test.applyPushTheLimit();
+        test.data.secondChance = false;
+        test.applySecondChance();
+
         // Should this test not have been extended yet, prepare it to be an extended test.
         if (!test.extended) {
             test.data.extended = true;
             test.calculateExtendedHits();
         }
+
+        // In case the previous test used edge, remove those modifiers.
 
         await test.execute();
     }
@@ -1211,7 +1250,7 @@ export class SuccessTest {
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = this.actor?.getActiveTokens(true) || [];
-        const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
+        const token = linkedTokens.length >= 1 ? linkedTokens[0] : undefined;
 
         return {
             title: this.data.title,
@@ -1364,6 +1403,7 @@ export class SuccessTest {
         html.find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
         html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
         html.find('.result-action').on('click', this._castResultAction);
+        html.find('.chat-select-link').on('click', this._selectSceneToken);
 
         handleRenderChatMessage(message, html, data);
 
@@ -1381,6 +1421,27 @@ export class SuccessTest {
         }
         else if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
             html.find('.gm-only-content').removeClass('gm-only-content');
+        }
+    }
+
+    /** 
+     * Select a Token on the current scene based on the link id.
+     * @params event Any user PointerEvent
+    */
+    static async _selectSceneToken(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!game || !game.ready || !canvas || !canvas.ready) return;
+
+        const selectLink = $(event.currentTarget);
+        const tokenId = selectLink.data('tokenId');
+        const token = canvas.tokens?.get(tokenId);
+
+        if (token && token instanceof Token) {
+            token.control();
+        } else {
+            ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
         }
     }
 
@@ -1452,7 +1513,7 @@ export class SuccessTest {
         const deleteOption = options.pop();
 
         options.push({
-            name: game.i18n.localize('SR5.SecondChange'),
+            name: game.i18n.localize('SR5.SecondChance'),
             callback: secondChance,
             condition: true,
             icon: '<i class="fas fa-meteor"></i>'

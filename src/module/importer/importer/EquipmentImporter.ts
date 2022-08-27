@@ -50,7 +50,7 @@ export class EquipmentImporter extends DataImporter {
             //@ts-ignore
             data.folder = categoryFolder.id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data);
+            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
             //@ts-ignore
             entries.push(data);

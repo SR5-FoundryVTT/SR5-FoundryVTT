@@ -464,7 +464,7 @@
   "SR5.RecklessSpellButton": "Reckless",
   "SR5.DV": "DV",
   "SR5.PushTheLimit": "Push The Limit",
-  "SR5.SecondChange": "Second Chance",
+  "SR5.SecondChance": "Second Chance",
   "SR5.DuckOrCover": "Duck or Cover",
   "SR5.RangeWeaponAttack": "Range Weapon Attack",
   "SR5.MeleeWeaponAttack": "Melee Weapon Attack",
@@ -684,6 +684,9 @@
     "Inventory": {
       "OpenInventory": "Inventory",
       "Carried": "Carried"
+    },
+    "Message": {
+      "ClickToSelect": "Click to select on scene"
     }
   },
   "SR5.Spirit": {
@@ -1003,6 +1006,7 @@
   },
   "SR5.MissingRessource": {
     "Edge": "No Edge left to consume",
-    "Ammo": "Not enough ammunition to fire using selected mode"
+    "Ammo": "Not enough ammunition to fire",
+    "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced."
   }
 }

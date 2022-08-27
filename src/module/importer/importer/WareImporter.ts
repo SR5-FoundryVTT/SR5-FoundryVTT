@@ -97,7 +97,7 @@ export class WareImporter extends DataImporter {
 
             // // TODO: Follow ComplexFormParserBase approach.
             // data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
-            Helpers.injectActionTestsIntoChangeData(data.type, data);
+            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
             datas.push(data);
         }

@@ -24,7 +24,7 @@ declare namespace Shadowrun {
     /**
      * Weapon categories.
      */
-    export type WeaponCategory = 'range' | 'melee' | 'thrown';
+    export type WeaponCategory = 'range' | 'melee' | 'thrown' | '';
 
     /**
      * Ammunition data for an weapon.
