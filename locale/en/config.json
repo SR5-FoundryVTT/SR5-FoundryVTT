@@ -989,6 +989,7 @@
     "OpposedTest": "Opposed Test",
     "ExtendedTest": "Extended Test",
     "PhysicalDefenseTest": "Physical Defense",
+    "SupressionDefenseTest": "Supression Defense",
     "RangedAttackTest": "Ranged Weapon Attack",
     "MeleeAttackTest": "Melee Weapon Attack",
     "ThrownAttackTest": "Thrown Weapon Attack",

@@ -952,6 +952,7 @@
     "OpposedTest": "Vergleichsprobe",
     "ExtendedTest": "Ausgedehnte Probe",
     "PhysicalDefenseTest": "Physische Verteidigung",
+    "SupressionDefenseTest": "Unterdrückungsfeuer Verteidigung",
     "RangedAttackTest": "Fernkampf Angriff",
     "MeleeAttackTest": "Nahkampf Angriff",
     "ThrownAttackTest": "Wurfwaffen Angriff",

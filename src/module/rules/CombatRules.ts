@@ -118,6 +118,17 @@ export class CombatRules {
     }
 
     /**
+     * Modify damage according to suppression defense (SR5#179). Successfull attack.
+     * 
+     * In case of suppression a successfull attack just does weapon damage (base + ammunition)
+     * 
+     * @param damage The incoming weapon damage of the attack, unaltered.
+     */
+    static modifyDamageAfterSupressionHit(damage: DamageData): DamageData {
+        return foundry.utils.duplicate(damage);
+    }
+
+    /**
      * Modify damage according to combat sequence (SR5#173 part defend. Missing attack.
      * @param damage Incoming damage to be modified
      * @return A new damage object for modified damage.

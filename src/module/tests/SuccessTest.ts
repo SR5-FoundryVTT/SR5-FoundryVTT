@@ -432,6 +432,9 @@ export class SuccessTest {
 
     /**
      * Handle chosen modifier types and apply them to the pool modifiers.
+     * 
+     * NOTE: To keep this.pool.mod and this.modifiers.mod in sync, never remove
+     *       a modifier. Rather set it to zero, causing it to not be shown.
      */
     applyPoolModifiers() {
         const pool = new PartsList(this.pool.mod);

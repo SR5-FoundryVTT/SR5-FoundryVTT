@@ -194,6 +194,7 @@ export class RangedAttackTest extends SuccessTest {
         const {fireModes, fireModeSelected, recoilCompensation} = this.data;
 
         // Use selection for actual fireMode, overwriting possible previous selection for item.
+        // TODO: Suppression fire mode causes dice pool modifiers against all actions. Add an active effect to the chat message.
         this.data.fireMode = fireModes[fireModeSelected];
 
         // Alter fire mode by ammunition constraints.
@@ -201,10 +202,7 @@ export class RangedAttackTest extends SuccessTest {
         // Alter recoil modifier by ammunition constraints.
         const {compensation, recoilModifier} = FireModeRules.recoilAttackModifier(this.data.fireMode, recoilCompensation, this.item.ammoLeft);
 
-        if (recoilModifier < 0)
-            poolMods.addUniquePart('SR5.Recoil', recoilModifier);
-        else
-            poolMods.removePart('SR5.Recoil');
+        poolMods.addUniquePart('SR5.Recoil', recoilModifier);
 
         // Get range modifier from selected target instead of selected range.
         if (this.hasTargets) {

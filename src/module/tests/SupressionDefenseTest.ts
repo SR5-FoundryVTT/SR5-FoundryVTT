@@ -1,4 +1,5 @@
 import {DefaultValues} from "../data/DataDefaults";
+import { CombatRules } from "../rules/CombatRules";
 import { PhysicalDefenseTest, PhysicalDefenseTestData } from "./PhysicalDefenseTest";
 
 
@@ -10,5 +11,9 @@ export class SupressionDefenseTest extends PhysicalDefenseTest {
             'attribute': 'reaction',
             'attribute2': 'edge'
         });
+    }
+
+    async processFailure() {
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterSupressionHit(this.data.incomingDamage);
     }
 }
