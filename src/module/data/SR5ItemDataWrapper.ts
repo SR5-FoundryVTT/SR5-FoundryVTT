@@ -12,6 +12,8 @@ import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import ModificationItemData = Shadowrun.ModificationItemData;
 import ActionResultData = Shadowrun.ActionResultData;
 import AmmunitionData = Shadowrun.AmmunitionData;
+import WeaponData = Shadowrun.WeaponData;
+import DeviceData = Shadowrun.DeviceData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
@@ -57,7 +59,9 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isThrownWeapon(): boolean {
-        return this.isWeapon() && this.getData().category === 'thrown';
+        if (!this.isWeapon()) return false;
+        const weaponData = this.getData() as WeaponData;
+        return weaponData.category === 'thrown';
     }
 
     isWeapon(): boolean {
@@ -105,7 +109,9 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isCombatSpell(): boolean {
-        return this.isSpell() && this.getData().category === 'combat';
+        if (!this.isSpell()) return false;
+        const spellData = this.getData() as unknown as SpellData;
+        return spellData.category === 'combat';
     }
 
     isDirectCombatSpell(): boolean {
@@ -133,7 +139,9 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isRangedWeapon(): boolean {
-        return this.isWeapon() && this.getData().category === 'range';
+        if (!this.isWeapon()) return false;
+        const weaponData = this.getData() as WeaponData;
+        return weaponData.category === 'range';
     }
 
     isSpell(): boolean {
@@ -157,7 +165,9 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isMeleeWeapon(): boolean {
-        return this.data.type === 'weapon' && this.getData().category === 'melee';
+        if (!this.isWeapon()) return false;
+        const weaponData = this.getData() as WeaponData;
+        return weaponData.category === 'melee';
     }
 
     isDevice(): boolean {
@@ -173,11 +183,15 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isCyberdeck(): boolean {
-        return this.isDevice() && this.getData().category === 'cyberdeck';
+        if (!this.isDevice()) return false;
+        const deviceData = this.getData() as DeviceData;
+        return deviceData.category === 'cyberdeck';
     }
 
     isCommlink(): boolean {
-        return this.isDevice() && this.getData().category === 'commlink';
+        if (!this.isDevice()) return false;
+        const deviceData = this.getData() as DeviceData;
+        return deviceData.category === 'commlink';
     }
 
     isMatrixAction(): boolean {

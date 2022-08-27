@@ -8805,12 +8805,14 @@ var PartsList = class {
     }
   }
   removePart(name) {
-    const index = this._list.findIndex((part) => part.name === name);
-    if (index > -1) {
+    let index = this._list.findIndex((part) => part.name === name);
+    let removed = false;
+    while (index > -1) {
+      removed = true;
       this._list.splice(index, 1);
-      return true;
+      index = this._list.findIndex((part) => part.name === name);
     }
-    return false;
+    return removed;
   }
   getMessageOutput() {
     return this.list;
@@ -9792,7 +9794,7 @@ var SR5 = {
   },
   activeTests: {
     "spell": "SpellCastingTest",
-    "complexForm": "ComplexFormTest"
+    "complex_form": "ComplexFormTest"
   },
   opposedTests: {
     "spell": {
@@ -9958,7 +9960,7 @@ var Helpers = class {
     if (!isNaN(value.temp) && Number(value.temp) > 0) {
       parts.addUniquePart("SR5.Temporary", value["temp"]);
     }
-    value.base = value.base !== void 0 ? value.base : 0;
+    value.base = value.base !== void 0 ? Number(value.base) : 0;
     if (value.override) {
       value.value = Helpers.applyValueRange(value.override.value, options);
       return value.value;
@@ -10567,79 +10569,53 @@ var Helpers = class {
       yield document2.sheet.render(true);
     });
   }
-  static injectActionTestsIntoChangeData(type, changeData) {
-    var _a, _b;
-    if (!changeData)
-      return changeData;
-    switch (type) {
-      case "weapon": {
-        if (((_a = changeData == null ? void 0 : changeData.data) == null ? void 0 : _a.category) === void 0)
-          return;
-        switch (changeData.data.category) {
-          case "": {
-            foundry.utils.mergeObject(changeData, {
-              data: {
-                action: { test: "", opposed: { test: "", resist: { test: "" } } }
-              }
-            });
-            break;
-          }
-          default: {
-            const test = SR5.weaponCategoryActiveTests[changeData.data.category];
-            if (!test) {
-              console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
-            }
-            foundry.utils.mergeObject(changeData, { data: { action: { test } } });
-            break;
-          }
-        }
-        break;
-      }
-      case "spell": {
-        if (((_b = changeData == null ? void 0 : changeData.data) == null ? void 0 : _b.category) === void 0)
-          return;
-        switch (changeData.data.category) {
-          case "": {
-            foundry.utils.mergeObject(changeData, {
-              data: {
-                action: { test: "", opposed: { test: "", resist: { test: "" } } }
-              }
-            });
-            break;
-          }
-          default: {
-            const activeTest = SR5.activeTests[type];
-            const opposedTest = SR5.opposedTests[type][changeData.data.category] || "OpposedTest";
-            const resistTest = SR5.opposedResistTests[type][changeData.data.category] || "";
-            foundry.utils.mergeObject(changeData, {
-              data: {
-                action: {
-                  test: activeTest,
-                  opposed: {
-                    test: opposedTest,
-                    resist: { test: resistTest }
-                  }
-                }
-              }
-            });
-            break;
-          }
-        }
-        break;
-      }
-      case "complex_form": {
-        const activeTest = SR5.activeTests[type];
-        foundry.utils.mergeObject(changeData, {
-          data: {
-            action: {
-              test: activeTest
-            }
-          }
-        });
-        break;
-      }
+  static injectWeaponTestIntoChangeData(type, changeData, applyData) {
+    var _a;
+    if (((_a = changeData == null ? void 0 : changeData.data) == null ? void 0 : _a.category) === void 0)
+      return;
+    if (changeData.data.category === "") {
+      foundry.utils.setProperty(applyData, "data.action.test", "");
+      return;
     }
-    return changeData;
+    const test = SR5.weaponCategoryActiveTests[changeData.data.category];
+    if (!test) {
+      console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
+    }
+    foundry.utils.setProperty(applyData, "data.action.test", test);
+    foundry.utils.setProperty(applyData, "data.action.opposed.test", "PhysicalDefenseTest");
+    foundry.utils.setProperty(applyData, "data.action.opposed.resist.test", "PhysicalResistTest");
+  }
+  static injectSpellTestIntoChangeData(type, changeData, applyData) {
+    var _a;
+    if (((_a = changeData == null ? void 0 : changeData.data) == null ? void 0 : _a.category) === void 0)
+      return;
+    if (changeData.data.category === "") {
+      foundry.utils.setProperty(applyData, "data.action.test", "");
+      return;
+    }
+    const test = SR5.activeTests[type];
+    const opposedTest = SR5.opposedTests[type][changeData.data.category] || "OpposedTest";
+    const resistTest = SR5.opposedResistTests[type][changeData.data.category] || "";
+    foundry.utils.setProperty(applyData, "data.action.test", test);
+    foundry.utils.setProperty(applyData, "data.action.opposed.test", opposedTest);
+    foundry.utils.setProperty(applyData, "data.action.opposed.resist.test", resistTest);
+  }
+  static injectComplexFormTestIntoChangeData(type, changeData, applyData) {
+    const test = SR5.activeTests[type];
+    foundry.utils.setProperty(applyData, "data.action.test", test);
+  }
+  static injectActionTestsIntoChangeData(type, changeData, applyData) {
+    if (!changeData)
+      return;
+    const typeHandler = {
+      "weapon": Helpers.injectWeaponTestIntoChangeData,
+      "spell": Helpers.injectSpellTestIntoChangeData,
+      "complex_form": Helpers.injectComplexFormTestIntoChangeData
+    };
+    const handler = typeHandler[type];
+    if (!handler)
+      return;
+    handler(type, changeData, applyData);
   }
 };
 
@@ -10744,7 +10720,10 @@ var SR5ItemDataWrapper = class extends DataWrapper {
     return this.isThrownWeapon() && ((_b = (_a = this.getData().thrown) == null ? void 0 : _a.blast.radius) != null ? _b : 0) > 0;
   }
   isThrownWeapon() {
-    return this.isWeapon() && this.getData().category === "thrown";
+    if (!this.isWeapon())
+      return false;
+    const weaponData = this.getData();
+    return weaponData.category === "thrown";
   }
   isWeapon() {
     return this.data.type === "weapon";
@@ -10783,7 +10762,10 @@ var SR5ItemDataWrapper = class extends DataWrapper {
     return this.isCyberware() || this.isBioware();
   }
   isCombatSpell() {
-    return this.isSpell() && this.getData().category === "combat";
+    if (!this.isSpell())
+      return false;
+    const spellData = this.getData();
+    return spellData.category === "combat";
   }
   isDirectCombatSpell() {
     var _a, _b;
@@ -10810,7 +10792,10 @@ var SR5ItemDataWrapper = class extends DataWrapper {
     return spellData.type === "physical";
   }
   isRangedWeapon() {
-    return this.isWeapon() && this.getData().category === "range";
+    if (!this.isWeapon())
+      return false;
+    const weaponData = this.getData();
+    return weaponData.category === "range";
   }
   isSpell() {
     return this.data.type === "spell";
@@ -10828,7 +10813,10 @@ var SR5ItemDataWrapper = class extends DataWrapper {
     return this.data.type === "critter_power";
   }
   isMeleeWeapon() {
-    return this.data.type === "weapon" && this.getData().category === "melee";
+    if (!this.isWeapon())
+      return false;
+    const weaponData = this.getData();
+    return weaponData.category === "melee";
   }
   isDevice() {
     return this.data.type === "device";
@@ -10841,10 +10829,16 @@ var SR5ItemDataWrapper = class extends DataWrapper {
     return ((_a = this.getData().technology) == null ? void 0 : _a.equipped) || false;
   }
   isCyberdeck() {
-    return this.isDevice() && this.getData().category === "cyberdeck";
+    if (!this.isDevice())
+      return false;
+    const deviceData = this.getData();
+    return deviceData.category === "cyberdeck";
   }
   isCommlink() {
-    return this.isDevice() && this.getData().category === "commlink";
+    if (!this.isDevice())
+      return false;
+    const deviceData = this.getData();
+    return deviceData.category === "commlink";
   }
   isMatrixAction() {
     return this.isAction() && this.getData().result.success.matrix.placeMarks;
@@ -11745,6 +11739,9 @@ var SR5Roll = class extends Roll {
     }
     return this.parts[0].rolls.length;
   }
+  get poolThrown() {
+    return this.dice[0].results.length;
+  }
   get glitched() {
     return this.glitches > Math.floor(this.pool / 2);
   }
@@ -11782,6 +11779,62 @@ var SkillFlow = class {
   }
   static isLegacySkill(skill) {
     return !SkillFlow.isCustomSkill(skill);
+  }
+};
+
+// src/module/item/flows/ActionFlow.ts
+var ActionFlow = class {
+  static calcDamage(damage, actor, item) {
+    damage = duplicate(damage);
+    if (!actor)
+      return damage;
+    if (item) {
+      damage.source = ActionFlow._damageSource(actor, item);
+    }
+    const attribute = actor.findAttribute(damage.attribute);
+    if (!attribute)
+      return damage;
+    if (!damage.base_formula_operator) {
+      console.error(`Unsupported base damage formula operator: '${damage.base_formula_operator}' used. Falling back to 'add'.`);
+      damage.base_formula_operator = "add";
+    }
+    switch (damage.base_formula_operator) {
+      case "add":
+        PartsList.AddUniquePart(damage.mod, attribute.label, attribute.value);
+        break;
+      case "subtract":
+        PartsList.AddUniquePart(damage.mod, attribute.label, -attribute.value);
+        break;
+      case "multiply":
+        PartsList.AddUniquePart(damage.mod, "SR5.Value", damage.base * attribute.value - damage.base);
+        break;
+      case "divide":
+        PartsList.AddUniquePart(damage.mod, "SR5.BaseValue", damage.base * -1);
+        const denominator = attribute.value === 0 ? 1 : attribute.value;
+        PartsList.AddUniquePart(damage.mod, "SR5.Value", Math.floor(damage.base / denominator));
+        break;
+    }
+    damage.value = Helpers.calcTotal(damage, { min: 0 });
+    return damage;
+  }
+  static _damageSource(actor, item) {
+    return {
+      actorId: actor.id || "",
+      itemId: item.id || "",
+      itemName: item.name || "",
+      itemType: item.type
+    };
+  }
+  static hasDamage(damage) {
+    if (damage.base !== 0)
+      return true;
+    if (damage.attribute)
+      return true;
+    if (damage.type)
+      return true;
+    if (damage.element)
+      return true;
+    return false;
   }
 };
 
@@ -11989,9 +12042,18 @@ var TestCreator = {
       if (action.mod) {
         data.pool.base = Number(action.mod);
       }
+      if (action.dice_pool_mod) {
+        action.dice_pool_mod.forEach((mod) => PartsList.AddUniquePart(data.modifiers.mod, mod.name, mod.value));
+      }
       if (action.armor) {
         const armor = actor.getArmor();
         data.pool.mod = PartsList.AddUniquePart(data.pool.mod, "SR5.Armor", armor.value);
+      }
+      if (action.limit.base) {
+        data.limit.base = Number(action.limit.base);
+      }
+      if (action.limit.mod) {
+        action.limit.mod.forEach((mod) => PartsList.AddUniquePart(data.limit.mod, mod.name, mod.value));
       }
       if (action.limit.attribute) {
         const limit = actor.getLimit(action.limit.attribute);
@@ -12000,13 +12062,10 @@ var TestCreator = {
         if (limit && actor._isMatrixAttribute(action.limit.attribute))
           actor._addMatrixParts(pool, true);
       }
-      if (action.limit.base || action.limit.value) {
-        data.limit.base = Number(action.limit.value);
-      }
       if (action.threshold.base) {
         data.threshold.base = Number(action.threshold.base);
       }
-      if (action.damage.base || action.damage.attribute) {
+      if (ActionFlow.hasDamage(action.damage)) {
         data.damage = foundry.utils.duplicate(action.damage);
       }
       if (action.opposed.test) {
@@ -14118,9 +14177,20 @@ var SR5Item = class extends Item {
         yield NetworkDeviceFlow.removeDeviceFromController(this);
     });
   }
+  _onCreate(changed, options, user) {
+    return __async(this, null, function* () {
+      const applyData = {};
+      Helpers.injectActionTestsIntoChangeData(this.type, changed, applyData);
+      yield __superGet(SR5Item.prototype, this, "_preCreate").call(this, changed, options, user);
+      if (!foundry.utils.isObjectEmpty(applyData))
+        this.update(applyData);
+    });
+  }
   _preUpdate(changed, options, user) {
-    changed = Helpers.injectActionTestsIntoChangeData(this.type, changed);
-    return super._preUpdate(changed, options, user);
+    return __async(this, null, function* () {
+      Helpers.injectActionTestsIntoChangeData(this.type, changed, changed);
+      yield __superGet(SR5Item.prototype, this, "_preUpdate").call(this, changed, options, user);
+    });
   }
 };
 
@@ -15700,51 +15770,6 @@ var TestDialog = class extends FormDialog {
   }
 };
 
-// src/module/item/flows/ActionFlow.ts
-var ActionFlow = class {
-  static calcDamage(damage, actor, item) {
-    damage = duplicate(damage);
-    if (!actor)
-      return damage;
-    if (item) {
-      damage.source = ActionFlow._damageSource(actor, item);
-    }
-    const attribute = actor.findAttribute(damage.attribute);
-    if (!attribute)
-      return damage;
-    if (!damage.base_formula_operator) {
-      console.error(`Unsupported base damage formula operator: '${damage.base_formula_operator}' used. Falling back to 'add'.`);
-      damage.base_formula_operator = "add";
-    }
-    switch (damage.base_formula_operator) {
-      case "add":
-        PartsList.AddUniquePart(damage.mod, attribute.label, attribute.value);
-        break;
-      case "subtract":
-        PartsList.AddUniquePart(damage.mod, attribute.label, -attribute.value);
-        break;
-      case "multiply":
-        PartsList.AddUniquePart(damage.mod, "SR5.Value", damage.base * attribute.value - damage.base);
-        break;
-      case "divide":
-        PartsList.AddUniquePart(damage.mod, "SR5.BaseValue", damage.base * -1);
-        const denominator = attribute.value === 0 ? 1 : attribute.value;
-        PartsList.AddUniquePart(damage.mod, "SR5.Value", Math.floor(damage.base / denominator));
-        break;
-    }
-    damage.value = Helpers.calcTotal(damage, { min: 0 });
-    return damage;
-  }
-  static _damageSource(actor, item) {
-    return {
-      actorId: actor.id || "",
-      itemId: item.id || "",
-      itemName: item.name || "",
-      itemType: item.type
-    };
-  }
-};
-
 // src/module/template.ts
 var Template = class extends MeasuredTemplate {
   static fromItem(item, onComplete) {
@@ -16268,9 +16293,34 @@ var SuccessTest = class {
       parts.removePart("SR5.PushTheLimit");
     }
   }
+  applySecondChance() {
+    var _a, _b;
+    if (!this.actor)
+      return;
+    const parts = new PartsList(this.pool.mod);
+    if (this.hasSecondChance) {
+      if (this.glitched) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
+        return this;
+      }
+      const lastRoll = this.rolls[this.rolls.length - 1];
+      const dice = lastRoll.poolThrown - lastRoll.hits;
+      if (dice <= 0) {
+        (_b = ui.notifications) == null ? void 0 : _b.warn("SR5.Warnings.CantSecondChanceWithoutNoneHits", { localize: true });
+        return this;
+      }
+      const parts2 = new PartsList(this.pool.mod);
+      parts2.addPart("SR5.SecondChance", dice);
+      const formula = `${dice}d6`;
+      const roll = new SR5Roll(formula);
+      this.rolls.push(roll);
+    } else {
+      parts.removePart("SR5.SecondChance");
+    }
+  }
   executeSecondChance() {
     return __async(this, null, function* () {
-      var _a, _b;
+      var _a;
       console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
       if (!this.data.sourceActorUuid)
         return this;
@@ -16278,20 +16328,10 @@ var SuccessTest = class {
         (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
         return this;
       }
-      const lastRoll = this.rolls[this.rolls.length - 1];
-      const dice = lastRoll.pool - lastRoll.hits;
-      if (dice <= 0) {
-        (_b = ui.notifications) == null ? void 0 : _b.warn("SR5.Warnings.CantSecondChanceWithoutNoneHits", { localize: true });
-        return this;
-      }
-      const parts = new PartsList(this.pool.mod);
-      parts.addPart("SR5.SecondChange", dice);
       yield this.populateDocuments();
-      this.calculateBaseValues();
-      const formula = `${dice}d6`;
-      const roll = new SR5Roll(formula);
-      this.rolls.push(roll);
       this.data.secondChance = true;
+      this.applySecondChance();
+      this.calculateBaseValues();
       const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
       if (!actorConsumedResources)
         return this;
@@ -16309,7 +16349,7 @@ var SuccessTest = class {
       return true;
     if (this.hasPushTheLimit || this.hasSecondChance) {
       if (this.actor.getEdge().uses <= 0) {
-        (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.MissingResource.Edge"));
+        (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.MissingRessource.Edge"));
         return false;
       }
     }
@@ -16319,8 +16359,6 @@ var SuccessTest = class {
     return __async(this, null, function* () {
       if (!this.actor)
         return true;
-      if (!this.canConsumeDocumentRessources())
-        return false;
       if (this.hasPushTheLimit || this.hasSecondChance) {
         yield this.actor.useEdge();
       }
@@ -16330,8 +16368,10 @@ var SuccessTest = class {
   consumeDocumentRessoucesWhenNeeded() {
     return __async(this, null, function* () {
       const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
-      if (!mustHaveRessouces)
-        return true;
+      if (mustHaveRessouces) {
+        if (!this.canConsumeDocumentRessources())
+          return false;
+      }
       return yield this.consumeDocumentRessources();
     });
   }
@@ -16428,6 +16468,11 @@ var SuccessTest = class {
       if (!testCls)
         return;
       const test = new testCls(data, { actor: this.actor, item: this.item }, this.data.options);
+      yield this.populateDocuments();
+      test.data.pushTheLimit = false;
+      test.applyPushTheLimit();
+      test.data.secondChance = false;
+      test.applySecondChance();
       if (!test.extended) {
         test.data.extended = true;
         test.calculateExtendedHits();
@@ -16477,7 +16522,7 @@ var SuccessTest = class {
   _prepareMessageTemplateData() {
     var _a, _b;
     const linkedTokens = ((_a = this.actor) == null ? void 0 : _a.getActiveTokens(true)) || [];
-    const token = linkedTokens.length === 1 ? linkedTokens[0].id : void 0;
+    const token = linkedTokens.length >= 1 ? linkedTokens[0] : void 0;
     return {
       title: this.data.title,
       test: this,
@@ -16567,6 +16612,7 @@ var SuccessTest = class {
       html.find(".chat-document-link").on("click", Helpers.renderEntityLinkSheet);
       html.find(".place-template").on("click", this._placeItemBlastZoneTemplate);
       html.find(".result-action").on("click", this._castResultAction);
+      html.find(".chat-select-link").on("click", this._selectSceneToken);
       handleRenderChatMessage(message, html, data);
       yield this._showGmOnlyContent(message, html, data);
     });
@@ -16582,6 +16628,23 @@ var SuccessTest = class {
         html.find(".gm-only-content").removeClass("gm-only-content");
       } else if (game.user.isGM || game.user.isTrusted || ((_a = test.actor) == null ? void 0 : _a.isOwner)) {
         html.find(".gm-only-content").removeClass("gm-only-content");
+      }
+    });
+  }
+  static _selectSceneToken(event) {
+    return __async(this, null, function* () {
+      var _a, _b;
+      event.preventDefault();
+      event.stopPropagation();
+      if (!game || !game.ready || !canvas || !canvas.ready)
+        return;
+      const selectLink = $(event.currentTarget);
+      const tokenId = selectLink.data("tokenId");
+      const token = (_a = canvas.tokens) == null ? void 0 : _a.get(tokenId);
+      if (token && token instanceof Token) {
+        token.control();
+      } else {
+        (_b = ui.notifications) == null ? void 0 : _b.warn(game.i18n.localize("SR5.NoSelectableToken"));
       }
     });
   }
@@ -16638,7 +16701,7 @@ var SuccessTest = class {
     });
     const deleteOption = options.pop();
     options.push({
-      name: game.i18n.localize("SR5.SecondChange"),
+      name: game.i18n.localize("SR5.SecondChance"),
       callback: secondChance,
       condition: true,
       icon: '<i class="fas fa-meteor"></i>'
@@ -16906,7 +16969,7 @@ var SR5Actor = class extends Actor {
       const edge = this.getEdge();
       if (edge && edge.value === 0)
         return;
-      const usesLeft = edge.uses > 0 ? edge.uses : 0;
+      const usesLeft = edge.uses > 0 ? edge.uses : by * -1;
       const uses = Math.min(edge.value, usesLeft + by);
       yield this.update({ "data.attributes.edge.uses": uses });
     });
@@ -16917,10 +16980,20 @@ var SR5Actor = class extends Actor {
   hasArmor() {
     return "armor" in this.data.data;
   }
-  getArmor() {
-    if ("armor" in this.data.data)
-      return this.data.data.armor;
-    return DefaultValues.actorArmorData();
+  getArmor(damage) {
+    const armor = "armor" in this.data.data ? foundry.utils.duplicate(this.data.data.armor) : DefaultValues.actorArmorData();
+    damage = damage || DefaultValues.damageData();
+    Helpers.calcTotal(damage);
+    Helpers.calcTotal(damage.ap);
+    if (damage.ap.value !== 0)
+      PartsList.AddUniquePart(armor.mod, "SR5.AP", damage.ap.value);
+    if (damage.element.value !== "") {
+      const armorForDamageElement = armor[damage.element.value] || 0;
+      if (armorForDamageElement > 0)
+        PartsList.AddUniquePart(armor.mod, "SR5.Element", armorForDamageElement);
+    }
+    Helpers.calcTotal(armor, { min: 0 });
+    return armor;
   }
   getMatrixDevice() {
     if (!("matrix" in this.data.data))
@@ -17902,6 +17975,12 @@ var SR5Actor = class extends Actor {
       markId
     }));
   }
+  _preCreateEmbeddedDocuments(embeddedName, result, options, userId) {
+    if (embeddedName === "Item") {
+      for (const data of result) {
+      }
+    }
+  }
 };
 
 // src/module/handlebars/BasicHelpers.ts
@@ -18677,7 +18756,7 @@ var Version0_8_0 = class extends VersionMigration {
   MigrateItemData(data) {
     return __async(this, null, function* () {
       const updateData = {};
-      Helpers.injectActionTestsIntoChangeData(data.type, data);
+      Helpers.injectActionTestsIntoChangeData(data.type, data, data);
       return updateData;
     });
   }
@@ -20961,7 +21040,7 @@ var WeaponImporter = class extends DataImporter {
         }
         let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
         data.folder = folders[data.data.subcategory].id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         datas.push(data);
       }
       return yield Item.create(datas);
@@ -21034,7 +21113,7 @@ var ArmorImporter = class extends DataImporter {
         const category = ImportHelper.StringValue(jsonData, "category").toLowerCase();
         data.name = ImportHelper.MapNameToTranslation(this.armorTranslations, data.name);
         data.folder = folders[category].id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         datas.push(data);
       }
       return yield Item.create(datas);
@@ -21133,7 +21212,7 @@ var AmmoImporter = class extends DataImporter {
           }
         }
         data.data.technology.conceal.base = 0;
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         ammoDatas.push(data);
       }
       for (let i = 0; i < ammoDatas.length; i++) {
@@ -21218,7 +21297,7 @@ var ModImporter = class extends DataImporter {
         }
         let folder = yield ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Mods/${folderName}`, true);
         data.folder = folder.id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         datas.push(data);
       }
       return yield Item.create(datas);
@@ -21445,7 +21524,7 @@ var SpellImporter = class extends DataImporter {
         }
         let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
         data.folder = folders[data.data.category].id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         datas.push(data);
       }
       return yield Item.create(datas);
@@ -21518,7 +21597,7 @@ var QualityImporter = class extends DataImporter {
         let category = ImportHelper.StringValue(jsonData, "category");
         data.folder = folders[category.toLowerCase()].id;
         data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         datas.push(data);
       }
       return yield Item.create(datas);
@@ -21617,7 +21696,7 @@ var ComplexFormImporter = class extends DataImporter {
         let data = parser.Parse(jsonData, this.GetDefaultData(), this.nameTranslations);
         data.folder = folder.id;
         data.name = ImportHelper.MapNameToTranslation(this.nameTranslations, data.name);
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         datas.push(data);
       }
       return yield Item.create(datas);
@@ -21711,7 +21790,7 @@ var WareImporter = class extends DataImporter {
         let data = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
         const category = ImportHelper.StringValue(jsonData, "category");
         data.folder = folders[category.toLowerCase()].id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         datas.push(data);
       }
       return yield Item.create(datas);
@@ -21822,7 +21901,7 @@ var CritterPowerImporter = class extends DataImporter {
         let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
         data.folder = folder.id;
         data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         datas.push(data);
       }
       return yield Item.create(datas);
@@ -21866,7 +21945,7 @@ var DeviceImporter = class extends DataImporter {
       data.data.atts.att3.value = ImportHelper.IntValue(commlink, "dataprocessing", 0);
       data.data.atts.att4.value = ImportHelper.IntValue(commlink, "firewall", 0);
       data.folder = folder.id;
-      Helpers.injectActionTestsIntoChangeData(data.type, data);
+      Helpers.injectActionTestsIntoChangeData(data.type, data, data);
       entries.push(data);
     }
     return entries;
@@ -21902,7 +21981,7 @@ var DeviceImporter = class extends DataImporter {
         data.data.atts.att4.value = ImportHelper.IntValue(cyberdeck, "firewall", 0);
       }
       data.folder = folder.id;
-      Helpers.injectActionTestsIntoChangeData(data.type, data);
+      Helpers.injectActionTestsIntoChangeData(data.type, data, data);
       entries.push(data);
     }
     return entries;
@@ -21967,7 +22046,7 @@ var EquipmentImporter = class extends DataImporter {
         data.data.technology.availability = ImportHelper.StringValue(equipment, "avail");
         data.data.technology.cost = ImportHelper.IntValue(equipment, "cost", 0);
         data.folder = categoryFolder.id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
         entries.push(data);
       }
       return entries;
@@ -24367,9 +24446,6 @@ var WeaponParser = class {
     action.limit = {
       base: parseInt(getValues(chummerWeapon.accuracy)[0])
     };
-    action.opposed = {
-      type: "defense"
-    };
     if (chummerWeapon.type.toLowerCase() === "melee") {
       action.type = "complex";
       data.category = "melee";
@@ -26408,9 +26484,9 @@ var RangedAttackTest = class extends SuccessTest {
     else
       poolMods.removePart("SR5.Recoil");
     if (this.hasTargets) {
+      this.data.targetRangesSelected = Number(this.data.targetRangesSelected);
       const target = this.data.targetRanges[this.data.targetRangesSelected];
       this.data.range = target.range.modifier;
-      this.targets = this.targets.filter((tokenDoc) => tokenDoc.uuid === target.uuid);
       this.data.targetActorsUuid = this.data.targetActorsUuid.filter((uuid) => uuid === target.uuid);
     }
     this.data.range = Number(this.data.range);
@@ -26453,9 +26529,8 @@ var RangedAttackTest = class extends SuccessTest {
       const fireMode = this.data.fireMode;
       if (fireMode.value === 0)
         return true;
-      if (!this.item.hasAmmo(1)) {
-        yield (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.MissingRessource.Ammo", { localize: true });
-        return false;
+      if (!this.item.hasAmmo(fireMode.value)) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.MissingRessource.SomeAmmo", { localize: true });
       }
       yield this.item.useAmmo(fireMode.value);
       return true;
@@ -26754,11 +26829,12 @@ var PhysicalResistTest = class extends SuccessTest {
   }
   applyPoolModifiers() {
     super.applyPoolModifiers();
+    this.applyArmorPoolModifier();
+  }
+  applyArmorPoolModifier() {
     if (this.data.action.armor) {
       if (this.actor) {
-        const armor = foundry.utils.duplicate(this.actor.getArmor());
-        armor.mod = PartsList.AddUniquePart(armor.mod, "SR5.AP", this.data.incomingDamage.ap.value);
-        Helpers.calcTotal(armor, { min: 0 });
+        const armor = this.actor.getArmor(this.data.incomingDamage);
         this.data.pool.mod = PartsList.AddUniquePart(this.data.pool.mod, "SR5.Armor", armor.value);
       }
     }

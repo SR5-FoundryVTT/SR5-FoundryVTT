@@ -46,7 +46,7 @@ export class Version0_8_0 extends VersionMigration {
             data?: object
         } = {};
 
-        Helpers.injectActionTestsIntoChangeData(data.type, data);
+        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
         return updateData;
     }

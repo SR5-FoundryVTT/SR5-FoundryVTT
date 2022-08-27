@@ -67,7 +67,7 @@ export class ArmorImporter extends DataImporter {
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folders[category].id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data);
+            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
             datas.push(data);
         }

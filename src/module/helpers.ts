@@ -20,6 +20,10 @@ import {DataDefaults} from "./data/DataDefaults";
 import {SuccessTestData} from "./tests/SuccessTest";
 import {SR5} from "./config";
 
+import SpellItemData = Shadowrun.SpellItemData;
+import WeaponItemData = Shadowrun.WeaponItemData;
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+
 interface CalcTotalOptions {
     min?: number,
     max?: number
@@ -43,7 +47,7 @@ export class Helpers {
 
         // On some values base might be undefined...
         // Check for undefined, as some Values might be none numerical / boolean.
-        value.base = value.base !== undefined ? value.base : 0;
+        value.base = value.base !== undefined ? Number(value.base) : 0;
 
         // If the given value has an override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {
@@ -923,90 +927,90 @@ export class Helpers {
         await document.sheet.render(true);
     }
 
-    static injectActionTestsIntoChangeData(type: string, changeData) {
-        if (!changeData) return changeData;
-
-        // Make sure weapon actions are in a valid state for different weapon categories.
-        switch (type) {
-            case 'weapon': {
-                if (changeData?.data?.category === undefined) return;
-
-                switch (changeData.data.category) {
-                    // Reset test selection on empty category.
-                    case '': {
-                        foundry.utils.mergeObject(changeData, {
-                            data: {
-                                action: {test: '', opposed: {test: '', resist: {test: ''}}}
-                            }
-                        });
-                        break;
-                    }
-
-                    default: {
-                        //@ts-ignore Make sure a matching active test for the configured weapons category is used.
-                        const test = SR5.weaponCategoryActiveTests[changeData.data.category];
-                        if (!test) {
-                            console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
-                        }
-                        foundry.utils.mergeObject(changeData, {data: {action: {test}}});
-                        break;
-                    }
-                }
-
-                break;
-            }
-
-            case 'spell': {
-                if (changeData?.data?.category === undefined) return;
-
-                switch (changeData.data.category) {
-                    // Reset test selection on empty category.
-                    case '': {
-                        foundry.utils.mergeObject(changeData, {
-                            data: {
-                                action: {test: '', opposed: {test: '', resist: {test: ''}}}
-                            }
-                        });
-                        break;
-                    }
-
-                    default: {
-                        const activeTest = SR5.activeTests[type];
-                        const opposedTest = SR5.opposedTests[type][changeData.data.category] || 'OpposedTest';
-                        const resistTest = SR5.opposedResistTests[type][changeData.data.category] || '';
-
-                        foundry.utils.mergeObject(changeData, {
-                            data: {
-                                action: {
-                                    test: activeTest,
-                                    opposed: {
-                                        test: opposedTest,
-                                        resist: {test: resistTest}
-                                    }
-                                }
-                            }
-                        });
-                        break;
-                    }
-                }
-
-                break;
-            }
-
-            case 'complex_form': {
-                const activeTest = SR5.activeTests[type];
-
-                foundry.utils.mergeObject(changeData, {
-                    data: {
-                        action: {
-                            test: activeTest
-                        }
-                    }
-                });
-                break;
-            }
+    /**
+     * See injectActionTestsIntoChangeData for documentation.
+     */
+    static injectWeaponTestIntoChangeData(type: string, changeData: Partial<WeaponItemData>, applyData) {
+        // Abort when category isn't part of this change.
+        if (changeData?.data?.category === undefined) return;
+        
+        // Remove test when user selects empty category.
+        if (changeData.data.category === '') {
+            foundry.utils.setProperty(applyData, 'data.action.test', '');
+            return;
         }
 
-        return changeData;
+        //@ts-ignore Make sure a matching active test for the configured weapons category is used.
+        const test = SR5.weaponCategoryActiveTests[changeData.data.category];
+        if (!test) {
+            console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
+        }
+
+        foundry.utils.setProperty(applyData, 'data.action.test', test);
+        foundry.utils.setProperty(applyData, 'data.action.opposed.test', 'PhysicalDefenseTest');
+        foundry.utils.setProperty(applyData, 'data.action.opposed.resist.test', 'PhysicalResistTest');
+    }
+
+    /**
+     * See injectActionTestsIntoChangeData for documentation.
+     */
+    static injectSpellTestIntoChangeData(type: string, changeData: Partial<SpellItemData>, applyData) {
+        // Abort when category isn't part of this change.
+        if (changeData?.data?.category === undefined) return;
+        
+        // Remove test when user selects empty category.
+        if (changeData.data.category === '') {
+            foundry.utils.setProperty(applyData, 'data.action.test', '');
+            return;
+        } 
+        
+        // Based on category switch out active, opposed and resist test.
+        const test = SR5.activeTests[type];
+        const opposedTest = SR5.opposedTests[type][changeData.data.category] || 'OpposedTest';
+        const resistTest = SR5.opposedResistTests[type][changeData.data.category] || '';
+
+        foundry.utils.setProperty(applyData, 'data.action.test', test);
+        foundry.utils.setProperty(applyData, 'data.action.opposed.test', opposedTest);
+        foundry.utils.setProperty(applyData, 'data.action.opposed.resist.test', resistTest);
+    }
+
+    /**
+     * See injectActionTestsIntoChangeData for documentation.
+     */
+    static injectComplexFormTestIntoChangeData(type: string, changeData: Partial<SpellItemData>, applyData) {
+        const test = SR5.activeTests[type];
+
+        foundry.utils.setProperty(applyData, 'data.action.test', test);
+    }
+
+    /**
+     * Inject action test data into any item 
+     * 
+     * This method is designed to be called on _preCreate/_preUpdate/_preCreateEmbeddedDocuments
+     * 
+     * Make sure to not mix up changeData and itemData
+     * 
+     * Depending on the caller whatever was applied to the applyData parameter must be handeled differently.
+     * When called by _onCreate, it must be used as updateData using Document#update
+     * When called by _preUpdate, it must be applied directly to changeData
+     * When called before any DocumentData as been created, it can be applied directly to the source object before Document#create
+     * 
+     * @param type The item type where operating on
+     * @param changeData The changeData (partial or complet) that's been transmitted.
+     * @param applyData An object to carry the altering data changes
+     */
+    static injectActionTestsIntoChangeData(type: string, changeData: Partial<ShadowrunItemData>, applyData) {
+        if (!changeData) return;
+
+        const typeHandler = {
+            'weapon': Helpers.injectWeaponTestIntoChangeData,
+            'spell': Helpers.injectSpellTestIntoChangeData,
+            'complex_form': Helpers.injectComplexFormTestIntoChangeData
+        };
+
+        const handler = typeHandler[type];
+        if (!handler) return;
+
+        handler(type, changeData, applyData);
     }
 }

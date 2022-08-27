@@ -393,7 +393,7 @@ export const SR5 = {
 
     activeTests: {
         'spell': 'SpellCastingTest',
-        'complexForm': 'ComplexFormTest'
+        'complex_form': 'ComplexFormTest'
     },
 
     opposedTests: {

@@ -464,7 +464,7 @@
   "SR5.RecklessSpellButton": "Schnell",
   "SR5.DV": "Schaden",
   "SR5.PushTheLimit": "Grenzen sprengen",
-  "SR5.SecondChange": "Zweite Chance",
+  "SR5.SecondChance": "Zweite Chance",
   "SR5.DuckOrCover": "Deckung oder Hinwerfen",
   "SR5.RangeWeaponAttack": "Feuerwaffenangriff",
   "SR5.MeleeWeaponAttack": "Nahkampfwaffenangriff",
@@ -670,6 +670,9 @@
     "Inventory": {
       "OpenInventory": "Inventar",
       "Carried": "Mitgeführt"
+    },
+    "Message": {
+      "ClickToSelect": "Klicke um auf Szene auzuwählen"
     }
   },
   "SR5.Spirit": {
@@ -966,6 +969,7 @@
   },
   "SR5.MissingRessource": {
     "Edge": "Kein Edge übrig",
-    "Ammo": "Nicht genug Munition für ausgewählten Feuer Modus"
+    "Ammo": "Nicht genug Munition zum Feuern",
+    "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, entstehenden Modifikatoren werden reduziert"
   }
 }

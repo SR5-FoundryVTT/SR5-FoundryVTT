@@ -219,11 +219,11 @@ export class RangedAttackTest extends SuccessTest {
 
         // Get range modifier from selected target instead of selected range.
         if (this.hasTargets) {
+            // Cast select options string to integer index.
+            this.data.targetRangesSelected = Number(this.data.targetRangesSelected);
             const target = this.data.targetRanges[this.data.targetRangesSelected];
             this.data.range = target.range.modifier;
 
-            // Only use selected target as this tests target list. Otherwise, opposed test will use all targets.
-            this.targets = this.targets.filter(tokenDoc => tokenDoc.uuid === target.uuid);
             this.data.targetActorsUuid = this.data.targetActorsUuid.filter(uuid => uuid === target.uuid);
         }
 
@@ -285,13 +285,12 @@ export class RangedAttackTest extends SuccessTest {
         const fireMode = this.data.fireMode;
         if (fireMode.value === 0) return true;
 
-        // Abort if the weapon doesn't even contain at least one round.
-        if (!this.item.hasAmmo(1)) {
-            await ui.notifications?.warn('SR5.MissingRessource.Ammo', {localize: true});
-            return false;
+        // Notify user about some but not no ammo. Still fire though.
+        if (!this.item.hasAmmo(fireMode.value)) {
+            ui.notifications?.warn('SR5.MissingRessource.SomeAmmo', {localize: true});
         }
 
-        await this.item.useAmmo(fireMode.value)
+        await this.item.useAmmo(fireMode.value);
 
         return true;
     }

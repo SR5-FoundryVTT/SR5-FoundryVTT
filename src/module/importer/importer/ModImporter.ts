@@ -72,7 +72,7 @@ export class ModImporter extends DataImporter {
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folder.id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data);
+            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
             datas.push(data);
         }

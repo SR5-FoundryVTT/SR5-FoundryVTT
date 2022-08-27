@@ -357,7 +357,8 @@ export class SR5Actor extends Actor {
         const edge = this.getEdge();
         if (edge && edge.value === 0) return;
         // NOTE: There used to be a bug which could lower edge usage below zero. Let's quietly ignore and reset. :)
-        const usesLeft = edge.uses > 0 ? edge.uses : 0;
+        const usesLeft = edge.uses > 0 ? edge.uses : by * -1;
+
         const uses = Math.min(edge.value, usesLeft + by);
 
         // @ts-ignore
@@ -372,11 +373,36 @@ export class SR5Actor extends Actor {
         return "armor" in this.data.data;
     }
 
-    getArmor(): ActorArmorData {
-        if ("armor" in this.data.data)
-            return this.data.data.armor;
+    /**
+     * Return 
+     * @param damage 
+     * @returns 
+     */
+    getArmor(damage?:DamageData): ActorArmorData {
+        // Prepare base armor data.
+        const armor = "armor" in this.data.data ? 
+            foundry.utils.duplicate(this.data.data.armor) : 
+            DefaultValues.actorArmorData();
+        // Prepare damage to apply to armor.
+        damage = damage || DefaultValues.damageData();
 
-        return DefaultValues.actorArmorData();
+        Helpers.calcTotal(damage);
+        Helpers.calcTotal(damage.ap);
+
+        // Modify by penetration
+        if (damage.ap.value !== 0)
+            PartsList.AddUniquePart(armor.mod, 'SR5.AP', damage.ap.value);
+                
+        // Modify by element
+        if (damage.element.value !== '') {
+            const armorForDamageElement = armor[damage.element.value] || 0;
+            if (armorForDamageElement > 0)
+                PartsList.AddUniquePart(armor.mod, 'SR5.Element', armorForDamageElement);
+        }
+        
+        Helpers.calcTotal(armor, {min: 0});
+
+        return armor;
     }
 
     getMatrixDevice(): SR5Item | undefined {
@@ -1767,5 +1793,18 @@ export class SR5Actor extends Actor {
                 marks,
                 markId
             }))
+    }
+
+    _preCreateEmbeddedDocuments(embeddedName, result, options, userId) {
+        // Importing embedded documents using Chummer char generator does overwrite test values during
+        // creation, even though values are set... this causes the SR5Item#_preCreate/_onCreate changes to
+        // be overwritten again with template.json default values for .action
+        // To test this issue import a character using Chummer JSON export with weapons/spells/complex form
+        if (embeddedName === 'Item') {
+            for (const data of result) {
+                //Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            }
+        }
+        
     }
 }

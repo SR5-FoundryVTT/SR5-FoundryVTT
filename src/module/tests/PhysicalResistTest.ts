@@ -67,15 +67,18 @@ export class PhysicalResistTest extends SuccessTest {
 
     applyPoolModifiers() {
         super.applyPoolModifiers();
+        this.applyArmorPoolModifier();
+    }
 
+    /**
+     * Resisting against damage on the physical plane includes the modified armor value.
+     */
+    applyArmorPoolModifier() {
         if (this.data.action.armor) {
             if (this.actor) {
-                const armor = foundry.utils.duplicate(this.actor.getArmor());
-                armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.AP', this.data.incomingDamage.ap.value);
-                Helpers.calcTotal(armor, {min: 0});
+                const armor = this.actor.getArmor(this.data.incomingDamage);
                 this.data.pool.mod = PartsList.AddUniquePart(this.data.pool.mod,'SR5.Armor', armor.value);
             }
-
         }
     }
 

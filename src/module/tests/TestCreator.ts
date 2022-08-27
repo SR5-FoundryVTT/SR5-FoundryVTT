@@ -373,33 +373,40 @@ export const TestCreator = {
             if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
         }
         // A general pool modifier will be used as a base value.
+        // TODO: what is action.mod on the action GUI?
         if (action.mod) {
             data.pool.base = Number(action.mod);
         }
-        // Add the armor value as a pool modifier
+        
+        // Include pool modifiers that have been collected on the action item.
+        // Thes can come from nested items and more.
+        if(action.dice_pool_mod) {
+            action.dice_pool_mod.forEach(mod => PartsList.AddUniquePart(data.modifiers.mod, mod.name, mod.value));
+        }
+        
+        // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
             data.pool.mod = PartsList.AddUniquePart(data.pool.mod,'SR5.Armor', armor.value);
         }
 
         // Prepare limit values...
+        if (action.limit.base) {
+            // TODO: For easier readability this could be mapped to an item specific limit value
+            //       For WeaponItem this would result in 'Precision' to be shown instead of a numerical literal.
+            data.limit.base = Number(action.limit.base);
+        }
+        //...add limit modifiers
+        if (action.limit.mod) {
+            action.limit.mod.forEach(mod => PartsList.AddUniquePart(data.limit.mod, mod.name, mod.value));
+        }
+        //...add limit attribute value based on actor.
         if (action.limit.attribute) {
             // Get the limit connected to the defined attribute.
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
             if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
             if (limit && actor._isMatrixAttribute(action.limit.attribute)) actor._addMatrixParts(pool, true);
-        }
-        // // No explicit limit set, maybe derive from used skill / action
-        // NOTE: This is an issue for spell/complex form as they don't define a limit within the action but their test implementation.
-        // else if (action.skill && action.attribute) {
-        //     const attribute = actor.getAttribute(action.attribute);
-        //     const limit = actor.getLimit(attribute.limit as string);
-        //     if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
-        // }
-
-        if (action.limit.base || action.limit.value) {
-            data.limit.base = Number(action.limit.value);
         }
 
         // Prepare threshold values...
@@ -408,7 +415,8 @@ export const TestCreator = {
         }
 
         // Prepare general damage values...
-        if (action.damage.base || action.damage.attribute) {
+        // ...a test without damage, shouldn't contain any damage information.
+        if (ActionFlow.hasDamage(action.damage)) {
             data.damage = foundry.utils.duplicate(action.damage);
         }
 

@@ -71,7 +71,7 @@ export class CritterPowerImporter extends DataImporter {
             data.folder = folder.id;
             data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data);
+            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
             datas.push(data);
         }

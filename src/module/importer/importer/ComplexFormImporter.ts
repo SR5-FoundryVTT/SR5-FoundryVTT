@@ -67,7 +67,7 @@ export class ComplexFormImporter extends DataImporter {
             // TODO: Follow ComplexFormParserBase approach.
             data.name = ImportHelper.MapNameToTranslation(this.nameTranslations, data.name);
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data);
+            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
 
             datas.push(data);
         }
