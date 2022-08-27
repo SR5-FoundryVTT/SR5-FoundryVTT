@@ -428,8 +428,12 @@ export class SR5Actor extends Actor {
         return this.items.filter((item: SR5Item) => item.isEquipped() && item.isWeapon());
     }
 
+    /**
+     * Amount of recoil compensation this actor has.
+     */
     getRecoilCompensation(): number {
-        let total = 1; // always get 1
+        // Each new attack allows one free compensation.
+        let total = 1;
         const strength = this.findAttribute('strength');
         if (strength) {
             total += Math.ceil(strength.value / 3);

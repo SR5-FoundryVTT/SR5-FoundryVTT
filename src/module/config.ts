@@ -579,6 +579,9 @@ export const SR5 = {
      * These are the mode selectors on the weapon. The term 'fire mode' 
      * is only used to describe as the combination of weapon mode and action
      * used, causing a specific fire mode.
+     * 
+     * NOTE: This list is also used for sorting order of ranged weapon mode.
+     *       Alter it with care.
      */
     rangeWeaponMode: [
         'single_shot',
@@ -588,10 +591,10 @@ export const SR5 = {
     ],
 
     rangeWeaponModeLabel: {
-        'single_shot': 'SR5.FireMode.SingleShot',
-        'semi_auto': 'SR5.FireMode.SemiAuto',
-        'burst_file': 'SR5.FireMode.BurstFire',
-        'full_auto': 'SR5.FireMode.FullAuto'
+        'single_shot': 'SR5.WeaponModeSingleShot',
+        'semi_auto': 'SR5.WeaponModeSemiAuto',
+        'burst_file': 'SR5.WeaponModeBurstFire',
+        'full_auto': 'SR5.WeaponModeFullAuto'
     },
 
     /**
@@ -602,7 +605,7 @@ export const SR5 = {
      */
     fireModes: [
     {
-        label: "SR5.WeaponModeSingleShotShort",
+        label: "SR5.WeaponModeSingleShot",
         value: 1,
         recoil: false,
         defense: 0,
@@ -655,15 +658,15 @@ export const SR5 = {
         value: 10,
         recoil: true,
         defense: -9,
-        action: 'simple',
+        action: 'complex',
         mode: 'full_auto'
     },
     {
         label: 'SR5.Suppressing',
         value: 20,
         recoil: false,
-        action: 'complex',
         defense: 0,
+        action: 'complex',
         mode: 'full_auto'
     }
     ] as Shadowrun.FireModeData[]

@@ -345,10 +345,10 @@ export class DefaultValues {
         }, partialActionData) as ActionRollData;
     }
 
-    static fireModeData(partialFireModeData: Partial<FireModeData>): FireModeData {
+    static fireModeData(partialFireModeData: Partial<FireModeData> = {}): FireModeData {
         return mergeObject({
             value: 0,
-            label: 'SR5.FireMode',
+            label: '',
             defense: 0,
             recoil: false,
             mode: 'single_shot',

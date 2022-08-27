@@ -15,13 +15,15 @@ import { SR5Item } from "../item/SR5Item";
 
 export interface RangedAttackTestData extends SuccessTestData {
     damage: DamageData
-    fireModes: Record<string, string>
+    fireModes: FireModeData[]
     fireMode: FireModeData
+    // index of selceted fireMode in fireModes
+    fireModeSelected: number
     recoilCompensation: number
     ranges: RangesTemplateData
     range: number
     targetRanges: TargetRangeTemplateData[]
-    // index of selected targetRanges
+    // index of selected target range in targetRanges
     targetRangesSelected: number
 }
 
@@ -36,7 +38,7 @@ export class RangedAttackTest extends SuccessTest {
     _prepareData(data, options): RangedAttackTestData {
         data = super._prepareData(data, options);
 
-        data.fireModes = {};
+        data.fireModes = [];
         data.fireMode = {value: 0, defense: 0, label: ''};
         data.ranges = {};
         data.range = 0;
@@ -60,33 +62,30 @@ export class RangedAttackTest extends SuccessTest {
         const weaponData = this.item.asWeaponData();
         if (!weaponData) return;
 
-        // Firemodes selection.
-        const {modes} = weaponData.data.range;
-
-        // TODO: Remove fire modes unavailable due to missing ammunition.
-
-         if (modes.single_shot) {
-            this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
-        }
-        if (modes.semi_auto) {
-            this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSemiAutoShort");
-            this.data.fireModes['3'] = game.i18n.localize("SR5.WeaponModeSemiAutoBurst");
-        }
-        if (modes.burst_fire) {
-            this.data.fireModes['3'] = `${modes.semi_auto ? `${game.i18n.localize("SR5.WeaponModeSemiAutoBurst")}/` : ''}${game.i18n.localize("SR5.WeaponModeBurstFireShort")}`;
-            this.data.fireModes['6'] = game.i18n.localize("SR5.WeaponModeBurstFireLong");
-        }
-        if (modes.full_auto) {
-            this.data.fireModes['6'] = `${modes.burst_fire ? 'LB/' : ''}${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(s)`;
-            this.data.fireModes['10'] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
-            this.data.fireModes['20'] = game.i18n.localize('SR5.Suppressing');
-        }
+        //  if (modes.single_shot) {
+        //     this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
+        // }
+        // if (modes.semi_auto) {
+        //     this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSemiAutoShort");
+        //     this.data.fireModes['3'] = game.i18n.localize("SR5.WeaponModeSemiAutoBurst");
+        // }
+        // if (modes.burst_fire) {
+        //     this.data.fireModes['3'] = `${modes.semi_auto ? `${game.i18n.localize("SR5.WeaponModeSemiAutoBurst")}/` : ''}${game.i18n.localize("SR5.WeaponModeBurstFireShort")}`;
+        //     this.data.fireModes['6'] = game.i18n.localize("SR5.WeaponModeBurstFireLong");
+        // }
+        // if (modes.full_auto) {
+        //     this.data.fireModes['6'] = `${modes.burst_fire ? 'LB/' : ''}${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(s)`;
+        //     this.data.fireModes['10'] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
+        //     this.data.fireModes['20'] = game.i18n.localize('SR5.Suppressing');
+        // }
 
         // TODO: Add rounds based on consumption setting.
-        console.error('available modes', FireModeRules.availableFireModes(modes));
-
+        this.data.fireModes = FireModeRules.availableFireModes(weaponData.data.range.modes);
         // Current firemode selected
-        this.data.fireMode = this.item.getLastFireMode() || {value: 0, defense: 0, label: ''};
+        this.data.fireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
+        // Preselect based on label
+        this.data.fireModeSelected = this.data.fireModes.findIndex(available => this.data.fireMode.label === available.label);
+        if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;
     }
 
     async _prepareWeaponRanges() {
@@ -200,28 +199,15 @@ export class RangedAttackTest extends SuccessTest {
 
         // Apply recoil modification to general modifiers before calculating base values.
         // TODO: Actual recoil calculation with consumption of recoil compensation.
-        const {fireMode, fireModes, recoilCompensation} = this.data;
+        const {fireModes, fireModeSelected, recoilCompensation} = this.data;
+
+        // Use selection for actual fireMode, overwriting possible previous selection for item.
+        this.data.fireMode = fireModes[fireModeSelected];
 
         // Alter fire mode by ammunition constraints.
-        fireMode.value = Number(fireMode.value || 0);
-        const fireModeName = fireModes[fireMode.value];
-        const defenseModifier = FireModeRules.fireModeDefenseModifier(fireMode.value, this.item.ammoLeft);
-
-        // this.data.fireMode = {
-        //     label: fireModeName,
-        //     value: fireMode.value,
-        //     defense: defenseModifier,
-            
-        // };
-
-        this.data.fireMode = DefaultValues.fireModeData({
-            label: fireModeName,
-            value: fireMode.value,
-            defense: defenseModifier,
-        });
-
+        this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft);
         // Alter recoil modifier by ammunition constraints.
-        const {recoilModifier} = FireModeRules.recoilAttackModifier(recoilCompensation, Number(fireMode.value), this.item.ammoLeft);
+        const {compensation, recoilModifier} = FireModeRules.recoilAttackModifier(this.data.fireMode, recoilCompensation, this.item.ammoLeft);
 
         if (recoilModifier < 0)
             poolMods.addUniquePart('SR5.Recoil', recoilModifier);

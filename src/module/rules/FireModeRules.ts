@@ -1,5 +1,6 @@
 import FireModeData = Shadowrun.FireModeData;
 import FiringModeData = Shadowrun.FiringModeData;
+import RangedWeaponMode = Shadowrun.RangedWeaponMode;
 import { SR5 } from "../config";
 import { Helpers } from "../helpers";
 
@@ -10,19 +11,20 @@ export const FireModeRules = {
      * If given and not enough ammunition is available reduced defense modifier rules
      * will be applied.
      *
-     * @param rounds How many rounds should be fired
+     * @param fireMode The selected fireMode 
      * @param ammo How many rounds can be fired
      *
      * @returns a negative defense modifier value
      */
-    fireModeDefenseModifier: function(rounds: number, ammo: number=0): number {
+    fireModeDefenseModifier: function(fireMode: FireModeData, ammo: number=0): number {
         // For negative rounds use a sane default.
-        rounds = rounds < 0 ? rounds * -1 : rounds;
-
-        let modifier = Helpers.mapRoundsToDefenseMod(rounds);
-        // No modifier can't be further reduced by missing ammunition.
+        const rounds = fireMode.value < 0 ? fireMode.value * -1 : fireMode.value;
+        // Due to legecy value, sometimes a string numerical sneaks in...
+        const modifier = Number(fireMode.defense);
+        // Zero modifier can't be further reduced by missing ammunition.
         if (modifier === 0) return 0;
 
+        // Reduce modifier by avaiable ammunition.
         if (ammo <= 0) ammo = rounds;
         if (ammo >= rounds) return modifier;
 
@@ -36,19 +38,22 @@ export const FireModeRules = {
      * NOTE: Reducing recoil compensation here is a bit unintuitive and might be easier to read
      *       with its own rule function.
      *
+     * @param fireMode The chosen fire mode
      * @param compensation Remaining recoil compensation
-     * @param rounds Amount of rounds to be fired
      * @param ammo Amount of ammunition available
      *
      * @return compensation Amount of compensation left.
      * @return recoilModifier Attack modifier to be applied on the attack.
      */
-    recoilAttackModifier: function(compensation: number, rounds: number, ammo: number = 0): { compensation: number, recoilModifier: number } {
-        if (ammo <= 0) ammo = rounds;
+    recoilAttackModifier: function(fireMode: FireModeData, compensation: number, ammo: number = 0): { compensation: number, recoilModifier: number } {
+        // Some firemodes don't cause recoil.
+        if (!fireMode.recoil) return {compensation, recoilModifier: 0};
+        // Sanitaze negative ammo values by pretending to have just enough.
+        if (ammo <= 0) ammo = fireMode.value;
 
         // Only fire amount of rounds available.
-        rounds = Math.min(rounds, ammo);
-        // Derive recoil modifier from difference.
+        const rounds = Math.min(fireMode.value, ammo);
+        // Compensate recoil to get modifier.
         const recoilModifier = Math.min(compensation - rounds, 0);
         // Reduce compensation for additional attacks this combat turn.
         compensation = Math.max(compensation - rounds, 0);
@@ -65,23 +70,19 @@ export const FireModeRules = {
      */
     availableFireModes: function (rangedWeaponModes: FiringModeData, rounds?: number): FireModeData[] {
         // Reduce all fire modes to what's available on weapon
-        const available = SR5.fireModes.filter(fireMode => {
-            // TODO: rounds check
-            const isAvailable = rangedWeaponModes[fireMode.mode];
-            if (!isAvailable) return false;
-        });
-
-        //@ts-ignore
-        available.sort((modeA, modeB) => {
+        // TODO: rounds check
+        return SR5.fireModes
+            .filter(fireMode => rangedWeaponModes[fireMode.mode])
+            .sort((modeA, modeB) => {
             // Same modes, ascending spent rounds.
             if (modeA.mode === modeB.mode) {
                 // Numerical values can be substracted to 1 / -1 aprox.
                 return modeA.value - modeB.value;
             }
-            // Alphabetical sort by comparing.
-            return modeA.mode > modeB.mode ? 1 : -1;
+            
+            const modeAIndex = SR5.rangeWeaponMode.indexOf(modeA.mode);
+            const modeBIndex = SR5.rangeWeaponMode.indexOf(modeB.mode);
+            return modeAIndex > modeBIndex ? 1 : -1;
         });
-
-        return available;
     }
 }
