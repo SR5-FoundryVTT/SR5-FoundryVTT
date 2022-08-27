@@ -62,24 +62,6 @@ export class RangedAttackTest extends SuccessTest {
         const weaponData = this.item.asWeaponData();
         if (!weaponData) return;
 
-        //  if (modes.single_shot) {
-        //     this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
-        // }
-        // if (modes.semi_auto) {
-        //     this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSemiAutoShort");
-        //     this.data.fireModes['3'] = game.i18n.localize("SR5.WeaponModeSemiAutoBurst");
-        // }
-        // if (modes.burst_fire) {
-        //     this.data.fireModes['3'] = `${modes.semi_auto ? `${game.i18n.localize("SR5.WeaponModeSemiAutoBurst")}/` : ''}${game.i18n.localize("SR5.WeaponModeBurstFireShort")}`;
-        //     this.data.fireModes['6'] = game.i18n.localize("SR5.WeaponModeBurstFireLong");
-        // }
-        // if (modes.full_auto) {
-        //     this.data.fireModes['6'] = `${modes.burst_fire ? 'LB/' : ''}${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(s)`;
-        //     this.data.fireModes['10'] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
-        //     this.data.fireModes['20'] = game.i18n.localize('SR5.Suppressing');
-        // }
-
-        // TODO: Add rounds based on consumption setting.
         this.data.fireModes = FireModeRules.availableFireModes(weaponData.data.range.modes);
         // Current firemode selected
         this.data.fireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
