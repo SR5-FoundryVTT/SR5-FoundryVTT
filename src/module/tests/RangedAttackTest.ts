@@ -219,11 +219,11 @@ export class RangedAttackTest extends SuccessTest {
 
         // Get range modifier from selected target instead of selected range.
         if (this.hasTargets) {
+            // Cast select options string to integer index.
+            this.data.targetRangesSelected = Number(this.data.targetRangesSelected);
             const target = this.data.targetRanges[this.data.targetRangesSelected];
             this.data.range = target.range.modifier;
 
-            // Only use selected target as this tests target list. Otherwise, opposed test will use all targets.
-            this.targets = this.targets.filter(tokenDoc => tokenDoc.uuid === target.uuid);
             this.data.targetActorsUuid = this.data.targetActorsUuid.filter(uuid => uuid === target.uuid);
         }
 
