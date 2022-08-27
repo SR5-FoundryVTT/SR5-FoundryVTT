@@ -1799,7 +1799,7 @@ export class SR5Actor extends Actor {
         // To test this issue import a character using Chummer JSON export with weapons/spells/complex form
         if (embeddedName === 'Item') {
             for (const data of result) {
-                Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+                //Helpers.injectActionTestsIntoChangeData(data.type, data, data);
             }
         }
         

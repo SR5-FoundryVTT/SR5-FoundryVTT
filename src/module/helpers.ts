@@ -930,13 +930,13 @@ export class Helpers {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    static injectWeaponTestIntoChangeData(type: string, changeData: Partial<WeaponItemData>, itemData: WeaponItemData) {
+    static injectWeaponTestIntoChangeData(type: string, changeData: Partial<WeaponItemData>, applyData) {
         // Abort when category isn't part of this change.
         if (changeData?.data?.category === undefined) return;
         
         // Remove test when user selects empty category.
         if (changeData.data.category === '') {
-            foundry.utils.mergeObject(itemData, {data: {action: {test: ''}}});
+            foundry.utils.setProperty(applyData, 'data.action.test', '');
             return;
         }
 
@@ -945,44 +945,42 @@ export class Helpers {
         if (!test) {
             console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
         }
-        foundry.utils.mergeObject(itemData, {data: {action: {
-            test,
-            opposed: {
-                test: 'PhysicalDefenseTest',
-                resist: {test: 'PhysicalResistTest'}}
-        }}});
-        return;
+
+        foundry.utils.setProperty(applyData, 'data.action.test', test);
+        foundry.utils.setProperty(applyData, 'data.action.opposed.test', 'PhysicalDefenseTest');
+        foundry.utils.setProperty(applyData, 'data.action.opposed.resist.test', 'PhysicalResistTest');
     }
 
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    static injectSpellTestIntoChangeData(type: string, changeData: Partial<SpellItemData>, itemData: SpellItemData) {
+    static injectSpellTestIntoChangeData(type: string, changeData: Partial<SpellItemData>, applyData) {
         // Abort when category isn't part of this change.
         if (changeData?.data?.category === undefined) return;
         
         // Remove test when user selects empty category.
         if (changeData.data.category === '') {
-            foundry.utils.mergeObject(itemData, {data: {action: {test: ''}}});
+            foundry.utils.setProperty(applyData, 'data.action.test', '');
             return;
         } 
         
         // Based on category switch out active, opposed and resist test.
-        const activeTest = SR5.activeTests[type];
+        const test = SR5.activeTests[type];
         const opposedTest = SR5.opposedTests[type][changeData.data.category] || 'OpposedTest';
         const resistTest = SR5.opposedResistTests[type][changeData.data.category] || '';
 
-        foundry.utils.mergeObject(itemData, {
-            data: {
-                action: {
-                    test: activeTest,
-                    opposed: {
-                        test: opposedTest,
-                        resist: {test: resistTest}
-                    }}}
-        });
+        foundry.utils.setProperty(applyData, 'data.action.test', test);
+        foundry.utils.setProperty(applyData, 'data.action.opposed.test', opposedTest);
+        foundry.utils.setProperty(applyData, 'data.action.opposed.resist.test', resistTest);
+    }
 
-        return;
+    /**
+     * See injectActionTestsIntoChangeData for documentation.
+     */
+    static injectComplexFormTestIntoChangeData(type: string, changeData: Partial<SpellItemData>, applyData) {
+        const test = SR5.activeTests[type];
+
+        foundry.utils.setProperty(applyData, 'data.action.test', test);
     }
 
     /**
@@ -992,21 +990,27 @@ export class Helpers {
      * 
      * Make sure to not mix up changeData and itemData
      * 
+     * Depending on the caller whatever was applied to the applyData parameter must be handeled differently.
+     * When called by _onCreate, it must be used as updateData using Document#update
+     * When called by _preUpdate, it must be applied directly to changeData
+     * When called before any DocumentData as been created, it can be applied directly to the source object before Document#create
+     * 
      * @param type The item type where operating on
      * @param changeData The changeData (partial or complet) that's been transmitted.
-     * @param itemData The to be changed itemData to apply any changes to
+     * @param applyData An object to carry the altering data changes
      */
-    static injectActionTestsIntoChangeData(type: string, changeData: Partial<ShadowrunItemData>, itemData: ShadowrunItemData) {
+    static injectActionTestsIntoChangeData(type: string, changeData: Partial<ShadowrunItemData>, applyData) {
         if (!changeData) return;
 
         const typeHandler = {
             'weapon': Helpers.injectWeaponTestIntoChangeData,
-            'spell': Helpers.injectSpellTestIntoChangeData
+            'spell': Helpers.injectSpellTestIntoChangeData,
+            'complex_form': Helpers.injectComplexFormTestIntoChangeData
         };
 
         const handler = typeHandler[type];
         if (!handler) return;
 
-        handler(type, changeData, itemData);
+        handler(type, changeData, applyData);
     }
 }

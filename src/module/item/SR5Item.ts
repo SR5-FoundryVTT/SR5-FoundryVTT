@@ -1669,9 +1669,14 @@ export class SR5Item extends Item {
         if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
     }
 
-    async _preCreate(changed, options, user) {
-        Helpers.injectActionTestsIntoChangeData(this.type, changed, this.data);
+    async _onCreate(changed, options, user) {
+        const applyData = {};
+        //@ts-ignore
+        Helpers.injectActionTestsIntoChangeData(this.type, changed, applyData);
         await super._preCreate(changed, options, user);
+
+        // Don't kill DocumentData by applying empty objects. Also performance.
+        if (!foundry.utils.isObjectEmpty(applyData)) this.update(applyData);
     }
 
     /**
