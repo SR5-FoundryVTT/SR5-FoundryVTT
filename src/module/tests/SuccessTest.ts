@@ -1250,7 +1250,7 @@ export class SuccessTest {
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = this.actor?.getActiveTokens(true) || [];
-        const token = linkedTokens.length === 1 ? linkedTokens[0] : undefined;
+        const token = linkedTokens.length >= 1 ? linkedTokens[0] : undefined;
 
         return {
             title: this.data.title,
@@ -1428,7 +1428,7 @@ export class SuccessTest {
      * Select a Token on the current scene based on the link id.
      * @params event Any user PointerEvent
     */
-    static _selectSceneToken(event) {
+    static async _selectSceneToken(event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -1438,7 +1438,7 @@ export class SuccessTest {
         const tokenId = selectLink.data('tokenId');
         const token = canvas.tokens?.get(tokenId);
 
-        if (token) {
+        if (token && token instanceof Token) {
             token.control();
         } else {
             ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
