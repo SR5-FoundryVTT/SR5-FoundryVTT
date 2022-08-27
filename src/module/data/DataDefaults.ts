@@ -351,6 +351,7 @@ export class DefaultValues {
             label: '',
             defense: 0,
             recoil: false,
+            suppression: false,
             mode: 'single_shot',
             action: 'simple'
         }, partialFireModeData);

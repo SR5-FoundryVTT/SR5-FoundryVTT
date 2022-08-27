@@ -408,6 +408,9 @@ export const SR5 = {
         }
     },
 
+    // When a firemode with suppression is used, this test should defense against it.
+    supressionDefenseTest: 'SupressionDefenseTest',
+
     /**
      * Names of FoundryVTT packs supplied by the system to be used as action sources.
      */
@@ -609,6 +612,7 @@ export const SR5 = {
         value: 1,
         recoil: false,
         defense: 0,
+        suppression: false,
         action: 'simple',
         mode: 'single_shot'
     },
@@ -617,6 +621,7 @@ export const SR5 = {
         value: 1,
         recoil: true,
         defense: 0,
+        suppression: false,
         action: 'simple',
         mode: 'semi_auto'
     },
@@ -625,6 +630,7 @@ export const SR5 = {
         value: 3,
         recoil: true,
         defense: -2,
+        suppression: false,
         action: 'complex',
         mode: 'semi_auto'
     },
@@ -634,6 +640,7 @@ export const SR5 = {
         value: 3,
         recoil: true,
         defense: -2,
+        suppression: false,
         action: 'simple',
         mode: 'burst_fire'
     },
@@ -642,6 +649,7 @@ export const SR5 = {
         value: 6,
         recoil: true,
         defense: -2,
+        suppression: false,
         action: 'complex',
         mode: 'burst_fire',
     },
@@ -650,6 +658,7 @@ export const SR5 = {
         value: 6,
         recoil: true,
         defense: -5,
+        suppression: false,
         action: 'simple',
         mode: 'full_auto'
     },
@@ -658,6 +667,7 @@ export const SR5 = {
         value: 10,
         recoil: true,
         defense: -9,
+        suppression: false,
         action: 'complex',
         mode: 'full_auto'
     },
@@ -666,6 +676,7 @@ export const SR5 = {
         value: 20,
         recoil: false,
         defense: 0,
+        suppression: true,
         action: 'complex',
         mode: 'full_auto'
     }

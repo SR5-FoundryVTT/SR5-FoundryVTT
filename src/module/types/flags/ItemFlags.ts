@@ -6,11 +6,19 @@
 declare namespace Shadowrun {
     
     export interface FireModeData {
+        // Amound of rounds fired
         value: number
+        // Display label string
         label: string
+        // Defense modification value
         defense: number | string
+        // Does this firemode cause recoil?
         recoil: boolean
+        // Does this firemode cause suppresssion?
+        suppression: boolean
+        // The ranged weapon mode to be used with
         mode: RangedWeaponMode
+        // What action must be spent
         action: ActionType
     }
 

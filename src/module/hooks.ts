@@ -50,6 +50,7 @@ import {ThrownAttackTest} from "./tests/ThrownAttackTest";
 import {PilotVehicleTest} from "./tests/PilotVehicleTest";
 import {DronePerceptionTest} from "./tests/DronePerceptionTest";
 import {DroneInfiltrationTest} from "./tests/DroneInfiltrationTest";
+import { SupressionDefenseTest } from './tests/SupressionDefenseTest';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -135,6 +136,7 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalDefenseTest,
+                SupressionDefenseTest,
                 PhysicalResistTest,
                 SpellCastingTest,
                 CombatSpellDefenseTest,
@@ -159,6 +161,7 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalResistTest,
+                SupressionDefenseTest,
                 SpellCastingTest,
                 ComplexFormTest,
                 PhysicalDefenseTest,
@@ -178,6 +181,7 @@ ___________________
             opposedTests: {
                 OpposedTest,
                 PhysicalDefenseTest,
+                SupressionDefenseTest,
                 CombatSpellDefenseTest
             },
             /**

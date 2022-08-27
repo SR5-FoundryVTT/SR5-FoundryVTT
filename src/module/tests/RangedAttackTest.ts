@@ -12,6 +12,7 @@ import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
 import RangedWeaponMode = Shadowrun.RangedWeaponMode;
 import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
+import { TestCreator } from './TestCreator';
 
 export interface RangedAttackTestData extends SuccessTestData {
     damage: DamageData
@@ -154,6 +155,14 @@ export class RangedAttackTest extends SuccessTest {
 
     get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html';
+    }
+
+    /**
+     * If a supression fire mode is used, ignore action opposed test configuration.
+     */
+    get _opposedTestClass() {
+        if (this.data.fireMode.suppression) return TestCreator._getTestClass(SR5.supressionDefenseTest);
+        return super._opposedTestClass;
     }
 
     async saveUserSelectionAfterDialog() {
