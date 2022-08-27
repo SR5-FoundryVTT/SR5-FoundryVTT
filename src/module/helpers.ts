@@ -47,7 +47,7 @@ export class Helpers {
 
         // On some values base might be undefined...
         // Check for undefined, as some Values might be none numerical / boolean.
-        value.base = value.base !== undefined ? value.base : 0;
+        value.base = value.base !== undefined ? Number(value.base) : 0;
 
         // If the given value has an override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {

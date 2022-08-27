@@ -386,6 +386,9 @@ export class SR5Actor extends Actor {
         // Prepare damage to apply to armor.
         damage = damage || DefaultValues.damageData();
 
+        Helpers.calcTotal(damage);
+        Helpers.calcTotal(damage.ap);
+
         // Modify by penetration
         if (damage.ap.value !== 0)
             PartsList.AddUniquePart(armor.mod, 'SR5.AP', damage.ap.value);
