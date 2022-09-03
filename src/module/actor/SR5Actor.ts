@@ -1452,6 +1452,11 @@ export class SR5Actor extends Actor {
         // Token might not be part of active combat.
         if (!combatant) return;
 
+        // While not prohibiting, inform user about missing ressource.
+        if (combatant.initiative + modifier < 0) {
+            ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+        }
+
         await combat.adjustInitiative(combatant, modifier);
     }
 

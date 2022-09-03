@@ -1009,6 +1009,7 @@
   "SR5.MissingRessource": {
     "Edge": "No Edge left to consume",
     "Ammo": "Not enough ammunition to fire",
-    "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced."
+    "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
+    "Initiative": "Not enough initiative score"
   }
 }

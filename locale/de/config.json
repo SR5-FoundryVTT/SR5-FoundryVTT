@@ -617,6 +617,11 @@
     "MustHaveRessourcesOnTest": "Proben nur mit außreichenden Ressourcen",
     "MustHaveRessourcesOnTestDescription": "Eine Probe kann nur durchgeführt werden wenn alle Ressourcen dafür vorhadnen sind"
   },
+  "SR5.COMBAT": {
+    "ReduceInitByOne": "Initiative -1",
+    "ReduceInitByFive": "Initiative -5",
+    "ReduceInitByTen": "Initiative -10"
+  },
   "SR5.MIGRATION.WarningTitle": "Alarm",
   "SR5.MIGRATION.WarningHeader": "Migrationswarnung",
   "SR5.MIGRATION.WarningRequired": "Das Shadowrun 5E System muss eine notwendige Aktualisierung ausführen.",
@@ -972,6 +977,7 @@
   "SR5.MissingRessource": {
     "Edge": "Kein Edge übrig",
     "Ammo": "Nicht genug Munition zum Feuern",
-    "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, entstehenden Modifikatoren werden reduziert"
+    "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, entstehenden Modifikatoren werden reduziert",
+    "Initiative": "Zu geringer Initiative Wert"
   }
 }

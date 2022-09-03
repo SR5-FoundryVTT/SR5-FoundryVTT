@@ -14,10 +14,12 @@ import OpposedTestData = Shadowrun.OpposedTestData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import ActionRollData = Shadowrun.ActionRollData;
 import MinimalActionData = Shadowrun.MinimalActionData;
+import ActionResultData = Shadowrun.ActionResultData;
+import ResultActionData = Shadowrun.ResultActionData;
 import {TestCreator} from "./TestCreator";
 import Template from "../template";
 import {TestRules} from "../rules/TestRules";
-import ActionResultData = Shadowrun.ActionResultData;
+
 import {ActionResultFlow} from "../item/flows/ActionResultFlow";
 import {handleRenderChatMessage} from "../chat";
 
@@ -43,6 +45,8 @@ interface TestModifier {
     label: string
     total: number
 }
+
+
 
 /**
  * Contain all data necessary to handle an action based test.
@@ -819,16 +823,6 @@ export class SuccessTest {
     }
 
     /**
-     * Determine if this test provides any results
-     */
-    get hasResults(): boolean {
-        if (!this.item) return false;
-        const actionResultData = this.item.getActionResult();
-        if (!actionResultData) return false;
-        return !foundry.utils.isObjectEmpty(actionResultData);
-    }
-
-    /**
      * Helper to get an items action result information.
      */
     get results(): ActionResultData|undefined {
@@ -1350,15 +1344,16 @@ export class SuccessTest {
     /**
      * Prepare result action buttons
      */
-    _prepareResultActionsTemplateData(): {action: string, label: string}[] {
-        const actions: {action: string, label: string}[] = [];
+    _prepareResultActionsTemplateData(): ResultActionData[] {
+        const actions: ResultActionData[] = [];
         const actionResultData = this.results;
         if (!actionResultData) return actions;
 
         if (actionResultData.success.matrix.placeMarks) {
             actions.push({
                 action: 'placeMarks',
-                label: 'SR5.PlaceMarks'
+                label: 'SR5.PlaceMarks',
+                value: ''
             });
         }
 
@@ -1600,9 +1595,10 @@ export class SuccessTest {
 
         const messageId = element.closest('.chat-message').data('messageId');
         const test = await TestCreator.fromMessage(messageId);
-
+        
         if (!test) return console.error(`Shadowrun5e | Couldn't find both a result action ('${resultAction}') and extract test from message ('${messageId}')`);
-
+        
+        await test.populateDocuments();
         await ActionResultFlow.executeResult(resultAction, test);
     }
 }
