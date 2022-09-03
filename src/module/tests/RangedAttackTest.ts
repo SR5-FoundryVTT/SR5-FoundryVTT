@@ -1,5 +1,5 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults, DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import {LENGTH_UNIT, SR} from "../constants";
@@ -9,18 +9,22 @@ import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
-import {RangedRules} from "../rules/RangedRules";
+import RangedWeaponMode = Shadowrun.RangedWeaponMode;
+import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
+import { TestCreator } from './TestCreator';
 
 export interface RangedAttackTestData extends SuccessTestData {
     damage: DamageData
-    fireModes: Record<string, string>
+    fireModes: FireModeData[]
     fireMode: FireModeData
+    // index of selceted fireMode in fireModes
+    fireModeSelected: number
     recoilCompensation: number
     ranges: RangesTemplateData
     range: number
     targetRanges: TargetRangeTemplateData[]
-    // index of selected targetRanges
+    // index of selected target range in targetRanges
     targetRangesSelected: number
 }
 
@@ -35,7 +39,7 @@ export class RangedAttackTest extends SuccessTest {
     _prepareData(data, options): RangedAttackTestData {
         data = super._prepareData(data, options);
 
-        data.fireModes = {};
+        data.fireModes = [];
         data.fireMode = {value: 0, defense: 0, label: ''};
         data.ranges = {};
         data.range = 0;
@@ -59,30 +63,13 @@ export class RangedAttackTest extends SuccessTest {
         const weaponData = this.item.asWeaponData();
         if (!weaponData) return;
 
-        // Firemodes selection.
-        const {modes} = weaponData.data.range;
-
-        // TODO: Remove fire modes unavailable due to missing ammunition.
-
-         if (modes.single_shot) {
-            this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
-        }
-        if (modes.semi_auto) {
-            this.data.fireModes['1'] = game.i18n.localize("SR5.WeaponModeSemiAutoShort");
-            this.data.fireModes['3'] = game.i18n.localize("SR5.WeaponModeSemiAutoBurst");
-        }
-        if (modes.burst_fire) {
-            this.data.fireModes['3'] = `${modes.semi_auto ? `${game.i18n.localize("SR5.WeaponModeSemiAutoBurst")}/` : ''}${game.i18n.localize("SR5.WeaponModeBurstFireShort")}`;
-            this.data.fireModes['6'] = game.i18n.localize("SR5.WeaponModeBurstFireLong");
-        }
-        if (modes.full_auto) {
-            this.data.fireModes['6'] = `${modes.burst_fire ? 'LB/' : ''}${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(s)`;
-            this.data.fireModes['10'] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
-            this.data.fireModes['20'] = game.i18n.localize('SR5.Suppressing');
-        }
-
+        this.data.fireModes = FireModeRules.availableFireModes(weaponData.data.range.modes);
         // Current firemode selected
-        this.data.fireMode = this.item.getLastFireMode() || {value: 0, defense: 0, label: ''};
+        const lastFireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
+        // Try pre-selection based on last fire mode.
+        this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
+        if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;
+        this.data.fireMode = this.data.fireModes[this.data.fireModeSelected];
     }
 
     async _prepareWeaponRanges() {
@@ -171,6 +158,14 @@ export class RangedAttackTest extends SuccessTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html';
     }
 
+    /**
+     * If a supression fire mode is used, ignore action opposed test configuration.
+     */
+    get _opposedTestClass() {
+        if (this.data.fireMode.suppression) return TestCreator._getTestClass(SR5.supressionDefenseTest);
+        return super._opposedTestClass;
+    }
+
     async saveUserSelectionAfterDialog() {
         if (!this.item) return;
 
@@ -196,26 +191,18 @@ export class RangedAttackTest extends SuccessTest {
 
         // Apply recoil modification to general modifiers before calculating base values.
         // TODO: Actual recoil calculation with consumption of recoil compensation.
-        const {fireMode, fireModes, recoilCompensation} = this.data;
+        const {fireModes, fireModeSelected, recoilCompensation} = this.data;
+
+        // Use selection for actual fireMode, overwriting possible previous selection for item.
+        // TODO: Suppression fire mode causes dice pool modifiers against all actions. Add an active effect to the chat message.
+        this.data.fireMode = fireModes[fireModeSelected];
 
         // Alter fire mode by ammunition constraints.
-        fireMode.value = Number(fireMode.value || 0);
-        const fireModeName = fireModes[fireMode.value];
-        const defenseModifier = RangedRules.fireModeDefenseModifier(fireMode.value, this.item.ammoLeft);
-
-        this.data.fireMode = {
-            label: fireModeName,
-            value: fireMode.value,
-            defense: defenseModifier,
-        };
-
+        this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft);
         // Alter recoil modifier by ammunition constraints.
-        const {recoilModifier} = RangedRules.recoilAttackModifier(recoilCompensation, Number(fireMode.value), this.item.ammoLeft);
+        const {compensation, recoilModifier} = FireModeRules.recoilAttackModifier(this.data.fireMode, recoilCompensation, this.item.ammoLeft);
 
-        if (recoilModifier < 0)
-            poolMods.addUniquePart('SR5.Recoil', recoilModifier);
-        else
-            poolMods.removePart('SR5.Recoil');
+        poolMods.addUniquePart('SR5.Recoil', recoilModifier);
 
         // Get range modifier from selected target instead of selected range.
         if (this.hasTargets) {

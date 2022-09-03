@@ -17,6 +17,11 @@
     input {
       color: $white;
     }
+
+    // Avoid overlong selects to break flow acrooss rows.
+    select {
+      width: 100%;
+    }
   }
 
 

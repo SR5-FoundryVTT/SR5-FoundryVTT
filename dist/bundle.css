@@ -311,6 +311,9 @@
   /**
          * Content with this class should be hidden from players eyes
          * Check SuccessTest._showGmOnlyContent for when to show it to users.
+         */
+  /** 
+         * Provide a button look-alike for interaction.
          */ }
   .sr5.chat-card .gm-only-content {
     display: none !important; }
@@ -360,17 +363,17 @@
       padding-right: 0; }
   .sr5.chat-card .card-description .card-description-content {
     border-bottom: 1px solid #4d4d4d; }
+  .sr5.chat-card .button {
+    cursor: pointer;
+    border: 1px solid #4d4d4d;
+    background: grey;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold; }
+    .sr5.chat-card .button:hover {
+      box-shadow: 0 0 0.25em 0.15em black; }
   .sr5.chat-card .damage-line {
     margin-top: 0.25em; }
-    .sr5.chat-card .damage-line .button {
-      cursor: pointer;
-      border: 1px solid #4d4d4d;
-      background: grey;
-      text-align: center;
-      font-size: 14px;
-      font-weight: bold; }
-      .sr5.chat-card .damage-line .button:hover {
-        box-shadow: 0 0 0.25em 0.15em black; }
   .sr5.chat-card .reducedResult {
     color: #aa0200;
     filter: sepia(0.5) hue-rotate(-60deg); }
@@ -603,6 +606,9 @@
 
 .sr5.form-dialog .form-group input {
   color: white; }
+
+.sr5.form-dialog .form-group select {
+  width: 100%; }
 
 .sr5.form-dialog .dialog-content-common h2 {
   text-underline: none;

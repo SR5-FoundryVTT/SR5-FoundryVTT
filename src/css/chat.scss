@@ -77,20 +77,24 @@
                 border-bottom: $groove;
             }
         }
+
+        /** 
+         * Provide a button look-alike for interaction.
+         */
+        .button {
+            &:hover {
+                box-shadow: 0 0 0.25em 0.15em $black;
+            }
+            cursor: pointer;
+            border: $groove;
+            background: $grey;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
         .damage-line {
             margin-top: 0.25em;
-
-            .button {
-                &:hover {
-                    box-shadow: 0 0 0.25em 0.15em $black;
-                }
-                cursor: pointer;
-                border: $groove;
-                background: $grey;
-                text-align: center;
-                font-size: 14px;
-                font-weight: bold;
-            }
         }
         .reducedResult {
             color: #aa0200;

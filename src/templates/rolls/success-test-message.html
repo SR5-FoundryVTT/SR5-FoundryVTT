@@ -129,26 +129,34 @@
         {{/each}}
     </div>
     {{/if}}
-    {{#if test.hasResults}}
-    <div class="card-buttons">
-        {{#each resultActions}}
-        <div class="button result-action" data-action="{{this.action}}">
-            {{localize "SR5.PlaceMarks"}} {{actionTestData.matrix.marks}}
+    {{#if resultActions}}
+    <div class="card-content">
+        <div class="left-side">
+            {{#each resultActions}}
+            {{log this}}
+            <div class="test-value">
+                <span class="value">{{localize this.label}}: </span>
+                <span class="value-result">
+                    <span class="button result-action" data-action="{{this.action}}">{{this.value}}</span>
+                </span>
+            </div>
+            {{/each}}
         </div>
-        {{/each}}
+        <div class="right-side"></div>
     </div>
     {{/if}}
 </div>
 {{#if test.data.damage}}{{#ifgt test.data.damage.base 0}}
 <div class="sr5 chat-card roll-card">
     <div class="card-content">
-        <div class="right-side">
-        {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
+        <div class="left-side">
+            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
                 name=(localize "SR5.Incoming")
                 damage=test.data.damage
                 showAP=true
-        }}
+            }}
         </div>
+        <div class="right-side"></div>
     </div>
 </div>
 {{/ifgt}}{{/if}}

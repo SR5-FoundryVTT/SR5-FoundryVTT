@@ -395,7 +395,7 @@ export class ShadowrunItemDialog {
             const fireModeString = fireModes[fireModeValue];
             const defenseModifier = Helpers.mapRoundsToDefenseDesc(fireModeValue);
 
-            const fireMode: FireModeData = {
+            const fireMode = {
                 label: fireModeString,
                 value: fireModeValue,
                 defense: defenseModifier,

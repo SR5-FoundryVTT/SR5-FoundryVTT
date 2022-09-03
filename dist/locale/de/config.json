@@ -450,10 +450,11 @@
   "SR5.ResetOverwatchScore": "Nulle Overwatch Wert",
   "SR5.WeaponModeSingleShotShort": "EM",
   "SR5.WeaponModeSemiAutoShort": "HM",
-  "SR5.WeaponModeSemiAutoBurst": "HS",
+  "SR5.WeaponModeSemiAutoBurst": "HM-HS",
   "SR5.WeaponModeBurstFireShort": "SM",
-  "SR5.WeaponModeBurstFireLong": "LS",
+  "SR5.WeaponModeBurstFireLong": "SM-LS",
   "SR5.WeaponModeFullAutoShort": "AM",
+  "SR5.WeaponModeFullAutoLong": "AM-L",
   "SR5.Total": "Gesamt",
   "SR5.PlaceTemplate": "Platziere Vorlage",
   "SR5.Defaulting": "Improvisieren",
@@ -615,6 +616,11 @@
     "HideGMOnlyChatContentDescription": "Nachrichten durch GM Proben zeigen kritische Informationen nur Spielern mit Besitzer Rechten für den genutzten Akteur",
     "MustHaveRessourcesOnTest": "Proben nur mit außreichenden Ressourcen",
     "MustHaveRessourcesOnTestDescription": "Eine Probe kann nur durchgeführt werden wenn alle Ressourcen dafür vorhadnen sind"
+  },
+  "SR5.COMBAT": {
+    "ReduceInitByOne": "Initiative -1",
+    "ReduceInitByFive": "Initiative -5",
+    "ReduceInitByTen": "Initiative -10"
   },
   "SR5.MIGRATION.WarningTitle": "Alarm",
   "SR5.MIGRATION.WarningHeader": "Migrationswarnung",
@@ -951,6 +957,7 @@
     "OpposedTest": "Vergleichsprobe",
     "ExtendedTest": "Ausgedehnte Probe",
     "PhysicalDefenseTest": "Physische Verteidigung",
+    "SupressionDefenseTest": "Unterdrückungsfeuer Verteidigung",
     "RangedAttackTest": "Fernkampf Angriff",
     "MeleeAttackTest": "Nahkampf Angriff",
     "ThrownAttackTest": "Wurfwaffen Angriff",
@@ -970,6 +977,7 @@
   "SR5.MissingRessource": {
     "Edge": "Kein Edge übrig",
     "Ammo": "Nicht genug Munition zum Feuern",
-    "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, entstehenden Modifikatoren werden reduziert"
+    "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, entstehenden Modifikatoren werden reduziert",
+    "Initiative": "Zu geringer Initiative Wert"
   }
 }

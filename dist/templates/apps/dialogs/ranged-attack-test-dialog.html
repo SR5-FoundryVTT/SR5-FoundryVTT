@@ -17,13 +17,14 @@
                     </div>
                     <div class="form-group">
                         <label>{{localize 'SR5.FireMode'}}</label>
-                        <select name="test.data.fireMode.value">
-                            {{#select test.data.fireMode.value}} {{#each test.data.fireModes as |description count|}}
-                            <option value="{{count}}">
-                                {{description}} - {{count}} {{#ifgt count 1}}{{localize
-                                "SR5.Bullets"}}{{else}}{{localize "SR5.Bullet"}}{{/ifgt}}
+                        <select name="test.data.fireModeSelected">
+                            {{#select test.data.fireModeSelected}}
+                            {{#each test.data.fireModes}}
+                            <option value="{{@index}}">
+                                {{localize this.label}} ({{this.value}}) ({{localize (objValue ../config.actionTypes this.action)}})
                             </option>
-                            {{/each}} {{/select}}
+                            {{/each}}
+                            {{/select}}
                         </select>
                     </div>
                     {{#if test.hasTargets}}

@@ -14,10 +14,12 @@ import OpposedTestData = Shadowrun.OpposedTestData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import ActionRollData = Shadowrun.ActionRollData;
 import MinimalActionData = Shadowrun.MinimalActionData;
+import ActionResultData = Shadowrun.ActionResultData;
+import ResultActionData = Shadowrun.ResultActionData;
 import {TestCreator} from "./TestCreator";
 import Template from "../template";
 import {TestRules} from "../rules/TestRules";
-import ActionResultData = Shadowrun.ActionResultData;
+
 import {ActionResultFlow} from "../item/flows/ActionResultFlow";
 import {handleRenderChatMessage} from "../chat";
 
@@ -43,6 +45,8 @@ interface TestModifier {
     label: string
     total: number
 }
+
+
 
 /**
  * Contain all data necessary to handle an action based test.
@@ -416,6 +420,13 @@ export class SuccessTest {
     async saveUserSelectionAfterDialog() {}
 
     /**
+     * Allow sub-classes to alter the base value calculation.
+     * 
+     * This can be used to dynamically alter action calculation before anything else.
+     */
+    alterBaseValues() {}
+
+    /**
      * Overwrite this method if you need to alter base values.
      */
     prepareBaseValues() {
@@ -425,6 +436,9 @@ export class SuccessTest {
 
     /**
      * Handle chosen modifier types and apply them to the pool modifiers.
+     * 
+     * NOTE: To keep this.pool.mod and this.modifiers.mod in sync, never remove
+     *       a modifier. Rather set it to zero, causing it to not be shown.
      */
     applyPoolModifiers() {
         const pool = new PartsList(this.pool.mod);
@@ -809,16 +823,6 @@ export class SuccessTest {
     }
 
     /**
-     * Determine if this test provides any results
-     */
-    get hasResults(): boolean {
-        if (!this.item) return false;
-        const actionResultData = this.item.getActionResult();
-        if (!actionResultData) return false;
-        return !foundry.utils.isObjectEmpty(actionResultData);
-    }
-
-    /**
      * Helper to get an items action result information.
      */
     get results(): ActionResultData|undefined {
@@ -1031,6 +1035,8 @@ export class SuccessTest {
         await this.populateDocuments();
         await this.prepareDocumentModifiers();
         await this.prepareDocumentData();
+
+        this.alterBaseValues();
 
         // Initial base value preparation will show default result without any user input.
         this.prepareBaseValues();
@@ -1300,24 +1306,34 @@ export class SuccessTest {
     }
 
     /**
+     * This class should be used for the opposing test implementation.
+     */
+    get _opposedTestClass(): any|undefined {
+        if (!this.data.opposed || !this.data.opposed.test) return;
+        return TestCreator._getTestClass(this.data.opposed.test);
+    }
+
+    /**
      * Prepare opposed test action buttons.
      *
      * Currently, one opposed action is supported, however the template
      * is prepared to support multiple action buttons.
      */
     _prepareOpposedActionsTemplateData() {
-        if (!this.data.opposed || !this.data.opposed.test) return [];
-
         // @ts-ignore TODO: Move this into a helper
-        const testCls = game.shadowrun5e.tests[this.data.opposed.test];
-        if (!testCls) return console.error('Shadowrun 5e | Opposed Action has no test class registered.')
+        const testCls = this._opposedTestClass;
+        if (!testCls) {
+            console.error('Shadowrun 5e | Opposed Action has no test class registered.');
+            return [];
+        }
 
         const action = {
             // Store the test implementation registration name.
-            test: this.data.opposed.test,
+            test: testCls.name,
             label: testCls.label
         };
 
+        // Show the flat dice pool modifier on the chat action.
         if (this.data.opposed.mod) {
             action.label += ` ${this.data.opposed.mod}`;
         }
@@ -1328,15 +1344,16 @@ export class SuccessTest {
     /**
      * Prepare result action buttons
      */
-    _prepareResultActionsTemplateData(): {action: string, label: string}[] {
-        const actions: {action: string, label: string}[] = [];
+    _prepareResultActionsTemplateData(): ResultActionData[] {
+        const actions: ResultActionData[] = [];
         const actionResultData = this.results;
         if (!actionResultData) return actions;
 
         if (actionResultData.success.matrix.placeMarks) {
             actions.push({
                 action: 'placeMarks',
-                label: 'SR5.PlaceMarks'
+                label: 'SR5.PlaceMarks',
+                value: ''
             });
         }
 
@@ -1578,9 +1595,10 @@ export class SuccessTest {
 
         const messageId = element.closest('.chat-message').data('messageId');
         const test = await TestCreator.fromMessage(messageId);
-
+        
         if (!test) return console.error(`Shadowrun5e | Couldn't find both a result action ('${resultAction}') and extract test from message ('${messageId}')`);
-
+        
+        await test.populateDocuments();
         await ActionResultFlow.executeResult(resultAction, test);
     }
 }
