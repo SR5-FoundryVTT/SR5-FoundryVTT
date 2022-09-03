@@ -450,10 +450,11 @@
   "SR5.ResetOverwatchScore": "Reset Overwatch Score",
   "SR5.WeaponModeSingleShotShort": "SS",
   "SR5.WeaponModeSemiAutoShort": "SA",
-  "SR5.WeaponModeSemiAutoBurst": "SB",
+  "SR5.WeaponModeSemiAutoBurst": "SA-BF",
   "SR5.WeaponModeBurstFireShort": "BF",
-  "SR5.WeaponModeBurstFireLong": "LB",
+  "SR5.WeaponModeBurstFireLong": "BF-LB",
   "SR5.WeaponModeFullAutoShort": "FA",
+  "SR5.WeaponModeFullAutoLong": "FA-L",
   "SR5.Total": "Total",
   "SR5.PlaceTemplate": "Place Template",
   "SR5.Defaulting": "Defaulting",
@@ -988,6 +989,7 @@
     "OpposedTest": "Opposed Test",
     "ExtendedTest": "Extended Test",
     "PhysicalDefenseTest": "Physical Defense",
+    "SupressionDefenseTest": "Supression Defense",
     "RangedAttackTest": "Ranged Weapon Attack",
     "MeleeAttackTest": "Melee Weapon Attack",
     "ThrownAttackTest": "Thrown Weapon Attack",
@@ -1007,6 +1009,7 @@
   "SR5.MissingRessource": {
     "Edge": "No Edge left to consume",
     "Ammo": "Not enough ammunition to fire",
-    "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced."
+    "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
+    "Initiative": "Not enough initiative score"
   }
 }
