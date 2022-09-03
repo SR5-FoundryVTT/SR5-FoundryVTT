@@ -145,4 +145,11 @@ export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeShortened', function (label: string, length: number, options: any): SafeString {
         return new Handlebars.SafeString(Helpers.shortenAttributeLocalization(label, length));
     });
+
+    /**
+     * Given an object return the value for a given key.
+     */
+    Handlebars.registerHelper('objValue', function(obj: Object, key: string) {
+        return obj[key] ||  '';
+    });
 };

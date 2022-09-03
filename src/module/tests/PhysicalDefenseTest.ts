@@ -5,7 +5,7 @@ import {MeleeAttackData} from "./MeleeAttackTest";
 import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import {DefaultValues} from "../data/DataDefaults";
-import {RangedAttackTestData} from "./RangedAttackTest";
+import { SR5Combat } from "../combat/SR5Combat";
 
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
@@ -114,6 +114,11 @@ export class PhysicalDefenseTest extends DefenseTest {
         this.data.defenseReach = MeleeRules.defenseReachModifier(incomingReach, defenseReach);
     }
 
+    calculateBaseValues() {
+        super.calculateBaseValues();
+        this.applyIniModFromActiveDefense();
+    }
+
     applyPoolModifiers() {
         this.applyPoolCoverModifier();
         this.applyPoolActiveDefenseModifier();
@@ -185,25 +190,49 @@ export class PhysicalDefenseTest extends DefenseTest {
         await test.execute();
     }
 
-    async processResults() {
-        await this.applyIniModFromActiveDefense();
-        await super.processResults();
+    canConsumeDocumentRessources() {
+        // Check if the actor is in active combat situation and has enough initiative score left.
+        if (this.actor && this.data.iniMod && game.combat) {
+            const combat: SR5Combat = game.combat as unknown as SR5Combat;
+            const combatant = combat.getActorCombatant(this.actor);
+            if (combatant && combatant.initiative + this.data.iniMod < 0) {
+                ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+                return false;
+            }
+        }
+
+        return super.canConsumeDocumentRessources();
     }
 
     /**
      * Should an active defense be selected apply the initiative modifier to the defenders combat initiative.
      */
-    async applyIniModFromActiveDefense() {
+    applyIniModFromActiveDefense() {
         if (!this.actor) return;
         if (!this.data.activeDefense) return;
 
         const activeDefense = this.data.activeDefenses[this.data.activeDefense];
         if (!activeDefense) return;
 
-        // Change this casting actors combat ini.
-        await this.actor.changeCombatInitiative(activeDefense.initMod);
-
         // Use DefenseTest general iniMod behaviour.
         this.data.iniMod = activeDefense.initMod;
+    }
+
+    _prepareResultActionsTemplateData() {
+        const actions = super._prepareResultActionsTemplateData();
+
+        // Don't add an action if no active defense was selected.
+        if (!this.data.activeDefense) return actions;
+
+        const activeDefense = this.data.activeDefenses[this.data.activeDefense];
+        if (!activeDefense) return actions;
+
+        actions.push({
+            action: 'modifyCombatantInit',
+            label: 'SR5.Initiative',
+            value: String(activeDefense.initMod)
+        });
+
+        return actions;
     }
 }

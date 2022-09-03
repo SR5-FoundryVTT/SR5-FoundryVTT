@@ -428,8 +428,12 @@ export class SR5Actor extends Actor {
         return this.items.filter((item: SR5Item) => item.isEquipped() && item.isWeapon());
     }
 
+    /**
+     * Amount of recoil compensation this actor has.
+     */
     getRecoilCompensation(): number {
-        let total = 1; // always get 1
+        // Each new attack allows one free compensation.
+        let total = 1;
         const strength = this.findAttribute('strength');
         if (strength) {
             total += Math.ceil(strength.value / 3);
@@ -1447,6 +1451,11 @@ export class SR5Actor extends Actor {
 
         // Token might not be part of active combat.
         if (!combatant) return;
+
+        // While not prohibiting, inform user about missing ressource.
+        if (combatant.initiative + modifier < 0) {
+            ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+        }
 
         await combat.adjustInitiative(combatant, modifier);
     }

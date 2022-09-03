@@ -408,6 +408,9 @@ export const SR5 = {
         }
     },
 
+    // When a firemode with suppression is used, this test should defense against it.
+    supressionDefenseTest: 'SupressionDefenseTest',
+
     /**
      * Names of FoundryVTT packs supplied by the system to be used as action sources.
      */
@@ -572,4 +575,110 @@ export const SR5 = {
             troll: 'SR5.Character.Types.Troll',
         },
     },
+
+    /**
+     * The available range weapon modes for to SR5#424
+     * 
+     * These are the mode selectors on the weapon. The term 'fire mode' 
+     * is only used to describe as the combination of weapon mode and action
+     * used, causing a specific fire mode.
+     * 
+     * NOTE: This list is also used for sorting order of ranged weapon mode.
+     *       Alter it with care.
+     */
+    rangeWeaponMode: [
+        'single_shot',
+        'semi_auto',
+        'burst_fire',
+        'full_auto'
+    ],
+
+    rangeWeaponModeLabel: {
+        'single_shot': 'SR5.WeaponModeSingleShot',
+        'semi_auto': 'SR5.WeaponModeSemiAuto',
+        'burst_file': 'SR5.WeaponModeBurstFire',
+        'full_auto': 'SR5.WeaponModeFullAuto'
+    },
+
+    /**
+     * The preconfigured default Shadowrun firemodes according to SR5#180
+     * 
+     * These are separate from ranged weapon modes but depend on the selected 
+     * ranged weapon mode.
+     */
+    fireModes: [
+    {
+        label: "SR5.WeaponModeSingleShot",
+        value: 1,
+        recoil: false,
+        defense: 0,
+        suppression: false,
+        action: 'simple',
+        mode: 'single_shot'
+    },
+    {
+        label: "SR5.WeaponModeSemiAutoShort",
+        value: 1,
+        recoil: true,
+        defense: 0,
+        suppression: false,
+        action: 'simple',
+        mode: 'semi_auto'
+    },
+    {
+        label: "SR5.WeaponModeSemiAutoBurst",
+        value: 3,
+        recoil: true,
+        defense: -2,
+        suppression: false,
+        action: 'complex',
+        mode: 'semi_auto'
+    },
+    
+    {
+        label: "SR5.WeaponModeBurstFire",
+        value: 3,
+        recoil: true,
+        defense: -2,
+        suppression: false,
+        action: 'simple',
+        mode: 'burst_fire'
+    },
+    {
+        label: "SR5.WeaponModeBurstFireLong",
+        value: 6,
+        recoil: true,
+        defense: -2,
+        suppression: false,
+        action: 'complex',
+        mode: 'burst_fire',
+    },
+    {
+        label: "SR5.WeaponModeFullAutoShort",
+        value: 6,
+        recoil: true,
+        defense: -5,
+        suppression: false,
+        action: 'simple',
+        mode: 'full_auto'
+    },
+    {
+        label: 'SR5.WeaponModeFullAutoLong',
+        value: 10,
+        recoil: true,
+        defense: -9,
+        suppression: false,
+        action: 'complex',
+        mode: 'full_auto'
+    },
+    {
+        label: 'SR5.Suppressing',
+        value: 20,
+        recoil: false,
+        defense: 0,
+        suppression: true,
+        action: 'complex',
+        mode: 'full_auto'
+    }
+    ] as Shadowrun.FireModeData[]
 };

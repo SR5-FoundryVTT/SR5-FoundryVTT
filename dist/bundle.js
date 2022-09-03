@@ -9408,6 +9408,17 @@ var DefaultValues = class {
       dice_pool_mod: []
     }, partialActionData);
   }
+  static fireModeData(partialFireModeData = {}) {
+    return mergeObject({
+      value: 0,
+      label: "",
+      defense: 0,
+      recoil: false,
+      suppression: false,
+      mode: "single_shot",
+      action: "simple"
+    }, partialFireModeData);
+  }
 };
 var DataDefaults = {
   grunt: {
@@ -9806,6 +9817,7 @@ var SR5 = {
       "combat": "PhysicalResistTest"
     }
   },
+  supressionDefenseTest: "SupressionDefenseTest",
   packNames: {
     "generalActions": "General Actions",
     "matrixActions": "Matrix Actions"
@@ -9948,7 +9960,93 @@ var SR5 = {
       dwarf: "SR5.Character.Types.Dwarf",
       troll: "SR5.Character.Types.Troll"
     }
-  }
+  },
+  rangeWeaponMode: [
+    "single_shot",
+    "semi_auto",
+    "burst_fire",
+    "full_auto"
+  ],
+  rangeWeaponModeLabel: {
+    "single_shot": "SR5.WeaponModeSingleShot",
+    "semi_auto": "SR5.WeaponModeSemiAuto",
+    "burst_file": "SR5.WeaponModeBurstFire",
+    "full_auto": "SR5.WeaponModeFullAuto"
+  },
+  fireModes: [
+    {
+      label: "SR5.WeaponModeSingleShot",
+      value: 1,
+      recoil: false,
+      defense: 0,
+      suppression: false,
+      action: "simple",
+      mode: "single_shot"
+    },
+    {
+      label: "SR5.WeaponModeSemiAutoShort",
+      value: 1,
+      recoil: true,
+      defense: 0,
+      suppression: false,
+      action: "simple",
+      mode: "semi_auto"
+    },
+    {
+      label: "SR5.WeaponModeSemiAutoBurst",
+      value: 3,
+      recoil: true,
+      defense: -2,
+      suppression: false,
+      action: "complex",
+      mode: "semi_auto"
+    },
+    {
+      label: "SR5.WeaponModeBurstFire",
+      value: 3,
+      recoil: true,
+      defense: -2,
+      suppression: false,
+      action: "simple",
+      mode: "burst_fire"
+    },
+    {
+      label: "SR5.WeaponModeBurstFireLong",
+      value: 6,
+      recoil: true,
+      defense: -2,
+      suppression: false,
+      action: "complex",
+      mode: "burst_fire"
+    },
+    {
+      label: "SR5.WeaponModeFullAutoShort",
+      value: 6,
+      recoil: true,
+      defense: -5,
+      suppression: false,
+      action: "simple",
+      mode: "full_auto"
+    },
+    {
+      label: "SR5.WeaponModeFullAutoLong",
+      value: 10,
+      recoil: true,
+      defense: -9,
+      suppression: false,
+      action: "complex",
+      mode: "full_auto"
+    },
+    {
+      label: "SR5.Suppressing",
+      value: 20,
+      recoil: false,
+      defense: 0,
+      suppression: true,
+      action: "complex",
+      mode: "full_auto"
+    }
+  ]
 };
 
 // src/module/helpers.ts
@@ -10097,17 +10195,6 @@ var Helpers = class {
     });
     html.find("label.checkbox").click((event) => setContent(event.currentTarget));
     html.find(".submit-checkbox").change((event) => app._onSubmit(event));
-  }
-  static mapRoundsToDefenseMod(rounds) {
-    if (rounds === 1)
-      return 0;
-    if (rounds === 3)
-      return -2;
-    if (rounds === 6)
-      return -5;
-    if (rounds === 10)
-      return -9;
-    return 0;
   }
   static mapRoundsToDefenseDesc(rounds) {
     if (rounds === 1)
@@ -12654,17 +12741,1598 @@ var MatrixRules = class {
   }
 };
 
-// src/module/item/flows/ActionResultFlow.ts
-var ActionResultFlow = class {
-  static executeResult(resultAction, test) {
-    return __async(this, null, function* () {
-      var _a;
-      switch (resultAction) {
-        case "placeMarks": {
-          (_a = ui.notifications) == null ? void 0 : _a.error("Placing marks currently isnt suported. Sorry!");
-          break;
+// src/module/rules/SoakRules.ts
+var SoakRules = class {
+  static applyAllSoakParts(soakParts, actor, damageData) {
+    if (damageData.type.base !== "matrix") {
+      SoakRules.applyPhysicalAndStunSoakParts(soakParts, actor, damageData);
+    } else {
+      SoakRules.applyMatrixSoakParts(soakParts, actor);
+    }
+  }
+  static applyPhysicalAndStunSoakParts(soakParts, actor, damageData) {
+    const damageSourceItem = Helpers.findDamageSource(damageData);
+    if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
+      return SoakRules.applyDirectCombatSpellParts(damageSourceItem.data, soakParts, actor);
+    }
+    SoakRules.applyBodyAndArmorParts(soakParts, actor);
+    const armor = actor.getArmor();
+    SoakRules.applyArmorPenetration(soakParts, armor, damageData);
+    SoakRules.applyElementalArmor(soakParts, armor, damageData.element.base);
+  }
+  static applyDirectCombatSpellParts(spellItem, soakParts, actor) {
+    if (spellItem.data.type === "mana") {
+      SoakRules.addUniquePart(soakParts, actor.getAttribute("willpower"), SR5.attributes.willpower);
+    } else {
+      SoakRules.addUniquePart(soakParts, actor.getAttribute("body"), SR5.attributes.body);
+    }
+    return;
+  }
+  static applyBodyAndArmorParts(soakParts, actor) {
+    const body = actor.findAttribute("body");
+    if (body) {
+      soakParts.addUniquePart(body.label || "SR5.Body", body.value);
+    }
+    const mod = actor.getModifier("soak");
+    if (mod) {
+      soakParts.addUniquePart("SR5.Bonus", mod);
+    }
+    actor._addArmorParts(soakParts);
+  }
+  static applyArmorPenetration(soakParts, armor, damageData) {
+    var _a;
+    const bonusArmor = (_a = armor[damageData.element.value]) != null ? _a : 0;
+    const totalArmor = armor.value + bonusArmor;
+    const ap = Helpers.calcTotal(damageData.ap);
+    soakParts.addUniquePart("SR5.AP", Math.max(ap, -totalArmor));
+  }
+  static applyElementalArmor(soakParts, armor, element) {
+    var _a;
+    const bonusArmor = (_a = armor[element]) != null ? _a : 0;
+    if (bonusArmor) {
+      soakParts.addUniquePart(SR5.elementTypes[element], bonusArmor);
+    }
+  }
+  static applyMatrixSoakParts(soakParts, actor) {
+    const actorData = actor.data.data;
+    if (actorData.initiative.perception === "matrix") {
+      if (actor.isVehicle()) {
+        SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
+      } else {
+        SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
+      }
+    } else {
+      SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
+    }
+  }
+  static applyBiofeedbackParts(soakParts, actor, actorData) {
+    SoakRules.addUniquePart(soakParts, actor.getAttribute("willpower"), SR5.attributes.willpower);
+    if (!actorData.matrix) {
+      return;
+    }
+    SoakRules.addUniquePart(soakParts, actorData.matrix.firewall, SR5.matrixAttributes.firewall);
+  }
+  static applyRatingAndFirewallParts(actorData, soakParts) {
+    if (!actorData.matrix) {
+      return;
+    }
+    const deviceRating = actorData.matrix.rating;
+    if (deviceRating) {
+      soakParts.addUniquePart("SR5.Labels.ActorSheet.DeviceRating", deviceRating);
+    }
+    this.addUniquePart(soakParts, actorData.matrix.firewall, SR5.matrixAttributes.firewall);
+  }
+  static addUniquePart(partsList, modifiableValue, label) {
+    const totalValue = Helpers.calcTotal(modifiableValue);
+    partsList.addUniquePart(label, totalValue);
+  }
+  static reduceDamage(actor, damageData, hits) {
+    if (damageData.type.value === "stun" && actor.isVehicle()) {
+      return Helpers.reduceDamageByHits(damageData, damageData.value, "SR5.VehicleStunImmunity");
+    }
+    return Helpers.reduceDamageByHits(damageData, hits, "SR5.SoakTest");
+  }
+  static modifyDamageType(damage, actor) {
+    let updatedDamage = duplicate(damage);
+    if (actor.isVehicle() && updatedDamage.element.value === "electricity" && updatedDamage.type.value === "stun") {
+      updatedDamage.type.value = "physical";
+    }
+    const damageSourceItem = Helpers.findDamageSource(damage);
+    if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
+      return updatedDamage;
+    }
+    updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
+    return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
+  }
+  static modifyPhysicalDamageForArmor(damage, actor) {
+    const updatedDamage = duplicate(damage);
+    if (damage.type.value === "physical") {
+      if (!actor.isCharacter() && !actor.isSpirit() && !actor.isCritter() && !actor.isVehicle()) {
+        return updatedDamage;
+      }
+      const modifiedArmor = actor.getModifiedArmor(damage);
+      if (modifiedArmor) {
+        const armorWillChangeDamageType = modifiedArmor.value > damage.value;
+        if (armorWillChangeDamageType) {
+          updatedDamage.type.value = "stun";
         }
       }
+    }
+    return updatedDamage;
+  }
+  static modifyMatrixDamageForBiofeedback(damage, actor) {
+    const updatedDamage = duplicate(damage);
+    if (damage.type.value === "matrix") {
+      const actorData = actor.data.data;
+      if (!actor.isCharacter()) {
+        return updatedDamage;
+      }
+      if (actorData.initiative.perception === "matrix") {
+        if (actorData.matrix.hot_sim) {
+          updatedDamage.type.value = "physical";
+        } else {
+          updatedDamage.type.value = "stun";
+        }
+      }
+    }
+    return updatedDamage;
+  }
+};
+
+// src/module/rules/CombatRules.ts
+var CombatRules = class {
+  static iniOrderCanDoAnotherPass(scores) {
+    for (const score of scores) {
+      if (CombatRules.iniScoreCanDoAnotherPass(score))
+        return true;
+    }
+    return false;
+  }
+  static iniScoreCanDoAnotherPass(score) {
+    return CombatRules.reduceIniResultAfterPass(score) > 0;
+  }
+  static reduceIniResultAfterPass(score) {
+    return Math.max(score + SR.combat.INI_RESULT_MOD_AFTER_INI_PASS, 0);
+  }
+  static reduceIniOnLateSpawn(score, pass) {
+    pass = Math.max(pass - 1, 0);
+    score = Math.max(score, 0);
+    const reducedScore = score + pass * SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
+    return CombatRules.getValidInitiativeScore(reducedScore);
+  }
+  static getValidInitiativeScore(score) {
+    return Math.max(score, 0);
+  }
+  static attackHits(attackerHits, defenderHits) {
+    return attackerHits > defenderHits;
+  }
+  static attackGrazes(attackerHits, defenderHits) {
+    return attackerHits === defenderHits;
+  }
+  static attackMisses(attackerHits, defenderHits) {
+    return !CombatRules.attackHits(attackerHits, defenderHits);
+  }
+  static modifyDamageAfterHit(attackerHits, defenderHits, damage) {
+    const modifiedDamage = foundry.utils.duplicate(damage);
+    if (attackerHits < 0)
+      attackerHits = 0;
+    if (defenderHits < 0)
+      defenderHits = 0;
+    PartsList.AddUniquePart(modifiedDamage.mod, "SR5.Attacker", attackerHits);
+    PartsList.AddUniquePart(modifiedDamage.mod, "SR5.Defender", -defenderHits);
+    modifiedDamage.value = Helpers.calcTotal(modifiedDamage, { min: 0 });
+    return modifiedDamage;
+  }
+  static modifyDamageAfterSupressionHit(damage) {
+    return foundry.utils.duplicate(damage);
+  }
+  static modifyDamageAfterMiss(damage) {
+    const modifiedDamage = foundry.utils.duplicate(damage);
+    modifiedDamage.override = { name: "SR5.Success", value: 0 };
+    Helpers.calcTotal(modifiedDamage, { min: 0 });
+    return modifiedDamage;
+  }
+  static modifyDamageAfterResist(actor, damage, hits) {
+    if (hits < 0)
+      hits = 0;
+    let { modified } = SoakRules.reduceDamage(actor, damage, hits);
+    modified = SoakRules.modifyDamageType(modified, actor);
+    Helpers.calcTotal(modified, { min: 0 });
+    return modified;
+  }
+  static modifyArmorAfterHit(armor, damage) {
+    const modifiedArmor = foundry.utils.duplicate(armor);
+    if (damage.ap.value <= 0)
+      return modifiedArmor;
+    console.error("Check if ap is a negative value or positive value during weapon item configuration");
+    PartsList.AddUniquePart(modifiedArmor.mod, "SR5.AP", damage.ap.value);
+    modifiedArmor.value = Helpers.calcTotal(modifiedArmor, { min: 0 });
+    return modifiedArmor;
+  }
+};
+
+// src/module/rules/MeleeRules.ts
+var MeleeRules = class {
+  static defenseReachModifier(incomingReach, defendingReach) {
+    return defendingReach - incomingReach;
+  }
+};
+
+// src/module/apps/dialogs/TestDialog.ts
+var TestDialog = class extends FormDialog {
+  constructor(data, options = {}) {
+    options.applyFormChangesOnSubmit = true;
+    super(data, options);
+  }
+  static get defaultOptions() {
+    const options = super.defaultOptions;
+    options.id = "test-dialog";
+    options.classes = ["sr5", "form-dialog"];
+    options.resizable = true;
+    options.height = "auto";
+    options.width = "auto";
+    return options;
+  }
+  activateListeners(html) {
+    super.activateListeners(html);
+    html.find(".entity-link").on("click", Helpers.renderEntityLinkSheet);
+  }
+  get templateContent() {
+    return "systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html";
+  }
+  getData() {
+    var _a;
+    const data = super.getData();
+    data.rollMode = (_a = data.test.data.options) == null ? void 0 : _a.rollMode;
+    data.rollModes = CONFIG.Dice.rollModes;
+    data.default = "roll";
+    data.config = SR5;
+    return data;
+  }
+  get title() {
+    const data = this.data;
+    return game.i18n.localize(data.test.title);
+  }
+  get buttons() {
+    return {
+      roll: {
+        label: game.i18n.localize("SR5.Roll"),
+        icon: '<i class="fas fa-dice-six"></i>'
+      },
+      cancel: {
+        label: game.i18n.localize("SR5.Dialogs.Common.Cancel")
+      }
+    };
+  }
+  onAfterClose(html) {
+    return this.data.test.data;
+  }
+  _updateData(data) {
+    if (this.selectedButton === "cancel")
+      return;
+    Object.entries(data).forEach(([key, value]) => {
+      const valueField = foundry.utils.getProperty(this.data, key);
+      if (foundry.utils.getType(valueField) !== "Object" || !valueField.hasOwnProperty("mod"))
+        return;
+      delete data[key];
+      if (valueField.value === value)
+        return;
+      if (value === null || value === "")
+        delete valueField.override;
+      else
+        valueField.override = { name: "SR5.ManualOverride", value };
+    });
+    foundry.utils.mergeObject(this.data, data);
+    this.data.test.prepareBaseValues();
+    this.data.test.calculateBaseValues();
+  }
+};
+
+// src/module/template.ts
+var Template = class extends MeasuredTemplate {
+  static fromItem(item, onComplete) {
+    var _a, _b;
+    const templateShape = "circle";
+    const templateData = {
+      t: templateShape,
+      user: (_a = game.user) == null ? void 0 : _a.id,
+      direction: 0,
+      x: 0,
+      y: 0,
+      fillColor: (_b = game.user) == null ? void 0 : _b.color
+    };
+    const blast = item.getBlastData();
+    templateData["distance"] = blast == null ? void 0 : blast.radius;
+    templateData["dropoff"] = blast == null ? void 0 : blast.dropoff;
+    const document2 = new MeasuredTemplateDocument(templateData, { parent: canvas.scene });
+    const template = new Template(document2);
+    template.item = item;
+    template.onComplete = onComplete;
+    return template;
+  }
+  drawPreview() {
+    return __async(this, null, function* () {
+      if (!canvas.ready || !this.layer.preview)
+        return;
+      const initialLayer = canvas.activeLayer;
+      if (!initialLayer)
+        return;
+      yield this.draw();
+      this.layer.activate();
+      this.layer.preview.addChild(this);
+      this.activatePreviewListeners(initialLayer);
+    });
+  }
+  activatePreviewListeners(initialLayer) {
+    if (!canvas.ready || !canvas.stage || !canvas.app)
+      return;
+    const handlers = {};
+    let moveTime = 0;
+    handlers["mm"] = (event) => {
+      event.stopPropagation();
+      if (!canvas.grid)
+        return;
+      let now = Date.now();
+      if (now - moveTime <= 20)
+        return;
+      const center = event.data.getLocalPosition(this.layer);
+      const snapped = canvas.grid.getSnappedPosition(center.x, center.y, 2);
+      this.data.x = snapped.x;
+      this.data.y = snapped.y;
+      this.refresh();
+      moveTime = now;
+    };
+    handlers["rc"] = () => {
+      if (!canvas.ready || !this.layer.preview || !canvas.stage || !canvas.app)
+        return;
+      this.layer.preview.removeChildren();
+      canvas.stage.off("mousemove", handlers["mm"]);
+      canvas.stage.off("mousedown", handlers["lc"]);
+      canvas.app.view.oncontextmenu = null;
+      canvas.app.view.onwheel = null;
+      initialLayer.activate();
+      if (this.onComplete)
+        this.onComplete();
+    };
+    handlers["lc"] = (event) => {
+      var _a;
+      handlers["rc"](event);
+      if (!canvas.grid)
+        return;
+      const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
+      this.data.update({ x: destination.x, y: destination.y });
+      (_a = canvas.scene) == null ? void 0 : _a.createEmbeddedDocuments("MeasuredTemplate", [this.data]);
+    };
+    handlers["mw"] = (event) => {
+      if (event.ctrlKey)
+        event.preventDefault();
+      event.stopPropagation();
+      if (!canvas.grid)
+        return;
+      let delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
+      let snap = event.shiftKey ? delta : 5;
+      this.data.direction += snap * Math.sign(event.deltaY);
+      this.refresh();
+    };
+    canvas.stage.on("mousemove", handlers["mm"]);
+    canvas.stage.on("mousedown", handlers["lc"]);
+    canvas.app.view.oncontextmenu = handlers["rc"];
+    canvas.app.view.onwheel = handlers["mw"];
+  }
+};
+
+// src/module/rules/TestRules.ts
+var TestRules = {
+  extendedModifierValue: -1,
+  calcNextExtendedModifier: (current = 0) => {
+    return current + TestRules.extendedModifierValue;
+  },
+  canExtendTest: (pool, threshold, extendedHits) => {
+    if (threshold > 0)
+      return extendedHits < threshold && pool > 0;
+    return pool > 0;
+  },
+  success: (hits, threshold) => {
+    hits = Math.max(hits, 0);
+    threshold = Math.max(threshold, 0);
+    if (threshold > 0)
+      return hits >= threshold;
+    else
+      return hits > 0;
+  },
+  glitched: (glitches, pool) => {
+    glitches = Math.max(glitches, 0);
+    pool = Math.max(pool, 1);
+    return glitches > Math.floor(pool / 2);
+  },
+  criticalGlitched: (success, glitched) => {
+    return !success && glitched;
+  }
+};
+
+// src/module/tests/SuccessTest.ts
+var SuccessTest = class {
+  constructor(data, documents, options) {
+    this.actor = documents == null ? void 0 : documents.actor;
+    this.item = documents == null ? void 0 : documents.item;
+    this.rolls = (documents == null ? void 0 : documents.rolls) || [];
+    this.targets = [];
+    this.evaluated = false;
+    options = options || {};
+    this.data = this._prepareData(data, options);
+    this.calculateBaseValues();
+    console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
+  }
+  _prepareData(data, options) {
+    var _a, _b;
+    data.type = data.type || this.type;
+    data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map((token) => {
+      var _a2;
+      return (_a2 = token.actor) == null ? void 0 : _a2.uuid;
+    }).filter((uuid) => !!uuid);
+    data.sourceActorUuid = data.sourceActorUuid || ((_a = this.actor) == null ? void 0 : _a.uuid);
+    data.sourceItemUuid = data.sourceItemUuid || ((_b = this.item) == null ? void 0 : _b.uuid);
+    data.title = data.title || this.constructor.label;
+    options.rollMode = options.rollMode !== void 0 ? options.rollMode : game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+    options.showDialog = options.showDialog !== void 0 ? options.showDialog : true;
+    options.showMessage = options.showMessage !== void 0 ? options.showMessage : true;
+    data.options = options;
+    data.pushTheLimit = data.pushTheLimit !== void 0 ? data.pushTheLimit : false;
+    data.secondChance = data.secondChance !== void 0 ? data.secondChance : false;
+    data.pool = data.pool || DefaultValues.valueData({ label: "SR5.DicePool" });
+    data.threshold = data.threshold || DefaultValues.valueData({ label: "SR5.Threshold" });
+    data.limit = data.limit || DefaultValues.valueData({ label: "SR5.Limit" });
+    data.values = data.values || {};
+    data.values.hits = data.values.hits || DefaultValues.valueData({ label: "SR5.Hits" });
+    data.values.extendedHits = data.values.extendedHits || DefaultValues.valueData({ label: "SR5.ExtendedHits" });
+    data.values.netHits = data.values.netHits || DefaultValues.valueData({ label: "SR5.NetHits" });
+    data.values.glitches = data.values.glitches || DefaultValues.valueData({ label: "SR5.Glitches" });
+    data.opposed = data.opposed || void 0;
+    data.modifiers = this._prepareModifiers(data.modifiers);
+    data.damage = data.damage || DefaultValues.damageData();
+    return data;
+  }
+  _prepareModifiers(modifiers) {
+    return modifiers || DefaultValues.valueData({ label: "SR5.Labels.Action.Modifiers" });
+  }
+  get type() {
+    return this.constructor.name;
+  }
+  toJSON() {
+    return {
+      data: this.data,
+      rolls: this.rolls
+    };
+  }
+  static get lowestSuccessSide() {
+    return Math.min(...SR.die.success);
+  }
+  static get lowestGlitchSide() {
+    return Math.min(...SR.die.glitch);
+  }
+  static _getDefaultTestAction() {
+    return {};
+  }
+  static _getDocumentTestAction(item, actor) {
+    return __async(this, null, function* () {
+      return {};
+    });
+  }
+  static _prepareActionTestData(action, actor, data) {
+    return __async(this, null, function* () {
+      return TestCreator._prepareTestDataWithAction(action, actor, data);
+    });
+  }
+  static _getOpposedActionTestData(testData, actor, previousMessageId) {
+    return __async(this, null, function* () {
+      console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
+      return;
+    });
+  }
+  static get label() {
+    return `SR5.Tests.${this.name}`;
+  }
+  get hasModifiers() {
+    return this.data.modifiers.mod.length > 0;
+  }
+  get formula() {
+    const pool = Helpers.calcTotal(this.data.pool, { min: 0 });
+    const explode = this.hasPushTheLimit ? "x6" : "";
+    return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}${explode}`;
+  }
+  get code() {
+    let pool = this.pool.mod.filter((mod) => mod.value !== 0).map((mod) => `${game.i18n.localize(mod.name)} (${mod.value})`);
+    let threshold = this.threshold.override ? [game.i18n.localize(this.threshold.override.name)] : this.threshold.mod.map((mod) => game.i18n.localize(mod.name));
+    let limit = this.limit.override ? [game.i18n.localize(this.limit.override.name)] : this.limit.mod.map((mod) => game.i18n.localize(mod.name));
+    if (this.pool.base > 0)
+      pool.push(String(this.pool.base));
+    if (this.threshold.base > 0 && !this.threshold.override)
+      threshold.push(String(this.threshold.base));
+    if (this.limit.base > 0 && !this.limit.override)
+      limit.push(String(this.limit.base));
+    let code = pool.join(" + ").trim() || `${this.pool.value}`;
+    if (threshold.length > 0 && this.threshold.value > 0)
+      code = `${code} (${threshold.join(" + ").trim()})`;
+    if (limit.length > 0 && this.limit.value > 0)
+      code = `${code} [${limit.join(" + ").trim()}]`;
+    return code;
+  }
+  get hasCode() {
+    return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
+  }
+  get title() {
+    return `${game.i18n.localize(this.constructor.label)}`;
+  }
+  createRoll() {
+    const roll = new SR5Roll(this.formula);
+    this.rolls.push(roll);
+    return roll;
+  }
+  get _dialogTemplate() {
+    return "systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html";
+  }
+  get _chatMessageTemplate() {
+    return "systems/shadowrun5e/dist/templates/rolls/success-test-message.html";
+  }
+  _createTestDialog() {
+    return new TestDialog({ test: this, templatePath: this._dialogTemplate });
+  }
+  showDialog() {
+    return __async(this, null, function* () {
+      var _a;
+      if (!((_a = this.data.options) == null ? void 0 : _a.showDialog))
+        return true;
+      const dialog = this._createTestDialog();
+      const data = yield dialog.select();
+      if (dialog.canceled)
+        return false;
+      this.data = data;
+      yield this.saveUserSelectionAfterDialog();
+      this.prepareBaseValues();
+      this.calculateBaseValues();
+      return true;
+    });
+  }
+  saveUserSelectionAfterDialog() {
+    return __async(this, null, function* () {
+    });
+  }
+  alterBaseValues() {
+  }
+  prepareBaseValues() {
+    this.applyPushTheLimit();
+    this.applyPoolModifiers();
+  }
+  applyPoolModifiers() {
+    const pool = new PartsList(this.pool.mod);
+    pool.removePart("SR5.Labels.Action.Modifiers");
+    if (this.data.modifiers.override) {
+      for (const modifier of this.data.modifiers.mod) {
+        pool.removePart(modifier.name);
+      }
+      pool.addUniquePart("SR5.Labels.Action.Modifiers", this.data.modifiers.override.value);
+      return;
+    }
+    for (const modifier of this.data.modifiers.mod) {
+      pool.addUniquePart(modifier.name, modifier.value);
+    }
+  }
+  calculateBaseValues() {
+    this.data.modifiers.value = Helpers.calcTotal(this.data.modifiers);
+    this.data.pool.value = Helpers.calcTotal(this.data.pool, { min: 0 });
+    this.data.threshold.value = Helpers.calcTotal(this.data.threshold, { min: 0 });
+    this.data.limit.value = Helpers.calcTotal(this.data.limit, { min: 0 });
+    console.log(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
+  }
+  evaluate() {
+    return __async(this, null, function* () {
+      for (const roll of this.rolls) {
+        if (!roll._evaluated)
+          yield roll.evaluate({ async: true });
+      }
+      this.evaluated = true;
+      this.calculateDerivedValues();
+      return this;
+    });
+  }
+  populateTests() {
+    return __async(this, null, function* () {
+    });
+  }
+  populateDocuments() {
+    return __async(this, null, function* () {
+      if (!this.actor && this.data.sourceActorUuid) {
+        const document2 = (yield fromUuid(this.data.sourceActorUuid)) || void 0;
+        this.actor = document2 instanceof TokenDocument ? document2.actor : document2;
+      }
+      if (!this.item && this.data.sourceItemUuid)
+        this.item = (yield fromUuid(this.data.sourceItemUuid)) || void 0;
+      if (this.targets.length === 0 && this.data.targetActorsUuid) {
+        this.targets = [];
+        for (const uuid of this.data.targetActorsUuid) {
+          const document2 = yield fromUuid(uuid);
+          if (!document2)
+            continue;
+          const token = document2 instanceof SR5Actor ? document2.getToken() : document2;
+          if (!(token instanceof TokenDocument))
+            continue;
+          this.targets.push(token);
+        }
+      }
+    });
+  }
+  prepareDocumentData() {
+    return __async(this, null, function* () {
+      this.data.damage = ActionFlow.calcDamage(this.data.damage, this.actor, this.item);
+    });
+  }
+  get testModifiers() {
+    return ["global", "wounds"];
+  }
+  prepareDocumentModifiers() {
+    return __async(this, null, function* () {
+      yield this.prepareActorModifiers();
+      yield this.prepareItemModifiers();
+    });
+  }
+  prepareActorModifiers() {
+    return __async(this, null, function* () {
+      if (!this.actor)
+        return;
+      if (this.data.action.modifiers.length > 0)
+        return;
+      for (const type of this.testModifiers) {
+        const value = yield this.actor.modifiers.totalFor(type);
+        const name = SR5.modifierTypes[type];
+        PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
+      }
+    });
+  }
+  prepareItemModifiers() {
+    return __async(this, null, function* () {
+    });
+  }
+  calculateDerivedValues() {
+    this.data.values.hits = this.calculateHits();
+    this.data.values.extendedHits = this.calculateExtendedHits();
+    this.data.values.netHits = this.calculateNetHits();
+    this.data.values.glitches = this.calculateGlitches();
+    console.log(`Shadowrun 5e | Calculated derived values for ${this.constructor.name}`, this.data);
+  }
+  get pool() {
+    return this.data.pool;
+  }
+  get limit() {
+    return this.data.limit;
+  }
+  get hasLimit() {
+    const applyLimit = game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits);
+    return applyLimit && !this.hasPushTheLimit && this.limit.value > 0;
+  }
+  get hasReducedHits() {
+    return this.hits.value > this.limit.value;
+  }
+  get threshold() {
+    return this.data.threshold;
+  }
+  get hasThreshold() {
+    return this.threshold.value > 0;
+  }
+  calculateNetHits() {
+    const hits = this.extended ? this.extendedHits : this.hits;
+    const base = this.hasThreshold ? Math.max(hits.value - this.threshold.value, 0) : hits.value;
+    const netHits = DefaultValues.valueData({
+      label: "SR5.NetHits",
+      base
+    });
+    netHits.value = Helpers.calcTotal(netHits, { min: 0 });
+    return netHits;
+  }
+  get netHits() {
+    return this.data.values.netHits;
+  }
+  calculateHits() {
+    const rollHits = this.rolls.reduce((hits2, roll) => hits2 + roll.hits, 0);
+    const hits = DefaultValues.valueData({
+      label: "SR5.Hits",
+      base: this.hasLimit ? Math.min(this.limit.value, rollHits) : rollHits
+    });
+    hits.value = Helpers.calcTotal(hits, { min: 0 });
+    return hits;
+  }
+  get hits() {
+    return this.data.values.hits;
+  }
+  get extendedHits() {
+    return this.data.values.extendedHits || DefaultValues.valueData({ label: "SR5.ExtendedHits" });
+  }
+  calculateGlitches() {
+    const rollGlitches = this.rolls.reduce((glitches2, roll) => glitches2 + roll.glitches, 0);
+    const glitches = DefaultValues.valueData({
+      label: "SR5.Glitches",
+      base: rollGlitches
+    });
+    glitches.value = Helpers.calcTotal(glitches, { min: 0 });
+    return glitches;
+  }
+  calculateExtendedHits() {
+    if (!this.extended)
+      return DefaultValues.valueData({ label: "SR5.ExtendedHits" });
+    const extendedHits = this.extendedHits;
+    extendedHits.mod = PartsList.AddPart(extendedHits.mod, "SR5.Hits", this.hits.value);
+    Helpers.calcTotal(extendedHits, { min: 0 });
+    return extendedHits;
+  }
+  get extended() {
+    return this.canBeExtended && this.data.extended;
+  }
+  get canBeExtended() {
+    return true;
+  }
+  get glitches() {
+    return this.data.values.glitches;
+  }
+  get glitched() {
+    return TestRules.glitched(this.glitches.value, this.pool.value);
+  }
+  get criticalGlitched() {
+    return TestRules.criticalGlitched(this.success, this.glitched);
+  }
+  get success() {
+    const hits = this.extended ? this.extendedHits : this.hits;
+    return TestRules.success(hits.value, this.threshold.value);
+  }
+  get failure() {
+    if (this.extended && this.threshold.value === 0)
+      return true;
+    if (this.extendedHits.value > 0 && this.threshold.value > 0)
+      return this.extendedHits.value < this.threshold.value;
+    return !this.success;
+  }
+  get canSucceed() {
+    if (!this.extended)
+      return true;
+    return this.extended && this.hasThreshold;
+  }
+  get canFail() {
+    return true;
+  }
+  get successLabel() {
+    return "SR5.Success";
+  }
+  get failureLabel() {
+    if (this.extended)
+      return "SR5.Results";
+    return "SR5.Failure";
+  }
+  get opposed() {
+    return !!this.data.opposed && this.data.opposed.test !== "";
+  }
+  get opposing() {
+    return false;
+  }
+  get results() {
+    if (!this.item)
+      return;
+    return this.item.getActionResult();
+  }
+  get hasTargets() {
+    return this.targets.length > 0;
+  }
+  get hasAction() {
+    return !foundry.utils.isObjectEmpty(this.data.action);
+  }
+  get description() {
+    const poolPart = this.pool.value;
+    const thresholdPart = this.hasThreshold ? `(${this.threshold.value})` : "";
+    const limitPart = this.hasLimit ? `[${this.limit.value}]` : "";
+    return `${poolPart} ${thresholdPart} ${limitPart}`;
+  }
+  get hasPushTheLimit() {
+    return this.data.pushTheLimit;
+  }
+  get hasSecondChance() {
+    return this.data.secondChance;
+  }
+  applyPushTheLimit() {
+    if (!this.actor)
+      return;
+    const parts = new PartsList(this.pool.mod);
+    if (this.hasPushTheLimit) {
+      const edge = this.actor.getEdge().value;
+      parts.addUniquePart("SR5.PushTheLimit", edge, true);
+    } else {
+      parts.removePart("SR5.PushTheLimit");
+    }
+  }
+  applySecondChance() {
+    var _a, _b;
+    if (!this.actor)
+      return;
+    const parts = new PartsList(this.pool.mod);
+    if (this.hasSecondChance) {
+      if (this.glitched) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
+        return this;
+      }
+      const lastRoll = this.rolls[this.rolls.length - 1];
+      const dice = lastRoll.poolThrown - lastRoll.hits;
+      if (dice <= 0) {
+        (_b = ui.notifications) == null ? void 0 : _b.warn("SR5.Warnings.CantSecondChanceWithoutNoneHits", { localize: true });
+        return this;
+      }
+      const parts2 = new PartsList(this.pool.mod);
+      parts2.addPart("SR5.SecondChance", dice);
+      const formula = `${dice}d6`;
+      const roll = new SR5Roll(formula);
+      this.rolls.push(roll);
+    } else {
+      parts.removePart("SR5.SecondChance");
+    }
+  }
+  executeSecondChance() {
+    return __async(this, null, function* () {
+      var _a;
+      console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
+      if (!this.data.sourceActorUuid)
+        return this;
+      if (this.glitched) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
+        return this;
+      }
+      yield this.populateDocuments();
+      this.data.secondChance = true;
+      this.applySecondChance();
+      this.calculateBaseValues();
+      const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
+      if (!actorConsumedResources)
+        return this;
+      this.data.secondChance = false;
+      yield this.evaluate();
+      yield this.processResults();
+      yield this.toMessage();
+      yield this.afterTestComplete();
+      return this;
+    });
+  }
+  canConsumeDocumentRessources() {
+    var _a;
+    if (!this.actor)
+      return true;
+    if (this.hasPushTheLimit || this.hasSecondChance) {
+      if (this.actor.getEdge().uses <= 0) {
+        (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.MissingRessource.Edge"));
+        return false;
+      }
+    }
+    return true;
+  }
+  consumeDocumentRessources() {
+    return __async(this, null, function* () {
+      if (!this.actor)
+        return true;
+      if (this.hasPushTheLimit || this.hasSecondChance) {
+        yield this.actor.useEdge();
+      }
+      return true;
+    });
+  }
+  consumeDocumentRessoucesWhenNeeded() {
+    return __async(this, null, function* () {
+      const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
+      if (mustHaveRessouces) {
+        if (!this.canConsumeDocumentRessources())
+          return false;
+      }
+      return yield this.consumeDocumentRessources();
+    });
+  }
+  execute() {
+    return __async(this, null, function* () {
+      yield this.populateTests();
+      yield this.populateDocuments();
+      yield this.prepareDocumentModifiers();
+      yield this.prepareDocumentData();
+      this.alterBaseValues();
+      this.prepareBaseValues();
+      this.calculateBaseValues();
+      const userConsented = yield this.showDialog();
+      if (!userConsented)
+        return this;
+      const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
+      if (!actorConsumedResources)
+        return this;
+      this.createRoll();
+      yield this.evaluate();
+      yield this.processResults();
+      yield this.toMessage();
+      yield this.afterTestComplete();
+      return this;
+    });
+  }
+  processResults() {
+    return __async(this, null, function* () {
+      if (this.success) {
+        yield this.processSuccess();
+      } else {
+        yield this.processFailure();
+      }
+    });
+  }
+  processSuccess() {
+    return __async(this, null, function* () {
+    });
+  }
+  processFailure() {
+    return __async(this, null, function* () {
+    });
+  }
+  afterTestComplete() {
+    return __async(this, null, function* () {
+      console.log(`Shadowrun5e | Test ${this.constructor.name} completed.`, this);
+      if (this.success) {
+        yield this.afterSuccess();
+      } else {
+        yield this.afterFailure();
+      }
+      yield this.executeFollowUpTest();
+      if (this.extended) {
+        yield this.extendCurrentTest();
+      }
+    });
+  }
+  afterSuccess() {
+    return __async(this, null, function* () {
+    });
+  }
+  afterFailure() {
+    return __async(this, null, function* () {
+    });
+  }
+  executeFollowUpTest() {
+    return __async(this, null, function* () {
+      const test = yield TestCreator.fromFollowupTest(this, this.data.options);
+      if (!test)
+        return;
+      yield test.execute();
+    });
+  }
+  extendCurrentTest() {
+    return __async(this, null, function* () {
+      var _a;
+      if (!this.canBeExtended)
+        return;
+      const data = foundry.utils.duplicate(this.data);
+      if (!data.type)
+        return;
+      const pool = new PartsList(data.pool.mod);
+      const currentModifierValue = pool.getPartValue("SR5.ExtendedTest") || 0;
+      const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
+      if (data.pool.override) {
+        data.pool.override.value = Math.max(data.pool.override.value - 1, 0);
+      } else {
+        pool.addUniquePart("SR5.ExtendedTest", nextModifierValue);
+      }
+      Helpers.calcTotal(data.pool, { min: 0 });
+      if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
+        return (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantExtendTestFurther", { localize: true });
+      }
+      const testCls = TestCreator._getTestClass(data.type);
+      if (!testCls)
+        return;
+      const test = new testCls(data, { actor: this.actor, item: this.item }, this.data.options);
+      yield this.populateDocuments();
+      test.data.pushTheLimit = false;
+      test.applyPushTheLimit();
+      test.data.secondChance = false;
+      test.applySecondChance();
+      if (!test.extended) {
+        test.data.extended = true;
+        test.calculateExtendedHits();
+      }
+      yield test.execute();
+    });
+  }
+  rollDiceSoNice() {
+    return __async(this, null, function* () {
+      var _a, _b, _c, _d;
+      if (!game.dice3d || !game.user || !game.users)
+        return;
+      console.log("Shadowrun5e | Initiating DiceSoNice throw");
+      const roll = this.rolls[this.rolls.length - 1];
+      let whisper = null;
+      if (this._applyGmOnlyContent && this.actor) {
+        whisper = game.users.filter((user) => {
+          var _a2;
+          return (_a2 = this.actor) == null ? void 0 : _a2.testUserPermission(user, "OWNER");
+        });
+      }
+      if (((_a = this.data.options) == null ? void 0 : _a.rollMode) === "gmroll" || ((_b = this.data.options) == null ? void 0 : _b.rollMode) === "blindroll") {
+        whisper = whisper || [];
+        whisper = [...game.users.filter((user) => user.isGM), ...whisper];
+      }
+      const blind = ((_c = this.data.options) == null ? void 0 : _c.rollMode) === "blindroll";
+      const synchronize = ((_d = this.data.options) == null ? void 0 : _d.rollMode) === "publicroll";
+      game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
+    });
+  }
+  toMessage() {
+    return __async(this, null, function* () {
+      var _a;
+      if (!((_a = this.data.options) == null ? void 0 : _a.showMessage))
+        return;
+      const templateData = this._prepareMessageTemplateData();
+      const content = yield renderTemplate(this._chatMessageTemplate, templateData);
+      const messageData = this._prepareMessageData(content);
+      const message = yield ChatMessage.create(messageData);
+      if (!message)
+        return;
+      this.data.messageUuid = message.uuid;
+      yield this.rollDiceSoNice();
+      return message;
+    });
+  }
+  _prepareMessageTemplateData() {
+    var _a, _b;
+    const linkedTokens = ((_a = this.actor) == null ? void 0 : _a.getActiveTokens(true)) || [];
+    const token = linkedTokens.length >= 1 ? linkedTokens[0] : void 0;
+    return {
+      title: this.data.title,
+      test: this,
+      speaker: {
+        actor: this.actor,
+        token
+      },
+      item: this.item,
+      opposedActions: this._prepareOpposedActionsTemplateData(),
+      resultActions: this._prepareResultActionsTemplateData(),
+      previewTemplate: this._canPlaceBlastTemplate,
+      showDescription: this._canShowDescription,
+      description: ((_b = this.item) == null ? void 0 : _b.getChatData()) || "",
+      applyGmOnlyContent: this._applyGmOnlyContent
+    };
+  }
+  get _canShowDescription() {
+    return true;
+  }
+  get _canPlaceBlastTemplate() {
+    var _a;
+    return ((_a = this.item) == null ? void 0 : _a.hasTemplate) || false;
+  }
+  get _applyGmOnlyContent() {
+    const enableFeature = game.settings.get(SYSTEM_NAME, FLAGS.HideGMOnlyChatContent);
+    return enableFeature && !!game.user && game.user.isGM && !!this.actor;
+  }
+  get _opposedTestClass() {
+    if (!this.data.opposed || !this.data.opposed.test)
+      return;
+    return TestCreator._getTestClass(this.data.opposed.test);
+  }
+  _prepareOpposedActionsTemplateData() {
+    const testCls = this._opposedTestClass;
+    if (!testCls) {
+      console.error("Shadowrun 5e | Opposed Action has no test class registered.");
+      return [];
+    }
+    const action = {
+      test: testCls.name,
+      label: testCls.label
+    };
+    if (this.data.opposed.mod) {
+      action.label += ` ${this.data.opposed.mod}`;
+    }
+    return [action];
+  }
+  _prepareResultActionsTemplateData() {
+    const actions = [];
+    const actionResultData = this.results;
+    if (!actionResultData)
+      return actions;
+    if (actionResultData.success.matrix.placeMarks) {
+      actions.push({
+        action: "placeMarks",
+        label: "SR5.PlaceMarks",
+        value: ""
+      });
+    }
+    return actions;
+  }
+  _prepareMessageData(content) {
+    var _a, _b, _c, _d, _e, _f;
+    const linkedTokens = ((_a = this.actor) == null ? void 0 : _a.getActiveTokens(true)) || [];
+    const token = linkedTokens.length === 1 ? linkedTokens[0].id : void 0;
+    const actor = (_b = this.actor) == null ? void 0 : _b.id;
+    const alias = (_c = game.user) == null ? void 0 : _c.name;
+    const formula = `0d6`;
+    const roll = new SR5Roll(formula);
+    const messageData = {
+      user: (_d = game.user) == null ? void 0 : _d.id,
+      speaker: {
+        actor,
+        alias,
+        token
+      },
+      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+      roll,
+      content,
+      rollMode: (_e = this.data.options) == null ? void 0 : _e.rollMode,
+      flags: {
+        [SYSTEM_NAME]: { [FLAGS.Test]: this.toJSON() }
+      },
+      sound: CONFIG.sounds.dice
+    };
+    ChatMessage.applyRollMode(messageData, (_f = this.data.options) == null ? void 0 : _f.rollMode);
+    return messageData;
+  }
+  static chatMessageListeners(message, html, data) {
+    return __async(this, null, function* () {
+      html.find(".show-roll").on("click", this._chatToggleCardRolls);
+      html.find(".show-description").on("click", this._chatToggleCardDescription);
+      html.find(".chat-document-link").on("click", Helpers.renderEntityLinkSheet);
+      html.find(".place-template").on("click", this._placeItemBlastZoneTemplate);
+      html.find(".result-action").on("click", this._castResultAction);
+      html.find(".chat-select-link").on("click", this._selectSceneToken);
+      handleRenderChatMessage(message, html, data);
+      yield this._showGmOnlyContent(message, html, data);
+    });
+  }
+  static _showGmOnlyContent(message, html, data) {
+    return __async(this, null, function* () {
+      var _a;
+      const test = yield TestCreator.fromMessage(message.id);
+      if (!test)
+        return;
+      yield test.populateDocuments();
+      if (!test.actor || !game.user) {
+        html.find(".gm-only-content").removeClass("gm-only-content");
+      } else if (game.user.isGM || game.user.isTrusted || ((_a = test.actor) == null ? void 0 : _a.isOwner)) {
+        html.find(".gm-only-content").removeClass("gm-only-content");
+      }
+    });
+  }
+  static _selectSceneToken(event) {
+    return __async(this, null, function* () {
+      var _a, _b;
+      event.preventDefault();
+      event.stopPropagation();
+      if (!game || !game.ready || !canvas || !canvas.ready)
+        return;
+      const selectLink = $(event.currentTarget);
+      const tokenId = selectLink.data("tokenId");
+      const token = (_a = canvas.tokens) == null ? void 0 : _a.get(tokenId);
+      if (token && token instanceof Token) {
+        token.control();
+      } else {
+        (_b = ui.notifications) == null ? void 0 : _b.warn(game.i18n.localize("SR5.NoSelectableToken"));
+      }
+    });
+  }
+  static chatLogListeners(chatLog, html, data) {
+    return __async(this, null, function* () {
+      html.find(".chat-message").each((index, element) => __async(this, null, function* () {
+        var _a;
+        element = $(element);
+        const id = element.data("messageId");
+        const message = (_a = game.messages) == null ? void 0 : _a.get(id);
+        if (!message)
+          return;
+        yield this.chatMessageListeners(message, element, message.toObject());
+      }));
+    });
+  }
+  static _placeItemBlastZoneTemplate(event) {
+    return __async(this, null, function* () {
+      event.preventDefault();
+      event.stopPropagation();
+      const element = $(event.currentTarget);
+      const card = element.closest(".chat-message");
+      const messageId = card.data("messageId");
+      const test = yield TestCreator.fromMessage(messageId);
+      if (!test)
+        return;
+      yield test.populateDocuments();
+      if (!test.item)
+        return;
+      const template = Template.fromItem(test.item);
+      if (!template)
+        return;
+      yield template.drawPreview();
+    });
+  }
+  static chatMessageContextOptions(html, options) {
+    const secondChance = (li) => __async(this, null, function* () {
+      const messageId = li.data().messageId;
+      const test = yield TestCreator.fromMessage(messageId);
+      if (!test)
+        return console.error("Shadowrun 5e | Could not restore test from message");
+      yield test.executeSecondChance();
+    });
+    const extendTest = (li) => __async(this, null, function* () {
+      var _a;
+      const messageId = li.data().messageId;
+      const test = yield TestCreator.fromMessage(messageId);
+      if (!test)
+        return console.error("Shadowrun 5e | Could not restore test from message");
+      if (!test.canBeExtended) {
+        return (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantExtendTest", { localize: true });
+      }
+      yield test.extendCurrentTest();
+    });
+    const deleteOption = options.pop();
+    options.push({
+      name: game.i18n.localize("SR5.SecondChance"),
+      callback: secondChance,
+      condition: true,
+      icon: '<i class="fas fa-meteor"></i>'
+    });
+    options.push({
+      name: game.i18n.localize("SR5.Extend"),
+      callback: extendTest,
+      condition: true,
+      icon: '<i class="fas fa-clock"></i>'
+    });
+    options.push(deleteOption);
+    return options;
+  }
+  static _chatToggleCardRolls(event) {
+    return __async(this, null, function* () {
+      event.preventDefault();
+      event.stopPropagation();
+      const card = $(event.currentTarget).closest(".chat-card");
+      const element = card.find(".dice-rolls");
+      if (element.is(":visible"))
+        element.slideUp(200);
+      else
+        element.slideDown(200);
+    });
+  }
+  static _chatToggleCardDescription(event) {
+    return __async(this, null, function* () {
+      event.preventDefault();
+      event.stopPropagation();
+      const card = $(event.currentTarget).closest(".chat-card");
+      const element = card.find(".card-description");
+      if (element.is(":visible"))
+        element.slideUp(200);
+      else
+        element.slideDown(200);
+    });
+  }
+  static _castResultAction(event) {
+    return __async(this, null, function* () {
+      event.preventDefault();
+      event.stopPropagation();
+      const element = $(event.currentTarget);
+      const resultAction = element.data("action");
+      const messageId = element.closest(".chat-message").data("messageId");
+      const test = yield TestCreator.fromMessage(messageId);
+      if (!test)
+        return console.error(`Shadowrun5e | Couldn't find both a result action ('${resultAction}') and extract test from message ('${messageId}')`);
+      yield test.populateDocuments();
+      yield ActionResultFlow.executeResult(resultAction, test);
+    });
+  }
+};
+
+// src/module/tests/OpposedTest.ts
+var OpposedTest = class extends SuccessTest {
+  constructor(data, documents, options) {
+    super(data, documents, options);
+    const AgainstCls = data.against ? TestCreator._getTestClass(data.against.type) : SuccessTest;
+    this.against = new AgainstCls(data.against || {});
+  }
+  _prepareData(data, options) {
+    data = super._prepareData(data, options);
+    delete data.opposed;
+    delete data.targetActorsUuid;
+    return data;
+  }
+  populateDocuments() {
+    return __async(this, null, function* () {
+      yield __superGet(OpposedTest.prototype, this, "populateDocuments").call(this);
+      yield this.against.populateDocuments();
+    });
+  }
+  static _getOpposedActionTestData(againstData, actor, previousMessageId) {
+    return __async(this, null, function* () {
+      if (!againstData.opposed) {
+        console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
+        return;
+      }
+      if (againstData.opposed.type !== "") {
+        console.warn(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
+      }
+      if (!actor) {
+        console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
+        return;
+      }
+      const data = {
+        title: againstData.opposed.description || void 0,
+        previousMessageId,
+        pool: DefaultValues.valueData({ label: "SR5.DicePool" }),
+        limit: DefaultValues.valueData({ label: "SR5.Limit" }),
+        threshold: DefaultValues.valueData({ label: "SR5.Threshold" }),
+        values: {},
+        sourceItemUuid: againstData.sourceItemUuid,
+        against: againstData
+      };
+      data.threshold.base = againstData.values.netHits.value;
+      let action = DefaultValues.actionData();
+      action = TestCreator._mergeMinimalActionDataInOrder(action, againstData.opposed, this._getDefaultTestAction());
+      if (againstData.sourceItemUuid) {
+        const item = yield fromUuid(againstData.sourceItemUuid);
+        if (item) {
+          const itemAction = yield this._getDocumentTestAction(item, actor);
+          action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
+        }
+      }
+      return yield this._prepareActionTestData(action, actor, data);
+    });
+  }
+  get opposed() {
+    return false;
+  }
+  get opposing() {
+    return true;
+  }
+  get canBeExtended() {
+    return false;
+  }
+  get _canShowDescription() {
+    return false;
+  }
+  get _canPlaceBlastTemplate() {
+    return false;
+  }
+  prepareItemModifiers() {
+    return __async(this, null, function* () {
+      if (!this.item)
+        return;
+      const opposedMod = this.item.getOpposedTestMod();
+      for (const modifier of opposedMod.list) {
+        PartsList.AddUniquePart(this.data.modifiers.mod, modifier.name, modifier.value, true);
+      }
+    });
+  }
+  static _castOpposedAction(event) {
+    return __async(this, null, function* () {
+      event.preventDefault();
+      const button = $(event.currentTarget);
+      const card = button.closest(".chat-message");
+      const messageId = card.data("messageId");
+      const opposedActionTest = button.data("action");
+      const showDialog = !TestCreator.shouldHideDialog(event);
+      yield TestCreator.fromMessageAction(messageId, opposedActionTest, { showDialog });
+    });
+  }
+  static chatMessageListeners(message, html, data) {
+    return __async(this, null, function* () {
+      html.find(".opposed-action").on("click", OpposedTest._castOpposedAction);
+    });
+  }
+};
+
+// src/module/tests/DefenseTest.ts
+var DefenseTest = class extends OpposedTest {
+  _prepareData(data, options) {
+    data = super._prepareData(data, options);
+    const damage = data.against ? data.against.damage : DefaultValues.damageData();
+    data.incomingDamage = foundry.utils.duplicate(damage);
+    data.modifiedDamage = foundry.utils.duplicate(damage);
+    return data;
+  }
+  get _chatMessageTemplate() {
+    return "systems/shadowrun5e/dist/templates/rolls/defense-test-message.html";
+  }
+  get successLabel() {
+    return "SR5.AttackDodged";
+  }
+  get failureLabel() {
+    return "SR5.AttackHits";
+  }
+  get hasChangedInitiative() {
+    return this.data.iniMod !== void 0;
+  }
+  get initiativeModifier() {
+    return this.data.iniMod || 0;
+  }
+};
+
+// src/module/tests/PhysicalDefenseTest.ts
+var PhysicalDefenseTest = class extends DefenseTest {
+  _prepareData(data, options) {
+    data = super._prepareData(data, options);
+    data.cover = 0;
+    data.activeDefense = "";
+    data.activeDefenses = {};
+    data.isMeleeAttack = false;
+    data.defenseReach = 0;
+    return data;
+  }
+  get _dialogTemplate() {
+    return "systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html";
+  }
+  static _getDefaultTestAction() {
+    return DefaultValues.minimalActionData({
+      "attribute": "reaction",
+      "attribute2": "intuition"
+    });
+  }
+  get testModifiers() {
+    return ["global", "wounds", "defense"];
+  }
+  prepareDocumentData() {
+    return __async(this, null, function* () {
+      this.prepareActiveDefense();
+      this.prepareMeleeReach();
+      yield __superGet(PhysicalDefenseTest.prototype, this, "prepareDocumentData").call(this);
+    });
+  }
+  prepareActiveDefense() {
+    var _a, _b, _c;
+    if (!this.actor)
+      return;
+    const actor = this.actor;
+    this.data.activeDefenses = {
+      full_defense: {
+        label: "SR5.FullDefense",
+        value: (_a = actor.getFullDefenseAttribute()) == null ? void 0 : _a.value,
+        initMod: -10
+      },
+      dodge: {
+        label: "SR5.Dodge",
+        value: (_b = actor.findActiveSkill("gymnastics")) == null ? void 0 : _b.value,
+        initMod: -5
+      },
+      block: {
+        label: "SR5.Block",
+        value: (_c = actor.findActiveSkill("unarmed_combat")) == null ? void 0 : _c.value,
+        initMod: -5
+      }
+    };
+    const equippedMeleeWeapons = actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+    equippedMeleeWeapons.forEach((weapon) => {
+      var _a2;
+      this.data.activeDefenses[`parry-${weapon.name}`] = {
+        label: "SR5.Parry",
+        weapon: weapon.name || "",
+        value: (_a2 = actor.findActiveSkill(weapon.getActionSkill())) == null ? void 0 : _a2.value,
+        initMod: -5
+      };
+    });
+  }
+  prepareMeleeReach() {
+    if (!this.against.item)
+      return;
+    this.data.isMeleeAttack = this.against.item.isMeleeWeapon();
+    if (!this.data.isMeleeAttack)
+      return;
+    if (!this.actor)
+      return;
+    const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+    equippedMeleeWeapons.forEach((weapon) => {
+      this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());
+    });
+    const attackData = this.against.data;
+    const incomingReach = attackData.reach || 0;
+    const defenseReach = this.data.defenseReach;
+    this.data.defenseReach = MeleeRules.defenseReachModifier(incomingReach, defenseReach);
+  }
+  calculateBaseValues() {
+    super.calculateBaseValues();
+    this.applyIniModFromActiveDefense();
+  }
+  applyPoolModifiers() {
+    this.applyPoolCoverModifier();
+    this.applyPoolActiveDefenseModifier();
+    this.applyPoolMeleeReachModifier();
+    this.applyPoolRangedFireModModifier();
+    super.applyPoolModifiers();
+  }
+  applyPoolCoverModifier() {
+    this.data.cover = foundry.utils.getType(this.data.cover) === "string" ? Number(this.data.cover) : this.data.cover;
+    PartsList.AddUniquePart(this.data.modifiers.mod, "SR5.Cover", this.data.cover);
+  }
+  applyPoolActiveDefenseModifier() {
+    const defense = this.data.activeDefenses[this.data.activeDefense] || { label: "SR5.ActiveDefense", value: 0, init: 0 };
+    PartsList.AddUniquePart(this.data.modifiers.mod, "SR5.ActiveDefense", defense.value);
+  }
+  applyPoolMeleeReachModifier() {
+    if (!this.data.isMeleeAttack)
+      return;
+    PartsList.AddUniquePart(this.data.modifiers.mod, "SR5.WeaponReach", this.data.defenseReach);
+  }
+  applyPoolRangedFireModModifier() {
+    if (!this.against.item)
+      return;
+    if (!this.against.item.isRangedWeapon())
+      return;
+    const fireMode = this.against.item.getLastFireMode();
+    if (!fireMode.defense)
+      return;
+    PartsList.AddUniquePart(this.data.modifiers.mod, fireMode.label, Number(fireMode.defense));
+  }
+  get success() {
+    return CombatRules.attackMisses(this.against.hits.value, this.hits.value);
+  }
+  get failure() {
+    return CombatRules.attackHits(this.against.hits.value, this.hits.value);
+  }
+  processSuccess() {
+    return __async(this, null, function* () {
+      this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
+      yield __superGet(PhysicalDefenseTest.prototype, this, "processSuccess").call(this);
+    });
+  }
+  processFailure() {
+    return __async(this, null, function* () {
+      this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
+      yield __superGet(PhysicalDefenseTest.prototype, this, "processFailure").call(this);
+    });
+  }
+  afterFailure() {
+    return __async(this, null, function* () {
+      const test = yield TestCreator.fromOpposedTestResistTest(this, this.data.options);
+      if (!test)
+        return;
+      yield test.execute();
+    });
+  }
+  canConsumeDocumentRessources() {
+    var _a;
+    if (this.actor && this.data.iniMod && game.combat) {
+      const combat = game.combat;
+      const combatant = combat.getActorCombatant(this.actor);
+      if (combatant && combatant.initiative + this.data.iniMod < 0) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.MissingRessource.Initiative", { localize: true });
+        return false;
+      }
+    }
+    return super.canConsumeDocumentRessources();
+  }
+  applyIniModFromActiveDefense() {
+    if (!this.actor)
+      return;
+    if (!this.data.activeDefense)
+      return;
+    const activeDefense = this.data.activeDefenses[this.data.activeDefense];
+    if (!activeDefense)
+      return;
+    this.data.iniMod = activeDefense.initMod;
+  }
+  _prepareResultActionsTemplateData() {
+    const actions = super._prepareResultActionsTemplateData();
+    if (!this.data.activeDefense)
+      return actions;
+    const activeDefense = this.data.activeDefenses[this.data.activeDefense];
+    if (!activeDefense)
+      return actions;
+    actions.push({
+      action: "modifyCombatantInit",
+      label: "SR5.Initiative",
+      value: String(activeDefense.initMod)
+    });
+    return actions;
+  }
+};
+
+// src/module/item/flows/ActionResultFlow.ts
+var ActionResultFlow = class {
+  static get _handlersResultAction() {
+    const handlers = /* @__PURE__ */ new Map();
+    handlers.set("placeMarks", () => {
+      var _a;
+      return (_a = ui.notifications) == null ? void 0 : _a.error("Placing marks currently isnt suported. Sorry!");
+    });
+    handlers.set("modifyCombatantInit", ActionResultFlow._castInitModifierAction);
+    return handlers;
+  }
+  static executeResult(resultAction, test) {
+    return __async(this, null, function* () {
+      const handler = ActionResultFlow._handlersResultAction.get(resultAction);
+      if (!handler)
+        return console.error(`Shadowrun 5e | Action result ${resultAction} has not handler registered`);
+      yield handler(test);
     });
   }
   static placeMatrixMarks(active, targets, marks) {
@@ -12676,6 +14344,16 @@ var ActionResultFlow = class {
       for (const target of targets) {
         yield active.setMarks(target, marks);
       }
+    });
+  }
+  static _castInitModifierAction(test) {
+    return __async(this, null, function* () {
+      var _a;
+      if (!(test instanceof PhysicalDefenseTest))
+        return;
+      if (!test.data.iniMod)
+        return;
+      yield (_a = test.actor) == null ? void 0 : _a.changeCombatInitiative(test.data.iniMod);
     });
   }
 };
@@ -12740,7 +14418,6 @@ var chatMessageActionApplyDamage = (html, event) => __async(void 0, null, functi
   const element = String(applyDamage.data("damageElement"));
   let damage = Helpers.createDamageData(value, type, ap, element);
   let actors = Helpers.getSelectedActorsOrCharacter();
-  console.error("damage application");
   if (actors.length === 0) {
     const messageId = html.data("messageId");
     const message = (_a = game.messages) == null ? void 0 : _a.get(messageId);
@@ -15700,1060 +17377,6 @@ var ModifierFlow = class {
   }
 };
 
-// src/module/apps/dialogs/TestDialog.ts
-var TestDialog = class extends FormDialog {
-  constructor(data, options = {}) {
-    options.applyFormChangesOnSubmit = true;
-    super(data, options);
-  }
-  static get defaultOptions() {
-    const options = super.defaultOptions;
-    options.id = "test-dialog";
-    options.classes = ["sr5", "form-dialog"];
-    options.resizable = true;
-    options.height = "auto";
-    options.width = "auto";
-    return options;
-  }
-  activateListeners(html) {
-    super.activateListeners(html);
-    html.find(".entity-link").on("click", Helpers.renderEntityLinkSheet);
-  }
-  get templateContent() {
-    return "systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html";
-  }
-  getData() {
-    var _a;
-    const data = super.getData();
-    data.rollMode = (_a = data.test.data.options) == null ? void 0 : _a.rollMode;
-    data.rollModes = CONFIG.Dice.rollModes;
-    data.default = "roll";
-    data.config = SR5;
-    return data;
-  }
-  get title() {
-    const data = this.data;
-    return game.i18n.localize(data.test.title);
-  }
-  get buttons() {
-    return {
-      roll: {
-        label: game.i18n.localize("SR5.Roll"),
-        icon: '<i class="fas fa-dice-six"></i>'
-      },
-      cancel: {
-        label: game.i18n.localize("SR5.Dialogs.Common.Cancel")
-      }
-    };
-  }
-  onAfterClose(html) {
-    return this.data.test.data;
-  }
-  _updateData(data) {
-    if (this.selectedButton === "cancel")
-      return;
-    Object.entries(data).forEach(([key, value]) => {
-      const valueField = foundry.utils.getProperty(this.data, key);
-      if (foundry.utils.getType(valueField) !== "Object" || !valueField.hasOwnProperty("mod"))
-        return;
-      delete data[key];
-      if (valueField.value === value)
-        return;
-      if (value === null || value === "")
-        delete valueField.override;
-      else
-        valueField.override = { name: "SR5.ManualOverride", value };
-    });
-    foundry.utils.mergeObject(this.data, data);
-    this.data.test.prepareBaseValues();
-    this.data.test.calculateBaseValues();
-  }
-};
-
-// src/module/template.ts
-var Template = class extends MeasuredTemplate {
-  static fromItem(item, onComplete) {
-    var _a, _b;
-    const templateShape = "circle";
-    const templateData = {
-      t: templateShape,
-      user: (_a = game.user) == null ? void 0 : _a.id,
-      direction: 0,
-      x: 0,
-      y: 0,
-      fillColor: (_b = game.user) == null ? void 0 : _b.color
-    };
-    const blast = item.getBlastData();
-    templateData["distance"] = blast == null ? void 0 : blast.radius;
-    templateData["dropoff"] = blast == null ? void 0 : blast.dropoff;
-    const document2 = new MeasuredTemplateDocument(templateData, { parent: canvas.scene });
-    const template = new Template(document2);
-    template.item = item;
-    template.onComplete = onComplete;
-    return template;
-  }
-  drawPreview() {
-    return __async(this, null, function* () {
-      if (!canvas.ready || !this.layer.preview)
-        return;
-      const initialLayer = canvas.activeLayer;
-      if (!initialLayer)
-        return;
-      yield this.draw();
-      this.layer.activate();
-      this.layer.preview.addChild(this);
-      this.activatePreviewListeners(initialLayer);
-    });
-  }
-  activatePreviewListeners(initialLayer) {
-    if (!canvas.ready || !canvas.stage || !canvas.app)
-      return;
-    const handlers = {};
-    let moveTime = 0;
-    handlers["mm"] = (event) => {
-      event.stopPropagation();
-      if (!canvas.grid)
-        return;
-      let now = Date.now();
-      if (now - moveTime <= 20)
-        return;
-      const center = event.data.getLocalPosition(this.layer);
-      const snapped = canvas.grid.getSnappedPosition(center.x, center.y, 2);
-      this.data.x = snapped.x;
-      this.data.y = snapped.y;
-      this.refresh();
-      moveTime = now;
-    };
-    handlers["rc"] = () => {
-      if (!canvas.ready || !this.layer.preview || !canvas.stage || !canvas.app)
-        return;
-      this.layer.preview.removeChildren();
-      canvas.stage.off("mousemove", handlers["mm"]);
-      canvas.stage.off("mousedown", handlers["lc"]);
-      canvas.app.view.oncontextmenu = null;
-      canvas.app.view.onwheel = null;
-      initialLayer.activate();
-      if (this.onComplete)
-        this.onComplete();
-    };
-    handlers["lc"] = (event) => {
-      var _a;
-      handlers["rc"](event);
-      if (!canvas.grid)
-        return;
-      const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
-      this.data.update({ x: destination.x, y: destination.y });
-      (_a = canvas.scene) == null ? void 0 : _a.createEmbeddedDocuments("MeasuredTemplate", [this.data]);
-    };
-    handlers["mw"] = (event) => {
-      if (event.ctrlKey)
-        event.preventDefault();
-      event.stopPropagation();
-      if (!canvas.grid)
-        return;
-      let delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
-      let snap = event.shiftKey ? delta : 5;
-      this.data.direction += snap * Math.sign(event.deltaY);
-      this.refresh();
-    };
-    canvas.stage.on("mousemove", handlers["mm"]);
-    canvas.stage.on("mousedown", handlers["lc"]);
-    canvas.app.view.oncontextmenu = handlers["rc"];
-    canvas.app.view.onwheel = handlers["mw"];
-  }
-};
-
-// src/module/rules/TestRules.ts
-var TestRules = {
-  extendedModifierValue: -1,
-  calcNextExtendedModifier: (current = 0) => {
-    return current + TestRules.extendedModifierValue;
-  },
-  canExtendTest: (pool, threshold, extendedHits) => {
-    if (threshold > 0)
-      return extendedHits < threshold && pool > 0;
-    return pool > 0;
-  },
-  success: (hits, threshold) => {
-    hits = Math.max(hits, 0);
-    threshold = Math.max(threshold, 0);
-    if (threshold > 0)
-      return hits >= threshold;
-    else
-      return hits > 0;
-  },
-  glitched: (glitches, pool) => {
-    glitches = Math.max(glitches, 0);
-    pool = Math.max(pool, 1);
-    return glitches > Math.floor(pool / 2);
-  },
-  criticalGlitched: (success, glitched) => {
-    return !success && glitched;
-  }
-};
-
-// src/module/tests/SuccessTest.ts
-var SuccessTest = class {
-  constructor(data, documents, options) {
-    this.actor = documents == null ? void 0 : documents.actor;
-    this.item = documents == null ? void 0 : documents.item;
-    this.rolls = (documents == null ? void 0 : documents.rolls) || [];
-    this.targets = [];
-    this.evaluated = false;
-    options = options || {};
-    this.data = this._prepareData(data, options);
-    this.calculateBaseValues();
-    console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
-  }
-  _prepareData(data, options) {
-    var _a, _b;
-    data.type = data.type || this.type;
-    data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map((token) => {
-      var _a2;
-      return (_a2 = token.actor) == null ? void 0 : _a2.uuid;
-    }).filter((uuid) => !!uuid);
-    data.sourceActorUuid = data.sourceActorUuid || ((_a = this.actor) == null ? void 0 : _a.uuid);
-    data.sourceItemUuid = data.sourceItemUuid || ((_b = this.item) == null ? void 0 : _b.uuid);
-    data.title = data.title || this.constructor.label;
-    options.rollMode = options.rollMode !== void 0 ? options.rollMode : game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
-    options.showDialog = options.showDialog !== void 0 ? options.showDialog : true;
-    options.showMessage = options.showMessage !== void 0 ? options.showMessage : true;
-    data.options = options;
-    data.pushTheLimit = data.pushTheLimit !== void 0 ? data.pushTheLimit : false;
-    data.secondChance = data.secondChance !== void 0 ? data.secondChance : false;
-    data.pool = data.pool || DefaultValues.valueData({ label: "SR5.DicePool" });
-    data.threshold = data.threshold || DefaultValues.valueData({ label: "SR5.Threshold" });
-    data.limit = data.limit || DefaultValues.valueData({ label: "SR5.Limit" });
-    data.values = data.values || {};
-    data.values.hits = data.values.hits || DefaultValues.valueData({ label: "SR5.Hits" });
-    data.values.extendedHits = data.values.extendedHits || DefaultValues.valueData({ label: "SR5.ExtendedHits" });
-    data.values.netHits = data.values.netHits || DefaultValues.valueData({ label: "SR5.NetHits" });
-    data.values.glitches = data.values.glitches || DefaultValues.valueData({ label: "SR5.Glitches" });
-    data.opposed = data.opposed || void 0;
-    data.modifiers = this._prepareModifiers(data.modifiers);
-    data.damage = data.damage || DefaultValues.damageData();
-    return data;
-  }
-  _prepareModifiers(modifiers) {
-    return modifiers || DefaultValues.valueData({ label: "SR5.Labels.Action.Modifiers" });
-  }
-  get type() {
-    return this.constructor.name;
-  }
-  toJSON() {
-    return {
-      data: this.data,
-      rolls: this.rolls
-    };
-  }
-  static get lowestSuccessSide() {
-    return Math.min(...SR.die.success);
-  }
-  static get lowestGlitchSide() {
-    return Math.min(...SR.die.glitch);
-  }
-  static _getDefaultTestAction() {
-    return {};
-  }
-  static _getDocumentTestAction(item, actor) {
-    return __async(this, null, function* () {
-      return {};
-    });
-  }
-  static _prepareActionTestData(action, actor, data) {
-    return __async(this, null, function* () {
-      return TestCreator._prepareTestDataWithAction(action, actor, data);
-    });
-  }
-  static _getOpposedActionTestData(testData, actor, previousMessageId) {
-    return __async(this, null, function* () {
-      console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
-      return;
-    });
-  }
-  static get label() {
-    return `SR5.Tests.${this.name}`;
-  }
-  get hasModifiers() {
-    return this.data.modifiers.mod.length > 0;
-  }
-  get formula() {
-    const pool = Helpers.calcTotal(this.data.pool, { min: 0 });
-    const explode = this.hasPushTheLimit ? "x6" : "";
-    return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}${explode}`;
-  }
-  get code() {
-    let pool = this.pool.mod.filter((mod) => mod.value !== 0).map((mod) => `${game.i18n.localize(mod.name)} (${mod.value})`);
-    let threshold = this.threshold.override ? [game.i18n.localize(this.threshold.override.name)] : this.threshold.mod.map((mod) => game.i18n.localize(mod.name));
-    let limit = this.limit.override ? [game.i18n.localize(this.limit.override.name)] : this.limit.mod.map((mod) => game.i18n.localize(mod.name));
-    if (this.pool.base > 0)
-      pool.push(String(this.pool.base));
-    if (this.threshold.base > 0 && !this.threshold.override)
-      threshold.push(String(this.threshold.base));
-    if (this.limit.base > 0 && !this.limit.override)
-      limit.push(String(this.limit.base));
-    let code = pool.join(" + ").trim() || `${this.pool.value}`;
-    if (threshold.length > 0 && this.threshold.value > 0)
-      code = `${code} (${threshold.join(" + ").trim()})`;
-    if (limit.length > 0 && this.limit.value > 0)
-      code = `${code} [${limit.join(" + ").trim()}]`;
-    return code;
-  }
-  get hasCode() {
-    return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
-  }
-  get title() {
-    return `${game.i18n.localize(this.constructor.label)}`;
-  }
-  createRoll() {
-    const roll = new SR5Roll(this.formula);
-    this.rolls.push(roll);
-    return roll;
-  }
-  get _dialogTemplate() {
-    return "systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html";
-  }
-  get _chatMessageTemplate() {
-    return "systems/shadowrun5e/dist/templates/rolls/success-test-message.html";
-  }
-  _createTestDialog() {
-    return new TestDialog({ test: this, templatePath: this._dialogTemplate });
-  }
-  showDialog() {
-    return __async(this, null, function* () {
-      var _a;
-      if (!((_a = this.data.options) == null ? void 0 : _a.showDialog))
-        return true;
-      const dialog = this._createTestDialog();
-      const data = yield dialog.select();
-      if (dialog.canceled)
-        return false;
-      this.data = data;
-      yield this.saveUserSelectionAfterDialog();
-      this.prepareBaseValues();
-      this.calculateBaseValues();
-      return true;
-    });
-  }
-  saveUserSelectionAfterDialog() {
-    return __async(this, null, function* () {
-    });
-  }
-  prepareBaseValues() {
-    this.applyPushTheLimit();
-    this.applyPoolModifiers();
-  }
-  applyPoolModifiers() {
-    const pool = new PartsList(this.pool.mod);
-    pool.removePart("SR5.Labels.Action.Modifiers");
-    if (this.data.modifiers.override) {
-      for (const modifier of this.data.modifiers.mod) {
-        pool.removePart(modifier.name);
-      }
-      pool.addUniquePart("SR5.Labels.Action.Modifiers", this.data.modifiers.override.value);
-      return;
-    }
-    for (const modifier of this.data.modifiers.mod) {
-      pool.addUniquePart(modifier.name, modifier.value);
-    }
-  }
-  calculateBaseValues() {
-    this.data.modifiers.value = Helpers.calcTotal(this.data.modifiers);
-    this.data.pool.value = Helpers.calcTotal(this.data.pool, { min: 0 });
-    this.data.threshold.value = Helpers.calcTotal(this.data.threshold, { min: 0 });
-    this.data.limit.value = Helpers.calcTotal(this.data.limit, { min: 0 });
-    console.log(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
-  }
-  evaluate() {
-    return __async(this, null, function* () {
-      for (const roll of this.rolls) {
-        if (!roll._evaluated)
-          yield roll.evaluate({ async: true });
-      }
-      this.evaluated = true;
-      this.calculateDerivedValues();
-      return this;
-    });
-  }
-  populateTests() {
-    return __async(this, null, function* () {
-    });
-  }
-  populateDocuments() {
-    return __async(this, null, function* () {
-      if (!this.actor && this.data.sourceActorUuid) {
-        const document2 = (yield fromUuid(this.data.sourceActorUuid)) || void 0;
-        this.actor = document2 instanceof TokenDocument ? document2.actor : document2;
-      }
-      if (!this.item && this.data.sourceItemUuid)
-        this.item = (yield fromUuid(this.data.sourceItemUuid)) || void 0;
-      if (this.targets.length === 0 && this.data.targetActorsUuid) {
-        this.targets = [];
-        for (const uuid of this.data.targetActorsUuid) {
-          const document2 = yield fromUuid(uuid);
-          if (!document2)
-            continue;
-          const token = document2 instanceof SR5Actor ? document2.getToken() : document2;
-          if (!(token instanceof TokenDocument))
-            continue;
-          this.targets.push(token);
-        }
-      }
-    });
-  }
-  prepareDocumentData() {
-    return __async(this, null, function* () {
-      this.data.damage = ActionFlow.calcDamage(this.data.damage, this.actor, this.item);
-    });
-  }
-  get testModifiers() {
-    return ["global", "wounds"];
-  }
-  prepareDocumentModifiers() {
-    return __async(this, null, function* () {
-      yield this.prepareActorModifiers();
-      yield this.prepareItemModifiers();
-    });
-  }
-  prepareActorModifiers() {
-    return __async(this, null, function* () {
-      if (!this.actor)
-        return;
-      if (this.data.action.modifiers.length > 0)
-        return;
-      for (const type of this.testModifiers) {
-        const value = yield this.actor.modifiers.totalFor(type);
-        const name = SR5.modifierTypes[type];
-        PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
-      }
-    });
-  }
-  prepareItemModifiers() {
-    return __async(this, null, function* () {
-    });
-  }
-  calculateDerivedValues() {
-    this.data.values.hits = this.calculateHits();
-    this.data.values.extendedHits = this.calculateExtendedHits();
-    this.data.values.netHits = this.calculateNetHits();
-    this.data.values.glitches = this.calculateGlitches();
-    console.log(`Shadowrun 5e | Calculated derived values for ${this.constructor.name}`, this.data);
-  }
-  get pool() {
-    return this.data.pool;
-  }
-  get limit() {
-    return this.data.limit;
-  }
-  get hasLimit() {
-    const applyLimit = game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits);
-    return applyLimit && !this.hasPushTheLimit && this.limit.value > 0;
-  }
-  get hasReducedHits() {
-    return this.hits.value > this.limit.value;
-  }
-  get threshold() {
-    return this.data.threshold;
-  }
-  get hasThreshold() {
-    return this.threshold.value > 0;
-  }
-  calculateNetHits() {
-    const hits = this.extended ? this.extendedHits : this.hits;
-    const base = this.hasThreshold ? Math.max(hits.value - this.threshold.value, 0) : hits.value;
-    const netHits = DefaultValues.valueData({
-      label: "SR5.NetHits",
-      base
-    });
-    netHits.value = Helpers.calcTotal(netHits, { min: 0 });
-    return netHits;
-  }
-  get netHits() {
-    return this.data.values.netHits;
-  }
-  calculateHits() {
-    const rollHits = this.rolls.reduce((hits2, roll) => hits2 + roll.hits, 0);
-    const hits = DefaultValues.valueData({
-      label: "SR5.Hits",
-      base: this.hasLimit ? Math.min(this.limit.value, rollHits) : rollHits
-    });
-    hits.value = Helpers.calcTotal(hits, { min: 0 });
-    return hits;
-  }
-  get hits() {
-    return this.data.values.hits;
-  }
-  get extendedHits() {
-    return this.data.values.extendedHits || DefaultValues.valueData({ label: "SR5.ExtendedHits" });
-  }
-  calculateGlitches() {
-    const rollGlitches = this.rolls.reduce((glitches2, roll) => glitches2 + roll.glitches, 0);
-    const glitches = DefaultValues.valueData({
-      label: "SR5.Glitches",
-      base: rollGlitches
-    });
-    glitches.value = Helpers.calcTotal(glitches, { min: 0 });
-    return glitches;
-  }
-  calculateExtendedHits() {
-    if (!this.extended)
-      return DefaultValues.valueData({ label: "SR5.ExtendedHits" });
-    const extendedHits = this.extendedHits;
-    extendedHits.mod = PartsList.AddPart(extendedHits.mod, "SR5.Hits", this.hits.value);
-    Helpers.calcTotal(extendedHits, { min: 0 });
-    return extendedHits;
-  }
-  get extended() {
-    return this.canBeExtended && this.data.extended;
-  }
-  get canBeExtended() {
-    return true;
-  }
-  get glitches() {
-    return this.data.values.glitches;
-  }
-  get glitched() {
-    return TestRules.glitched(this.glitches.value, this.pool.value);
-  }
-  get criticalGlitched() {
-    return TestRules.criticalGlitched(this.success, this.glitched);
-  }
-  get success() {
-    const hits = this.extended ? this.extendedHits : this.hits;
-    return TestRules.success(hits.value, this.threshold.value);
-  }
-  get failure() {
-    if (this.extended && this.threshold.value === 0)
-      return true;
-    if (this.extendedHits.value > 0 && this.threshold.value > 0)
-      return this.extendedHits.value < this.threshold.value;
-    return !this.success;
-  }
-  get canSucceed() {
-    if (!this.extended)
-      return true;
-    return this.extended && this.hasThreshold;
-  }
-  get canFail() {
-    return true;
-  }
-  get successLabel() {
-    return "SR5.Success";
-  }
-  get failureLabel() {
-    if (this.extended)
-      return "SR5.Results";
-    return "SR5.Failure";
-  }
-  get opposed() {
-    return !!this.data.opposed && this.data.opposed.test !== "";
-  }
-  get opposing() {
-    return false;
-  }
-  get hasResults() {
-    if (!this.item)
-      return false;
-    const actionResultData = this.item.getActionResult();
-    if (!actionResultData)
-      return false;
-    return !foundry.utils.isObjectEmpty(actionResultData);
-  }
-  get results() {
-    if (!this.item)
-      return;
-    return this.item.getActionResult();
-  }
-  get hasTargets() {
-    return this.targets.length > 0;
-  }
-  get hasAction() {
-    return !foundry.utils.isObjectEmpty(this.data.action);
-  }
-  get description() {
-    const poolPart = this.pool.value;
-    const thresholdPart = this.hasThreshold ? `(${this.threshold.value})` : "";
-    const limitPart = this.hasLimit ? `[${this.limit.value}]` : "";
-    return `${poolPart} ${thresholdPart} ${limitPart}`;
-  }
-  get hasPushTheLimit() {
-    return this.data.pushTheLimit;
-  }
-  get hasSecondChance() {
-    return this.data.secondChance;
-  }
-  applyPushTheLimit() {
-    if (!this.actor)
-      return;
-    const parts = new PartsList(this.pool.mod);
-    if (this.hasPushTheLimit) {
-      const edge = this.actor.getEdge().value;
-      parts.addUniquePart("SR5.PushTheLimit", edge, true);
-    } else {
-      parts.removePart("SR5.PushTheLimit");
-    }
-  }
-  applySecondChance() {
-    var _a, _b;
-    if (!this.actor)
-      return;
-    const parts = new PartsList(this.pool.mod);
-    if (this.hasSecondChance) {
-      if (this.glitched) {
-        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
-        return this;
-      }
-      const lastRoll = this.rolls[this.rolls.length - 1];
-      const dice = lastRoll.poolThrown - lastRoll.hits;
-      if (dice <= 0) {
-        (_b = ui.notifications) == null ? void 0 : _b.warn("SR5.Warnings.CantSecondChanceWithoutNoneHits", { localize: true });
-        return this;
-      }
-      const parts2 = new PartsList(this.pool.mod);
-      parts2.addPart("SR5.SecondChance", dice);
-      const formula = `${dice}d6`;
-      const roll = new SR5Roll(formula);
-      this.rolls.push(roll);
-    } else {
-      parts.removePart("SR5.SecondChance");
-    }
-  }
-  executeSecondChance() {
-    return __async(this, null, function* () {
-      var _a;
-      console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
-      if (!this.data.sourceActorUuid)
-        return this;
-      if (this.glitched) {
-        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
-        return this;
-      }
-      yield this.populateDocuments();
-      this.data.secondChance = true;
-      this.applySecondChance();
-      this.calculateBaseValues();
-      const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
-      if (!actorConsumedResources)
-        return this;
-      this.data.secondChance = false;
-      yield this.evaluate();
-      yield this.processResults();
-      yield this.toMessage();
-      yield this.afterTestComplete();
-      return this;
-    });
-  }
-  canConsumeDocumentRessources() {
-    var _a;
-    if (!this.actor)
-      return true;
-    if (this.hasPushTheLimit || this.hasSecondChance) {
-      if (this.actor.getEdge().uses <= 0) {
-        (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.MissingRessource.Edge"));
-        return false;
-      }
-    }
-    return true;
-  }
-  consumeDocumentRessources() {
-    return __async(this, null, function* () {
-      if (!this.actor)
-        return true;
-      if (this.hasPushTheLimit || this.hasSecondChance) {
-        yield this.actor.useEdge();
-      }
-      return true;
-    });
-  }
-  consumeDocumentRessoucesWhenNeeded() {
-    return __async(this, null, function* () {
-      const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
-      if (mustHaveRessouces) {
-        if (!this.canConsumeDocumentRessources())
-          return false;
-      }
-      return yield this.consumeDocumentRessources();
-    });
-  }
-  execute() {
-    return __async(this, null, function* () {
-      yield this.populateTests();
-      yield this.populateDocuments();
-      yield this.prepareDocumentModifiers();
-      yield this.prepareDocumentData();
-      this.prepareBaseValues();
-      this.calculateBaseValues();
-      const userConsented = yield this.showDialog();
-      if (!userConsented)
-        return this;
-      const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
-      if (!actorConsumedResources)
-        return this;
-      this.createRoll();
-      yield this.evaluate();
-      yield this.processResults();
-      yield this.toMessage();
-      yield this.afterTestComplete();
-      return this;
-    });
-  }
-  processResults() {
-    return __async(this, null, function* () {
-      if (this.success) {
-        yield this.processSuccess();
-      } else {
-        yield this.processFailure();
-      }
-    });
-  }
-  processSuccess() {
-    return __async(this, null, function* () {
-    });
-  }
-  processFailure() {
-    return __async(this, null, function* () {
-    });
-  }
-  afterTestComplete() {
-    return __async(this, null, function* () {
-      console.log(`Shadowrun5e | Test ${this.constructor.name} completed.`, this);
-      if (this.success) {
-        yield this.afterSuccess();
-      } else {
-        yield this.afterFailure();
-      }
-      yield this.executeFollowUpTest();
-      if (this.extended) {
-        yield this.extendCurrentTest();
-      }
-    });
-  }
-  afterSuccess() {
-    return __async(this, null, function* () {
-    });
-  }
-  afterFailure() {
-    return __async(this, null, function* () {
-    });
-  }
-  executeFollowUpTest() {
-    return __async(this, null, function* () {
-      const test = yield TestCreator.fromFollowupTest(this, this.data.options);
-      if (!test)
-        return;
-      yield test.execute();
-    });
-  }
-  extendCurrentTest() {
-    return __async(this, null, function* () {
-      var _a;
-      if (!this.canBeExtended)
-        return;
-      const data = foundry.utils.duplicate(this.data);
-      if (!data.type)
-        return;
-      const pool = new PartsList(data.pool.mod);
-      const currentModifierValue = pool.getPartValue("SR5.ExtendedTest") || 0;
-      const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
-      if (data.pool.override) {
-        data.pool.override.value = Math.max(data.pool.override.value - 1, 0);
-      } else {
-        pool.addUniquePart("SR5.ExtendedTest", nextModifierValue);
-      }
-      Helpers.calcTotal(data.pool, { min: 0 });
-      if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
-        return (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantExtendTestFurther", { localize: true });
-      }
-      const testCls = TestCreator._getTestClass(data.type);
-      if (!testCls)
-        return;
-      const test = new testCls(data, { actor: this.actor, item: this.item }, this.data.options);
-      yield this.populateDocuments();
-      test.data.pushTheLimit = false;
-      test.applyPushTheLimit();
-      test.data.secondChance = false;
-      test.applySecondChance();
-      if (!test.extended) {
-        test.data.extended = true;
-        test.calculateExtendedHits();
-      }
-      yield test.execute();
-    });
-  }
-  rollDiceSoNice() {
-    return __async(this, null, function* () {
-      var _a, _b, _c, _d;
-      if (!game.dice3d || !game.user || !game.users)
-        return;
-      console.log("Shadowrun5e | Initiating DiceSoNice throw");
-      const roll = this.rolls[this.rolls.length - 1];
-      let whisper = null;
-      if (this._applyGmOnlyContent && this.actor) {
-        whisper = game.users.filter((user) => {
-          var _a2;
-          return (_a2 = this.actor) == null ? void 0 : _a2.testUserPermission(user, "OWNER");
-        });
-      }
-      if (((_a = this.data.options) == null ? void 0 : _a.rollMode) === "gmroll" || ((_b = this.data.options) == null ? void 0 : _b.rollMode) === "blindroll") {
-        whisper = whisper || [];
-        whisper = [...game.users.filter((user) => user.isGM), ...whisper];
-      }
-      const blind = ((_c = this.data.options) == null ? void 0 : _c.rollMode) === "blindroll";
-      const synchronize = ((_d = this.data.options) == null ? void 0 : _d.rollMode) === "publicroll";
-      game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
-    });
-  }
-  toMessage() {
-    return __async(this, null, function* () {
-      var _a;
-      if (!((_a = this.data.options) == null ? void 0 : _a.showMessage))
-        return;
-      const templateData = this._prepareMessageTemplateData();
-      const content = yield renderTemplate(this._chatMessageTemplate, templateData);
-      const messageData = this._prepareMessageData(content);
-      const message = yield ChatMessage.create(messageData);
-      if (!message)
-        return;
-      this.data.messageUuid = message.uuid;
-      yield this.rollDiceSoNice();
-      return message;
-    });
-  }
-  _prepareMessageTemplateData() {
-    var _a, _b;
-    const linkedTokens = ((_a = this.actor) == null ? void 0 : _a.getActiveTokens(true)) || [];
-    const token = linkedTokens.length >= 1 ? linkedTokens[0] : void 0;
-    return {
-      title: this.data.title,
-      test: this,
-      speaker: {
-        actor: this.actor,
-        token
-      },
-      item: this.item,
-      opposedActions: this._prepareOpposedActionsTemplateData(),
-      resultActions: this._prepareResultActionsTemplateData(),
-      previewTemplate: this._canPlaceBlastTemplate,
-      showDescription: this._canShowDescription,
-      description: ((_b = this.item) == null ? void 0 : _b.getChatData()) || "",
-      applyGmOnlyContent: this._applyGmOnlyContent
-    };
-  }
-  get _canShowDescription() {
-    return true;
-  }
-  get _canPlaceBlastTemplate() {
-    var _a;
-    return ((_a = this.item) == null ? void 0 : _a.hasTemplate) || false;
-  }
-  get _applyGmOnlyContent() {
-    const enableFeature = game.settings.get(SYSTEM_NAME, FLAGS.HideGMOnlyChatContent);
-    return enableFeature && !!game.user && game.user.isGM && !!this.actor;
-  }
-  _prepareOpposedActionsTemplateData() {
-    if (!this.data.opposed || !this.data.opposed.test)
-      return [];
-    const testCls = game.shadowrun5e.tests[this.data.opposed.test];
-    if (!testCls)
-      return console.error("Shadowrun 5e | Opposed Action has no test class registered.");
-    const action = {
-      test: this.data.opposed.test,
-      label: testCls.label
-    };
-    if (this.data.opposed.mod) {
-      action.label += ` ${this.data.opposed.mod}`;
-    }
-    return [action];
-  }
-  _prepareResultActionsTemplateData() {
-    const actions = [];
-    const actionResultData = this.results;
-    if (!actionResultData)
-      return actions;
-    if (actionResultData.success.matrix.placeMarks) {
-      actions.push({
-        action: "placeMarks",
-        label: "SR5.PlaceMarks"
-      });
-    }
-    return actions;
-  }
-  _prepareMessageData(content) {
-    var _a, _b, _c, _d, _e, _f;
-    const linkedTokens = ((_a = this.actor) == null ? void 0 : _a.getActiveTokens(true)) || [];
-    const token = linkedTokens.length === 1 ? linkedTokens[0].id : void 0;
-    const actor = (_b = this.actor) == null ? void 0 : _b.id;
-    const alias = (_c = game.user) == null ? void 0 : _c.name;
-    const formula = `0d6`;
-    const roll = new SR5Roll(formula);
-    const messageData = {
-      user: (_d = game.user) == null ? void 0 : _d.id,
-      speaker: {
-        actor,
-        alias,
-        token
-      },
-      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-      roll,
-      content,
-      rollMode: (_e = this.data.options) == null ? void 0 : _e.rollMode,
-      flags: {
-        [SYSTEM_NAME]: { [FLAGS.Test]: this.toJSON() }
-      },
-      sound: CONFIG.sounds.dice
-    };
-    ChatMessage.applyRollMode(messageData, (_f = this.data.options) == null ? void 0 : _f.rollMode);
-    return messageData;
-  }
-  static chatMessageListeners(message, html, data) {
-    return __async(this, null, function* () {
-      html.find(".show-roll").on("click", this._chatToggleCardRolls);
-      html.find(".show-description").on("click", this._chatToggleCardDescription);
-      html.find(".chat-document-link").on("click", Helpers.renderEntityLinkSheet);
-      html.find(".place-template").on("click", this._placeItemBlastZoneTemplate);
-      html.find(".result-action").on("click", this._castResultAction);
-      html.find(".chat-select-link").on("click", this._selectSceneToken);
-      handleRenderChatMessage(message, html, data);
-      yield this._showGmOnlyContent(message, html, data);
-    });
-  }
-  static _showGmOnlyContent(message, html, data) {
-    return __async(this, null, function* () {
-      var _a;
-      const test = yield TestCreator.fromMessage(message.id);
-      if (!test)
-        return;
-      yield test.populateDocuments();
-      if (!test.actor || !game.user) {
-        html.find(".gm-only-content").removeClass("gm-only-content");
-      } else if (game.user.isGM || game.user.isTrusted || ((_a = test.actor) == null ? void 0 : _a.isOwner)) {
-        html.find(".gm-only-content").removeClass("gm-only-content");
-      }
-    });
-  }
-  static _selectSceneToken(event) {
-    return __async(this, null, function* () {
-      var _a, _b;
-      event.preventDefault();
-      event.stopPropagation();
-      if (!game || !game.ready || !canvas || !canvas.ready)
-        return;
-      const selectLink = $(event.currentTarget);
-      const tokenId = selectLink.data("tokenId");
-      const token = (_a = canvas.tokens) == null ? void 0 : _a.get(tokenId);
-      if (token && token instanceof Token) {
-        token.control();
-      } else {
-        (_b = ui.notifications) == null ? void 0 : _b.warn(game.i18n.localize("SR5.NoSelectableToken"));
-      }
-    });
-  }
-  static chatLogListeners(chatLog, html, data) {
-    return __async(this, null, function* () {
-      html.find(".chat-message").each((index, element) => __async(this, null, function* () {
-        var _a;
-        element = $(element);
-        const id = element.data("messageId");
-        const message = (_a = game.messages) == null ? void 0 : _a.get(id);
-        if (!message)
-          return;
-        yield this.chatMessageListeners(message, element, message.toObject());
-      }));
-    });
-  }
-  static _placeItemBlastZoneTemplate(event) {
-    return __async(this, null, function* () {
-      event.preventDefault();
-      event.stopPropagation();
-      const element = $(event.currentTarget);
-      const card = element.closest(".chat-message");
-      const messageId = card.data("messageId");
-      const test = yield TestCreator.fromMessage(messageId);
-      if (!test)
-        return;
-      yield test.populateDocuments();
-      if (!test.item)
-        return;
-      const template = Template.fromItem(test.item);
-      if (!template)
-        return;
-      yield template.drawPreview();
-    });
-  }
-  static chatMessageContextOptions(html, options) {
-    const secondChance = (li) => __async(this, null, function* () {
-      const messageId = li.data().messageId;
-      const test = yield TestCreator.fromMessage(messageId);
-      if (!test)
-        return console.error("Shadowrun 5e | Could not restore test from message");
-      yield test.executeSecondChance();
-    });
-    const extendTest = (li) => __async(this, null, function* () {
-      var _a;
-      const messageId = li.data().messageId;
-      const test = yield TestCreator.fromMessage(messageId);
-      if (!test)
-        return console.error("Shadowrun 5e | Could not restore test from message");
-      if (!test.canBeExtended) {
-        return (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantExtendTest", { localize: true });
-      }
-      yield test.extendCurrentTest();
-    });
-    const deleteOption = options.pop();
-    options.push({
-      name: game.i18n.localize("SR5.SecondChance"),
-      callback: secondChance,
-      condition: true,
-      icon: '<i class="fas fa-meteor"></i>'
-    });
-    options.push({
-      name: game.i18n.localize("SR5.Extend"),
-      callback: extendTest,
-      condition: true,
-      icon: '<i class="fas fa-clock"></i>'
-    });
-    options.push(deleteOption);
-    return options;
-  }
-  static _chatToggleCardRolls(event) {
-    return __async(this, null, function* () {
-      event.preventDefault();
-      event.stopPropagation();
-      const card = $(event.currentTarget).closest(".chat-card");
-      const element = card.find(".dice-rolls");
-      if (element.is(":visible"))
-        element.slideUp(200);
-      else
-        element.slideDown(200);
-    });
-  }
-  static _chatToggleCardDescription(event) {
-    return __async(this, null, function* () {
-      event.preventDefault();
-      event.stopPropagation();
-      const card = $(event.currentTarget).closest(".chat-card");
-      const element = card.find(".card-description");
-      if (element.is(":visible"))
-        element.slideUp(200);
-      else
-        element.slideDown(200);
-    });
-  }
-  static _castResultAction(event) {
-    return __async(this, null, function* () {
-      event.preventDefault();
-      event.stopPropagation();
-      const element = $(event.currentTarget);
-      const resultAction = element.data("action");
-      const messageId = element.closest(".chat-message").data("messageId");
-      const test = yield TestCreator.fromMessage(messageId);
-      if (!test)
-        return console.error(`Shadowrun5e | Couldn't find both a result action ('${resultAction}') and extract test from message ('${messageId}')`);
-      yield ActionResultFlow.executeResult(resultAction, test);
-    });
-  }
-};
-
 // src/module/tests/AttributeOnlyTest.ts
 var AttributeOnlyTest = class extends SuccessTest {
   get _dialogTemplate() {
@@ -17723,12 +18346,16 @@ var SR5Actor = class extends Actor {
   }
   changeCombatInitiative(modifier) {
     return __async(this, null, function* () {
+      var _a;
       if (modifier === 0)
         return;
       const combat = game.combat;
       const combatant = combat.getActorCombatant(this);
       if (!combatant)
         return;
+      if (combatant.initiative + modifier < 0) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.MissingRessource.Initiative", { localize: true });
+      }
       yield combat.adjustInitiative(combatant, modifier);
     });
   }
@@ -18110,6 +18737,9 @@ var registerBasicHelpers = () => {
   });
   Handlebars.registerHelper("localizeShortened", function(label, length, options) {
     return new Handlebars.SafeString(Helpers.shortenAttributeLocalization(label, length));
+  });
+  Handlebars.registerHelper("objValue", function(obj, key) {
+    return obj[key] || "";
   });
 };
 
@@ -19723,213 +20353,6 @@ var _OverwatchScoreTracker = class extends Application {
 var OverwatchScoreTracker = _OverwatchScoreTracker;
 __publicField(OverwatchScoreTracker, "MatrixOverwatchDiceCount", "2d6");
 __publicField(OverwatchScoreTracker, "addedActors", []);
-
-// src/module/rules/SoakRules.ts
-var SoakRules = class {
-  static applyAllSoakParts(soakParts, actor, damageData) {
-    if (damageData.type.base !== "matrix") {
-      SoakRules.applyPhysicalAndStunSoakParts(soakParts, actor, damageData);
-    } else {
-      SoakRules.applyMatrixSoakParts(soakParts, actor);
-    }
-  }
-  static applyPhysicalAndStunSoakParts(soakParts, actor, damageData) {
-    const damageSourceItem = Helpers.findDamageSource(damageData);
-    if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
-      return SoakRules.applyDirectCombatSpellParts(damageSourceItem.data, soakParts, actor);
-    }
-    SoakRules.applyBodyAndArmorParts(soakParts, actor);
-    const armor = actor.getArmor();
-    SoakRules.applyArmorPenetration(soakParts, armor, damageData);
-    SoakRules.applyElementalArmor(soakParts, armor, damageData.element.base);
-  }
-  static applyDirectCombatSpellParts(spellItem, soakParts, actor) {
-    if (spellItem.data.type === "mana") {
-      SoakRules.addUniquePart(soakParts, actor.getAttribute("willpower"), SR5.attributes.willpower);
-    } else {
-      SoakRules.addUniquePart(soakParts, actor.getAttribute("body"), SR5.attributes.body);
-    }
-    return;
-  }
-  static applyBodyAndArmorParts(soakParts, actor) {
-    const body = actor.findAttribute("body");
-    if (body) {
-      soakParts.addUniquePart(body.label || "SR5.Body", body.value);
-    }
-    const mod = actor.getModifier("soak");
-    if (mod) {
-      soakParts.addUniquePart("SR5.Bonus", mod);
-    }
-    actor._addArmorParts(soakParts);
-  }
-  static applyArmorPenetration(soakParts, armor, damageData) {
-    var _a;
-    const bonusArmor = (_a = armor[damageData.element.value]) != null ? _a : 0;
-    const totalArmor = armor.value + bonusArmor;
-    const ap = Helpers.calcTotal(damageData.ap);
-    soakParts.addUniquePart("SR5.AP", Math.max(ap, -totalArmor));
-  }
-  static applyElementalArmor(soakParts, armor, element) {
-    var _a;
-    const bonusArmor = (_a = armor[element]) != null ? _a : 0;
-    if (bonusArmor) {
-      soakParts.addUniquePart(SR5.elementTypes[element], bonusArmor);
-    }
-  }
-  static applyMatrixSoakParts(soakParts, actor) {
-    const actorData = actor.data.data;
-    if (actorData.initiative.perception === "matrix") {
-      if (actor.isVehicle()) {
-        SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
-      } else {
-        SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
-      }
-    } else {
-      SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
-    }
-  }
-  static applyBiofeedbackParts(soakParts, actor, actorData) {
-    SoakRules.addUniquePart(soakParts, actor.getAttribute("willpower"), SR5.attributes.willpower);
-    if (!actorData.matrix) {
-      return;
-    }
-    SoakRules.addUniquePart(soakParts, actorData.matrix.firewall, SR5.matrixAttributes.firewall);
-  }
-  static applyRatingAndFirewallParts(actorData, soakParts) {
-    if (!actorData.matrix) {
-      return;
-    }
-    const deviceRating = actorData.matrix.rating;
-    if (deviceRating) {
-      soakParts.addUniquePart("SR5.Labels.ActorSheet.DeviceRating", deviceRating);
-    }
-    this.addUniquePart(soakParts, actorData.matrix.firewall, SR5.matrixAttributes.firewall);
-  }
-  static addUniquePart(partsList, modifiableValue, label) {
-    const totalValue = Helpers.calcTotal(modifiableValue);
-    partsList.addUniquePart(label, totalValue);
-  }
-  static reduceDamage(actor, damageData, hits) {
-    if (damageData.type.value === "stun" && actor.isVehicle()) {
-      return Helpers.reduceDamageByHits(damageData, damageData.value, "SR5.VehicleStunImmunity");
-    }
-    return Helpers.reduceDamageByHits(damageData, hits, "SR5.SoakTest");
-  }
-  static modifyDamageType(damage, actor) {
-    let updatedDamage = duplicate(damage);
-    if (actor.isVehicle() && updatedDamage.element.value === "electricity" && updatedDamage.type.value === "stun") {
-      updatedDamage.type.value = "physical";
-    }
-    const damageSourceItem = Helpers.findDamageSource(damage);
-    if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
-      return updatedDamage;
-    }
-    updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
-    return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
-  }
-  static modifyPhysicalDamageForArmor(damage, actor) {
-    const updatedDamage = duplicate(damage);
-    if (damage.type.value === "physical") {
-      if (!actor.isCharacter() && !actor.isSpirit() && !actor.isCritter() && !actor.isVehicle()) {
-        return updatedDamage;
-      }
-      const modifiedArmor = actor.getModifiedArmor(damage);
-      if (modifiedArmor) {
-        const armorWillChangeDamageType = modifiedArmor.value > damage.value;
-        if (armorWillChangeDamageType) {
-          updatedDamage.type.value = "stun";
-        }
-      }
-    }
-    return updatedDamage;
-  }
-  static modifyMatrixDamageForBiofeedback(damage, actor) {
-    const updatedDamage = duplicate(damage);
-    if (damage.type.value === "matrix") {
-      const actorData = actor.data.data;
-      if (!actor.isCharacter()) {
-        return updatedDamage;
-      }
-      if (actorData.initiative.perception === "matrix") {
-        if (actorData.matrix.hot_sim) {
-          updatedDamage.type.value = "physical";
-        } else {
-          updatedDamage.type.value = "stun";
-        }
-      }
-    }
-    return updatedDamage;
-  }
-};
-
-// src/module/rules/CombatRules.ts
-var CombatRules = class {
-  static iniOrderCanDoAnotherPass(scores) {
-    for (const score of scores) {
-      if (CombatRules.iniScoreCanDoAnotherPass(score))
-        return true;
-    }
-    return false;
-  }
-  static iniScoreCanDoAnotherPass(score) {
-    return CombatRules.reduceIniResultAfterPass(score) > 0;
-  }
-  static reduceIniResultAfterPass(score) {
-    return Math.max(score + SR.combat.INI_RESULT_MOD_AFTER_INI_PASS, 0);
-  }
-  static reduceIniOnLateSpawn(score, pass) {
-    pass = Math.max(pass - 1, 0);
-    score = Math.max(score, 0);
-    const reducedScore = score + pass * SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
-    return CombatRules.getValidInitiativeScore(reducedScore);
-  }
-  static getValidInitiativeScore(score) {
-    return Math.max(score, 0);
-  }
-  static attackHits(attackerHits, defenderHits) {
-    return attackerHits > defenderHits;
-  }
-  static attackGrazes(attackerHits, defenderHits) {
-    return attackerHits === defenderHits;
-  }
-  static attackMisses(attackerHits, defenderHits) {
-    return !CombatRules.attackHits(attackerHits, defenderHits);
-  }
-  static modifyDamageAfterHit(attackerHits, defenderHits, damage) {
-    const modifiedDamage = foundry.utils.duplicate(damage);
-    if (attackerHits < 0)
-      attackerHits = 0;
-    if (defenderHits < 0)
-      defenderHits = 0;
-    PartsList.AddUniquePart(modifiedDamage.mod, "SR5.Attacker", attackerHits);
-    PartsList.AddUniquePart(modifiedDamage.mod, "SR5.Defender", -defenderHits);
-    modifiedDamage.value = Helpers.calcTotal(modifiedDamage, { min: 0 });
-    return modifiedDamage;
-  }
-  static modifyDamageAfterMiss(damage) {
-    const modifiedDamage = foundry.utils.duplicate(damage);
-    modifiedDamage.override = { name: "SR5.Success", value: 0 };
-    Helpers.calcTotal(modifiedDamage, { min: 0 });
-    return modifiedDamage;
-  }
-  static modifyDamageAfterResist(actor, damage, hits) {
-    if (hits < 0)
-      hits = 0;
-    let { modified } = SoakRules.reduceDamage(actor, damage, hits);
-    modified = SoakRules.modifyDamageType(modified, actor);
-    Helpers.calcTotal(modified, { min: 0 });
-    return modified;
-  }
-  static modifyArmorAfterHit(armor, damage) {
-    const modifiedArmor = foundry.utils.duplicate(armor);
-    if (damage.ap.value <= 0)
-      return modifiedArmor;
-    console.error("Check if ap is a negative value or positive value during weapon item configuration");
-    PartsList.AddUniquePart(modifiedArmor.mod, "SR5.AP", damage.ap.value);
-    modifiedArmor.value = Helpers.calcTotal(modifiedArmor, { min: 0 });
-    return modifiedArmor;
-  }
-};
 
 // src/module/combat/SR5Combat.ts
 var SR5Combat = class extends Combat {
@@ -26024,299 +26447,11 @@ var SR5SpriteActorSheet = class extends SR5BaseActorSheet {
   }
 };
 
-// src/module/rules/MeleeRules.ts
-var MeleeRules = class {
-  static defenseReachModifier(incomingReach, defendingReach) {
-    return defendingReach - incomingReach;
-  }
-};
-
-// src/module/tests/OpposedTest.ts
-var OpposedTest = class extends SuccessTest {
-  constructor(data, documents, options) {
-    super(data, documents, options);
-    const AgainstCls = data.against ? TestCreator._getTestClass(data.against.type) : SuccessTest;
-    this.against = new AgainstCls(data.against || {});
-  }
-  _prepareData(data, options) {
-    data = super._prepareData(data, options);
-    delete data.opposed;
-    delete data.targetActorsUuid;
-    return data;
-  }
-  populateDocuments() {
-    return __async(this, null, function* () {
-      yield __superGet(OpposedTest.prototype, this, "populateDocuments").call(this);
-      yield this.against.populateDocuments();
-    });
-  }
-  static _getOpposedActionTestData(againstData, actor, previousMessageId) {
-    return __async(this, null, function* () {
-      if (!againstData.opposed) {
-        console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
-        return;
-      }
-      if (againstData.opposed.type !== "") {
-        console.warn(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
-      }
-      if (!actor) {
-        console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
-        return;
-      }
-      const data = {
-        title: againstData.opposed.description || void 0,
-        previousMessageId,
-        pool: DefaultValues.valueData({ label: "SR5.DicePool" }),
-        limit: DefaultValues.valueData({ label: "SR5.Limit" }),
-        threshold: DefaultValues.valueData({ label: "SR5.Threshold" }),
-        values: {},
-        sourceItemUuid: againstData.sourceItemUuid,
-        against: againstData
-      };
-      data.threshold.base = againstData.values.netHits.value;
-      let action = DefaultValues.actionData();
-      action = TestCreator._mergeMinimalActionDataInOrder(action, againstData.opposed, this._getDefaultTestAction());
-      if (againstData.sourceItemUuid) {
-        const item = yield fromUuid(againstData.sourceItemUuid);
-        if (item) {
-          const itemAction = yield this._getDocumentTestAction(item, actor);
-          action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
-        }
-      }
-      return yield this._prepareActionTestData(action, actor, data);
-    });
-  }
-  get opposed() {
-    return false;
-  }
-  get opposing() {
-    return true;
-  }
-  get canBeExtended() {
-    return false;
-  }
-  get _canShowDescription() {
-    return false;
-  }
-  get _canPlaceBlastTemplate() {
-    return false;
-  }
-  prepareItemModifiers() {
-    return __async(this, null, function* () {
-      if (!this.item)
-        return;
-      const opposedMod = this.item.getOpposedTestMod();
-      for (const modifier of opposedMod.list) {
-        PartsList.AddUniquePart(this.data.modifiers.mod, modifier.name, modifier.value, true);
-      }
-    });
-  }
-  static _castOpposedAction(event) {
-    return __async(this, null, function* () {
-      event.preventDefault();
-      const button = $(event.currentTarget);
-      const card = button.closest(".chat-message");
-      const messageId = card.data("messageId");
-      const opposedActionTest = button.data("action");
-      const showDialog = !TestCreator.shouldHideDialog(event);
-      yield TestCreator.fromMessageAction(messageId, opposedActionTest, { showDialog });
-    });
-  }
-  static chatMessageListeners(message, html, data) {
-    return __async(this, null, function* () {
-      html.find(".opposed-action").on("click", OpposedTest._castOpposedAction);
-    });
-  }
-};
-
-// src/module/tests/DefenseTest.ts
-var DefenseTest = class extends OpposedTest {
-  _prepareData(data, options) {
-    data = super._prepareData(data, options);
-    const damage = data.against ? data.against.damage : DefaultValues.damageData();
-    data.incomingDamage = foundry.utils.duplicate(damage);
-    data.modifiedDamage = foundry.utils.duplicate(damage);
-    return data;
-  }
-  get _chatMessageTemplate() {
-    return "systems/shadowrun5e/dist/templates/rolls/defense-test-message.html";
-  }
-  get successLabel() {
-    return "SR5.AttackDodged";
-  }
-  get failureLabel() {
-    return "SR5.AttackHits";
-  }
-  get hasChangedInitiative() {
-    return this.data.iniMod !== void 0;
-  }
-  get initiativeModifier() {
-    return this.data.iniMod || 0;
-  }
-};
-
-// src/module/tests/PhysicalDefenseTest.ts
-var PhysicalDefenseTest = class extends DefenseTest {
-  _prepareData(data, options) {
-    data = super._prepareData(data, options);
-    data.cover = 0;
-    data.activeDefense = "";
-    data.activeDefenses = {};
-    data.isMeleeAttack = false;
-    data.defenseReach = 0;
-    return data;
-  }
-  get _dialogTemplate() {
-    return "systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html";
-  }
-  static _getDefaultTestAction() {
-    return DefaultValues.minimalActionData({
-      "attribute": "reaction",
-      "attribute2": "intuition"
-    });
-  }
-  get testModifiers() {
-    return ["global", "wounds", "defense"];
-  }
-  prepareDocumentData() {
-    return __async(this, null, function* () {
-      this.prepareActiveDefense();
-      this.prepareMeleeReach();
-      yield __superGet(PhysicalDefenseTest.prototype, this, "prepareDocumentData").call(this);
-    });
-  }
-  prepareActiveDefense() {
-    var _a, _b, _c;
-    if (!this.actor)
-      return;
-    const actor = this.actor;
-    this.data.activeDefenses = {
-      full_defense: {
-        label: "SR5.FullDefense",
-        value: (_a = actor.getFullDefenseAttribute()) == null ? void 0 : _a.value,
-        initMod: -10
-      },
-      dodge: {
-        label: "SR5.Dodge",
-        value: (_b = actor.findActiveSkill("gymnastics")) == null ? void 0 : _b.value,
-        initMod: -5
-      },
-      block: {
-        label: "SR5.Block",
-        value: (_c = actor.findActiveSkill("unarmed_combat")) == null ? void 0 : _c.value,
-        initMod: -5
-      }
-    };
-    const equippedMeleeWeapons = actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
-    equippedMeleeWeapons.forEach((weapon) => {
-      var _a2;
-      this.data.activeDefenses[`parry-${weapon.name}`] = {
-        label: "SR5.Parry",
-        weapon: weapon.name || "",
-        value: (_a2 = actor.findActiveSkill(weapon.getActionSkill())) == null ? void 0 : _a2.value,
-        initMod: -5
-      };
-    });
-  }
-  prepareMeleeReach() {
-    if (!this.against.item)
-      return;
-    this.data.isMeleeAttack = this.against.item.isMeleeWeapon();
-    if (!this.data.isMeleeAttack)
-      return;
-    if (!this.actor)
-      return;
-    const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
-    equippedMeleeWeapons.forEach((weapon) => {
-      this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());
-    });
-    const attackData = this.against.data;
-    const incomingReach = attackData.reach || 0;
-    const defenseReach = this.data.defenseReach;
-    this.data.defenseReach = MeleeRules.defenseReachModifier(incomingReach, defenseReach);
-  }
-  applyPoolModifiers() {
-    this.applyPoolCoverModifier();
-    this.applyPoolActiveDefenseModifier();
-    this.applyPoolMeleeReachModifier();
-    this.applyPoolRangedFireModModifier();
-    super.applyPoolModifiers();
-  }
-  applyPoolCoverModifier() {
-    this.data.cover = foundry.utils.getType(this.data.cover) === "string" ? Number(this.data.cover) : this.data.cover;
-    PartsList.AddUniquePart(this.data.modifiers.mod, "SR5.Cover", this.data.cover);
-  }
-  applyPoolActiveDefenseModifier() {
-    const defense = this.data.activeDefenses[this.data.activeDefense] || { label: "SR5.ActiveDefense", value: 0, init: 0 };
-    PartsList.AddUniquePart(this.data.modifiers.mod, "SR5.ActiveDefense", defense.value);
-  }
-  applyPoolMeleeReachModifier() {
-    if (!this.data.isMeleeAttack)
-      return;
-    PartsList.AddUniquePart(this.data.modifiers.mod, "SR5.WeaponReach", this.data.defenseReach);
-  }
-  applyPoolRangedFireModModifier() {
-    if (!this.against.item)
-      return;
-    if (!this.against.item.isRangedWeapon())
-      return;
-    const fireMode = this.against.item.getLastFireMode();
-    if (!fireMode.defense)
-      return;
-    PartsList.AddUniquePart(this.data.modifiers.mod, fireMode.label, Number(fireMode.defense));
-  }
-  get success() {
-    return CombatRules.attackMisses(this.against.hits.value, this.hits.value);
-  }
-  get failure() {
-    return CombatRules.attackHits(this.against.hits.value, this.hits.value);
-  }
-  processSuccess() {
-    return __async(this, null, function* () {
-      this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
-      yield __superGet(PhysicalDefenseTest.prototype, this, "processSuccess").call(this);
-    });
-  }
-  processFailure() {
-    return __async(this, null, function* () {
-      this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
-      yield __superGet(PhysicalDefenseTest.prototype, this, "processFailure").call(this);
-    });
-  }
-  afterFailure() {
-    return __async(this, null, function* () {
-      const test = yield TestCreator.fromOpposedTestResistTest(this, this.data.options);
-      if (!test)
-        return;
-      yield test.execute();
-    });
-  }
-  processResults() {
-    return __async(this, null, function* () {
-      yield this.applyIniModFromActiveDefense();
-      yield __superGet(PhysicalDefenseTest.prototype, this, "processResults").call(this);
-    });
-  }
-  applyIniModFromActiveDefense() {
-    return __async(this, null, function* () {
-      if (!this.actor)
-        return;
-      if (!this.data.activeDefense)
-        return;
-      const activeDefense = this.data.activeDefenses[this.data.activeDefense];
-      if (!activeDefense)
-        return;
-      yield this.actor.changeCombatInitiative(activeDefense.initMod);
-      this.data.iniMod = activeDefense.initMod;
-    });
-  }
-};
-
-// src/module/rules/RangedRules.ts
-var RangedRules = {
-  fireModeDefenseModifier: function(rounds, ammo = 0) {
-    rounds = rounds < 0 ? rounds * -1 : rounds;
-    let modifier = Helpers.mapRoundsToDefenseMod(rounds);
+// src/module/rules/FireModeRules.ts
+var FireModeRules = {
+  fireModeDefenseModifier: function(fireMode, ammo = 0) {
+    const rounds = fireMode.value < 0 ? fireMode.value * -1 : fireMode.value;
+    const modifier = Number(fireMode.defense);
     if (modifier === 0)
       return 0;
     if (ammo <= 0)
@@ -26325,13 +26460,25 @@ var RangedRules = {
       return modifier;
     return Math.min(modifier + rounds - ammo, 0);
   },
-  recoilAttackModifier: function(compensation, rounds, ammo = 0) {
+  recoilAttackModifier: function(fireMode, compensation, ammo = 0) {
+    if (!fireMode.recoil)
+      return { compensation, recoilModifier: 0 };
     if (ammo <= 0)
-      ammo = rounds;
-    rounds = Math.min(rounds, ammo);
+      ammo = fireMode.value;
+    const rounds = Math.min(fireMode.value, ammo);
     const recoilModifier = Math.min(compensation - rounds, 0);
     compensation = Math.max(compensation - rounds, 0);
     return { compensation, recoilModifier };
+  },
+  availableFireModes: function(rangedWeaponModes, rounds) {
+    return SR5.fireModes.filter((fireMode) => rangedWeaponModes[fireMode.mode]).sort((modeA, modeB) => {
+      if (modeA.mode === modeB.mode) {
+        return modeA.value - modeB.value;
+      }
+      const modeAIndex = SR5.rangeWeaponMode.indexOf(modeA.mode);
+      const modeBIndex = SR5.rangeWeaponMode.indexOf(modeB.mode);
+      return modeAIndex > modeBIndex ? 1 : -1;
+    });
   }
 };
 
@@ -26339,7 +26486,7 @@ var RangedRules = {
 var RangedAttackTest = class extends SuccessTest {
   _prepareData(data, options) {
     data = super._prepareData(data, options);
-    data.fireModes = {};
+    data.fireModes = [];
     data.fireMode = { value: 0, defense: 0, label: "" };
     data.ranges = {};
     data.range = 0;
@@ -26356,24 +26503,12 @@ var RangedAttackTest = class extends SuccessTest {
     const weaponData = this.item.asWeaponData();
     if (!weaponData)
       return;
-    const { modes } = weaponData.data.range;
-    if (modes.single_shot) {
-      this.data.fireModes["1"] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
-    }
-    if (modes.semi_auto) {
-      this.data.fireModes["1"] = game.i18n.localize("SR5.WeaponModeSemiAutoShort");
-      this.data.fireModes["3"] = game.i18n.localize("SR5.WeaponModeSemiAutoBurst");
-    }
-    if (modes.burst_fire) {
-      this.data.fireModes["3"] = `${modes.semi_auto ? `${game.i18n.localize("SR5.WeaponModeSemiAutoBurst")}/` : ""}${game.i18n.localize("SR5.WeaponModeBurstFireShort")}`;
-      this.data.fireModes["6"] = game.i18n.localize("SR5.WeaponModeBurstFireLong");
-    }
-    if (modes.full_auto) {
-      this.data.fireModes["6"] = `${modes.burst_fire ? "LB/" : ""}${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(s)`;
-      this.data.fireModes["10"] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
-      this.data.fireModes["20"] = game.i18n.localize("SR5.Suppressing");
-    }
-    this.data.fireMode = this.item.getLastFireMode() || { value: 0, defense: 0, label: "" };
+    this.data.fireModes = FireModeRules.availableFireModes(weaponData.data.range.modes);
+    const lastFireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
+    this.data.fireModeSelected = this.data.fireModes.findIndex((available) => lastFireMode.label === available.label);
+    if (this.data.fireModeSelected == -1)
+      this.data.fireModeSelected = 0;
+    this.data.fireMode = this.data.fireModes[this.data.fireModeSelected];
   }
   _prepareWeaponRanges() {
     return __async(this, null, function* () {
@@ -26451,6 +26586,11 @@ var RangedAttackTest = class extends SuccessTest {
   get _dialogTemplate() {
     return "systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html";
   }
+  get _opposedTestClass() {
+    if (this.data.fireMode.suppression)
+      return TestCreator._getTestClass(SR5.supressionDefenseTest);
+    return super._opposedTestClass;
+  }
   saveUserSelectionAfterDialog() {
     return __async(this, null, function* () {
       if (!this.item)
@@ -26469,20 +26609,11 @@ var RangedAttackTest = class extends SuccessTest {
     if (!this.item)
       return;
     const poolMods = new PartsList(this.data.modifiers.mod);
-    const { fireMode, fireModes, recoilCompensation } = this.data;
-    fireMode.value = Number(fireMode.value || 0);
-    const fireModeName = fireModes[fireMode.value];
-    const defenseModifier = RangedRules.fireModeDefenseModifier(fireMode.value, this.item.ammoLeft);
-    this.data.fireMode = {
-      label: fireModeName,
-      value: fireMode.value,
-      defense: defenseModifier
-    };
-    const { recoilModifier } = RangedRules.recoilAttackModifier(recoilCompensation, Number(fireMode.value), this.item.ammoLeft);
-    if (recoilModifier < 0)
-      poolMods.addUniquePart("SR5.Recoil", recoilModifier);
-    else
-      poolMods.removePart("SR5.Recoil");
+    const { fireModes, fireModeSelected, recoilCompensation } = this.data;
+    this.data.fireMode = fireModes[fireModeSelected];
+    this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft);
+    const { compensation, recoilModifier } = FireModeRules.recoilAttackModifier(this.data.fireMode, recoilCompensation, this.item.ammoLeft);
+    poolMods.addUniquePart("SR5.Recoil", recoilModifier);
     if (this.hasTargets) {
       this.data.targetRangesSelected = Number(this.data.targetRangesSelected);
       const target = this.data.targetRanges[this.data.targetRangesSelected];
@@ -27573,6 +27704,21 @@ var DroneInfiltrationTest = class extends SuccessTest {
   }
 };
 
+// src/module/tests/SupressionDefenseTest.ts
+var SupressionDefenseTest = class extends PhysicalDefenseTest {
+  static _getDefaultTestAction() {
+    return DefaultValues.minimalActionData({
+      "attribute": "reaction",
+      "attribute2": "edge"
+    });
+  }
+  processFailure() {
+    return __async(this, null, function* () {
+      this.data.modifiedDamage = CombatRules.modifyDamageAfterSupressionHit(this.data.incomingDamage);
+    });
+  }
+};
+
 // src/module/hooks.ts
 var HooksManager = class {
   static registerHooks() {
@@ -27621,6 +27767,7 @@ ___________________
         RangedAttackTest,
         ThrownAttackTest,
         PhysicalDefenseTest,
+        SupressionDefenseTest,
         PhysicalResistTest,
         SpellCastingTest,
         CombatSpellDefenseTest,
@@ -27640,6 +27787,7 @@ ___________________
         RangedAttackTest,
         ThrownAttackTest,
         PhysicalResistTest,
+        SupressionDefenseTest,
         SpellCastingTest,
         ComplexFormTest,
         PhysicalDefenseTest,
@@ -27654,6 +27802,7 @@ ___________________
       opposedTests: {
         OpposedTest,
         PhysicalDefenseTest,
+        SupressionDefenseTest,
         CombatSpellDefenseTest
       },
       resistTests: {

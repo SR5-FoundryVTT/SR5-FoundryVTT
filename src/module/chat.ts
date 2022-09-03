@@ -231,7 +231,6 @@ export const chatMessageActionApplyDamage = async (html, event) => {
     let damage = Helpers.createDamageData(value, type, ap, element);
 
     let actors = Helpers.getSelectedActorsOrCharacter();
-    console.error('damage application');
 
     // Should no selection be available try guessing.
     if (actors.length === 0) {

@@ -17,6 +17,11 @@ declare namespace Shadowrun {
 
     export type OpposedType = 'defense' | 'soak' | 'armor' | 'custom' | '';
 
+    /**
+     * Types of actions that can be taken during the combat action phase.
+     */
+    export type ActionType = 'free'|'simple'|'complex';
+
     export type NumberOrEmpty = number | '';
 
     export type SkillName = string;

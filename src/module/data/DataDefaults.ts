@@ -1,5 +1,6 @@
 import DamageData = Shadowrun.DamageData;
 import ActorArmorData = Shadowrun.ActorArmorData;
+import FireModeData = Shadowrun.FireModeData;
 import TechnologyData = Shadowrun.TechnologyData;
 import DescriptionData = Shadowrun.DescriptionData;
 import EquipmentData = Shadowrun.EquipmentData;
@@ -342,6 +343,18 @@ export class DefaultValues {
             alt_mod: 0,
             dice_pool_mod: []
         }, partialActionData) as ActionRollData;
+    }
+
+    static fireModeData(partialFireModeData: Partial<FireModeData> = {}): FireModeData {
+        return mergeObject({
+            value: 0,
+            label: '',
+            defense: 0,
+            recoil: false,
+            suppression: false,
+            mode: 'single_shot',
+            action: 'simple'
+        }, partialFireModeData);
     }
 }
 
