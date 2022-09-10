@@ -12,8 +12,8 @@
                         <input
                                 type="checkbox"
                                 class="submit-checkbox"
-                                name="data.matrix.hot_sim"
-                            {{checked data.matrix.hot_sim}}
+                                name="system.matrix.hot_sim"
+                            {{checked system.matrix.hot_sim}}
                         />
                     </label>
                     <label>
@@ -21,8 +21,8 @@
                         <input
                                 type="checkbox"
                                 class="submit-checkbox"
-                                name="data.matrix.running_silent"
-                            {{checked data.matrix.running_silent}}
+                                name="system.matrix.running_silent"
+                            {{checked system.matrix.running_silent}}
                         />
                     </label>
                 </div>
@@ -31,20 +31,20 @@
                         {{localize "SR5.ConditionMonitor"}}
                     </div>
                     {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                            value=data.matrix.condition_monitor.value
-                            max=data.matrix.condition_monitor.max
+                            value=system.matrix.condition_monitor.value
+                            max=system.matrix.condition_monitor.max
                             id="matrix"
                     }}
                 </div>
             </div>
             {{#each config.matrixAttributes as |label key|}}
                 {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html"
-                        matrixAtt=(lookup ../data.matrix key)
-                        isCyberdeck=../data.matrix.is_cyberdeck
+                        matrixAtt=(lookup ../system.matrix key)
+                        isCyberdeck=../system.matrix.is_cyberdeck
                         key=key
                         label=label
                         matrixAttributes=../config/matrixAttributes
-                        item=../data.matrix.item }}
+                        item=../system.matrix.item }}
             {{/each}}
         </div>
     </div>

@@ -1,25 +1,25 @@
 <div class="flexcol">
     {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.html" }}
     <div class="attributes">
-        {{#each data.vehicle_stats as |attribute a|}}
+        {{#each system.vehicle_stats as |attribute a|}}
             {{#unless attribute.hidden}}
                 {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                         rollId=(concatStrings "vehicleStat." a)
                         attributeId=a
                         attribute=attribute
-                        attributesPath="data.vehicle_stats"
+                        attributesPath="system.vehicle_stats"
                 }}
             {{/unless}}
         {{/each}}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                 rollId="attribute.body"
                 attributeId='body'
-                attribute=data.attributes.body
+                attribute=system.attributes.body
         }}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                 rollId="armor"
                 attributeId='armor'
-                attribute=data.armor
+                attribute=system.armor
                 attributesPath='data'
                 label="SR5.Armor"
         }}

@@ -19,14 +19,14 @@
             </div>
         </div>
     </div>
-    {{#each data.licenses as |license id|}}
+    {{#each system.licenses as |license id|}}
     <div class="list-item">
         <div class="item-left">
             <div class="item-text item-name">
                 <input
                     class="display left"
                     type="text"
-                    name="data.licenses.{{id}}.name"
+                    name="system.licenses.{{id}}.name"
                     value="{{license.name}}"
                     placeholder=""
                 />
@@ -38,7 +38,7 @@
                     class="display"
                     size="3"
                     type="text"
-                    name="data.licenses.{{id}}.rtg"
+                    name="system.licenses.{{id}}.rtg"
                     value="{{license.rtg}}"
                     data-dtype="Number"
                     placeholder="0"
@@ -48,7 +48,7 @@
                 <input
                     class="display"
                     type="text"
-                    name="data.license.{{id}}.description"
+                    name="system.licenses.{{id}}.description"
                     value="{{license.description}}"
                     placeholder='{{localize "SR5.Description"}}'
                 />

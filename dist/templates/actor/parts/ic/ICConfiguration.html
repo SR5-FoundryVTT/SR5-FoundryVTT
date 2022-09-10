@@ -6,8 +6,8 @@
         <div>
             {{> "systems/shadowrun5e/dist/templates/common/Select.html"
                     options=config.ic.types
-                    value=data.icType
-                    path="data.icType"
+                    value=system.icType
+                    path="system.icType"
             }}
         </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
@@ -17,8 +17,8 @@
                     cssClass="attribute-input"
                     size="2"
                     maxLength="2"
-                    value=data.host.rating
-                    name="data.host.rating"
+                    value=system.host.rating
+                    name="system.host.rating"
                     fieldType="Number"
                     placeholder="0"
                     disabled=(disabledHelper host)

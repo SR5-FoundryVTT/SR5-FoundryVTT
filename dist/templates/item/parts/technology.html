@@ -1,36 +1,36 @@
 <div class="flexcol flex0">
     <div class="technology">
-        {{#hasprop data 'grade'}}
+        {{#hasprop system 'grade'}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.CyberwareGrade"}}</label>
-            <select name="data.grade" class="display">
-                {{#select data.grade}} {{#each config.cyberwareGrades as |name type|}}
+            <select name="system.grade" class="display">
+                {{#select system.grade}} {{#each config.cyberwareGrades as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
         </div>
-        {{/hasprop}} {{#hasprop data 'essence'}}
+        {{/hasprop}} {{#hasprop system 'essence'}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.EssenceCost"}}</label>
             <input
                 class="display attribute-input"
                 type="text"
                 size="4"
-                name="data.essence"
-                value="{{data.essence}}"
+                name="system.essence"
+                value="{{system.essence}}"
                 data-dtype="Number"
                 placeholder="0"
             />
         </div>
-        {{/hasprop}} {{#hasprop data 'capacity'}}
+        {{/hasprop}} {{#hasprop system 'capacity'}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.Capacity"}}</label>
             <input
                 class="display attribute-input"
                 type="text"
                 size="4"
-                name="data.capacity"
-                value="{{data.capacity}}"
+                name="system.capacity"
+                value="{{system.capacity}}"
                 data-dtype="Number"
                 placeholder="0"
             />
@@ -43,8 +43,8 @@
                 type="text"
                 size="2"
                 maxlength="2"
-                name="data.technology.rating"
-                value="{{data.technology.rating}}"
+                name="system.technology.rating"
+                value="{{system.technology.rating}}"
                 data-dtype="Number"
                 placeholder="2"
             />
@@ -56,8 +56,8 @@
                 type="text"
                 size="3"
                 maxlength="3"
-                name="data.technology.quantity"
-                value="{{data.technology.quantity}}"
+                name="system.technology.quantity"
+                value="{{system.technology.quantity}}"
                 data-dtype="Number"
                 placeholder="1"
             />
@@ -69,8 +69,8 @@
                 class="display"
                 type="text"
                 size="3"
-                name="data.technology.conceal.base"
-                value="{{data.technology.conceal.base}}"
+                name="system.technology.conceal.base"
+                value="{{system.technology.conceal.base}}"
                 data-dtype="Number"
                 placeholder="0"
             />
@@ -82,8 +82,8 @@
                 <input
                     class="display"
                     type="text"
-                    name="data.technology.cost"
-                    value="{{data.technology.cost}}"
+                    name="system.technology.cost"
+                    value="{{system.technology.cost}}"
                     data-dtype="Number"
                     placeholder="100"
                 />
@@ -97,8 +97,8 @@
             <input
                 class="display"
                 type="text"
-                name="data.technology.availability"
-                value="{{data.technology.availability}}"
+                name="system.technology.availability"
+                value="{{system.technology.availability}}"
                 placeholder="2R"
             />
         </div>
@@ -111,8 +111,8 @@
                     type="text"
                     size="2"
                     maxlength="2"
-                    name="data.technology.condition_monitor.value"
-                    value="{{data.technology.condition_monitor.value}}"
+                    name="system.technology.condition_monitor.value"
+                    value="{{system.technology.condition_monitor.value}}"
                     placeholder="0"
                     data-dtype="Number"
                 />
@@ -121,7 +121,7 @@
                     type="text"
                     size="3"
                     maxlength="3"
-                    value="/{{data.technology.condition_monitor.max}}"
+                    value="/{{system.technology.condition_monitor.max}}"
                     disabled
                 />
             </div>
@@ -131,18 +131,18 @@
             {{localize "SR5.Equipped"}}<input
                 class="checkbox"
                 type="checkbox"
-                name="data.technology.equipped"
+                name="system.technology.equipped"
                 {{checked
-                data.technology.equipped}}
+                system.technology.equipped}}
             />
         </div>
         <div class="flexrow nowrap">
             {{localize "SR5.Wireless"}}<input
                 class="checkbox"
                 type="checkbox"
-                name="data.technology.wireless"
+                name="system.technology.wireless"
                 {{checked
-                data.technology.wireless}}
+                system.technology.wireless}}
             />
         </div>
         <div class="flexrow nowrap">

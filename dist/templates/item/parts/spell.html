@@ -7,8 +7,8 @@
             {{localize "SR5.SpellCategory"}}
         </div>
         <div class="inputs">
-            <select name="data.category">
-                {{#select data.category}}
+            <select name="system.category">
+                {{#select system.category}}
                 <option value=""></option>
                 {{#each config.spellCategories as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
@@ -16,14 +16,14 @@
             </select>
         </div>
     </div>
-    {{#if data.category}}
+    {{#if system.category}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.SpellType"}}
         </div>
         <div class="inputs">
-            <select name="data.type">
-                {{#select data.type}} {{#each config.spellTypes as |name type|}}
+            <select name="system.type">
+                {{#select system.type}} {{#each config.spellTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
@@ -34,8 +34,8 @@
             {{localize "SR5.SpellRange"}}
         </div>
         <div class="inputs">
-            <select name="data.range">
-                {{#select data.range}} {{#each config.spellRanges as |name type|}}
+            <select name="system.range">
+                {{#select system.range}} {{#each config.spellRanges as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
@@ -46,8 +46,8 @@
             {{localize "SR5.Duration"}}
         </div>
         <div class="inputs">
-            <select name="data.duration">
-                {{#select data.duration}} {{#each config.durations as |name type|}}
+            <select name="system.duration">
+                {{#select system.duration}} {{#each config.durations as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
@@ -62,41 +62,41 @@
                 type="text"
                 maxlength="2"
                 size="2"
-                name="data.drain"
-                value="{{data.drain}}"
+                name="system.drain"
+                value="{{system.drain}}"
                 data-dtype="Number"
                 placeholder="-2"
                 data-dtype="Number"
             />
         </div>
     </div>
-    {{#ife data.category "combat"}}
+    {{#ife system.category "combat"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.SpellCatCombat"}}
         </div>
         <div class="inputs">
-            <select name="data.combat.type">
-                {{#select data.combat.type}} {{#each config.combatSpellTypes as |name type|}}
+            <select name="system.combat.type">
+                {{#select system.combat.type}} {{#each config.combatSpellTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
         </div>
     </div>
-    {{/ife}} {{#ife data.category "detection"}}
+    {{/ife}} {{#ife system.category "detection"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.SpellCatDetection"}}
         </div>
         <div class="inputs between">
-            <select name="data.detection.passive" data-dtype="Boolean">
-                {{#select data.detection.passive}}
+            <select name="system.detection.passive" data-dtype="Boolean">
+                {{#select system.detection.passive}}
                 <option value="false">{{localize "SR5.Active"}}</option>
                 <option value="true">{{localize "SR5.Passive"}}</option>
                 {{/select}}
             </select>
-            <select name="data.detection.type">
-                {{#select data.detection.type}} {{#each config.detectionSpellTypes as |name type|}}
+            <select name="system.detection.type">
+                {{#select system.detection.type}} {{#each config.detectionSpellTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
@@ -104,32 +104,31 @@
                 <input
                     class="display"
                     type="checkbox"
-                    name="data.detection.extended"
-                    {{checked
-                    data.detection.extended}}
+                    name="system.detection.extended"
+                    {{checked system.detection.extended}}
                 />{{localize "SR5.DetectionSpellExtended"}}
             </label>
         </div>
     </div>
-    {{/ife}} {{#ife data.category "illusion"}}
+    {{/ife}} {{#ife system.category "illusion"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.SpellCatIllusion"}}
         </div>
         <div class="inputs between">
-            <select name="data.illusion.type">
-                {{#select data.illusion.type}} {{#each config.illusionSpellTypes as |name type|}}
+            <select name="system.illusion.type">
+                {{#select system.illusion.type}} {{#each config.illusionSpellTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
-            <select name="data.illusion.sense">
-                {{#select data.illusion.sense}} {{#each config.illusionSpellSenses as |name type|}}
+            <select name="system.illusion.sense">
+                {{#select system.illusion.sense}} {{#each config.illusionSpellSenses as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
         </div>
     </div>
-    {{/ife}} {{#ife data.category "manipulation"}}
+    {{/ife}} {{#ife system.category "manipulation"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.SpellCatManipulation"}}
@@ -140,9 +139,8 @@
                 <input
                     class="display"
                     type="checkbox"
-                    name="data.manipulation.damaging"
-                    {{checked
-                    data.manipulation.damaging}}
+                    name="system.manipulation.damaging"
+                    {{checked system.manipulation.damaging}}
                 />
             </label>
             <label>
@@ -150,9 +148,8 @@
                 <input
                     class="display"
                     type="checkbox"
-                    name="data.manipulation.mental"
-                    {{checked
-                    data.manipulation.mental}}
+                    name="system.manipulation.mental"
+                    {{checked system.manipulation.mental}}
                 />
             </label>
             <label>
@@ -160,9 +157,8 @@
                 <input
                     class="display"
                     type="checkbox"
-                    name="data.manipulation.environmental"
-                    {{checked
-                    data.manipulation.environmental}}
+                    name="system.manipulation.environmental"
+                    {{checked system.manipulation.environmental}}
                 />
             </label>
             <label>
@@ -170,9 +166,8 @@
                 <input
                     class="display"
                     type="checkbox"
-                    name="data.manipulation.physical"
-                    {{checked
-                    data.manipulation.physical}}
+                    name="system.manipulation.physical"
+                    {{checked system.manipulation.physical}}
                 />
             </label>
         </div>

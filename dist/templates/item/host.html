@@ -18,8 +18,8 @@
                                     type="text"
                                     size="2"
                                     maxlength="2"
-                                    name="data.rating"
-                                    value="{{data.rating}}"
+                                    name="system.rating"
+                                    value="{{system.rating}}"
                                     data-dtype="Number"
                                     placeholder="2"/>
                         </div>
@@ -40,7 +40,7 @@
                         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                                 name=(localize "SR5.Host.ICOrder")
                         }}
-                        {{#each data.ic as | ic |}}
+                        {{#each system.ic as | ic |}}
                         {{> 'systems/shadowrun5e/dist/templates/common/List/ListEntityItem.html'
                                 id=ic.id
                                 linkName=ic.name
