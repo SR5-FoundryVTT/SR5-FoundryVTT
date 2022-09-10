@@ -850,7 +850,7 @@
   },
   "SR5.Infos": {
     "CantModifyHostContent": "Host daten können nicht von einem IC Akteur aus verändert werden",
-    "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen",
+    "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen"
   },
   "SR5.Warnings": {
     "NegativeLimitValue": "Limit Werte müssen über Null liegen",
