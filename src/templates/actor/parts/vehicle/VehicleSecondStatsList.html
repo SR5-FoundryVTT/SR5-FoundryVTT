@@ -16,8 +16,8 @@
         <div>
             {{> "systems/shadowrun5e/dist/templates/common/Select.html"
                     options=config.vehicle.types
-                    value=data.vehicleType
-                    path="data.vehicleType"
+                    value=system.vehicleType
+                    path="system.vehicleType"
             }}
         </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
@@ -26,8 +26,8 @@
         <div>
             {{> "systems/shadowrun5e/dist/templates/common/Select.html"
                     options=config.vehicle.control_modes
-                    value=data.controlMode
-                    path="data.controlMode"
+                    value=system.controlMode
+                    path="system.controlMode"
             }}
         </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
@@ -36,16 +36,16 @@
         <div>
             {{> "systems/shadowrun5e/dist/templates/common/Select.html"
                     options=config.vehicle.environments
-                    value=data.environment
-                    path="data.environment"
+                    value=system.environment
+                    path="system.environment"
             }}
         </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
 
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.IsDrone") }}
-        <input type="checkbox" class="checkbox" name="data.isDrone" {{checked data.isDrone}}/>
+        <input type="checkbox" class="checkbox" name="system.isDrone" {{checked system.isDrone}}/>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.IsOffRoad") }}
-        <input type="checkbox" class="checkbox" name="data.isOffRoad" {{checked data.isOffRoad}}/>
+        <input type="checkbox" class="checkbox" name="system.isOffRoad" {{checked system.isOffRoad}}/>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
 </div>

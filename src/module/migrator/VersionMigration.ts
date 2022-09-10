@@ -145,7 +145,9 @@ export abstract class VersionMigration {
                 for (const token of scene.data.tokens) {
                     // Don't migrate tokens without or a linked actor.
                     if (!token.actor || token.data.actorLink) continue;
-                    if (isObjectEmpty(token.actor.data)) continue;
+                    
+                    //@ts-ignore // TODO: foundry-vtt-types v10
+                    if (foundry.utils.isEmpty(token.actor.data)) continue;
 
                     // @ts-ignore
                     const updateData = await this.MigrateActorData(foundry.utils.duplicate(token.actor.data));
@@ -157,8 +159,8 @@ export abstract class VersionMigration {
                     });
                 }
 
-
-                if (isObjectEmpty(updateData)) {
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                if (foundry.utils.isEmpty(updateData)) {
                     continue;
                 }
 
@@ -189,7 +191,8 @@ export abstract class VersionMigration {
                 console.log(`Migrating Item: ${item.name}`);
                 const updateData = await this.MigrateItemData(item.data);
 
-                if (isObjectEmpty(updateData)) {
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                if (foundry.utils.isEmpty(updateData)) {
                     continue;
                 }
 
@@ -381,7 +384,8 @@ export abstract class VersionMigration {
                     // @ts-ignore // TODO: vtt-types v9 document.data.type check added to type gate... but didn't work
                     updateData = await this.MigrateItemData(foundry.utils.duplicate(document.data));
 
-                    if (isObjectEmpty(updateData)) {
+                    //@ts-ignore // TODO: foundry-vtt-types v10
+                    if (foundry.utils.isEmpty(updateData)) {
                         continue;
                     }
 
@@ -390,13 +394,14 @@ export abstract class VersionMigration {
                         document.update(updateData.data);
                     }
 
-                    // TODO: Uncomment when foundry allows embeddeds to be updated in packs
+                // TODO: Uncomment when foundry allows embeddeds to be updated in packs
                 //@ts-ignore
                 } else if (pack.metadata.type === 'Actor') {
                     // @ts-ignore
                     updateData = await this.MigrateActorData(foundry.utils.duplicate(document.data));
 
-                    if (isObjectEmpty(updateData)) {
+                    //@ts-ignore // TODO: foundry-vtt-types v10
+                    if (foundry.utils.isEmpty(updateData)) {
                         continue;
                     }
 
@@ -416,7 +421,8 @@ export abstract class VersionMigration {
                 } else if (pack.metadata.type === 'Scene') {
                     updateData = await this.MigrateSceneData(foundry.utils.duplicate(document.data));
 
-                    if (isObjectEmpty(updateData)) {
+                    //@ts-ignore // TODO: foundry-vtt-types v10
+                    if (foundry.utils.isEmpty(updateData)) {
                         continue;
                     }
 

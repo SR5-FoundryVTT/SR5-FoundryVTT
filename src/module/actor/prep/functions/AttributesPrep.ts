@@ -9,8 +9,8 @@ export class AttributesPrep {
     /**
      * Prepare actor data for attributes
      */
-    static prepareAttributes(data: ActorTypesData) {
-        const {attributes} = data;
+    static prepareAttributes(system: ActorTypesData) {
+        const {attributes} = system;
 
         // always have special attributes set to hidden
         attributes.magic.hidden = true;

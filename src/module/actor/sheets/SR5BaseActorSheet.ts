@@ -168,13 +168,17 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /** SheetData used by _all_ actor types! */
-    getData() {
+    async getData(options) {
         // Foundry v8 redesigned SheetData. To avoid restructuring all sheet templates, map new onto old and ignore it.
         let data = super.getData() as any;
+        const actorData = this.actor.toObject(false);
+
         data = {
             ...data,
-            // @ts-ignore
-            data: data.data.data
+            // @ts-ignore TODO: foundry-vtt-types v10
+            data: actorData.system,
+             // @ts-ignore TODO: foundry-vtt-types v10
+            system: actorData.system
         }
 
         // Sheet related general purpose fields. These aren't persistent.
@@ -195,6 +199,15 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
+
+        // @ts-ignore TODO: foundry-vtt-types v10
+        data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
+            // secrets: this.actor.isOwner,
+            // rollData: this.actor.getRollData.bind(this.actor),
+            // @ts-ignore TODO: foundry-vtt-types v10
+            async: true,
+            relativeTo: this.actor
+          });
 
         return data;
     }

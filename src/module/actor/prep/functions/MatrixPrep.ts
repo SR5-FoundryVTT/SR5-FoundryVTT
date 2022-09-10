@@ -14,8 +14,8 @@ export class MatrixPrep {
      * - if an item is equipped, it will use that data
      * - if it isn't and player is technomancer, it will use that data
      */
-    static prepareMatrix(actorData: ActorTypesData & MatrixActorData, items: SR5ItemDataWrapper[]) {
-        const { matrix, attributes } = actorData;
+    static prepareMatrix(system: ActorTypesData & MatrixActorData, items: SR5ItemDataWrapper[]) {
+        const { matrix, attributes } = system;
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
 
@@ -57,7 +57,7 @@ export class MatrixPrep {
                 }
             }
         } // if we don't have a device, use living persona
-        else if (actorData.special === 'resonance') {
+        else if (system.special === 'resonance') {
             matrix.firewall.base = Helpers.calcTotal(attributes.willpower);
             matrix.data_processing.base = Helpers.calcTotal(attributes.logic);
             matrix.rating = Helpers.calcTotal(attributes.resonance);
@@ -74,10 +74,10 @@ export class MatrixPrep {
 
     /**
      * Add Matrix Attributes to Limits and Attributes
-     * @param data
+     * @param system
      */
-    static prepareMatrixToLimitsAndAttributes(data: CommonData & MatrixActorData) {
-        const { matrix, attributes, limits } = data;
+    static prepareMatrixToLimitsAndAttributes(system: CommonData & MatrixActorData) {
+        const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries
         Object.keys(SR5.matrixAttributes).forEach((attributeName) => {
@@ -115,10 +115,10 @@ export class MatrixPrep {
 
     /**
      * Prepare the mental attributes for a sheet that just has a device rating
-     * @param data
+     * @param system
      */
-    static prepareAttributesForDevice(data: CommonData & MatrixActorData) {
-        const { matrix, attributes } = data;
+    static prepareAttributesForDevice(system: CommonData & MatrixActorData) {
+        const { matrix, attributes } = system;
         const rating = matrix.rating || 0;
         const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];
 

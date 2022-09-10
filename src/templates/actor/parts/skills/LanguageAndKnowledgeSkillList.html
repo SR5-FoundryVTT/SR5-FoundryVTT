@@ -4,7 +4,7 @@
             icons=(SkillHeaderIcons 'language')
             rightSide=(SkillHeaderRightSide 'language' filters)
     }}
-    {{#each data.skills.language.value as |skill sid|}}
+    {{#each system.skills.language.value as |skill sid|}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                 name=(localizeSkill skill)
                 itemNameCssClass="language-skill"
@@ -15,7 +15,7 @@
                 hasRoll="true"
         }}
     {{/each}}
-    {{#each data.skills.knowledge as |cat cid|}}
+    {{#each system.skills.knowledge as |cat cid|}}
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
             name=(localizeOb cid ../config.knowledgeSkillCategories)
             itemId=cid

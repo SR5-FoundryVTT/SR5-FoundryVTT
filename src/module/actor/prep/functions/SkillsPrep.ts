@@ -7,8 +7,8 @@ export class SkillsPrep {
     /**
      * Prepare actor data for skills
      */
-    static prepareSkills(data: ActorTypesData) {
-        const { language, active, knowledge } = data.skills;
+    static prepareSkills(system: ActorTypesData) {
+        const { language, active, knowledge } = system.skills;
         if (language) {
             if (!language.value) {
                 language.value = {};
@@ -46,9 +46,9 @@ export class SkillsPrep {
             }
         }
 
-        const entries = Object.entries(data.skills.language.value);
+        const entries = Object.entries(system.skills.language.value);
         // remove entries which are deleted TODO figure out how to delete these from the data
-        entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete data.skills.language.value[key]);
+        entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete system.skills.language.value[key]);
 
         for (let skill of Object.values(language.value)) {
             prepareSkill(skill);

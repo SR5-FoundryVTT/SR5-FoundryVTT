@@ -5,8 +5,8 @@ import { PartsList } from '../../../parts/PartsList';
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class InitiativePrep {
-    static prepareCurrentInitiative(data: ActorTypesData) {
-        const { initiative } = data;
+    static prepareCurrentInitiative(system: ActorTypesData) {
+        const { initiative } = system;
 
         if (initiative.perception === 'matrix') initiative.current = initiative.matrix;
         else if (initiative.perception === 'astral') initiative.current = initiative.astral;
@@ -23,8 +23,8 @@ export class InitiativePrep {
         initiative.current.base.value = Helpers.calcTotal(initiative.current.base);
     }
 
-    static prepareMeatspaceInit(data: ActorTypesData) {
-        const { initiative, attributes, modifiers } = data;
+    static prepareMeatspaceInit(system: ActorTypesData) {
+        const { initiative, attributes, modifiers } = system;
 
         initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
         initiative.meatspace.base.mod = PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meat_initiative']));
@@ -33,8 +33,8 @@ export class InitiativePrep {
         initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
     }
 
-    static prepareAstralInit(data: ActorTypesData & MagicActorData) {
-        const { initiative, attributes, modifiers } = data;
+    static prepareAstralInit(system: ActorTypesData & MagicActorData) {
+        const { initiative, attributes, modifiers } = system;
 
         initiative.astral.base.base = attributes.intuition.value * 2;
         initiative.astral.base.mod = PartsList.AddUniquePart(initiative.astral.base.mod, "SR5.Bonus", Number(modifiers['astral_initiative']));
@@ -43,11 +43,11 @@ export class InitiativePrep {
         initiative.astral.dice.mod = PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", Number(modifiers['astral_initiative_dice']));
     }
 
-    static prepareMatrixInit(data: ActorTypesData & MatrixActorData) {
-        const { initiative, attributes, modifiers, matrix } = data;
+    static prepareMatrixInit(system: ActorTypesData & MatrixActorData) {
+        const { initiative, attributes, modifiers, matrix } = system;
         if (matrix) {
 
-            initiative.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value;
+            initiative.matrix.base.base = attributes.intuition.value + system.matrix.data_processing.value;
             initiative.matrix.base.mod = PartsList.AddUniquePart(initiative.matrix.base.mod, "SR5.Bonus", Number(modifiers['matrix_initiative']));
 
             initiative.matrix.dice.base = (matrix.hot_sim ? 4 : 3);
