@@ -247,6 +247,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
         html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditCancel.bind(this));
         html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditSave.bind(this));
+        html.find('input#input-inventory').on('change', this._onInventoryChangePreventSheetSubmit.bind(this));
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
         html.find('.inventory-item-move').on('click', this._onItemMoveToInventory.bind(this));
 
@@ -1499,6 +1500,24 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (dialog.canceled) return;
 
         await this.document.inventory.addItems(inventory, item);
+    }
+
+    /**
+     * When editing an existing or new inventory on a new actor for the frist time,
+     * the initial change event (by leaving the element focus, i.e. leaving or clicking on submit)
+     * will cause a general form submit (Foundry FormApplication onChangeSubmit), causing a render
+     * and removing the inventory input box.
+     * 
+     * Note: This ONLY happens on new actors and NOT on inventory changes on old actors. The root cause
+     * is unclear.
+     * 
+     * As the inventory inpunt box lives outside of Foundries default form handling, prevent
+     * this by stopping propagation into Foundries onChange listeners.
+     * 
+     * @param event Any event
+     */
+    _onInventoryChangePreventSheetSubmit(event: Event) {
+        event.stopPropagation();
     }
 
     /**
