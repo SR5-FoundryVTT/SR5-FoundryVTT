@@ -736,7 +736,13 @@ export class SR5Actor extends Actor {
         return skill.label ? skill.label : skill.name ? skill.name : '';
     }
 
-    async addKnowledgeSkill(category, skill?): Promise<string> {
+    async addKnowledgeSkill(category, skill?): Promise<string|undefined> {
+        //@ts-ignore // prevent accidental creation for wrong categories
+        if (!this.system.skills.knowledge.hasOwnProperty(category)) {
+            console.error(`Shadowrun5e | Tried creating knowledge skill with unkown category ${category}`);
+            return;
+        }
+        
         const defaultSkill = {
             name: '',
             specs: [],

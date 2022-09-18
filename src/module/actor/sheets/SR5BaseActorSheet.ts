@@ -247,6 +247,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
         html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditCancel.bind(this));
         html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditSave.bind(this));
+        html.find('input#input-inventory').on('change', this._onInventoryChangePreventSheetSubmit.bind(this));
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
         html.find('.inventory-item-move').on('click', this._onItemMoveToInventory.bind(this));
 
@@ -1113,6 +1114,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onShowEditSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
+        
+        if (!skill) {
+            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+        }
+
         // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
         await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skill);
     }
@@ -1136,6 +1142,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const [skill, category] = Helpers.listItemId(event).split('.');
 
+        if (!skill || !category) {
+            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`);
+        }
+
         this._showSkillEditForm(
             KnowledgeSkillEditSheet,
             this.actor,
@@ -1150,6 +1160,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
+
+        if (!skill) {
+            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+        }
+
         // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
         await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event: event }, skill);
     }
@@ -1499,6 +1514,24 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (dialog.canceled) return;
 
         await this.document.inventory.addItems(inventory, item);
+    }
+
+    /**
+     * When editing an existing or new inventory on a new actor for the frist time,
+     * the initial change event (by leaving the element focus, i.e. leaving or clicking on submit)
+     * will cause a general form submit (Foundry FormApplication onChangeSubmit), causing a render
+     * and removing the inventory input box.
+     * 
+     * Note: This ONLY happens on new actors and NOT on inventory changes on old actors. The root cause
+     * is unclear.
+     * 
+     * As the inventory inpunt box lives outside of Foundries default form handling, prevent
+     * this by stopping propagation into Foundries onChange listeners.
+     * 
+     * @param event Any event
+     */
+    _onInventoryChangePreventSheetSubmit(event: Event) {
+        event.stopPropagation();
     }
 
     /**
