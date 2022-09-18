@@ -65,6 +65,13 @@ export class RangedAttackTest extends SuccessTest {
 
         //@ts-ignore // TODO: foundry-vtt-types v10 
         this.data.fireModes = FireModeRules.availableFireModes(weaponData.system.range.modes);
+
+        // To avoid problems when no firemode is configured on the weapon, add at least one to what's available
+        if (this.data.fireModes.length === 0) {
+            this.data.fireModes.push(SR5.fireModes[0]);
+            ui.notifications?.warn('SR5.Warnings.NoFireModeConfigured', {localize: true});
+        }
+
         // Current firemode selected
         const lastFireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
         // Try pre-selection based on last fire mode.

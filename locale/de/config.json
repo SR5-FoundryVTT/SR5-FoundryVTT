@@ -865,7 +865,8 @@
     "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",
     "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
     "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Glitch.",
-    "CantConsumeEquippedAmmo": "Ausgerüstete Munition hat nicht genug Kugeln"
+    "CantConsumeEquippedAmmo": "Ausgerüstete Munition hat nicht genug Kugeln",
+    "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer."
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
