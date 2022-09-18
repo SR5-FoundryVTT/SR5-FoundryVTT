@@ -49,7 +49,8 @@ export class InventoryFlow {
         };
 
         console.log(`Shadowrun 5e | Executing update to create inventory`, updateData)
-        return await this.document.update(updateData)
+        // Don't render to allow sheets to manage switching inventories.
+        return await this.document.update(updateData, {render: false})
     }
 
     /**
@@ -86,7 +87,8 @@ export class InventoryFlow {
         }
 
         console.log(`Shadowrun 5e | Executing update to remove inventory`, updateData);
-        await this.document.update(updateData);
+        // Don't render to allow sheets to manage switching inventories.
+        await this.document.update(updateData, {render: false});
     }
 
         /**
@@ -147,7 +149,8 @@ export class InventoryFlow {
         };
 
         console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
-        await this.document.update(updateData);
+        // Don't render to allow sheets to manage switching inventories.
+        await this.document.update(updateData, {render: false});
     }
 
     /**
