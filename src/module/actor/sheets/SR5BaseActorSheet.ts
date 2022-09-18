@@ -1114,6 +1114,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onShowEditSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
+        
+        if (!skill) {
+            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+        }
+
         // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
         await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skill);
     }
@@ -1137,6 +1142,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const [skill, category] = Helpers.listItemId(event).split('.');
 
+        if (!skill || !category) {
+            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`);
+        }
+
         this._showSkillEditForm(
             KnowledgeSkillEditSheet,
             this.actor,
@@ -1151,6 +1160,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
+
+        if (!skill) {
+            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+        }
+
         // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
         await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event: event }, skill);
     }

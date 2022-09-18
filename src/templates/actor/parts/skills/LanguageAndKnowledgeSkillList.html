@@ -26,7 +26,7 @@
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                     name=(localizeSkill skill)
                     itemNameCssClass="knowledge-skill"
-                    itemId=sid
+                    itemId=(buildName part1=sid part2=cid)
                     itemType="knowledgeskill"
                     icons=(SkillIcons 'knowledge' skill)
                     rightSide=(SkillRightSide 'knowledge' skill)
