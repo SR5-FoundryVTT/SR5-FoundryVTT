@@ -10,11 +10,11 @@ export class ModifiersPrep {
     /**
      * Prepare the modifiers that are displayed in the Misc. tab
      */
-    static prepareModifiers(data: ActorTypesData) {
+    static prepareModifiers(system: ActorTypesData) {
         let modifiers = ModifiersPrep.commonModifiers;
         modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
         modifiers = modifiers.concat(ModifiersPrep.characterModifiers)
-        ModifiersPrep.setupModifiers(data, modifiers);
+        ModifiersPrep.setupModifiers(system, modifiers);
     }
 
     static get commonModifiers() {
@@ -54,9 +54,9 @@ export class ModifiersPrep {
         ]
     }
 
-    static setupModifiers(data, modifiers) {
-        if (!data.modifiers) {
-            data.modifiers = {};
+    static setupModifiers(system: ShadowrunActorDataData, modifiers) {
+        if (!system.modifiers) {
+            system.modifiers = {};
         }
 
         // TODO: localize sorting of modifiers.
@@ -68,14 +68,14 @@ export class ModifiersPrep {
         // Unset modifier values will be null or not exist at all.
         const sorted = {};
         for (const modifier of modifiers) {
-            sorted[modifier] = Number(data.modifiers[modifier]) || 0;
+            sorted[modifier] = Number(system.modifiers[modifier]) || 0;
         }
 
-        data.modifiers = sorted;
+        system.modifiers = sorted;
     }
 
-    static clearAttributeMods(data: ShadowrunActorDataData) {
-        const { attributes } = data;
+    static clearAttributeMods(system: ShadowrunActorDataData) {
+        const { attributes } = system;
         for (const [name, attribute] of Object.entries(attributes)) {
             // Check for valid attributes. Active Effects can cause unexpected properties to appear.
             if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
@@ -84,14 +84,14 @@ export class ModifiersPrep {
         }
     }
 
-    static clearArmorMods(data: CharacterData|CritterData|SpiritData|VehicleData) {
-        const {armor} = data;
+    static clearArmorMods(system: CharacterData|CritterData|SpiritData|VehicleData) {
+        const {armor} = system;
 
         armor.mod = [];
     }
 
-    static clearLimitMods(data: ShadowrunActorDataData) {
-        const {limits} = data;
+    static clearLimitMods(system: ShadowrunActorDataData) {
+        const {limits} = system;
         for (const [name, limit] of Object.entries(limits)) {
             if (!SR5.limits.hasOwnProperty(name) || !limit) return;
 

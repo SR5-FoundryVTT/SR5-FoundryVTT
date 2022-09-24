@@ -39,13 +39,13 @@ export class ImportHelper {
     /**
      * Helper method to create a new folder.
      * @param name The name of the folder.
-     * @param parent The parent folder.
+     * @param folder The parent folder.
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
-    public static async NewFolder(name: string, parent: Folder | null = null) {
+    public static async NewFolder(name: string, folder: Folder | null = null) {
         return await Folder.create({
             type: 'Item',
-            parent: parent === null ? null : parent.id,
+            folder: folder === null ? null : folder.id,
             name: name,
         });
     }
@@ -61,12 +61,12 @@ export class ImportHelper {
      */
     public static async GetFolderAtPath(path: string, mkdirs: boolean = false): Promise<Folder> {
         let currentFolder,
-            lastFolder = undefined;
+            lastFolder = null;
         const pathSegments = path.split('/');
         for (const pathSegment of pathSegments) {
              // Check if the path structure matches the folder structure.
             currentFolder = game.folders?.find((folder) => {
-                return folder.parentFolder === lastFolder && folder.name === pathSegment
+                return folder.folder === lastFolder && folder.name === pathSegment
             });
 
             // Only create when allowed to. Otherwise abort with error.

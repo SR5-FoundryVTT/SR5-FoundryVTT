@@ -1,25 +1,22 @@
-import {Helpers} from '../helpers';
-import {SR5Actor} from '../actor/SR5Actor';
-import {ActionTestData} from '../apps/dialogs/ShadowrunItemDialog';
-import {ChatData} from './ChatData';
-import {createItemChatMessage} from '../chat';
-import {DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME} from '../constants';
-import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
-import {PartsList} from '../parts/PartsList';
-import {ActionFlow} from "./flows/ActionFlow";
-import {SkillFlow} from "../actor/flows/SkillFlow";
-import {SR5} from "../config";
-import {DefaultValues} from "../data/DataDefaults";
-import {HostDataPreparation} from "./prep/HostPrep";
-import {MatrixRules} from "../rules/MatrixRules";
-import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
-import {TestCreator} from "../tests/TestCreator";
-import {Test} from "../rolls/ShadowrunRoller";
+import { SkillFlow } from "../actor/flows/SkillFlow";
+import { SR5Actor } from '../actor/SR5Actor';
+import { ActionTestData } from '../apps/dialogs/ShadowrunItemDialog';
+import { createItemChatMessage } from '../chat';
+import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
+import { DefaultValues } from "../data/DataDefaults";
+import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
+import { Helpers } from '../helpers';
+import { PartsList } from '../parts/PartsList';
+import { Test } from "../rolls/ShadowrunRoller";
+import { MatrixRules } from "../rules/MatrixRules";
+import { TestCreator } from "../tests/TestCreator";
+import { ChatData } from './ChatData';
+import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
+import { HostDataPreparation } from "./prep/HostPrep";
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
-import LimitField = Shadowrun.LimitField;
 import FireModeData = Shadowrun.FireModeData;
 import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
@@ -31,7 +28,6 @@ import DamageData = Shadowrun.DamageData;
 import SpellData = Shadowrun.SpellData;
 import WeaponData = Shadowrun.WeaponData;
 import AmmoData = Shadowrun.AmmoData;
-import TechnologyPartData = Shadowrun.TechnologyPartData;
 import TechnologyData = Shadowrun.TechnologyData;
 import RangeWeaponData = Shadowrun.RangeWeaponData;
 import SpellRange = Shadowrun.SpellRange;
@@ -60,7 +56,6 @@ import ActionResultData = Shadowrun.ActionResultData;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
-import AmmunitionData = Shadowrun.AmmunitionData;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -80,6 +75,8 @@ import AmmunitionData = Shadowrun.AmmunitionData;
  *       Be wary of SR5Item.actor for this reason!
  */
 export class SR5Item extends Item {
+    static LOG_V10_COMPATIBILITY_WARNINGS = false;
+    
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
     // to allow for embedded items in items in actors.
     items: SR5Item[];
@@ -126,25 +123,25 @@ export class SR5Item extends Item {
 
     // Flag Functions
     getLastFireMode(): FireModeData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || { value: 0, defense: 0, label: 'SR5.FireMode' };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) as FireModeData || DefaultValues.fireModeData();
     }
     async setLastFireMode(fireMode: FireModeData) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
     }
     getLastSpellForce(): SpellForceData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastSpellForce) || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastSpellForce) as SpellForceData|| { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel) || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel) as ComplexFormLevelData || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
     }
     getLastFireRangeMod(): FireRangeData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireRange) || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireRange) as FireRangeData || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
@@ -154,7 +151,7 @@ export class SR5Item extends Item {
      * Return an Array of the Embedded Item Data
      */
     getNestedItems(): any[] {
-        let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
+        let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems) as any[];
 
         items = items ? items : [];
 
@@ -168,6 +165,13 @@ export class SR5Item extends Item {
             if (item.effects && !Array.isArray(item.effects)) {
                 item.effects = Helpers.convertIndexedObjectToArray(item.effects);
             }
+            // TODO: foundry-vtt-types v10 - TODO: Move into migration...
+            // if (item.data) {
+            //     item.system = item.system || {};
+            //     mergeObject(item.system, item.data);
+            //     item.system = item.data;
+            //     delete item.data;
+            // }
             return item;
         });
 
@@ -214,11 +218,13 @@ export class SR5Item extends Item {
         // Description labels might have changed since last data prep.
         this.labels = {};
 
-        if (this.data.type === 'sin') {
-            if (typeof this.data.data.licenses === 'object') {
+        if (this.type === 'sin') {
+            //@ts-ignore // TODO: foundry-vtt-types v10 
+            if (typeof this.system.licenses === 'object') {
                 //@ts-ignore // taMiF: This seems to be a hacky solution to some internal or Foundry issue with reading
                 //                      a object/HashMap when an array/iterable was expected
-                this.data.data.licenses = Object.values(this.data.data.licenses);
+                //@ts-ignore // TODO: foundry-vtt-types v10 
+                this.system.licenses = Object.values(this.system.licenses);
             }
         }
         const equippedMods = this.getEquippedMods();
@@ -265,12 +271,13 @@ export class SR5Item extends Item {
             }
 
             // Item.prepareData is called once (first) with an empty SR5Actor instance without .data and once (second) with .data.
+            //@ts-ignore // TODO: foundry-vtt-types v10 Is there way with v10 to determine if data has been set? (second round)
             if (this.actor?.data) {
                 action.damage.source = {
                     actorId: this.actor.id as string,
                     itemId: this.id as string,
                     itemName: this.name as string,
-                    itemType: this.data.type
+                    itemType: this.type
                 };
             }
 
@@ -281,18 +288,18 @@ export class SR5Item extends Item {
                 const modification = mod.asModificationData();
                 if (!modification) return;
 
-                if (modification.data.accuracy) {
-                    limitParts.addUniquePart(mod.name as string, modification.data.accuracy);
-                }
-                if (modification.data.dice_pool) {
-                    dpParts.addUniquePart(mod.name as string, modification.data.dice_pool);
-                }
+                //@ts-ignore // TODO: foundry-vtt-types v10 
+                if (modification.system.accuracy) limitParts.addUniquePart(mod.name as string, modification.system.accuracy);
+                //@ts-ignore // TODO: foundry-vtt-types v10 
+                if (modification.system.dice_pool) dpParts.addUniquePart(mod.name as string, modification.system.dice_pool);
+                
             });
 
 
 
             if (equippedAmmo) {
-                const ammoData = equippedAmmo.data.data as AmmoData;
+                //@ts-ignore // TODO: foundry-vtt-types v10 
+                const ammoData = equippedAmmo.system as AmmoData;
                 // add mods to damage from ammo
                 action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
                 // add mods to ap from ammo
@@ -329,27 +336,30 @@ export class SR5Item extends Item {
             if (range.rc) {
                 const rangeParts = new PartsList();
                 equippedMods.forEach((mod) => {
-                    //@ts-ignore // TypeScript doesn't like this.data.data Item.Data<DataType> possibly being all the things.
-                    if (mod.data.data.rc) rangeParts.addUniquePart(mod.name, mod.data.data.rc);
+                    //@ts-ignore // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
+                    //@ts-ignore // TODO: foundry-vtt-types v10 
+                    if (mod.system.rc) rangeParts.addUniquePart(mod.name, mod.system.rc);
                     // handle overrides from ammo
                 });
-                //@ts-ignore // TypeScript doesn't like this.data.data Item.Data<DataType> possibly being all the things.
+                //@ts-ignore // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
                 range.rc.mod = rangeParts.list;
-                //@ts-ignore // TypeScript doesn't like this.data.data Item.Data<DataType> possibly being all the things.
+                //@ts-ignore // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
                 if (range.rc) range.rc.value = Helpers.calcTotal(range.rc);
             }
         }
 
         const adeptPower = this.asAdeptPowerData();
         if (adeptPower) {
-            adeptPower.data.type = adeptPower.data.action.type ? 'active' : 'passive';
+            //@ts-ignore // TODO: foundry-vtt-types v10 
+            adeptPower.system.type = adeptPower.system.action.type ? 'active' : 'passive';
         }
 
         // Switch item data preparation between types...
         // ... this is ongoing work to clean up SR5item.prepareData
-        switch (this.data.type) {
+        switch (this.type) {
             case 'host':
-                HostDataPreparation(this.data.data);
+                //@ts-ignore // TODO: foundry-vtt-types v10 
+                HostDataPreparation(this.system);
         }
     }
 
@@ -383,26 +393,28 @@ export class SR5Item extends Item {
         await test.execute();
 }
 
-    getChatData(htmlOptions?) {
-        const data = duplicate(this.data.data);
+    getChatData(htmlOptions={}) {
+        //@ts-ignore // TODO: foundry-vtt-types v10 
+        const system = duplicate(this.system);
         const { labels } = this;
         //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
         //              that's not actually defined in any SR5Item typing.
-        if (!data.description) data.description = {};
+        if (!system.description) system.description = {};
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
-        if (!data.description.value) data.description.value = '';
-
-        data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
+        if (!system.description.value) system.description.value = '';
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        system.description.value = TextEditor.enrichHTML(system.description.value, {...htmlOptions, async: false});
 
         const props = [];
-        const func = ChatData[this.data.type];
-        if (func) func(duplicate(data), labels, props, this);
+        //@ts-ignore // TODO: foundry-vtt-types v10 
+        const func = ChatData[this.type];
+        if (func) func(duplicate(system), labels, props, this);
 
         //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
         //              that's not actually defined in any SR5Item typing.
-        data.properties = props.filter((p) => !!p);
+        system.properties = props.filter((p) => !!p);
 
-        return data;
+        return system;
     }
 
     getActionTestName(): string {
@@ -427,11 +439,10 @@ export class SR5Item extends Item {
         return parts;
     }
 
-
-
-     getBlastData(actionTestData?: ActionTestData): BlastData | undefined {
+    getBlastData(actionTestData?: ActionTestData): BlastData | undefined {
         if (this.isSpell() && this.isAreaOfEffect()) {
-            const data = this.data.data as SpellData;
+            //@ts-ignore // TODO: foundry-vtt-types v10 
+            const system = this.system as SpellData;
 
             // By default spell distance is equal to it's Force.
             let distance = this.getLastSpellForce().value;
@@ -442,7 +453,7 @@ export class SR5Item extends Item {
             }
 
             // Extended spells have a longer range.
-            if (data.extended) distance *= 10;
+            if (system.extended) distance *= 10;
             const dropoff = 0;
 
             return {
@@ -451,10 +462,11 @@ export class SR5Item extends Item {
             }
 
         } else if (this.isGrenade()) {
-            const data = this.data.data as WeaponData;
+            //@ts-ignore // TODO: foundry-vtt-types v10 
+            const system = this.system as WeaponData;
 
-            const distance = data.thrown.blast.radius;
-            const dropoff = data.thrown.blast.dropoff;
+            const distance = system.thrown.blast.radius;
+            const dropoff = system.thrown.blast.dropoff;
 
             return {
                 radius: distance,
@@ -467,8 +479,10 @@ export class SR5Item extends Item {
 
             if (!ammoData) return {radius: 0, dropoff: 0};
 
-            const distance = ammoData.data.blast.radius;
-            const dropoff = ammoData.data.blast.dropoff;
+            //@ts-ignore // TODO: foundry-vtt-types v10 
+            const distance = ammoData.system.blast.radius;
+            //@ts-ignore // TODO: foundry-vtt-types v10 
+            const dropoff = ammoData.system.blast.dropoff;
 
             return {
                 radius: distance,
@@ -495,18 +509,17 @@ export class SR5Item extends Item {
     hasExplosiveAmmo(): boolean {
         const ammo = this.getEquippedAmmo();
         if (!ammo) return false;
-        const data = ammo.data.data as AmmoData;
-        return data.blast.radius > 0;
+        //@ts-ignore // TODO: foundry-vtt-types v10 
+        const system = ammo.system as AmmoData;
+        return system.blast.radius > 0;
     }
 
+    /**
+     * Toggle equipment state of a single Modification item.
+     * @param iid Modification item id to be equip toggled
+     */
     async equipWeaponMod(iid) {
-        const mod = this.getOwnedItem(iid);
-        if (mod) {
-            const dupData = duplicate(mod.data);
-            const data = dupData.data as TechnologyPartData;
-            data.technology.equipped = !data.technology.equipped;
-            await this.updateOwnedItem(dupData);
-        }
+        await this.equipNestedItem(iid, 'modification', {unequipOthers: false, toggle: true});
     }
 
     /**
@@ -534,83 +547,115 @@ export class SR5Item extends Item {
      * @param fired Amount of bullets fired.
      */
     async useAmmo(fired) {
-        const weapon = duplicate(this.asWeaponData());
-        if (weapon) {
-            const { ammo } = weapon.data;
-            ammo.current.value = Math.max(0, ammo.current.value - fired);
+        if (this.type !== 'weapon') return;
 
-            return await this.update(weapon);
-        }
+        //@ts-ignore // TODO: foundry-vtt-types v10 
+        const value = Math.max(0, this.system.ammo.current.value - fired);
+        return await this.update({'system.ammo.current.value': value});
     }
 
     async reloadAmmo() {
-        const data = duplicate(this.asWeaponData());
-
-        if (!data) return;
-
-        const { ammo } = data.data;
-        const diff = ammo.current.max - ammo.current.value;
-        ammo.current.value = ammo.current.max;
-
-        if (ammo.spare_clips) {
-            ammo.spare_clips.value = Math.max(0, ammo.spare_clips.value - 1);
+        if (this.type !== 'weapon') return;
+        
+        // Reload this weapons ammunition to it's max capacity.
+        const updateData = {};
+        //@ts-ignore // TODO: foundry-vtt-types v10 
+        const diff = this.system.ammo.current.max - this.system.ammo.current.value;
+        //@ts-ignore // TODO: foundry-vtt-types v10 
+        updateData['system.ammo.current.value'] = this.system.ammo.current.max;
+        
+        // TODO: Make actual use of this spare clips system...
+        //@ts-ignore // TODO: foundry-vtt-types v10 
+        if (this.system.ammo.current.spare_clips) {
+            //@ts-ignore // TODO: foundry-vtt-types v10 
+            updateData['system.ammo.current.value'] = Math.max(0, this.system.ammo.spare_clips.value - 1);
         }
+        
+        await this.update(updateData);
 
-        await this.update(data);
 
+        // Reduce capacity in whatever equipped nested ammunition item.
+        // TODO: This must be the other way around. Reduce equipped ammo first and only reload what's possible to the weapon item.
+        //       Additionally there needs to be a reload clip mechanism equipping / unequipping clips/mags
         const newAmmunition = (this.items || [])
-            .filter((i) => i.data.type === 'ammo')
-            .reduce((acc, item) => {
-                const ammoData = item.asAmmoData();
+            .filter((i) => i.type === 'ammo')
+            .reduce((acc: AmmoItemData[], item: SR5Item) => {
+                //@ts-ignore // TODO: foundry-vtt-types v10 
+                // Not-equipped ammunition isn't expected to be consumed.
+                if (item.data && item.data.system.technology.equipped) {
 
-                if (ammoData && ammoData.data.technology.equipped) {
-                    const { technology } = ammoData.data;
-                    const qty = typeof technology.quantity === 'string' ? 0 : technology.quantity;
-                    technology.quantity = Math.max(0, qty - diff);
-                    // @ts-ignore
-                    acc.push(item.data);
+                    const itemData = item.toObject() as AmmoItemData;
+                    //@ts-ignore // TODO: foundry-vtt-types v10 
+                    const qty = typeof itemData.system.technology.quantity === 'string' ? 0 : itemData.system.technology.quantity;
+
+                    // Inform user about missing rounds.
+                    if (qty - diff < 0) {
+                        ui.notifications?.warn('SR5.Warnings.CantConsumeEquippedAmmo', {localize: true})
+                    }
+                    
+                    //@ts-ignore // TODO: foundry-vtt-types v10 
+                    itemData.system.technology.quantity = Math.max(0, qty - diff);
+                    acc.push(itemData);
                 }
+                
                 return acc;
             }, []);
 
         if (newAmmunition && newAmmunition.length) {
-            await this.updateOwnedItem(newAmmunition);
+            await this.updateNestedItems(newAmmunition);
+
+            // Inform user about change to equipped ammo.
+            ui.notifications?.info('SR5.Infos.ConsumedEquippedAmmo', {localize: true});
         }
     }
 
-    async equipAmmo(iid) {
-        // only allow ammo that was just clicked to be equipped
-        const ammo = this.items
-            .filter((item) => item.type === 'ammo')
-            .map((item) => {
-                const ownedItem = this.getOwnedItem(item.id);
-                const ammoData = ownedItem?.asAmmoData();
+    async equipNestedItem(id: string, type: string, options: {unequipOthers?: boolean, toggle?: boolean}={}) {
+        const unequipOthers = options.unequipOthers || false;
+        const toggle = options.toggle || false;
 
-                if (ownedItem && ammoData) {
-                    ammoData.data.technology.equipped = iid === item.id;
-                    return ownedItem.data;
-                }
-            });
-        await this.updateOwnedItem(ammo);
+        // Collect all item data and update at once.
+        const updateData: Record<any, any>[] = [];
+        const ammoItems = this.items.filter(item => item.type === type);
+            
+        for (const item of ammoItems) {
+            if (!unequipOthers && item.id !== id) continue;
+            //@ts-ignore TODO: foundry-vtt-types v10
+            const equip = toggle ? !item.system.technology.equipped : id === item.id;
+
+            updateData.push({_id: item.id, 'system.technology.equipped': equip});
+        }
+
+        if (updateData) await this.updateNestedItems(updateData);
+    }
+
+    /**
+     * Equip one ammo item exclusivley.
+     * 
+     * @param id Item id of the to be exclusivley equipped ammo item.
+     */
+    async equipAmmo(id) {
+        await this.equipNestedItem(id, 'ammo', {unequipOthers: true});
     }
 
     async addNewLicense() {
-        const sin = duplicate(this.asSinData());
-        if (!sin) return;
+        if (this.type !== 'sin') return;
 
         // NOTE: This might be related to Foundry data serialization sometimes returning arrays as ordered HashMaps...
-        if (typeof sin.data.licenses === 'object') {
-            // @ts-ignore
-            sin.data.licenses = Object.values(sin.data.licenses);
-        }
-
-        sin.data.licenses.push({
+        //@ts-ignore TODO: foundry-vtt-types v10
+        const licenses = foundry.utils.getType(this.system.licenses) === 'Object' ? 
+            //@ts-ignore TODO: foundry-vtt-types v10
+            Object.values(this.system.licenses) :
+            //@ts-ignore TODO: foundry-vtt-types v10
+            this.system.licenses;
+        
+        // Add the new license to the list
+        licenses.push({
             name: '',
             rtg: '',
             description: '',
         });
 
-        await this.update(sin);
+        await this.update({'system.licenses': licenses});
     }
 
     getRollPartsList(): ModList<number> {
@@ -639,8 +684,8 @@ export class SR5Item extends Item {
         const spec = this.getActionSpecialization();
         if (spec) parts.addUniquePart(spec, 2);
 
-        //@ts-ignore parseInt does allow for number type parameter.
-        const mod = parseInt(this.data.data.action.mod || 0);
+        //@ts-ignore parseInt does allow for number type parameter. // TODO: foundry-vtt-types v10
+        const mod = parseInt(this.system.action.mod || 0);
         if (mod) parts.addUniquePart('SR5.ItemMod', mod);
 
         const atts: (AttributeField | SkillField)[] | boolean = [];
@@ -675,6 +720,7 @@ export class SR5Item extends Item {
 
     asSinData(): SinItemData | undefined {
         if (this.isSin()) {
+            //@ts-ignore TODO: foundry-vtt-types v10
             return this.data as SinItemData;
         }
     }
@@ -685,6 +731,7 @@ export class SR5Item extends Item {
 
     asLifestyleData(): LifestyleItemData | undefined {
         if (this.isLifestyle()) {
+            //@ts-ignore TODO: foundry-vtt-types v10
             return this.data as LifestyleItemData;
         }
     }
@@ -695,6 +742,7 @@ export class SR5Item extends Item {
 
     asAmmoData(): AmmoItemData | undefined {
         if (this.isAmmo()) {
+            //@ts-ignore TODO: foundry-vtt-types v10
             return this.data as AmmoItemData;
         }
     }
@@ -705,6 +753,7 @@ export class SR5Item extends Item {
 
     asModificationData(): ModificationItemData | undefined {
         if (this.isModification()) {
+            //@ts-ignore TODO: foundry-vtt-types v10
             return this.data as ModificationItemData;
         }
     }
@@ -723,6 +772,7 @@ export class SR5Item extends Item {
 
     asProgramData(): ProgramItemData | undefined {
         if (this.isProgram()) {
+            //@ts-ignore TODO: foundry-vtt-types v10
             return this.data as ProgramItemData;
         }
     }
@@ -733,36 +783,44 @@ export class SR5Item extends Item {
 
     asQualityData(): QualityItemData | undefined {
         if (this.isQuality()) {
+            //@ts-ignore TODO: foundry-vtt-types v10
             return this.data as QualityItemData;
         }
     }
 
     isAdeptPower(): boolean {
-        return this.data.type === 'adept_power';
+        return this.type === 'adept_power';
     }
 
     asAdeptPowerData(): AdeptPowerItemData|undefined {
         if (this.isAdeptPower())
+        //@ts-ignore TODO: foundry-vtt-types v10
             return this.data as AdeptPowerItemData;
     }
 
 
     isHost(): boolean {
-        return this.data.type === 'host';
+        return this.type === 'host';
     }
 
     asHostData(): HostItemData|undefined {
         if (this.isHost()) {
+            //@ts-ignore TODO: foundry-vtt-types v10
             return this.data as HostItemData;
         }
     }
 
+    /**
+     * SIN Item - remove a single license within this SIN
+     * 
+     * @param index The license list index
+     */
     async removeLicense(index) {
-        const data = duplicate(this.asSinData());
-        if (data) {
-            data.data.licenses.splice(index, 1);
-            await this.update(data);
-        }
+        if (this.type !== 'sin') return;
+
+        //@ts-ignore TODO: foundry-vtt-types v10
+        const licenses = this.system.licenses.splice(index, 1);
+        await this.update({'system.licenses': licenses});
     }
 
     isAction(): boolean {
@@ -771,6 +829,7 @@ export class SR5Item extends Item {
 
     asActionData(): ActionItemData | undefined {
         if (this.isAction()) {
+            //@ts-ignore TODO: foundry-vtt-types v10
             return this.data as ActionItemData;
         }
     }
@@ -779,51 +838,6 @@ export class SR5Item extends Item {
 
     async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<void> {
         console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
-        return;
-        // const options = {
-        //     event,
-        //     fireModeDefense: 0,
-        //     cover: false,
-        //     attack
-        // };
-        //
-        // const parts = this.getOpposedTestMod();
-        // const action = this.getAction();
-        // if (!action) return;
-        //
-        // const { opposed } = action;
-        //
-        // if (opposed.type === 'defense') {
-        //     return await this.rollDefense(target, options);
-        //
-        // } else if (opposed.type === 'soak') {
-        //     options['damage'] = attack?.damage;
-        //     options['attackerHits'] = attack?.hits;
-        //     return await target.rollSoak(options, parts.list);
-        //
-        // } else if (opposed.type === 'armor') {
-        //     return target.rollArmor(options);
-        //
-        // } else if (opposed.skill && opposed.attribute) {
-        //     const skill = target.getSkill(opposed.skill);
-        //
-        //     if (!skill) {
-        //         ui.notifications?.error(game.i18n.localize("SR5.Errors.MissingSkill"));
-        //         return;
-        //     }
-        //
-        //     return target.rollSkill(skill, {
-        //         ...options,
-        //         attribute: opposed.attribute,
-        //     });
-        //
-        // } else if (opposed.attribute && opposed.attribute2) {
-        //     return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
-        //
-        // } else if (opposed.attribute) {
-        //     return target.rollSingleAttribute(opposed.attribute, options);
-        //
-        // }
     }
 
     async rollTestType(type: string, attack: AttackData, event, target: SR5Actor) {
@@ -888,8 +902,10 @@ export class SR5Item extends Item {
      * Create an item in this item
      * @param itemData
      * @param options
+     * 
+     * //@ts-ignore TODO: foundry-vtt-types v10 Rework method...
      */
-    async createOwnedItem(itemData, options = {}) {
+    async createNestedItem(itemData, options = {}) {
         if (!Array.isArray(itemData)) itemData = [itemData];
         // weapons accept items
         if (this.type === 'weapon') {
@@ -899,8 +915,8 @@ export class SR5Item extends Item {
                 const item = duplicate(ogItem);
                 item._id = randomID(16);
                 if (item.type === 'ammo' || item.type === 'modification') {
-                    if (item?.data?.technology?.equipped) {
-                        item.data.technology.equipped = false;
+                    if (item?.system?.technology?.equipped) {
+                        item.system.technology.equipped = false;
                     }
                     currentItems.push(item);
                 }
@@ -908,9 +924,9 @@ export class SR5Item extends Item {
 
             await this.setNestedItems(currentItems);
         }
-        await this.prepareNestedItems();
-        await this.prepareData();
-        await this.render(false);
+        this.prepareNestedItems();
+        this.prepareData();
+        this.render(false);
 
         return true;
     }
@@ -919,45 +935,46 @@ export class SR5Item extends Item {
      * Prepare embeddedItems
      */
     prepareNestedItems() {
-        // super.prepareNestedItems();
-        let items = this.getNestedItems();
+        this.items = this.items || [];
+        
+        const items = this.getNestedItems();
+        if (!items) return;
 
-        // Templates and further logic need a items HashMap, yet the flag provides an array.
-        if (items) {
+        // Reduce items to id:item HashMap style
+        const loaded = this.items.reduce((object, item) => {
+            object[item.id as string] = item;
+            return object;
+        }, {});
 
-            const existing = (this.items || []).reduce((object, item) => {
-                object[item.id as string] = item;
-                return object;
-            }, {});
+        // Merge and overwrite existing owned items with new changes.
+        const tempItems = items.map((item) => {
+            // Set user permissions to owner, to allow none-GM users to edit their own nested items.
+            const data = game.user ? {ownership: {[game.user.id]: CONST.DOCUMENT_PERMISSION_LEVELS.OWNER}} :
+                                     {};
+            item = mergeObject(item, data);
 
-            // Merge and overwrite existing owned items with new changes.
-            this.items = items.map((item) => {
-                // Set user permissions to owner, to allow none-GM users to edit their own nested items.
-                // @ts-ignore // TODO: foundry-vtt-types v10
-                const data = game.user ? {permission: {[game.user.id]: CONST.DOCUMENT_PERMISSION_LEVELS.OWNER}} :
-                                          {};
+            // Case: MODIFY => Update existing item.
+            if (item._id in loaded) {
+                const currentItem = loaded[item._id];
+                
+                // Update DocumentData directly, since we're not really having database items here.
+                currentItem.updateSource(item);
+                currentItem.prepareData();
+                return currentItem;
 
-                // Case: MODIFY => Update existing item.
-                if (item._id in existing) {
-                    const currentItem = existing[item._id];
+            // Case: CREATE => Create new item.
+            } else {
+                // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
+                //       The legacy approach for embeddedItems (within another item) relies upon this.actor
+                //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
+                return new SR5Item(item, {parent: this as unknown as SR5Actor});
+            }
+        });
 
-                    // Update DocumentData directly, since we're not really having database items here.
-                    currentItem.data.update({...item, ...data});
-                    currentItem.prepareData();
-                    return currentItem;
-
-                // Case: CREATE => Create new item.
-                } else {
-
-                    // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
-                    //       The legacy approach for embeddedItems (within another item) relies upon this.actor
-                    //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
-                    return new SR5Item({...item, ...data}, {parent: this as unknown as SR5Actor});
-                }
-            });
-        }
+        this.items = tempItems;
     }
 
+    // TODO: Rework to either use custom embeddedCollection or Map
     getOwnedItem(itemId): SR5Item | undefined {
         const items = this.items;
         if (!items) return;
@@ -965,7 +982,7 @@ export class SR5Item extends Item {
     }
 
     // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
-    async updateOwnedItem(changes) {
+    async updateNestedItems(changes) {
         const items = duplicate(this.getNestedItems());
         if (!items) return;
         changes = Array.isArray(changes) ? changes : [changes];
@@ -974,6 +991,7 @@ export class SR5Item extends Item {
             const index = items.findIndex((i) => i._id === itemChanges._id);
             if (index === -1) return;
             const item = items[index];
+
             // TODO: The _id field has been added by the system. Even so, don't change the id to avoid any byproducts.
             delete itemChanges._id;
 
@@ -986,9 +1004,9 @@ export class SR5Item extends Item {
         });
 
         await this.setNestedItems(items);
-        await this.prepareNestedItems();
-        await this.prepareData();
-        await this.render(false);
+        this.prepareNestedItems();
+        this.prepareData();
+        this.render(false);
         return true;
     }
 
@@ -1000,8 +1018,8 @@ export class SR5Item extends Item {
      * @param options
      */
     // @ts-ignore
-    async updateEmbeddedEntity(embeddedName,data, options?): Promise<any> {
-        await this.updateOwnedItem(data);
+    async updateEmbeddedEntity(embeddedName, data, options?): Promise<any> {
+        await this.updateNestedItems(data);
         return this;
     }
 
@@ -1096,27 +1114,6 @@ export class SR5Item extends Item {
     }
 
     /**
-     * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
-     * @param scope
-     * @param key
-     * @param value
-     */
-    setFlag(scope: string, key: string, value: any){
-        const newValue = Helpers.onSetFlag(value);
-        return super.setFlag(scope, key, newValue);
-    }
-
-    /**
-     * Override getFlag to add back the 'SR5.' keys correctly to be handled
-     * @param scope
-     * @param key
-     */
-    getFlag(scope: string, key: string): any {
-        const data = super.getFlag(scope, key);
-        return Helpers.onGetFlag(data);
-    }
-
-    /**
      * Passthrough functions
      */
     isAreaOfEffect(): boolean {
@@ -1153,7 +1150,8 @@ export class SR5Item extends Item {
         return this.wrapper.isWeapon();
     }
 
-    asWeaponData(): WeaponItemData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asWeapon(): WeaponItemData | undefined {
         if (this.wrapper.isWeapon()) {
             return this.data as WeaponItemData;
         }
@@ -1163,7 +1161,8 @@ export class SR5Item extends Item {
         return this.wrapper.isCyberware();
     }
 
-    asCyberwareData(): CyberwareItemData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asCyberware(): CyberwareItemData | undefined {
         if (this.isCyberware()) {
             return this.data as CyberwareItemData;
         }
@@ -1197,7 +1196,8 @@ export class SR5Item extends Item {
         return this.wrapper.isSpell();
     }
 
-    asSpellData(): SpellItemData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asSpell(): SpellItemData | undefined {
         if (this.isSpell()) {
             return this.data as SpellItemData;
         }
@@ -1207,7 +1207,8 @@ export class SR5Item extends Item {
         return this.wrapper.isSpritePower();
     }
 
-    asSpritePowerData(): SpritePowerItemData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asSpritePower(): SpritePowerItemData | undefined {
         if (this.isSpritePower()) {
             return this.data as SpritePowerItemData;
         }
@@ -1221,7 +1222,8 @@ export class SR5Item extends Item {
         return this.wrapper.isComplexForm();
     }
 
-    asComplexFormData(): ComplexFormItemData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asComplexForm(): ComplexFormItemData | undefined {
         if (this.isComplexForm()) {
             return this.data as ComplexFormItemData;
         }
@@ -1231,7 +1233,8 @@ export class SR5Item extends Item {
         return this.wrapper.isContact();
     }
 
-    asContactData(): ContactItemData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asContact(): ContactItemData | undefined {
         if (this.isContact()) {
             return this.data as ContactItemData;
         }
@@ -1241,7 +1244,8 @@ export class SR5Item extends Item {
         return this.wrapper.isCritterPower();
     }
 
-    asCritterPowerData(): CritterPowerItemData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asCritterPower(): CritterPowerItemData | undefined {
         if (this.isCritterPower()) {
             return this.data as CritterPowerItemData;
         }
@@ -1255,21 +1259,24 @@ export class SR5Item extends Item {
         return this.wrapper.isDevice();
     }
 
-    asDeviceData(): DeviceItemData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asDevice(): DeviceItemData | undefined {
         if (this.isDevice()) {
             return this.data as DeviceItemData;
         }
     }
 
-    asControllerData(): HostItemData | DeviceItemData | undefined {
-        return this.asHostData() || this.asDeviceData() || undefined;
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asController(): HostItemData | DeviceItemData | undefined {
+        return this.asHostData() || this.asDevice() || undefined;
     }
 
     isEquipment(): boolean {
         return this.wrapper.isEquipment();
     }
 
-    asEquipmentData(): EquipmentItemData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10
+    asEquipment(): EquipmentItemData | undefined {
         if (this.isEquipment()) {
             return this.data as EquipmentItemData;
         }
@@ -1357,8 +1364,9 @@ export class SR5Item extends Item {
 
     getReach(): number {
         if (this.isMeleeWeapon()) {
-            const data = this.data.data as WeaponData;
-            return data.melee.reach ?? 0;
+            //@ts-ignore // TODO: foundry-vtt-types v10 
+            const system = this.system as WeaponData;
+            return system.melee.reach ?? 0;
         }
         return 0;
     }
@@ -1392,7 +1400,7 @@ export class SR5Item extends Item {
             return;
         }
 
-        const icData = actor.asICData();
+        const icData = actor.asIC();
         if (!icData) return;
 
         // Add IC to the hosts IC order
@@ -1425,7 +1433,7 @@ export class SR5Item extends Item {
         await this.update({'data.ic': hostData.data.ic});
     }
 
-    get _isEmbeddedItem(): boolean {
+    get _isNestedItem(): boolean {
         return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
     }
 
@@ -1434,7 +1442,7 @@ export class SR5Item extends Item {
      *
      * @param data changes made to the SR5ItemData
      */
-    async updateEmbeddedItem(data): Promise<this> {
+    async updateNestedItem(data): Promise<this> {
         if (!this.parent || this.parent instanceof SR5Actor) return this;
         // Inform the parent item about changes to one of it's embedded items.
         // TODO: updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
@@ -1442,7 +1450,7 @@ export class SR5Item extends Item {
 
         // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
         // @ts-ignore
-        await this.parent.updateOwnedItem(data);
+        await this.parent.updateNestedItems(data);
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
         // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all
@@ -1454,8 +1462,8 @@ export class SR5Item extends Item {
 
     async update(data, options?): Promise<this> {
         // Item.item => Embedded item into another item!
-        if (this._isEmbeddedItem) {
-            return this.updateEmbeddedItem(data);
+        if (this._isNestedItem) {
+            return this.updateNestedItem(data);
         }
 
         // Actor.item => Directly owned item by an actor!
@@ -1591,7 +1599,7 @@ export class SR5Item extends Item {
     }
 
     async removeNetworkDevice(index: number) {
-        const controllerData = this.asControllerData();
+        const controllerData = this.asController();
         if (!controllerData) return;
 
         // Convert the index to a device link.
@@ -1602,7 +1610,7 @@ export class SR5Item extends Item {
     }
 
     async removeAllNetworkDevices() {
-        const controllerData = this.asControllerData();
+        const controllerData = this.asController();
         if (!controllerData) return;
 
         return await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
@@ -1640,7 +1648,7 @@ export class SR5Item extends Item {
      * Return all network device items within a possible PAN or WAN.
      */
     get networkDevices(): SR5Item[] {
-        const controllerData = this.asDeviceData() || this.asHostData();
+        const controllerData = this.asDevice() || this.asHostData();
         if (!controllerData) return [];
 
         return NetworkDeviceFlow.getNetworkDevices(this);
@@ -1676,7 +1684,8 @@ export class SR5Item extends Item {
         await super._preCreate(changed, options, user);
 
         // Don't kill DocumentData by applying empty objects. Also performance.
-        if (!foundry.utils.isObjectEmpty(applyData)) this.update(applyData);
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (!foundry.utils.isEmpty(applyData)) this.update(applyData);
     }
 
     /**

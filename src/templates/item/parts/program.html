@@ -7,8 +7,8 @@
             {{localize "SR5.ProgramType"}}
         </div>
         <div class="inputs">
-            <select name="data.type">
-                {{#select data.type}} {{#each config.programTypes as |name type|}}
+            <select name="system.type">
+                {{#select system.type}} {{#each config.programTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>

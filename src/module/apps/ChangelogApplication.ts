@@ -21,13 +21,15 @@ export class ChangelogApplication extends Application {
 
     // Let the async operation happen in background.
     private static setRenderForCurrentVersion() {
-        game.user?.setFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion, game.system.data.version);
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        game.user?.setFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion, game.system.version);
     }
 
     static get showApplication(): boolean {
         if (!game.user?.isGM || !game.user?.isTrusted) return false;
 
         const shownForVersion = game.user?.getFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion);
-        return shownForVersion !== game.system.data.version;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return shownForVersion !== game.system.version;
     }
 }

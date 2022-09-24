@@ -17,9 +17,9 @@
             <div class="attributes smooth">
                 <div class="block">
                     {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                            name=(localize data.track.physical.label)
-                            value=data.track.physical.value
-                            max=data.track.physical.max
+                            name=(localize system.track.physical.label)
+                            value=system.track.physical.value
+                            max=system.track.physical.max
                             id='physical'
                     }}
                 </div>
@@ -49,7 +49,7 @@
                 {{localize "SR5.RollSoak"}}
             </div>
             <div class="attribute-name Roll" data-roll-id="armor">
-                {{localize "SR5.RollArmor"}} ({{data.armor.value}})
+                {{localize "SR5.RollArmor"}} ({{system.armor.value}})
             </div>
         </div>
     </div>

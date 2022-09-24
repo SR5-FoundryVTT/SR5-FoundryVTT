@@ -41,7 +41,7 @@
                     <i
                         title="{{localize 'SR5.ToggleEquip'}}"
                         class="ammo-equip roll
-                             {{#if ammo.data.technology.equipped}}
+                             {{#if ammo.system.technology.equipped}}
                               fas fa-check-circle
                              {{else}}
                               far fa-circle
@@ -61,7 +61,7 @@
                         maxlength="3"
                         type="text"
                         disabled
-                        value="{{ammo.data.technology.quantity}}"
+                        value="{{ammo.system.technology.quantity}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -71,7 +71,7 @@
                         class="display"
                         type="text"
                         disabled
-                        value="{{ammo.data.damage}}{{damageAbbreviation ammo.data.damageType}}"
+                        value="{{ammo.system.damage}}{{damageAbbreviation ammo.system.damageType}}"
                         data-dtype="Text"
                     />
                 </div>
@@ -80,7 +80,7 @@
                         class="display"
                         type="text"
                         disabled
-                        value="{{localizeOb ammo.data.element ../config.elementTypes}}"
+                        value="{{localizeOb ammo.system.element ../config.elementTypes}}"
                         data-dtype="Text"
                     />
                 </div>
@@ -91,7 +91,7 @@
                         maxlength="3"
                         type="text"
                         disabled
-                        value="{{ammo.data.ap}}"
+                        value="{{ammo.system.ap}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -103,7 +103,7 @@
                         maxlength="2"
                         size="2"
                         disabled
-                        value="{{ammo.data.blast.radius}}"
+                        value="{{ammo.system.blast.radius}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -116,7 +116,7 @@
                         maxlength="2"
                         type="text"
                         disabled
-                        value="{{ammo.data.blast.dropoff}}"
+                        value="{{ammo.system.blast.dropoff}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -136,7 +136,7 @@
                     {{/each}}
                 </div>
                 <div class="description">
-                    {{{ammo.data.description.value}}}
+                    {{{ammo.system.description.value}}}
                 </div>
             </div>
         </div>

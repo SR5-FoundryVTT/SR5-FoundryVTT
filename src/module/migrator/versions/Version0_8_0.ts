@@ -7,7 +7,6 @@
  */
 import {VersionMigration} from "../VersionMigration";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import {SR5} from "../../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import {Helpers} from "../../helpers";
 
@@ -61,8 +60,8 @@ export class Version0_8_0 extends VersionMigration {
 
         updateData = await this.IterateActorItems(data, updateData);
 
-        // @ts-ignore
-        if (updateData.data && foundry.utils.isObjectEmpty(updateData.data)) delete updateData.data;
+        // @ts-ignore//@ts-ignore // TODO: foundry-vtt-types v10
+        if (updateData.data && foundry.utils.isEmpty(updateData.data)) delete updateData.data;
         // @ts-ignore
         if (updateData.items?.length === 0) delete updateData.items;
 

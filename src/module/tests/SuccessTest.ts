@@ -843,7 +843,8 @@ export class SuccessTest {
      * This can either be from an items action or a pre-configured action.
      */
     get hasAction(): boolean {
-        return !foundry.utils.isObjectEmpty(this.data.action);
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return !foundry.utils.isEmpty(this.data.action);
     }
 
     /**
@@ -1320,12 +1321,9 @@ export class SuccessTest {
      * is prepared to support multiple action buttons.
      */
     _prepareOpposedActionsTemplateData() {
-        // @ts-ignore TODO: Move this into a helper
         const testCls = this._opposedTestClass;
-        if (!testCls) {
-            console.error('Shadowrun 5e | Opposed Action has no test class registered.');
-            return [];
-        }
+        // No opposing test configured. Nothing to build.
+        if (!testCls) return [];
 
         const action = {
             // Store the test implementation registration name.
@@ -1376,7 +1374,9 @@ export class SuccessTest {
 
         const formula = `0d6`;
         const roll = new SR5Roll(formula);
-
+        // evaluation is necessary for Roll DataModel validation.
+        roll.evaluate({async: false});
+        
         const messageData = {
             user: game.user?.id,
             speaker: {
@@ -1384,23 +1384,20 @@ export class SuccessTest {
                 alias,
                 token
             },
-            // Use type roll with an empty roll for FoundryVTT ChatMessage visibility behaviour.
-            // This doesn't include DiceSoNice rolls.
-            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             roll,
             content,
-            rollMode: this.data.options?.rollMode,
             // Manually build flag data to give renderChatMessage hook flag access.
             // This test data is needed for all subsequent testing based on this chat messages.
             flags: {
-                [SYSTEM_NAME]: {[FLAGS.Test]: this.toJSON()}
+                [SYSTEM_NAME]: {[FLAGS.Test]: this.toJSON()},
+                'core.canPopout': true
             },
-            sound: CONFIG.sounds.dice
+            sound: CONFIG.sounds.dice,            
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
         // @ts-ignore TODO: Types Provide propper SuccessTestData and SuccessTestOptions
-        ChatMessage.applyRollMode(messageData, this.data.options?.rollMode);
+        ChatMessage.applyRollMode(messageData, this.data.options?.rollMode ?? game.settings.get('core', 'rollmode'));
 
         return messageData;
     }

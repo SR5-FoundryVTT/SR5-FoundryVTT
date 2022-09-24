@@ -12,8 +12,8 @@ export class ItemPrep {
      * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
-    static prepareArmor(data: ActorTypesData & ArmorActorData, items: SR5ItemDataWrapper[]) {
-        const { armor } = data;
+    static prepareArmor(system: ActorTypesData & ArmorActorData, items: SR5ItemDataWrapper[]) {
+        const { armor } = system;
         armor.base = 0;
         armor.value = 0;
         // if (!isNaN(armor.mod)) {
@@ -48,7 +48,7 @@ export class ItemPrep {
             }
         });
 
-        if (data.modifiers['armor']) armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), data.modifiers['armor']);
+        if (system.modifiers['armor']) armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), system.modifiers['armor']);
         // SET ARMOR
         armor.value = Helpers.calcTotal(armor);
     }
@@ -56,8 +56,8 @@ export class ItemPrep {
      * Prepare actor data for ware changes
      * - this calculates the actors essence
      */
-    static prepareBodyware(data: ActorTypesData, items: SR5ItemDataWrapper[]) {
-        const { attributes } = data;
+    static prepareBodyware(system: ActorTypesData, items: SR5ItemDataWrapper[]) {
+        const { attributes } = system;
         const parts = new PartsList<number>();
         // add Items as values to lower the total value of essence
         items
@@ -68,7 +68,7 @@ export class ItemPrep {
                 }
             });
         // add the bonus from the misc tab if applied
-        const essenceMod = data.modifiers['essence'];
+        const essenceMod = system.modifiers['essence'];
         if (essenceMod && !Number.isNaN(essenceMod)) {
             parts.addUniquePart('SR5.Bonus', Number(essenceMod));
         }

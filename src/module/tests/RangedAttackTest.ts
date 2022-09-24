@@ -60,10 +60,18 @@ export class RangedAttackTest extends SuccessTest {
 
     _prepareFireMode() {        
         // No firemodes selectable on dialog for invalid item provided.
-        const weaponData = this.item.asWeaponData();
+        const weaponData = this.item.asWeapon();
         if (!weaponData) return;
 
-        this.data.fireModes = FireModeRules.availableFireModes(weaponData.data.range.modes);
+        //@ts-ignore // TODO: foundry-vtt-types v10 
+        this.data.fireModes = FireModeRules.availableFireModes(weaponData.system.range.modes);
+
+        // To avoid problems when no firemode is configured on the weapon, add at least one to what's available
+        if (this.data.fireModes.length === 0) {
+            this.data.fireModes.push(SR5.fireModes[0]);
+            ui.notifications?.warn('SR5.Warnings.NoFireModeConfigured', {localize: true});
+        }
+
         // Current firemode selected
         const lastFireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
         // Try pre-selection based on last fire mode.
@@ -74,7 +82,7 @@ export class RangedAttackTest extends SuccessTest {
 
     async _prepareWeaponRanges() {
         // Don't let missing weapon ranges break test.
-        const itemData = this.item?.asWeaponData();
+        const itemData = this.item?.asWeapon();
         if (!itemData) return;
 
         // Transform weapon ranges to something usable
@@ -101,7 +109,8 @@ export class RangedAttackTest extends SuccessTest {
      * Prepare distances between attacker and targeted tokens.
      */
     async _prepareTargetRanges() {
-        if (foundry.utils.isObjectEmpty(this.data.ranges)) return;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (foundry.utils.isEmpty(this.data.ranges)) return;
         if (!this.actor) return;
         if (!this.hasTargets) return;
 

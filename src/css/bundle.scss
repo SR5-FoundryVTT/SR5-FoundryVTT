@@ -267,7 +267,7 @@ select.display {
     /**
      * Elements used for linkable documents / entities.
      */
-    .entity-link {
+    .entity-link, .content-link {
         color: $black;
     }
 
@@ -291,6 +291,33 @@ select.display {
     }
     .editor .tox-edit-area {
         background: $mce-background;
+    }
+
+    // Styling for any prosemirror editors within shadowrun applications.
+    .editor.prosemirror {
+        // handles dropdown menus, not select based.
+        .pm-dropdown {
+            color: $color;
+            background: rgba($black, 0.05);
+            border-radius: 0.3em;
+            border-color: $dark;
+
+            // Icons like chevron and ticks.
+            i, i:hover {
+                color: $color;
+            }
+
+            // ul will contain menus and sub-menus and can be nested.
+            ul {
+                background-color: $dark;
+            }
+            // li represents each menu entry in both menus and sub-menus
+            ul > li:hover {
+                color: $color;
+                border-color: rgba($white, 0.1);
+                background: rgba($black, 0.05);
+            }
+        }
     }
 
 

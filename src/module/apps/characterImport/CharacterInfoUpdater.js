@@ -67,77 +67,71 @@ export class CharacterInfoUpdater {
 
     /**
      * Parses the actor data from the chummer file and returns an updated clone of the actor data.
-     * @param {*} actorData The actor data (actor.data not actor.data.data) that is used as the basis for the import. Will not be changed.
+     * @param {*} actorSource The actor data (actor.data not actor.data.data) that is used as the basis for the import. Will not be changed.
      * @param {*} chummerChar The chummer character to parse.
      */
-    update(actorData, chummerChar) {
+    update(actorSource, chummerChar) {
 
-        const clonedActorData = duplicate(actorData);
+        const clonedActorSource = duplicate(actorSource);
 
         // Name is required, so we need to always set something (even if the chummer field is empty)
         if (chummerChar.alias) {
-            clonedActorData.name = chummerChar.alias;
+            clonedActorSource.name = chummerChar.alias;
         }
         else {
-            clonedActorData.name = chummerChar.name ? chummerChar.name : '[Name not found]';
+            clonedActorSource.name = chummerChar.name ? chummerChar.name : '[Name not found]';
         }
 
-        this.importBasicData(clonedActorData.data, chummerChar);
-        this.importBio(clonedActorData.data, chummerChar);
-        this.importAttributes(clonedActorData.data, chummerChar)
-        this.importInitiative(clonedActorData.data, chummerChar);
-        this.importSkills(clonedActorData.data, chummerChar);
+        this.importBasicData(clonedActorSource.system, chummerChar);
+        this.importBio(clonedActorSource.system, chummerChar);
+        this.importAttributes(clonedActorSource.system, chummerChar)
+        this.importInitiative(clonedActorSource.system, chummerChar);
+        this.importSkills(clonedActorSource.system, chummerChar);
 
-        return clonedActorData;
+        return clonedActorSource;
     }
 
-    importBasicData(actorDataData, chummerChar) {
+    importBasicData(system, chummerChar) {
 
         try {
-            if (chummerChar.playername) {
-                actorDataData.player_name = chummerChar.playername;
-            }
-            if (chummerChar.alias) {
-                actorDataData.name = chummerChar.alias;
-            }
             if (chummerChar.metatype) {
-                actorDataData.metatype = chummerChar.metatype;
+                system.metatype = chummerChar.metatype;
             }
             if (chummerChar.sex) {
-                actorDataData.sex = chummerChar.sex;
+                system.sex = chummerChar.sex;
             }
             if (chummerChar.age) {
-                actorDataData.age = chummerChar.age;
+                system.age = chummerChar.age;
             }
             if (chummerChar.height) {
-                actorDataData.height = chummerChar.height;
+                system.height = chummerChar.height;
             }
             if (chummerChar.weight) {
-                actorDataData.weight = chummerChar.weight;
+                system.weight = chummerChar.weight;
             }
             if (chummerChar.calculatedstreetcred) {
-                actorDataData.street_cred = chummerChar.calculatedstreetcred;
+                system.street_cred = chummerChar.calculatedstreetcred;
             }
             if (chummerChar.calculatednotoriety) {
-                actorDataData.notoriety = chummerChar.calculatednotoriety;
+                system.notoriety = chummerChar.calculatednotoriety;
             }
             if (chummerChar.calculatedpublicawareness) {
-                actorDataData.public_awareness = chummerChar.calculatedpublicawareness;
+                system.public_awareness = chummerChar.calculatedpublicawareness;
             }
             if (chummerChar.karma) {
-                actorDataData.karma.value = chummerChar.karma;
+                system.karma.value = chummerChar.karma;
             }
             if (chummerChar.totalkarma) {
-                actorDataData.karma.max = chummerChar.totalkarma;
+                system.karma.max = chummerChar.totalkarma;
             }
             if (chummerChar.technomancer && chummerChar.technomancer.toLowerCase() === 'true') {
-                actorDataData.special = 'resonance';
+                system.special = 'resonance';
             }
             if (
                 (chummerChar.magician && chummerChar.magician.toLowerCase() === 'true') ||
                 (chummerChar.adept && chummerChar.adept.toLowerCase() === 'true')
             ) {
-                actorDataData.special = 'magic';
+                system.special = 'magic';
                 let attr = [];
                 if (
                     chummerChar.tradition &&
@@ -152,49 +146,49 @@ export class CharacterInfoUpdater {
                 }
                 attr.forEach((att) => {
                     const attName = this.parseAttName(att);
-                    if (attName !== 'willpower') actorDataData.magic.attribute = att;
+                    if (attName !== 'willpower') system.magic.attribute = att;
                 });
             }
             if (chummerChar.totaless) {
-                actorDataData.attributes.essence.value = chummerChar.totaless;
+                system.attributes.essence.value = chummerChar.totaless;
             }
             if (chummerChar.nuyen) {
-                actorDataData.nuyen = parseInt(chummerChar.nuyen.replace(',', ''));
+                system.nuyen = parseInt(chummerChar.nuyen.replace(',', ''));
             }
         } catch (e) {
             console.error(`Error while parsing character information ${e}`);
         }
     }
 
-    importBio(actorDataData, chummerChar) {
-        actorDataData.description.value = '';
+    importBio(system, chummerChar) {
+        system.description.value = '';
 
         // Chummer outputs html and wraps every section in <p> tags,
         // so we just concat everything with an additional linebreak in between
         if (chummerChar.description) {
-            actorDataData.description.value += TextEditor.enrichHTML(chummerChar.description + '<br/>');
+            system.description.value += TextEditor.enrichHTML(chummerChar.description + '<br/>');
         }
 
         if (chummerChar.background) {
-            actorDataData.description.value += TextEditor.enrichHTML(chummerChar.background + '<br/>');
+            system.description.value += TextEditor.enrichHTML(chummerChar.background + '<br/>');
         }
 
         if (chummerChar.concept) {
-            actorDataData.description.value += TextEditor.enrichHTML(chummerChar.concept + '<br/>');
+            system.description.value += TextEditor.enrichHTML(chummerChar.concept + '<br/>');
         }
 
         if (chummerChar.notes) {
-            actorDataData.description.value += TextEditor.enrichHTML(chummerChar.notes + '<br/>');
+            system.description.value += TextEditor.enrichHTML(chummerChar.notes + '<br/>');
         }
     }
 
-    importAttributes(actorDataData, chummerChar) {
+    importAttributes(system, chummerChar) {
         const atts = chummerChar.attributes[1].attribute;
         atts.forEach((att) => {
             try {
                 const attName = this.parseAttName(att.name);
                 if (attName) {
-                    actorDataData.attributes[attName].base = this.parseAttBaseValue(att);
+                    system.attributes[attName].base = this.parseAttBaseValue(att);
                 }
 
             } catch (e) {
@@ -204,18 +198,18 @@ export class CharacterInfoUpdater {
     }
 
     // TODO: These modifiers are very unclear in how they're used here and where they come from.
-    importInitiative(actorDataData, chummerChar) {
+    importInitiative(system, chummerChar) {
         try {
-            actorDataData.modifiers.meat_initiative = chummerChar.initbonus;
+            system.modifiers.meat_initiative = chummerChar.initbonus;
 
             // 'initdice' contains the total amount of initiative dice, not just the bonus.
-            actorDataData.modifiers.meat_initiative_dice = chummerChar.initdice - 1;
+            system.modifiers.meat_initiative_dice = chummerChar.initdice - 1;
         } catch (e) {
             console.error(`Error while parsing initiative ${e}`);
         }
     }
 
-    importSkills(actorDataData, chummerChar) {
+    importSkills(system, chummerChar) {
         const chummerSkills = chummerChar.skills.skill;
         for (let i = 0; i < chummerSkills.length; i++) {
             try {
@@ -231,7 +225,7 @@ export class CharacterInfoUpdater {
                     if (chummerSkill.islanguage && chummerSkill.islanguage.toLowerCase() === 'true') {
                         const id = randomID(16);
                         parsedSkill = {};
-                        actorDataData.skills.language.value[id] = parsedSkill;
+                        system.skills.language.value[id] = parsedSkill;
                         determinedGroup = 'language';
                     }
                     else if (chummerSkill.knowledge && chummerSkill.knowledge.toLowerCase() === 'true') {
@@ -244,22 +238,22 @@ export class CharacterInfoUpdater {
                         if (category) {
                             const cat = category.toLowerCase();
                             if (cat === 'street')
-                                skillCategory = actorDataData.skills.knowledge.street.value;
+                                skillCategory = system.skills.knowledge.street.value;
                             if (cat === 'academic')
-                                skillCategory = actorDataData.skills.knowledge.academic.value;
+                                skillCategory = system.skills.knowledge.academic.value;
                             if (cat === 'professional')
-                                skillCategory = actorDataData.skills.knowledge.professional.value;
+                                skillCategory = system.skills.knowledge.professional.value;
                             if (cat === 'interest')
-                                skillCategory = actorDataData.skills.knowledge.interests.value;
+                                skillCategory = system.skills.knowledge.interests.value;
                             if (skillCategory)
                                 skillCategory[id] = parsedSkill;
                         }
                         else {
                             if (chummerSkill.attribute.toLowerCase() === 'int') {
-                                actorDataData.skills.knowledge.street.value[id] = parsedSkill;
+                                system.skills.knowledge.street.value[id] = parsedSkill;
                             }
                             if (chummerSkill.attribute.toLowerCase() === 'log') {
-                                actorDataData.skills.knowledge.professional.value[id] = parsedSkill;
+                                system.skills.knowledge.professional.value[id] = parsedSkill;
                             }
                         }
                         determinedGroup = 'knowledge';
@@ -274,7 +268,7 @@ export class CharacterInfoUpdater {
                             name = name.replace('_weapon', '');
                         if (name === 'pilot_watercraft')
                             name = 'pilot_water_craft';
-                        parsedSkill = actorDataData.skills.active[name];
+                        parsedSkill = system.skills.active[name];
                     }
 
                     // Fill the found skill with a base rating.

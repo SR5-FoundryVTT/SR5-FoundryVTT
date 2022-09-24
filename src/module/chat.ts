@@ -13,6 +13,7 @@ import CombatData = Shadowrun.CombatData;
 import ActionResultData = Shadowrun.ActionResultData;
 import {ActionTestData} from "./apps/dialogs/ShadowrunItemDialog";
 import {ActionResultFlow} from "./item/flows/ActionResultFlow";
+import { TestCreator } from './tests/TestCreator';
 
 export interface RollTargetChatMessage {
     actor: SR5Actor
@@ -235,31 +236,21 @@ export const chatMessageActionApplyDamage = async (html, event) => {
     // Should no selection be available try guessing.
     if (actors.length === 0) {
         const messageId = html.data('messageId');
-        const message = game.messages?.get(messageId);
-        if (!message) return;
-        const targetIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
+
+        const test = await TestCreator.fromMessage(messageId);
+        if (!test) return
+        await test.populateDocuments();
 
         // If targeting is available, use that.
-        if (targetIds) {
-            targetIds.forEach(targetId => {
-                const actor = Helpers.getSceneTokenActor(targetId);
-                if (!actor) return;
-                actors.push(actor);
-            });
+        if (test.hasTargets) test.targets.forEach(target => actors.push(target.actor as SR5Actor));
+        // Otherwise apply to the actor casting the damage.
+        else actors.push(test.actor as SR5Actor);
+    }
 
-            // Otherwise apply to the actor casting the damage.
-        } else {
-            const sceneTokenId = html.find('.chat-card').data('tokenId');
-            const actor = Helpers.getSceneTokenActor(sceneTokenId)
-            if (actor) {
-                actors.push(actor);
-            }
-        }
-
-        if (actors.length === 0) {
-            ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
-            return;
-        }
+    // Abort if no actors could be collected.
+    if (actors.length === 0) {
+        ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+        return;
     }
 
     await new DamageApplicationFlow().runApplyDamage(actors, damage);

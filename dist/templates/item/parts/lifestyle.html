@@ -7,8 +7,8 @@
             {{localize "SR5.LifestyleType"}}
         </div>
         <div class="inputs">
-            <select name="data.type">
-                {{#select data.type}}
+            <select name="system.type">
+                {{#select system.type}}
                 <option value=""></option>
                 {{#each config.lifestyleTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
@@ -24,8 +24,8 @@
             <input
                 size="2"
                 type="text"
-                name="data.cost"
-                value="{{data.cost}}"
+                name="system.cost"
+                value="{{system.cost}}"
                 data-dtype="Number"
                 placeholder="0"
             />
@@ -39,8 +39,8 @@
             <input
                 size="2"
                 type="text"
-                name="data.comforts"
-                value="{{data.comforts}}"
+                name="system.comforts"
+                value="{{system.comforts}}"
                 data-dtype="Number"
                 placeholder="0"
             />
@@ -54,8 +54,8 @@
             <input
                 size="2"
                 type="text"
-                name="data.security"
-                value="{{data.security}}"
+                name="system.security"
+                value="{{system.security}}"
                 data-dtype="Number"
                 placeholder="0"
             />
@@ -69,8 +69,8 @@
             <input
                 size="2"
                 type="text"
-                name="data.neighborhood"
-                value="{{data.neighborhood}}"
+                name="system.neighborhood"
+                value="{{system.neighborhood}}"
                 data-dtype="Number"
                 placeholder="0"
             />
@@ -84,8 +84,8 @@
             <input
                 size="2"
                 type="text"
-                name="data.guests"
-                value="{{data.guests}}"
+                name="system.guests"
+                value="{{system.guests}}"
                 data-dtype="Number"
                 placeholder="0"
             />

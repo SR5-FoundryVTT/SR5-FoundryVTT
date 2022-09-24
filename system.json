@@ -1,17 +1,30 @@
 {
+  "id": "shadowrun5e",
   "name": "shadowrun5e",
   "title": "Shadowrun 5th Edition",
   "description": "Shadowrun 5th Edition game",
-  "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982], Jan Schoska [taM#9507]",
-  "authors": [],
+  "authors": [{
+      "name": "Shawn Milligan",
+      "discord": "n3rf_herder#9026"
+    },{
+      "name": "Andrew Cuccinello",
+      "discord": "DJ#1982"
+    },{
+      "name": "Jan Schoska",
+      "discord": "taM#9507"
+  }],
   "url": "https://github.com/smilligan93/SR5-FoundryVTT",
   "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues",
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.8.2",
-  "minimumCoreVersion": "9",
-  "compatibleCoreVersion": "9",
+  "version": "0.8.3",
+  "compatibility": {
+    "minimum": "10",
+    "maximum": "10",
+    "verified": "10.286"
+  },
+  "minimumCoreVersion": "10",
   "scripts": [],
   "esmodules": [
     "dist/bundle.js"
@@ -52,7 +65,7 @@
       "label": "SR5e Matrix Actions",
       "path": "./packs/sr5e-matrix-actions.db",
       "private": false,
-      "entity": "Item",
+      "type": "Item",
       "system": "shadowrun5e"
     },
     {
@@ -60,15 +73,14 @@
       "label": "SR5e General Actions",
       "path": "./packs/sr5e-general-actions.db",
       "private": false,
-      "entity": "Item",
+      "type": "Item",
       "system": "shadowrun5e"
     }
   ],
   "system": [],
-  "dependencies": [],
   "socket": true,
   "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
-  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.8.2.zip",
+  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/t0.8.3.zip",
   "protected": false,
   "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
   "gridDistance": 1,

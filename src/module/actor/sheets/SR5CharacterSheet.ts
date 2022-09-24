@@ -61,8 +61,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         ];
     }
 
-    getData(): any {
-        const data = super.getData() as CharacterSheetData;
+    async getData(options) {
+        const data = await super.getData(options) as CharacterSheetData;
 
         // Character actor types are matrix actors.
         super._prepareMatrixAttributes(data);
