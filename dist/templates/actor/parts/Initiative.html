@@ -1,11 +1,11 @@
 {{#> "systems/shadowrun5e/dist/templates/common/Attribute.html" cssClass="no-grow"}}
     <div class="track">
         <div class="attribute-name">
-            <select name="data.initiative.perception" class="display">
-                {{#select data.initiative.perception}}
+            <select name="system.initiative.perception" class="display">
+                {{#select system.initiative.perception}}
                     <option value="meatspace">{{localize "SR5.InitCatMeatspace"}}</option>
                     <option value="matrix">{{localize "SR5.InitCatMatrix"}}</option>
-                    {{#ife data.special 'magic'}}
+                    {{#ife system.special 'magic'}}
                         <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
                     {{/ife}} {{/select}}
             </select>
@@ -18,8 +18,8 @@
                 <input
                         type="checkbox"
                         class="submit-checkbox hidden"
-                        name="data.initiative.edge"
-                    {{checked data.initiative.edge}}
+                        name="system.initiative.edge"
+                    {{checked system.initiative.edge}}
                 />
                 <span class="checkmark far"></span>
             </label>
@@ -31,7 +31,7 @@
                     class="display"
                     size="4"
                     type="text"
-                    value="{{data.initiative.current.base.value}}"
+                    value="{{system.initiative.current.base.value}}"
                     disabled
             />
         </div>
@@ -41,7 +41,7 @@
                     class="display"
                     size="4"
                     type="text"
-                    value="{{data.initiative.current.dice.text}}"
+                    value="{{system.initiative.current.dice.text}}"
                     disabled
             />
         </div>

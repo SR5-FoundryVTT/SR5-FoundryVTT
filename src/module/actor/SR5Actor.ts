@@ -62,12 +62,6 @@ import PackName = Shadowrun.PackName;
 import ActionRollData = Shadowrun.ActionRollData;
 import ActorAttribute = Shadowrun.ActorAttribute;
 
-function getGame(): Game {
-    if (!(game instanceof Game)) {
-        throw new Error('game is not initialized yet!');
-    }
-    return game;
-}
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -85,6 +79,8 @@ function getGame(): Game {
  *
  */
 export class SR5Actor extends Actor {
+    static LOG_V10_COMPATIBILITY_WARNINGS = false;
+    
     // This is the default inventory name and label for when no other inventory has been created.
     defaultInventory: InventoryData = {
         name: 'Carried',
@@ -135,24 +131,30 @@ export class SR5Actor extends Actor {
     prepareBaseData() {
         super.prepareBaseData();
 
-        switch (this.data.type) {
+        switch (this.type) {
             case 'character':
-                CharacterPrep.prepareBaseData(this.data.data);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                CharacterPrep.prepareBaseData(this.system);
                 break;
             case "critter":
-                CritterPrep.prepareBaseData(this.data.data);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                CritterPrep.prepareBaseData(this.system);
                 break;
             case "spirit":
-                SpiritPrep.prepareBaseData(this.data.data);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                SpiritPrep.prepareBaseData(this.system);
                 break;
             case "sprite":
-                SpritePrep.prepareBaseData(this.data.data);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                SpritePrep.prepareBaseData(this.system);
                 break;
             case "vehicle":
-                VehiclePrep.prepareBaseData(this.data.data);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                VehiclePrep.prepareBaseData(this.system);
                 break;
             case "ic":
-                ICPrep.prepareBaseData(this.data.data);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                ICPrep.prepareBaseData(this.system);
                 break;
         }
     }
@@ -160,15 +162,15 @@ export class SR5Actor extends Actor {
     /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
      */
-    prepareEmbeddedEntities() {
+    prepareEmbeddedDocuments() {
         // This will apply ActiveEffects, which is okay for modify (custom) effects, however add/multiply on .value will be
         // overwritten.
-        super.prepareEmbeddedEntities();
+        super.prepareEmbeddedDocuments();
 
         // @ts-ignore
         // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
         //       look at this beautiful piece of software and shiver in it's glory.
-        // ClientDocumentMixin(class {}).prototype.prepareEmbeddedEntities.apply(this);
+        // ClientDocumentMixin(class {}).prototype.prepareEmbeddedDocuments.apply(this);
     }
 
     /**
@@ -176,7 +178,15 @@ export class SR5Actor extends Actor {
      * @override
      */
     applyActiveEffects() {
-        super.applyActiveEffects();
+        // Shadowrun uses prepareDerivedData to calculate lot's of things that don't exist on the data model in full.
+        // Errors during change application will stop that process and cause a broken sheet.
+        try {
+            super.applyActiveEffects();
+        } catch (error) {
+            console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+            console.error(error);
+            ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+        }
     }
 
     /**
@@ -190,24 +200,30 @@ export class SR5Actor extends Actor {
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
         const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item.data));
-        switch (this.data.type) {
+        switch (this.type) {
             case 'character':
-                CharacterPrep.prepareDerivedData(this.data.data, itemDataWrappers);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                CharacterPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "critter":
-                CritterPrep.prepareDerivedData(this.data.data, itemDataWrappers);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                CritterPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "spirit":
-                SpiritPrep.prepareDerivedData(this.data.data, itemDataWrappers);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                SpiritPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "sprite":
-                SpritePrep.prepareDerivedData(this.data.data, itemDataWrappers);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                SpritePrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "vehicle":
-                VehiclePrep.prepareDerivedData(this.data.data, itemDataWrappers);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                VehiclePrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "ic":
-                ICPrep.prepareDerivedData(this.data.data, itemDataWrappers);
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                ICPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
         }
     }
@@ -298,7 +314,8 @@ export class SR5Actor extends Actor {
     }
 
     getModifier(modifierName: string): NumberOrEmpty {
-        return this.data.data.modifiers[modifierName];
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.modifiers[modifierName];
     }
 
     /**
@@ -341,12 +358,15 @@ export class SR5Actor extends Actor {
 
     findLimit(limitName?: string): LimitField | undefined {
         if (!limitName) return undefined;
-        return this.data.data.limits[limitName];
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.limits[limitName];
     }
 
     getWoundModifier(): number {
-        if (!("wounds" in this.data.data)) return 0;
-        return -1 * this.data.data.wounds.value || 0;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (!("wounds" in this.system)) return 0;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return -1 * this.system.wounds.value || 0;
     }
 
     /** Use edge on actors that have an edge attribute.
@@ -366,11 +386,13 @@ export class SR5Actor extends Actor {
     }
 
     getEdge(): EdgeAttributeField {
-        return this.data.data.attributes.edge;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.attributes.edge;
     }
 
     hasArmor(): boolean {
-        return "armor" in this.data.data;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return "armor" in this.system;
     }
 
     /**
@@ -380,8 +402,10 @@ export class SR5Actor extends Actor {
      */
     getArmor(damage?:DamageData): ActorArmorData {
         // Prepare base armor data.
-        const armor = "armor" in this.data.data ? 
-            foundry.utils.duplicate(this.data.data.armor) : 
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const armor = "armor" in this.system ? 
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            foundry.utils.duplicate(this.system.armor) : 
             DefaultValues.actorArmorData();
         // Prepare damage to apply to armor.
         damage = damage || DefaultValues.damageData();
@@ -406,8 +430,10 @@ export class SR5Actor extends Actor {
     }
 
     getMatrixDevice(): SR5Item | undefined {
-        if (!("matrix" in this.data.data)) return;
-        const matrix = this.data.data.matrix;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (!("matrix" in this.system)) return;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const matrix = this.system.matrix;
         if (matrix.device) return this.items.get(matrix.device);
     }
 
@@ -415,9 +441,10 @@ export class SR5Actor extends Actor {
         if (this.isVehicle()) {
             return this.findVehicleStat('pilot');
         } else if (this.isCharacter()) {
-            const character = this.asCharacterData();
+            const character = this.asCharacter();
             if (character) {
-                let att = character.data.full_defense_attribute;
+                //@ts-ignore // TODO: foundry-vtt-types v10
+                let att = character.system.full_defense_attribute;
                 if (!att) att = 'willpower';
                 return this.findAttribute(att);
             }
@@ -442,13 +469,15 @@ export class SR5Actor extends Actor {
     }
 
     getDeviceRating(): number {
-        if (!("matrix" in this.data.data)) return 0;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (!("matrix" in this.system)) return 0;
         // @ts-ignore // parseInt does indeed allow number types.
-        return parseInt(this.data.data.matrix.rating);
+        return parseInt(this.system.matrix.rating);
     }
 
     getAttributes(): Attributes {
-        return this.data.data.attributes;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.attributes;
     }
 
     /**
@@ -471,7 +500,8 @@ export class SR5Actor extends Actor {
     }
 
     getLimits(): Limits {
-        return this.data.data.limits;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.limits;
     }
 
     getLimit(name: string): LimitField {
@@ -483,7 +513,7 @@ export class SR5Actor extends Actor {
      *  Please check SR5ActorType for reference.
      */
     getType(): string {
-        return this.data.type;
+        return this.type;
     }
 
     isCharacter(): boolean {
@@ -503,9 +533,11 @@ export class SR5Actor extends Actor {
     }
 
     isGrunt() {
-        if (!("is_npc" in this.data.data) || !("npc" in this.data.data)) return false;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (!("is_npc" in this.system) || !("npc" in this.system)) return false;
 
-        return this.data.data.is_npc && this.data.data.npc.is_grunt;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.is_npc && this.system.npc.is_grunt;
     }
 
     isCritter() {
@@ -525,9 +557,11 @@ export class SR5Actor extends Actor {
     }
 
     getVehicleTypeSkillName(): string | undefined {
-        if (!("vehicleType" in this.data.data)) return;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (!("vehicleType" in this.system)) return;
 
-        switch (this.data.data.vehicleType) {
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        switch (this.system.vehicleType) {
             case 'air':
                 return 'pilot_aircraft';
             case 'ground':
@@ -557,32 +591,35 @@ export class SR5Actor extends Actor {
     }
 
     getSkills(): CharacterSkills {
-        return this.data.data.skills;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.skills;
     }
 
     getActiveSkills(): Skills {
-        return this.data.data.skills.active;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.skills.active;
     }
 
     /**
      * Determine if an actor can choose a special trait using the special field.
      */
     get hasSpecial(): boolean {
-        return ['character', 'sprite', 'spirit', 'critter'].includes(this.data.type);
+        return ['character', 'sprite', 'spirit', 'critter'].includes(this.type);
     }
 
     /**
      * Determine if an actor can choose a full defense attribute
      */
     get hasFullDefense(): boolean {
-        return ['character', 'vehicle', 'sprite', 'spirit', 'critter'].includes(this.data.type);
+        return ['character', 'vehicle', 'sprite', 'spirit', 'critter'].includes(this.type);
     }
 
     /**
      * Determine if an actor is awakened / magical in some kind.
      */
     get isAwakened(): boolean {
-        return this.data.data.special === 'magic';
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.special === 'magic';
     }
 
     /**
@@ -591,7 +628,8 @@ export class SR5Actor extends Actor {
      */
     get isEmerged(): boolean {
         if (this.isSprite()) return true;
-        if (this.isCharacter() && this.data.data.special === 'resonance') return true;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (this.isCharacter() && this.system.special === 'resonance') return true;
 
         return false;
     }
@@ -640,7 +678,8 @@ export class SR5Actor extends Actor {
         if (options.byLabel)
             return this.getSkillByLabel(id);
 
-        const {skills} = this.data.data;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const {skills} = this.system;
 
         // Find skill by direct id to key matching.
         if (skills.active.hasOwnProperty(id)) {
@@ -705,7 +744,13 @@ export class SR5Actor extends Actor {
         return skill.label ? skill.label : skill.name ? skill.name : '';
     }
 
-    async addKnowledgeSkill(category, skill?): Promise<string> {
+    async addKnowledgeSkill(category, skill?): Promise<string|undefined> {
+        //@ts-ignore // prevent accidental creation for wrong categories
+        if (!this.system.skills.knowledge.hasOwnProperty(category)) {
+            console.error(`Shadowrun5e | Tried creating knowledge skill with unkown category ${category}`);
+            return;
+        }
+        
         const defaultSkill = {
             name: '',
             specs: [],
@@ -721,7 +766,7 @@ export class SR5Actor extends Actor {
         const id = randomID(16);
         const value = {};
         value[id] = skill;
-        const fieldName = `data.skills.knowledge.${category}.value`;
+        const fieldName = `system.skills.knowledge.${category}.value`;
         const updateData = {};
         updateData[fieldName] = value;
 
@@ -733,7 +778,7 @@ export class SR5Actor extends Actor {
     async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
         const skill = DefaultValues.skillData(skillData);
 
-        const activeSkillsPath = 'data.skills.active';
+        const activeSkillsPath = 'system.skills.active';
         const updateSkillDataResult = Helpers.getRandomIdSkillFieldDataEntry(activeSkillsPath, skill);
 
         if (!updateSkillDataResult) return;
@@ -746,7 +791,7 @@ export class SR5Actor extends Actor {
     }
 
     async removeLanguageSkill(skillId) {
-        const updateData = Helpers.getDeleteKeyUpdateData('data.skills.language.value', skillId);
+        const updateData = Helpers.getDeleteKeyUpdateData('system.skills.language.value', skillId);
         await this.update(updateData);
     }
 
@@ -767,7 +812,7 @@ export class SR5Actor extends Actor {
         const id = randomID(16);
         const value = {};
         value[id] = skill;
-        const fieldName = `data.skills.language.value`;
+        const fieldName = `system.skills.language.value`;
         const updateData = {};
         updateData[fieldName] = value;
 
@@ -777,7 +822,7 @@ export class SR5Actor extends Actor {
     }
 
     async removeKnowledgeSkill(skillId, category) {
-        const updateData = Helpers.getDeleteKeyUpdateData(`data.skills.knowledge.${category}.value`, skillId);
+        const updateData = Helpers.getDeleteKeyUpdateData(`system.skills.knowledge.${category}.value`, skillId);
         await this.update(updateData);
     }
 
@@ -796,13 +841,14 @@ export class SR5Actor extends Actor {
         if (skill.name === '' && skill.label !== undefined && skill.label !== '') {
             await this.hideSkill(skillId);
             // NOTE: For some reason unlinked token actors won't cause a render on update?
-            if (!this.data.token.actorLink)
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            if (!this.prototypeToken.actorLink)
                 await this.sheet?.render();
             return;
         }
 
         // Remove custom skills without mercy!
-        const updateData = Helpers.getDeleteKeyUpdateData('data.skills.active', skillId);
+        const updateData = Helpers.getDeleteKeyUpdateData('system.skills.active', skillId);
         await this.update(updateData);
     }
 
@@ -819,7 +865,7 @@ export class SR5Actor extends Actor {
         if (!skill) return;
 
         skill.hidden = true;
-        const updateData = Helpers.getUpdateDataEntry(`data.skills.active.${skillId}`, skill);
+        const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
         await this.update(updateData);
     }
 
@@ -834,7 +880,7 @@ export class SR5Actor extends Actor {
         if (!skill) return;
 
         skill.hidden = false;
-        const updateData = Helpers.getUpdateDataEntry(`data.skills.active.${skillId}`, skill);
+        const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
         await this.update(updateData);
     }
 
@@ -848,7 +894,7 @@ export class SR5Actor extends Actor {
         for (const [id, skill] of Object.entries(skills)) {
             if (skill.hidden === true) {
                 skill.hidden = false;
-                updateData[`data.skills.active.${id}`] = skill;
+                updateData[`system.skills.active.${id}`] = skill;
             }
         }
 
@@ -856,7 +902,8 @@ export class SR5Actor extends Actor {
 
         await this.update(updateData);
         // NOTE: For some reason unlinked token actors won't cause a render on update?
-        if (!this.data.token.actorLink)
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (!this.prototypeToken.actorLink)
             await this.sheet?.render();
     }
 
@@ -940,7 +987,8 @@ export class SR5Actor extends Actor {
         if (!this.isVehicle()) {
             return undefined;
         }
-        const actorData = duplicate(this.data.data) as VehicleData;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const actorData = duplicate(this.system) as VehicleData;
         if (actorData.controlMode === 'autopilot') {
             const parts = new PartsList<number>();
 
@@ -995,17 +1043,21 @@ export class SR5Actor extends Actor {
 
     _addMatrixParts(parts: PartsList<number>, atts) {
         if (Helpers.isMatrix(atts)) {
-            if (!("matrix" in this.data.data)) return;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            if (!("matrix" in this.system)) return;
 
-            const matrix = this.data.data.matrix;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            const matrix = this.system.matrix;
             if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
             if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
         }
     }
 
     _addGlobalParts(parts: PartsList<number>) {
-        if (this.data.data.modifiers.global) {
-            parts.addUniquePart('SR5.Global', this.data.data.modifiers.global);
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (this.system.modifiers.global) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            parts.addUniquePart('SR5.Global', this.system.modifiers.global);
         }
     }
 
@@ -1094,7 +1146,9 @@ export class SR5Actor extends Actor {
      * @param key
      * @param value
      */
+    //@ts-ignore // TODO: foundry-vtt-types v10
     setFlag(scope: string, key: string, value: any): Promise<any> {
+        //@ts-ignore TODO: foundry-vtt-types v10
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
     }
@@ -1104,7 +1158,9 @@ export class SR5Actor extends Actor {
      * @param scope
      * @param key
      */
+    //@ts-ignore // TODO: foundry-vtt-types v10
     getFlag(scope: string, key: string): any {
+        //@ts-ignore TODO: foundry-vtt-types v10
         const data = super.getFlag(scope, key);
         return Helpers.onGetFlag(data);
     }
@@ -1130,9 +1186,9 @@ export class SR5Actor extends Actor {
      * There is no need for a token to placed. The prototype token is enough.
      */
     _isLinkedToToken(): boolean {
-        //@ts-ignore
+        //@ts-ignore // TODO: foundry-vtt-types v10
         // If an actor is linked, all it's copies also contain this linked status, even if they're not.
-        return this.data.token.actorLink && !this.token;
+        return this.prototypeToken.actorLink && !this.token;
     }
 
     hasToken(): boolean {
@@ -1194,8 +1250,8 @@ export class SR5Actor extends Actor {
 
         condition = this.__addDamageToTrackValue(damage, condition);
 
-        const data = {['data.technology.condition_monitor']: condition};
-        await device.update(data);
+        const updateData = {['system.technology.condition_monitor']: condition};
+        await device.update(updateData);
     }
 
     async _addDamageToTrack(damage: DamageData, track: TrackType | OverflowTrackType | ConditionData) {
@@ -1203,8 +1259,8 @@ export class SR5Actor extends Actor {
         if (track.value === track.max) return;
 
         track = this.__addDamageToTrackValue(damage, track);
-        const data = {[`data.track.${damage.type.value}`]: track};
-        await this.update(data);
+        const updateData = {[`system.track.${damage.type.value}`]: track};
+        await this.update(updateData);
     }
 
     async _addDamageToOverflow(damage: DamageData, track: OverflowTrackType) {
@@ -1218,8 +1274,8 @@ export class SR5Actor extends Actor {
         overflow.value += damage.value;
         overflow.value = Math.min(overflow.value, overflow.max);
 
-        const data = {[`data.track.${damage.type.value}.overflow`]: overflow};
-        await this.update(data);
+        const updateData = {[`system.track.${damage.type.value}.overflow`]: overflow};
+        await this.update(updateData);
     }
 
     /**
@@ -1233,12 +1289,12 @@ export class SR5Actor extends Actor {
         console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
 
         // @ts-ignore
-        if (!this.data.data?.track.hasOwnProperty(track)) return
+        if (!this.system?.track.hasOwnProperty(track)) return
 
         // @ts-ignore
-        const current = Math.max(this.data.data.track[track].value - healing, 0);
+        const current = Math.max(this.system.track[track].value - healing, 0);
 
-        await this.update({[`data.track.${track}.value`]: current});
+        await this.update({[`system.track.${track}.value`]: current});
     }
 
     async healStunDamage(healing: number) {
@@ -1349,17 +1405,17 @@ export class SR5Actor extends Actor {
         // If a matrix device is used, damage that instead of the actor.
         const device = this.getMatrixDevice();
         if (device) {
-            return await device.update({'data.technology.condition_monitor': track});
+            return await device.update({'system.technology.condition_monitor': track});
         }
 
         // IC actors use a matrix track.
         if (this.isIC()) {
-            return await this.update({'data.track.matrix': track});
+            return await this.update({'system.track.matrix': track});
         }
 
         // Emerged actors use a personal device like condition monitor.
         if (this.isMatrixActor) {
-            return await this.update({'data.matrix.condition_monitor': track});
+            return await this.update({'system.matrix.condition_monitor': track});
         }
     }
 
@@ -1384,13 +1440,17 @@ export class SR5Actor extends Actor {
     }
 
     getStunTrack(): TrackType | undefined {
-        if ("track" in this.data.data && "stun" in this.data.data.track)
-            return this.data.data.track.stun;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if ("track" in this.system && "stun" in this.system.track)
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this.system.track.stun;
     }
 
     getPhysicalTrack(): OverflowTrackType | undefined {
-        if ("track" in this.data.data && "physical" in this.data.data.track)
-            return this.data.data.track.physical;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if ("track" in this.system && "physical" in this.system.track)
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this.system.track.physical;
     }
 
     /**
@@ -1400,14 +1460,16 @@ export class SR5Actor extends Actor {
      */
     getMatrixTrack(): ConditionData | undefined {
         // Some actors will have a direct matrix track.
-        if ("track" in this.data.data && "matrix" in this.data.data.track) {
-            return this.data.data.track.matrix;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if ("track" in this.system && "matrix" in this.system.track) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this.system.track.matrix;
         }
 
         // Some actors will have a personal matrix condition monitor, like a device condition monitor.
         if (this.isMatrixActor) {
             // @ts-ignore isMatrixActor checks for the matrix attribute
-            return this.data.data.matrix.condition_monitor;
+            return this.system.matrix.condition_monitor;
         }
 
         // Fallback to equipped matrix device.
@@ -1461,46 +1523,55 @@ export class SR5Actor extends Actor {
     }
 
     hasDamageTracks(): boolean {
-        return "track" in this.data.data;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return "track" in this.system;
     }
 
-    asVehicleData(): VehicleActorData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
+    asVehicle(): VehicleActorData | undefined {
         if (this.isVehicle())
             return this.data as VehicleActorData;
     }
 
-    asCharacterData(): CharacterActorData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
+    asCharacter(): CharacterActorData | undefined {
         if (this.isCharacter())
             return this.data as CharacterActorData;
     }
 
-    asSpiritData(): SpiritActorData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
+    asSpirit(): SpiritActorData | undefined {
         if (this.isSpirit()) {
             return this.data as SpiritActorData;
         }
     }
 
-    asSpriteData(): SpriteActorData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
+    asSprite(): SpriteActorData | undefined {
         if (this.isSprite()) {
             return this.data as SpriteActorData;
         }
     }
 
-    asCritterData(): CritterActorData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
+    asCritter(): CritterActorData | undefined {
         if (this.isCritter()) {
             return this.data as CritterActorData;
         }
     }
 
-    asICData(): ICActorData | undefined {
+    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
+    asIC(): ICActorData | undefined {
         if (this.isIC()) {
             return this.data as ICActorData;
         }
     }
 
     getVehicleStats(): VehicleStats | undefined {
-        if (this.isVehicle() && "vehicle_stats" in this.data.data) {
-            return this.data.data.vehicle_stats;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (this.isVehicle() && "vehicle_stats" in this.system) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this.system.vehicle_stats;
         }
     }
 
@@ -1517,28 +1588,30 @@ export class SR5Actor extends Actor {
         // NOTE: In THEORY almost all actor types can drive a vehicle.
         // ... drek, in theory a drone could drive another vehicle even...
 
-        await this.update({'data.driver': driver.id});
+        await this.update({'system.driver': driver.id});
     }
 
     async removeVehicleDriver() {
         if (!this.hasDriver()) return;
 
-        await this.update({'data.driver': ''});
+        await this.update({'system.driver': ''});
     }
 
     hasDriver(): boolean {
-        const data = this.asVehicleData();
-
+        const data = this.asVehicle();
         if (!data) return false;
-        return data.data.driver.length > 0;
+
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.system.driver.length > 0;
     }
 
     getVehicleDriver(): SR5Actor | undefined {
         if (!this.hasDriver()) return;
-        const data = this.asVehicleData();
+        const data = this.asVehicle();
         if (!data) return;
 
-        const driver = game.actors?.get(data.data.driver) as SR5Actor;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const driver = game.actors?.get(this.system.driver) as SR5Actor;
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver) return;
         return driver;
@@ -1569,11 +1642,12 @@ export class SR5Actor extends Actor {
             // @ts-ignore _id is missing on internal typing...
             id: hostData._id,
             rating: hostData.data.rating,
-            atts: duplicate(hostData.data.atts)
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            atts: duplicate(hostData.system.atts)
         }
 
         // Some host data isn't stored on the IC actor (marks) and won't cause an automatic render.
-        await this.update({'data.host': updateData}, {render: false});
+        await this.update({'system.host': updateData}, {render: false});
         await this.sheet?.render();
     }
 
@@ -1589,25 +1663,27 @@ export class SR5Actor extends Actor {
             atts: null
         }
 
-        await this.update({'data.host': updateData});
+        await this.update({'system.host': updateData});
     }
 
     /**
      * Will return true if this ic type actor has been connected to a host.
      */
     hasHost(): boolean {
-        const icData = this.asICData();
-        if (!icData) return false;
-        return icData && !!icData.data.host.id;
+        const ic = this.asIC();
+        if (!ic) return false;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return ic && !!ic.system.host.id;
     }
 
     /**
      * Get the host item connect to this ic type actor.
      */
     getICHost(): SR5Item | undefined {
-        const icData = this.asICData();
-        if (!icData) return;
-        return game.items?.get(icData?.data?.host.id);
+        const ic = this.asIC();
+        if (!ic) return;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return game.items?.get(ic?.system?.host.id);
     }
 
     /** Check if this actor is of one or multiple given actor types
@@ -1615,7 +1691,7 @@ export class SR5Actor extends Actor {
      * @param types A list of actor types to check.
      */
     matchesActorTypes(types: string[]): boolean {
-        return types.includes(this.data.type);
+        return types.includes(this.type);
     }
 
     /** TODO: method documentation
@@ -1645,13 +1721,14 @@ export class SR5Actor extends Actor {
      * Check if the current actor has matrix capabilities.
      */
     get isMatrixActor(): boolean {
-        return 'matrix' in this.data.data;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return 'matrix' in this.system;
     }
 
     get matrixData(): MatrixData | undefined {
         if (!this.isMatrixActor) return;
         // @ts-ignore // isMatrixActor handles it, TypeScript doesn't know.
-        return this.data.data.matrix as MatrixData;
+        return this.system.matrix as MatrixData;
     }
 
     /**
@@ -1674,7 +1751,7 @@ export class SR5Actor extends Actor {
 
         if (!this.isMatrixActor) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
-            return console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
+            return console.error(`The actor type ${this.type} can't receive matrix marks!`);
         }
         if (target.actor && !target.actor.isMatrixActor) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
@@ -1702,7 +1779,7 @@ export class SR5Actor extends Actor {
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
         matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
-        await this.update({'data.matrix.marks': matrixData.marks});
+        await this.update({'system.matrix.marks': matrixData.marks});
     }
 
     /**
@@ -1718,7 +1795,7 @@ export class SR5Actor extends Actor {
             updateData[`-=${markId}`] = null;
         }
 
-        await this.update({'data.matrix.marks': updateData});
+        await this.update({'system.matrix.marks': updateData});
     }
 
     /**
@@ -1730,7 +1807,7 @@ export class SR5Actor extends Actor {
         const updateData = {}
         updateData[`-=${markId}`] = null;
 
-        await this.update({'data.matrix.marks': updateData});
+        await this.update({'system.matrix.marks': updateData});
     }
 
     getAllMarks(): MatrixMarks | undefined {
@@ -1802,18 +1879,5 @@ export class SR5Actor extends Actor {
                 marks,
                 markId
             }))
-    }
-
-    _preCreateEmbeddedDocuments(embeddedName, result, options, userId) {
-        // Importing embedded documents using Chummer char generator does overwrite test values during
-        // creation, even though values are set... this causes the SR5Item#_preCreate/_onCreate changes to
-        // be overwritten again with template.json default values for .action
-        // To test this issue import a character using Chummer JSON export with weapons/spells/complex form
-        if (embeddedName === 'Item') {
-            for (const data of result) {
-                //Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-            }
-        }
-        
     }
 }

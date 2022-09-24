@@ -104,6 +104,7 @@ export class Helpers {
     }
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
+    //@ts-ignore TODO: foundry-vtt-types v10
     static onSetFlag(data) {
         if (typeof data !== 'object') return data;
         if (data === undefined || data === null) return data;
@@ -116,6 +117,7 @@ export class Helpers {
     }
 
     // replace 'SR5_DOT_' with 'SR5.' on keys
+    //@ts-ignore TODO: foundry-vtt-types v10
     static onGetFlag(data) {
         if (typeof data !== 'object') return data;
         if (data === undefined || data === null) return data;
@@ -453,7 +455,7 @@ export class Helpers {
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        if (useTokenNameForChatOutput && token) return token.data.name as string;
+        if (useTokenNameForChatOutput && token) return token.name as string;
 
         return actor.name as string;
     }
@@ -472,7 +474,8 @@ export class Helpers {
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        if (useTokenForChatOutput && token) return token.data.img || '';
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (useTokenForChatOutput && token) return token.texture.src || '';
         return actor.img || '';
     }
 
@@ -924,23 +927,25 @@ export class Helpers {
      */
     static injectWeaponTestIntoChangeData(type: string, changeData: Partial<WeaponItemData>, applyData) {
         // Abort when category isn't part of this change.
-        if (changeData?.data?.category === undefined) return;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (changeData?.system?.category === undefined) return;
         
         // Remove test when user selects empty category.
-        if (changeData.data.category === '') {
-            foundry.utils.setProperty(applyData, 'data.action.test', '');
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (changeData.system.category === '') {
+            foundry.utils.setProperty(applyData, 'system.action.test', '');
             return;
         }
 
         //@ts-ignore Make sure a matching active test for the configured weapons category is used.
-        const test = SR5.weaponCategoryActiveTests[changeData.data.category];
-        if (!test) {
-            console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.data.category}.`, changeData);
+        const test = SR5.weaponCategoryActiveTests[changeData.system.category];
+        if (!test) { //@ts-ignore // TODO: foundry-vtt-types v10
+            console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.system.category}.`, changeData);
         }
 
-        foundry.utils.setProperty(applyData, 'data.action.test', test);
-        foundry.utils.setProperty(applyData, 'data.action.opposed.test', 'PhysicalDefenseTest');
-        foundry.utils.setProperty(applyData, 'data.action.opposed.resist.test', 'PhysicalResistTest');
+        foundry.utils.setProperty(applyData, 'system.action.test', test);
+        foundry.utils.setProperty(applyData, 'system.action.opposed.test', 'PhysicalDefenseTest');
+        foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', 'PhysicalResistTest');
     }
 
     /**
@@ -948,22 +953,26 @@ export class Helpers {
      */
     static injectSpellTestIntoChangeData(type: string, changeData: Partial<SpellItemData>, applyData) {
         // Abort when category isn't part of this change.
-        if (changeData?.data?.category === undefined) return;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (changeData?.system?.category === undefined) return;
         
         // Remove test when user selects empty category.
-        if (changeData.data.category === '') {
-            foundry.utils.setProperty(applyData, 'data.action.test', '');
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (changeData.system.category === '') {
+            foundry.utils.setProperty(applyData, 'system.action.test', '');
             return;
         } 
         
         // Based on category switch out active, opposed and resist test.
         const test = SR5.activeTests[type];
-        const opposedTest = SR5.opposedTests[type][changeData.data.category] || 'OpposedTest';
-        const resistTest = SR5.opposedResistTests[type][changeData.data.category] || '';
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const opposedTest = SR5.opposedTests[type][changeData.system.category] || 'OpposedTest';
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const resistTest = SR5.opposedResistTests[type][changeData.system.category] || '';
 
-        foundry.utils.setProperty(applyData, 'data.action.test', test);
-        foundry.utils.setProperty(applyData, 'data.action.opposed.test', opposedTest);
-        foundry.utils.setProperty(applyData, 'data.action.opposed.resist.test', resistTest);
+        foundry.utils.setProperty(applyData, 'system.action.test', test);
+        foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
+        foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', resistTest);
     }
 
     /**
@@ -972,7 +981,7 @@ export class Helpers {
     static injectComplexFormTestIntoChangeData(type: string, changeData: Partial<SpellItemData>, applyData) {
         const test = SR5.activeTests[type];
 
-        foundry.utils.setProperty(applyData, 'data.action.test', test);
+        foundry.utils.setProperty(applyData, 'system.action.test', test);
     }
 
     /**

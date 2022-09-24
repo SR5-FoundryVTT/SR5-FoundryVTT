@@ -90,7 +90,8 @@ export class FormDialog extends Dialog<FormDialogOptions> {
 
         if ( !this.form ) throw new Error(`The FormApplication subclass has no registered form element`);
         const fd = new FormDataExtended(this.form, {editors: {}});
-        const data = fd.toObject();
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const data = fd.object;
 
         this._updateData(data);
     }

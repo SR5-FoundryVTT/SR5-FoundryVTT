@@ -7,8 +7,8 @@
             {{localize "SR5.Labels.Action.ActiveTest"}}
         </div>
         <div class="inputs">
-            <select name="data.action.test" disabled>
-                {{#select data.action.test}}
+            <select name="system.action.test" disabled>
+                {{#select system.action.test}}
                 <option value=""></option>
                 {{#each activeTests}}
                 <option value="{{this.name}}">{{localize this.label}}</option>
@@ -22,18 +22,18 @@
             {{localize "SR5.ActionType"}}
         </div>
         <div class="inputs">
-            {{#if data.action.type}}
+            {{#if system.action.type}}
             <label>
                 {{localize "SR5.Extended"}}<input
                     title="Specialization"
                     type="checkbox"
-                    name="data.action.extended"
-                    {{checked data.action.extended}}
+                    name="system.action.extended"
+                    {{checked system.action.extended}}
                 />
             </label>
             {{/if}}
-            <select name="data.action.type">
-                {{#select data.action.type}}
+            <select name="system.action.type">
+                {{#select system.action.type}}
                 <option value=""></option>
                 {{#each config.actionTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
@@ -41,25 +41,25 @@
             </select>
         </div>
     </div>
-    {{#if data.action.type}}
+    {{#if system.action.type}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.Skill"}}
         </div>
         <div class="inputs">
-            {{#if data.action.skill}}
+            {{#if system.action.skill}}
             <label>
                 {{localize "SR5.Specialization"}}
                 <input
                     title="Specialization"
                     type="checkbox"
-                    name="data.action.spec"
-                    {{checked data.action.spec}}
+                    name="system.action.spec"
+                    {{checked system.action.spec}}
                 />
             </label>
             {{/if}}
-            <select name="data.action.skill">
-                {{#select data.action.skill}}
+            <select name="system.action.skill">
+                {{#select system.action.skill}}
                 <option value=""></option>
                 {{#each activeSkills as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
@@ -72,16 +72,16 @@
             {{localize "SR5.Attribute"}}
         </div>
         <div class="inputs">
-            <select name="data.action.attribute">
-                {{#select data.action.attribute}}
+            <select name="system.action.attribute">
+                {{#select system.action.attribute}}
                 <option value=""></option>
                 {{#each attributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
-            {{#unless data.action.skill}}
-            <select name="data.action.attribute2">
-                {{#select data.action.attribute2}}
+            {{#unless system.action.skill}}
+            <select name="system.action.attribute2">
+                {{#select system.action.attribute2}}
                 <option value=""></option>
                 {{#each config.attributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
@@ -98,8 +98,8 @@
             <input
                     title="{{localize SR5.Armor}}"
                     type="checkbox"
-                    name="data.action.armor"
-                    {{checked data.action.armor}}
+                    name="system.action.armor"
+                    {{checked system.action.armor}}
             />
         </div>
     </div>
@@ -112,8 +112,8 @@
                 size="4"
                 maxlength="3"
                 type="number"
-                name="data.action.mod"
-                value="{{data.action.mod}}"
+                name="system.action.mod"
+                value="{{system.action.mod}}"
                 data-dtype="Number"
                 placeholder="+Mod"
             />
@@ -129,16 +129,16 @@
                 size="4"
                 maxlength="3"
                 type="number"
-                name="data.action.limit.base"
-                value="{{data.action.limit.base}}"
+                name="system.action.limit.base"
+                value="{{system.action.limit.base}}"
                 data-dtype="Number"
                 placeholder=""
             />
             <div>
                 +
             </div>
-            <select name="data.action.limit.attribute" data-dtype="Text">
-                {{#select data.action.limit.attribute}}
+            <select name="system.action.limit.attribute" data-dtype="Text">
+                {{#select system.action.limit.attribute}}
                 <option value=""></option>
                 {{#each limits as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
@@ -156,8 +156,8 @@
                 size="4"
                 maxlength="3"
                 type="number"
-                name="data.action.threshold.base"
-                value="{{data.action.threshold.base}}"
+                name="system.action.threshold.base"
+                value="{{system.action.threshold.base}}"
                 data-dtype="Number"
                 placeholder=""
             />

@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div class="scroll-area mods">
-                    {{#each data.modifiers as |value id|}} {{#ifne id 'wound'}}
+                    {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
                         <div class="list-item">
                             <div class="item-left">
                                 <div class="item-text item-name">
@@ -35,7 +35,7 @@
                                             size="4"
                                             maxlength="3"
                                             type="text"
-                                            name="data.modifiers.{{id}}"
+                                            name="system.modifiers.{{id}}"
                                             value="{{value}}"
                                             placeholder="None"
                                             data-dtype="Number"

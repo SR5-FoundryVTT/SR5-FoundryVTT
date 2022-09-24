@@ -6,7 +6,7 @@
         <div class="attributes">
             {{#each config.matrixAttributes as |label key|}}
                 {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html"
-                        matrixAtt=(lookup ../data.matrix key)
+                        matrixAtt=(lookup ../system.matrix key)
                         key=key
                         label=label
                         matrixAttributes=../config/matrixAttributes
@@ -14,7 +14,7 @@
             {{/each}}
             {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                     attributeId='resonance'
-                    attribute=data.attributes.resonance
+                    attribute=system.attributes.resonance
             }}
             <div>
                 <div class="list-item">
@@ -25,8 +25,8 @@
                     </div>
                     <div class="item-right">
                         <div>
-                            <select name="data.spriteType" class="display">
-                                {{#select data.spriteType}} {{#each config.spriteTypes as |name type|}}
+                            <select name="system.spriteType" class="display">
+                                {{#select system.spriteType}} {{#each config.spriteTypes as |name type|}}
                                     <option value="{{type}}">{{localize name}}</option>
                                 {{/each}} {{/select}}
                             </select>
@@ -45,8 +45,8 @@
                                     cssClass="attribute-input"
                                     size="2"
                                     maxLength="2"
-                                    value=data.level
-                                    name="data.level"
+                                    value=system.level
+                                    name="system.level"
                             }}
                         </div>
                     </div>
@@ -59,7 +59,7 @@
                     </div>
                     <div class="item-right">
                         <div class="item-text">
-                            <input type="checkbox" class="checkbox" name="data.registered" {{checked data.registered}}/>
+                            <input type="checkbox" class="checkbox" name="system.registered" {{checked system.registered}}/>
                         </div>
                     </div>
                 </div>

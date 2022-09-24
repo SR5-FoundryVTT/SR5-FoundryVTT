@@ -10,7 +10,7 @@
             </div>
             <div class="attributes smooth">
                 <div class="block">
-                    {{#each data.track as |track id|}}
+                    {{#each system.track as |track id|}}
                         {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
                                 name=(localize track.label)
                                 value=track.value
@@ -42,8 +42,8 @@
                 <div class="attribute">
                     {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
                             name=(localize "SR5.AttrEdge")
-                            value=data.attributes.edge.uses
-                            max=data.attributes.edge.value
+                            value=system.attributes.edge.uses
+                            max=system.attributes.edge.value
                             id="edge"
                     }}
                 </div>
@@ -76,7 +76,7 @@
                 {{localize "SR5.RollSoak"}}
             </div>
             <div class="attribute-name Roll" data-roll-id="armor">
-                {{localize "SR5.RollArmor"}} ({{data.armor.value}})
+                {{localize "SR5.RollArmor"}} ({{system.armor.value}})
             </div>
 
             {{#if awakened}}
@@ -96,10 +96,10 @@
         <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
         <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
         <a class="item active" data-tab="inventory">{{localize "SR5.Gear"}}</a>
-        {{#ife data.special 'magic'}}
+        {{#ife system.special 'magic'}}
         <a class="item" data-tab="magic">{{localize "SR5.Magic"}}</a>
         {{/ife}}
-        {{#if data.is_critter}}
+        {{#if system.is_critter}}
         <a class="item" data-tab="critter_powers">{{localize "SR5.Labels.ActorSheet.CritterPowers"}}</a>
         {{/if}}
         <a class="item" data-tab="matrix">{{localize "SR5.Labels.ActorSheet.Matrix"}}</a>

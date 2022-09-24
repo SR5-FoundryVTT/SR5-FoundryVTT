@@ -7,23 +7,23 @@
             {{localize "SR5.DamageType"}}
         </div>
         <div class="inputs">
-            <select name="data.type">
+            <select name="system.type">
                 <option value=""></option>
-                {{#select data.type}} {{#each config.modificationTypes as |name type|}}
+                {{#select system.type}} {{#each config.modificationTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
         </div>
     </div>
-    {{#ife data.type 'weapon'}}
+    {{#ife system.type 'weapon'}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.MountPoint"}}
         </div>
         <div class="inputs">
-            <select name="data.mount_point">
+            <select name="system.mount_point">
                 <option value=""></option>
-                {{#select data.mount_point}} {{#each config.mountPoints as |name type|}}
+                {{#select system.mount_point}} {{#each config.mountPoints as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
@@ -38,8 +38,8 @@
                 type="text"
                 maxlength="2"
                 size="2"
-                name="data.dice_pool"
-                value="{{data.dice_pool}}"
+                name="system.dice_pool"
+                value="{{system.dice_pool}}"
                 data-dtype="Number"
                 placeholder="Dice Pool"
             />
@@ -54,8 +54,8 @@
                 type="text"
                 maxlength="2"
                 size="2"
-                name="data.accuracy"
-                value="{{data.accuracy}}"
+                name="system.accuracy"
+                value="{{system.accuracy}}"
                 data-dtype="Number"
                 placeholder="Accuracy"
             />
@@ -68,8 +68,8 @@
         <div class="inputs">
             <input
                 type="text"
-                name="data.rc"
-                value="{{data.rc}}"
+                name="system.rc"
+                value="{{system.rc}}"
                 data-dtype="Number"
                 placeholder="RC"
             />

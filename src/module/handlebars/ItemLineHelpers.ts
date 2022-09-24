@@ -289,7 +289,11 @@ export const registerItemLineHelpers = () => {
                 if (wrapper.isRangedWeapon()) {
                     const count = wrapper.getAmmo()?.current.value ?? 0;
                     const max = wrapper.getAmmo()?.current.max ?? 0;
-                    const text = count < max ? `${game.i18n.localize('SR5.WeaponReload')} (${count}/${max})` : game.i18n.localize('SR5.AmmoFull');
+                    // Show reload on both no ammo configured and partially consumed clips.
+                    const text = count < max || max === 0 ? 
+                        `${game.i18n.localize('SR5.WeaponReload')} (${count}/${max})` : 
+                        game.i18n.localize('SR5.AmmoFull');
+
                     const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : 'faded');
                     return [
                         {

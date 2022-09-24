@@ -4,8 +4,8 @@ import {SR5} from "../../../config";
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class LimitsPrep {
-    static prepareLimits(data: ActorTypesData) {
-        const { limits, modifiers } = data;
+    static prepareLimits(system: ActorTypesData) {
+        const { limits, modifiers } = system;
 
 
         // SETUP LIMITS
@@ -20,9 +20,9 @@ export class LimitsPrep {
         }
     }
 
-    static prepareLimitBaseFromAttributes(data: ActorTypesData) {
+    static prepareLimitBaseFromAttributes(system: ActorTypesData) {
 
-        const { limits, attributes } = data;
+        const { limits, attributes } = system;
 
         limits.physical.base = Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3);
         limits.mental.base = Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3);

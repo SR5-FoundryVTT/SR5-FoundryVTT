@@ -7,8 +7,8 @@
             {{localize "SR5.WeaponType"}}
         </div>
         <div class="inputs">
-            <select name="data.category">
-                {{#select data.category}}
+            <select name="system.category">
+                {{#select system.category}}
                 <option value=""></option>
                 {{#each config.weaponCategories as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
@@ -24,8 +24,8 @@
             <input
                     size="2"
                     type="text"
-                    name="data.ammo.current.value"
-                    value="{{data.ammo.current.value}}"
+                    name="system.ammo.current.value"
+                    value="{{system.ammo.current.value}}"
                     data-dtype="Number"
                     placeholder="0"
             />
@@ -33,14 +33,14 @@
             <input
                     size="2"
                     type="text"
-                    name="data.ammo.current.max"
-                    value="{{data.ammo.current.max}}"
+                    name="system.ammo.current.max"
+                    value="{{system.ammo.current.max}}"
                     data-dtype="Number"
                     placeholder="{{localize SR5.Max}}"
             />
         </div>
     </div>
-    {{#if data.category}} {{#ife data.category "range"}}
+    {{#if system.category}} {{#ife system.category "range"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.SpareClips"}}
@@ -49,8 +49,8 @@
             <input
                     size="2"
                     type="text"
-                    name="data.ammo.spare_clips.value"
-                    value="{{data.ammo.spare_clips.value}}"
+                    name="system.ammo.spare_clips.value"
+                    value="{{system.ammo.spare_clips.value}}"
                     data-dtype="Number"
                     placeholder="0"
             />
@@ -58,8 +58,8 @@
             <input
                     size="2"
                     type="text"
-                    name="data.ammo.spare_clips.max"
-                    value="{{data.ammo.spare_clips.max}}"
+                    name="system.ammo.spare_clips.max"
+                    value="{{system.ammo.spare_clips.max}}"
                     data-dtype="Number"
                     placeholder="{{localize SR5.Max}}"
             />
@@ -73,38 +73,38 @@
             <label>
                 {{localize "SR5.WeaponModeSingleShot"}}<input
                     type="checkbox"
-                    name="data.range.modes.single_shot"
+                    name="system.range.modes.single_shot"
                     {{checked
-                    data.range.modes.single_shot}}
+                    system.range.modes.single_shot}}
                 />
             </label>
             <label>
                 {{localize "SR5.WeaponModeSemiAuto"}}<input
                     type="checkbox"
-                    name="data.range.modes.semi_auto"
+                    name="system.range.modes.semi_auto"
                     {{checked
-                    data.range.modes.semi_auto}}
+                    system.range.modes.semi_auto}}
                 />
             </label>
             <label>
                 {{localize "SR5.WeaponModeBurstFire"}}<input
                     type="checkbox"
-                    name="data.range.modes.burst_fire"
+                    name="system.range.modes.burst_fire"
                     {{checked
-                    data.range.modes.burst_fire}}
+                    system.range.modes.burst_fire}}
                 />
             </label>
             <label>
                 {{localize "SR5.WeaponModeFullAuto"}}<input
                     type="checkbox"
-                    name="data.range.modes.full_auto"
+                    name="system.range.modes.full_auto"
                     {{checked
-                    data.range.modes.full_auto}}
+                    system.range.modes.full_auto}}
                 />
             </label>
         </div>
     </div>
-    {{/ife}} {{#ife data.category "range"}}
+    {{/ife}} {{#ife system.category "range"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.WeaponRanges"}}
@@ -113,32 +113,32 @@
             <input
                 size="3"
                 type="text"
-                name="data.range.ranges.short"
-                value="{{data.range.ranges.short}}"
+                name="system.range.ranges.short"
+                value="{{system.range.ranges.short}}"
                 data-dtype="Number"
             />
             /
             <input
                 size="3"
                 type="text"
-                name="data.range.ranges.medium"
-                value="{{data.range.ranges.medium}}"
+                name="system.range.ranges.medium"
+                value="{{system.range.ranges.medium}}"
                 data-dtype="Number"
             />
             /
             <input
                 size="3"
                 type="text"
-                name="data.range.ranges.long"
-                value="{{data.range.ranges.long}}"
+                name="system.range.ranges.long"
+                value="{{system.range.ranges.long}}"
                 data-dtype="Number"
             />
             /
             <input
                 size="3"
                 type="text"
-                name="data.range.ranges.extreme"
-                value="{{data.range.ranges.extreme}}"
+                name="system.range.ranges.extreme"
+                value="{{system.range.ranges.extreme}}"
                 data-dtype="Number"
             />
         </div>
@@ -151,14 +151,14 @@
             <input
                 type="text"
                 size="2"
-                name="data.range.rc.base"
-                value="{{data.range.rc.base}}"
+                name="system.range.rc.base"
+                value="{{system.range.rc.base}}"
                 data-dtype="Number"
                 placeholder="1"
             />
         </div>
     </div>
-    {{/ife}} {{#ife data.category "thrown"}}
+    {{/ife}} {{#ife system.category "thrown"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.WeaponRanges"}}
@@ -167,37 +167,37 @@
             <input
                 size="3"
                 type="text"
-                name="data.thrown.ranges.short"
-                value="{{data.thrown.ranges.short}}"
+                name="system.thrown.ranges.short"
+                value="{{system.thrown.ranges.short}}"
                 data-dtype="Number"
             />
             /
             <input
                 size="3"
                 type="text"
-                name="data.thrown.ranges.medium"
-                value="{{data.thrown.ranges.medium}}"
+                name="system.thrown.ranges.medium"
+                value="{{system.thrown.ranges.medium}}"
                 data-dtype="Number"
             />
             /
             <input
                 size="3"
                 type="text"
-                name="data.thrown.ranges.long"
-                value="{{data.thrown.ranges.long}}"
+                name="system.thrown.ranges.long"
+                value="{{system.thrown.ranges.long}}"
                 data-dtype="Number"
             />
             /
             <input
                 size="3"
                 type="text"
-                name="data.thrown.ranges.extreme"
-                value="{{data.thrown.ranges.extreme}}"
+                name="system.thrown.ranges.extreme"
+                value="{{system.thrown.ranges.extreme}}"
                 data-dtype="Number"
             />
             <i class="fas fa-times"></i>
-            <select name="data.thrown.ranges.attribute">
-                {{#select data.thrown.ranges.attribute}}
+            <select name="system.thrown.ranges.attribute">
+                {{#select system.thrown.ranges.attribute}}
                 <option value=""></option>
                 {{#each config.attributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
@@ -205,7 +205,7 @@
             </select>
         </div>
     </div>
-    {{/ife}} {{#ife data.category "melee"}}
+    {{/ife}} {{#ife system.category "melee"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.WeaponReach"}}
@@ -214,14 +214,14 @@
             <input
                 type="text"
                 size="2"
-                name="data.melee.reach"
-                value="{{data.melee.reach}}"
+                name="system.melee.reach"
+                value="{{system.melee.reach}}"
                 data-dtype="Number"
                 placeholder="1"
             />
         </div>
     </div>
-    {{/ife}} {{#ife data.category "thrown"}}
+    {{/ife}} {{#ife system.category "thrown"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.Radius"}}
@@ -230,8 +230,8 @@
             <input
                 type="text"
                 size="4"
-                name="data.thrown.blast.radius"
-                value="{{data.thrown.blast.radius}}"
+                name="system.thrown.blast.radius"
+                value="{{system.thrown.blast.radius}}"
                 data-dtype="Number"
                 placeholder="1"
             />
@@ -246,8 +246,8 @@
             <input
                 size="3"
                 type="text"
-                name="data.thrown.blast.dropoff"
-                value="{{data.thrown.blast.dropoff}}"
+                name="system.thrown.blast.dropoff"
+                value="{{system.thrown.blast.dropoff}}"
                 data-dtype="Number"
                 placeholder="-1"
             />

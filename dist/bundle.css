@@ -401,7 +401,8 @@
     .sr5.roll-card .card-title .header-name {
       text-overflow: ellipsis;
       overflow: hidden;
-      white-space: nowrap; }
+      white-space: nowrap;
+      border-bottom: none; }
       .sr5.roll-card .card-title .header-name:hover {
         text-shadow: -1px -1px 0 #6495ed, 1px -1px 0 #6495ed, -1px 1px 0 #6495ed, 1px 1px 0 #6495ed; }
     .sr5.roll-card .card-title .show-display-description,
@@ -516,7 +517,8 @@
       font-weight: bold;
       text-align: center;
       width: 24px;
-      line-height: 24px; }
+      line-height: 24px;
+      margin-top: 5px; }
       .sr5.roll-card .dice-roll-content .dice-roll.red {
         color: #aa0200;
         filter: sepia(0.5) hue-rotate(-60deg); }
@@ -838,7 +840,7 @@ select.display {
     color: white; }
   .sr5 .inline-input-inventory {
     display: none; }
-  .sr5 .entity-link {
+  .sr5 .entity-link, .sr5 .content-link {
     color: black; }
   .sr5 .origin-link {
     background: #DDD;
@@ -857,6 +859,19 @@ select.display {
     width: 100%; }
   .sr5 .editor .tox-edit-area {
     background: #939393; }
+  .sr5 .editor.prosemirror .pm-dropdown {
+    color: white;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 0.3em;
+    border-color: #4d4d4d; }
+    .sr5 .editor.prosemirror .pm-dropdown i, .sr5 .editor.prosemirror .pm-dropdown i:hover {
+      color: white; }
+    .sr5 .editor.prosemirror .pm-dropdown ul {
+      background-color: #4d4d4d; }
+    .sr5 .editor.prosemirror .pm-dropdown ul > li:hover {
+      color: white;
+      border-color: rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.05); }
   .sr5 .parts-list {
     font-size: 12px;
     display: flex;

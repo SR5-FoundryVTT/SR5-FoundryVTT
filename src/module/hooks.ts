@@ -19,7 +19,7 @@ import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 import {quenchRegister} from "../test/quench";
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
-import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
+import {SR5ActiveEffectConfig} from "./effect/SR5ActiveEffectConfig";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
 import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
 import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
@@ -201,14 +201,15 @@ ___________________
             }
         };
 
+        // Register document classes
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
-        // @ts-ignore // TODO: Compare Combat/SR5Combat typing.
         CONFIG.Combat.documentClass = SR5Combat;
+        //@ts-ignore // TODO: foundry-vtt-types v10
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
-        // @ts-ignore // ActiveEffect.sheetClass might be an old approach, since DnD5e isn't using it anymore.
-        CONFIG.ActiveEffect.sheetClass = SR5ActiveEffectSheet;
+        // Register object classes
         CONFIG.Token.objectClass = SR5Token;
+
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-ignore
@@ -226,7 +227,7 @@ ___________________
 
         registerSystemSettings();
 
-        // Register sheet application classes
+        // Register sheets for collection documents.
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
         Actors.unregisterSheet('core', ActorSheet);
         Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
@@ -262,11 +263,25 @@ ___________________
             makeDefault: true
         });
 
+        // Register configs for embedded documents.
+        DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', ActiveEffectConfig);
+        DocumentSheetConfig.registerSheet(ActiveEffect, SYSTEM_NAME, SR5ActiveEffectConfig, {
+            makeDefault: true
+        })
+
+        // Preload might reduce loading time during play.
         HandlebarManager.loadTemplates();
     }
 
     static async ready() {
         if (game.user?.isGM) {
+            // Prohibit migration on empty worlds...
+            if (Migrator.isEmptyWorld) {
+                await Migrator.InitWorldForMigration();
+                return;
+            }
+            
+            // On populated worlds, try migrating
             await Migrator.BeginMigration();
 
             if (ChangelogApplication.showApplication) {

@@ -37,7 +37,7 @@
                 align-self: center;
                 flex: 1;
                 margin: 0;
-                @include nodesto;
+                @include nodesto;        
             }
         }
         .card-header:first-of-type {
@@ -133,6 +133,8 @@
                 text-overflow: ellipsis;
                 overflow: hidden;
                 white-space: nowrap;
+                // Override Foundry default header styling.
+                border-bottom: none;
 
                 &:hover {
                     text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower, 1px 1px 0 $cornflower;
@@ -283,6 +285,10 @@
                 text-align: center;
                 width: 24px;
                 line-height: 24px;
+                
+                // Consistent margin on top, if missing result boxes will clip.
+                margin-top: 5px;
+
                 &.red {
                     color: #aa0200;
                     filter: sepia(0.5) hue-rotate(-60deg);

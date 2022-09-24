@@ -3,8 +3,8 @@ import WoundsActorData = Shadowrun.WoundsActorData;
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class WoundsPrep {
-    static prepareWounds(data: ActorTypesData & TwoTrackActorData & WoundsActorData) {
-        const { modifiers, track } = data;
+    static prepareWounds(system: ActorTypesData & TwoTrackActorData & WoundsActorData) {
+        const { modifiers, track } = system;
         const count = 3 + Number(modifiers['wound_tolerance']);
         const stunWounds = track.stun.disabled ? 0 : Math.floor(track.stun.value / count);
         const physicalWounds = track.physical.disabled ? 0 : Math.floor(track.physical.value / count);
@@ -12,7 +12,7 @@ export class WoundsPrep {
         track.stun.wounds = stunWounds;
         track.physical.wounds = physicalWounds;
 
-        data.wounds = {
+        system.wounds = {
             value: stunWounds + physicalWounds,
         };
     }

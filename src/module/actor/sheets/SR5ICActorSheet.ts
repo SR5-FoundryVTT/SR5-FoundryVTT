@@ -22,8 +22,8 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
     }
 
 
-    getData(): any {
-        const data = super.getData() as ICActorSheetData;
+    async getData(options) {
+        const data = await super.getData(options) as ICActorSheetData;
 
         // Fetch a connected host.
         data.host = this.object.getICHost();

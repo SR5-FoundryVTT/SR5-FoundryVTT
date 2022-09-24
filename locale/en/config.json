@@ -878,7 +878,8 @@
     "ApplyUnmodifiedDamage": "Apply Unmod. Damage"
   },
   "SR5.Infos": {
-    "CantModifyHostContent": "Can't change host data from within an IC actor."
+    "CantModifyHostContent": "Can't change host data from within an IC actor.",
+    "ConsumedEquippedAmmo": "Consumed rounds from equipped ammunition"
   },
   "SR5.Warnings": {
     "NegativeLimitValue": "Limit values must be above zero",
@@ -892,7 +893,9 @@
     "CantExtendTestFurther": "Test can't be extended either by dice left or threshold reached",
     "CantExtendTest": "Test type can't be extended.",
     "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
-    "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched."
+    "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
+    "CantConsumeEquippedAmmo": "Equipped ammunition has not enouth rounds",
+    "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot."
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",

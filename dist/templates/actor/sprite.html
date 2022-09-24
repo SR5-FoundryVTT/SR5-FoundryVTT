@@ -11,8 +11,8 @@
             <div class="attributes smooth">
                 <div class="block">
                     {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                            value=data.matrix.condition_monitor.value
-                            max=data.matrix.condition_monitor.max
+                            value=system.matrix.condition_monitor.value
+                            max=system.matrix.condition_monitor.max
                             id="matrix"
                             name=(localize "SR5.ConditionMonitor")
                     }}
@@ -27,7 +27,7 @@
                         {{localize "SR5.Labels.ActorSheet.DeviceRating"}}
                     </div>
                     <div class="attribute-value" title="{{localize 'SR5.Total'}}">
-                        {{data.matrix.rating}}
+                        {{system.matrix.rating}}
                     </div>
                 {{/"systems/shadowrun5e/dist/templates/common/Attribute.html"}}
             </div>
@@ -44,8 +44,8 @@
                                     cssClass="attribute-input"
                                     size="2"
                                     maxLength="2"
-                                    value=data.services
-                                    name="data.services"
+                                    value=system.services
+                                    name="system.services"
                             }}
                         </div>
                     </div>

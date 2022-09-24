@@ -5,8 +5,8 @@ import {SR5} from "../../../config";
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class ConditionMonitorsPrep {
-    static prepareStun(data: ActorTypesData & StunTrackActorData) {
-        const { track, attributes, modifiers } = data;
+    static prepareStun(system: ActorTypesData & StunTrackActorData) {
+        const { track, attributes, modifiers } = system;
 
         track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
         track.stun.max = track.stun.base + Number(modifiers['stun_track']);
@@ -14,8 +14,8 @@ export class ConditionMonitorsPrep {
         track.stun.disabled = false;
     }
 
-    static preparePhysical(data: ActorTypesData & PhysicalTrackActorData) {
-        const { track, attributes, modifiers } = data;
+    static preparePhysical(system: ActorTypesData & PhysicalTrackActorData) {
+        const { track, attributes, modifiers } = system;
 
         track.physical.base = 8 + Math.ceil(attributes.body.value / 2);
         track.physical.max = track.physical.base + Number(modifiers['physical_track']);
@@ -24,11 +24,11 @@ export class ConditionMonitorsPrep {
         track.physical.disabled = false;
     }
 
-    static prepareGrunt(data: ActorTypesData & TwoTrackActorData) {
+    static prepareGrunt(system: ActorTypesData & TwoTrackActorData) {
         // Grunts use only one monitor, use physical to get overflow functionality.
-        ConditionMonitorsPrep.prepareStun(data);
+        ConditionMonitorsPrep.prepareStun(system);
 
-        const { track, attributes, modifiers } = data;
+        const { track, attributes, modifiers } = system;
         // Overwrite stun damage to avoid invisible damage modifiers.
         track.stun.value = 0;
         track.stun.disabled = true;

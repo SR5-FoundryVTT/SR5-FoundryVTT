@@ -5,18 +5,18 @@ import {PartsList} from "../../../parts/PartsList";
 import {AttributesPrep} from "./AttributesPrep";
 
 export class NPCPrep {
-    static prepareNPCData(data: CharacterActorData) {
+    static prepareNPCData(system: CharacterActorData) {
         // Apply to NPC and none NPC to remove lingering modifiers after actor has been removed it's npc status.
-        NPCPrep.applyMetatypeModifiers(data);
+        NPCPrep.applyMetatypeModifiers(system);
     }
 
     /**
      * Apply modifiers that result from an NPCs metatype.
      * This method also should still run on any none NPC to remove eventually lingering NPC metatype modifiers.
      */
-    static applyMetatypeModifiers(data: CharacterActorData) {
+    static applyMetatypeModifiers(system: CharacterActorData) {
         // Extract needed data.
-        const {attributes, metatype} = data;
+        const {attributes, metatype} = system;
         const metatypeModifier = DataDefaults.grunt.metatype_modifiers[metatype] || {};
 
         for (const [name, attribute] of Object.entries(attributes)) {
@@ -31,7 +31,7 @@ export class NPCPrep {
 
                 // Apply NPC modifiers
                 const modifyBy = metatypeModifier.attributes?.[name];
-                if (data.is_npc && modifyBy) {
+                if (system.is_npc && modifyBy) {
                     parts.addPart(METATYPEMODIFIER, modifyBy);
                 }
 
