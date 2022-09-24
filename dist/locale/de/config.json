@@ -850,7 +850,7 @@
   },
   "SR5.Infos": {
     "CantModifyHostContent": "Host daten können nicht von einem IC Akteur aus verändert werden",
-    "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen",
+    "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen"
   },
   "SR5.Warnings": {
     "NegativeLimitValue": "Limit Werte müssen über Null liegen",
@@ -865,7 +865,8 @@
     "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",
     "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
     "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Glitch.",
-    "CantConsumeEquippedAmmo": "Ausgerüstete Munition hat nicht genug Kugeln"
+    "CantConsumeEquippedAmmo": "Ausgerüstete Munition hat nicht genug Kugeln",
+    "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer."
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",

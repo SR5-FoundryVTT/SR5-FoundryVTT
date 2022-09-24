@@ -17244,7 +17244,7 @@ var InventoryFlow = class {
         }
       };
       console.log(`Shadowrun 5e | Executing update to create inventory`, updateData);
-      return yield this.document.update(updateData);
+      return yield this.document.update(updateData, { render: false });
     });
   }
   remove(_0) {
@@ -17265,7 +17265,7 @@ var InventoryFlow = class {
         ];
       }
       console.log(`Shadowrun 5e | Executing update to remove inventory`, updateData);
-      yield this.document.update(updateData);
+      yield this.document.update(updateData, { render: false });
     });
   }
   exists(name) {
@@ -17296,7 +17296,7 @@ var InventoryFlow = class {
         }
       };
       console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
-      yield this.document.update(updateData);
+      yield this.document.update(updateData, { render: false });
     });
   }
   addItems(name, items, removeFromCurrent = true) {
@@ -17803,6 +17803,10 @@ var _SR5Actor = class extends Actor {
   }
   addKnowledgeSkill(category, skill) {
     return __async(this, null, function* () {
+      if (!this.system.skills.knowledge.hasOwnProperty(category)) {
+        console.error(`Shadowrun5e | Tried creating knowledge skill with unkown category ${category}`);
+        return;
+      }
       const defaultSkill = {
         name: "",
         specs: [],
@@ -24914,6 +24918,7 @@ var SR5BaseActorSheet = class extends ActorSheet {
     html.find(".inventory-input-save").on("click", this._onInplaceInventoryEditSave.bind(this));
     html.find("input#input-inventory").on("keydown", this._onInplaceInventoryEditCancel.bind(this));
     html.find("input#input-inventory").on("keydown", this._onInplaceInventoryEditSave.bind(this));
+    html.find("input#input-inventory").on("change", this._onInventoryChangePreventSheetSubmit.bind(this));
     html.find("#select-inventory").on("change", this._onSelectInventory.bind(this));
     html.find(".inventory-item-move").on("click", this._onItemMoveToInventory.bind(this));
     html.find(".horizontal-cell-input .cell").on("click", this._onSetConditionTrackCell.bind(this));
@@ -25544,6 +25549,9 @@ var SR5BaseActorSheet = class extends ActorSheet {
     return __async(this, null, function* () {
       event.preventDefault();
       const skill = Helpers.listItemId(event);
+      if (!skill) {
+        return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+      }
       yield this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skill);
     });
   }
@@ -25558,6 +25566,9 @@ var SR5BaseActorSheet = class extends ActorSheet {
   _onShowEditKnowledgeSkill(event) {
     event.preventDefault();
     const [skill, category] = Helpers.listItemId(event).split(".");
+    if (!skill || !category) {
+      return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`);
+    }
     this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {
       event
     }, skill, category);
@@ -25566,6 +25577,9 @@ var SR5BaseActorSheet = class extends ActorSheet {
     return __async(this, null, function* () {
       event.preventDefault();
       const skill = Helpers.listItemId(event);
+      if (!skill) {
+        return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+      }
       yield this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event }, skill);
     });
   }
@@ -25827,6 +25841,9 @@ var SR5BaseActorSheet = class extends ActorSheet {
         return;
       yield this.document.inventory.addItems(inventory, item);
     });
+  }
+  _onInventoryChangePreventSheetSubmit(event) {
+    event.stopPropagation();
   }
   _onReloadAmmo(event) {
     return __async(this, null, function* () {
@@ -26205,10 +26222,15 @@ var RangedAttackTest = class extends SuccessTest {
     return false;
   }
   _prepareFireMode() {
+    var _a;
     const weaponData = this.item.asWeapon();
     if (!weaponData)
       return;
     this.data.fireModes = FireModeRules.availableFireModes(weaponData.system.range.modes);
+    if (this.data.fireModes.length === 0) {
+      this.data.fireModes.push(SR5.fireModes[0]);
+      (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.NoFireModeConfigured", { localize: true });
+    }
     const lastFireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
     this.data.fireModeSelected = this.data.fireModes.findIndex((available) => lastFireMode.label === available.label);
     if (this.data.fireModeSelected == -1)
