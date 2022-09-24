@@ -17457,7 +17457,14 @@ var _SR5Actor = class extends Actor {
     super.prepareEmbeddedDocuments();
   }
   applyActiveEffects() {
-    super.applyActiveEffects();
+    var _a;
+    try {
+      super.applyActiveEffects();
+    } catch (error) {
+      console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+      console.error(error);
+      (_a = ui.notifications) == null ? void 0 : _a.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+    }
   }
   prepareDerivedData() {
     super.prepareDerivedData();
@@ -25983,10 +25990,10 @@ var SR5ActiveEffect = class extends ActiveEffect {
       return this.update({ disabled });
     });
   }
-  _applyCustom(actor, change) {
-    return this._applyModify(actor, change);
+  _applyCustom(actor, change, current, delta, changes) {
+    return this._applyModify(actor, change, current, delta, changes);
   }
-  _applyModify(actor, change) {
+  _applyModify(actor, change, current, delta, changes) {
     if (this._isKeyModifiableValue(actor, change.key)) {
       const value = foundry.utils.getProperty(actor.data, change.key);
       value.mod.push({ name: this.label, value: Number(change.value) });
@@ -26000,9 +26007,9 @@ var SR5ActiveEffect = class extends ActiveEffect {
       value.mod.push({ name: this.label, value: Number(change.value) });
       return null;
     }
-    return super._applyAdd(actor, change);
+    return super._applyAdd(actor, change, current, delta, changes);
   }
-  _applyOverride(actor, change) {
+  _applyOverride(actor, change, current, delta, changes) {
     if (this._isKeyModifiableValue(actor, change.key)) {
       const value = foundry.utils.getProperty(actor.data, change.key);
       value.override = { name: this.label, value: Number(change.value) };
@@ -26017,7 +26024,7 @@ var SR5ActiveEffect = class extends ActiveEffect {
       value.override = { name: this.label, value: Number(change.value) };
       return null;
     }
-    return super._applyOverride(actor, change);
+    return super._applyOverride(actor, change, current, delta, changes);
   }
   _isKeyModifiableValue(actor, key) {
     const possibleValue = foundry.utils.getProperty(actor.data, key);

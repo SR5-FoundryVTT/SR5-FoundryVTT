@@ -178,7 +178,15 @@ export class SR5Actor extends Actor {
      * @override
      */
     applyActiveEffects() {
-        super.applyActiveEffects();
+        // Shadowrun uses prepareDerivedData to calculate lot's of things that don't exist on the data model in full.
+        // Errors during change application will stop that process and cause a broken sheet.
+        try {
+            super.applyActiveEffects();
+        } catch (error) {
+            console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+            console.error(error);
+            ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+        }
     }
 
     /**

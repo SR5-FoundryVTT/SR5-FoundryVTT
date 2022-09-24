@@ -205,6 +205,7 @@ ___________________
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
         CONFIG.Combat.documentClass = SR5Combat;
+        //@ts-ignore // TODO: foundry-vtt-types v10
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
         // Register object classes
         CONFIG.Token.objectClass = SR5Token;

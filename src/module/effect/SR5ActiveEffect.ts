@@ -53,8 +53,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         return this.update({disabled});
     }
 
-    protected _applyCustom(actor: SR5Actor, change: EffectChangeData) {
-        return this._applyModify(actor, change);
+    //@ts-ignore // TODO: foundry-vtt-types
+    protected _applyCustom(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
+        return this._applyModify(actor, change, current, delta, changes);
     }
 
     /**
@@ -63,7 +64,8 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    protected _applyModify(actor: SR5Actor, change: EffectChangeData) {
+    //@ts-ignore // TODO: foundry-vtt-types
+    protected _applyModify(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor.data, change.key) as ModifiableValue;
@@ -88,7 +90,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         }
 
         // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value choosen
-        return super._applyAdd(actor, change);
+        //@ts-ignore // TODO: foundry-vtt-types
+        return super._applyAdd(actor, change, current, delta, changes);
     }
 
     /**
@@ -99,7 +102,8 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    protected _applyOverride(actor: SR5Actor, change: EffectChangeData) {
+    //@ts-ignore // TODO: foundry-vtt-types
+    protected _applyOverride(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor.data, change.key);
@@ -124,7 +128,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         }
 
         // Neither a direct nor an indirect ModifiableValue match.
-        return super._applyOverride(actor, change);
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return super._applyOverride(actor, change, current, delta, changes);
     }
 
     _isKeyModifiableValue(actor: SR5Actor, key: string): boolean {
