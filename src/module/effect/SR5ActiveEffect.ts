@@ -3,7 +3,12 @@ import {Helpers} from "../helpers";
 import ModifiableValue = Shadowrun.ModifiableValue;
 import {EffectChangeData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 
+
+
 export class SR5ActiveEffect extends ActiveEffect {
+    // TODO: foundry-vtt-types v10 - getProperty(actor.data works with 'data.attributes' and 'system.attributes')
+    //                               changing it to actor works with 'system.attributes' but 'data.attributes' will break.
+    static LOG_V10_COMPATIBILITY_WARNINGS = false;
     /**
      * Can be used to determine if the origin of the effect is an document that is owned by another document.
      *
@@ -13,8 +18,10 @@ export class SR5ActiveEffect extends ActiveEffect {
      * items, this would need change.
      */
     public get isOriginOwned(): boolean {
-        if (!this.data.origin) return false;
-        const path = this.data.origin.split('.');
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        if (!this.origin) return false;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const path = this.origin.split('.');
 
         if (path[0] === 'Scene' && path.length === 6) return true;
         if (path[0] === 'Actor' && path.length === 4) return true;
@@ -23,7 +30,8 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     public get source() {
-        return this.data.origin ? fromUuid(this.data.origin) : null;
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return this.origin ? fromUuid(this.origin) : null;
     }
 
     /**
@@ -37,7 +45,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     async toggleDisabled() {
         // @ts-ignore
-        return this.update({disabled: !this.data.disabled});
+        return this.update({disabled: !this.disabled});
     }
 
     async disable(disabled) {
@@ -59,7 +67,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor.data, change.key) as ModifiableValue;
-            value.mod.push({name: this.data.label, value: Number(change.value)});
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            value.mod.push({name: this.label, value: Number(change.value)});
 
             return null;
         }
@@ -72,7 +81,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Don't apply any changes if it's also not a indirect match.
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor.data, indirectKey) as ModifiableValue;
-            value.mod.push({name: this.data.label, value: Number(change.value)});
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            value.mod.push({name: this.label, value: Number(change.value)});
 
             return null;
         }
@@ -93,7 +103,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor.data, change.key);
-            value.override = {name: this.data.label, value: Number(change.value)};
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            value.override = {name: this.label, value: Number(change.value)};
             value.value = change.value;
 
             return null;
@@ -106,7 +117,8 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor.data, indirectKey);
-            value.override = {name: this.data.label, value: Number(change.value)};
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            value.override = {name: this.label, value: Number(change.value)};
 
             return null;
         }

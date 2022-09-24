@@ -1,4 +1,4 @@
-export class SR5ActiveEffectSheet extends ActiveEffectConfig {
+export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     get template(): string {
         return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
     }

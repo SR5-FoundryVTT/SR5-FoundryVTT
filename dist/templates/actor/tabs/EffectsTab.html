@@ -11,8 +11,8 @@
 
             {{#each section.effects as |effect|}}
                  {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                    img=effect.data.icon
-                    name=effect.data.label
+                    img=effect.icon
+                    name=effect.label
                     itemId=effect.id
                     icons=(EffectIcons effect)
                     rightSide=[]

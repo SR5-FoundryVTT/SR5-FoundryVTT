@@ -24,7 +24,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
     static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<MinimalActionData> {
         const action = DefaultValues.minimalActionData(await super._getDocumentTestAction(item, actor));
 
-        const spellData = item.asSpellData();
+        const spellData = item.asSpell();
         if (!spellData) return action;
 
         const itemAction = CombatSpellRules.defenseTestAction(spellData.data.type, spellData.data.combat.type);
@@ -37,7 +37,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
     }
 
     get testModifiers() {
-        const spellData = this.item?.asSpellData();
+        const spellData = this.item?.asSpell();
         if (!spellData) return ['global'];
 
         if (spellData.data.type === 'mana' && spellData.data.combat.type === 'direct') {
@@ -57,7 +57,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
      * A combat spells damage depends on
      */
     calculateCombatSpellDamage() {
-        const spellData = this.item?.asSpellData();
+        const spellData = this.item?.asSpell();
         if (!spellData) return;
 
         this.data.incomingDamage = CombatSpellRules.calculateBaseDamage(spellData.data.combat.type, this.data.incomingDamage, this.data.against.force);
@@ -77,7 +77,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
      * A failure on a defense test is a HIT on the initial attack.
      */
     async processFailure() {
-        const spellData = this.item?.asSpellData();
+        const spellData = this.item?.asSpell();
         if (!spellData) return;
 
         this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(spellData.data.type, spellData.data.combat.type,
@@ -90,7 +90,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
      * Combat Spell Defense allows a resist test for the defending actor.
      */
     async afterFailure() {
-        const spellData = this.item?.asSpellData();
+        const spellData = this.item?.asSpell();
         if (!spellData) return;
 
         // Only allow a defense test for in

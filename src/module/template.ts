@@ -1,15 +1,16 @@
 import { SR5Item } from './item/SR5Item';
 
-
-export default // @ts-ignore
-class Template extends MeasuredTemplate {
+export default class Template extends MeasuredTemplate {
     x: number;
     y: number;
     item?: SR5Item;
     onComplete?: () => void;
 
     static fromItem(item: SR5Item, onComplete?: () => void): Template | undefined {
-        const templateShape = 'circle';
+        if (!canvas.scene) return;
+        
+        // Cast string to const for type const string union to match.
+        const templateShape = 'circle' as const;
 
         const templateData = {
             t: templateShape,
@@ -17,14 +18,15 @@ class Template extends MeasuredTemplate {
             direction: 0,
             x: 0,
             y: 0,
-            // @ts-ignore
             fillColor: game.user?.color,
         };
-        const blast = item.getBlastData();
-        templateData['distance'] = blast?.radius;
-        templateData['dropoff'] = blast?.dropoff;
 
-        // @ts-ignore
+        // Either use blast data or default values.
+        const blast = item.getBlastData();
+        // Not all items return blast data.
+        templateData['distance'] = blast?.radius || 1; // Adhere to DataModel validation.
+        templateData['dropoff'] = blast?.dropoff || 0;
+
         const document = new MeasuredTemplateDocument(templateData, {parent: canvas.scene});
         // @ts-ignore
         const template = new Template(document);
@@ -57,10 +59,12 @@ class Template extends MeasuredTemplate {
             if (!canvas.grid) return;
             let now = Date.now(); // Apply a 20ms throttle
             if (now - moveTime <= 20) return;
-            const center = event.data.getLocalPosition(this.layer);
-            const snapped = canvas.grid.getSnappedPosition(center.x, center.y, 2);
-            this.data.x = snapped.x;
-            this.data.y = snapped.y;
+            const mousePos = event.data.getLocalPosition(this.layer);
+            const snapped = canvas.grid.getSnappedPosition(mousePos.x, mousePos.y, 2);
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            this.document.updateSource({x: snapped.x, y: snapped.y})
+            // this.data.x = snapped.x;
+            // this.data.y = snapped.y;
             this.refresh();
             moveTime = now;
         };
@@ -81,16 +85,21 @@ class Template extends MeasuredTemplate {
 
         // Confirm the workflow (left-click)
         handlers['lc'] = (event) => {
+            // Trigger cancel to remove event listeners.
             handlers['rc'](event);
+            
             if (!canvas.grid) return;
 
-            // Confirm final snapped position
-            const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
-            this.data.update({x: destination.x, y: destination.y});
+            // Transform mouse position into grid position
+            const gridPos = canvas.grid.getSnappedPosition(this.x, this.y, 2);
+            
+            // Prepare measued template data.
+            const templateData = this.document.toObject();
+            templateData.x = gridPos.x;
+            templateData.y = gridPos.y;
 
-            // Create the template
-            // @ts-ignore
-            canvas.scene?.createEmbeddedDocuments('MeasuredTemplate', [this.data]);
+            // Create new document from that.
+            canvas.scene?.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
         };
 
         // Rotate the template by 3 degree increments (mouse-wheel)
@@ -101,8 +110,11 @@ class Template extends MeasuredTemplate {
 
             let delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
             let snap = event.shiftKey ? delta : 5;
-            this.data.direction += snap * Math.sign(event.deltaY);
-            // @ts-ignore
+
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            const direction = this.document.direction + snap * Math.sign(event.deltaY);
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            this.document.updateSource({direction})
             this.refresh();
         };
 

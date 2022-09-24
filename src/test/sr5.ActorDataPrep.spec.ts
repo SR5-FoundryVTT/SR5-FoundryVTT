@@ -49,7 +49,7 @@ export const shadowrunSR5ActorDataPrep = context => {
             it('Character monitor calculation', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
 
-                let data = actor.asCharacterData() as CharacterActorData;
+                let data = actor.asCharacter() as CharacterActorData;
 
                 // Check default values.
                 assert.strictEqual(data.data.track.stun.max, 9); // 8 + round_up(1 / 2)
@@ -70,7 +70,7 @@ export const shadowrunSR5ActorDataPrep = context => {
             it('Character initiative calculation', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
 
-                const data = actor.asCharacterData() as CharacterActorData;
+                const data = actor.asCharacter() as CharacterActorData;
 
                 // Check default values.
                 console.log('Meatspace Ini');
@@ -87,7 +87,7 @@ export const shadowrunSR5ActorDataPrep = context => {
             it('Character limit calculation', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
 
-                const data = actor.asCharacterData() as CharacterActorData;
+                const data = actor.asCharacter() as CharacterActorData;
 
                 assert.strictEqual(data.data.limits.physical.value, 2); // (STR*2 + BOD + REA) / 3
                 assert.strictEqual(data.data.limits.mental.value, 2);   // (LOG*2 + INT + WIL) / 3
@@ -112,7 +112,7 @@ export const shadowrunSR5ActorDataPrep = context => {
             it('Character movement calculation', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
 
-                const data = actor.asCharacterData() as CharacterActorData;
+                const data = actor.asCharacter() as CharacterActorData;
 
                 assert.strictEqual(data.data.movement.walk.value, 2); // AGI * 2
                 assert.strictEqual(data.data.movement.run.value, 4);  // AGI * 4
@@ -128,7 +128,7 @@ export const shadowrunSR5ActorDataPrep = context => {
             it('Character skill calculation', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
 
-                const data = actor.asCharacterData() as CharacterActorData;
+                const data = actor.asCharacter() as CharacterActorData;
 
                 await actor.update({
                     'data.skills.active.arcana.base': 6,
@@ -141,7 +141,7 @@ export const shadowrunSR5ActorDataPrep = context => {
 
             it('Character damage application', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
-                const data = actor.asCharacterData() as CharacterActorData;
+                const data = actor.asCharacter() as CharacterActorData;
 
                 assert.strictEqual(data.data.track.stun.value, 0);
                 assert.strictEqual(data.data.track.stun.wounds, 0);
@@ -165,7 +165,7 @@ export const shadowrunSR5ActorDataPrep = context => {
 
             it('Character damage application with high pain/wound tolerance', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
-                const data = actor.asCharacterData() as CharacterActorData;
+                const data = actor.asCharacter() as CharacterActorData;
 
                 await actor.update({
                     'data.track.stun.value': 6,
@@ -190,7 +190,7 @@ export const shadowrunSR5ActorDataPrep = context => {
 
             it('Spirit default/overrides by example type', async () => {
                 const actor = await testActor.create({type: 'spirit', 'data.spiritType': 'air'}) as SR5Actor;
-                const data = actor.asSpiritData() as SpiritActorData;
+                const data = actor.asSpirit() as SpiritActorData;
 
                 // Without adequate force there will be negative base values with minimum attribute values.
                 assert.strictEqual(data.data.attributes.body.base, -2);
@@ -227,7 +227,7 @@ export const shadowrunSR5ActorDataPrep = context => {
 
             it('Sprites default/override values by example type', async () => {
                 const actor = await testActor.create({type: 'sprite', 'data.spriteType': 'courier'}) as SR5Actor;
-                const data = actor.asSpriteData() as SpriteActorData;
+                const data = actor.asSprite() as SpriteActorData;
 
                 assert.strictEqual(data.data.matrix.sleaze.base, 3);
                 assert.strictEqual(data.data.matrix.data_processing.base, 1);

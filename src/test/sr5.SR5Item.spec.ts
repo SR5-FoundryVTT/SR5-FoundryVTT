@@ -45,7 +45,7 @@ export const shadowrunSR5Item = context => {
             const weapon = await testItem.create({type: 'weapon'}) as SR5Item;
             const ammo = await testItem.create({type: 'ammo'}) as SR5Item;
 
-            await weapon.createOwnedItem(ammo.data);
+            await weapon.createNestedItem(ammo.data);
 
             const embeddedItemDatas = weapon.getNestedItems();
             assert.isNotEmpty(embeddedItemDatas);
@@ -64,7 +64,7 @@ export const shadowrunSR5Item = context => {
             const ammo = await testItem.create({type: 'ammo'}) as SR5Item;
 
             // Embed the item and get
-            await weapon.createOwnedItem(ammo.data);
+            await weapon.createNestedItem(ammo.data);
             const embeddedItemDatas = weapon.getNestedItems();
             assert.lengthOf(embeddedItemDatas, 1);
             const embeddedAmmoData = embeddedItemDatas[0];

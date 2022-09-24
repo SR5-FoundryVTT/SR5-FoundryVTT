@@ -1,8 +1,4 @@
 import { VersionMigration } from './VersionMigration';
-import { LegacyMigration } from './versions/LegacyMigration';
-import { Version0_6_5 } from './versions/Version0_6_5';
-import { Version0_6_10 } from './versions/Version0_6_10';
-import {Version0_7_2} from "./versions/Version0_7_2";
 import {Version0_8_0} from "./versions/Version0_8_0";
 
 type VersionDefinition = {
@@ -12,12 +8,30 @@ type VersionDefinition = {
 export class Migrator {
     // Map of all version migrations to their target version numbers.
     private static readonly s_Versions: VersionDefinition[] = [
-        { versionNumber: LegacyMigration.TargetVersion, migration: new LegacyMigration() },
-        { versionNumber: Version0_6_5.TargetVersion, migration: new Version0_6_5() },
-        { versionNumber: Version0_6_10.TargetVersion, migration: new Version0_6_10() },
-        { versionNumber: Version0_7_2.TargetVersion, migration: new Version0_7_2() },
         { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
     ];
+
+    /**
+     * Check if the current world is empty of any migratable documents.
+     * 
+     */
+    public static get isEmptyWorld(): boolean {
+        return game.actors?.contents.length === 0 &&
+               game.items?.contents.length === 0 &&
+               game.scenes?.contents.length === 0 &&
+               Migrator.onlySystemPacks
+    }
+
+    public static get onlySystemPacks(): boolean {
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        return game.packs.contents.filter(pack => pack.metadata.packageType !== 'system' && pack.metadata.packageName !== 'shadowrun5e').length === 0;
+    }
+
+    public static async InitWorldForMigration() {
+        console.log('Shadowrun 5e | Initializing an empty world for future migrations');
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, game.system.version);
+    }
 
     public static async BeginMigration() {
         let currentVersion = game.settings.get(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION) as string;

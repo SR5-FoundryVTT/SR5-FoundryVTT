@@ -35,7 +35,7 @@
                     <i
                         title="{{localize 'SR5.ToggleEquip'}}"
                         class="mod-equip roll
-                             {{#if mod.data.technology.equipped}}
+                             {{#if mod.system.technology.equipped}}
                               fas fa-check-circle
                              {{else}}
                               far fa-circle
@@ -52,7 +52,7 @@
                     <input
                         class="display left"
                         type="text"
-                        value="{{localizeOb mod.data.mount_point ../config.mountPoints}}"
+                        value="{{localizeOb mod.system.mount_point ../config.mountPoints}}"
                         disabled
                     />
                 </div>
@@ -62,7 +62,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.dice_pool}}"
+                        value="{{mod.system.dice_pool}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -73,7 +73,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.accuracy}}"
+                        value="{{mod.system.accuracy}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -84,7 +84,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.rc}}"
+                        value="{{mod.system.rc}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -95,7 +95,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.technology.conceal.value}}"
+                        value="{{mod.system.technology.conceal.value}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -114,7 +114,7 @@
                     {{/each}}
                 </div>
                 <div class="description">
-                    {{{mod.data.description.value}}}
+                    {{{mod.system.description.value}}}
                 </div>
             </div>
         </div>

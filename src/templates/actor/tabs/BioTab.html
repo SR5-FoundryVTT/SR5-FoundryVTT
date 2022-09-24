@@ -7,8 +7,8 @@
                         itemId='biography'
                         icons=(ItemHeaderIcons 'biography')
                 }}
-                {{editor content=data.description.value target="data.description.value" button=true
-                         editable=true}}
+                {{editor biographyHTML target="system.description.value" button=true
+                         editable=true engine="prosemirror" collaborate=false}}
             </div>
             <div class="scroll-area">
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
@@ -26,7 +26,7 @@
                             rightSide=(ItemRightSide item)
                             hasDesc="true"
                             hasRoll="true"
-                            description=item.data.description.value
+                            description=item.description.value
                     }}
                 {{/each}}
             </div>

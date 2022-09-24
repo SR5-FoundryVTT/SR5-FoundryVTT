@@ -7,8 +7,8 @@
             {{localize "SR5.CritterPower.Type"}}
         </div>
         <div class="inputs">
-            <select name="data.powerType">
-                {{#select data.powerType}}
+            <select name="system.powerType">
+                {{#select system.powerType}}
                     {{#each config.critterPower.types as |name type|}}
                         <option value="{{type}}">{{localize name}}</option>
                     {{/each}} {{/select}}
@@ -20,8 +20,8 @@
             {{localize "SR5.CritterPower.Duration"}}
         </div>
         <div class="inputs">
-            <select name="data.duration">
-                {{#select data.duration}} {{#each config.critterPower.durations as |name type|}}
+            <select name="system.duration">
+                {{#select system.duration}} {{#each config.critterPower.durations as |name type|}}
                     <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
@@ -32,8 +32,8 @@
             {{localize "SR5.CritterPower.Range"}}
         </div>
         <div class="inputs">
-            <select name="data.range">
-                {{#select data.range}} {{#each config.critterPower.ranges as |name type|}}
+            <select name="system.range">
+                {{#select system.range}} {{#each config.critterPower.ranges as |name type|}}
                     <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>

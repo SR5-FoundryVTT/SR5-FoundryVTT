@@ -9,10 +9,10 @@
                     title=(localize 'SR5.WalkingSpeed')
                     size="2"
                     maxLength="2"
-                    value=data.movement.walk.value
+                    value=system.movement.walk.value
                     disabled="true"
             }}
-            {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=data.movement.run}}
+            {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=system.movement.run}}
         </div>
         <div class="track-slash"></div>
         <div class="attribute-input-container value">
@@ -21,10 +21,10 @@
                     title=(localize 'SR5.RunningSpeed')
                     size="2"
                     maxLength="2"
-                    value=data.movement.run.value
+                    value=system.movement.run.value
                     disabled="true"
             }}
-            {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=data.movement.run}}
+            {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=system.movement.run}}
         </div>
         <div class="track-slash"></div>
         <div class="input attribute-input-container">
@@ -33,8 +33,8 @@
                     title=(localize 'SR5.RunningSpeed')
                     size="2"
                     maxLength="2"
-                    value=data.movement.sprint
-                    name="data.movement.sprint"
+                    value=system.movement.sprint
+                    name="system.movement.sprint"
             }}
             <span class="unit"> + </span>
         </div>

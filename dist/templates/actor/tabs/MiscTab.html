@@ -16,7 +16,7 @@
                         </div>
                         <div class="item-right">
                             <div class="item-text input">
-                                <input class="display" type="text" name="data.nuyen" value="{{data.nuyen}}" data-dtype="Number" />
+                                <input class="display" type="text" name="system.nuyen" value="{{system.nuyen}}" data-dtype="Number" />
                                 <span class="unit">
                                 <i class="fas fa-yen-sign"></i>
                             </span>
@@ -31,7 +31,7 @@
                         </div>
                         <div class="item-right">
                             <div class="item-text">
-                                <input class="display" type="text" size="10" name="data.karma.value" value="{{data.karma.value}}" data-dtype="Number" />
+                                <input class="display" type="text" size="10" name="system.karma.value" value="{{system.karma.value}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
@@ -43,7 +43,7 @@
                         </div>
                         <div class="item-right">
                             <div class="item-text">
-                                <input class="display" type="text" size="10" name="data.karma.max" value="{{data.karma.max}}" data-dtype="Number" />
+                                <input class="display" type="text" size="10" name="system.karma.max" value="{{system.karma.max}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                         </div>
                         <div class="item-right">
                             <div class="item-text">
-                                <input class="display" type="text" size="10" name="data.notoriety" value="{{data.notoriety}}" data-dtype="Number" />
+                                <input class="display" type="text" size="10" name="system.notoriety" value="{{system.notoriety}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                         </div>
                         <div class="item-right">
                             <div class="item-text">
-                                <input class="display" type="text" size="10" name="data.public_awareness" value="{{data.public_awareness}}" data-dtype="Number" />
+                                <input class="display" type="text" size="10" name="system.public_awareness" value="{{system.public_awareness}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
@@ -79,7 +79,7 @@
                         </div>
                         <div class="item-right">
                             <div class="item-text">
-                                <input class="display" type="text" size="10" name="data.street_cred" value="{{data.street_cred}}" data-dtype="Number" />
+                                <input class="display" type="text" size="10" name="system.street_cred" value="{{system.street_cred}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
@@ -93,8 +93,8 @@
                     </div>
                     <div class="item-right">
                         <div class="item-text input">
-                            <select class="display" name="data.special">
-                                {{#select data.special}} {{#each config.specialTypes as |name type|}}
+                            <select class="display" name="system.special">
+                                {{#select system.special}} {{#each config.specialTypes as |name type|}}
                                     <option value="{{type}}">{{localize name}}</option>
                                 {{/each}} {{/select}}
                             </select>
@@ -111,8 +111,8 @@
                         </div>
                         <div class="item-right">
                             <div class="item-text input">
-                                <select name="data.magic.attribute" class="display">
-                                    {{#select data.magic.attribute}} {{#each config.attributes as |name type|}}
+                                <select name="system.magic.attribute" class="display">
+                                    {{#select system.magic.attribute}} {{#each config.attributes as |name type|}}
                                         <option value="{{type}}">{{localize name}}</option>
                                     {{/each}} {{/select}}
                                 </select>
@@ -129,8 +129,8 @@
                     </div>
                     <div class="item-right">
                         <div class="item-text input">
-                            <select name="data.full_defense_attribute" class="display">
-                                {{#select data.full_defense_attribute}} {{#each config.attributes as |name type|}}
+                            <select name="system.full_defense_attribute" class="display">
+                                {{#select system.full_defense_attribute}} {{#each config.attributes as |name type|}}
                                     <option value="{{type}}">{{localize name}}</option>
                                 {{/each}} {{/select}}
                             </select>
@@ -147,7 +147,7 @@
                     </div>
                     <div class="item-right">
                         <div class="item-text input">
-                            <input type="checkbox" class="checkbox" name="data.is_critter" {{checked data.is_critter}}/>
+                            <input type="checkbox" class="checkbox" name="system.is_critter" {{checked system.is_critter}}/>
                         </div>
                     </div>
                 </div>
@@ -159,11 +159,11 @@
                     </div>
                     <div class="item-right">
                         <div class="item-text input">
-                            <input type="checkbox" class="checkbox" name="data.is_npc" {{checked data.is_npc}}/>
+                            <input type="checkbox" class="checkbox" name="system.is_npc" {{checked system.is_npc}}/>
                         </div>
                     </div>
                 </div>
-                {{#if data.is_npc }}
+                {{#if system.is_npc }}
                 <div class="list-item">
                     <div class="item-left">
                         <div class="item-text item-name">
@@ -173,7 +173,7 @@
                     <div class="item-right">
                         <div class="item-text input">
                             <div class="item-text input">
-                            <input type="checkbox" class="checkbox" name="data.npc.is_grunt" {{checked data.npc.is_grunt}}/>
+                            <input type="checkbox" class="checkbox" name="system.npc.is_grunt" {{checked system.npc.is_grunt}}/>
                         </div>
                         </div>
                     </div>
@@ -187,8 +187,8 @@
                     </div>
                     <div class="item-right">
                         <div class="item-text input">
-                            <select name="data.metatype" class="display">
-                                {{#select data.metatype}} {{#each config.character.types as |name type|}}
+                            <select name="system.metatype" class="display">
+                                {{#select system.metatype}} {{#each config.character.types as |name type|}}
                                     <option value="{{type}}">{{localize name}}</option>
                                 {{/each}} {{/select}}
                             </select>
@@ -218,7 +218,7 @@
                     </div>
                 </div>
                 <div class="scroll-area mods">
-                    {{#each data.modifiers as |value id|}} {{#ifne id 'wound'}}
+                    {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
                         <div class="list-item">
                             <div class="item-left">
                                 <div class="item-text item-name">
@@ -232,7 +232,7 @@
                                             size="4"
                                             maxlength="3"
                                             type="text"
-                                            name="data.modifiers.{{id}}"
+                                            name="system.modifiers.{{id}}"
                                             value="{{value}}"
                                             placeholder="None"
                                             data-dtype="Number"

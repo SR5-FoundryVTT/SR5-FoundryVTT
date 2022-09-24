@@ -109,7 +109,7 @@ export class NetworkDeviceFlow {
     private static async _handleAddDeviceToNetwork(controller: SR5Item, device: SR5Item): Promise<any> {
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller) && !NetworkDeviceFlow._currentUserCanModifyDevice(device)) return console.error(`User isn't owner or GM of this device`, controller);
 
-        const controllerData = controller.asDeviceData() || controller.asHostData();
+        const controllerData = controller.asDevice() || controller.asHostData();
         if (!controllerData) return console.error(`Device isn't capable of accepting network devices`, controller);
         const technologyData = device.getTechnologyData();
         if (!technologyData) return console.error(`'Device can't be added to a network`);
@@ -151,7 +151,7 @@ export class NetworkDeviceFlow {
      */
     static async removeDeviceLinkFromNetwork(controller: SR5Item, deviceLink: string) {
         console.log(`Shadowrun 5e | Removing device with uuid ${deviceLink} from network`);
-        const controllerData = controller.asControllerData();
+        const controllerData = controller.asController();
         const device = NetworkDeviceFlow.resolveLink(deviceLink);
 
         // Remove an existing item from the network.
@@ -221,7 +221,7 @@ export class NetworkDeviceFlow {
         if (!controller) return;
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller)) return;
 
-        const controllerData = controller.asControllerData();
+        const controllerData = controller.asController();
         if (!controllerData) return;
 
         // Remove device from it's controller.
@@ -232,7 +232,7 @@ export class NetworkDeviceFlow {
 
     private static async _removeControllerFromAllDevices(controller: SR5Item) {
         if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
-        const controllerData = controller.asControllerData();
+        const controllerData = controller.asController();
         if (!controllerData) return;
 
         const networkDevices = controllerData.data.networkDevices;
@@ -255,7 +255,7 @@ export class NetworkDeviceFlow {
      */
     static getNetworkDevices(controller: SR5Item): SR5Item[] {
         const devices: SR5Item[] = [];
-        const controllerData = controller.asControllerData();
+        const controllerData = controller.asController();
         if (!controllerData) return devices;
 
         controllerData.data.networkDevices.forEach(link => {
