@@ -198,7 +198,14 @@ ___________________
             followedTests: {
                 DrainTest,
                 FadeTest
-            }
+            },
+
+            /**
+             * Amount of delay used on user filter inputs.
+             * This came out of an unclear user issue regarding multi-char UTF symbol inputs, to allow
+             * 'interactive' changing of the delay on the user side until a sweetspot could be found.
+             */
+            inputDelay: 300
         };
 
         // Register document classes
