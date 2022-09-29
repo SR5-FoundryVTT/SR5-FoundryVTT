@@ -283,60 +283,29 @@ export class SR5ItemSheet extends ItemSheet {
                 item = await Helpers.getEntityFromCollection(data.pack, data.id);
             // Case 3 - From a World Entity
             } else {
-                item = game.items.get(data.id);
+                item = await fromUuid(data.uuid);
             }
+
+            // Provide readable error for failing item retrieval assumptions.
+            if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
 
             return await this.item.createNestedItem(item._source);
         }
 
         // Add items to hosts WAN.
         if (this.item.isHost() && data.type === 'Actor') {
-            return await this.item.addIC(data.id, data.pack);
+            const actor = await fromUuid(data.uuid);
+            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+            return await this.item.addIC(actor.id , data.pack);
         }
 
         // Add items to a network (PAN/WAN).
         if (this.item.canBeNetworkController && data.type === 'Item') {
-            if (data.actorId && !data.sceneId && !data.tokenId) {
-                console.log('Shadowrun 5e | Dropped an item from a collection actor');
-                const actor = game.actors.get(data.actorId);
-                if (!actor) return;
-                const item = actor.items.get(data.data._id);
-                if (!item) return;
+            const item = await fromUuid(data.uuid) as SR5Item;
 
-                return await this.item.addNetworkDevice(item);
-            }
-
-            if (data.actorId && data.sceneId && data.tokenId) {
-                console.log('Shadowrun 5e | Dropped in an item from a scene token actor');
-                const scene = game.scenes.get(data.sceneId);
-                if (!scene) return;
-                const token = scene.tokens.get(data.tokenId);
-                if (!token) return;
-                const actor = token.actor;
-                if (!actor) return;
-                const item  = actor.items.get(data.data._id);
-                if (!item) return;
-
-                return await this.item.addNetworkDevice(item);
-            }
-            //
-            // else if (data.actorId && data.sceneId && data.tokenId) {
-            //     console.log('Shadowrun 5e | Adding unlinked token actors item to the network', data);
-            //     const scene = game.scenes.get(data.sceneId);
-            //     if (!scene) return;
-            //     const token = scene.tokens.get(data.tokenId);
-            //     if (!token || !token.actor) return;
-            //     const item = token.actor.items.get(data.data._id) as SR5Item;
-            //
-            //     await this.item.addNetworkDevice(item);
-            // }
-            //
-            // // TODO: Collection item
-            // else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
-            //     console.log('Shadowrun 5e | Adding collection item without actor to the network', data);
-            // }
-
-            return;
+            if (!item || !item.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
+            
+            return await this.item.addNetworkDevice(item);
         }
     }
 
