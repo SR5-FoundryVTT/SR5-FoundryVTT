@@ -3,7 +3,7 @@
 ## General development
 The main development workflow uses a build system using npm and gulp with Github pull requests required for changes made. None of this is required for issues, content or translations described above! This process can be involved and should a step fail with errors please search the web first.
 
-Shadowrun5e uses Typescript, npm with gulp and git. Follow these installation manuals: 
+Shadowrun5e uses Typescript (with esbuild), npm with gulp and git. Follow these installation manuals: 
 * [https://www.npmjs.com/get-npm](https://www.npmjs.com/get-npm)
 * [https://github.com/git-guides/install-git#:~:text=To%20install%20Git%2C%20navigate%20to,installation%20by%20typing%3A%20git%20version%20.](https://github.com/git-guides/install-git#:~:text=To%20install%20Git%2C%20navigate%20to,installation%20by%20typing%3A%20git%20version%20.)
 
@@ -21,6 +21,13 @@ There are multiple gulp tasks available to help development:
 * link => See section below
 
 In general the application within FoundryVTT will use what's the build process puts into _dist/_, while most else isn't needed to function but only to provide sources.
+
+## Branches and Pull Requests
+We'll gladly accept pull requests for all things moving the system forward. :)
+
+The system branch workflow is simple:
+`master` is the main and stable branch that is *save* to pull from and is meant to adress your pull requests into. It's setup with an GitHub action performing a TypeScript build dry run; this action has to succeed for any pull request to be considered.
+`release/**` is the active branch for upcoming releases. It's temporary and will be removed once merged into `master`. If you're actively working on changes for that release, you cann pull from it and adress your pull request into it. It's setup using the same GitHub action as `master`. You should only pull from this branch, if you need commits in it's history. Otherwise use `master`.
 
 ## Unittesting
 There is unit testing support using the FVTT Quench module. It's encouraged to do some unit testing where possible but it's not mandatory. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules. 
