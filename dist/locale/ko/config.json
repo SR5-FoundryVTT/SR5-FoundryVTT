@@ -894,7 +894,7 @@
     "CantExtendTest": "해당 종류의 테스트에서는 연장 불가",
     "CantSecondChanceWithoutNoneHits": "해당 테스트에서는 두 번째 기회가 없음. 성공한 주사위만 남음.",
     "CantSecondChanceAGlitch": "해당 테스트에서는 두 번째 기회가 없음. 테스트 결과는 글리치 발생.",
-    "CantConsumeEquippedAmmo": "E장착된 탄약의 개수가 충분하지 않음",
+    "CantConsumeEquippedAmmo": "장착된 탄약의 개수가 충분하지 않음",
     "NoFireModeConfigured": "원거리 무기에 사격 방식 설정이 없음. 단발로 사용됨."
   },
   "SR5.Errors": {
