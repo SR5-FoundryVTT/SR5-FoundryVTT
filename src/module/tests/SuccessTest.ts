@@ -1234,7 +1234,10 @@ export class SuccessTest {
         const content = await renderTemplate(this._chatMessageTemplate, templateData);
         // Prepare the actual message.
         const messageData = this._prepareMessageData(content);
-        const message = await ChatMessage.create(messageData);
+        const options = {rollMode: this._rollMode};
+
+        //@ts-ignore // TODO: foundry-vtt-types v10
+        const message = await ChatMessage.create(messageData, options);
 
         if (!message) return;
 
@@ -1359,6 +1362,13 @@ export class SuccessTest {
     }
 
     /**
+     * What ChatMessage rollMode is this test supposed to use?
+     */
+    get _rollMode(): string {
+        return this.data.options?.rollMode as string ?? game.settings.get('core', 'rollmode');
+    }
+
+    /**
      * Prepare chat message data for this success test card.
      *
      * @param content Pre rendered template content.
@@ -1379,6 +1389,8 @@ export class SuccessTest {
         
         const messageData = {
             user: game.user?.id,
+            // Use type roll, for Foundry built in content visibility.
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             speaker: {
                 actor,
                 alias,
@@ -1397,7 +1409,7 @@ export class SuccessTest {
 
         // Instead of manually applying whisper ids, let Foundry do it.
         // @ts-ignore TODO: Types Provide propper SuccessTestData and SuccessTestOptions
-        ChatMessage.applyRollMode(messageData, this.data.options?.rollMode ?? game.settings.get('core', 'rollmode'));
+        ChatMessage.applyRollMode(messageData, this._rollMode);
 
         return messageData;
     }

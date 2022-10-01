@@ -1045,22 +1045,21 @@ export class SR5Item extends Item {
     }
 
     async openPdfSource() {
-        // Check for PDFoundry module hook: https://github.com/Djphoenix719/PDFoundry
-        if (!ui['PDFoundry']) {
-            ui.notifications?.warn(game.i18n.localize('SR5.DIALOG.MissingModuleContent'));
+        // Check for pdfpager module hook: https://github.com/farling42/fvtt-pdf-pager
+        if (!ui['pdfpager']) {
+            ui.notifications?.warn('SR5.DIALOG.MissingModuleContent', {localize: true});
             return;
         }
 
         const source = this.getBookSource();
         if (source === '') {
-            // @ts-ignore
-            ui.notifications?.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
+            ui.notifications?.error('SR5.SourceFieldEmptyError', {localize: true});
         }
-        // parse however you need, all "buttons" will lead to this function
+
         const [code, page] = source.split(' ');
 
         //@ts-ignore
-        ui.PDFoundry.openPDFByCode(code, { page: parseInt(page) });
+        ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
     }
 
     _canDealDamage(): boolean {

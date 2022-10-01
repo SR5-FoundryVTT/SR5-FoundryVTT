@@ -1,3 +1,4 @@
+import { CombatantData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import {SR5Actor} from "../actor/SR5Actor";
 import {FLAGS, SR, SYSTEM_NAME} from "../constants";
 import {CombatRules} from "../rules/CombatRules";
@@ -110,14 +111,19 @@ export class SR5Combat extends Combat {
         // Start at the top!
         const turn = 0;
 
+        // Collect all combatants ini changes for singular update.
+        const combatantsData: {_id: string|null, initiative: number}[] = [];
         for (const combatant of combat.combatants) {
             const initiative = CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
-            // @ts-ignore
-            await combatant.update({initiative});
+            
+            combatantsData.push({
+                _id: combatant.id,
+                initiative
+            });
         }
 
         await SR5Combat.setInitiativePass(combat, initiativePass);
-        await combat.update({turn});
+        await combat.update({turn, combatants: combatantsData});
         return;
     }
 

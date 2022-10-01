@@ -646,7 +646,7 @@
   "SR5.MIGRATION.SuccessNotification": "섀도우런 시스템이 성공적으로 버전으로 마이그레이션 되었습니다.",
   "CONTROLS.SR5.OverwatchScoreTracker": "감시 점수 추적기",
   "CONTROLS.SR5.EnvironmentalModifiers": "환경 수정치",
-  "SR5.DIALOG.MissingModuleContent": "출처 PDF를 표시하기 위해서는 PDFoundry 모듈을 반드시 설치하고, 코드에 일치하는 PDF를 만들어야 합니다.",
+  "SR5.DIALOG.MissingModuleContent": "출처 PDF를 표시하기 위해서는 pdfpager 모듈을 반드시 설치하고, 코드에 일치하는 PDF를 만들어야 합니다.",
   "SR5.Labels": {
     "Sheet": {
       "AddOne": "추가",

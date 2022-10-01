@@ -198,7 +198,14 @@ ___________________
             followedTests: {
                 DrainTest,
                 FadeTest
-            }
+            },
+
+            /**
+             * Amount of delay used on user filter inputs.
+             * This came out of an unclear user issue regarding multi-char UTF symbol inputs, to allow
+             * 'interactive' changing of the delay on the user side until a sweetspot could be found.
+             */
+            inputDelay: 300
         };
 
         // Register document classes
@@ -384,8 +391,8 @@ ___________________
                 // All sidebar actors should also include tokens with linked actors.
                 ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
                 // All token actors that aren't linked.
-                // @ts-ignore
-                ...canvas.scene.tokens.filter(token => !token.data.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
+                // @ts-ignore // TODO: foundry-vtt-types v10
+                ...canvas.scene.tokens.filter(token => !token.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
             ];
 
             // Update host data on the ic actor.

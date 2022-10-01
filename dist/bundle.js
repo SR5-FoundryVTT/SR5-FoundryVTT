@@ -12423,7 +12423,7 @@ var MatrixRules = class {
     return Math.max(marks, MatrixRules.minMarksCount());
   }
   static hostMatrixAttributeRatings(hostRating) {
-    return [1, 2, 3, 4].map((rating) => rating + hostRating);
+    return [0, 1, 2, 3].map((rating) => rating + hostRating);
   }
 };
 
@@ -12706,7 +12706,7 @@ var TestDialog = class extends FormDialog {
       if (value === null || value === "")
         delete valueField.override;
       else
-        valueField.override = { name: "SR5.ManualOverride", value };
+        valueField.override = { name: "SR5.ManualOverride", value: Number(value) };
     });
     foundry.utils.mergeObject(this.data, data);
     this.data.test.prepareBaseValues();
@@ -13454,7 +13454,8 @@ var SuccessTest = class {
       const templateData = this._prepareMessageTemplateData();
       const content = yield renderTemplate(this._chatMessageTemplate, templateData);
       const messageData = this._prepareMessageData(content);
-      const message = yield ChatMessage.create(messageData);
+      const options = { rollMode: this._rollMode };
+      const message = yield ChatMessage.create(messageData, options);
       if (!message)
         return;
       this.data.messageUuid = message.uuid;
@@ -13525,8 +13526,12 @@ var SuccessTest = class {
     }
     return actions;
   }
+  get _rollMode() {
+    var _a, _b;
+    return (_b = (_a = this.data.options) == null ? void 0 : _a.rollMode) != null ? _b : game.settings.get("core", "rollmode");
+  }
   _prepareMessageData(content) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d;
     const linkedTokens = ((_a = this.actor) == null ? void 0 : _a.getActiveTokens(true)) || [];
     const token = linkedTokens.length === 1 ? linkedTokens[0].id : void 0;
     const actor = (_b = this.actor) == null ? void 0 : _b.id;
@@ -13536,6 +13541,7 @@ var SuccessTest = class {
     roll.evaluate({ async: false });
     const messageData = {
       user: (_d = game.user) == null ? void 0 : _d.id,
+      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
       speaker: {
         actor,
         alias,
@@ -13549,7 +13555,7 @@ var SuccessTest = class {
       },
       sound: CONFIG.sounds.dice
     };
-    ChatMessage.applyRollMode(messageData, (_f = (_e = this.data.options) == null ? void 0 : _e.rollMode) != null ? _f : game.settings.get("core", "rollmode"));
+    ChatMessage.applyRollMode(messageData, this._rollMode);
     return messageData;
   }
   static chatMessageListeners(message, html, data) {
@@ -15384,16 +15390,16 @@ var _SR5Item = class extends Item {
   openPdfSource() {
     return __async(this, null, function* () {
       var _a, _b;
-      if (!ui["PDFoundry"]) {
-        (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.DIALOG.MissingModuleContent"));
+      if (!ui["pdfpager"]) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.DIALOG.MissingModuleContent", { localize: true });
         return;
       }
       const source = this.getBookSource();
       if (source === "") {
-        (_b = ui.notifications) == null ? void 0 : _b.error(game.i18n.localize("SR5.SourceFieldEmptyError"));
+        (_b = ui.notifications) == null ? void 0 : _b.error("SR5.SourceFieldEmptyError", { localize: true });
       }
       const [code, page] = source.split(" ");
-      ui.PDFoundry.openPDFByCode(code, { page: parseInt(page) });
+      ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
     });
   }
   _canDealDamage() {
@@ -19566,41 +19572,23 @@ var SR5ItemSheet = class extends ItemSheet {
         } else if (data.pack) {
           item = yield Helpers.getEntityFromCollection(data.pack, data.id);
         } else {
-          item = game.items.get(data.id);
+          item = yield fromUuid(data.uuid);
         }
+        if (!item)
+          return console.error("Shadowrun 5e | Item could not be created from DropData", data);
         return yield this.item.createNestedItem(item._source);
       }
       if (this.item.isHost() && data.type === "Actor") {
-        return yield this.item.addIC(data.id, data.pack);
+        const actor = yield fromUuid(data.uuid);
+        if (!actor || !actor.id)
+          return console.error("Shadowrun 5e | Actor could not be retrieved from DropData", data);
+        return yield this.item.addIC(actor.id, data.pack);
       }
       if (this.item.canBeNetworkController && data.type === "Item") {
-        if (data.actorId && !data.sceneId && !data.tokenId) {
-          console.log("Shadowrun 5e | Dropped an item from a collection actor");
-          const actor = game.actors.get(data.actorId);
-          if (!actor)
-            return;
-          const item = actor.items.get(data.data._id);
-          if (!item)
-            return;
-          return yield this.item.addNetworkDevice(item);
-        }
-        if (data.actorId && data.sceneId && data.tokenId) {
-          console.log("Shadowrun 5e | Dropped in an item from a scene token actor");
-          const scene = game.scenes.get(data.sceneId);
-          if (!scene)
-            return;
-          const token = scene.tokens.get(data.tokenId);
-          if (!token)
-            return;
-          const actor = token.actor;
-          if (!actor)
-            return;
-          const item = actor.items.get(data.data._id);
-          if (!item)
-            return;
-          return yield this.item.addNetworkDevice(item);
-        }
-        return;
+        const item = yield fromUuid(data.uuid);
+        if (!item || !item.id)
+          return console.error("Shadowrun 5e | Item could not be retrieved from DropData", data);
+        return yield this.item.addNetworkDevice(item);
       }
     });
   }
@@ -20138,12 +20126,16 @@ var SR5Combat = class extends Combat {
         return;
       const initiativePass = combat.initiativePass + 1;
       const turn = 0;
+      const combatantsData = [];
       for (const combatant of combat.combatants) {
         const initiative = CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
-        yield combatant.update({ initiative });
+        combatantsData.push({
+          _id: combatant.id,
+          initiative
+        });
       }
       yield SR5Combat.setInitiativePass(combat, initiativePass);
-      yield combat.update({ turn });
+      yield combat.update({ turn, combatants: combatantsData });
       return;
     });
   }
@@ -24844,6 +24836,9 @@ var SR5BaseActorSheet = class extends ActorSheet {
       skills: "",
       showUntrainedSkills: true
     };
+    this._delays = {
+      skills: null
+    };
     this.selectedInventory = this.document.defaultInventory.name;
   }
   getHandledItemTypes() {
@@ -25534,8 +25529,12 @@ var SR5BaseActorSheet = class extends ActorSheet {
   }
   _onFilterSkills(event) {
     return __async(this, null, function* () {
-      this._filters.skills = event.currentTarget.value;
-      yield this.render();
+      if (this._delays.skills)
+        clearTimeout(this._delays.skills);
+      this._delays.skills = setTimeout(() => {
+        this._filters.skills = event.currentTarget.value;
+        this.render();
+      }, game.shadowrun5e.inputDelay);
     });
   }
   _onRollSkill(event) {
@@ -27545,7 +27544,8 @@ ___________________
       followedTests: {
         DrainTest,
         FadeTest
-      }
+      },
+      inputDelay: 300
     };
     CONFIG.Actor.documentClass = SR5Actor;
     CONFIG.Item.documentClass = SR5Item;
@@ -27678,7 +27678,7 @@ ___________________
           ...game.actors.filter((actor) => actor.isIC() && actor.hasHost()),
           ...canvas.scene.tokens.filter((token) => {
             var _a, _b;
-            return !token.data.actorLink && ((_a = token.actor) == null ? void 0 : _a.isIC()) && ((_b = token.actor) == null ? void 0 : _b.hasHost());
+            return !token.actorLink && ((_a = token.actor) == null ? void 0 : _a.isIC()) && ((_b = token.actor) == null ? void 0 : _b.hasHost());
           }).map((t) => t.actor)
         ];
         const hostData = item.asHostData();

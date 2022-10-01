@@ -67,6 +67,10 @@ const sortyByQuality = (a: any, b: any) => {
     return a.name < b.name ? -1 : 1;
 }
 
+export interface SR5BaseSheetDelays {
+    skills: ReturnType<typeof setTimeout>|null;
+}
+
 
 
 /**
@@ -81,6 +85,10 @@ export class SR5BaseActorSheet extends ActorSheet {
             skills: '', // filter based on user input and skill name/label.
             showUntrainedSkills: true, // filter based on pool size.
         };
+    // Used together with _filters to delay textinput
+    _delays: SR5BaseSheetDelays = {
+        skills: null
+    }
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
     _scroll: string;
     // Store the currently selected inventory.
@@ -1093,10 +1101,22 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.render();
     }
 
-    /** Setup skill name filter within getData */
+    /** 
+     * Parameterize skill filtering within getData and implement a general delay around it.
+     * 
+     * NOTE: Be aware of UTF-8/16 multi character input languages, using mulitple separate input symbol to form a single alphabet character.
+     * NOTE: This is ONLY necessary as shadowrun5e filters through the render -> getData -> template chain instead of 
+     *       hiding HTML elements based on their text.
+     */
     async _onFilterSkills(event) {
-        this._filters.skills = event.currentTarget.value;
-        await this.render();
+        if (this._delays.skills) 
+            clearTimeout(this._delays.skills);
+        
+        this._delays.skills = setTimeout(() => {
+            this._filters.skills = event.currentTarget.value;
+            this.render();
+            //@ts-ignore TODO: foundry-vtt-types v10. Add to typing.
+        }, game.shadowrun5e.inputDelay);
     }
 
     async _onRollSkill(event) {
