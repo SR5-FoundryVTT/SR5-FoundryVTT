@@ -99,7 +99,7 @@ export class Helpers {
         return value;
     }
 
-    static listItemId(event) {
+    static listItemId(event): string {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
