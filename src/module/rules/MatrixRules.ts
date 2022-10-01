@@ -75,6 +75,6 @@ export class MatrixRules {
      * @param hostRating
      */
     static hostMatrixAttributeRatings(hostRating): number[] {
-        return [1, 2, 3, 4].map(rating => rating + hostRating);
+        return [0, 1, 2, 3].map(rating => rating + hostRating);
     }
 }
