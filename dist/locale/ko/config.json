@@ -454,6 +454,7 @@
   "SR5.WeaponModeBurstFireShort": "점사",
   "SR5.WeaponModeBurstFireLong": "지속 점사",
   "SR5.WeaponModeFullAutoShort": "자동사격",
+	"SR5.WeaponModeFullAutoLong": "지속 자동사격",
   "SR5.Total": "총",
   "SR5.PlaceTemplate": "템플릿 놓기",
   "SR5.Defaulting": "무리",
@@ -803,7 +804,7 @@
     "Stealth": "은신",
     "Maneuvering": "기동",
     "Driver": "운전사",
-    "MissingDriver": "플레이어를 운전사로 끌어서 놓기",
+    "MissingDriver": "운전자로 할 플레이어 끌어서 놓기",
     "Stats": {
       "Handling": "조작력",
       "OffRoadHandling": "조작력 (오프로드)",
@@ -877,7 +878,8 @@
     "ApplyUnmodifiedDamage": "보정치 제외 피해 적용"
   },
   "SR5.Infos": {
-    "CantModifyHostContent": "IC 액터 내에서 호스트 데이터를 변경할 수 없습니다."
+    "CantModifyHostContent": "IC 액터 내에서 호스트 데이터를 변경할 수 없습니다.",
+    "ConsumedEquippedAmmo": "장착된 탄약에서 탄약 소비"
   },
   "SR5.Warnings": {
     "NegativeLimitValue": "한계치는 반드시 0보다 높아야 함",
@@ -891,10 +893,12 @@
     "CantExtendTestFurther": "주사위가 남거나 성공 값을 넘겨서 테스트를 연장할 수 없음",
     "CantExtendTest": "해당 종류의 테스트에서는 연장 불가",
     "CantSecondChanceWithoutNoneHits": "해당 테스트에서는 두 번째 기회가 없음. 성공한 주사위만 남음.",
-    "CantSecondChanceAGlitch": "해당 테스트에서는 두 번째 기회가 없음. 테스트 결과는 글리치 발생."
+    "CantSecondChanceAGlitch": "해당 테스트에서는 두 번째 기회가 없음. 테스트 결과는 글리치 발생.",
+    "CantConsumeEquippedAmmo": "E장착된 탄약의 개수가 충분하지 않음",
+    "NoFireModeConfigured": "원거리 무기에 사격 방식 설정이 없음. 단발로 사용됨."
   },
   "SR5.Errors": {
-    "MissingSkill": "액터에게 필요한 기술이 없습니다.",
+    "MissingSkill": "액터가 요구되는 기술을 가지고 있지 않습니다.",
     "SkillWithoutAttribute": "이 기술은 특성치 설정이 없습니다.",
     "MarkCouldNotBePlaced": "내부 오류: 당신의 마커는 배치될 수 없습니다.",
     "MarksCantBePlacedBy": "활성화된 액터는 마커를 배치할 수 없습니다.",
@@ -988,6 +992,7 @@
     "OpposedTest": "경쟁 테스트",
     "ExtendedTest": "연장 테스트",
     "PhysicalDefenseTest": "물리 방어",
+		"SupressionDefenseTest": "제압사격 방어",
     "RangedAttackTest": "원거리 무기 공격",
     "MeleeAttackTest": "근접 무기 공격",
     "ThrownAttackTest": "투척 무기 공격",
@@ -1007,6 +1012,7 @@
   "SR5.MissingRessource": {
     "Edge": "소비 할 수 있는 엣지가 없음",
     "Ammo": "사격을 위한 탄약이 충분하지 않음",
-    "SomeAmmo": "선택된 사격 방식으로 사격하기에 탄약이 충분하지 않음, 사격 방식 수정치가 감소됨"
+    "SomeAmmo": "선택된 사격 방식으로 사격하기에 탄약이 충분하지 않음, 사격 방식 수정치가 감소됨",
+		"Initiative": "우선권 점수가 충분하지 않음"
   }
 }
