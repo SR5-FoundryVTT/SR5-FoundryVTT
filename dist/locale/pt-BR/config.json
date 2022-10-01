@@ -522,7 +522,7 @@
   "SR5.MIGRATION.SuccessConfirm": "Fechar",
   "SR5.MIGRATION.SuccessNotification": "Shadowrun system successfully migrated to version",
   "CONTROLS.SR5.OverwatchScoreTracker": "Monitor de Valor de Vigilancia",
-  "SR5.DIALOG.MissingModuleContent": "Para mostrar os PDFs de fonte, o modulo PDFoundry deve estar instalado e um PDF correspondente ao codigo criado.",
+  "SR5.DIALOG.MissingModuleContent": "Para mostrar os PDFs de fonte, o modulo pdfpager deve estar instalado e um PDF correspondente ao codigo criado.",
   "SR5.Labels": {
     "ActorSheet": {
       "SpiritConfiguration": "Configuracao Espirito",

@@ -616,7 +616,7 @@
     "CONTROLS.SR5.OverwatchScoreTracker": "Suivi du Score de Surveillace",
     "CONTROLS.SR5.EnvironmentalModifiers": "Modificateurs environnementals",
 
-    "SR5.DIALOG.MissingModuleContent": "Pour que les PDFs soient affichés, le module 'PDFoundry' doit être installé et un PDF doit être lié à la fiche",
+    "SR5.DIALOG.MissingModuleContent": "Pour que les PDFs soient affichés, le module 'pdfpager' doit être installé et un PDF doit être lié à la fiche",
 
     "SR5.Labels": {
         "ActorSheet": {
