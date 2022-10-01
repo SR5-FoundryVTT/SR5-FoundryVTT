@@ -391,8 +391,8 @@ ___________________
                 // All sidebar actors should also include tokens with linked actors.
                 ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
                 // All token actors that aren't linked.
-                // @ts-ignore
-                ...canvas.scene.tokens.filter(token => !token.data.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
+                // @ts-ignore // TODO: foundry-vtt-types v10
+                ...canvas.scene.tokens.filter(token => !token.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
             ];
 
             // Update host data on the ic actor.
