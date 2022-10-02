@@ -327,6 +327,9 @@ export const SR5 = {
         HIDE_DIALOG: 'shiftKey',
     },
 
+    /**
+     * Labels for ALL actor types actor based local modifiers.
+     */
     actorModifiers: {
         soak: 'SR5.RollSoak',
         drain: 'SR5.Drain',
@@ -336,6 +339,7 @@ export const SR5 = {
         mental_limit: 'SR5.MentalLimit',
         stun_track: 'SR5.StunTrack',
         physical_track: 'SR5.PhysicalTrack',
+        physical_overflow_track: 'SR5.PhysicalOverflowTrack',
         meat_initiative: 'SR5.MeatSpaceInit',
         meat_initiative_dice: 'SR5.MeatSpaceDice',
         astral_initiative: 'SR5.AstralInit',
