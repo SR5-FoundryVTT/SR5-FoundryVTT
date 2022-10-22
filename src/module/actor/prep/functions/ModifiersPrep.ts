@@ -9,6 +9,9 @@ import VehicleData = Shadowrun.VehicleData;
 export class ModifiersPrep {
     /**
      * Prepare the modifiers that are displayed in the Misc. tab
+     * 
+     * NOTE: Currently these aren't controlled by the Foundry template. But ONLY here.
+     *       Therefore adding a modifier to an actor DataModel happens here and during Actor#prepareData
      */
     static prepareModifiers(system: ActorTypesData) {
         let modifiers = ModifiersPrep.commonModifiers;
@@ -30,6 +33,7 @@ export class ModifiersPrep {
             'mental_limit',
             'stun_track',
             'physical_track',
+            'physical_overflow_track',
             'meat_initiative',
             'meat_initiative_dice',
             'astral_initiative',

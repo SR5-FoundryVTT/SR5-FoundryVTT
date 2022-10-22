@@ -1234,7 +1234,8 @@
                     "cold": 0,
                     "fire": 0,
                     "electricity": 0,
-                    "radiation": 0
+                    "radiation": 0,
+                    "temp": 0
                 }
             },
             "matrix": {

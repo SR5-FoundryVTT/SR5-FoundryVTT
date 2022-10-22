@@ -1121,13 +1121,18 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onRollSkill(event) {
         event.preventDefault();
-        const skillId = Helpers.listItemId(event);
+        const itemId = Helpers.listItemId(event);
+        // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
+        const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
+        if (!skillId) return console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`);
         return this.actor.rollSkill(skillId, {event});
     }
 
     async _onRollSkillSpec(event) {
         event.preventDefault();
-        const skillId = Helpers.listItemId(event);
+        const itemId = Helpers.listItemId(event);
+        // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
+        const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
         return this.actor.rollSkill(skillId, {event, specialization: true});
     }
 

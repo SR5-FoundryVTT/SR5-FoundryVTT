@@ -4,8 +4,8 @@ import {MeleeRules} from "../rules/MeleeRules";
 import {MeleeAttackData} from "./MeleeAttackTest";
 import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
-import {DefaultValues} from "../data/DataDefaults";
 import { SR5Combat } from "../combat/SR5Combat";
+import MinimalActionData = Shadowrun.MinimalActionData;
 
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
@@ -39,11 +39,11 @@ export class PhysicalDefenseTest extends DefenseTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
     }
 
-    static _getDefaultTestAction() {
-        return DefaultValues.minimalActionData({
+    static _getDefaultTestAction(): Partial<MinimalActionData> {
+        return {
             'attribute': 'reaction',
             'attribute2': 'intuition'
-        });
+        };
     }
 
     get testModifiers() {
@@ -179,7 +179,9 @@ export class PhysicalDefenseTest extends DefenseTest {
     }
 
     async processFailure() {
-        this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
+        if (!this.actor) return;
+
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.actor, this.against.hits.value, this.hits.value, this.data.incomingDamage);
 
         await super.processFailure();
     }

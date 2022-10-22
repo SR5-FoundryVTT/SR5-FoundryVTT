@@ -73,6 +73,7 @@ export class ItemPrep {
             parts.addUniquePart('SR5.Bonus', Number(essenceMod));
         }
 
+        // The essence base is fixed. Changes should be made through the attribute.temp field.
         attributes.essence.base = SR.attributes.defaults.essence;
         attributes.essence.mod = parts.list;
         attributes.essence.value = Helpers.calcTotal(attributes.essence);

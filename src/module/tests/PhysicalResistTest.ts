@@ -4,9 +4,9 @@ import {PartsList} from "../parts/PartsList";
 import {CombatRules} from "../rules/CombatRules";
 import {Helpers} from "../helpers";
 import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
-import DamageData = Shadowrun.DamageData;
 import {SoakFlow} from "../actor/flows/SoakFlow";
-import {SoakRules} from "../rules/SoakRules";
+import DamageData = Shadowrun.DamageData;
+import MinimalActionData = Shadowrun.MinimalActionData;
 
 
 export interface PhysicalResistTestData extends SuccessTestData {
@@ -54,11 +54,11 @@ export class PhysicalResistTest extends SuccessTest {
         return false;
     }
 
-    static _getDefaultTestAction() {
-        return DefaultValues.minimalActionData({
+    static _getDefaultTestAction(): Partial<MinimalActionData> {
+        return {
             'attribute': 'body',
             'armor': true
-        });
+        };
     }
 
     get testModifiers() {

@@ -4,6 +4,7 @@ import {ComplexFormRules} from "../rules/ComplexFormRules";
 import {PartsList} from "../parts/PartsList";
 import {FadeRules} from "../rules/FadeRules";
 import DamageData = Shadowrun.DamageData;
+import MinimalActionData = Shadowrun.MinimalActionData;
 
 export interface ComplexFormTestData extends SuccessTestData {
     level: number
@@ -43,11 +44,11 @@ export class ComplexFormTest extends SuccessTest {
         return false;
     }
 
-    static _getDefaultTestAction() {
-        return DefaultValues.minimalActionData({
+    static _getDefaultTestAction(): Partial<MinimalActionData> {
+        return {
             skill: 'software',
             attribute: 'resonance'
-        });
+        };
     }
 
     // TODO: Add missing modifiers (noise, gitter) // SR5#251

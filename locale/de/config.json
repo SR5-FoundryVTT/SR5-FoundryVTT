@@ -512,6 +512,7 @@
   "SR5.Walk": "Gehen",
   "SR5.Run": "Laufen",
   "SR5.PhysicalTrack": "Körperlicher Monitor",
+  "SR5.PhysicalOverflowTrack": "Körperlicher Überschuss Monitor",
   "SR5.StunTrack": "Geistiger Monitor",
   "SR5.MatrixTrack": "Matrix Monitor",
   "SR5.WoundTolerance": "Schmerztoleranz",

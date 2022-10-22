@@ -512,6 +512,7 @@
   "SR5.Walk": "걷기",
   "SR5.Run": "달리기",
   "SR5.PhysicalTrack": "물리 트랙",
+  "SR5.PhysicalOverflowTrack": "물리 치명상 트랙",
   "SR5.StunTrack": "기절 트랙",
   "SR5.MatrixTrack": "매트릭스 트랙",
   "SR5.WoundTolerance": "부상 내성",

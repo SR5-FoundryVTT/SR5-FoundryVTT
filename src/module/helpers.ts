@@ -41,7 +41,7 @@ export class Helpers {
 
         const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (!isNaN(value.temp as number) && Number(value.temp) > 0) {
+        if (!isNaN(value.temp as number) && Number(value.temp) !== 0) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
@@ -99,7 +99,7 @@ export class Helpers {
         return value;
     }
 
-    static listItemId(event) {
+    static listItemId(event): string {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 

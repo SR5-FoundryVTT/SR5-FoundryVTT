@@ -70,7 +70,7 @@ export class CharacterInfoUpdater {
      * @param {*} actorSource The actor data (actor.data not actor.data.data) that is used as the basis for the import. Will not be changed.
      * @param {*} chummerChar The chummer character to parse.
      */
-    update(actorSource, chummerChar) {
+    async update(actorSource, chummerChar) {
 
         const clonedActorSource = duplicate(actorSource);
 
@@ -83,7 +83,7 @@ export class CharacterInfoUpdater {
         }
 
         this.importBasicData(clonedActorSource.system, chummerChar);
-        this.importBio(clonedActorSource.system, chummerChar);
+        await this.importBio(clonedActorSource.system, chummerChar);
         this.importAttributes(clonedActorSource.system, chummerChar)
         this.importInitiative(clonedActorSource.system, chummerChar);
         this.importSkills(clonedActorSource.system, chummerChar);
@@ -160,25 +160,27 @@ export class CharacterInfoUpdater {
         }
     }
 
-    importBio(system, chummerChar) {
+    async importBio(system, chummerChar) {
         system.description.value = '';
+
+        // Adding the option async.true is necessary for the pdf-pager module not to cause an error on import.
 
         // Chummer outputs html and wraps every section in <p> tags,
         // so we just concat everything with an additional linebreak in between
         if (chummerChar.description) {
-            system.description.value += TextEditor.enrichHTML(chummerChar.description + '<br/>');
+            system.description.value += await TextEditor.enrichHTML(chummerChar.description + '<br/>', {async: true});
         }
 
         if (chummerChar.background) {
-            system.description.value += TextEditor.enrichHTML(chummerChar.background + '<br/>');
+            system.description.value += await TextEditor.enrichHTML(chummerChar.background + '<br/>', {async: true});
         }
 
         if (chummerChar.concept) {
-            system.description.value += TextEditor.enrichHTML(chummerChar.concept + '<br/>');
+            system.description.value += await TextEditor.enrichHTML(chummerChar.concept + '<br/>', {async: true});
         }
 
         if (chummerChar.notes) {
-            system.description.value += TextEditor.enrichHTML(chummerChar.notes + '<br/>');
+            system.description.value += await TextEditor.enrichHTML(chummerChar.notes + '<br/>', {async: true});
         }
     }
 
@@ -217,7 +219,7 @@ export class CharacterInfoUpdater {
                 // NOTE: taMiF here: I have no idea what the general islanguage check has been added for.
                 //                   it MIGHT be in order to exclude skill groups or some such, but I haven't found a reason
                 //                   for it. Since it's working with it, I'll leave it to the pile. Warm your hands.
-                if (chummerSkill.rating > 0 && chummerSkill.islanguage) {
+                if ((chummerSkill.rating > 0 ||chummerSkill.isnativelanguage === 'True') && chummerSkill.islanguage) {
                     let determinedGroup = 'active';
                     let parsedSkill = null;
 
@@ -227,6 +229,11 @@ export class CharacterInfoUpdater {
                         parsedSkill = {};
                         system.skills.language.value[id] = parsedSkill;
                         determinedGroup = 'language';
+
+                        // Transform native rating into max rating.
+                        if (chummerSkill.isnativelanguage === 'True') {
+                            chummerSkill.rating = 6;
+                        }
                     }
                     else if (chummerSkill.knowledge && chummerSkill.knowledge.toLowerCase() === 'true') {
                         const id = randomID(16);

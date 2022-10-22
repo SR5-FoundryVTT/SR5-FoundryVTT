@@ -79,8 +79,9 @@ export class CombatSpellDefenseTest extends DefenseTest {
     async processFailure() {
         const spellData = this.item?.asSpell();
         if (!spellData) return;
+        if (!this.actor) return;
 
-        this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(spellData.data.type, spellData.data.combat.type,
+        this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(this.actor, spellData.data.type, spellData.data.combat.type,
             this.data.incomingDamage, this.against.hits.value, this.hits.value);
 
         await super.processFailure();

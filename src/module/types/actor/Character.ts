@@ -21,6 +21,7 @@ declare namespace Shadowrun {
             full_defense_attribute: string;
             // Can a character have critter powers?
             is_critter: boolean;
+            modifiers: CharacterModifiers
     }
 
     export type PhysicalTrackActorData = {
@@ -67,9 +68,12 @@ declare namespace Shadowrun {
         value: number;
     };
 
-    export type Modifiers = {
+    /**
+     * In general modifiers should always be a number BUT legacy wise there were many issue with strings creeping in.
+     */
+    export interface Modifiers {
         [name: string]: NumberOrEmpty;
-    };
+    }
 
     export type InitiativeType = {
         base: BaseValuePair<number> & ModifiableValue;
@@ -95,4 +99,31 @@ declare namespace Shadowrun {
         editable_attribute: boolean
         attributes: object
     };
+
+    /**
+     * Add character related modifiers here.
+     */
+    export interface CharacterModifiers extends Modifiers {
+        drain: NumberOrEmpty
+        armor: NumberOrEmpty
+        physical_limit: NumberOrEmpty
+        social_limit: NumberOrEmpty
+        mental_limit: NumberOrEmpty
+        stun_track: NumberOrEmpty
+        physical_track: NumberOrEmpty
+        physical_overflow_track: NumberOrEmpty
+        meat_initiative: NumberOrEmpty
+        meat_initiative_dice: NumberOrEmpty
+        astral_initiative: NumberOrEmpty
+        astral_initiative_dice: NumberOrEmpty
+        composure: NumberOrEmpty
+        lift_carry: NumberOrEmpty
+        judge_intentions: NumberOrEmpty
+        memory: NumberOrEmpty
+        walk: NumberOrEmpty
+        run: NumberOrEmpty
+        wound_tolerance: NumberOrEmpty
+        essence: NumberOrEmpty
+        fade: NumberOrEmpty
+    }
 }

@@ -1577,12 +1577,12 @@ export class SR5Actor extends Actor {
 
     /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
      *
-     * @param id An actors id. Should be a character able to drive a vehicle
+     * @param uuid An actors id. Should be a character able to drive a vehicle
      */
-    async addVehicleDriver(id: string) {
+    async addVehicleDriver(uuid: string) {
         if (!this.isVehicle()) return;
 
-        const driver = game.actors?.get(id) as SR5Actor;
+        const driver = await fromUuid(uuid) as SR5Actor;
         if (!driver) return;
 
         // NOTE: In THEORY almost all actor types can drive a vehicle.
@@ -1623,13 +1623,13 @@ export class SR5Actor extends Actor {
      * Currently compendium hosts aren't supported.
      * Any other actor type has no use for this method.
      *
-     * @param id The host item id
+     * @param uuid The host item id
      */
-    async addICHost(id: string) {
+    async addICHost(uuid: string) {
         if (!this.isIC()) return;
 
         // Check if the given item id is valid.
-        const item = game.items?.get(id) as SR5Item;
+        const item = await fromUuid(uuid) as SR5Item;
         if (!item || !item.isHost()) return;
 
         const hostData = item.asHostData();

@@ -18,11 +18,11 @@
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.8.4",
+  "version": "0.8.5",
   "compatibility": {
     "minimum": "10",
     "maximum": "10",
-    "verified": "10.286"
+    "verified": "10.288"
   },
   "minimumCoreVersion": "10",
   "scripts": [],
@@ -77,10 +77,9 @@
       "system": "shadowrun5e"
     }
   ],
-  "system": [],
   "socket": true,
-  "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
-  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.8.4.zip",
+  "manifest": "https://github.com/smilligan93/SR5-FoundryVTT/releases/latest/download/system.json",
+  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.8.5.zip",
   "protected": false,
   "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
   "gridDistance": 1,

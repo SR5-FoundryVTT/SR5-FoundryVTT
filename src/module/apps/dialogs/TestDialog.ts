@@ -53,6 +53,7 @@ export class TestDialog extends FormDialog {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html';
     }
 
+    //@ts-ignore TODO: foundry-vtt-types v10
     getData() {
         const data = super.getData() as unknown as TestDialogData;
 

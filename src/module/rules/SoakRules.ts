@@ -156,30 +156,6 @@ export class SoakRules {
     }
 
     /**
-     * Changes the damage type based on the incoming damage type and the actor state (armor, matrix perception..)
-     * @param damage The incoming damage
-     * @param actor The actor affected by the damage
-     * @returns The updated damage data
-     */
-    static modifyDamageType(damage: DamageData, actor : SR5Actor) : DamageData {
-        // Careful, order of damage conversion is very important
-        // Electricity stun damage is considered physical for vehicles
-        let updatedDamage = duplicate(damage) as DamageData;
-        if (actor.isVehicle() && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
-            updatedDamage.type.value = 'physical';
-        }
-
-        const damageSourceItem = Helpers.findDamageSource(damage);
-        if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
-            // Damage from direct combat spells is never converted
-            return updatedDamage;
-        }
-
-        updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
-        return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
-    }
-
-    /**
      * Turns physical damage to stun damage based on the damage and armor
      * @param damage The incoming damage
      * @param actor The actor affected by the damage

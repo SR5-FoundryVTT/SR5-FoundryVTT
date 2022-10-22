@@ -2,9 +2,9 @@ import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellcastingRules} from "../rules/SpellcastingRules";
 import {PartsList} from "../parts/PartsList";
 import {DefaultValues} from "../data/DataDefaults";
-import DamageData = Shadowrun.DamageData;
-import {Helpers} from "../helpers";
 import {DrainRules} from "../rules/DrainRules";
+import DamageData = Shadowrun.DamageData;
+import MinimalActionData = Shadowrun.MinimalActionData;
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -49,11 +49,11 @@ export class SpellCastingTest extends SuccessTest {
         return false;
     }
 
-    static _getDefaultTestAction() {
-        return DefaultValues.minimalActionData({
+    static _getDefaultTestAction(): Partial<MinimalActionData> {
+        return {
             skill: 'spellcasting',
             attribute: 'magic'
-        });
+        };
     }
 
     get testModifiers() {

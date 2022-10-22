@@ -512,6 +512,7 @@
   "SR5.Walk": "Walk",
   "SR5.Run": "Run",
   "SR5.PhysicalTrack": "Physical Track",
+  "SR5.PhysicalOverflowTrack": "Physical Overflow Track",
   "SR5.StunTrack": "Stun Track",
   "SR5.MatrixTrack": "Matrix Track",
   "SR5.WoundTolerance": "Wound Tolerance",
