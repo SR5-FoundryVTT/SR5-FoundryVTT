@@ -9,7 +9,7 @@ var __propIsEnum = Object.prototype.propertyIsEnumerable;
 var __reflectGet = Reflect.get;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
+  for (var prop in b ||= {})
     if (__hasOwnProp.call(b, prop))
       __defNormalProp(a, prop, b[prop]);
   if (__getOwnPropSymbols)
@@ -4287,10 +4287,14 @@ var require_base64_js = __commonJS({
       }
       if (extraBytes === 1) {
         tmp = uint8[len2 - 1];
-        parts.push(lookup[tmp >> 2] + lookup[tmp << 4 & 63] + "==");
+        parts.push(
+          lookup[tmp >> 2] + lookup[tmp << 4 & 63] + "=="
+        );
       } else if (extraBytes === 2) {
         tmp = (uint8[len2 - 2] << 8) + uint8[len2 - 1];
-        parts.push(lookup[tmp >> 10] + lookup[tmp >> 4 & 63] + lookup[tmp << 2 & 63] + "=");
+        parts.push(
+          lookup[tmp >> 10] + lookup[tmp >> 4 & 63] + lookup[tmp << 2 & 63] + "="
+        );
       }
       return parts.join("");
     }
@@ -4394,7 +4398,9 @@ var require_buffer = __commonJS({
     exports.kMaxLength = K_MAX_LENGTH;
     Buffer2.TYPED_ARRAY_SUPPORT = typedArraySupport();
     if (!Buffer2.TYPED_ARRAY_SUPPORT && typeof console !== "undefined" && typeof console.error === "function") {
-      console.error("This browser lacks typed array (Uint8Array) support which is required by `buffer` v5.x. Use `buffer` v4.x if you require old browser support.");
+      console.error(
+        "This browser lacks typed array (Uint8Array) support which is required by `buffer` v5.x. Use `buffer` v4.x if you require old browser support."
+      );
     }
     function typedArraySupport() {
       try {
@@ -4436,7 +4442,9 @@ var require_buffer = __commonJS({
     function Buffer2(arg, encodingOrOffset, length) {
       if (typeof arg === "number") {
         if (typeof encodingOrOffset === "string") {
-          throw new TypeError('The "string" argument must be of type string. Received type number');
+          throw new TypeError(
+            'The "string" argument must be of type string. Received type number'
+          );
         }
         return allocUnsafe(arg);
       }
@@ -4451,7 +4459,9 @@ var require_buffer = __commonJS({
         return fromArrayView(value);
       }
       if (value == null) {
-        throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type " + typeof value);
+        throw new TypeError(
+          "The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type " + typeof value
+        );
       }
       if (isInstance(value, ArrayBuffer) || value && isInstance(value.buffer, ArrayBuffer)) {
         return fromArrayBuffer(value, encodingOrOffset, length);
@@ -4460,7 +4470,9 @@ var require_buffer = __commonJS({
         return fromArrayBuffer(value, encodingOrOffset, length);
       }
       if (typeof value === "number") {
-        throw new TypeError('The "value" argument must not be of type number. Received type number');
+        throw new TypeError(
+          'The "value" argument must not be of type number. Received type number'
+        );
       }
       const valueOf = value.valueOf && value.valueOf();
       if (valueOf != null && valueOf !== value) {
@@ -4472,7 +4484,9 @@ var require_buffer = __commonJS({
       if (typeof Symbol !== "undefined" && Symbol.toPrimitive != null && typeof value[Symbol.toPrimitive] === "function") {
         return Buffer2.from(value[Symbol.toPrimitive]("string"), encodingOrOffset, length);
       }
-      throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type " + typeof value);
+      throw new TypeError(
+        "The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type " + typeof value
+      );
     }
     Buffer2.from = function(value, encodingOrOffset, length) {
       return from(value, encodingOrOffset, length);
@@ -4598,7 +4612,9 @@ var require_buffer = __commonJS({
       if (isInstance(b, Uint8Array))
         b = Buffer2.from(b, b.offset, b.byteLength);
       if (!Buffer2.isBuffer(a) || !Buffer2.isBuffer(b)) {
-        throw new TypeError('The "buf1", "buf2" arguments must be one of type Buffer or Uint8Array');
+        throw new TypeError(
+          'The "buf1", "buf2" arguments must be one of type Buffer or Uint8Array'
+        );
       }
       if (a === b)
         return 0;
@@ -4659,7 +4675,11 @@ var require_buffer = __commonJS({
               buf = Buffer2.from(buf);
             buf.copy(buffer, pos);
           } else {
-            Uint8Array.prototype.set.call(buffer, buf, pos);
+            Uint8Array.prototype.set.call(
+              buffer,
+              buf,
+              pos
+            );
           }
         } else if (!Buffer2.isBuffer(buf)) {
           throw new TypeError('"list" argument must be an Array of Buffers');
@@ -4678,7 +4698,9 @@ var require_buffer = __commonJS({
         return string.byteLength;
       }
       if (typeof string !== "string") {
-        throw new TypeError('The "string" argument must be one of type string, Buffer, or ArrayBuffer. Received type ' + typeof string);
+        throw new TypeError(
+          'The "string" argument must be one of type string, Buffer, or ArrayBuffer. Received type ' + typeof string
+        );
       }
       const len = string.length;
       const mustMatch = arguments.length > 2 && arguments[2] === true;
@@ -4833,7 +4855,9 @@ var require_buffer = __commonJS({
         target = Buffer2.from(target, target.offset, target.byteLength);
       }
       if (!Buffer2.isBuffer(target)) {
-        throw new TypeError('The "target" argument must be one of type Buffer or Uint8Array. Received type ' + typeof target);
+        throw new TypeError(
+          'The "target" argument must be one of type Buffer or Uint8Array. Received type ' + typeof target
+        );
       }
       if (start === void 0) {
         start = 0;
@@ -5052,7 +5076,9 @@ var require_buffer = __commonJS({
           length = void 0;
         }
       } else {
-        throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");
+        throw new Error(
+          "Buffer.write(string, encoding, offset[, length]) is no longer supported"
+        );
       }
       const remaining = this.length - offset;
       if (length === void 0 || length > remaining)
@@ -5171,7 +5197,10 @@ var require_buffer = __commonJS({
       let res = "";
       let i = 0;
       while (i < len) {
-        res += String.fromCharCode.apply(String, codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH));
+        res += String.fromCharCode.apply(
+          String,
+          codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH)
+        );
       }
       return res;
     }
@@ -5732,7 +5761,11 @@ var require_buffer = __commonJS({
       if (this === target && typeof Uint8Array.prototype.copyWithin === "function") {
         this.copyWithin(targetStart, start, end);
       } else {
-        Uint8Array.prototype.set.call(target, this.subarray(start, end), targetStart);
+        Uint8Array.prototype.set.call(
+          target,
+          this.subarray(start, end),
+          targetStart
+        );
       }
       return len;
     };
@@ -5820,30 +5853,42 @@ var require_buffer = __commonJS({
         }
       };
     }
-    E("ERR_BUFFER_OUT_OF_BOUNDS", function(name) {
-      if (name) {
-        return `${name} is outside of buffer bounds`;
-      }
-      return "Attempt to access memory outside buffer bounds";
-    }, RangeError);
-    E("ERR_INVALID_ARG_TYPE", function(name, actual) {
-      return `The "${name}" argument must be of type number. Received type ${typeof actual}`;
-    }, TypeError);
-    E("ERR_OUT_OF_RANGE", function(str, range, input) {
-      let msg = `The value of "${str}" is out of range.`;
-      let received = input;
-      if (Number.isInteger(input) && Math.abs(input) > 2 ** 32) {
-        received = addNumericalSeparator(String(input));
-      } else if (typeof input === "bigint") {
-        received = String(input);
-        if (input > BigInt(2) ** BigInt(32) || input < -(BigInt(2) ** BigInt(32))) {
-          received = addNumericalSeparator(received);
+    E(
+      "ERR_BUFFER_OUT_OF_BOUNDS",
+      function(name) {
+        if (name) {
+          return `${name} is outside of buffer bounds`;
         }
-        received += "n";
-      }
-      msg += ` It must be ${range}. Received ${received}`;
-      return msg;
-    }, RangeError);
+        return "Attempt to access memory outside buffer bounds";
+      },
+      RangeError
+    );
+    E(
+      "ERR_INVALID_ARG_TYPE",
+      function(name, actual) {
+        return `The "${name}" argument must be of type number. Received type ${typeof actual}`;
+      },
+      TypeError
+    );
+    E(
+      "ERR_OUT_OF_RANGE",
+      function(str, range, input) {
+        let msg = `The value of "${str}" is out of range.`;
+        let received = input;
+        if (Number.isInteger(input) && Math.abs(input) > 2 ** 32) {
+          received = addNumericalSeparator(String(input));
+        } else if (typeof input === "bigint") {
+          received = String(input);
+          if (input > BigInt(2) ** BigInt(32) || input < -(BigInt(2) ** BigInt(32))) {
+            received = addNumericalSeparator(received);
+          }
+          received += "n";
+        }
+        msg += ` It must be ${range}. Received ${received}`;
+        return msg;
+      },
+      RangeError
+    );
     function addNumericalSeparator(val) {
       let res = "";
       let i = val.length;
@@ -5889,7 +5934,11 @@ var require_buffer = __commonJS({
       if (length < 0) {
         throw new errors.ERR_BUFFER_OUT_OF_BOUNDS();
       }
-      throw new errors.ERR_OUT_OF_RANGE(type || "offset", `>= ${type ? 1 : 0} and <= ${length}`, value);
+      throw new errors.ERR_OUT_OF_RANGE(
+        type || "offset",
+        `>= ${type ? 1 : 0} and <= ${length}`,
+        value
+      );
     }
     var INVALID_BASE64_RE = /[^+/0-9A-Za-z-_]/g;
     function base64clean(str) {
@@ -5943,15 +5992,27 @@ var require_buffer = __commonJS({
         } else if (codePoint < 2048) {
           if ((units -= 2) < 0)
             break;
-          bytes.push(codePoint >> 6 | 192, codePoint & 63 | 128);
+          bytes.push(
+            codePoint >> 6 | 192,
+            codePoint & 63 | 128
+          );
         } else if (codePoint < 65536) {
           if ((units -= 3) < 0)
             break;
-          bytes.push(codePoint >> 12 | 224, codePoint >> 6 & 63 | 128, codePoint & 63 | 128);
+          bytes.push(
+            codePoint >> 12 | 224,
+            codePoint >> 6 & 63 | 128,
+            codePoint & 63 | 128
+          );
         } else if (codePoint < 1114112) {
           if ((units -= 4) < 0)
             break;
-          bytes.push(codePoint >> 18 | 240, codePoint >> 12 & 63 | 128, codePoint >> 6 & 63 | 128, codePoint & 63 | 128);
+          bytes.push(
+            codePoint >> 18 | 240,
+            codePoint >> 12 & 63 | 128,
+            codePoint >> 6 & 63 | 128,
+            codePoint & 63 | 128
+          );
         } else {
           throw new Error("Invalid code point");
         }
@@ -6036,7 +6097,6 @@ var require_safe_buffer = __commonJS({
     function SafeBuffer(arg, encodingOrOffset, length) {
       return Buffer2(arg, encodingOrOffset, length);
     }
-    SafeBuffer.prototype = Object.create(Buffer2.prototype);
     copyProps(Buffer2, SafeBuffer);
     SafeBuffer.from = function(arg, encodingOrOffset, length) {
       if (typeof arg === "number") {
@@ -6991,9 +7051,15 @@ var require_sax = __commonJS({
           var local = qn.local;
           if (prefix === "xmlns") {
             if (local === "xml" && parser.attribValue !== XML_NAMESPACE) {
-              strictFail(parser, "xml: prefix must be bound to " + XML_NAMESPACE + "\nActual: " + parser.attribValue);
+              strictFail(
+                parser,
+                "xml: prefix must be bound to " + XML_NAMESPACE + "\nActual: " + parser.attribValue
+              );
             } else if (local === "xmlns" && parser.attribValue !== XMLNS_NAMESPACE) {
-              strictFail(parser, "xmlns: prefix must be bound to " + XMLNS_NAMESPACE + "\nActual: " + parser.attribValue);
+              strictFail(
+                parser,
+                "xmlns: prefix must be bound to " + XMLNS_NAMESPACE + "\nActual: " + parser.attribValue
+              );
             } else {
               var tag = parser.tag;
               var parent = parser.tags[parser.tags.length - 1] || parser;
@@ -7187,7 +7253,10 @@ var require_sax = __commonJS({
           throw this.error;
         }
         if (parser.closed) {
-          return error(parser, "Cannot write after close. Assign an onready handler.");
+          return error(
+            parser,
+            "Cannot write after close. Assign an onready handler."
+          );
         }
         if (chunk === null) {
           return end(parser);
@@ -7306,7 +7375,10 @@ var require_sax = __commonJS({
               } else if ((parser.sgmlDecl + c).toUpperCase() === DOCTYPE) {
                 parser.state = S.DOCTYPE;
                 if (parser.doctype || parser.sawRoot) {
-                  strictFail(parser, "Inappropriately located doctype declaration");
+                  strictFail(
+                    parser,
+                    "Inappropriately located doctype declaration"
+                  );
                 }
                 parser.doctype = "";
                 parser.sgmlDecl = "";
@@ -7846,7 +7918,11 @@ var require_events = __commonJS({
         target._eventsCount = 0;
       } else {
         if (events.newListener !== void 0) {
-          target.emit("newListener", type, listener.listener ? listener.listener : listener);
+          target.emit(
+            "newListener",
+            type,
+            listener.listener ? listener.listener : listener
+          );
           events = target._events;
         }
         existing = events[type];
@@ -9058,7 +9134,10 @@ var FormDialog = class extends Dialog {
     return __async(this, null, function* () {
       const templatePath = data.templatePath || this.templateContent;
       if (templatePath)
-        data.content = yield renderTemplate(data.templatePath || this.templateContent, data.templateData || data);
+        data.content = yield renderTemplate(
+          data.templatePath || this.templateContent,
+          data.templateData || data
+        );
       const html = yield __superGet(FormDialog.prototype, this, "_renderInner").call(this, data);
       this.form = html.filter((i, el) => el instanceof HTMLFormElement)[0];
       if (!this.form)
@@ -9762,6 +9841,7 @@ var SR5 = {
     mental_limit: "SR5.MentalLimit",
     stun_track: "SR5.StunTrack",
     physical_track: "SR5.PhysicalTrack",
+    physical_overflow_track: "SR5.PhysicalOverflowTrack",
     meat_initiative: "SR5.MeatSpaceInit",
     meat_initiative_dice: "SR5.MeatSpaceDice",
     astral_initiative: "SR5.AstralInit",
@@ -10055,7 +10135,7 @@ var Helpers = class {
     if (value.mod === void 0)
       value.mod = [];
     const parts = new PartsList(value.mod);
-    if (!isNaN(value.temp) && Number(value.temp) > 0) {
+    if (!isNaN(value.temp) && Number(value.temp) !== 0) {
       parts.addUniquePart("SR5.Temporary", value["temp"]);
     }
     value.base = value.base !== void 0 ? Number(value.base) : 0;
@@ -11812,13 +11892,22 @@ var SR5Roll = class extends Roll {
     return this.data.explodeSixes;
   }
   count(side) {
-    return this.sides.reduce((counted, result) => result === side ? counted + 1 : counted, 0);
+    return this.sides.reduce(
+      (counted, result) => result === side ? counted + 1 : counted,
+      0
+    );
   }
   get hits() {
-    return this.sides.reduce((hits, result) => SR.die.success.includes(result) ? hits + 1 : hits, 0);
+    return this.sides.reduce(
+      (hits, result) => SR.die.success.includes(result) ? hits + 1 : hits,
+      0
+    );
   }
   get glitches() {
-    return this.sides.reduce((glitches, result) => SR.die.glitch.includes(result) ? glitches + 1 : glitches, 0);
+    return this.sides.reduce(
+      (glitches, result) => SR.die.glitch.includes(result) ? glitches + 1 : glitches,
+      0
+    );
   }
   get pool() {
     if (this.terms) {
@@ -12074,7 +12163,11 @@ var TestCreator = {
       data.title = testCls.title;
       data.previousMessageId = test.data.messageUuid;
       data.against = test.data;
-      const action = TestCreator._mergeMinimalActionDataInOrder(DefaultValues.actionData({ test: testCls.name }), yield testCls._getDocumentTestAction(test.item, test.actor), testCls._getDefaultTestAction());
+      const action = TestCreator._mergeMinimalActionDataInOrder(
+        DefaultValues.actionData({ test: testCls.name }),
+        yield testCls._getDocumentTestAction(test.item, test.actor),
+        testCls._getDefaultTestAction()
+      );
       const testData = yield testCls._prepareActionTestData(action, test.actor, data);
       testData.following = test.data;
       const documents = { item: test.item, actor: test.actor };
@@ -12094,7 +12187,11 @@ var TestCreator = {
       let action = item.getAction();
       if (!action || !actor)
         return data;
-      action = TestCreator._mergeMinimalActionDataInOrder(action, yield testCls._getDocumentTestAction(item, actor), testCls._getDefaultTestAction());
+      action = TestCreator._mergeMinimalActionDataInOrder(
+        action,
+        yield testCls._getDocumentTestAction(item, actor),
+        testCls._getDefaultTestAction()
+      );
       return yield TestCreator._prepareTestDataWithAction(action, actor, data);
     });
   },
@@ -12180,7 +12277,11 @@ var TestCreator = {
       data.previousMessageId = previousMessageId;
       data.following = opposedData;
       data.targetActorsUuid = [];
-      const action = TestCreator._mergeMinimalActionDataInOrder(DefaultValues.actionData({ test: resistTestCls.name }), opposedData.against.opposed.resist, resistTestCls._getDefaultTestAction());
+      const action = TestCreator._mergeMinimalActionDataInOrder(
+        DefaultValues.actionData({ test: resistTestCls.name }),
+        opposedData.against.opposed.resist,
+        resistTestCls._getDefaultTestAction()
+      );
       return yield TestCreator._prepareTestDataWithAction(action, actor, data);
     });
   },
@@ -12518,18 +12619,6 @@ var SoakRules = class {
     }
     return Helpers.reduceDamageByHits(damageData, hits, "SR5.SoakTest");
   }
-  static modifyDamageType(damage, actor) {
-    let updatedDamage = duplicate(damage);
-    if (actor.isVehicle() && updatedDamage.element.value === "electricity" && updatedDamage.type.value === "stun") {
-      updatedDamage.type.value = "physical";
-    }
-    const damageSourceItem = Helpers.findDamageSource(damage);
-    if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
-      return updatedDamage;
-    }
-    updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
-    return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
-  }
   static modifyPhysicalDamageForArmor(damage, actor) {
     const updatedDamage = duplicate(damage);
     if (damage.type.value === "physical") {
@@ -12598,16 +12687,17 @@ var CombatRules = class {
   static attackMisses(attackerHits, defenderHits) {
     return !CombatRules.attackHits(attackerHits, defenderHits);
   }
-  static modifyDamageAfterHit(attackerHits, defenderHits, damage) {
-    const modifiedDamage = foundry.utils.duplicate(damage);
+  static modifyDamageAfterHit(defender, attackerHits, defenderHits, damage) {
+    let modified = foundry.utils.duplicate(damage);
     if (attackerHits < 0)
       attackerHits = 0;
     if (defenderHits < 0)
       defenderHits = 0;
-    PartsList.AddUniquePart(modifiedDamage.mod, "SR5.Attacker", attackerHits);
-    PartsList.AddUniquePart(modifiedDamage.mod, "SR5.Defender", -defenderHits);
-    modifiedDamage.value = Helpers.calcTotal(modifiedDamage, { min: 0 });
-    return modifiedDamage;
+    PartsList.AddUniquePart(modified.mod, "SR5.Attacker", attackerHits);
+    PartsList.AddUniquePart(modified.mod, "SR5.Defender", -defenderHits);
+    modified.value = Helpers.calcTotal(modified, { min: 0 });
+    modified = CombatRules.modifyDamageTypeAfterHit(modified, defender);
+    return modified;
   }
   static modifyDamageAfterSupressionHit(damage) {
     return foundry.utils.duplicate(damage);
@@ -12622,7 +12712,6 @@ var CombatRules = class {
     if (hits < 0)
       hits = 0;
     let { modified } = SoakRules.reduceDamage(actor, damage, hits);
-    modified = SoakRules.modifyDamageType(modified, actor);
     Helpers.calcTotal(modified, { min: 0 });
     return modified;
   }
@@ -12634,6 +12723,18 @@ var CombatRules = class {
     PartsList.AddUniquePart(modifiedArmor.mod, "SR5.AP", damage.ap.value);
     modifiedArmor.value = Helpers.calcTotal(modifiedArmor, { min: 0 });
     return modifiedArmor;
+  }
+  static modifyDamageTypeAfterHit(damage, actor) {
+    let updatedDamage = duplicate(damage);
+    if (actor.isVehicle() && updatedDamage.element.value === "electricity" && updatedDamage.type.value === "stun") {
+      updatedDamage.type.value = "physical";
+    }
+    const damageSourceItem = Helpers.findDamageSource(damage);
+    if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
+      return updatedDamage;
+    }
+    updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
+    return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
   }
 };
 
@@ -13752,7 +13853,11 @@ var OpposedTest = class extends SuccessTest {
       };
       data.threshold.base = againstData.values.netHits.value;
       let action = DefaultValues.actionData();
-      action = TestCreator._mergeMinimalActionDataInOrder(action, againstData.opposed, this._getDefaultTestAction());
+      action = TestCreator._mergeMinimalActionDataInOrder(
+        action,
+        againstData.opposed,
+        this._getDefaultTestAction()
+      );
       if (againstData.sourceItemUuid) {
         const item = yield fromUuid(againstData.sourceItemUuid);
         if (item) {
@@ -13847,10 +13952,10 @@ var PhysicalDefenseTest = class extends DefenseTest {
     return "systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html";
   }
   static _getDefaultTestAction() {
-    return DefaultValues.minimalActionData({
+    return {
       "attribute": "reaction",
       "attribute2": "intuition"
-    });
+    };
   }
   get testModifiers() {
     return ["global", "wounds", "defense"];
@@ -13960,7 +14065,9 @@ var PhysicalDefenseTest = class extends DefenseTest {
   }
   processFailure() {
     return __async(this, null, function* () {
-      this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
+      if (!this.actor)
+        return;
+      this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.actor, this.against.hits.value, this.hits.value, this.data.incomingDamage);
       yield __superGet(PhysicalDefenseTest.prototype, this, "processFailure").call(this);
     });
   }
@@ -15927,6 +16034,7 @@ var ModifiersPrep = class {
       "mental_limit",
       "stun_track",
       "physical_track",
+      "physical_overflow_track",
       "meat_initiative",
       "meat_initiative_dice",
       "astral_initiative",
@@ -16242,15 +16350,15 @@ var ConditionMonitorsPrep = class {
   static prepareStun(system) {
     const { track, attributes, modifiers } = system;
     track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
-    track.stun.max = track.stun.base + Number(modifiers["stun_track"]);
+    track.stun.max = track.stun.base + Number(modifiers.stun_track);
     track.stun.label = SR5.damageTypes.stun;
     track.stun.disabled = false;
   }
   static preparePhysical(system) {
     const { track, attributes, modifiers } = system;
     track.physical.base = 8 + Math.ceil(attributes.body.value / 2);
-    track.physical.max = track.physical.base + Number(modifiers["physical_track"]);
-    track.physical.overflow.max = attributes.body.value;
+    track.physical.max = track.physical.base + Number(modifiers.physical_track);
+    track.physical.overflow.max = attributes.body.value + Number(modifiers.physical_overflow_track);
     track.physical.label = SR5.damageTypes.physical;
     track.physical.disabled = false;
   }
@@ -16261,7 +16369,7 @@ var ConditionMonitorsPrep = class {
     track.stun.disabled = true;
     const attribute = attributes.willpower.value > attributes.body.value ? attributes.willpower : attributes.body;
     track.physical.base = 8 + Math.ceil(attribute.value / 2);
-    track.physical.max = track.physical.base + Number(modifiers["physical_track"]);
+    track.physical.max = track.physical.base + Number(modifiers.physical_track);
     track.physical.overflow.max = attributes.body.value;
     track.physical.label = "SR5.ConditionMonitor";
     track.physical.disabled = false;
@@ -16744,7 +16852,18 @@ var SpiritPrep = class {
         overrides.attributes.logic = 1;
         overrides.attributes.intuition = 1;
         overrides.init = 5;
-        overrides.skills.push("assensing", "astral_combat", "con", "counterspelling", "gymnastics", "leadership", "negotiation", "perception", "spellcasting", "unarmed_combat");
+        overrides.skills.push(
+          "assensing",
+          "astral_combat",
+          "con",
+          "counterspelling",
+          "gymnastics",
+          "leadership",
+          "negotiation",
+          "perception",
+          "spellcasting",
+          "unarmed_combat"
+        );
         break;
     }
     return overrides;
@@ -18398,12 +18517,11 @@ var _SR5Actor = class extends Actor {
       return this.system.vehicle_stats;
     }
   }
-  addVehicleDriver(id) {
+  addVehicleDriver(uuid) {
     return __async(this, null, function* () {
-      var _a;
       if (!this.isVehicle())
         return;
-      const driver = (_a = game.actors) == null ? void 0 : _a.get(id);
+      const driver = yield fromUuid(uuid);
       if (!driver)
         return;
       yield this.update({ "system.driver": driver.id });
@@ -18434,12 +18552,11 @@ var _SR5Actor = class extends Actor {
       return;
     return driver;
   }
-  addICHost(id) {
+  addICHost(uuid) {
     return __async(this, null, function* () {
-      var _a;
       if (!this.isIC())
         return;
-      const item = (_a = game.items) == null ? void 0 : _a.get(id);
+      const item = yield fromUuid(uuid);
       if (!item || !item.isHost())
         return;
       const hostData = item.asHostData();
@@ -18925,19 +19042,21 @@ var _VersionMigration = class {
     return __async(this, null, function* () {
       let hasItemUpdates = false;
       if (actorData.items !== void 0) {
-        const items = yield Promise.all(actorData.items.map((itemData) => __async(this, null, function* () {
-          if (itemData instanceof SR5Item)
-            console.error("Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object");
-          if (!(yield this.ShouldMigrateItemData(itemData)))
-            return itemData;
-          let itemUpdate = yield this.MigrateItemData(itemData);
-          hasItemUpdates = true;
-          itemUpdate["_id"] = itemData._id;
-          return mergeObject(itemData, itemUpdate.data, {
-            enforceTypes: false,
-            inplace: false
-          });
-        })));
+        const items = yield Promise.all(
+          actorData.items.map((itemData) => __async(this, null, function* () {
+            if (itemData instanceof SR5Item)
+              console.error("Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object");
+            if (!(yield this.ShouldMigrateItemData(itemData)))
+              return itemData;
+            let itemUpdate = yield this.MigrateItemData(itemData);
+            hasItemUpdates = true;
+            itemUpdate["_id"] = itemData._id;
+            return mergeObject(itemData, itemUpdate.data, {
+              enforceTypes: false,
+              inplace: false
+            });
+          }))
+        );
         if (hasItemUpdates) {
           updateData.items = items;
         }
@@ -19444,15 +19563,18 @@ var SR5ItemSheet = class extends ItemSheet {
       }
       data["config"] = SR5;
       const items = this.item.items;
-      const [ammunition, weaponMods, armorMods] = items.reduce((parts, item) => {
-        if (item.type === "ammo")
-          parts[0].push(item.data);
-        if (item.type === "modification" && "type" in item.system && item.system.type === "weapon")
-          parts[1].push(item._source);
-        if (item.type === "modification" && "type" in item.system && item.system.type === "armor")
-          parts[2].push(item._source);
-        return parts;
-      }, [[], [], []]);
+      const [ammunition, weaponMods, armorMods] = items.reduce(
+        (parts, item) => {
+          if (item.type === "ammo")
+            parts[0].push(item.data);
+          if (item.type === "modification" && "type" in item.system && item.system.type === "weapon")
+            parts[1].push(item._source);
+          if (item.type === "modification" && "type" in item.system && item.system.type === "armor")
+            parts[2].push(item._source);
+          return parts;
+        },
+        [[], [], []]
+      );
       data["ammunition"] = ammunition;
       data["weaponMods"] = weaponMods;
       data["armorMods"] = armorMods;
@@ -19875,13 +19997,16 @@ function createItemMacro(item, slot) {
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
     let macro = game.macros.contents.find((m) => m.name === item.name);
     if (!macro) {
-      macro = yield Macro.create({
-        name: item.name,
-        type: "script",
-        img: item.img,
-        command,
-        flags: { "shadowrun5e.itemMacro": true }
-      }, { renderSheet: false });
+      macro = yield Macro.create(
+        {
+          name: item.name,
+          type: "script",
+          img: item.img,
+          command,
+          flags: { "shadowrun5e.itemMacro": true }
+        },
+        { renderSheet: false }
+      );
     }
     if (macro)
       (_a = game.user) == null ? void 0 : _a.assignHotbarMacro(macro, slot);
@@ -20070,40 +20195,44 @@ var SR5Combat = class extends Combat {
     return this.getCombatantByToken(token.id);
   }
   static addCombatTrackerContextOptions(html, options) {
-    options.push({
-      name: game.i18n.localize("SR5.COMBAT.ReduceInitByOne"),
-      icon: '<i class="fas fa-caret-down"></i>',
-      callback: (li) => __async(this, null, function* () {
-        var _a;
-        const combatant = yield (_a = game.combat) == null ? void 0 : _a.combatants.get(li.data("combatant-id"));
-        if (combatant) {
-          const combat = game.combat;
-          yield combat.adjustInitiative(combatant, -1);
-        }
-      })
-    }, {
-      name: game.i18n.localize("SR5.COMBAT.ReduceInitByFive"),
-      icon: '<i class="fas fa-angle-down"></i>',
-      callback: (li) => __async(this, null, function* () {
-        var _a;
-        const combatant = yield (_a = game.combat) == null ? void 0 : _a.combatants.get(li.data("combatant-id"));
-        if (combatant) {
-          const combat = game.combat;
-          yield combat.adjustInitiative(combatant, -5);
-        }
-      })
-    }, {
-      name: game.i18n.localize("SR5.COMBAT.ReduceInitByTen"),
-      icon: '<i class="fas fa-angle-double-down"></i>',
-      callback: (li) => __async(this, null, function* () {
-        var _a;
-        const combatant = yield (_a = game.combat) == null ? void 0 : _a.combatants.get(li.data("combatant-id"));
-        if (combatant) {
-          const combat = game.combat;
-          yield combat.adjustInitiative(combatant, -10);
-        }
-      })
-    });
+    options.push(
+      {
+        name: game.i18n.localize("SR5.COMBAT.ReduceInitByOne"),
+        icon: '<i class="fas fa-caret-down"></i>',
+        callback: (li) => __async(this, null, function* () {
+          var _a;
+          const combatant = yield (_a = game.combat) == null ? void 0 : _a.combatants.get(li.data("combatant-id"));
+          if (combatant) {
+            const combat = game.combat;
+            yield combat.adjustInitiative(combatant, -1);
+          }
+        })
+      },
+      {
+        name: game.i18n.localize("SR5.COMBAT.ReduceInitByFive"),
+        icon: '<i class="fas fa-angle-down"></i>',
+        callback: (li) => __async(this, null, function* () {
+          var _a;
+          const combatant = yield (_a = game.combat) == null ? void 0 : _a.combatants.get(li.data("combatant-id"));
+          if (combatant) {
+            const combat = game.combat;
+            yield combat.adjustInitiative(combatant, -5);
+          }
+        })
+      },
+      {
+        name: game.i18n.localize("SR5.COMBAT.ReduceInitByTen"),
+        icon: '<i class="fas fa-angle-double-down"></i>',
+        callback: (li) => __async(this, null, function* () {
+          var _a;
+          const combatant = yield (_a = game.combat) == null ? void 0 : _a.combatants.get(li.data("combatant-id"));
+          if (combatant) {
+            const combat = game.combat;
+            yield combat.adjustInitiative(combatant, -10);
+          }
+        })
+      }
+    );
     return options;
   }
   adjustInitiative(combatant, adjustment) {
@@ -20890,8 +21019,13 @@ var RangedParser = class extends WeaponParserBase {
   }
   Parse(jsonData, data, jsonTranslation) {
     data = super.Parse(jsonData, data, jsonTranslation);
-    data.data.range.rc.base = ImportHelper.IntValue(jsonData, "rc");
-    data.data.range.rc.value = ImportHelper.IntValue(jsonData, "rc");
+    if (jsonData.hasOwnProperty("rc")) {
+      data.data.range.rc.base = ImportHelper.IntValue(jsonData, "rc");
+      data.data.range.rc.value = ImportHelper.IntValue(jsonData, "rc");
+    } else {
+      data.data.range.rc.base = 0;
+      data.data.range.rc.value = 0;
+    }
     if (jsonData.hasOwnProperty("range")) {
       data.data.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, "range")];
     } else {
@@ -23793,18 +23927,20 @@ var CharacterInfoUpdater = class {
     });
   }
   update(actorSource, chummerChar) {
-    const clonedActorSource = duplicate(actorSource);
-    if (chummerChar.alias) {
-      clonedActorSource.name = chummerChar.alias;
-    } else {
-      clonedActorSource.name = chummerChar.name ? chummerChar.name : "[Name not found]";
-    }
-    this.importBasicData(clonedActorSource.system, chummerChar);
-    this.importBio(clonedActorSource.system, chummerChar);
-    this.importAttributes(clonedActorSource.system, chummerChar);
-    this.importInitiative(clonedActorSource.system, chummerChar);
-    this.importSkills(clonedActorSource.system, chummerChar);
-    return clonedActorSource;
+    return __async(this, null, function* () {
+      const clonedActorSource = duplicate(actorSource);
+      if (chummerChar.alias) {
+        clonedActorSource.name = chummerChar.alias;
+      } else {
+        clonedActorSource.name = chummerChar.name ? chummerChar.name : "[Name not found]";
+      }
+      this.importBasicData(clonedActorSource.system, chummerChar);
+      yield this.importBio(clonedActorSource.system, chummerChar);
+      this.importAttributes(clonedActorSource.system, chummerChar);
+      this.importInitiative(clonedActorSource.system, chummerChar);
+      this.importSkills(clonedActorSource.system, chummerChar);
+      return clonedActorSource;
+    });
   }
   importBasicData(system, chummerChar) {
     try {
@@ -23866,19 +24002,21 @@ var CharacterInfoUpdater = class {
     }
   }
   importBio(system, chummerChar) {
-    system.description.value = "";
-    if (chummerChar.description) {
-      system.description.value += TextEditor.enrichHTML(chummerChar.description + "<br/>");
-    }
-    if (chummerChar.background) {
-      system.description.value += TextEditor.enrichHTML(chummerChar.background + "<br/>");
-    }
-    if (chummerChar.concept) {
-      system.description.value += TextEditor.enrichHTML(chummerChar.concept + "<br/>");
-    }
-    if (chummerChar.notes) {
-      system.description.value += TextEditor.enrichHTML(chummerChar.notes + "<br/>");
-    }
+    return __async(this, null, function* () {
+      system.description.value = "";
+      if (chummerChar.description) {
+        system.description.value += yield TextEditor.enrichHTML(chummerChar.description + "<br/>", { async: true });
+      }
+      if (chummerChar.background) {
+        system.description.value += yield TextEditor.enrichHTML(chummerChar.background + "<br/>", { async: true });
+      }
+      if (chummerChar.concept) {
+        system.description.value += yield TextEditor.enrichHTML(chummerChar.concept + "<br/>", { async: true });
+      }
+      if (chummerChar.notes) {
+        system.description.value += yield TextEditor.enrichHTML(chummerChar.notes + "<br/>", { async: true });
+      }
+    });
   }
   importAttributes(system, chummerChar) {
     const atts = chummerChar.attributes[1].attribute;
@@ -23906,7 +24044,7 @@ var CharacterInfoUpdater = class {
     for (let i = 0; i < chummerSkills.length; i++) {
       try {
         const chummerSkill = chummerSkills[i];
-        if (chummerSkill.rating > 0 && chummerSkill.islanguage) {
+        if ((chummerSkill.rating > 0 || chummerSkill.isnativelanguage === "True") && chummerSkill.islanguage) {
           let determinedGroup = "active";
           let parsedSkill = null;
           if (chummerSkill.islanguage && chummerSkill.islanguage.toLowerCase() === "true") {
@@ -23914,6 +24052,9 @@ var CharacterInfoUpdater = class {
             parsedSkill = {};
             system.skills.language.value[id] = parsedSkill;
             determinedGroup = "language";
+            if (chummerSkill.isnativelanguage === "True") {
+              chummerSkill.rating = 6;
+            }
           } else if (chummerSkill.knowledge && chummerSkill.knowledge.toLowerCase() === "true") {
             const id = randomID(16);
             const category = chummerSkill.skillcategory_english;
@@ -23955,7 +24096,9 @@ var CharacterInfoUpdater = class {
               parsedSkill.name = chummerSkill.name;
             parsedSkill.base = parseInt(chummerSkill.rating);
             if (chummerSkill.skillspecializations) {
-              parsedSkill.specs = this.getArray(chummerSkill.skillspecializations.skillspecialization.name);
+              parsedSkill.specs = this.getArray(
+                chummerSkill.skillspecializations.skillspecialization.name
+              );
             }
             _mergeWithMissingSkillFields(parsedSkill);
           }
@@ -24067,11 +24210,13 @@ var SinParser = class extends BaseGearParser {
     const parsedLicenses = [];
     chummerLicenses.forEach((chummerLicense) => {
       if (chummerLicense.category === "ID/Credsticks") {
-        parsedLicenses.push({
-          name: chummerLicense.extra,
-          rtg: chummerLicense.rating,
-          description: ""
-        });
+        parsedLicenses.push(
+          {
+            name: chummerLicense.extra,
+            rtg: chummerLicense.rating,
+            description: ""
+          }
+        );
       }
     });
     return parsedLicenses;
@@ -24751,7 +24896,8 @@ var CharacterImporter = class {
         return;
       }
       const chummerCharacter = chummerFile.characters.character;
-      const updatedActorData = new CharacterInfoUpdater().update(actor._source, chummerCharacter);
+      const characterInfoUpdater = new CharacterInfoUpdater();
+      const updatedActorData = yield characterInfoUpdater.update(actor._source, chummerCharacter);
       const items = new ItemsParser().parse(chummerCharacter, importOptions);
       yield actor.update(updatedActorData);
       yield actor.createEmbeddedDocuments("Item", items);
@@ -24792,7 +24938,9 @@ var ChummerImportForm = class extends FormApplication {
       };
       const importer = new CharacterImporter();
       yield importer.importChummerCharacter(this.object, chummerFile, importOptions);
-      (_a = ui.notifications) == null ? void 0 : _a.info("Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;");
+      (_a = ui.notifications) == null ? void 0 : _a.info(
+        "Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;"
+      );
       this.close();
     }));
   }
@@ -25540,14 +25688,18 @@ var SR5BaseActorSheet = class extends ActorSheet {
   _onRollSkill(event) {
     return __async(this, null, function* () {
       event.preventDefault();
-      const skillId = Helpers.listItemId(event);
+      const itemId = Helpers.listItemId(event);
+      const skillId = itemId.includes(".") ? itemId.split(".")[0] : itemId;
+      if (!skillId)
+        return console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`);
       return this.actor.rollSkill(skillId, { event });
     });
   }
   _onRollSkillSpec(event) {
     return __async(this, null, function* () {
       event.preventDefault();
-      const skillId = Helpers.listItemId(event);
+      const itemId = Helpers.listItemId(event);
+      const skillId = itemId.includes(".") ? itemId.split(".")[0] : itemId;
       return this.actor.rollSkill(skillId, { event, specialization: true });
     });
   }
@@ -25575,9 +25727,15 @@ var SR5BaseActorSheet = class extends ActorSheet {
     if (!skill || !category) {
       return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`);
     }
-    this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {
-      event
-    }, skill, category);
+    this._showSkillEditForm(
+      KnowledgeSkillEditSheet,
+      this.actor,
+      {
+        event
+      },
+      skill,
+      category
+    );
   }
   _onShowEditLanguageSkill(event) {
     return __async(this, null, function* () {
@@ -25950,7 +26108,7 @@ var SR5ICActorSheet = class extends SR5BaseActorSheet {
       const dropData = JSON.parse(event.dataTransfer.getData("text/plain"));
       switch (dropData.type) {
         case "Item":
-          return yield this.object.addICHost(dropData.id);
+          return yield this.object.addICHost(dropData.uuid);
       }
       return __superGet(SR5ICActorSheet.prototype, this, "_onDrop").call(this, event);
     });
@@ -26091,7 +26249,7 @@ var SR5VehicleActorSheet = class extends SR5BaseActorSheet {
       const dropData = JSON.parse(event.dataTransfer.getData("text/plain"));
       switch (dropData.type) {
         case "Actor":
-          return yield this.actor.addVehicleDriver(dropData.id);
+          return yield this.actor.addVehicleDriver(dropData.uuid);
       }
       return __superGet(SR5VehicleActorSheet.prototype, this, "_onDrop").call(this, event);
     });
@@ -26550,11 +26708,13 @@ var ShadowrunActorDialogs = class {
       }
     };
     if ((_a = options.skill.specs) == null ? void 0 : _a.length) {
-      options.skill.specs.forEach((spec) => buttons[spec] = {
-        label: spec,
-        callback: () => {
+      options.skill.specs.forEach(
+        (spec) => buttons[spec] = {
+          label: spec,
+          callback: () => {
+          }
         }
-      });
+      );
     }
     const onAfterClose = (html, selectedButton) => {
       const newAtt = Helpers.parseInputToString($(html).find('[name="attribute"]').val());
@@ -26683,10 +26843,10 @@ var PhysicalResistTest = class extends SuccessTest {
     return false;
   }
   static _getDefaultTestAction() {
-    return DefaultValues.minimalActionData({
+    return {
       "attribute": "body",
       "armor": true
-    });
+    };
   }
   get testModifiers() {
     return ["soak"];
@@ -26839,10 +26999,10 @@ var SpellCastingTest = class extends SuccessTest {
     return false;
   }
   static _getDefaultTestAction() {
-    return DefaultValues.minimalActionData({
+    return {
       skill: "spellcasting",
       attribute: "magic"
-    });
+    };
   }
   get testModifiers() {
     return ["global", "wounds"];
@@ -26866,7 +27026,11 @@ var SpellCastingTest = class extends SuccessTest {
   }
   prepareLimitValue() {
     const force = Number(this.data.force);
-    this.data.limit.mod = PartsList.AddUniquePart(this.data.limit.mod, "SR5.Force", SpellcastingRules.calculateLimit(force));
+    this.data.limit.mod = PartsList.AddUniquePart(
+      this.data.limit.mod,
+      "SR5.Force",
+      SpellcastingRules.calculateLimit(force)
+    );
   }
   calculateBaseValues() {
     super.calculateBaseValues();
@@ -26975,11 +27139,11 @@ var CombatSpellRules = class {
     Helpers.calcTotal(damage, { min: 0 });
     return damage;
   }
-  static modifyDirectDamageAfterHit(damage, attackerHits, defenderHits) {
-    return CombatRules.modifyDamageAfterHit(attackerHits, defenderHits, damage);
+  static modifyDirectDamageAfterHit(defender, damage, attackerHits, defenderHits) {
+    return CombatRules.modifyDamageAfterHit(defender, attackerHits, defenderHits, damage);
   }
-  static modifyIndirectDamageAfterHit(damage, attackerHits, defenderHits) {
-    return CombatRules.modifyDamageAfterHit(attackerHits, defenderHits, damage);
+  static modifyIndirectDamageAfterHit(defender, damage, attackerHits, defenderHits) {
+    return CombatRules.modifyDamageAfterHit(defender, attackerHits, defenderHits, damage);
   }
   static modifyDamageAfterMiss(damage) {
     return CombatRules.modifyDamageAfterMiss(damage);
@@ -26996,15 +27160,30 @@ var CombatSpellRules = class {
     }
     return foundry.utils.duplicate(damage);
   }
-  static modifyDamageAfterHit(spellType, combatType, damage, attackerHits, defenderHits) {
+  static modifyDamageAfterHit(defender, spellType, combatType, damage, attackerHits, defenderHits) {
     if (spellType === "mana" && combatType === "direct") {
-      return CombatSpellRules.modifyDirectDamageAfterHit(damage, attackerHits, defenderHits);
+      return CombatSpellRules.modifyDirectDamageAfterHit(
+        defender,
+        damage,
+        attackerHits,
+        defenderHits
+      );
     }
     if (spellType === "physical" && combatType === "direct") {
-      return CombatSpellRules.modifyDirectDamageAfterHit(damage, attackerHits, defenderHits);
+      return CombatSpellRules.modifyDirectDamageAfterHit(
+        defender,
+        damage,
+        attackerHits,
+        defenderHits
+      );
     }
     if (combatType === "indirect") {
-      return CombatSpellRules.modifyIndirectDamageAfterHit(damage, attackerHits, defenderHits);
+      return CombatSpellRules.modifyIndirectDamageAfterHit(
+        defender,
+        damage,
+        attackerHits,
+        defenderHits
+      );
     }
     return foundry.utils.duplicate(damage);
   }
@@ -27077,7 +27256,16 @@ var CombatSpellDefenseTest = class extends DefenseTest {
       const spellData = (_a = this.item) == null ? void 0 : _a.asSpell();
       if (!spellData)
         return;
-      this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(spellData.data.type, spellData.data.combat.type, this.data.incomingDamage, this.against.hits.value, this.hits.value);
+      if (!this.actor)
+        return;
+      this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(
+        this.actor,
+        spellData.data.type,
+        spellData.data.combat.type,
+        this.data.incomingDamage,
+        this.against.hits.value,
+        this.hits.value
+      );
       yield __superGet(CombatSpellDefenseTest.prototype, this, "processFailure").call(this);
     });
   }
@@ -27164,10 +27352,10 @@ var ComplexFormTest = class extends SuccessTest {
     return false;
   }
   static _getDefaultTestAction() {
-    return DefaultValues.minimalActionData({
+    return {
       skill: "software",
       attribute: "resonance"
-    });
+    };
   }
   get testModifiers() {
     return ["global", "wounds"];
@@ -27195,7 +27383,11 @@ var ComplexFormTest = class extends SuccessTest {
   }
   prepareLimitValue() {
     const level = Number(this.data.level);
-    this.data.limit.mod = PartsList.AddUniquePart(this.data.limit.mod, "SR5.Level", ComplexFormRules.calculateLimit(level));
+    this.data.limit.mod = PartsList.AddUniquePart(
+      this.data.limit.mod,
+      "SR5.Level",
+      ComplexFormRules.calculateLimit(level)
+    );
   }
   calculateBaseValues() {
     super.calculateBaseValues();
@@ -27440,10 +27632,10 @@ var DroneInfiltrationTest = class extends SuccessTest {
 // src/module/tests/SupressionDefenseTest.ts
 var SupressionDefenseTest = class extends PhysicalDefenseTest {
   static _getDefaultTestAction() {
-    return DefaultValues.minimalActionData({
+    return {
       "attribute": "reaction",
       "attribute2": "edge"
-    });
+    };
   }
   processFailure() {
     return __async(this, null, function* () {
@@ -27767,5 +27959,4 @@ HandlebarManager.registerHelpers();
  */
 /*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
-/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 //# sourceMappingURL=bundle.js.map
