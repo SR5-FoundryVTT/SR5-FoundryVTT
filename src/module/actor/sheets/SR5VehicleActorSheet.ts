@@ -82,7 +82,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         // Handle specific system drop events.
         switch (dropData.type) {
             case "Actor":
-                return await this.actor.addVehicleDriver(dropData.id)
+                return await this.actor.addVehicleDriver(dropData.uuid)
         }
 
         // Handle none specific drop events.

@@ -63,7 +63,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         switch(dropData.type) {
             case 'Item':
                 // We don't have to narrow down type here, the SR5Actor will handle this for us.
-                return await this.object.addICHost(dropData.id);
+                return await this.object.addICHost(dropData.uuid);
         }
 
         // Let Foundry handle default cases.
