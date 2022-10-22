@@ -44,8 +44,15 @@ export class RangedParser extends WeaponParserBase {
     Parse(jsonData: object, data: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         data = super.Parse(jsonData, data, jsonTranslation);
 
-        data.data.range.rc.base = ImportHelper.IntValue(jsonData, 'rc');
-        data.data.range.rc.value = ImportHelper.IntValue(jsonData, 'rc');
+        // Some new weapons don't have any rc defined in XML.
+        if (jsonData.hasOwnProperty('rc')) {
+            data.data.range.rc.base = ImportHelper.IntValue(jsonData, 'rc');
+            data.data.range.rc.value = ImportHelper.IntValue(jsonData, 'rc');
+        } else {
+            data.data.range.rc.base = 0;
+            data.data.range.rc.value = 0;
+        }
+        
 
         if (jsonData.hasOwnProperty('range')) {
             data.data.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'range')];
