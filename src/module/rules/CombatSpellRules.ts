@@ -6,6 +6,7 @@ import CombatSpellType = Shadowrun.CombatSpellType;
 import SpellType = Shadowrun.SpellType;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import {DefaultValues} from "../data/DataDefaults";
+import { SR5Actor } from "../actor/SR5Actor";
 
 export class CombatSpellRules {
     /**
@@ -44,16 +45,17 @@ export class CombatSpellRules {
     /**
      * Modify incoming direct combat spell damage as defined in SR5#283 Combat Spell direct section.
      *
+     * @param defender The active defender
      * @param damage Incoming damage including base damage values.
      * @param attackerHits The attackers hits achieved
      * @param defenderHits The defenders hits achieved
      */
-    static modifyDirectDamageAfterHit(damage: DamageData, attackerHits: number, defenderHits: number): DamageData {
-        return CombatRules.modifyDamageAfterHit(attackerHits, defenderHits, damage);
+    static modifyDirectDamageAfterHit(defender: SR5Actor, damage: DamageData, attackerHits: number, defenderHits: number): DamageData {
+        return CombatRules.modifyDamageAfterHit(defender, attackerHits, defenderHits, damage);
     }
 
-    static modifyIndirectDamageAfterHit(damage: DamageData, attackerHits: number, defenderHits): DamageData {
-        return CombatRules.modifyDamageAfterHit(attackerHits, defenderHits, damage);
+    static modifyIndirectDamageAfterHit(defender: SR5Actor, damage: DamageData, attackerHits: number, defenderHits): DamageData {
+        return CombatRules.modifyDamageAfterHit(defender, attackerHits, defenderHits, damage);
     }
 
     static modifyDamageAfterMiss(damage: DamageData): DamageData {
@@ -93,28 +95,32 @@ export class CombatSpellRules {
     /**
      * Modify incoming damage for a combat spell after the spell hit the defending target according to SR5#283 Section 'Combat Defense'
      *
+     * @param defender The active defender
      * @param spellType The general spell type.
      * @param combatType The combat spell type.
      * @param damage The incoming damage.
      * @param attackerHits Hits achieved by the spell attack aster.
      * @param defenderHits Hits achieved by the defender against the spell attack.
      */
-    static modifyDamageAfterHit(spellType: SpellType, combatType: CombatSpellType, damage: DamageData, attackerHits: number, defenderHits: number): DamageData {
+    static modifyDamageAfterHit(defender: SR5Actor, spellType: SpellType, combatType: CombatSpellType, damage: DamageData, attackerHits: number, defenderHits: number): DamageData {
 
         if (spellType === 'mana' && combatType === 'direct') {
             return CombatSpellRules.modifyDirectDamageAfterHit(
+                defender,
                 damage,
                 attackerHits,
                 defenderHits);
         }
         if (spellType === 'physical' && combatType === 'direct') {
             return CombatSpellRules.modifyDirectDamageAfterHit(
+                defender,
                 damage,
                 attackerHits,
                 defenderHits);
         }
         if (combatType === 'indirect') {
             return CombatSpellRules.modifyIndirectDamageAfterHit(
+                defender,
                 damage,
                 attackerHits,
                 defenderHits);

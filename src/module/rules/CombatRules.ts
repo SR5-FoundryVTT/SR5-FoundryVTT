@@ -98,23 +98,28 @@ export class CombatRules {
     /**
      * Modify Damage according to combat sequence (SR5#173) part defend. Successfull attack.
      *
+     * @param defender The active defender
      * @param attackerHits The attackers hits. Should be a positive number.
      * @param defenderHits The attackers hits. Should be a positive number.
      * @param damage Incoming damage to be modified
      * @return A new damage object for modified damage.
      */
-    static modifyDamageAfterHit(attackerHits: number, defenderHits: number, damage: DamageData): DamageData {
-        const modifiedDamage = foundry.utils.duplicate(damage);
+    static modifyDamageAfterHit(defender: SR5Actor, attackerHits: number, defenderHits: number, damage: DamageData): DamageData {
+        let modified = foundry.utils.duplicate(damage);
 
         // netHits should never be below zero...
         if (attackerHits < 0) attackerHits = 0;
         if (defenderHits < 0) defenderHits = 0;
 
-        PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Attacker', attackerHits);
-        PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Defender', -defenderHits);
-        modifiedDamage.value = Helpers.calcTotal(modifiedDamage, {min: 0});
+        // SR5#173  Step3: Defend B.
+        PartsList.AddUniquePart(modified.mod, 'SR5.Attacker', attackerHits);
+        PartsList.AddUniquePart(modified.mod, 'SR5.Defender', -defenderHits);
+        modified.value = Helpers.calcTotal(modified, {min: 0});
 
-        return modifiedDamage;
+        // SR5#173 Step 3: Defend B.
+        modified = CombatRules.modifyDamageTypeAfterHit(modified, defender);
+
+        return modified;
     }
 
     /**
@@ -156,7 +161,6 @@ export class CombatRules {
 
         // modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
         let {modified} = SoakRules.reduceDamage(actor, damage, hits);
-        modified = SoakRules.modifyDamageType(modified, actor);
 
         Helpers.calcTotal(modified, {min: 0});
 
@@ -181,5 +185,29 @@ export class CombatRules {
         modifiedArmor.value = Helpers.calcTotal(modifiedArmor, {min: 0});
 
         return modifiedArmor;
+    }
+
+    /**
+     * Changes the damage type based on the incoming damage type and the actor state (armor, matrix perception..)
+     * @param damage The incoming damage
+     * @param actor The actor affected by the damage
+     * @returns The updated damage data
+     */
+     static modifyDamageTypeAfterHit(damage: DamageData, actor : SR5Actor) : DamageData {
+        // Careful, order of damage conversion is very important
+        // Electricity stun damage is considered physical for vehicles
+        let updatedDamage = duplicate(damage) as DamageData;
+        if (actor.isVehicle() && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
+            updatedDamage.type.value = 'physical';
+        }
+
+        const damageSourceItem = Helpers.findDamageSource(damage);
+        if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
+            // Damage from direct combat spells is never converted
+            return updatedDamage;
+        }
+
+        updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
+        return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
     }
 }

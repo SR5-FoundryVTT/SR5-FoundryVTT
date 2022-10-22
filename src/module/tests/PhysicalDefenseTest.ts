@@ -179,7 +179,9 @@ export class PhysicalDefenseTest extends DefenseTest {
     }
 
     async processFailure() {
-        this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
+        if (!this.actor) return;
+
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.actor, this.against.hits.value, this.hits.value, this.data.incomingDamage);
 
         await super.processFailure();
     }
