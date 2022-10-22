@@ -1,16 +1,16 @@
-import {DefaultValues} from "../data/DataDefaults";
 import { CombatRules } from "../rules/CombatRules";
 import { PhysicalDefenseTest, PhysicalDefenseTestData } from "./PhysicalDefenseTest";
+import MinimalActionData = Shadowrun.MinimalActionData;
 
 
 export class SupressionDefenseTest extends PhysicalDefenseTest {
     public data: PhysicalDefenseTestData;
 
-    static _getDefaultTestAction() {
-        return DefaultValues.minimalActionData({
+    static _getDefaultTestAction(): Partial<MinimalActionData> {
+        return {
             'attribute': 'reaction',
             'attribute2': 'edge'
-        });
+        };
     }
 
     async processFailure() {

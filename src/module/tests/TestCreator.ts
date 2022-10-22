@@ -372,8 +372,10 @@ export const TestCreator = {
             // Apply matrix modifiers, when applicable
             if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
         }
+        
         // A general pool modifier will be used as a base value.
-        // TODO: what is action.mod on the action GUI?
+        // NOTE: This might not be transparent to users, instead a normal .mod entry might better?
+        //       That might clash with general pool modifier compilation though.
         if (action.mod) {
             data.pool.base = Number(action.mod);
         }
