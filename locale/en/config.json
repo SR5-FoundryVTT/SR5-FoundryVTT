@@ -506,7 +506,7 @@
   "SR5.MatrixInit": "Matrix Init",
   "SR5.MatrixDice": "Matrix Init Dice",
   "SR5.MeatSpaceInit": "Meatspace Init",
-  "SR5.MeatSpaceDice": "Meatspace Dice",
+  "SR5.MeatSpaceDice": "Meatspace Init Dice",
   "SR5.PhysicalLimit": "Physical Limit",
   "SR5.MentalLimit": "Mental Limit",
   "SR5.SocialLimit": "Social Limit",
