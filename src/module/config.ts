@@ -50,9 +50,11 @@ export const SR5 = {
      * All labels for all limits used across all actor and item types.
      */
     limits: {
+        // TODO: Add magic attribute.
         physical: 'SR5.LimitPhysical',
         social: 'SR5.LimitSocial',
         mental: 'SR5.LimitMental',
+        astral: 'SR5.LimitAstral',
         attack: 'SR5.MatrixAttrAttack',
         sleaze: 'SR5.MatrixAttrSleaze',
         data_processing: 'SR5.MatrixAttrDataProc',
@@ -337,6 +339,7 @@ export const SR5 = {
         physical_limit: 'SR5.PhysicalLimit',
         social_limit: 'SR5.SocialLimit',
         mental_limit: 'SR5.MentalLimit',
+        astral_limit: 'SR5.AstralLimit',
         stun_track: 'SR5.StunTrack',
         physical_track: 'SR5.PhysicalTrack',
         physical_overflow_track: 'SR5.PhysicalOverflowTrack',

@@ -32,6 +32,7 @@ export class SpiritPrep {
 
         LimitsPrep.prepareLimitBaseFromAttributes(data);
         LimitsPrep.prepareLimits(data);
+        LimitsPrep.prepareDerivedLimits(data);
 
         SpiritPrep.prepareSpiritArmor(data);
 

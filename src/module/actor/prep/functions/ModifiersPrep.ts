@@ -16,7 +16,7 @@ export class ModifiersPrep {
     static prepareModifiers(system: ActorTypesData) {
         let modifiers = ModifiersPrep.commonModifiers;
         modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
-        modifiers = modifiers.concat(ModifiersPrep.characterModifiers)
+        modifiers = modifiers.concat(ModifiersPrep.characterModifiers);
         ModifiersPrep.setupModifiers(system, modifiers);
     }
 
@@ -31,6 +31,7 @@ export class ModifiersPrep {
             'physical_limit',
             'social_limit',
             'mental_limit',
+            'astral_limit',
             'stun_track',
             'physical_track',
             'physical_overflow_track',

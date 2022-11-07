@@ -7,6 +7,7 @@ import EquipmentData = Shadowrun.EquipmentData;
 import QualityData = Shadowrun.QualityData;
 import ActionRollData = Shadowrun.ActionRollData;
 import LimitData = Shadowrun.LimitData;
+import LimitField = Shadowrun.LimitField;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import SkillField = Shadowrun.SkillField;
 import TrackType = Shadowrun.TrackType;
@@ -183,6 +184,17 @@ export class DefaultValues {
             attribute: '',
             mod: []
         }, partialLimitData) as LimitData;
+    }
+
+    static limitField(partialLimitField: Partial<LimitField> = {}): LimitField {
+        return mergeObject({
+            value: 0,
+            base: 0,
+            attribute: '',
+            label: '',
+            hidden: false,
+            mod: []
+        }, partialLimitField) as LimitField;
     }
 
     static opposedTestData(partialOpposedTestData: Partial<OpposedTestData> = {}): OpposedTestData {

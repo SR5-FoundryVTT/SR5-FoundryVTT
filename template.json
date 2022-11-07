@@ -67,6 +67,12 @@
                         "value": 1,
                         "mod": [],
                         "min": 1
+                    },
+                    "astral": {
+                        "base": 0,
+                        "value": 1,
+                        "mod": [],
+                        "min": 1
                     }
                 }
             },
