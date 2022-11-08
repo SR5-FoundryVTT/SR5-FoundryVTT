@@ -50,7 +50,6 @@ export const SR5 = {
      * All labels for all limits used across all actor and item types.
      */
     limits: {
-        // TODO: Add magic attribute.
         physical: 'SR5.LimitPhysical',
         social: 'SR5.LimitSocial',
         mental: 'SR5.LimitMental',
@@ -61,7 +60,8 @@ export const SR5 = {
         firewall: 'SR5.MatrixAttrFirewall',
         speed: 'SR5.Vehicle.Stats.Speed',
         sensor: 'SR5.Vehicle.Stats.Sensor',
-        handling: 'SR5.Vehicle.Stats.Handling'
+        handling: 'SR5.Vehicle.Stats.Handling',
+        magic: 'SR5.AttrMagic'
     },
 
     specialTypes: {

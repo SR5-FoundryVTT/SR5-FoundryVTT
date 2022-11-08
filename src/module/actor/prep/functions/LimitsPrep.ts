@@ -36,14 +36,18 @@ export class LimitsPrep {
      * Some limits are derived from others or must be caluclated last.
      */
     static prepareDerivedLimits(system: ActorTypesData) {
-        const {limits, modifiers, special} = system;
+        const {limits, modifiers, special, attributes} = system;
 
         if (special === 'magic') {
+            // Astral limit.
             limits.astral = LimitRules.calculateAstralLimit(limits.astral, limits.mental, limits.social);
             limits.astral.mod = PartsList.AddUniquePart(limits.astral.mod, "SR5.Bonus", Number(modifiers['astral_limit']));
-            limits.astral.label = SR5.limits.astral;
-
             Helpers.calcTotal(limits.astral);
+
+            // Magic attribute as limit, hidden as it's directly derived from an attribute.
+            limits.magic = LimitRules.calculateMagicLimit(attributes.magic);
+            limits.magic.hidden = true;
+            Helpers.calcTotal(limits.magic);
         }
     }
 }
