@@ -341,7 +341,6 @@ export const TestCreator = {
         const pool = new PartsList<number>(data.pool.mod);
 
         // Prepare pool values.
-        // TODO: Check if knowledge / language skills can be used for actions.
         if (action.skill) {
             // Grab the skill by its id (default skills), or its label (custom skills).
             const skill = actor.getSkill(action.skill) ?? actor.getSkill(action.skill, {byLabel: true});
