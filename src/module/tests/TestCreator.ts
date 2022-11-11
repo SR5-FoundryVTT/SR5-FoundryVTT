@@ -342,9 +342,9 @@ export const TestCreator = {
 
         // Prepare pool values.
         // TODO: Check if knowledge / language skills can be used for actions.
-        // TODO: Handle skill improvisation.
         if (action.skill) {
-            const skill = actor.getSkill(action.skill);
+            // Grab the skill by its id (default skills), or its label (custom skills).
+            const skill = actor.getSkill(action.skill) ?? actor.getSkill(action.skill, {byLabel: true});
 
             // Notify user about their sins.
             if (skill && !SkillFlow.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
