@@ -173,6 +173,8 @@ export const TestCreator = {
      * @param options
      */
     fromMessageAction: async function(id: string, testClsName: string, options?: TestOptions): Promise<SuccessTest | undefined> {
+        if (!game.user) return;
+        
         const message = game.messages?.get(id);
         if (!message) {
             console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
@@ -193,12 +195,21 @@ export const TestCreator = {
             return;
         }
 
-
-        const targets = await Helpers.getTestTargetActors(testData.data);
-        const actors = targets.length > 0 ? targets : Helpers.getSelectedActorsOrCharacter();
+        // Determine actors to roll test with.
+        // First - use selection or targets.
+        let actors = Helpers.userHasControlledTokens() ? 
+            Helpers.getControlledTokenActors() :
+            await Helpers.getTestTargetActors(testData.data);
+            
+        // Second - filter out actors current user shouldn't be able to test with.
+        actors = actors.filter(actor => actor.isOwner);
+        // Last - Fallback to player character.
+        if (actors.length === 0 && game.user.character) actors.push(game.user.character);
 
         if (actors.length === 0)
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
+        else 
+            console.log('Shadowrun 5e | Casting an opposed test using these actors', actors, testData);
 
         for (const actor of actors) {
             const data = await testClass._getOpposedActionTestData(testData.data, actor, id);
@@ -207,7 +218,6 @@ export const TestCreator = {
             const documents = {actor};
             const test = new testClass(data, documents, options);
 
-            // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
             // Await test chain resolution for each actor, to avoid dialog spam.
             await test.execute();
         }

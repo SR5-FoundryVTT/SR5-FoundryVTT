@@ -386,17 +386,44 @@ export class Helpers {
         return canvas.tokens.controlled;
     }
 
+    /**
+     * Determine if the current user has any tokens selected.
+     * @returns true if one or more tokens have been selected.
+     */
+    static userHasControlledTokens(): boolean {
+        if (!canvas || !canvas.ready || !canvas.tokens) return false;
+        return canvas.tokens.controlled.length > 0;
+    }
+
+    /**
+     * Return all actors connected to all user controlled tokens.
+     * @returns An array token actors.
+     */
+    static getControlledTokenActors(): SR5Actor[] {
+        if (!canvas || !canvas.ready) return []
+
+        const tokens = Helpers.getControlledTokens();
+        return tokens.map(token => token.actor) as SR5Actor[];
+    }
+
+    /**
+     * return all tokens a user has targeted at the moment.
+     * @returns An array tokens.
+     */
     static getTargetedTokens(): Token[] {
         if (!canvas.ready || !game.user) return [];
 
         return Array.from(game.user.targets);
     }
 
+    /**
+     * Return either all user selected token actors or the users game character actor.
+     * @returns An array of actors.
+     */
     static getSelectedActorsOrCharacter(): SR5Actor[] {
         if (!game.user) return [];
 
-        const tokens = Helpers.getControlledTokens();
-        const actors = tokens.map(token => token.actor);
+        const actors = Helpers.getControlledTokenActors();
 
         // Try to default to a users character.
         if (actors.length === 0 && game.user.character) {
