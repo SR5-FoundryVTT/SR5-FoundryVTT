@@ -200,7 +200,7 @@ export const TestCreator = {
         let actors = Helpers.userHasControlledTokens() ? 
             Helpers.getControlledTokenActors() :
             await Helpers.getTestTargetActors(testData.data);
-            
+
         // Second - filter out actors current user shouldn't be able to test with.
         actors = actors.filter(actor => actor.isOwner);
         // Last - Fallback to player character.
@@ -507,26 +507,50 @@ export const TestCreator = {
      * Merge multiple MinimalActionData objects into one action object. This will only look at keys within a minimal action,
      * not all action keys.
      *
-     * Each MinimalActionData can contain only a partial, and an existing property will always overwrite either the
-     * main action or previously set values of this property from other MinimalActionDatas.
+     * A value of a minimal action will only overwrite the main action value if that is not set.
+     * 
+     * For example:
+     * A: action.skill == '' will be overwritten by minimalAction.skill == 'Spellcasting'
+     * B: action.skill == 'ritual_spellcasting' won't be overwritten by minimalAction.skill == 'Spellcasting'
+     * C: action.armor == true will be overwritten by minimalAction.armor == false
      *
-     * @param action The main action
-     * @param minimalActions A list of partial action properties.
+     * @param action Main action, as defined by user input.
+     * @param defaultActions List of partial actions, as defined by test implementions.
      * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
      */
-    _mergeMinimalActionDataInOrder: function(action, ...minimalActions: Partial<MinimalActionData>[]): ActionRollData {
+    _mergeMinimalActionDataInOrder: function(action, ...defaultActions: Partial<MinimalActionData>[]): ActionRollData {
         // This action might be taken from ItemData, causing changes to be reflected upstream.
-        action = duplicate(action);
+        const resultAction = foundry.utils.duplicate(action);
 
-        // Overwrite keys from second action on forward in indexed order.
-        for (const minimalAction of minimalActions) {
+        // Check if overwriting default 
+        for (const defaultAction of defaultActions) {
              for (const key of Object.keys(DefaultValues.minimalActionData())) {
-                 if (!minimalAction.hasOwnProperty(key)) continue;
-                 action[key] = minimalAction[key];
+                 if (TestCreator._keepActionValue(resultAction, defaultAction, key)) continue;
+
+                 resultAction[key] = defaultAction[key];
              }
         }
 
-        return action;
+        return resultAction;
+    },
+
+    /**
+     * Should an action value be kept even if a default action defines another value?
+     * 
+     * @param action The original action data.
+     * @param defaultAction A partial action that may provide values to apply to the main action.
+     * @param key The action key to take the value from
+     * @returns true for when the orgiginal action value should be kept, false if it's to be overwritten.
+     */
+    _keepActionValue(action: ActionRollData, defaultAction: Partial<MinimalActionData>, key: string): boolean {
+        if (!defaultAction.hasOwnProperty(key)) return true;
+        const value = action[key];
+        const type = foundry.utils.getType(value);
+
+        if (type === 'string') return value.length > 0;
+        if (type === 'Array') return value.length > 0;
+
+        return false;
     },
 
     /**
