@@ -537,6 +537,9 @@ export const TestCreator = {
     /**
      * Should an action value be kept even if a default action defines another value?
      * 
+     * The comparison uses a rather simple approach of only comparing some data types, assuming that 
+     * a defaultAction shouldn't define ALL action fields but only some.
+     * 
      * @param action The original action data.
      * @param defaultAction A partial action that may provide values to apply to the main action.
      * @param key The action key to take the value from
@@ -547,7 +550,11 @@ export const TestCreator = {
         const value = action[key];
         const type = foundry.utils.getType(value);
 
+        // A value name should only be overwritten when no value has been user selected.
+        // This would affect .skill and .attribute like fields.
         if (type === 'string') return value.length > 0;
+        // A list of value names should only be overwritten when not one has been user selected.
+        // This would affect .modifiers like fields.
         if (type === 'Array') return value.length > 0;
 
         return false;
