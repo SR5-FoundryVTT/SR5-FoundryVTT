@@ -3,8 +3,21 @@ import {Helpers} from "./helpers";
 import {ActionResultFlow} from "./item/flows/ActionResultFlow";
 
 
-export const addRollListeners = (app: ChatMessage, html) => {
+/**
+ * WARN: I don't know why, but removing addRollListener, or some of the remaing functions in chat.ts (or their usage in SR5Item#postItemCard, see createItemChatMessage)
+ * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of transpiled bundle.js code, resulting OpposedTest not finding SuccessTest (undefined)
+ * due to JavaScript order issues....
+ * 
+ * ... I'd love to remove or even just comment them out, but even though addRollListeners is unused, and therefore shaken out and not even included in the bundle, doing so will break
+ * everything...
+ * 
+ * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
+ * 
+ * An esbuild update might fix this, but caused other issues at the time...
+ */
 
+export const addRollListeners = (app: ChatMessage, html) => {
+    console.error("Shadowrun5e | addRollListeners is deprecated. Don't use it.");
     /**
      * Apply action results onto targets or selections.
      */
