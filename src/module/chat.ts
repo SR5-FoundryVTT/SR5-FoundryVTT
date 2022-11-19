@@ -1,27 +1,19 @@
 import {SR5Actor} from './actor/SR5Actor';
 import {SR5Item} from './item/SR5Item';
 import {CORE_FLAGS, CORE_NAME} from './constants';
-import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import {Helpers} from "./helpers";
 import {DamageApplicationFlow} from './actor/flows/DamageApplicationFlow';
-import AttackData = Shadowrun.AttackData;
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import { TestCreator } from './tests/TestCreator';
 
-export interface RollTargetChatMessage {
-    actor: SR5Actor
-    target?: Token | undefined
-    targets?: Token[]
-    item: SR5Item
-    tests: Test[]
-    roll: ShadowrunRoll
-    attack?: AttackData
-    rollMode?: keyof typeof CONFIG.Dice.rollModes
-}
-
-export interface TargetChatMessageOptions extends RollTargetChatMessage {
-    whisperTo: User
+/*
+ * Legacy type, still used for posting item cards only.
+ * Used to display the castable tests.
+ */
+export type ChatMessageCastableTest =  {
+    label: string;
+    type: string;
 }
 
 // Simple card text messages
@@ -29,7 +21,7 @@ export interface ItemChatMessageOptions {
     actor: SR5Actor
     item: SR5Item
     description: object
-    tests?: Test[]
+    tests?: ChatMessageCastableTest[]
 }
 
 interface ItemChatTemplateData {
@@ -38,7 +30,7 @@ interface ItemChatTemplateData {
     token: TokenDocument|null
     item: SR5Item
     description: object
-    tests?: Test[]
+    tests?: ChatMessageCastableTest[]
 }
 
 /**

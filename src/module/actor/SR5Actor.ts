@@ -1,4 +1,3 @@
-import {ShadowrunRoller} from '../rolls/ShadowrunRoller';
 import {Helpers} from '../helpers';
 import {SR5Item} from '../item/SR5Item';
 import {SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
@@ -908,11 +907,11 @@ export class SR5Actor extends Actor {
     }
 
     async promptRoll() {
-        await ShadowrunRoller.promptSuccessTest();
+        await TestCreator.promptSuccessTest();
     }
 
     /**
-     * The general action process has currently good way of injecting device ratings into the mix.
+     * The general action process has currently no good way of injecting device ratings into the mix.
      * So, let's trick a bit.
      *
      * @param options
@@ -981,39 +980,6 @@ export class SR5Actor extends Actor {
         if (!test) return;
 
         await test.execute();
-    }
-
-    async rollDroneInfiltration(options?: ActorRollOptions) {
-        if (!this.isVehicle()) {
-            return undefined;
-        }
-        //@ts-ignore // TODO: foundry-vtt-types v10
-        const actorData = duplicate(this.system) as VehicleData;
-        if (actorData.controlMode === 'autopilot') {
-            const parts = new PartsList<number>();
-
-            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
-            // TODO possibly look for autosoft item level?
-            const sneaking = this.findActiveSkill('sneaking');
-            const limit = this.findLimit('sensor');
-
-            if (sneaking && limit) {
-                parts.addPart('SR5.Vehicle.Stealth', Helpers.calcTotal(sneaking));
-                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
-
-                this._addGlobalParts(parts);
-
-                return ShadowrunRoller.advancedRoll({
-                    event: options?.event,
-                    actor: this,
-                    parts: parts.list,
-                    limit,
-                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDroneInfiltration'),
-                });
-            }
-        } else {
-            await this.rollSkill('sneaking', options);
-        }
     }
 
     /**

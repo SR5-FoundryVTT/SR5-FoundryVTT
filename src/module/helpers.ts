@@ -2,7 +2,6 @@ import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
-import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
 import DamageData = Shadowrun.DamageData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
@@ -10,15 +9,14 @@ import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import Skills = Shadowrun.Skills;
 import TargetedDocument = Shadowrun.TargetedDocument;
-import {PartsList} from './parts/PartsList';
-import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
-import {SR5Actor} from "./actor/SR5Actor";
-import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
-import {SR5Item} from './item/SR5Item';
-import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
-import {DataDefaults} from "./data/DataDefaults";
-import {SuccessTestData} from "./tests/SuccessTest";
-import {SR5} from "./config";
+import { SR5Actor } from "./actor/SR5Actor";
+import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
+import { SR5 } from "./config";
+import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
+import { DataDefaults } from "./data/DataDefaults";
+import { SR5Item } from './item/SR5Item';
+import { PartsList } from './parts/PartsList';
+import { SuccessTestData } from "./tests/SuccessTest";
 
 import SpellItemData = Shadowrun.SpellItemData;
 import WeaponItemData = Shadowrun.WeaponItemData;
@@ -741,32 +739,6 @@ export class Helpers {
         // Custom skills don't have labels, use their name instead.
         return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
     }
-
-
-    /**
-     * Support for the Dice So Nice module
-     *
-     * Dice So Nice Roll API: https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/API/Roll
-     *
-     * @param roll The roll thrown.
-     * @param whisper The user ids the roll should be shown to. Null for show all.
-     * @param blind Is the roll blind to current user?
-     *
-     */
-    static async showDiceSoNice(roll: ShadowrunRoll, whisper: string[], blind: boolean = false) {
-        // @ts-ignore // dice3d is a module
-        if (!game.dice3d) return;
-        // @ts-ignore
-        const synchronize = whisper?.length === 0 || whisper === null;
-        // @ts-ignore
-        whisper = whisper?.length > 0 ? whisper : null;
-        // @ts-ignore
-        await game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind);
-
-        //@ts-ignore
-        console.error(game.dice3d);
-    }
-
 
     /**
      * Fetch entities from global or pack collections using data acquired by Foundry Drag&Drop process

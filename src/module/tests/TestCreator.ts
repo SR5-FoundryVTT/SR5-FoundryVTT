@@ -11,7 +11,7 @@ import {
     TestDocuments,
     TestOptions
 } from "./SuccessTest";
-import {DataDefaults, DefaultValues} from "../data/DataDefaults";
+import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
@@ -295,6 +295,22 @@ export const TestCreator = {
         // Create the followup test based on tests documents and options.
         const documents = {item: test.item, actor: test.actor};
         return new testCls(testData, documents, options);
+    },
+
+    /*
+     * Prompt the user for a default SuccessTest
+     */
+    promptSuccessTest: async function() {
+        // Get the last used pool size for simple SuccessTestDialogs
+        const lastPoolValue = Number(game.user?.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue)) || 0;
+
+        const test = TestCreator.fromPool({pool: lastPoolValue});
+        await test.execute();
+
+        if (test.evaluated) {
+            // Store the last used pool size for the next simple SuccessTest
+            await game.user?.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, test.pool.value);
+        }
     },
 
     /** Internal helpers */

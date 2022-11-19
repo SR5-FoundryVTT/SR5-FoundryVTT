@@ -6,7 +6,6 @@ import {SR5Actor} from './actor/SR5Actor';
 import {SR5Item} from './item/SR5Item';
 import {SR5ItemSheet} from './item/SR5ItemSheet';
 import {SR5Token} from './token/SR5Token';
-import {ShadowrunRoller} from './rolls/ShadowrunRoller';
 import {HandlebarManager} from './handlebars/HandlebarManager';
 import {measureDistance} from './canvas';
 import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
@@ -105,10 +104,6 @@ ___________________
              */
             rollItemMacro,
             rollSkillMacro,
-            /**
-             * Complex test support (legacy).
-             */
-            ShadowrunRoller,
             /**
              * Should you only really need dice handling, use this. If you need more complex testing behaviour,
              * check the Test implementations.
@@ -295,9 +290,9 @@ ___________________
 
         // Connect chat dice icon to shadowrun basic success test roll.
         const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-        $(document).on('click', diceIconSelector, async () => await ShadowrunRoller.promptSuccessTest());
+        $(document).on('click', diceIconSelector, async () => await TestCreator.promptSuccessTest());
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
-        $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
+        $(document).on('click', diceIconSelectorNew, async () => await TestCreator.promptSuccessTest());
 
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
         HooksManager.registerSocketListeners();

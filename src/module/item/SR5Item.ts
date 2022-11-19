@@ -1,12 +1,11 @@
 import { SkillFlow } from "../actor/flows/SkillFlow";
 import { SR5Actor } from '../actor/SR5Actor';
-import { createItemChatMessage } from '../chat';
+import { createItemChatMessage, ChatMessageCastableTest } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
 import { DefaultValues } from "../data/DataDefaults";
 import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
-import { Test } from "../rolls/ShadowrunRoller";
 import { MatrixRules } from "../rules/MatrixRules";
 import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
@@ -876,7 +875,7 @@ export class SR5Item extends Item {
         return targets;
     }
 
-    getActionTests(): Test[] {
+    getActionTests(): ChatMessageCastableTest[] {
         if (!this.hasRoll) return []
 
         return [{
