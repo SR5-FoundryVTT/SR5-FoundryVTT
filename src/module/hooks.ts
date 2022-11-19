@@ -10,7 +10,6 @@ import {ShadowrunRoller} from './rolls/ShadowrunRoller';
 import {HandlebarManager} from './handlebars/HandlebarManager';
 import {measureDistance} from './canvas';
 import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
-
 import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
 import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
 import {Import} from './importer/apps/import-form';
@@ -25,14 +24,12 @@ import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
 import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
 import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
-
 import {SR5Roll} from "./rolls/SR5Roll";
 import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
 import {RangedAttackTest} from "./tests/RangedAttackTest";
 import {SuccessTest} from "./tests/SuccessTest";
 import {OpposedTest} from "./tests/OpposedTest";
 import {PhysicalResistTest} from "./tests/PhysicalResistTest";
-import {handleRenderChatMessage} from "./chat";
 import {MeleeAttackTest} from "./tests/MeleeAttackTest";
 import {SpellCastingTest} from "./tests/SpellCastingTest";
 import {DrainTest} from "./tests/DrainTest";

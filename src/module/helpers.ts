@@ -370,18 +370,6 @@ export class Helpers {
         return Math.round(length * LENGTH_UNIT_TO_METERS_MULTIPLIERS[fromUnit]);
     }
 
-    static getWeaponRange(distance: number, ranges: RangesTemplateData): RangeTemplateData {
-        // Assume ranges to be in ASC order and to define their max range.
-        // Should no range be found, assume distance to be out of range.
-        const rangeKey = Object.keys(ranges).find(range => distance < ranges[range].distance);
-        if (rangeKey) {
-            return ranges[rangeKey];
-        } else {
-            const {extreme} = ranges;
-            return Helpers.createRangeDescription('SR5.OutOfRange', extreme.distance, SR.combat.environmental.range_modifiers.out_of_range);
-        }
-    }
-
     static getControlledTokens(): Token[] {
         if (!canvas || !canvas.ready || !canvas.tokens) return [];
         return canvas.tokens.controlled;

@@ -1,6 +1,5 @@
 import { SkillFlow } from "../actor/flows/SkillFlow";
 import { SR5Actor } from '../actor/SR5Actor';
-import { ActionTestData } from '../apps/dialogs/ShadowrunItemDialog';
 import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
 import { DefaultValues } from "../data/DataDefaults";
@@ -24,7 +23,6 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import ActionRollData = Shadowrun.ActionRollData;
-import DamageData = Shadowrun.DamageData;
 import SpellData = Shadowrun.SpellData;
 import WeaponData = Shadowrun.WeaponData;
 import AmmoData = Shadowrun.AmmoData;
@@ -439,18 +437,13 @@ export class SR5Item extends Item {
         return parts;
     }
 
-    getBlastData(actionTestData?: ActionTestData): BlastData | undefined {
+    getBlastData(): BlastData | undefined {
         if (this.isSpell() && this.isAreaOfEffect()) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as SpellData;
 
             // By default spell distance is equal to it's Force.
             let distance = this.getLastSpellForce().value;
-
-            // Except for predefined user test selection.
-            if (actionTestData?.spell) {
-                distance = actionTestData.spell.force;
-            }
 
             // Extended spells have a longer range.
             if (system.extended) distance *= 10;

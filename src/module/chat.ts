@@ -1,18 +1,12 @@
 import {SR5Actor} from './actor/SR5Actor';
 import {SR5Item} from './item/SR5Item';
-import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
+import {CORE_FLAGS, CORE_NAME} from './constants';
 import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import {Helpers} from "./helpers";
 import {DamageApplicationFlow} from './actor/flows/DamageApplicationFlow';
 import AttackData = Shadowrun.AttackData;
-import DrainData = Shadowrun.DrainData;
-import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
-import CombatData = Shadowrun.CombatData;
-import ActionResultData = Shadowrun.ActionResultData;
-import {ActionTestData} from "./apps/dialogs/ShadowrunItemDialog";
-import {ActionResultFlow} from "./item/flows/ActionResultFlow";
 import { TestCreator } from './tests/TestCreator';
 
 export interface RollTargetChatMessage {
@@ -38,31 +32,6 @@ export interface ItemChatMessageOptions {
     tests?: Test[]
 }
 
-export interface RollChatMessageOptions {
-    title: string
-    roll: ShadowrunRoll
-    actor?: SR5Actor
-    target?: Token
-    targets?: Token[]
-
-    item?: SR5Item
-
-    description?: object
-
-    rollMode?: keyof typeof CONFIG.Dice.rollModes
-    previewTemplate?: boolean
-
-    attack?: AttackData
-    incomingAttack?: AttackData
-    incomingDrain?: DrainData
-    damage?: ModifiedDamageData
-    tests?: Test[]
-    combat?: CombatData
-    reach?: number
-    result?: ActionResultData
-    actionData?: ActionTestData
-}
-
 interface ItemChatTemplateData {
     title: string
     actor: SR5Actor
@@ -70,12 +39,6 @@ interface ItemChatTemplateData {
     item: SR5Item
     description: object
     tests?: Test[]
-}
-
-interface RollChatTemplateData extends RollChatMessageOptions {
-    tokenId?: string
-    targetTokenId?: string
-    rollMode: keyof typeof CONFIG.Dice.rollModes
 }
 
 /**
@@ -141,74 +104,59 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
     }
 }
 
-/**
- * Return a mixed Scene and Token id data pair, separated by a dot '.'.
- *
- * This is needed for later retrieval of token related data from a chat message, should the scene have been switched after
- * the chat message has been created.
- *
- * TODO: Store the scene id in the chat message data or flag in it's OWN data property instead of a mixed special case.
- *
- * @param token What token the sceneTokenId must be created for.
- * @return '<SceneId>.<TokenId>'
- */
-function getTokenSceneId(token: TokenDocument | undefined | null): string | undefined {
-    const scene = token?.parent;
-
-    if (!token || !scene) return;
-    return `${scene.id}.${token.id}`;
-}
-
 export const addRollListeners = (app: ChatMessage, html) => {
-
     /**
      * Apply action results onto targets or selections.
      */
     html.on('click', '.result', async event => {
-        event.stopPropagation();
+        // NOTE: Keep method content  for later matrix mark revival (not used in 0.8.5 anymore)
+        console.error("Shadowrun5e | Deprecated function used. Please report.")
 
-        const messageId = html.data('messageId');
-        const message = game.messages?.get(messageId);
+        // event.stopPropagation();
 
-        if (!message) return;
+        // const messageId = html.data('messageId');
+        // const message = game.messages?.get(messageId);
 
-        const actionTestData = message.getFlag(SYSTEM_NAME, FLAGS.ActionTestData) as ActionTestData;
+        // if (!message) return;
 
-        if (actionTestData.matrix) {
-            const sceneTokenId = html.find('.chat-card').data('tokenId');
-            const actor = Helpers.getSceneTokenActor(sceneTokenId);
+        // const actionTestData = message.getFlag(SYSTEM_NAME, FLAGS.ActionTestData) as ActionTestData;
 
-            if (!actor) return console.error('No actor could be extracted from message data.');
+        // if (actionTestData.matrix) {
+        //     const sceneTokenId = html.find('.chat-card').data('tokenId');
+        //     const actor = Helpers.getSceneTokenActor(sceneTokenId);
 
-            // Allow custom selection for GMs and users with enough permissions.
-            // token.actor can be undefined for tokens with removed actors.
-            let targets = Helpers.getControlledTokens().filter(token => token.actor?.id !== game.user?.character?.id);
+        //     if (!actor) return console.error('No actor could be extracted from message data.');
 
-            // For users allow custom selection using targeting.
-            if (targets.length === 0) {
-                targets = Helpers.getTargetedTokens();
-            }
-            // For no manual selection fall back to previous message targets.
-            if (targets.length === 0) {
-                const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
+        //     // Allow custom selection for GMs and users with enough permissions.
+        //     // token.actor can be undefined for tokens with removed actors.
+        //     let targets = Helpers.getControlledTokens().filter(token => token.actor?.id !== game.user?.character?.id);
 
-                targetSceneIds.forEach(targetSceneId => {
-                    const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(targetSceneId);
-                    // @ts-ignore // TODO: Token vs TokenDocument... the workflow here is confusing.
-                    targets.push(Helpers.getSceneTokenDocument(sceneId, tokenId));
-                })
-            }
+        //     // For users allow custom selection using targeting.
+        //     if (targets.length === 0) {
+        //         targets = Helpers.getTargetedTokens();
+        //     }
+        //     // For no manual selection fall back to previous message targets.
+        //     if (targets.length === 0) {
+        //         const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
 
-            if (targets.length === 0) {
-                return ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
-            }
+        //         targetSceneIds.forEach(targetSceneId => {
+        //             const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(targetSceneId);
+        //             // @ts-ignore // TODO: Token vs TokenDocument... the workflow here is confusing.
+        //             targets.push(Helpers.getSceneTokenDocument(sceneId, tokenId));
+        //         })
+        //     }
 
-            const {marks} = actionTestData.matrix;
-            await ActionResultFlow.placeMatrixMarks(actor, targets, marks);
-        }
+        //     if (targets.length === 0) {
+        //         return ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+        //     }
+
+        //     const {marks} = actionTestData.matrix;
+        //     await ActionResultFlow.placeMatrixMarks(actor, targets, marks);
+        // }
     });
 };
 
+// NOTE: In use shadowrun5e 0.8.5
 export const handleRenderChatMessage = (app: ChatMessage, html, data) => {
     /**
      * Apply damage to the actor speaking the chat card.
@@ -218,6 +166,7 @@ export const handleRenderChatMessage = (app: ChatMessage, html, data) => {
 
 /**
  * Clicking on a damage number within any chat message will trigger damage application.
+ * // NOTE: In use shadowrun5e 0.8.5
  * @param event
  */
 export const chatMessageActionApplyDamage = async (html, event) => {
