@@ -1,3 +1,4 @@
+import { DamageApplicationFlow } from './../actor/flows/DamageApplicationFlow';
 import {SR5Actor} from "../actor/SR5Actor";
 import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from "../constants";
 import {DefaultValues} from "../data/DataDefaults";
@@ -21,7 +22,6 @@ import Template from "../template";
 import {TestRules} from "../rules/TestRules";
 
 import {ActionResultFlow} from "../item/flows/ActionResultFlow";
-import {handleRenderChatMessage} from "../chat";
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -1431,7 +1431,7 @@ export class SuccessTest {
         html.find('.result-action').on('click', this._castResultAction);
         html.find('.chat-select-link').on('click', this._selectSceneToken);
 
-        handleRenderChatMessage(message, html, data);
+        DamageApplicationFlow.handleRenderChatMessage(message, html, data);
 
         await this._showGmOnlyContent(message, html, data)
     }

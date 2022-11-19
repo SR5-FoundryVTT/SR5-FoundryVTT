@@ -1,6 +1,6 @@
 import { SkillFlow } from "../actor/flows/SkillFlow";
 import { SR5Actor } from '../actor/SR5Actor';
-import { createItemChatMessage, ChatMessageCastableTest } from '../chat';
+import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
 import { DefaultValues } from "../data/DataDefaults";
 import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
@@ -50,6 +50,7 @@ import SpritePowerItemData = Shadowrun.SpritePowerItemData;
 import WeaponItemData = Shadowrun.WeaponItemData;
 import HostItemData = Shadowrun.HostItemData;
 import ActionResultData = Shadowrun.ActionResultData;
+import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
@@ -292,8 +293,6 @@ export class SR5Item extends Item {
                 
             });
 
-
-
             if (equippedAmmo) {
                 //@ts-ignore // TODO: foundry-vtt-types v10 
                 const ammoData = equippedAmmo.system as AmmoData;
@@ -361,13 +360,12 @@ export class SR5Item extends Item {
     }
 
     async postItemCard() {
-        const tests =  this.getActionTests();
         const options = {
             actor: this.actor,
             description: this.getChatData(),
             item: this,
             previewTemplate: this.hasTemplate,
-            tests
+            tests: this.getActionTests()
         };
         return await createItemChatMessage(options);
     }
@@ -436,13 +434,18 @@ export class SR5Item extends Item {
         return parts;
     }
 
-    getBlastData(): BlastData | undefined {
+    getBlastData(actionTestData?: any): BlastData | undefined {
         if (this.isSpell() && this.isAreaOfEffect()) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as SpellData;
 
             // By default spell distance is equal to it's Force.
             let distance = this.getLastSpellForce().value;
+
+            // Except for predefined user test selection.
+            if (actionTestData?.spell) {
+                distance = actionTestData.spell.force;
+            }
 
             // Extended spells have a longer range.
             if (system.extended) distance *= 10;
@@ -875,7 +878,7 @@ export class SR5Item extends Item {
         return targets;
     }
 
-    getActionTests(): ChatMessageCastableTest[] {
+    getActionTests(): ActionTestLabel[] {
         if (!this.hasRoll) return []
 
         return [{

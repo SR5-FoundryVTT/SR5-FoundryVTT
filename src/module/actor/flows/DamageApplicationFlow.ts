@@ -1,6 +1,10 @@
 import {DamageApplicationDialog} from "../../apps/dialogs/DamageApplicationDialog";
 import {SR5Actor} from "../SR5Actor";
 import DamageData = Shadowrun.DamageData;
+import DamageType = Shadowrun.DamageType;
+import DamageElement = Shadowrun.DamageElement;
+import { Helpers } from '../../helpers';
+import { TestCreator } from '../../tests/TestCreator';
 
 export class DamageApplicationFlow {
 
@@ -69,5 +73,51 @@ export class DamageApplicationFlow {
         }
 
         return updatedDamage;
+    }
+
+    static handleRenderChatMessage(app: ChatMessage, html, data) {
+        html.on('click', '.apply-damage', event => DamageApplicationFlow.chatMessageActionApplyDamage(html, event));
+    }
+
+    /**
+     * When triggered from a chat message 
+     * @param html 
+     * @param event 
+     * @returns 
+     */
+    static async chatMessageActionApplyDamage(html, event) {
+        event.stopPropagation();
+        event.preventDefault();
+        const applyDamage = $(event.currentTarget);
+
+        const value = Number(applyDamage.data('damageValue'));
+        const type = String(applyDamage.data('damageType')) as DamageType;
+        const ap = Number(applyDamage.data('damageAp'));
+        const element = String(applyDamage.data('damageElement')) as DamageElement;
+        let damage = Helpers.createDamageData(value, type, ap, element);
+
+        let actors = Helpers.getSelectedActorsOrCharacter();
+
+        // Should no selection be available try guessing.
+        if (actors.length === 0) {
+            const messageId = html.data('messageId');
+
+            const test = await TestCreator.fromMessage(messageId);
+            if (!test) return
+            await test.populateDocuments();
+
+            // If targeting is available, use that.
+            if (test.hasTargets) test.targets.forEach(target => actors.push(target.actor as SR5Actor));
+            // Otherwise apply to the actor casting the damage.
+            else actors.push(test.actor as SR5Actor);
+        }
+
+        // Abort if no actors could be collected.
+        if (actors.length === 0) {
+            ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+            return;
+        }
+
+        await new DamageApplicationFlow().runApplyDamage(actors, damage);
     }
 }

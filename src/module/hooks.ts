@@ -9,6 +9,7 @@ import {SR5Token} from './token/SR5Token';
 import {HandlebarManager} from './handlebars/HandlebarManager';
 import {measureDistance} from './canvas';
 import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
+
 import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
 import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
 import {Import} from './importer/apps/import-form';
@@ -23,6 +24,7 @@ import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
 import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
 import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
+
 import {SR5Roll} from "./rolls/SR5Roll";
 import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
 import {RangedAttackTest} from "./tests/RangedAttackTest";
@@ -61,8 +63,6 @@ export class HooksManager {
 
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        // Hooks.on('renderChatMessage', chat.addRollListeners)
-        // Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
@@ -74,7 +74,6 @@ export class HooksManager {
         Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners);
-        // Hooks.on("renderChatPopout", chatMessageListeners);
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
 
         Hooks.on('init', quenchRegister);

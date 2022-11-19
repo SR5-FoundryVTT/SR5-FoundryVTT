@@ -12,7 +12,7 @@ import TargetedDocument = Shadowrun.TargetedDocument;
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
 import { SR5 } from "./config";
-import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
+import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME } from "./constants";
 import { DataDefaults } from "./data/DataDefaults";
 import { SR5Item } from './item/SR5Item';
 import { PartsList } from './parts/PartsList';
