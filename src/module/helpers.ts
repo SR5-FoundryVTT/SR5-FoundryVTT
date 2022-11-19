@@ -365,8 +365,9 @@ export class Helpers {
             return 0;
         }
 
-        // Round down since X.8 will hit X and not X+1.
-        return Math.floor(length * LENGTH_UNIT_TO_METERS_MULTIPLIERS[fromUnit]);
+        // Note: length is a grid distance. To avoid suddenly feeding floats, still round in case
+        //       of a later API change somewhere.
+        return Math.round(length * LENGTH_UNIT_TO_METERS_MULTIPLIERS[fromUnit]);
     }
 
     static getWeaponRange(distance: number, ranges: RangesTemplateData): RangeTemplateData {
