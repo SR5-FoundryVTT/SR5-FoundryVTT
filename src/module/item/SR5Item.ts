@@ -1,4 +1,3 @@
-import { ShadowrunItemDataData } from './../types/ShadowrunItemData';
 import { SkillFlow } from "../actor/flows/SkillFlow";
 import { SR5Actor } from '../actor/SR5Actor';
 import { createItemChatMessage } from '../chat';
@@ -55,6 +54,7 @@ import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
+import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
@@ -412,8 +412,9 @@ export class SR5Item extends Item {
         const { labels } = this;
         //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
         //              that's not actually defined in any SR5Item typing.
-        if (!system.description) system.description = {};
+        if (system.description) system.description = {};
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
+        //@ts-ignore // TODO: foundry-vtt-types v10
         if (!system.description.value) system.description.value = '';
         //@ts-ignore // TODO: foundry-vtt-types v10
         system.description.value = TextEditor.enrichHTML(system.description.value, {...htmlOptions, async: false});
@@ -660,6 +661,8 @@ export class SR5Item extends Item {
             Object.values(this.system.licenses) :
             //@ts-ignore TODO: foundry-vtt-types v10
             this.system.licenses;
+
+        if (!licenses) return;
         
         // Add the new license to the list
         licenses.push({

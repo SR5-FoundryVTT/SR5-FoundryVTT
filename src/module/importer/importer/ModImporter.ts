@@ -19,7 +19,7 @@ export class ModImporter extends DataImporter {
         return {
             name: '',
             type: 'modification',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -32,7 +32,7 @@ export class ModImporter extends DataImporter {
                 accuracy: 0,
                 rc: 0,
             }
-        };
+        } as ModificationItemData;
     }
 
     ExtractTranslation() {

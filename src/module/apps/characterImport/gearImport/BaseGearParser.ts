@@ -36,8 +36,8 @@ export class BaseGearParser implements GearParser {
         return {
             name: '',
             type: 'equipment',
-            data: DefaultValues.equipmentData(),
-        };
+            system: DefaultValues.equipmentData(),
+        } as EquipmentItemData;
     }
 }
 

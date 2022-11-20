@@ -17,7 +17,7 @@ export class AmmoImporter extends DataImporter {
         return {
             name: '',
             type: 'ammo',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -33,7 +33,7 @@ export class AmmoImporter extends DataImporter {
                     dropoff: 0,
                 },
             }
-        };
+        } as AmmoItemData;
     }
 
     ExtractTranslation() {

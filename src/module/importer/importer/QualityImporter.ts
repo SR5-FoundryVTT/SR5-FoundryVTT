@@ -18,7 +18,7 @@ export class QualityImporter extends DataImporter {
         return {
             name: 'Unnamed Quality',
             type: 'quality',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -29,7 +29,7 @@ export class QualityImporter extends DataImporter {
                 }),
                 type: '',
             },
-        };
+        } as QualityItemData;
     }
 
     ExtractTranslation() {

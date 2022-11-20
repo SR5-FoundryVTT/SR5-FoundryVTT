@@ -47,13 +47,12 @@ export class SR5ItemSheet extends ItemSheet {
         data.system = data.item.system;
         //@ts-ignore // TODO: remove TODO: foundry-vtt-types v10
         data.data = data.item.system;
-        //@ts-ignore
-        const itemData = this.item.system;
+        const itemData = this.document.system;
 
         if (itemData.action) {
             try {
-                const { action } = itemData;
-                if (action.mod === 0) delete action.mod;
+                const action = itemData.action as any;
+                if (itemData.action.mod === 0) delete action.mod;
                 if (action.limit === 0) delete action.limit;
                 if (action.damage) {
                     if (action.damage.mod === 0) delete action.damage.mod;
@@ -69,10 +68,10 @@ export class SR5ItemSheet extends ItemSheet {
 
         if (itemData.technology) {
             try {
-                const tech = itemData.technology;
-                if (tech.rating === 0) delete tech.rating;
-                if (tech.quantity === 0) delete tech.quantity;
-                if (tech.cost === 0) delete tech.cost;
+                const technology = itemData.technology as any;
+                if (technology.rating === 0) delete technology.rating;
+                if (technology.quantity === 0) delete technology.quantity;
+                if (technology.cost === 0) delete technology.cost;
             } catch (e) {
                 console.log(e);
             }

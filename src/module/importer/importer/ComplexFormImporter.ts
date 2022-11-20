@@ -19,7 +19,7 @@ export class ComplexFormImporter extends DataImporter {
         return {
             name: 'Unnamed Form',
             type: 'complex_form',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -34,7 +34,7 @@ export class ComplexFormImporter extends DataImporter {
                 duration: '',
                 fade: 0,
             },
-        };
+        } as ComplexFormItemData;
     }
 
     ExtractTranslation() {

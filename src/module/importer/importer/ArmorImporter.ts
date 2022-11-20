@@ -18,7 +18,7 @@ export class ArmorImporter extends DataImporter {
         return {
             name: 'Unnamed Armor',
             type: 'armor',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -35,7 +35,7 @@ export class ArmorImporter extends DataImporter {
                     radiation: 0,
                 },
             },
-        };
+        } as ArmorItemData;
     }
 
     ExtractTranslation() {

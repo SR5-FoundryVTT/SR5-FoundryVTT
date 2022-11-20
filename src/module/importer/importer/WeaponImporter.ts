@@ -23,7 +23,7 @@ export class WeaponImporter extends DataImporter {
         return {
             name: 'Unnamed Item',
             type: 'weapon',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -80,7 +80,7 @@ export class WeaponImporter extends DataImporter {
                 category: 'range',
                 subcategory: '',
             },
-        };
+        } as unknown as WeaponItemData;
     }
 
     ExtractTranslation() {

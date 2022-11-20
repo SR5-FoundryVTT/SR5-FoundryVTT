@@ -30,7 +30,7 @@ export class WareImporter extends DataImporter {
         return {
             name: 'Unnamed Form',
             type: 'cyberware',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -51,7 +51,7 @@ export class WareImporter extends DataImporter {
                 essence: 0,
                 capacity: 0,
             },
-        };
+        } as Ware;
     }
     ExtractTranslation(fileName) {
         if (!DataImporter.jsoni18n) {

@@ -19,7 +19,7 @@ export class CritterPowerImporter extends DataImporter {
         return {
             name: 'Unnamed Item',
             type: 'critter_power',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -43,7 +43,7 @@ export class CritterPowerImporter extends DataImporter {
                 duration: '',
                 karma: 0,
             },
-        };
+        } as CritterPowerItemData;
     }
 
     ExtractTranslation() {

@@ -23,7 +23,7 @@ export class SpellImporter extends DataImporter {
         return {
             name: 'Unnamed Item',
             type: 'spell',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -59,7 +59,7 @@ export class SpellImporter extends DataImporter {
                     physical: false,
                 },
             },
-        };
+        } as SpellItemData;
     }
 
     ExtractTranslation() {
