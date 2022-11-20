@@ -9039,156 +9039,114 @@ var SR = {
   }
 };
 
-// src/module/apps/dialogs/FormDialog.ts
-var FormDialog = class extends Dialog {
-  constructor(data, options) {
-    super(data, options);
-    const { templateData, templatePath } = data;
-    this._templateData = templateData;
-    this._templatePath = templatePath;
-    this._onAfterClose = data.onAfterClose || this.onAfterClose;
-    this.selection = this._emptySelection();
-    this._selectionPromise = new Promise((resolve, reject) => {
-      this._selectionResolve = resolve;
-      this._selectionReject = reject;
-    });
+// src/module/rules/SkillRules.ts
+var SkillRules = class {
+  static mustDefaultToRoll(skill) {
+    return skill.base === 0;
   }
-  close() {
-    return __async(this, null, function* () {
-      yield __superGet(FormDialog.prototype, this, "close").call(this);
-      if (this.canceled) {
-        setTimeout(() => this._selectionResolve(this.selection), 250);
-      }
-    });
+  static allowDefaultingRoll(skill) {
+    return skill.canDefault;
   }
-  activateListeners(html) {
-    super.activateListeners(html);
-    html.on("change", "input,select,textarea", this._onChangeInput.bind(this));
+  static allowRoll(skill) {
+    return !SkillRules.mustDefaultToRoll(skill) || SkillRules.allowDefaultingRoll(skill);
   }
-  submit(button) {
-    return __async(this, null, function* () {
-      var _a;
-      this.selectedButton = (_a = button.name) != null ? _a : button.label;
-      this.applyFormData();
-      __superGet(FormDialog.prototype, this, "submit").call(this, button);
-      yield this.afterSubmit("jQuery" in this.options ? this.element : this.element[0]);
-    });
+  static addDefaultingPart(parts) {
+    parts.addUniquePart("SR5.Defaulting", SkillRules.defaultingModifier);
   }
-  afterSubmit(html) {
-    return __async(this, null, function* () {
-      this.selection = yield this._onAfterClose(html, this.selectedButton);
-      setTimeout(() => this._selectionResolve(this.selection), 250);
-    });
+  static level(skill, options = { specialization: false }) {
+    if (this.mustDefaultToRoll(skill) && this.allowDefaultingRoll(skill)) {
+      return SkillRules.defaultingModifier;
+    }
+    const skillValue = typeof skill.value === "number" ? skill.value : 0;
+    const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
+    return skillValue + specializationBonus;
   }
-  applyFormData() {
-    if (!this.options.applyFormChangesOnSubmit)
-      return;
-    if (!this.form)
-      throw new Error(`The FormApplication subclass has no registered form element`);
-    const fd = new FormDataExtended(this.form, { editors: {} });
-    const data = fd.object;
-    this._updateData(data);
+  static get defaultingModifier() {
+    return SR.skill.DEFAULTING_MODIFIER;
   }
-  _updateData(data) {
-    foundry.utils.mergeObject(this.data.templateData, data);
-  }
-  getData() {
-    this.data.buttons = this.data.buttons || this.buttons;
-    this._amendButtonsWithName(this.data.buttons);
-    const data = super.getData();
-    return mergeObject(data, __spreadProps(__spreadValues({}, this.data), {
-      content: ""
-    }));
-  }
-  get buttons() {
-    return {};
-  }
-  get templateContent() {
-    return "";
-  }
-  select() {
-    return __async(this, null, function* () {
-      yield this.render(true);
-      if (this._selectionPromise === void 0 || this.selection === void 0) {
-        return this._emptySelection();
-      }
-      return yield this._selectionPromise;
-    });
-  }
-  _emptySelection() {
-    return {};
-  }
-  get selected() {
-    return !this.canceled;
-  }
-  get canceled() {
-    return !this.selectedButton || this.selectedButton === "cancel";
-  }
-  static getButtons() {
-    return {};
-  }
-  _amendButtonsWithName(buttons) {
-    Object.keys(buttons).forEach((name) => buttons[name].name = name);
-  }
-  _renderInner(data) {
-    return __async(this, null, function* () {
-      const templatePath = data.templatePath || this.templateContent;
-      if (templatePath)
-        data.content = yield renderTemplate(
-          data.templatePath || this.templateContent,
-          data.templateData || data
-        );
-      const html = yield __superGet(FormDialog.prototype, this, "_renderInner").call(this, data);
-      this.form = html.filter((i, el) => el instanceof HTMLFormElement)[0];
-      if (!this.form)
-        this.form = html.find("form")[0];
-      return html;
-    });
-  }
-  _onChangeInput(event) {
-    return __async(this, null, function* () {
-      const el = event.target;
-      if (this.options.applyFormChangesOnSubmit) {
-        this.applyFormData();
-        this.render();
-      }
-    });
-  }
-  onAfterClose(html) {
+  static get SpecializationModifier() {
+    return SR.skill.SPECIALIZATION_MODIFIER;
   }
 };
 
-// src/module/apps/dialogs/DeleteConfirmationDialog.ts
-var DeleteConfirmationDialog = class extends FormDialog {
-  constructor(options) {
-    const dialogData = DeleteConfirmationDialog.getDialogData();
-    super(dialogData, options);
+// src/module/actor/flows/SkillFlow.ts
+var SkillFlow = class {
+  static handleDefaulting(skill, parts) {
+    var _a;
+    if (!SkillRules.mustDefaultToRoll(skill))
+      return;
+    if (!SkillFlow.allowDefaultingRoll(skill)) {
+      (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.SkillCantBeDefault"));
+      return;
+    }
+    SkillRules.addDefaultingPart(parts);
   }
-  static getDialogData() {
-    return {
-      title: game.i18n.localize("SR5.DeleteConfirmationApplication.Title"),
-      buttons: {
-        delete: {
-          label: game.i18n.localize("SR5.DeleteConfirmationApplication.Delete")
-        },
-        cancel: {
-          label: game.i18n.localize("SR5.DeleteConfirmationApplication.Cancel")
-        }
-      },
-      default: "cancel",
-      templateData: {},
-      templatePath: "systems/shadowrun5e/dist/templates/apps/dialogs/delete-confirmation-dialog.html"
-    };
+  static allowDefaultingRoll(skill) {
+    const allowUnimproviseable = game.settings.get(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills) === false;
+    if (allowUnimproviseable)
+      return true;
+    return SkillRules.allowDefaultingRoll(skill);
   }
-  static get defaultOptions() {
-    const options = super.defaultOptions;
-    options.id = "delete-confirmation-application";
-    options.classes = ["sr5", "form-dialog"];
-    options.resizable = true;
-    options.height = "auto";
-    return options;
+  static allowRoll(skill) {
+    if (SkillRules.mustDefaultToRoll(skill) && SkillFlow.allowDefaultingRoll(skill)) {
+      return true;
+    }
+    return SkillRules.allowRoll(skill);
+  }
+  static isCustomSkill(skill) {
+    return skill.name !== void 0 && skill.name !== "";
+  }
+  static isLegacySkill(skill) {
+    return !SkillFlow.isCustomSkill(skill);
   }
 };
+
+// src/module/chat.ts
+function createChatMessage(template, templateData) {
+  return __async(this, null, function* () {
+    const chatData = yield createChatData(template, templateData);
+    const message = yield ChatMessage.create(chatData);
+    if (!message)
+      return null;
+    return message;
+  });
+}
+var createChatData = (template, templateData) => __async(void 0, null, function* () {
+  var _a, _b, _c, _d;
+  const html = yield renderTemplate(template, templateData);
+  const chatData = {
+    user: (_a = game.user) == null ? void 0 : _a.id,
+    speaker: {
+      actor: (_b = templateData.actor) == null ? void 0 : _b.id,
+      token: (_c = templateData.token) == null ? void 0 : _c.id,
+      alias: (_d = game.user) == null ? void 0 : _d.name
+    },
+    item: templateData.item,
+    content: html,
+    rollMode: game.settings.get(CORE_NAME, CORE_FLAGS.RollMode)
+  };
+  ChatMessage.applyRollMode(chatData, chatData.rollMode);
+  return chatData;
+});
+function createItemChatMessage(options) {
+  return __async(this, null, function* () {
+    const templateData = createChatTemplateData(options);
+    return yield createChatMessage("systems/shadowrun5e/dist/templates/rolls/item-card.html", templateData);
+  });
+}
+function createChatTemplateData(options) {
+  let { actor, item, description, tests } = options;
+  const token = actor == null ? void 0 : actor.getToken();
+  const title = game.i18n.localize("SR5.Description");
+  return {
+    title,
+    actor,
+    token,
+    item,
+    description,
+    tests
+  };
+}
 
 // src/module/data/DataDefaults.ts
 var DefaultValues = class {
@@ -9336,6 +9294,16 @@ var DefaultValues = class {
       attribute: "",
       mod: []
     }, partialLimitData);
+  }
+  static limitField(partialLimitField = {}) {
+    return mergeObject({
+      value: 0,
+      base: 0,
+      attribute: "",
+      label: "",
+      hidden: false,
+      mod: []
+    }, partialLimitField);
   }
   static opposedTestData(partialOpposedTestData = {}) {
     return mergeObject({
@@ -9544,1306 +9512,6 @@ var DataDefaults = {
     }
   },
   damage: DefaultValues.damageData({ type: { base: "", value: "" } })
-};
-
-// src/module/config.ts
-var SR5 = {
-  itemTypes: {
-    action: "SR5.ItemTypes.Action",
-    adept_power: "SR5.ItemTypes.AdeptPower",
-    ammo: "SR5.ItemTypes.Ammo",
-    armor: "SR5.ItemTypes.Armor",
-    complex_form: "SR5.ItemTypes.ComplexForm",
-    contact: "SR5.ItemTypes.Contact",
-    critter_power: "SR5.ItemTypes.CritterPower",
-    cyberware: "SR5.ItemTypes.Cyberware",
-    bioware: "SR5.ItemTypes.Bioware",
-    device: "SR5.ItemTypes.Device",
-    equipment: "SR5.ItemTypes.Equipment",
-    lifestyle: "SR5.ItemTypes.Lifestyle",
-    modification: "SR5.ItemTypes.Modification",
-    quality: "SR5.ItemTypes.Quality",
-    sin: "SR5.ItemTypes.Sin",
-    spell: "SR5.ItemTypes.Spell",
-    weapon: "SR5.ItemTypes.Weapon",
-    host: "SR5.ItemTypes.Host"
-  },
-  attributes: {
-    agility: "SR5.AttrAgility",
-    attack: "SR5.MatrixAttrAttack",
-    body: "SR5.AttrBody",
-    charisma: "SR5.AttrCharisma",
-    data_processing: "SR5.MatrixAttrDataProc",
-    edge: "SR5.AttrEdge",
-    essence: "SR5.AttrEssence",
-    firewall: "SR5.MatrixAttrFirewall",
-    intuition: "SR5.AttrIntuition",
-    logic: "SR5.AttrLogic",
-    magic: "SR5.AttrMagic",
-    reaction: "SR5.AttrReaction",
-    resonance: "SR5.AttrResonance",
-    sleaze: "SR5.MatrixAttrSleaze",
-    strength: "SR5.AttrStrength",
-    willpower: "SR5.AttrWillpower"
-  },
-  limits: {
-    physical: "SR5.LimitPhysical",
-    social: "SR5.LimitSocial",
-    mental: "SR5.LimitMental",
-    attack: "SR5.MatrixAttrAttack",
-    sleaze: "SR5.MatrixAttrSleaze",
-    data_processing: "SR5.MatrixAttrDataProc",
-    firewall: "SR5.MatrixAttrFirewall",
-    speed: "SR5.Vehicle.Stats.Speed",
-    sensor: "SR5.Vehicle.Stats.Sensor",
-    handling: "SR5.Vehicle.Stats.Handling"
-  },
-  specialTypes: {
-    mundane: "SR5.Mundane",
-    magic: "SR5.Awakened",
-    resonance: "SR5.Emerged"
-  },
-  damageTypes: {
-    physical: "SR5.DmgTypePhysical",
-    stun: "SR5.DmgTypeStun",
-    matrix: "SR5.DmgTypeMatrix"
-  },
-  elementTypes: {
-    fire: "SR5.ElementFire",
-    cold: "SR5.ElementCold",
-    acid: "SR5.ElementAcid",
-    electricity: "SR5.ElementElectricity",
-    radiation: "SR5.ElementRadiation"
-  },
-  spellCategories: {
-    combat: "SR5.SpellCatCombat",
-    detection: "SR5.SpellCatDetection",
-    health: "SR5.SpellCatHealth",
-    illusion: "SR5.SpellCatIllusion",
-    manipulation: "SR5.SpellCatManipulation"
-  },
-  spellTypes: {
-    physical: "SR5.SpellTypePhysical",
-    mana: "SR5.SpellTypeMana"
-  },
-  spellRanges: {
-    touch: "SR5.SpellRangeTouch",
-    los: "SR5.SpellRangeLos",
-    los_a: "SR5.SpellRangeLosA"
-  },
-  combatSpellTypes: {
-    direct: "SR5.SpellCombatDirect",
-    indirect: "SR5.SpellCombatIndirect"
-  },
-  detectionSpellTypes: {
-    directional: "SR5.SpellDetectionDirectional",
-    psychic: "SR5.SpellDetectionPsychic",
-    area: "SR5.SpellDetectionArea"
-  },
-  illusionSpellTypes: {
-    obvious: "SR5.SpellIllusionObvious",
-    realistic: "SR5.SpellIllusionRealistic"
-  },
-  illusionSpellSenses: {
-    "single-sense": "SR5.SpellIllusionSingleSense",
-    "multi-sense": "SR5.SpellIllusionMultiSense"
-  },
-  attributeRolls: {
-    composure: "SR5.RollComposure",
-    lift_carry: "SR5.RollLiftCarry",
-    judge_intentions: "SR5.RollJudgeIntentions",
-    memory: "SR5.RollMemory"
-  },
-  matrixTargets: {
-    persona: "SR5.TargetPersona",
-    device: "SR5.TargetDevice",
-    file: "SR5.TargetFile",
-    self: "SR5.TargetSelf",
-    sprite: "SR5.TargetSprite",
-    other: "SR5.TargetOther"
-  },
-  durations: {
-    instant: "SR5.DurationInstant",
-    sustained: "SR5.DurationSustained",
-    permanent: "SR5.DurationPermanent"
-  },
-  weaponCategories: {
-    range: "SR5.WeaponCatRange",
-    melee: "SR5.WeaponCatMelee",
-    thrown: "SR5.WeaponCatThrown"
-  },
-  weaponRanges: {
-    short: "SR5.WeaponRangeShort",
-    medium: "SR5.WeaponRangeMedium",
-    long: "SR5.WeaponRangeLong",
-    extreme: "SR5.WeaponRangeExtreme"
-  },
-  qualityTypes: {
-    positive: "SR5.QualityTypePositive",
-    negative: "SR5.QualityTypeNegative"
-  },
-  adeptPower: {
-    types: {
-      active: "SR5.AdeptPower.Types.Active",
-      passive: "SR5.AdeptPower.Types.Passive"
-    }
-  },
-  deviceCategories: {
-    commlink: "SR5.DeviceCatCommlink",
-    cyberdeck: "SR5.DeviceCatCyberdeck"
-  },
-  cyberwareGrades: {
-    standard: "SR5.CyberwareGradeStandard",
-    alpha: "SR5.CyberwareGradeAlpha",
-    beta: "SR5.CyberwareGradeBeta",
-    delta: "SR5.CyberwareGradeDelta",
-    used: "SR5.CyberwareGradeUsed"
-  },
-  knowledgeSkillCategories: {
-    street: "SR5.KnowledgeSkillStreet",
-    academic: "SR5.KnowledgeSkillAcademic",
-    professional: "SR5.KnowledgeSkillProfessional",
-    interests: "SR5.KnowledgeSkillInterests"
-  },
-  activeSkills: {
-    archery: "SR5.SkillArchery",
-    automatics: "SR5.SkillAutomatics",
-    blades: "SR5.SkillBlades",
-    clubs: "SR5.SkillClubs",
-    exotic_melee: "SR5.SkillExoticMelee",
-    exotic_range: "SR5.SkillExoticRange",
-    heavy_weapons: "SR5.SkillHeavyWeapons",
-    longarms: "SR5.SkillLongarms",
-    pistols: "SR5.SkillPistols",
-    throwing_weapons: "SR5.SkillThrowingWeapons",
-    unarmed_combat: "SR5.SkillUnarmedCombat",
-    disguise: "SR5.SkillDisguise",
-    diving: "SR5.SkillDiving",
-    escape_artist: "SR5.SkillEscapeArtist",
-    free_fall: "SR5.SkillFreeFall",
-    gymnastics: "SR5.SkillGymnastics",
-    palming: "SR5.SkillPalming",
-    perception: "SR5.SkillPerception",
-    running: "SR5.SkillRunning",
-    sneaking: "SR5.SkillSneaking",
-    survival: "SR5.SkillSurvival",
-    swimming: "SR5.SkillSwimming",
-    tracking: "SR5.SkillTracking",
-    con: "SR5.SkillCon",
-    etiquette: "SR5.SkillEtiquette",
-    impersonation: "SR5.SkillImpersonation",
-    instruction: "SR5.SkillInstruction",
-    intimidation: "SR5.SkillIntimidation",
-    leadership: "SR5.SkillLeadership",
-    negotiation: "SR5.SkillNegotiation",
-    performance: "SR5.SkillPerformance",
-    alchemy: "SR5.SkillAlchemy",
-    arcana: "SR5.SkillArcana",
-    artificing: "SR5.SkillArtificing",
-    assensing: "SR5.SkillAssensing",
-    astral_combat: "SR5.SkillAstralCombat",
-    banishing: "SR5.SkillBanishing",
-    binding: "SR5.SkillBinding",
-    counterspelling: "SR5.SkillCounterspelling",
-    disenchanting: "SR5.SkillDisenchanting",
-    ritual_spellcasting: "SR5.SkillRitualSpellcasting",
-    spellcasting: "SR5.SkillSpellcasting",
-    summoning: "SR5.SkillSummoning",
-    compiling: "SR5.SkillCompiling",
-    decompiling: "SR5.SkillDecompiling",
-    registering: "SR5.SkillRegistering",
-    aeronautics_mechanic: "SR5.SkillAeronauticsMechanic",
-    automotive_mechanic: "SR5.SkillAutomotiveMechanic",
-    industrial_mechanic: "SR5.SkillIndustrialMechanic",
-    nautical_mechanic: "SR5.SkillNauticalMechanic",
-    animal_handling: "SR5.SkillAnimalHandling",
-    armorer: "SR5.SkillArmorer",
-    artisan: "SR5.SkillArtisan",
-    biotechnology: "SR5.SkillBiotechnology",
-    chemistry: "SR5.SkillChemistry",
-    computer: "SR5.SkillComputer",
-    cybercombat: "SR5.SkillCybercombat",
-    cybertechnology: "SR5.SkillCybertechnology",
-    demolitions: "SR5.SkillDemolitions",
-    electronic_warfare: "SR5.SkillElectronicWarfare",
-    first_aid: "SR5.SkillFirstAid",
-    forgery: "SR5.SkillForgery",
-    hacking: "SR5.SkillHacking",
-    hardware: "SR5.SkillHardware",
-    locksmith: "SR5.SkillLocksmith",
-    medicine: "SR5.SkillMedicine",
-    navigation: "SR5.SkillNavigation",
-    software: "SR5.SkillSoftware",
-    gunnery: "SR5.SkillGunnery",
-    pilot_aerospace: "SR5.SkillPilotAerospace",
-    pilot_aircraft: "SR5.SkillPilotAircraft",
-    pilot_walker: "SR5.SkillPilotWalker",
-    pilot_ground_craft: "SR5.SkillPilotGroundCraft",
-    pilot_water_craft: "SR5.SkillPilotWaterCraft",
-    pilot_exotic_vehicle: "SR5.SkillPilotExoticVehicle"
-  },
-  actionTypes: {
-    none: "SR5.ActionTypeNone",
-    free: "SR5.ActionTypeFree",
-    simple: "SR5.ActionTypeSimple",
-    complex: "SR5.ActionTypeComplex",
-    varies: "SR5.ActionTypeVaries"
-  },
-  actionDamageFormulaOperators: {
-    add: "+",
-    subtract: "-",
-    multiply: "*",
-    divide: "/"
-  },
-  matrixAttributes: {
-    attack: "SR5.MatrixAttrAttack",
-    sleaze: "SR5.MatrixAttrSleaze",
-    data_processing: "SR5.MatrixAttrDataProc",
-    firewall: "SR5.MatrixAttrFirewall"
-  },
-  initiativeCategories: {
-    meatspace: "SR5.InitCatMeatspace",
-    astral: "SR5.InitCatAstral",
-    matrix: "SR5.InitCatMatrix"
-  },
-  modificationTypes: {
-    weapon: "SR5.Weapon",
-    armor: "SR5.Armor"
-  },
-  mountPoints: {
-    barrel: "SR5.Barrel",
-    under_barrel: "SR5.UnderBarrel",
-    stock: "SR5.Stock",
-    top: "SR5.Top",
-    side: "SR5.Side",
-    internal: "SR5.Internal"
-  },
-  lifestyleTypes: {
-    street: "SR5.LifestyleStreet",
-    squatter: "SR5.LifestyleSquatter",
-    low: "SR5.LifestyleLow",
-    medium: "SR5.LifestyleMiddle",
-    high: "SR5.LifestyleHigh",
-    luxory: "SR5.LifestyleLuxory",
-    other: "SR5.LifestyleOther"
-  },
-  kbmod: {
-    ITEM_DESCR: "ctrlKey",
-    EDGE: "altKey",
-    HIDE_DIALOG: "shiftKey"
-  },
-  actorModifiers: {
-    soak: "SR5.RollSoak",
-    drain: "SR5.Drain",
-    armor: "SR5.Armor",
-    physical_limit: "SR5.PhysicalLimit",
-    social_limit: "SR5.SocialLimit",
-    mental_limit: "SR5.MentalLimit",
-    stun_track: "SR5.StunTrack",
-    physical_track: "SR5.PhysicalTrack",
-    physical_overflow_track: "SR5.PhysicalOverflowTrack",
-    meat_initiative: "SR5.MeatSpaceInit",
-    meat_initiative_dice: "SR5.MeatSpaceDice",
-    astral_initiative: "SR5.AstralInit",
-    astral_initiative_dice: "SR5.AstralDice",
-    matrix_initiative: "SR5.MatrixInit",
-    matrix_initiative_dice: "SR5.MatrixDice",
-    matrix_track: "SR5.MatrixTrack",
-    composure: "SR5.RollComposure",
-    lift_carry: "SR5.RollLiftCarry",
-    judge_intentions: "SR5.RollJudgeIntentions",
-    memory: "SR5.RollMemory",
-    walk: "SR5.Walk",
-    run: "SR5.Run",
-    defense: "SR5.RollDefense",
-    wound_tolerance: "SR5.WoundTolerance",
-    essence: "SR5.AttrEssence",
-    fade: "SR5.RollFade",
-    global: "SR5.Global"
-  },
-  modifierTypes: {
-    armor: "SR5.Armor",
-    composure: "SR5.RollComposure",
-    defense: "SR5.RollDefense",
-    drain: "SR5.Drain",
-    environmental: "SR5.ModifierTypes.Environmental",
-    fade: "SR5.RollFade",
-    global: "SR5.Global",
-    judge_intentions: "SR5.RollJudgeIntentions",
-    lift_carry: "SR5.RollLiftCarry",
-    memory: "SR5.RollMemory",
-    soak: "SR5.RollSoak",
-    wounds: "SR5.ModifierTypes.Wounds"
-  },
-  weaponCategoryActiveTests: {
-    "range": "RangedAttackTest",
-    "melee": "MeleeAttackTest",
-    "thrown": "ThrownAttackTest"
-  },
-  spellOpposedTests: {
-    "combat": "CombatSpellDefenseTest"
-  },
-  activeTests: {
-    "spell": "SpellCastingTest",
-    "complex_form": "ComplexFormTest"
-  },
-  opposedTests: {
-    "spell": {
-      "combat": "CombatSpellDefenseTest"
-    }
-  },
-  opposedResistTests: {
-    "spell": {
-      "combat": "PhysicalResistTest"
-    }
-  },
-  supressionDefenseTest: "SupressionDefenseTest",
-  packNames: {
-    "generalActions": "General Actions",
-    "matrixActions": "Matrix Actions"
-  },
-  programTypes: {
-    common_program: "SR5.CommonProgram",
-    hacking_program: "SR5.HackingProgram",
-    agent: "SR5.Agent"
-  },
-  spiritTypes: {
-    air: "SR5.Spirit.Types.Air",
-    aircraft: "SR5.Spirit.Types.Aircraft",
-    airwave: "SR5.Spirit.Types.Airwave",
-    automotive: "SR5.Spirit.Types.Automotive",
-    beasts: "SR5.Spirit.Types.Beasts",
-    ceramic: "SR5.Spirit.Types.Ceramic",
-    earth: "SR5.Spirit.Types.Earth",
-    energy: "SR5.Spirit.Types.Energy",
-    fire: "SR5.Spirit.Types.Fire",
-    guardian: "SR5.Spirit.Types.Guardian",
-    guidance: "SR5.Spirit.Types.Guidance",
-    man: "SR5.Spirit.Types.Man",
-    metal: "SR5.Spirit.Types.Metal",
-    plant: "SR5.Spirit.Types.Plant",
-    ship: "SR5.Spirit.Types.Ship",
-    task: "SR5.Spirit.Types.Task",
-    train: "SR5.Spirit.Types.Train",
-    water: "SR5.Spirit.Types.Water",
-    toxic_air: "SR5.Spirit.Types.ToxicAir",
-    toxic_beasts: "SR5.Spirit.Types.ToxicBeasts",
-    toxic_earth: "SR5.Spirit.Types.ToxicEarth",
-    toxic_fire: "SR5.Spirit.Types.ToxicFire",
-    toxic_man: "SR5.Spirit.Types.ToxicMan",
-    toxic_water: "SR5.Spirit.Types.ToxicWater",
-    blood: "SR5.Spirit.Types.Blood",
-    muse: "SR5.Spirit.Types.Muse",
-    nightmare: "SR5.Spirit.Types.Nightmare",
-    shade: "SR5.Spirit.Types.Shade",
-    succubus: "SR5.Spirit.Types.Succubus",
-    wraith: "SR5.Spirit.Types.Wraith",
-    shedim: "SR5.Spirit.Types.Shedim",
-    master_shedim: "SR5.Spirit.Types.MasterShedim",
-    caretaker: "SR5.Spirit.Types.Caretaker",
-    nymph: "SR5.Spirit.Types.Nymph",
-    scout: "SR5.Spirit.Types.Scout",
-    soldier: "SR5.Spirit.Types.Soldier",
-    worker: "SR5.Spirit.Types.Worker",
-    queen: "SR5.Spirit.Types.Queen"
-  },
-  critterPower: {
-    categories: {
-      mundane: "SR5.CritterPower.Categories.Mundane",
-      paranormal: "SR5.CritterPower.Categories.Paranormal",
-      free_spirit: "SR5.CritterPower.Categories.FreeSpirit",
-      emergent: "SR5.CritterPower.Categories.Emergent",
-      shapeshifter: "SR5.CritterPower.Categories.Shapeshifter",
-      drake: "SR5.CritterPower.Categories.Drake",
-      echoes: "SR5.CritterPower.Categories.Echoes",
-      weakness: "SR5.CritterPower.Categories.Weakness",
-      paranormal_infected: "SR5.CritterPower.Categories.ParanormalInfected"
-    },
-    types: {
-      mana: "SR5.CritterPower.Types.Mana",
-      physical: "SR5.CritterPower.Types.Physical"
-    },
-    ranges: {
-      los: "SR5.CritterPower.Ranges.LineOfSight",
-      self: "SR5.CritterPower.Ranges.Self",
-      touch: "SR5.CritterPower.Ranges.Touch",
-      los_a: "SR5.CritterPower.Ranges.LineOfSightArea",
-      special: "SR5.CritterPower.Ranges.Special"
-    },
-    durations: {
-      always: "SR5.CritterPower.Durations.Always",
-      instant: "SR5.CritterPower.Durations.Instant",
-      sustained: "SR5.CritterPower.Durations.Sustained",
-      permanent: "SR5.CritterPower.Durations.Permanent",
-      special: "SR5.CritterPower.Durations.Special"
-    }
-  },
-  spriteTypes: {
-    courier: "SR5.Sprite.Types.Courier",
-    crack: "SR5.Sprite.Types.Crack",
-    data: "SR5.Sprite.Types.Data",
-    fault: "SR5.Sprite.Types.Fault",
-    machine: "SR5.Sprite.Types.Machine"
-  },
-  vehicle: {
-    types: {
-      air: "SR5.Vehicle.Types.Air",
-      aerospace: "SR5.Vehicle.Types.Aerospace",
-      ground: "SR5.Vehicle.Types.Ground",
-      water: "SR5.Vehicle.Types.Water",
-      walker: "SR5.Vehicle.Types.Walker",
-      exotic: "SR5.Vehicle.Types.Exotic"
-    },
-    stats: {
-      handling: "SR5.Vehicle.Stats.Handling",
-      off_road_handling: "SR5.Vehicle.Stats.OffRoadHandling",
-      speed: "SR5.Vehicle.Stats.Speed",
-      off_road_speed: "SR5.Vehicle.Stats.OffRoadSpeed",
-      acceleration: "SR5.Vehicle.Stats.Acceleration",
-      pilot: "SR5.Vehicle.Stats.Pilot",
-      sensor: "SR5.Vehicle.Stats.Sensor"
-    },
-    control_modes: {
-      manual: "SR5.Vehicle.ControlModes.Manual",
-      remote: "SR5.Vehicle.ControlModes.Remote",
-      rigger: "SR5.Vehicle.ControlModes.Rigger",
-      autopilot: "SR5.Vehicle.ControlModes.Autopilot"
-    },
-    environments: {
-      speed: "SR5.Vehicle.Environments.Speed",
-      handling: "SR5.Vehicle.Environments.Handling"
-    }
-  },
-  ic: {
-    types: {
-      acid: "SR5.IC.Types.Acid",
-      binder: "SR5.IC.Types.Binder",
-      black_ic: "SR5.IC.Types.BlackIC",
-      blaster: "SR5.IC.Types.Blaster",
-      crash: "SR5.IC.Types.Crash",
-      jammer: "SR5.IC.Types.Jammer",
-      killer: "SR5.IC.Types.Killer",
-      marker: "SR5.IC.Types.Marker",
-      patrol: "SR5.IC.Types.Patrol",
-      probe: "SR5.IC.Types.Probe",
-      scramble: "SR5.IC.Types.Scramble",
-      sparky: "SR5.IC.Types.Sparky",
-      tar_baby: "SR5.IC.Types.TarBaby",
-      track: "SR5.IC.Types.Track"
-    }
-  },
-  character: {
-    types: {
-      human: "SR5.Character.Types.Human",
-      elf: "SR5.Character.Types.Elf",
-      ork: "SR5.Character.Types.Ork",
-      dwarf: "SR5.Character.Types.Dwarf",
-      troll: "SR5.Character.Types.Troll"
-    }
-  },
-  rangeWeaponMode: [
-    "single_shot",
-    "semi_auto",
-    "burst_fire",
-    "full_auto"
-  ],
-  rangeWeaponModeLabel: {
-    "single_shot": "SR5.WeaponModeSingleShot",
-    "semi_auto": "SR5.WeaponModeSemiAuto",
-    "burst_file": "SR5.WeaponModeBurstFire",
-    "full_auto": "SR5.WeaponModeFullAuto"
-  },
-  fireModes: [
-    {
-      label: "SR5.WeaponModeSingleShot",
-      value: 1,
-      recoil: false,
-      defense: 0,
-      suppression: false,
-      action: "simple",
-      mode: "single_shot"
-    },
-    {
-      label: "SR5.WeaponModeSemiAutoShort",
-      value: 1,
-      recoil: true,
-      defense: 0,
-      suppression: false,
-      action: "simple",
-      mode: "semi_auto"
-    },
-    {
-      label: "SR5.WeaponModeSemiAutoBurst",
-      value: 3,
-      recoil: true,
-      defense: -2,
-      suppression: false,
-      action: "complex",
-      mode: "semi_auto"
-    },
-    {
-      label: "SR5.WeaponModeBurstFire",
-      value: 3,
-      recoil: true,
-      defense: -2,
-      suppression: false,
-      action: "simple",
-      mode: "burst_fire"
-    },
-    {
-      label: "SR5.WeaponModeBurstFireLong",
-      value: 6,
-      recoil: true,
-      defense: -2,
-      suppression: false,
-      action: "complex",
-      mode: "burst_fire"
-    },
-    {
-      label: "SR5.WeaponModeFullAutoShort",
-      value: 6,
-      recoil: true,
-      defense: -5,
-      suppression: false,
-      action: "simple",
-      mode: "full_auto"
-    },
-    {
-      label: "SR5.WeaponModeFullAutoLong",
-      value: 10,
-      recoil: true,
-      defense: -9,
-      suppression: false,
-      action: "complex",
-      mode: "full_auto"
-    },
-    {
-      label: "SR5.Suppressing",
-      value: 20,
-      recoil: false,
-      defense: 0,
-      suppression: true,
-      action: "complex",
-      mode: "full_auto"
-    }
-  ]
-};
-
-// src/module/helpers.ts
-var Helpers = class {
-  static calcTotal(value, options) {
-    if (value.mod === void 0)
-      value.mod = [];
-    const parts = new PartsList(value.mod);
-    if (!isNaN(value.temp) && Number(value.temp) !== 0) {
-      parts.addUniquePart("SR5.Temporary", value["temp"]);
-    }
-    value.base = value.base !== void 0 ? Number(value.base) : 0;
-    if (value.override) {
-      value.value = Helpers.applyValueRange(value.override.value, options);
-      return value.value;
-    }
-    switch (getType(value.base)) {
-      case "number":
-        value.value = Helpers.roundTo(parts.total + value.base, 3);
-        value.value = Helpers.applyValueRange(value.value, options);
-        break;
-      default:
-        value.value = parts.last === void 0 ? value.base : parts.last;
-        break;
-    }
-    value.mod = parts.list;
-    return value.value;
-  }
-  static roundTo(value, decimals) {
-    const multiplier = Math.pow(10, decimals);
-    return Math.round(value * multiplier) / multiplier;
-  }
-  static applyValueRange(value, options) {
-    if (typeof (options == null ? void 0 : options.min) === "number") {
-      value = Math.max(options.min, value);
-    }
-    if (typeof (options == null ? void 0 : options.max) === "number") {
-      value = Math.min(options.max, value);
-    }
-    return value;
-  }
-  static listItemId(event) {
-    return event.currentTarget.closest(".list-item").dataset.itemId;
-  }
-  static onSetFlag(data) {
-    if (typeof data !== "object")
-      return data;
-    if (data === void 0 || data === null)
-      return data;
-    const newData = {};
-    for (const [key, value] of Object.entries(data)) {
-      const newKey = key.replace("SR5.", "SR5_DOT_");
-      newData[newKey] = this.onSetFlag(value);
-    }
-    return newData;
-  }
-  static onGetFlag(data) {
-    if (typeof data !== "object")
-      return data;
-    if (data === void 0 || data === null)
-      return data;
-    const newData = {};
-    for (const [key, value] of Object.entries(data)) {
-      const newKey = key.replace("SR5_DOT_", "SR5.");
-      newData[newKey] = this.onGetFlag(value);
-    }
-    return newData;
-  }
-  static isMatrix(atts) {
-    var _a;
-    if (!atts)
-      return false;
-    if (typeof atts === "boolean")
-      return atts;
-    const matrixLabels = [
-      "SR5.MatrixAttrFirewall",
-      "SR5.MatrixAttrDataProcessing",
-      "SR5.MatrixAttrSleaze",
-      "SR5.MatrixAttrAttack",
-      "SR5.SkillComputer",
-      "SR5.SkillHacking",
-      "SR5.SkillCybercombat",
-      "SR5.SkillElectronicWarfare",
-      "SR5.Software"
-    ];
-    if (!Array.isArray(atts))
-      atts = [atts];
-    atts = atts.filter((att) => att);
-    for (const att of atts) {
-      if (typeof att === "string") {
-        if (matrixLabels.indexOf(att) >= 0) {
-          return true;
-        }
-      } else if (typeof att === "object" && att.label !== void 0) {
-        if (matrixLabels.indexOf((_a = att.label) != null ? _a : "") >= 0) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-  static parseInputToString(val) {
-    if (val === void 0)
-      return "";
-    if (typeof val === "number")
-      return val.toString();
-    if (typeof val === "string")
-      return val;
-    if (Array.isArray(val)) {
-      return val.join(",");
-    }
-    return "";
-  }
-  static parseInputToNumber(val) {
-    if (typeof val === "number")
-      return val;
-    if (typeof val === "string") {
-      const ret = +val;
-      if (!isNaN(ret))
-        return ret;
-      return 0;
-    }
-    if (Array.isArray(val)) {
-      const str = val.join("");
-      const ret = +str;
-      if (!isNaN(ret))
-        return ret;
-      return 0;
-    }
-    return 0;
-  }
-  static setupCustomCheckbox(app, html) {
-    const setContent = (el) => {
-      const checkbox = $(el).children("input[type=checkbox]");
-      const checkmark = $(el).children(".checkmark");
-      if ($(checkbox).prop("checked")) {
-        $(checkmark).addClass("fa-check-circle");
-        $(checkmark).removeClass("fa-circle");
-      } else {
-        $(checkmark).addClass("fa-circle");
-        $(checkmark).removeClass("fa-check-circle");
-      }
-    };
-    html.find("label.checkbox").each(function() {
-      setContent(this);
-    });
-    html.find("label.checkbox").click((event) => setContent(event.currentTarget));
-    html.find(".submit-checkbox").change((event) => app._onSubmit(event));
-  }
-  static mapRoundsToDefenseDesc(rounds) {
-    if (rounds === 1)
-      return "";
-    if (rounds === 3)
-      return "-2";
-    if (rounds === 6)
-      return "-5";
-    if (rounds === 10)
-      return "-9";
-    if (rounds === 20)
-      return "SR5.DuckOrCover";
-    return "";
-  }
-  static label(str) {
-    const frags = str.split("_");
-    for (let i = 0; i < frags.length; i++) {
-      frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
-    }
-    frags.forEach((frag, idx) => {
-      if (frag === "Processing")
-        frags[idx] = "Proc.";
-      if (frag === "Mechanic")
-        frags[idx] = "Mech.";
-    });
-    return frags.join(" ");
-  }
-  static orderKeys(obj) {
-    const keys = Object.keys(obj).sort(function keyOrder(k1, k2) {
-      if (k1 < k2)
-        return -1;
-      if (k1 > k2)
-        return 1;
-      return 0;
-    });
-    let i;
-    const after = {};
-    for (i = 0; i < keys.length; i++) {
-      after[keys[i]] = obj[keys[i]];
-      delete obj[keys[i]];
-    }
-    for (i = 0; i < keys.length; i++) {
-      obj[keys[i]] = after[keys[i]];
-    }
-    return obj;
-  }
-  static hasModifiers(event) {
-    return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
-  }
-  static filter(obj, comp) {
-    const retObj = {};
-    if (typeof obj === "object" && obj !== null) {
-      Object.entries(obj).forEach(([key, value]) => {
-        if (comp([key, value]))
-          retObj[key] = value;
-      });
-    }
-    return retObj;
-  }
-  static addLabels(obj, label) {
-    if (typeof obj === "object" && obj !== null) {
-      if (!obj.hasOwnProperty("label") && obj.hasOwnProperty("value") && label !== "") {
-        obj.label = label;
-      }
-      Object.entries(obj).filter(([, value]) => typeof value === "object").forEach(([key, value]) => Helpers.addLabels(value, key));
-    }
-  }
-  static shortenAttributeLocalization(label, length = 3) {
-    const name = game.i18n.localize(label);
-    if (length <= 0) {
-      return name;
-    }
-    if (name.length < length) {
-      length = name.length;
-    }
-    return name.slice(0, length).toUpperCase();
-  }
-  static getToken(id) {
-    if (!canvas || !canvas.ready || !canvas.tokens)
-      return;
-    for (const token of canvas.tokens.placeables) {
-      if (token.id === id) {
-        return token;
-      }
-    }
-  }
-  static getSceneTokenActor(sceneTokenId) {
-    const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(sceneTokenId);
-    const token = Helpers.getSceneTokenDocument(sceneId, tokenId);
-    if (!token)
-      return null;
-    return token.getActor();
-  }
-  static deconstructSceneTokenId(sceneTokenId) {
-    return sceneTokenId.split(".");
-  }
-  static getSceneTokenDocument(sceneId, tokenId) {
-    var _a;
-    const scene = (_a = game.scenes) == null ? void 0 : _a.get(sceneId);
-    if (!scene)
-      return;
-    const token = scene.tokens.get(tokenId);
-    if (!token)
-      return;
-    return token;
-  }
-  static getUserTargets(user) {
-    user = user ? user : game.user;
-    if (!user)
-      return [];
-    return Array.from(user.targets);
-  }
-  static userHasTargets(user) {
-    user = user ? user : game.user;
-    if (!user)
-      return false;
-    return user.targets.size > 0;
-  }
-  static measureTokenDistance(tokenOrigin, tokenDest) {
-    if (!canvas || !canvas.ready || !canvas.scene || !canvas.grid)
-      return 0;
-    if (!tokenOrigin || !tokenDest)
-      return 0;
-    const origin = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
-    const dest = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
-    const distanceInGridUnits = canvas.grid.measureDistance(origin, dest);
-    const sceneUnit = canvas.scene.data.gridUnits;
-    return Helpers.convertLengthUnit(distanceInGridUnits, sceneUnit);
-  }
-  static convertLengthUnit(length, fromUnit) {
-    fromUnit = fromUnit.toLowerCase();
-    if (!LENGTH_UNIT_TO_METERS_MULTIPLIERS.hasOwnProperty(fromUnit)) {
-      console.error(`Distance can't be converted from ${fromUnit} to ${LENGTH_UNIT}`);
-      return 0;
-    }
-    return Math.floor(length * LENGTH_UNIT_TO_METERS_MULTIPLIERS[fromUnit]);
-  }
-  static getWeaponRange(distance, ranges) {
-    const rangeKey = Object.keys(ranges).find((range) => distance < ranges[range].distance);
-    if (rangeKey) {
-      return ranges[rangeKey];
-    } else {
-      const { extreme } = ranges;
-      return Helpers.createRangeDescription("SR5.OutOfRange", extreme.distance, SR.combat.environmental.range_modifiers.out_of_range);
-    }
-  }
-  static getControlledTokens() {
-    if (!canvas || !canvas.ready || !canvas.tokens)
-      return [];
-    return canvas.tokens.controlled;
-  }
-  static getTargetedTokens() {
-    if (!canvas.ready || !game.user)
-      return [];
-    return Array.from(game.user.targets);
-  }
-  static getSelectedActorsOrCharacter() {
-    if (!game.user)
-      return [];
-    const tokens = Helpers.getControlledTokens();
-    const actors = tokens.map((token) => token.actor);
-    if (actors.length === 0 && game.user.character) {
-      actors.push(game.user.character);
-    }
-    return actors;
-  }
-  static getTestTargetActors(testData) {
-    return __async(this, null, function* () {
-      const actors = [];
-      for (const uuid of testData.targetActorsUuid) {
-        const tokenDoc = yield fromUuid(uuid);
-        if (!(tokenDoc instanceof TokenDocument)) {
-          console.error(`Shadowrun5e | Been given testData with targets. UUID ${uuid} should point to a TokenDocument but doesn't`, tokenDoc);
-          continue;
-        }
-        if (!tokenDoc.actor)
-          continue;
-        actors.push(tokenDoc.actor);
-      }
-      return actors;
-    });
-  }
-  static createRangeDescription(label, distance, modifier) {
-    label = game.i18n.localize(label);
-    return { label, distance, modifier };
-  }
-  static convertIndexedObjectToArray(indexedObject) {
-    return Object.keys(indexedObject).map((index) => {
-      if (Number.isNaN(index)) {
-        console.warn("An object with no numerical index was given, which is likely a bug.", indexedObject);
-      }
-      return indexedObject[index];
-    });
-  }
-  static getChatSpeakerName(actor) {
-    if (!actor)
-      return "";
-    const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-    const token = actor.getToken();
-    if (useTokenNameForChatOutput && token)
-      return token.name;
-    return actor.name;
-  }
-  static getChatSpeakerImg(actor) {
-    if (!actor)
-      return "";
-    const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-    const token = actor.getToken();
-    if (useTokenForChatOutput && token)
-      return token.texture.src || "";
-    return actor.img || "";
-  }
-  static createDamageData(value, type, ap = 0, element = "", sourceItem) {
-    const damage = duplicate(DataDefaults.damage);
-    damage.base = value;
-    damage.value = value;
-    damage.type.base = type;
-    damage.type.value = type;
-    damage.ap.base = ap;
-    damage.ap.value = ap;
-    damage.element.base = element;
-    damage.element.value = element;
-    if (sourceItem && sourceItem.actor) {
-      damage.source = {
-        actorId: sourceItem.actor.id,
-        itemType: sourceItem.type,
-        itemId: sourceItem.id,
-        itemName: sourceItem.name
-      };
-    }
-    return damage;
-  }
-  static findDamageSource(damageData) {
-    if (!game.actors)
-      return;
-    if (!damageData.source) {
-      return;
-    }
-    const actorId = damageData.source.actorId;
-    const actorSource = game.actors.get(actorId);
-    if (!actorSource) {
-      return;
-    }
-    const itemId = damageData.source.itemId;
-    const actorItem = actorSource.items.get(itemId);
-    if (actorItem) {
-      return actorItem;
-    }
-    const tokens = actorSource.getActiveTokens();
-    let tokenItem;
-    tokens.forEach((token) => {
-      if (!token.actor)
-        return;
-      const foundItem = token.actor.items.get(itemId);
-      if (foundItem) {
-        tokenItem = foundItem;
-      }
-    });
-    return tokenItem;
-  }
-  static modifyDamageByHits(incoming, hits, modificationLabel) {
-    const modified = duplicate(incoming);
-    modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
-    modified.value = Helpers.calcTotal(modified, { min: 0 });
-    return { incoming, modified };
-  }
-  static reduceDamageByHits(incoming, hits, modificationLabel) {
-    if (hits < 0)
-      hits = 0;
-    return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
-  }
-  static confirmDeletion() {
-    return __async(this, null, function* () {
-      const dialog = new DeleteConfirmationDialog();
-      yield dialog.select();
-      return !dialog.canceled && dialog.selectedButton === "delete";
-    });
-  }
-  static getRandomIdSkillFieldDataEntry(skillDataPath, skillField, idLength = DEFAULT_ID_LENGTH) {
-    if (!skillDataPath || skillDataPath.length === 0)
-      return;
-    const id = randomID(idLength);
-    const updateSkillData = {
-      [skillDataPath]: { [id]: skillField }
-    };
-    return {
-      id,
-      updateSkillData
-    };
-  }
-  static getUpdateDataEntry(path, value) {
-    return { [path]: value };
-  }
-  static getDeleteKeyUpdateData(path, key) {
-    return { [path]: { [`-=${key}`]: null } };
-  }
-  static localizeSkill(skill) {
-    return skill.label ? game.i18n.localize(skill.label) : skill.name;
-  }
-  static sortSkills(skills, asc = true) {
-    const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
-      const comparatorA = Helpers.localizeSkill(a) || aId;
-      const comparatorB = Helpers.localizeSkill(b) || bId;
-      if (asc)
-        return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
-      else
-        return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
-    });
-    const sortedAsObject = {};
-    for (const [id, skill] of sortedEntries) {
-      sortedAsObject[id] = skill;
-    }
-    return sortedAsObject;
-  }
-  static sortConfigValuesByTranslation(configValues, asc = true) {
-    const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
-      const comparatorA = game.i18n.localize(a);
-      const comparatorB = game.i18n.localize(b);
-      if (asc)
-        return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
-      else
-        return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
-    });
-    const sortedAsObject = {};
-    for (const [key, translated] of sortedEntries) {
-      sortedAsObject[key] = translated;
-    }
-    return sortedAsObject;
-  }
-  static getPlayersWithPermission(document2, permission, active = true) {
-    if (!game.users)
-      return [];
-    return game.users.filter((user) => {
-      if (user.isGM)
-        return false;
-      if (!document2.testUserPermission(user, permission))
-        return false;
-      if (active && !user.active)
-        return false;
-      return true;
-    });
-  }
-  static getSkillLabelOrName(skill) {
-    return skill.label ? game.i18n.localize(skill.label) : skill.name || "";
-  }
-  static showDiceSoNice(roll, whisper, blind = false) {
-    return __async(this, null, function* () {
-      if (!game.dice3d)
-        return;
-      const synchronize = (whisper == null ? void 0 : whisper.length) === 0 || whisper === null;
-      whisper = (whisper == null ? void 0 : whisper.length) > 0 ? whisper : null;
-      yield game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind);
-      console.error(game.dice3d);
-    });
-  }
-  static getEntityFromDropData(data) {
-    return __async(this, null, function* () {
-      if (!game.actors || !game.items)
-        return;
-      if (data.pack && data.type === "Actor")
-        return yield Helpers.getEntityFromCollection(data.pack, data.id);
-      if (data.pack && data.type === "Item")
-        return yield Helpers.getEntityFromCollection(data.pack, data.id);
-      if (data.type === "Actor")
-        return game.actors.get(data.id);
-      if (data.type === "Item")
-        return game.items.get(data.id);
-    });
-  }
-  static getEntityFromCollection(collection, id) {
-    return __async(this, null, function* () {
-      const pack = game.packs.find((p) => p.collection === collection);
-      return yield pack.getDocument(id);
-    });
-  }
-  static isValidMarkId(markId) {
-    if (!game.scenes)
-      return false;
-    const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
-    const scene = game.scenes.get(sceneId);
-    if (!scene)
-      return false;
-    const tokenDocument = scene.tokens.get(targetId);
-    if (!tokenDocument)
-      return false;
-    const actor = tokenDocument.actor;
-    if (itemId && !(actor == null ? void 0 : actor.items.get(itemId)))
-      return false;
-    return true;
-  }
-  static buildMarkId(sceneId, targetId, itemId, separator = "/") {
-    return [sceneId, targetId, itemId || ""].join(separator);
-  }
-  static deconstructMarkId(markId, separator = "/") {
-    const ids = markId.split(separator);
-    if (ids.length !== 3) {
-      console.error("A mark id must always be of length 3");
-    }
-    return ids;
-  }
-  static getMarkIdDocuments(markId) {
-    var _a, _b;
-    if (!game.scenes || !game.items)
-      return;
-    const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
-    const scene = game.scenes.get(sceneId);
-    if (!scene)
-      return;
-    const target = scene.tokens.get(targetId) || game.items.get(targetId);
-    const item = (_b = (_a = target == null ? void 0 : target.actor) == null ? void 0 : _a.items) == null ? void 0 : _b.get(itemId);
-    return {
-      scene,
-      target,
-      item
-    };
-  }
-  static objectHasKeys(obj, keys) {
-    for (const key of keys) {
-      if (!obj.hasOwnProperty(key))
-        return false;
-    }
-    return true;
-  }
-  static getPackAction(packName, actionName) {
-    return __async(this, null, function* () {
-      console.info(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
-      const pack = game.packs.find((pack2) => pack2.metadata.system === SYSTEM_NAME && pack2.metadata.name === packName);
-      if (!pack)
-        return;
-      const packEntry = pack.index.find((data) => {
-        var _a;
-        return ((_a = data.name) == null ? void 0 : _a.toLowerCase().replace(new RegExp(" ", "g"), "_")) === actionName.toLowerCase();
-      });
-      if (!packEntry)
-        return;
-      const item = yield pack.getDocument(packEntry._id);
-      if (!item || item.type !== "action")
-        return;
-      console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
-      return item;
-    });
-  }
-  static renderEntityLinkSheet(event) {
-    return __async(this, null, function* () {
-      const element = $(event.currentTarget);
-      const uuid = element.data("uuid");
-      yield Helpers.renderDocumentSheet(uuid);
-    });
-  }
-  static renderDocumentSheet(uuid, resolveTokenToActor = true) {
-    return __async(this, null, function* () {
-      if (!uuid)
-        return;
-      let document2 = yield fromUuid(uuid);
-      if (!document2)
-        return;
-      if (document2 instanceof TokenDocument && resolveTokenToActor && document2.actor)
-        document2 = document2.actor;
-      yield document2.sheet.render(true);
-    });
-  }
-  static injectWeaponTestIntoChangeData(type, changeData, applyData) {
-    var _a;
-    if (((_a = changeData == null ? void 0 : changeData.system) == null ? void 0 : _a.category) === void 0)
-      return;
-    if (changeData.system.category === "") {
-      foundry.utils.setProperty(applyData, "system.action.test", "");
-      return;
-    }
-    const test = SR5.weaponCategoryActiveTests[changeData.system.category];
-    if (!test) {
-      console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.system.category}.`, changeData);
-    }
-    foundry.utils.setProperty(applyData, "system.action.test", test);
-    foundry.utils.setProperty(applyData, "system.action.opposed.test", "PhysicalDefenseTest");
-    foundry.utils.setProperty(applyData, "system.action.opposed.resist.test", "PhysicalResistTest");
-  }
-  static injectSpellTestIntoChangeData(type, changeData, applyData) {
-    var _a;
-    if (((_a = changeData == null ? void 0 : changeData.system) == null ? void 0 : _a.category) === void 0)
-      return;
-    if (changeData.system.category === "") {
-      foundry.utils.setProperty(applyData, "system.action.test", "");
-      return;
-    }
-    const test = SR5.activeTests[type];
-    const opposedTest = SR5.opposedTests[type][changeData.system.category] || "OpposedTest";
-    const resistTest = SR5.opposedResistTests[type][changeData.system.category] || "";
-    foundry.utils.setProperty(applyData, "system.action.test", test);
-    foundry.utils.setProperty(applyData, "system.action.opposed.test", opposedTest);
-    foundry.utils.setProperty(applyData, "system.action.opposed.resist.test", resistTest);
-  }
-  static injectComplexFormTestIntoChangeData(type, changeData, applyData) {
-    const test = SR5.activeTests[type];
-    foundry.utils.setProperty(applyData, "system.action.test", test);
-  }
-  static injectActionTestsIntoChangeData(type, changeData, applyData) {
-    if (!changeData)
-      return;
-    const typeHandler = {
-      "weapon": Helpers.injectWeaponTestIntoChangeData,
-      "spell": Helpers.injectSpellTestIntoChangeData,
-      "complex_form": Helpers.injectComplexFormTestIntoChangeData
-    };
-    const handler = typeHandler[type];
-    if (!handler)
-      return;
-    handler(type, changeData, applyData);
-  }
-};
-
-// src/module/handlebars/RollAndLabelHelpers.ts
-var registerRollAndLabelHelpers = () => {
-  Handlebars.registerHelper("damageAbbreviation", function(damage) {
-    if (damage === "physical")
-      return "P";
-    if (damage === "stun")
-      return "S";
-    if (damage === "matrix")
-      return "M";
-    return "";
-  });
-  Handlebars.registerHelper("damageCode", function(damage) {
-    const typeCode = Handlebars.helpers.damageAbbreviation(damage.type.value);
-    let code = `${damage.value}${typeCode}`;
-    return new Handlebars.SafeString(code);
-  });
-  Handlebars.registerHelper("diceIcon", function(side) {
-    if (side) {
-      switch (side) {
-        case 1:
-          return "red";
-        case 2:
-          return "grey";
-        case 3:
-          return "grey";
-        case 4:
-          return "grey";
-        case 5:
-          return "green";
-        case 6:
-          return "green";
-      }
-    }
-  });
-  Handlebars.registerHelper("elementIcon", function(element) {
-    let icon = "";
-    if (element === "electricity") {
-      icon = "fas fa-bolt";
-    } else if (element === "radiation") {
-      icon = "fas fa-radiation-alt";
-    } else if (element === "fire") {
-      icon = "fas fa-fire";
-    } else if (element === "acid") {
-      icon = "fas fa-vials";
-    } else if (element === "cold") {
-      icon = "fas fa-snowflake";
-    }
-    return icon;
-  });
-  Handlebars.registerHelper("partsTotal", function(partsList) {
-    const parts = new PartsList(partsList);
-    return parts.total;
-  });
-  Handlebars.registerHelper("signedValue", function(value) {
-    return value > 0 ? `+${value}` : `${value}`;
-  });
-  Handlebars.registerHelper("speakerName", Helpers.getChatSpeakerName);
-  Handlebars.registerHelper("speakerImg", Helpers.getChatSpeakerImg);
 };
 
 // src/module/data/DataWrapper.ts
@@ -11171,704 +9839,40 @@ var SR5ItemDataWrapper = class extends DataWrapper {
   }
 };
 
-// src/module/handlebars/ItemLineHelpers.ts
-var registerItemLineHelpers = () => {
-  Handlebars.registerHelper("ItemHeaderIcons", function(type) {
-    const PlusIcon = "fas fa-plus";
-    const AddText = game.i18n.localize("SR5.Add");
-    const addIcon = {
-      icon: PlusIcon,
-      text: AddText,
-      title: game.i18n.localize("SR5.CreateItem"),
-      cssClass: "item-create",
-      data: {}
-    };
-    switch (type) {
-      case "lifestyle":
-        addIcon.title = game.i18n.localize("SR5.CreateItemLifestyle");
-        return [addIcon];
-      case "contact":
-        addIcon.title = game.i18n.localize("SR5.CreateItemContact");
-        return [addIcon];
-      case "sin":
-        addIcon.title = game.i18n.localize("SR5.CreateItemSIN");
-        return [addIcon];
-      case "license":
-        addIcon.title = game.i18n.localize("SR5.CreateItemLicense");
-        return [addIcon];
-      case "quality":
-        addIcon.title = game.i18n.localize("SR5.CreateItemQuality");
-        return [addIcon];
-      case "adept_power":
-        addIcon.title = game.i18n.localize("SR5.CreateItemAdeptPower");
-        return [addIcon];
-      case "action":
-        addIcon.title = game.i18n.localize("SR5.CreateItemAction");
-        return [addIcon];
-      case "spell":
-        addIcon.title = game.i18n.localize("SR5.CreateItemSpell");
-        return [addIcon];
-      case "gear":
-        addIcon.title = game.i18n.localize("SR5.CreateItemGear");
-        return [addIcon];
-      case "complex_form":
-        addIcon.title = game.i18n.localize("SR5.CreateItemComplexForm");
-        return [addIcon];
-      case "program":
-        addIcon.title = game.i18n.localize("SR5.CreateItemProgram");
-        return [addIcon];
-      case "weapon":
-        addIcon.title = game.i18n.localize("SR5.CreateItemWeapon");
-        return [addIcon];
-      case "armor":
-        addIcon.title = game.i18n.localize("SR5.CreateItemArmor");
-        return [addIcon];
-      case "ammo":
-        addIcon.title = game.i18n.localize("SR5.CreateItemAmmo");
-        return [addIcon];
-      case "modification":
-        addIcon.title = game.i18n.localize("SR5.CreateItemModification");
-        return [addIcon];
-      case "device":
-        addIcon.title = game.i18n.localize("SR5.CreateItemDevice");
-        return [addIcon];
-      case "equipment":
-        addIcon.title = game.i18n.localize("SR5.CreateItemEquipment");
-        return [addIcon];
-      case "cyberware":
-        addIcon.title = game.i18n.localize("SR5.CreateItemCyberware");
-        return [addIcon];
-      case "bioware":
-        addIcon.title = game.i18n.localize("SR5.CreateItemBioware");
-        return [addIcon];
-      case "critter_power":
-        addIcon.title = game.i18n.localize("SR5.CreateItemCritterPower");
-        return [addIcon];
-      case "sprite_power":
-        addIcon.title = game.i18n.localize("SR5.CreateItemSpritePower");
-        return [addIcon];
-      case "effect":
-        addIcon.title = game.i18n.localize("SR5.CreateEffect");
-        addIcon.cssClass = "effect-control";
-        addIcon.data = { action: "create" };
-        return [addIcon];
-      default:
-        return [];
-    }
-  });
-  Handlebars.registerHelper("InventoryIcons", function(name) {
-    const addItemIcon = {
-      icon: "fas fa-plus",
-      text: game.i18n.localize("SR5.Add"),
-      title: game.i18n.localize("SR5.CreateItem"),
-      cssClass: "inventory-item-create",
-      data: { inventory: name }
-    };
-    return [addItemIcon];
-  });
-  Handlebars.registerHelper("ItemHeaderRightSide", function(id) {
-    switch (id) {
-      case "action":
-        return [
-          {
-            text: {
-              text: game.i18n.localize("SR5.Skill"),
-              cssClass: "six"
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.Attribute"),
-              cssClass: "six"
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.Attribute"),
-              cssClass: "six"
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.Limit"),
-              cssClass: "six"
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.Modifier"),
-              cssClass: "six"
-            }
-          }
-        ];
-      case "weapon":
-      case "armor":
-      case "device":
-      case "equipment":
-      case "cyberware":
-      case "bioware":
-      case "modification":
-      case "ammo":
-        return [
-          {
-            text: {
-              text: game.i18n.localize("SR5.Qty")
-            }
-          }
-        ];
-      case "complex_form":
-        return [
-          {
-            text: {
-              text: game.i18n.localize("SR5.Target")
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.Duration")
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.Fade")
-            }
-          }
-        ];
-      case "adept_power":
-        return [
-          {
-            text: {
-              text: game.i18n.localize("SR5.PowerType")
-            }
-          }
-        ];
-      case "spell":
-        return [
-          {
-            text: {
-              text: game.i18n.localize("SR5.SpellType")
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.SpellRange")
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.Duration")
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.Drain")
-            }
-          }
-        ];
-      case "critter_power":
-        return [
-          {
-            text: {
-              text: game.i18n.localize("SR5.CritterPower.Type")
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.CritterPower.Range")
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize("SR5.CritterPower.Duration")
-            }
-          }
-        ];
-      case "quality":
-        return [
-          {
-            text: {
-              text: game.i18n.localize("SR5.QualityType")
-            }
-          }
-        ];
-      default:
-        return [];
-    }
-  });
-  Handlebars.registerHelper("ItemRightSide", function(item) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r;
-    const wrapper = new SR5ItemDataWrapper(item);
-    const qtyInput = {
-      input: {
-        type: "number",
-        value: wrapper.getQuantity(),
-        cssClass: "item-qty"
-      }
-    };
-    switch (item.type) {
-      case "action":
-        return [
-          {
-            text: {
-              text: game.i18n.localize(SR5.activeSkills[(_a = wrapper.getActionSkill()) != null ? _a : ""]),
-              cssClass: "six"
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize(SR5.attributes[(_b = wrapper.getActionAttribute()) != null ? _b : ""]),
-              cssClass: "six"
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize(SR5.attributes[(_c = wrapper.getActionAttribute2()) != null ? _c : ""]),
-              cssClass: "six"
-            }
-          },
-          {
-            text: {
-              text: wrapper.getLimitAttribute() ? game.i18n.localize(SR5.attributes[(_d = wrapper.getLimitAttribute()) != null ? _d : ""]) : wrapper.getActionLimit(),
-              cssClass: "six"
-            }
-          },
-          {
-            text: {
-              text: wrapper.getActionDicePoolMod(),
-              cssClass: "six"
-            }
-          }
-        ];
-      case "armor":
-      case "ammo":
-      case "modification":
-      case "device":
-      case "equipment":
-      case "cyberware":
-      case "bioware":
-        return [qtyInput];
-      case "weapon":
-        if (wrapper.isRangedWeapon()) {
-          const count = (_f = (_e = wrapper.getAmmo()) == null ? void 0 : _e.current.value) != null ? _f : 0;
-          const max = (_h = (_g = wrapper.getAmmo()) == null ? void 0 : _g.current.max) != null ? _h : 0;
-          const text = count < max || max === 0 ? `${game.i18n.localize("SR5.WeaponReload")} (${count}/${max})` : game.i18n.localize("SR5.AmmoFull");
-          const cssClass = "no-break" + (count < max ? " reload-ammo roll" : "faded");
-          return [
-            {
-              text: {
-                title: `${game.i18n.localize("SR5.WeaponAmmoCount")}: ${count}`,
-                text,
-                cssClass
-              }
-            },
-            {
-              text: {
-                text: ""
-              }
-            },
-            qtyInput
-          ];
-        } else {
-          return [qtyInput];
-        }
-      case "quality":
-        return [
-          {
-            text: {
-              text: game.i18n.localize(SR5.qualityTypes[(_i = item.data.type) != null ? _i : ""])
-            }
-          }
-        ];
-      case "adept_power":
-        return [
-          {
-            text: {
-              text: game.i18n.localize(SR5.adeptPower.types[(_j = item.data.type) != null ? _j : ""])
-            }
-          }
-        ];
-      case "spell":
-        return [
-          {
-            text: {
-              text: game.i18n.localize(SR5.spellTypes[(_k = item.data.type) != null ? _k : ""])
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize(SR5.spellRanges[(_l = item.data.range) != null ? _l : ""])
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize(SR5.durations[(_m = item.data.duration) != null ? _m : ""])
-            }
-          },
-          {
-            text: {
-              text: wrapper.getDrain()
-            }
-          }
-        ];
-      case "critter_power":
-        return [
-          {
-            text: {
-              text: game.i18n.localize(SR5.critterPower.types[(_n = item.data.powerType) != null ? _n : ""])
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize(SR5.critterPower.ranges[(_o = item.data.range) != null ? _o : ""])
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize(SR5.critterPower.durations[(_p = item.data.duration) != null ? _p : ""])
-            }
-          }
-        ];
-      case "complex_form":
-        return [
-          {
-            text: {
-              text: game.i18n.localize(SR5.matrixTargets[(_q = item.data.target) != null ? _q : ""])
-            }
-          },
-          {
-            text: {
-              text: game.i18n.localize(SR5.durations[(_r = item.data.duration) != null ? _r : ""])
-            }
-          },
-          {
-            text: {
-              text: String(item.data.fade)
-            }
-          }
-        ];
-      case "program":
-        return [
-          {
-            button: {
-              cssClass: `item-equip-toggle ${wrapper.isEquipped() ? "light" : ""}`,
-              short: true,
-              text: wrapper.isEquipped() ? game.i18n.localize("SR5.Loaded") : game.i18n.localize("SR5.Load") + " >>"
-            }
-          }
-        ];
-      default:
-        return [];
-    }
-  });
-  Handlebars.registerHelper("ItemIcons", function(item) {
-    const wrapper = new SR5ItemDataWrapper(item);
-    const editIcon = {
-      icon: "fas fa-edit item-edit",
-      title: game.i18n.localize("SR5.EditItem")
-    };
-    const removeIcon = {
-      icon: "fas fa-trash item-delete",
-      title: game.i18n.localize("SR5.DeleteItem")
-    };
-    const equipIcon = {
-      icon: `${wrapper.isEquipped() ? "fas fa-check-circle" : "far fa-circle"} item-equip-toggle`,
-      title: game.i18n.localize("SR5.ToggleEquip")
-    };
-    const pdfIcon = {
-      icon: "fas fa-file open-source-pdf",
-      title: game.i18n.localize("SR5.OpenSourcePdf")
-    };
-    const icons = [editIcon, removeIcon];
-    if (ui["PDFoundry"]) {
-      icons.unshift(pdfIcon);
-    }
-    switch (wrapper.getType()) {
-      case "program":
-      case "armor":
-      case "device":
-      case "equipment":
-      case "cyberware":
-      case "bioware":
-      case "weapon":
-        icons.unshift(equipIcon);
-    }
-    return icons;
-  });
-  Handlebars.registerHelper("InventoryItemIcons", function(item) {
-    const wrapper = new SR5ItemDataWrapper(item);
-    const moveIcon = {
-      icon: "fas fa-exchange-alt inventory-item-move",
-      title: game.i18n.localize("SR5.MoveItemInventory")
-    };
-    const editIcon = {
-      icon: "fas fa-edit item-edit",
-      title: game.i18n.localize("SR5.EditItem")
-    };
-    const removeIcon = {
-      icon: "fas fa-trash item-delete",
-      title: game.i18n.localize("SR5.DeleteItem")
-    };
-    const equipIcon = {
-      icon: `${wrapper.isEquipped() ? "fas fa-check-circle" : "far fa-circle"} item-equip-toggle`,
-      title: game.i18n.localize("SR5.ToggleEquip")
-    };
-    const pdfIcon = {
-      icon: "fas fa-file open-source-pdf",
-      title: game.i18n.localize("SR5.OpenSourcePdf")
-    };
-    const icons = [moveIcon, editIcon, removeIcon];
-    if (ui["PDFoundry"]) {
-      icons.unshift(pdfIcon);
-    }
-    switch (wrapper.getType()) {
-      case "program":
-      case "armor":
-      case "device":
-      case "equipment":
-      case "cyberware":
-      case "bioware":
-      case "weapon":
-        icons.unshift(equipIcon);
-    }
-    return icons;
-  });
-  Handlebars.registerHelper("EffectIcons", function(effect) {
-    const editIcon = {
-      icon: "fas fa-edit effect-control",
-      title: game.i18n.localize("SR5.EditItem"),
-      data: { action: "edit" }
-    };
-    const removeIcon = {
-      icon: "fas fa-trash effect-control",
-      title: game.i18n.localize("SR5.DeleteItem"),
-      data: { action: "delete" }
-    };
-    const disableIcon = {
-      icon: `${effect.data.disabled ? "far fa-circle" : "fas fa-check-circle"} effect-control`,
-      title: game.i18n.localize("SR5.ToggleActive"),
-      data: { action: "toggle" }
-    };
-    const openOriginIcon = {
-      icon: "fas fa-file effect-control",
-      title: game.i18n.localize("SR5.OpenOrigin"),
-      data: { action: "open-origin" }
-    };
-    let icons = [disableIcon, editIcon, removeIcon];
-    if (effect.isOriginOwned)
-      icons = [openOriginIcon, ...icons];
-    return icons;
-  });
-  Handlebars.registerHelper("EffectData", function(effectType) {
-    return { "effect-type": effectType };
-  });
-  Handlebars.registerHelper("MarksRightSide", (marked) => {
-    const quantityInput = {
-      input: {
-        type: "number",
-        value: marked.marks,
-        cssClass: "marks-qty"
-      }
-    };
-    return [quantityInput];
-  });
-  Handlebars.registerHelper("MarksIcons", (marked) => {
-    const incrementIcon = {
-      icon: "fas fa-plus marks-add-one",
-      title: game.i18n.localize("SR5.Labels.Sheet.AddOne"),
-      data: { action: "add-one" }
-    };
-    const decrementIcon = {
-      icon: "fas fa-minus marks-remove-one",
-      title: game.i18n.localize("SR5.Labels.Sheet.SubtractOne"),
-      data: { action: "remove-one" }
-    };
-    return [incrementIcon, decrementIcon];
-  });
-  Handlebars.registerHelper("MarkListHeaderRightSide", () => {
-    return [
-      {
-        text: {
-          text: game.i18n.localize("SR5.FOUNDRY.Scene")
-        }
-      },
-      {
-        text: {
-          text: game.i18n.localize("SR5.FOUNDRY.Item")
-        }
-      },
-      {
-        text: {
-          text: game.i18n.localize("SR5.Qty")
-        }
-      }
-    ];
-  });
-  Handlebars.registerHelper("MarkListHeaderIcons", () => {
-    return [{
-      icon: "fas fa-trash",
-      title: game.i18n.localize("SR5.ClearMarks"),
-      text: game.i18n.localize("SR5.Del"),
-      cssClass: "marks-clear-all"
-    }];
-  });
-  Handlebars.registerHelper("NetworkDevicesListRightSide", () => {
-    return [
-      {
-        text: {
-          text: game.i18n.localize("SR5.FOUNDRY.Actor")
-        }
-      },
-      {
-        text: {
-          text: game.i18n.localize("SR5.FOUNDRY.Item")
-        }
-      }
-    ];
-  });
-  Handlebars.registerHelper("NetworkDevicesListHeaderIcons", () => {
-    return [{
-      icon: "fas fa-trash",
-      title: game.i18n.localize("SR5.Labels.Sheet.ClearNetwork"),
-      text: game.i18n.localize("SR5.Del"),
-      cssClass: "network-clear"
-    }];
-  });
-};
-
-// src/module/rules/SkillRules.ts
-var SkillRules = class {
-  static mustDefaultToRoll(skill) {
-    return skill.base === 0;
+// src/module/rules/MatrixRules.ts
+var MatrixRules = class {
+  static getConditionMonitor(deviceRating) {
+    deviceRating = Math.max(deviceRating, SR.attributes.ranges.host_rating.min);
+    return Math.ceil(8 + deviceRating / 2);
   }
-  static allowDefaultingRoll(skill) {
-    return skill.canDefault;
+  static getICDeviceRating(hostRating) {
+    return Math.max(hostRating, SR.attributes.ranges.host_rating.min);
   }
-  static allowRoll(skill) {
-    return !SkillRules.mustDefaultToRoll(skill) || SkillRules.allowDefaultingRoll(skill);
+  static getICInitiativeBase(hostRating) {
+    return Math.max(hostRating * 2, SR.attributes.ranges.host_rating.min);
   }
-  static addDefaultingPart(parts) {
-    parts.addUniquePart("SR5.Defaulting", SkillRules.defaultingModifier);
+  static getICInitiativeDice() {
+    return Math.max(SR.initiatives.ic.dice, SR.initiatives.ranges.dice.min);
   }
-  static level(skill, options = { specialization: false }) {
-    if (this.mustDefaultToRoll(skill) && this.allowDefaultingRoll(skill)) {
-      return SkillRules.defaultingModifier;
-    }
-    const skillValue = typeof skill.value === "number" ? skill.value : 0;
-    const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
-    return skillValue + specializationBonus;
+  static getICMeatAttributeBase(hostRating) {
+    return Math.max(hostRating, SR.attributes.ranges.host_rating.min);
   }
-  static get defaultingModifier() {
-    return SR.skill.DEFAULTING_MODIFIER;
+  static isValidMarksCount(marks) {
+    return marks >= MatrixRules.minMarksCount() && marks <= MatrixRules.maxMarksCount() && marks % 1 === 0;
   }
-  static get SpecializationModifier() {
-    return SR.skill.SPECIALIZATION_MODIFIER;
+  static maxMarksCount() {
+    return 3;
   }
-};
-
-// src/module/handlebars/SkillLineHelpers.ts
-var registerSkillLineHelpers = () => {
-  Handlebars.registerHelper("SkillHeaderIcons", function(category) {
-    const addIcon = {
-      icon: "fas fa-plus",
-      title: game.i18n.localize("SR5.AddSkill"),
-      text: game.i18n.localize("SR5.Add"),
-      cssClass: ""
-    };
-    switch (category) {
-      case "active":
-        addIcon.cssClass = "add-active";
-        return [addIcon];
-      case "language":
-        addIcon.cssClass = "add-language";
-        return [addIcon];
-      case "knowledge":
-        addIcon.cssClass = "add-knowledge";
-        return [addIcon];
-      default:
-        return [];
-    }
-  });
-  Handlebars.registerHelper("SkillHeaderRightSide", function(id, filters) {
-    const specs = {
-      text: {
-        text: game.i18n.localize("SR5.Specialization"),
-        cssClass: "skill-spec-item"
-      }
-    };
-    const rtg = {
-      text: {
-        text: !filters || filters.showUntrainedSkills ? game.i18n.localize("SR5.Rtg") : game.i18n.localize("SR5.RtgAboveZero"),
-        cssClass: "rtg"
-      }
-    };
-    switch (id) {
-      case "active":
-      case "knowledge":
-      case "language":
-        return [specs, rtg];
-      default:
-        return [];
-    }
-  });
-  Handlebars.registerHelper("SkillRightSide", function(skillType, skill) {
-    const specs = Array.isArray(skill.specs) ? skill.specs : [skill.specs];
-    return [
-      {
-        html: {
-          text: specs.map((spec) => `<span class="roll skill-spec-roll">${spec}</span>`).join(", "),
-          cssClass: "skill-spec-item"
-        }
-      },
-      {
-        text: {
-          text: Helpers.calcTotal(skill),
-          cssClass: "rtg"
-        }
-      }
-    ];
-  });
-  Handlebars.registerHelper("SkillAdditionCssClass", function(skill) {
-    const classes = [];
-    if (game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) && !SkillRules.allowDefaultingRoll(skill)) {
-      classes.push("skill-roll-not-defaultable");
-    }
-    return classes;
-  });
-  Handlebars.registerHelper("SkillIcons", function(skillType, skill) {
-    const editIcon = {
-      icon: "fas fa-edit",
-      title: game.i18n.localize("SR5.EditSkill"),
-      cssClass: ""
-    };
-    const removeIcon = {
-      icon: "fas fa-trash",
-      title: game.i18n.localize("SR5.DeleteSkill"),
-      cssClass: ""
-    };
-    switch (skillType) {
-      case "active":
-        editIcon.cssClass = "skill-edit";
-        removeIcon.cssClass = "remove-active";
-        return [editIcon, removeIcon];
-      case "language":
-        editIcon.cssClass = "language-skill-edit";
-        removeIcon.cssClass = "remove-language";
-        return [editIcon, removeIcon];
-      case "knowledge":
-        editIcon.cssClass = "knowledge-skill-edit";
-        removeIcon.cssClass = "remove-knowledge";
-        return [editIcon, removeIcon];
-      default:
-        return [editIcon];
-    }
-  });
-};
-
-// src/module/handlebars/AppHelpers.ts
-var registerAppHelpers = () => {
-  Handlebars.registerHelper("IsEnvModifierActive", (active, category, modifier) => {
-    return active[category] === modifier;
-  });
+  static minMarksCount() {
+    return 0;
+  }
+  static getValidMarksCount(marks) {
+    marks = Math.min(marks, MatrixRules.maxMarksCount());
+    return Math.max(marks, MatrixRules.minMarksCount());
+  }
+  static hostMatrixAttributeRatings(hostRating) {
+    return [0, 1, 2, 3].map((rating) => rating + hostRating);
+  }
 };
 
 // src/module/rolls/SR5Roll.ts
@@ -11926,36 +9930,590 @@ var SR5Roll = class extends Roll {
   }
 };
 
-// src/module/actor/flows/SkillFlow.ts
-var SkillFlow = class {
-  static handleDefaulting(skill, parts) {
-    var _a;
-    if (!SkillRules.mustDefaultToRoll(skill))
-      return;
-    if (!SkillFlow.allowDefaultingRoll(skill)) {
-      (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.SkillCantBeDefault"));
-      return;
+// src/module/config.ts
+var SR5 = {
+  itemTypes: {
+    action: "SR5.ItemTypes.Action",
+    adept_power: "SR5.ItemTypes.AdeptPower",
+    ammo: "SR5.ItemTypes.Ammo",
+    armor: "SR5.ItemTypes.Armor",
+    complex_form: "SR5.ItemTypes.ComplexForm",
+    contact: "SR5.ItemTypes.Contact",
+    critter_power: "SR5.ItemTypes.CritterPower",
+    cyberware: "SR5.ItemTypes.Cyberware",
+    bioware: "SR5.ItemTypes.Bioware",
+    device: "SR5.ItemTypes.Device",
+    equipment: "SR5.ItemTypes.Equipment",
+    lifestyle: "SR5.ItemTypes.Lifestyle",
+    modification: "SR5.ItemTypes.Modification",
+    quality: "SR5.ItemTypes.Quality",
+    sin: "SR5.ItemTypes.Sin",
+    spell: "SR5.ItemTypes.Spell",
+    weapon: "SR5.ItemTypes.Weapon",
+    host: "SR5.ItemTypes.Host"
+  },
+  attributes: {
+    agility: "SR5.AttrAgility",
+    attack: "SR5.MatrixAttrAttack",
+    body: "SR5.AttrBody",
+    charisma: "SR5.AttrCharisma",
+    data_processing: "SR5.MatrixAttrDataProc",
+    edge: "SR5.AttrEdge",
+    essence: "SR5.AttrEssence",
+    firewall: "SR5.MatrixAttrFirewall",
+    intuition: "SR5.AttrIntuition",
+    logic: "SR5.AttrLogic",
+    magic: "SR5.AttrMagic",
+    reaction: "SR5.AttrReaction",
+    resonance: "SR5.AttrResonance",
+    sleaze: "SR5.MatrixAttrSleaze",
+    strength: "SR5.AttrStrength",
+    willpower: "SR5.AttrWillpower"
+  },
+  limits: {
+    physical: "SR5.LimitPhysical",
+    social: "SR5.LimitSocial",
+    mental: "SR5.LimitMental",
+    astral: "SR5.LimitAstral",
+    attack: "SR5.MatrixAttrAttack",
+    sleaze: "SR5.MatrixAttrSleaze",
+    data_processing: "SR5.MatrixAttrDataProc",
+    firewall: "SR5.MatrixAttrFirewall",
+    speed: "SR5.Vehicle.Stats.Speed",
+    sensor: "SR5.Vehicle.Stats.Sensor",
+    handling: "SR5.Vehicle.Stats.Handling",
+    magic: "SR5.AttrMagic"
+  },
+  specialTypes: {
+    mundane: "SR5.Mundane",
+    magic: "SR5.Awakened",
+    resonance: "SR5.Emerged"
+  },
+  damageTypes: {
+    physical: "SR5.DmgTypePhysical",
+    stun: "SR5.DmgTypeStun",
+    matrix: "SR5.DmgTypeMatrix"
+  },
+  elementTypes: {
+    fire: "SR5.ElementFire",
+    cold: "SR5.ElementCold",
+    acid: "SR5.ElementAcid",
+    electricity: "SR5.ElementElectricity",
+    radiation: "SR5.ElementRadiation"
+  },
+  spellCategories: {
+    combat: "SR5.SpellCatCombat",
+    detection: "SR5.SpellCatDetection",
+    health: "SR5.SpellCatHealth",
+    illusion: "SR5.SpellCatIllusion",
+    manipulation: "SR5.SpellCatManipulation"
+  },
+  spellTypes: {
+    physical: "SR5.SpellTypePhysical",
+    mana: "SR5.SpellTypeMana"
+  },
+  spellRanges: {
+    touch: "SR5.SpellRangeTouch",
+    los: "SR5.SpellRangeLos",
+    los_a: "SR5.SpellRangeLosA"
+  },
+  combatSpellTypes: {
+    direct: "SR5.SpellCombatDirect",
+    indirect: "SR5.SpellCombatIndirect"
+  },
+  detectionSpellTypes: {
+    directional: "SR5.SpellDetectionDirectional",
+    psychic: "SR5.SpellDetectionPsychic",
+    area: "SR5.SpellDetectionArea"
+  },
+  illusionSpellTypes: {
+    obvious: "SR5.SpellIllusionObvious",
+    realistic: "SR5.SpellIllusionRealistic"
+  },
+  illusionSpellSenses: {
+    "single-sense": "SR5.SpellIllusionSingleSense",
+    "multi-sense": "SR5.SpellIllusionMultiSense"
+  },
+  attributeRolls: {
+    composure: "SR5.RollComposure",
+    lift_carry: "SR5.RollLiftCarry",
+    judge_intentions: "SR5.RollJudgeIntentions",
+    memory: "SR5.RollMemory"
+  },
+  matrixTargets: {
+    persona: "SR5.TargetPersona",
+    device: "SR5.TargetDevice",
+    file: "SR5.TargetFile",
+    self: "SR5.TargetSelf",
+    sprite: "SR5.TargetSprite",
+    other: "SR5.TargetOther"
+  },
+  durations: {
+    instant: "SR5.DurationInstant",
+    sustained: "SR5.DurationSustained",
+    permanent: "SR5.DurationPermanent"
+  },
+  weaponCategories: {
+    range: "SR5.WeaponCatRange",
+    melee: "SR5.WeaponCatMelee",
+    thrown: "SR5.WeaponCatThrown"
+  },
+  weaponRanges: {
+    short: "SR5.WeaponRangeShort",
+    medium: "SR5.WeaponRangeMedium",
+    long: "SR5.WeaponRangeLong",
+    extreme: "SR5.WeaponRangeExtreme"
+  },
+  qualityTypes: {
+    positive: "SR5.QualityTypePositive",
+    negative: "SR5.QualityTypeNegative"
+  },
+  adeptPower: {
+    types: {
+      active: "SR5.AdeptPower.Types.Active",
+      passive: "SR5.AdeptPower.Types.Passive"
     }
-    SkillRules.addDefaultingPart(parts);
-  }
-  static allowDefaultingRoll(skill) {
-    const allowUnimproviseable = game.settings.get(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills) === false;
-    if (allowUnimproviseable)
-      return true;
-    return SkillRules.allowDefaultingRoll(skill);
-  }
-  static allowRoll(skill) {
-    if (SkillRules.mustDefaultToRoll(skill) && SkillFlow.allowDefaultingRoll(skill)) {
-      return true;
+  },
+  deviceCategories: {
+    commlink: "SR5.DeviceCatCommlink",
+    cyberdeck: "SR5.DeviceCatCyberdeck"
+  },
+  cyberwareGrades: {
+    standard: "SR5.CyberwareGradeStandard",
+    alpha: "SR5.CyberwareGradeAlpha",
+    beta: "SR5.CyberwareGradeBeta",
+    delta: "SR5.CyberwareGradeDelta",
+    used: "SR5.CyberwareGradeUsed"
+  },
+  knowledgeSkillCategories: {
+    street: "SR5.KnowledgeSkillStreet",
+    academic: "SR5.KnowledgeSkillAcademic",
+    professional: "SR5.KnowledgeSkillProfessional",
+    interests: "SR5.KnowledgeSkillInterests"
+  },
+  activeSkills: {
+    archery: "SR5.SkillArchery",
+    automatics: "SR5.SkillAutomatics",
+    blades: "SR5.SkillBlades",
+    clubs: "SR5.SkillClubs",
+    exotic_melee: "SR5.SkillExoticMelee",
+    exotic_range: "SR5.SkillExoticRange",
+    heavy_weapons: "SR5.SkillHeavyWeapons",
+    longarms: "SR5.SkillLongarms",
+    pistols: "SR5.SkillPistols",
+    throwing_weapons: "SR5.SkillThrowingWeapons",
+    unarmed_combat: "SR5.SkillUnarmedCombat",
+    disguise: "SR5.SkillDisguise",
+    diving: "SR5.SkillDiving",
+    escape_artist: "SR5.SkillEscapeArtist",
+    free_fall: "SR5.SkillFreeFall",
+    gymnastics: "SR5.SkillGymnastics",
+    palming: "SR5.SkillPalming",
+    perception: "SR5.SkillPerception",
+    running: "SR5.SkillRunning",
+    sneaking: "SR5.SkillSneaking",
+    survival: "SR5.SkillSurvival",
+    swimming: "SR5.SkillSwimming",
+    tracking: "SR5.SkillTracking",
+    con: "SR5.SkillCon",
+    etiquette: "SR5.SkillEtiquette",
+    impersonation: "SR5.SkillImpersonation",
+    instruction: "SR5.SkillInstruction",
+    intimidation: "SR5.SkillIntimidation",
+    leadership: "SR5.SkillLeadership",
+    negotiation: "SR5.SkillNegotiation",
+    performance: "SR5.SkillPerformance",
+    alchemy: "SR5.SkillAlchemy",
+    arcana: "SR5.SkillArcana",
+    artificing: "SR5.SkillArtificing",
+    assensing: "SR5.SkillAssensing",
+    astral_combat: "SR5.SkillAstralCombat",
+    banishing: "SR5.SkillBanishing",
+    binding: "SR5.SkillBinding",
+    counterspelling: "SR5.SkillCounterspelling",
+    disenchanting: "SR5.SkillDisenchanting",
+    ritual_spellcasting: "SR5.SkillRitualSpellcasting",
+    spellcasting: "SR5.SkillSpellcasting",
+    summoning: "SR5.SkillSummoning",
+    compiling: "SR5.SkillCompiling",
+    decompiling: "SR5.SkillDecompiling",
+    registering: "SR5.SkillRegistering",
+    aeronautics_mechanic: "SR5.SkillAeronauticsMechanic",
+    automotive_mechanic: "SR5.SkillAutomotiveMechanic",
+    industrial_mechanic: "SR5.SkillIndustrialMechanic",
+    nautical_mechanic: "SR5.SkillNauticalMechanic",
+    animal_handling: "SR5.SkillAnimalHandling",
+    armorer: "SR5.SkillArmorer",
+    artisan: "SR5.SkillArtisan",
+    biotechnology: "SR5.SkillBiotechnology",
+    chemistry: "SR5.SkillChemistry",
+    computer: "SR5.SkillComputer",
+    cybercombat: "SR5.SkillCybercombat",
+    cybertechnology: "SR5.SkillCybertechnology",
+    demolitions: "SR5.SkillDemolitions",
+    electronic_warfare: "SR5.SkillElectronicWarfare",
+    first_aid: "SR5.SkillFirstAid",
+    forgery: "SR5.SkillForgery",
+    hacking: "SR5.SkillHacking",
+    hardware: "SR5.SkillHardware",
+    locksmith: "SR5.SkillLocksmith",
+    medicine: "SR5.SkillMedicine",
+    navigation: "SR5.SkillNavigation",
+    software: "SR5.SkillSoftware",
+    gunnery: "SR5.SkillGunnery",
+    pilot_aerospace: "SR5.SkillPilotAerospace",
+    pilot_aircraft: "SR5.SkillPilotAircraft",
+    pilot_walker: "SR5.SkillPilotWalker",
+    pilot_ground_craft: "SR5.SkillPilotGroundCraft",
+    pilot_water_craft: "SR5.SkillPilotWaterCraft",
+    pilot_exotic_vehicle: "SR5.SkillPilotExoticVehicle"
+  },
+  actionTypes: {
+    none: "SR5.ActionTypeNone",
+    free: "SR5.ActionTypeFree",
+    simple: "SR5.ActionTypeSimple",
+    complex: "SR5.ActionTypeComplex",
+    varies: "SR5.ActionTypeVaries"
+  },
+  actionDamageFormulaOperators: {
+    add: "+",
+    subtract: "-",
+    multiply: "*",
+    divide: "/"
+  },
+  matrixAttributes: {
+    attack: "SR5.MatrixAttrAttack",
+    sleaze: "SR5.MatrixAttrSleaze",
+    data_processing: "SR5.MatrixAttrDataProc",
+    firewall: "SR5.MatrixAttrFirewall"
+  },
+  initiativeCategories: {
+    meatspace: "SR5.InitCatMeatspace",
+    astral: "SR5.InitCatAstral",
+    matrix: "SR5.InitCatMatrix"
+  },
+  modificationTypes: {
+    weapon: "SR5.Weapon",
+    armor: "SR5.Armor"
+  },
+  mountPoints: {
+    barrel: "SR5.Barrel",
+    under_barrel: "SR5.UnderBarrel",
+    stock: "SR5.Stock",
+    top: "SR5.Top",
+    side: "SR5.Side",
+    internal: "SR5.Internal"
+  },
+  lifestyleTypes: {
+    street: "SR5.LifestyleStreet",
+    squatter: "SR5.LifestyleSquatter",
+    low: "SR5.LifestyleLow",
+    medium: "SR5.LifestyleMiddle",
+    high: "SR5.LifestyleHigh",
+    luxory: "SR5.LifestyleLuxory",
+    other: "SR5.LifestyleOther"
+  },
+  kbmod: {
+    ITEM_DESCR: "ctrlKey",
+    EDGE: "altKey",
+    HIDE_DIALOG: "shiftKey"
+  },
+  actorModifiers: {
+    soak: "SR5.RollSoak",
+    drain: "SR5.Drain",
+    armor: "SR5.Armor",
+    physical_limit: "SR5.PhysicalLimit",
+    social_limit: "SR5.SocialLimit",
+    mental_limit: "SR5.MentalLimit",
+    astral_limit: "SR5.AstralLimit",
+    stun_track: "SR5.StunTrack",
+    physical_track: "SR5.PhysicalTrack",
+    physical_overflow_track: "SR5.PhysicalOverflowTrack",
+    meat_initiative: "SR5.MeatSpaceInit",
+    meat_initiative_dice: "SR5.MeatSpaceDice",
+    astral_initiative: "SR5.AstralInit",
+    astral_initiative_dice: "SR5.AstralDice",
+    matrix_initiative: "SR5.MatrixInit",
+    matrix_initiative_dice: "SR5.MatrixDice",
+    matrix_track: "SR5.MatrixTrack",
+    composure: "SR5.RollComposure",
+    lift_carry: "SR5.RollLiftCarry",
+    judge_intentions: "SR5.RollJudgeIntentions",
+    memory: "SR5.RollMemory",
+    walk: "SR5.Walk",
+    run: "SR5.Run",
+    defense: "SR5.RollDefense",
+    wound_tolerance: "SR5.WoundTolerance",
+    essence: "SR5.AttrEssence",
+    fade: "SR5.RollFade",
+    global: "SR5.Global"
+  },
+  modifierTypes: {
+    armor: "SR5.Armor",
+    composure: "SR5.RollComposure",
+    defense: "SR5.RollDefense",
+    drain: "SR5.Drain",
+    environmental: "SR5.ModifierTypes.Environmental",
+    fade: "SR5.RollFade",
+    global: "SR5.Global",
+    judge_intentions: "SR5.RollJudgeIntentions",
+    lift_carry: "SR5.RollLiftCarry",
+    memory: "SR5.RollMemory",
+    soak: "SR5.RollSoak",
+    wounds: "SR5.ModifierTypes.Wounds"
+  },
+  weaponCategoryActiveTests: {
+    "range": "RangedAttackTest",
+    "melee": "MeleeAttackTest",
+    "thrown": "ThrownAttackTest"
+  },
+  spellOpposedTests: {
+    "combat": "CombatSpellDefenseTest"
+  },
+  activeTests: {
+    "spell": "SpellCastingTest",
+    "complex_form": "ComplexFormTest"
+  },
+  opposedTests: {
+    "spell": {
+      "combat": "CombatSpellDefenseTest"
     }
-    return SkillRules.allowRoll(skill);
-  }
-  static isCustomSkill(skill) {
-    return skill.name !== void 0 && skill.name !== "";
-  }
-  static isLegacySkill(skill) {
-    return !SkillFlow.isCustomSkill(skill);
-  }
+  },
+  opposedResistTests: {
+    "spell": {
+      "combat": "PhysicalResistTest"
+    }
+  },
+  supressionDefenseTest: "SupressionDefenseTest",
+  packNames: {
+    "generalActions": "General Actions",
+    "matrixActions": "Matrix Actions"
+  },
+  programTypes: {
+    common_program: "SR5.CommonProgram",
+    hacking_program: "SR5.HackingProgram",
+    agent: "SR5.Agent"
+  },
+  spiritTypes: {
+    air: "SR5.Spirit.Types.Air",
+    aircraft: "SR5.Spirit.Types.Aircraft",
+    airwave: "SR5.Spirit.Types.Airwave",
+    automotive: "SR5.Spirit.Types.Automotive",
+    beasts: "SR5.Spirit.Types.Beasts",
+    ceramic: "SR5.Spirit.Types.Ceramic",
+    earth: "SR5.Spirit.Types.Earth",
+    energy: "SR5.Spirit.Types.Energy",
+    fire: "SR5.Spirit.Types.Fire",
+    guardian: "SR5.Spirit.Types.Guardian",
+    guidance: "SR5.Spirit.Types.Guidance",
+    man: "SR5.Spirit.Types.Man",
+    metal: "SR5.Spirit.Types.Metal",
+    plant: "SR5.Spirit.Types.Plant",
+    ship: "SR5.Spirit.Types.Ship",
+    task: "SR5.Spirit.Types.Task",
+    train: "SR5.Spirit.Types.Train",
+    water: "SR5.Spirit.Types.Water",
+    toxic_air: "SR5.Spirit.Types.ToxicAir",
+    toxic_beasts: "SR5.Spirit.Types.ToxicBeasts",
+    toxic_earth: "SR5.Spirit.Types.ToxicEarth",
+    toxic_fire: "SR5.Spirit.Types.ToxicFire",
+    toxic_man: "SR5.Spirit.Types.ToxicMan",
+    toxic_water: "SR5.Spirit.Types.ToxicWater",
+    blood: "SR5.Spirit.Types.Blood",
+    muse: "SR5.Spirit.Types.Muse",
+    nightmare: "SR5.Spirit.Types.Nightmare",
+    shade: "SR5.Spirit.Types.Shade",
+    succubus: "SR5.Spirit.Types.Succubus",
+    wraith: "SR5.Spirit.Types.Wraith",
+    shedim: "SR5.Spirit.Types.Shedim",
+    master_shedim: "SR5.Spirit.Types.MasterShedim",
+    caretaker: "SR5.Spirit.Types.Caretaker",
+    nymph: "SR5.Spirit.Types.Nymph",
+    scout: "SR5.Spirit.Types.Scout",
+    soldier: "SR5.Spirit.Types.Soldier",
+    worker: "SR5.Spirit.Types.Worker",
+    queen: "SR5.Spirit.Types.Queen"
+  },
+  critterPower: {
+    categories: {
+      mundane: "SR5.CritterPower.Categories.Mundane",
+      paranormal: "SR5.CritterPower.Categories.Paranormal",
+      free_spirit: "SR5.CritterPower.Categories.FreeSpirit",
+      emergent: "SR5.CritterPower.Categories.Emergent",
+      shapeshifter: "SR5.CritterPower.Categories.Shapeshifter",
+      drake: "SR5.CritterPower.Categories.Drake",
+      echoes: "SR5.CritterPower.Categories.Echoes",
+      weakness: "SR5.CritterPower.Categories.Weakness",
+      paranormal_infected: "SR5.CritterPower.Categories.ParanormalInfected"
+    },
+    types: {
+      mana: "SR5.CritterPower.Types.Mana",
+      physical: "SR5.CritterPower.Types.Physical"
+    },
+    ranges: {
+      los: "SR5.CritterPower.Ranges.LineOfSight",
+      self: "SR5.CritterPower.Ranges.Self",
+      touch: "SR5.CritterPower.Ranges.Touch",
+      los_a: "SR5.CritterPower.Ranges.LineOfSightArea",
+      special: "SR5.CritterPower.Ranges.Special"
+    },
+    durations: {
+      always: "SR5.CritterPower.Durations.Always",
+      instant: "SR5.CritterPower.Durations.Instant",
+      sustained: "SR5.CritterPower.Durations.Sustained",
+      permanent: "SR5.CritterPower.Durations.Permanent",
+      special: "SR5.CritterPower.Durations.Special"
+    }
+  },
+  spriteTypes: {
+    courier: "SR5.Sprite.Types.Courier",
+    crack: "SR5.Sprite.Types.Crack",
+    data: "SR5.Sprite.Types.Data",
+    fault: "SR5.Sprite.Types.Fault",
+    machine: "SR5.Sprite.Types.Machine"
+  },
+  vehicle: {
+    types: {
+      air: "SR5.Vehicle.Types.Air",
+      aerospace: "SR5.Vehicle.Types.Aerospace",
+      ground: "SR5.Vehicle.Types.Ground",
+      water: "SR5.Vehicle.Types.Water",
+      walker: "SR5.Vehicle.Types.Walker",
+      exotic: "SR5.Vehicle.Types.Exotic"
+    },
+    stats: {
+      handling: "SR5.Vehicle.Stats.Handling",
+      off_road_handling: "SR5.Vehicle.Stats.OffRoadHandling",
+      speed: "SR5.Vehicle.Stats.Speed",
+      off_road_speed: "SR5.Vehicle.Stats.OffRoadSpeed",
+      acceleration: "SR5.Vehicle.Stats.Acceleration",
+      pilot: "SR5.Vehicle.Stats.Pilot",
+      sensor: "SR5.Vehicle.Stats.Sensor"
+    },
+    control_modes: {
+      manual: "SR5.Vehicle.ControlModes.Manual",
+      remote: "SR5.Vehicle.ControlModes.Remote",
+      rigger: "SR5.Vehicle.ControlModes.Rigger",
+      autopilot: "SR5.Vehicle.ControlModes.Autopilot"
+    },
+    environments: {
+      speed: "SR5.Vehicle.Environments.Speed",
+      handling: "SR5.Vehicle.Environments.Handling"
+    }
+  },
+  ic: {
+    types: {
+      acid: "SR5.IC.Types.Acid",
+      binder: "SR5.IC.Types.Binder",
+      black_ic: "SR5.IC.Types.BlackIC",
+      blaster: "SR5.IC.Types.Blaster",
+      crash: "SR5.IC.Types.Crash",
+      jammer: "SR5.IC.Types.Jammer",
+      killer: "SR5.IC.Types.Killer",
+      marker: "SR5.IC.Types.Marker",
+      patrol: "SR5.IC.Types.Patrol",
+      probe: "SR5.IC.Types.Probe",
+      scramble: "SR5.IC.Types.Scramble",
+      sparky: "SR5.IC.Types.Sparky",
+      tar_baby: "SR5.IC.Types.TarBaby",
+      track: "SR5.IC.Types.Track"
+    }
+  },
+  character: {
+    types: {
+      human: "SR5.Character.Types.Human",
+      elf: "SR5.Character.Types.Elf",
+      ork: "SR5.Character.Types.Ork",
+      dwarf: "SR5.Character.Types.Dwarf",
+      troll: "SR5.Character.Types.Troll"
+    }
+  },
+  rangeWeaponMode: [
+    "single_shot",
+    "semi_auto",
+    "burst_fire",
+    "full_auto"
+  ],
+  rangeWeaponModeLabel: {
+    "single_shot": "SR5.WeaponModeSingleShot",
+    "semi_auto": "SR5.WeaponModeSemiAuto",
+    "burst_file": "SR5.WeaponModeBurstFire",
+    "full_auto": "SR5.WeaponModeFullAuto"
+  },
+  fireModes: [
+    {
+      label: "SR5.WeaponModeSingleShot",
+      value: 1,
+      recoil: false,
+      defense: 0,
+      suppression: false,
+      action: "simple",
+      mode: "single_shot"
+    },
+    {
+      label: "SR5.WeaponModeSemiAutoShort",
+      value: 1,
+      recoil: true,
+      defense: 0,
+      suppression: false,
+      action: "simple",
+      mode: "semi_auto"
+    },
+    {
+      label: "SR5.WeaponModeSemiAutoBurst",
+      value: 3,
+      recoil: true,
+      defense: -2,
+      suppression: false,
+      action: "complex",
+      mode: "semi_auto"
+    },
+    {
+      label: "SR5.WeaponModeBurstFire",
+      value: 3,
+      recoil: true,
+      defense: -2,
+      suppression: false,
+      action: "simple",
+      mode: "burst_fire"
+    },
+    {
+      label: "SR5.WeaponModeBurstFireLong",
+      value: 6,
+      recoil: true,
+      defense: -2,
+      suppression: false,
+      action: "complex",
+      mode: "burst_fire"
+    },
+    {
+      label: "SR5.WeaponModeFullAutoShort",
+      value: 6,
+      recoil: true,
+      defense: -5,
+      suppression: false,
+      action: "simple",
+      mode: "full_auto"
+    },
+    {
+      label: "SR5.WeaponModeFullAutoLong",
+      value: 10,
+      recoil: true,
+      defense: -9,
+      suppression: false,
+      action: "complex",
+      mode: "full_auto"
+    },
+    {
+      label: "SR5.Suppressing",
+      value: 20,
+      recoil: false,
+      defense: 0,
+      suppression: true,
+      action: "complex",
+      mode: "full_auto"
+    }
+  ]
 };
 
 // src/module/item/flows/ActionFlow.ts
@@ -12099,6 +10657,8 @@ var TestCreator = {
   fromMessageAction: function(id, testClsName, options) {
     return __async(this, null, function* () {
       var _a, _b;
+      if (!game.user)
+        return;
       const message = (_a = game.messages) == null ? void 0 : _a.get(id);
       if (!message) {
         console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
@@ -12114,10 +10674,14 @@ var TestCreator = {
         console.error(`Shadowrun 5e | Couldn't find a registered test implementation for ${testClsName}`);
         return;
       }
-      const targets = yield Helpers.getTestTargetActors(testData.data);
-      const actors = targets.length > 0 ? targets : Helpers.getSelectedActorsOrCharacter();
+      let actors = Helpers.userHasControlledTokens() ? Helpers.getControlledTokenActors() : yield Helpers.getTestTargetActors(testData.data);
+      actors = actors.filter((actor) => actor.isOwner);
+      if (actors.length === 0 && game.user.character)
+        actors.push(game.user.character);
       if (actors.length === 0)
         (_b = ui.notifications) == null ? void 0 : _b.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+      else
+        console.log("Shadowrun 5e | Casting an opposed test using these actors", actors, testData);
       for (const actor of actors) {
         const data = yield testClass._getOpposedActionTestData(testData.data, actor, id);
         if (!data)
@@ -12174,6 +10738,17 @@ var TestCreator = {
       return new testCls(testData, documents, options);
     });
   },
+  promptSuccessTest: function() {
+    return __async(this, null, function* () {
+      var _a, _b;
+      const lastPoolValue = Number((_a = game.user) == null ? void 0 : _a.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue)) || 0;
+      const test = TestCreator.fromPool({ pool: lastPoolValue });
+      yield test.execute();
+      if (test.evaluated) {
+        yield (_b = game.user) == null ? void 0 : _b.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, test.pool.value);
+      }
+    });
+  },
   _getTestClass: function(testName) {
     if (!game.shadowrun5e.tests.hasOwnProperty(testName)) {
       console.error(`Shadowrun 5e | Tried getting a Test Class ${testName}, which isn't registered in: `, game.shadowrun5e.tests);
@@ -12197,13 +10772,13 @@ var TestCreator = {
   },
   _prepareTestDataWithAction: function(action, actor, data) {
     return __async(this, null, function* () {
-      var _a;
+      var _a, _b;
       data.action = action;
       const pool = new PartsList(data.pool.mod);
       if (action.skill) {
-        const skill = actor.getSkill(action.skill);
+        const skill = (_a = actor.getSkill(action.skill)) != null ? _a : actor.getSkill(action.skill, { byLabel: true });
         if (skill && !SkillFlow.allowRoll(skill))
-          (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.SkillCantBeDefault", { localize: true });
+          (_b = ui.notifications) == null ? void 0 : _b.warn("SR5.Warnings.SkillCantBeDefault", { localize: true });
         if (skill)
           pool.addUniquePart(skill.label || skill.name, SkillRules.level(skill));
         if (action.spec)
@@ -12277,9 +10852,10 @@ var TestCreator = {
       data.previousMessageId = previousMessageId;
       data.following = opposedData;
       data.targetActorsUuid = [];
-      const action = TestCreator._mergeMinimalActionDataInOrder(
-        DefaultValues.actionData({ test: resistTestCls.name }),
-        opposedData.against.opposed.resist,
+      let action = DefaultValues.actionData(__spreadValues({}, opposedData.against.opposed.resist));
+      action = TestCreator._mergeMinimalActionDataInOrder(
+        action,
+        resistTestCls._getDocumentTestAction(),
         resistTestCls._getDefaultTestAction()
       );
       return yield TestCreator._prepareTestDataWithAction(action, actor, data);
@@ -12297,16 +10873,41 @@ var TestCreator = {
       opposed: {}
     };
   },
-  _mergeMinimalActionDataInOrder: function(action, ...minimalActions) {
-    action = duplicate(action);
-    for (const minimalAction of minimalActions) {
+  _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions) {
+    const resultAction = foundry.utils.duplicate(sourceAction);
+    for (const defaultAction of defaultActions) {
+      if (Object.keys(defaultAction).length === 0)
+        continue;
       for (const key of Object.keys(DefaultValues.minimalActionData())) {
-        if (!minimalAction.hasOwnProperty(key))
+        if (TestCreator._keepItemActionValue(sourceAction, defaultAction, key))
           continue;
-        action[key] = minimalAction[key];
+        resultAction[key] = defaultAction[key];
       }
     }
-    return action;
+    return resultAction;
+  },
+  _keepItemActionValue(action, defaultAction, key) {
+    if (!defaultAction.hasOwnProperty(key))
+      return true;
+    const skillSection = ["skill", "attribute", "attribute2", "armor"];
+    if (skillSection.includes(key)) {
+      const noneDefault = skillSection.some((sectionKey) => TestCreator._actionHasNoneDefaultValue(action, sectionKey));
+      return noneDefault;
+    }
+    return TestCreator._actionHasNoneDefaultValue(action, key);
+  },
+  _actionHasNoneDefaultValue(action, key) {
+    if (!action.hasOwnProperty(key))
+      return false;
+    const value = action[key];
+    const type = foundry.utils.getType(value);
+    if (type === "string")
+      return value.length > 0;
+    if (type === "Array")
+      return value.length > 0;
+    if (type === "boolean" && key === "armor")
+      return action[key] === true;
+    return false;
   },
   shouldHideDialog(event) {
     if (!event)
@@ -12320,211 +10921,582 @@ var TestCreator = {
   }
 };
 
-// src/module/rolls/ShadowrunRoller.ts
-var ShadowrunRoll = class extends Roll {
-  toJSON() {
-    const data = super.toJSON();
-    data.class = "Roll";
-    return data;
-  }
-  get sides() {
-    if (this.terms) {
-      return this.terms[0].results.map((result) => result.result);
-    }
-    return this.parts[0].rolls.map((roll) => roll.roll);
-  }
-  get limit() {
-    return this.data.limit;
-  }
-  get threshold() {
-    return this.data.threshold;
-  }
-  get parts() {
-    return this.data.parts;
-  }
-  get explodeSixes() {
-    return this.data.explodeSixes;
-  }
-  count(side) {
-    const results = this.sides;
-    return results.reduce((counted, result) => result === side ? counted + 1 : counted, 0);
-  }
-  get hits() {
-    return this.total || 0;
-  }
-  get pool() {
-    if (this.terms) {
-      return this.dice[0].number;
-    }
-    return this.parts[0].rolls.length;
-  }
-  get glitched() {
-    let glitched = 0;
-    SR.die.glitch.forEach((die) => glitched += this.count(die));
-    return glitched > Math.floor(this.pool / 2);
-  }
-  toMessage(messageData, rollMode) {
-    console.error("message", messageData, rollMode);
-    return super.toMessage(messageData, rollMode);
-  }
-};
-var ShadowrunRoller = class {
-  static shadowrunFormula({
-    parts: partsProps,
-    limit,
-    explode
-  }) {
-    var _a;
-    const parts = new PartsList(partsProps);
-    const count = parts.total;
-    if (count <= 0) {
-      (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.RollOneDie"));
-      return "0d6cs>=5";
-    }
-    let formula = `${count}d6`;
-    if (explode) {
-      formula += "x6";
-    }
-    if (limit == null ? void 0 : limit.value) {
-      formula += `kh${limit.value}`;
-    }
-    formula += "cs>=5";
-    return formula;
-  }
-  static promptSuccessTest() {
-    return __async(this, null, function* () {
-      var _a, _b;
-      const lastPoolValue = Number((_a = game.user) == null ? void 0 : _a.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue)) || 0;
-      const test = yield TestCreator.fromPool({ pool: lastPoolValue });
-      yield test.execute();
-      if (test.evaluated) {
-        yield (_b = game.user) == null ? void 0 : _b.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, test.pool.value);
+// src/module/item/ChatData.ts
+var ChatData = {
+  action: (data, labels, props) => {
+    if (data.action) {
+      const labelStringList = [];
+      if (data.action.skill) {
+        labelStringList.push(Helpers.label(data.action.skill));
+        labelStringList.push(Helpers.label(data.action.attribute));
+      } else if (data.action.attribute2) {
+        labelStringList.push(Helpers.label(data.action.attribute));
+        labelStringList.push(Helpers.label(data.action.attribute2));
+      } else if (data.action.attribute) {
+        labelStringList.push(Helpers.label(data.action.attribute));
       }
-    });
-  }
-  static advancedRoll(advancedProps, dialogOptions) {
-    return __async(this, null, function* () {
-    });
-  }
-};
-
-// src/module/apps/dialogs/DamageApplicationDialog.ts
-var DamageApplicationDialog = class extends FormDialog {
-  constructor(actors, damage, options) {
-    const dialogData = DamageApplicationDialog.getDialogData(actors, damage);
-    super(dialogData, options);
-  }
-  static get defaultOptions() {
-    const options = super.defaultOptions;
-    options.id = "damage-application";
-    options.classes = ["sr5", "form-dialog"];
-    options.resizable = true;
-    options.height = "auto";
-    return options;
-  }
-  static getDialogData(actors, damage) {
-    const title = game.i18n.localize("SR5.DamageApplication.Title");
-    const templatePath = "systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html";
-    const actorDamage = actors.map((a) => {
-      return { actor: a };
-    });
-    const templateData = {
-      damage,
-      actorDamage
-    };
-    const buttons = {
-      damage: {
-        label: game.i18n.localize("SR5.DamageApplication.ApplyDamage")
+      if (data.action.mod) {
+        labelStringList.push(`${game.i18n.localize("SR5.ItemMod")} (${data.action.mod})`);
       }
-    };
-    const onAfterClose = () => actorDamage;
-    return {
-      title,
-      templatePath,
-      templateData,
-      onAfterClose,
-      buttons,
-      default: "damage"
-    };
-  }
-};
-
-// src/module/actor/flows/DamageApplicationFlow.ts
-var DamageApplicationFlow = class {
-  runApplyDamage(actors, damage) {
-    return __async(this, null, function* () {
-      const damageApplicationDialog = yield new DamageApplicationDialog(actors, damage);
-      yield damageApplicationDialog.select();
-      if (damageApplicationDialog.canceled) {
-        return;
+      if (labelStringList.length) {
+        labels.roll = labelStringList.join(" + ");
       }
-      actors.forEach((actor) => {
-        this.applyDamageToActor(actor, damage);
+      if (data.action.opposed.type) {
+        const { opposed } = data.action;
+        if (opposed.type !== "custom")
+          labels.opposedRoll = `vs. ${Helpers.label(opposed.type)}`;
+        else if (opposed.skill)
+          labels.opposedRoll = `vs. ${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
+        else if (opposed.attribute2)
+          labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
+        else if (opposed.attribute)
+          labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}`;
+      }
+      if (data.action.type !== "" && data.action.type !== "varies" && data.action.type !== "none") {
+        props.push(`${Helpers.label(data.action.type)} Action`);
+      }
+      if (data.action.limit) {
+        const { limit } = data.action;
+        const attribute = limit.attribute ? `${game.i18n.localize(SR5.limits[limit.attribute])}` : "";
+        const limitVal = limit.value ? limit.value : "";
+        let limitStr = "";
+        if (attribute) {
+          limitStr += attribute;
+        }
+        if (limitVal) {
+          if (attribute) {
+            limitStr += " + ";
+          }
+          limitStr += limitVal;
+        }
+        if (limitStr) {
+          props.push(`Limit ${limitStr}`);
+        }
+      }
+      if (data.action.damage.type.value) {
+        const { damage } = data.action;
+        let damageString = "";
+        let elementString = "";
+        const attribute = damage.attribute ? `${game.i18n.localize(SR5.attributes[damage.attribute])} + ` : "";
+        if (damage.value || attribute) {
+          const type = damage.type.value ? damage.type.value.toUpperCase().charAt(0) : "";
+          damageString = `DV ${attribute}${damage.value}${type}`;
+        }
+        if (damage.element.value) {
+          if (damage.value) {
+            if (damage.element.value === "electricity") {
+              damageString += " (e)";
+            } else {
+              elementString = Helpers.label(damage.element.value);
+            }
+          } else {
+            elementString = Helpers.label(damage.element.value);
+          }
+        }
+        if (damageString)
+          props.push(damageString);
+        if (elementString)
+          props.push(elementString);
+        if (damage.ap && damage.ap.value)
+          props.push(`AP ${damage.ap.value}`);
+      }
+    }
+  },
+  sin: (data, labels, props) => {
+    props.push(`Rating ${data.technology.rating}`);
+    data.licenses.forEach((license) => {
+      props.push(`${license.name} R${license.rtg}`);
+    });
+  },
+  contact: (data, labels, props) => {
+    props.push(data.type);
+    props.push(`${game.i18n.localize("SR5.Connection")} ${data.connection}`);
+    props.push(`${game.i18n.localize("SR5.Loyalty")} ${data.loyalty}`);
+    if (data.blackmail) {
+      props.push(`${game.i18n.localize("SR5.Blackmail")}`);
+    }
+    if (data.family) {
+      props.push(game.i18n.localize("SR5.Family"));
+    }
+  },
+  lifestyle: (data, labels, props) => {
+    props.push(Helpers.label(data.type));
+    if (data.cost)
+      props.push(`\xA5${data.cost}`);
+    if (data.comforts)
+      props.push(`Comforts ${data.comforts}`);
+    if (data.security)
+      props.push(`Security ${data.security}`);
+    if (data.neighborhood)
+      props.push(`Neighborhood ${data.neighborhood}`);
+    if (data.guests)
+      props.push(`Guests ${data.guests}`);
+  },
+  adept_power: (data, labels, props) => {
+    ChatData.action(data, labels, props);
+    props.push(`PP ${data.pp}`);
+    props.push(Helpers.label(data.type));
+  },
+  armor: (data, labels, props) => {
+    if (data.armor) {
+      if (data.armor.value)
+        props.push(`Armor ${data.armor.mod ? "+" : ""}${data.armor.value}`);
+      if (data.armor.acid)
+        props.push(`Acid ${data.armor.acid}`);
+      if (data.armor.cold)
+        props.push(`Cold ${data.armor.cold}`);
+      if (data.armor.fire)
+        props.push(`Fire ${data.armor.fire}`);
+      if (data.armor.electricity)
+        props.push(`Electricity ${data.armor.electricity}`);
+      if (data.armor.radiation)
+        props.push(`Radiation ${data.armor.radiation}`);
+    }
+  },
+  ammo: (data, labels, props) => {
+    if (data.damageType)
+      props.push(`${game.i18n.localize("SR5.DamageType")} ${data.damageType}`);
+    if (data.damage)
+      props.push(`${game.i18n.localize("SR5.DamageValue")} ${data.damage}`);
+    if (data.element)
+      props.push(`${game.i18n.localize("SR5.Element")} ${data.element}`);
+    if (data.ap)
+      props.push(`${game.i18n.localize("SR5.AP")} ${data.ap}`);
+    if (data.blast.radius)
+      props.push(`${game.i18n.localize("SR5.BlastRadius")} ${data.blast.radius}m`);
+    if (data.blast.dropoff)
+      props.push(`${game.i18n.localize("SR5.Dropoff")} ${data.blast.dropoff}/m`);
+  },
+  program: (data, labels, props) => {
+    props.push(game.i18n.localize(SR5.programTypes[data.type]));
+  },
+  complex_form: (data, labels, props) => {
+    ChatData.action(data, labels, props);
+    props.push(Helpers.label(data.target), Helpers.label(data.duration));
+    const { fade } = data;
+    if (fade > 0)
+      props.push(`Fade L+${fade}`);
+    else if (fade < 0)
+      props.push(`Fade L${fade}`);
+    else
+      props.push("Fade L");
+  },
+  cyberware: (data, labels, props) => {
+    ChatData.action(data, labels, props);
+    ChatData.armor(data, labels, props);
+    if (data.essence)
+      props.push(`Ess ${data.essence}`);
+  },
+  bioware: (data, labels, props) => {
+    ChatData.action(data, labels, props);
+    ChatData.armor(data, labels, props);
+    if (data.essence)
+      props.push(`Ess ${data.essence}`);
+  },
+  device: (data, labels, props) => {
+    if (data.technology && data.technology.rating)
+      props.push(`Rating ${data.technology.rating}`);
+    if (data.category === "cyberdeck") {
+      for (const attN of Object.values(data.atts)) {
+        props.push(`${Helpers.label(attN.att)} ${attN.value}`);
+      }
+    }
+  },
+  equipment: (data, labels, props) => {
+    if (data.technology && data.technology.rating)
+      props.push(`Rating ${data.technology.rating}`);
+  },
+  quality: (data, labels, props) => {
+    ChatData.action(data, labels, props);
+    props.push(Helpers.label(data.type));
+  },
+  sprite_power: (data, labels, props) => {
+    ChatData.action(data, labels, props);
+  },
+  critter_power: (data, labels, props) => {
+    props.push(game.i18n.localize(SR5.critterPower.types[data.powerType]));
+    props.push(game.i18n.localize(SR5.critterPower.durations[data.duration]));
+    props.push(game.i18n.localize(SR5.critterPower.ranges[data.range]));
+    ChatData.action(data, labels, props);
+  },
+  spell: (data, labels, props) => {
+    props.push(Helpers.label(data.category), Helpers.label(data.type));
+    if (data.category === "combat") {
+      props.push(Helpers.label(data.combat.type));
+    } else if (data.category === "health") {
+    } else if (data.category === "illusion") {
+      props.push(data.illusion.type);
+      props.push(data.illusion.sense);
+    } else if (data.category === "manipulation") {
+      if (data.manipulation.damaging)
+        props.push("Damaging");
+      if (data.manipulation.mental)
+        props.push("Mental");
+      if (data.manipulation.environmental)
+        props.push("Environmental");
+      if (data.manipulation.physical)
+        props.push("Physical");
+    } else if (data.category === "detection") {
+      props.push(data.illusion.type);
+      props.push(data.illusion.passive ? "Passive" : "Active");
+      if (data.illusion.extended)
+        props.push("Extended");
+    }
+    props.push(Helpers.label(data.range));
+    ChatData.action(data, labels, props);
+    props.push(Helpers.label(data.duration));
+    const { drain } = data;
+    if (drain > 0)
+      props.push(`Drain F+${drain}`);
+    else if (drain < 0)
+      props.push(`Drain F${drain}`);
+    else
+      props.push("Drain F");
+    labels.roll = "Cast";
+  },
+  weapon: (data, labels, props, item) => {
+    var _a, _b, _c;
+    ChatData.action(data, labels, props);
+    for (let i = 0; i < props.length; i++) {
+      const prop = props[i];
+      if (prop.includes("Limit")) {
+        props[i] = prop.replace("Limit", "Accuracy");
+      }
+    }
+    const equippedAmmo = item.getEquippedAmmo();
+    if (equippedAmmo && data.ammo && ((_a = data.ammo.current) == null ? void 0 : _a.max)) {
+      if (equippedAmmo) {
+        const ammoData = equippedAmmo.data.data;
+        const { current, spare_clips } = data.ammo;
+        if (equippedAmmo.name)
+          props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
+        if (ammoData.blast.radius)
+          props.push(`${game.i18n.localize("SR5.BlastRadius")} ${ammoData.blast.radius}m`);
+        if (ammoData.blast.dropoff)
+          props.push(`${game.i18n.localize("SR5.Dropoff")} $ammoData.blast.dropoff}/m`);
+        if (spare_clips && spare_clips.max)
+          props.push(`${game.i18n.localize("SR5.SpareClips")} (${spare_clips.value}/${spare_clips.max})`);
+      }
+    }
+    if ((_c = (_b = data.technology) == null ? void 0 : _b.conceal) == null ? void 0 : _c.value) {
+      props.push(`${game.i18n.localize("SR5.Conceal")} ${data.technology.conceal.value}`);
+    }
+    if (data.category === "range") {
+      if (data.range.rc) {
+        let rcString = `${game.i18n.localize("SR5.RecoilCompensation")} ${data.range.rc.value}`;
+        if (item == null ? void 0 : item.actor) {
+          rcString += ` (${game.i18n.localize("SR5.Total")} ${item.actor.getRecoilCompensation()})`;
+        }
+        props.push(rcString);
+      }
+      if (data.range.modes) {
+        const newModes = [];
+        const { modes } = data.range;
+        if (modes.single_shot)
+          newModes.push("SR5.WeaponModeSingleShotShort");
+        if (modes.semi_auto)
+          newModes.push("SR5.WeaponModeSemiAutoShort");
+        if (modes.burst_fire)
+          newModes.push("SR5.WeaponModeBurstFireShort");
+        if (modes.full_auto)
+          newModes.push("SR5.WeaponModeFullAutoShort");
+        props.push(newModes.map((m) => game.i18n.localize(m)).join("/"));
+      }
+      if (data.range.ranges)
+        props.push(Array.from(Object.values(data.range.ranges)).join("/"));
+    } else if (data.category === "melee") {
+      if (data.melee.reach) {
+        const reachString = `${game.i18n.localize("SR5.Reach")} ${data.melee.reach}`;
+        const accIndex = props.findIndex((p) => p.includes("Accuracy"));
+        if (accIndex > -1) {
+          props.splice(accIndex + 1, 0, reachString);
+        } else {
+          props.push(reachString);
+        }
+      }
+    } else if (data.category === "thrown") {
+      const { blast } = data.thrown;
+      if (blast == null ? void 0 : blast.radius)
+        props.push(`${game.i18n.localize("SR5.BlastRadius")} ${blast.radius}m`);
+      if (blast == null ? void 0 : blast.dropoff)
+        props.push(`${game.i18n.localize("SR5.Dropoff")} ${blast.dropoff}/m`);
+      if (data.thrown.ranges) {
+        const mult = data.thrown.ranges.attribute && (item == null ? void 0 : item.actor) ? item.actor.data.data.attributes[data.thrown.ranges.attribute].value : 1;
+        const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
+        props.push(ranges.map((v) => v * mult).join("/"));
+      }
+    }
+    const equippedMods = item.getEquippedMods();
+    if (equippedMods) {
+      equippedMods.forEach((mod) => {
+        props.push(`${mod.name}`);
       });
-    });
-  }
-  applyDamageToActor(actor, damage) {
-    return __async(this, null, function* () {
-      if (damage.value <= 0) {
-        return;
-      }
-      damage = this.changeStunToPhysicalForGrunts(actor, damage);
-      if (damage.type.value === "matrix") {
-        damage = yield actor.addMatrixDamage(damage);
-      }
-      if (damage.type.value === "stun") {
-        damage = yield actor.addStunDamage(damage);
-      }
-      if (damage.type.value === "physical") {
-        yield actor.addPhysicalDamage(damage);
-      }
-    });
-  }
-  changeStunToPhysicalForGrunts(actor, damage) {
-    const updatedDamage = duplicate(damage);
-    if (!actor.isGrunt()) {
-      return updatedDamage;
     }
-    if (damage.type.value === "stun") {
-      updatedDamage.type.value = "physical";
-    }
-    return updatedDamage;
   }
 };
 
-// src/module/rules/MatrixRules.ts
-var MatrixRules = class {
-  static getConditionMonitor(deviceRating) {
-    deviceRating = Math.max(deviceRating, SR.attributes.ranges.host_rating.min);
-    return Math.ceil(8 + deviceRating / 2);
+// src/module/sockets.ts
+var SocketMessage = class {
+  static _createMessage(type, data, userId) {
+    return { type, data, userId };
   }
-  static getICDeviceRating(hostRating) {
-    return Math.max(hostRating, SR.attributes.ranges.host_rating.min);
+  static emit(type, data) {
+    return __async(this, null, function* () {
+      if (!game.socket)
+        return;
+      const message = SocketMessage._createMessage(type, data);
+      console.trace("Shadowrun 5e | Emiting Shadowrun5e system socket message", message);
+      yield game.socket.emit(SYSTEM_SOCKET, message);
+    });
   }
-  static getICInitiativeBase(hostRating) {
-    return Math.max(hostRating * 2, SR.attributes.ranges.host_rating.min);
+  static emitForGM(type, data) {
+    return __async(this, null, function* () {
+      if (!game.socket || !game.user || !game.users)
+        return;
+      if (game.user.isGM)
+        return console.error("Active user is GM! Aborting socket message...");
+      const gmUser = game.users.find((user) => user.isGM);
+      if (!gmUser)
+        return console.error("No active GM user! One GM must be active for this action to work.");
+      const message = SocketMessage._createMessage(type, data, gmUser.id);
+      console.trace("Shadowrun 5e | Emiting Shadowrun5e system socket message", message);
+      yield game.socket.emit(SYSTEM_SOCKET, message);
+    });
   }
-  static getICInitiativeDice() {
-    return Math.max(SR.initiatives.ic.dice, SR.initiatives.ranges.dice.min);
+};
+
+// src/module/item/flows/NetworkDeviceFlow.ts
+var NetworkDeviceFlow = class {
+  static buildLink(target) {
+    return target.uuid;
   }
-  static getICMeatAttributeBase(hostRating) {
-    return Math.max(hostRating, SR.attributes.ranges.host_rating.min);
+  static resolveLink(link) {
+    if (!link)
+      return;
+    let parts = link.split(".");
+    let doc;
+    if (parts[0] === "Compendium") {
+      parts.shift();
+      const [scope, packName, id] = parts.slice(0, 3);
+      parts = parts.slice(3);
+      const pack = game.packs.get(`${scope}.${packName}`);
+      if (!pack)
+        return;
+      doc = pack.getDocument(id);
+    } else {
+      const [docName, docId] = parts.slice(0, 2);
+      parts = parts.slice(2);
+      const collection = CONFIG[docName].collection.instance;
+      doc = collection.get(docId);
+    }
+    while (doc && parts.length > 1) {
+      const [embeddedName, embeddedId] = parts.slice(0, 2);
+      doc = doc.getEmbeddedDocument(embeddedName, embeddedId);
+      parts = parts.slice(2);
+    }
+    return doc || null;
   }
-  static isValidMarksCount(marks) {
-    return marks >= MatrixRules.minMarksCount() && marks <= MatrixRules.maxMarksCount() && marks % 1 === 0;
+  static emitAddNetworkControllerSocketMessage(controller, networkDevice) {
+    return __async(this, null, function* () {
+      const controllerLink = NetworkDeviceFlow.buildLink(controller);
+      const networkDeviceLink = NetworkDeviceFlow.buildLink(networkDevice);
+      yield SocketMessage.emitForGM(FLAGS.addNetworkController, { controllerLink, networkDeviceLink });
+    });
   }
-  static maxMarksCount() {
-    return 3;
+  static _handleAddNetworkControllerSocketMessage(message) {
+    return __async(this, null, function* () {
+      var _a;
+      console.log("Shadowrun 5e | Handle add network controller socket message", message);
+      if (!((_a = game.user) == null ? void 0 : _a.isGM))
+        return console.error(`Shadowrun 5e | Abort handling of message. Current user isn't a GM`, game.user);
+      const controller = NetworkDeviceFlow.resolveLink(message.data.controllerLink);
+      const device = NetworkDeviceFlow.resolveLink(message.data.networkDeviceLink);
+      if (!controller || !device)
+        return console.error("Shadowrun 5e | Either the networks controller or device did not resolve.");
+      yield NetworkDeviceFlow._handleAddDeviceToNetwork(controller, device);
+    });
   }
-  static minMarksCount() {
-    return 0;
+  static addDeviceToNetwork(controller, device) {
+    return __async(this, null, function* () {
+      var _a;
+      console.log(`Shadowrun5e | Adding an the item ${device.name} to the controller ${controller.name}`, controller, device);
+      if (controller.id === device.id)
+        return console.warn("Shadowrun 5e | A device cant be its own network controller");
+      const technologyData = device.getTechnologyData();
+      if (!technologyData)
+        return (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.Errors.CanOnlyAddTechnologyItemsToANetwork"));
+      if (!controller.canBeNetworkController)
+        return;
+      if (NetworkDeviceFlow._currentUserCanModifyDevice(controller) && NetworkDeviceFlow._currentUserCanModifyDevice(device))
+        yield NetworkDeviceFlow._handleAddDeviceToNetwork(controller, device);
+      else
+        yield NetworkDeviceFlow.emitAddNetworkControllerSocketMessage(controller, device);
+    });
   }
-  static getValidMarksCount(marks) {
-    marks = Math.min(marks, MatrixRules.maxMarksCount());
-    return Math.max(marks, MatrixRules.minMarksCount());
+  static _handleAddDeviceToNetwork(controller, device) {
+    return __async(this, null, function* () {
+      if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller) && !NetworkDeviceFlow._currentUserCanModifyDevice(device))
+        return console.error(`User isn't owner or GM of this device`, controller);
+      const controllerData = controller.asDevice() || controller.asHostData();
+      if (!controllerData)
+        return console.error(`Device isn't capable of accepting network devices`, controller);
+      const technologyData = device.getTechnologyData();
+      if (!technologyData)
+        return console.error(`'Device can't be added to a network`);
+      if (technologyData.networkController)
+        yield NetworkDeviceFlow._removeDeviceFromController(device);
+      const controllerLink = NetworkDeviceFlow.buildLink(controller);
+      yield NetworkDeviceFlow._setControllerFromLink(device, controllerLink);
+      const networkDeviceLink = NetworkDeviceFlow.buildLink(device);
+      const networkDevices = controllerData.data.networkDevices;
+      if (networkDevices.includes(networkDeviceLink))
+        return;
+      return NetworkDeviceFlow._setDevicesOnController(controller, [...networkDevices, networkDeviceLink]);
+    });
   }
-  static hostMatrixAttributeRatings(hostRating) {
-    return [0, 1, 2, 3].map((rating) => rating + hostRating);
+  static removeDeviceFromController(device) {
+    return __async(this, null, function* () {
+      if (!device)
+        return;
+      console.log(`Shadowrun 5e | Removing device ${device.name} from it's controller`);
+      yield NetworkDeviceFlow._removeDeviceFromController(device);
+      yield NetworkDeviceFlow._removeControllerFromDevice(device);
+    });
+  }
+  static removeDeviceLinkFromNetwork(controller, deviceLink) {
+    return __async(this, null, function* () {
+      console.log(`Shadowrun 5e | Removing device with uuid ${deviceLink} from network`);
+      const controllerData = controller.asController();
+      const device = NetworkDeviceFlow.resolveLink(deviceLink);
+      if (device) {
+        const technologyData = device.getTechnologyData();
+        if (technologyData)
+          yield NetworkDeviceFlow._removeControllerFromDevice(device);
+      }
+      if (!controllerData)
+        return;
+      const deviceLinks = controllerData.data.networkDevices.filter((existingLink) => existingLink !== deviceLink);
+      yield NetworkDeviceFlow._setDevicesOnController(controller, deviceLinks);
+    });
+  }
+  static removeAllDevicesFromNetwork(controller) {
+    return __async(this, null, function* () {
+      console.log(`Shadowrun 5e | Removing all devices from network ${controller.name}`);
+      yield NetworkDeviceFlow._removeControllerFromAllDevices(controller);
+      yield NetworkDeviceFlow._removeAllDevicesFromController(controller);
+    });
+  }
+  static _setControllerFromLink(device, controllerLink) {
+    return __async(this, null, function* () {
+      if (!device.canBeNetworkDevice)
+        return console.error("Shadowrun 5e | Given device cant be part of a network", device);
+      yield device.update({ "data.technology.networkController": controllerLink });
+    });
+  }
+  static _removeControllerFromDevice(device) {
+    return __async(this, null, function* () {
+      if (!device.canBeNetworkDevice)
+        return console.error("Shadowrun 5e | Given device cant be part of a network", device);
+      if (!NetworkDeviceFlow._currentUserCanModifyDevice(device))
+        return;
+      yield device.update({ "data.technology.networkController": "" });
+    });
+  }
+  static _setDevicesOnController(controller, deviceLinks) {
+    return __async(this, null, function* () {
+      if (!controller.canBeNetworkController)
+        return console.error("Shadowrun 5e | Given device cant control a network", controller);
+      yield controller.update({ "data.networkDevices": deviceLinks });
+    });
+  }
+  static _removeAllDevicesFromController(controller) {
+    return __async(this, null, function* () {
+      if (!controller.canBeNetworkController)
+        return console.error("Shadowrun 5e | Given device cant control a network", controller);
+      yield controller.update({ "data.networkDevices": [] });
+    });
+  }
+  static _removeDeviceFromController(device) {
+    return __async(this, null, function* () {
+      if (!device.canBeNetworkDevice)
+        return console.error("Shadowrun 5e | Given device cant be part of a network", device);
+      const technologyData = device.getTechnologyData();
+      if (!technologyData)
+        return;
+      const controller = NetworkDeviceFlow.resolveLink(technologyData.networkController);
+      if (!controller)
+        return;
+      if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller))
+        return;
+      const controllerData = controller.asController();
+      if (!controllerData)
+        return;
+      const deviceLink = NetworkDeviceFlow.buildLink(device);
+      const deviceLinks = controllerData.data.networkDevices.filter((existingLink) => existingLink !== deviceLink);
+      yield NetworkDeviceFlow._setDevicesOnController(controller, deviceLinks);
+    });
+  }
+  static _removeControllerFromAllDevices(controller) {
+    return __async(this, null, function* () {
+      if (!controller.canBeNetworkController)
+        return console.error("Shadowrun 5e | Given device cant control a network", controller);
+      const controllerData = controller.asController();
+      if (!controllerData)
+        return;
+      const networkDevices = controllerData.data.networkDevices;
+      if (networkDevices) {
+        const devices = networkDevices.map((deviceLink) => NetworkDeviceFlow.resolveLink(deviceLink));
+        for (const device of devices) {
+          if (!device)
+            continue;
+          yield NetworkDeviceFlow._removeControllerFromDevice(device);
+        }
+      }
+    });
+  }
+  static getNetworkDevices(controller) {
+    const devices = [];
+    const controllerData = controller.asController();
+    if (!controllerData)
+      return devices;
+    controllerData.data.networkDevices.forEach((link) => {
+      const device = NetworkDeviceFlow.resolveLink(link);
+      if (!device)
+        return console.warn(`Shadowrun5e | Controller ${controller.name} has a network device ${link} that doesn't exist anymore`);
+      devices.push(device);
+    });
+    return devices;
+  }
+  static handleOnDeleteItem(item, data, id) {
+    return __async(this, null, function* () {
+      console.log(`Shadowrun 5e | Checking for network on deleted item ${item.name}`, item);
+      if (item.canBeNetworkController)
+        return yield NetworkDeviceFlow._removeControllerFromAllDevices(item);
+      if (item.canBeNetworkDevice)
+        return yield NetworkDeviceFlow._removeDeviceFromController(item);
+    });
+  }
+  static _currentUserCanModifyDevice(device) {
+    var _a;
+    return ((_a = game.user) == null ? void 0 : _a.isGM) || device.isOwner;
+  }
+};
+
+// src/module/item/prep/HostPrep.ts
+function HostDataPreparation(system) {
+  HostPrep.setDeviceCategory(system);
+  HostPrep.prepareMatrixAttributes(system);
+}
+var HostPrep = class {
+  static setDeviceCategory(system) {
+    system.category = "host";
+  }
+  static prepareMatrixAttributes(system) {
+    const hostAttributeRatings = MatrixRules.hostMatrixAttributeRatings(system.rating);
+    Object.values(system.atts).forEach((attribute) => {
+      attribute.value = hostAttributeRatings.pop();
+      attribute.editable = false;
+    });
   }
 };
 
@@ -12742,6 +11714,242 @@ var CombatRules = class {
 var MeleeRules = class {
   static defenseReachModifier(incomingReach, defendingReach) {
     return defendingReach - incomingReach;
+  }
+};
+
+// src/module/apps/dialogs/FormDialog.ts
+var FormDialog = class extends Dialog {
+  constructor(data, options) {
+    super(data, options);
+    const { templateData, templatePath } = data;
+    this._templateData = templateData;
+    this._templatePath = templatePath;
+    this._onAfterClose = data.onAfterClose || this.onAfterClose;
+    this.selection = this._emptySelection();
+    this._selectionPromise = new Promise((resolve, reject) => {
+      this._selectionResolve = resolve;
+      this._selectionReject = reject;
+    });
+  }
+  close() {
+    return __async(this, null, function* () {
+      yield __superGet(FormDialog.prototype, this, "close").call(this);
+      if (this.canceled) {
+        setTimeout(() => this._selectionResolve(this.selection), 250);
+      }
+    });
+  }
+  activateListeners(html) {
+    super.activateListeners(html);
+    html.on("change", "input,select,textarea", this._onChangeInput.bind(this));
+  }
+  submit(button) {
+    return __async(this, null, function* () {
+      var _a;
+      this.selectedButton = (_a = button.name) != null ? _a : button.label;
+      this.applyFormData();
+      __superGet(FormDialog.prototype, this, "submit").call(this, button);
+      yield this.afterSubmit("jQuery" in this.options ? this.element : this.element[0]);
+    });
+  }
+  afterSubmit(html) {
+    return __async(this, null, function* () {
+      this.selection = yield this._onAfterClose(html, this.selectedButton);
+      setTimeout(() => this._selectionResolve(this.selection), 250);
+    });
+  }
+  applyFormData() {
+    if (!this.options.applyFormChangesOnSubmit)
+      return;
+    if (!this.form)
+      throw new Error(`The FormApplication subclass has no registered form element`);
+    const fd = new FormDataExtended(this.form, { editors: {} });
+    const data = fd.object;
+    this._updateData(data);
+  }
+  _updateData(data) {
+    foundry.utils.mergeObject(this.data.templateData, data);
+  }
+  getData() {
+    this.data.buttons = this.data.buttons || this.buttons;
+    this._amendButtonsWithName(this.data.buttons);
+    const data = super.getData();
+    return mergeObject(data, __spreadProps(__spreadValues({}, this.data), {
+      content: ""
+    }));
+  }
+  get buttons() {
+    return {};
+  }
+  get templateContent() {
+    return "";
+  }
+  select() {
+    return __async(this, null, function* () {
+      yield this.render(true);
+      if (this._selectionPromise === void 0 || this.selection === void 0) {
+        return this._emptySelection();
+      }
+      return yield this._selectionPromise;
+    });
+  }
+  _emptySelection() {
+    return {};
+  }
+  get selected() {
+    return !this.canceled;
+  }
+  get canceled() {
+    return !this.selectedButton || this.selectedButton === "cancel";
+  }
+  static getButtons() {
+    return {};
+  }
+  _amendButtonsWithName(buttons) {
+    Object.keys(buttons).forEach((name) => buttons[name].name = name);
+  }
+  _renderInner(data) {
+    return __async(this, null, function* () {
+      const templatePath = data.templatePath || this.templateContent;
+      if (templatePath)
+        data.content = yield renderTemplate(
+          data.templatePath || this.templateContent,
+          data.templateData || data
+        );
+      const html = yield __superGet(FormDialog.prototype, this, "_renderInner").call(this, data);
+      this.form = html.filter((i, el) => el instanceof HTMLFormElement)[0];
+      if (!this.form)
+        this.form = html.find("form")[0];
+      return html;
+    });
+  }
+  _onChangeInput(event) {
+    return __async(this, null, function* () {
+      const el = event.target;
+      if (this.options.applyFormChangesOnSubmit) {
+        this.applyFormData();
+        this.render();
+      }
+    });
+  }
+  onAfterClose(html) {
+  }
+};
+
+// src/module/apps/dialogs/DamageApplicationDialog.ts
+var DamageApplicationDialog = class extends FormDialog {
+  constructor(actors, damage, options) {
+    const dialogData = DamageApplicationDialog.getDialogData(actors, damage);
+    super(dialogData, options);
+  }
+  static get defaultOptions() {
+    const options = super.defaultOptions;
+    options.id = "damage-application";
+    options.classes = ["sr5", "form-dialog"];
+    options.resizable = true;
+    options.height = "auto";
+    return options;
+  }
+  static getDialogData(actors, damage) {
+    const title = game.i18n.localize("SR5.DamageApplication.Title");
+    const templatePath = "systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html";
+    const actorDamage = actors.map((a) => {
+      return { actor: a };
+    });
+    const templateData = {
+      damage,
+      actorDamage
+    };
+    const buttons = {
+      damage: {
+        label: game.i18n.localize("SR5.DamageApplication.ApplyDamage")
+      }
+    };
+    const onAfterClose = () => actorDamage;
+    return {
+      title,
+      templatePath,
+      templateData,
+      onAfterClose,
+      buttons,
+      default: "damage"
+    };
+  }
+};
+
+// src/module/actor/flows/DamageApplicationFlow.ts
+var DamageApplicationFlow = class {
+  runApplyDamage(actors, damage) {
+    return __async(this, null, function* () {
+      const damageApplicationDialog = yield new DamageApplicationDialog(actors, damage);
+      yield damageApplicationDialog.select();
+      if (damageApplicationDialog.canceled) {
+        return;
+      }
+      actors.forEach((actor) => {
+        this.applyDamageToActor(actor, damage);
+      });
+    });
+  }
+  applyDamageToActor(actor, damage) {
+    return __async(this, null, function* () {
+      if (damage.value <= 0) {
+        return;
+      }
+      damage = this.changeStunToPhysicalForGrunts(actor, damage);
+      if (damage.type.value === "matrix") {
+        damage = yield actor.addMatrixDamage(damage);
+      }
+      if (damage.type.value === "stun") {
+        damage = yield actor.addStunDamage(damage);
+      }
+      if (damage.type.value === "physical") {
+        yield actor.addPhysicalDamage(damage);
+      }
+    });
+  }
+  changeStunToPhysicalForGrunts(actor, damage) {
+    const updatedDamage = duplicate(damage);
+    if (!actor.isGrunt()) {
+      return updatedDamage;
+    }
+    if (damage.type.value === "stun") {
+      updatedDamage.type.value = "physical";
+    }
+    return updatedDamage;
+  }
+  static handleRenderChatMessage(app, html, data) {
+    html.on("click", ".apply-damage", (event) => DamageApplicationFlow.chatMessageActionApplyDamage(html, event));
+  }
+  static chatMessageActionApplyDamage(html, event) {
+    return __async(this, null, function* () {
+      var _a;
+      event.stopPropagation();
+      event.preventDefault();
+      const applyDamage = $(event.currentTarget);
+      const value = Number(applyDamage.data("damageValue"));
+      const type = String(applyDamage.data("damageType"));
+      const ap = Number(applyDamage.data("damageAp"));
+      const element = String(applyDamage.data("damageElement"));
+      let damage = Helpers.createDamageData(value, type, ap, element);
+      let actors = Helpers.getSelectedActorsOrCharacter();
+      if (actors.length === 0) {
+        const messageId = html.data("messageId");
+        const test = yield TestCreator.fromMessage(messageId);
+        if (!test)
+          return;
+        yield test.populateDocuments();
+        if (test.hasTargets)
+          test.targets.forEach((target) => actors.push(target.actor));
+        else
+          actors.push(test.actor);
+      }
+      if (actors.length === 0) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+        return;
+      }
+      yield new DamageApplicationFlow().runApplyDamage(actors, damage);
+    });
   }
 };
 
@@ -13667,7 +12875,7 @@ var SuccessTest = class {
       html.find(".place-template").on("click", this._placeItemBlastZoneTemplate);
       html.find(".result-action").on("click", this._castResultAction);
       html.find(".chat-select-link").on("click", this._selectSceneToken);
-      handleRenderChatMessage(message, html, data);
+      DamageApplicationFlow.handleRenderChatMessage(message, html, data);
       yield this._showGmOnlyContent(message, html, data);
     });
   }
@@ -14159,663 +13367,6 @@ var ActionResultFlow = class {
   }
 };
 
-// src/module/chat.ts
-function createChatMessage(template, templateData) {
-  return __async(this, null, function* () {
-    const chatData = yield createChatData(template, templateData);
-    const message = yield ChatMessage.create(chatData);
-    if (!message)
-      return null;
-    return message;
-  });
-}
-var createChatData = (template, templateData) => __async(void 0, null, function* () {
-  var _a, _b, _c, _d;
-  const html = yield renderTemplate(template, templateData);
-  const chatData = {
-    user: (_a = game.user) == null ? void 0 : _a.id,
-    speaker: {
-      actor: (_b = templateData.actor) == null ? void 0 : _b.id,
-      token: (_c = templateData.token) == null ? void 0 : _c.id,
-      alias: (_d = game.user) == null ? void 0 : _d.name
-    },
-    item: templateData.item,
-    content: html,
-    rollMode: game.settings.get(CORE_NAME, CORE_FLAGS.RollMode)
-  };
-  ChatMessage.applyRollMode(chatData, chatData.rollMode);
-  return chatData;
-});
-function createItemChatMessage(options) {
-  return __async(this, null, function* () {
-    const templateData = createChatTemplateData(options);
-    return yield createChatMessage("systems/shadowrun5e/dist/templates/rolls/item-card.html", templateData);
-  });
-}
-function createChatTemplateData(options) {
-  let { actor, item, description, tests } = options;
-  const token = actor == null ? void 0 : actor.getToken();
-  const title = game.i18n.localize("SR5.Description");
-  return {
-    title,
-    actor,
-    token,
-    item,
-    description,
-    tests
-  };
-}
-var handleRenderChatMessage = (app, html, data) => {
-  html.on("click", ".apply-damage", (event) => chatMessageActionApplyDamage(html, event));
-};
-var chatMessageActionApplyDamage = (html, event) => __async(void 0, null, function* () {
-  var _a;
-  event.stopPropagation();
-  event.preventDefault();
-  const applyDamage = $(event.currentTarget);
-  const value = Number(applyDamage.data("damageValue"));
-  const type = String(applyDamage.data("damageType"));
-  const ap = Number(applyDamage.data("damageAp"));
-  const element = String(applyDamage.data("damageElement"));
-  let damage = Helpers.createDamageData(value, type, ap, element);
-  let actors = Helpers.getSelectedActorsOrCharacter();
-  if (actors.length === 0) {
-    const messageId = html.data("messageId");
-    const test = yield TestCreator.fromMessage(messageId);
-    if (!test)
-      return;
-    yield test.populateDocuments();
-    if (test.hasTargets)
-      test.targets.forEach((target) => actors.push(target.actor));
-    else
-      actors.push(test.actor);
-  }
-  if (actors.length === 0) {
-    (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
-    return;
-  }
-  yield new DamageApplicationFlow().runApplyDamage(actors, damage);
-});
-
-// src/module/item/ChatData.ts
-var ChatData = {
-  action: (data, labels, props) => {
-    if (data.action) {
-      const labelStringList = [];
-      if (data.action.skill) {
-        labelStringList.push(Helpers.label(data.action.skill));
-        labelStringList.push(Helpers.label(data.action.attribute));
-      } else if (data.action.attribute2) {
-        labelStringList.push(Helpers.label(data.action.attribute));
-        labelStringList.push(Helpers.label(data.action.attribute2));
-      } else if (data.action.attribute) {
-        labelStringList.push(Helpers.label(data.action.attribute));
-      }
-      if (data.action.mod) {
-        labelStringList.push(`${game.i18n.localize("SR5.ItemMod")} (${data.action.mod})`);
-      }
-      if (labelStringList.length) {
-        labels.roll = labelStringList.join(" + ");
-      }
-      if (data.action.opposed.type) {
-        const { opposed } = data.action;
-        if (opposed.type !== "custom")
-          labels.opposedRoll = `vs. ${Helpers.label(opposed.type)}`;
-        else if (opposed.skill)
-          labels.opposedRoll = `vs. ${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
-        else if (opposed.attribute2)
-          labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
-        else if (opposed.attribute)
-          labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}`;
-      }
-      if (data.action.type !== "" && data.action.type !== "varies" && data.action.type !== "none") {
-        props.push(`${Helpers.label(data.action.type)} Action`);
-      }
-      if (data.action.limit) {
-        const { limit } = data.action;
-        const attribute = limit.attribute ? `${game.i18n.localize(SR5.limits[limit.attribute])}` : "";
-        const limitVal = limit.value ? limit.value : "";
-        let limitStr = "";
-        if (attribute) {
-          limitStr += attribute;
-        }
-        if (limitVal) {
-          if (attribute) {
-            limitStr += " + ";
-          }
-          limitStr += limitVal;
-        }
-        if (limitStr) {
-          props.push(`Limit ${limitStr}`);
-        }
-      }
-      if (data.action.damage.type.value) {
-        const { damage } = data.action;
-        let damageString = "";
-        let elementString = "";
-        const attribute = damage.attribute ? `${game.i18n.localize(SR5.attributes[damage.attribute])} + ` : "";
-        if (damage.value || attribute) {
-          const type = damage.type.value ? damage.type.value.toUpperCase().charAt(0) : "";
-          damageString = `DV ${attribute}${damage.value}${type}`;
-        }
-        if (damage.element.value) {
-          if (damage.value) {
-            if (damage.element.value === "electricity") {
-              damageString += " (e)";
-            } else {
-              elementString = Helpers.label(damage.element.value);
-            }
-          } else {
-            elementString = Helpers.label(damage.element.value);
-          }
-        }
-        if (damageString)
-          props.push(damageString);
-        if (elementString)
-          props.push(elementString);
-        if (damage.ap && damage.ap.value)
-          props.push(`AP ${damage.ap.value}`);
-      }
-    }
-  },
-  sin: (data, labels, props) => {
-    props.push(`Rating ${data.technology.rating}`);
-    data.licenses.forEach((license) => {
-      props.push(`${license.name} R${license.rtg}`);
-    });
-  },
-  contact: (data, labels, props) => {
-    props.push(data.type);
-    props.push(`${game.i18n.localize("SR5.Connection")} ${data.connection}`);
-    props.push(`${game.i18n.localize("SR5.Loyalty")} ${data.loyalty}`);
-    if (data.blackmail) {
-      props.push(`${game.i18n.localize("SR5.Blackmail")}`);
-    }
-    if (data.family) {
-      props.push(game.i18n.localize("SR5.Family"));
-    }
-  },
-  lifestyle: (data, labels, props) => {
-    props.push(Helpers.label(data.type));
-    if (data.cost)
-      props.push(`\xA5${data.cost}`);
-    if (data.comforts)
-      props.push(`Comforts ${data.comforts}`);
-    if (data.security)
-      props.push(`Security ${data.security}`);
-    if (data.neighborhood)
-      props.push(`Neighborhood ${data.neighborhood}`);
-    if (data.guests)
-      props.push(`Guests ${data.guests}`);
-  },
-  adept_power: (data, labels, props) => {
-    ChatData.action(data, labels, props);
-    props.push(`PP ${data.pp}`);
-    props.push(Helpers.label(data.type));
-  },
-  armor: (data, labels, props) => {
-    if (data.armor) {
-      if (data.armor.value)
-        props.push(`Armor ${data.armor.mod ? "+" : ""}${data.armor.value}`);
-      if (data.armor.acid)
-        props.push(`Acid ${data.armor.acid}`);
-      if (data.armor.cold)
-        props.push(`Cold ${data.armor.cold}`);
-      if (data.armor.fire)
-        props.push(`Fire ${data.armor.fire}`);
-      if (data.armor.electricity)
-        props.push(`Electricity ${data.armor.electricity}`);
-      if (data.armor.radiation)
-        props.push(`Radiation ${data.armor.radiation}`);
-    }
-  },
-  ammo: (data, labels, props) => {
-    if (data.damageType)
-      props.push(`${game.i18n.localize("SR5.DamageType")} ${data.damageType}`);
-    if (data.damage)
-      props.push(`${game.i18n.localize("SR5.DamageValue")} ${data.damage}`);
-    if (data.element)
-      props.push(`${game.i18n.localize("SR5.Element")} ${data.element}`);
-    if (data.ap)
-      props.push(`${game.i18n.localize("SR5.AP")} ${data.ap}`);
-    if (data.blast.radius)
-      props.push(`${game.i18n.localize("SR5.BlastRadius")} ${data.blast.radius}m`);
-    if (data.blast.dropoff)
-      props.push(`${game.i18n.localize("SR5.Dropoff")} ${data.blast.dropoff}/m`);
-  },
-  program: (data, labels, props) => {
-    props.push(game.i18n.localize(SR5.programTypes[data.type]));
-  },
-  complex_form: (data, labels, props) => {
-    ChatData.action(data, labels, props);
-    props.push(Helpers.label(data.target), Helpers.label(data.duration));
-    const { fade } = data;
-    if (fade > 0)
-      props.push(`Fade L+${fade}`);
-    else if (fade < 0)
-      props.push(`Fade L${fade}`);
-    else
-      props.push("Fade L");
-  },
-  cyberware: (data, labels, props) => {
-    ChatData.action(data, labels, props);
-    ChatData.armor(data, labels, props);
-    if (data.essence)
-      props.push(`Ess ${data.essence}`);
-  },
-  bioware: (data, labels, props) => {
-    ChatData.action(data, labels, props);
-    ChatData.armor(data, labels, props);
-    if (data.essence)
-      props.push(`Ess ${data.essence}`);
-  },
-  device: (data, labels, props) => {
-    if (data.technology && data.technology.rating)
-      props.push(`Rating ${data.technology.rating}`);
-    if (data.category === "cyberdeck") {
-      for (const attN of Object.values(data.atts)) {
-        props.push(`${Helpers.label(attN.att)} ${attN.value}`);
-      }
-    }
-  },
-  equipment: (data, labels, props) => {
-    if (data.technology && data.technology.rating)
-      props.push(`Rating ${data.technology.rating}`);
-  },
-  quality: (data, labels, props) => {
-    ChatData.action(data, labels, props);
-    props.push(Helpers.label(data.type));
-  },
-  sprite_power: (data, labels, props) => {
-    ChatData.action(data, labels, props);
-  },
-  critter_power: (data, labels, props) => {
-    props.push(game.i18n.localize(SR5.critterPower.types[data.powerType]));
-    props.push(game.i18n.localize(SR5.critterPower.durations[data.duration]));
-    props.push(game.i18n.localize(SR5.critterPower.ranges[data.range]));
-    ChatData.action(data, labels, props);
-  },
-  spell: (data, labels, props) => {
-    props.push(Helpers.label(data.category), Helpers.label(data.type));
-    if (data.category === "combat") {
-      props.push(Helpers.label(data.combat.type));
-    } else if (data.category === "health") {
-    } else if (data.category === "illusion") {
-      props.push(data.illusion.type);
-      props.push(data.illusion.sense);
-    } else if (data.category === "manipulation") {
-      if (data.manipulation.damaging)
-        props.push("Damaging");
-      if (data.manipulation.mental)
-        props.push("Mental");
-      if (data.manipulation.environmental)
-        props.push("Environmental");
-      if (data.manipulation.physical)
-        props.push("Physical");
-    } else if (data.category === "detection") {
-      props.push(data.illusion.type);
-      props.push(data.illusion.passive ? "Passive" : "Active");
-      if (data.illusion.extended)
-        props.push("Extended");
-    }
-    props.push(Helpers.label(data.range));
-    ChatData.action(data, labels, props);
-    props.push(Helpers.label(data.duration));
-    const { drain } = data;
-    if (drain > 0)
-      props.push(`Drain F+${drain}`);
-    else if (drain < 0)
-      props.push(`Drain F${drain}`);
-    else
-      props.push("Drain F");
-    labels.roll = "Cast";
-  },
-  weapon: (data, labels, props, item) => {
-    var _a, _b, _c;
-    ChatData.action(data, labels, props);
-    for (let i = 0; i < props.length; i++) {
-      const prop = props[i];
-      if (prop.includes("Limit")) {
-        props[i] = prop.replace("Limit", "Accuracy");
-      }
-    }
-    const equippedAmmo = item.getEquippedAmmo();
-    if (equippedAmmo && data.ammo && ((_a = data.ammo.current) == null ? void 0 : _a.max)) {
-      if (equippedAmmo) {
-        const ammoData = equippedAmmo.data.data;
-        const { current, spare_clips } = data.ammo;
-        if (equippedAmmo.name)
-          props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
-        if (ammoData.blast.radius)
-          props.push(`${game.i18n.localize("SR5.BlastRadius")} ${ammoData.blast.radius}m`);
-        if (ammoData.blast.dropoff)
-          props.push(`${game.i18n.localize("SR5.Dropoff")} $ammoData.blast.dropoff}/m`);
-        if (spare_clips && spare_clips.max)
-          props.push(`${game.i18n.localize("SR5.SpareClips")} (${spare_clips.value}/${spare_clips.max})`);
-      }
-    }
-    if ((_c = (_b = data.technology) == null ? void 0 : _b.conceal) == null ? void 0 : _c.value) {
-      props.push(`${game.i18n.localize("SR5.Conceal")} ${data.technology.conceal.value}`);
-    }
-    if (data.category === "range") {
-      if (data.range.rc) {
-        let rcString = `${game.i18n.localize("SR5.RecoilCompensation")} ${data.range.rc.value}`;
-        if (item == null ? void 0 : item.actor) {
-          rcString += ` (${game.i18n.localize("SR5.Total")} ${item.actor.getRecoilCompensation()})`;
-        }
-        props.push(rcString);
-      }
-      if (data.range.modes) {
-        const newModes = [];
-        const { modes } = data.range;
-        if (modes.single_shot)
-          newModes.push("SR5.WeaponModeSingleShotShort");
-        if (modes.semi_auto)
-          newModes.push("SR5.WeaponModeSemiAutoShort");
-        if (modes.burst_fire)
-          newModes.push("SR5.WeaponModeBurstFireShort");
-        if (modes.full_auto)
-          newModes.push("SR5.WeaponModeFullAutoShort");
-        props.push(newModes.map((m) => game.i18n.localize(m)).join("/"));
-      }
-      if (data.range.ranges)
-        props.push(Array.from(Object.values(data.range.ranges)).join("/"));
-    } else if (data.category === "melee") {
-      if (data.melee.reach) {
-        const reachString = `${game.i18n.localize("SR5.Reach")} ${data.melee.reach}`;
-        const accIndex = props.findIndex((p) => p.includes("Accuracy"));
-        if (accIndex > -1) {
-          props.splice(accIndex + 1, 0, reachString);
-        } else {
-          props.push(reachString);
-        }
-      }
-    } else if (data.category === "thrown") {
-      const { blast } = data.thrown;
-      if (blast == null ? void 0 : blast.radius)
-        props.push(`${game.i18n.localize("SR5.BlastRadius")} ${blast.radius}m`);
-      if (blast == null ? void 0 : blast.dropoff)
-        props.push(`${game.i18n.localize("SR5.Dropoff")} ${blast.dropoff}/m`);
-      if (data.thrown.ranges) {
-        const mult = data.thrown.ranges.attribute && (item == null ? void 0 : item.actor) ? item.actor.data.data.attributes[data.thrown.ranges.attribute].value : 1;
-        const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
-        props.push(ranges.map((v) => v * mult).join("/"));
-      }
-    }
-    const equippedMods = item.getEquippedMods();
-    if (equippedMods) {
-      equippedMods.forEach((mod) => {
-        props.push(`${mod.name}`);
-      });
-    }
-  }
-};
-
-// src/module/sockets.ts
-var SocketMessage = class {
-  static _createMessage(type, data, userId) {
-    return { type, data, userId };
-  }
-  static emit(type, data) {
-    return __async(this, null, function* () {
-      if (!game.socket)
-        return;
-      const message = SocketMessage._createMessage(type, data);
-      console.trace("Shadowrun 5e | Emiting Shadowrun5e system socket message", message);
-      yield game.socket.emit(SYSTEM_SOCKET, message);
-    });
-  }
-  static emitForGM(type, data) {
-    return __async(this, null, function* () {
-      if (!game.socket || !game.user || !game.users)
-        return;
-      if (game.user.isGM)
-        return console.error("Active user is GM! Aborting socket message...");
-      const gmUser = game.users.find((user) => user.isGM);
-      if (!gmUser)
-        return console.error("No active GM user! One GM must be active for this action to work.");
-      const message = SocketMessage._createMessage(type, data, gmUser.id);
-      console.trace("Shadowrun 5e | Emiting Shadowrun5e system socket message", message);
-      yield game.socket.emit(SYSTEM_SOCKET, message);
-    });
-  }
-};
-
-// src/module/item/flows/NetworkDeviceFlow.ts
-var NetworkDeviceFlow = class {
-  static buildLink(target) {
-    return target.uuid;
-  }
-  static resolveLink(link) {
-    if (!link)
-      return;
-    let parts = link.split(".");
-    let doc;
-    if (parts[0] === "Compendium") {
-      parts.shift();
-      const [scope, packName, id] = parts.slice(0, 3);
-      parts = parts.slice(3);
-      const pack = game.packs.get(`${scope}.${packName}`);
-      if (!pack)
-        return;
-      doc = pack.getDocument(id);
-    } else {
-      const [docName, docId] = parts.slice(0, 2);
-      parts = parts.slice(2);
-      const collection = CONFIG[docName].collection.instance;
-      doc = collection.get(docId);
-    }
-    while (doc && parts.length > 1) {
-      const [embeddedName, embeddedId] = parts.slice(0, 2);
-      doc = doc.getEmbeddedDocument(embeddedName, embeddedId);
-      parts = parts.slice(2);
-    }
-    return doc || null;
-  }
-  static emitAddNetworkControllerSocketMessage(controller, networkDevice) {
-    return __async(this, null, function* () {
-      const controllerLink = NetworkDeviceFlow.buildLink(controller);
-      const networkDeviceLink = NetworkDeviceFlow.buildLink(networkDevice);
-      yield SocketMessage.emitForGM(FLAGS.addNetworkController, { controllerLink, networkDeviceLink });
-    });
-  }
-  static _handleAddNetworkControllerSocketMessage(message) {
-    return __async(this, null, function* () {
-      var _a;
-      console.log("Shadowrun 5e | Handle add network controller socket message", message);
-      if (!((_a = game.user) == null ? void 0 : _a.isGM))
-        return console.error(`Shadowrun 5e | Abort handling of message. Current user isn't a GM`, game.user);
-      const controller = NetworkDeviceFlow.resolveLink(message.data.controllerLink);
-      const device = NetworkDeviceFlow.resolveLink(message.data.networkDeviceLink);
-      if (!controller || !device)
-        return console.error("Shadowrun 5e | Either the networks controller or device did not resolve.");
-      yield NetworkDeviceFlow._handleAddDeviceToNetwork(controller, device);
-    });
-  }
-  static addDeviceToNetwork(controller, device) {
-    return __async(this, null, function* () {
-      var _a;
-      console.log(`Shadowrun5e | Adding an the item ${device.name} to the controller ${controller.name}`, controller, device);
-      if (controller.id === device.id)
-        return console.warn("Shadowrun 5e | A device cant be its own network controller");
-      const technologyData = device.getTechnologyData();
-      if (!technologyData)
-        return (_a = ui.notifications) == null ? void 0 : _a.error(game.i18n.localize("SR5.Errors.CanOnlyAddTechnologyItemsToANetwork"));
-      if (!controller.canBeNetworkController)
-        return;
-      if (NetworkDeviceFlow._currentUserCanModifyDevice(controller) && NetworkDeviceFlow._currentUserCanModifyDevice(device))
-        yield NetworkDeviceFlow._handleAddDeviceToNetwork(controller, device);
-      else
-        yield NetworkDeviceFlow.emitAddNetworkControllerSocketMessage(controller, device);
-    });
-  }
-  static _handleAddDeviceToNetwork(controller, device) {
-    return __async(this, null, function* () {
-      if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller) && !NetworkDeviceFlow._currentUserCanModifyDevice(device))
-        return console.error(`User isn't owner or GM of this device`, controller);
-      const controllerData = controller.asDevice() || controller.asHostData();
-      if (!controllerData)
-        return console.error(`Device isn't capable of accepting network devices`, controller);
-      const technologyData = device.getTechnologyData();
-      if (!technologyData)
-        return console.error(`'Device can't be added to a network`);
-      if (technologyData.networkController)
-        yield NetworkDeviceFlow._removeDeviceFromController(device);
-      const controllerLink = NetworkDeviceFlow.buildLink(controller);
-      yield NetworkDeviceFlow._setControllerFromLink(device, controllerLink);
-      const networkDeviceLink = NetworkDeviceFlow.buildLink(device);
-      const networkDevices = controllerData.data.networkDevices;
-      if (networkDevices.includes(networkDeviceLink))
-        return;
-      return NetworkDeviceFlow._setDevicesOnController(controller, [...networkDevices, networkDeviceLink]);
-    });
-  }
-  static removeDeviceFromController(device) {
-    return __async(this, null, function* () {
-      if (!device)
-        return;
-      console.log(`Shadowrun 5e | Removing device ${device.name} from it's controller`);
-      yield NetworkDeviceFlow._removeDeviceFromController(device);
-      yield NetworkDeviceFlow._removeControllerFromDevice(device);
-    });
-  }
-  static removeDeviceLinkFromNetwork(controller, deviceLink) {
-    return __async(this, null, function* () {
-      console.log(`Shadowrun 5e | Removing device with uuid ${deviceLink} from network`);
-      const controllerData = controller.asController();
-      const device = NetworkDeviceFlow.resolveLink(deviceLink);
-      if (device) {
-        const technologyData = device.getTechnologyData();
-        if (technologyData)
-          yield NetworkDeviceFlow._removeControllerFromDevice(device);
-      }
-      if (!controllerData)
-        return;
-      const deviceLinks = controllerData.data.networkDevices.filter((existingLink) => existingLink !== deviceLink);
-      yield NetworkDeviceFlow._setDevicesOnController(controller, deviceLinks);
-    });
-  }
-  static removeAllDevicesFromNetwork(controller) {
-    return __async(this, null, function* () {
-      console.log(`Shadowrun 5e | Removing all devices from network ${controller.name}`);
-      yield NetworkDeviceFlow._removeControllerFromAllDevices(controller);
-      yield NetworkDeviceFlow._removeAllDevicesFromController(controller);
-    });
-  }
-  static _setControllerFromLink(device, controllerLink) {
-    return __async(this, null, function* () {
-      if (!device.canBeNetworkDevice)
-        return console.error("Shadowrun 5e | Given device cant be part of a network", device);
-      yield device.update({ "data.technology.networkController": controllerLink });
-    });
-  }
-  static _removeControllerFromDevice(device) {
-    return __async(this, null, function* () {
-      if (!device.canBeNetworkDevice)
-        return console.error("Shadowrun 5e | Given device cant be part of a network", device);
-      if (!NetworkDeviceFlow._currentUserCanModifyDevice(device))
-        return;
-      yield device.update({ "data.technology.networkController": "" });
-    });
-  }
-  static _setDevicesOnController(controller, deviceLinks) {
-    return __async(this, null, function* () {
-      if (!controller.canBeNetworkController)
-        return console.error("Shadowrun 5e | Given device cant control a network", controller);
-      yield controller.update({ "data.networkDevices": deviceLinks });
-    });
-  }
-  static _removeAllDevicesFromController(controller) {
-    return __async(this, null, function* () {
-      if (!controller.canBeNetworkController)
-        return console.error("Shadowrun 5e | Given device cant control a network", controller);
-      yield controller.update({ "data.networkDevices": [] });
-    });
-  }
-  static _removeDeviceFromController(device) {
-    return __async(this, null, function* () {
-      if (!device.canBeNetworkDevice)
-        return console.error("Shadowrun 5e | Given device cant be part of a network", device);
-      const technologyData = device.getTechnologyData();
-      if (!technologyData)
-        return;
-      const controller = NetworkDeviceFlow.resolveLink(technologyData.networkController);
-      if (!controller)
-        return;
-      if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller))
-        return;
-      const controllerData = controller.asController();
-      if (!controllerData)
-        return;
-      const deviceLink = NetworkDeviceFlow.buildLink(device);
-      const deviceLinks = controllerData.data.networkDevices.filter((existingLink) => existingLink !== deviceLink);
-      yield NetworkDeviceFlow._setDevicesOnController(controller, deviceLinks);
-    });
-  }
-  static _removeControllerFromAllDevices(controller) {
-    return __async(this, null, function* () {
-      if (!controller.canBeNetworkController)
-        return console.error("Shadowrun 5e | Given device cant control a network", controller);
-      const controllerData = controller.asController();
-      if (!controllerData)
-        return;
-      const networkDevices = controllerData.data.networkDevices;
-      if (networkDevices) {
-        const devices = networkDevices.map((deviceLink) => NetworkDeviceFlow.resolveLink(deviceLink));
-        for (const device of devices) {
-          if (!device)
-            continue;
-          yield NetworkDeviceFlow._removeControllerFromDevice(device);
-        }
-      }
-    });
-  }
-  static getNetworkDevices(controller) {
-    const devices = [];
-    const controllerData = controller.asController();
-    if (!controllerData)
-      return devices;
-    controllerData.data.networkDevices.forEach((link) => {
-      const device = NetworkDeviceFlow.resolveLink(link);
-      if (!device)
-        return console.warn(`Shadowrun5e | Controller ${controller.name} has a network device ${link} that doesn't exist anymore`);
-      devices.push(device);
-    });
-    return devices;
-  }
-  static handleOnDeleteItem(item, data, id) {
-    return __async(this, null, function* () {
-      console.log(`Shadowrun 5e | Checking for network on deleted item ${item.name}`, item);
-      if (item.canBeNetworkController)
-        return yield NetworkDeviceFlow._removeControllerFromAllDevices(item);
-      if (item.canBeNetworkDevice)
-        return yield NetworkDeviceFlow._removeDeviceFromController(item);
-    });
-  }
-  static _currentUserCanModifyDevice(device) {
-    var _a;
-    return ((_a = game.user) == null ? void 0 : _a.isGM) || device.isOwner;
-  }
-};
-
-// src/module/item/prep/HostPrep.ts
-function HostDataPreparation(system) {
-  HostPrep.setDeviceCategory(system);
-  HostPrep.prepareMatrixAttributes(system);
-}
-var HostPrep = class {
-  static setDeviceCategory(system) {
-    system.category = "host";
-  }
-  static prepareMatrixAttributes(system) {
-    const hostAttributeRatings = MatrixRules.hostMatrixAttributeRatings(system.rating);
-    Object.values(system.atts).forEach((attribute) => {
-      attribute.value = hostAttributeRatings.pop();
-      attribute.editable = false;
-    });
-  }
-};
-
 // src/module/item/SR5Item.ts
 var _SR5Item = class extends Item {
   constructor() {
@@ -15010,13 +13561,12 @@ var _SR5Item = class extends Item {
   }
   postItemCard() {
     return __async(this, null, function* () {
-      const tests = this.getActionTests();
       const options = {
         actor: this.actor,
         description: this.getChatData(),
         item: this,
         previewTemplate: this.hasTemplate,
-        tests
+        tests: this.getActionTests()
       };
       return yield createItemChatMessage(options);
     });
@@ -16032,6 +14582,7 @@ var ModifiersPrep = class {
       "physical_limit",
       "social_limit",
       "mental_limit",
+      "astral_limit",
       "stun_track",
       "physical_track",
       "physical_overflow_track",
@@ -16325,13 +14876,29 @@ var _mergeWithMissingSkillFields = (givenSkill) => {
   mergeObject(givenSkill, template, { overwrite: false });
 };
 
+// src/module/rules/LimitRules.ts
+var LimitRules = {
+  calculateAstralLimit(astral, mental, social) {
+    astral.base = Math.max(mental.value, social.value);
+    astral.label = SR5.limits.astral;
+    return astral;
+  },
+  calculateMagicLimit(magic) {
+    return DefaultValues.limitField({
+      base: magic.value,
+      label: magic.label
+    });
+  }
+};
+
 // src/module/actor/prep/functions/LimitsPrep.ts
 var LimitsPrep = class {
   static prepareLimits(system) {
-    const { limits, modifiers } = system;
+    const { limits, modifiers, special } = system;
     limits.physical.mod = PartsList.AddUniquePart(limits.physical.mod, "SR5.Bonus", Number(modifiers["physical_limit"]));
     limits.mental.mod = PartsList.AddUniquePart(limits.mental.mod, "SR5.Bonus", Number(modifiers["mental_limit"]));
     limits.social.mod = PartsList.AddUniquePart(limits.social.mod, "SR5.Bonus", Number(modifiers["social_limit"]));
+    limits.astral.hidden = special !== "magic";
     for (let [name, limit] of Object.entries(limits)) {
       Helpers.calcTotal(limit);
       limit.label = SR5.limits[name];
@@ -16342,6 +14909,17 @@ var LimitsPrep = class {
     limits.physical.base = Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3);
     limits.mental.base = Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3);
     limits.social.base = Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3);
+  }
+  static prepareDerivedLimits(system) {
+    const { limits, modifiers, special, attributes } = system;
+    if (special === "magic") {
+      limits.astral = LimitRules.calculateAstralLimit(limits.astral, limits.mental, limits.social);
+      limits.astral.mod = PartsList.AddUniquePart(limits.astral.mod, "SR5.Bonus", Number(modifiers["astral_limit"]));
+      Helpers.calcTotal(limits.astral);
+      limits.magic = LimitRules.calculateMagicLimit(attributes.magic);
+      limits.magic.hidden = true;
+      Helpers.calcTotal(limits.magic);
+    }
   }
 };
 
@@ -16445,6 +15023,7 @@ var CharacterPrep = class {
     MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
     LimitsPrep.prepareLimitBaseFromAttributes(system);
     LimitsPrep.prepareLimits(system);
+    LimitsPrep.prepareDerivedLimits(system);
     if (system.is_npc && system.npc.is_grunt) {
       ConditionMonitorsPrep.prepareGrunt(system);
     } else {
@@ -16477,6 +15056,7 @@ var CritterPrep = class {
     MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
     LimitsPrep.prepareLimitBaseFromAttributes(data);
     LimitsPrep.prepareLimits(data);
+    LimitsPrep.prepareDerivedLimits(data);
     ConditionMonitorsPrep.preparePhysical(data);
     ConditionMonitorsPrep.prepareStun(data);
     MovementPrep.prepareMovement(data);
@@ -16503,6 +15083,7 @@ var SpiritPrep = class {
     SkillsPrep.prepareSkills(data);
     LimitsPrep.prepareLimitBaseFromAttributes(data);
     LimitsPrep.prepareLimits(data);
+    LimitsPrep.prepareDerivedLimits(data);
     SpiritPrep.prepareSpiritArmor(data);
     ConditionMonitorsPrep.prepareStun(data);
     ConditionMonitorsPrep.preparePhysical(data);
@@ -18064,7 +16645,7 @@ var _SR5Actor = class extends Actor {
   }
   promptRoll() {
     return __async(this, null, function* () {
-      yield ShadowrunRoller.promptSuccessTest();
+      yield TestCreator.promptSuccessTest();
     });
   }
   rollDeviceRating(options) {
@@ -18107,34 +16688,6 @@ var _SR5Actor = class extends Actor {
       if (!test)
         return;
       yield test.execute();
-    });
-  }
-  rollDroneInfiltration(options) {
-    return __async(this, null, function* () {
-      if (!this.isVehicle()) {
-        return void 0;
-      }
-      const actorData = duplicate(this.system);
-      if (actorData.controlMode === "autopilot") {
-        const parts = new PartsList();
-        const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
-        const sneaking = this.findActiveSkill("sneaking");
-        const limit = this.findLimit("sensor");
-        if (sneaking && limit) {
-          parts.addPart("SR5.Vehicle.Stealth", Helpers.calcTotal(sneaking));
-          parts.addPart("SR5.Vehicle.Stats.Pilot", pilot);
-          this._addGlobalParts(parts);
-          return ShadowrunRoller.advancedRoll({
-            event: options == null ? void 0 : options.event,
-            actor: this,
-            parts: parts.list,
-            limit,
-            title: game.i18n.localize("SR5.Labels.ActorSheet.RollDroneInfiltration")
-          });
-        }
-      } else {
-        yield this.rollSkill("sneaking", options);
-      }
     });
   }
   rollAttribute(name, options) {
@@ -18725,6 +17278,1420 @@ var _SR5Actor = class extends Actor {
 };
 var SR5Actor = _SR5Actor;
 SR5Actor.LOG_V10_COMPATIBILITY_WARNINGS = false;
+
+// src/module/apps/dialogs/DeleteConfirmationDialog.ts
+var DeleteConfirmationDialog = class extends FormDialog {
+  constructor(options) {
+    const dialogData = DeleteConfirmationDialog.getDialogData();
+    super(dialogData, options);
+  }
+  static getDialogData() {
+    return {
+      title: game.i18n.localize("SR5.DeleteConfirmationApplication.Title"),
+      buttons: {
+        delete: {
+          label: game.i18n.localize("SR5.DeleteConfirmationApplication.Delete")
+        },
+        cancel: {
+          label: game.i18n.localize("SR5.DeleteConfirmationApplication.Cancel")
+        }
+      },
+      default: "cancel",
+      templateData: {},
+      templatePath: "systems/shadowrun5e/dist/templates/apps/dialogs/delete-confirmation-dialog.html"
+    };
+  }
+  static get defaultOptions() {
+    const options = super.defaultOptions;
+    options.id = "delete-confirmation-application";
+    options.classes = ["sr5", "form-dialog"];
+    options.resizable = true;
+    options.height = "auto";
+    return options;
+  }
+};
+
+// src/module/helpers.ts
+var Helpers = class {
+  static calcTotal(value, options) {
+    if (value.mod === void 0)
+      value.mod = [];
+    const parts = new PartsList(value.mod);
+    if (!isNaN(value.temp) && Number(value.temp) !== 0) {
+      parts.addUniquePart("SR5.Temporary", value["temp"]);
+    }
+    value.base = value.base !== void 0 ? Number(value.base) : 0;
+    if (value.override) {
+      value.value = Helpers.applyValueRange(value.override.value, options);
+      return value.value;
+    }
+    switch (getType(value.base)) {
+      case "number":
+        value.value = Helpers.roundTo(parts.total + value.base, 3);
+        value.value = Helpers.applyValueRange(value.value, options);
+        break;
+      default:
+        value.value = parts.last === void 0 ? value.base : parts.last;
+        break;
+    }
+    value.mod = parts.list;
+    return value.value;
+  }
+  static roundTo(value, decimals) {
+    const multiplier = Math.pow(10, decimals);
+    return Math.round(value * multiplier) / multiplier;
+  }
+  static applyValueRange(value, options) {
+    if (typeof (options == null ? void 0 : options.min) === "number") {
+      value = Math.max(options.min, value);
+    }
+    if (typeof (options == null ? void 0 : options.max) === "number") {
+      value = Math.min(options.max, value);
+    }
+    return value;
+  }
+  static listItemId(event) {
+    return event.currentTarget.closest(".list-item").dataset.itemId;
+  }
+  static onSetFlag(data) {
+    if (typeof data !== "object")
+      return data;
+    if (data === void 0 || data === null)
+      return data;
+    const newData = {};
+    for (const [key, value] of Object.entries(data)) {
+      const newKey = key.replace("SR5.", "SR5_DOT_");
+      newData[newKey] = this.onSetFlag(value);
+    }
+    return newData;
+  }
+  static onGetFlag(data) {
+    if (typeof data !== "object")
+      return data;
+    if (data === void 0 || data === null)
+      return data;
+    const newData = {};
+    for (const [key, value] of Object.entries(data)) {
+      const newKey = key.replace("SR5_DOT_", "SR5.");
+      newData[newKey] = this.onGetFlag(value);
+    }
+    return newData;
+  }
+  static isMatrix(atts) {
+    var _a;
+    if (!atts)
+      return false;
+    if (typeof atts === "boolean")
+      return atts;
+    const matrixLabels = [
+      "SR5.MatrixAttrFirewall",
+      "SR5.MatrixAttrDataProcessing",
+      "SR5.MatrixAttrSleaze",
+      "SR5.MatrixAttrAttack",
+      "SR5.SkillComputer",
+      "SR5.SkillHacking",
+      "SR5.SkillCybercombat",
+      "SR5.SkillElectronicWarfare",
+      "SR5.Software"
+    ];
+    if (!Array.isArray(atts))
+      atts = [atts];
+    atts = atts.filter((att) => att);
+    for (const att of atts) {
+      if (typeof att === "string") {
+        if (matrixLabels.indexOf(att) >= 0) {
+          return true;
+        }
+      } else if (typeof att === "object" && att.label !== void 0) {
+        if (matrixLabels.indexOf((_a = att.label) != null ? _a : "") >= 0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  static parseInputToString(val) {
+    if (val === void 0)
+      return "";
+    if (typeof val === "number")
+      return val.toString();
+    if (typeof val === "string")
+      return val;
+    if (Array.isArray(val)) {
+      return val.join(",");
+    }
+    return "";
+  }
+  static parseInputToNumber(val) {
+    if (typeof val === "number")
+      return val;
+    if (typeof val === "string") {
+      const ret = +val;
+      if (!isNaN(ret))
+        return ret;
+      return 0;
+    }
+    if (Array.isArray(val)) {
+      const str = val.join("");
+      const ret = +str;
+      if (!isNaN(ret))
+        return ret;
+      return 0;
+    }
+    return 0;
+  }
+  static setupCustomCheckbox(app, html) {
+    const setContent = (el) => {
+      const checkbox = $(el).children("input[type=checkbox]");
+      const checkmark = $(el).children(".checkmark");
+      if ($(checkbox).prop("checked")) {
+        $(checkmark).addClass("fa-check-circle");
+        $(checkmark).removeClass("fa-circle");
+      } else {
+        $(checkmark).addClass("fa-circle");
+        $(checkmark).removeClass("fa-check-circle");
+      }
+    };
+    html.find("label.checkbox").each(function() {
+      setContent(this);
+    });
+    html.find("label.checkbox").click((event) => setContent(event.currentTarget));
+    html.find(".submit-checkbox").change((event) => app._onSubmit(event));
+  }
+  static mapRoundsToDefenseDesc(rounds) {
+    if (rounds === 1)
+      return "";
+    if (rounds === 3)
+      return "-2";
+    if (rounds === 6)
+      return "-5";
+    if (rounds === 10)
+      return "-9";
+    if (rounds === 20)
+      return "SR5.DuckOrCover";
+    return "";
+  }
+  static label(str) {
+    const frags = str.split("_");
+    for (let i = 0; i < frags.length; i++) {
+      frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
+    }
+    frags.forEach((frag, idx) => {
+      if (frag === "Processing")
+        frags[idx] = "Proc.";
+      if (frag === "Mechanic")
+        frags[idx] = "Mech.";
+    });
+    return frags.join(" ");
+  }
+  static orderKeys(obj) {
+    const keys = Object.keys(obj).sort(function keyOrder(k1, k2) {
+      if (k1 < k2)
+        return -1;
+      if (k1 > k2)
+        return 1;
+      return 0;
+    });
+    let i;
+    const after = {};
+    for (i = 0; i < keys.length; i++) {
+      after[keys[i]] = obj[keys[i]];
+      delete obj[keys[i]];
+    }
+    for (i = 0; i < keys.length; i++) {
+      obj[keys[i]] = after[keys[i]];
+    }
+    return obj;
+  }
+  static hasModifiers(event) {
+    return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
+  }
+  static filter(obj, comp) {
+    const retObj = {};
+    if (typeof obj === "object" && obj !== null) {
+      Object.entries(obj).forEach(([key, value]) => {
+        if (comp([key, value]))
+          retObj[key] = value;
+      });
+    }
+    return retObj;
+  }
+  static addLabels(obj, label) {
+    if (typeof obj === "object" && obj !== null) {
+      if (!obj.hasOwnProperty("label") && obj.hasOwnProperty("value") && label !== "") {
+        obj.label = label;
+      }
+      Object.entries(obj).filter(([, value]) => typeof value === "object").forEach(([key, value]) => Helpers.addLabels(value, key));
+    }
+  }
+  static shortenAttributeLocalization(label, length = 3) {
+    const name = game.i18n.localize(label);
+    if (length <= 0) {
+      return name;
+    }
+    if (name.length < length) {
+      length = name.length;
+    }
+    return name.slice(0, length).toUpperCase();
+  }
+  static getToken(id) {
+    if (!canvas || !canvas.ready || !canvas.tokens)
+      return;
+    for (const token of canvas.tokens.placeables) {
+      if (token.id === id) {
+        return token;
+      }
+    }
+  }
+  static getSceneTokenActor(sceneTokenId) {
+    const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(sceneTokenId);
+    const token = Helpers.getSceneTokenDocument(sceneId, tokenId);
+    if (!token)
+      return null;
+    return token.getActor();
+  }
+  static deconstructSceneTokenId(sceneTokenId) {
+    return sceneTokenId.split(".");
+  }
+  static getSceneTokenDocument(sceneId, tokenId) {
+    var _a;
+    const scene = (_a = game.scenes) == null ? void 0 : _a.get(sceneId);
+    if (!scene)
+      return;
+    const token = scene.tokens.get(tokenId);
+    if (!token)
+      return;
+    return token;
+  }
+  static getUserTargets(user) {
+    user = user ? user : game.user;
+    if (!user)
+      return [];
+    return Array.from(user.targets);
+  }
+  static userHasTargets(user) {
+    user = user ? user : game.user;
+    if (!user)
+      return false;
+    return user.targets.size > 0;
+  }
+  static measureTokenDistance(tokenOrigin, tokenDest) {
+    if (!canvas || !canvas.ready || !canvas.scene || !canvas.grid)
+      return 0;
+    if (!tokenOrigin || !tokenDest)
+      return 0;
+    const origin = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
+    const dest = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
+    const distanceInGridUnits = canvas.grid.measureDistance(origin, dest);
+    const sceneUnit = canvas.scene.data.gridUnits;
+    return Helpers.convertLengthUnit(distanceInGridUnits, sceneUnit);
+  }
+  static convertLengthUnit(length, fromUnit) {
+    fromUnit = fromUnit.toLowerCase();
+    if (!LENGTH_UNIT_TO_METERS_MULTIPLIERS.hasOwnProperty(fromUnit)) {
+      console.error(`Distance can't be converted from ${fromUnit} to ${LENGTH_UNIT}`);
+      return 0;
+    }
+    return Math.round(length * LENGTH_UNIT_TO_METERS_MULTIPLIERS[fromUnit]);
+  }
+  static getControlledTokens() {
+    if (!canvas || !canvas.ready || !canvas.tokens)
+      return [];
+    return canvas.tokens.controlled;
+  }
+  static userHasControlledTokens() {
+    if (!canvas || !canvas.ready || !canvas.tokens)
+      return false;
+    return canvas.tokens.controlled.length > 0;
+  }
+  static getControlledTokenActors() {
+    if (!canvas || !canvas.ready)
+      return [];
+    const tokens = Helpers.getControlledTokens();
+    return tokens.map((token) => token.actor);
+  }
+  static getTargetedTokens() {
+    if (!canvas.ready || !game.user)
+      return [];
+    return Array.from(game.user.targets);
+  }
+  static getSelectedActorsOrCharacter() {
+    if (!game.user)
+      return [];
+    const actors = Helpers.getControlledTokenActors();
+    if (actors.length === 0 && game.user.character) {
+      actors.push(game.user.character);
+    }
+    return actors;
+  }
+  static getTestTargetActors(testData) {
+    return __async(this, null, function* () {
+      const actors = [];
+      for (const uuid of testData.targetActorsUuid) {
+        const tokenOrActor = yield fromUuid(uuid);
+        let actor = tokenOrActor;
+        if (tokenOrActor instanceof TokenDocument) {
+          if (!tokenOrActor.actor)
+            continue;
+          actor = tokenOrActor.actor;
+        }
+        if (!(actor instanceof SR5Actor)) {
+          console.error(`Shadowrun5e | testData with targets containt UUID ${uuid} which doesn't provide an actor or syntheic actor`, tokenOrActor);
+          continue;
+        }
+        actors.push(actor);
+      }
+      return actors;
+    });
+  }
+  static createRangeDescription(label, distance, modifier) {
+    label = game.i18n.localize(label);
+    return { label, distance, modifier };
+  }
+  static convertIndexedObjectToArray(indexedObject) {
+    return Object.keys(indexedObject).map((index) => {
+      if (Number.isNaN(index)) {
+        console.warn("An object with no numerical index was given, which is likely a bug.", indexedObject);
+      }
+      return indexedObject[index];
+    });
+  }
+  static getChatSpeakerName(actor) {
+    if (!actor)
+      return "";
+    const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+    const token = actor.getToken();
+    if (useTokenNameForChatOutput && token)
+      return token.name;
+    return actor.name;
+  }
+  static getChatSpeakerImg(actor) {
+    if (!actor)
+      return "";
+    const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+    const token = actor.getToken();
+    if (useTokenForChatOutput && token)
+      return token.texture.src || "";
+    return actor.img || "";
+  }
+  static createDamageData(value, type, ap = 0, element = "", sourceItem) {
+    const damage = duplicate(DataDefaults.damage);
+    damage.base = value;
+    damage.value = value;
+    damage.type.base = type;
+    damage.type.value = type;
+    damage.ap.base = ap;
+    damage.ap.value = ap;
+    damage.element.base = element;
+    damage.element.value = element;
+    if (sourceItem && sourceItem.actor) {
+      damage.source = {
+        actorId: sourceItem.actor.id,
+        itemType: sourceItem.type,
+        itemId: sourceItem.id,
+        itemName: sourceItem.name
+      };
+    }
+    return damage;
+  }
+  static findDamageSource(damageData) {
+    if (!game.actors)
+      return;
+    if (!damageData.source) {
+      return;
+    }
+    const actorId = damageData.source.actorId;
+    const actorSource = game.actors.get(actorId);
+    if (!actorSource) {
+      return;
+    }
+    const itemId = damageData.source.itemId;
+    const actorItem = actorSource.items.get(itemId);
+    if (actorItem) {
+      return actorItem;
+    }
+    const tokens = actorSource.getActiveTokens();
+    let tokenItem;
+    tokens.forEach((token) => {
+      if (!token.actor)
+        return;
+      const foundItem = token.actor.items.get(itemId);
+      if (foundItem) {
+        tokenItem = foundItem;
+      }
+    });
+    return tokenItem;
+  }
+  static modifyDamageByHits(incoming, hits, modificationLabel) {
+    const modified = duplicate(incoming);
+    modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
+    modified.value = Helpers.calcTotal(modified, { min: 0 });
+    return { incoming, modified };
+  }
+  static reduceDamageByHits(incoming, hits, modificationLabel) {
+    if (hits < 0)
+      hits = 0;
+    return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
+  }
+  static confirmDeletion() {
+    return __async(this, null, function* () {
+      const dialog = new DeleteConfirmationDialog();
+      yield dialog.select();
+      return !dialog.canceled && dialog.selectedButton === "delete";
+    });
+  }
+  static getRandomIdSkillFieldDataEntry(skillDataPath, skillField, idLength = DEFAULT_ID_LENGTH) {
+    if (!skillDataPath || skillDataPath.length === 0)
+      return;
+    const id = randomID(idLength);
+    const updateSkillData = {
+      [skillDataPath]: { [id]: skillField }
+    };
+    return {
+      id,
+      updateSkillData
+    };
+  }
+  static getUpdateDataEntry(path, value) {
+    return { [path]: value };
+  }
+  static getDeleteKeyUpdateData(path, key) {
+    return { [path]: { [`-=${key}`]: null } };
+  }
+  static localizeSkill(skill) {
+    return skill.label ? game.i18n.localize(skill.label) : skill.name;
+  }
+  static sortSkills(skills, asc = true) {
+    const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
+      const comparatorA = Helpers.localizeSkill(a) || aId;
+      const comparatorB = Helpers.localizeSkill(b) || bId;
+      if (asc)
+        return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+      else
+        return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
+    });
+    const sortedAsObject = {};
+    for (const [id, skill] of sortedEntries) {
+      sortedAsObject[id] = skill;
+    }
+    return sortedAsObject;
+  }
+  static sortConfigValuesByTranslation(configValues, asc = true) {
+    const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
+      const comparatorA = game.i18n.localize(a);
+      const comparatorB = game.i18n.localize(b);
+      if (asc)
+        return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+      else
+        return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
+    });
+    const sortedAsObject = {};
+    for (const [key, translated] of sortedEntries) {
+      sortedAsObject[key] = translated;
+    }
+    return sortedAsObject;
+  }
+  static getPlayersWithPermission(document2, permission, active = true) {
+    if (!game.users)
+      return [];
+    return game.users.filter((user) => {
+      if (user.isGM)
+        return false;
+      if (!document2.testUserPermission(user, permission))
+        return false;
+      if (active && !user.active)
+        return false;
+      return true;
+    });
+  }
+  static getSkillLabelOrName(skill) {
+    return skill.label ? game.i18n.localize(skill.label) : skill.name || "";
+  }
+  static getEntityFromDropData(data) {
+    return __async(this, null, function* () {
+      if (!game.actors || !game.items)
+        return;
+      if (data.pack && data.type === "Actor")
+        return yield Helpers.getEntityFromCollection(data.pack, data.id);
+      if (data.pack && data.type === "Item")
+        return yield Helpers.getEntityFromCollection(data.pack, data.id);
+      if (data.type === "Actor")
+        return game.actors.get(data.id);
+      if (data.type === "Item")
+        return game.items.get(data.id);
+    });
+  }
+  static getEntityFromCollection(collection, id) {
+    return __async(this, null, function* () {
+      const pack = game.packs.find((p) => p.collection === collection);
+      return yield pack.getDocument(id);
+    });
+  }
+  static isValidMarkId(markId) {
+    if (!game.scenes)
+      return false;
+    const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
+    const scene = game.scenes.get(sceneId);
+    if (!scene)
+      return false;
+    const tokenDocument = scene.tokens.get(targetId);
+    if (!tokenDocument)
+      return false;
+    const actor = tokenDocument.actor;
+    if (itemId && !(actor == null ? void 0 : actor.items.get(itemId)))
+      return false;
+    return true;
+  }
+  static buildMarkId(sceneId, targetId, itemId, separator = "/") {
+    return [sceneId, targetId, itemId || ""].join(separator);
+  }
+  static deconstructMarkId(markId, separator = "/") {
+    const ids = markId.split(separator);
+    if (ids.length !== 3) {
+      console.error("A mark id must always be of length 3");
+    }
+    return ids;
+  }
+  static getMarkIdDocuments(markId) {
+    var _a, _b;
+    if (!game.scenes || !game.items)
+      return;
+    const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
+    const scene = game.scenes.get(sceneId);
+    if (!scene)
+      return;
+    const target = scene.tokens.get(targetId) || game.items.get(targetId);
+    const item = (_b = (_a = target == null ? void 0 : target.actor) == null ? void 0 : _a.items) == null ? void 0 : _b.get(itemId);
+    return {
+      scene,
+      target,
+      item
+    };
+  }
+  static objectHasKeys(obj, keys) {
+    for (const key of keys) {
+      if (!obj.hasOwnProperty(key))
+        return false;
+    }
+    return true;
+  }
+  static getPackAction(packName, actionName) {
+    return __async(this, null, function* () {
+      console.info(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
+      const pack = game.packs.find((pack2) => pack2.metadata.system === SYSTEM_NAME && pack2.metadata.name === packName);
+      if (!pack)
+        return;
+      const packEntry = pack.index.find((data) => {
+        var _a;
+        return ((_a = data.name) == null ? void 0 : _a.toLowerCase().replace(new RegExp(" ", "g"), "_")) === actionName.toLowerCase();
+      });
+      if (!packEntry)
+        return;
+      const item = yield pack.getDocument(packEntry._id);
+      if (!item || item.type !== "action")
+        return;
+      console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
+      return item;
+    });
+  }
+  static renderEntityLinkSheet(event) {
+    return __async(this, null, function* () {
+      const element = $(event.currentTarget);
+      const uuid = element.data("uuid");
+      yield Helpers.renderDocumentSheet(uuid);
+    });
+  }
+  static renderDocumentSheet(uuid, resolveTokenToActor = true) {
+    return __async(this, null, function* () {
+      if (!uuid)
+        return;
+      let document2 = yield fromUuid(uuid);
+      if (!document2)
+        return;
+      if (document2 instanceof TokenDocument && resolveTokenToActor && document2.actor)
+        document2 = document2.actor;
+      yield document2.sheet.render(true);
+    });
+  }
+  static injectWeaponTestIntoChangeData(type, changeData, applyData) {
+    var _a;
+    if (((_a = changeData == null ? void 0 : changeData.system) == null ? void 0 : _a.category) === void 0)
+      return;
+    if (changeData.system.category === "") {
+      foundry.utils.setProperty(applyData, "system.action.test", "");
+      return;
+    }
+    const test = SR5.weaponCategoryActiveTests[changeData.system.category];
+    if (!test) {
+      console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.system.category}.`, changeData);
+    }
+    foundry.utils.setProperty(applyData, "system.action.test", test);
+    foundry.utils.setProperty(applyData, "system.action.opposed.test", "PhysicalDefenseTest");
+    foundry.utils.setProperty(applyData, "system.action.opposed.resist.test", "PhysicalResistTest");
+  }
+  static injectSpellTestIntoChangeData(type, changeData, applyData) {
+    var _a;
+    if (((_a = changeData == null ? void 0 : changeData.system) == null ? void 0 : _a.category) === void 0)
+      return;
+    if (changeData.system.category === "") {
+      foundry.utils.setProperty(applyData, "system.action.test", "");
+      return;
+    }
+    const test = SR5.activeTests[type];
+    const opposedTest = SR5.opposedTests[type][changeData.system.category] || "OpposedTest";
+    const resistTest = SR5.opposedResistTests[type][changeData.system.category] || "";
+    foundry.utils.setProperty(applyData, "system.action.test", test);
+    foundry.utils.setProperty(applyData, "system.action.opposed.test", opposedTest);
+    foundry.utils.setProperty(applyData, "system.action.opposed.resist.test", resistTest);
+  }
+  static injectComplexFormTestIntoChangeData(type, changeData, applyData) {
+    const test = SR5.activeTests[type];
+    foundry.utils.setProperty(applyData, "system.action.test", test);
+  }
+  static injectActionTestsIntoChangeData(type, changeData, applyData) {
+    if (!changeData)
+      return;
+    const typeHandler = {
+      "weapon": Helpers.injectWeaponTestIntoChangeData,
+      "spell": Helpers.injectSpellTestIntoChangeData,
+      "complex_form": Helpers.injectComplexFormTestIntoChangeData
+    };
+    const handler = typeHandler[type];
+    if (!handler)
+      return;
+    handler(type, changeData, applyData);
+  }
+};
+
+// src/module/handlebars/RollAndLabelHelpers.ts
+var registerRollAndLabelHelpers = () => {
+  Handlebars.registerHelper("damageAbbreviation", function(damage) {
+    if (damage === "physical")
+      return "P";
+    if (damage === "stun")
+      return "S";
+    if (damage === "matrix")
+      return "M";
+    return "";
+  });
+  Handlebars.registerHelper("damageCode", function(damage) {
+    const typeCode = Handlebars.helpers.damageAbbreviation(damage.type.value);
+    let code = `${damage.value}${typeCode}`;
+    return new Handlebars.SafeString(code);
+  });
+  Handlebars.registerHelper("diceIcon", function(side) {
+    if (side) {
+      switch (side) {
+        case 1:
+          return "red";
+        case 2:
+          return "grey";
+        case 3:
+          return "grey";
+        case 4:
+          return "grey";
+        case 5:
+          return "green";
+        case 6:
+          return "green";
+      }
+    }
+  });
+  Handlebars.registerHelper("elementIcon", function(element) {
+    let icon = "";
+    if (element === "electricity") {
+      icon = "fas fa-bolt";
+    } else if (element === "radiation") {
+      icon = "fas fa-radiation-alt";
+    } else if (element === "fire") {
+      icon = "fas fa-fire";
+    } else if (element === "acid") {
+      icon = "fas fa-vials";
+    } else if (element === "cold") {
+      icon = "fas fa-snowflake";
+    }
+    return icon;
+  });
+  Handlebars.registerHelper("partsTotal", function(partsList) {
+    const parts = new PartsList(partsList);
+    return parts.total;
+  });
+  Handlebars.registerHelper("signedValue", function(value) {
+    return value > 0 ? `+${value}` : `${value}`;
+  });
+  Handlebars.registerHelper("speakerName", Helpers.getChatSpeakerName);
+  Handlebars.registerHelper("speakerImg", Helpers.getChatSpeakerImg);
+};
+
+// src/module/handlebars/ItemLineHelpers.ts
+var registerItemLineHelpers = () => {
+  Handlebars.registerHelper("ItemHeaderIcons", function(type) {
+    const PlusIcon = "fas fa-plus";
+    const AddText = game.i18n.localize("SR5.Add");
+    const addIcon = {
+      icon: PlusIcon,
+      text: AddText,
+      title: game.i18n.localize("SR5.CreateItem"),
+      cssClass: "item-create",
+      data: {}
+    };
+    switch (type) {
+      case "lifestyle":
+        addIcon.title = game.i18n.localize("SR5.CreateItemLifestyle");
+        return [addIcon];
+      case "contact":
+        addIcon.title = game.i18n.localize("SR5.CreateItemContact");
+        return [addIcon];
+      case "sin":
+        addIcon.title = game.i18n.localize("SR5.CreateItemSIN");
+        return [addIcon];
+      case "license":
+        addIcon.title = game.i18n.localize("SR5.CreateItemLicense");
+        return [addIcon];
+      case "quality":
+        addIcon.title = game.i18n.localize("SR5.CreateItemQuality");
+        return [addIcon];
+      case "adept_power":
+        addIcon.title = game.i18n.localize("SR5.CreateItemAdeptPower");
+        return [addIcon];
+      case "action":
+        addIcon.title = game.i18n.localize("SR5.CreateItemAction");
+        return [addIcon];
+      case "spell":
+        addIcon.title = game.i18n.localize("SR5.CreateItemSpell");
+        return [addIcon];
+      case "gear":
+        addIcon.title = game.i18n.localize("SR5.CreateItemGear");
+        return [addIcon];
+      case "complex_form":
+        addIcon.title = game.i18n.localize("SR5.CreateItemComplexForm");
+        return [addIcon];
+      case "program":
+        addIcon.title = game.i18n.localize("SR5.CreateItemProgram");
+        return [addIcon];
+      case "weapon":
+        addIcon.title = game.i18n.localize("SR5.CreateItemWeapon");
+        return [addIcon];
+      case "armor":
+        addIcon.title = game.i18n.localize("SR5.CreateItemArmor");
+        return [addIcon];
+      case "ammo":
+        addIcon.title = game.i18n.localize("SR5.CreateItemAmmo");
+        return [addIcon];
+      case "modification":
+        addIcon.title = game.i18n.localize("SR5.CreateItemModification");
+        return [addIcon];
+      case "device":
+        addIcon.title = game.i18n.localize("SR5.CreateItemDevice");
+        return [addIcon];
+      case "equipment":
+        addIcon.title = game.i18n.localize("SR5.CreateItemEquipment");
+        return [addIcon];
+      case "cyberware":
+        addIcon.title = game.i18n.localize("SR5.CreateItemCyberware");
+        return [addIcon];
+      case "bioware":
+        addIcon.title = game.i18n.localize("SR5.CreateItemBioware");
+        return [addIcon];
+      case "critter_power":
+        addIcon.title = game.i18n.localize("SR5.CreateItemCritterPower");
+        return [addIcon];
+      case "sprite_power":
+        addIcon.title = game.i18n.localize("SR5.CreateItemSpritePower");
+        return [addIcon];
+      case "effect":
+        addIcon.title = game.i18n.localize("SR5.CreateEffect");
+        addIcon.cssClass = "effect-control";
+        addIcon.data = { action: "create" };
+        return [addIcon];
+      default:
+        return [];
+    }
+  });
+  Handlebars.registerHelper("InventoryIcons", function(name) {
+    const addItemIcon = {
+      icon: "fas fa-plus",
+      text: game.i18n.localize("SR5.Add"),
+      title: game.i18n.localize("SR5.CreateItem"),
+      cssClass: "inventory-item-create",
+      data: { inventory: name }
+    };
+    return [addItemIcon];
+  });
+  Handlebars.registerHelper("ItemHeaderRightSide", function(id) {
+    switch (id) {
+      case "action":
+        return [
+          {
+            text: {
+              text: game.i18n.localize("SR5.Skill"),
+              cssClass: "six"
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.Attribute"),
+              cssClass: "six"
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.Attribute"),
+              cssClass: "six"
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.Limit"),
+              cssClass: "six"
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.Modifier"),
+              cssClass: "six"
+            }
+          }
+        ];
+      case "weapon":
+      case "armor":
+      case "device":
+      case "equipment":
+      case "cyberware":
+      case "bioware":
+      case "modification":
+      case "ammo":
+        return [
+          {
+            text: {
+              text: game.i18n.localize("SR5.Qty")
+            }
+          }
+        ];
+      case "complex_form":
+        return [
+          {
+            text: {
+              text: game.i18n.localize("SR5.Target")
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.Duration")
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.Fade")
+            }
+          }
+        ];
+      case "adept_power":
+        return [
+          {
+            text: {
+              text: game.i18n.localize("SR5.PowerType")
+            }
+          }
+        ];
+      case "spell":
+        return [
+          {
+            text: {
+              text: game.i18n.localize("SR5.SpellType")
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.SpellRange")
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.Duration")
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.Drain")
+            }
+          }
+        ];
+      case "critter_power":
+        return [
+          {
+            text: {
+              text: game.i18n.localize("SR5.CritterPower.Type")
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.CritterPower.Range")
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize("SR5.CritterPower.Duration")
+            }
+          }
+        ];
+      case "quality":
+        return [
+          {
+            text: {
+              text: game.i18n.localize("SR5.QualityType")
+            }
+          }
+        ];
+      default:
+        return [];
+    }
+  });
+  Handlebars.registerHelper("ItemRightSide", function(item) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r;
+    const wrapper = new SR5ItemDataWrapper(item);
+    const qtyInput = {
+      input: {
+        type: "number",
+        value: wrapper.getQuantity(),
+        cssClass: "item-qty"
+      }
+    };
+    switch (item.type) {
+      case "action":
+        return [
+          {
+            text: {
+              text: game.i18n.localize(SR5.activeSkills[(_a = wrapper.getActionSkill()) != null ? _a : ""]),
+              cssClass: "six"
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize(SR5.attributes[(_b = wrapper.getActionAttribute()) != null ? _b : ""]),
+              cssClass: "six"
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize(SR5.attributes[(_c = wrapper.getActionAttribute2()) != null ? _c : ""]),
+              cssClass: "six"
+            }
+          },
+          {
+            text: {
+              text: wrapper.getLimitAttribute() ? game.i18n.localize(SR5.attributes[(_d = wrapper.getLimitAttribute()) != null ? _d : ""]) : wrapper.getActionLimit(),
+              cssClass: "six"
+            }
+          },
+          {
+            text: {
+              text: wrapper.getActionDicePoolMod(),
+              cssClass: "six"
+            }
+          }
+        ];
+      case "armor":
+      case "ammo":
+      case "modification":
+      case "device":
+      case "equipment":
+      case "cyberware":
+      case "bioware":
+        return [qtyInput];
+      case "weapon":
+        if (wrapper.isRangedWeapon()) {
+          const count = (_f = (_e = wrapper.getAmmo()) == null ? void 0 : _e.current.value) != null ? _f : 0;
+          const max = (_h = (_g = wrapper.getAmmo()) == null ? void 0 : _g.current.max) != null ? _h : 0;
+          const text = count < max || max === 0 ? `${game.i18n.localize("SR5.WeaponReload")} (${count}/${max})` : game.i18n.localize("SR5.AmmoFull");
+          const cssClass = "no-break" + (count < max ? " reload-ammo roll" : "faded");
+          return [
+            {
+              text: {
+                title: `${game.i18n.localize("SR5.WeaponAmmoCount")}: ${count}`,
+                text,
+                cssClass
+              }
+            },
+            {
+              text: {
+                text: ""
+              }
+            },
+            qtyInput
+          ];
+        } else {
+          return [qtyInput];
+        }
+      case "quality":
+        return [
+          {
+            text: {
+              text: game.i18n.localize(SR5.qualityTypes[(_i = item.data.type) != null ? _i : ""])
+            }
+          }
+        ];
+      case "adept_power":
+        return [
+          {
+            text: {
+              text: game.i18n.localize(SR5.adeptPower.types[(_j = item.data.type) != null ? _j : ""])
+            }
+          }
+        ];
+      case "spell":
+        return [
+          {
+            text: {
+              text: game.i18n.localize(SR5.spellTypes[(_k = item.data.type) != null ? _k : ""])
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize(SR5.spellRanges[(_l = item.data.range) != null ? _l : ""])
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize(SR5.durations[(_m = item.data.duration) != null ? _m : ""])
+            }
+          },
+          {
+            text: {
+              text: wrapper.getDrain()
+            }
+          }
+        ];
+      case "critter_power":
+        return [
+          {
+            text: {
+              text: game.i18n.localize(SR5.critterPower.types[(_n = item.data.powerType) != null ? _n : ""])
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize(SR5.critterPower.ranges[(_o = item.data.range) != null ? _o : ""])
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize(SR5.critterPower.durations[(_p = item.data.duration) != null ? _p : ""])
+            }
+          }
+        ];
+      case "complex_form":
+        return [
+          {
+            text: {
+              text: game.i18n.localize(SR5.matrixTargets[(_q = item.data.target) != null ? _q : ""])
+            }
+          },
+          {
+            text: {
+              text: game.i18n.localize(SR5.durations[(_r = item.data.duration) != null ? _r : ""])
+            }
+          },
+          {
+            text: {
+              text: String(item.data.fade)
+            }
+          }
+        ];
+      case "program":
+        return [
+          {
+            button: {
+              cssClass: `item-equip-toggle ${wrapper.isEquipped() ? "light" : ""}`,
+              short: true,
+              text: wrapper.isEquipped() ? game.i18n.localize("SR5.Loaded") : game.i18n.localize("SR5.Load") + " >>"
+            }
+          }
+        ];
+      default:
+        return [];
+    }
+  });
+  Handlebars.registerHelper("ItemIcons", function(item) {
+    const wrapper = new SR5ItemDataWrapper(item);
+    const editIcon = {
+      icon: "fas fa-edit item-edit",
+      title: game.i18n.localize("SR5.EditItem")
+    };
+    const removeIcon = {
+      icon: "fas fa-trash item-delete",
+      title: game.i18n.localize("SR5.DeleteItem")
+    };
+    const equipIcon = {
+      icon: `${wrapper.isEquipped() ? "fas fa-check-circle" : "far fa-circle"} item-equip-toggle`,
+      title: game.i18n.localize("SR5.ToggleEquip")
+    };
+    const pdfIcon = {
+      icon: "fas fa-file open-source-pdf",
+      title: game.i18n.localize("SR5.OpenSourcePdf")
+    };
+    const icons = [editIcon, removeIcon];
+    if (ui["PDFoundry"]) {
+      icons.unshift(pdfIcon);
+    }
+    switch (wrapper.getType()) {
+      case "program":
+      case "armor":
+      case "device":
+      case "equipment":
+      case "cyberware":
+      case "bioware":
+      case "weapon":
+        icons.unshift(equipIcon);
+    }
+    return icons;
+  });
+  Handlebars.registerHelper("InventoryItemIcons", function(item) {
+    const wrapper = new SR5ItemDataWrapper(item);
+    const moveIcon = {
+      icon: "fas fa-exchange-alt inventory-item-move",
+      title: game.i18n.localize("SR5.MoveItemInventory")
+    };
+    const editIcon = {
+      icon: "fas fa-edit item-edit",
+      title: game.i18n.localize("SR5.EditItem")
+    };
+    const removeIcon = {
+      icon: "fas fa-trash item-delete",
+      title: game.i18n.localize("SR5.DeleteItem")
+    };
+    const equipIcon = {
+      icon: `${wrapper.isEquipped() ? "fas fa-check-circle" : "far fa-circle"} item-equip-toggle`,
+      title: game.i18n.localize("SR5.ToggleEquip")
+    };
+    const pdfIcon = {
+      icon: "fas fa-file open-source-pdf",
+      title: game.i18n.localize("SR5.OpenSourcePdf")
+    };
+    const icons = [moveIcon, editIcon, removeIcon];
+    if (ui["PDFoundry"]) {
+      icons.unshift(pdfIcon);
+    }
+    switch (wrapper.getType()) {
+      case "program":
+      case "armor":
+      case "device":
+      case "equipment":
+      case "cyberware":
+      case "bioware":
+      case "weapon":
+        icons.unshift(equipIcon);
+    }
+    return icons;
+  });
+  Handlebars.registerHelper("EffectIcons", function(effect) {
+    const editIcon = {
+      icon: "fas fa-edit effect-control",
+      title: game.i18n.localize("SR5.EditItem"),
+      data: { action: "edit" }
+    };
+    const removeIcon = {
+      icon: "fas fa-trash effect-control",
+      title: game.i18n.localize("SR5.DeleteItem"),
+      data: { action: "delete" }
+    };
+    const disableIcon = {
+      icon: `${effect.data.disabled ? "far fa-circle" : "fas fa-check-circle"} effect-control`,
+      title: game.i18n.localize("SR5.ToggleActive"),
+      data: { action: "toggle" }
+    };
+    const openOriginIcon = {
+      icon: "fas fa-file effect-control",
+      title: game.i18n.localize("SR5.OpenOrigin"),
+      data: { action: "open-origin" }
+    };
+    let icons = [disableIcon, editIcon, removeIcon];
+    if (effect.isOriginOwned)
+      icons = [openOriginIcon, ...icons];
+    return icons;
+  });
+  Handlebars.registerHelper("EffectData", function(effectType) {
+    return { "effect-type": effectType };
+  });
+  Handlebars.registerHelper("MarksRightSide", (marked) => {
+    const quantityInput = {
+      input: {
+        type: "number",
+        value: marked.marks,
+        cssClass: "marks-qty"
+      }
+    };
+    return [quantityInput];
+  });
+  Handlebars.registerHelper("MarksIcons", (marked) => {
+    const incrementIcon = {
+      icon: "fas fa-plus marks-add-one",
+      title: game.i18n.localize("SR5.Labels.Sheet.AddOne"),
+      data: { action: "add-one" }
+    };
+    const decrementIcon = {
+      icon: "fas fa-minus marks-remove-one",
+      title: game.i18n.localize("SR5.Labels.Sheet.SubtractOne"),
+      data: { action: "remove-one" }
+    };
+    return [incrementIcon, decrementIcon];
+  });
+  Handlebars.registerHelper("MarkListHeaderRightSide", () => {
+    return [
+      {
+        text: {
+          text: game.i18n.localize("SR5.FOUNDRY.Scene")
+        }
+      },
+      {
+        text: {
+          text: game.i18n.localize("SR5.FOUNDRY.Item")
+        }
+      },
+      {
+        text: {
+          text: game.i18n.localize("SR5.Qty")
+        }
+      }
+    ];
+  });
+  Handlebars.registerHelper("MarkListHeaderIcons", () => {
+    return [{
+      icon: "fas fa-trash",
+      title: game.i18n.localize("SR5.ClearMarks"),
+      text: game.i18n.localize("SR5.Del"),
+      cssClass: "marks-clear-all"
+    }];
+  });
+  Handlebars.registerHelper("NetworkDevicesListRightSide", () => {
+    return [
+      {
+        text: {
+          text: game.i18n.localize("SR5.FOUNDRY.Actor")
+        }
+      },
+      {
+        text: {
+          text: game.i18n.localize("SR5.FOUNDRY.Item")
+        }
+      }
+    ];
+  });
+  Handlebars.registerHelper("NetworkDevicesListHeaderIcons", () => {
+    return [{
+      icon: "fas fa-trash",
+      title: game.i18n.localize("SR5.Labels.Sheet.ClearNetwork"),
+      text: game.i18n.localize("SR5.Del"),
+      cssClass: "network-clear"
+    }];
+  });
+};
+
+// src/module/handlebars/SkillLineHelpers.ts
+var registerSkillLineHelpers = () => {
+  Handlebars.registerHelper("SkillHeaderIcons", function(category) {
+    const addIcon = {
+      icon: "fas fa-plus",
+      title: game.i18n.localize("SR5.AddSkill"),
+      text: game.i18n.localize("SR5.Add"),
+      cssClass: ""
+    };
+    switch (category) {
+      case "active":
+        addIcon.cssClass = "add-active";
+        return [addIcon];
+      case "language":
+        addIcon.cssClass = "add-language";
+        return [addIcon];
+      case "knowledge":
+        addIcon.cssClass = "add-knowledge";
+        return [addIcon];
+      default:
+        return [];
+    }
+  });
+  Handlebars.registerHelper("SkillHeaderRightSide", function(id, filters) {
+    const specs = {
+      text: {
+        text: game.i18n.localize("SR5.Specialization"),
+        cssClass: "skill-spec-item"
+      }
+    };
+    const rtg = {
+      text: {
+        text: !filters || filters.showUntrainedSkills ? game.i18n.localize("SR5.Rtg") : game.i18n.localize("SR5.RtgAboveZero"),
+        cssClass: "rtg"
+      }
+    };
+    switch (id) {
+      case "active":
+      case "knowledge":
+      case "language":
+        return [specs, rtg];
+      default:
+        return [];
+    }
+  });
+  Handlebars.registerHelper("SkillRightSide", function(skillType, skill) {
+    const specs = Array.isArray(skill.specs) ? skill.specs : [skill.specs];
+    return [
+      {
+        html: {
+          text: specs.map((spec) => `<span class="roll skill-spec-roll">${spec}</span>`).join(", "),
+          cssClass: "skill-spec-item"
+        }
+      },
+      {
+        text: {
+          text: Helpers.calcTotal(skill),
+          cssClass: "rtg"
+        }
+      }
+    ];
+  });
+  Handlebars.registerHelper("SkillAdditionCssClass", function(skill) {
+    const classes = [];
+    if (game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) && !SkillRules.allowDefaultingRoll(skill)) {
+      classes.push("skill-roll-not-defaultable");
+    }
+    return classes;
+  });
+  Handlebars.registerHelper("SkillIcons", function(skillType, skill) {
+    const editIcon = {
+      icon: "fas fa-edit",
+      title: game.i18n.localize("SR5.EditSkill"),
+      cssClass: ""
+    };
+    const removeIcon = {
+      icon: "fas fa-trash",
+      title: game.i18n.localize("SR5.DeleteSkill"),
+      cssClass: ""
+    };
+    switch (skillType) {
+      case "active":
+        editIcon.cssClass = "skill-edit";
+        removeIcon.cssClass = "remove-active";
+        return [editIcon, removeIcon];
+      case "language":
+        editIcon.cssClass = "language-skill-edit";
+        removeIcon.cssClass = "remove-language";
+        return [editIcon, removeIcon];
+      case "knowledge":
+        editIcon.cssClass = "knowledge-skill-edit";
+        removeIcon.cssClass = "remove-knowledge";
+        return [editIcon, removeIcon];
+      default:
+        return [editIcon];
+    }
+  });
+};
+
+// src/module/handlebars/AppHelpers.ts
+var registerAppHelpers = () => {
+  Handlebars.registerHelper("IsEnvModifierActive", (active, category, modifier) => {
+    return active[category] === modifier;
+  });
+};
 
 // src/module/handlebars/BasicHelpers.ts
 var registerBasicHelpers = () => {
@@ -19961,218 +19928,84 @@ var SR5Token = class extends Token {
   }
 };
 
-// src/module/canvas.ts
-var measureDistance = function(segments, options = {}) {
-  if (!game || !game.ready || !canvas || !canvas.ready)
-    return 0;
-  if (!options.gridSpaces)
-    return BaseGrid.prototype.measureDistances.call(this, segments, options);
-  let nDiagonal = 0;
-  const rule = this.parent.diagonalRule;
-  const d = canvas.dimensions;
-  return segments.map((s) => {
-    let r = s.ray;
-    let nx = Math.abs(Math.ceil(r.dx / d.size));
-    let ny = Math.abs(Math.ceil(r.dy / d.size));
-    let nd = Math.min(nx, ny);
-    let ns = Math.abs(ny - nx);
-    nDiagonal += nd;
-    if (rule === "1-2-1") {
-      let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
-      let spaces = nd10 * 2 + (nd - nd10) + ns;
-      return spaces * canvas.dimensions.distance;
-    } else if (rule === "EUCL") {
-      return Math.round(Math.hypot(nx, ny) * canvas.scene.data.gridDistance);
-    } else
-      return (ns + nd) * canvas.scene.data.gridDistance;
-  });
-};
-
-// src/module/macros.ts
-function createItemMacro(item, slot) {
-  return __async(this, null, function* () {
-    var _a;
-    if (!game || !game.macros)
-      return;
-    const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    let macro = game.macros.contents.find((m) => m.name === item.name);
-    if (!macro) {
-      macro = yield Macro.create(
-        {
-          name: item.name,
-          type: "script",
-          img: item.img,
-          command,
-          flags: { "shadowrun5e.itemMacro": true }
-        },
-        { renderSheet: false }
-      );
-    }
-    if (macro)
-      (_a = game.user) == null ? void 0 : _a.assignHotbarMacro(macro, slot);
-  });
-}
-function rollItemMacro(itemName) {
-  var _a;
-  if (!game || !game.actors)
-    return;
-  const speaker = ChatMessage.getSpeaker();
-  let actor;
-  if (speaker.token)
-    actor = game.actors.tokens[speaker.token];
-  if (!speaker.actor)
-    return;
-  if (!actor)
-    actor = game.actors.get(speaker.actor);
-  const item = actor ? actor.items.find((i) => i.name === itemName) : null;
-  if (!item) {
-    return (_a = ui.notifications) == null ? void 0 : _a.warn(`Your controlled Actor does not have an item named ${itemName}`);
+// src/module/effect/SR5ActiveEffect.ts
+var SR5ActiveEffect = class extends ActiveEffect {
+  get isOriginOwned() {
+    if (!this.origin)
+      return false;
+    const path = this.origin.split(".");
+    if (path[0] === "Scene" && path.length === 6)
+      return true;
+    if (path[0] === "Actor" && path.length === 4)
+      return true;
+    return false;
   }
-  return item.castAction();
-}
-function createSkillMacro(data, slot) {
-  return __async(this, null, function* () {
-    if (!game.macros || !game.user)
-      return;
-    const { skillId, skill } = data;
-    const name = Helpers.getSkillLabelOrName(skill);
-    const existingMacro = game.macros.contents.find((macro2) => macro2.name === name);
-    if (existingMacro)
-      return;
-    const command = `game.shadowrun5e.rollSkillMacro("${name}");`;
-    const macro = yield Macro.create({
-      name,
-      type: "script",
-      command
+  get source() {
+    return this.origin ? fromUuid(this.origin) : null;
+  }
+  renderSourceSheet() {
+    return __async(this, null, function* () {
+      var _a;
+      const document2 = yield this.source;
+      return (_a = document2 == null ? void 0 : document2.sheet) == null ? void 0 : _a.render(true);
     });
-    if (macro)
-      yield game.user.assignHotbarMacro(macro, slot);
-  });
-}
-function rollSkillMacro(skillLabel) {
-  return __async(this, null, function* () {
-    if (!game || !game.actors)
-      return;
-    if (!skillLabel)
-      return;
-    const speaker = ChatMessage.getSpeaker();
-    if (!speaker)
-      return;
-    const actor = game.actors.tokens[speaker.token] || game.actors.get(speaker.actor);
-    if (!actor)
-      return;
-    yield actor.rollSkill(skillLabel, { byLabel: true });
-  });
-}
-
-// src/module/apps/gmtools/OverwatchScoreTracker.js
-var _OverwatchScoreTracker = class extends Application {
-  static get defaultOptions() {
-    const options = super.defaultOptions;
-    options.id = "overwatch-score-tracker";
-    options.classes = ["sr5"];
-    options.title = game.i18n.localize("SR5.OverwatchScoreTrackerTitle");
-    options.template = "systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.html";
-    options.width = 450;
-    options.height = "auto";
-    options.resizable = true;
-    return options;
   }
-  getData(options) {
-    const actors = this._prepareCharacterActorsData();
-    _OverwatchScoreTracker.addedActors.forEach((id) => {
-      const actor = game.actors.get(id);
-      if (actor) {
-        actors.push(actor.toObject());
-      }
+  toggleDisabled() {
+    return __async(this, null, function* () {
+      return this.update({ disabled: !this.disabled });
     });
-    this.actors = actors;
-    return {
-      actors
-    };
   }
-  _prepareCharacterActorsData() {
-    return game.users.reduce((acc, user) => {
-      if (!user.isGM && user.character) {
-        acc.push(user.character.toObject());
-      }
-      return acc;
-    }, []);
-  }
-  activateListeners(html) {
-    html.find(".overwatch-score-reset").on("click", this._resetOverwatchScore.bind(this));
-    html.find(".overwatch-score-add").on("click", this._addOverwatchScore.bind(this));
-    html.find(".overwatch-score-input").on("change", this._setOverwatchScore.bind(this));
-    html.find(".overwatch-score-roll-15-minutes").on("click", this._rollFor15Minutes.bind(this));
-    html.find(".overwatch-score-add-actor").on("click", this._onAddActor.bind(this));
-  }
-  _getActorFromEvent(event) {
-    const id = $(event.currentTarget).closest(".list-item").data("actorId");
-    if (id)
-      return game.actors.get(id);
-  }
-  _onAddActor(event) {
-    var _a;
-    event.preventDefault();
-    const tokens = Helpers.getControlledTokens();
-    if (tokens.length === 0) {
-      return (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.OverwatchScoreTracker.NotifyNoSelectedTokens"));
-    }
-    const unlinkedActor = tokens.find((token) => !token.data.actorLink);
-    if (unlinkedActor !== void 0) {
-      ui.notifications.warn(game.i18n.localize("SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported"));
-    }
-    tokens.filter((token) => token.data.actorLink).forEach((token) => {
-      const actor = game.actors.get(token.data.actorId);
-      if (!actor)
-        return;
-      if (this._isActorOnTracker(actor))
-        return;
-      _OverwatchScoreTracker.addedActors.push(actor.id);
+  disable(disabled) {
+    return __async(this, null, function* () {
+      return this.update({ disabled });
     });
-    this.render();
   }
-  _isActorOnTracker(actor) {
-    return this.actors.find((actorData) => actorData._id === actor.id) !== void 0;
+  _applyCustom(actor, change, current, delta, changes) {
+    return this._applyModify(actor, change, current, delta, changes);
   }
-  _setOverwatchScore(event) {
-    const actor = this._getActorFromEvent(event);
-    const amount = event.currentTarget.value;
-    if (amount && actor) {
-      actor.setOverwatchScore(amount).then(() => this.render());
+  _applyModify(actor, change, current, delta, changes) {
+    if (this._isKeyModifiableValue(actor, change.key)) {
+      const value = foundry.utils.getProperty(actor.data, change.key);
+      value.mod.push({ name: this.label, value: Number(change.value) });
+      return null;
     }
-  }
-  _addOverwatchScore(event) {
-    const actor = this._getActorFromEvent(event);
-    const amount = parseInt(event.currentTarget.dataset.amount);
-    if (amount && actor) {
-      const os = actor.getOverwatchScore();
-      actor.setOverwatchScore(os + amount).then(() => this.render());
+    const nodes = change.key.split(".");
+    nodes.pop();
+    const indirectKey = nodes.join(".");
+    if (this._isKeyModifiableValue(actor, indirectKey)) {
+      const value = foundry.utils.getProperty(actor.data, indirectKey);
+      value.mod.push({ name: this.label, value: Number(change.value) });
+      return null;
     }
+    return super._applyAdd(actor, change, current, delta, changes);
   }
-  _resetOverwatchScore(event) {
-    event.preventDefault();
-    const actor = this._getActorFromEvent(event);
-    if (actor) {
-      actor.setOverwatchScore(0).then(() => this.render());
+  _applyOverride(actor, change, current, delta, changes) {
+    if (this._isKeyModifiableValue(actor, change.key)) {
+      const value = foundry.utils.getProperty(actor.data, change.key);
+      value.override = { name: this.label, value: Number(change.value) };
+      value.value = change.value;
+      return null;
     }
+    const nodes = change.key.split(".");
+    nodes.pop();
+    const indirectKey = nodes.join(".");
+    if (this._isKeyModifiableValue(actor, indirectKey)) {
+      const value = foundry.utils.getProperty(actor.data, indirectKey);
+      value.override = { name: this.label, value: Number(change.value) };
+      return null;
+    }
+    return super._applyOverride(actor, change, current, delta, changes);
   }
-  _rollFor15Minutes(event) {
-    event.preventDefault();
-    const actor = this._getActorFromEvent(event);
-    if (actor) {
-      const roll = new Roll(_OverwatchScoreTracker.MatrixOverwatchDiceCount);
-      roll.evaluate({ async: false });
-      if (roll.total) {
-        const os = actor.getOverwatchScore();
-        actor.setOverwatchScore(os + roll.total).then(() => this.render());
-      }
-    }
+  _isKeyModifiableValue(actor, key) {
+    const possibleValue = foundry.utils.getProperty(actor.data, key);
+    const possibleValueType = foundry.utils.getType(possibleValue);
+    return possibleValue && possibleValueType === "Object" && Helpers.objectHasKeys(possibleValue, this.minValueKeys);
+  }
+  get minValueKeys() {
+    return ["value", "mod"];
   }
 };
-var OverwatchScoreTracker = _OverwatchScoreTracker;
-__publicField(OverwatchScoreTracker, "MatrixOverwatchDiceCount", "2d6");
-__publicField(OverwatchScoreTracker, "addedActors", []);
+SR5ActiveEffect.LOG_V10_COMPATIBILITY_WARNINGS = false;
 
 // src/module/combat/SR5Combat.ts
 var SR5Combat = class extends Combat {
@@ -20466,6 +20299,115 @@ function _combatantGetInitiativeFormula() {
   const combat = this.parent;
   return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
+
+// src/module/apps/gmtools/OverwatchScoreTracker.js
+var _OverwatchScoreTracker = class extends Application {
+  static get defaultOptions() {
+    const options = super.defaultOptions;
+    options.id = "overwatch-score-tracker";
+    options.classes = ["sr5"];
+    options.title = game.i18n.localize("SR5.OverwatchScoreTrackerTitle");
+    options.template = "systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.html";
+    options.width = 450;
+    options.height = "auto";
+    options.resizable = true;
+    return options;
+  }
+  getData(options) {
+    const actors = this._prepareCharacterActorsData();
+    _OverwatchScoreTracker.addedActors.forEach((id) => {
+      const actor = game.actors.get(id);
+      if (actor) {
+        actors.push(actor.toObject());
+      }
+    });
+    this.actors = actors;
+    return {
+      actors
+    };
+  }
+  _prepareCharacterActorsData() {
+    return game.users.reduce((acc, user) => {
+      if (!user.isGM && user.character) {
+        acc.push(user.character.toObject());
+      }
+      return acc;
+    }, []);
+  }
+  activateListeners(html) {
+    html.find(".overwatch-score-reset").on("click", this._resetOverwatchScore.bind(this));
+    html.find(".overwatch-score-add").on("click", this._addOverwatchScore.bind(this));
+    html.find(".overwatch-score-input").on("change", this._setOverwatchScore.bind(this));
+    html.find(".overwatch-score-roll-15-minutes").on("click", this._rollFor15Minutes.bind(this));
+    html.find(".overwatch-score-add-actor").on("click", this._onAddActor.bind(this));
+  }
+  _getActorFromEvent(event) {
+    const id = $(event.currentTarget).closest(".list-item").data("actorId");
+    if (id)
+      return game.actors.get(id);
+  }
+  _onAddActor(event) {
+    var _a;
+    event.preventDefault();
+    const tokens = Helpers.getControlledTokens();
+    if (tokens.length === 0) {
+      return (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.OverwatchScoreTracker.NotifyNoSelectedTokens"));
+    }
+    const unlinkedActor = tokens.find((token) => !token.data.actorLink);
+    if (unlinkedActor !== void 0) {
+      ui.notifications.warn(game.i18n.localize("SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported"));
+    }
+    tokens.filter((token) => token.data.actorLink).forEach((token) => {
+      const actor = game.actors.get(token.data.actorId);
+      if (!actor)
+        return;
+      if (this._isActorOnTracker(actor))
+        return;
+      _OverwatchScoreTracker.addedActors.push(actor.id);
+    });
+    this.render();
+  }
+  _isActorOnTracker(actor) {
+    return this.actors.find((actorData) => actorData._id === actor.id) !== void 0;
+  }
+  _setOverwatchScore(event) {
+    const actor = this._getActorFromEvent(event);
+    const amount = event.currentTarget.value;
+    if (amount && actor) {
+      actor.setOverwatchScore(amount).then(() => this.render());
+    }
+  }
+  _addOverwatchScore(event) {
+    const actor = this._getActorFromEvent(event);
+    const amount = parseInt(event.currentTarget.dataset.amount);
+    if (amount && actor) {
+      const os = actor.getOverwatchScore();
+      actor.setOverwatchScore(os + amount).then(() => this.render());
+    }
+  }
+  _resetOverwatchScore(event) {
+    event.preventDefault();
+    const actor = this._getActorFromEvent(event);
+    if (actor) {
+      actor.setOverwatchScore(0).then(() => this.render());
+    }
+  }
+  _rollFor15Minutes(event) {
+    event.preventDefault();
+    const actor = this._getActorFromEvent(event);
+    if (actor) {
+      const roll = new Roll(_OverwatchScoreTracker.MatrixOverwatchDiceCount);
+      roll.evaluate({ async: false });
+      if (roll.total) {
+        const os = actor.getOverwatchScore();
+        actor.setOverwatchScore(os + roll.total).then(() => this.render());
+      }
+    }
+  }
+};
+var OverwatchScoreTracker = _OverwatchScoreTracker;
+__publicField(OverwatchScoreTracker, "MatrixOverwatchDiceCount", "2d6");
+__publicField(OverwatchScoreTracker, "addedActors", []);
 
 // src/module/importer/importer/Constants.ts
 var Constants = class {
@@ -22671,978 +22613,6 @@ var EnvModifiersApplication = class extends Application {
       html.find(".col.right").after(container);
     });
   }
-};
-
-// src/test/sr5.Modifiers.spec.ts
-var shadowrunRulesModifiers = (context) => {
-  const { describe, it, assert } = context;
-  const defaultModifiers = {
-    environmental: {
-      active: {},
-      total: 0
-    }
-  };
-  const activeModifiers = {
-    environmental: {
-      active: {
-        wind: -1,
-        light: -1
-      },
-      total: -3
-    }
-  };
-  describe("SR5 Modifiers", () => {
-    it("should create default modifier values", () => {
-      const modifiers = Modifiers.getDefaultModifiers();
-      assert.deepEqual(modifiers, defaultModifiers);
-    });
-    it("should use default modifiers for faulty constructor params", () => {
-      assert.deepEqual(new Modifiers({}).data, defaultModifiers);
-      assert.deepEqual(new Modifiers(void 0).data, defaultModifiers);
-      assert.deepEqual(new Modifiers(null).data, defaultModifiers);
-      assert.deepEqual(new Modifiers(0).data, defaultModifiers);
-      assert.deepEqual(new Modifiers(1).data, defaultModifiers);
-      assert.deepEqual(new Modifiers().data, defaultModifiers);
-    });
-    it("should set an environmental modifier active", () => {
-      const modifiers = new Modifiers(defaultModifiers);
-      modifiers._setEnvironmentalCategoryActive("wind", -1);
-    });
-    it("should set an environmental modifier inactive", () => {
-      const modifiers = new Modifiers({
-        environmental: {
-          active: {
-            wind: -1,
-            light: -3
-          },
-          total: 0
-        }
-      });
-      modifiers._setEnvironmentalCategoryInactive("wind");
-      assert.deepEqual(modifiers.environmental.active, { light: -3 });
-    });
-    it("should understand active environmental modifiers", () => {
-      const modifiersActive = new Modifiers({
-        environmental: {
-          active: {
-            wind: -1,
-            light: -3
-          },
-          total: 0
-        }
-      });
-      assert.equal(modifiersActive.hasActiveEnvironmental, true);
-      const modifiersInactive = new Modifiers({
-        environmental: {
-          active: {},
-          total: 0
-        }
-      });
-      assert.equal(modifiersInactive.hasActiveEnvironmental, false);
-    });
-    it("should calculate the total according to sr5 rules", () => {
-      const modifiers = new Modifiers(defaultModifiers);
-      assert.equal(modifiers.environmental.total, 0);
-      modifiers.environmental.active.wind = -1;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -1);
-      modifiers.environmental.active.light = -1;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.range = -1;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      delete modifiers.environmental.active.light;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.light = 0;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.wind = -3;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.light = -3;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.range = -3;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      delete modifiers.environmental.active.light;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.light = 0;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.wind = -6;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.light = -6;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-      modifiers.environmental.active.range = -6;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-      delete modifiers.environmental.active.light;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-      modifiers.environmental.active.light = 0;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-      modifiers.environmental.active.value = 0;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, 0);
-      modifiers.environmental.active.value = -1;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -1);
-      modifiers.environmental.active.value = -3;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.value = -6;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.value = -10;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-    });
-    it("should reset active environmental modifiers", () => {
-      const modifiers = new Modifiers(activeModifiers);
-      modifiers._resetEnvironmental();
-      assert.deepEqual(modifiers.environmental.active, {});
-    });
-    it("should calculate total for faulty active", () => {
-      const modifiers = new Modifiers({
-        environmental: {
-          total: -1,
-          active: {
-            light: null,
-            wind: void 0,
-            range: "",
-            visibility: "string"
-          }
-        }
-      });
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, 0);
-    });
-  });
-};
-
-// src/test/utils.ts
-var SR5TestingDocuments = class {
-  constructor(documentClass) {
-    this.documents = {};
-    this.documentClass = documentClass;
-  }
-  create(data) {
-    return __async(this, null, function* () {
-      const document2 = yield this.documentClass.create(__spreadValues(__spreadValues({ name: `#QUENCH_TEST_DOCUMENT_SHOULD_HAVE_BEEN_DELETED` }, data), { folder: this.folder }));
-      this.documents[document2.id] = document2;
-      return document2;
-    });
-  }
-  delete(id) {
-    return __async(this, null, function* () {
-      const document2 = this.documents[id];
-      if (!document2)
-        return;
-      yield this.documentClass.deleteDocuments([document2.data._id]);
-      delete this.documents[document2.id];
-    });
-  }
-  teardown() {
-    return __async(this, null, function* () {
-      yield this.documentClass.deleteDocuments(Object.values(this.documents).map((document2) => document2.id));
-    });
-  }
-};
-
-// src/test/sr5.SR5Item.spec.ts
-var shadowrunSR5Item = (context) => {
-  const { describe, it, assert, before, after } = context;
-  let testItem;
-  before(() => __async(void 0, null, function* () {
-    testItem = new SR5TestingDocuments(SR5Item);
-  }));
-  after(() => __async(void 0, null, function* () {
-    yield testItem.teardown();
-  }));
-  describe("SR5Items", () => {
-    it("create a naked item of any type", () => __async(void 0, null, function* () {
-      var _a;
-      const item = yield testItem.create({ type: "action" });
-      assert.notStrictEqual(item.id, "");
-      assert.notStrictEqual(item.id, void 0);
-      assert.notStrictEqual(item.id, null);
-      const itemFromCollection = (_a = game.items) == null ? void 0 : _a.get(item.id);
-      assert.notStrictEqual(itemFromCollection, null);
-      assert.strictEqual(item.id, itemFromCollection == null ? void 0 : itemFromCollection.id);
-    }));
-    it("update an item of any type", () => __async(void 0, null, function* () {
-      const item = yield testItem.create({ type: "action" });
-      assert.notProperty(item.data.data, "test");
-      yield item.update({ "data.test": true });
-      assert.property(item.data.data, "test");
-      assert.propertyVal(item.data.data, "test", true);
-    }));
-    it("embedd a ammo into a weapon and not the global item collection", () => __async(void 0, null, function* () {
-      var _a;
-      const weapon = yield testItem.create({ type: "weapon" });
-      const ammo = yield testItem.create({ type: "ammo" });
-      yield weapon.createNestedItem(ammo.data);
-      const embeddedItemDatas = weapon.getNestedItems();
-      assert.isNotEmpty(embeddedItemDatas);
-      assert.lengthOf(embeddedItemDatas, 1);
-      const embeddedAmmoData = embeddedItemDatas[0];
-      assert.strictEqual(embeddedAmmoData.type, ammo.data.type);
-      const embeddedAmmoInCollection = (_a = game.items) == null ? void 0 : _a.get(embeddedAmmoData._id);
-      assert.strictEqual(embeddedAmmoInCollection, void 0);
-    }));
-    it("update an embedded ammo", () => __async(void 0, null, function* () {
-      const weapon = yield testItem.create({ type: "weapon" });
-      const ammo = yield testItem.create({ type: "ammo" });
-      yield weapon.createNestedItem(ammo.data);
-      const embeddedItemDatas = weapon.getNestedItems();
-      assert.lengthOf(embeddedItemDatas, 1);
-      const embeddedAmmoData = embeddedItemDatas[0];
-      const embeddedAmmo = weapon.getOwnedItem(embeddedAmmoData._id);
-      assert.notStrictEqual(embeddedAmmo, void 0);
-      assert.instanceOf(embeddedAmmo, SR5Item);
-      if (!embeddedAmmo)
-        return;
-      assert.notProperty(embeddedAmmo.data.data, "test");
-      yield embeddedAmmo.update({ "data.test": true });
-      assert.property(embeddedAmmo.data.data, "test");
-      assert.propertyVal(embeddedAmmo.data.data, "test", true);
-    }));
-  });
-};
-
-// src/test/sr5.Matrix.spec.ts
-var shadowrunMatrix = (context) => {
-  const { describe, it, assert, before, after } = context;
-  describe("Matrix Rules", () => {
-    it("calculate IC device rating", () => {
-      let hostRating = 5;
-      assert.strictEqual(MatrixRules.getICDeviceRating(hostRating), hostRating);
-      hostRating = -1;
-      assert.strictEqual(MatrixRules.getICDeviceRating(hostRating), 0);
-    });
-    it("calculate IC condition monitor", () => {
-      assert.strictEqual(MatrixRules.getConditionMonitor(0), 8);
-      assert.strictEqual(MatrixRules.getConditionMonitor(1), 9);
-      assert.strictEqual(MatrixRules.getConditionMonitor(4), 10);
-      assert.strictEqual(MatrixRules.getConditionMonitor(-1), 8);
-    });
-    it("calculate IC matrix initiative base", () => {
-      assert.strictEqual(MatrixRules.getICInitiativeBase(0), 0);
-      assert.strictEqual(MatrixRules.getICInitiativeBase(-3), 0);
-      assert.strictEqual(MatrixRules.getICInitiativeBase(1), 2);
-      assert.strictEqual(MatrixRules.getICInitiativeBase(2), 4);
-      assert.strictEqual(MatrixRules.getICInitiativeBase(3), 6);
-      assert.strictEqual(MatrixRules.getICInitiativeBase(12), 24);
-    });
-    it("calculate IC matrix initiative dice", () => {
-      assert.strictEqual(MatrixRules.getICInitiativeDice(), 4);
-    });
-    it("calculate meat attribute base with the host rating", () => {
-      assert.strictEqual(MatrixRules.getICMeatAttributeBase(0), 0);
-      assert.strictEqual(MatrixRules.getICMeatAttributeBase(-3), 0);
-      assert.strictEqual(MatrixRules.getICMeatAttributeBase(3), 3);
-      assert.strictEqual(MatrixRules.getICMeatAttributeBase(27), 27);
-    });
-    it("disallow invalid marks counters", () => {
-      assert.isTrue(MatrixRules.isValidMarksCount(0));
-      assert.isTrue(MatrixRules.isValidMarksCount(1));
-      assert.isTrue(MatrixRules.isValidMarksCount(2));
-      assert.isTrue(MatrixRules.isValidMarksCount(3));
-      assert.isFalse(MatrixRules.isValidMarksCount(-1));
-      assert.isFalse(MatrixRules.isValidMarksCount(4));
-      assert.isFalse(MatrixRules.isValidMarksCount(1.5));
-    });
-    it("return valid marks counts", () => {
-      assert.strictEqual(MatrixRules.getValidMarksCount(-1), MatrixRules.minMarksCount());
-      assert.strictEqual(MatrixRules.getValidMarksCount(0), 0);
-      assert.strictEqual(MatrixRules.getValidMarksCount(1), 1);
-      assert.strictEqual(MatrixRules.getValidMarksCount(2), 2);
-      assert.strictEqual(MatrixRules.getValidMarksCount(3), 3);
-      assert.strictEqual(MatrixRules.getValidMarksCount(4), MatrixRules.maxMarksCount());
-    });
-    it("return expected host matrix attribute ratings", () => {
-      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
-      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
-      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);
-    });
-  });
-};
-
-// src/test/sr5.SR5Actor.spec.ts
-var shadowrunSR5Actor = (context) => {
-  const { describe, it, assert, before, after } = context;
-  let testActor;
-  let testItem;
-  before(() => __async(void 0, null, function* () {
-    testActor = new SR5TestingDocuments(SR5Actor);
-    testItem = new SR5TestingDocuments(SR5Item);
-  }));
-  after(() => __async(void 0, null, function* () {
-    yield testActor.teardown();
-    yield testItem.teardown();
-  }));
-  describe("SR5Actor", () => {
-    it("create a naked actor of any type", () => __async(void 0, null, function* () {
-      var _a;
-      const actor = yield testActor.create({ type: "character" });
-      assert.notStrictEqual(actor.id, "");
-      assert.notStrictEqual(actor.id, void 0);
-      assert.notStrictEqual(actor.id, null);
-      const fromCollection = (_a = game.actors) == null ? void 0 : _a.get(actor.id);
-      assert.isOk(fromCollection);
-      assert.strictEqual(actor.id, fromCollection == null ? void 0 : fromCollection.id);
-    }));
-    it("update an actor of any time", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      assert.notProperty(actor.data.data, "test");
-      yield actor.update({ "data.test": true });
-      assert.property(actor.data.data, "test");
-      assert.propertyVal(actor.data.data, "test", true);
-    }));
-    it("embedd a weapon into an actor and not the global item colection", () => __async(void 0, null, function* () {
-      var _a;
-      const actor = yield testActor.create({ type: "character" });
-      const weapon = yield testItem.create({ type: "weapon" });
-      yield actor.createEmbeddedDocuments("Item", [weapon.data]);
-      const ownedItems = Array.from(actor.items);
-      assert.isNotEmpty(ownedItems);
-      assert.lengthOf(ownedItems, 1);
-      const ownedItem = ownedItems[0];
-      assert.strictEqual(ownedItem.type, weapon.data.type);
-      const ownedInCollection = (_a = game.items) == null ? void 0 : _a.get(ownedItem.id);
-      assert.isNotOk(ownedInCollection);
-    }));
-  });
-};
-
-// src/test/sr5.ActorDataPrep.spec.ts
-var shadowrunSR5ActorDataPrep = (context) => {
-  const { describe, it, assert, before, after } = context;
-  let testActor;
-  let testItem;
-  before(() => __async(void 0, null, function* () {
-    testActor = new SR5TestingDocuments(SR5Actor);
-    testItem = new SR5TestingDocuments(SR5Item);
-  }));
-  after(() => __async(void 0, null, function* () {
-    yield testActor.teardown();
-    yield testItem.teardown();
-  }));
-  describe("CharacterDataPrep", () => {
-    it("Character default attribute values", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character", metatype: "human" });
-      console.log("Physical attributes");
-      assert.strictEqual(actor.data.data.attributes.body.value, SR.attributes.ranges["body"].min);
-      assert.strictEqual(actor.data.data.attributes.agility.value, SR.attributes.ranges["agility"].min);
-      assert.strictEqual(actor.data.data.attributes.reaction.value, SR.attributes.ranges["reaction"].min);
-      assert.strictEqual(actor.data.data.attributes.strength.value, SR.attributes.ranges["strength"].min);
-      assert.strictEqual(actor.data.data.attributes.willpower.value, SR.attributes.ranges["willpower"].min);
-      assert.strictEqual(actor.data.data.attributes.logic.value, SR.attributes.ranges["logic"].min);
-      assert.strictEqual(actor.data.data.attributes.intuition.value, SR.attributes.ranges["intuition"].min);
-      assert.strictEqual(actor.data.data.attributes.charisma.value, SR.attributes.ranges["charisma"].min);
-      console.log("Comon special attributes");
-      assert.strictEqual(actor.data.data.attributes.edge.value, SR.attributes.ranges["edge"].min);
-      assert.strictEqual(actor.data.data.attributes.essence.value, SR.attributes.defaults["essence"]);
-      console.log("Special special attributes");
-      assert.strictEqual(actor.data.data.attributes.resonance.value, SR.attributes.ranges["resonance"].min);
-      assert.strictEqual(actor.data.data.attributes.magic.value, SR.attributes.ranges["magic"].min);
-    }));
-    it("Character monitor calculation", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      let data = actor.asCharacter();
-      assert.strictEqual(data.data.track.stun.max, 9);
-      assert.strictEqual(data.data.track.physical.max, 9);
-      assert.strictEqual(data.data.track.physical.overflow.max, SR.attributes.ranges.body.min);
-      yield actor.update({
-        "data.attributes.body.base": 6,
-        "data.attributes.willpower.base": 6
-      });
-      assert.strictEqual(data.data.track.stun.max, 11);
-      assert.strictEqual(data.data.track.physical.max, 11);
-      assert.strictEqual(data.data.track.physical.overflow.max, 6);
-    }));
-    it("Character initiative calculation", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
-      console.log("Meatspace Ini");
-      assert.strictEqual(data.data.initiative.meatspace.base.base, 2);
-      assert.strictEqual(data.data.initiative.meatspace.dice.base, 1);
-      console.log("Matrix AR Ini");
-      assert.strictEqual(data.data.initiative.matrix.base.base, 1);
-      assert.strictEqual(data.data.initiative.matrix.dice.base, 3);
-      console.log("Magic Ini");
-      assert.strictEqual(data.data.initiative.astral.base.base, 2);
-      assert.strictEqual(data.data.initiative.astral.dice.base, 2);
-    }));
-    it("Character limit calculation", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
-      assert.strictEqual(data.data.limits.physical.value, 2);
-      assert.strictEqual(data.data.limits.mental.value, 2);
-      assert.strictEqual(data.data.limits.social.value, 3);
-      yield actor.update({
-        "data.attributes.strength.base": 6,
-        "data.attributes.body.base": 6,
-        "data.attributes.reaction.base": 6,
-        "data.attributes.logic.base": 6,
-        "data.attributes.intuition.base": 6,
-        "data.attributes.willpower.base": 6,
-        "data.attributes.charisma.base": 6,
-        "data.attributes.essence.base": 6
-      });
-      assert.strictEqual(data.data.limits.physical.value, 8);
-      assert.strictEqual(data.data.limits.mental.value, 8);
-      assert.strictEqual(data.data.limits.social.value, 8);
-    }));
-    it("Character movement calculation", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
-      assert.strictEqual(data.data.movement.walk.value, 2);
-      assert.strictEqual(data.data.movement.run.value, 4);
-      yield actor.update({
-        "data.attributes.agility.base": 6
-      });
-      assert.strictEqual(data.data.movement.walk.value, 12);
-      assert.strictEqual(data.data.movement.run.value, 24);
-    }));
-    it("Character skill calculation", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
-      yield actor.update({
-        "data.skills.active.arcana.base": 6,
-        "data.skills.active.arcana.bonus": [{ key: "Test", value: 1 }],
-        "data.skills.active.arcana.specs": ["Test"]
-      });
-      assert.strictEqual(data.data.skills.active.arcana.value, 7);
-    }));
-    it("Character damage application", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
-      assert.strictEqual(data.data.track.stun.value, 0);
-      assert.strictEqual(data.data.track.stun.wounds, 0);
-      assert.strictEqual(data.data.track.physical.value, 0);
-      assert.strictEqual(data.data.track.physical.wounds, 0);
-      assert.strictEqual(data.data.wounds.value, 0);
-      yield actor.update({
-        "data.track.stun.value": 3,
-        "data.track.physical.value": 3
-      });
-      assert.strictEqual(data.data.track.stun.value, 3);
-      assert.strictEqual(data.data.track.stun.wounds, 1);
-      assert.strictEqual(data.data.track.physical.value, 3);
-      assert.strictEqual(data.data.track.physical.wounds, 1);
-      assert.strictEqual(data.data.wounds.value, 2);
-    }));
-    it("Character damage application with high pain/wound tolerance", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
-      yield actor.update({
-        "data.track.stun.value": 6,
-        "data.track.physical.value": 6,
-        "data.modifiers.wound_tolerance": 3
-      });
-      assert.strictEqual(data.data.track.stun.value, 6);
-      assert.strictEqual(data.data.track.stun.wounds, 1);
-      assert.strictEqual(data.data.track.physical.value, 6);
-      assert.strictEqual(data.data.track.physical.wounds, 1);
-      assert.strictEqual(data.data.wounds.value, 2);
-    }));
-  });
-  describe("SpiritDataPrep", () => {
-    it("Spirits are always magical", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "spirit" });
-      assert.strictEqual(actor.data.data.special, "magic");
-    }));
-    it("Spirit default/overrides by example type", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "spirit", "data.spiritType": "air" });
-      const data = actor.asSpirit();
-      assert.strictEqual(data.data.attributes.body.base, -2);
-      assert.strictEqual(data.data.attributes.agility.base, 3);
-      assert.strictEqual(data.data.attributes.reaction.base, 4);
-      assert.strictEqual(data.data.attributes.strength.base, -3);
-      assert.strictEqual(data.data.attributes.intuition.base, 0);
-      assert.strictEqual(data.data.initiative.meatspace.base.base, 4);
-      assert.strictEqual(data.data.skills.active.assensing.base, 0);
-      yield actor.update({
-        "data.force": 6
-      });
-      assert.strictEqual(data.data.attributes.body.base, 4);
-      assert.strictEqual(data.data.attributes.agility.base, 9);
-      assert.strictEqual(data.data.attributes.reaction.base, 10);
-      assert.strictEqual(data.data.attributes.strength.base, 3);
-      assert.strictEqual(data.data.attributes.intuition.base, 6);
-      assert.strictEqual(data.data.initiative.meatspace.base.base, 16);
-      assert.strictEqual(data.data.skills.active.assensing.base, 6);
-      assert.strictEqual(data.data.skills.active.arcana.base, 0);
-    }));
-  });
-  describe("SpriteDataPrep", () => {
-    it("Sprites are always awakened", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "sprite" });
-      assert.strictEqual(actor.data.data.special, "resonance");
-    }));
-    it("Sprites default/override values by example type", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "sprite", "data.spriteType": "courier" });
-      const data = actor.asSprite();
-      assert.strictEqual(data.data.matrix.sleaze.base, 3);
-      assert.strictEqual(data.data.matrix.data_processing.base, 1);
-      assert.strictEqual(data.data.matrix.firewall.base, 2);
-      assert.strictEqual(data.data.matrix.sleaze.base, 3);
-      assert.strictEqual(data.data.initiative.matrix.base.base, 1);
-      assert.strictEqual(data.data.skills.active.hacking.base, 0);
-      yield actor.update({
-        "data.level": 6
-      });
-      assert.strictEqual(data.data.level, 6);
-      assert.strictEqual(data.data.matrix.sleaze.base, 9);
-      assert.strictEqual(data.data.matrix.data_processing.base, 7);
-      assert.strictEqual(data.data.matrix.firewall.base, 8);
-      assert.strictEqual(data.data.matrix.sleaze.base, 9);
-      assert.strictEqual(data.data.initiative.matrix.base.base, 13);
-      assert.strictEqual(data.data.initiative.matrix.dice.base, 4);
-      assert.strictEqual(data.data.skills.active.hacking.base, 6);
-      assert.strictEqual(data.data.skills.active.computer.base, 6);
-      assert.strictEqual(data.data.skills.active.electronic_warfare.base, 0);
-    }));
-  });
-};
-
-// src/test/sr5.ActiveEffect.spec.ts
-var shadowrunSR5ActiveEffect = (context) => {
-  const { describe, it, assert, before, after } = context;
-  let testActor;
-  let testItem;
-  before(() => __async(void 0, null, function* () {
-    testActor = new SR5TestingDocuments(SR5Actor);
-    testItem = new SR5TestingDocuments(SR5Item);
-  }));
-  after(() => __async(void 0, null, function* () {
-    yield testActor.teardown();
-    yield testItem.teardown();
-  }));
-  describe("SR5ActiveEffect", () => {
-    it("apply the custom modify mode", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      const effect = yield actor.createEmbeddedDocuments("ActiveEffect", [{
-        origin: actor.uuid,
-        disabled: false,
-        label: "Test Effect"
-      }]);
-      yield effect[0].update({
-        "changes": [
-          { key: "data.attributes.body.mod", value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
-          { key: "data.attributes.body", value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
-        ]
-      });
-      assert.deepEqual(actor.data.data.attributes.body.mod, [{
-        name: "Test Effect",
-        value: 2
-      }, { name: "Test Effect", value: 2 }]);
-      assert.strictEqual(actor.data.data.attributes.body.value, 4);
-      yield effect[0].update({
-        "changes": [
-          { key: "data.attributes.body.mod", value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
-          { key: "data.attributes.body.mod", value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
-        ]
-      });
-    }));
-    it("apply custom modify mode, none ModifiableValue should work as the add mode", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      const effect = yield actor.createEmbeddedDocuments("ActiveEffect", [{
-        origin: actor.uuid,
-        disabled: false,
-        label: "Test Effect"
-      }]);
-      yield effect[0].update({
-        "changes": [{
-          key: "data.modifiers.global",
-          value: 3,
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM
-        }]
-      });
-      assert.strictEqual(actor.data.data.modifiers.global, 3);
-      assert.strictEqual(actor.data.data.modifiers.global.mod, void 0);
-      assert.strictEqual(actor.data.data.modifiers.global.override, void 0);
-      it("apply the custom override mode", () => __async(void 0, null, function* () {
-        const actor2 = yield testActor.create({ type: "character" });
-        const effect2 = yield actor2.createEmbeddedDocuments("ActiveEffect", [{
-          origin: actor2.uuid,
-          disabled: false,
-          label: "Test Effect"
-        }]);
-        yield effect2[0].update({
-          "changes": [
-            { key: "data.attributes.body", value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
-            { key: "data.attributes.body.value", value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
-          ]
-        });
-        assert.deepEqual(actor2.data.data.attributes.body.override, { name: "Test Effect", value: 3 });
-        assert.deepEqual(actor2.data.data.attributes.body.mod, []);
-        assert.strictEqual(actor2.data.data.attributes.body.value, 3);
-      }));
-      it("apply custom override mode, should override all existing .mod values", () => __async(void 0, null, function* () {
-        it("apply the custom override mode", () => __async(void 0, null, function* () {
-          const actor2 = yield testActor.create({ type: "character" });
-          const effect2 = yield actor2.createEmbeddedDocuments("ActiveEffect", [{
-            origin: actor2.uuid,
-            disabled: false,
-            label: "Test Effect"
-          }]);
-          yield effect2[0].update({
-            "changes": [
-              { key: "data.attributes.body.mod", value: 5, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-              { key: "data.attributes.body.value", value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
-            ]
-          });
-          assert.strictEqual(actor2.data.data.attributes.body.mod.length, 1);
-          assert.deepEqual(actor2.data.data.attributes.body.override, { name: "Test Effect", value: 3 });
-          assert.deepEqual(actor2.data.data.attributes.body.mod, [{ name: "Test Effect", value: 5 }]);
-          assert.strictEqual(actor2.data.data.attributes.body.value, 3);
-        }));
-      }));
-      it("apply custom override mode, none ModifiableValue should work without altering anything", () => __async(void 0, null, function* () {
-        const actor2 = yield testActor.create({ type: "character" });
-        const effect2 = yield actor2.createEmbeddedDocuments("ActiveEffect", [{
-          origin: actor2.uuid,
-          disabled: false,
-          label: "Test Effect"
-        }]);
-        yield effect2[0].update({
-          "changes": [{
-            key: "data.modifiers.global",
-            value: 3,
-            mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
-          }]
-        });
-        assert.strictEqual(actor2.data.data.modifiers.global, 3);
-        assert.strictEqual(actor2.data.data.modifiers.global.mod, void 0);
-        assert.strictEqual(actor2.data.data.modifiers.global.override, void 0);
-      }));
-    }));
-  });
-};
-
-// src/test/sr5.NetworkDevices.spec.ts
-var shadowrunNetworkDevices = (context) => {
-  const { describe, it, assert, should, before, after } = context;
-  let testActor;
-  let testItem;
-  let testScene;
-  before(() => __async(void 0, null, function* () {
-    testActor = new SR5TestingDocuments(SR5Actor);
-    testItem = new SR5TestingDocuments(SR5Item);
-    testScene = new SR5TestingDocuments(Scene);
-  }));
-  after(() => __async(void 0, null, function* () {
-    yield testActor.teardown();
-    yield testItem.teardown();
-    yield testScene.teardown();
-  }));
-  describe("Network Devices handling", () => {
-    it("give a network link to given document class", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ "type": "character" });
-      const link = NetworkDeviceFlow.buildLink(actor);
-      const nodes = link.split(".");
-      assert.strictEqual(nodes[0], "Actor");
-      assert.strictEqual(nodes.length, 2);
-    }));
-    it("resolve a network link back to a sidebar document", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ "type": "character" });
-      const link = NetworkDeviceFlow.buildLink(actor);
-      const resolvedActor = yield NetworkDeviceFlow.resolveLink(link);
-      assert.isNotNull(resolvedActor);
-      assert.strictEqual(resolvedActor == null ? void 0 : resolvedActor.id, actor.id);
-    }));
-    it("resolve a network link back to a embedded collection document", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ "type": "character" });
-      const item = yield testItem.create({ type: "weapon" });
-      const embeddedItems = yield actor.createEmbeddedDocuments("Item", [item.data]);
-      const embeddedItem = embeddedItems[0];
-      const link = NetworkDeviceFlow.buildLink(embeddedItem);
-      const resolvedItem = yield NetworkDeviceFlow.resolveLink(link);
-      assert.isNotNull(resolvedItem);
-      assert.strictEqual(resolvedItem == null ? void 0 : resolvedItem.id, embeddedItem == null ? void 0 : embeddedItem.id);
-    }));
-    it("resolve a network link back to a token collection document", () => __async(void 0, null, function* () {
-      const scene = yield testScene.create({ name: "Test" });
-      const actor = yield testActor.create({ "type": "character" });
-      const token = yield getDocumentClass("Token").create(yield actor.getTokenData({ x: 0, y: 0 }), { parent: scene });
-      const link = NetworkDeviceFlow.buildLink(token);
-      const resolvedToken = yield NetworkDeviceFlow.resolveLink(link);
-      assert.isNotNull(resolvedToken);
-      assert.strictEqual(token == null ? void 0 : token.id, resolvedToken == null ? void 0 : resolvedToken.id);
-    }));
-    it("connect a device controller to a network device", () => __async(void 0, null, function* () {
-      const controller = yield testItem.create({ type: "device" });
-      const device = yield testItem.create({ type: "weapon" });
-      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
-      assert.strictEqual(device.data.data.technology.networkController, controller.uuid);
-      assert.strictEqual(yield NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
-      assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
-    }));
-    it("connect a host controller to a network device", () => __async(void 0, null, function* () {
-      const controller = yield testItem.create({ type: "host" });
-      const device = yield testItem.create({ type: "weapon" });
-      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
-      assert.strictEqual(device.data.data.technology.networkController, controller.uuid);
-      assert.strictEqual(yield NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
-      assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
-    }));
-    it("get all connected network devices of a controller as their Document", () => __async(void 0, null, function* () {
-      const controller = yield testItem.create({ type: "device" });
-      const devices = [
-        yield testItem.create({ type: "weapon" })
-      ];
-      for (const device of devices) {
-        yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
-      }
-      const fetchedDevices = NetworkDeviceFlow.getNetworkDevices(controller);
-      assert.strictEqual(controller.data.data.networkDevices.length, 1);
-      assert.strictEqual(fetchedDevices.length, 1);
-      for (const fetched of fetchedDevices) {
-        assert.include(devices, fetched);
-      }
-    }));
-    it("remove a device from a network", () => __async(void 0, null, function* () {
-      const controller = yield testItem.create({ type: "device" });
-      const device = yield testItem.create({ type: "weapon" });
-      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
-      yield NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, device.uuid);
-      assert.deepEqual(controller.data.data.networkDevices, []);
-      assert.strictEqual(device.data.data.technology.networkController, "");
-    }));
-    it("remove a device from a network when it is added to a new one", () => __async(void 0, null, function* () {
-      const controller = yield testItem.create({ type: "device" });
-      const newController = yield testItem.create({ type: "device" });
-      const device = yield testItem.create({ type: "weapon" });
-      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
-      yield NetworkDeviceFlow.addDeviceToNetwork(newController, device);
-      assert.deepEqual(controller.data.data.networkDevices, []);
-      assert.deepEqual(newController.data.data.networkDevices, [device.uuid]);
-      assert.strictEqual(device.data.data.technology.networkController, newController.uuid);
-    }));
-    it("remove a network device that doesnt exist anymore", () => __async(void 0, null, function* () {
-      var _a;
-      const controller = yield testItem.create({ type: "device" });
-      const device = yield testItem.create({ type: "weapon" });
-      const deviceId = device.id;
-      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
-      yield testItem.delete(deviceId);
-      const collectionItem = (_a = game.items) == null ? void 0 : _a.get(deviceId);
-      assert.strictEqual(collectionItem, void 0);
-      assert.strictEqual(controller.data.data.networkDevices.length, 1);
-      yield NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, controller.data.data.networkDevices[0]);
-      assert.deepEqual(controller.data.data.networkDevices, []);
-    }));
-    it("remove all devices from a controller", () => __async(void 0, null, function* () {
-      const controller = yield testItem.create({ type: "device" });
-      const devices = [
-        yield testItem.create({ type: "weapon" })
-      ];
-      for (const device of devices) {
-        yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
-      }
-      yield NetworkDeviceFlow.removeAllDevicesFromNetwork(controller);
-      assert.deepEqual(controller.data.data.networkDevices, []);
-      for (const device of devices) {
-        assert.strictEqual(device.data.data.technology.networkController, "");
-      }
-    }));
-  });
-};
-
-// src/test/sr5.Testing.spec.ts
-var shadowrunTesting = (context) => {
-  const { describe, it, assert, before, after } = context;
-  let testActor;
-  let testItem;
-  before(() => __async(void 0, null, function* () {
-    testActor = new SR5TestingDocuments(SR5Actor);
-    testItem = new SR5TestingDocuments(SR5Item);
-  }));
-  after(() => __async(void 0, null, function* () {
-    yield testActor.teardown();
-    yield testItem.teardown();
-  }));
-  describe("SuccessTest", () => {
-    it("evaluate a roll from action data", () => __async(void 0, null, function* () {
-      const actionData = {
-        "data.action.test": "SuccessTest",
-        "type": "action",
-        "data.action.type": "simple",
-        "data.action.attribute": "body",
-        "data.action.skill": "automatics",
-        "data.action.spec": false,
-        "data.action.limit": {
-          base: 1,
-          value: 1,
-          attribute: "physical"
-        },
-        "data.action.threshold": {
-          base: 1,
-          value: 1
-        },
-        "data.action.damage": {
-          ap: { value: 5, base: 5, mod: Array(0) },
-          attribute: "",
-          base: 5,
-          base_formula_operator: "add",
-          element: { value: "", base: "" },
-          itemSource: { actorId: "", itemId: "", itemType: "", itemName: "" },
-          mod: [],
-          type: { value: "physical", base: "physical" },
-          value: 5
-        }
-      };
-      const action = yield testItem.create(actionData);
-      const actorData = {
-        "type": "character",
-        "data.attributes.body.base": 5,
-        "data.skills.active.automatics.base": 45
-      };
-      const actor = yield testActor.create(actorData);
-      const test = yield TestCreator.fromItem(action, actor);
-      if (!test)
-        assert.strictEqual(true, false);
-      if (test) {
-        yield test.evaluate();
-        console.error(test.data);
-        assert.strictEqual(test.pool.value, 50);
-        assert.strictEqual(test.threshold.value, 1);
-        assert.strictEqual(test.limit.value, 4);
-        assert.strictEqual(test.netHits.value, 3);
-        assert.strictEqual(test.hasReducedHits, true);
-        assert.strictEqual(test.hasThreshold, true);
-        assert.strictEqual(test.hasLimit, true);
-      }
-    }));
-    it("evaluate a roll from simple pool data", () => __async(void 0, null, function* () {
-      const test = TestCreator.fromPool({ pool: 10 });
-      yield test.evaluate();
-      assert.strictEqual(test.pool.value, 10);
-    }));
-    it("evaluate an opposed roll from a opposed action", () => __async(void 0, null, function* () {
-      const actionData = {
-        "type": "action",
-        "data.action.test": "SuccessTest",
-        "data.action.type": "simple",
-        "data.action.attribute": "body",
-        "data.action.skill": "automatics",
-        "data.action.spec": false,
-        "data.action.limit": {
-          base: 1,
-          value: 1,
-          attribute: "physical"
-        },
-        "data.action.threshold": {
-          base: 1,
-          value: 1
-        },
-        "data.action.opposed": {
-          "type": "custom",
-          "test": "OpposedTest",
-          "attribute": "reaction",
-          "attribute2": "intuition",
-          "skill": "",
-          "mod": 0,
-          "description": ""
-        }
-      };
-      const action = yield testItem.create(actionData);
-      const actorData = {
-        "type": "character",
-        "data.attributes.body.base": 5,
-        "data.skills.active.automatics.base": 45
-      };
-      const actor = yield testActor.create(actorData);
-      const test = yield TestCreator.fromItem(action, actor);
-      if (test) {
-        yield test.toMessage();
-      }
-    }));
-  });
-  describe("OpposedTest", () => {
-  });
-};
-
-// src/test/sr5.Inventory.spec.ts
-var shadowrunInventoryFlow = (context) => {
-  const { describe, it, assert, should, before, after } = context;
-  let testActor;
-  let testItem;
-  before(() => __async(void 0, null, function* () {
-    testActor = new SR5TestingDocuments(SR5Actor);
-    testItem = new SR5TestingDocuments(SR5Item);
-  }));
-  after(() => __async(void 0, null, function* () {
-    yield testActor.teardown();
-    yield testItem.teardown();
-  }));
-  describe("InventoryFlow testing", () => {
-    it("create a new inventory and know of its existance", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character" });
-      yield actor.inventory.create("test");
-      assert.deepEqual(actor.data.data.inventories, {
-        "test": {
-          name: "test",
-          label: "test",
-          itemIds: []
-        }
-      });
-      assert.strictEqual(actor.inventory.exists("test"), true);
-    }));
-    it("remove an inventory", () => __async(void 0, null, function* () {
-      const inventoriesData = { test: { name: "test", label: "test", itemIds: [] } };
-      const actor = yield testActor.create({ type: "character", "data.inventories": inventoriesData });
-      yield actor.inventory.remove("test");
-      assert.deepEqual(actor.data.data.inventories, {});
-    }));
-    it("add and remove an item to and from an inventory", () => __async(void 0, null, function* () {
-      const inventoriesData = { test: { name: "test", label: "test", itemIds: [] } };
-      const actor = yield testActor.create({ type: "character", "data.inventories": inventoriesData });
-      const item = yield actor.createEmbeddedDocuments("Item", [{ type: "weapon", name: "Test Weapon" }]);
-      yield actor.inventory.addItems("test", item);
-      const itemIds = item.map((item2) => item2.id);
-      assert.deepEqual(actor.data.data.inventories.test.itemIds, itemIds);
-      yield actor.inventory.removeItem(item[0]);
-      assert.deepEqual(actor.data.data.inventories.test.itemIds, []);
-    }));
-    it("rename an existing inventory", () => __async(void 0, null, function* () {
-      const inventoriesData = { test: { name: "test", label: "test", itemIds: ["asd"] } };
-      const actor = yield testActor.create({ type: "character", "data.inventories": inventoriesData });
-      yield actor.inventory.rename("test", "betterTest");
-      assert.deepEqual(actor.data.data.inventories, {
-        "betterTest": {
-          name: "betterTest",
-          label: "betterTest",
-          itemIds: ["asd"]
-        }
-      });
-    }));
-  });
-};
-
-// src/test/quench.ts
-var quenchRegister = (quench) => {
-  if (!quench)
-    return;
-  console.warn("Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)");
-  quench.registerBatch("shadowrun5e.rules.matrix", shadowrunMatrix, { displayName: "SHADOWRUN5e: Matrix Test" });
-  quench.registerBatch("shadowrun5e.rules.modifiers", shadowrunRulesModifiers, { displayName: "SHADOWRUN5e: Modifiers Test" });
-  quench.registerBatch("shadowrun5e.entities.items", shadowrunSR5Item, { displayName: "SHADOWRUN5e: SR5Item Test" });
-  quench.registerBatch("shadowrun5e.entities.actors", shadowrunSR5Actor, { displayName: "SHADOWRUN5e: SR5Actor Test" });
-  quench.registerBatch("shadowrun5e.entities.effects", shadowrunSR5ActiveEffect, { displayName: "SHADOWRUN5e: SR5ActiveEffect Test" });
-  quench.registerBatch("shadowrun5e.data_prep.actor", shadowrunSR5ActorDataPrep, { displayName: "SHADOWRUN5e: SR5ActorDataPreparation Test" });
-  quench.registerBatch("shadowrun5e.flow.networkDevices", shadowrunNetworkDevices, { displayName: "SHADOWRUN5e: Matrix Network Devices Test" });
-  quench.registerBatch("shadowrun5e.flow.inventory", shadowrunInventoryFlow, { displayName: "SHADOWRUN5e: InventoryFlow Test" });
-  quench.registerBatch("shadowrun5e.flow.tests", shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
 };
 
 // src/module/apps/skills/SkillEditSheet.ts
@@ -26115,85 +25085,6 @@ var SR5ICActorSheet = class extends SR5BaseActorSheet {
   }
 };
 
-// src/module/effect/SR5ActiveEffect.ts
-var SR5ActiveEffect = class extends ActiveEffect {
-  get isOriginOwned() {
-    if (!this.origin)
-      return false;
-    const path = this.origin.split(".");
-    if (path[0] === "Scene" && path.length === 6)
-      return true;
-    if (path[0] === "Actor" && path.length === 4)
-      return true;
-    return false;
-  }
-  get source() {
-    return this.origin ? fromUuid(this.origin) : null;
-  }
-  renderSourceSheet() {
-    return __async(this, null, function* () {
-      var _a;
-      const document2 = yield this.source;
-      return (_a = document2 == null ? void 0 : document2.sheet) == null ? void 0 : _a.render(true);
-    });
-  }
-  toggleDisabled() {
-    return __async(this, null, function* () {
-      return this.update({ disabled: !this.disabled });
-    });
-  }
-  disable(disabled) {
-    return __async(this, null, function* () {
-      return this.update({ disabled });
-    });
-  }
-  _applyCustom(actor, change, current, delta, changes) {
-    return this._applyModify(actor, change, current, delta, changes);
-  }
-  _applyModify(actor, change, current, delta, changes) {
-    if (this._isKeyModifiableValue(actor, change.key)) {
-      const value = foundry.utils.getProperty(actor.data, change.key);
-      value.mod.push({ name: this.label, value: Number(change.value) });
-      return null;
-    }
-    const nodes = change.key.split(".");
-    nodes.pop();
-    const indirectKey = nodes.join(".");
-    if (this._isKeyModifiableValue(actor, indirectKey)) {
-      const value = foundry.utils.getProperty(actor.data, indirectKey);
-      value.mod.push({ name: this.label, value: Number(change.value) });
-      return null;
-    }
-    return super._applyAdd(actor, change, current, delta, changes);
-  }
-  _applyOverride(actor, change, current, delta, changes) {
-    if (this._isKeyModifiableValue(actor, change.key)) {
-      const value = foundry.utils.getProperty(actor.data, change.key);
-      value.override = { name: this.label, value: Number(change.value) };
-      value.value = change.value;
-      return null;
-    }
-    const nodes = change.key.split(".");
-    nodes.pop();
-    const indirectKey = nodes.join(".");
-    if (this._isKeyModifiableValue(actor, indirectKey)) {
-      const value = foundry.utils.getProperty(actor.data, indirectKey);
-      value.override = { name: this.label, value: Number(change.value) };
-      return null;
-    }
-    return super._applyOverride(actor, change, current, delta, changes);
-  }
-  _isKeyModifiableValue(actor, key) {
-    const possibleValue = foundry.utils.getProperty(actor.data, key);
-    const possibleValueType = foundry.utils.getType(possibleValue);
-    return possibleValue && possibleValueType === "Object" && Helpers.objectHasKeys(possibleValue, this.minValueKeys);
-  }
-  get minValueKeys() {
-    return ["value", "mod"];
-  }
-};
-SR5ActiveEffect.LOG_V10_COMPATIBILITY_WARNINGS = false;
-
 // src/module/effect/SR5ActiveEffectConfig.ts
 var SR5ActiveEffectConfig = class extends ActiveEffectConfig {
   get template() {
@@ -26333,6 +25224,19 @@ var SR5SpriteActorSheet = class extends SR5BaseActorSheet {
   }
 };
 
+// src/module/rules/RangedWeaponRules.ts
+var RangedWeaponRules = {
+  getRangeForTargetDistance(distance, ranges) {
+    const rangeKey = Object.keys(ranges).find((range) => distance <= ranges[range].distance);
+    if (rangeKey) {
+      return ranges[rangeKey];
+    } else {
+      const { extreme } = ranges;
+      return Helpers.createRangeDescription("SR5.OutOfRange", extreme.distance, SR.combat.environmental.range_modifiers.out_of_range);
+    }
+  }
+};
+
 // src/module/rules/FireModeRules.ts
 var FireModeRules = {
   fireModeDefenseModifier: function(fireMode, ammo = 0) {
@@ -26438,7 +25342,7 @@ var RangedAttackTest = class extends SuccessTest {
       }
       this.data.targetRanges = this.targets.map((target) => {
         const distance = Helpers.measureTokenDistance(attacker, target);
-        const range = Helpers.getWeaponRange(distance, this.data.ranges);
+        const range = RangedWeaponRules.getRangeForTargetDistance(distance, this.data.ranges);
         return {
           uuid: target.uuid,
           name: target.name || "",
@@ -27644,6 +26548,1082 @@ var SupressionDefenseTest = class extends PhysicalDefenseTest {
   }
 };
 
+// src/module/macros.ts
+function createItemMacro(item, slot) {
+  return __async(this, null, function* () {
+    var _a;
+    if (!game || !game.macros)
+      return;
+    const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
+    let macro = game.macros.contents.find((m) => m.name === item.name);
+    if (!macro) {
+      macro = yield Macro.create(
+        {
+          name: item.name,
+          type: "script",
+          img: item.img,
+          command,
+          flags: { "shadowrun5e.itemMacro": true }
+        },
+        { renderSheet: false }
+      );
+    }
+    if (macro)
+      (_a = game.user) == null ? void 0 : _a.assignHotbarMacro(macro, slot);
+  });
+}
+function rollItemMacro(itemName) {
+  var _a;
+  if (!game || !game.actors)
+    return;
+  const speaker = ChatMessage.getSpeaker();
+  let actor;
+  if (speaker.token)
+    actor = game.actors.tokens[speaker.token];
+  if (!speaker.actor)
+    return;
+  if (!actor)
+    actor = game.actors.get(speaker.actor);
+  const item = actor ? actor.items.find((i) => i.name === itemName) : null;
+  if (!item) {
+    return (_a = ui.notifications) == null ? void 0 : _a.warn(`Your controlled Actor does not have an item named ${itemName}`);
+  }
+  return item.castAction();
+}
+function createSkillMacro(data, slot) {
+  return __async(this, null, function* () {
+    if (!game.macros || !game.user)
+      return;
+    const { skillId, skill } = data;
+    const name = Helpers.getSkillLabelOrName(skill);
+    const existingMacro = game.macros.contents.find((macro2) => macro2.name === name);
+    if (existingMacro)
+      return;
+    const command = `game.shadowrun5e.rollSkillMacro("${name}");`;
+    const macro = yield Macro.create({
+      name,
+      type: "script",
+      command
+    });
+    if (macro)
+      yield game.user.assignHotbarMacro(macro, slot);
+  });
+}
+function rollSkillMacro(skillLabel) {
+  return __async(this, null, function* () {
+    if (!game || !game.actors)
+      return;
+    if (!skillLabel)
+      return;
+    const speaker = ChatMessage.getSpeaker();
+    if (!speaker)
+      return;
+    const actor = game.actors.tokens[speaker.token] || game.actors.get(speaker.actor);
+    if (!actor)
+      return;
+    yield actor.rollSkill(skillLabel, { byLabel: true });
+  });
+}
+
+// src/module/canvas.ts
+var measureDistance = function(segments, options = {}) {
+  if (!game || !game.ready || !canvas || !canvas.ready)
+    return 0;
+  if (!options.gridSpaces)
+    return BaseGrid.prototype.measureDistances.call(this, segments, options);
+  let nDiagonal = 0;
+  const rule = this.parent.diagonalRule;
+  const d = canvas.dimensions;
+  return segments.map((s) => {
+    let r = s.ray;
+    let nx = Math.abs(Math.ceil(r.dx / d.size));
+    let ny = Math.abs(Math.ceil(r.dy / d.size));
+    let nd = Math.min(nx, ny);
+    let ns = Math.abs(ny - nx);
+    nDiagonal += nd;
+    if (rule === "1-2-1") {
+      let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
+      let spaces = nd10 * 2 + (nd - nd10) + ns;
+      return spaces * canvas.dimensions.distance;
+    } else if (rule === "EUCL") {
+      return Math.round(Math.hypot(nx, ny) * canvas.scene.data.gridDistance);
+    } else
+      return (ns + nd) * canvas.scene.data.gridDistance;
+  });
+};
+
+// src/test/sr5.Modifiers.spec.ts
+var shadowrunRulesModifiers = (context) => {
+  const { describe, it, assert } = context;
+  const defaultModifiers = {
+    environmental: {
+      active: {},
+      total: 0
+    }
+  };
+  const activeModifiers = {
+    environmental: {
+      active: {
+        wind: -1,
+        light: -1
+      },
+      total: -3
+    }
+  };
+  describe("SR5 Modifiers", () => {
+    it("should create default modifier values", () => {
+      const modifiers = Modifiers.getDefaultModifiers();
+      assert.deepEqual(modifiers, defaultModifiers);
+    });
+    it("should use default modifiers for faulty constructor params", () => {
+      assert.deepEqual(new Modifiers({}).data, defaultModifiers);
+      assert.deepEqual(new Modifiers(void 0).data, defaultModifiers);
+      assert.deepEqual(new Modifiers(null).data, defaultModifiers);
+      assert.deepEqual(new Modifiers(0).data, defaultModifiers);
+      assert.deepEqual(new Modifiers(1).data, defaultModifiers);
+      assert.deepEqual(new Modifiers().data, defaultModifiers);
+    });
+    it("should set an environmental modifier active", () => {
+      const modifiers = new Modifiers(defaultModifiers);
+      modifiers._setEnvironmentalCategoryActive("wind", -1);
+    });
+    it("should set an environmental modifier inactive", () => {
+      const modifiers = new Modifiers({
+        environmental: {
+          active: {
+            wind: -1,
+            light: -3
+          },
+          total: 0
+        }
+      });
+      modifiers._setEnvironmentalCategoryInactive("wind");
+      assert.deepEqual(modifiers.environmental.active, { light: -3 });
+    });
+    it("should understand active environmental modifiers", () => {
+      const modifiersActive = new Modifiers({
+        environmental: {
+          active: {
+            wind: -1,
+            light: -3
+          },
+          total: 0
+        }
+      });
+      assert.equal(modifiersActive.hasActiveEnvironmental, true);
+      const modifiersInactive = new Modifiers({
+        environmental: {
+          active: {},
+          total: 0
+        }
+      });
+      assert.equal(modifiersInactive.hasActiveEnvironmental, false);
+    });
+    it("should calculate the total according to sr5 rules", () => {
+      const modifiers = new Modifiers(defaultModifiers);
+      assert.equal(modifiers.environmental.total, 0);
+      modifiers.environmental.active.wind = -1;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -1);
+      modifiers.environmental.active.light = -1;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -3);
+      modifiers.environmental.active.range = -1;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -3);
+      delete modifiers.environmental.active.light;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -3);
+      modifiers.environmental.active.light = 0;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -3);
+      modifiers.environmental.active.wind = -3;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -3);
+      modifiers.environmental.active.light = -3;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -6);
+      modifiers.environmental.active.range = -3;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -6);
+      delete modifiers.environmental.active.light;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -6);
+      modifiers.environmental.active.light = 0;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -6);
+      modifiers.environmental.active.wind = -6;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -6);
+      modifiers.environmental.active.light = -6;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -10);
+      modifiers.environmental.active.range = -6;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -10);
+      delete modifiers.environmental.active.light;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -10);
+      modifiers.environmental.active.light = 0;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -10);
+      modifiers.environmental.active.value = 0;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, 0);
+      modifiers.environmental.active.value = -1;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -1);
+      modifiers.environmental.active.value = -3;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -3);
+      modifiers.environmental.active.value = -6;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -6);
+      modifiers.environmental.active.value = -10;
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, -10);
+    });
+    it("should reset active environmental modifiers", () => {
+      const modifiers = new Modifiers(activeModifiers);
+      modifiers._resetEnvironmental();
+      assert.deepEqual(modifiers.environmental.active, {});
+    });
+    it("should calculate total for faulty active", () => {
+      const modifiers = new Modifiers({
+        environmental: {
+          total: -1,
+          active: {
+            light: null,
+            wind: void 0,
+            range: "",
+            visibility: "string"
+          }
+        }
+      });
+      modifiers.calcEnvironmentalTotal();
+      assert.equal(modifiers.environmental.total, 0);
+    });
+  });
+};
+
+// src/test/utils.ts
+var SR5TestingDocuments = class {
+  constructor(documentClass) {
+    this.documents = {};
+    this.documentClass = documentClass;
+  }
+  create(data) {
+    return __async(this, null, function* () {
+      const document2 = yield this.documentClass.create(__spreadValues(__spreadValues({ name: `#QUENCH_TEST_DOCUMENT_SHOULD_HAVE_BEEN_DELETED` }, data), { folder: this.folder }));
+      this.documents[document2.id] = document2;
+      return document2;
+    });
+  }
+  delete(id) {
+    return __async(this, null, function* () {
+      const document2 = this.documents[id];
+      if (!document2)
+        return;
+      yield this.documentClass.deleteDocuments([document2.data._id]);
+      delete this.documents[document2.id];
+    });
+  }
+  teardown() {
+    return __async(this, null, function* () {
+      yield this.documentClass.deleteDocuments(Object.values(this.documents).map((document2) => document2.id));
+    });
+  }
+};
+
+// src/test/sr5.SR5Item.spec.ts
+var shadowrunSR5Item = (context) => {
+  const { describe, it, assert, before, after } = context;
+  let testItem;
+  before(() => __async(void 0, null, function* () {
+    testItem = new SR5TestingDocuments(SR5Item);
+  }));
+  after(() => __async(void 0, null, function* () {
+    yield testItem.teardown();
+  }));
+  describe("SR5Items", () => {
+    it("create a naked item of any type", () => __async(void 0, null, function* () {
+      var _a;
+      const item = yield testItem.create({ type: "action" });
+      assert.notStrictEqual(item.id, "");
+      assert.notStrictEqual(item.id, void 0);
+      assert.notStrictEqual(item.id, null);
+      const itemFromCollection = (_a = game.items) == null ? void 0 : _a.get(item.id);
+      assert.notStrictEqual(itemFromCollection, null);
+      assert.strictEqual(item.id, itemFromCollection == null ? void 0 : itemFromCollection.id);
+    }));
+    it("update an item of any type", () => __async(void 0, null, function* () {
+      const item = yield testItem.create({ type: "action" });
+      assert.notProperty(item.data.data, "test");
+      yield item.update({ "data.test": true });
+      assert.property(item.data.data, "test");
+      assert.propertyVal(item.data.data, "test", true);
+    }));
+    it("embedd a ammo into a weapon and not the global item collection", () => __async(void 0, null, function* () {
+      var _a;
+      const weapon = yield testItem.create({ type: "weapon" });
+      const ammo = yield testItem.create({ type: "ammo" });
+      yield weapon.createNestedItem(ammo.data);
+      const embeddedItemDatas = weapon.getNestedItems();
+      assert.isNotEmpty(embeddedItemDatas);
+      assert.lengthOf(embeddedItemDatas, 1);
+      const embeddedAmmoData = embeddedItemDatas[0];
+      assert.strictEqual(embeddedAmmoData.type, ammo.data.type);
+      const embeddedAmmoInCollection = (_a = game.items) == null ? void 0 : _a.get(embeddedAmmoData._id);
+      assert.strictEqual(embeddedAmmoInCollection, void 0);
+    }));
+    it("update an embedded ammo", () => __async(void 0, null, function* () {
+      const weapon = yield testItem.create({ type: "weapon" });
+      const ammo = yield testItem.create({ type: "ammo" });
+      yield weapon.createNestedItem(ammo.data);
+      const embeddedItemDatas = weapon.getNestedItems();
+      assert.lengthOf(embeddedItemDatas, 1);
+      const embeddedAmmoData = embeddedItemDatas[0];
+      const embeddedAmmo = weapon.getOwnedItem(embeddedAmmoData._id);
+      assert.notStrictEqual(embeddedAmmo, void 0);
+      assert.instanceOf(embeddedAmmo, SR5Item);
+      if (!embeddedAmmo)
+        return;
+      assert.notProperty(embeddedAmmo.data.data, "test");
+      yield embeddedAmmo.update({ "data.test": true });
+      assert.property(embeddedAmmo.data.data, "test");
+      assert.propertyVal(embeddedAmmo.data.data, "test", true);
+    }));
+  });
+};
+
+// src/test/sr5.Matrix.spec.ts
+var shadowrunMatrix = (context) => {
+  const { describe, it, assert, before, after } = context;
+  describe("Matrix Rules", () => {
+    it("calculate IC device rating", () => {
+      let hostRating = 5;
+      assert.strictEqual(MatrixRules.getICDeviceRating(hostRating), hostRating);
+      hostRating = -1;
+      assert.strictEqual(MatrixRules.getICDeviceRating(hostRating), 0);
+    });
+    it("calculate IC condition monitor", () => {
+      assert.strictEqual(MatrixRules.getConditionMonitor(0), 8);
+      assert.strictEqual(MatrixRules.getConditionMonitor(1), 9);
+      assert.strictEqual(MatrixRules.getConditionMonitor(4), 10);
+      assert.strictEqual(MatrixRules.getConditionMonitor(-1), 8);
+    });
+    it("calculate IC matrix initiative base", () => {
+      assert.strictEqual(MatrixRules.getICInitiativeBase(0), 0);
+      assert.strictEqual(MatrixRules.getICInitiativeBase(-3), 0);
+      assert.strictEqual(MatrixRules.getICInitiativeBase(1), 2);
+      assert.strictEqual(MatrixRules.getICInitiativeBase(2), 4);
+      assert.strictEqual(MatrixRules.getICInitiativeBase(3), 6);
+      assert.strictEqual(MatrixRules.getICInitiativeBase(12), 24);
+    });
+    it("calculate IC matrix initiative dice", () => {
+      assert.strictEqual(MatrixRules.getICInitiativeDice(), 4);
+    });
+    it("calculate meat attribute base with the host rating", () => {
+      assert.strictEqual(MatrixRules.getICMeatAttributeBase(0), 0);
+      assert.strictEqual(MatrixRules.getICMeatAttributeBase(-3), 0);
+      assert.strictEqual(MatrixRules.getICMeatAttributeBase(3), 3);
+      assert.strictEqual(MatrixRules.getICMeatAttributeBase(27), 27);
+    });
+    it("disallow invalid marks counters", () => {
+      assert.isTrue(MatrixRules.isValidMarksCount(0));
+      assert.isTrue(MatrixRules.isValidMarksCount(1));
+      assert.isTrue(MatrixRules.isValidMarksCount(2));
+      assert.isTrue(MatrixRules.isValidMarksCount(3));
+      assert.isFalse(MatrixRules.isValidMarksCount(-1));
+      assert.isFalse(MatrixRules.isValidMarksCount(4));
+      assert.isFalse(MatrixRules.isValidMarksCount(1.5));
+    });
+    it("return valid marks counts", () => {
+      assert.strictEqual(MatrixRules.getValidMarksCount(-1), MatrixRules.minMarksCount());
+      assert.strictEqual(MatrixRules.getValidMarksCount(0), 0);
+      assert.strictEqual(MatrixRules.getValidMarksCount(1), 1);
+      assert.strictEqual(MatrixRules.getValidMarksCount(2), 2);
+      assert.strictEqual(MatrixRules.getValidMarksCount(3), 3);
+      assert.strictEqual(MatrixRules.getValidMarksCount(4), MatrixRules.maxMarksCount());
+    });
+    it("return expected host matrix attribute ratings", () => {
+      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
+      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
+      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);
+    });
+  });
+};
+
+// src/test/sr5.SR5Actor.spec.ts
+var shadowrunSR5Actor = (context) => {
+  const { describe, it, assert, before, after } = context;
+  let testActor;
+  let testItem;
+  before(() => __async(void 0, null, function* () {
+    testActor = new SR5TestingDocuments(SR5Actor);
+    testItem = new SR5TestingDocuments(SR5Item);
+  }));
+  after(() => __async(void 0, null, function* () {
+    yield testActor.teardown();
+    yield testItem.teardown();
+  }));
+  describe("SR5Actor", () => {
+    it("create a naked actor of any type", () => __async(void 0, null, function* () {
+      var _a;
+      const actor = yield testActor.create({ type: "character" });
+      assert.notStrictEqual(actor.id, "");
+      assert.notStrictEqual(actor.id, void 0);
+      assert.notStrictEqual(actor.id, null);
+      const fromCollection = (_a = game.actors) == null ? void 0 : _a.get(actor.id);
+      assert.isOk(fromCollection);
+      assert.strictEqual(actor.id, fromCollection == null ? void 0 : fromCollection.id);
+    }));
+    it("update an actor of any time", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      assert.notProperty(actor.data.data, "test");
+      yield actor.update({ "data.test": true });
+      assert.property(actor.data.data, "test");
+      assert.propertyVal(actor.data.data, "test", true);
+    }));
+    it("embedd a weapon into an actor and not the global item colection", () => __async(void 0, null, function* () {
+      var _a;
+      const actor = yield testActor.create({ type: "character" });
+      const weapon = yield testItem.create({ type: "weapon" });
+      yield actor.createEmbeddedDocuments("Item", [weapon.data]);
+      const ownedItems = Array.from(actor.items);
+      assert.isNotEmpty(ownedItems);
+      assert.lengthOf(ownedItems, 1);
+      const ownedItem = ownedItems[0];
+      assert.strictEqual(ownedItem.type, weapon.data.type);
+      const ownedInCollection = (_a = game.items) == null ? void 0 : _a.get(ownedItem.id);
+      assert.isNotOk(ownedInCollection);
+    }));
+  });
+};
+
+// src/test/sr5.ActorDataPrep.spec.ts
+var shadowrunSR5ActorDataPrep = (context) => {
+  const { describe, it, assert, before, after } = context;
+  let testActor;
+  let testItem;
+  before(() => __async(void 0, null, function* () {
+    testActor = new SR5TestingDocuments(SR5Actor);
+    testItem = new SR5TestingDocuments(SR5Item);
+  }));
+  after(() => __async(void 0, null, function* () {
+    yield testActor.teardown();
+    yield testItem.teardown();
+  }));
+  describe("CharacterDataPrep", () => {
+    it("Character default attribute values", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character", metatype: "human" });
+      console.log("Physical attributes");
+      assert.strictEqual(actor.data.data.attributes.body.value, SR.attributes.ranges["body"].min);
+      assert.strictEqual(actor.data.data.attributes.agility.value, SR.attributes.ranges["agility"].min);
+      assert.strictEqual(actor.data.data.attributes.reaction.value, SR.attributes.ranges["reaction"].min);
+      assert.strictEqual(actor.data.data.attributes.strength.value, SR.attributes.ranges["strength"].min);
+      assert.strictEqual(actor.data.data.attributes.willpower.value, SR.attributes.ranges["willpower"].min);
+      assert.strictEqual(actor.data.data.attributes.logic.value, SR.attributes.ranges["logic"].min);
+      assert.strictEqual(actor.data.data.attributes.intuition.value, SR.attributes.ranges["intuition"].min);
+      assert.strictEqual(actor.data.data.attributes.charisma.value, SR.attributes.ranges["charisma"].min);
+      console.log("Comon special attributes");
+      assert.strictEqual(actor.data.data.attributes.edge.value, SR.attributes.ranges["edge"].min);
+      assert.strictEqual(actor.data.data.attributes.essence.value, SR.attributes.defaults["essence"]);
+      console.log("Special special attributes");
+      assert.strictEqual(actor.data.data.attributes.resonance.value, SR.attributes.ranges["resonance"].min);
+      assert.strictEqual(actor.data.data.attributes.magic.value, SR.attributes.ranges["magic"].min);
+    }));
+    it("Character monitor calculation", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      let data = actor.asCharacter();
+      assert.strictEqual(data.data.track.stun.max, 9);
+      assert.strictEqual(data.data.track.physical.max, 9);
+      assert.strictEqual(data.data.track.physical.overflow.max, SR.attributes.ranges.body.min);
+      yield actor.update({
+        "data.attributes.body.base": 6,
+        "data.attributes.willpower.base": 6
+      });
+      assert.strictEqual(data.data.track.stun.max, 11);
+      assert.strictEqual(data.data.track.physical.max, 11);
+      assert.strictEqual(data.data.track.physical.overflow.max, 6);
+    }));
+    it("Character initiative calculation", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      const data = actor.asCharacter();
+      console.log("Meatspace Ini");
+      assert.strictEqual(data.data.initiative.meatspace.base.base, 2);
+      assert.strictEqual(data.data.initiative.meatspace.dice.base, 1);
+      console.log("Matrix AR Ini");
+      assert.strictEqual(data.data.initiative.matrix.base.base, 1);
+      assert.strictEqual(data.data.initiative.matrix.dice.base, 3);
+      console.log("Magic Ini");
+      assert.strictEqual(data.data.initiative.astral.base.base, 2);
+      assert.strictEqual(data.data.initiative.astral.dice.base, 2);
+    }));
+    it("Character limit calculation", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      const data = actor.asCharacter();
+      assert.strictEqual(data.data.limits.physical.value, 2);
+      assert.strictEqual(data.data.limits.mental.value, 2);
+      assert.strictEqual(data.data.limits.social.value, 3);
+      yield actor.update({
+        "data.attributes.strength.base": 6,
+        "data.attributes.body.base": 6,
+        "data.attributes.reaction.base": 6,
+        "data.attributes.logic.base": 6,
+        "data.attributes.intuition.base": 6,
+        "data.attributes.willpower.base": 6,
+        "data.attributes.charisma.base": 6,
+        "data.attributes.essence.base": 6
+      });
+      assert.strictEqual(data.data.limits.physical.value, 8);
+      assert.strictEqual(data.data.limits.mental.value, 8);
+      assert.strictEqual(data.data.limits.social.value, 8);
+    }));
+    it("Character movement calculation", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      const data = actor.asCharacter();
+      assert.strictEqual(data.data.movement.walk.value, 2);
+      assert.strictEqual(data.data.movement.run.value, 4);
+      yield actor.update({
+        "data.attributes.agility.base": 6
+      });
+      assert.strictEqual(data.data.movement.walk.value, 12);
+      assert.strictEqual(data.data.movement.run.value, 24);
+    }));
+    it("Character skill calculation", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      const data = actor.asCharacter();
+      yield actor.update({
+        "data.skills.active.arcana.base": 6,
+        "data.skills.active.arcana.bonus": [{ key: "Test", value: 1 }],
+        "data.skills.active.arcana.specs": ["Test"]
+      });
+      assert.strictEqual(data.data.skills.active.arcana.value, 7);
+    }));
+    it("Character damage application", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      const data = actor.asCharacter();
+      assert.strictEqual(data.data.track.stun.value, 0);
+      assert.strictEqual(data.data.track.stun.wounds, 0);
+      assert.strictEqual(data.data.track.physical.value, 0);
+      assert.strictEqual(data.data.track.physical.wounds, 0);
+      assert.strictEqual(data.data.wounds.value, 0);
+      yield actor.update({
+        "data.track.stun.value": 3,
+        "data.track.physical.value": 3
+      });
+      assert.strictEqual(data.data.track.stun.value, 3);
+      assert.strictEqual(data.data.track.stun.wounds, 1);
+      assert.strictEqual(data.data.track.physical.value, 3);
+      assert.strictEqual(data.data.track.physical.wounds, 1);
+      assert.strictEqual(data.data.wounds.value, 2);
+    }));
+    it("Character damage application with high pain/wound tolerance", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      const data = actor.asCharacter();
+      yield actor.update({
+        "data.track.stun.value": 6,
+        "data.track.physical.value": 6,
+        "data.modifiers.wound_tolerance": 3
+      });
+      assert.strictEqual(data.data.track.stun.value, 6);
+      assert.strictEqual(data.data.track.stun.wounds, 1);
+      assert.strictEqual(data.data.track.physical.value, 6);
+      assert.strictEqual(data.data.track.physical.wounds, 1);
+      assert.strictEqual(data.data.wounds.value, 2);
+    }));
+  });
+  describe("SpiritDataPrep", () => {
+    it("Spirits are always magical", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "spirit" });
+      assert.strictEqual(actor.data.data.special, "magic");
+    }));
+    it("Spirit default/overrides by example type", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "spirit", "data.spiritType": "air" });
+      const data = actor.asSpirit();
+      assert.strictEqual(data.data.attributes.body.base, -2);
+      assert.strictEqual(data.data.attributes.agility.base, 3);
+      assert.strictEqual(data.data.attributes.reaction.base, 4);
+      assert.strictEqual(data.data.attributes.strength.base, -3);
+      assert.strictEqual(data.data.attributes.intuition.base, 0);
+      assert.strictEqual(data.data.initiative.meatspace.base.base, 4);
+      assert.strictEqual(data.data.skills.active.assensing.base, 0);
+      yield actor.update({
+        "data.force": 6
+      });
+      assert.strictEqual(data.data.attributes.body.base, 4);
+      assert.strictEqual(data.data.attributes.agility.base, 9);
+      assert.strictEqual(data.data.attributes.reaction.base, 10);
+      assert.strictEqual(data.data.attributes.strength.base, 3);
+      assert.strictEqual(data.data.attributes.intuition.base, 6);
+      assert.strictEqual(data.data.initiative.meatspace.base.base, 16);
+      assert.strictEqual(data.data.skills.active.assensing.base, 6);
+      assert.strictEqual(data.data.skills.active.arcana.base, 0);
+    }));
+  });
+  describe("SpriteDataPrep", () => {
+    it("Sprites are always awakened", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "sprite" });
+      assert.strictEqual(actor.data.data.special, "resonance");
+    }));
+    it("Sprites default/override values by example type", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "sprite", "data.spriteType": "courier" });
+      const data = actor.asSprite();
+      assert.strictEqual(data.data.matrix.sleaze.base, 3);
+      assert.strictEqual(data.data.matrix.data_processing.base, 1);
+      assert.strictEqual(data.data.matrix.firewall.base, 2);
+      assert.strictEqual(data.data.matrix.sleaze.base, 3);
+      assert.strictEqual(data.data.initiative.matrix.base.base, 1);
+      assert.strictEqual(data.data.skills.active.hacking.base, 0);
+      yield actor.update({
+        "data.level": 6
+      });
+      assert.strictEqual(data.data.level, 6);
+      assert.strictEqual(data.data.matrix.sleaze.base, 9);
+      assert.strictEqual(data.data.matrix.data_processing.base, 7);
+      assert.strictEqual(data.data.matrix.firewall.base, 8);
+      assert.strictEqual(data.data.matrix.sleaze.base, 9);
+      assert.strictEqual(data.data.initiative.matrix.base.base, 13);
+      assert.strictEqual(data.data.initiative.matrix.dice.base, 4);
+      assert.strictEqual(data.data.skills.active.hacking.base, 6);
+      assert.strictEqual(data.data.skills.active.computer.base, 6);
+      assert.strictEqual(data.data.skills.active.electronic_warfare.base, 0);
+    }));
+  });
+};
+
+// src/test/sr5.ActiveEffect.spec.ts
+var shadowrunSR5ActiveEffect = (context) => {
+  const { describe, it, assert, before, after } = context;
+  let testActor;
+  let testItem;
+  before(() => __async(void 0, null, function* () {
+    testActor = new SR5TestingDocuments(SR5Actor);
+    testItem = new SR5TestingDocuments(SR5Item);
+  }));
+  after(() => __async(void 0, null, function* () {
+    yield testActor.teardown();
+    yield testItem.teardown();
+  }));
+  describe("SR5ActiveEffect", () => {
+    it("apply the custom modify mode", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      const effect = yield actor.createEmbeddedDocuments("ActiveEffect", [{
+        origin: actor.uuid,
+        disabled: false,
+        label: "Test Effect"
+      }]);
+      yield effect[0].update({
+        "changes": [
+          { key: "data.attributes.body.mod", value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+          { key: "data.attributes.body", value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
+        ]
+      });
+      assert.deepEqual(actor.data.data.attributes.body.mod, [{
+        name: "Test Effect",
+        value: 2
+      }, { name: "Test Effect", value: 2 }]);
+      assert.strictEqual(actor.data.data.attributes.body.value, 4);
+      yield effect[0].update({
+        "changes": [
+          { key: "data.attributes.body.mod", value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+          { key: "data.attributes.body.mod", value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
+        ]
+      });
+    }));
+    it("apply custom modify mode, none ModifiableValue should work as the add mode", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      const effect = yield actor.createEmbeddedDocuments("ActiveEffect", [{
+        origin: actor.uuid,
+        disabled: false,
+        label: "Test Effect"
+      }]);
+      yield effect[0].update({
+        "changes": [{
+          key: "data.modifiers.global",
+          value: 3,
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM
+        }]
+      });
+      assert.strictEqual(actor.data.data.modifiers.global, 3);
+      assert.strictEqual(actor.data.data.modifiers.global.mod, void 0);
+      assert.strictEqual(actor.data.data.modifiers.global.override, void 0);
+      it("apply the custom override mode", () => __async(void 0, null, function* () {
+        const actor2 = yield testActor.create({ type: "character" });
+        const effect2 = yield actor2.createEmbeddedDocuments("ActiveEffect", [{
+          origin: actor2.uuid,
+          disabled: false,
+          label: "Test Effect"
+        }]);
+        yield effect2[0].update({
+          "changes": [
+            { key: "data.attributes.body", value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+            { key: "data.attributes.body.value", value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
+          ]
+        });
+        assert.deepEqual(actor2.data.data.attributes.body.override, { name: "Test Effect", value: 3 });
+        assert.deepEqual(actor2.data.data.attributes.body.mod, []);
+        assert.strictEqual(actor2.data.data.attributes.body.value, 3);
+      }));
+      it("apply custom override mode, should override all existing .mod values", () => __async(void 0, null, function* () {
+        it("apply the custom override mode", () => __async(void 0, null, function* () {
+          const actor2 = yield testActor.create({ type: "character" });
+          const effect2 = yield actor2.createEmbeddedDocuments("ActiveEffect", [{
+            origin: actor2.uuid,
+            disabled: false,
+            label: "Test Effect"
+          }]);
+          yield effect2[0].update({
+            "changes": [
+              { key: "data.attributes.body.mod", value: 5, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+              { key: "data.attributes.body.value", value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
+            ]
+          });
+          assert.strictEqual(actor2.data.data.attributes.body.mod.length, 1);
+          assert.deepEqual(actor2.data.data.attributes.body.override, { name: "Test Effect", value: 3 });
+          assert.deepEqual(actor2.data.data.attributes.body.mod, [{ name: "Test Effect", value: 5 }]);
+          assert.strictEqual(actor2.data.data.attributes.body.value, 3);
+        }));
+      }));
+      it("apply custom override mode, none ModifiableValue should work without altering anything", () => __async(void 0, null, function* () {
+        const actor2 = yield testActor.create({ type: "character" });
+        const effect2 = yield actor2.createEmbeddedDocuments("ActiveEffect", [{
+          origin: actor2.uuid,
+          disabled: false,
+          label: "Test Effect"
+        }]);
+        yield effect2[0].update({
+          "changes": [{
+            key: "data.modifiers.global",
+            value: 3,
+            mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
+          }]
+        });
+        assert.strictEqual(actor2.data.data.modifiers.global, 3);
+        assert.strictEqual(actor2.data.data.modifiers.global.mod, void 0);
+        assert.strictEqual(actor2.data.data.modifiers.global.override, void 0);
+      }));
+    }));
+  });
+};
+
+// src/test/sr5.NetworkDevices.spec.ts
+var shadowrunNetworkDevices = (context) => {
+  const { describe, it, assert, should, before, after } = context;
+  let testActor;
+  let testItem;
+  let testScene;
+  before(() => __async(void 0, null, function* () {
+    testActor = new SR5TestingDocuments(SR5Actor);
+    testItem = new SR5TestingDocuments(SR5Item);
+    testScene = new SR5TestingDocuments(Scene);
+  }));
+  after(() => __async(void 0, null, function* () {
+    yield testActor.teardown();
+    yield testItem.teardown();
+    yield testScene.teardown();
+  }));
+  describe("Network Devices handling", () => {
+    it("give a network link to given document class", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ "type": "character" });
+      const link = NetworkDeviceFlow.buildLink(actor);
+      const nodes = link.split(".");
+      assert.strictEqual(nodes[0], "Actor");
+      assert.strictEqual(nodes.length, 2);
+    }));
+    it("resolve a network link back to a sidebar document", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ "type": "character" });
+      const link = NetworkDeviceFlow.buildLink(actor);
+      const resolvedActor = yield NetworkDeviceFlow.resolveLink(link);
+      assert.isNotNull(resolvedActor);
+      assert.strictEqual(resolvedActor == null ? void 0 : resolvedActor.id, actor.id);
+    }));
+    it("resolve a network link back to a embedded collection document", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ "type": "character" });
+      const item = yield testItem.create({ type: "weapon" });
+      const embeddedItems = yield actor.createEmbeddedDocuments("Item", [item.data]);
+      const embeddedItem = embeddedItems[0];
+      const link = NetworkDeviceFlow.buildLink(embeddedItem);
+      const resolvedItem = yield NetworkDeviceFlow.resolveLink(link);
+      assert.isNotNull(resolvedItem);
+      assert.strictEqual(resolvedItem == null ? void 0 : resolvedItem.id, embeddedItem == null ? void 0 : embeddedItem.id);
+    }));
+    it("resolve a network link back to a token collection document", () => __async(void 0, null, function* () {
+      const scene = yield testScene.create({ name: "Test" });
+      const actor = yield testActor.create({ "type": "character" });
+      const token = yield getDocumentClass("Token").create(yield actor.getTokenData({ x: 0, y: 0 }), { parent: scene });
+      const link = NetworkDeviceFlow.buildLink(token);
+      const resolvedToken = yield NetworkDeviceFlow.resolveLink(link);
+      assert.isNotNull(resolvedToken);
+      assert.strictEqual(token == null ? void 0 : token.id, resolvedToken == null ? void 0 : resolvedToken.id);
+    }));
+    it("connect a device controller to a network device", () => __async(void 0, null, function* () {
+      const controller = yield testItem.create({ type: "device" });
+      const device = yield testItem.create({ type: "weapon" });
+      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+      assert.strictEqual(device.data.data.technology.networkController, controller.uuid);
+      assert.strictEqual(yield NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
+      assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
+    }));
+    it("connect a host controller to a network device", () => __async(void 0, null, function* () {
+      const controller = yield testItem.create({ type: "host" });
+      const device = yield testItem.create({ type: "weapon" });
+      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+      assert.strictEqual(device.data.data.technology.networkController, controller.uuid);
+      assert.strictEqual(yield NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
+      assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
+    }));
+    it("get all connected network devices of a controller as their Document", () => __async(void 0, null, function* () {
+      const controller = yield testItem.create({ type: "device" });
+      const devices = [
+        yield testItem.create({ type: "weapon" })
+      ];
+      for (const device of devices) {
+        yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+      }
+      const fetchedDevices = NetworkDeviceFlow.getNetworkDevices(controller);
+      assert.strictEqual(controller.data.data.networkDevices.length, 1);
+      assert.strictEqual(fetchedDevices.length, 1);
+      for (const fetched of fetchedDevices) {
+        assert.include(devices, fetched);
+      }
+    }));
+    it("remove a device from a network", () => __async(void 0, null, function* () {
+      const controller = yield testItem.create({ type: "device" });
+      const device = yield testItem.create({ type: "weapon" });
+      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+      yield NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, device.uuid);
+      assert.deepEqual(controller.data.data.networkDevices, []);
+      assert.strictEqual(device.data.data.technology.networkController, "");
+    }));
+    it("remove a device from a network when it is added to a new one", () => __async(void 0, null, function* () {
+      const controller = yield testItem.create({ type: "device" });
+      const newController = yield testItem.create({ type: "device" });
+      const device = yield testItem.create({ type: "weapon" });
+      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+      yield NetworkDeviceFlow.addDeviceToNetwork(newController, device);
+      assert.deepEqual(controller.data.data.networkDevices, []);
+      assert.deepEqual(newController.data.data.networkDevices, [device.uuid]);
+      assert.strictEqual(device.data.data.technology.networkController, newController.uuid);
+    }));
+    it("remove a network device that doesnt exist anymore", () => __async(void 0, null, function* () {
+      var _a;
+      const controller = yield testItem.create({ type: "device" });
+      const device = yield testItem.create({ type: "weapon" });
+      const deviceId = device.id;
+      yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+      yield testItem.delete(deviceId);
+      const collectionItem = (_a = game.items) == null ? void 0 : _a.get(deviceId);
+      assert.strictEqual(collectionItem, void 0);
+      assert.strictEqual(controller.data.data.networkDevices.length, 1);
+      yield NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, controller.data.data.networkDevices[0]);
+      assert.deepEqual(controller.data.data.networkDevices, []);
+    }));
+    it("remove all devices from a controller", () => __async(void 0, null, function* () {
+      const controller = yield testItem.create({ type: "device" });
+      const devices = [
+        yield testItem.create({ type: "weapon" })
+      ];
+      for (const device of devices) {
+        yield NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+      }
+      yield NetworkDeviceFlow.removeAllDevicesFromNetwork(controller);
+      assert.deepEqual(controller.data.data.networkDevices, []);
+      for (const device of devices) {
+        assert.strictEqual(device.data.data.technology.networkController, "");
+      }
+    }));
+  });
+};
+
+// src/test/sr5.Testing.spec.ts
+var shadowrunTesting = (context) => {
+  const { describe, it, assert, before, after } = context;
+  let testActor;
+  let testItem;
+  before(() => __async(void 0, null, function* () {
+    testActor = new SR5TestingDocuments(SR5Actor);
+    testItem = new SR5TestingDocuments(SR5Item);
+  }));
+  after(() => __async(void 0, null, function* () {
+    yield testActor.teardown();
+    yield testItem.teardown();
+  }));
+  describe("SuccessTest", () => {
+    it("evaluate a roll from action data", () => __async(void 0, null, function* () {
+      const actionData = {
+        "data.action.test": "SuccessTest",
+        "type": "action",
+        "data.action.type": "simple",
+        "data.action.attribute": "body",
+        "data.action.skill": "automatics",
+        "data.action.spec": false,
+        "data.action.limit": {
+          base: 1,
+          value: 1,
+          attribute: "physical"
+        },
+        "data.action.threshold": {
+          base: 1,
+          value: 1
+        },
+        "data.action.damage": {
+          ap: { value: 5, base: 5, mod: Array(0) },
+          attribute: "",
+          base: 5,
+          base_formula_operator: "add",
+          element: { value: "", base: "" },
+          itemSource: { actorId: "", itemId: "", itemType: "", itemName: "" },
+          mod: [],
+          type: { value: "physical", base: "physical" },
+          value: 5
+        }
+      };
+      const action = yield testItem.create(actionData);
+      const actorData = {
+        "type": "character",
+        "data.attributes.body.base": 5,
+        "data.skills.active.automatics.base": 45
+      };
+      const actor = yield testActor.create(actorData);
+      const test = yield TestCreator.fromItem(action, actor);
+      if (!test)
+        assert.strictEqual(true, false);
+      if (test) {
+        yield test.evaluate();
+        console.error(test.data);
+        assert.strictEqual(test.pool.value, 50);
+        assert.strictEqual(test.threshold.value, 1);
+        assert.strictEqual(test.limit.value, 4);
+        assert.strictEqual(test.netHits.value, 3);
+        assert.strictEqual(test.hasReducedHits, true);
+        assert.strictEqual(test.hasThreshold, true);
+        assert.strictEqual(test.hasLimit, true);
+      }
+    }));
+    it("evaluate a roll from simple pool data", () => __async(void 0, null, function* () {
+      const test = TestCreator.fromPool({ pool: 10 });
+      yield test.evaluate();
+      assert.strictEqual(test.pool.value, 10);
+    }));
+    it("evaluate an opposed roll from a opposed action", () => __async(void 0, null, function* () {
+      const actionData = {
+        "type": "action",
+        "data.action.test": "SuccessTest",
+        "data.action.type": "simple",
+        "data.action.attribute": "body",
+        "data.action.skill": "automatics",
+        "data.action.spec": false,
+        "data.action.limit": {
+          base: 1,
+          value: 1,
+          attribute: "physical"
+        },
+        "data.action.threshold": {
+          base: 1,
+          value: 1
+        },
+        "data.action.opposed": {
+          "type": "custom",
+          "test": "OpposedTest",
+          "attribute": "reaction",
+          "attribute2": "intuition",
+          "skill": "",
+          "mod": 0,
+          "description": ""
+        }
+      };
+      const action = yield testItem.create(actionData);
+      const actorData = {
+        "type": "character",
+        "data.attributes.body.base": 5,
+        "data.skills.active.automatics.base": 45
+      };
+      const actor = yield testActor.create(actorData);
+      const test = yield TestCreator.fromItem(action, actor);
+      if (test) {
+        yield test.toMessage();
+      }
+    }));
+  });
+  describe("OpposedTest", () => {
+  });
+};
+
+// src/test/sr5.Inventory.spec.ts
+var shadowrunInventoryFlow = (context) => {
+  const { describe, it, assert, should, before, after } = context;
+  let testActor;
+  let testItem;
+  before(() => __async(void 0, null, function* () {
+    testActor = new SR5TestingDocuments(SR5Actor);
+    testItem = new SR5TestingDocuments(SR5Item);
+  }));
+  after(() => __async(void 0, null, function* () {
+    yield testActor.teardown();
+    yield testItem.teardown();
+  }));
+  describe("InventoryFlow testing", () => {
+    it("create a new inventory and know of its existance", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character" });
+      yield actor.inventory.create("test");
+      assert.deepEqual(actor.data.data.inventories, {
+        "test": {
+          name: "test",
+          label: "test",
+          itemIds: []
+        }
+      });
+      assert.strictEqual(actor.inventory.exists("test"), true);
+    }));
+    it("remove an inventory", () => __async(void 0, null, function* () {
+      const inventoriesData = { test: { name: "test", label: "test", itemIds: [] } };
+      const actor = yield testActor.create({ type: "character", "data.inventories": inventoriesData });
+      yield actor.inventory.remove("test");
+      assert.deepEqual(actor.data.data.inventories, {});
+    }));
+    it("add and remove an item to and from an inventory", () => __async(void 0, null, function* () {
+      const inventoriesData = { test: { name: "test", label: "test", itemIds: [] } };
+      const actor = yield testActor.create({ type: "character", "data.inventories": inventoriesData });
+      const item = yield actor.createEmbeddedDocuments("Item", [{ type: "weapon", name: "Test Weapon" }]);
+      yield actor.inventory.addItems("test", item);
+      const itemIds = item.map((item2) => item2.id);
+      assert.deepEqual(actor.data.data.inventories.test.itemIds, itemIds);
+      yield actor.inventory.removeItem(item[0]);
+      assert.deepEqual(actor.data.data.inventories.test.itemIds, []);
+    }));
+    it("rename an existing inventory", () => __async(void 0, null, function* () {
+      const inventoriesData = { test: { name: "test", label: "test", itemIds: ["asd"] } };
+      const actor = yield testActor.create({ type: "character", "data.inventories": inventoriesData });
+      yield actor.inventory.rename("test", "betterTest");
+      assert.deepEqual(actor.data.data.inventories, {
+        "betterTest": {
+          name: "betterTest",
+          label: "betterTest",
+          itemIds: ["asd"]
+        }
+      });
+    }));
+  });
+};
+
+// src/test/quench.ts
+var quenchRegister = (quench) => {
+  if (!quench)
+    return;
+  console.warn("Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)");
+  quench.registerBatch("shadowrun5e.rules.matrix", shadowrunMatrix, { displayName: "SHADOWRUN5e: Matrix Test" });
+  quench.registerBatch("shadowrun5e.rules.modifiers", shadowrunRulesModifiers, { displayName: "SHADOWRUN5e: Modifiers Test" });
+  quench.registerBatch("shadowrun5e.entities.items", shadowrunSR5Item, { displayName: "SHADOWRUN5e: SR5Item Test" });
+  quench.registerBatch("shadowrun5e.entities.actors", shadowrunSR5Actor, { displayName: "SHADOWRUN5e: SR5Actor Test" });
+  quench.registerBatch("shadowrun5e.entities.effects", shadowrunSR5ActiveEffect, { displayName: "SHADOWRUN5e: SR5ActiveEffect Test" });
+  quench.registerBatch("shadowrun5e.data_prep.actor", shadowrunSR5ActorDataPrep, { displayName: "SHADOWRUN5e: SR5ActorDataPreparation Test" });
+  quench.registerBatch("shadowrun5e.flow.networkDevices", shadowrunNetworkDevices, { displayName: "SHADOWRUN5e: Matrix Network Devices Test" });
+  quench.registerBatch("shadowrun5e.flow.inventory", shadowrunInventoryFlow, { displayName: "SHADOWRUN5e: InventoryFlow Test" });
+  quench.registerBatch("shadowrun5e.flow.tests", shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
+};
+
 // src/module/hooks.ts
 var HooksManager = class {
   static registerHooks() {
@@ -27682,7 +27662,6 @@ ___________________
       SR5ActiveEffect,
       rollItemMacro,
       rollSkillMacro,
-      ShadowrunRoller,
       SR5Roll,
       test: TestCreator,
       tests: {
@@ -27802,11 +27781,11 @@ ___________________
       }
       const diceIconSelector = "#chat-controls .roll-type-select .fa-dice-d20";
       $(document).on("click", diceIconSelector, () => __async(this, null, function* () {
-        return yield ShadowrunRoller.promptSuccessTest();
+        return yield TestCreator.promptSuccessTest();
       }));
       const diceIconSelectorNew = "#chat-controls .chat-control-icon .fa-dice-d20";
       $(document).on("click", diceIconSelectorNew, () => __async(this, null, function* () {
-        return yield ShadowrunRoller.promptSuccessTest();
+        return yield TestCreator.promptSuccessTest();
       }));
       Hooks.on("renderChatMessage", HooksManager.chatMessageListeners);
       HooksManager.registerSocketListeners();

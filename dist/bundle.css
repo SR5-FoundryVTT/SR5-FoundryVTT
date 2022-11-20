@@ -872,6 +872,8 @@ select.display {
       color: white;
       border-color: rgba(255, 255, 255, 0.1);
       background: rgba(0, 0, 0, 0.05); }
+  .sr5 .editor.prosemirror textarea {
+    color: white; }
   .sr5 .parts-list {
     font-size: 12px;
     display: flex;
