@@ -6,39 +6,33 @@ import {SR5Actor} from './actor/SR5Actor';
 import {SR5Item} from './item/SR5Item';
 import {SR5ItemSheet} from './item/SR5ItemSheet';
 import {SR5Token} from './token/SR5Token';
+import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
+import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
 import {HandlebarManager} from './handlebars/HandlebarManager';
-import {measureDistance} from './canvas';
-import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
 
 import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
-import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
 import {Import} from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
-import {quenchRegister} from "../test/quench";
-import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
-import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
-import {SR5ActiveEffectConfig} from "./effect/SR5ActiveEffectConfig";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
+import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
+import {SR5ActiveEffectConfig} from "./effect/SR5ActiveEffectConfig";
 import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
 import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
 import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
 
 import {SR5Roll} from "./rolls/SR5Roll";
-import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
-import {RangedAttackTest} from "./tests/RangedAttackTest";
 import {SuccessTest} from "./tests/SuccessTest";
 import {OpposedTest} from "./tests/OpposedTest";
+import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
+import {RangedAttackTest} from "./tests/RangedAttackTest";
 import {PhysicalResistTest} from "./tests/PhysicalResistTest";
 import {MeleeAttackTest} from "./tests/MeleeAttackTest";
 import {SpellCastingTest} from "./tests/SpellCastingTest";
 import {DrainTest} from "./tests/DrainTest";
 import {TestCreator} from "./tests/TestCreator";
 import {CombatSpellDefenseTest} from "./tests/CombatSpellDefenseTest";
-import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
-import SocketMessageHooks = Shadowrun.SocketMessageHooks;
-import SocketMessage = Shadowrun.SocketMessageData;
 import {ComplexFormTest} from "./tests/ComplexFormTest";
 import {AttributeOnlyTest} from "./tests/AttributeOnlyTest";
 import {NaturalRecoveryStunTest} from "./tests/NaturalRecoveryStunTest";
@@ -48,7 +42,15 @@ import {ThrownAttackTest} from "./tests/ThrownAttackTest";
 import {PilotVehicleTest} from "./tests/PilotVehicleTest";
 import {DronePerceptionTest} from "./tests/DronePerceptionTest";
 import {DroneInfiltrationTest} from "./tests/DroneInfiltrationTest";
-import { SupressionDefenseTest } from './tests/SupressionDefenseTest';
+import {SupressionDefenseTest} from './tests/SupressionDefenseTest';
+
+import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
+import {measureDistance} from './canvas';
+import {quenchRegister} from "../test/quench";
+
+import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
+import SocketMessageHooks = Shadowrun.SocketMessageHooks;
+import SocketMessage = Shadowrun.SocketMessageData;
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
