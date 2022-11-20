@@ -492,10 +492,14 @@ export const TestCreator = {
         // Make sure to give NO target actors. Otherwise, user selection will be used.
         data.targetActorsUuid = [];
 
+        // Setup the original item actions minimal action resist configuration as a complete item action.
+        let action = DefaultValues.actionData({
+            ...opposedData.against.opposed.resist
+        });
         // Provide default action information.
-        const action = TestCreator._mergeMinimalActionDataInOrder(
-            DefaultValues.actionData({test: resistTestCls.name}),
-            opposedData.against.opposed.resist,
+        action = TestCreator._mergeMinimalActionDataInOrder(
+            action,
+            resistTestCls._getDocumentTestAction(),
             resistTestCls._getDefaultTestAction()
         );
 
@@ -530,21 +534,25 @@ export const TestCreator = {
      * B: action.skill == 'ritual_spellcasting' won't be overwritten by minimalAction.skill == 'Spellcasting'
      * C: action.armor == true will be overwritten by minimalAction.armor == false
      *
-     * @param action Main action, as defined by user input.
+     * @param sourceAction Main action, as defined by user input.
      * @param defaultActions List of partial actions, as defined by test implementions.
      * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
      */
-    _mergeMinimalActionDataInOrder: function(action, ...defaultActions: Partial<MinimalActionData>[]): ActionRollData {
+    _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: Partial<MinimalActionData>[]): ActionRollData {
         // This action might be taken from ItemData, causing changes to be reflected upstream.
-        const resultAction = foundry.utils.duplicate(action);
+        const resultAction = foundry.utils.duplicate(sourceAction);
 
         // Check if overwriting default 
         for (const defaultAction of defaultActions) {
-             for (const key of Object.keys(DefaultValues.minimalActionData())) {
-                 if (TestCreator._keepActionValue(resultAction, defaultAction, key)) continue;
+            if (Object.keys(defaultAction).length === 0) continue;
 
-                 resultAction[key] = defaultAction[key];
-             }
+            // Iterate over complete MinimalActionData to avoid tests providing other ActionRollData fields they're not
+            // supposed to override.
+            for (const key of Object.keys(DefaultValues.minimalActionData())) {
+                if (TestCreator._keepItemActionValue(sourceAction, defaultAction, key)) continue;
+
+                resultAction[key] = defaultAction[key];
+            }
         }
 
         return resultAction;
@@ -553,16 +561,44 @@ export const TestCreator = {
     /**
      * Should an action value be kept even if a default action defines another value?
      * 
-     * The comparison uses a rather simple approach of only comparing some data types, assuming that 
-     * a defaultAction shouldn't define ALL action fields but only some.
+     * This comparison checks either a simple value against defaults OR checks values grouped as a 
+     * logical unit (skill+attribute/2)
      * 
      * @param action The original action data.
      * @param defaultAction A partial action that may provide values to apply to the main action.
      * @param key The action key to take the value from
      * @returns true for when the orgiginal action value should be kept, false if it's to be overwritten.
      */
-    _keepActionValue(action: ActionRollData, defaultAction: Partial<MinimalActionData>, key: string): boolean {
+    _keepItemActionValue(action: ActionRollData, defaultAction: Partial<MinimalActionData>, key: string): boolean {
         if (!defaultAction.hasOwnProperty(key)) return true;
+
+        // Avoid user confusion. A user might change one value of a logical value grouping (skill+attribute)
+        // and get a default value for the other. 
+        // Instead check some values as a section and only use default values when not one value of that
+        // section has been changed by user input.
+        const skillSection = ['skill', 'attribute', 'attribute2', 'armor'];
+        if (skillSection.includes(key)) {
+            const noneDefault = skillSection.some(sectionKey => TestCreator._actionHasNoneDefaultValue(action, sectionKey));
+            return noneDefault;
+        }
+    
+        // Fallback to basic value checking.
+        return TestCreator._actionHasNoneDefaultValue(action, key);
+    },
+
+    /**
+     * Determine if the field value behind the action property 'key' is of a none-default value.
+     * 
+     * This can be used to determine if a user / automated change has been made.
+     * 
+     * @param action Any action configuration.
+     * @param key A key of action configuration within action parameter
+     * @returns false, when the value behind key is a default value. true, when it's a custom value.
+     */
+    _actionHasNoneDefaultValue(action: ActionRollData, key: string): boolean {
+        if (!action.hasOwnProperty(key)) return false;
+
+        // NOTE: A more complete comparison would take a default ActionRollData object and compare the sub-key against it.
         const value = action[key];
         const type = foundry.utils.getType(value);
 
@@ -572,6 +608,8 @@ export const TestCreator = {
         // A list of value names should only be overwritten when not one has been user selected.
         // This would affect .modifiers like fields.
         if (type === 'Array') return value.length > 0;
+        // Booleans don't have a intrinsic default value on ActionRollData.
+        if (type === 'boolean' && key === 'armor') return action[key] === true; // default is false
 
         return false;
     },
