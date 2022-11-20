@@ -421,21 +421,33 @@ export class Helpers {
     }
 
     /**
-     * Given a SuccessTestData subset fetch all target TokenDocument actors
+     * Given a SuccessTestData subset fetch all target actors.
      *
-     * @param testData A SuccessTest.data property
+     * BEWARE: A target will always be token based BUT linked actors provide an actor uuid instead of
+     * pointing to their token actors.
+     * 
+     * @param testData The test data containing target uuids.
      */
     static async getTestTargetActors(testData: SuccessTestData): Promise<SR5Actor[]> {
         const actors: SR5Actor[] = [];
         for (const uuid of testData.targetActorsUuid) {
-            const tokenDoc = await fromUuid(uuid);
-            if (!(tokenDoc instanceof TokenDocument)) {
-                console.error(`Shadowrun5e | Been given testData with targets. UUID ${uuid} should point to a TokenDocument but doesn't`, tokenDoc);
+            const tokenOrActor = await fromUuid(uuid);
+            // Assume given target to be an actor.
+            let actor = tokenOrActor;
+
+            // In case of a Token, extract it's synthetic actor.
+            if (tokenOrActor instanceof TokenDocument) {
+                if (!tokenOrActor.actor) continue;
+                actor = tokenOrActor.actor;
+            }
+
+            // Avoid fromUuid pulling an unwanted Document type.
+            if (!(actor instanceof SR5Actor)) {
+                console.error(`Shadowrun5e | testData with targets containt UUID ${uuid} which doesn't provide an actor or syntheic actor`, tokenOrActor);
                 continue;
             }
-            if (!tokenDoc.actor) continue;
 
-            actors.push(tokenDoc.actor);
+            actors.push(actor);
         }
         return actors;
     }
