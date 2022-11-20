@@ -249,7 +249,7 @@ export class DefaultValues {
             name: '',
             pack: null,
             type: 'Actor',
-            data: partialSourceEntityData.data || undefined
+            system: partialSourceEntityData.data || undefined
         }, partialSourceEntityData) as SourceEntityField;
     }
 
@@ -257,7 +257,7 @@ export class DefaultValues {
         return  mergeObject({
             name: '',
             type: 'equipment',
-            data: {
+            system: {
                 description: DefaultValues.descriptionData(partialEquipmentItemData.data?.description || {}),
                 technology: DefaultValues.technologyData(partialEquipmentItemData.data?.technology || {})
             }
@@ -268,7 +268,7 @@ export class DefaultValues {
         return mergeObject({
             name: '',
             type: 'device',
-            data: {
+            system: {
                 description: DefaultValues.descriptionData(partialDeviceItemData.data?.description || {}),
                 technology: DefaultValues.technologyData(partialDeviceItemData.data?.technology || {}),
                 ...DefaultValues.matrixData({category: partialDeviceItemData.data?.category, atts: partialDeviceItemData.data?.atts}),

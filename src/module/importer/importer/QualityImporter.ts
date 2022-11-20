@@ -48,7 +48,7 @@ export class QualityImporter extends DataImporter {
 
         const parser = new QualityParserBase();
 
-        let datas: QualityItemData[] = [];
+        let items: QualityItemData[] = [];
         let jsonDatas = jsonObject['qualities']['quality'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
@@ -57,19 +57,19 @@ export class QualityImporter extends DataImporter {
                 continue;
             }
 
-            let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
 
             let category = ImportHelper.StringValue(jsonData, 'category');
             //@ts-ignore TODO: Foundry Where is my foundry base data?
-            data.folder = folders[category.toLowerCase()].id;
-            data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+            item.folder = folders[category.toLowerCase()].id;
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(data);
+            items.push(item);
         }
 
         // @ts-ignore // TODO: TYPE: Remove this.
-        return await Item.create(datas);
+        return await Item.create(items);
     }
 }

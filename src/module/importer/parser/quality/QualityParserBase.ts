@@ -3,21 +3,21 @@ import { ItemParserBase } from '../item/ItemParserBase';
 import QualityItemData = Shadowrun.QualityItemData;
 
 export class QualityParserBase extends ItemParserBase<QualityItemData> {
-    public Parse(jsonData: object, data: QualityItemData, jsonTranslation?): QualityItemData {
+    public Parse(jsonData: object, item: QualityItemData, jsonTranslation?): QualityItemData {
         // @ts-ignore // TODO: Foundry Where is my foundry base data?
-        data.name = ImportHelper.StringValue(jsonData, 'name');
+        item.name = ImportHelper.StringValue(jsonData, 'name');
 
-        data.data.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
+        item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
 
-        data.data.type = ImportHelper.StringValue(jsonData, 'category') === 'Positive' ? 'positive' : 'negative';
+        item.system.type = ImportHelper.StringValue(jsonData, 'category') === 'Positive' ? 'positive' : 'negative';
 
         if (jsonTranslation) {
             const origName = ImportHelper.StringValue(jsonData, 'name');
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
-            data.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-            data.data.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+            item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
+            item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
         }
 
-        return data;
+        return item;
     }
 }

@@ -44,11 +44,11 @@ export class MeleeParser extends WeaponParserBase {
         return DefaultValues.damageData(partialDamageData);
     }
 
-    Parse(jsonData: object, data: WeaponItemData, jsonTranslation?: object): WeaponItemData {
-        data = super.Parse(jsonData, data, jsonTranslation);
+    Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+        item = super.Parse(jsonData, item, jsonTranslation);
 
-        data.data.melee.reach = ImportHelper.IntValue(jsonData, 'reach');
+        item.system.melee.reach = ImportHelper.IntValue(jsonData, 'reach');
 
-        return data;
+        return item;
     }
 }

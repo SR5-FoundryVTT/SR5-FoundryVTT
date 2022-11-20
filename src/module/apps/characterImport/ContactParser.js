@@ -19,28 +19,28 @@ export class ContactParser {
     }
 
     parseContact(chummerContact) {
-        const data = {};
-        data.type = chummerContact.role;
+        const system = {};
+        system.type = chummerContact.role;
 
         // Group contacts are stored in chummer as 'Group(connectionRating)', e.g. 'Group(5)'
         // We handle group contacts as normal contacts until they are supported in the codebase.
         if (chummerContact.connection.toLowerCase().includes('group')) {
-            data.connection = chummerContact.connection
+            system.connection = chummerContact.connection
                 .toLowerCase()
                 .replace('group(', '')
                 .replace(')', '');
         }
         else {
-            data.connection = chummerContact.connection;
+            system.connection = chummerContact.connection;
         }
 
-        data.loyalty = chummerContact.loyalty;
-        data.family = (chummerContact.family.toLowerCase() === 'true');
-        data.blackmail = (chummerContact.blackmail.toLowerCase() === 'true');
-        data.description = parseDescription(chummerContact);
+        system.loyalty = chummerContact.loyalty;
+        system.family = (chummerContact.family.toLowerCase() === 'true');
+        system.blackmail = (chummerContact.blackmail.toLowerCase() === 'true');
+        system.description = parseDescription(chummerContact);
 
         const itemName = chummerContact.name ? chummerContact.name : '[Unnamed connection]';
-        const itemData = createItemData(itemName, 'contact', data);
+        const itemData = createItemData(itemName, 'contact', system);
         return itemData;
     }
 }

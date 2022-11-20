@@ -57,12 +57,10 @@ export class ModImporter extends DataImporter {
                 continue;
             }
 
-            let data = parser.Parse(jsonData, this.GetDefaultData());
-            // TODO: Integrate into ModParserBase approach.
-            data.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, data.name);
+            let item = parser.Parse(jsonData, this.GetDefaultData());
+            item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
 
-            //TODO: Test this
-            let folderName = data.data.mount_point !== undefined ? data.data.mount_point : 'Other';
+            let folderName = item.system.mount_point !== undefined ? item.system.mount_point : 'Other';
             if (folderName.includes('/')) {
                 let splitName = folderName.split('/');
                 folderName = splitName[0];
@@ -70,11 +68,11 @@ export class ModImporter extends DataImporter {
 
             let folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Mods/${folderName}`, true);
             //@ts-ignore TODO: Foundry Where is my foundry base data?
-            data.folder = folder.id;
+            item.folder = folder.id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(data);
+            datas.push(item);
         }
 
         // @ts-ignore // TODO: TYPE: Remove this.

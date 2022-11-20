@@ -61,15 +61,15 @@ export class ArmorImporter extends DataImporter {
                 continue;
             }
 
-            let data = parser.Parse(jsonData, this.GetDefaultData());
+            let item = parser.Parse(jsonData, this.GetDefaultData());
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
-            data.name = ImportHelper.MapNameToTranslation(this.armorTranslations, data.name);
+            item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
             // @ts-ignore TODO: Foundry Where is my foundry base data?
-            data.folder = folders[category].id;
+            item.folder = folders[category].id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(data);
+            datas.push(item);
         }
 
         // @ts-ignore

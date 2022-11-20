@@ -78,7 +78,7 @@ export class WareImporter extends DataImporter {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, key);
 
         key = key.toLowerCase();
-        let datas: Ware[] = [];
+        let items: Ware[] = [];
         let jsonDatas = jsonObject[key + 's'][key];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
@@ -88,21 +88,21 @@ export class WareImporter extends DataImporter {
             }
 
             const defaultData = key === 'cyberware' ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
-            let data = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
+            let item = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
             const category = ImportHelper.StringValue(jsonData, 'category');
 
             // TODO: Does this type mixture cause later issues? Will it carry over?
             //@ts-ignore
-            data.folder = folders[category.toLowerCase()].id;
+            item.folder = folders[category.toLowerCase()].id;
 
             // // TODO: Follow ComplexFormParserBase approach.
             // data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(data);
+            items.push(item);
         }
 
         // @ts-ignore // TODO: TYPE: Remove this.
-        return await Item.create(datas);
+        return await Item.create(items);
     }
 }

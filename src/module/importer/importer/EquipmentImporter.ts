@@ -27,7 +27,7 @@ export class EquipmentImporter extends DataImporter {
     }
 
     async ParseEquipments(equipments) {
-        const entries = [];
+        const items = [];
 
         for (const equipment of equipments) {
             if (DataImporter.unsupportedEntry(equipment)) {
@@ -38,25 +38,25 @@ export class EquipmentImporter extends DataImporter {
             const category = ImportHelper.TranslateCategory(ImportHelper.StringValue(equipment, 'category'), this.categoryTranslations).replace('/', ' ');
             let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
 
-            const data = this.GetDefaultData();
-            data.name = ImportHelper.StringValue(equipment, 'name');
-            data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
+            const item = this.GetDefaultData();
+            item.name = ImportHelper.StringValue(equipment, 'name');
+            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
 
-            data.data.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;
-            data.data.technology.rating = ImportHelper.IntValue(equipment, 'rating', 0);
-            data.data.technology.availability = ImportHelper.StringValue(equipment, 'avail');
-            data.data.technology.cost = ImportHelper.IntValue(equipment, 'cost', 0);
-
-            //@ts-ignore
-            data.folder = categoryFolder.id;
-
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            item.system.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;
+            item.system.technology.rating = ImportHelper.IntValue(equipment, 'rating', 0);
+            item.system.technology.availability = ImportHelper.StringValue(equipment, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(equipment, 'cost', 0);
 
             //@ts-ignore
-            entries.push(data);
+            item.folder = categoryFolder.id;
+
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            //@ts-ignore
+            items.push(item);
         }
 
-        return entries;
+        return items;
     }
 
     FilterJsonObjects(jsonObject) {
@@ -75,9 +75,9 @@ export class EquipmentImporter extends DataImporter {
     async Parse(jsonObject: object): Promise<Item> {
         const equipments = this.FilterJsonObjects(jsonObject);
 
-        const entries = await this.ParseEquipments(equipments);
+        const items = await this.ParseEquipments(equipments);
 
         // @ts-ignore // TODO: TYPE: Remove this.
-        return await Item.create(entries);
+        return await Item.create(items);
     }
 }

@@ -66,7 +66,7 @@ export const parseTechnology = (chummerEntry) => {
     return parsedTechnology
 }
 
-export const createItemData = (name, type, data) => {
+export const createItemData = (name, type, system) => {
     return {
         name: name,
         _id: '',
@@ -74,7 +74,7 @@ export const createItemData = (name, type, data) => {
         flags: {},
         img: 'icons/svg/mystery-man.svg',
         type: type,
-        data,
+        system,
         permission: {
             default: 2,
         },

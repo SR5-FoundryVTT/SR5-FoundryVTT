@@ -105,7 +105,7 @@ export class WeaponImporter extends DataImporter {
             { key: 'thrown', value: new ThrownParser() },
         ]);
 
-        let datas: WeaponItemData[] = [];
+        let items: WeaponItemData[] = [];
         let jsonDatas = jsonObject['weapons']['weapon'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
@@ -114,16 +114,16 @@ export class WeaponImporter extends DataImporter {
                 continue;
             }
 
-            let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
-            data.folder = folders[data.data.subcategory].id;
+            item.folder = folders[item.system.subcategory].id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(data);
+            items.push(item);
         }
 
         // @ts-ignore // TODO: TYPE: This should be removed after typing of SR5Item
-        return await Item.create(datas);
+        return await Item.create(items);
     }
 }

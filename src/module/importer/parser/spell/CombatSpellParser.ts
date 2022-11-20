@@ -3,8 +3,8 @@ import { ImportHelper } from '../../helper/ImportHelper';
 import SpellItemData = Shadowrun.SpellItemData;
 
 export class CombatSpellParser extends SpellParserBase {
-    Parse(jsonData: object, data: SpellItemData, jsonTranslation?: object): SpellItemData {
-        data = super.Parse(jsonData, data, jsonTranslation);
+    Parse(jsonData: object, item: SpellItemData, jsonTranslation?: object): SpellItemData {
+        item = super.Parse(jsonData, item, jsonTranslation);
 
         let descriptor = ImportHelper.StringValue(jsonData, 'descriptor');
         // A few spells have a missing descriptor instead of an empty string.
@@ -16,8 +16,8 @@ export class CombatSpellParser extends SpellParserBase {
         }
 
         // Lower case is needed for the system.
-        data.data.combat.type = descriptor.includes('Indirect') ? 'indirect' : 'direct';
+        item.system.combat.type = descriptor.includes('Indirect') ? 'indirect' : 'direct';
 
-        return data;
+        return item;
     }
 }

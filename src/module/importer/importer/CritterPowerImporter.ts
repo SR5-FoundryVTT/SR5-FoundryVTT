@@ -60,23 +60,23 @@ export class CritterPowerImporter extends DataImporter {
         const parser = new CritterPowerParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
 
-        let datas: CritterPowerItemData[] = [];
+        let items: CritterPowerItemData[] = [];
         let jsonDatas = jsonObject['powers']['power'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
-            let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
 
             // @ts-ignore TODO: Foundry Where is my foundry base data?
-            data.folder = folder.id;
-            data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+            item.folder = folder.id;
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(data);
+            items.push(item);
         }
 
         // @ts-ignore // TODO: TYPE: Remove this.
-        return await Item.create(datas);
+        return await Item.create(items);
     }
 }

@@ -41,33 +41,33 @@ export class RangedParser extends WeaponParserBase {
         return match !== undefined ? parseInt(match) : 0;
     }
 
-    Parse(jsonData: object, data: WeaponItemData, jsonTranslation?: object): WeaponItemData {
-        data = super.Parse(jsonData, data, jsonTranslation);
+    Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+        item = super.Parse(jsonData, item, jsonTranslation);
 
         // Some new weapons don't have any rc defined in XML.
         if (jsonData.hasOwnProperty('rc')) {
-            data.data.range.rc.base = ImportHelper.IntValue(jsonData, 'rc');
-            data.data.range.rc.value = ImportHelper.IntValue(jsonData, 'rc');
+            item.system.range.rc.base = ImportHelper.IntValue(jsonData, 'rc');
+            item.system.range.rc.value = ImportHelper.IntValue(jsonData, 'rc');
         } else {
-            data.data.range.rc.base = 0;
-            data.data.range.rc.value = 0;
+            item.system.range.rc.base = 0;
+            item.system.range.rc.value = 0;
         }
         
 
         if (jsonData.hasOwnProperty('range')) {
-            data.data.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'range')];
+            item.system.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'range')];
         } else {
-            data.data.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'category')];
+            item.system.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'category')];
         }
 
-        data.data.ammo.current.value = this.GetAmmo(jsonData);
-        data.data.ammo.current.max = this.GetAmmo(jsonData);
+        item.system.ammo.current.value = this.GetAmmo(jsonData);
+        item.system.ammo.current.max = this.GetAmmo(jsonData);
 
-        data.data.range.modes.single_shot = ImportHelper.StringValue(jsonData, 'mode').includes('SS');
-        data.data.range.modes.semi_auto = ImportHelper.StringValue(jsonData, 'mode').includes('SA');
-        data.data.range.modes.burst_fire = ImportHelper.StringValue(jsonData, 'mode').includes('BF');
-        data.data.range.modes.full_auto = ImportHelper.StringValue(jsonData, 'mode').includes('FA');
+        item.system.range.modes.single_shot = ImportHelper.StringValue(jsonData, 'mode').includes('SS');
+        item.system.range.modes.semi_auto = ImportHelper.StringValue(jsonData, 'mode').includes('SA');
+        item.system.range.modes.burst_fire = ImportHelper.StringValue(jsonData, 'mode').includes('BF');
+        item.system.range.modes.full_auto = ImportHelper.StringValue(jsonData, 'mode').includes('FA');
 
-        return data;
+        return item;
     }
 }

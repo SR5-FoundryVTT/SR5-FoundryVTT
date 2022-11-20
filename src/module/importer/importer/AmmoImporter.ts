@@ -59,34 +59,34 @@ export class AmmoImporter extends DataImporter {
                 continue;
             }
 
-            let data = this.GetDefaultData();
-            data.name = ImportHelper.StringValue(jsonData, 'name');
-            data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
+            let item = this.GetDefaultData();
+            item.name = ImportHelper.StringValue(jsonData, 'name');
+            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
 
-            data.data.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
-            data.data.technology.rating = 2;
-            data.data.technology.availability = ImportHelper.StringValue(jsonData, 'avail');
-            data.data.technology.cost = ImportHelper.IntValue(jsonData, 'cost', 0);
+            item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
+            item.system.technology.rating = 2;
+            item.system.technology.availability = ImportHelper.StringValue(jsonData, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(jsonData, 'cost', 0);
 
             let bonusData = ImportHelper.ObjectValue(jsonData, 'weaponbonus', null);
             if (bonusData !== undefined && bonusData !== null) {
-                data.data.ap = ImportHelper.IntValue(bonusData, 'ap', 0);
-                data.data.damage = ImportHelper.IntValue(bonusData, 'damage', 0);
+                item.system.ap = ImportHelper.IntValue(bonusData, 'ap', 0);
+                item.system.damage = ImportHelper.IntValue(bonusData, 'damage', 0);
 
                 let damageType = ImportHelper.StringValue(bonusData, 'damagetype', '');
                 if (damageType.length > 0) {
                     if (damageType.includes('P')) {
-                        data.data.damageType = 'physical';
+                        item.system.damageType = 'physical';
                     } else if (damageType.includes('S')) {
-                        data.data.damageType = 'stun';
+                        item.system.damageType = 'stun';
                     } else if (damageType.includes('M')) {
-                        data.data.damageType = 'matrix';
+                        item.system.damageType = 'matrix';
                     }
                 }
             }
 
             let shouldLookForWeapons = false;
-            let nameLower = data.name.toLowerCase();
+            let nameLower = item.name.toLowerCase();
             ['grenade', 'rocket', 'missile'].forEach((compare) => {
                 shouldLookForWeapons = shouldLookForWeapons || nameLower.includes(compare);
             });
@@ -100,18 +100,18 @@ export class AmmoImporter extends DataImporter {
 
                 if (foundWeapon != null && "action" in foundWeapon.data.data) {
                     const weaponData = foundWeapon.data.data as WeaponData;
-                    data.data.damage = weaponData.action.damage.value;
-                    data.data.ap =weaponData.action.damage.ap.value;
+                    item.system.damage = weaponData.action.damage.value;
+                    item.system.ap =weaponData.action.damage.ap.value;
                 }
             }
 
             // ammo doesn't have conceal rating from looking at the data
             // data.data.technology.conceal.base = ImportHelper.intValue(jsonData, "conceal");
-            data.data.technology.conceal.base = 0;
+            item.system.technology.conceal.base = 0;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            ammoDatas.push(data);
+            ammoDatas.push(item);
         }
 
         for (let i = 0; i < ammoDatas.length; i++) {

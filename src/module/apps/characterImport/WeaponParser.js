@@ -41,14 +41,14 @@ export class WeaponParser {
     }
 
     parseWeapon(chummerWeapon) {
-        const data = {};
+        const system = {};
         const action = {};
         const damage = {};
         action.damage = damage;
-        data.action = action;
+        system.action = action;
 
-        data.description = parseDescription(chummerWeapon);
-        data.technology = parseTechnology(chummerWeapon);
+        system.description = parseDescription(chummerWeapon);
+        system.technology = parseTechnology(chummerWeapon);
 
         damage.ap = {
             base: parseInt(getValues(chummerWeapon.ap)[0])
@@ -80,17 +80,17 @@ export class WeaponParser {
 
         if (chummerWeapon.type.toLowerCase() === 'melee') {
             action.type = 'complex';
-            data.category = 'melee';
+            system.category = 'melee';
             const melee = {};
-            data.melee = melee;
+            system.melee = melee;
             melee.reach = parseInt(chummerWeapon.reach);
         } else if (chummerWeapon.type.toLowerCase() === 'ranged') {
-            data.category = 'range';
+            system.category = 'range';
             if (action.skill.toLowerCase().includes('throw')) {
-                data.category = 'thrown';
+                system.category = 'thrown';
             }
             const range = {};
-            data.range = range;
+            system.range = range;
             range.rc = {
                 base: parseInt(getValues(chummerWeapon.rc)[0]),
             };
@@ -128,7 +128,7 @@ export class WeaponParser {
             }
 
         } else if (chummerWeapon.type.toLowerCase() === 'thrown') {
-            data.category = 'thrown';
+            system.category = 'thrown';
         }
         {
             // TODO handle raw damage if present
@@ -138,7 +138,7 @@ export class WeaponParser {
             damage.type.base = d.type;
             if (d.dropoff || d.radius) {
                 const thrown = {};
-                data.thrown = thrown;
+                system.thrown = thrown;
                 thrown.blast = {
                     radius: d.radius,
                     dropoff: d.dropoff,
@@ -146,7 +146,7 @@ export class WeaponParser {
             }
         }
 
-        const itemData = createItemData(chummerWeapon.name, 'weapon', data);
+        const itemData = createItemData(chummerWeapon.name, 'weapon', system);
         return itemData;
     }
 }
