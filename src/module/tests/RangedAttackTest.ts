@@ -1,5 +1,6 @@
+import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DataDefaults, DefaultValues} from "../data/DataDefaults";
+import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import {LENGTH_UNIT, SR} from "../constants";
@@ -9,7 +10,6 @@ import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
-import RangedWeaponMode = Shadowrun.RangedWeaponMode;
 import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
@@ -95,7 +95,6 @@ export class RangedAttackTest extends SuccessTest {
         }
         this.data.ranges = newRanges;
 
-        // TODO: template disableTargetRange
         // Get currently active range modifier.
         const actor = this.actor;
         if (!actor) return;
@@ -124,7 +123,7 @@ export class RangedAttackTest extends SuccessTest {
         // Build target ranges for template display.
         this.data.targetRanges = this.targets.map(target => {
             const distance = Helpers.measureTokenDistance(attacker, target);
-            const range = Helpers.getWeaponRange(distance, this.data.ranges);
+            const range = RangedWeaponRules.getRangeForTargetDistance(distance, this.data.ranges);
             return {
                 uuid: target.uuid,
                 name: target.name || '',

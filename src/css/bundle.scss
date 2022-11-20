@@ -318,6 +318,11 @@ select.display {
                 background: rgba($black, 0.05);
             }
         }
+
+        // HTML editing uses a class-less textarea
+        textarea {
+            color: $color;
+        }
     }
 
 

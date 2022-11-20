@@ -12,5 +12,6 @@ declare namespace Shadowrun {
         MovementActorData {
             spiritType: SpiritType
             force: number
+            limits: AwakendLimits
     }
 }

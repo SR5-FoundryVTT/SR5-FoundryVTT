@@ -11,7 +11,7 @@ import {
     TestDocuments,
     TestOptions
 } from "./SuccessTest";
-import {DataDefaults, DefaultValues} from "../data/DataDefaults";
+import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
@@ -173,6 +173,8 @@ export const TestCreator = {
      * @param options
      */
     fromMessageAction: async function(id: string, testClsName: string, options?: TestOptions): Promise<SuccessTest | undefined> {
+        if (!game.user) return;
+        
         const message = game.messages?.get(id);
         if (!message) {
             console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
@@ -193,12 +195,21 @@ export const TestCreator = {
             return;
         }
 
+        // Determine actors to roll test with.
+        // First - use selection or targets.
+        let actors = Helpers.userHasControlledTokens() ? 
+            Helpers.getControlledTokenActors() :
+            await Helpers.getTestTargetActors(testData.data);
 
-        const targets = await Helpers.getTestTargetActors(testData.data);
-        const actors = targets.length > 0 ? targets : Helpers.getSelectedActorsOrCharacter();
+        // Second - filter out actors current user shouldn't be able to test with.
+        actors = actors.filter(actor => actor.isOwner);
+        // Last - Fallback to player character.
+        if (actors.length === 0 && game.user.character) actors.push(game.user.character);
 
         if (actors.length === 0)
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
+        else 
+            console.log('Shadowrun 5e | Casting an opposed test using these actors', actors, testData);
 
         for (const actor of actors) {
             const data = await testClass._getOpposedActionTestData(testData.data, actor, id);
@@ -207,7 +218,6 @@ export const TestCreator = {
             const documents = {actor};
             const test = new testClass(data, documents, options);
 
-            // TODO: Handle dialog visibility based on SHIFT+CLICK of whoever casts opposed action.
             // Await test chain resolution for each actor, to avoid dialog spam.
             await test.execute();
         }
@@ -287,6 +297,22 @@ export const TestCreator = {
         return new testCls(testData, documents, options);
     },
 
+    /*
+     * Prompt the user for a default SuccessTest
+     */
+    promptSuccessTest: async function() {
+        // Get the last used pool size for simple SuccessTestDialogs
+        const lastPoolValue = Number(game.user?.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue)) || 0;
+
+        const test = TestCreator.fromPool({pool: lastPoolValue});
+        await test.execute();
+
+        if (test.evaluated) {
+            // Store the last used pool size for the next simple SuccessTest
+            await game.user?.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, test.pool.value);
+        }
+    },
+
     /** Internal helpers */
 
     /**
@@ -341,10 +367,9 @@ export const TestCreator = {
         const pool = new PartsList<number>(data.pool.mod);
 
         // Prepare pool values.
-        // TODO: Check if knowledge / language skills can be used for actions.
-        // TODO: Handle skill improvisation.
         if (action.skill) {
-            const skill = actor.getSkill(action.skill);
+            // Grab the skill by its id (default skills), or its label (custom skills).
+            const skill = actor.getSkill(action.skill) ?? actor.getSkill(action.skill, {byLabel: true});
 
             // Notify user about their sins.
             if (skill && !SkillFlow.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
@@ -467,10 +492,14 @@ export const TestCreator = {
         // Make sure to give NO target actors. Otherwise, user selection will be used.
         data.targetActorsUuid = [];
 
+        // Setup the original item actions minimal action resist configuration as a complete item action.
+        let action = DefaultValues.actionData({
+            ...opposedData.against.opposed.resist
+        });
         // Provide default action information.
-        const action = TestCreator._mergeMinimalActionDataInOrder(
-            DefaultValues.actionData({test: resistTestCls.name}),
-            opposedData.against.opposed.resist,
+        action = TestCreator._mergeMinimalActionDataInOrder(
+            action,
+            resistTestCls._getDocumentTestAction(),
             resistTestCls._getDefaultTestAction()
         );
 
@@ -498,26 +527,91 @@ export const TestCreator = {
      * Merge multiple MinimalActionData objects into one action object. This will only look at keys within a minimal action,
      * not all action keys.
      *
-     * Each MinimalActionData can contain only a partial, and an existing property will always overwrite either the
-     * main action or previously set values of this property from other MinimalActionDatas.
+     * A value of a minimal action will only overwrite the main action value if that is not set.
+     * 
+     * For example:
+     * A: action.skill == '' will be overwritten by minimalAction.skill == 'Spellcasting'
+     * B: action.skill == 'ritual_spellcasting' won't be overwritten by minimalAction.skill == 'Spellcasting'
+     * C: action.armor == true will be overwritten by minimalAction.armor == false
      *
-     * @param action The main action
-     * @param minimalActions A list of partial action properties.
+     * @param sourceAction Main action, as defined by user input.
+     * @param defaultActions List of partial actions, as defined by test implementions.
      * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
      */
-    _mergeMinimalActionDataInOrder: function(action, ...minimalActions: Partial<MinimalActionData>[]): ActionRollData {
+    _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: Partial<MinimalActionData>[]): ActionRollData {
         // This action might be taken from ItemData, causing changes to be reflected upstream.
-        action = duplicate(action);
+        const resultAction = foundry.utils.duplicate(sourceAction);
 
-        // Overwrite keys from second action on forward in indexed order.
-        for (const minimalAction of minimalActions) {
-             for (const key of Object.keys(DefaultValues.minimalActionData())) {
-                 if (!minimalAction.hasOwnProperty(key)) continue;
-                 action[key] = minimalAction[key];
-             }
+        // Check if overwriting default 
+        for (const defaultAction of defaultActions) {
+            if (Object.keys(defaultAction).length === 0) continue;
+
+            // Iterate over complete MinimalActionData to avoid tests providing other ActionRollData fields they're not
+            // supposed to override.
+            for (const key of Object.keys(DefaultValues.minimalActionData())) {
+                if (TestCreator._keepItemActionValue(sourceAction, defaultAction, key)) continue;
+
+                resultAction[key] = defaultAction[key];
+            }
         }
 
-        return action;
+        return resultAction;
+    },
+
+    /**
+     * Should an action value be kept even if a default action defines another value?
+     * 
+     * This comparison checks either a simple value against defaults OR checks values grouped as a 
+     * logical unit (skill+attribute/2)
+     * 
+     * @param action The original action data.
+     * @param defaultAction A partial action that may provide values to apply to the main action.
+     * @param key The action key to take the value from
+     * @returns true for when the orgiginal action value should be kept, false if it's to be overwritten.
+     */
+    _keepItemActionValue(action: ActionRollData, defaultAction: Partial<MinimalActionData>, key: string): boolean {
+        if (!defaultAction.hasOwnProperty(key)) return true;
+
+        // Avoid user confusion. A user might change one value of a logical value grouping (skill+attribute)
+        // and get a default value for the other. 
+        // Instead check some values as a section and only use default values when not one value of that
+        // section has been changed by user input.
+        const skillSection = ['skill', 'attribute', 'attribute2', 'armor'];
+        if (skillSection.includes(key)) {
+            const noneDefault = skillSection.some(sectionKey => TestCreator._actionHasNoneDefaultValue(action, sectionKey));
+            return noneDefault;
+        }
+    
+        // Fallback to basic value checking.
+        return TestCreator._actionHasNoneDefaultValue(action, key);
+    },
+
+    /**
+     * Determine if the field value behind the action property 'key' is of a none-default value.
+     * 
+     * This can be used to determine if a user / automated change has been made.
+     * 
+     * @param action Any action configuration.
+     * @param key A key of action configuration within action parameter
+     * @returns false, when the value behind key is a default value. true, when it's a custom value.
+     */
+    _actionHasNoneDefaultValue(action: ActionRollData, key: string): boolean {
+        if (!action.hasOwnProperty(key)) return false;
+
+        // NOTE: A more complete comparison would take a default ActionRollData object and compare the sub-key against it.
+        const value = action[key];
+        const type = foundry.utils.getType(value);
+
+        // A value name should only be overwritten when no value has been user selected.
+        // This would affect .skill and .attribute like fields.
+        if (type === 'string') return value.length > 0;
+        // A list of value names should only be overwritten when not one has been user selected.
+        // This would affect .modifiers like fields.
+        if (type === 'Array') return value.length > 0;
+        // Booleans don't have a intrinsic default value on ActionRollData.
+        if (type === 'boolean' && key === 'armor') return action[key] === true; // default is false
+
+        return false;
     },
 
     /**

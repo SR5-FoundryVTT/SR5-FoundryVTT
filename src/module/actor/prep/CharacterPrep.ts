@@ -44,6 +44,7 @@ export class CharacterPrep {
         // Limits depend on attributes and active effects.
         LimitsPrep.prepareLimitBaseFromAttributes(system);
         LimitsPrep.prepareLimits(system);
+        LimitsPrep.prepareDerivedLimits(system);
 
         if (system.is_npc && system.npc.is_grunt) {
             ConditionMonitorsPrep.prepareGrunt(system);

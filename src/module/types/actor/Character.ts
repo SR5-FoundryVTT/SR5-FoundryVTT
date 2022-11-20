@@ -22,7 +22,10 @@ declare namespace Shadowrun {
             // Can a character have critter powers?
             is_critter: boolean;
             modifiers: CharacterModifiers
+            limits: CharacterLimits
     }
+
+    export interface CharacterLimits extends AwakendLimits, MatrixLimits {}
 
     export type PhysicalTrackActorData = {
         track: {
@@ -52,7 +55,7 @@ declare namespace Shadowrun {
     };
 
     export type MagicActorData = {
-        magic: MagicData;
+        magic: MagicData
     };
 
     export type MatrixActorData = {

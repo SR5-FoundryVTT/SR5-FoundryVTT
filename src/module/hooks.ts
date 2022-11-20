@@ -6,41 +6,33 @@ import {SR5Actor} from './actor/SR5Actor';
 import {SR5Item} from './item/SR5Item';
 import {SR5ItemSheet} from './item/SR5ItemSheet';
 import {SR5Token} from './token/SR5Token';
-import {ShadowrunRoller} from './rolls/ShadowrunRoller';
+import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
+import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
 import {HandlebarManager} from './handlebars/HandlebarManager';
-import {measureDistance} from './canvas';
-import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
 
 import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
-import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
 import {Import} from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
-import {quenchRegister} from "../test/quench";
-import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
-import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
-import {SR5ActiveEffectConfig} from "./effect/SR5ActiveEffectConfig";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
+import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
+import {SR5ActiveEffectConfig} from "./effect/SR5ActiveEffectConfig";
 import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
 import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
 import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
 
 import {SR5Roll} from "./rolls/SR5Roll";
-import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
-import {RangedAttackTest} from "./tests/RangedAttackTest";
 import {SuccessTest} from "./tests/SuccessTest";
 import {OpposedTest} from "./tests/OpposedTest";
+import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
+import {RangedAttackTest} from "./tests/RangedAttackTest";
 import {PhysicalResistTest} from "./tests/PhysicalResistTest";
-import {handleRenderChatMessage} from "./chat";
 import {MeleeAttackTest} from "./tests/MeleeAttackTest";
 import {SpellCastingTest} from "./tests/SpellCastingTest";
 import {DrainTest} from "./tests/DrainTest";
 import {TestCreator} from "./tests/TestCreator";
 import {CombatSpellDefenseTest} from "./tests/CombatSpellDefenseTest";
-import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
-import SocketMessageHooks = Shadowrun.SocketMessageHooks;
-import SocketMessage = Shadowrun.SocketMessageData;
 import {ComplexFormTest} from "./tests/ComplexFormTest";
 import {AttributeOnlyTest} from "./tests/AttributeOnlyTest";
 import {NaturalRecoveryStunTest} from "./tests/NaturalRecoveryStunTest";
@@ -50,7 +42,15 @@ import {ThrownAttackTest} from "./tests/ThrownAttackTest";
 import {PilotVehicleTest} from "./tests/PilotVehicleTest";
 import {DronePerceptionTest} from "./tests/DronePerceptionTest";
 import {DroneInfiltrationTest} from "./tests/DroneInfiltrationTest";
-import { SupressionDefenseTest } from './tests/SupressionDefenseTest';
+import {SupressionDefenseTest} from './tests/SupressionDefenseTest';
+
+import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
+import {measureDistance} from './canvas';
+import {quenchRegister} from "../test/quench";
+
+import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
+import SocketMessageHooks = Shadowrun.SocketMessageHooks;
+import SocketMessage = Shadowrun.SocketMessageData;
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -65,8 +65,6 @@ export class HooksManager {
 
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        // Hooks.on('renderChatMessage', chat.addRollListeners)
-        // Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
@@ -78,7 +76,6 @@ export class HooksManager {
         Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners);
-        // Hooks.on("renderChatPopout", chatMessageListeners);
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
 
         Hooks.on('init', quenchRegister);
@@ -108,10 +105,6 @@ ___________________
              */
             rollItemMacro,
             rollSkillMacro,
-            /**
-             * Complex test support (legacy).
-             */
-            ShadowrunRoller,
             /**
              * Should you only really need dice handling, use this. If you need more complex testing behaviour,
              * check the Test implementations.
@@ -298,9 +291,9 @@ ___________________
 
         // Connect chat dice icon to shadowrun basic success test roll.
         const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-        $(document).on('click', diceIconSelector, async () => await ShadowrunRoller.promptSuccessTest());
+        $(document).on('click', diceIconSelector, async () => await TestCreator.promptSuccessTest());
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
-        $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
+        $(document).on('click', diceIconSelectorNew, async () => await TestCreator.promptSuccessTest());
 
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
         HooksManager.registerSocketListeners();

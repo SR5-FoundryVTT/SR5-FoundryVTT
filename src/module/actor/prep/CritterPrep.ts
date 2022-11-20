@@ -33,6 +33,7 @@ export class CritterPrep {
         // Limits depend on attributes and active effects.
         LimitsPrep.prepareLimitBaseFromAttributes(data);
         LimitsPrep.prepareLimits(data);
+        LimitsPrep.prepareDerivedLimits(data);
 
         ConditionMonitorsPrep.preparePhysical(data);
         ConditionMonitorsPrep.prepareStun(data);

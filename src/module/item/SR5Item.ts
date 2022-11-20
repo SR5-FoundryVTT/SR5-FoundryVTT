@@ -1,13 +1,11 @@
 import { SkillFlow } from "../actor/flows/SkillFlow";
 import { SR5Actor } from '../actor/SR5Actor';
-import { ActionTestData } from '../apps/dialogs/ShadowrunItemDialog';
 import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
 import { DefaultValues } from "../data/DataDefaults";
 import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
-import { Test } from "../rolls/ShadowrunRoller";
 import { MatrixRules } from "../rules/MatrixRules";
 import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
@@ -24,7 +22,6 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import ActionRollData = Shadowrun.ActionRollData;
-import DamageData = Shadowrun.DamageData;
 import SpellData = Shadowrun.SpellData;
 import WeaponData = Shadowrun.WeaponData;
 import AmmoData = Shadowrun.AmmoData;
@@ -53,9 +50,24 @@ import SpritePowerItemData = Shadowrun.SpritePowerItemData;
 import WeaponItemData = Shadowrun.WeaponItemData;
 import HostItemData = Shadowrun.HostItemData;
 import ActionResultData = Shadowrun.ActionResultData;
+import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
+
+/**
+ * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
+ * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of exceution within transpiled bundle.js code, 
+ * resulting OpposedTest not finding SuccessTest (undefined) when extending it.
+ * 
+ * ... I'd love to remove this, or even just comment it, but tree-shaking will do it's job.
+ * 
+ * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
+ * 
+ * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
+ */
+import { ActionResultFlow } from './flows/ActionResultFlow';
+ActionResultFlow; // DON'T TOUCH!
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -295,8 +307,6 @@ export class SR5Item extends Item {
                 
             });
 
-
-
             if (equippedAmmo) {
                 //@ts-ignore // TODO: foundry-vtt-types v10 
                 const ammoData = equippedAmmo.system as AmmoData;
@@ -364,13 +374,12 @@ export class SR5Item extends Item {
     }
 
     async postItemCard() {
-        const tests =  this.getActionTests();
         const options = {
             actor: this.actor,
             description: this.getChatData(),
             item: this,
             previewTemplate: this.hasTemplate,
-            tests
+            tests: this.getActionTests()
         };
         return await createItemChatMessage(options);
     }
@@ -439,7 +448,7 @@ export class SR5Item extends Item {
         return parts;
     }
 
-    getBlastData(actionTestData?: ActionTestData): BlastData | undefined {
+    getBlastData(actionTestData?: any): BlastData | undefined {
         if (this.isSpell() && this.isAreaOfEffect()) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as SpellData;
@@ -883,7 +892,7 @@ export class SR5Item extends Item {
         return targets;
     }
 
-    getActionTests(): Test[] {
+    getActionTests(): ActionTestLabel[] {
         if (!this.hasRoll) return []
 
         return [{

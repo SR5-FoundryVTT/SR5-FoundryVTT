@@ -148,4 +148,9 @@ declare namespace Shadowrun {
         | 'drone_pilot_vehicle'
         | 'drone_perception'
         | 'drone_infiltration';
+
+    export type ActionTestLabel =  {
+        label: string;
+        type: string;
+    }
 }
