@@ -59,7 +59,7 @@ export const shadowrunSR5Item = context => {
             assert.strictEqual(embeddedAmmoInCollection, undefined);
         });
 
-        it('update an embedded ammo', async () => {
+        it('update a nested ammunition item', async () => {
             const weapon = await testItem.create({type: 'weapon'}) as SR5Item;
             const ammo = await testItem.create({type: 'ammo'}) as SR5Item;
 
@@ -74,11 +74,11 @@ export const shadowrunSR5Item = context => {
             assert.instanceOf(embeddedAmmo, SR5Item);
             if (!embeddedAmmo) return; //type script gate...
 
-            // Set an testing property.
-            assert.notProperty(embeddedAmmo.data.data, 'test');
-            await embeddedAmmo.update({'data.test': true});
-            assert.property(embeddedAmmo.data.data, 'test');
-            assert.propertyVal(embeddedAmmo.data.data, 'test', true);
+            // Set an unexsting random property and check for it to be set.
+            assert.notProperty(embeddedAmmo.system, 'test');
+            await embeddedAmmo.update({'system.test': true});
+            assert.property(embeddedAmmo.system, 'test');
+            assert.propertyVal(embeddedAmmo.system, 'test', true);
         });
     });
 };
