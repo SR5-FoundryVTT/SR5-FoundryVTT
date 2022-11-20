@@ -78,7 +78,7 @@ export class HooksManager {
         Hooks.on("renderChatLog", HooksManager.chatLogListeners);
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
 
-        Hooks.on('init', quenchRegister);
+        Hooks.on('quenchReady', quenchRegister);
     }
 
     static init() {

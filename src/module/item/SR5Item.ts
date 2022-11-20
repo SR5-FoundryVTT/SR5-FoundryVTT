@@ -1,3 +1,4 @@
+import { ShadowrunItemDataData } from './../types/ShadowrunItemData';
 import { SkillFlow } from "../actor/flows/SkillFlow";
 import { SR5Actor } from '../actor/SR5Actor';
 import { createItemChatMessage } from '../chat';
@@ -95,6 +96,9 @@ export class SR5Item extends Item {
 
     // Item Sheet labels for quick info on an item dropdown.
     labels: {} = {};
+
+    // Add v10 type helper
+    system: ShadowrunItemDataData; // TODO: foundry-vtt-types v10
 
 
     /**

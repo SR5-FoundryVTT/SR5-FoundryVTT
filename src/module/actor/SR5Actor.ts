@@ -46,7 +46,6 @@ import CharacterSkills = Shadowrun.CharacterSkills;
 import SpiritActorData = Shadowrun.SpiritActorData;
 import CharacterActorData = Shadowrun.CharacterActorData;
 import SpriteActorData = Shadowrun.SpriteActorData;
-import VehicleData = Shadowrun.VehicleData;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import CritterActorData = Shadowrun.CritterActorData;
 import ICActorData = Shadowrun.ICActorData;
@@ -60,6 +59,7 @@ import PackActionName = Shadowrun.PackActionName;
 import PackName = Shadowrun.PackName;
 import ActionRollData = Shadowrun.ActionRollData;
 import ActorAttribute = Shadowrun.ActorAttribute;
+import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 
 
 /**
@@ -86,6 +86,9 @@ export class SR5Actor extends Actor {
         label: 'SR5.Labels.Inventory.Carried',
         itemIds: []
     }
+
+    // Add v10 type helper
+    system: ShadowrunActorDataData; // TODO: foundry-vtt-types v10
 
     // Holds all operations related to this actors inventory.
     inventory: InventoryFlow;
