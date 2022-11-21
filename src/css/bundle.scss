@@ -692,7 +692,7 @@ select.display {
             height: 100%;
         }
         .item-text {
-            width: 5em;
+            width: 6em; // Long enough to avoid most line breaks / test wrapping...
             margin: 0 0.1rem;
             flex: 1 0 auto;
             text-align: center;

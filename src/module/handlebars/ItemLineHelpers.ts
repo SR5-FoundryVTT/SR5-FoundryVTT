@@ -243,10 +243,26 @@ export const registerItemLineHelpers = () => {
         };
         switch (item.type) {
             case 'action':
+
+                // Only show a limit, when one is defined. Either by name or attribute
+                const limitAttribute = item.system.action.limit.attribute;
+                const limitBase = Number(item.system.action.limit.base);
+                // Transform into text values, either numerical or localized.
+                const textLimitParts: string[] = [];
+                if (!isNaN(limitBase) && limitBase > 0) {
+                    textLimitParts.push(limitBase.toString());
+                }
+                if (limitAttribute) {
+                    textLimitParts.push(game.i18n.localize(SR5.limits[limitAttribute ?? '']));
+                }
+                const textLimit = textLimitParts.join(' + ');
+                
+
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(SR5.activeSkills[wrapper.getActionSkill() ?? '']),
+                            // Either use the legacy skill localization OR just the skill name/id instead.
+                            text: game.i18n.localize(SR5.activeSkills[wrapper.getActionSkill() ?? ''] ?? wrapper.getActionSkill()),
                             cssClass: 'six',
                         },
                     },
@@ -264,9 +280,7 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: wrapper.getLimitAttribute()
-                                ? game.i18n.localize(SR5.attributes[wrapper.getLimitAttribute() ?? ''])
-                                : wrapper.getActionLimit(),
+                            text: textLimit,
                             cssClass: 'six',
                         },
                     },
