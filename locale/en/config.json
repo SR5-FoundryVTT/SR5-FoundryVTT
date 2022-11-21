@@ -898,7 +898,8 @@
     "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
     "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
     "CantConsumeEquippedAmmo": "Equipped ammunition has not enouth rounds",
-    "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot."
+    "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
+    "CantSpendMulitplePointsOfEdge": "Can't spend mulitple points of edge on one test or action"
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",

@@ -118,6 +118,16 @@ export class PartsList<TType> {
         return removed;
     }
 
+    /**
+     * Check if this part list contains at least one part with a matching name.
+     * 
+     * @param name Needle in the part list stack
+     * @returns true, when a matching part is found.
+     */
+    hasPart(name: string): boolean {
+        return this._list.some(part => part.name === name);
+    }
+
     getMessageOutput() {
         return this.list;
     }
