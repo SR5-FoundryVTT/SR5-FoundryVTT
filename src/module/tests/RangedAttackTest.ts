@@ -58,6 +58,10 @@ export class RangedAttackTest extends SuccessTest {
         return false;
     }
 
+    get showSuccessLabel(): boolean {
+        return this.success;
+    }
+
     _prepareFireMode() {        
         // No firemodes selectable on dialog for invalid item provided.
         const weaponData = this.item.asWeapon();

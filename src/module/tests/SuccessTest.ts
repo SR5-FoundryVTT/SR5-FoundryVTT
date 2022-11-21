@@ -813,6 +813,18 @@ export class SuccessTest {
     }
 
     /**
+     * While a test might be successfull with a zero threshold, it's
+     * unclear if it's meant to be a sucsess.
+     * 
+     * Tests that don't know their threshold, either by GM secrecy or
+     * following opposed tests not yet thrown, shouldn't show user
+     * their successful.
+     */
+    get showSuccessLabel(): boolean {
+        return this.success && this.hasThreshold;
+    }
+
+    /**
      * How to call a successful test of this type.
      */
     get successLabel(): string {
@@ -1101,7 +1113,10 @@ export class SuccessTest {
      async executeWithSecondChance(): Promise<this> {
         console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
 
-        if (!this.data.sourceActorUuid) return this;
+        if (!this.data.sourceActorUuid) {
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
+            return this;
+        };
         if (!this.canSecondChance)  return this;
 
         // Fetch documents.
@@ -1135,7 +1150,10 @@ export class SuccessTest {
     async executeWithPushTheLimit(): Promise<this> {
         console.log(`Shadowrun 5e | ${this.constructor.name} will push the limit rules`);
 
-        if (!this.data.sourceActorUuid) return this;
+        if (!this.data.sourceActorUuid) {
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
+            return this;
+        };
         if (!this.canPushTheLimit) return this;
 
         // Fetch documents.

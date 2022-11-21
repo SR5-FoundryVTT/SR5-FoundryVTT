@@ -32,10 +32,11 @@ export const TestRules = {
 
     /**
      * Has a Success Test been successful?
-     * @param hits
-     * @param threshold
+     * @param hits Amount of hits (reduced by limit) scored on a test
+     * @param threshold Threshold to reach for a test. 0 should none be applied.
+     * @returns true, when hits vs threshold score a success
      */
-    success:(hits, threshold): boolean => {
+    success:(hits: number, threshold: number): boolean => {
         // Don't allow any negative values.
         hits = Math.max(hits, 0);
         threshold = Math.max(threshold, 0);

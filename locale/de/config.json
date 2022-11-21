@@ -869,7 +869,8 @@
     "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Glitch.",
     "CantConsumeEquippedAmmo": "Ausgerüstete Munition hat nicht genug Kugeln",
     "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer.",
-    "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden."
+    "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
+    "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge Punkte können nicht auf Proben ohne Actor angewendet werden."
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",

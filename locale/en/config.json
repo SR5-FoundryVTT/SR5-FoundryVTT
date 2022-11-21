@@ -899,7 +899,8 @@
     "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
     "CantConsumeEquippedAmmo": "Equipped ammunition has not enouth rounds",
     "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
-    "CantSpendMulitplePointsOfEdge": "Can't spend mulitple points of edge on one test or action"
+    "CantSpendMulitplePointsOfEdge": "Can't spend mulitple points of edge on one test or action",
+    "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors"
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
