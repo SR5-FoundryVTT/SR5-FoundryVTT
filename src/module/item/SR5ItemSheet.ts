@@ -81,11 +81,17 @@ export class SR5ItemSheet extends ItemSheet {
         const items = this.item.items;
         const [ammunition, weaponMods, armorMods] = items.reduce(
             (parts: [ItemData[], ItemData[], ItemData[]], item: SR5Item) => {
-                if (item.type === 'ammo') parts[0].push(item.data);
+                const itemData = item.toObject();
+                //@ts-ignore
+                itemData.descriptionHTML = this.enrichEditorFieldToHTML(itemData.system.description.value);
+
+                //@ts-ignore
+                if (item.type === 'ammo') parts[0].push(itemData); // TODO: foundry-vtt-types v10
                 //@ts-ignore TODO: foundry-vtt-types v10
-                if (item.type === 'modification' && "type" in item.system && item.system.type === 'weapon') parts[1].push(item._source);
+                if (item.type === 'modification' && "type" in item.system && item.system.type === 'weapon') parts[1].push(itemData);
                 //@ts-ignore TODO: foundry-vtt-types v10
-                if (item.type === 'modification' && "type" in item.system && item.system.type === 'armor') parts[2].push(item._source);
+                if (item.type === 'modification' && "type" in item.system && item.system.type === 'armor') parts[2].push(itemData);
+                
                 return parts;
             },
             [[], [], []],
@@ -123,15 +129,20 @@ export class SR5ItemSheet extends ItemSheet {
         data.resistTests = game.shadowrun5e.resistTests;
 
         // @ts-ignore TODO: foundry-vtt-types v10
-        data.descriptionHTML = await TextEditor.enrichHTML(this.item.system.description.value, {
-            // secrets: this.item.isOwner,
-            // rollData: this.actor.getRollData.bind(this.actor),
-            // @ts-ignore TODO: foundry-vtt-types v10
-            async: true,
-            // relativeTo: this.item
-          });
+        data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
 
         return data;
+    }
+
+    /**
+     * Help enriching editor field values to HTML used to display editor values as read-only HTML in sheets.
+     * 
+     * @param editorValue A editor field value like Item.system.description.value
+     * @param options TextEditor, enrichHTML.options passed through
+     * @returns Enriched HTML result
+     */
+    enrichEditorFieldToHTML(editorValue: string, options:any={async: false}): string {
+        return TextEditor.enrichHTML(editorValue, options);
     }
 
     /**
