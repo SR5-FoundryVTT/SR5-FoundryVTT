@@ -68,6 +68,7 @@ import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
  * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
+import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -1708,9 +1709,14 @@ export class SR5Item extends Item {
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-     async _preUpdate(changed, options, user) {
-        // Change used action test implementation when necessary.
-        Helpers.injectActionTestsIntoChangeData(this.type, changed, changed);
+     async _preUpdate(changed, options: DocumentModificationOptions, user: User) {
+        // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
+        // differential approach of action test injection. (NOTE: Changing ownership of a document)
+        if (options.diff && options.recursive) {
+            // Change used action test implementation when necessary.
+            Helpers.injectActionTestsIntoChangeData(this.type, changed, changed);
+        }
+        
         await super._preUpdate(changed, options, user);
     }
 }
