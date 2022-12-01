@@ -1,3 +1,5 @@
+import { SituationModifierCategory } from './../../rules/modifiers/SituationModifier';
+import { SituationModifiersApplication } from './../../apps/SituationModifiersApplication';
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../../effects";
@@ -14,6 +16,8 @@ import SkillField = Shadowrun.SkillField;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
+import KnowledgeSkills = Shadowrun.KnowledgeSkills;
+import ModifierData = Shadowrun.ModifierData;
 
 
 /**
@@ -208,6 +212,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
 
+        data.situationModifiers = this._prepareSituationModifiers();
+
         // @ts-ignore TODO: foundry-vtt-types v10
         data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
             // secrets: this.actor.isOwner,
@@ -308,6 +314,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Misc. item type actions...
         html.find('.reload-ammo').on('click', this._onReloadAmmo.bind(this));
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
+
+        // Situation modifiers application
+        html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
     }
 
     /**
@@ -1224,7 +1233,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = Helpers.listItemId(event);
+        const category = Helpers.listItemId(event) as keyof KnowledgeSkills;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
@@ -1238,7 +1247,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const [skillId, category] = Helpers.listItemId(event).split('.');
+        const [skillId, category] = Helpers.listItemId(event).split('.') as [string, keyof KnowledgeSkills];
         await this.actor.removeKnowledgeSkill(skillId, category);
     }
 
@@ -1640,5 +1649,53 @@ export class SR5BaseActorSheet extends ActorSheet {
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
         html.find('.submit-checkbox').change((event) => this._onSubmit(event));
+    }
+
+    /**
+     * Prepare applied Situation Modifiers for display (read-only) on any actor sheet.
+     * 
+     * Some modifiers might be hidden, when the document doesn't fullfill criterea for it.
+     * 
+     * @returns List of prepare sit. mod data
+     */
+    _prepareSituationModifiers(): {category: string, label: string, value: number, hidden: boolean}[] {
+        const modifiers = this.document.getSituationModifiers();
+        if (!modifiers) return [];
+
+        // Be sure to be up to date to current situation.
+        modifiers.applyAll();
+
+        return Object.entries(modifiers.applied).map(([category, values]: [SituationModifierCategory, ModifierData]) => {
+            const hidden = this._hideSituationModifier(category);
+
+            const label = SR5.modifierTypes[category];
+            return {category, value: values.total, hidden, label};
+        });
+    }
+
+    /**
+     * Determine if a situation modifier category should be hidden from an actor sheet.
+     * 
+     * @param category Modifier category to maybe hide
+     * @returns true, hide this category from the actors sheet.
+     */
+    _hideSituationModifier(category: SituationModifierCategory): boolean {
+        switch (category) {
+            case 'background_count':
+                return !this.document.isAwakened;
+            case 'environmental':
+                return this.document.isSprite();
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Show the situation modifiers application for this actor doucment
+     * 
+     * @param event 
+     */
+    _onShowSituationModifiersApplication(event) {
+        new SituationModifiersApplication(this.document).render(true);
     }
 }

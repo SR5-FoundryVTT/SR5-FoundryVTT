@@ -13,8 +13,7 @@ import {HandlebarManager} from './handlebars/HandlebarManager';
 import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
 import {Import} from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
-import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
-import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
+import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
 import {SR5ActiveEffectConfig} from "./effect/SR5ActiveEffectConfig";
 import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
@@ -42,15 +41,15 @@ import {ThrownAttackTest} from "./tests/ThrownAttackTest";
 import {PilotVehicleTest} from "./tests/PilotVehicleTest";
 import {DronePerceptionTest} from "./tests/DronePerceptionTest";
 import {DroneInfiltrationTest} from "./tests/DroneInfiltrationTest";
-import {SupressionDefenseTest} from './tests/SupressionDefenseTest';
-
-import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
-import {measureDistance} from './canvas';
-import {quenchRegister} from "../test/quench";
+import { SupressionDefenseTest } from './tests/SupressionDefenseTest';
+import { quenchRegister } from '../test/quench';
+import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
+import SocketMessageData = Shadowrun.SocketMessageData;
 import SocketMessageHooks = Shadowrun.SocketMessageHooks;
-import SocketMessage = Shadowrun.SocketMessageData;
+import { NetworkDeviceFlow } from './item/flows/NetworkDeviceFlow';
+import { registerSystemKeybindings } from './keybindings';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -70,7 +69,8 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
-        Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
+        // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
+        Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
         Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
@@ -226,6 +226,7 @@ ___________________
 
 
         registerSystemSettings();
+        registerSystemKeybindings();
 
         // Register sheets for collection documents.
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
@@ -347,7 +348,7 @@ ___________________
             });
         }
 
-        tokenControls.tools.push(EnvModifiersApplication.getControl());
+        tokenControls.tools.push(SituationModifiersApplication.getControl());
     }
 
     /**
@@ -416,7 +417,7 @@ ___________________
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
         }
 
-        game.socket.on(SYSTEM_SOCKET, async (message: SocketMessage) => {
+        game.socket.on(SYSTEM_SOCKET, async (message: SocketMessageData) => {
             console.log('Shadowrun 5e | Received system socket message.', message);
 
             const handlers = hooks[message.type];

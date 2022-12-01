@@ -74,6 +74,10 @@
     .align-center {
         align-items: center;
     }
+
+    .show-situation-modifiers-application {
+        @include rollable;
+    }
 }
 
 .align-items-center {
@@ -255,6 +259,30 @@ select.display {
         }
         input {
             color: $white;
+        }
+
+        .form-group-element-numerical {
+            display: flex;
+            flex-direction: row;
+
+            button {
+                border-color: $grey;
+            }
+
+            button, input {
+                width: 25px;
+                height: 25px;
+                line-height: inherit;
+                vertical-align: middle;
+                text-align: center;
+            }
+            // input {
+            //     width: 35px;
+            //     height: 25px;
+            //     line-height: inherit;
+            //     vertical-align: middle;
+            //     text-align: center;
+            // }
         }
     }
     /**
@@ -758,6 +786,11 @@ select.display {
         background-color: $dark-sunken;
     }
 
+    .card-sunken {
+        @extend .sunken;
+        margin-bottom: $large-distance;
+    }
+
     .modified-target-damage {
         margin-top: $large-distance;
         margin-bottom: $large-distance;
@@ -799,16 +832,18 @@ select.display {
      */
     button.env-modifier {
         text-align: left;
+        font-size: var(--font-size-13) !important;
+        line-height: normal;
+        padding-top: 5px;
+        padding-bottom: 5px;
     }
     .env-modifier-active {
-        box-shadow: 0 0 0.25em 0.15em $white;
         border-radius: 8px;
+        box-shadow: $dark-sunken-box-shadow;
+        background-color: $dark-sunken;
     }
     .env-modifier-total {
         font-weight: bold;
-    }
-    tr.env-modifier-category {
-        height: 45px;
     }
     td.env-modifier-level {
         padding-right: 6px;
@@ -842,7 +877,11 @@ select.display {
     right: -150px;
 }
 
+/**
+  * Is used on TokenHUDs to display a additional segment per situational modifer.
+  */
 .sr-modifier-container {
+    // The column to hold all modifiers besides the FoundryVTT token HUD.
     .modifier-column {
         padding-top: 66px;
         // Stop flexing.
@@ -852,7 +891,7 @@ select.display {
         // Render below the open/closable token hud actions.
         z-index: -1;
     }
-
+    // The row containing a single situation modifier.
     .modifier-row {
         position: relative;
         display: grid;
@@ -871,21 +910,46 @@ select.display {
         grid-template-columns: 36px auto;
         overflow: hidden;
 
-        .modifier-value {
-        }
-
+        // The numerical modifier total 
+        .modifier-value {}
+        // The corresponding modifier description per .modifier-value
         .modifier-description {
+            // Handle big labels without breaking layout.
             text-overflow: clip;
             white-space: nowrap;
-        }
 
-        .open-environmental-modifier {
+            // Show interactability.
             cursor: pointer;
-
             &:hover {
                 box-shadow: 0 0 0.25em 0.15em $white;
                 border-radius: 8px;
             }
         }
+    }
+}
+
+/**
+ * All stylings necessary for situation modifiers
+ */
+.sr5#situational-modifiers-application {
+    // Remove other sr5 window styles.
+    * {
+        font-size: var(--font-size-14);
+        font-weight: normal;
+    }
+
+    h1 {
+        font-weight: bold;
+    }
+
+    // Add back in stylings as necessary
+    h2, h3 {
+        border-bottom: none;
+        font-weight: normal;
+    }
+
+    .modifier-total {
+        display: flex;
+        flex-direction: column;
     }
 }

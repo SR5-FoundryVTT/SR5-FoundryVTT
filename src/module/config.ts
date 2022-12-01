@@ -376,6 +376,8 @@ export const SR5 = {
         defense: 'SR5.RollDefense',
         drain: 'SR5.Drain',
         environmental: 'SR5.ModifierTypes.Environmental',
+        background_count: 'SR5.ModifierTypes.Magic',
+        noise: 'SR5.ModifierTypes.Matrix',
         fade: 'SR5.RollFade',
         global: 'SR5.Global',
         judge_intentions: 'SR5.RollJudgeIntentions',

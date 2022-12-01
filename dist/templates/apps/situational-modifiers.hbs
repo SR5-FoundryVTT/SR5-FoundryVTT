@@ -1,0 +1,39 @@
+<div>
+    <div>
+        <h2>{{targetType}}: {{targetName}}</h2>
+    </div>
+    <div class="scroll-area">
+        <form>
+            <h3>{{localize "SR5.SituationalModifiersApplication.Category.Matrix"}}</h3>
+            <div class="card-sunken">
+                <div class="form-group">
+                    <label for="modifiers-matrix-total">{{localize "SR5.SituationalModifiersApplication.Matrix.Noise"}}</label>
+                    <div class="form-group-element-numerical">
+                        <button data-delta="-1">-</button>
+                        <input id="modifiers-matrix-total" class="modifiers-total" type='number' title="{{localize "SR5.SituationalModifiersApplication.Matrix.Noise"}}" name="modifiers.data.matrix.total" size='3' maxlength='3' data-dtype="Number" 
+                            value='{{modifiers.matrix.total}}' placeholder="0"/>
+                        <button data-delta="1">+</button>
+                    </div>
+                </div>
+            </div>
+            <h3>{{localize "SR5.SituationalModifiersApplication.Category.Magic"}}</h3>
+            <div class="card-sunken">
+            <div class="form-group">
+                <label for="modifiers-magic-total">{{localize "SR5.SituationalModifiersApplication.Magic.BackgroundCount"}}</label>
+                <div class="form-group-element-numerical">
+                    <button data-delta="-1">-</button>
+                    <input id="modifiers-magic-total" type='number' title="{{localize "SR5.SituationalModifiersApplication.Magic.BackgroundCount"}}" name="modifiers.data.magic.total" size='3' maxlength='3' data-dtype="Number" 
+                        value='{{modifiers.magic.total}}' placeholder="0"/>
+                    <button data-delta="1">+</button>
+                    <button data-delta="3">+3</button>
+                </div>
+            </div>
+            </div>
+            <h3>{{localize "SR5.SituationalModifiersApplication.Category.Physical"}}</h3>
+            <div class="card-sunken">
+                {{> 'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'}}
+            </div>
+        </section>
+        </form>
+    </div>
+</div>

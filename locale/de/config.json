@@ -64,6 +64,8 @@
   },
   "SR5.ModifierTypes": {
     "Environmental": "Umgebung",
+    "Matrix": "Rauschen",
+    "Magic": "Hintergrundstrahlung",
     "Wounds": "Wunden"
   },
   "SR5.ActiveSkills": "Aktive Fertigkeiten",
@@ -640,6 +642,7 @@
   "SR5.MIGRATION.SuccessNotification": "Shadowrun System erfolgreich migriert zu Version",
   "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Wert Übersicht",
   "CONTROLS.SR5.EnvironmentalModifiers": "Umgebungsmodifikatoren",
+  "CONTROLS.SR5.SituationalModifiers": "Situationsmodifikatoren",
   "SR5.DIALOG.MissingModuleContent": "Um das Quell-PDF anzuzeigen, muss das Modul pdfpager installiert sein und ein PDF mit passendem Code erstellt werden.",
   "SR5.Labels": {
     "Sheet": {
@@ -901,6 +904,23 @@
     "Consent": "Bist du sicher?",
     "Description": "Das Löschen eines Eintrags kann nicht rückgängig gemacht werden!"
   },
+  "SR5.SituationalModifiersApplication": {
+    "Title": "Situationsmodifikatoren",
+    "ClearLocalAll": "Entferne lokale Modifikatoren",
+    "ClearLocalAllTokens": "Entferne alle Tokenmodifikatoren der Szene",
+    "Category": {
+      "Matrix": "Matrix",
+      "Magic": "Magie",
+      "Physical": "Physisch"
+    },
+    "Matrix": {
+      "Noise": "Rauschen"
+    },
+    "Magic": {
+      "BackgroundCount": "Hintergrundstrahlung"
+    },
+    "Total": "Ergebnis"
+  },
   "SR5.EnvModifiersApplication": {
     "Title": "Umgebungsmodifikatoren",
     "Visibility": {
@@ -986,5 +1006,15 @@
     "Ammo": "Nicht genug Munition zum Feuern",
     "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, entstehenden Modifikatoren werden reduziert",
     "Initiative": "Zu geringer Initiative Wert"
+  },
+  "SR5.Keybinding": {
+    "OverwatchScoreTracker": {
+      "Label": "Overwatchwert Monitor",
+      "Hint": "Öffne den Overwatchwert Monitor"
+    },
+    "ShowSituationModifiers": {
+      "Label": "Situationsmodifikatoren",
+      "Hint": "Öffne Situationsmodifikatoren für aktuelle Auswahl"
+    }
   }
 }

@@ -64,6 +64,8 @@
   },
   "SR5.ModifierTypes": {
     "Environmental": "Environmental",
+    "Matrix": "Noise",
+    "Magic": "Background Count",
     "Wounds": "Wounds"
   },
   "SR5.ActiveSkills": "Active Skills",
@@ -650,6 +652,7 @@
   "SR5.MIGRATION.SuccessNotification": "Shadowrun system successfully migrated to version",
   "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker",
   "CONTROLS.SR5.EnvironmentalModifiers": "Environmental Modifiers",
+  "CONTROLS.SR5.SituationalModifiers": "Situational Modifiers",
   "SR5.DIALOG.MissingModuleContent": "In order for source PDFs to be shown, the pdfpager module must be installed and a PDF matching the code created.",
   "SR5.Labels": {
     "Sheet": {
@@ -931,6 +934,23 @@
     "Consent": "Are you sure?",
     "Description": "Deleting an item can't be reversed!"
   },
+  "SR5.SituationalModifiersApplication": {
+    "Title": "Situational Modifiers",
+    "ClearLocalAll": "Remove local modifiers",
+    "ClearLocalAllTokens": "Remove all token modifiers on scene",
+    "Category": {
+      "Matrix": "Matrix",
+      "Magic": "Magic",
+      "Physical": "Physical"
+    },
+    "Matrix": {
+      "Noise": "Noise"
+    },
+    "Magic": {
+      "BackgroundCount": "Background Count"
+    },
+    "Total": "Result"
+  },
   "SR5.EnvModifiersApplication": {
     "Title": "Environmental Modifiers",
     "Visibility": {
@@ -1019,5 +1039,15 @@
     "Ammo": "Not enough ammunition to fire",
     "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
     "Initiative": "Not enough initiative score"
+  },
+  "SR5.Keybinding": {
+    "OverwatchScoreTracker": {
+      "Label": "Overwatch Score Tracker",
+      "Hint": "Open overwatch score tracker"
+    },
+    "ShowSituationModifiers": {
+      "Label": "Situation Modifiers",
+      "Hint": "Open situation modifiers for selection"
+    }
   }
 }

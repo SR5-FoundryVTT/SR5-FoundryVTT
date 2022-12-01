@@ -5,7 +5,7 @@ import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import {LENGTH_UNIT, SR} from "../constants";
 import {SR5} from "../config";
-import {Modifiers} from "../rules/Modifiers";
+import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
 import RangesTemplateData = Shadowrun.RangesTemplateData;
@@ -103,9 +103,9 @@ export class RangedAttackTest extends SuccessTest {
         const actor = this.actor;
         if (!actor) return;
 
-        const modifiers = await actor.getModifiers();
+        const modifiers = actor.getSituationModifiers();
         // If no range is active, set to zero.
-        this.data.range = modifiers.environmental.active.range || 0;
+        this.data.range = modifiers.environmental.applied.active.range || 0;
     }
 
     /**
@@ -145,8 +145,8 @@ export class RangedAttackTest extends SuccessTest {
         });
 
         // if no range is active, set to first target selected.
-        const modifiers = await this.actor.getModifiers();
-        this.data.range = modifiers.environmental.active.range || this.data.targetRanges[0].range.modifier;
+        const modifiers = this.actor.getSituationModifiers();
+        this.data.range = modifiers.environmental.applied.active.range || this.data.targetRanges[0].range.modifier;
     }
 
     _prepareRecoilCompensation() {
@@ -190,9 +190,9 @@ export class RangedAttackTest extends SuccessTest {
 
         if (!this.actor) return;
 
-        const modifiers = await this.actor.getModifiers();
-        modifiers.activateEnvironmentalCategory('range', this.data.range);
-        await this.actor.setModifiers(modifiers);
+        const modifiers = await this.actor.getSituationModifiers();
+        modifiers.environmental.setActive('range', this.data.range);
+        await this.actor.setSituationModifiers(modifiers);
     }
 
     prepareBaseValues() {
@@ -231,11 +231,13 @@ export class RangedAttackTest extends SuccessTest {
 
         // Apply altered environmental modifiers
         const range = this.hasTargets ? this.data.targetRanges[this.data.targetRangesSelected].range.modifier : this.data.range;
-        const modifiers = Modifiers.getModifiersFromEntity(this.actor);
-        modifiers.activateEnvironmentalCategory('range', Number(range));
-        const environmental = modifiers.environmental.total;
+        const modifiers = DocumentSituationModifiers.getDocumentModifiers(this.actor);
+        
+        // Locally set env modifier temporarily.
+        modifiers.environmental.setActive('range', Number(range));
+        modifiers.environmental.apply({reapply: true});
 
-        poolMods.addUniquePart(SR5.modifierTypes.environmental, environmental);
+        poolMods.addUniquePart(SR5.modifierTypes.environmental, modifiers.environmental.total);
 
         super.prepareBaseValues();
     }

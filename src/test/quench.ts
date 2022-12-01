@@ -7,16 +7,19 @@ import {shadowrunSR5ActiveEffect} from "./sr5.ActiveEffect.spec";
 import {shadowrunNetworkDevices} from "./sr5.NetworkDevices.spec";
 import {shadowrunTesting} from "./sr5.Testing.spec";
 import {shadowrunInventoryFlow} from "./sr5.Inventory.spec";
+import { Quench } from "@ethaks/fvtt-quench";
 
 
 /**
  * Register FoundryVTT Quench test batches...
  *
+ * @params quench Quench unittest registry
  * https://github.com/Ethaks/FVTT-Quench
  */
-export const quenchRegister = (quench) => {
+export const quenchRegister = (quench: Quench) => {
     if (!quench) return;
 
+    console.info('Shadowrun 5e | Registering quench unittests');
     console.warn('Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)');
 
     quench.registerBatch("shadowrun5e.rules.matrix", shadowrunMatrix, {displayName: "SHADOWRUN5e: Matrix Test"});

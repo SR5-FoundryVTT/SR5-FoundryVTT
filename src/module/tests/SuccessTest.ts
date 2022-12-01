@@ -40,13 +40,6 @@ export interface SuccessTestValues extends TestValues {
     extendedHits: ValueField
 }
 
-interface TestModifier {
-    type: ModifierTypes
-    label: string
-    total: number
-}
-
-
 
 /**
  * Contain all data necessary to handle an action based test.
