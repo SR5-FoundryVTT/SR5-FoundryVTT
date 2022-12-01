@@ -2,9 +2,23 @@ declare namespace Shadowrun {
     /**
      * The general types of modifiers supported by the system.
      * 
-     * For the actual modifier identifiers see config.ts#SR5.modifierTypes
+     * These should match config.ts#SR5.modifierTypes
      */
-    export type ModifierTypes = string
+    export type ModifierTypes = 
+        'armor' |
+        'composure'|
+        'defense'|
+        'drain'|
+        'environmental'|
+        'background_count'|
+        'noise'|
+        'fade'|
+        'global'|
+        'judge_intentions'|
+        'lift_carry'|
+        'memory'|
+        'soak'|
+        'wounds'
 
     /** All situational modifiers affecting any actor placed on the canvas.
      */

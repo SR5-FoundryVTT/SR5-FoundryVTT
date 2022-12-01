@@ -1,5 +1,6 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface MeleeAttackData extends SuccessTestData {
     reach: number
@@ -23,7 +24,7 @@ export class MeleeAttackTest extends SuccessTest {
         return false;
     }
 
-     get testModifiers() {
+     get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'environmental'];
     }
 

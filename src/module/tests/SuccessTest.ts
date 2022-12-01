@@ -554,7 +554,7 @@ export class SuccessTest {
      *
      * NOTE: These modifiers are routed through ModifierFlow.totalFor()
      */
-    get testModifiers() {
+    get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds'];
     }
 

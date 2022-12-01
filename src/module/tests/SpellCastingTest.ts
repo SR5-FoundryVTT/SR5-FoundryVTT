@@ -5,6 +5,7 @@ import {DefaultValues} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -57,7 +58,13 @@ export class SpellCastingTest extends SuccessTest {
     }
 
     get testModifiers() {
-        return ['global', 'wounds'];
+        const modifiers: ModifierTypes[] = ['global', 'wounds'];
+
+        if (this.item?.isCombatSpell()) {
+            modifiers.push('environmental');
+        }
+
+        return modifiers;
     }
 
     async prepareDocumentData() {

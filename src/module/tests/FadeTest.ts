@@ -1,10 +1,10 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {ComplexFormTest, ComplexFormTestData} from "./ComplexFormTest";
-import DamageData = Shadowrun.DamageData;
 import {Helpers} from "../helpers";
-import {DrainRules} from "../rules/DrainRules";
 import {FadeRules} from "../rules/FadeRules";
+import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface FadeTestData extends SuccessTestData {
     incomingFade: DamageData
@@ -43,7 +43,7 @@ export class FadeTest extends SuccessTest {
         };
     }
 
-    get testModifiers() {
+    get testModifiers(): ModifierTypes[] {
         return ['global', 'fade']
     }
 

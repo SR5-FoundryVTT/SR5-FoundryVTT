@@ -5,7 +5,7 @@ import {PartsList} from "../parts/PartsList";
 import {FadeRules} from "../rules/FadeRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
-
+import ModifierTypes = Shadowrun.ModifierTypes;
 export interface ComplexFormTestData extends SuccessTestData {
     level: number
     fade: number
@@ -52,7 +52,7 @@ export class ComplexFormTest extends SuccessTest {
     }
 
     // TODO: Add missing modifiers (noise, gitter) // SR5#251
-    get testModifiers() {
+    get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds'];
     }
 

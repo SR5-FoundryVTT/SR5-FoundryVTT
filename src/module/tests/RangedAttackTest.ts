@@ -6,13 +6,14 @@ import {Helpers} from "../helpers";
 import {LENGTH_UNIT, SR} from "../constants";
 import {SR5} from "../config";
 import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
+import {FireModeRules} from "../rules/FireModeRules";
+import { SR5Item } from "../item/SR5Item";
+import { TestCreator } from './TestCreator';
 import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
-import {FireModeRules} from "../rules/FireModeRules";
-import { SR5Item } from "../item/SR5Item";
-import { TestCreator } from './TestCreator';
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface RangedAttackTestData extends SuccessTestData {
     damage: DamageData
@@ -153,7 +154,7 @@ export class RangedAttackTest extends SuccessTest {
         this.data.recoilCompensation = this.item?.getRecoilCompensation(true) || 0;
     }
 
-    get testModifiers() {
+    get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'environmental'];
     }
 
