@@ -1,6 +1,9 @@
+import { EnvironmentalModifier } from './../rules/modifiers/EnvironmentalModifier';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
+import { SR5Actor } from "../actor/SR5Actor";
 import ModifierTypes = Shadowrun.ModifierTypes;
+import EnvironmentalModifiersSourceData = Shadowrun.EnvironmentalModifiersSourceData;
 
 export interface MeleeAttackData extends SuccessTestData {
     reach: number
@@ -42,5 +45,38 @@ export class MeleeAttackTest extends SuccessTest {
         this.data.reach = this.item.getReach();
 
         await super.prepareDocumentData();
+    }
+
+    /**
+     * Remove unneeded environmental modifier categories for melee tests.
+     * 
+     * See SR5#187 'Environmental Modifiers'
+     * 
+     * @param actor 
+     * @param type 
+     */
+     async prepareActorModifier(actor: SR5Actor, type: ModifierTypes): Promise<{ name: string; value: number; }> {
+        if (type !== 'environmental' && !this.item?.isMeleeWeapon()) return await super.prepareActorModifier(actor, type);
+
+        // Only light and visibility apply.
+        const modifiers = actor.getSituationModifiers();
+        const envModifier = new EnvironmentalModifier();
+        
+        const applied = modifiers.environmental.applied;
+
+        // Rebuild a new source selection from the actors applied selection.
+        const source: EnvironmentalModifiersSourceData = {active: {}};
+
+        if (applied.active.light) source.active.light = applied.active.light;
+        if (applied.active.visibility) source.active.visibility = applied.active.visibility;
+        if (applied.active.value) source.active.value = applied.active.value;
+        if (applied.fixed) source.fixed = applied.fixed;
+
+        envModifier.apply({source, reapply: true});
+
+        const name = this._getModifierTypeLabel(type);
+        const value = envModifier.total;
+
+        return {name, value};
     }
 }

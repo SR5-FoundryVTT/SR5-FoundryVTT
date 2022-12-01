@@ -17,8 +17,7 @@ export class BackgroundCountModifier extends SituationModifier {
      * as a negative modifier.
      * 
      */
-     _calcActiveTotal(): number {
-        const countTotal = super._calcActiveTotal();
-        return Math.max(countTotal, 0) * -1;
+    get total(): number {
+        return Math.max(this.applied.total, 0) * -1;
     }
 }

@@ -107,10 +107,17 @@ export class SituationModifier {
     }
 
     /**
-     * Determine if a user selection for a fixed value has been made.
+     * Determine if a fixed value has been set.
      */
     get hasFixed(): boolean {
-        return this.source.hasOwnProperty('fixed');
+        return this.applied.hasOwnProperty('fixed');
+    }
+
+    /**
+     * Determine if a fixed user selection has been made.
+     */
+    get hasFixedSelection(): boolean {
+        return this.applied.active.hasOwnProperty('value');
     }
 
     /**
@@ -188,7 +195,7 @@ export class SituationModifier {
      */
     apply(options: SituationalModifierApplyOptions={}) {
         // Initial application or reapplication
-        if (!this.applied || options.reapply) {
+        if (!this.applied || options.reapply || options.source) {
             // Clear current application.
             this.applied = {
                 active: {},
@@ -225,6 +232,9 @@ export class SituationModifier {
         // Apply each source in order.
         sources.forEach(source => foundry.utils.mergeObject(this.applied, source));
 
+        // If a fixed value selection has been made, use that.
+        if (!this.hasFixed && this.hasFixedSelection) this.applied.fixed = this.applied.active.value;
+
         // After merging active and fixed value, derive total.
         if (this.hasFixed) this.applied.total = this.applied.fixed as number;
         else this.applied.total = this._calcActiveTotal();
@@ -256,15 +266,13 @@ export class SituationModifier {
 
     /**
      * Give the total modifier value for this category.
-     * 
-     * This can be either a manually set value across the document chain 
-     * OR
-     * be applied from all selections made.
+     *  
+     * Should this modifier not yet been applied, this will apply.
      */
     get total(): number {
-        // Re apply all currently active selections.
-        this.apply();
-        
+        if (!this.applied) {
+            this.apply();
+        }
         return this.applied.total;
     }
 

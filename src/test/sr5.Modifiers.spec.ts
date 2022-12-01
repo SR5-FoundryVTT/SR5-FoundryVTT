@@ -98,8 +98,12 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
             });
 
             it('correctly determine if a fixed modifier is set', () => {
-                assert.isTrue(new SituationModifier({fixed: 0}).hasFixed);
-                assert.isFalse(new SituationModifier().hasFixed);
+                const sitMod = new SituationModifier();
+                sitMod.apply({source: {fixed: 0, active: {}}});
+                assert.isTrue(sitMod.hasFixed);
+
+                sitMod.apply({source: {active: {}}});
+                assert.isFalse(sitMod.hasFixed);
             });
 
             it('correctly determine if an active modifier selection matches', () => {
@@ -118,6 +122,20 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
 
                 sitMod.clear();
                 assert.equal(sitMod.hasActive, false);
+            });
+
+            it('use a fixed user selection instead of suming up', () => {
+                const sitMod = new SituationModifier({active: {value: 3, a: 1, b: 3}});
+                sitMod.apply();
+
+                assert.equal(sitMod.total, 3);
+            });
+
+            it('use a fixed programmating value before a fixed user selection', () => {
+                const sitMod = new SituationModifier({active: {value: 3, a: 1, b: 3}, fixed: -3});
+                sitMod.apply();
+
+                assert.equal(sitMod.total, -3);
             });
         });
 

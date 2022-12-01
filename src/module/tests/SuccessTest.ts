@@ -577,11 +577,28 @@ export class SuccessTest {
         if (this.data.action.modifiers.length > 0) return;
 
         for (const type of this.testModifiers) {
-            const value = await this.actor.modifiers.totalFor(type);
-            const name = SR5.modifierTypes[type];
-
+            const {name, value} = await this.prepareActorModifier(this.actor, type);
             PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
         }
+    }
+
+    /**
+     * Prepare a single modifier.
+     * 
+     * Extend this method should you want to alter a single modifiers application.
+     * 
+     * @param actor The actor to fetch modifier information for.
+     * @param type The modifier type to be prepared.
+     */
+    async prepareActorModifier(actor: SR5Actor, type: ModifierTypes): Promise<{name: string, value: number}> {
+        const value = await actor.modifiers.totalFor(type);
+        const name = this._getModifierTypeLabel(type);
+
+        return {name, value};
+    }
+
+    _getModifierTypeLabel(type: ModifierTypes): string {
+        return SR5.modifierTypes[type];
     }
 
     /**

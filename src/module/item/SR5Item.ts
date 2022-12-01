@@ -1712,7 +1712,7 @@ export class SR5Item extends Item {
      async _preUpdate(changed, options: DocumentModificationOptions, user: User) {
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
-        if (options.diff && options.recursive) {
+        if (options.diff !== false && options.recursive !== false) {
             // Change used action test implementation when necessary.
             Helpers.injectActionTestsIntoChangeData(this.type, changed, changed);
         }

@@ -18,8 +18,7 @@ export class NoiseModifier extends SituationModifier {
      * 
      * SR5#230 Noise
      */
-     _calcActiveTotal(): number {
-        const levelTotal = super._calcActiveTotal();
-        return Math.max(levelTotal, 0) * -1;
+    get total(): number {
+        return Math.max(this.applied.total, 0) * -1;
     }
 }

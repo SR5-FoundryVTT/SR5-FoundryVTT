@@ -1662,9 +1662,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         const modifiers = this.document.getSituationModifiers();
         if (!modifiers) return [];
 
-        // Be sure to be up to date to current situation.
-        modifiers.applyAll();
-
         return Object.entries(modifiers.applied).map(([category, values]: [SituationModifierCategory, ModifierData]) => {
             const hidden = this._hideSituationModifier(category);
 
