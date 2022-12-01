@@ -60,22 +60,10 @@ export class MeleeAttackTest extends SuccessTest {
 
         // Only light and visibility apply.
         const modifiers = actor.getSituationModifiers();
-        const envModifier = new EnvironmentalModifier();
-        
-        const applied = modifiers.environmental.applied;
-
-        // Rebuild a new source selection from the actors applied selection.
-        const source: EnvironmentalModifiersSourceData = {active: {}};
-
-        if (applied.active.light) source.active.light = applied.active.light;
-        if (applied.active.visibility) source.active.visibility = applied.active.visibility;
-        if (applied.active.value) source.active.value = applied.active.value;
-        if (applied.fixed) source.fixed = applied.fixed;
-
-        envModifier.apply({source, reapply: true});
+        modifiers.environmental.apply({applicable: ['light', 'visibility']});
 
         const name = this._getModifierTypeLabel(type);
-        const value = envModifier.total;
+        const value = modifiers.environmental.total;
 
         return {name, value};
     }

@@ -133,9 +133,14 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
 
             it('use a fixed programmating value before a fixed user selection', () => {
                 const sitMod = new SituationModifier({active: {value: 3, a: 1, b: 3}, fixed: -3});
-                sitMod.apply();
-
                 assert.equal(sitMod.total, -3);
+            });
+
+            it('should only apply applicable selections', () => {
+                const sitMod = new SituationModifier({active: {a: 1, b: 3, c: 4}});
+                sitMod.apply({applicable: ['a', 'c']});
+
+                assert.equal(sitMod.total, 5);
             });
         });
 

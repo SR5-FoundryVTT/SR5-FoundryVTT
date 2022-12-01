@@ -4,12 +4,18 @@ import Modifier = Shadowrun.ModifierData;
 import SourceModifierData = Shadowrun.SourceModifierData;
 import ActiveModifierValue = Shadowrun.ActiveModifierValue;
 import SituationModifiersSourceData = Shadowrun.SituationModifiersSourceData;
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 
 
 export interface SituationalModifierApplyOptions {
-    reapply?: boolean;
+    // When set to true, applied will be regenerated always.
+    reapply?: boolean
+    // When new source data is given, internal source is overwritten.
     source?: SourceModifierData
+    // When given will be used to ONLY applied active selections within.
+    // keys should be included as applied.active.<applicable>
+    applicable?: string[]
 }
 
 export type SituationModifierCategory = keyof SituationModifiersSourceData;
@@ -206,6 +212,9 @@ export class SituationModifier {
         // Update source when given.
         this.source = options.source ?? this.source;
 
+        // To filter active selections.
+        const applicable = options.applicable ?? null;
+
         // Collected source to applied in order.
         const sources: SourceModifierData[] = [];
 
@@ -231,6 +240,13 @@ export class SituationModifier {
 
         // Apply each source in order.
         sources.forEach(source => foundry.utils.mergeObject(this.applied, source));
+
+        // Remove not applicable active selections.
+        if (applicable) {
+            Object.keys(this.applied.active).forEach((selection) => {
+                if (!applicable.includes(selection)) delete this.applied.active[selection];
+            });
+        }
 
         // If a fixed value selection has been made, use that.
         if (!this.hasFixed && this.hasFixedSelection) this.applied.fixed = this.applied.active.value;
