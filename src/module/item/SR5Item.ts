@@ -261,11 +261,9 @@ export class SR5Item extends Item {
             if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: []};
 
             const concealParts = new PartsList<number>();
-            equippedMods.forEach((mod) => {
-                const technology = mod.getTechnologyData();
-
-                if (technology && technology.conceal.value) {
-                    concealParts.addUniquePart(mod.name as string, technology.conceal.value);
+            equippedMods.forEach((modificiation) => {
+                if (modificiation.system.conceal  && modificiation.system.conceal > 0) {
+                    concealParts.addUniquePart(modificiation.name as string, modificiation.system.conceal);
                 }
             });
 
@@ -319,7 +317,7 @@ export class SR5Item extends Item {
                 action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
                 // add mods to ap from ammo
                 action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
-                
+
                 if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name as string, ammoData.accuracy);
 
                 // override element
