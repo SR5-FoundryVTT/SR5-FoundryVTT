@@ -87,9 +87,9 @@ export class SpritePrep {
     }
 
     static prepareSpriteConditionMonitor(data: SpriteData) {
-        const {matrix, level} = data;
+        const {matrix, level, modifiers} = data;
 
-        matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
+        matrix.condition_monitor.max = 8 + Math.ceil(level / 2) + Number(modifiers.matrix_track);
     }
 
     static prepareSpriteInitiative(data: SpriteData) {
