@@ -56,13 +56,13 @@
                         "mod": [],
                         "min": 1
                     },
-                    "social": {
+                    "mental": {
                         "base": 0,
                         "value": 1,
                         "mod": [],
                         "min": 1
                     },
-                    "mental": {
+                    "social": {
                         "base": 0,
                         "value": 1,
                         "mod": [],
