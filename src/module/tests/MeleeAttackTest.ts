@@ -56,7 +56,7 @@ export class MeleeAttackTest extends SuccessTest {
      * @param type 
      */
      async prepareActorModifier(actor: SR5Actor, type: ModifierTypes): Promise<{ name: string; value: number; }> {
-        if (type !== 'environmental' && !this.item?.isMeleeWeapon()) return await super.prepareActorModifier(actor, type);
+        if (type !== 'environmental') return await super.prepareActorModifier(actor, type);
 
         // Only light and visibility apply.
         const modifiers = actor.getSituationModifiers();

@@ -10,6 +10,10 @@ declare namespace Shadowrun {
         'defense'|
         'drain'|
         'environmental'|
+        'environmental.light'|
+        'environmental.visibility'|
+        'environmental.wind'|
+        'environmental.range'|
         'background_count'|
         'noise'|
         'fade'|

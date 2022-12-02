@@ -193,7 +193,7 @@ export class SuccessTest {
         data.values.glitches = data.values.glitches || DefaultValues.valueData({label: "SR5.Glitches"});
 
         data.opposed = data.opposed || undefined;
-        data.modifiers = this._prepareModifiers(data.modifiers);
+        data.modifiers = this._prepareModifiersData(data.modifiers);
 
         data.damage = data.damage || DefaultValues.damageData();
 
@@ -205,7 +205,7 @@ export class SuccessTest {
      *
      * This should be used for whenever a Test doesn't modifiers specified externally.
      */
-    _prepareModifiers(modifiers?: ValueField) {
+    _prepareModifiersData(modifiers?: ValueField) {
         return modifiers || DefaultValues.valueData({label: 'SR5.Labels.Action.Modifiers'});
     }
 

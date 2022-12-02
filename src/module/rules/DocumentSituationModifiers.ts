@@ -8,6 +8,10 @@ import SituationModifiersSourceData = Shadowrun.SituationModifiersSourceData;
 import SituationModifiersData = Shadowrun.SituationModifiersData;
 
 
+export interface DocumentSituationModifiersTotalForOptions {
+    applicable?: string[]
+}
+
 /**
  * These documents can store situational modifiers
  */
@@ -36,9 +40,6 @@ import SituationModifiersData = Shadowrun.SituationModifiersData;
  * also allowing as many documents in that apply chain as necessary.
  * 
  * TODO: Apply active effects 
- * TODO: Move into flow instead of rules
- * TODO: Define document application order here via configuration for each document type instead of
- *       via implementation for each.
  * 
  */
 export class DocumentSituationModifiers {
@@ -121,9 +122,16 @@ export class DocumentSituationModifiers {
      * Return this total value for a modifiers category selection.
      * 
      * @param category A string matching a situation modifiers category.
+     * @param options
      */
-    getTotalFor(category: string): number {
-        const modifier = this.applied[category] || {total: 0};
+    getTotalFor(category: keyof SituationModifiersSourceData, options:DocumentSituationModifiersTotalForOptions={}): number {
+        const modifier = this.handlers[category];
+
+        // re-apply to limit applicable selections.
+        if (options.applicable) {
+            modifier.apply({applicable: options.applicable})
+        }
+
         return modifier.total;
     }
 

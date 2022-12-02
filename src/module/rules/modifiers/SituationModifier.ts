@@ -242,7 +242,7 @@ export class SituationModifier {
         sources.forEach(source => foundry.utils.mergeObject(this.applied, source));
 
         // Remove not applicable active selections.
-        if (applicable) {
+        if (applicable && applicable.length > 0) {
             Object.keys(this.applied.active).forEach((selection) => {
                 if (!applicable.includes(selection)) delete this.applied.active[selection];
             });

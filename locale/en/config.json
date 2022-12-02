@@ -63,7 +63,11 @@
     "IC": "IC"
   },
   "SR5.ModifierTypes": {
-    "Environmental": "Environmental",
+    "Environmental": "Environmental (All)",
+    "EnvironmentalLight": "Environmental (Light)",
+    "EnvironmentalVisibility": "Environmental (Visibility)",
+    "EnvironmentalWind": "Environmental (Wind)",
+    "EnvironmentalRange": "Environmental (Range)",
     "Matrix": "Noise",
     "Magic": "Background Count",
     "Wounds": "Wounds"
