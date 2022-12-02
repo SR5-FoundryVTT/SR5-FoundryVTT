@@ -1564,6 +1564,7 @@ export class SuccessTest {
         html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
         html.find('.result-action').on('click', this._castResultAction);
         html.find('.chat-select-link').on('click', this._selectSceneToken);
+        html.find('.test-action').on('click', this._castTestAction);
 
         DamageApplicationFlow.handleRenderChatMessage(message, html, data);
 
@@ -1603,6 +1604,25 @@ export class SuccessTest {
         } else {
             ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
         }
+    }
+
+    /**
+     * Cast a item action from a chat message.
+     * 
+     * @param event Any pointer event
+     */
+    static async _castTestAction(event) {
+        event.preventDefault();
+
+        const showDialog = !TestCreator.shouldHideDialog(event);
+        const element = $(event.currentTarget);
+        // Grab item uuid or fallback to empty string for foundry
+        const uuid = element.data('uuid') ?? '';
+        const item = await fromUuid(uuid) as SR5Item;
+
+        if (!item) return console.error('Shadowrun 5e | Item doesnt exist for uuid', uuid);
+
+        item.castAction(event);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {

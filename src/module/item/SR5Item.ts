@@ -905,7 +905,7 @@ export class SR5Item extends Item {
 
         return [{
             label: this.getActionTestName(),
-            type: 'action',
+            uuid: this.uuid
         }];
     }
 

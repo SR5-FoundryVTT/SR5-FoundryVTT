@@ -149,8 +149,11 @@ declare namespace Shadowrun {
         | 'drone_perception'
         | 'drone_infiltration';
 
+    /*
+     * A test label for item action chat message casting button creation
+     */
     export type ActionTestLabel =  {
         label: string;
-        type: string;
+        uuid: string;
     }
 }
