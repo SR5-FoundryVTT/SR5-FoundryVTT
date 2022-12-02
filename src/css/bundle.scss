@@ -858,6 +858,12 @@ select.display {
         // Otherwise the other classes used will break styling.
         width: auto;
     }
+
+    .document-name {
+        font-family: $signika;
+        font-size: var(--font-size-18);
+        font-weight: bold;
+    }
 }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will

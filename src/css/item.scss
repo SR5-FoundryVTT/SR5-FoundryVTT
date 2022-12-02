@@ -19,11 +19,12 @@
         border: $groove;
         .item-name {
             flex: 1;
-            @include nodesto;
-            font-size: 1.5em;
+            font-family: $signika;
+            font-size: var(--font-size-18);
             .display {
                 padding-top: 1em;
                 padding-bottom: 1em;
+                border: none;
             }
         }
         .source {
@@ -43,6 +44,8 @@
             .display {
                 padding-top: 1em;
                 padding-bottom: 1em;
+                height: auto;
+                border: none;
             }
         }
         .item-type {
@@ -60,6 +63,7 @@
             border-right: $groove;
             margin-bottom: 0;
             padding-bottom: 0;
+            border: none;
         }
         .item-info {
             flex: 1;

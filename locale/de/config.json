@@ -63,7 +63,7 @@
     "IC": "IC"
   },
   "SR5.ModifierTypes": {
-    "Environmental": "Umgebung (Alle)",
+    "Environmental": "Umgebung",
     "EnvironmentalLight": "Umgebung (Licht)",
     "EnvironmentalVisibility": "Umgebung (Sicht)",
     "EnvironmentalWind": "Umgebung (Wind)",
