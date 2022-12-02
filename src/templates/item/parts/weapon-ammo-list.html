@@ -20,6 +20,9 @@
                 <div class="item-text rtg">
                     {{localize "SR5.AP"}}
                 </div>
+                <div class="item-text">
+                    {{localize "SR5.Accuracy"}}
+                </div>
                 <div class="item-text radius">
                     {{localize "SR5.Radius"}}
                 </div>
@@ -92,6 +95,18 @@
                         type="text"
                         disabled
                         value="{{ammo.system.ap}}"
+                        data-dtype="Number"
+                        placeholder="0"
+                    />
+                </div>
+                <div class="item-text">
+                    <input
+                        class="display"
+                        size="3"
+                        maxlength="3"
+                        type="text"
+                        disabled
+                        value="{{ammo.system.accuracy}}"
                         data-dtype="Number"
                         placeholder="0"
                     />

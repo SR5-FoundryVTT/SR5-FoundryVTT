@@ -4,11 +4,15 @@ declare namespace Shadowrun {
 
     }
 
+    /**
+     * Fields provided by ammunition to modify matching weapon fields with
+     */
     export interface AmmoPartData {
-        element: DamageElement;
-        ap: number;
-        damage: number;
-        damageType: DamageType;
-        blast: BlastData;
+        element: DamageElement
+        ap: number
+        damage: number
+        damageType: DamageType
+        blast: BlastData
+        accuracy: number
     }
 }

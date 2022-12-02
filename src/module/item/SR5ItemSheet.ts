@@ -19,7 +19,7 @@ export class SR5ItemSheet extends ItemSheet {
         // @ts-ignore // mergeObject breaks TypeScript typing. Should be fine.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'item'],
-            width: 650,
+            width: 720,
             height: 450,
             tabs: [{ navSelector: '.tabs', contentSelector: '.sheetbody' }],
         });
