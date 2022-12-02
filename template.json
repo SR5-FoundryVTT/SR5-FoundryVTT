@@ -1291,7 +1291,8 @@
             "mount_point": "",
             "dice_pool": 0,
             "accuracy": 0,
-            "rc": 0
+            "rc": 0,
+            "conceal": 0
         },
         "spell": {
             "templates": ["description", "action"],
