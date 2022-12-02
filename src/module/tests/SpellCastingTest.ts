@@ -58,15 +58,8 @@ export class SpellCastingTest extends SuccessTest {
         };
     }
 
-    get testModifiers() {
-        const modifiers: ModifierTypes[] = ['global', 'wounds'];
-
-        // Some spell types need additional modifiers;
-        if (this.item?.isIndirectCombatSpell() && this.item?.isPhysicalSpell()) {
-            modifiers.push('environmental');
-        }
-
-        return modifiers;
+    get testModifiers(): ModifierTypes[] {
+        return ['global', 'wounds', 'background_count'];
     }
 
     async prepareDocumentData() {

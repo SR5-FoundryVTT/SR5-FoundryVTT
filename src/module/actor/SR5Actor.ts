@@ -1053,11 +1053,9 @@ export class SR5Actor extends Actor {
      */
     _addMatrixParts(parts: PartsList<number>, atts) {
         if (Helpers.isMatrix(atts)) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
             if (!("matrix" in this.system)) return;
 
             // Apply general matrix modifiers based on commlink/cyberdeck status.
-            //@ts-ignore // TODO: foundry-vtt-types v10
             const matrix = this.system.matrix;
             if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
             if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);

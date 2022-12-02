@@ -51,9 +51,9 @@ export class ComplexFormTest extends SuccessTest {
         };
     }
 
-    // TODO: Add missing modifiers (noise, gitter) // SR5#251
+    // TODO: Add missing modifiers (gitter) // SR5#251
     get testModifiers(): ModifierTypes[] {
-        return ['global', 'wounds'];
+        return ['global', 'wounds', 'noise'];
     }
 
     async prepareDocumentData() {
