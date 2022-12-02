@@ -330,7 +330,7 @@ export class SuccessTest {
      */
     get code(): string {
         // Add action dynamic value sources as labels.
-        let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
+        let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} ${mod.value}`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
         // let pool = this.pool.mod.map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
 
         // Threshold and Limit are values that can be overwritten.
