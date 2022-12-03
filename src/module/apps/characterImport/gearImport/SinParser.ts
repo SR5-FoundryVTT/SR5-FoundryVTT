@@ -21,7 +21,7 @@ export class SinParser extends BaseGearParser {
                 chummerLicenses.push(...chummerGear.children.gear);
             }
 
-            parsedGear.data.licenses = this.parseLicenses(chummerLicenses);
+            parsedGear.system.licenses = this.parseLicenses(chummerLicenses);
         }
         return parsedGear;
     }

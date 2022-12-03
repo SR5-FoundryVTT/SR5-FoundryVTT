@@ -10,15 +10,15 @@ export class ProgramParser extends BaseGearParser {
 
         if (chummerGear.category === 'Common Programs')
         {
-            parsedGear.data.type = 'common_program'
+            parsedGear.system.type = 'common_program'
         }
         else if (chummerGear.category === 'Hacking Programs')
         {
-            parsedGear.data.type = 'hacking_program'
+            parsedGear.system.type = 'hacking_program'
         } 
         else if (chummerGear.category === 'Software')
         {
-            parsedGear.data.type = 'agent'
+            parsedGear.system.type = 'agent'
         }
 
         return parsedGear;

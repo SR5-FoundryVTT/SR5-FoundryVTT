@@ -8,9 +8,9 @@ export class DeviceParser extends BaseGearParser {
     parse(chummerGear : any) : any {
         const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'device';
-        parsedGear.data.technology.rating = chummerGear.devicerating;
+        parsedGear.system.technology.rating = chummerGear.devicerating;
 
-        parsedGear.data.atts = {
+        parsedGear.system.atts = {
             att1:
             {
                 value: chummerGear.attack,
@@ -25,7 +25,7 @@ export class DeviceParser extends BaseGearParser {
 
             att3:
             {
-                value: chummerGear.dataprocessing,
+                value: chummerGear.systemprocessing,
                 att: 'data_processing'
             },
 
@@ -38,18 +38,18 @@ export class DeviceParser extends BaseGearParser {
 
         if (chummerGear.category === 'Cyberdecks')
         {
-            parsedGear.data.category = 'cyberdeck';
+            parsedGear.system.category = 'cyberdeck';
         }
 
         if (chummerGear.category === 'Commlinks')
         {
-            parsedGear.data.category = 'commlink';
+            parsedGear.system.category = 'commlink';
         }
 
         if (chummerGear.category === 'Rigger Command Consoles')
         {
             // We are handling rccs as commlinks for the moment since we have no support for rigger command consoles yet.
-            parsedGear.data.category = 'commlink'; 
+            parsedGear.system.category = 'commlink'; 
         }
 
         return parsedGear;
