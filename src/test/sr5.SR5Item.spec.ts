@@ -80,5 +80,92 @@ export const shadowrunSR5Item = context => {
             assert.property(embeddedAmmo.system, 'test');
             assert.propertyVal(embeddedAmmo.system, 'test', true);
         });
+
+        describe('Testing related data injection', () => {
+            it('Correctly add default test to spells', async () => {
+                // const item = await testItem.create({type: 'spell'});
+
+                // assert.equal(item.system.action.test, 'SpellCastingTest');
+                // assert.equal(item.system.action.followed.test, 'DrainTest');
+                // assert.equal(item.system.action.opposed.test, '');
+            });
+
+            it('Correctly add defense tests to spells', async () => {
+                const item = await testItem.create({type: 'spell'});
+
+                await item.update({'system.category': 'combat'});
+                assert.equal(item.system.action.test, 'SpellCastingTest');
+                assert.equal(item.system.action.followed.test, 'DrainTest');
+                assert.equal(item.system.action.opposed.test, 'CombatSpellDefenseTest');
+                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
+
+                await item.update({'system.category': 'detection'});
+                assert.equal(item.system.action.test, 'SpellCastingTest');
+                assert.equal(item.system.action.followed.test, 'DrainTest');
+                assert.equal(item.system.action.opposed.test, 'OpposedTest');
+                assert.equal(item.system.action.opposed.resist.test, '');
+            });
+            it('Correctly add default tests to melee weapons', async () => {
+                const item = await testItem.create({type: 'weapon'});
+
+                await item.update({'system.category': 'melee'});
+                assert.equal(item.system.action.test, 'MeleeAttackTest');
+                assert.equal(item.system.action.followed.test, '');
+                assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
+                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
+            });
+            it('Correctly add default tests to range weapons', async () => {
+                const item = await testItem.create({type: 'weapon'});
+
+                await item.update({'system.category': 'range'});
+                assert.equal(item.system.action.test, 'RangedAttackTest');
+                assert.equal(item.system.action.followed.test, '');
+                assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
+                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
+            });
+            it('Correctly add defense tests to complex forms', async () => {
+                const item = await testItem.create({type: 'complex_form'});
+
+                assert.equal(item.system.action.test, 'ComplexFormTest');
+                assert.equal(item.system.action.followed.test, 'FadeTest');
+                assert.equal(item.system.action.opposed.test, 'OpposedTest');
+                assert.equal(item.system.action.opposed.resist.test, '');
+            });
+            it('Correctly alter default test for weapon category changes', async () => {
+                const item = await testItem.create({type: 'weapon'});
+
+                await item.update({'system.category': 'range'});
+                assert.equal(item.system.action.test, 'RangedAttackTest');
+                assert.equal(item.system.action.followed.test, '');
+                assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
+                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
+
+                await item.update({'system.category': ''});
+                assert.equal(item.system.action.test, '');
+                assert.equal(item.system.action.followed.test, '');
+                assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
+                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
+            });
+            it('Correctly stop injection when mergeOptions recursive or diff are set to false', async () => {
+                /**
+                 * Foundry sometimes updates document data by replacing foundry data segements fully:
+                 * recusrive: true and sometimes diff: true
+                 * 
+                 * In that case, injecting ANYthing into systemdata will replace ALL of system data
+                 * with what is meant to be injected.
+                 * 
+                 * This is testing Helpers.injectActionTestsIntoChangeData which is connected to some 
+                 * document lifecycle methods.
+                 */
+                const item = await testItem.create({type: 'complex_form'});
+                // Should not inject.
+                await item.update({'name': 'Test'}, {recursive: false});
+                assert.equal(item.system.action.skill, ''); // Check if system data still exists
+                await item.update({'name': 'Test2'}, {diff: false});
+                assert.equal(item.system.action.skill, ''); // Check if system data still exists
+                await item.update({'name': 'Test'}, {recursive: true});
+                assert.equal(item.system.action.skill, ''); // Check if system data still exists
+            });
+        });
     });
 };

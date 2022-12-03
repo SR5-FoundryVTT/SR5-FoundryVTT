@@ -1701,7 +1701,7 @@ export class SR5Item extends Item {
 
         // Don't kill DocumentData by applying empty objects. Also performance.
         //@ts-ignore // TODO: foundry-vtt-types v10
-        if (!foundry.utils.isEmpty(applyData)) this.update(applyData);
+        if (!foundry.utils.isEmpty(applyData)) await this.update(applyData);
     }
 
     /**
