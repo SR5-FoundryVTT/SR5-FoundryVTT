@@ -5,6 +5,8 @@ import {SR} from "../module/constants";
 import CharacterActorData = Shadowrun.CharacterActorData;
 import SpiritActorData = Shadowrun.SpiritActorData;
 import SpriteActorData = Shadowrun.SpriteActorData;
+import ICActorData = Shadowrun.ICActorData;
+import VehicleActorData = Shadowrun.VehicleActorData;
 
 export const shadowrunSR5ActorDataPrep = context => {
     const {describe, it, assert, before, after} = context;
@@ -66,6 +68,19 @@ export const shadowrunSR5ActorDataPrep = context => {
                 assert.strictEqual(character.system.track.stun.max, 11); // 8 + round_up(6 / 2)
                 assert.strictEqual(character.system.track.physical.max, 11); // 8 + round_up(6 / 2)
                 assert.strictEqual(character.system.track.physical.overflow.max, 6); // body value
+            });
+
+            it('Matrix condition monitor track calculation with modifiers', async () => {
+                const actor = await testActor.create({type: 'character', 'system.modifiers.matrix_track': 1}) as SR5Actor;
+                await actor.createEmbeddedDocuments('Item', [{
+                    'name': 'Commlink',
+                    'type': 'device', 
+                    'system.category': 'commlink', 
+                    'system.technology.equipped': true
+                }]);
+                
+                const character = actor.asCharacter() as CharacterActorData;
+                assert.equal(character.system.matrix.condition_monitor.max, 10); // 9 + 1
             });
 
             it('Character initiative calculation', async () => {
@@ -271,5 +286,40 @@ export const shadowrunSR5ActorDataPrep = context => {
                 assert.strictEqual(sprite.system.skills.active.computer.base, 6); // all sprites
                 assert.strictEqual(sprite.system.skills.active.electronic_warfare.base, 0); // not set by sprite type.
             })
+
+            it('Matrix condition monitor track calculation with modifiers', async () => {
+                const actor = await testActor.create({type: 'sprite'}) as SR5Actor;
+                
+                let sprite = actor.asSprite() as SpriteActorData;
+                assert.equal(sprite.system.matrix.condition_monitor.max, 8);
+
+                await actor.update({'system.modifiers.matrix_track': 1});
+                sprite = actor.asSprite() as SpriteActorData;
+                assert.equal(sprite.system.matrix.condition_monitor.max, 9);
+            });
+        });
+        describe('VehicleDataPrep', () => {
+                it('Matrix condition monitor track calculation with modifiers', async () => {
+                const actor = await testActor.create({type: 'vehicle'}) as SR5Actor;
+                
+                let vehicle = actor.asVehicle() as VehicleActorData;
+                assert.equal(vehicle.system.matrix.condition_monitor.max, 8);
+
+                await actor.update({'system.modifiers.matrix_track': 1});
+                vehicle = actor.asVehicle() as VehicleActorData;
+                assert.equal(vehicle.system.matrix.condition_monitor.max, 9);
+            });
+        });
+        describe('ICDataPrep', () => {
+            it('Matrix condition monitor track calculation with modifiers', async () => {
+                const actor = await testActor.create({type: 'ic'}) as SR5Actor;
+                
+                let ic = actor.asIC() as ICActorData;
+                assert.equal(ic.system.matrix.condition_monitor.max, 8);
+
+                await actor.update({'system.modifiers.matrix_track': 1});
+                ic = actor.asIC() as ICActorData;
+                assert.equal(ic.system.matrix.condition_monitor.max, 9);
+            });
         });
 }
