@@ -30,7 +30,7 @@ declare namespace Shadowrun {
         firewall: MatrixAttributeField
 
         condition_monitor: ConditionData
-        rating: NumberOrEmpty
+        rating: number
         name: string
         device: string
         is_cyberdeck: boolean

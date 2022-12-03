@@ -16,11 +16,7 @@
                         "max": 0
                     },
                     "vr": false,
-                    "rating": {
-                        "value": 0,
-                        "mod": [],
-                        "base": 0
-                    },
+                    "rating": 0,
                     "is_cyberdeck": false,
                     "name": "",
                     "silent": false,
