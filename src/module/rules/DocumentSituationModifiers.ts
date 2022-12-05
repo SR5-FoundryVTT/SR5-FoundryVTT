@@ -39,8 +39,6 @@ export interface DocumentSituationModifiersTotalForOptions {
  * This allows for modifiers to be defined globally (scene) for all other documents (actors), while
  * also allowing as many documents in that apply chain as necessary.
  * 
- * TODO: Apply active effects 
- * 
  */
 export class DocumentSituationModifiers {
     // A reference to the original document holding modifier source data.
@@ -179,9 +177,15 @@ export class DocumentSituationModifiers {
      * @param document The document to clear.
      * @returns A new instance with the resulting modifiers structure
      */
-    static async clearAllOnDocument(document: ModifiableDocumentTypes): Promise<DocumentSituationModifiers> {
-        await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
-        return new DocumentSituationModifiers(DocumentSituationModifiers._defaultModifiers);
+    static async clearAllOnDocument(document: ModifiableDocumentTypes) {
+        if (document instanceof SR5Actor) {
+            // Overwrite all selections with default values.
+            await document.update({'system.-=situation_modifiers': null}, {render: false});
+            await document.update({'system.situation_modifiers': DocumentSituationModifiers._defaultModifiers});
+        } else {
+            await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
+            await document.setFlag(SYSTEM_NAME, FLAGS.Modifier, DocumentSituationModifiers._defaultModifiers);
+        }
     }
 
     /**
@@ -272,7 +276,11 @@ export class DocumentSituationModifiers {
      * @returns The raw modifier data of a document
      */
      static getDocumentModifiersData(document: ModifiableDocumentTypes): SituationModifiersSourceData {
-        return document.getFlag(SYSTEM_NAME, FLAGS.Modifier) as SituationModifiersSourceData;
+        if (document instanceof SR5Actor) {
+            return document.system.situation_modifiers;
+        } else {
+            return document.getFlag(SYSTEM_NAME, FLAGS.Modifier) as SituationModifiersSourceData;
+        }
     }
 
     /**
@@ -310,10 +318,15 @@ export class DocumentSituationModifiers {
      * @param modifiers Source data of all situation modifiers for this document.
      */
     static async setDocumentModifiers(document: ModifiableDocumentTypes, modifiers: SituationModifiersSourceData) {
-        // Removing unsetFlag causes strange update behaviour...
-        // ...this behaviour has been observed at other updates on flags.
-        await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
-        await document.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
+        if (document instanceof SR5Actor) {
+            // Due to active selection merging by Foundry mergeObject, we need to delete first.
+            await document.update({'system.-=situation_modifiers': null}, {render: false});
+            await document.update({'system.situation_modifiers': modifiers});
+        } else {
+            // Due to active selection merging by Foundry mergeObject, we need to delete first.
+            await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
+            await document.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
+        }
     }
 
     /**
@@ -331,8 +344,7 @@ export class DocumentSituationModifiers {
         if (!this.document) return console.error(`'Shadowrun 5e | ${this.constructor.name} can't clear without connected document'`);
         await DocumentSituationModifiers.clearAllOnDocument(this.document);
         // Reset local source data.
-        // Let caller decide time of re-apply
-        this.source = DocumentSituationModifiers._defaultModifiers;
+        this.source = DocumentSituationModifiers.getDocumentModifiersData(this.document);
     }
 
     /**

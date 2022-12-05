@@ -1,4 +1,4 @@
-import { SituationModifierCategory } from './../../rules/modifiers/SituationModifier';
+import { SituationModifier, SituationModifierCategory } from './../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from './../../apps/SituationModifiersApplication';
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
@@ -1662,11 +1662,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         const modifiers = this.document.getSituationModifiers();
         if (!modifiers) return [];
 
-        return Object.entries(modifiers.applied).map(([category, values]: [SituationModifierCategory, ModifierData]) => {
+        return Object.entries(modifiers.handlers).map(([category, modifier]: [SituationModifierCategory, SituationModifier]) => {
             const hidden = this._hideSituationModifier(category);
 
             const label = SR5.modifierTypes[category];
-            return {category, value: values.total, hidden, label};
+            return {category, value: modifier.total, hidden, label};
         });
     }
 

@@ -8,6 +8,7 @@ declare namespace Shadowrun {
         special: SpecialTrait
         initiative: Initiative
         modifiers: Modifiers
+        situation_modifiers: SituationModifiersSourceData
         /**
          * Actor inventories allow to show items separated out into different places / inventories.
          */

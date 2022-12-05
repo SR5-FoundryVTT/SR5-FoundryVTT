@@ -5,10 +5,28 @@ import { EnvironmentalModifier } from './../module/rules/modifiers/Environmental
 import {DocumentSituationModifiers} from "../module/rules/DocumentSituationModifiers";
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SituationModifier } from "../module/rules/modifiers/SituationModifier";
+import { SR5TestingDocuments } from './utils';
+import { SR5Actor } from '../module/actor/SR5Actor';
+import { SR5Item } from '../module/item/SR5Item';
 
 export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
-    const {describe, it, assert} = context;
+    const {describe, it, assert, before, after} = context;
 
+    let testActor;
+    let testItem;
+    let testScene;
+
+    before(async () => {
+        testActor = new SR5TestingDocuments(SR5Actor);
+        testItem = new SR5TestingDocuments(SR5Item);
+        testScene = new SR5TestingDocuments(Scene);
+    })
+
+    after(async () => {
+        await testActor.teardown();
+        await testItem.teardown();
+        await testScene.teardown();
+    })
 
     const defaultSourceModifiers = {
         environmental: {
@@ -169,40 +187,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 assert.equal(envMod.total, -1);
             });
         });
-
-        describe('class NoiseMoidifer', () => {
-            it('apply a negative modifier for a positive noise level', () => {
-                const noiseMod = new NoiseModifier();
-                noiseMod.apply({source: {active: {value: 3}}});
-
-                assert.equal(noiseMod.total, -3);
-            });
-
-            it('prohibit positive modifier values', () => {
-                const noiseMod = new NoiseModifier();
-                noiseMod.apply({source: {active: {value: -3}}});
-
-                assert.equal(noiseMod.total, 0);
-            });
-        });
-
-        describe('class BackgroundCountMoidifer', () => {
-            it('apply a negative modifier for a positive noise level', () => {
-                const noiseMod = new BackgroundCountModifier();
-                noiseMod.apply({source: {active: {value: 3}}});
-
-                assert.equal(noiseMod.total, -3);
-            });
-
-            it('prohibit positive modifier values', () => {
-                const noiseMod = new NoiseModifier();
-                noiseMod.apply({source: {active: {value: -3}}});
-
-                assert.equal(noiseMod.total, 0);
-            });
-        });
         
-
         describe('class DocumentSituationModifiers', () => {
             it('create default modifier values', () => {
                 const modifiers = DocumentSituationModifiers._defaultModifiers;
@@ -224,8 +209,44 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 //@ts-ignore
                 assert.deepEqual(new DocumentSituationModifiers().source, defaultSourceModifiers);
             })
+
+            it('Store data depending on document type', async () => {
+                const actor = await testActor.create({type: 'character'}) as SR5Actor;
+                let modifiers = actor.getSituationModifiers();
+
+                assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
+
+                modifiers.source.noise.fixed = 1;
+                await modifiers.updateDocument();
+
+                assert.equal(modifiers.source.noise.fixed, 1);
+
+                const scene = await testScene.create() as Scene;
+                modifiers = DocumentSituationModifiers.fromDocument(scene);
+
+                assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
+
+                modifiers.source.noise.fixed = 1;
+                await modifiers.updateDocument();
+
+                assert.equal(modifiers.source.noise.fixed, 1);
+            })
+
+            it('clear documents data to defaults', async () => {
+                
+                const actor = await testActor.create({
+                    type: 'character'}) as SR5Actor;
+
+                const modifiers = actor.getSituationModifiers();
+                
+                modifiers.source.noise.fixed = 1;
+                await modifiers.updateDocument();
+                assert.notDeepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
+
+                await modifiers.clearAll();
+                assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
+            });
         })
-        
     })
 }
 

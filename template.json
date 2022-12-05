@@ -901,6 +901,11 @@
                     }
                 },
                 "modifiers": {},
+                "situation_modifiers": {
+                    "environmental": {"active": {}},
+                    "noise": {"active": {}},
+                    "background_count": {"active": {}}
+                },
                 "inventories": {}
             }
         },

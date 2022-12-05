@@ -458,7 +458,7 @@ ___________________
             sheetClasses: [{
                 name: "ActiveEffectConfig",
                 fieldConfigs: [
-                    { selector: `.tab[data-tab="effects"] .key input[type="text"]`, defaultPath: "data", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="effects"] .key input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
                 ]
             }]
         };

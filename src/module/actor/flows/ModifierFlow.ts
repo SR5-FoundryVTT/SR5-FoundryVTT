@@ -1,3 +1,4 @@
+import { DocumentSituationModifiers } from './../../rules/DocumentSituationModifiers';
 import {SR5Actor} from "../SR5Actor";
 
 
@@ -14,7 +15,6 @@ export interface ModifierFlowOptions {
  * 
  * Use this interface to retrieve a total value, not values used to create that total.
  * 
- * TODO: This flow could be improved by using a Proxy object interface and mapping get's to modifiers instead of using totalFor
  */
 export class ModifierFlow {
     // The actor document to retrieve modifiers for.

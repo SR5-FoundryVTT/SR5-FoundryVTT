@@ -283,7 +283,9 @@ export class SituationModifier {
     /**
      * Give the total modifier value for this category.
      *  
-     * Should this modifier not yet been applied, this will apply.
+     * Should this modifier not yet been applied, this will apply it.
+     * 
+     * NOTE: Always use this field to access resulting modifier values as some modifiers might have a total level applied vs a total modifer given.
      */
     get total(): number {
         if (!this.applied) {
