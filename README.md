@@ -1,6 +1,8 @@
 # Shadowrun5e for Foundry Virtual Tabletop
 Manifest: https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json
 
+There is no discord channel / server for the moment.
+
 We will always be happy to look at a Pull Request if there are features or bugs you'd like to work on.
 
 Should you need an older version you can check https://github.com/smilligan93/SR5-FoundryVTT/releases and reference the system.json on each release instead of FoundryVTTs system marketplace.
@@ -18,7 +20,6 @@ It's complicated, it's a work in progress, but it is _kinda_ stable. We try to b
 
 ## Learn more
 To learn more about the features of the system and how to use them, please visit our wiki: https://github.com/smilligan93/SR5-FoundryVTT/wiki
-If you want to improve our wiki and help us out, feel free to contact us on the FoundryVTT discord server.
 
 ## Report issues
 Found some problem? Please report it in our issue tracker or on discord.
