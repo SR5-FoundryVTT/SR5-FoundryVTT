@@ -20,11 +20,10 @@ export class QualityParser {
     }
 
     parseQuality(chummerQuality) {
-        const data = DefaultValues.qualityData();
-        data.type = chummerQuality.qualitytype.toLowerCase();
-        data.description = parseDescription(chummerQuality);
+        const system = DefaultValues.qualityData();
+        system.type = chummerQuality.qualitytype.toLowerCase();
+        system.description = parseDescription(chummerQuality);
 
-        const itemData = createItemData(chummerQuality.name, 'quality', data);
-        return itemData;
+        return createItemData(chummerQuality.name, 'quality', system);
     }
 }

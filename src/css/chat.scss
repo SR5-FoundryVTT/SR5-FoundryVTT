@@ -33,11 +33,11 @@
             }
 
             h3 {
-                font-size: 1.5em;
+                font-size: var(--font-size-16);
+                font-weight: bold;
                 align-self: center;
                 flex: 1;
                 margin: 0;
-                @include nodesto;        
             }
         }
         .card-header:first-of-type {
@@ -264,8 +264,8 @@
                 }
             }
             .test-code {
-                font-family: $nodesto;
-                font-size: 1.5em;
+                font-family: $signika;
+                font-size: var(--font-size-12);
             }
         }
         .dice-rolls {

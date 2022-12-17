@@ -64,7 +64,7 @@ export class ThrownParser extends WeaponParserBase {
         return DefaultValues.damageData(partialDamageData);
     }
 
-    public GetBlast(jsonData: object, data: WeaponItemData): BlastData {
+    public GetBlast(jsonData: object, item: WeaponItemData): BlastData {
         let blastData: BlastData = {
             radius: 0,
             dropoff: 0,
@@ -89,23 +89,23 @@ export class ThrownParser extends WeaponParserBase {
         }
 
         if (blastData.dropoff && !blastData.radius) {
-            blastData.radius = -(data.data.action.damage.base / blastData.dropoff);
+            blastData.radius = -(item.system.action.damage.base / blastData.dropoff);
         }
 
         return blastData;
     }
 
-    Parse(jsonData: object, data: WeaponItemData, jsonTranslation?: object): WeaponItemData {
-        data = super.Parse(jsonData, data, jsonTranslation);
+    Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+        item = super.Parse(jsonData, item, jsonTranslation);
 
         if (jsonData.hasOwnProperty('range')) {
-            data.data.thrown.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'range')];
+            item.system.thrown.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'range')];
         } else {
-            data.data.thrown.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'category')];
+            item.system.thrown.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'category')];
         }
 
-        data.data.thrown.blast = this.GetBlast(jsonData, data);
+        item.system.thrown.blast = this.GetBlast(jsonData, item);
 
-        return data;
+        return item;
     }
 }

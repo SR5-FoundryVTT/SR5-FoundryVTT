@@ -6,6 +6,7 @@ import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import { SR5Combat } from "../combat/SR5Combat";
 import MinimalActionData = Shadowrun.MinimalActionData;
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
@@ -46,7 +47,7 @@ export class PhysicalDefenseTest extends DefenseTest {
         };
     }
 
-    get testModifiers() {
+    get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'defense'];
     }
 

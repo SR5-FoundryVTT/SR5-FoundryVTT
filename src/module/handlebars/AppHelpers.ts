@@ -1,8 +1,10 @@
 export const registerAppHelpers = () => {
     // TODO: Add modifiers.env typing and add missing type
-    /** Determine if a environmental modifier of a specific category is active
+    /** 
+     * An environmental modifier is active when the the set value matches the expected modifier value
+     * for this selection.
      *
-     * @param active
+     * @param active The applied environmental modifiers 
      * @param category A environment modifier category (wind, range, ...)
      * @param modifier A environmental modifier value (0, -1)
      */

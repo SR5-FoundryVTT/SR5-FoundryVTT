@@ -47,8 +47,8 @@ export abstract class WeaponParserBase extends TechnologyItemParserBase<WeaponIt
         }
     }
 
-    public Parse(jsonData: object, data: WeaponItemData, jsonTranslation?: object): WeaponItemData {
-        data = super.Parse(jsonData, data, jsonTranslation);
+    public Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+        item = super.Parse(jsonData, item, jsonTranslation);
 
         let category = ImportHelper.StringValue(jsonData, 'category');
         // A single item does not meet normal rules, thanks Chummer!
@@ -57,17 +57,17 @@ export abstract class WeaponParserBase extends TechnologyItemParserBase<WeaponIt
             category = 'Holdouts';
         }
 
-        data.data.category = WeaponParserBase.GetWeaponType(jsonData);
-        data.data.subcategory = category.toLowerCase();
+        item.system.category = WeaponParserBase.GetWeaponType(jsonData);
+        item.system.subcategory = category.toLowerCase();
 
-        data.data.action.skill = this.GetSkill(jsonData);
-        data.data.action.damage = this.GetDamage(jsonData);
+        item.system.action.skill = this.GetSkill(jsonData);
+        item.system.action.damage = this.GetDamage(jsonData);
 
-        data.data.action.limit.value = ImportHelper.IntValue(jsonData, 'accuracy');
-        data.data.action.limit.base = ImportHelper.IntValue(jsonData, 'accuracy');
+        item.system.action.limit.value = ImportHelper.IntValue(jsonData, 'accuracy');
+        item.system.action.limit.base = ImportHelper.IntValue(jsonData, 'accuracy');
 
-        data.data.technology.conceal.base = ImportHelper.IntValue(jsonData, 'conceal');
+        item.system.technology.conceal.base = ImportHelper.IntValue(jsonData, 'conceal');
 
-        return data;
+        return item;
     }
 }

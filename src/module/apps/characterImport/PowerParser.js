@@ -15,12 +15,11 @@ export class PowerParser {
     }
 
     parsePower(chummerPower) {
-        const data = {};
-        data.description = parseDescription(chummerPower);
+        const system = {};
+        system.description = parseDescription(chummerPower);
 
-        data.level = parseInt(chummerPower.rating);
-        data.pp = parseFloat(chummerPower.totalpoints);
-        const itemData = createItemData(chummerPower.fullname, 'adept_power', data);
-        return itemData;
+        system.level = parseInt(chummerPower.rating);
+        system.pp = parseFloat(chummerPower.totalpoints);
+        return createItemData(chummerPower.fullname, 'adept_power', system);
     }
 }

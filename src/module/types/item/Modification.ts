@@ -7,14 +7,17 @@ declare namespace Shadowrun {
 
     }
 
+    /**
+     * Fields to modify matching parent item fields with during item preparation
+     */
     export interface ModificationPartType {
-        type: 'weapon' | 'armor' | '';
-        mount_point: MountType;
-        dice_pool: number;
-        accuracy: number;
-        rc: number;
+        type: 'weapon' | 'armor' | ''
+        mount_point: MountType
+        dice_pool: number
+        accuracy: number
+        rc: number
+        conceal: number
     }
 
     export type MountType = 'barrel' | 'stock' | 'top' | 'side' | 'internal' | '';
-
 }

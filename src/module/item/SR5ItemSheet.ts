@@ -19,7 +19,7 @@ export class SR5ItemSheet extends ItemSheet {
         // @ts-ignore // mergeObject breaks TypeScript typing. Should be fine.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'item'],
-            width: 650,
+            width: 720,
             height: 450,
             tabs: [{ navSelector: '.tabs', contentSelector: '.sheetbody' }],
         });
@@ -47,13 +47,12 @@ export class SR5ItemSheet extends ItemSheet {
         data.system = data.item.system;
         //@ts-ignore // TODO: remove TODO: foundry-vtt-types v10
         data.data = data.item.system;
-        //@ts-ignore
-        const itemData = this.item.system;
+        const itemData = this.document.system;
 
         if (itemData.action) {
             try {
-                const { action } = itemData;
-                if (action.mod === 0) delete action.mod;
+                const action = itemData.action as any;
+                if (itemData.action.mod === 0) delete action.mod;
                 if (action.limit === 0) delete action.limit;
                 if (action.damage) {
                     if (action.damage.mod === 0) delete action.damage.mod;
@@ -69,10 +68,10 @@ export class SR5ItemSheet extends ItemSheet {
 
         if (itemData.technology) {
             try {
-                const tech = itemData.technology;
-                if (tech.rating === 0) delete tech.rating;
-                if (tech.quantity === 0) delete tech.quantity;
-                if (tech.cost === 0) delete tech.cost;
+                const technology = itemData.technology as any;
+                if (technology.rating === 0) delete technology.rating;
+                if (technology.quantity === 0) delete technology.quantity;
+                if (technology.cost === 0) delete technology.cost;
             } catch (e) {
                 console.log(e);
             }
@@ -82,11 +81,17 @@ export class SR5ItemSheet extends ItemSheet {
         const items = this.item.items;
         const [ammunition, weaponMods, armorMods] = items.reduce(
             (parts: [ItemData[], ItemData[], ItemData[]], item: SR5Item) => {
-                if (item.type === 'ammo') parts[0].push(item.data);
+                const itemData = item.toObject();
+                //@ts-ignore
+                itemData.descriptionHTML = this.enrichEditorFieldToHTML(itemData.system.description.value);
+
+                //@ts-ignore
+                if (item.type === 'ammo') parts[0].push(itemData); // TODO: foundry-vtt-types v10
                 //@ts-ignore TODO: foundry-vtt-types v10
-                if (item.type === 'modification' && "type" in item.system && item.system.type === 'weapon') parts[1].push(item._source);
+                if (item.type === 'modification' && "type" in item.system && item.system.type === 'weapon') parts[1].push(itemData);
                 //@ts-ignore TODO: foundry-vtt-types v10
-                if (item.type === 'modification' && "type" in item.system && item.system.type === 'armor') parts[2].push(item._source);
+                if (item.type === 'modification' && "type" in item.system && item.system.type === 'armor') parts[2].push(itemData);
+                
                 return parts;
             },
             [[], [], []],
@@ -124,15 +129,20 @@ export class SR5ItemSheet extends ItemSheet {
         data.resistTests = game.shadowrun5e.resistTests;
 
         // @ts-ignore TODO: foundry-vtt-types v10
-        data.descriptionHTML = await TextEditor.enrichHTML(this.item.system.description.value, {
-            // secrets: this.item.isOwner,
-            // rollData: this.actor.getRollData.bind(this.actor),
-            // @ts-ignore TODO: foundry-vtt-types v10
-            async: true,
-            // relativeTo: this.item
-          });
+        data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
 
         return data;
+    }
+
+    /**
+     * Help enriching editor field values to HTML used to display editor values as read-only HTML in sheets.
+     * 
+     * @param editorValue A editor field value like Item.system.description.value
+     * @param options TextEditor, enrichHTML.options passed through
+     * @returns Enriched HTML result
+     */
+    enrichEditorFieldToHTML(editorValue: string, options:any={async: false}): string {
+        return TextEditor.enrichHTML(editorValue, options);
     }
 
     /**

@@ -54,6 +54,7 @@ import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
+import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
@@ -67,6 +68,7 @@ import RollEvent = Shadowrun.RollEvent;
  * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
+import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -95,6 +97,9 @@ export class SR5Item extends Item {
 
     // Item Sheet labels for quick info on an item dropdown.
     labels: {} = {};
+
+    // Add v10 type helper
+    system: ShadowrunItemDataData; // TODO: foundry-vtt-types v10
 
 
     /**
@@ -256,11 +261,9 @@ export class SR5Item extends Item {
             if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: []};
 
             const concealParts = new PartsList<number>();
-            equippedMods.forEach((mod) => {
-                const technology = mod.getTechnologyData();
-
-                if (technology && technology.conceal.value) {
-                    concealParts.addUniquePart(mod.name as string, technology.conceal.value);
+            equippedMods.forEach((modificiation) => {
+                if (modificiation.system.conceal  && modificiation.system.conceal > 0) {
+                    concealParts.addUniquePart(modificiation.name as string, modificiation.system.conceal);
                 }
             });
 
@@ -314,6 +317,8 @@ export class SR5Item extends Item {
                 action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
                 // add mods to ap from ammo
                 action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
+
+                if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name as string, ammoData.accuracy);
 
                 // override element
                 if (ammoData.element) {
@@ -408,8 +413,9 @@ export class SR5Item extends Item {
         const { labels } = this;
         //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
         //              that's not actually defined in any SR5Item typing.
-        if (!system.description) system.description = {};
+        if (system.description) system.description = {};
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
+        //@ts-ignore // TODO: foundry-vtt-types v10
         if (!system.description.value) system.description.value = '';
         //@ts-ignore // TODO: foundry-vtt-types v10
         system.description.value = TextEditor.enrichHTML(system.description.value, {...htmlOptions, async: false});
@@ -656,6 +662,8 @@ export class SR5Item extends Item {
             Object.values(this.system.licenses) :
             //@ts-ignore TODO: foundry-vtt-types v10
             this.system.licenses;
+
+        if (!licenses) return;
         
         // Add the new license to the list
         licenses.push({
@@ -897,7 +905,7 @@ export class SR5Item extends Item {
 
         return [{
             label: this.getActionTestName(),
-            type: 'action',
+            uuid: this.uuid
         }];
     }
 
@@ -1693,7 +1701,7 @@ export class SR5Item extends Item {
 
         // Don't kill DocumentData by applying empty objects. Also performance.
         //@ts-ignore // TODO: foundry-vtt-types v10
-        if (!foundry.utils.isEmpty(applyData)) this.update(applyData);
+        if (!foundry.utils.isEmpty(applyData)) await this.update(applyData);
     }
 
     /**
@@ -1701,9 +1709,14 @@ export class SR5Item extends Item {
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-     async _preUpdate(changed, options, user) {
-        // Change used action test implementation when necessary.
-        Helpers.injectActionTestsIntoChangeData(this.type, changed, changed);
+     async _preUpdate(changed, options: DocumentModificationOptions, user: User) {
+        // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
+        // differential approach of action test injection. (NOTE: Changing ownership of a document)
+        if (options.diff !== false && options.recursive !== false) {
+            // Change used action test implementation when necessary.
+            Helpers.injectActionTestsIntoChangeData(this.type, changed, changed);
+        }
+        
         await super._preUpdate(changed, options, user);
     }
 }

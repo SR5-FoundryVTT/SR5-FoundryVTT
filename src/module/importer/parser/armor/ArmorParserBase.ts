@@ -3,12 +3,12 @@ import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
 import ArmorItemData = Shadowrun.ArmorItemData;
 
 export class ArmorParserBase extends TechnologyItemParserBase<ArmorItemData> {
-    Parse(jsonData: object, data: ArmorItemData): ArmorItemData {
-        data = super.Parse(jsonData, data);
+    Parse(jsonData: object, item: ArmorItemData): ArmorItemData {
+        item = super.Parse(jsonData, item);
 
-        data.data.armor.value = ImportHelper.IntValue(jsonData, 'armor', 0);
-        data.data.armor.mod = ImportHelper.StringValue(jsonData, 'armor').includes('+');
+        item.system.armor.value = ImportHelper.IntValue(jsonData, 'armor', 0);
+        item.system.armor.mod = ImportHelper.StringValue(jsonData, 'armor').includes('+');
 
-        return data;
+        return item;
     }
 }

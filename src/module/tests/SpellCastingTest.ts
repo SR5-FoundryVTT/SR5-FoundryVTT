@@ -5,6 +5,8 @@ import {DefaultValues} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
+import ModifierTypes = Shadowrun.ModifierTypes;
+import { SR5Actor } from "../actor/SR5Actor";
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -56,8 +58,8 @@ export class SpellCastingTest extends SuccessTest {
         };
     }
 
-    get testModifiers() {
-        return ['global', 'wounds'];
+    get testModifiers(): ModifierTypes[] {
+        return ['global', 'wounds', 'background_count'];
     }
 
     async prepareDocumentData() {
@@ -89,6 +91,18 @@ export class SpellCastingTest extends SuccessTest {
             'SR5.Force',
             SpellcastingRules.calculateLimit(force));
     }
+
+    // /**
+    //  * Overwrite range from environmental modifiers for indirect combat spells.
+    //  * 
+    //  * @param actor 
+    //  * @param type 
+    //  */
+    // async prepareActorModifier(actor: SR5Actor, type: ModifierTypes): Promise<{ name: string; value: number; }> {
+    //     if (type !== 'environmental' && !this.item?.isIndirectCombatSpell()) return await super.prepareActorModifier(actor, type);
+
+    //     const modifiers = actor.getSituationModifiers();
+    // }
 
     calculateBaseValues() {
         super.calculateBaseValues();

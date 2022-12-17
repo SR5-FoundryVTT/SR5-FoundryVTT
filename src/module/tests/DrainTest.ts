@@ -1,10 +1,10 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellCastingTest, SpellCastingTestData} from "./SpellCastingTest";
-import {DefaultValues} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
+import {Helpers} from "../helpers";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
-import {Helpers} from "../helpers";
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface DrainTestData extends SuccessTestData {
     incomingDrain: DamageData
@@ -49,7 +49,7 @@ export class DrainTest extends SuccessTest {
         return false;
     }
 
-    get testModifiers() {
+    get testModifiers(): ModifierTypes[] {
         return ['global', 'drain']
     }
 

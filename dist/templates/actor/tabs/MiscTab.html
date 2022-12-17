@@ -205,19 +205,51 @@
                 {{/if}}
             </div>
             <div class="flexcol">
-                <div class="list-item item-section">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.Modifier"}}
-                        </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text rtg">
-                            {{localize "SR5.Value"}}
-                        </div>
-                    </div>
-                </div>
                 <div class="scroll-area mods">
+                    {{#if situationModifiers}}
+                    <div class="list-item item-section">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.SituationalModifiersApplication.Title"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text rtg">
+                                {{localize "SR5.Value"}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mods">
+                        {{#each situationModifiers}}
+                            {{#if (not this.hidden)}}
+                            <div class="list-item">
+                                <div class="item-left">
+                                    <div class="item-text item-name show-situation-modifiers-application">
+                                        {{localize this.label}}
+                                    </div>
+                                </div>
+                                <div class="item-right">
+                                    <div class="item-text rtg">
+                                        {{this.value}}
+                                    </div>
+                                </div>
+                            </div>
+                            {{/if}}
+                        {{/each}}
+                    </div>
+                    {{/if}}
+                    <div class="list-item item-section">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Modifier"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text rtg">
+                                {{localize "SR5.Value"}}
+                            </div>
+                        </div>
+                    </div>
                     {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
                         <div class="list-item">
                             <div class="item-left">

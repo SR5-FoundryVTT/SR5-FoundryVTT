@@ -19,7 +19,7 @@ export class ComplexFormImporter extends DataImporter {
         return {
             name: 'Unnamed Form',
             type: 'complex_form',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -34,7 +34,7 @@ export class ComplexFormImporter extends DataImporter {
                 duration: '',
                 fade: 0,
             },
-        };
+        } as ComplexFormItemData;
     }
 
     ExtractTranslation() {
@@ -51,7 +51,7 @@ export class ComplexFormImporter extends DataImporter {
         const parser = new ComplexFormParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
 
-        let datas: ComplexFormItemData[] = [];
+        let items: ComplexFormItemData[] = [];
         let jsonDatas = jsonObject['complexforms']['complexform'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
@@ -59,20 +59,20 @@ export class ComplexFormImporter extends DataImporter {
                 continue;
             }
 
-            let data = parser.Parse(jsonData, this.GetDefaultData(), this.nameTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData(), this.nameTranslations);
 
             // @ts-ignore TODO: Foundry Where is my foundry base data?
-            data.folder = folder.id;
+            item.folder = folder.id;
 
             // TODO: Follow ComplexFormParserBase approach.
-            data.name = ImportHelper.MapNameToTranslation(this.nameTranslations, data.name);
+            item.name = ImportHelper.MapNameToTranslation(this.nameTranslations, item.name);
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(data);
+            items.push(item);
         }
 
         // @ts-ignore
-        return await Item.create(datas) as Item;
+        return await Item.create(items) as Item;
     }
 }

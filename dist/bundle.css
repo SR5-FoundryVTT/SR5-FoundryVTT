@@ -16,11 +16,12 @@
     border: 1px solid #4d4d4d; }
     .sr5.item .item-header .item-name {
       flex: 1;
-      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-      font-size: 1.5em; }
+      font-family: "Signika", "Palatino Linotype", serif;
+      font-size: var(--font-size-18); }
       .sr5.item .item-header .item-name .display {
         padding-top: 1em;
-        padding-bottom: 1em; }
+        padding-bottom: 1em;
+        border: none; }
     .sr5.item .item-header .source {
       flex: 1;
       display: flex;
@@ -36,7 +37,9 @@
         height: 2em; }
       .sr5.item .item-header .source .display {
         padding-top: 1em;
-        padding-bottom: 1em; }
+        padding-bottom: 1em;
+        height: auto;
+        border: none; }
     .sr5.item .item-header .item-type {
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
       flex: 0;
@@ -50,7 +53,8 @@
       max-width: 100px;
       border-right: 1px solid #4d4d4d;
       margin-bottom: 0;
-      padding-bottom: 0; }
+      padding-bottom: 0;
+      border: none; }
     .sr5.item .item-header .item-info {
       flex: 1; }
       .sr5.item .item-header .item-info > :not(:last-child) {
@@ -332,11 +336,11 @@
       height: 28px;
       width: 28px; }
     .sr5.chat-card .card-header h3 {
-      font-size: 1.5em;
+      font-size: var(--font-size-16);
+      font-weight: bold;
       align-self: center;
       flex: 1;
-      margin: 0;
-      font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
+      margin: 0; }
   .sr5.chat-card .card-header:first-of-type {
     border-top: 1px solid #4d4d4d; }
   .sr5.chat-card .card-buttons .button {
@@ -500,8 +504,8 @@
         padding-right: 8px;
         white-space: nowrap; }
     .sr5.roll-card .card-content .test-code {
-      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-      font-size: 1.5em; }
+      font-family: "Signika", "Palatino Linotype", serif;
+      font-size: var(--font-size-12); }
   .sr5.roll-card .dice-rolls {
     display: none;
     border-bottom: 1px solid #4d4d4d; }
@@ -617,16 +621,16 @@
   border: none;
   margin: 0; }
 
-.sr5.form-dialog .dialog-content-common .sunken {
+.sr5.form-dialog .dialog-content-common .sunken, .sr5.form-dialog .dialog-content-common .card-sunken {
   padding: 0.5em; }
 
 .sr5.form-dialog .dialog-content-column {
   width: 300px; }
 
-.sr5.form-dialog .sunken select {
+.sr5.form-dialog .sunken select, .sr5.form-dialog .card-sunken select {
   color: white; }
 
-.sr5.form-dialog .sunken select option {
+.sr5.form-dialog .sunken select option, .sr5.form-dialog .card-sunken select option {
   background-color: #414040; }
 
 @font-face {
@@ -682,6 +686,11 @@
 
 .sr5 .align-center {
   align-items: center; }
+
+.sr5 .show-situation-modifiers-application:hover {
+  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
+  cursor: pointer;
+  color: #6495ed; }
 
 .align-items-center {
   align-items: center; }
@@ -838,6 +847,17 @@ select.display {
     font-weight: bold; }
   .sr5 .form-group input {
     color: white; }
+  .sr5 .form-group .form-group-element-numerical {
+    display: flex;
+    flex-direction: row; }
+    .sr5 .form-group .form-group-element-numerical button {
+      border-color: grey; }
+    .sr5 .form-group .form-group-element-numerical button, .sr5 .form-group .form-group-element-numerical input {
+      width: 25px;
+      height: 25px;
+      line-height: inherit;
+      vertical-align: middle;
+      text-align: center; }
   .sr5 .inline-input-inventory {
     display: none; }
   .sr5 .entity-link, .sr5 .content-link {
@@ -1180,7 +1200,7 @@ select.display {
       font-size: 12px;
       height: 100%; }
     .sr5 .list-item .item-text {
-      width: 5em;
+      width: 6em;
       margin: 0 0.1rem;
       flex: 1 0 auto;
       text-align: center;
@@ -1225,10 +1245,12 @@ select.display {
       text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
       cursor: pointer;
       color: #6495ed; }
-  .sr5 .sunken {
+  .sr5 .sunken, .sr5 .card-sunken {
     box-shadow: inset 0 0 3px 0 #000, 0 -2px 2px -1px #000, -2px 0 2px -2px #28221f, -2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 0 3px 3px -3px #8f8c8b, 0 2px 2px -2px #8f8c8b, 0 1px 1px -1px #8f8c8b;
     padding: 0.25em;
     background-color: #414040; }
+  .sr5 .card-sunken {
+    margin-bottom: 0.5em; }
   .sr5 .modified-target-damage {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
@@ -1258,20 +1280,27 @@ select.display {
       color: black;
       background: #e6e6e6; }
   .sr5 button.env-modifier {
-    text-align: left; }
+    text-align: left;
+    font-size: var(--font-size-13) !important;
+    line-height: normal;
+    padding-top: 5px;
+    padding-bottom: 5px; }
   .sr5 .env-modifier-active {
-    box-shadow: 0 0 0.25em 0.15em white;
-    border-radius: 8px; }
+    border-radius: 8px;
+    box-shadow: inset 0 0 3px 0 #000, 0 -2px 2px -1px #000, -2px 0 2px -2px #28221f, -2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 0 3px 3px -3px #8f8c8b, 0 2px 2px -2px #8f8c8b, 0 1px 1px -1px #8f8c8b;
+    background-color: #414040; }
   .sr5 .env-modifier-total {
     font-weight: bold; }
-  .sr5 tr.env-modifier-category {
-    height: 45px; }
   .sr5 td.env-modifier-level {
     padding-right: 6px; }
   .sr5 .skill-roll-not-defaultable {
     font-style: italic; }
   .sr5 input#input-inventory {
     width: auto; }
+  .sr5 .document-name {
+    font-family: "Signika", "Palatino Linotype", serif;
+    font-size: var(--font-size-18);
+    font-weight: bold; }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
  * otherwise cause issues with custom button styling.
@@ -1288,6 +1317,9 @@ select.display {
   justify-content: center;
   right: -150px; }
 
+/**
+  * Is used on TokenHUDs to display a additional segment per situational modifer.
+  */
 .sr-modifier-container .modifier-column {
   padding-top: 66px;
   display: block;
@@ -1314,11 +1346,28 @@ select.display {
   overflow: hidden; }
   .sr-modifier-container .modifier-row .modifier-description {
     text-overflow: clip;
-    white-space: nowrap; }
-  .sr-modifier-container .modifier-row .open-environmental-modifier {
+    white-space: nowrap;
     cursor: pointer; }
-    .sr-modifier-container .modifier-row .open-environmental-modifier:hover {
+    .sr-modifier-container .modifier-row .modifier-description:hover {
       box-shadow: 0 0 0.25em 0.15em white;
       border-radius: 8px; }
+
+/**
+ * All stylings necessary for situation modifiers
+ */
+.sr5#situational-modifiers-application * {
+  font-size: var(--font-size-14);
+  font-weight: normal; }
+
+.sr5#situational-modifiers-application h1 {
+  font-weight: bold; }
+
+.sr5#situational-modifiers-application h2, .sr5#situational-modifiers-application h3 {
+  border-bottom: none;
+  font-weight: normal; }
+
+.sr5#situational-modifiers-application .modifier-total {
+  display: flex;
+  flex-direction: column; }
 
 /*# sourceMappingURL=bundle.css.map */

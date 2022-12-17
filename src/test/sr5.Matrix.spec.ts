@@ -71,9 +71,9 @@ export const shadowrunMatrix = context => {
         });
 
         it('return expected host matrix attribute ratings', () => {
-            assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
-            assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
-            assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);
+            assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(1), [1, 2, 3, 4]);
+            assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(2), [2, 3, 4, 5]);
+            assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(10), [10, 11, 12, 13]);
         });
     })
 };

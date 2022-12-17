@@ -9,6 +9,9 @@
             </div>
             <div class="item-right">
                 <div class="item-text">
+                    {{localize "SR5.MountPoint"}}
+                </div>
+                <div class="item-text">
                     {{localize "SR5.DP"}}
                 </div>
                 <div class="item-text">
@@ -48,7 +51,7 @@
                 </div>
             </div>
             <div class="item-right">
-                <div class="">
+                <div class="item-text">
                     <input
                         class="display left"
                         type="text"
@@ -63,7 +66,6 @@
                         type="text"
                         disabled
                         value="{{mod.system.dice_pool}}"
-                        data-dtype="Number"
                         placeholder="0"
                     />
                 </div>
@@ -74,7 +76,6 @@
                         type="text"
                         disabled
                         value="{{mod.system.accuracy}}"
-                        data-dtype="Number"
                         placeholder="0"
                     />
                 </div>
@@ -85,7 +86,6 @@
                         type="text"
                         disabled
                         value="{{mod.system.rc}}"
-                        data-dtype="Number"
                         placeholder="0"
                     />
                 </div>
@@ -95,8 +95,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.system.technology.conceal.value}}"
-                        data-dtype="Number"
+                        value="{{mod.system.conceal}}"
                         placeholder="0"
                     />
                 </div>
@@ -114,7 +113,7 @@
                     {{/each}}
                 </div>
                 <div class="description">
-                    {{{mod.system.description.value}}}
+                    {{{mod.descriptionHTML}}}
                 </div>
             </div>
         </div>

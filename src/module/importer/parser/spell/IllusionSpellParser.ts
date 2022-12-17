@@ -3,8 +3,8 @@ import { ImportHelper } from '../../helper/ImportHelper';
 import SpellItemData = Shadowrun.SpellItemData;
 
 export class IllusionSpellParser extends SpellParserBase {
-    Parse(jsonData: object, data: SpellItemData, jsonTranslation?: object): SpellItemData {
-        data = super.Parse(jsonData, data, jsonTranslation);
+    Parse(jsonData: object, item: SpellItemData, jsonTranslation?: object): SpellItemData {
+        item = super.Parse(jsonData, item, jsonTranslation);
 
         let descriptor = ImportHelper.StringValue(jsonData, 'descriptor');
         // A few spells have a missing descriptor instead of an empty string.
@@ -15,16 +15,16 @@ export class IllusionSpellParser extends SpellParserBase {
             descriptor = '';
         }
 
-        if (data.data.type === 'mana') {
-            data.data.action.opposed.type = 'custom';
-            data.data.action.opposed.attribute = 'logic';
-            data.data.action.opposed.attribute2 = 'willpower';
-        } else if (data.data.type === 'physical') {
-            data.data.action.opposed.type = 'custom';
-            data.data.action.opposed.attribute = 'intuition';
-            data.data.action.opposed.attribute2 = 'logic';
+        if (item.system.type === 'mana') {
+            item.system.action.opposed.type = 'custom';
+            item.system.action.opposed.attribute = 'logic';
+            item.system.action.opposed.attribute2 = 'willpower';
+        } else if (item.system.type === 'physical') {
+            item.system.action.opposed.type = 'custom';
+            item.system.action.opposed.attribute = 'intuition';
+            item.system.action.opposed.attribute2 = 'logic';
         }
 
-        return data;
+        return item;
     }
 }

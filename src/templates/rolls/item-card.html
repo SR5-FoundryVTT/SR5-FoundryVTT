@@ -40,4 +40,14 @@
             {{/each}}
         </div>
     </div>
+
+    {{#if tests}}
+    <div class="card-buttons">
+        {{#each tests}}
+        <div class="button test-action" data-uuid="{{this.uuid}}">
+            {{localize this.label}}
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
 </div>

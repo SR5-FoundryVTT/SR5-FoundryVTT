@@ -2,10 +2,11 @@ import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import {SpellCastingTest, SpellCastingTestData} from "./SpellCastingTest";
 import {SR5Item} from "../item/SR5Item";
 import {SR5Actor} from "../actor/SR5Actor";
-import MinimalActionData = Shadowrun.MinimalActionData;
 import {DefaultValues} from "../data/DataDefaults";
 import {CombatSpellRules} from "../rules/CombatSpellRules";
 import {TestCreator} from "./TestCreator";
+import MinimalActionData = Shadowrun.MinimalActionData;
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface CombatSpellDefenseTestData extends DefenseTestData {
     against: SpellCastingTestData
@@ -36,7 +37,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
         this.calculateCombatSpellDamage();
     }
 
-    get testModifiers() {
+    get testModifiers(): ModifierTypes[] {
         const spellData = this.item?.asSpell();
         if (!spellData) return ['global'];
 

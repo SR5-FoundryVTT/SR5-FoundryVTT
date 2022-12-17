@@ -18,15 +18,15 @@ export class CyberwareParser {
     }
 
     parseCyberware(chummerCyber) {
-        const data = {};
-        data.description = parseDescription(chummerCyber);
-        data.technology = parseTechnology(chummerCyber);
+        const system = {};
+        system.description = parseDescription(chummerCyber);
+        system.technology = parseTechnology(chummerCyber);
         
         // Cyberware has no equipped flag in chummer so it cannot be parsed - we consider it as always equipped
-        data.technology.equipped = true;
-        data.essence = chummerCyber.ess;
-        data.grade = chummerCyber.grade;
+        system.technology.equipped = true;
+        system.essence = chummerCyber.ess;
+        system.grade = chummerCyber.grade;
 
-        return createItemData(chummerCyber.name, 'cyberware', data);
+        return createItemData(chummerCyber.name, 'cyberware', system);
     }
 }

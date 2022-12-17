@@ -8,6 +8,7 @@ declare namespace Shadowrun {
         special: SpecialTrait
         initiative: Initiative
         modifiers: Modifiers
+        situation_modifiers: SituationModifiersSourceData
         /**
          * Actor inventories allow to show items separated out into different places / inventories.
          */
@@ -30,7 +31,7 @@ declare namespace Shadowrun {
         firewall: MatrixAttributeField
 
         condition_monitor: ConditionData
-        rating: NumberOrEmpty
+        rating: number
         name: string
         device: string
         is_cyberdeck: boolean

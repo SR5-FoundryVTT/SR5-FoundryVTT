@@ -1,3 +1,4 @@
+import { ModifierFlowOptions } from './../actor/flows/ModifierFlow';
 /**
  * All things around helping with Test creation.
  *
@@ -18,12 +19,14 @@ import {FLAGS, SYSTEM_NAME} from "../constants";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {Helpers} from "../helpers";
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
-import MinimalActionData = Shadowrun.MinimalActionData;
-import ActionRollData = Shadowrun.ActionRollData;
 import {SR5} from "../config";
-import RollEvent = Shadowrun.RollEvent;
 import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
+
+import MinimalActionData = Shadowrun.MinimalActionData;
+import ActionRollData = Shadowrun.ActionRollData;
+import RollEvent = Shadowrun.RollEvent;
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 /**
  * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
@@ -452,12 +455,35 @@ export const TestCreator = {
             data.opposed = action.opposed;
         }
 
-        // Prepare modifier value based on action modifiers
+        
+        // Prepare action modifiers and possible applicable selections
+        const modifiers: {[key in ModifierTypes]?: string[]} = {};
         for (const modifier of data.action.modifiers) {
+            // A modifier with an applicable selection is found.
+            if (modifier.includes('.')) {
+                // Assert correct action modifier segment structure.
+                const segments = modifier.split('.') as string[];
+                if (segments.length > 2) console.error('Shadowrun 5e | Action contained a partial modifier with more than two segments', modifier, data.action);
+
+                // Record the modifier catgeory with it's single applicable.
+                const [category, applicable] = segments;
+                modifiers[category] = modifiers[category] ?? [];
+                modifiers[category].push(applicable);
+
+            // No applicable found yet, just collect the modifier
+            } else {
+                modifiers[modifier] = modifiers[modifier] ?? [];
+            }
+        }
+
+        // Apply applicable selections and collect modifiers.
+        for (const [modifier, applicable] of Object.entries(modifiers)) {
+            // Setup the resulting modifier value.
             const label = SR5.modifierTypes[modifier];
-            const value = await actor.modifiers.totalFor(modifier);
+            const value = await actor.modifiers.totalFor(modifier, {applicable});
             data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
         }
+        
 
         // Mark test as extended.
         data.extended = action.extended;

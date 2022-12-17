@@ -366,9 +366,11 @@ export const SR5 = {
     /**
      * Modification types used for actions and general success tests, based on actors.
      *
-     * These are meant to be used with the Modifiers class and SR5Actor.getModifiers('wounds').
+     * These are meant to be used with the Modifiers and SituationModifier classes and SR5Actor.modifiers.totalFor('wounds').
      *
      * There are additional item based modifiers that aren't present here.
+     * 
+     * NOTE: Adding a modifier type here will directly affect modifiers shown on item actions for user selection.
      */
     modifierTypes: {
         armor: 'SR5.Armor',
@@ -376,6 +378,12 @@ export const SR5 = {
         defense: 'SR5.RollDefense',
         drain: 'SR5.Drain',
         environmental: 'SR5.ModifierTypes.Environmental',
+        ['environmental.light']: 'SR5.ModifierTypes.EnvironmentalLight',
+        ['environmental.visibility']: 'SR5.ModifierTypes.EnvironmentalVisibility',
+        ['environmental.wind']: 'SR5.ModifierTypes.EnvironmentalWind',
+        ['environmental.range']: 'SR5.ModifierTypes.EnvironmentalRange',
+        background_count: 'SR5.ModifierTypes.Magic',
+        noise: 'SR5.ModifierTypes.Matrix',
         fade: 'SR5.RollFade',
         global: 'SR5.Global',
         judge_intentions: 'SR5.RollJudgeIntentions',

@@ -26,8 +26,8 @@ export class BaseGearParser implements GearParser {
             parsedGear.name += ` (${chummerGear.extra})`;
         }
 
-        parsedGear.data.technology = parseTechnology(chummerGear);
-        parsedGear.data.description = parseDescription(chummerGear);
+        parsedGear.system.technology = parseTechnology(chummerGear);
+        parsedGear.system.description = parseDescription(chummerGear);
 
         return parsedGear;
     }
@@ -36,8 +36,8 @@ export class BaseGearParser implements GearParser {
         return {
             name: '',
             type: 'equipment',
-            data: DefaultValues.equipmentData(),
-        };
+            system: DefaultValues.equipmentData(),
+        } as EquipmentItemData;
     }
 }
 

@@ -82,101 +82,121 @@ declare namespace Shadowrun {
         type: 'action';
         name: string;
         data: ActionData;
+        system: ActionData;
     }
 
     export interface AdeptPowerItemData {
         type: 'adept_power';
         name: string;
         data: AdeptPowerData;
+        system: AdeptPowerData;
     }
     export interface AmmoItemData {
         type: 'ammo';
         name: string;
         data: AmmoData;
+        system: AmmoData;
     }
     export interface ArmorItemData {
         type: 'armor';
         name: string;
         data: ArmorData;
+        system: ArmorData;
     }
     export interface BiowareItemData {
         type: 'bioware';
         name: string;
         data:  BiowareData;
+        system: BiowareData;
     }
     export interface ComplexFormItemData {
         type: 'complex_form';
         name: string;
         data: ComplexFormData;
+        system: ComplexFormData;
     }
     export interface ContactItemData {
         type: 'contact';
         name: string;
         data: ContactData;
+        system: ContactData;
     }
     export interface CritterPowerItemData {
         type: 'critter_power';
         name: string;
         data: CritterPowerData;
+        system: CritterPowerData;
     }
     export interface CyberwareItemData {
         type: 'cyberware';
         name: string;
         data: CyberwareData;
+        system: CyberwareData;
     }
     export interface DeviceItemData {
         type: 'device';
         name: string;
         data: DeviceData;
+        system: DeviceData;
     }
     export interface EquipmentItemData {
         type: 'equipment';
         name: string;
         data: EquipmentData;
+        system: EquipmentData;
     }
     export interface HostItemData {
         type: 'host';
         name: string;
         data: HostData;
+        system: HostData;
     }
     export interface LifestyleItemData {
         type: 'lifestyle';
         name: string;
         data: LifestyleData;
+        system: LifestyleData;
     }
     export interface ModificationItemData {
         type: 'modification';
         name: string;
         data: ModificationData;
+        system: ModificationData;
     }
     export interface ProgramItemData {
         type: 'program';
         name: string;
         data: ProgramData;
+        system: ProgramData;
     }
     export interface QualityItemData {
         type: 'quality';
         name: string;
         data: QualityData;
+        system: QualityData;
     }
     export interface SinItemData {
         type: 'sin';
         name: string;
         data: SinData;
+        system: SinData;
     }
     export interface SpellItemData {
         type: 'spell';
         name: string;
         data: SpellData;
+        system: SpellData;
     }
     export interface SpritePowerItemData {
         type: 'sprite_power';
         name: string;
         data: SpritePowerData;
+        system: SpritePowerData;
     }
     export interface WeaponItemData {
         type: 'weapon';
         name: string;
         data: WeaponData;
+        system: WeaponData;
     }
 }

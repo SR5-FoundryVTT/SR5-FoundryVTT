@@ -4,24 +4,24 @@ import ComplexFormTarget = Shadowrun.ComplexFormTarget;
 import ComplexFormItemData = Shadowrun.ComplexFormItemData;
 
 export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
-    Parse(jsonData: object, data: ComplexFormItemData, jsonTranslation?: object): ComplexFormItemData {
+    Parse(jsonData: object, item: ComplexFormItemData, jsonTranslation?: object): ComplexFormItemData {
         // @ts-ignore // TODO: Foundry Where is my foundry base data?
-        data.name = ImportHelper.StringValue(jsonData, 'name');
+        item.name = ImportHelper.StringValue(jsonData, 'name');
 
-        data.data.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
+        item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
 
         let fade = ImportHelper.StringValue(jsonData, 'fv');
         if (fade.includes('+') || fade.includes('-')) {
-            data.data.fade = parseInt(fade.substring(1, fade.length));
+            item.system.fade = parseInt(fade.substring(1, fade.length));
         }
 
         let duration = ImportHelper.StringValue(jsonData, 'duration');
         if (duration === 'I') {
-            data.data.duration = 'instant';
+            item.system.duration = 'instant';
         } else if (duration === 'S') {
-            data.data.duration = 'sustained';
+            item.system.duration = 'sustained';
         } else if (duration === 'P') {
-            data.data.duration = 'permanent';
+            item.system.duration = 'permanent';
         }
 
         let target = ImportHelper.StringValue(jsonData, 'target');
@@ -32,20 +32,20 @@ export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
             case 'Persona':
             case 'Self':
             case 'Sprite':
-                data.data.target = target.toLowerCase() as ComplexFormTarget;
+                item.system.target = target.toLowerCase() as ComplexFormTarget;
                 break;
             default:
-                data.data.target = 'other';
+                item.system.target = 'other';
                 break;
         }
 
         if (jsonTranslation) {
             const origName = ImportHelper.StringValue(jsonData, 'name');
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
-            data.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-            data.data.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+            item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
+            item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
         }
 
-        return data;
+        return item;
     }
 }

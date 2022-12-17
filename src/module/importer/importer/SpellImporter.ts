@@ -23,7 +23,7 @@ export class SpellImporter extends DataImporter {
         return {
             name: 'Unnamed Item',
             type: 'spell',
-            data: {
+            system: {
                 description: {
                     value: '',
                     chat: '',
@@ -59,7 +59,7 @@ export class SpellImporter extends DataImporter {
                     physical: false,
                 },
             },
-        };
+        } as SpellItemData;
     }
 
     ExtractTranslation() {
@@ -85,7 +85,7 @@ export class SpellImporter extends DataImporter {
             { key: 'Rituals', value: new SpellParserBase() },
         ]);
 
-        let datas: SpellItemData[] = [];
+        let items: SpellItemData[] = [];
         let jsonDatas = jsonObject['spells']['spell'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
@@ -93,16 +93,16 @@ export class SpellImporter extends DataImporter {
                 continue;
             }
 
-            let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
             //@ts-ignore TODO: Foundry Where is my foundry base data?
-            data.folder = folders[data.data.category].id;
+            item.folder = folders[item.system.category].id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(data);
+            items.push(item);
         }
 
         // @ts-ignore // TODO: TYPE: Remove this.
-        return await Item.create(datas);
+        return await Item.create(items);
     }
 }

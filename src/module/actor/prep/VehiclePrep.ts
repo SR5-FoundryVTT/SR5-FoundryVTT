@@ -115,7 +115,7 @@ export class VehiclePrep {
         track.physical.label = SR5.damageTypes.physical;
 
         const rating = matrix.rating || 0;
-        matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);
+        matrix.condition_monitor.max = 8 + Math.ceil(rating / 2) + Number(modifiers.matrix_track);
     }
 
     static prepareMovement(data: VehicleActorData) {

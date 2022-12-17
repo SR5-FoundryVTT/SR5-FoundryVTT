@@ -12,7 +12,7 @@ import {CritterPrep} from "./prep/CritterPrep";
 import {SpiritPrep} from "./prep/SpiritPrep";
 import {SpritePrep} from "./prep/SpritePrep";
 import {VehiclePrep} from "./prep/VehiclePrep";
-import {Modifiers} from "../rules/Modifiers";
+import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import {SkillRules} from "../rules/SkillRules";
 import {MatrixRules} from "../rules/MatrixRules";
 import {ICPrep} from "./prep/ICPrep";
@@ -46,7 +46,6 @@ import CharacterSkills = Shadowrun.CharacterSkills;
 import SpiritActorData = Shadowrun.SpiritActorData;
 import CharacterActorData = Shadowrun.CharacterActorData;
 import SpriteActorData = Shadowrun.SpriteActorData;
-import VehicleData = Shadowrun.VehicleData;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import CritterActorData = Shadowrun.CritterActorData;
 import ICActorData = Shadowrun.ICActorData;
@@ -60,6 +59,8 @@ import PackActionName = Shadowrun.PackActionName;
 import PackName = Shadowrun.PackName;
 import ActionRollData = Shadowrun.ActionRollData;
 import ActorAttribute = Shadowrun.ActorAttribute;
+import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
+import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 
 
 /**
@@ -86,6 +87,9 @@ export class SR5Actor extends Actor {
         label: 'SR5.Labels.Inventory.Carried',
         itemIds: []
     }
+
+    // Add v10 type helper
+    system: ShadowrunActorDataData; // TODO: foundry-vtt-types v10
 
     // Holds all operations related to this actors inventory.
     inventory: InventoryFlow;
@@ -734,6 +738,13 @@ export class SR5Actor extends Actor {
         }
     }
 
+    /**
+     * For the given skillId as it be would in the skill data structure for either
+     * active, knowledge or language skill.
+     * 
+     * @param skillId Legacy / default skills have human-readable ids, while custom one have machine-readable.
+     * @returns The label (not yet translated) OR set custom name.
+     */
     getSkillLabel(skillId: string): string {
         const skill = this.getSkill(skillId);
         if (!skill) {
@@ -743,25 +754,24 @@ export class SR5Actor extends Actor {
         return skill.label ? skill.label : skill.name ? skill.name : '';
     }
 
-    async addKnowledgeSkill(category, skill?): Promise<string|undefined> {
-        //@ts-ignore // prevent accidental creation for wrong categories
+    /**
+     * Add a new knowledge skill for a specific category.
+     * 
+     * Knowledge skills are stored separataly from active and language skills and have
+     * some values pre-defined by their category (street, professional, ...)
+     * 
+     * @param category Define the knowledege skill category
+     * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
+     * @returns The id of the created knowledege skill.
+     */
+    async addKnowledgeSkill(category: keyof KnowledgeSkills, skill: Partial<SkillField>={name: SKILL_DEFAULT_NAME}): Promise<string|undefined> {
+        //@ts-ignore // prevent accidental creation for wrong categories TODO: foundry-vtt-types v10
         if (!this.system.skills.knowledge.hasOwnProperty(category)) {
             console.error(`Shadowrun5e | Tried creating knowledge skill with unkown category ${category}`);
             return;
         }
         
-        const defaultSkill = {
-            name: '',
-            specs: [],
-            base: 0,
-            value: 0,
-            mod: 0,
-        };
-        skill = {
-            ...defaultSkill,
-            ...skill,
-        };
-
+        skill = DefaultValues.skillData(skill);
         const id = randomID(16);
         const value = {};
         value[id] = skill;
@@ -774,6 +784,12 @@ export class SR5Actor extends Actor {
         return id;
     }
 
+    /**
+     * Add a new active skill.
+     * 
+     * @param skillData Partially define the SkillField properties needed. Omitted properties will be default.
+     * @returns The new active skill id.
+     */
     async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
         const skill = DefaultValues.skillData(skillData);
 
@@ -789,11 +805,21 @@ export class SR5Actor extends Actor {
         return id;
     }
 
-    async removeLanguageSkill(skillId) {
+    /**
+     * Remove a language skill by it's id.
+     * @param skillId What skill id to delete.
+     */
+    async removeLanguageSkill(skillId: string) {
         const updateData = Helpers.getDeleteKeyUpdateData('system.skills.language.value', skillId);
         await this.update(updateData);
     }
 
+    /**
+     * Add a language skill.
+     * 
+     * @param skill Partially define the SkillField properties needed. Omitted properties will be default.
+     * @returns The new language skill id.
+     */
     async addLanguageSkill(skill): Promise<string> {
         const defaultSkill = {
             name: '',
@@ -820,12 +846,18 @@ export class SR5Actor extends Actor {
         return id;
     }
 
-    async removeKnowledgeSkill(skillId, category) {
+    /**
+     * Remove a knowledge skill
+     * @param skillId What skill id to delete.
+     * @param category The matching knowledege skill category for skillId
+     */
+    async removeKnowledgeSkill(skillId: string, category: keyof KnowledgeSkills) {
         const updateData = Helpers.getDeleteKeyUpdateData(`system.skills.knowledge.${category}.value`, skillId);
         await this.update(updateData);
     }
 
-    /** Delete the given active skill by it's id. It doesn't
+    /** 
+     * Delete the given active skill by it's id. It doesn't
      *
      * @param skillId Either a random id for custom skills or the skills name used as an id.
      */
@@ -885,6 +917,8 @@ export class SR5Actor extends Actor {
 
     /**
      * Show all hidden skills.
+     * 
+     * For hidding/unhiding skill see SR5Actor#showSkill and SR5Actor#hideSkill.
      */
     async showHiddenSkills() {
         const updateData = {};
@@ -906,6 +940,9 @@ export class SR5Actor extends Actor {
             await this.sheet?.render();
     }
 
+    /**
+     * Prompt the current user for a generic roll. 
+     */
     async promptRoll() {
         await TestCreator.promptSuccessTest();
     }
@@ -1007,18 +1044,25 @@ export class SR5Actor extends Actor {
         return SR5.matrixAttributes.hasOwnProperty(attribute);
     }
 
+    /**
+     * Add matrix modifier values to the given modifier parts from whatever Value as part of 
+     * matrix success test.
+     * 
+     * @param parts The Value.mod field as a PartsList
+     * @param atts The attributes used for the success test.
+     */
     _addMatrixParts(parts: PartsList<number>, atts) {
         if (Helpers.isMatrix(atts)) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
             if (!("matrix" in this.system)) return;
 
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            // Apply general matrix modifiers based on commlink/cyberdeck status.
             const matrix = this.system.matrix;
             if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
             if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
         }
     }
 
+    // TODO: Check for legacy removal
     _addGlobalParts(parts: PartsList<number>) {
         //@ts-ignore // TODO: foundry-vtt-types v10
         if (this.system.modifiers.global) {
@@ -1027,6 +1071,7 @@ export class SR5Actor extends Actor {
         }
     }
 
+    // TODO: check for legacy removal.
     _addDefenseParts(parts: PartsList<number>) {
         if (this.isVehicle()) {
             const pilot = this.findVehicleStat('pilot');
@@ -1055,6 +1100,7 @@ export class SR5Actor extends Actor {
         }
     }
 
+    // TODO: Check for legacy removal.
     _addArmorParts(parts: PartsList<number>) {
         const armor = this.getArmor();
         if (armor) {
@@ -1660,27 +1706,23 @@ export class SR5Actor extends Actor {
         return types.includes(this.type);
     }
 
-    /** TODO: method documentation
-     *
-     * @param ignoreScene Set to true to ignore modifiers set on active or given scene.
-     * @param scene Should a scene be used as a fallback, provide this here. Otherwise current scene will be used.
+    /** 
+     * Get all situaitional modifiers from this actor.
      */
-    // @ts-ignore
-    async getModifiers(ignoreScene: boolean = false, scene: Scene = canvas.scene): Promise<Modifiers> {
-        const onActor = Modifiers.getModifiersFromEntity(this);
-
-        if (onActor.hasActiveEnvironmental) {
-            return onActor;
-            // No open scene, or scene ignored.
-        } else if (ignoreScene || scene === null) {
-            return new Modifiers(Modifiers.getDefaultModifiers());
-        } else {
-            return Modifiers.getModifiersFromEntity(scene);
-        }
+    getSituationModifiers(): DocumentSituationModifiers {
+        const modifiers = DocumentSituationModifiers.getDocumentModifiers(this);
+        modifiers.applyAll();
+        return modifiers;
     }
 
-    async setModifiers(modifiers: Modifiers) {
-        await Modifiers.setModifiersOnEntity(this, modifiers.modifiers);
+    /**
+     * Set all situational modifiers for this actor
+     * 
+     * @param modifiers The DocumentSituationModifiers instance to save source modifiers from.
+     *                  The actor will not be checked, so be careful.
+     */
+    async setSituationModifiers(modifiers: DocumentSituationModifiers) {
+        await DocumentSituationModifiers.setDocumentModifiers(this, modifiers.source);
     }
 
     /**

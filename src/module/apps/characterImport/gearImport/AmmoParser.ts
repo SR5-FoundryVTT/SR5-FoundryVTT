@@ -10,21 +10,21 @@ export class AmmoParser extends BaseGearParser {
         parsedGear.type = 'ammo';
 
         if (chummerGear.weaponbonusap) {
-            parsedGear.data.ap = parseInt(chummerGear.weaponbonusap);
+            parsedGear.system.ap = parseInt(chummerGear.weaponbonusap);
         }
 
         if (chummerGear.weaponbonusdamage) {
-            parsedGear.data.damage = parseInt(chummerGear.weaponbonusdamage);
+            parsedGear.system.damage = parseInt(chummerGear.weaponbonusdamage);
 
             if (chummerGear.weaponbonusdamage.includes('P')) {
-                parsedGear.data.damageType = 'physical';
+                parsedGear.system.damageType = 'physical';
             } else if (chummerGear.weaponbonusdamage.includes('S')) {
-                parsedGear.data.damageType = 'stun';
+                parsedGear.system.damageType = 'stun';
             } else if (chummerGear.weaponbonusdamage.includes('M')) {
-                parsedGear.data.damageType = 'matrix';
+                parsedGear.system.damageType = 'matrix';
             }
             else {
-                parsedGear.data.damageType = 'physical';
+                parsedGear.system.damageType = 'physical';
             }
         }
 

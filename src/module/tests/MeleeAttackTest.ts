@@ -1,5 +1,9 @@
+import { EnvironmentalModifier } from './../rules/modifiers/EnvironmentalModifier';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DefaultValues} from "../data/DataDefaults";
+import { SR5Actor } from "../actor/SR5Actor";
+import ModifierTypes = Shadowrun.ModifierTypes;
+import EnvironmentalModifiersSourceData = Shadowrun.EnvironmentalModifiersSourceData;
 
 export interface MeleeAttackData extends SuccessTestData {
     reach: number
@@ -23,12 +27,16 @@ export class MeleeAttackTest extends SuccessTest {
         return false;
     }
 
-     get testModifiers() {
+     get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'environmental'];
     }
 
      get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.html';
+    }
+
+    get showSuccessLabel(): boolean {
+        return this.success;
     }
 
     async prepareDocumentData() {
@@ -37,5 +45,26 @@ export class MeleeAttackTest extends SuccessTest {
         this.data.reach = this.item.getReach();
 
         await super.prepareDocumentData();
+    }
+
+    /**
+     * Remove unneeded environmental modifier categories for melee tests.
+     * 
+     * See SR5#187 'Environmental Modifiers'
+     * 
+     * @param actor 
+     * @param type 
+     */
+     async prepareActorModifier(actor: SR5Actor, type: ModifierTypes): Promise<{ name: string; value: number; }> {
+        if (type !== 'environmental') return await super.prepareActorModifier(actor, type);
+
+        // Only light and visibility apply.
+        const modifiers = actor.getSituationModifiers();
+        modifiers.environmental.apply({applicable: ['light', 'visibility']});
+
+        const name = this._getModifierTypeLabel(type);
+        const value = modifiers.environmental.total;
+
+        return {name, value};
     }
 }

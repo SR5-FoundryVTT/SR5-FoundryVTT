@@ -7,6 +7,7 @@ import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
 import {SoakFlow} from "../actor/flows/SoakFlow";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 
 export interface PhysicalResistTestData extends SuccessTestData {
@@ -61,7 +62,7 @@ export class PhysicalResistTest extends SuccessTest {
         };
     }
 
-    get testModifiers() {
+    get testModifiers(): ModifierTypes[] {
         return ['soak'];
     }
 

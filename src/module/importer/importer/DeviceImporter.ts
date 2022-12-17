@@ -33,48 +33,48 @@ export class DeviceImporter extends DataImporter {
             if (DataImporter.unsupportedEntry(commlink)) {
                 continue;
             }
-            const data = this.GetDefaultData();
+            const item = this.GetDefaultData();
+            
+            item.name = ImportHelper.StringValue(commlink, 'name');
+            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
 
-            data.name = ImportHelper.StringValue(commlink, 'name');
-            data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
-
-            data.data.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
-            data.data.technology.rating = ImportHelper.IntValue(commlink, 'devicerating', 0);
-            data.data.technology.availability = ImportHelper.StringValue(commlink, 'avail');
-            data.data.technology.cost = ImportHelper.IntValue(commlink, 'cost', 0);
-            data.data.atts.att3.value = ImportHelper.IntValue(commlink, 'dataprocessing', 0);
-            data.data.atts.att4.value = ImportHelper.IntValue(commlink, 'firewall', 0);
-
-            //@ts-ignore
-            data.folder = folder.id;
-
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            item.system.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
+            item.system.technology.rating = ImportHelper.IntValue(commlink, 'devicerating', 0);
+            item.system.technology.availability = ImportHelper.StringValue(commlink, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(commlink, 'cost', 0);
+            item.system.atts.att3.value = ImportHelper.IntValue(commlink, 'dataprocessing', 0);
+            item.system.atts.att4.value = ImportHelper.IntValue(commlink, 'firewall', 0);
 
             //@ts-ignore
-            entries.push(data);
+            item.folder = folder.id;
+
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            //@ts-ignore
+            entries.push(item);
         }
 
         return entries;
     }
 
     ParseCyberdeckDevices(cyberdecks, folder) {
-        const entries = [];
+        const items = [];
 
         for (const cyberdeck of cyberdecks) {
             if (DataImporter.unsupportedEntry(cyberdeck)) {
                 continue;
             }
 
-            const data = this.GetDefaultData();
+            const item = this.GetDefaultData();
 
-            data.data.category = 'cyberdeck';
-            data.name = ImportHelper.StringValue(cyberdeck, 'name');
-            data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
+            item.system.category = 'cyberdeck';
+            item.name = ImportHelper.StringValue(cyberdeck, 'name');
+            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
 
-            data.data.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;
-            data.data.technology.rating = ImportHelper.IntValue(cyberdeck, 'devicerating', 0);
-            data.data.technology.availability = ImportHelper.StringValue(cyberdeck, 'avail');
-            data.data.technology.cost = ImportHelper.IntValue(cyberdeck, 'cost', 0);
+            item.system.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;
+            item.system.technology.rating = ImportHelper.IntValue(cyberdeck, 'devicerating', 0);
+            item.system.technology.availability = ImportHelper.StringValue(cyberdeck, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(cyberdeck, 'cost', 0);
 
             // Some cyberdecks have a flexible attribute order
             // attributearray is a ',' separated list of values. Since it's hacky, be very unforgiving.
@@ -84,29 +84,29 @@ export class DeviceImporter extends DataImporter {
                 const att2 = Number(attributeOrder[1]);
                 const att3 = Number(attributeOrder[2]);
                 const att4 = Number(attributeOrder[3]);
-                data.data.atts.att1.value = att1;
-                data.data.atts.att2.value = att2;
-                data.data.atts.att3.value = att3;
-                data.data.atts.att4.value = att4;
+                item.system.atts.att1.value = att1;
+                item.system.atts.att2.value = att2;
+                item.system.atts.att3.value = att3;
+                item.system.atts.att4.value = att4;
 
             // Some cyberdecks have a fixed attribute order
             } else if (cyberdeck.hasOwnProperty('attack')) {
-                data.data.atts.att1.value = ImportHelper.IntValue(cyberdeck, 'attack', 0);
-                data.data.atts.att2.value = ImportHelper.IntValue(cyberdeck, 'sleaze', 0);
-                data.data.atts.att3.value = ImportHelper.IntValue(cyberdeck, 'dataprocessing', 0);
-                data.data.atts.att4.value = ImportHelper.IntValue(cyberdeck, 'firewall', 0);
+                item.system.atts.att1.value = ImportHelper.IntValue(cyberdeck, 'attack', 0);
+                item.system.atts.att2.value = ImportHelper.IntValue(cyberdeck, 'sleaze', 0);
+                item.system.atts.att3.value = ImportHelper.IntValue(cyberdeck, 'dataprocessing', 0);
+                item.system.atts.att4.value = ImportHelper.IntValue(cyberdeck, 'firewall', 0);
             }
 
             //@ts-ignore
-            data.folder = folder.id;
+            item.folder = folder.id;
 
-            Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             //@ts-ignore
-            entries.push(data);
+            items.push(item);
         }
 
-        return entries;
+        return items;
     }
 
     async Parse(jsonObject: object): Promise<Item> {

@@ -16,11 +16,7 @@
                         "max": 0
                     },
                     "vr": false,
-                    "rating": {
-                        "value": 0,
-                        "mod": [],
-                        "base": 0
-                    },
+                    "rating": 0,
                     "is_cyberdeck": false,
                     "name": "",
                     "silent": false,
@@ -56,13 +52,13 @@
                         "mod": [],
                         "min": 1
                     },
-                    "social": {
+                    "mental": {
                         "base": 0,
                         "value": 1,
                         "mod": [],
                         "min": 1
                     },
-                    "mental": {
+                    "social": {
                         "base": 0,
                         "value": 1,
                         "mod": [],
@@ -905,6 +901,11 @@
                     }
                 },
                 "modifiers": {},
+                "situation_modifiers": {
+                    "environmental": {"active": {}},
+                    "noise": {"active": {}},
+                    "background_count": {"active": {}}
+                },
                 "inventories": {}
             }
         },
@@ -1291,7 +1292,8 @@
             "mount_point": "",
             "dice_pool": 0,
             "accuracy": 0,
-            "rc": 0
+            "rc": 0,
+            "conceal": 0
         },
         "spell": {
             "templates": ["description", "action"],

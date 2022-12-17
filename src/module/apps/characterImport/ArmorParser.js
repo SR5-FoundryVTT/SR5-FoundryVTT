@@ -18,9 +18,9 @@ export class ArmorParser {
     }
 
     parseArmor(chummerArmor) {
-        const data = {};
+        const system = {};
         const armor = {};
-        data.armor = armor;
+        system.armor = armor;
 
         let desc = '';
         armor.mod = chummerArmor.armor.includes('+');
@@ -60,9 +60,9 @@ export class ArmorParser {
             }
         }
 
-        data.technology = parseTechnology(chummerArmor);
-        data.description = parseDescription(chummerArmor);
+        system.technology = parseTechnology(chummerArmor);
+        system.description = parseDescription(chummerArmor);
         
-        return createItemData(chummerArmor.name, 'armor', data);
+        return createItemData(chummerArmor.name, 'armor', system);
     }
 }

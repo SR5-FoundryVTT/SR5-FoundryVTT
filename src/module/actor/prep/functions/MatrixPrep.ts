@@ -15,7 +15,7 @@ export class MatrixPrep {
      * - if it isn't and player is technomancer, it will use that data
      */
     static prepareMatrix(system: ActorTypesData & MatrixActorData, items: SR5ItemDataWrapper[]) {
-        const { matrix, attributes } = system;
+        const { matrix, attributes, modifiers } = system;
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
 
@@ -38,9 +38,11 @@ export class MatrixPrep {
         const device = items.find((item) => item.isEquipped() && item.isDevice());
 
         if (device) {
-            const conditionMonitor = device.getConditionMonitor();
             matrix.device = device.getId();
-            matrix.condition_monitor.max = conditionMonitor.max;
+
+            const conditionMonitor = device.getConditionMonitor();
+
+            matrix.condition_monitor.max = conditionMonitor.max + Number(modifiers.matrix_track);
             matrix.condition_monitor.value = conditionMonitor.value;
             matrix.rating = device.getRating();
             matrix.is_cyberdeck = device.isCyberdeck();

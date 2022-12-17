@@ -40,13 +40,6 @@ export interface SuccessTestValues extends TestValues {
     extendedHits: ValueField
 }
 
-interface TestModifier {
-    type: ModifierTypes
-    label: string
-    total: number
-}
-
-
 
 /**
  * Contain all data necessary to handle an action based test.
@@ -92,6 +85,9 @@ export interface TestData {
 
     // Options the test was created with.
     options?: TestOptions
+
+    // Has this test been cast before
+    evaluated: boolean
 }
 
 export interface SuccessTestData extends TestData {
@@ -127,7 +123,6 @@ export class SuccessTest {
     public actor: SR5Actor | undefined;
     public item: SR5Item | undefined;
     public rolls: SR5Roll[];
-    public evaluated: boolean;
 
     public targets: TokenDocument[];
 
@@ -137,7 +132,6 @@ export class SuccessTest {
         this.item = documents?.item;
         this.rolls = documents?.rolls || [];
         this.targets = [];
-        this.evaluated = false;
 
         options = options || {}
 
@@ -178,6 +172,9 @@ export class SuccessTest {
         // Options will be used when a test is reused further on.
         data.options = options;
 
+        // Keep previous evaluation state.
+        data.evaluated = data.evaluated ?? false;
+
         data.pushTheLimit = data.pushTheLimit !== undefined ? data.pushTheLimit : false;
         data.secondChance = data.secondChance !== undefined ? data.secondChance : false;
 
@@ -196,7 +193,7 @@ export class SuccessTest {
         data.values.glitches = data.values.glitches || DefaultValues.valueData({label: "SR5.Glitches"});
 
         data.opposed = data.opposed || undefined;
-        data.modifiers = this._prepareModifiers(data.modifiers);
+        data.modifiers = this._prepareModifiersData(data.modifiers);
 
         data.damage = data.damage || DefaultValues.damageData();
 
@@ -208,12 +205,16 @@ export class SuccessTest {
      *
      * This should be used for whenever a Test doesn't modifiers specified externally.
      */
-    _prepareModifiers(modifiers?: ValueField) {
+    _prepareModifiersData(modifiers?: ValueField) {
         return modifiers || DefaultValues.valueData({label: 'SR5.Labels.Action.Modifiers'});
     }
 
     get type(): string {
         return this.constructor.name;
+    }
+
+    get evaluated(): boolean {
+        return this.data.evaluated;
     }
 
     toJSON() {
@@ -293,20 +294,31 @@ export class SuccessTest {
     }
 
     /**
-     * Create a Shadowrun 5 pool formula which will count all hits.
+     * Create the default formula for this test based on it's pool
      *
      * FoundryVTT documentation:
-     *  Dice:       https://foundryvtt.com/article/dice-advanced/
-     *  Modifiers:  https://foundryvtt.com/article/dice-modifiers/
      * Shadowrun5e: SR5#44
      *
      */
     get formula(): string {
         const pool = Helpers.calcTotal(this.data.pool, {min: 0});
-        // Apply dice explosion, removing the limit is done outside the roll.
-        const explode = this.hasPushTheLimit ? 'x6' : '';
+        return this.buildFormula(pool, this.hasPushTheLimit);
+    }
 
-        return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}${explode}`;
+    /**
+     * Build a Foundry Roll formula string
+     * 
+     * Dice:       https://foundryvtt.com/article/dice-advanced/
+     * Modifiers:  https://foundryvtt.com/article/dice-modifiers/
+     * 
+     * @param dice Amount of d6 to use.
+     * @param explode Should the d6 be exploded.
+     * @returns The complete formula string.
+     */
+    buildFormula(dice: number, explode: boolean): string {
+        // Apply dice explosion, removing the limit is done outside the roll.
+        const explodeFormula = explode ? 'x6' : '';
+        return `(${dice})d6cs>=${SuccessTest.lowestSuccessSide}${explodeFormula}`;
     }
 
     /**
@@ -318,7 +330,7 @@ export class SuccessTest {
      */
     get code(): string {
         // Add action dynamic value sources as labels.
-        let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
+        let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name)} ${mod.value}`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
         // let pool = this.pool.mod.map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
 
         // Threshold and Limit are values that can be overwritten.
@@ -488,7 +500,7 @@ export class SuccessTest {
                 await roll.evaluate({async: true});
         }
 
-        this.evaluated = true;
+        this.data.evaluated = true;
         this.calculateDerivedValues();
 
         return this;
@@ -542,7 +554,7 @@ export class SuccessTest {
      *
      * NOTE: These modifiers are routed through ModifierFlow.totalFor()
      */
-    get testModifiers() {
+    get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds'];
     }
 
@@ -565,11 +577,28 @@ export class SuccessTest {
         if (this.data.action.modifiers.length > 0) return;
 
         for (const type of this.testModifiers) {
-            const value = await this.actor.modifiers.totalFor(type);
-            const name = SR5.modifierTypes[type];
-
+            const {name, value} = await this.prepareActorModifier(this.actor, type);
             PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
         }
+    }
+
+    /**
+     * Prepare a single modifier.
+     * 
+     * Extend this method should you want to alter a single modifiers application.
+     * 
+     * @param actor The actor to fetch modifier information for.
+     * @param type The modifier type to be prepared.
+     */
+    async prepareActorModifier(actor: SR5Actor, type: ModifierTypes): Promise<{name: string, value: number}> {
+        const value = await actor.modifiers.totalFor(type);
+        const name = this._getModifierTypeLabel(type);
+
+        return {name, value};
+    }
+
+    _getModifierTypeLabel(type: ModifierTypes): string {
+        return SR5.modifierTypes[type];
     }
 
     /**
@@ -794,6 +823,18 @@ export class SuccessTest {
     }
 
     /**
+     * While a test might be successfull with a zero threshold, it's
+     * unclear if it's meant to be a sucsess.
+     * 
+     * Tests that don't know their threshold, either by GM secrecy or
+     * following opposed tests not yet thrown, shouldn't show user
+     * their successful.
+     */
+    get showSuccessLabel(): boolean {
+        return this.success && this.hasThreshold;
+    }
+
+    /**
      * How to call a successful test of this type.
      */
     get successLabel(): string {
@@ -867,7 +908,52 @@ export class SuccessTest {
     }
 
     /**
-     * Handle Edge rule 'push the limit'.
+     * Determine if this test can use second chance rules.
+     * 
+     * Use this property to check if a existing test can use this edge rule.
+     * 
+     * SR5#56.
+     */
+    get canSecondChance(): boolean {
+        if (!this.evaluated) {
+            console.error('Shadowrun5e | Second chance edge rules should not be appliable on initial cast');
+            return false;
+        }
+        // According to rules, second chance can't be used on glitched tests.
+        if (this.glitched) {
+            ui.notifications?.warn('SR5.Warnings.CantSecondChanceAGlitch', {localize: true});
+            return false;
+        }
+
+        if (this.hasPushTheLimit || this.hasSecondChance) {
+            ui.notifications?.warn('SR5.Warnings.CantSpendMulitplePointsOfEdge', {localize: true});
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if this test can use push the limit rules
+     * 
+     * Use this property to check if a existing test can use this edge rule.
+     * 
+     * SR5#56.
+     */
+    get canPushTheLimit(): boolean {
+        if (this.hasPushTheLimit || this.hasSecondChance) {
+            ui.notifications?.warn('SR5.Warnings.CantSpendMulitplePointsOfEdge', {localize: true});
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Handle Edge rule 'push the limit', either adding edge before or after casting
+     * and exploding sixes for either all dice or only edge dice.
+     * 
+     * Check edge rules on SR5#56.
      * 
      * If called without push the limit, all modifiers for it will be removed.
      */
@@ -876,13 +962,25 @@ export class SuccessTest {
 
         const parts = new PartsList(this.pool.mod);
 
-        if (this.hasPushTheLimit) {
-            const edge = this.actor.getEdge().value;
-            // Overwrite is needed to not keep adding edge when test is restored from message.
-            parts.addUniquePart('SR5.PushTheLimit', edge, true);
-        } else {
+        // During the lifetime of a test (dialog/recasting) the user might want to remove push the limit again.
+        if (!this.hasPushTheLimit) {
             parts.removePart('SR5.PushTheLimit');
+            return;
         }
+        
+        // Edge will be applied differently for when the test has been already been cast or not.
+        // Exploding dice will be handled during normal roll creation.
+        const edge = this.actor.getEdge().value;
+        parts.addUniquePart('SR5.PushTheLimit', edge, true);
+
+        // Before casting edge will be part of the whole dice pool and that pool will explode.
+        if (!this.evaluated) return;
+        
+        // After casting use a separate roll, as only those will be rolled again and explode.
+        const explodeDice = true;
+        const formula = this.buildFormula(edge, explodeDice);
+        const roll = new SR5Roll(formula);
+        this.rolls.push(roll);
     }
 
     /**
@@ -895,72 +993,30 @@ export class SuccessTest {
 
         const parts = new PartsList(this.pool.mod);
 
-        if (this.hasSecondChance) {
-            // According to rules, second chance can't be used on glitched tests.
-            if (this.glitched) {
-                ui.notifications?.warn('SR5.Warnings.CantSecondChanceAGlitch', {localize: true});
-                return this;
-            }
-
-            // Only count last roll as there might be multiple second chances already
-            const lastRoll = this.rolls[this.rolls.length - 1];
-            const dice = lastRoll.poolThrown - lastRoll.hits;
-            if (dice <= 0) {
-                ui.notifications?.warn('SR5.Warnings.CantSecondChanceWithoutNoneHits', {localize: true});
-                return this;
-            }
-
-            // Apply second chance modifiers.
-            const parts = new PartsList(this.pool.mod);
-            // Second chance can stack, so don't add it as unique.
-            parts.addPart('SR5.SecondChance', dice);
-
-            // Add new dice as fully separate Roll.
-            const formula = `${dice}d6`;
-            const roll = new SR5Roll(formula);
-            this.rolls.push(roll);
-
-        } else {
+        // During test lifetime (dialog/recasting) the user might want to remove second chance again.
+        if (!this.hasSecondChance) {
             parts.removePart('SR5.SecondChance');
+            return;
         }
-    }
 
-    /**
-     * Handle Edge rule 'second chance' within this test according to SR5#56
-     */
-    async executeSecondChance(): Promise<this> {
-        console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
-
-        if (!this.data.sourceActorUuid) return this;
-
-        // According to rules, second chance can't be used on glitched tests.
-        if (this.glitched) {
-            ui.notifications?.warn('SR5.Warnings.CantSecondChanceAGlitch', {localize: true});
+        // Since only ONE edge can be spent on a test, last roll will either be a
+        // - the original dice pool
+        // - an extending dice pool
+        const lastRoll = this.rolls[this.rolls.length - 1];
+        const dice = lastRoll.poolThrown - lastRoll.hits;
+        if (dice <= 0) {
+            ui.notifications?.warn('SR5.Warnings.CantSecondChanceWithoutNoneHits', {localize: true});
             return this;
         }
 
-        // Fetch documents.
-        await this.populateDocuments();
+        // Apply second chance modifiers.
+        // Overwrite existing, as only ONE edge per test is allowed, therefore stacking is not possible.
+        parts.addUniquePart('SR5.SecondChance', dice, true);
 
-        //  Trigger edge consumption.
-        this.data.secondChance = true;
-        this.applySecondChance();
-
-        // Can't use normal #execute as not all parts are needed.        
-        this.calculateBaseValues();
-
-        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
-        if (!actorConsumedResources) return this;
-        
-        // Remove second chance to avoid edge consumption on any kind of re-rolls.
-        this.data.secondChance = false;
-
-        await this.evaluate();
-        await this.processResults();
-        await this.toMessage();
-        await this.afterTestComplete();
-
-        return this;
+        // Add new dice as fully separate Roll.
+        const formula = `${dice}d6`;
+        const roll = new SR5Roll(formula);
+        this.rolls.push(roll);
     }
 
     /**
@@ -1062,6 +1118,81 @@ export class SuccessTest {
     }
 
     /**
+     * Handle Edge rule 'second chance' within this test according to SR5#56
+     */
+     async executeWithSecondChance(): Promise<this> {
+        console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
+
+        if (!this.data.sourceActorUuid) {
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
+            return this;
+        };
+        if (!this.canSecondChance)  return this;
+
+        // Fetch documents.
+        await this.populateDocuments();
+
+        //  Trigger edge consumption.
+        this.data.secondChance = true;
+        this.applySecondChance();
+
+        // Can't use normal #execute as not all general testing flow are needed.        
+        this.calculateBaseValues();
+
+        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
+        if (!actorConsumedResources) return this;
+        
+        // Remove second chance to avoid edge consumption on any kind of re-rolls.
+        this.data.secondChance = false;
+
+        await this.evaluate();
+        await this.processResults();
+        await this.toMessage();
+        await this.afterTestComplete();
+
+        return this;
+    }
+
+    /**
+     * 
+     * @returns 
+     */
+    async executeWithPushTheLimit(): Promise<this> {
+        console.log(`Shadowrun 5e | ${this.constructor.name} will push the limit rules`);
+
+        if (!this.data.sourceActorUuid) {
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
+            return this;
+        };
+        if (!this.canPushTheLimit) return this;
+
+        // Fetch documents.
+        await this.populateDocuments();
+
+        this.data.pushTheLimit = true;
+        this.applyPushTheLimit();
+
+        // Can't use normal #execute as not all general testing flow are needed.        
+        this.calculateBaseValues();
+
+        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
+        if (!actorConsumedResources) return this;
+
+        // Keep push the limit active, to have remove limit during derived value calcution.
+        await this.evaluate();
+        await this.processResults();
+
+        // Remove push the limit to avoid edge consumption on any kind of re-rolls.
+        this.data.pushTheLimit = false;
+
+        await this.toMessage();
+        await this.afterTestComplete();
+
+        return this;
+    }
+
+
+    /**
      * Allow subclasses to override behaviour after a test has finished.
      *
      * This can be used to alter values after a test is over.
@@ -1108,7 +1239,7 @@ export class SuccessTest {
         await this.executeFollowUpTest();
 
         if (this.extended) {
-            await this.extendCurrentTest();
+            await this.executeAsExtended();
         }
     }
 
@@ -1136,10 +1267,11 @@ export class SuccessTest {
     /**
      * Should this test be an extended test, re-execute it until it can't be anymore.
      */
-    async extendCurrentTest() {
+    async executeAsExtended() {
         if (!this.canBeExtended) return;
 
         const data = foundry.utils.duplicate(this.data);
+    
         // No extension possible, if test type / class is unknown.
         if (!data.type) return;
 
@@ -1149,7 +1281,7 @@ export class SuccessTest {
         const currentModifierValue = pool.getPartValue('SR5.ExtendedTest') || 0;
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
 
-        // Reduce either user override or default value.
+        // A pool could be overriden or not.
         if (data.pool.override) {
             data.pool.override.value = Math.max(data.pool.override.value - 1, 0);
         } else {
@@ -1162,11 +1294,15 @@ export class SuccessTest {
             return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', {localize: true});
         }
 
+        // Fetch original tests docments.
+        await this.populateDocuments();
+
+        // Create a new test instance of the same type.
         const testCls = TestCreator._getTestClass(data.type);
         if (!testCls) return;
+        // The new test will be incomplete.
+        data.evaluated = false;
         const test = new testCls(data, {actor: this.actor, item: this.item}, this.data.options);
-
-        await this.populateDocuments();
 
         // Remove previous edge usage.
         test.data.pushTheLimit = false;
@@ -1174,13 +1310,11 @@ export class SuccessTest {
         test.data.secondChance = false;
         test.applySecondChance();
 
-        // Should this test not have been extended yet, prepare it to be an extended test.
+        // Mark test as extended to get iterative execution.
         if (!test.extended) {
             test.data.extended = true;
             test.calculateExtendedHits();
         }
-
-        // In case the previous test used edge, remove those modifiers.
 
         await test.execute();
     }
@@ -1430,6 +1564,7 @@ export class SuccessTest {
         html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
         html.find('.result-action').on('click', this._castResultAction);
         html.find('.chat-select-link').on('click', this._selectSceneToken);
+        html.find('.test-action').on('click', this._castTestAction);
 
         DamageApplicationFlow.handleRenderChatMessage(message, html, data);
 
@@ -1469,6 +1604,25 @@ export class SuccessTest {
         } else {
             ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
         }
+    }
+
+    /**
+     * Cast a item action from a chat message.
+     * 
+     * @param event Any pointer event
+     */
+    static async _castTestAction(event) {
+        event.preventDefault();
+
+        const showDialog = !TestCreator.shouldHideDialog(event);
+        const element = $(event.currentTarget);
+        // Grab item uuid or fallback to empty string for foundry
+        const uuid = element.data('uuid') ?? '';
+        const item = await fromUuid(uuid) as SR5Item;
+
+        if (!item) return console.error('Shadowrun 5e | Item doesnt exist for uuid', uuid);
+
+        item.castAction(event);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
@@ -1515,12 +1669,20 @@ export class SuccessTest {
      * @param options
      */
     static chatMessageContextOptions(html, options) {
+        const pushTheLimit = async (li) => {
+            const messageId = li.data().messageId;
+            const test = await TestCreator.fromMessage(messageId);
+            if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
+
+            await test.executeWithPushTheLimit();
+        }
+        
         const secondChance = async (li) => {
             const messageId = li.data().messageId;
             const test = await TestCreator.fromMessage(messageId);
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 
-            await test.executeSecondChance();
+            await test.executeWithSecondChance();
         };
 
         const extendTest = async (li) => {
@@ -1533,11 +1695,19 @@ export class SuccessTest {
                 return ui.notifications?.warn('SR5.Warnings.CantExtendTest', {localize: true});
             }
 
-            await test.extendCurrentTest();
+            await test.executeAsExtended();
         };
 
+        // Keep Foundry delete option at the context menus bottom.
         const deleteOption = options.pop();
 
+        options.push({
+            name: game.i18n.localize('SR5.PushTheLimit'),
+            callback: pushTheLimit,
+            condition: true,
+            icon: '<i class="fas fa-meteor"></i>'
+        })
+        
         options.push({
             name: game.i18n.localize('SR5.SecondChance'),
             callback: secondChance,
@@ -1552,6 +1722,7 @@ export class SuccessTest {
             icon: '<i class="fas fa-clock"></i>'
         })
 
+        // Reinsert Foundry delete option last.
         options.push(deleteOption);
 
         return options;
