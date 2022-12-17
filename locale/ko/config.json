@@ -408,6 +408,23 @@
   "SR5.Bonus": "보너스",
   "SR5.DicePool": "주사위 풀",
   "SR5.SituationalModifier": "상황 수정치",
+  "SR5.SituationalModifiersApplication": {
+      "Title": "상황 수정치",
+      "ClearLocalAll": "일부 수정치 삭제",
+      "ClearLocalAllTokens": "장면에 있는 모든 토큰 수정치 삭제",
+      "Category": {
+          "Matrix": "매트릭스",
+          "Magic": "마법",
+          "Physical": "물리"
+      },
+      "Matrix": {
+          "Noise": "노이즈"
+      },
+      "Magic": {
+          "BackgroundCount": "배경 마나 수치"
+      },
+      "Total": "결과"
+  },
   "SR5.ItemMod": "물품 부착물",
   "SR5.Suppressing": "제압 사격",
   "SR5.BulletCount": "잔탄 수",
@@ -507,6 +524,7 @@
   "SR5.MeatSpaceInit": "현실 우선권",
   "SR5.MeatSpaceDice": "현실 우선권 주사위",
   "SR5.PhysicalLimit": "육체 한계치",
+  "SR5.LimitAstral":  "아스트랄 한계",
   "SR5.MentalLimit": "정신 한계치",
   "SR5.SocialLimit": "사교 한계치",
   "SR5.Walk": "걷기",
