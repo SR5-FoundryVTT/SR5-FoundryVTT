@@ -8799,7 +8799,8 @@ var preloadHandlebarsTemplates = () => __async(void 0, null, function* () {
     "systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html",
     "systems/shadowrun5e/dist/templates/rolls/success-test-message.html",
     "systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html",
-    "systems/shadowrun5e/dist/templates/rolls/parts/test-opposed-resist.html"
+    "systems/shadowrun5e/dist/templates/rolls/parts/test-opposed-resist.html",
+    "systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs"
   ];
   return loadTemplates(templatePaths);
 });
@@ -8889,6 +8890,9 @@ var PartsList = class {
       index = this._list.findIndex((part) => part.name === name);
     }
     return removed;
+  }
+  hasPart(name) {
+    return this._list.some((part) => part.name === name);
   }
   getMessageOutput() {
     return this.list;
@@ -9353,7 +9357,7 @@ var DefaultValues = class {
       name: "",
       pack: null,
       type: "Actor",
-      data: partialSourceEntityData.data || void 0
+      system: partialSourceEntityData.data || void 0
     }, partialSourceEntityData);
   }
   static equipmentItemData(partialEquipmentItemData = {}) {
@@ -9361,7 +9365,7 @@ var DefaultValues = class {
     return mergeObject({
       name: "",
       type: "equipment",
-      data: {
+      system: {
         description: DefaultValues.descriptionData(((_a = partialEquipmentItemData.data) == null ? void 0 : _a.description) || {}),
         technology: DefaultValues.technologyData(((_b = partialEquipmentItemData.data) == null ? void 0 : _b.technology) || {})
       }
@@ -9372,7 +9376,7 @@ var DefaultValues = class {
     return mergeObject({
       name: "",
       type: "device",
-      data: __spreadValues({
+      system: __spreadValues({
         description: DefaultValues.descriptionData(((_a = partialDeviceItemData.data) == null ? void 0 : _a.description) || {}),
         technology: DefaultValues.technologyData(((_b = partialDeviceItemData.data) == null ? void 0 : _b.technology) || {})
       }, DefaultValues.matrixData({ category: (_c = partialDeviceItemData.data) == null ? void 0 : _c.category, atts: (_d = partialDeviceItemData.data) == null ? void 0 : _d.atts }))
@@ -10254,6 +10258,12 @@ var SR5 = {
     defense: "SR5.RollDefense",
     drain: "SR5.Drain",
     environmental: "SR5.ModifierTypes.Environmental",
+    ["environmental.light"]: "SR5.ModifierTypes.EnvironmentalLight",
+    ["environmental.visibility"]: "SR5.ModifierTypes.EnvironmentalVisibility",
+    ["environmental.wind"]: "SR5.ModifierTypes.EnvironmentalWind",
+    ["environmental.range"]: "SR5.ModifierTypes.EnvironmentalRange",
+    background_count: "SR5.ModifierTypes.Magic",
+    noise: "SR5.ModifierTypes.Matrix",
     fade: "SR5.RollFade",
     global: "SR5.Global",
     judge_intentions: "SR5.RollJudgeIntentions",
@@ -10772,7 +10782,7 @@ var TestCreator = {
   },
   _prepareTestDataWithAction: function(action, actor, data) {
     return __async(this, null, function* () {
-      var _a, _b;
+      var _a, _b, _c, _d;
       data.action = action;
       const pool = new PartsList(data.pool.mod);
       if (action.skill) {
@@ -10830,9 +10840,22 @@ var TestCreator = {
       if (action.opposed.test) {
         data.opposed = action.opposed;
       }
+      const modifiers = {};
       for (const modifier of data.action.modifiers) {
+        if (modifier.includes(".")) {
+          const segments = modifier.split(".");
+          if (segments.length > 2)
+            console.error("Shadowrun 5e | Action contained a partial modifier with more than two segments", modifier, data.action);
+          const [category, applicable] = segments;
+          modifiers[category] = (_c = modifiers[category]) != null ? _c : [];
+          modifiers[category].push(applicable);
+        } else {
+          modifiers[modifier] = (_d = modifiers[modifier]) != null ? _d : [];
+        }
+      }
+      for (const [modifier, applicable] of Object.entries(modifiers)) {
         const label = SR5.modifierTypes[modifier];
-        const value = yield actor.modifiers.totalFor(modifier);
+        const value = yield actor.modifiers.totalFor(modifier, { applicable });
         data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
       }
       data.extended = action.extended;
@@ -12156,14 +12179,13 @@ var SuccessTest = class {
     this.item = documents == null ? void 0 : documents.item;
     this.rolls = (documents == null ? void 0 : documents.rolls) || [];
     this.targets = [];
-    this.evaluated = false;
     options = options || {};
     this.data = this._prepareData(data, options);
     this.calculateBaseValues();
     console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
   }
   _prepareData(data, options) {
-    var _a, _b;
+    var _a, _b, _c;
     data.type = data.type || this.type;
     data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map((token) => {
       var _a2;
@@ -12176,6 +12198,7 @@ var SuccessTest = class {
     options.showDialog = options.showDialog !== void 0 ? options.showDialog : true;
     options.showMessage = options.showMessage !== void 0 ? options.showMessage : true;
     data.options = options;
+    data.evaluated = (_c = data.evaluated) != null ? _c : false;
     data.pushTheLimit = data.pushTheLimit !== void 0 ? data.pushTheLimit : false;
     data.secondChance = data.secondChance !== void 0 ? data.secondChance : false;
     data.pool = data.pool || DefaultValues.valueData({ label: "SR5.DicePool" });
@@ -12187,15 +12210,18 @@ var SuccessTest = class {
     data.values.netHits = data.values.netHits || DefaultValues.valueData({ label: "SR5.NetHits" });
     data.values.glitches = data.values.glitches || DefaultValues.valueData({ label: "SR5.Glitches" });
     data.opposed = data.opposed || void 0;
-    data.modifiers = this._prepareModifiers(data.modifiers);
+    data.modifiers = this._prepareModifiersData(data.modifiers);
     data.damage = data.damage || DefaultValues.damageData();
     return data;
   }
-  _prepareModifiers(modifiers) {
+  _prepareModifiersData(modifiers) {
     return modifiers || DefaultValues.valueData({ label: "SR5.Labels.Action.Modifiers" });
   }
   get type() {
     return this.constructor.name;
+  }
+  get evaluated() {
+    return this.data.evaluated;
   }
   toJSON() {
     return {
@@ -12236,11 +12262,14 @@ var SuccessTest = class {
   }
   get formula() {
     const pool = Helpers.calcTotal(this.data.pool, { min: 0 });
-    const explode = this.hasPushTheLimit ? "x6" : "";
-    return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}${explode}`;
+    return this.buildFormula(pool, this.hasPushTheLimit);
+  }
+  buildFormula(dice, explode) {
+    const explodeFormula = explode ? "x6" : "";
+    return `(${dice})d6cs>=${SuccessTest.lowestSuccessSide}${explodeFormula}`;
   }
   get code() {
-    let pool = this.pool.mod.filter((mod) => mod.value !== 0).map((mod) => `${game.i18n.localize(mod.name)} (${mod.value})`);
+    let pool = this.pool.mod.filter((mod) => mod.value !== 0).map((mod) => `${game.i18n.localize(mod.name)} ${mod.value}`);
     let threshold = this.threshold.override ? [game.i18n.localize(this.threshold.override.name)] : this.threshold.mod.map((mod) => game.i18n.localize(mod.name));
     let limit = this.limit.override ? [game.i18n.localize(this.limit.override.name)] : this.limit.mod.map((mod) => game.i18n.localize(mod.name));
     if (this.pool.base > 0)
@@ -12329,7 +12358,7 @@ var SuccessTest = class {
         if (!roll._evaluated)
           yield roll.evaluate({ async: true });
       }
-      this.evaluated = true;
+      this.data.evaluated = true;
       this.calculateDerivedValues();
       return this;
     });
@@ -12381,11 +12410,20 @@ var SuccessTest = class {
       if (this.data.action.modifiers.length > 0)
         return;
       for (const type of this.testModifiers) {
-        const value = yield this.actor.modifiers.totalFor(type);
-        const name = SR5.modifierTypes[type];
+        const { name, value } = yield this.prepareActorModifier(this.actor, type);
         PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
       }
     });
+  }
+  prepareActorModifier(actor, type) {
+    return __async(this, null, function* () {
+      const value = yield actor.modifiers.totalFor(type);
+      const name = this._getModifierTypeLabel(type);
+      return { name, value };
+    });
+  }
+  _getModifierTypeLabel(type) {
+    return SR5.modifierTypes[type];
   }
   prepareItemModifiers() {
     return __async(this, null, function* () {
@@ -12496,6 +12534,9 @@ var SuccessTest = class {
   get canFail() {
     return true;
   }
+  get showSuccessLabel() {
+    return this.success && this.hasThreshold;
+  }
   get successLabel() {
     return "SR5.Success";
   }
@@ -12533,66 +12574,66 @@ var SuccessTest = class {
   get hasSecondChance() {
     return this.data.secondChance;
   }
+  get canSecondChance() {
+    var _a, _b;
+    if (!this.evaluated) {
+      console.error("Shadowrun5e | Second chance edge rules should not be appliable on initial cast");
+      return false;
+    }
+    if (this.glitched) {
+      (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
+      return false;
+    }
+    if (this.hasPushTheLimit || this.hasSecondChance) {
+      (_b = ui.notifications) == null ? void 0 : _b.warn("SR5.Warnings.CantSpendMulitplePointsOfEdge", { localize: true });
+      return false;
+    }
+    return true;
+  }
+  get canPushTheLimit() {
+    var _a;
+    if (this.hasPushTheLimit || this.hasSecondChance) {
+      (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSpendMulitplePointsOfEdge", { localize: true });
+      return false;
+    }
+    return true;
+  }
   applyPushTheLimit() {
     if (!this.actor)
       return;
     const parts = new PartsList(this.pool.mod);
-    if (this.hasPushTheLimit) {
-      const edge = this.actor.getEdge().value;
-      parts.addUniquePart("SR5.PushTheLimit", edge, true);
-    } else {
+    if (!this.hasPushTheLimit) {
       parts.removePart("SR5.PushTheLimit");
+      return;
     }
+    const edge = this.actor.getEdge().value;
+    parts.addUniquePart("SR5.PushTheLimit", edge, true);
+    if (!this.evaluated)
+      return;
+    const explodeDice = true;
+    const formula = this.buildFormula(edge, explodeDice);
+    const roll = new SR5Roll(formula);
+    this.rolls.push(roll);
   }
   applySecondChance() {
-    var _a, _b;
+    var _a;
     if (!this.actor)
       return;
     const parts = new PartsList(this.pool.mod);
-    if (this.hasSecondChance) {
-      if (this.glitched) {
-        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
-        return this;
-      }
-      const lastRoll = this.rolls[this.rolls.length - 1];
-      const dice = lastRoll.poolThrown - lastRoll.hits;
-      if (dice <= 0) {
-        (_b = ui.notifications) == null ? void 0 : _b.warn("SR5.Warnings.CantSecondChanceWithoutNoneHits", { localize: true });
-        return this;
-      }
-      const parts2 = new PartsList(this.pool.mod);
-      parts2.addPart("SR5.SecondChance", dice);
-      const formula = `${dice}d6`;
-      const roll = new SR5Roll(formula);
-      this.rolls.push(roll);
-    } else {
+    if (!this.hasSecondChance) {
       parts.removePart("SR5.SecondChance");
+      return;
     }
-  }
-  executeSecondChance() {
-    return __async(this, null, function* () {
-      var _a;
-      console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
-      if (!this.data.sourceActorUuid)
-        return this;
-      if (this.glitched) {
-        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceAGlitch", { localize: true });
-        return this;
-      }
-      yield this.populateDocuments();
-      this.data.secondChance = true;
-      this.applySecondChance();
-      this.calculateBaseValues();
-      const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
-      if (!actorConsumedResources)
-        return this;
-      this.data.secondChance = false;
-      yield this.evaluate();
-      yield this.processResults();
-      yield this.toMessage();
-      yield this.afterTestComplete();
+    const lastRoll = this.rolls[this.rolls.length - 1];
+    const dice = lastRoll.poolThrown - lastRoll.hits;
+    if (dice <= 0) {
+      (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantSecondChanceWithoutNoneHits", { localize: true });
       return this;
-    });
+    }
+    parts.addUniquePart("SR5.SecondChance", dice, true);
+    const formula = `${dice}d6`;
+    const roll = new SR5Roll(formula);
+    this.rolls.push(roll);
   }
   canConsumeDocumentRessources() {
     var _a;
@@ -12649,6 +12690,58 @@ var SuccessTest = class {
       return this;
     });
   }
+  executeWithSecondChance() {
+    return __async(this, null, function* () {
+      var _a;
+      console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
+      if (!this.data.sourceActorUuid) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor", { localize: true });
+        return this;
+      }
+      ;
+      if (!this.canSecondChance)
+        return this;
+      yield this.populateDocuments();
+      this.data.secondChance = true;
+      this.applySecondChance();
+      this.calculateBaseValues();
+      const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
+      if (!actorConsumedResources)
+        return this;
+      this.data.secondChance = false;
+      yield this.evaluate();
+      yield this.processResults();
+      yield this.toMessage();
+      yield this.afterTestComplete();
+      return this;
+    });
+  }
+  executeWithPushTheLimit() {
+    return __async(this, null, function* () {
+      var _a;
+      console.log(`Shadowrun 5e | ${this.constructor.name} will push the limit rules`);
+      if (!this.data.sourceActorUuid) {
+        (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor", { localize: true });
+        return this;
+      }
+      ;
+      if (!this.canPushTheLimit)
+        return this;
+      yield this.populateDocuments();
+      this.data.pushTheLimit = true;
+      this.applyPushTheLimit();
+      this.calculateBaseValues();
+      const actorConsumedResources = yield this.consumeDocumentRessoucesWhenNeeded();
+      if (!actorConsumedResources)
+        return this;
+      yield this.evaluate();
+      yield this.processResults();
+      this.data.pushTheLimit = false;
+      yield this.toMessage();
+      yield this.afterTestComplete();
+      return this;
+    });
+  }
   processResults() {
     return __async(this, null, function* () {
       if (this.success) {
@@ -12676,7 +12769,7 @@ var SuccessTest = class {
       }
       yield this.executeFollowUpTest();
       if (this.extended) {
-        yield this.extendCurrentTest();
+        yield this.executeAsExtended();
       }
     });
   }
@@ -12696,7 +12789,7 @@ var SuccessTest = class {
       yield test.execute();
     });
   }
-  extendCurrentTest() {
+  executeAsExtended() {
     return __async(this, null, function* () {
       var _a;
       if (!this.canBeExtended)
@@ -12716,11 +12809,12 @@ var SuccessTest = class {
       if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
         return (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantExtendTestFurther", { localize: true });
       }
+      yield this.populateDocuments();
       const testCls = TestCreator._getTestClass(data.type);
       if (!testCls)
         return;
+      data.evaluated = false;
       const test = new testCls(data, { actor: this.actor, item: this.item }, this.data.options);
-      yield this.populateDocuments();
       test.data.pushTheLimit = false;
       test.applyPushTheLimit();
       test.data.secondChance = false;
@@ -12875,6 +12969,7 @@ var SuccessTest = class {
       html.find(".place-template").on("click", this._placeItemBlastZoneTemplate);
       html.find(".result-action").on("click", this._castResultAction);
       html.find(".chat-select-link").on("click", this._selectSceneToken);
+      html.find(".test-action").on("click", this._castTestAction);
       DamageApplicationFlow.handleRenderChatMessage(message, html, data);
       yield this._showGmOnlyContent(message, html, data);
     });
@@ -12910,6 +13005,19 @@ var SuccessTest = class {
       }
     });
   }
+  static _castTestAction(event) {
+    return __async(this, null, function* () {
+      var _a;
+      event.preventDefault();
+      const showDialog = !TestCreator.shouldHideDialog(event);
+      const element = $(event.currentTarget);
+      const uuid = (_a = element.data("uuid")) != null ? _a : "";
+      const item = yield fromUuid(uuid);
+      if (!item)
+        return console.error("Shadowrun 5e | Item doesnt exist for uuid", uuid);
+      item.castAction(event);
+    });
+  }
   static chatLogListeners(chatLog, html, data) {
     return __async(this, null, function* () {
       html.find(".chat-message").each((index, element) => __async(this, null, function* () {
@@ -12943,12 +13051,19 @@ var SuccessTest = class {
     });
   }
   static chatMessageContextOptions(html, options) {
+    const pushTheLimit = (li) => __async(this, null, function* () {
+      const messageId = li.data().messageId;
+      const test = yield TestCreator.fromMessage(messageId);
+      if (!test)
+        return console.error("Shadowrun 5e | Could not restore test from message");
+      yield test.executeWithPushTheLimit();
+    });
     const secondChance = (li) => __async(this, null, function* () {
       const messageId = li.data().messageId;
       const test = yield TestCreator.fromMessage(messageId);
       if (!test)
         return console.error("Shadowrun 5e | Could not restore test from message");
-      yield test.executeSecondChance();
+      yield test.executeWithSecondChance();
     });
     const extendTest = (li) => __async(this, null, function* () {
       var _a;
@@ -12959,9 +13074,15 @@ var SuccessTest = class {
       if (!test.canBeExtended) {
         return (_a = ui.notifications) == null ? void 0 : _a.warn("SR5.Warnings.CantExtendTest", { localize: true });
       }
-      yield test.extendCurrentTest();
+      yield test.executeAsExtended();
     });
     const deleteOption = options.pop();
+    options.push({
+      name: game.i18n.localize("SR5.PushTheLimit"),
+      callback: pushTheLimit,
+      condition: true,
+      icon: '<i class="fas fa-meteor"></i>'
+    });
     options.push({
       name: game.i18n.localize("SR5.SecondChance"),
       callback: secondChance,
@@ -13477,10 +13598,9 @@ var _SR5Item = class extends Item {
       if (!technology.conceal)
         technology.conceal = { base: 0, value: 0, mod: [] };
       const concealParts = new PartsList();
-      equippedMods.forEach((mod) => {
-        const technology2 = mod.getTechnologyData();
-        if (technology2 && technology2.conceal.value) {
-          concealParts.addUniquePart(mod.name, technology2.conceal.value);
+      equippedMods.forEach((modificiation) => {
+        if (modificiation.system.conceal && modificiation.system.conceal > 0) {
+          concealParts.addUniquePart(modificiation.name, modificiation.system.conceal);
         }
       });
       technology.conceal.mod = concealParts.list;
@@ -13519,6 +13639,8 @@ var _SR5Item = class extends Item {
         const ammoData = equippedAmmo.system;
         action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
         action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, ammoData.ap);
+        if (ammoData.accuracy)
+          limitParts.addUniquePart(equippedAmmo.name, ammoData.accuracy);
         if (ammoData.element) {
           action.damage.element.value = ammoData.element;
         } else {
@@ -13588,7 +13710,7 @@ var _SR5Item = class extends Item {
   getChatData(htmlOptions = {}) {
     const system = duplicate(this.system);
     const { labels } = this;
-    if (!system.description)
+    if (system.description)
       system.description = {};
     if (!system.description.value)
       system.description.value = "";
@@ -13741,6 +13863,8 @@ var _SR5Item = class extends Item {
       if (this.type !== "sin")
         return;
       const licenses = foundry.utils.getType(this.system.licenses) === "Object" ? Object.values(this.system.licenses) : this.system.licenses;
+      if (!licenses)
+        return;
       licenses.push({
         name: "",
         rtg: "",
@@ -13932,7 +14056,7 @@ var _SR5Item = class extends Item {
       return [];
     return [{
       label: this.getActionTestName(),
-      type: "action"
+      uuid: this.uuid
     }];
   }
   getActionResult() {
@@ -14507,12 +14631,14 @@ var _SR5Item = class extends Item {
       Helpers.injectActionTestsIntoChangeData(this.type, changed, applyData);
       yield __superGet(_SR5Item.prototype, this, "_preCreate").call(this, changed, options, user);
       if (!foundry.utils.isEmpty(applyData))
-        this.update(applyData);
+        yield this.update(applyData);
     });
   }
   _preUpdate(changed, options, user) {
     return __async(this, null, function* () {
-      Helpers.injectActionTestsIntoChangeData(this.type, changed, changed);
+      if (options.diff !== false && options.recursive !== false) {
+        Helpers.injectActionTestsIntoChangeData(this.type, changed, changed);
+      }
       yield __superGet(_SR5Item.prototype, this, "_preUpdate").call(this, changed, options, user);
     });
   }
@@ -14673,7 +14799,7 @@ var AttributesPrep = class {
 // src/module/actor/prep/functions/MatrixPrep.ts
 var MatrixPrep = class {
   static prepareMatrix(system, items) {
-    const { matrix, attributes } = system;
+    const { matrix, attributes, modifiers } = system;
     const MatrixList = ["firewall", "sleaze", "data_processing", "attack"];
     MatrixList.forEach((key) => {
       const parts = new PartsList(matrix[key].mod);
@@ -14689,9 +14815,9 @@ var MatrixPrep = class {
     matrix.condition_monitor.label = "SR5.ConditionMonitor";
     const device = items.find((item) => item.isEquipped() && item.isDevice());
     if (device) {
-      const conditionMonitor = device.getConditionMonitor();
       matrix.device = device.getId();
-      matrix.condition_monitor.max = conditionMonitor.max;
+      const conditionMonitor = device.getConditionMonitor();
+      matrix.condition_monitor.max = conditionMonitor.max + Number(modifiers.matrix_track);
       matrix.condition_monitor.value = conditionMonitor.value;
       matrix.rating = device.getRating();
       matrix.is_cyberdeck = device.isCyberdeck();
@@ -15500,8 +15626,8 @@ var SpritePrep = class {
     }
   }
   static prepareSpriteConditionMonitor(data) {
-    const { matrix, level } = data;
-    matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
+    const { matrix, level, modifiers } = data;
+    matrix.condition_monitor.max = 8 + Math.ceil(level / 2) + Number(modifiers.matrix_track);
   }
   static prepareSpriteInitiative(data) {
     const { initiative, level, spriteType, modifiers } = data;
@@ -15643,7 +15769,7 @@ var VehiclePrep = class {
     }
     track.physical.label = SR5.damageTypes.physical;
     const rating = matrix.rating || 0;
-    matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);
+    matrix.condition_monitor.max = 8 + Math.ceil(rating / 2) + Number(modifiers.matrix_track);
   }
   static prepareMovement(data) {
     const { vehicle_stats, movement, isOffRoad } = data;
@@ -15671,165 +15797,358 @@ var VehiclePrep = class {
   }
 };
 
-// src/module/rules/Modifiers.ts
-var Modifiers = class {
-  constructor(data) {
-    if (!data || typeof data !== "object" || !("environmental" in data)) {
-      data = Modifiers.getDefaultModifiers();
+// src/module/rules/modifiers/SituationModifier.ts
+var SituationModifier = class {
+  constructor(data, modifiers) {
+    this.source = this._prepareSourceData(data);
+    this.modifiers = modifiers;
+  }
+  _prepareSourceData(data = {}) {
+    return __spreadValues(__spreadValues({}, { active: {} }), data);
+  }
+  get hasDocuments() {
+    return this.modifiers !== void 0;
+  }
+  get sourceDocumentIsActor() {
+    return this.modifiers !== void 0 && this.modifiers.documentIsActor;
+  }
+  get sourceDocumentIsScene() {
+    return this.modifiers !== void 0 && this.modifiers.documentIsScene;
+  }
+  get active() {
+    return this.source.active;
+  }
+  get hasActive() {
+    return !foundry.utils.isEmpty(this.source.active);
+  }
+  get hasFixed() {
+    return this.applied.hasOwnProperty("fixed");
+  }
+  get hasFixedSelection() {
+    return this.applied.active.hasOwnProperty("value");
+  }
+  get hasSelection() {
+    return this.hasActive || this.hasFixed;
+  }
+  isMatching(modifier, level) {
+    return this.applied.active[modifier] === level;
+  }
+  setActive(modifier, level) {
+    this.source.active[modifier] = level;
+    this._updateDocumentSourceModifiers();
+  }
+  setInactive(modifier) {
+    delete this.source.active[modifier];
+    this._updateDocumentSourceModifiers();
+  }
+  isActive(modifier) {
+    return this.source.active.hasOwnProperty(modifier);
+  }
+  toggleSelection(modifier, value) {
+    if (this.isMatching(modifier, value)) {
+      this.setInactive(modifier);
+    } else {
+      this.setActive(modifier, value);
     }
-    this.data = duplicate(data);
   }
-  get hasActiveEnvironmental() {
-    return Object.keys(this.environmental.active).length > 0;
+  apply(options = {}) {
+    var _a, _b, _c, _d, _e;
+    if (!this.applied || options.reapply || options.source) {
+      this.applied = {
+        active: {},
+        total: 0
+      };
+    }
+    this.source = (_a = options.source) != null ? _a : this.source;
+    const applicable = (_b = options.applicable) != null ? _b : null;
+    const sources = [];
+    if (this.modifiers && this.sourceDocumentIsActor) {
+      if (!this.category)
+        return console.error(`Shadowrun 5e | ${this.constructor.name} can't interact with documents without a modifier category set.`);
+      const actor = this.modifiers.document;
+      const scene = (_c = actor.getToken()) == null ? void 0 : _c.parent;
+      if (!scene)
+        return;
+      const sceneSource = this._getDocumentsSourceData(scene);
+      if (!sceneSource)
+        return;
+      sources.push(sceneSource);
+    }
+    sources.push(this.source);
+    sources.forEach((source) => foundry.utils.mergeObject(this.applied, source));
+    if (applicable && applicable.length > 0) {
+      Object.keys(this.applied.active).forEach((selection) => {
+        if (!applicable.includes(selection))
+          delete this.applied.active[selection];
+      });
+    }
+    if (!this.hasFixed && this.hasFixedSelection)
+      this.applied.fixed = this.applied.active.value;
+    if (this.hasFixed)
+      this.applied.total = this.applied.fixed;
+    else
+      this.applied.total = this._calcActiveTotal();
+    console.debug(`Shadowrun 5e | Totalled situational modifiers for ${(_e = (_d = this.modifiers) == null ? void 0 : _d.document) == null ? void 0 : _e.name} to be: ${this.applied.total}`, this.applied);
   }
-  get modifiers() {
-    return this.data;
+  _getDocumentsSourceData(document2) {
+    if (!this.category)
+      return;
+    const modifiers = DocumentSituationModifiers.getDocumentModifiers(document2);
+    return modifiers.source[this.category];
   }
-  set modifiers(modifiers) {
-    this.data = modifiers;
+  _calcActiveTotal() {
+    return Object.values(this.applied.active).reduce((sum, current) => sum + current, 0) || 0;
   }
-  getTotalForType(type) {
-    const modifier = this.modifiers[type] || { total: 0 };
-    return modifier.total;
+  get total() {
+    if (!this.applied) {
+      this.apply();
+    }
+    return this.applied.total;
+  }
+  clear() {
+    this.source = this._prepareSourceData();
+    this.apply({ reapply: true });
+    this._updateDocumentModifiers();
+  }
+  _updateDocumentSourceModifiers() {
+    if (!this.category || !this.modifiers)
+      return;
+    this.modifiers.source[this.category] = this.source;
+  }
+  _updateDocumentAppliedModifiers() {
+    if (!this.category || !this.modifiers)
+      return;
+    this.modifiers.applied[this.category] = this.applied;
+  }
+  _updateDocumentModifiers() {
+    this._updateDocumentSourceModifiers();
+    this._updateDocumentAppliedModifiers();
+  }
+};
+
+// src/module/rules/modifiers/BackgroundCountModifier.ts
+var BackgroundCountModifier = class extends SituationModifier {
+  constructor() {
+    super(...arguments);
+    this.category = "background_count";
+  }
+};
+
+// src/module/rules/modifiers/NoiseModifier.ts
+var NoiseModifier = class extends SituationModifier {
+  constructor() {
+    super(...arguments);
+    this.category = "noise";
+  }
+};
+
+// src/module/rules/modifiers/EnvironmentalModifier.ts
+var EnvironmentalModifier = class extends SituationModifier {
+  constructor() {
+    super(...arguments);
+    this.category = "environmental";
+  }
+  get levels() {
+    return SR.combat.environmental.levels;
+  }
+  activeLevels(values) {
+    return {
+      light: values.reduce((count, value) => value === this.levels.light ? count + 1 : count, 0),
+      moderate: values.reduce((count, value) => value === this.levels.moderate ? count + 1 : count, 0),
+      heavy: values.reduce((count, value) => value === this.levels.heavy ? count + 1 : count, 0),
+      extreme: values.reduce((count, value) => value === this.levels.extreme ? count + 1 : count, 0)
+    };
+  }
+  _calcActiveTotal() {
+    if (this.applied.active.value)
+      return this.applied.active.value;
+    const activeCategories = Object.entries(this.applied.active);
+    const activeValues = activeCategories.map(([category, level]) => level ? level : 0);
+    const count = this.activeLevels(activeValues);
+    if (count.extreme > 0 || count.heavy >= 2) {
+      return this.levels.extreme;
+    } else if (count.heavy === 1 || count.moderate >= 2) {
+      return this.levels.heavy;
+    } else if (count.moderate === 1 || count.light >= 2) {
+      return this.levels.moderate;
+    } else if (count.light === 1) {
+      return this.levels.light;
+    }
+    return this.levels.good;
+  }
+  setInactive(modifier) {
+    if (this.source.active[modifier] !== this.applied.active[modifier])
+      this.setActive(modifier, 0);
+    else
+      delete this.source.active[modifier];
+  }
+};
+
+// src/module/rules/DocumentSituationModifiers.ts
+var DocumentSituationModifiers = class {
+  constructor(data, document2) {
+    if (!data || foundry.utils.getType(data) !== "Object") {
+      data = DocumentSituationModifiers._defaultModifiers;
+    }
+    this.source = this._completeSourceData(data);
+    this.document = document2;
+    this.handlers = {
+      noise: new NoiseModifier(this.source.noise, this),
+      background_count: new BackgroundCountModifier(this.source.background_count, this),
+      environmental: new EnvironmentalModifier(this.source.environmental, this)
+    };
+  }
+  get noise() {
+    return this.handlers.noise;
+  }
+  get background_count() {
+    return this.handlers.background_count;
   }
   get environmental() {
-    return this.data.environmental;
+    return this.handlers.environmental;
   }
-  set environmental(modifiers) {
-    this.data.environmental = modifiers;
-  }
-  _matchingActiveEnvironmental(category, level) {
-    return this.environmental.active[category] === level;
-  }
-  _setEnvironmentalCategoryActive(category, level) {
-    this.environmental.active[category] = level;
-  }
-  _setEnvironmentalCategoryInactive(category) {
-    delete this.environmental.active[category];
-  }
-  _disableEnvironmentalOverwrite() {
-    this._setEnvironmentalCategoryInactive("value");
-  }
-  activateEnvironmentalCategory(category, level) {
-    if (!this._environmentalCategoryIsOverwrite(category)) {
-      this._disableEnvironmentalOverwrite();
+  _completeSourceData(data) {
+    data = foundry.utils.duplicate(data);
+    for (const [category, modifiers] of Object.entries(DocumentSituationModifiers._defaultModifiers)) {
+      if (!data.hasOwnProperty(category))
+        data[category] = modifiers;
     }
-    this._setEnvironmentalCategoryActive(category, level);
-    this.calcEnvironmentalTotal();
+    return data;
   }
-  toggleEnvironmentalCategory(category, level) {
-    if (this._matchingActiveEnvironmental(category, level)) {
-      this._setEnvironmentalCategoryInactive(category);
-    } else if (this._environmentalCategoryIsOverwrite(category)) {
-      this._setEnvironmentalOverwriteActive(level);
-    } else {
-      this._setEnvironmentalCategoryActive(category, level);
+  getTotalFor(category, options = {}) {
+    const modifier = this.handlers[category];
+    if (options.applicable) {
+      modifier.apply({ applicable: options.applicable });
     }
-    if (!this._environmentalCategoryIsOverwrite(category)) {
-      this._setEnvironmentalOverwriteInactive();
-    }
-    this.calcEnvironmentalTotal();
+    return modifier.total;
   }
-  calcEnvironmentalTotal() {
-    if (this.hasActiveEnvironmentalOverwrite) {
-      const modifier = this._activeEnvironmentalOverwrite;
-      if (modifier === void 0) {
-        console.error("An active overwrite modifier was returned as undefined");
-        return;
-      }
-      this._resetEnvironmental();
-      this._setEnvironmentalOverwriteActive(modifier);
-      this._setEnvironmentalTotal(modifier);
-    } else {
-      const activeCategories = Object.entries(this.environmental.active).filter(([category, level]) => category !== "value");
-      const activeLevels = activeCategories.map(([category, level]) => level ? level : 0);
-      const count = this._countActiveModifierLevels(activeLevels);
-      const modifiers = Modifiers.getEnvironmentalModifierLevels();
-      if (count.extreme > 0 || count.heavy >= 2) {
-        this._setEnvironmentalTotal(modifiers.extreme);
-      } else if (count.heavy === 1 || count.moderate >= 2) {
-        this._setEnvironmentalTotal(modifiers.heavy);
-      } else if (count.moderate === 1 || count.light >= 2) {
-        this._setEnvironmentalTotal(modifiers.moderate);
-      } else if (count.light === 1) {
-        this._setEnvironmentalTotal(modifiers.light);
-      } else {
-        this._setEnvironmentalTotal(modifiers.good);
-      }
-    }
-  }
-  static clearOnEntity(document2) {
-    return __async(this, null, function* () {
-      yield document2.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
-      return new Modifiers(Modifiers.getDefaultModifiers());
+  applyAll(options = {}) {
+    this.applied = {};
+    Object.entries(this.handlers).forEach(([category, handler]) => {
+      var _a;
+      Object.entries(this.source[category].active).forEach(([modifier, value]) => {
+        switch (value) {
+          case null:
+          case void 0:
+            delete this.source[category].active[modifier];
+        }
+      });
+      options.reapply = (_a = options.reapply) != null ? _a : true;
+      options.source = this.source[category];
+      handler.apply(options);
+      this.applied[category] = handler.applied;
     });
   }
-  static clearEnvironmentalOnEntity(document2) {
+  static clearAllOnDocument(document2) {
     return __async(this, null, function* () {
-      const modifiers = yield Modifiers.getModifiersFromEntity(document2);
-      modifiers.data.environmental = Modifiers.getDefaultEnvironmentalModifiers();
-      yield Modifiers.setModifiersOnEntity(document2, modifiers.data);
+      if (document2 instanceof SR5Actor) {
+        yield document2.update({ "system.-=situation_modifiers": null }, { render: false });
+        yield document2.update({ "system.situation_modifiers": DocumentSituationModifiers._defaultModifiers });
+      } else {
+        yield document2.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
+        yield document2.setFlag(SYSTEM_NAME, FLAGS.Modifier, DocumentSituationModifiers._defaultModifiers);
+      }
+    });
+  }
+  static clearCategoryOnDocument(document2, category) {
+    return __async(this, null, function* () {
+      const modifiers = DocumentSituationModifiers.getDocumentModifiers(document2);
+      if (!modifiers.source.hasOwnProperty(category))
+        return modifiers;
+      modifiers.source[category] = DocumentSituationModifiers._defaultModifier;
+      yield DocumentSituationModifiers.setDocumentModifiers(document2, modifiers.source);
       return modifiers;
     });
   }
-  _environmentalCategoryIsOverwrite(category) {
-    return category === "value";
+  static clearEnvironmentalOn(document2) {
+    return __async(this, null, function* () {
+      return yield DocumentSituationModifiers.clearCategoryOnDocument(document2, "environmental");
+    });
   }
-  _resetEnvironmental() {
-    Object.keys(this.environmental.active).forEach((category) => delete this.environmental.active[category]);
+  static clearBackgroundCountOn(document2) {
+    return __async(this, null, function* () {
+      return yield DocumentSituationModifiers.clearCategoryOnDocument(document2, "background_count");
+    });
   }
-  _setEnvironmentalOverwriteActive(value) {
-    this._resetEnvironmental();
-    this._setEnvironmentalCategoryActive("value", value);
+  static clearNoiseOn(document2) {
+    return __async(this, null, function* () {
+      return yield DocumentSituationModifiers.clearCategoryOnDocument(document2, "noise");
+    });
   }
-  _setEnvironmentalOverwriteInactive() {
-    this._setEnvironmentalCategoryInactive("value");
-  }
-  _setEnvironmentalTotal(value) {
-    this.environmental.total = value;
-  }
-  get _activeEnvironmentalOverwrite() {
-    return this.modifiers.environmental.active.value;
-  }
-  get hasActiveEnvironmentalOverwrite() {
-    return this.environmental.active.value !== void 0;
-  }
-  _countActiveModifierLevels(values) {
-    const modifiers = Modifiers.getEnvironmentalModifierLevels();
+  static get _defaultModifier() {
     return {
-      light: values.reduce((count, value) => value === modifiers.light ? count + 1 : count, 0),
-      moderate: values.reduce((count, value) => value === modifiers.moderate ? count + 1 : count, 0),
-      heavy: values.reduce((count, value) => value === modifiers.heavy ? count + 1 : count, 0),
-      extreme: values.reduce((count, value) => value === modifiers.extreme ? count + 1 : count, 0)
-    };
-  }
-  static getDefaultEnvironmentalModifiers() {
-    return {
-      total: 0,
       active: {}
     };
   }
-  static getDefaultModifier() {
+  static get _defaultModifiers() {
     return {
-      total: 0
+      environmental: DocumentSituationModifiers._defaultModifier,
+      noise: DocumentSituationModifiers._defaultModifier,
+      background_count: DocumentSituationModifiers._defaultModifier
     };
   }
-  static getDefaultModifiers() {
-    return {
-      environmental: Modifiers.getDefaultEnvironmentalModifiers()
-    };
+  get documentIsScene() {
+    return this.document instanceof CONFIG.Scene.documentClass;
   }
-  static getEnvironmentalModifierLevels() {
-    return SR.combat.environmental.levels;
+  get documentIsActor() {
+    return this.document instanceof CONFIG.Actor.documentClass;
   }
-  static getModifiersFromEntity(document2) {
-    const data = document2.getFlag(SYSTEM_NAME, FLAGS.Modifier);
-    return new Modifiers(data);
+  static getDocumentModifiersData(document2) {
+    if (document2 instanceof SR5Actor) {
+      return document2.system.situation_modifiers;
+    } else {
+      return document2.getFlag(SYSTEM_NAME, FLAGS.Modifier);
+    }
   }
-  static setModifiersOnEntity(document2, modifiers) {
+  static fromDocument(document2) {
+    if (document2 instanceof SR5Actor) {
+      return document2.getSituationModifiers();
+    }
+    return DocumentSituationModifiers.getDocumentModifiers(document2);
+  }
+  static getDocumentModifiers(document2) {
+    const data = DocumentSituationModifiers.getDocumentModifiersData(document2);
+    return new DocumentSituationModifiers(data, document2);
+  }
+  static setDocumentModifiers(document2, modifiers) {
     return __async(this, null, function* () {
-      yield document2.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
-      yield document2.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
+      if (document2 instanceof SR5Actor) {
+        yield document2.update({ "system.-=situation_modifiers": null }, { render: false });
+        yield document2.update({ "system.situation_modifiers": modifiers });
+      } else {
+        yield document2.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
+        yield document2.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
+      }
+    });
+  }
+  updateDocument() {
+    return __async(this, null, function* () {
+      if (!this.document)
+        return console.error(`'Shadowrun 5e | ${this.constructor.name} can't update without connected document'`);
+      yield DocumentSituationModifiers.setDocumentModifiers(this.document, this.source);
+    });
+  }
+  clearAll() {
+    return __async(this, null, function* () {
+      if (!this.document)
+        return console.error(`'Shadowrun 5e | ${this.constructor.name} can't clear without connected document'`);
+      yield DocumentSituationModifiers.clearAllOnDocument(this.document);
+      this.source = DocumentSituationModifiers.getDocumentModifiersData(this.document);
+    });
+  }
+  clearAllTokensOnScene() {
+    return __async(this, null, function* () {
+      if (!canvas.ready || !canvas.scene)
+        return;
+      if (!this.documentIsScene)
+        return;
+      const scene = this.document;
+      if (canvas.scene.id !== scene.id)
+        return;
+      canvas.scene.tokens.forEach((token) => {
+        var _a;
+        return (_a = token.actor) == null ? void 0 : _a.getSituationModifiers().clearAll();
+      });
     });
   }
 };
@@ -16054,14 +16373,14 @@ var ModifierFlow = class {
   constructor(document2) {
     this.document = document2;
   }
-  totalFor(type) {
-    return __async(this, null, function* () {
-      if (this[type] !== void 0)
-        return this[type];
-      const modifiers = yield this.document.getModifiers();
-      if (modifiers.modifiers.hasOwnProperty(type))
-        return modifiers.getTotalForType(type);
-      return this.document.getModifier(type) || 0;
+  totalFor(_0) {
+    return __async(this, arguments, function* (name, options = {}) {
+      if (this[name] !== void 0)
+        return this[name];
+      const modifiers = this.document.getSituationModifiers();
+      if (modifiers.source.hasOwnProperty(name))
+        return modifiers.getTotalFor(name, { applicable: options.applicable });
+      return this.document.getModifier(name) || 0;
     });
   }
   get wounds() {
@@ -16514,20 +16833,13 @@ var _SR5Actor = class extends Actor {
     }
     return skill.label ? skill.label : skill.name ? skill.name : "";
   }
-  addKnowledgeSkill(category, skill) {
-    return __async(this, null, function* () {
+  addKnowledgeSkill(_0) {
+    return __async(this, arguments, function* (category, skill = { name: SKILL_DEFAULT_NAME }) {
       if (!this.system.skills.knowledge.hasOwnProperty(category)) {
         console.error(`Shadowrun5e | Tried creating knowledge skill with unkown category ${category}`);
         return;
       }
-      const defaultSkill = {
-        name: "",
-        specs: [],
-        base: 0,
-        value: 0,
-        mod: 0
-      };
-      skill = __spreadValues(__spreadValues({}, defaultSkill), skill);
+      skill = DefaultValues.skillData(skill);
       const id = randomID(16);
       const value = {};
       value[id] = skill;
@@ -17158,21 +17470,14 @@ var _SR5Actor = class extends Actor {
   matchesActorTypes(types) {
     return types.includes(this.type);
   }
-  getModifiers() {
-    return __async(this, arguments, function* (ignoreScene = false, scene = canvas.scene) {
-      const onActor = Modifiers.getModifiersFromEntity(this);
-      if (onActor.hasActiveEnvironmental) {
-        return onActor;
-      } else if (ignoreScene || scene === null) {
-        return new Modifiers(Modifiers.getDefaultModifiers());
-      } else {
-        return Modifiers.getModifiersFromEntity(scene);
-      }
-    });
+  getSituationModifiers() {
+    const modifiers = DocumentSituationModifiers.getDocumentModifiers(this);
+    modifiers.applyAll();
+    return modifiers;
   }
-  setModifiers(modifiers) {
+  setSituationModifiers(modifiers) {
     return __async(this, null, function* () {
-      yield Modifiers.setModifiersOnEntity(this, modifiers.modifiers);
+      yield DocumentSituationModifiers.setDocumentModifiers(this, modifiers.source);
     });
   }
   get isMatrixActor() {
@@ -18259,28 +18564,38 @@ var registerItemLineHelpers = () => {
     };
     switch (item.type) {
       case "action":
+        const limitAttribute = item.system.action.limit.attribute;
+        const limitBase = Number(item.system.action.limit.base);
+        const textLimitParts = [];
+        if (!isNaN(limitBase) && limitBase > 0) {
+          textLimitParts.push(limitBase.toString());
+        }
+        if (limitAttribute) {
+          textLimitParts.push(game.i18n.localize(SR5.limits[limitAttribute != null ? limitAttribute : ""]));
+        }
+        const textLimit = textLimitParts.join(" + ");
         return [
           {
             text: {
-              text: game.i18n.localize(SR5.activeSkills[(_a = wrapper.getActionSkill()) != null ? _a : ""]),
+              text: game.i18n.localize((_b = SR5.activeSkills[(_a = wrapper.getActionSkill()) != null ? _a : ""]) != null ? _b : wrapper.getActionSkill()),
               cssClass: "six"
             }
           },
           {
             text: {
-              text: game.i18n.localize(SR5.attributes[(_b = wrapper.getActionAttribute()) != null ? _b : ""]),
+              text: game.i18n.localize(SR5.attributes[(_c = wrapper.getActionAttribute()) != null ? _c : ""]),
               cssClass: "six"
             }
           },
           {
             text: {
-              text: game.i18n.localize(SR5.attributes[(_c = wrapper.getActionAttribute2()) != null ? _c : ""]),
+              text: game.i18n.localize(SR5.attributes[(_d = wrapper.getActionAttribute2()) != null ? _d : ""]),
               cssClass: "six"
             }
           },
           {
             text: {
-              text: wrapper.getLimitAttribute() ? game.i18n.localize(SR5.attributes[(_d = wrapper.getLimitAttribute()) != null ? _d : ""]) : wrapper.getActionLimit(),
+              text: textLimit,
               cssClass: "six"
             }
           },
@@ -19478,7 +19793,7 @@ var SR5ItemSheet = class extends ItemSheet {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       classes: ["sr5", "sheet", "item"],
-      width: 650,
+      width: 720,
       height: 450,
       tabs: [{ navSelector: ".tabs", contentSelector: ".sheetbody" }]
     });
@@ -19493,11 +19808,11 @@ var SR5ItemSheet = class extends ItemSheet {
       data.type = data.data.type;
       data.system = data.item.system;
       data.data = data.item.system;
-      const itemData = this.item.system;
+      const itemData = this.document.system;
       if (itemData.action) {
         try {
-          const { action } = itemData;
-          if (action.mod === 0)
+          const action = itemData.action;
+          if (itemData.action.mod === 0)
             delete action.mod;
           if (action.limit === 0)
             delete action.limit;
@@ -19517,13 +19832,13 @@ var SR5ItemSheet = class extends ItemSheet {
       }
       if (itemData.technology) {
         try {
-          const tech = itemData.technology;
-          if (tech.rating === 0)
-            delete tech.rating;
-          if (tech.quantity === 0)
-            delete tech.quantity;
-          if (tech.cost === 0)
-            delete tech.cost;
+          const technology = itemData.technology;
+          if (technology.rating === 0)
+            delete technology.rating;
+          if (technology.quantity === 0)
+            delete technology.quantity;
+          if (technology.cost === 0)
+            delete technology.cost;
         } catch (e) {
           console.log(e);
         }
@@ -19532,12 +19847,14 @@ var SR5ItemSheet = class extends ItemSheet {
       const items = this.item.items;
       const [ammunition, weaponMods, armorMods] = items.reduce(
         (parts, item) => {
+          const itemData2 = item.toObject();
+          itemData2.descriptionHTML = this.enrichEditorFieldToHTML(itemData2.system.description.value);
           if (item.type === "ammo")
-            parts[0].push(item.data);
+            parts[0].push(itemData2);
           if (item.type === "modification" && "type" in item.system && item.system.type === "weapon")
-            parts[1].push(item._source);
+            parts[1].push(itemData2);
           if (item.type === "modification" && "type" in item.system && item.system.type === "armor")
-            parts[2].push(item._source);
+            parts[2].push(itemData2);
           return parts;
         },
         [[], [], []]
@@ -19562,11 +19879,12 @@ var SR5ItemSheet = class extends ItemSheet {
       data.opposedTests = game.shadowrun5e.opposedTests;
       data.activeTests = game.shadowrun5e.activeTests;
       data.resistTests = game.shadowrun5e.resistTests;
-      data.descriptionHTML = yield TextEditor.enrichHTML(this.item.system.description.value, {
-        async: true
-      });
+      data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
       return data;
     });
+  }
+  enrichEditorFieldToHTML(editorValue, options = { async: false }) {
+    return TextEditor.enrichHTML(editorValue, options);
   }
   _getSortedLimitsForSelect() {
     return Helpers.sortConfigValuesByTranslation(SR5.limits);
@@ -20852,26 +21170,26 @@ var Parser = class {
 
 // src/module/importer/parser/item/ItemParserBase.ts
 var ItemParserBase = class extends Parser {
-  Parse(jsonData, data, jsonTranslation) {
-    data.name = ImportHelper.StringValue(jsonData, "name");
-    data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
+  Parse(jsonData, item, jsonTranslation) {
+    item.name = ImportHelper.StringValue(jsonData, "name");
+    item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
     if (jsonTranslation) {
       const origName = ImportHelper.StringValue(jsonData, "name");
-      data.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-      data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+      item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
+      item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
     }
-    return data;
+    return item;
   }
 };
 
 // src/module/importer/parser/item/TechnologyItemParserBase.ts
 var TechnologyItemParserBase = class extends ItemParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
-    data.data.technology.availability = ImportHelper.StringValue(jsonData, "avail", "0");
-    data.data.technology.cost = ImportHelper.IntValue(jsonData, "cost", 0);
-    data.data.technology.rating = ImportHelper.IntValue(jsonData, "rating", 0);
-    return data;
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
+    item.system.technology.availability = ImportHelper.StringValue(jsonData, "avail", "0");
+    item.system.technology.cost = ImportHelper.IntValue(jsonData, "cost", 0);
+    item.system.technology.rating = ImportHelper.IntValue(jsonData, "rating", 0);
+    return item;
   }
 };
 
@@ -20909,20 +21227,20 @@ var WeaponParserBase = class extends TechnologyItemParserBase {
       return "range";
     }
   }
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
     let category = ImportHelper.StringValue(jsonData, "category");
     if (category === "Hold-outs") {
       category = "Holdouts";
     }
-    data.data.category = WeaponParserBase.GetWeaponType(jsonData);
-    data.data.subcategory = category.toLowerCase();
-    data.data.action.skill = this.GetSkill(jsonData);
-    data.data.action.damage = this.GetDamage(jsonData);
-    data.data.action.limit.value = ImportHelper.IntValue(jsonData, "accuracy");
-    data.data.action.limit.base = ImportHelper.IntValue(jsonData, "accuracy");
-    data.data.technology.conceal.base = ImportHelper.IntValue(jsonData, "conceal");
-    return data;
+    item.system.category = WeaponParserBase.GetWeaponType(jsonData);
+    item.system.subcategory = category.toLowerCase();
+    item.system.action.skill = this.GetSkill(jsonData);
+    item.system.action.damage = this.GetDamage(jsonData);
+    item.system.action.limit.value = ImportHelper.IntValue(jsonData, "accuracy");
+    item.system.action.limit.base = ImportHelper.IntValue(jsonData, "accuracy");
+    item.system.technology.conceal.base = ImportHelper.IntValue(jsonData, "conceal");
+    return item;
   }
 };
 
@@ -20959,27 +21277,27 @@ var RangedParser = class extends WeaponParserBase {
     let match = (_a = jsonAmmo.match(/([0-9]+)/g)) == null ? void 0 : _a[0];
     return match !== void 0 ? parseInt(match) : 0;
   }
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
     if (jsonData.hasOwnProperty("rc")) {
-      data.data.range.rc.base = ImportHelper.IntValue(jsonData, "rc");
-      data.data.range.rc.value = ImportHelper.IntValue(jsonData, "rc");
+      item.system.range.rc.base = ImportHelper.IntValue(jsonData, "rc");
+      item.system.range.rc.value = ImportHelper.IntValue(jsonData, "rc");
     } else {
-      data.data.range.rc.base = 0;
-      data.data.range.rc.value = 0;
+      item.system.range.rc.base = 0;
+      item.system.range.rc.value = 0;
     }
     if (jsonData.hasOwnProperty("range")) {
-      data.data.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, "range")];
+      item.system.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, "range")];
     } else {
-      data.data.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, "category")];
+      item.system.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, "category")];
     }
-    data.data.ammo.current.value = this.GetAmmo(jsonData);
-    data.data.ammo.current.max = this.GetAmmo(jsonData);
-    data.data.range.modes.single_shot = ImportHelper.StringValue(jsonData, "mode").includes("SS");
-    data.data.range.modes.semi_auto = ImportHelper.StringValue(jsonData, "mode").includes("SA");
-    data.data.range.modes.burst_fire = ImportHelper.StringValue(jsonData, "mode").includes("BF");
-    data.data.range.modes.full_auto = ImportHelper.StringValue(jsonData, "mode").includes("FA");
-    return data;
+    item.system.ammo.current.value = this.GetAmmo(jsonData);
+    item.system.ammo.current.max = this.GetAmmo(jsonData);
+    item.system.range.modes.single_shot = ImportHelper.StringValue(jsonData, "mode").includes("SS");
+    item.system.range.modes.semi_auto = ImportHelper.StringValue(jsonData, "mode").includes("SA");
+    item.system.range.modes.burst_fire = ImportHelper.StringValue(jsonData, "mode").includes("BF");
+    item.system.range.modes.full_auto = ImportHelper.StringValue(jsonData, "mode").includes("FA");
+    return item;
   }
 };
 
@@ -21017,10 +21335,10 @@ var MeleeParser = class extends WeaponParserBase {
     };
     return DefaultValues.damageData(partialDamageData);
   }
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
-    data.data.melee.reach = ImportHelper.IntValue(jsonData, "reach");
-    return data;
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
+    item.system.melee.reach = ImportHelper.IntValue(jsonData, "reach");
+    return item;
   }
 };
 
@@ -21074,7 +21392,7 @@ var ThrownParser = class extends WeaponParserBase {
     };
     return DefaultValues.damageData(partialDamageData);
   }
-  GetBlast(jsonData, data) {
+  GetBlast(jsonData, item) {
     var _a, _b, _c, _d;
     let blastData = {
       radius: 0,
@@ -21096,19 +21414,19 @@ var ThrownParser = class extends WeaponParserBase {
       }
     }
     if (blastData.dropoff && !blastData.radius) {
-      blastData.radius = -(data.data.action.damage.base / blastData.dropoff);
+      blastData.radius = -(item.system.action.damage.base / blastData.dropoff);
     }
     return blastData;
   }
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
     if (jsonData.hasOwnProperty("range")) {
-      data.data.thrown.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, "range")];
+      item.system.thrown.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, "range")];
     } else {
-      data.data.thrown.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, "category")];
+      item.system.thrown.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, "category")];
     }
-    data.data.thrown.blast = this.GetBlast(jsonData, data);
-    return data;
+    item.system.thrown.blast = this.GetBlast(jsonData, item);
+    return item;
   }
 };
 
@@ -21122,7 +21440,7 @@ var ParserMap = class extends Parser {
       this.m_Map.set(key, value);
     }
   }
-  Parse(jsonData, data, jsonTranslation) {
+  Parse(jsonData, item, jsonTranslation) {
     let key;
     if (typeof this.m_BranchKey === "function") {
       key = this.m_BranchKey(jsonData);
@@ -21133,9 +21451,9 @@ var ParserMap = class extends Parser {
     const parser = this.m_Map.get(key);
     if (parser === void 0) {
       console.warn(`Could not find mapped parser for category ${key}.`);
-      return data;
+      return item;
     }
-    return parser.Parse(jsonData, data, jsonTranslation);
+    return parser.Parse(jsonData, item, jsonTranslation);
   }
 };
 
@@ -21152,7 +21470,7 @@ var WeaponImporter = class extends DataImporter {
     return {
       name: "Unnamed Item",
       type: "weapon",
-      data: {
+      system: {
         description: {
           value: "",
           chat: "",
@@ -21229,30 +21547,30 @@ var WeaponImporter = class extends DataImporter {
         { key: "melee", value: new MeleeParser() },
         { key: "thrown", value: new ThrownParser() }
       ]);
-      let datas = [];
+      let items = [];
       let jsonDatas = jsonObject["weapons"]["weapon"];
       for (let i = 0; i < jsonDatas.length; i++) {
         let jsonData = jsonDatas[i];
         if (DataImporter.unsupportedEntry(jsonData)) {
           continue;
         }
-        let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
-        data.folder = folders[data.data.subcategory].id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        datas.push(data);
+        let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+        item.folder = folders[item.system.subcategory].id;
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        items.push(item);
       }
-      return yield Item.create(datas);
+      return yield Item.create(items);
     });
   }
 };
 
 // src/module/importer/parser/armor/ArmorParserBase.ts
 var ArmorParserBase = class extends TechnologyItemParserBase {
-  Parse(jsonData, data) {
-    data = super.Parse(jsonData, data);
-    data.data.armor.value = ImportHelper.IntValue(jsonData, "armor", 0);
-    data.data.armor.mod = ImportHelper.StringValue(jsonData, "armor").includes("+");
-    return data;
+  Parse(jsonData, item) {
+    item = super.Parse(jsonData, item);
+    item.system.armor.value = ImportHelper.IntValue(jsonData, "armor", 0);
+    item.system.armor.mod = ImportHelper.StringValue(jsonData, "armor").includes("+");
+    return item;
   }
 };
 
@@ -21269,7 +21587,7 @@ var ArmorImporter = class extends DataImporter {
     return {
       name: "Unnamed Armor",
       type: "armor",
-      data: {
+      system: {
         description: {
           value: "",
           chat: "",
@@ -21307,12 +21625,12 @@ var ArmorImporter = class extends DataImporter {
         if (DataImporter.unsupportedEntry(jsonData)) {
           continue;
         }
-        let data = parser.Parse(jsonData, this.GetDefaultData());
+        let item = parser.Parse(jsonData, this.GetDefaultData());
         const category = ImportHelper.StringValue(jsonData, "category").toLowerCase();
-        data.name = ImportHelper.MapNameToTranslation(this.armorTranslations, data.name);
-        data.folder = folders[category].id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        datas.push(data);
+        item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
+        item.folder = folders[category].id;
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        datas.push(item);
       }
       return yield Item.create(datas);
     });
@@ -21332,7 +21650,7 @@ var AmmoImporter = class extends DataImporter {
     return {
       name: "",
       type: "ammo",
-      data: {
+      system: {
         description: {
           value: "",
           chat: "",
@@ -21370,48 +21688,48 @@ var AmmoImporter = class extends DataImporter {
         if (ImportHelper.StringValue(jsonData, "category", "") !== "Ammunition") {
           continue;
         }
-        let data = this.GetDefaultData();
-        data.name = ImportHelper.StringValue(jsonData, "name");
-        data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
-        data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
-        data.data.technology.rating = 2;
-        data.data.technology.availability = ImportHelper.StringValue(jsonData, "avail");
-        data.data.technology.cost = ImportHelper.IntValue(jsonData, "cost", 0);
+        let item = this.GetDefaultData();
+        item.name = ImportHelper.StringValue(jsonData, "name");
+        item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+        item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
+        item.system.technology.rating = 2;
+        item.system.technology.availability = ImportHelper.StringValue(jsonData, "avail");
+        item.system.technology.cost = ImportHelper.IntValue(jsonData, "cost", 0);
         let bonusData = ImportHelper.ObjectValue(jsonData, "weaponbonus", null);
         if (bonusData !== void 0 && bonusData !== null) {
-          data.data.ap = ImportHelper.IntValue(bonusData, "ap", 0);
-          data.data.damage = ImportHelper.IntValue(bonusData, "damage", 0);
+          item.system.ap = ImportHelper.IntValue(bonusData, "ap", 0);
+          item.system.damage = ImportHelper.IntValue(bonusData, "damage", 0);
           let damageType = ImportHelper.StringValue(bonusData, "damagetype", "");
           if (damageType.length > 0) {
             if (damageType.includes("P")) {
-              data.data.damageType = "physical";
+              item.system.damageType = "physical";
             } else if (damageType.includes("S")) {
-              data.data.damageType = "stun";
+              item.system.damageType = "stun";
             } else if (damageType.includes("M")) {
-              data.data.damageType = "matrix";
+              item.system.damageType = "matrix";
             }
           }
         }
         let shouldLookForWeapons = false;
-        let nameLower = data.name.toLowerCase();
+        let nameLower = item.name.toLowerCase();
         ["grenade", "rocket", "missile"].forEach((compare) => {
           shouldLookForWeapons = shouldLookForWeapons || nameLower.includes(compare);
         });
         if (shouldLookForWeapons) {
-          let foundWeapon = ImportHelper.findItem((item) => {
-            if (!item || !item.name)
+          let foundWeapon = ImportHelper.findItem((item2) => {
+            if (!item2 || !item2.name)
               return false;
-            return item.type === "weapon" && item.name.toLowerCase() === nameLower;
+            return item2.type === "weapon" && item2.name.toLowerCase() === nameLower;
           });
           if (foundWeapon != null && "action" in foundWeapon.data.data) {
             const weaponData = foundWeapon.data.data;
-            data.data.damage = weaponData.action.damage.value;
-            data.data.ap = weaponData.action.damage.ap.value;
+            item.system.damage = weaponData.action.damage.value;
+            item.system.ap = weaponData.action.damage.ap.value;
           }
         }
-        data.data.technology.conceal.base = 0;
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        ammoDatas.push(data);
+        item.system.technology.conceal.base = 0;
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        ammoDatas.push(item);
       }
       for (let i = 0; i < ammoDatas.length; i++) {
         let folderName = "Misc";
@@ -21430,14 +21748,14 @@ var AmmoImporter = class extends DataImporter {
 
 // src/module/importer/parser/mod/ModParserBase.ts
 var ModParserBase = class extends TechnologyItemParserBase {
-  Parse(jsonData, data) {
-    data = super.Parse(jsonData, data);
-    data.data.type = "weapon";
-    data.data.mount_point = ImportHelper.StringValue(jsonData, "mount");
-    data.data.rc = ImportHelper.IntValue(jsonData, "rc", 0);
-    data.data.accuracy = ImportHelper.IntValue(jsonData, "accuracy", 0);
-    data.data.technology.conceal.base = ImportHelper.IntValue(jsonData, "conceal", 0);
-    return data;
+  Parse(jsonData, item) {
+    item = super.Parse(jsonData, item);
+    item.system.type = "weapon";
+    item.system.mount_point = ImportHelper.StringValue(jsonData, "mount");
+    item.system.rc = ImportHelper.IntValue(jsonData, "rc", 0);
+    item.system.accuracy = ImportHelper.IntValue(jsonData, "accuracy", 0);
+    item.system.technology.conceal.base = ImportHelper.IntValue(jsonData, "conceal", 0);
+    return item;
   }
 };
 
@@ -21454,7 +21772,7 @@ var ModImporter = class extends DataImporter {
     return {
       name: "",
       type: "modification",
-      data: {
+      system: {
         description: {
           value: "",
           chat: "",
@@ -21486,17 +21804,17 @@ var ModImporter = class extends DataImporter {
         if (DataImporter.unsupportedEntry(jsonData)) {
           continue;
         }
-        let data = parser.Parse(jsonData, this.GetDefaultData());
-        data.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, data.name);
-        let folderName = data.data.mount_point !== void 0 ? data.data.mount_point : "Other";
+        let item = parser.Parse(jsonData, this.GetDefaultData());
+        item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
+        let folderName = item.system.mount_point !== void 0 ? item.system.mount_point : "Other";
         if (folderName.includes("/")) {
           let splitName = folderName.split("/");
           folderName = splitName[0];
         }
         let folder = yield ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Mods/${folderName}`, true);
-        data.folder = folder.id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        datas.push(data);
+        item.folder = folder.id;
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        datas.push(item);
       }
       return yield Item.create(datas);
     });
@@ -21505,139 +21823,139 @@ var ModImporter = class extends DataImporter {
 
 // src/module/importer/parser/spell/SpellParserBase.ts
 var SpellParserBase = class extends ItemParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data.name = ImportHelper.StringValue(jsonData, "name");
-    data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
-    data.data.category = ImportHelper.StringValue(jsonData, "category").toLowerCase();
+  Parse(jsonData, item, jsonTranslation) {
+    item.name = ImportHelper.StringValue(jsonData, "name");
+    item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
+    item.system.category = ImportHelper.StringValue(jsonData, "category").toLowerCase();
     let damage = ImportHelper.StringValue(jsonData, "damage");
     if (damage === "P") {
-      data.data.action.damage.type.base = "physical";
-      data.data.action.damage.type.value = "physical";
+      item.system.action.damage.type.base = "physical";
+      item.system.action.damage.type.value = "physical";
     } else if (damage === "S") {
-      data.data.action.damage.type.base = "stun";
-      data.data.action.damage.type.value = "stun";
+      item.system.action.damage.type.base = "stun";
+      item.system.action.damage.type.value = "stun";
     }
     let duration = ImportHelper.StringValue(jsonData, "duration");
     if (duration === "I") {
-      data.data.duration = "instant";
+      item.system.duration = "instant";
     } else if (duration === "S") {
-      data.data.duration = "sustained";
+      item.system.duration = "sustained";
     } else if (duration === "P") {
-      data.data.duration = "permanent";
+      item.system.duration = "permanent";
     }
     let drain = ImportHelper.StringValue(jsonData, "dv");
     if (drain.includes("+") || drain.includes("-")) {
-      data.data.drain = parseInt(drain.substring(1, drain.length));
+      item.system.drain = parseInt(drain.substring(1, drain.length));
     }
     let range = ImportHelper.StringValue(jsonData, "range");
     if (range === "T") {
-      data.data.range = "touch";
+      item.system.range = "touch";
     } else if (range === "LOS") {
-      data.data.range = "los";
+      item.system.range = "los";
     } else if (range === "LOS (A)") {
-      data.data.range = "los_a";
+      item.system.range = "los_a";
     }
     let type = ImportHelper.StringValue(jsonData, "type");
     if (type === "P") {
-      data.data.type = "physical";
+      item.system.type = "physical";
     } else if (type === "M") {
-      data.data.type = "mana";
+      item.system.type = "mana";
     }
     if (jsonTranslation) {
       const origName = ImportHelper.StringValue(jsonData, "name");
-      data.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-      data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+      item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
+      item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
     }
-    return data;
+    return item;
   }
 };
 
 // src/module/importer/parser/spell/CombatSpellParser.ts
 var CombatSpellParser = class extends SpellParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
     let descriptor = ImportHelper.StringValue(jsonData, "descriptor");
     if (descriptor === void 0) {
       descriptor = "";
     }
-    data.data.combat.type = descriptor.includes("Indirect") ? "indirect" : "direct";
-    return data;
+    item.system.combat.type = descriptor.includes("Indirect") ? "indirect" : "direct";
+    return item;
   }
 };
 
 // src/module/importer/parser/spell/ManipulationSpellParser.ts
 var ManipulationSpellParser = class extends SpellParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
     let descriptor = ImportHelper.StringValue(jsonData, "descriptor");
     if (descriptor === void 0) {
       descriptor = "";
     }
-    data.data.manipulation.environmental = descriptor.includes("Environmental");
-    data.data.manipulation.mental = descriptor.includes("Mental");
-    if (data.data.manipulation.mental) {
-      data.data.action.opposed.type = "custom";
-      data.data.action.opposed.attribute = "logic";
-      data.data.action.opposed.attribute2 = "willpower";
+    item.system.manipulation.environmental = descriptor.includes("Environmental");
+    item.system.manipulation.mental = descriptor.includes("Mental");
+    if (item.system.manipulation.mental) {
+      item.system.action.opposed.type = "custom";
+      item.system.action.opposed.attribute = "logic";
+      item.system.action.opposed.attribute2 = "willpower";
     }
-    data.data.manipulation.physical = descriptor.includes("Physical");
-    if (data.data.manipulation.physical) {
-      data.data.action.opposed.type = "custom";
-      data.data.action.opposed.attribute = "body";
-      data.data.action.opposed.attribute2 = "strength";
+    item.system.manipulation.physical = descriptor.includes("Physical");
+    if (item.system.manipulation.physical) {
+      item.system.action.opposed.type = "custom";
+      item.system.action.opposed.attribute = "body";
+      item.system.action.opposed.attribute2 = "strength";
     }
-    data.data.manipulation.damaging = descriptor.includes("Damaging");
-    if (data.data.manipulation.damaging) {
-      data.data.action.opposed.type = "soak";
+    item.system.manipulation.damaging = descriptor.includes("Damaging");
+    if (item.system.manipulation.damaging) {
+      item.system.action.opposed.type = "soak";
     }
-    return data;
+    return item;
   }
 };
 
 // src/module/importer/parser/spell/IllusionSpellParser.ts
 var IllusionSpellParser = class extends SpellParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
     let descriptor = ImportHelper.StringValue(jsonData, "descriptor");
     if (descriptor === void 0) {
       descriptor = "";
     }
-    if (data.data.type === "mana") {
-      data.data.action.opposed.type = "custom";
-      data.data.action.opposed.attribute = "logic";
-      data.data.action.opposed.attribute2 = "willpower";
-    } else if (data.data.type === "physical") {
-      data.data.action.opposed.type = "custom";
-      data.data.action.opposed.attribute = "intuition";
-      data.data.action.opposed.attribute2 = "logic";
+    if (item.system.type === "mana") {
+      item.system.action.opposed.type = "custom";
+      item.system.action.opposed.attribute = "logic";
+      item.system.action.opposed.attribute2 = "willpower";
+    } else if (item.system.type === "physical") {
+      item.system.action.opposed.type = "custom";
+      item.system.action.opposed.attribute = "intuition";
+      item.system.action.opposed.attribute2 = "logic";
     }
-    return data;
+    return item;
   }
 };
 
 // src/module/importer/parser/spell/DetectionSpellImporter.ts
 var DetectionSpellImporter = class extends SpellParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
     let descriptor = ImportHelper.StringValue(jsonData, "descriptor");
     if (descriptor === void 0) {
       descriptor = "";
     }
-    data.data.detection.passive = descriptor.includes("Passive");
-    if (!data.data.detection.passive) {
-      data.data.action.opposed.type = "custom";
-      data.data.action.opposed.attribute = "willpower";
-      data.data.action.opposed.attribute2 = "logic";
+    item.system.detection.passive = descriptor.includes("Passive");
+    if (!item.system.detection.passive) {
+      item.system.action.opposed.type = "custom";
+      item.system.action.opposed.attribute = "willpower";
+      item.system.action.opposed.attribute2 = "logic";
     }
-    data.data.detection.extended = descriptor.includes("Extended");
+    item.system.detection.extended = descriptor.includes("Extended");
     if (descriptor.includes("Psychic")) {
-      data.data.detection.type = "psychic";
+      item.system.detection.type = "psychic";
     } else if (descriptor.includes("Directional")) {
-      data.data.detection.type = "directional";
+      item.system.detection.type = "directional";
     } else if (descriptor.includes("Area")) {
-      data.data.detection.type = "area";
+      item.system.detection.type = "area";
     }
-    return data;
+    return item;
   }
 };
 
@@ -21654,7 +21972,7 @@ var SpellImporter = class extends DataImporter {
     return {
       name: "Unnamed Item",
       type: "spell",
-      data: {
+      system: {
         description: {
           value: "",
           chat: "",
@@ -21713,35 +22031,35 @@ var SpellImporter = class extends DataImporter {
         { key: "Enchantments", value: new SpellParserBase() },
         { key: "Rituals", value: new SpellParserBase() }
       ]);
-      let datas = [];
+      let items = [];
       let jsonDatas = jsonObject["spells"]["spell"];
       for (let i = 0; i < jsonDatas.length; i++) {
         let jsonData = jsonDatas[i];
         if (DataImporter.unsupportedEntry(jsonData)) {
           continue;
         }
-        let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
-        data.folder = folders[data.data.category].id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        datas.push(data);
+        let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+        item.folder = folders[item.system.category].id;
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        items.push(item);
       }
-      return yield Item.create(datas);
+      return yield Item.create(items);
     });
   }
 };
 
 // src/module/importer/parser/quality/QualityParserBase.ts
 var QualityParserBase = class extends ItemParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data.name = ImportHelper.StringValue(jsonData, "name");
-    data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
-    data.data.type = ImportHelper.StringValue(jsonData, "category") === "Positive" ? "positive" : "negative";
+  Parse(jsonData, item, jsonTranslation) {
+    item.name = ImportHelper.StringValue(jsonData, "name");
+    item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
+    item.system.type = ImportHelper.StringValue(jsonData, "category") === "Positive" ? "positive" : "negative";
     if (jsonTranslation) {
       const origName = ImportHelper.StringValue(jsonData, "name");
-      data.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-      data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+      item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
+      item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
     }
-    return data;
+    return item;
   }
 };
 
@@ -21758,7 +22076,7 @@ var QualityImporter = class extends DataImporter {
     return {
       name: "Unnamed Quality",
       type: "quality",
-      data: {
+      system: {
         description: {
           value: "",
           chat: "",
@@ -21784,41 +22102,41 @@ var QualityImporter = class extends DataImporter {
       const jsonNameTranslations = {};
       const folders = yield ImportHelper.MakeCategoryFolders(jsonObject, "Qualities", this.categoryTranslations);
       const parser = new QualityParserBase();
-      let datas = [];
+      let items = [];
       let jsonDatas = jsonObject["qualities"]["quality"];
       for (let i = 0; i < jsonDatas.length; i++) {
         let jsonData = jsonDatas[i];
         if (DataImporter.unsupportedEntry(jsonData)) {
           continue;
         }
-        let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+        let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
         let category = ImportHelper.StringValue(jsonData, "category");
-        data.folder = folders[category.toLowerCase()].id;
-        data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        datas.push(data);
+        item.folder = folders[category.toLowerCase()].id;
+        item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        items.push(item);
       }
-      return yield Item.create(datas);
+      return yield Item.create(items);
     });
   }
 };
 
 // src/module/importer/parser/complex-form/ComplexFormParserBase.ts
 var ComplexFormParserBase = class extends ItemParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data.name = ImportHelper.StringValue(jsonData, "name");
-    data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
+  Parse(jsonData, item, jsonTranslation) {
+    item.name = ImportHelper.StringValue(jsonData, "name");
+    item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
     let fade = ImportHelper.StringValue(jsonData, "fv");
     if (fade.includes("+") || fade.includes("-")) {
-      data.data.fade = parseInt(fade.substring(1, fade.length));
+      item.system.fade = parseInt(fade.substring(1, fade.length));
     }
     let duration = ImportHelper.StringValue(jsonData, "duration");
     if (duration === "I") {
-      data.data.duration = "instant";
+      item.system.duration = "instant";
     } else if (duration === "S") {
-      data.data.duration = "sustained";
+      item.system.duration = "sustained";
     } else if (duration === "P") {
-      data.data.duration = "permanent";
+      item.system.duration = "permanent";
     }
     let target = ImportHelper.StringValue(jsonData, "target");
     switch (target) {
@@ -21828,18 +22146,18 @@ var ComplexFormParserBase = class extends ItemParserBase {
       case "Persona":
       case "Self":
       case "Sprite":
-        data.data.target = target.toLowerCase();
+        item.system.target = target.toLowerCase();
         break;
       default:
-        data.data.target = "other";
+        item.system.target = "other";
         break;
     }
     if (jsonTranslation) {
       const origName = ImportHelper.StringValue(jsonData, "name");
-      data.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-      data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+      item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
+      item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
     }
-    return data;
+    return item;
   }
 };
 
@@ -21856,7 +22174,7 @@ var ComplexFormImporter = class extends DataImporter {
     return {
       name: "Unnamed Form",
       type: "complex_form",
-      data: {
+      system: {
         description: {
           value: "",
           chat: "",
@@ -21884,37 +22202,37 @@ var ComplexFormImporter = class extends DataImporter {
     return __async(this, null, function* () {
       const parser = new ComplexFormParserBase();
       const folder = yield ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
-      let datas = [];
+      let items = [];
       let jsonDatas = jsonObject["complexforms"]["complexform"];
       for (let i = 0; i < jsonDatas.length; i++) {
         let jsonData = jsonDatas[i];
         if (DataImporter.unsupportedEntry(jsonData)) {
           continue;
         }
-        let data = parser.Parse(jsonData, this.GetDefaultData(), this.nameTranslations);
-        data.folder = folder.id;
-        data.name = ImportHelper.MapNameToTranslation(this.nameTranslations, data.name);
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        datas.push(data);
+        let item = parser.Parse(jsonData, this.GetDefaultData(), this.nameTranslations);
+        item.folder = folder.id;
+        item.name = ImportHelper.MapNameToTranslation(this.nameTranslations, item.name);
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        items.push(item);
       }
-      return yield Item.create(datas);
+      return yield Item.create(items);
     });
   }
 };
 
 // src/module/importer/parser/ware/CyberwareParser.ts
 var CyberwareParser = class extends TechnologyItemParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data = super.Parse(jsonData, data, jsonTranslation);
+  Parse(jsonData, item, jsonTranslation) {
+    item = super.Parse(jsonData, item, jsonTranslation);
     const essence = ImportHelper.StringValue(jsonData, "ess", "0").match(/[0-9]\.?[0-9]*/g);
     if (essence !== null) {
-      data.data.essence = parseFloat(essence[0]);
+      item.system.essence = parseFloat(essence[0]);
     }
     const capacity = ImportHelper.StringValue(jsonData, "capacity", "0").match(/[0-9]+/g);
     if (capacity !== null) {
-      data.data.capacity = parseInt(capacity[0]);
+      item.system.capacity = parseInt(capacity[0]);
     }
-    return data;
+    return item;
   }
 };
 
@@ -21937,7 +22255,7 @@ var WareImporter = class extends DataImporter {
     return {
       name: "Unnamed Form",
       type: "cyberware",
-      data: {
+      system: {
         description: {
           value: "",
           chat: "",
@@ -21977,7 +22295,7 @@ var WareImporter = class extends DataImporter {
       let key = jsonObject.hasOwnProperty("cyberwares") ? "Cyberware" : "Bioware";
       const folders = yield ImportHelper.MakeCategoryFolders(jsonObject, key);
       key = key.toLowerCase();
-      let datas = [];
+      let items = [];
       let jsonDatas = jsonObject[key + "s"][key];
       for (let i = 0; i < jsonDatas.length; i++) {
         let jsonData = jsonDatas[i];
@@ -21985,59 +22303,59 @@ var WareImporter = class extends DataImporter {
           continue;
         }
         const defaultData = key === "cyberware" ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
-        let data = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
+        let item = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
         const category = ImportHelper.StringValue(jsonData, "category");
-        data.folder = folders[category.toLowerCase()].id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        datas.push(data);
+        item.folder = folders[category.toLowerCase()].id;
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        items.push(item);
       }
-      return yield Item.create(datas);
+      return yield Item.create(items);
     });
   }
 };
 
 // src/module/importer/parser/critter-power/CritterPowerParserBase.ts
 var CritterPowerParserBase = class extends ItemParserBase {
-  Parse(jsonData, data, jsonTranslation) {
-    data.name = ImportHelper.StringValue(jsonData, "name");
-    data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
-    data.data.category = ImportHelper.StringValue(jsonData, "category").toLowerCase();
+  Parse(jsonData, item, jsonTranslation) {
+    item.name = ImportHelper.StringValue(jsonData, "name");
+    item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.StringValue(jsonData, "page")}`;
+    item.system.category = ImportHelper.StringValue(jsonData, "category").toLowerCase();
     let duration = ImportHelper.StringValue(jsonData, "duration");
     if (duration === "Always") {
-      data.data.duration = "always";
+      item.system.duration = "always";
     } else if (duration === "Instant") {
-      data.data.duration = "instant";
+      item.system.duration = "instant";
     } else if (duration === "Sustained") {
-      data.data.duration = "sustained";
+      item.system.duration = "sustained";
     } else if (duration === "Permanent") {
-      data.data.duration = "permanent";
+      item.system.duration = "permanent";
     } else {
-      data.data.duration = "special";
+      item.system.duration = "special";
     }
     let range = ImportHelper.StringValue(jsonData, "range");
     if (range === "T") {
-      data.data.range = "touch";
+      item.system.range = "touch";
     } else if (range === "LOS") {
-      data.data.range = "los";
+      item.system.range = "los";
     } else if (range === "LOS (A)") {
-      data.data.range = "los_a";
+      item.system.range = "los_a";
     } else if (range === "Self") {
-      data.data.range = "self";
+      item.system.range = "self";
     } else {
-      data.data.range = "special";
+      item.system.range = "special";
     }
     let type = ImportHelper.StringValue(jsonData, "type");
     if (type === "P") {
-      data.data.powerType = "physical";
+      item.system.powerType = "physical";
     } else if (type === "M") {
-      data.data.powerType = "mana";
+      item.system.powerType = "mana";
     }
     if (jsonTranslation) {
       const origName = ImportHelper.StringValue(jsonData, "name");
-      data.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-      data.data.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+      item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
+      item.system.description.source = `${ImportHelper.StringValue(jsonData, "source")} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
     }
-    return data;
+    return item;
   }
 };
 
@@ -22054,7 +22372,7 @@ var CritterPowerImporter = class extends DataImporter {
     return {
       name: "Unnamed Item",
       type: "critter_power",
-      data: {
+      system: {
         description: {
           value: "",
           chat: "",
@@ -22092,17 +22410,17 @@ var CritterPowerImporter = class extends DataImporter {
     return __async(this, null, function* () {
       const parser = new CritterPowerParserBase();
       const folder = yield ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
-      let datas = [];
+      let items = [];
       let jsonDatas = jsonObject["powers"]["power"];
       for (let i = 0; i < jsonDatas.length; i++) {
         let jsonData = jsonDatas[i];
-        let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
-        data.folder = folder.id;
-        data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        datas.push(data);
+        let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+        item.folder = folder.id;
+        item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        items.push(item);
       }
-      return yield Item.create(datas);
+      return yield Item.create(items);
     });
   }
 };
@@ -22133,56 +22451,56 @@ var DeviceImporter = class extends DataImporter {
       if (DataImporter.unsupportedEntry(commlink)) {
         continue;
       }
-      const data = this.GetDefaultData();
-      data.name = ImportHelper.StringValue(commlink, "name");
-      data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
-      data.data.description.source = `${ImportHelper.StringValue(commlink, "source")} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(commlink, "name"), ImportHelper.StringValue(commlink, "page"))}`;
-      data.data.technology.rating = ImportHelper.IntValue(commlink, "devicerating", 0);
-      data.data.technology.availability = ImportHelper.StringValue(commlink, "avail");
-      data.data.technology.cost = ImportHelper.IntValue(commlink, "cost", 0);
-      data.data.atts.att3.value = ImportHelper.IntValue(commlink, "dataprocessing", 0);
-      data.data.atts.att4.value = ImportHelper.IntValue(commlink, "firewall", 0);
-      data.folder = folder.id;
-      Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-      entries.push(data);
+      const item = this.GetDefaultData();
+      item.name = ImportHelper.StringValue(commlink, "name");
+      item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+      item.system.description.source = `${ImportHelper.StringValue(commlink, "source")} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(commlink, "name"), ImportHelper.StringValue(commlink, "page"))}`;
+      item.system.technology.rating = ImportHelper.IntValue(commlink, "devicerating", 0);
+      item.system.technology.availability = ImportHelper.StringValue(commlink, "avail");
+      item.system.technology.cost = ImportHelper.IntValue(commlink, "cost", 0);
+      item.system.atts.att3.value = ImportHelper.IntValue(commlink, "dataprocessing", 0);
+      item.system.atts.att4.value = ImportHelper.IntValue(commlink, "firewall", 0);
+      item.folder = folder.id;
+      Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+      entries.push(item);
     }
     return entries;
   }
   ParseCyberdeckDevices(cyberdecks, folder) {
-    const entries = [];
+    const items = [];
     for (const cyberdeck of cyberdecks) {
       if (DataImporter.unsupportedEntry(cyberdeck)) {
         continue;
       }
-      const data = this.GetDefaultData();
-      data.data.category = "cyberdeck";
-      data.name = ImportHelper.StringValue(cyberdeck, "name");
-      data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
-      data.data.description.source = `${ImportHelper.StringValue(cyberdeck, "source")} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(cyberdeck, "name"), ImportHelper.StringValue(cyberdeck, "page"))}`;
-      data.data.technology.rating = ImportHelper.IntValue(cyberdeck, "devicerating", 0);
-      data.data.technology.availability = ImportHelper.StringValue(cyberdeck, "avail");
-      data.data.technology.cost = ImportHelper.IntValue(cyberdeck, "cost", 0);
+      const item = this.GetDefaultData();
+      item.system.category = "cyberdeck";
+      item.name = ImportHelper.StringValue(cyberdeck, "name");
+      item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+      item.system.description.source = `${ImportHelper.StringValue(cyberdeck, "source")} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(cyberdeck, "name"), ImportHelper.StringValue(cyberdeck, "page"))}`;
+      item.system.technology.rating = ImportHelper.IntValue(cyberdeck, "devicerating", 0);
+      item.system.technology.availability = ImportHelper.StringValue(cyberdeck, "avail");
+      item.system.technology.cost = ImportHelper.IntValue(cyberdeck, "cost", 0);
       if (cyberdeck.hasOwnProperty("attributearray")) {
         const attributeOrder = ImportHelper.StringValue(cyberdeck, "attributearray").split(",");
         const att1 = Number(attributeOrder[0]);
         const att2 = Number(attributeOrder[1]);
         const att3 = Number(attributeOrder[2]);
         const att4 = Number(attributeOrder[3]);
-        data.data.atts.att1.value = att1;
-        data.data.atts.att2.value = att2;
-        data.data.atts.att3.value = att3;
-        data.data.atts.att4.value = att4;
+        item.system.atts.att1.value = att1;
+        item.system.atts.att2.value = att2;
+        item.system.atts.att3.value = att3;
+        item.system.atts.att4.value = att4;
       } else if (cyberdeck.hasOwnProperty("attack")) {
-        data.data.atts.att1.value = ImportHelper.IntValue(cyberdeck, "attack", 0);
-        data.data.atts.att2.value = ImportHelper.IntValue(cyberdeck, "sleaze", 0);
-        data.data.atts.att3.value = ImportHelper.IntValue(cyberdeck, "dataprocessing", 0);
-        data.data.atts.att4.value = ImportHelper.IntValue(cyberdeck, "firewall", 0);
+        item.system.atts.att1.value = ImportHelper.IntValue(cyberdeck, "attack", 0);
+        item.system.atts.att2.value = ImportHelper.IntValue(cyberdeck, "sleaze", 0);
+        item.system.atts.att3.value = ImportHelper.IntValue(cyberdeck, "dataprocessing", 0);
+        item.system.atts.att4.value = ImportHelper.IntValue(cyberdeck, "firewall", 0);
       }
-      data.folder = folder.id;
-      Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-      entries.push(data);
+      item.folder = folder.id;
+      Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+      items.push(item);
     }
-    return entries;
+    return items;
   }
   Parse(jsonObject) {
     return __async(this, null, function* () {
@@ -22229,25 +22547,25 @@ var EquipmentImporter = class extends DataImporter {
   }
   ParseEquipments(equipments) {
     return __async(this, null, function* () {
-      const entries = [];
+      const items = [];
       for (const equipment of equipments) {
         if (DataImporter.unsupportedEntry(equipment)) {
           continue;
         }
         const category = ImportHelper.TranslateCategory(ImportHelper.StringValue(equipment, "category"), this.categoryTranslations).replace("/", " ");
         let categoryFolder = yield ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize("SR5.Gear")}/${category}`, true);
-        const data = this.GetDefaultData();
-        data.name = ImportHelper.StringValue(equipment, "name");
-        data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
-        data.data.description.source = `${ImportHelper.StringValue(equipment, "source")} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(equipment, "name"), ImportHelper.StringValue(equipment, "page"))}`;
-        data.data.technology.rating = ImportHelper.IntValue(equipment, "rating", 0);
-        data.data.technology.availability = ImportHelper.StringValue(equipment, "avail");
-        data.data.technology.cost = ImportHelper.IntValue(equipment, "cost", 0);
-        data.folder = categoryFolder.id;
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
-        entries.push(data);
+        const item = this.GetDefaultData();
+        item.name = ImportHelper.StringValue(equipment, "name");
+        item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+        item.system.description.source = `${ImportHelper.StringValue(equipment, "source")} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(equipment, "name"), ImportHelper.StringValue(equipment, "page"))}`;
+        item.system.technology.rating = ImportHelper.IntValue(equipment, "rating", 0);
+        item.system.technology.availability = ImportHelper.StringValue(equipment, "avail");
+        item.system.technology.cost = ImportHelper.IntValue(equipment, "cost", 0);
+        item.folder = categoryFolder.id;
+        Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+        items.push(item);
       }
-      return entries;
+      return items;
     });
   }
   FilterJsonObjects(jsonObject) {
@@ -22264,8 +22582,8 @@ var EquipmentImporter = class extends DataImporter {
   Parse(jsonObject) {
     return __async(this, null, function* () {
       const equipments = this.FilterJsonObjects(jsonObject);
-      const entries = yield this.ParseEquipments(equipments);
-      return yield Item.create(entries);
+      const items = yield this.ParseEquipments(equipments);
+      return yield Item.create(items);
     });
   }
 };
@@ -22449,41 +22767,32 @@ var ChangelogApplication = class extends Application {
   }
 };
 
-// src/module/apps/EnvModifiersApplication.ts
-var EnvModifiersApplication = class extends Application {
-  constructor(target) {
-    super();
-    this.target = target;
+// src/module/apps/SituationModifiersApplication.ts
+var ModifiersHandler = class {
+  constructor(situationModifiersApp) {
+    this.app = situationModifiersApp;
   }
-  get template() {
-    return "systems/shadowrun5e/dist/templates/apps/env-modifiers.html";
+  static addTokenHUDElements(modifierColumn, tokenId, actor, modifiers) {
+    console.error(`Shadowrun5e | Class ${this.constructor.name} must implement static method onRenderTokenHUD`);
   }
-  static get defaultOptions() {
-    const options = super.defaultOptions;
-    options.classes = ["sr5", "form-dialog"];
-    options.id = "env-modifiers-application";
-    options.title = game.i18n.localize("SR5.EnvModifiersApplication.Title");
-    options.width = "auto";
-    options.height = "auto";
-    options.resizable = true;
-    return options;
-  }
+};
+var EnvironmentalModifiersHandler = class extends ModifiersHandler {
   getData(options) {
-    return __async(this, null, function* () {
-      const data = __superGet(EnvModifiersApplication.prototype, this, "getData").call(this, options);
-      this.modifiers = yield this._getModifiers();
-      data.active = this.modifiers.environmental.active;
-      data.total = this.modifiers.environmental.total;
-      data.levels = Modifiers.getEnvironmentalModifierLevels();
-      data.targetType = this._getTargetTypeLabel();
-      data.targetName = this.target.name;
-      data.disableForm = this._disableInputsForUser();
-      return data;
-    });
+    return {};
   }
   activateListeners(html) {
+    console.log(`Shadowrun5e | Registering modifier handler ${this.constructor.name} listeners`);
     $(html).find("button.env-modifier").on("click", this._handleModifierChange.bind(this));
-    $(html).find("button.remove-modifiers-from-target").on("click", this._handleRemoveModifiersFromTarget.bind(this));
+  }
+  static addTokenHUDElements(modifierColumn, tokenId, actor, modifiers) {
+    console.log(`${SYSTEM_NAME} | Environmental modifier HUD on renderTokenHUD`);
+    const modifier = $('<div class="modifier-row"></div>');
+    const modifierValue = $(`<div class="modifier-value modifier-value-matrix">${modifiers.environmental.applied.total}</div>`);
+    const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Environmental")}</div>`);
+    modifierDescription.on("click", SituationModifiersApplication.openForTokenHUD(tokenId, "environmental"));
+    modifierColumn.append(modifier);
+    modifier.append(modifierValue);
+    modifier.append(modifierDescription);
   }
   _handleModifierChange(event) {
     return __async(this, null, function* () {
@@ -22493,64 +22802,182 @@ var EnvModifiersApplication = class extends Application {
         return;
       const category = element.dataset.category;
       const value = Number(element.dataset.value);
-      this._toggleActiveModifierCategory(category, value);
-      yield this._clearModifiersOnTargetForNoSelection();
-      yield this._storeModifiersOnTarget();
-      this._updateTokenHUDTotalDisplay();
-      yield this.render();
+      this.app.modifiers.environmental.toggleSelection(category, value);
+      yield this.app.modifiers.updateDocument();
+      yield this.app.render();
     });
-  }
-  _updateTokenHUDTotalDisplay() {
-    if (this.target instanceof SR5Actor) {
-      $(".modifier-value-environmental").each((index, element) => {
-        $(element).html(this.modifiers.environmental.total.toString());
-      });
-    }
   }
   _handleRemoveModifiersFromTarget(event) {
     return __async(this, null, function* () {
       event.preventDefault();
+      this.app.modifiers.environmental.clear();
       yield this.clearModifiersOnTarget();
-      this._updateTokenHUDTotalDisplay();
-      yield this.render();
-    });
-  }
-  _toggleActiveModifierCategory(category, level) {
-    this.modifiers.toggleEnvironmentalCategory(category, level);
-  }
-  _getModifiers() {
-    return __async(this, null, function* () {
-      if (this.target instanceof SR5Actor) {
-        return yield this.target.getModifiers();
-      }
-      return Modifiers.getModifiersFromEntity(this.target);
-    });
-  }
-  _storeModifiersOnTarget() {
-    return __async(this, null, function* () {
-      yield Modifiers.setModifiersOnEntity(this.target, this.modifiers.data);
-    });
-  }
-  _clearModifiersOnTargetForNoSelection() {
-    return __async(this, null, function* () {
-      if (!this.modifiers.hasActiveEnvironmental) {
-        this.modifiers = yield Modifiers.clearEnvironmentalOnEntity(this.target);
-      }
-    });
-  }
-  _targetHasEnvironmentalModifiers() {
-    return __async(this, null, function* () {
-      const modifiers = Modifiers.getModifiersFromEntity(this.target);
-      return !!modifiers.environmental;
+      yield this.app.render();
     });
   }
   clearModifiersOnTarget() {
     return __async(this, null, function* () {
-      yield Modifiers.clearEnvironmentalOnEntity(this.target);
-      this.modifiers = yield this._getModifiers();
+      yield DocumentSituationModifiers.clearEnvironmentalOn(this.app.target);
+      this.app.modifiers = this.app._getModifiers();
     });
   }
-  _getTargetTypeLabel() {
+  _updateTokenHUDTotalDisplay() {
+    console.error("FIXME: TokenHUD Update is disabled");
+  }
+};
+var MatrixModifiersHandler = class extends ModifiersHandler {
+  getData(options) {
+    return {};
+  }
+  activateListeners(html) {
+  }
+  static addTokenHUDElements(modifierColumn, tokenId, actor, modifiers) {
+    console.log(`${SYSTEM_NAME} | Matrix modifier HUD on renderTokenHUD`);
+    const modifier = $('<div class="modifier-row"></div>');
+    const modifierValue = $(`<div class="modifier-value modifier-value-matrix">${modifiers.noise.applied.total}</div>`);
+    const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Matrix")}</div>`);
+    modifierDescription.on("click", SituationModifiersApplication.openForTokenHUD(tokenId, "matrix"));
+    modifierColumn.append(modifier);
+    modifier.append(modifierValue);
+    modifier.append(modifierDescription);
+  }
+};
+var MagicModifiersHandler = class extends ModifiersHandler {
+  getData(options) {
+    return {};
+  }
+  activateListeners(html) {
+    html.find(".remove-magical-from-target").on("click", this.handleClearMagicModifiers.bind(this));
+  }
+  static addTokenHUDElements(modifierColumn, tokenId, actor, modifiers) {
+    console.log(`${SYSTEM_NAME} | Magic modifier HUD on renderTokenHUD`);
+    if (!actor.isAwakened)
+      return;
+    const modifier = $('<div class="modifier-row"></div>');
+    const modifierValue = $(`<div class="modifier-value modifier-value-magic">${modifiers.background_count.applied.total}</div>`);
+    const modifierDescription = $(`<div class="modifier-description open-magic-modifier">${game.i18n.localize("SR5.ModifierTypes.Magic")}</div>`);
+    modifierDescription.on("click", SituationModifiersApplication.openForTokenHUD(tokenId, "magic"));
+    modifierColumn.append(modifier);
+    modifier.append(modifierValue);
+    modifier.append(modifierDescription);
+  }
+  handleClearMagicModifiers(event) {
+    return __async(this, null, function* () {
+      event.preventDefault();
+      this.app.modifiers = yield DocumentSituationModifiers.clearCategoryOnDocument(this.app.target, "background_count");
+      this.app.render();
+    });
+  }
+};
+var _SituationModifiersApplication = class extends FormApplication {
+  constructor(target) {
+    super(target);
+    this.target = target;
+    this.modifiers = this._getModifiers();
+    this.handlers = this._prepareHandlers();
+  }
+  _prepareHandlers() {
+    return _SituationModifiersApplication._staticHandlers.map((staticHandler) => new staticHandler(this));
+  }
+  get template() {
+    return "systems/shadowrun5e/dist/templates/apps/situational-modifiers.hbs";
+  }
+  static get defaultOptions() {
+    const options = super.defaultOptions;
+    options.classes = ["sr5"];
+    options.id = "situational-modifiers-application";
+    options.title = game.i18n.localize("SR5.SituationalModifiersApplication.Title");
+    options.width = "auto";
+    options.height = "auto";
+    options.resizable = false;
+    options.tabs = [
+      {
+        navSelector: ".tabs",
+        contentSelector: ".sheetbody",
+        initial: _SituationModifiersApplication._defaultTabId
+      }
+    ];
+    options.submitOnChange = true;
+    options.closeOnSubmit = false;
+    return options;
+  }
+  getData(options) {
+    return __async(this, null, function* () {
+      this.modifiers.applyAll();
+      return __spreadProps(__spreadValues({}, yield __superGet(_SituationModifiersApplication.prototype, this, "getData").call(this, options)), {
+        targetType: this._targetTypeLabel,
+        targetName: this.target.name || "Unkown target",
+        modifiers: this.modifiers,
+        environmentalLevels: this.modifiers.environmental.levels
+      });
+    });
+  }
+  activateListeners(html) {
+    super.activateListeners(html);
+    this.handlers.forEach((handler) => handler.activateListeners(html));
+    html.find(".form-group-element-numerical button").on("click", this.applyModifierDelta.bind(this));
+    html.find(".remove-modifiers-from-target").on("click", this.clearModifierData.bind(this));
+    html.find(".remove-token-modifiers-from-scene").on("click", this.clearTokenModifiersData.bind(this));
+  }
+  applyModifierDelta(event) {
+    return __async(this, null, function* () {
+      var _a;
+      event.preventDefault();
+      const triggerElement = event.target;
+      if (!triggerElement || !triggerElement.dataset.hasOwnProperty("delta"))
+        return console.error("Shadowrun5e | Expected a DOMElement with a different structure");
+      const delta = Number(triggerElement.dataset["delta"]);
+      if (delta === 0)
+        return;
+      const valueElement = $(triggerElement).siblings().closest("input");
+      if (!valueElement || !valueElement.attr("name"))
+        return console.error("Shadowrun5e | Expected a DOMElement with a name attribute");
+      const sourceKey = valueElement.attr("name");
+      const appliedKey = sourceKey.includes("source") ? sourceKey.replace("source", "applied") : sourceKey;
+      const currentValue = (_a = foundry.utils.getProperty(this, appliedKey)) != null ? _a : 0;
+      if (isNaN(currentValue))
+        return console.error("Shadowrun5e | Expected data property is not a number", sourceKey, currentValue);
+      const value = currentValue + delta;
+      const formData = {
+        [sourceKey]: value
+      };
+      yield this._updateObject(event, formData);
+      this.modifiers.applyAll();
+      this.render();
+    });
+  }
+  clearModifierData() {
+    return __async(this, null, function* () {
+      yield this.modifiers.clearAll();
+      this.render(true);
+    });
+  }
+  clearTokenModifiersData() {
+    return __async(this, null, function* () {
+      yield this.modifiers.clearAllTokensOnScene();
+      this.render(true);
+    });
+  }
+  _updateObject(event, formData) {
+    return __async(this, null, function* () {
+      if (!formData)
+        return;
+      for (const [key, value] of Object.entries(formData)) {
+        foundry.utils.setProperty(this, key, value);
+      }
+      yield DocumentSituationModifiers.setDocumentModifiers(this.target, this.modifiers.source);
+    });
+  }
+  _onChangeInput(event) {
+    return __async(this, null, function* () {
+      yield __superGet(_SituationModifiersApplication.prototype, this, "_onChangeInput").call(this, event);
+      this.render(true);
+    });
+  }
+  _getModifiers() {
+    return DocumentSituationModifiers.fromDocument(this.target);
+  }
+  get _targetTypeLabel() {
     if (this.target instanceof Scene) {
       return game.i18n.localize("DOCUMENT.Scene");
     }
@@ -22559,61 +22986,72 @@ var EnvModifiersApplication = class extends Application {
     }
     return "";
   }
-  _disableInputsForUser() {
-    var _a;
-    if (!game.user)
-      return false;
-    return !(((_a = game.user) == null ? void 0 : _a.isGM) || this.target.testUserPermission(game.user, "OWNER"));
+  static getControl() {
+    return {
+      name: "situational-modifiers-application",
+      title: "CONTROLS.SR5.SituationalModifiers",
+      icon: "fas fa-list",
+      onClick: _SituationModifiersApplication.openForCurrentScene,
+      button: true
+    };
+  }
+  static onRenderTokenHUD(app, html, data) {
+    if (!data._id)
+      return;
+    const token = Helpers.getToken(data._id);
+    if (!token)
+      return;
+    const actor = token.actor;
+    const modifiers = actor.getSituationModifiers();
+    modifiers.applyAll();
+    const container = $('<div class="col far-right sr-modifier-container"></div>');
+    const column = $('<div class="col modifier-column"></div>');
+    container.append(column);
+    html.find(".col.right").after(container);
+    _SituationModifiersApplication._staticHandlers.forEach((handler) => handler.addTokenHUDElements(column, data._id, actor, modifiers));
   }
   static openForCurrentScene() {
-    return __async(this, null, function* () {
-      if (!canvas || !canvas.ready || !canvas.scene)
-        return;
-      yield new EnvModifiersApplication(canvas.scene).render(true);
-    });
+    if (!canvas || !canvas.ready || !canvas.scene)
+      return;
+    new _SituationModifiersApplication(canvas.scene).render(true);
   }
-  static openForTokenHUD(tokenId) {
+  static openForTokenHUD(tokenId, tab) {
     const token = Helpers.getToken(tokenId);
     return (event) => __async(this, null, function* () {
       event.preventDefault();
       if (!token || !token.actor)
         return;
-      yield new EnvModifiersApplication(token.actor).render(true);
+      const app = new _SituationModifiersApplication(token.actor);
+      yield app._render(true);
     });
   }
-  static getControl() {
-    return {
-      name: "environmental-modifiers-application",
-      title: "CONTROLS.SR5.EnvironmentalModifiers",
-      icon: "fas fa-list",
-      onClick: EnvModifiersApplication.openForCurrentScene,
-      button: true
-    };
-  }
-  static addTokenHUDFields(app, html, data) {
-    return __async(this, null, function* () {
-      if (!data._id)
-        return;
-      console.log(`${SYSTEM_NAME} | Environmental Modifier HUD on renderTokenHUD`);
-      const token = Helpers.getToken(data._id);
-      if (!token)
-        return;
-      const actor = token.actor;
-      const modifiers = yield actor.getModifiers();
-      const container = $('<div class="col far-right sr-modifier-container"></div>');
-      const column = $('<div class="col modifier-column"></div>');
-      const modifier = $('<div class="modifier-row"></div>');
-      const modifierValue = $(`<div class="modifier-value modifier-value-environmental">${modifiers.environmental.total}</div>`);
-      const modifierDescription = $(`<div class="modifier-description open-environmental-modifier">${game.i18n.localize("SR5.EnvironmentModifier")}</div>`);
-      modifierDescription.on("click", EnvModifiersApplication.openForTokenHUD(data._id));
-      container.append(column);
-      column.append(modifier);
-      modifier.append(modifierValue);
-      modifier.append(modifierDescription);
-      html.find(".col.right").after(container);
-    });
+  static openForKeybinding() {
+    var _a, _b;
+    console.debug(`Shadowrun 5e | Trying to open ${this.name}`);
+    let document2 = null;
+    const controlledActors = Helpers.getControlledTokenActors();
+    if (controlledActors.length === 1)
+      document2 = controlledActors[0];
+    if (!document2 && ((_a = game.user) == null ? void 0 : _a.isGM)) {
+      document2 = canvas.scene;
+    }
+    if (!document2) {
+      document2 = (_b = game.user) == null ? void 0 : _b.character;
+    }
+    if (!document2)
+      return console.debug(`Shadowrun 5e | ...aborting, as no suitable document could be found`);
+    console.debug(`Shadowrun 5e | ...opening with document ${document2.uuid}`, document2);
+    const app = new _SituationModifiersApplication(document2);
+    app.render(true);
   }
 };
+var SituationModifiersApplication = _SituationModifiersApplication;
+SituationModifiersApplication._staticHandlers = [
+  MatrixModifiersHandler,
+  MagicModifiersHandler,
+  EnvironmentalModifiersHandler
+];
+SituationModifiersApplication._defaultTabId = "physical";
 
 // src/module/apps/skills/SkillEditSheet.ts
 var SkillEditSheet = class extends DocumentSheet {
@@ -23124,7 +23562,7 @@ var parseTechnology = (chummerEntry) => {
   }
   return parsedTechnology;
 };
-var createItemData = (name, type, data) => {
+var createItemData = (name, type, system) => {
   return {
     name,
     _id: "",
@@ -23132,7 +23570,7 @@ var createItemData = (name, type, data) => {
     flags: {},
     img: "icons/svg/mystery-man.svg",
     type,
-    data,
+    system,
     permission: {
       default: 2
     }
@@ -23147,15 +23585,15 @@ var BaseGearParser = class {
     if (chummerGear.extra) {
       parsedGear.name += ` (${chummerGear.extra})`;
     }
-    parsedGear.data.technology = parseTechnology(chummerGear);
-    parsedGear.data.description = parseDescription(chummerGear);
+    parsedGear.system.technology = parseTechnology(chummerGear);
+    parsedGear.system.description = parseDescription(chummerGear);
     return parsedGear;
   }
   getDefaultData() {
     return {
       name: "",
       type: "equipment",
-      data: DefaultValues.equipmentData()
+      system: DefaultValues.equipmentData()
     };
   }
 };
@@ -23172,7 +23610,7 @@ var SinParser = class extends BaseGearParser {
       } else {
         chummerLicenses.push(...chummerGear.children.gear);
       }
-      parsedGear.data.licenses = this.parseLicenses(chummerLicenses);
+      parsedGear.system.licenses = this.parseLicenses(chummerLicenses);
     }
     return parsedGear;
   }
@@ -23198,8 +23636,8 @@ var DeviceParser = class extends BaseGearParser {
   parse(chummerGear) {
     const parsedGear = super.parse(chummerGear);
     parsedGear.type = "device";
-    parsedGear.data.technology.rating = chummerGear.devicerating;
-    parsedGear.data.atts = {
+    parsedGear.system.technology.rating = chummerGear.devicerating;
+    parsedGear.system.atts = {
       att1: {
         value: chummerGear.attack,
         att: "attack"
@@ -23209,7 +23647,7 @@ var DeviceParser = class extends BaseGearParser {
         att: "sleaze"
       },
       att3: {
-        value: chummerGear.dataprocessing,
+        value: chummerGear.systemprocessing,
         att: "data_processing"
       },
       att4: {
@@ -23218,13 +23656,13 @@ var DeviceParser = class extends BaseGearParser {
       }
     };
     if (chummerGear.category === "Cyberdecks") {
-      parsedGear.data.category = "cyberdeck";
+      parsedGear.system.category = "cyberdeck";
     }
     if (chummerGear.category === "Commlinks") {
-      parsedGear.data.category = "commlink";
+      parsedGear.system.category = "commlink";
     }
     if (chummerGear.category === "Rigger Command Consoles") {
-      parsedGear.data.category = "commlink";
+      parsedGear.system.category = "commlink";
     }
     return parsedGear;
   }
@@ -23236,11 +23674,11 @@ var ProgramParser = class extends BaseGearParser {
     const parsedGear = super.parse(chummerGear);
     parsedGear.type = "program";
     if (chummerGear.category === "Common Programs") {
-      parsedGear.data.type = "common_program";
+      parsedGear.system.type = "common_program";
     } else if (chummerGear.category === "Hacking Programs") {
-      parsedGear.data.type = "hacking_program";
+      parsedGear.system.type = "hacking_program";
     } else if (chummerGear.category === "Software") {
-      parsedGear.data.type = "agent";
+      parsedGear.system.type = "agent";
     }
     return parsedGear;
   }
@@ -23252,18 +23690,18 @@ var AmmoParser = class extends BaseGearParser {
     const parsedGear = super.parse(chummerGear);
     parsedGear.type = "ammo";
     if (chummerGear.weaponbonusap) {
-      parsedGear.data.ap = parseInt(chummerGear.weaponbonusap);
+      parsedGear.system.ap = parseInt(chummerGear.weaponbonusap);
     }
     if (chummerGear.weaponbonusdamage) {
-      parsedGear.data.damage = parseInt(chummerGear.weaponbonusdamage);
+      parsedGear.system.damage = parseInt(chummerGear.weaponbonusdamage);
       if (chummerGear.weaponbonusdamage.includes("P")) {
-        parsedGear.data.damageType = "physical";
+        parsedGear.system.damageType = "physical";
       } else if (chummerGear.weaponbonusdamage.includes("S")) {
-        parsedGear.data.damageType = "stun";
+        parsedGear.system.damageType = "stun";
       } else if (chummerGear.weaponbonusdamage.includes("M")) {
-        parsedGear.data.damageType = "matrix";
+        parsedGear.system.damageType = "matrix";
       } else {
-        parsedGear.data.damageType = "physical";
+        parsedGear.system.damageType = "physical";
       }
     }
     return parsedGear;
@@ -23336,9 +23774,9 @@ var ArmorParser = class {
     return parsedArmors;
   }
   parseArmor(chummerArmor) {
-    const data = {};
+    const system = {};
     const armor = {};
-    data.armor = armor;
+    system.armor = armor;
     let desc = "";
     armor.mod = chummerArmor.armor.includes("+");
     armor.value = parseInt(chummerArmor.armor.replace("+", ""));
@@ -23375,9 +23813,9 @@ var ArmorParser = class {
 ${desc}`;
       }
     }
-    data.technology = parseTechnology(chummerArmor);
-    data.description = parseDescription(chummerArmor);
-    return createItemData(chummerArmor.name, "armor", data);
+    system.technology = parseTechnology(chummerArmor);
+    system.description = parseDescription(chummerArmor);
+    return createItemData(chummerArmor.name, "armor", system);
   }
 };
 
@@ -23397,13 +23835,13 @@ var CyberwareParser2 = class {
     return parsedCyberware;
   }
   parseCyberware(chummerCyber) {
-    const data = {};
-    data.description = parseDescription(chummerCyber);
-    data.technology = parseTechnology(chummerCyber);
-    data.technology.equipped = true;
-    data.essence = chummerCyber.ess;
-    data.grade = chummerCyber.grade;
-    return createItemData(chummerCyber.name, "cyberware", data);
+    const system = {};
+    system.description = parseDescription(chummerCyber);
+    system.technology = parseTechnology(chummerCyber);
+    system.technology.equipped = true;
+    system.essence = chummerCyber.ess;
+    system.grade = chummerCyber.grade;
+    return createItemData(chummerCyber.name, "cyberware", system);
   }
 };
 
@@ -23423,11 +23861,10 @@ var QualityParser = class {
     return parsedQualities;
   }
   parseQuality(chummerQuality) {
-    const data = DefaultValues.qualityData();
-    data.type = chummerQuality.qualitytype.toLowerCase();
-    data.description = parseDescription(chummerQuality);
-    const itemData = createItemData(chummerQuality.name, "quality", data);
-    return itemData;
+    const system = DefaultValues.qualityData();
+    system.type = chummerQuality.qualitytype.toLowerCase();
+    system.description = parseDescription(chummerQuality);
+    return createItemData(chummerQuality.name, "quality", system);
   }
 };
 
@@ -23443,12 +23880,11 @@ var PowerParser = class {
     return parsedPowers;
   }
   parsePower(chummerPower) {
-    const data = {};
-    data.description = parseDescription(chummerPower);
-    data.level = parseInt(chummerPower.rating);
-    data.pp = parseFloat(chummerPower.totalpoints);
-    const itemData = createItemData(chummerPower.fullname, "adept_power", data);
-    return itemData;
+    const system = {};
+    system.description = parseDescription(chummerPower);
+    system.level = parseInt(chummerPower.rating);
+    system.pp = parseFloat(chummerPower.totalpoints);
+    return createItemData(chummerPower.fullname, "adept_power", system);
   }
 };
 
@@ -23471,27 +23907,27 @@ var SpellParser = class {
   }
   parseSpell(chummerSpell) {
     const action = {};
-    const data = {};
-    data.action = action;
-    data.category = chummerSpell.category.toLowerCase().replace(/\s/g, "_");
-    data.name = chummerSpell.name;
-    data.type = chummerSpell.type === "M" ? "mana" : "physical";
-    data.range = chummerSpell.range === "T" ? "touch" : chummerSpell.range.toLowerCase().replace(/\s/g, "_").replace("(", "").replace(")", "");
-    data.drain = parseInt(chummerSpell.dv.replace("F", ""));
-    data.description = parseDescription(chummerSpell);
+    const system = {};
+    system.action = action;
+    system.category = chummerSpell.category.toLowerCase().replace(/\s/g, "_");
+    system.name = chummerSpell.name;
+    system.type = chummerSpell.type === "M" ? "mana" : "physical";
+    system.range = chummerSpell.range === "T" ? "touch" : chummerSpell.range.toLowerCase().replace(/\s/g, "_").replace("(", "").replace(")", "");
+    system.drain = parseInt(chummerSpell.dv.replace("F", ""));
+    system.description = parseDescription(chummerSpell);
     let description = "";
     if (chummerSpell.descriptors)
       description = chummerSpell.descriptors;
     if (chummerSpell.description)
       description += `
 ${chummerSpell.description}`;
-    data.description.value = TextEditor.enrichHTML(description);
+    system.description.value = TextEditor.enrichHTML(description);
     if (chummerSpell.duration.toLowerCase() === "s")
-      data.duration = "sustained";
+      system.duration = "sustained";
     else if (chummerSpell.duration.toLowerCase() === "i")
-      data.duration = "instant";
+      system.duration = "instant";
     else if (chummerSpell.duration.toLowerCase() === "p")
-      data.duration = "permanent";
+      system.duration = "permanent";
     action.type = "varies";
     action.skill = "spellcasting";
     action.attribute = "magic";
@@ -23501,22 +23937,22 @@ ${chummerSpell.description}`;
     if (chummerSpell.descriptors) {
       const desc = chummerSpell.descriptors.toLowerCase();
       if (chummerSpell.category.toLowerCase() === "combat") {
-        data.combat = {};
+        system.combat = {};
         if (desc.includes("indirect")) {
-          data.combat.type = "indirect";
+          system.combat.type = "indirect";
           action.opposed = {
             type: "defense"
           };
         } else {
-          data.combat.type = "direct";
-          if (data.type === "mana") {
+          system.combat.type = "direct";
+          if (system.type === "mana") {
             action.damage.type.base = "stun";
             action.damage.type.value = "stun";
             action.opposed = {
               type: "soak",
               attribute: "willpower"
             };
-          } else if (data.type === "physical") {
+          } else if (system.type === "physical") {
             action.damage.type.base = "physical";
             action.damage.type.value = "physical";
             action.opposed = {
@@ -23527,7 +23963,7 @@ ${chummerSpell.description}`;
         }
       }
       if (chummerSpell.category.toLowerCase() === "detection") {
-        data.detection = {};
+        system.detection = {};
         const split = desc.split(",");
         split.forEach((token) => {
           token = token || "";
@@ -23537,13 +23973,13 @@ ${chummerSpell.description}`;
           if (token.includes("area"))
             return;
           if (token.includes("passive"))
-            data.detection.passive = true;
+            system.detection.passive = true;
           else if (token.includes("active"))
-            data.detection.passive = false;
+            system.detection.passive = false;
           else if (token)
-            data.detection.type = token.toLowerCase();
+            system.detection.type = token.toLowerCase();
         });
-        if (!data.detection.passive) {
+        if (!system.detection.passive) {
           action.opposed = {
             type: "custom",
             attribute: "willpower",
@@ -23552,7 +23988,7 @@ ${chummerSpell.description}`;
         }
       }
       if (chummerSpell.category.toLowerCase() === "illusion") {
-        data.illusion = {};
+        system.illusion = {};
         const split = desc.split(",");
         split.forEach((token) => {
           token = token || "";
@@ -23562,11 +23998,11 @@ ${chummerSpell.description}`;
           if (token.includes("area"))
             return;
           if (token.includes("sense"))
-            data.illusion.sense = token.toLowerCase();
+            system.illusion.sense = token.toLowerCase();
           else if (token)
-            data.illusion.type = token.toLowerCase();
+            system.illusion.type = token.toLowerCase();
         });
-        if (data.type === "mana") {
+        if (system.type === "mana") {
           action.opposed = {
             type: "custom",
             attribute: "willpower",
@@ -23581,21 +24017,21 @@ ${chummerSpell.description}`;
         }
       }
       if (chummerSpell.category.toLowerCase() === "manipulation") {
-        data.manipulation = {};
+        system.manipulation = {};
         if (desc.includes("environmental"))
-          data.manipulation.environmental = true;
+          system.manipulation.environmental = true;
         if (desc.includes("physical"))
-          data.manipulation.physical = true;
+          system.manipulation.physical = true;
         if (desc.includes("mental"))
-          data.manipulation.mental = true;
-        if (data.manipulation.mental) {
+          system.manipulation.mental = true;
+        if (system.manipulation.mental) {
           action.opposed = {
             type: "custom",
             attribute: "willpower",
             attribute2: "logic"
           };
         }
-        if (data.manipulation.physical) {
+        if (system.manipulation.physical) {
           action.opposed = {
             type: "custom",
             attribute: "body",
@@ -23604,7 +24040,7 @@ ${chummerSpell.description}`;
         }
       }
     }
-    return createItemData(chummerSpell.name, "spell", data);
+    return createItemData(chummerSpell.name, "spell", system);
   }
 };
 
@@ -23652,13 +24088,13 @@ var WeaponParser = class {
     return parsedWeapons;
   }
   parseWeapon(chummerWeapon) {
-    const data = {};
+    const system = {};
     const action = {};
     const damage = {};
     action.damage = damage;
-    data.action = action;
-    data.description = parseDescription(chummerWeapon);
-    data.technology = parseTechnology(chummerWeapon);
+    system.action = action;
+    system.description = parseDescription(chummerWeapon);
+    system.technology = parseTechnology(chummerWeapon);
     damage.ap = {
       base: parseInt(getValues(chummerWeapon.ap)[0])
     };
@@ -23679,17 +24115,17 @@ var WeaponParser = class {
     };
     if (chummerWeapon.type.toLowerCase() === "melee") {
       action.type = "complex";
-      data.category = "melee";
+      system.category = "melee";
       const melee = {};
-      data.melee = melee;
+      system.melee = melee;
       melee.reach = parseInt(chummerWeapon.reach);
     } else if (chummerWeapon.type.toLowerCase() === "ranged") {
-      data.category = "range";
+      system.category = "range";
       if (action.skill.toLowerCase().includes("throw")) {
-        data.category = "thrown";
+        system.category = "thrown";
       }
       const range = {};
-      data.range = range;
+      system.range = range;
       range.rc = {
         base: parseInt(getValues(chummerWeapon.rc)[0])
       };
@@ -23718,7 +24154,7 @@ var WeaponParser = class {
         };
       }
     } else if (chummerWeapon.type.toLowerCase() === "thrown") {
-      data.category = "thrown";
+      system.category = "thrown";
     }
     {
       const d = this.parseDamage(chummerWeapon.damage_english);
@@ -23727,14 +24163,14 @@ var WeaponParser = class {
       damage.type.base = d.type;
       if (d.dropoff || d.radius) {
         const thrown = {};
-        data.thrown = thrown;
+        system.thrown = thrown;
         thrown.blast = {
           radius: d.radius,
           dropoff: d.dropoff
         };
       }
     }
-    const itemData = createItemData(chummerWeapon.name, "weapon", data);
+    const itemData = createItemData(chummerWeapon.name, "weapon", system);
     return itemData;
   }
 };
@@ -23755,22 +24191,22 @@ var LifestyleParser = class {
     return parsedLifestyle;
   }
   parseLifestyle(chummerLifestyle) {
-    const data = {};
+    const system = {};
     const chummerLifestyleType = chummerLifestyle.baselifestyle.toLowerCase();
     if (chummerLifestyleType in SR5.lifestyleTypes) {
-      data.type = chummerLifestyleType;
+      system.type = chummerLifestyleType;
     } else {
       if (chummerLifestyleType === "luxury") {
-        data.type = "luxory";
+        system.type = "luxory";
       } else {
-        data.type = "other";
+        system.type = "other";
       }
     }
-    data.cost = chummerLifestyle.totalmonthlycost;
-    data.permanent = chummerLifestyle.purchased;
-    data.description = parseDescription(chummerLifestyle);
+    system.cost = chummerLifestyle.totalmonthlycost;
+    system.permanent = chummerLifestyle.purchased;
+    system.description = parseDescription(chummerLifestyle);
     const itemName = chummerLifestyle.name ? chummerLifestyle.name : chummerLifestyle.baselifestyle;
-    const itemData = createItemData(itemName, "lifestyle", data);
+    const itemData = createItemData(itemName, "lifestyle", system);
     return itemData;
   }
 };
@@ -23791,19 +24227,19 @@ var ContactParser = class {
     return parsedContacts;
   }
   parseContact(chummerContact) {
-    const data = {};
-    data.type = chummerContact.role;
+    const system = {};
+    system.type = chummerContact.role;
     if (chummerContact.connection.toLowerCase().includes("group")) {
-      data.connection = chummerContact.connection.toLowerCase().replace("group(", "").replace(")", "");
+      system.connection = chummerContact.connection.toLowerCase().replace("group(", "").replace(")", "");
     } else {
-      data.connection = chummerContact.connection;
+      system.connection = chummerContact.connection;
     }
-    data.loyalty = chummerContact.loyalty;
-    data.family = chummerContact.family.toLowerCase() === "true";
-    data.blackmail = chummerContact.blackmail.toLowerCase() === "true";
-    data.description = parseDescription(chummerContact);
+    system.loyalty = chummerContact.loyalty;
+    system.family = chummerContact.family.toLowerCase() === "true";
+    system.blackmail = chummerContact.blackmail.toLowerCase() === "true";
+    system.description = parseDescription(chummerContact);
     const itemName = chummerContact.name ? chummerContact.name : "[Unnamed connection]";
-    const itemData = createItemData(itemName, "contact", data);
+    const itemData = createItemData(itemName, "contact", system);
     return itemData;
   }
 };
@@ -24010,6 +24446,7 @@ var SR5BaseActorSheet = class extends ActorSheet {
       data.inventory = this._prepareSelectedInventory(data.inventories);
       data.hasInventory = this._prepareHasInventory(data.inventories);
       data.selectedInventory = this.selectedInventory;
+      data.situationModifiers = this._prepareSituationModifiers();
       data.biographyHTML = yield TextEditor.enrichHTML(actorData.system.description.value, {
         async: true,
         relativeTo: this.actor
@@ -24077,6 +24514,7 @@ var SR5BaseActorSheet = class extends ActorSheet {
     html.find(".import-character").on("click", this._onShowImportCharacter.bind(this));
     html.find(".reload-ammo").on("click", this._onReloadAmmo.bind(this));
     html.find(".matrix-att-selector").on("change", this._onMatrixAttributeSelected.bind(this));
+    html.find(".show-situation-modifiers-application").on("click", this._onShowSituationModifiersApplication.bind(this));
   }
   _addInventoryItemTypes(inventory) {
     const inventoryTypes = this.getInventoryItemTypes();
@@ -25043,6 +25481,29 @@ var SR5BaseActorSheet = class extends ActorSheet {
     html.find("label.checkbox").click((event) => setContent(event.currentTarget));
     html.find(".submit-checkbox").change((event) => this._onSubmit(event));
   }
+  _prepareSituationModifiers() {
+    const modifiers = this.document.getSituationModifiers();
+    if (!modifiers)
+      return [];
+    return Object.entries(modifiers.handlers).map(([category, modifier]) => {
+      const hidden = this._hideSituationModifier(category);
+      const label = SR5.modifierTypes[category];
+      return { category, value: modifier.total, hidden, label };
+    });
+  }
+  _hideSituationModifier(category) {
+    switch (category) {
+      case "background_count":
+        return !this.document.isAwakened;
+      case "environmental":
+        return this.document.isSprite();
+      default:
+        return false;
+    }
+  }
+  _onShowSituationModifiersApplication(event) {
+    new SituationModifiersApplication(this.document).render(true);
+  }
 };
 
 // src/module/actor/sheets/SR5ICActorSheet.ts
@@ -25289,6 +25750,9 @@ var RangedAttackTest = class extends SuccessTest {
   get canBeExtended() {
     return false;
   }
+  get showSuccessLabel() {
+    return this.success;
+  }
   _prepareFireMode() {
     var _a;
     const weaponData = this.item.asWeapon();
@@ -25322,8 +25786,8 @@ var RangedAttackTest = class extends SuccessTest {
       const actor = this.actor;
       if (!actor)
         return;
-      const modifiers = yield actor.getModifiers();
-      this.data.range = modifiers.environmental.active.range || 0;
+      const modifiers = actor.getSituationModifiers();
+      this.data.range = modifiers.environmental.applied.active.range || 0;
     });
   }
   _prepareTargetRanges() {
@@ -25358,8 +25822,8 @@ var RangedAttackTest = class extends SuccessTest {
           return 1;
         return 0;
       });
-      const modifiers = yield this.actor.getModifiers();
-      this.data.range = modifiers.environmental.active.range || this.data.targetRanges[0].range.modifier;
+      const modifiers = this.actor.getSituationModifiers();
+      this.data.range = modifiers.environmental.applied.active.range || this.data.targetRanges[0].range.modifier;
     });
   }
   _prepareRecoilCompensation() {
@@ -25393,9 +25857,9 @@ var RangedAttackTest = class extends SuccessTest {
       yield this.item.setLastFireMode(this.data.fireMode);
       if (!this.actor)
         return;
-      const modifiers = yield this.actor.getModifiers();
-      modifiers.activateEnvironmentalCategory("range", this.data.range);
-      yield this.actor.setModifiers(modifiers);
+      const modifiers = yield this.actor.getSituationModifiers();
+      modifiers.environmental.setActive("range", this.data.range);
+      yield this.actor.setSituationModifiers(modifiers);
     });
   }
   prepareBaseValues() {
@@ -25417,10 +25881,10 @@ var RangedAttackTest = class extends SuccessTest {
     }
     this.data.range = Number(this.data.range);
     const range = this.hasTargets ? this.data.targetRanges[this.data.targetRangesSelected].range.modifier : this.data.range;
-    const modifiers = Modifiers.getModifiersFromEntity(this.actor);
-    modifiers.activateEnvironmentalCategory("range", Number(range));
-    const environmental = modifiers.environmental.total;
-    poolMods.addUniquePart(SR5.modifierTypes.environmental, environmental);
+    const modifiers = DocumentSituationModifiers.getDocumentModifiers(this.actor);
+    modifiers.environmental.setActive("range", Number(range));
+    modifiers.environmental.apply({ reapply: true });
+    poolMods.addUniquePart(SR5.modifierTypes.environmental, modifiers.environmental.total);
     super.prepareBaseValues();
   }
   canConsumeDocumentRessources() {
@@ -25820,12 +26284,26 @@ var MeleeAttackTest = class extends SuccessTest {
   get _dialogTemplate() {
     return "systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.html";
   }
+  get showSuccessLabel() {
+    return this.success;
+  }
   prepareDocumentData() {
     return __async(this, null, function* () {
       if (!this.item || !this.item.isMeleeWeapon())
         return;
       this.data.reach = this.item.getReach();
       yield __superGet(MeleeAttackTest.prototype, this, "prepareDocumentData").call(this);
+    });
+  }
+  prepareActorModifier(actor, type) {
+    return __async(this, null, function* () {
+      if (type !== "environmental")
+        return yield __superGet(MeleeAttackTest.prototype, this, "prepareActorModifier").call(this, actor, type);
+      const modifiers = actor.getSituationModifiers();
+      modifiers.environmental.apply({ applicable: ["light", "visibility"] });
+      const name = this._getModifierTypeLabel(type);
+      const value = modifiers.environmental.total;
+      return { name, value };
     });
   }
 };
@@ -25909,7 +26387,7 @@ var SpellCastingTest = class extends SuccessTest {
     };
   }
   get testModifiers() {
-    return ["global", "wounds"];
+    return ["global", "wounds", "background_count"];
   }
   prepareDocumentData() {
     return __async(this, null, function* () {
@@ -26262,7 +26740,7 @@ var ComplexFormTest = class extends SuccessTest {
     };
   }
   get testModifiers() {
-    return ["global", "wounds"];
+    return ["global", "wounds", "noise"];
   }
   prepareDocumentData() {
     return __async(this, null, function* () {
@@ -26548,291 +27026,206 @@ var SupressionDefenseTest = class extends PhysicalDefenseTest {
   }
 };
 
-// src/module/macros.ts
-function createItemMacro(item, slot) {
-  return __async(this, null, function* () {
-    var _a;
-    if (!game || !game.macros)
-      return;
-    const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    let macro = game.macros.contents.find((m) => m.name === item.name);
-    if (!macro) {
-      macro = yield Macro.create(
-        {
-          name: item.name,
-          type: "script",
-          img: item.img,
-          command,
-          flags: { "shadowrun5e.itemMacro": true }
-        },
-        { renderSheet: false }
-      );
-    }
-    if (macro)
-      (_a = game.user) == null ? void 0 : _a.assignHotbarMacro(macro, slot);
-  });
-}
-function rollItemMacro(itemName) {
-  var _a;
-  if (!game || !game.actors)
-    return;
-  const speaker = ChatMessage.getSpeaker();
-  let actor;
-  if (speaker.token)
-    actor = game.actors.tokens[speaker.token];
-  if (!speaker.actor)
-    return;
-  if (!actor)
-    actor = game.actors.get(speaker.actor);
-  const item = actor ? actor.items.find((i) => i.name === itemName) : null;
-  if (!item) {
-    return (_a = ui.notifications) == null ? void 0 : _a.warn(`Your controlled Actor does not have an item named ${itemName}`);
-  }
-  return item.castAction();
-}
-function createSkillMacro(data, slot) {
-  return __async(this, null, function* () {
-    if (!game.macros || !game.user)
-      return;
-    const { skillId, skill } = data;
-    const name = Helpers.getSkillLabelOrName(skill);
-    const existingMacro = game.macros.contents.find((macro2) => macro2.name === name);
-    if (existingMacro)
-      return;
-    const command = `game.shadowrun5e.rollSkillMacro("${name}");`;
-    const macro = yield Macro.create({
-      name,
-      type: "script",
-      command
-    });
-    if (macro)
-      yield game.user.assignHotbarMacro(macro, slot);
-  });
-}
-function rollSkillMacro(skillLabel) {
-  return __async(this, null, function* () {
-    if (!game || !game.actors)
-      return;
-    if (!skillLabel)
-      return;
-    const speaker = ChatMessage.getSpeaker();
-    if (!speaker)
-      return;
-    const actor = game.actors.tokens[speaker.token] || game.actors.get(speaker.actor);
-    if (!actor)
-      return;
-    yield actor.rollSkill(skillLabel, { byLabel: true });
-  });
-}
-
-// src/module/canvas.ts
-var measureDistance = function(segments, options = {}) {
-  if (!game || !game.ready || !canvas || !canvas.ready)
-    return 0;
-  if (!options.gridSpaces)
-    return BaseGrid.prototype.measureDistances.call(this, segments, options);
-  let nDiagonal = 0;
-  const rule = this.parent.diagonalRule;
-  const d = canvas.dimensions;
-  return segments.map((s) => {
-    let r = s.ray;
-    let nx = Math.abs(Math.ceil(r.dx / d.size));
-    let ny = Math.abs(Math.ceil(r.dy / d.size));
-    let nd = Math.min(nx, ny);
-    let ns = Math.abs(ny - nx);
-    nDiagonal += nd;
-    if (rule === "1-2-1") {
-      let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
-      let spaces = nd10 * 2 + (nd - nd10) + ns;
-      return spaces * canvas.dimensions.distance;
-    } else if (rule === "EUCL") {
-      return Math.round(Math.hypot(nx, ny) * canvas.scene.data.gridDistance);
-    } else
-      return (ns + nd) * canvas.scene.data.gridDistance;
-  });
-};
-
-// src/test/sr5.Modifiers.spec.ts
-var shadowrunRulesModifiers = (context) => {
-  const { describe, it, assert } = context;
-  const defaultModifiers = {
-    environmental: {
-      active: {},
-      total: 0
-    }
-  };
-  const activeModifiers = {
-    environmental: {
-      active: {
-        wind: -1,
-        light: -1
-      },
-      total: -3
-    }
-  };
-  describe("SR5 Modifiers", () => {
-    it("should create default modifier values", () => {
-      const modifiers = Modifiers.getDefaultModifiers();
-      assert.deepEqual(modifiers, defaultModifiers);
-    });
-    it("should use default modifiers for faulty constructor params", () => {
-      assert.deepEqual(new Modifiers({}).data, defaultModifiers);
-      assert.deepEqual(new Modifiers(void 0).data, defaultModifiers);
-      assert.deepEqual(new Modifiers(null).data, defaultModifiers);
-      assert.deepEqual(new Modifiers(0).data, defaultModifiers);
-      assert.deepEqual(new Modifiers(1).data, defaultModifiers);
-      assert.deepEqual(new Modifiers().data, defaultModifiers);
-    });
-    it("should set an environmental modifier active", () => {
-      const modifiers = new Modifiers(defaultModifiers);
-      modifiers._setEnvironmentalCategoryActive("wind", -1);
-    });
-    it("should set an environmental modifier inactive", () => {
-      const modifiers = new Modifiers({
-        environmental: {
-          active: {
-            wind: -1,
-            light: -3
-          },
-          total: 0
-        }
-      });
-      modifiers._setEnvironmentalCategoryInactive("wind");
-      assert.deepEqual(modifiers.environmental.active, { light: -3 });
-    });
-    it("should understand active environmental modifiers", () => {
-      const modifiersActive = new Modifiers({
-        environmental: {
-          active: {
-            wind: -1,
-            light: -3
-          },
-          total: 0
-        }
-      });
-      assert.equal(modifiersActive.hasActiveEnvironmental, true);
-      const modifiersInactive = new Modifiers({
-        environmental: {
-          active: {},
-          total: 0
-        }
-      });
-      assert.equal(modifiersInactive.hasActiveEnvironmental, false);
-    });
-    it("should calculate the total according to sr5 rules", () => {
-      const modifiers = new Modifiers(defaultModifiers);
-      assert.equal(modifiers.environmental.total, 0);
-      modifiers.environmental.active.wind = -1;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -1);
-      modifiers.environmental.active.light = -1;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.range = -1;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      delete modifiers.environmental.active.light;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.light = 0;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.wind = -3;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.light = -3;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.range = -3;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      delete modifiers.environmental.active.light;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.light = 0;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.wind = -6;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.light = -6;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-      modifiers.environmental.active.range = -6;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-      delete modifiers.environmental.active.light;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-      modifiers.environmental.active.light = 0;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-      modifiers.environmental.active.value = 0;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, 0);
-      modifiers.environmental.active.value = -1;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -1);
-      modifiers.environmental.active.value = -3;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -3);
-      modifiers.environmental.active.value = -6;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -6);
-      modifiers.environmental.active.value = -10;
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, -10);
-    });
-    it("should reset active environmental modifiers", () => {
-      const modifiers = new Modifiers(activeModifiers);
-      modifiers._resetEnvironmental();
-      assert.deepEqual(modifiers.environmental.active, {});
-    });
-    it("should calculate total for faulty active", () => {
-      const modifiers = new Modifiers({
-        environmental: {
-          total: -1,
-          active: {
-            light: null,
-            wind: void 0,
-            range: "",
-            visibility: "string"
-          }
-        }
-      });
-      modifiers.calcEnvironmentalTotal();
-      assert.equal(modifiers.environmental.total, 0);
-    });
-  });
-};
-
 // src/test/utils.ts
 var SR5TestingDocuments = class {
   constructor(documentClass) {
-    this.documents = {};
+    this.documents = [];
     this.documentClass = documentClass;
   }
   create(data) {
     return __async(this, null, function* () {
       const document2 = yield this.documentClass.create(__spreadValues(__spreadValues({ name: `#QUENCH_TEST_DOCUMENT_SHOULD_HAVE_BEEN_DELETED` }, data), { folder: this.folder }));
-      this.documents[document2.id] = document2;
+      this.documents.push(document2);
       return document2;
-    });
-  }
-  delete(id) {
-    return __async(this, null, function* () {
-      const document2 = this.documents[id];
-      if (!document2)
-        return;
-      yield this.documentClass.deleteDocuments([document2.data._id]);
-      delete this.documents[document2.id];
     });
   }
   teardown() {
     return __async(this, null, function* () {
-      yield this.documentClass.deleteDocuments(Object.values(this.documents).map((document2) => document2.id));
+      yield this.documentClass.deleteDocuments(this.documents.map((document2) => document2.id));
     });
   }
+};
+
+// src/test/sr5.Modifiers.spec.ts
+var shadowrunRulesModifiers = (context) => {
+  const { describe, it, assert, before, after } = context;
+  let testActor;
+  let testItem;
+  let testScene;
+  before(() => __async(void 0, null, function* () {
+    testActor = new SR5TestingDocuments(SR5Actor);
+    testItem = new SR5TestingDocuments(SR5Item);
+    testScene = new SR5TestingDocuments(Scene);
+  }));
+  after(() => __async(void 0, null, function* () {
+    yield testActor.teardown();
+    yield testItem.teardown();
+    yield testScene.teardown();
+  }));
+  const defaultSourceModifiers = {
+    environmental: {
+      active: {}
+    },
+    noise: {
+      active: {}
+    },
+    background_count: {
+      active: {}
+    }
+  };
+  describe("SR5 Modifiers", () => {
+    describe("class SituationalModifiers", () => {
+      it("create valid applied modifiers without any input", () => {
+        const sitMod = new SituationModifier();
+        assert.deepEqual(sitMod.source, { active: {} });
+        assert.equal(sitMod.hasActive, false);
+        assert.equal(sitMod.total, 0);
+      });
+      it("determine if documents have been added to it", () => {
+        assert.equal(new SituationModifier().hasDocuments, false);
+        assert.equal(new SituationModifier(void 0, new DocumentSituationModifiers()).hasDocuments, true);
+      });
+      it("determine it has active modifiers", () => {
+        assert.equal(new SituationModifier({ active: { a: 0 } }).hasActive, true);
+      });
+      it("apply source active values to a sum of all active modifiers", () => {
+        const sitMod = new SituationModifier({
+          active: {
+            a: -1,
+            b: -3
+          }
+        });
+        assert.equal(sitMod.total, -4);
+      });
+      it("apply source fixed value instead of the sum of all active modifiers", () => {
+        const sitMod = new SituationModifier({
+          active: {
+            a: -1,
+            b: -3
+          },
+          fixed: 0
+        });
+        assert.equal(sitMod.total, 0);
+        assert.equal(sitMod._calcActiveTotal(), -4);
+      });
+      it("correctly report the state of active modifier selections", () => {
+        const sitMod = new SituationModifier({
+          active: {
+            a: -1
+          }
+        });
+        assert.equal(sitMod.isActive("a"), true);
+        assert.equal(sitMod.isActive("b"), false);
+        assert.equal(sitMod.isActive(""), false);
+      });
+      it("correctly active a modifier selection", () => {
+        const sitMod = new SituationModifier();
+        assert.equal(sitMod.source.active["a"], void 0);
+        sitMod.setActive("a", 1);
+        assert.equal(sitMod.source.active["a"], 1);
+      });
+      it("correctly deactive a modifier selection", () => {
+        const sitMod = new SituationModifier({ active: { a: 1, b: 2 } });
+        assert.equal(sitMod.isActive("a"), true);
+        sitMod.setInactive("a");
+        assert.equal(sitMod.isActive("a"), false);
+        assert.equal(sitMod.isActive("b"), true);
+      });
+      it("correctly determine if a fixed modifier is set", () => {
+        const sitMod = new SituationModifier();
+        sitMod.apply({ source: { fixed: 0, active: {} } });
+        assert.isTrue(sitMod.hasFixed);
+        sitMod.apply({ source: { active: {} } });
+        assert.isFalse(sitMod.hasFixed);
+      });
+      it("correctly determine if an active modifier selection matches", () => {
+        const sitMod = new SituationModifier({ active: { a: 1, b: 2 } });
+        sitMod.apply();
+        assert.equal(sitMod.isMatching("a", 1), true);
+        assert.equal(sitMod.isMatching("b", 1), false);
+        assert.equal(sitMod.isMatching("c", 0), false);
+      });
+      it("correctly clear an active set of selections", () => {
+        const sitMod = new SituationModifier({ active: { a: 1, b: 2 }, fixed: 0 });
+        assert.equal(sitMod.hasActive, true);
+        sitMod.clear();
+        assert.equal(sitMod.hasActive, false);
+      });
+      it("use a fixed user selection instead of suming up", () => {
+        const sitMod = new SituationModifier({ active: { value: 3, a: 1, b: 3 } });
+        sitMod.apply();
+        assert.equal(sitMod.total, 3);
+      });
+      it("use a fixed programmating value before a fixed user selection", () => {
+        const sitMod = new SituationModifier({ active: { value: 3, a: 1, b: 3 }, fixed: -3 });
+        assert.equal(sitMod.total, -3);
+      });
+      it("should only apply applicable selections", () => {
+        const sitMod = new SituationModifier({ active: { a: 1, b: 3, c: 4 } });
+        sitMod.apply({ applicable: ["a", "c"] });
+        assert.equal(sitMod.total, 5);
+      });
+    });
+    describe("class EnvironmentalModifier", () => {
+      it("apply higher level modifier for two same level selections", () => {
+        const envMod = new EnvironmentalModifier();
+        envMod.apply({ source: { active: { light: 0, wind: 0 } } });
+        assert.equal(envMod.total, 0);
+        envMod.apply({ source: { active: { light: -1, wind: -1 } } });
+        assert.equal(envMod.total, -3);
+        envMod.apply({ source: { active: { light: -3, wind: -3 } } });
+        assert.equal(envMod.total, -6);
+        envMod.apply({ source: { active: { light: -6, wind: -6 } } });
+        assert.equal(envMod.total, -10);
+      });
+      it("apply fixed modifier values instead of level selections", () => {
+        const envMod = new EnvironmentalModifier();
+        envMod.apply({ source: { active: { light: 0, wind: 0, value: -3 } } });
+        assert.equal(envMod.total, -3);
+        envMod.apply({ source: { active: { light: -1, wind: -1, value: -1 } } });
+        assert.equal(envMod.total, -1);
+      });
+    });
+    describe("class DocumentSituationModifiers", () => {
+      it("create default modifier values", () => {
+        const modifiers = DocumentSituationModifiers._defaultModifiers;
+        assert.deepEqual(modifiers, defaultSourceModifiers);
+      });
+      it("use default modifiers for faulty constructor params", () => {
+        assert.deepEqual(new DocumentSituationModifiers({}).source, defaultSourceModifiers);
+        assert.deepEqual(new DocumentSituationModifiers(void 0).source, defaultSourceModifiers);
+        assert.deepEqual(new DocumentSituationModifiers(null).source, defaultSourceModifiers);
+        assert.deepEqual(new DocumentSituationModifiers(0).source, defaultSourceModifiers);
+        assert.deepEqual(new DocumentSituationModifiers(1).source, defaultSourceModifiers);
+        assert.deepEqual(new DocumentSituationModifiers().source, defaultSourceModifiers);
+      });
+      it("Store data depending on document type", () => __async(void 0, null, function* () {
+        const actor = yield testActor.create({ type: "character" });
+        let modifiers = actor.getSituationModifiers();
+        assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
+        modifiers.source.noise.fixed = 1;
+        yield modifiers.updateDocument();
+        assert.equal(modifiers.source.noise.fixed, 1);
+        const scene = yield testScene.create();
+        modifiers = DocumentSituationModifiers.fromDocument(scene);
+        assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
+        modifiers.source.noise.fixed = 1;
+        yield modifiers.updateDocument();
+        assert.equal(modifiers.source.noise.fixed, 1);
+      }));
+      it("clear documents data to defaults", () => __async(void 0, null, function* () {
+        const actor = yield testActor.create({
+          type: "character"
+        });
+        const modifiers = actor.getSituationModifiers();
+        modifiers.source.noise.fixed = 1;
+        yield modifiers.updateDocument();
+        assert.notDeepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
+        yield modifiers.clearAll();
+        assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
+      }));
+    });
+  });
 };
 
 // src/test/sr5.SR5Item.spec.ts
@@ -26876,7 +27269,7 @@ var shadowrunSR5Item = (context) => {
       const embeddedAmmoInCollection = (_a = game.items) == null ? void 0 : _a.get(embeddedAmmoData._id);
       assert.strictEqual(embeddedAmmoInCollection, void 0);
     }));
-    it("update an embedded ammo", () => __async(void 0, null, function* () {
+    it("update a nested ammunition item", () => __async(void 0, null, function* () {
       const weapon = yield testItem.create({ type: "weapon" });
       const ammo = yield testItem.create({ type: "ammo" });
       yield weapon.createNestedItem(ammo.data);
@@ -26888,11 +27281,73 @@ var shadowrunSR5Item = (context) => {
       assert.instanceOf(embeddedAmmo, SR5Item);
       if (!embeddedAmmo)
         return;
-      assert.notProperty(embeddedAmmo.data.data, "test");
-      yield embeddedAmmo.update({ "data.test": true });
-      assert.property(embeddedAmmo.data.data, "test");
-      assert.propertyVal(embeddedAmmo.data.data, "test", true);
+      assert.notProperty(embeddedAmmo.system, "test");
+      yield embeddedAmmo.update({ "system.test": true });
+      assert.property(embeddedAmmo.system, "test");
+      assert.propertyVal(embeddedAmmo.system, "test", true);
     }));
+    describe("Testing related data injection", () => {
+      it("Correctly add default test to spells", () => __async(void 0, null, function* () {
+      }));
+      it("Correctly add defense tests to spells", () => __async(void 0, null, function* () {
+        const item = yield testItem.create({ type: "spell" });
+        yield item.update({ "system.category": "combat" });
+        assert.equal(item.system.action.test, "SpellCastingTest");
+        assert.equal(item.system.action.followed.test, "DrainTest");
+        assert.equal(item.system.action.opposed.test, "CombatSpellDefenseTest");
+        assert.equal(item.system.action.opposed.resist.test, "PhysicalResistTest");
+        yield item.update({ "system.category": "detection" });
+        assert.equal(item.system.action.test, "SpellCastingTest");
+        assert.equal(item.system.action.followed.test, "DrainTest");
+        assert.equal(item.system.action.opposed.test, "OpposedTest");
+        assert.equal(item.system.action.opposed.resist.test, "");
+      }));
+      it("Correctly add default tests to melee weapons", () => __async(void 0, null, function* () {
+        const item = yield testItem.create({ type: "weapon" });
+        yield item.update({ "system.category": "melee" });
+        assert.equal(item.system.action.test, "MeleeAttackTest");
+        assert.equal(item.system.action.followed.test, "");
+        assert.equal(item.system.action.opposed.test, "PhysicalDefenseTest");
+        assert.equal(item.system.action.opposed.resist.test, "PhysicalResistTest");
+      }));
+      it("Correctly add default tests to range weapons", () => __async(void 0, null, function* () {
+        const item = yield testItem.create({ type: "weapon" });
+        yield item.update({ "system.category": "range" });
+        assert.equal(item.system.action.test, "RangedAttackTest");
+        assert.equal(item.system.action.followed.test, "");
+        assert.equal(item.system.action.opposed.test, "PhysicalDefenseTest");
+        assert.equal(item.system.action.opposed.resist.test, "PhysicalResistTest");
+      }));
+      it("Correctly add defense tests to complex forms", () => __async(void 0, null, function* () {
+        const item = yield testItem.create({ type: "complex_form" });
+        assert.equal(item.system.action.test, "ComplexFormTest");
+        assert.equal(item.system.action.followed.test, "FadeTest");
+        assert.equal(item.system.action.opposed.test, "OpposedTest");
+        assert.equal(item.system.action.opposed.resist.test, "");
+      }));
+      it("Correctly alter default test for weapon category changes", () => __async(void 0, null, function* () {
+        const item = yield testItem.create({ type: "weapon" });
+        yield item.update({ "system.category": "range" });
+        assert.equal(item.system.action.test, "RangedAttackTest");
+        assert.equal(item.system.action.followed.test, "");
+        assert.equal(item.system.action.opposed.test, "PhysicalDefenseTest");
+        assert.equal(item.system.action.opposed.resist.test, "PhysicalResistTest");
+        yield item.update({ "system.category": "" });
+        assert.equal(item.system.action.test, "");
+        assert.equal(item.system.action.followed.test, "");
+        assert.equal(item.system.action.opposed.test, "PhysicalDefenseTest");
+        assert.equal(item.system.action.opposed.resist.test, "PhysicalResistTest");
+      }));
+      it("Correctly stop injection when mergeOptions recursive or diff are set to false", () => __async(void 0, null, function* () {
+        const item = yield testItem.create({ type: "complex_form" });
+        yield item.update({ "name": "Test" }, { recursive: false });
+        assert.equal(item.system.action.skill, "");
+        yield item.update({ "name": "Test2" }, { diff: false });
+        assert.equal(item.system.action.skill, "");
+        yield item.update({ "name": "Test" }, { recursive: true });
+        assert.equal(item.system.action.skill, "");
+      }));
+    });
   });
 };
 
@@ -26947,9 +27402,9 @@ var shadowrunMatrix = (context) => {
       assert.strictEqual(MatrixRules.getValidMarksCount(4), MatrixRules.maxMarksCount());
     });
     it("return expected host matrix attribute ratings", () => {
-      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
-      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
-      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);
+      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(1), [1, 2, 3, 4]);
+      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(2), [2, 3, 4, 5]);
+      assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(10), [10, 11, 12, 13]);
     });
   });
 };
@@ -27016,179 +27471,226 @@ var shadowrunSR5ActorDataPrep = (context) => {
   }));
   describe("CharacterDataPrep", () => {
     it("Character default attribute values", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "character", metatype: "human" });
+      const character = yield testActor.create({ type: "character", "system.metatype": "human" });
       console.log("Physical attributes");
-      assert.strictEqual(actor.data.data.attributes.body.value, SR.attributes.ranges["body"].min);
-      assert.strictEqual(actor.data.data.attributes.agility.value, SR.attributes.ranges["agility"].min);
-      assert.strictEqual(actor.data.data.attributes.reaction.value, SR.attributes.ranges["reaction"].min);
-      assert.strictEqual(actor.data.data.attributes.strength.value, SR.attributes.ranges["strength"].min);
-      assert.strictEqual(actor.data.data.attributes.willpower.value, SR.attributes.ranges["willpower"].min);
-      assert.strictEqual(actor.data.data.attributes.logic.value, SR.attributes.ranges["logic"].min);
-      assert.strictEqual(actor.data.data.attributes.intuition.value, SR.attributes.ranges["intuition"].min);
-      assert.strictEqual(actor.data.data.attributes.charisma.value, SR.attributes.ranges["charisma"].min);
+      assert.strictEqual(character.system.attributes.body.value, SR.attributes.ranges["body"].min);
+      assert.strictEqual(character.system.attributes.agility.value, SR.attributes.ranges["agility"].min);
+      assert.strictEqual(character.system.attributes.reaction.value, SR.attributes.ranges["reaction"].min);
+      assert.strictEqual(character.system.attributes.strength.value, SR.attributes.ranges["strength"].min);
+      assert.strictEqual(character.system.attributes.willpower.value, SR.attributes.ranges["willpower"].min);
+      assert.strictEqual(character.system.attributes.logic.value, SR.attributes.ranges["logic"].min);
+      assert.strictEqual(character.system.attributes.intuition.value, SR.attributes.ranges["intuition"].min);
+      assert.strictEqual(character.system.attributes.charisma.value, SR.attributes.ranges["charisma"].min);
       console.log("Comon special attributes");
-      assert.strictEqual(actor.data.data.attributes.edge.value, SR.attributes.ranges["edge"].min);
-      assert.strictEqual(actor.data.data.attributes.essence.value, SR.attributes.defaults["essence"]);
+      assert.strictEqual(character.system.attributes.edge.value, SR.attributes.ranges["edge"].min);
+      assert.strictEqual(character.system.attributes.essence.value, SR.attributes.defaults["essence"]);
       console.log("Special special attributes");
-      assert.strictEqual(actor.data.data.attributes.resonance.value, SR.attributes.ranges["resonance"].min);
-      assert.strictEqual(actor.data.data.attributes.magic.value, SR.attributes.ranges["magic"].min);
+      assert.strictEqual(character.system.attributes.resonance.value, SR.attributes.ranges["resonance"].min);
+      assert.strictEqual(character.system.attributes.magic.value, SR.attributes.ranges["magic"].min);
     }));
     it("Character monitor calculation", () => __async(void 0, null, function* () {
       const actor = yield testActor.create({ type: "character" });
-      let data = actor.asCharacter();
-      assert.strictEqual(data.data.track.stun.max, 9);
-      assert.strictEqual(data.data.track.physical.max, 9);
-      assert.strictEqual(data.data.track.physical.overflow.max, SR.attributes.ranges.body.min);
+      let character = actor.asCharacter();
+      assert.strictEqual(character.system.track.stun.max, 9);
+      assert.strictEqual(character.system.track.physical.max, 9);
+      assert.strictEqual(character.system.track.physical.overflow.max, SR.attributes.ranges.body.min);
       yield actor.update({
-        "data.attributes.body.base": 6,
-        "data.attributes.willpower.base": 6
+        "system.attributes.body.base": 6,
+        "system.attributes.willpower.base": 6
       });
-      assert.strictEqual(data.data.track.stun.max, 11);
-      assert.strictEqual(data.data.track.physical.max, 11);
-      assert.strictEqual(data.data.track.physical.overflow.max, 6);
+      character = actor.asCharacter();
+      assert.strictEqual(character.system.track.stun.max, 11);
+      assert.strictEqual(character.system.track.physical.max, 11);
+      assert.strictEqual(character.system.track.physical.overflow.max, 6);
+    }));
+    it("Matrix condition monitor track calculation with modifiers", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "character", "system.modifiers.matrix_track": 1 });
+      yield actor.createEmbeddedDocuments("Item", [{
+        "name": "Commlink",
+        "type": "device",
+        "system.category": "commlink",
+        "system.technology.equipped": true
+      }]);
+      const character = actor.asCharacter();
+      assert.equal(character.system.matrix.condition_monitor.max, 10);
     }));
     it("Character initiative calculation", () => __async(void 0, null, function* () {
       const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
+      let character = actor.asCharacter();
       console.log("Meatspace Ini");
-      assert.strictEqual(data.data.initiative.meatspace.base.base, 2);
-      assert.strictEqual(data.data.initiative.meatspace.dice.base, 1);
+      assert.strictEqual(character.system.initiative.meatspace.base.base, 2);
+      assert.strictEqual(character.system.initiative.meatspace.dice.base, 1);
       console.log("Matrix AR Ini");
-      assert.strictEqual(data.data.initiative.matrix.base.base, 1);
-      assert.strictEqual(data.data.initiative.matrix.dice.base, 3);
+      assert.strictEqual(character.system.initiative.matrix.base.base, 1);
+      assert.strictEqual(character.system.initiative.matrix.dice.base, 3);
       console.log("Magic Ini");
-      assert.strictEqual(data.data.initiative.astral.base.base, 2);
-      assert.strictEqual(data.data.initiative.astral.dice.base, 2);
+      assert.strictEqual(character.system.initiative.astral.base.base, 2);
+      assert.strictEqual(character.system.initiative.astral.dice.base, 2);
     }));
     it("Character limit calculation", () => __async(void 0, null, function* () {
       const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
-      assert.strictEqual(data.data.limits.physical.value, 2);
-      assert.strictEqual(data.data.limits.mental.value, 2);
-      assert.strictEqual(data.data.limits.social.value, 3);
+      let character = actor.asCharacter();
+      assert.strictEqual(character.system.limits.physical.value, 2);
+      assert.strictEqual(character.system.limits.mental.value, 2);
+      assert.strictEqual(character.system.limits.social.value, 3);
       yield actor.update({
-        "data.attributes.strength.base": 6,
-        "data.attributes.body.base": 6,
-        "data.attributes.reaction.base": 6,
-        "data.attributes.logic.base": 6,
-        "data.attributes.intuition.base": 6,
-        "data.attributes.willpower.base": 6,
-        "data.attributes.charisma.base": 6,
-        "data.attributes.essence.base": 6
+        "system.attributes.strength.base": 6,
+        "system.attributes.body.base": 6,
+        "system.attributes.reaction.base": 6,
+        "system.attributes.logic.base": 6,
+        "system.attributes.intuition.base": 6,
+        "system.attributes.willpower.base": 6,
+        "system.attributes.charisma.base": 6,
+        "system.attributes.essence.base": 6
       });
-      assert.strictEqual(data.data.limits.physical.value, 8);
-      assert.strictEqual(data.data.limits.mental.value, 8);
-      assert.strictEqual(data.data.limits.social.value, 8);
+      character = actor.asCharacter();
+      assert.strictEqual(character.system.limits.physical.value, 8);
+      assert.strictEqual(character.system.limits.mental.value, 8);
+      assert.strictEqual(character.system.limits.social.value, 8);
     }));
     it("Character movement calculation", () => __async(void 0, null, function* () {
       const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
-      assert.strictEqual(data.data.movement.walk.value, 2);
-      assert.strictEqual(data.data.movement.run.value, 4);
+      let character = actor.asCharacter();
+      assert.strictEqual(character.system.movement.walk.value, 2);
+      assert.strictEqual(character.system.movement.run.value, 4);
       yield actor.update({
-        "data.attributes.agility.base": 6
+        "system.attributes.agility.base": 6
       });
-      assert.strictEqual(data.data.movement.walk.value, 12);
-      assert.strictEqual(data.data.movement.run.value, 24);
+      character = actor.asCharacter();
+      assert.strictEqual(character.system.movement.walk.value, 12);
+      assert.strictEqual(character.system.movement.run.value, 24);
     }));
     it("Character skill calculation", () => __async(void 0, null, function* () {
       const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
+      let character = actor.asCharacter();
       yield actor.update({
-        "data.skills.active.arcana.base": 6,
-        "data.skills.active.arcana.bonus": [{ key: "Test", value: 1 }],
-        "data.skills.active.arcana.specs": ["Test"]
+        "system.skills.active.arcana.base": 6,
+        "system.skills.active.arcana.bonus": [{ key: "Test", value: 1 }],
+        "system.skills.active.arcana.specs": ["Test"]
       });
-      assert.strictEqual(data.data.skills.active.arcana.value, 7);
+      character = actor.asCharacter();
+      assert.strictEqual(character.system.skills.active.arcana.value, 7);
     }));
     it("Character damage application", () => __async(void 0, null, function* () {
       const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
-      assert.strictEqual(data.data.track.stun.value, 0);
-      assert.strictEqual(data.data.track.stun.wounds, 0);
-      assert.strictEqual(data.data.track.physical.value, 0);
-      assert.strictEqual(data.data.track.physical.wounds, 0);
-      assert.strictEqual(data.data.wounds.value, 0);
+      let character = actor.asCharacter();
+      assert.strictEqual(character.system.track.stun.value, 0);
+      assert.strictEqual(character.system.track.stun.wounds, 0);
+      assert.strictEqual(character.system.track.physical.value, 0);
+      assert.strictEqual(character.system.track.physical.wounds, 0);
+      assert.strictEqual(character.system.wounds.value, 0);
       yield actor.update({
-        "data.track.stun.value": 3,
-        "data.track.physical.value": 3
+        "system.track.stun.value": 3,
+        "system.track.physical.value": 3
       });
-      assert.strictEqual(data.data.track.stun.value, 3);
-      assert.strictEqual(data.data.track.stun.wounds, 1);
-      assert.strictEqual(data.data.track.physical.value, 3);
-      assert.strictEqual(data.data.track.physical.wounds, 1);
-      assert.strictEqual(data.data.wounds.value, 2);
+      character = actor.asCharacter();
+      assert.strictEqual(character.system.track.stun.value, 3);
+      assert.strictEqual(character.system.track.stun.wounds, 1);
+      assert.strictEqual(character.system.track.physical.value, 3);
+      assert.strictEqual(character.system.track.physical.wounds, 1);
+      assert.strictEqual(character.system.wounds.value, 2);
     }));
     it("Character damage application with high pain/wound tolerance", () => __async(void 0, null, function* () {
       const actor = yield testActor.create({ type: "character" });
-      const data = actor.asCharacter();
+      let character = actor.asCharacter();
       yield actor.update({
-        "data.track.stun.value": 6,
-        "data.track.physical.value": 6,
-        "data.modifiers.wound_tolerance": 3
+        "system.track.stun.value": 6,
+        "system.track.physical.value": 6,
+        "system.modifiers.wound_tolerance": 3
       });
-      assert.strictEqual(data.data.track.stun.value, 6);
-      assert.strictEqual(data.data.track.stun.wounds, 1);
-      assert.strictEqual(data.data.track.physical.value, 6);
-      assert.strictEqual(data.data.track.physical.wounds, 1);
-      assert.strictEqual(data.data.wounds.value, 2);
+      character = actor.asCharacter();
+      assert.strictEqual(character.system.track.stun.value, 6);
+      assert.strictEqual(character.system.track.stun.wounds, 1);
+      assert.strictEqual(character.system.track.physical.value, 6);
+      assert.strictEqual(character.system.track.physical.wounds, 1);
+      assert.strictEqual(character.system.wounds.value, 2);
     }));
   });
   describe("SpiritDataPrep", () => {
     it("Spirits are always magical", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "spirit" });
-      assert.strictEqual(actor.data.data.special, "magic");
+      const character = yield testActor.create({ type: "spirit" });
+      assert.strictEqual(character.system.special, "magic");
     }));
     it("Spirit default/overrides by example type", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "spirit", "data.spiritType": "air" });
-      const data = actor.asSpirit();
-      assert.strictEqual(data.data.attributes.body.base, -2);
-      assert.strictEqual(data.data.attributes.agility.base, 3);
-      assert.strictEqual(data.data.attributes.reaction.base, 4);
-      assert.strictEqual(data.data.attributes.strength.base, -3);
-      assert.strictEqual(data.data.attributes.intuition.base, 0);
-      assert.strictEqual(data.data.initiative.meatspace.base.base, 4);
-      assert.strictEqual(data.data.skills.active.assensing.base, 0);
+      const actor = yield testActor.create({ type: "spirit", "system.spiritType": "air" });
+      let spirit = actor.asSpirit();
+      assert.strictEqual(spirit.system.attributes.body.base, -2);
+      assert.strictEqual(spirit.system.attributes.agility.base, 3);
+      assert.strictEqual(spirit.system.attributes.reaction.base, 4);
+      assert.strictEqual(spirit.system.attributes.strength.base, -3);
+      assert.strictEqual(spirit.system.attributes.intuition.base, 0);
+      assert.strictEqual(spirit.system.initiative.meatspace.base.base, 4);
+      assert.strictEqual(spirit.system.skills.active.assensing.base, 0);
       yield actor.update({
-        "data.force": 6
+        "system.force": 6
       });
-      assert.strictEqual(data.data.attributes.body.base, 4);
-      assert.strictEqual(data.data.attributes.agility.base, 9);
-      assert.strictEqual(data.data.attributes.reaction.base, 10);
-      assert.strictEqual(data.data.attributes.strength.base, 3);
-      assert.strictEqual(data.data.attributes.intuition.base, 6);
-      assert.strictEqual(data.data.initiative.meatspace.base.base, 16);
-      assert.strictEqual(data.data.skills.active.assensing.base, 6);
-      assert.strictEqual(data.data.skills.active.arcana.base, 0);
+      spirit = actor.asSpirit();
+      assert.strictEqual(spirit.system.attributes.body.base, 4);
+      assert.strictEqual(spirit.system.attributes.agility.base, 9);
+      assert.strictEqual(spirit.system.attributes.reaction.base, 10);
+      assert.strictEqual(spirit.system.attributes.strength.base, 3);
+      assert.strictEqual(spirit.system.attributes.intuition.base, 6);
+      assert.strictEqual(spirit.system.initiative.meatspace.base.base, 16);
+      assert.strictEqual(spirit.system.skills.active.assensing.base, 6);
+      assert.strictEqual(spirit.system.skills.active.arcana.base, 0);
     }));
   });
   describe("SpriteDataPrep", () => {
-    it("Sprites are always awakened", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "sprite" });
-      assert.strictEqual(actor.data.data.special, "resonance");
+    it("Sprites are always resonat", () => __async(void 0, null, function* () {
+      const sprite = yield testActor.create({ type: "sprite" });
+      assert.strictEqual(sprite.system.special, "resonance");
     }));
     it("Sprites default/override values by example type", () => __async(void 0, null, function* () {
-      const actor = yield testActor.create({ type: "sprite", "data.spriteType": "courier" });
-      const data = actor.asSprite();
-      assert.strictEqual(data.data.matrix.sleaze.base, 3);
-      assert.strictEqual(data.data.matrix.data_processing.base, 1);
-      assert.strictEqual(data.data.matrix.firewall.base, 2);
-      assert.strictEqual(data.data.matrix.sleaze.base, 3);
-      assert.strictEqual(data.data.initiative.matrix.base.base, 1);
-      assert.strictEqual(data.data.skills.active.hacking.base, 0);
+      const actor = yield testActor.create({ type: "sprite", "system.spriteType": "courier" });
+      let sprite = actor.asSprite();
+      assert.strictEqual(sprite.system.matrix.sleaze.base, 3);
+      assert.strictEqual(sprite.system.matrix.data_processing.base, 1);
+      assert.strictEqual(sprite.system.matrix.firewall.base, 2);
+      assert.strictEqual(sprite.system.matrix.sleaze.base, 3);
+      assert.strictEqual(sprite.system.initiative.matrix.base.base, 1);
+      assert.strictEqual(sprite.system.skills.active.hacking.base, 0);
       yield actor.update({
-        "data.level": 6
+        "system.level": 6
       });
-      assert.strictEqual(data.data.level, 6);
-      assert.strictEqual(data.data.matrix.sleaze.base, 9);
-      assert.strictEqual(data.data.matrix.data_processing.base, 7);
-      assert.strictEqual(data.data.matrix.firewall.base, 8);
-      assert.strictEqual(data.data.matrix.sleaze.base, 9);
-      assert.strictEqual(data.data.initiative.matrix.base.base, 13);
-      assert.strictEqual(data.data.initiative.matrix.dice.base, 4);
-      assert.strictEqual(data.data.skills.active.hacking.base, 6);
-      assert.strictEqual(data.data.skills.active.computer.base, 6);
-      assert.strictEqual(data.data.skills.active.electronic_warfare.base, 0);
+      sprite = actor.asSprite();
+      assert.strictEqual(sprite.system.level, 6);
+      assert.strictEqual(sprite.system.matrix.sleaze.base, 9);
+      assert.strictEqual(sprite.system.matrix.data_processing.base, 7);
+      assert.strictEqual(sprite.system.matrix.firewall.base, 8);
+      assert.strictEqual(sprite.system.matrix.sleaze.base, 9);
+      assert.strictEqual(sprite.system.initiative.matrix.base.base, 13);
+      assert.strictEqual(sprite.system.initiative.matrix.dice.base, 4);
+      assert.strictEqual(sprite.system.skills.active.hacking.base, 6);
+      assert.strictEqual(sprite.system.skills.active.computer.base, 6);
+      assert.strictEqual(sprite.system.skills.active.electronic_warfare.base, 0);
+    }));
+    it("Matrix condition monitor track calculation with modifiers", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "sprite" });
+      let sprite = actor.asSprite();
+      assert.equal(sprite.system.matrix.condition_monitor.max, 8);
+      yield actor.update({ "system.modifiers.matrix_track": 1 });
+      sprite = actor.asSprite();
+      assert.equal(sprite.system.matrix.condition_monitor.max, 9);
+    }));
+  });
+  describe("VehicleDataPrep", () => {
+    it("Matrix condition monitor track calculation with modifiers", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "vehicle" });
+      let vehicle = actor.asVehicle();
+      assert.equal(vehicle.system.matrix.condition_monitor.max, 8);
+      yield actor.update({ "system.modifiers.matrix_track": 1 });
+      vehicle = actor.asVehicle();
+      assert.equal(vehicle.system.matrix.condition_monitor.max, 9);
+    }));
+  });
+  describe("ICDataPrep", () => {
+    it("Matrix condition monitor track calculation with modifiers", () => __async(void 0, null, function* () {
+      const actor = yield testActor.create({ type: "ic" });
+      let ic = actor.asIC();
+      assert.equal(ic.system.matrix.condition_monitor.max, 8);
+      yield actor.update({ "system.modifiers.matrix_track": 1 });
+      ic = actor.asIC();
+      assert.equal(ic.system.matrix.condition_monitor.max, 9);
     }));
   });
 };
@@ -27453,22 +27955,22 @@ var shadowrunTesting = (context) => {
   describe("SuccessTest", () => {
     it("evaluate a roll from action data", () => __async(void 0, null, function* () {
       const actionData = {
-        "data.action.test": "SuccessTest",
+        "system.action.test": "SuccessTest",
         "type": "action",
-        "data.action.type": "simple",
-        "data.action.attribute": "body",
-        "data.action.skill": "automatics",
-        "data.action.spec": false,
-        "data.action.limit": {
+        "system.action.type": "simple",
+        "system.action.attribute": "body",
+        "system.action.skill": "automatics",
+        "system.action.spec": false,
+        "system.action.limit": {
           base: 1,
           value: 1,
           attribute: "physical"
         },
-        "data.action.threshold": {
+        "system.action.threshold": {
           base: 1,
           value: 1
         },
-        "data.action.damage": {
+        "system.action.damage": {
           ap: { value: 5, base: 5, mod: Array(0) },
           attribute: "",
           base: 5,
@@ -27483,11 +27985,11 @@ var shadowrunTesting = (context) => {
       const action = yield testItem.create(actionData);
       const actorData = {
         "type": "character",
-        "data.attributes.body.base": 5,
-        "data.skills.active.automatics.base": 45
+        "system.attributes.body.base": 5,
+        "system.skills.active.automatics.base": 45
       };
       const actor = yield testActor.create(actorData);
-      const test = yield TestCreator.fromItem(action, actor);
+      const test = yield TestCreator.fromItem(action, actor, { showMessage: false, showDialog: false });
       if (!test)
         assert.strictEqual(true, false);
       if (test) {
@@ -27496,14 +27998,10 @@ var shadowrunTesting = (context) => {
         assert.strictEqual(test.pool.value, 50);
         assert.strictEqual(test.threshold.value, 1);
         assert.strictEqual(test.limit.value, 4);
-        assert.strictEqual(test.netHits.value, 3);
-        assert.strictEqual(test.hasReducedHits, true);
-        assert.strictEqual(test.hasThreshold, true);
-        assert.strictEqual(test.hasLimit, true);
       }
     }));
     it("evaluate a roll from simple pool data", () => __async(void 0, null, function* () {
-      const test = TestCreator.fromPool({ pool: 10 });
+      const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
       yield test.evaluate();
       assert.strictEqual(test.pool.value, 10);
     }));
@@ -27541,7 +28039,7 @@ var shadowrunTesting = (context) => {
         "data.skills.active.automatics.base": 45
       };
       const actor = yield testActor.create(actorData);
-      const test = yield TestCreator.fromItem(action, actor);
+      const test = yield TestCreator.fromItem(action, actor, { showMessage: false, showDialog: false });
       if (test) {
         yield test.toMessage();
       }
@@ -27612,6 +28110,7 @@ var shadowrunInventoryFlow = (context) => {
 var quenchRegister = (quench) => {
   if (!quench)
     return;
+  console.info("Shadowrun 5e | Registering quench unittests");
   console.warn("Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)");
   quench.registerBatch("shadowrun5e.rules.matrix", shadowrunMatrix, { displayName: "SHADOWRUN5e: Matrix Test" });
   quench.registerBatch("shadowrun5e.rules.modifiers", shadowrunRulesModifiers, { displayName: "SHADOWRUN5e: Modifiers Test" });
@@ -27622,6 +28121,99 @@ var quenchRegister = (quench) => {
   quench.registerBatch("shadowrun5e.flow.networkDevices", shadowrunNetworkDevices, { displayName: "SHADOWRUN5e: Matrix Network Devices Test" });
   quench.registerBatch("shadowrun5e.flow.inventory", shadowrunInventoryFlow, { displayName: "SHADOWRUN5e: InventoryFlow Test" });
   quench.registerBatch("shadowrun5e.flow.tests", shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
+};
+
+// src/module/macros.ts
+function createItemMacro(item, slot) {
+  return __async(this, null, function* () {
+    var _a;
+    if (!game || !game.macros)
+      return;
+    const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
+    let macro = game.macros.contents.find((m) => m.name === item.name);
+    if (!macro) {
+      macro = yield Macro.create(
+        {
+          name: item.name,
+          type: "script",
+          img: item.img,
+          command,
+          flags: { "shadowrun5e.itemMacro": true }
+        },
+        { renderSheet: false }
+      );
+    }
+    if (macro)
+      (_a = game.user) == null ? void 0 : _a.assignHotbarMacro(macro, slot);
+  });
+}
+function rollItemMacro(itemName) {
+  var _a;
+  if (!game || !game.actors)
+    return;
+  const speaker = ChatMessage.getSpeaker();
+  let actor;
+  if (speaker.token)
+    actor = game.actors.tokens[speaker.token];
+  if (!speaker.actor)
+    return;
+  if (!actor)
+    actor = game.actors.get(speaker.actor);
+  const item = actor ? actor.items.find((i) => i.name === itemName) : null;
+  if (!item) {
+    return (_a = ui.notifications) == null ? void 0 : _a.warn(`Your controlled Actor does not have an item named ${itemName}`);
+  }
+  return item.castAction();
+}
+function createSkillMacro(data, slot) {
+  return __async(this, null, function* () {
+    if (!game.macros || !game.user)
+      return;
+    const { skillId, skill } = data;
+    const name = Helpers.getSkillLabelOrName(skill);
+    const existingMacro = game.macros.contents.find((macro2) => macro2.name === name);
+    if (existingMacro)
+      return;
+    const command = `game.shadowrun5e.rollSkillMacro("${name}");`;
+    const macro = yield Macro.create({
+      name,
+      type: "script",
+      command
+    });
+    if (macro)
+      yield game.user.assignHotbarMacro(macro, slot);
+  });
+}
+function rollSkillMacro(skillLabel) {
+  return __async(this, null, function* () {
+    if (!game || !game.actors)
+      return;
+    if (!skillLabel)
+      return;
+    const speaker = ChatMessage.getSpeaker();
+    if (!speaker)
+      return;
+    const actor = game.actors.tokens[speaker.token] || game.actors.get(speaker.actor);
+    if (!actor)
+      return;
+    yield actor.rollSkill(skillLabel, { byLabel: true });
+  });
+}
+
+// src/module/keybindings.ts
+var registerSystemKeybindings = () => {
+  game.keybindings.register("shadowrun5e", "show-situation-modifier-app", {
+    name: "SR5.Keybinding.ShowSituationModifiers.Label",
+    hint: "SR5.Keybinding.ShowSituationModifiers.Hint",
+    editable: [{ key: "KeyM", modifiers: [] }],
+    onDown: () => SituationModifiersApplication.openForKeybinding()
+  });
+  game.keybindings.register("shadowrun5e", "show-overwatch-tracker-app", {
+    name: "SR5.Keybinding.OverwatchScoreTracker.Label",
+    hint: "SR5.Keybinding.OverwatchScoreTracker.Hint",
+    editable: [{ key: "KeyO", modifiers: [] }],
+    onDown: () => new OverwatchScoreTracker().render(true)
+  });
 };
 
 // src/module/hooks.ts
@@ -27637,13 +28229,13 @@ var HooksManager = class {
     Hooks.on("getSceneControlButtons", HooksManager.getSceneControlButtons);
     Hooks.on("getCombatTrackerEntryContext", SR5Combat.addCombatTrackerContextOptions);
     Hooks.on("renderItemDirectory", HooksManager.renderItemDirectory);
-    Hooks.on("renderTokenHUD", EnvModifiersApplication.addTokenHUDFields);
+    Hooks.on("renderTokenHUD", SituationModifiersApplication.onRenderTokenHUD);
     Hooks.on("updateItem", HooksManager.updateIcConnectedToHostItem);
     Hooks.on("deleteItem", HooksManager.removeDeletedItemsFromNetworks);
     Hooks.on("getChatLogEntryContext", SuccessTest.chatMessageContextOptions);
     Hooks.on("renderChatLog", HooksManager.chatLogListeners);
     Hooks.on("preUpdateCombatant", SR5Combat.onPreUpdateCombatant);
-    Hooks.on("init", quenchRegister);
+    Hooks.on("quenchReady", quenchRegister);
   }
   static init() {
     console.log(`Loading Shadowrun 5e System
@@ -27729,6 +28321,7 @@ ___________________
     CONFIG.Dice.SR5oll = SR5Roll;
     CONFIG.SR5 = SR5;
     registerSystemSettings();
+    registerSystemKeybindings();
     Actors.unregisterSheet("core", ActorSheet);
     Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
       label: "SR5.SheetActor",
@@ -27828,7 +28421,7 @@ ___________________
         button: true
       });
     }
-    tokenControls.tools.push(EnvModifiersApplication.getControl());
+    tokenControls.tools.push(SituationModifiersApplication.getControl());
   }
   static renderChatMessage() {
     console.debug("Shadowrun5e | Registering new chat messages related hooks");
@@ -27907,7 +28500,7 @@ ___________________
       sheetClasses: [{
         name: "ActiveEffectConfig",
         fieldConfigs: [
-          { selector: `.tab[data-tab="effects"] .key input[type="text"]`, defaultPath: "data", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA }
+          { selector: `.tab[data-tab="effects"] .key input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA }
         ]
       }]
     };
