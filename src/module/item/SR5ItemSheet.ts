@@ -4,6 +4,8 @@ import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import {ItemData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
 
+import Tagify from '@yaireo/tagify';
+
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
@@ -251,13 +253,20 @@ export class SR5ItemSheet extends ItemSheet {
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
         html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-remove-one').on('click', async (event) =>
+         this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
 
         // Origin Link handling
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
+
+        // https://github.com/yairEO/tagify Dependency
+        var inputElement = html.find('input#action-modifier').get(0);
+        const tagify = new Tagify(inputElement);
+        tagify.whitelist = ['wounds', 'global', 'environmental'];
+        tagify.addTags(['wounds', 'global']);
     }
 
     async _onDrop(event) {

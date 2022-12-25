@@ -4,6 +4,7 @@
         "@jgoz/esbuild-plugin-typecheck": "^2.0.0",
         "@league-of-foundry-developers/foundry-vtt-types": "^9.269.0",
         "@types/node": "^18.11.0",
+        "@yaireo/tagify": "^4.17.6",
         "buffer": "^6.0.3",
         "chalk": "^4.1.2",
         "del": "^5.1.0",

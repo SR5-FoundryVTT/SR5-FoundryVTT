@@ -17,7 +17,6 @@ import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
-import ModifierData = Shadowrun.ModifierData;
 
 
 /**
