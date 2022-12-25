@@ -262,11 +262,25 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
-        // https://github.com/yairEO/tagify Dependency
-        var inputElement = html.find('input#action-modifier').get(0);
-        const tagify = new Tagify(inputElement);
-        tagify.whitelist = ['wounds', 'global', 'environmental'];
-        tagify.addTags(['wounds', 'global']);
+        if (this.document.isAction()) {
+            // https://github.com/yairEO/tagify Dependency
+            var inputElement = html.find('input#action-modifier').get(0);
+            const tagify = new Tagify(inputElement, {
+                enforceWhitelist: true,
+                editTags: false,
+                skipInvalid: true,
+                dropdown: {
+                    maxItems: Object.keys(SR5.modifierTypes).length,
+                    fuzzySearch: true,
+                    enabled: 0
+                }
+            });
+            tagify.whitelist = Object.keys(SR5.modifierTypes);
+            tagify.addTags(this.document.system.action?.modifiers ?? []);
+            console.error(tagify);
+        }
+
+        
     }
 
     async _onDrop(event) {
