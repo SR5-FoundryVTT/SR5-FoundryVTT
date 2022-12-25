@@ -1,7 +1,7 @@
 # Shadowrun5e for Foundry Virtual Tabletop
 Manifest: https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json
 
-There is no discord channel / server for the moment.
+Come on the FoundryVTT discord shadowrun5e channel and have a chat. :)
 
 We will always be happy to look at a Pull Request if there are features or bugs you'd like to work on.
 
