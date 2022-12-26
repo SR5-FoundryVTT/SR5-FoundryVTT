@@ -263,6 +263,12 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
         if (this.document.isAction()) {
+
+            /**
+             * Prepare a tagify input wiht a internal value (id) and display value (i18n label).
+             * 
+             * Later on the id property must be used for processing.
+             */
             // https://github.com/yairEO/tagify Dependency
             var inputElement = html.find('input#action-modifier').get(0);
             const tagify = new Tagify(inputElement, {
@@ -272,15 +278,33 @@ export class SR5ItemSheet extends ItemSheet {
                 dropdown: {
                     maxItems: Object.keys(SR5.modifierTypes).length,
                     fuzzySearch: true,
-                    enabled: 0
+                    enabled: 0,
+                    searchKeys: ["id", "value"]
                 }
             });
-            tagify.whitelist = Object.keys(SR5.modifierTypes);
-            tagify.addTags(this.document.system.action?.modifiers ?? []);
-            console.error(tagify);
-        }
 
-        
+            const whitelist = Object.keys(SR5.modifierTypes).map(modifier => ({
+                value: game.i18n.localize(SR5.modifierTypes[modifier]),
+                id: modifier
+            }));
+            
+            // Use localized label as value, and modifier as the later to be extracted value 
+            const modifiers = this.document.system.action?.modifiers ?? []; 
+            const tags = modifiers.map(modifier => ({
+                value: game.i18n.localize(SR5.modifierTypes[modifier]),
+                id: modifier
+            }));
+
+            tagify.whitelist = whitelist;
+            tagify.addTags(tags);
+
+            html.find('input#action-modifier').on('change', async (event) => {
+                console.error(tagify.value);
+                const modifiers = tagify.value.map(tag => tag.id);
+                // render would loose tagify input focus. submit on close will save.
+                await this.document.update({'system.action.modifiers': modifiers}, {render:false});
+            })
+        }
     }
 
     async _onDrop(event) {
