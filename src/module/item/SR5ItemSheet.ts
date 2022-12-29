@@ -3,8 +3,7 @@ import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import {ItemData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
-
-import Tagify from '@yaireo/tagify';
+import { createTagify } from '../utils/sheets';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -262,48 +261,10 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
+        // Prepare listeners only applied to item type action
         if (this.document.isAction()) {
-
-            /**
-             * Prepare a tagify input wiht a internal value (id) and display value (i18n label).
-             * 
-             * Later on the id property must be used for processing.
-             */
-            // https://github.com/yairEO/tagify Dependency
-            var inputElement = html.find('input#action-modifier').get(0);
-            const tagify = new Tagify(inputElement, {
-                enforceWhitelist: true,
-                editTags: false,
-                skipInvalid: true,
-                dropdown: {
-                    maxItems: Object.keys(SR5.modifierTypes).length,
-                    fuzzySearch: true,
-                    enabled: 0,
-                    searchKeys: ["id", "value"]
-                }
-            });
-
-            const whitelist = Object.keys(SR5.modifierTypes).map(modifier => ({
-                value: game.i18n.localize(SR5.modifierTypes[modifier]),
-                id: modifier
-            }));
+            this._createActionModifierTagify(html);
             
-            // Use localized label as value, and modifier as the later to be extracted value 
-            const modifiers = this.document.system.action?.modifiers ?? []; 
-            const tags = modifiers.map(modifier => ({
-                value: game.i18n.localize(SR5.modifierTypes[modifier]),
-                id: modifier
-            }));
-
-            tagify.whitelist = whitelist;
-            tagify.addTags(tags);
-
-            html.find('input#action-modifier').on('change', async (event) => {
-                console.error(tagify.value);
-                const modifiers = tagify.value.map(tag => tag.id);
-                // render would loose tagify input focus. submit on close will save.
-                await this.document.update({'system.action.modifiers': modifiers}, {render:false});
-            })
         }
     }
 
@@ -494,6 +455,42 @@ export class SR5ItemSheet extends ItemSheet {
      */
     _findActiveList() {
         return $(this.element).find('.tab.active .scroll-area');
+    }
+
+    /**
+     * Add a tagify element for an action-modifier dom element.
+     * 
+     * Usage: Call method after render with a singular item's html sub-dom-tree.
+     * 
+     * @param html see DocumentSheet.activateListeners#html param for documentation.
+     */
+    _createActionModifierTagify(html) {
+        var inputElement = html.find('input#action-modifier').get(0);
+
+        // Tagify expects this format for localized tags.
+        const whitelist = Object.keys(SR5.modifierTypes).map(modifier => ({
+            value: game.i18n.localize(SR5.modifierTypes[modifier]),
+            id: modifier
+        }));
+
+        // Tagify dropdown should show all whitelist tags. 
+        const maxItems = Object.keys(SR5.modifierTypes).length;
+
+        // Use localized label as value, and modifier as the later to be extracted value 
+        const modifiers = this.document.system.action?.modifiers ?? []; 
+        const tags = modifiers.map(modifier => ({
+            value: game.i18n.localize(SR5.modifierTypes[modifier]),
+            id: modifier
+        }));
+
+        const tagify = createTagify(inputElement, {whitelist, maxItems, tags});
+
+        html.find('input#action-modifier').on('change', async (event) => {
+            console.error(tagify.value);
+            const modifiers = tagify.value.map(tag => tag.id);
+            // render would loose tagify input focus. submit on close will save.
+            await this.document.update({'system.action.modifiers': modifiers}, {render:false});
+        });
     }
 
     /** This is needed to circumvent Application.close setting closed state early, due to it's async animation
