@@ -486,7 +486,6 @@ export class SR5ItemSheet extends ItemSheet {
         const tagify = createTagify(inputElement, {whitelist, maxItems, tags});
 
         html.find('input#action-modifier').on('change', async (event) => {
-            console.error(tagify.value);
             const modifiers = tagify.value.map(tag => tag.id);
             // render would loose tagify input focus. submit on close will save.
             await this.document.update({'system.action.modifiers': modifiers}, {render:false});
