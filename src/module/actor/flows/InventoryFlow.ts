@@ -31,10 +31,14 @@ export class InventoryFlow {
      * Create an inventory place for gear organization.
      *
      * @param name How to name the inventory, will also be its label for custom inventories.
+     * @returns Created inventories name
      */
-    async create(name: string) {
+    async create(name: string): Promise<string|void> {
         console.log(`Shadowrun 5e | Creating inventory ${name}`);
 
+        name = InventoryFlow._sanitzeName(name);
+
+        if (name.length === 0) return console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
         if (this.exists(name)) return ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
         if (this.document.defaultInventory.name === name) return;
 
@@ -50,7 +54,9 @@ export class InventoryFlow {
 
         console.log(`Shadowrun 5e | Executing update to create inventory`, updateData)
         // Don't render to allow sheets to manage switching inventories.
-        return await this.document.update(updateData, {render: false})
+        await this.document.update(updateData, {render: false});
+
+        return name;
     }
 
     /**
@@ -128,9 +134,12 @@ export class InventoryFlow {
      * @param current The old name of the inventory.
      * @param newName The new name of the inventory.
      */
-    async rename(current: string, newName: string) {
+    async rename(current: string, newName: string): Promise<string|void> {
         console.log(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
 
+        newName = InventoryFlow._sanitzeName(newName);
+
+        if (newName.length === 0) return console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
         if (this.document.defaultInventory.name === current) return;
         if (current === newName) return;
 
@@ -151,6 +160,8 @@ export class InventoryFlow {
         console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
         // Don't render to allow sheets to manage switching inventories.
         await this.document.update(updateData, {render: false});
+
+        return newName;
     }
 
     /**
@@ -220,5 +231,14 @@ export class InventoryFlow {
 
         console.log(`Shadowrun 5e | Executing update to remove item`, updateData);
         if (updateData) await this.document.update(updateData);
+    }
+
+    /**
+     * Sanitize inventory name to not use characters used within FoundryVTT Document#update and expandObject methods.
+     * 
+     * @param name The inventory name, maybe containing prohibited characters
+     */
+    static _sanitzeName(name: string): string {
+        return Helpers.sanitizeDataKey(name);
     }
 }

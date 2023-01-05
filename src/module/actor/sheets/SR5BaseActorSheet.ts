@@ -1495,19 +1495,21 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const inputElement = $('#input-inventory');
         const action = inputElement.data('action');
-        let inventory = String(inputElement.val());
+        let inventory: string|void = String(inputElement.val());
         if (!inventory) return;
 
         switch (action) {
             case 'edit':
-                await this.document.inventory.rename(this.selectedInventory, inventory);
+                inventory = await this.document.inventory.rename(this.selectedInventory, inventory);
                 break;
             case 'create':
-                await this.document.inventory.create(inventory);
+                inventory = await this.document.inventory.create(inventory);
                 break;
         }
 
         await this._onInplaceInventoryEditCancel(event);
+
+        if (!inventory) return;
 
         // Preselect the new or previous inventory.
         this.selectedInventory = inventory;

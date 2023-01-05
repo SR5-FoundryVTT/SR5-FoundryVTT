@@ -24,7 +24,7 @@ export const shadowrunInventoryFlow = context => {
 
             await actor.inventory.create('test');
 
-            assert.deepEqual(actor.data.data.inventories, {
+            assert.deepEqual(actor.system.inventories, {
                 'test': {
                     name: 'test',
                     label: 'test',
@@ -41,7 +41,7 @@ export const shadowrunInventoryFlow = context => {
 
             await actor.inventory.remove('test');
 
-            assert.deepEqual(actor.data.data.inventories, {});
+            assert.deepEqual(actor.system.inventories, {});
         });
 
         it('add and remove an item to and from an inventory', async () => {
@@ -51,10 +51,10 @@ export const shadowrunInventoryFlow = context => {
 
             await actor.inventory.addItems('test', item);
             const itemIds = item.map(item => item.id);
-            assert.deepEqual(actor.data.data.inventories.test.itemIds, itemIds);
+            assert.deepEqual(actor.system.inventories.test.itemIds, itemIds);
 
             await actor.inventory.removeItem(item[0]);
-            assert.deepEqual(actor.data.data.inventories.test.itemIds, []);
+            assert.deepEqual(actor.system.inventories.test.itemIds, []);
         });
 
         it('rename an existing inventory', async () => {
@@ -63,11 +63,43 @@ export const shadowrunInventoryFlow = context => {
 
             await actor.inventory.rename('test', 'betterTest');
 
-            assert.deepEqual(actor.data.data.inventories, {
+            assert.deepEqual(actor.system.inventories, {
                 'betterTest': {
                     name: 'betterTest',
                     label: 'betterTest',
                     itemIds: ['asd']
+                }
+            });
+        });
+
+        it('create and rename an inventory including prohibited foundry chars', async () => {
+            const actor = await testActor.create({type: 'character'});
+            
+            await actor.inventory.create('Test.');            
+            assert.deepEqual(actor.system.inventories, {
+                'Test': {
+                    name: 'Test',
+                    label: 'Test',
+                    itemIds: []
+                }
+            });
+
+            await actor.inventory.rename('Test', 'Test.');
+            assert.deepEqual(actor.system.inventories, {
+                'Test': {
+                    name: 'Test',
+                    label: 'Test',
+                    itemIds: []
+                }
+            });
+
+            await actor.inventory.remove('Test');
+            await actor.inventory.create('-=Fisch.');            
+            assert.deepEqual(actor.system.inventories, {
+                'Fisch': {
+                    name: 'Fisch',
+                    label: 'Fisch',
+                    itemIds: []
                 }
             });
         });
