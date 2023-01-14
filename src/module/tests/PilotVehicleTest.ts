@@ -11,7 +11,7 @@ export class PilotVehicleTest extends SuccessTest {
         // Both item and actor are needed to determine what to roll.
         if (!item || !actor) return {};
 
-        const vehicleData = actor.asVehicleData();
+        const vehicleData = actor.asVehicle();
         if (!vehicleData) {
             await ui.notifications?.error(game.i18n.localize('SR5.ERROR.TestExpectsVehicleOnly'))
             return {};
