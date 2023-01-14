@@ -78,10 +78,10 @@ export const shadowrunNetworkDevices = context => {
 
             await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
 
-            assert.strictEqual(device.data.data.technology.networkController, controller.uuid);
-            assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
+            assert.strictEqual(device.system.technology.networkController, controller.uuid);
+            assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.system.technology.networkController), controller);
 
-            assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
+            assert.deepEqual(controller.system.networkDevices, [device.uuid]);
         });
 
         it('connect a host controller to a network device', async () => {
@@ -90,10 +90,10 @@ export const shadowrunNetworkDevices = context => {
 
             await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
 
-            assert.strictEqual(device.data.data.technology.networkController, controller.uuid);
-            assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
+            assert.strictEqual(device.system.technology.networkController, controller.uuid);
+            assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.system.technology.networkController), controller);
 
-            assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
+            assert.deepEqual(controller.system.networkDevices, [device.uuid]);
         });
 
         it('get all connected network devices of a controller as their Document', async () => {
@@ -109,7 +109,7 @@ export const shadowrunNetworkDevices = context => {
             const fetchedDevices = NetworkDeviceFlow.getNetworkDevices(controller);
 
             // Check for structural equality.
-            assert.strictEqual(controller.data.data.networkDevices.length, 1);
+            assert.strictEqual(controller.system.networkDevices.length, 1);
             assert.strictEqual(fetchedDevices.length, 1);
 
             // Check for referential equality.
@@ -125,8 +125,8 @@ export const shadowrunNetworkDevices = context => {
             await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
             await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, device.uuid);
 
-            assert.deepEqual(controller.data.data.networkDevices, []);
-            assert.strictEqual(device.data.data.technology.networkController, '');
+            assert.deepEqual(controller.system.networkDevices, []);
+            assert.strictEqual(device.system.technology.networkController, '');
         });
 
         it('remove a device from a network when it is added to a new one', async () => {
@@ -137,9 +137,9 @@ export const shadowrunNetworkDevices = context => {
             await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
             await NetworkDeviceFlow.addDeviceToNetwork(newController, device);
 
-            assert.deepEqual(controller.data.data.networkDevices, []);
-            assert.deepEqual(newController.data.data.networkDevices, [device.uuid]);
-            assert.strictEqual(device.data.data.technology.networkController, newController.uuid);
+            assert.deepEqual(controller.system.networkDevices, []);
+            assert.deepEqual(newController.system.networkDevices, [device.uuid]);
+            assert.strictEqual(device.system.technology.networkController, newController.uuid);
         });
 
         it('remove a network device that doesnt exist anymore', async () => {
@@ -148,17 +148,17 @@ export const shadowrunNetworkDevices = context => {
             const deviceId = device.id;
             await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
             // Simulate user deleting the network item.
-            await testItem.delete(deviceId);
+            await device.delete();
 
             // Make sure item is actually deleted.
             const collectionItem = game.items?.get(deviceId);
             assert.strictEqual(collectionItem, undefined);
 
             // However the device is still connected to the controller.
-            assert.strictEqual(controller.data.data.networkDevices.length, 1);
-            await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, controller.data.data.networkDevices[0]);
+            assert.strictEqual(controller.system.networkDevices.length, 1);
+            await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, controller.system.networkDevices[0]);
 
-            assert.deepEqual(controller.data.data.networkDevices, []);
+            assert.deepEqual(controller.system.networkDevices, []);
         });
 
         it('remove all devices from a controller', async () => {
@@ -173,9 +173,9 @@ export const shadowrunNetworkDevices = context => {
 
             await NetworkDeviceFlow.removeAllDevicesFromNetwork(controller);
 
-            assert.deepEqual(controller.data.data.networkDevices, []);
+            assert.deepEqual(controller.system.networkDevices, []);
             for (const device of devices) {
-                assert.strictEqual(device.data.data.technology.networkController, '');
+                assert.strictEqual(device.system.technology.networkController, '');
             }
         });
     });
