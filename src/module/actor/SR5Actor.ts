@@ -66,15 +66,15 @@ import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
  *
- * To easily access Actor.data without any typing issues us the SR5Actor.asCritterData helpers.
+ * To easily access Actor.data without any typing issues us the SR5Actor.asCritter helpers.
  * They are set up in a way that will handle both error management and type narrowing.
  * Example:
  * <pre><code>
  *     const actor = game.actors.get('randomId');
- *     const critterData = actor.asCritterData();
- *     if (!critterData) return;
- *     // critterData.type === 'critter'
- *     // critterData.data as CritterData
+ *     const critter = actor.asCritter();
+ *     if (!critter) return;
+ *     // critter.type === 'critter'
+ *     // critter.system as CritterData
  * </code></pre>
  *
  */

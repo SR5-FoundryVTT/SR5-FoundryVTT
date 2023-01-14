@@ -1014,4 +1014,17 @@ export class Helpers {
 
         handler(type, changeData, applyData);
     }
+
+    /**
+     * Sanitize keys to not use characters used within FoundryVTT Document#update and expandObject methods.
+     * 
+     * @param key The key, maybe containing prohibited characters
+     * @param replace The characters to replaces prohibited characters with
+     * @returns key without 
+     */
+    static sanitizeDataKey(key: string, replace: string=''): string {
+        const spicyCharacters = ['.', '-='];
+        spicyCharacters.forEach(character => key = key.replace(character, replace));
+        return key;
+    }
 }

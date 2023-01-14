@@ -17,7 +17,6 @@ import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
-import ModifierData = Shadowrun.ModifierData;
 
 
 /**
@@ -181,7 +180,8 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /** SheetData used by _all_ actor types! */
     async getData(options) {
-        // Foundry v8 redesigned SheetData. To avoid restructuring all sheet templates, map new onto old and ignore it.
+        // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
+        // NOTE: If this is changed, you'll have to match changes on all actor sheets.
         let data = super.getData() as any;
         const actorData = this.actor.toObject(false);
 
@@ -189,7 +189,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             ...data,
             // @ts-ignore TODO: foundry-vtt-types v10
             data: actorData.system,
-             // @ts-ignore TODO: foundry-vtt-types v10
+            // @ts-ignore TODO: foundry-vtt-types v10
             system: actorData.system
         }
 
@@ -714,26 +714,28 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * Special fields are shared across all actor types
+     * Special fields are shared across all actor types.
+     * 
+     * These are used as indicators about what kind of 'special' a character might be.
      *
-     * @param data
+     * @param data ActorSheetData as created within getData method
      */
-    _prepareSpecialFields(data) {
-        const {modifiers} = data.data;
+    _prepareSpecialFields(data: SR5ActorSheetData) {
+        const {modifiers} = data.system;
 
-        data.awakened = data.data.special === 'magic';
-        data.emerged = data.data.special === 'resonance';
+        data.awakened = data.system.special === 'magic';
+        data.emerged = data.system.special === 'resonance';
         data.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
     }
 
     /**
      * Pretty up display of zero value actor modifiers.
      *
-     * @param data
+     * @param data ActorSheetData as created within getData method
      */
     _prepareActorModifiers(data: SR5ActorSheetData) {
          // Empty zero value modifiers for display purposes.
-        const { modifiers: mods } = data.data;
+        const { modifiers: mods } = data.system;
         for (let [key, value] of Object.entries(mods)) {
             if (value === 0) mods[key] = '';
         }
@@ -741,7 +743,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     _prepareActorAttributes(data: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attributes = data.data.attributes;
+        const attributes = data.system.attributes;
         for (let [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
                 if (attribute.temp === 0) delete attribute.temp;
@@ -749,8 +751,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         }
     }
 
-    _prepareMatrixAttributes(data) {
-        const { matrix } = data.data;
+    _prepareMatrixAttributes(data: SR5ActorSheetData) {
+        //@ts-ignore Since we're field checking, we can ignore typing...
+        const { matrix } = data.system;
         if (matrix) {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
                 const att = matrix[attribute];
@@ -785,7 +788,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._addInventoryTypes(inventories[this.document.defaultInventory.name]);
 
         // Build all inventories, group items by their types.
-        Object.values(this.document.data.data.inventories).forEach(({name, label, itemIds}) => {
+        Object.values(this.document.system.inventories).forEach(({name, label, itemIds}) => {
             inventories[name] = {
                 name,
                 label,
@@ -1038,11 +1041,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     _showMagicSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
-        return this._isSkillMagic(skillId, skill) && data.data.special === 'magic' && this._isSkillFiltered(skillId, skill);
+        return this._isSkillMagic(skillId, skill) && data.system.special === 'magic' && this._isSkillFiltered(skillId, skill);
     }
 
     _showResonanceSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
-        return this._isSkillResonance(skill) && data.data.special === 'resonance' && this._isSkillFiltered(skillId, skill);
+        return this._isSkillResonance(skill) && data.system.special === 'resonance' && this._isSkillFiltered(skillId, skill);
     }
 
     _isSkillFiltered(skillId, skill) {
@@ -1077,22 +1080,22 @@ export class SR5BaseActorSheet extends ActorSheet {
     _filterKnowledgeSkills(data: SR5ActorSheetData) {
         // Knowledge skill have separate sub-categories.
         Object.keys(SR5.knowledgeSkillCategories).forEach((category) => {
-            if (!data.data.skills.knowledge.hasOwnProperty(category)) {
+            if (!data.system.skills.knowledge.hasOwnProperty(category)) {
                 console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
                 return;
             }
-            data.data.skills.knowledge[category].value = this._filterSkills(data, data.data.skills.knowledge[category].value);
+            data.system.skills.knowledge[category].value = this._filterSkills(data, data.system.skills.knowledge[category].value);
         });
     }
 
     _filterLanguageSkills(data: SR5ActorSheetData) {
         // Language Skills have no sub-categories.
-        data.data.skills.language.value = this._filterSkills(data, data.data.skills.language.value);
+        data.system.skills.language.value = this._filterSkills(data, data.system.skills.language.value);
     }
 
     _filterActiveSkills(data: SR5ActorSheetData) {
         // Handle active skills directly, as it doesn't use sub-categories.
-        data.data.skills.active = this._filterSkills(data, data.data.skills.active);
+        data.system.skills.active = this._filterSkills(data, data.system.skills.active);
     }
 
     _isSkillMagic(id, skill) {
@@ -1329,15 +1332,20 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Change the quantity on an item shown within a sheet item list.
+     * 
+     * @param event A DOM mouse/touch event
      */
     async _onListItemChangeQuantity(event) {
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
-        const qty = parseInt(event.currentTarget.value);
-        if (item && qty && "technology" in item.data.data) {
-            item.data.data.technology.quantity = qty;
-            await item.update({ 'data.technology.quantity': qty });
+        const quantity = parseInt(event.currentTarget.value);
+
+        // Inform users about issues with templating or programming.
+        if (item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
+            return console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item);
         }
+        	
+        await item.update({ 'system.technology.quantity': quantity });
     }
 
     /**
@@ -1496,19 +1504,21 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const inputElement = $('#input-inventory');
         const action = inputElement.data('action');
-        let inventory = String(inputElement.val());
+        let inventory: string|void = String(inputElement.val());
         if (!inventory) return;
 
         switch (action) {
             case 'edit':
-                await this.document.inventory.rename(this.selectedInventory, inventory);
+                inventory = await this.document.inventory.rename(this.selectedInventory, inventory);
                 break;
             case 'create':
-                await this.document.inventory.create(inventory);
+                inventory = await this.document.inventory.create(inventory);
                 break;
         }
 
         await this._onInplaceInventoryEditCancel(event);
+
+        if (!inventory) return;
 
         // Preselect the new or previous inventory.
         this.selectedInventory = inventory;
@@ -1581,14 +1591,17 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * Sync matrix attribute changes (order) made on the actor sheet into item data.
+     * Sync matrix attribute changes (order) made on the actor sheet into item data of the selected cyberdeck.
      *
-     * @param event
+     * This is done whenever a user changes matrix attribute order directly from the actor sheet matrix section.
+     * It's intent is to also order matrix attribute order on the selected matrix device of that actor.
+     * 
+     * @param event A mouse/pointer event
      */
     async _onMatrixAttributeSelected(event) {
-        if (!("matrix" in this.actor.data.data)) return;
+        if (!("matrix" in this.actor.system)) return;
 
-        let iid = this.actor.data.data.matrix.device;
+        let iid = this.actor.system.matrix.device;
         let item = this.actor.items.get(iid);
         if (!item) {
             console.error('could not find item');
@@ -1600,7 +1613,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         let deviceAtt = event.currentTarget.value;
 
         // get current matrix attribute on the device
-        const deviceData = item.data.data as DeviceData;
+        const deviceData = item.system as DeviceData;
         let oldVal = deviceData.atts[deviceAtt].att;
         let data = {
             _id: iid,

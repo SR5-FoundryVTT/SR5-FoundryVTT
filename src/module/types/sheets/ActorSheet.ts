@@ -1,7 +1,7 @@
 declare namespace Shadowrun {
     export interface SR5ActorSheetData {
         config: typeof SR5CONFIG
-        data: ShadowrunActorDataData
+        system: ShadowrunActorDataData
         filters: SR5SheetFilters
         isCharacter: boolean
         isSpirit: boolean

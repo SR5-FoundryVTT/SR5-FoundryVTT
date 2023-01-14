@@ -1,8 +1,11 @@
+@import "node_modules/@yaireo/tagify/dist/tagify";
+
 @import 'config';
 @import 'item';
 @import 'actor';
 @import 'chat';
 @import 'test';
+@import 'tagify';
 
 @font-face {
     font-family: 'Nodesto';

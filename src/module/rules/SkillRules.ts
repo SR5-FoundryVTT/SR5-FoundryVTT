@@ -5,8 +5,17 @@ import {SR} from "../constants";
 
 export class SkillRules {
 
+    /**
+     * Determing if a skills value / level makes defaulting necessary.
+     * 
+     * NOTE: A skill can be altered by an effect, which will leave it's base untouched. 
+     *       Therefore it's calculated value must be used as a level
+     * 
+     * @param skill Any legacy or custom skill
+     * @returns true, if a roll for the given skill must default.
+     */
     static mustDefaultToRoll(skill: SkillField): boolean {
-        return skill.base === 0;
+        return skill.value === 0;
     }
     /**
      * Allow defaulting a skill role.

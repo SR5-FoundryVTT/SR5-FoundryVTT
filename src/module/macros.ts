@@ -1,3 +1,4 @@
+import { SR5Item } from './item/SR5Item';
 /**
  * Create a Macro from an Item drop.
  * Get an existing item macro if one exists, otherwise create a new one.
@@ -9,14 +10,24 @@ import {Helpers} from "./helpers";
 import SkillField = Shadowrun.SkillField;
 import {SR5Actor} from "./actor/SR5Actor";
 
-export async function createItemMacro(item, slot) {
+/**
+ * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.
+ * 
+ * @param dropData Foundry DropData
+ * @param slot The slot to be dropped into on the Macro bar
+ */
+export async function createItemMacro(dropData, slot) {
     if (!game || !game.macros) return;
+
+    const item = await SR5Item.fromDropData(dropData);
+    if (!(item instanceof SR5Item)) return console.error(`Shadowrun 5e | Macro Drop expected an item document but got a different document type`, item);
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
     let macro = game.macros.contents.find((m) => m.name === item.name);
     if (!macro) {
         macro = await Macro.create(
             {
+                //@ts-ignore
                 name: item.name,
                 type: 'script',
                 img: item.img,
