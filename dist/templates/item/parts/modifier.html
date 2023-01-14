@@ -6,10 +6,8 @@
         <div class="label">
             {{localize "SR5.Labels.Action.Modifier"}}
         </div>
-        <div class="inputs">
-            <select name="system.action.modifiers" multiple>
-                {{selectOptions config.modifierTypes selected=system.action.modifiers localize=true}}
-            </select>
+        <div class="inputs" data-tooltip="{{localize 'SR5.Tooltips.Item.ActionModifier'}}" data-tooltip-direction="UP">
+            <input id="action-modifier" class="tagify-selection"/>
         </div>
     </div>
 

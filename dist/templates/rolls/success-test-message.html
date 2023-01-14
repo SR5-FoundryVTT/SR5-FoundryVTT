@@ -62,10 +62,16 @@
             {{/each}}
         </div>
         {{/if}}
-        <div class="card-test-content clickable show-roll">
+        <div class="card-test-content">
+            {{! Some tests will not determine an outcome }}
+            {{#unless test.showSuccessLabel}} 
+            <div class="glitch-content clickable show-roll"><div class="glitch">Results</div></div>
+            {{/unless}}
+
+            {{! Some tests will determine an outcome }}
             {{#if test.canSucceed}} {{#if test.showSuccessLabel}}
             <div class="glitch-content">
-                <div class="glitch">
+                <div class="glitch clickable show-roll">
                     {{localize test.successLabel}}
                 </div>
             </div>
@@ -76,9 +82,11 @@
                 </div>
             </div>
             {{/if}} {{/if}} {{/if}}
+            
+            {{! Some tests will determine a failure state }}
             {{#if test.canFail}}{{#if test.failure}}
             <div class="glitch-content">
-                <div class="glitch">
+                <div class="glitch clickable show-roll">
                     {{localize test.failureLabel}}
                 </div>
             </div>
