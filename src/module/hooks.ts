@@ -309,23 +309,24 @@ ___________________
     }
 
     /**
-     * Hanlde drop events on the hotbar creating different macros
+     * Hanlde drop events on the hotbar creating different macros.
+     * 
+     * NOTE: FoundryVTT Hook callbacks won't be resolved when returning a promise.
+     *       While this function calls async methods, it's order of operations isn't important.
      *
      * @param bar
-     * @param data
+     * @param dropData
      * @param slot
-     * @return false NOTE: when the hook call propagation should be stopped.
+     * @return false when callback has been handled, otherwise let Foundry default handling kick in
      */
-    static async hotbarDrop(bar, data, slot) {
-        switch (data.type) {
+    static hotbarDrop(bar, dropData, slot) {
+        switch (dropData.type) {
             case 'Item':
-                await createItemMacro(data.data, slot);
+                createItemMacro(dropData, slot);
                 return false;
             case 'Skill':
-                await createSkillMacro(data.data, slot);
+                createSkillMacro(dropData.data, slot);
                 return false;
-            default:
-                return;
         }
     }
 
