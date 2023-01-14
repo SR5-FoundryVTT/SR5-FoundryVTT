@@ -407,13 +407,22 @@ export class SR5Item extends Item {
         await test.execute();
 }
 
+    /**
+     * Create display only information for this item. Used on sheets, chat messages and more.
+     * Both actor and item sheets.
+     * 
+     * The original naming leans on the dnd5e systems use of it for chat messages.
+     * NOTE: This is very legacy, difficult to read and should be improved upon.
+     * 
+     * @param htmlOptions 
+     * @returns 
+     */
     getChatData(htmlOptions={}) {
-        //@ts-ignore // TODO: foundry-vtt-types v10 
         const system = duplicate(this.system);
         const { labels } = this;
         //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
         //              that's not actually defined in any SR5Item typing.
-        if (system.description) system.description = {};
+        if (!system.description) system.description = {chat: '', source: '', value: ''};
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
         //@ts-ignore // TODO: foundry-vtt-types v10
         if (!system.description.value) system.description.value = '';
@@ -421,9 +430,10 @@ export class SR5Item extends Item {
         system.description.value = TextEditor.enrichHTML(system.description.value, {...htmlOptions, async: false});
 
         const props = [];
+        // Add additional chat data fields depending on item type.
         //@ts-ignore // TODO: foundry-vtt-types v10 
-        const func = ChatData[this.type];
-        if (func) func(duplicate(system), labels, props, this);
+        const chatDataForItemType = ChatData[this.type];
+        if (chatDataForItemType) chatDataForItemType(duplicate(system), labels, props, this);
 
         //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
         //              that's not actually defined in any SR5Item typing.
