@@ -104,7 +104,9 @@ declare namespace Shadowrun {
     };
 
     /**
-     * Add character related modifiers here.
+     * These modifiers are available for Character type actors.
+     * 
+     * This interface must correspond with modifiers inject during character data prep.
      */
     export interface CharacterModifiers extends Modifiers {
         drain: NumberOrEmpty
@@ -126,6 +128,8 @@ declare namespace Shadowrun {
         walk: NumberOrEmpty
         run: NumberOrEmpty
         wound_tolerance: NumberOrEmpty
+        pain_tolerance_stun: NumberOrEmpty
+        pain_tolerance_physical: NumberOrEmpty
         essence: NumberOrEmpty
         fade: NumberOrEmpty
     }

@@ -46,6 +46,8 @@ export class ModifiersPrep {
             'walk',
             'run',
             'wound_tolerance',
+            'pain_tolerance_stun',
+            'pain_tolerance_physical',
             'essence',
             'fade',
         ];

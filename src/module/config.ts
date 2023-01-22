@@ -331,6 +331,8 @@ export const SR5 = {
 
     /**
      * Labels for ALL actor types actor based local modifiers.
+     * 
+     * All modifiers across all actor types must be included here, this is only used for display.
      */
     actorModifiers: {
         soak: 'SR5.RollSoak',
@@ -358,6 +360,8 @@ export const SR5 = {
         run: 'SR5.Run',
         defense: 'SR5.RollDefense',
         wound_tolerance: 'SR5.WoundTolerance',
+        pain_tolerance_stun: 'SR5.PainToleranceStun',
+        pain_tolerance_physical: 'SR5.PainTolerancePhysical',
         essence: 'SR5.AttrEssence',
         fade: 'SR5.RollFade',
         global: 'SR5.Global',

@@ -653,6 +653,8 @@
                 "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert."
         },
         "SR5.OverwatchScoreTrackerTitle": "Mr. Johnsons Baby Monitor",
+        "SR5.PainTolerancePhysical": "Schmerz Toleranz Physisch",
+        "SR5.PainToleranceStun": "Schmerz Toleranz Geistig",
         "SR5.Parry": "Parieren",
         "SR5.PartialCover": "Teildeckung",
         "SR5.Passive": "Passiv",

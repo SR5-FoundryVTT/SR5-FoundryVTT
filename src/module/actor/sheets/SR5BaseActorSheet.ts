@@ -721,11 +721,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param data ActorSheetData as created within getData method
      */
     _prepareSpecialFields(data: SR5ActorSheetData) {
-        const {modifiers} = data.system;
-
         data.awakened = data.system.special === 'magic';
         data.emerged = data.system.special === 'resonance';
-        data.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
     }
 
     /**
@@ -735,10 +732,12 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _prepareActorModifiers(data: SR5ActorSheetData) {
          // Empty zero value modifiers for display purposes.
-        const { modifiers: mods } = data.system;
-        for (let [key, value] of Object.entries(mods)) {
-            if (value === 0) mods[key] = '';
+        const { modifiers } = data.system;
+        for (let [key, value] of Object.entries(modifiers)) {
+            if (value === 0) modifiers[key] = '';
         }
+
+        data.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
     }
 
     _prepareActorAttributes(data: SR5ActorSheetData) {

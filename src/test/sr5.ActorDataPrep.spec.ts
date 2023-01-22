@@ -25,7 +25,7 @@ export const shadowrunSR5ActorDataPrep = context => {
     })
 
         describe('CharacterDataPrep', () => {
-            it('Character default attribute values', async () => {
+            it('default attribute values', async () => {
                 const character = await testActor.create({type: 'character', 'system.metatype': 'human'});
 
                 // Check for attribute min values;
@@ -48,7 +48,7 @@ export const shadowrunSR5ActorDataPrep = context => {
                 assert.strictEqual(character.system.attributes.magic.value, SR.attributes.ranges['magic'].min);
             });
 
-            it('Character monitor calculation', async () => {
+            it('monitor calculation', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
 
                 let character = actor.asCharacter() as CharacterActorData;
@@ -83,7 +83,7 @@ export const shadowrunSR5ActorDataPrep = context => {
                 assert.equal(character.system.matrix.condition_monitor.max, 10); // 9 + 1
             });
 
-            it('Character initiative calculation', async () => {
+            it('initiative calculation', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
 
                 let character = actor.asCharacter() as CharacterActorData;
@@ -100,7 +100,7 @@ export const shadowrunSR5ActorDataPrep = context => {
                 assert.strictEqual(character.system.initiative.astral.dice.base, 2);
             });
 
-            it('Character limit calculation', async () => {
+            it('limit calculation', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
 
                 let character = actor.asCharacter() as CharacterActorData;
@@ -127,7 +127,7 @@ export const shadowrunSR5ActorDataPrep = context => {
                 assert.strictEqual(character.system.limits.social.value, 8);
             });
 
-            it('Character movement calculation', async () => {
+            it('movement calculation', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
 
                 let character = actor.asCharacter() as CharacterActorData;
@@ -145,23 +145,20 @@ export const shadowrunSR5ActorDataPrep = context => {
                 assert.strictEqual(character.system.movement.run.value, 24);
             });
 
-            it('Character skill calculation', async () => {
-                const actor = await testActor.create({type: 'character'}) as SR5Actor;
-
-                let character = actor.asCharacter() as CharacterActorData;
-
-                await actor.update({
+            it('skill calculation', async () => {
+                const actor = await testActor.create({
+                    type: 'character',
                     'system.skills.active.arcana.base': 6,
                     'system.skills.active.arcana.bonus': [{key: 'Test', value: 1}],
                     'system.skills.active.arcana.specs': ['Test']
-                });
+                }) as SR5Actor;
 
-                character = actor.asCharacter() as CharacterActorData;
+                let character = actor.asCharacter() as CharacterActorData;
 
                 assert.strictEqual(character.system.skills.active.arcana.value, 7);
             });
 
-            it('Character damage application', async () => {
+            it('damage application to wounds', async () => {
                 const actor = await testActor.create({type: 'character'}) as SR5Actor;
                 let character = actor.asCharacter() as CharacterActorData;
 
@@ -187,24 +184,60 @@ export const shadowrunSR5ActorDataPrep = context => {
                 assert.strictEqual(character.system.wounds.value, 2);
             });
 
-            it('Character damage application with high pain/wound tolerance', async () => {
-                const actor = await testActor.create({type: 'character'}) as SR5Actor;
-                let character = actor.asCharacter() as CharacterActorData;
-
-                await actor.update({
+            it('damage application with low pain/wound tolerance', async () => {
+                const actor = await testActor.create({
+                    type: 'character',
                     'system.track.stun.value': 6,
                     'system.track.physical.value': 6,
-                    'system.modifiers.wound_tolerance': 3
-                });
+                    'system.modifiers.wound_tolerance': -1
+                }) as SR5Actor;
 
-                character = actor.asCharacter() as CharacterActorData;
+                let character = actor.asCharacter() as CharacterActorData;
 
                 assert.strictEqual(character.system.track.stun.value, 6);
-                assert.strictEqual(character.system.track.stun.wounds, 1); // would normally be 2 (-2)
+                assert.strictEqual(character.system.track.stun.wounds, 3); // would normally be 2
                 assert.strictEqual(character.system.track.physical.value, 6);
-                assert.strictEqual(character.system.track.physical.wounds, 1);
+                assert.strictEqual(character.system.track.physical.wounds, 3);
+            });
 
-                assert.strictEqual(character.system.wounds.value, 2); // would normally be 4 (-4)
+            it('damage application with high pain tolerance / damage compensators', async () => {
+                const actor = await testActor.create({
+                    type: 'character',
+                    'system.track.stun.value': 9,
+                    'system.track.physical.value': 9,
+                    'system.modifiers.pain_tolerance_stun': 3,
+                    'system.modifiers.pain_tolerance_physical': 6
+                }) as SR5Actor;
+
+                let character = actor.asCharacter() as CharacterActorData;
+
+                assert.strictEqual(character.system.track.stun.value, 9);
+                assert.strictEqual(character.system.track.stun.wounds, 2); // would normally be 3
+                assert.strictEqual(character.system.track.physical.value, 9);
+                assert.strictEqual(character.system.track.physical.wounds, 1); // would normally be 3
+            });
+
+            it('damage application with high AND low pain to lerance / damage compensators', async () => {
+                const actor = await testActor.create({
+                    type: 'character',
+                    'system.track.stun.value': 9,
+                    'system.track.physical.value': 9,
+                    'system.modifiers.pain_tolerance_stun': 3,
+                    'system.modifiers.pain_tolerance_physical': 6,
+                    'system.modifiers.wound_tolerance': -1
+
+                }) as SR5Actor;
+
+                let character = actor.asCharacter() as CharacterActorData;
+
+                /**
+                 * Wound tolerance should alter the amount of boxes of damage per wound
+                 * Pain tolerance should raise damage taken BEFORE wounds are derived from the remaining damage 
+                 */
+                assert.strictEqual(character.system.track.stun.value, 9);
+                assert.strictEqual(character.system.track.stun.wounds, 3);
+                assert.strictEqual(character.system.track.physical.value, 9);
+                assert.strictEqual(character.system.track.physical.wounds, 1);
             });
         });
         describe('SpiritDataPrep', () => {
