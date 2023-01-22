@@ -5,6 +5,7 @@ import {Helpers} from "../helpers";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import GenericValueField = Shadowrun.GenericValueField;
 
 export interface DrainTestData extends SuccessTestData {
     incomingDrain: DamageData
@@ -14,6 +15,12 @@ export interface DrainTestData extends SuccessTestData {
 }
 
 
+/**
+ * Implement a Drain Test as is defined in SR5#282 'Step 6 - Resist Drain'
+ * 
+ * Drain defines it's incoming drain and modifies it to it's modified drain,
+ * both of which the user can apply.
+ */
 export class DrainTest extends SuccessTest {
     data: DrainTestData
 
@@ -75,7 +82,10 @@ export class DrainTest extends SuccessTest {
     calculateBaseValues() {
         super.calculateBaseValues();
 
-        // Avoid using a user defined value override.
+        Helpers.calcValue<typeof this.data.incomingDrain.type.base>(this.data.incomingDrain.type as GenericValueField);
+
+        // Don't duplicate incomingDrain to avoild using a override, only transfer needed values.
+        this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain);
         this.data.modifiedDrain.base = Helpers.calcTotal(this.data.incomingDrain, {min: 0});
     }
 

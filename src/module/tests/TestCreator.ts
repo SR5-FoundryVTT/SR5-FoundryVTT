@@ -650,6 +650,14 @@ export const TestCreator = {
     },
 
     /**
+     * A helper to define the modifier key for all sheet test interactions to cause a test to show its dialog.
+     * @param event A PointerEvent by user interaction
+     */
+    shouldShowDialog(event: RollEvent|undefined): boolean {
+        return !TestCreator.shouldHideDialog(event);
+    },
+
+    /**
      * A helper to define the modifier key for all sheet test interactions to cause a test to not show its dialog.
      * @param event A PointerEvent by user interaction
      */

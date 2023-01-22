@@ -139,7 +139,7 @@ export class SuccessTest {
 
         this.calculateBaseValues();
 
-        console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
+        console.log(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
 
     /**
@@ -486,7 +486,7 @@ export class SuccessTest {
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
 
-        console.log(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
+        console.debug(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
 
     /**
@@ -616,7 +616,7 @@ export class SuccessTest {
         this.data.values.netHits = this.calculateNetHits();
         this.data.values.glitches = this.calculateGlitches();
 
-        console.log(`Shadowrun 5e | Calculated derived values for ${this.constructor.name}`, this.data);
+        console.debug(`Shadowrun 5e | Calculated derived values for ${this.constructor.name}`, this.data);
     }
 
     /**
@@ -1121,7 +1121,7 @@ export class SuccessTest {
      * Handle Edge rule 'second chance' within this test according to SR5#56
      */
      async executeWithSecondChance(): Promise<this> {
-        console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
+        console.debug(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
 
         if (!this.data.sourceActorUuid) {
             ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
@@ -1158,7 +1158,7 @@ export class SuccessTest {
      * @returns 
      */
     async executeWithPushTheLimit(): Promise<this> {
-        console.log(`Shadowrun 5e | ${this.constructor.name} will push the limit rules`);
+        console.debug(`Shadowrun 5e | ${this.constructor.name} will push the limit rules`);
 
         if (!this.data.sourceActorUuid) {
             ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
@@ -1228,7 +1228,7 @@ export class SuccessTest {
      * This can be used to trigger other processes like followup tests or saving values.
      */
     async afterTestComplete() {
-        console.log(`Shadowrun5e | Test ${this.constructor.name} completed.`, this);
+        console.debug(`Shadowrun5e | Test ${this.constructor.name} completed.`, this);
 
         if (this.success) {
             await this.afterSuccess();
@@ -1329,7 +1329,7 @@ export class SuccessTest {
         // @ts-ignore
         if (!game.dice3d || !game.user || !game.users) return;
 
-        console.log('Shadowrun5e | Initiating DiceSoNice throw');
+        console.debug('Shadowrun5e | Initiating DiceSoNice throw');
 
         // Only roll the last dice rolled.
         // This necessary when a test has been recast with second chance, and should only the re-rolled dice instead

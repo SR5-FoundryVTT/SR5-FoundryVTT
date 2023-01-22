@@ -1,6 +1,7 @@
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
+import GenericValueField = Shadowrun.GenericValueField;
 import LabelField = Shadowrun.LabelField;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
 import DamageData = Shadowrun.DamageData;
@@ -67,6 +68,20 @@ export class Helpers {
         }
 
         value.mod = parts.list;
+
+        return value.value;
+    }
+
+    static calcValue<ValueType>(value: GenericValueField): any {
+        if (value.mod === undefined) value.mod = [];
+
+        if (value.override) {
+            value.value = value.override.value;
+
+            return value.value;
+        }
+
+        value.value = value.base;
 
         return value.value;
     }
@@ -875,7 +890,7 @@ export class Helpers {
      * @param actionName The name of the action within that pack
      */
     static async getPackAction(packName, actionName): Promise<SR5Item | undefined> {
-        console.info(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
+        console.debug(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
         const pack = game.packs.find(pack =>
             pack.metadata.system === SYSTEM_NAME &&
             pack.metadata.name === packName);
@@ -888,7 +903,7 @@ export class Helpers {
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
         if (!item || item.type !== 'action') return;
 
-        console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
+        console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;
     }
 

@@ -88,6 +88,9 @@ export class SR5Actor extends Actor {
         itemIds: []
     }
 
+    // Allow users to access to tests creation.
+    tests: typeof TestCreator = TestCreator;
+
     // Add v10 type helper
     system: ShadowrunActorDataData; // TODO: foundry-vtt-types v10
 
@@ -944,7 +947,7 @@ export class SR5Actor extends Actor {
      * Prompt the current user for a generic roll. 
      */
     async promptRoll() {
-        await TestCreator.promptSuccessTest();
+        await this.tests.promptSuccessTest();
     }
 
     /**
@@ -956,8 +959,8 @@ export class SR5Actor extends Actor {
     async rollDeviceRating(options?: ActorRollOptions) {
         const rating = this.getDeviceRating();
 
-        const showDialog = !TestCreator.shouldHideDialog(options?.event);
-        const testCls = TestCreator._getTestClass('SuccessTest');
+        const showDialog = this.tests.shouldShowDialog(options?.event);
+        const testCls = this.tests._getTestClass('SuccessTest');
         const test = new testCls({}, {actor: this}, {showDialog});
 
         // Build pool values.
@@ -974,29 +977,52 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Get an action from any pack with the given name, configured for this actor and let the caller handle it..
+     * 
+     * @param packName The name of the item pack to search.
+     * @param actionName The name within that pack.
+     * @param options Success Test options
+     * @returns the test instance after configuration and before it's execution.
+     */
+    async packActionTest(packName: PackName, actionName: PackActionName, options?: ActorRollOptions) {
+        const showDialog = this.tests.shouldShowDialog(options?.event);
+        return await this.tests.fromPackAction(packName, actionName, this, {showDialog});
+    }
+
+    /**
      * Roll an action from any pack with the given name.
      *
      * @param packName The name of the item pack to search.
      * @param actionName The name within that pack.
      * @param options Success Test options
+     * @returns the test instance after it's been executed
      */
     async rollPackAction(packName: PackName, actionName: PackActionName, options?: ActorRollOptions) {
-        const showDialog = !TestCreator.shouldHideDialog(options?.event);
-        const test = await TestCreator.fromPackAction(packName, actionName, this, {showDialog});
+        const test = await this.packActionTest(packName, actionName, options);
 
         if (!test) return console.error('Shadowrun 5e | Rolling pack action failed');
 
-        await test.execute();
+        return await test.execute();
     }
 
     /**
-     * Roll an attribute tests as defined within the systems general action pack.
+     * Get an action as defined within the systems general action pack.
+     * 
+     * @param actionName The action with in the general pack.
+     * @param options Success Test options 
+     */
+    async generalActionTest(actionName: PackActionName, options?: ActorRollOptions) {
+        return await this.packActionTest(SR5.packNames.generalActions as PackName, actionName, options);
+    }
+
+    /**
+     * Roll an action as defined within the systems general action pack.
      *
-     * @param actionName The internal attribute action id
+     * @param actionName The action with in the general pack.
      * @param options Success Test options
      */
     async rollGeneralAction(actionName: PackActionName, options?: ActorRollOptions) {
-        await this.rollPackAction(SR5.packNames.generalActions as PackName, actionName, options);
+        return await this.rollPackAction(SR5.packNames.generalActions as PackName, actionName, options);
     }
 
     /**
@@ -1012,8 +1038,8 @@ export class SR5Actor extends Actor {
         const action = this.skillActionData(skillId, options);
         if (!action) return;
 
-        const showDialog = !TestCreator.shouldHideDialog(options.event);
-        const test = await TestCreator.fromAction(action, this, {showDialog});
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.tests.fromAction(action, this, {showDialog});
         if (!test) return;
 
         await test.execute();
@@ -1030,7 +1056,7 @@ export class SR5Actor extends Actor {
 
         // Prepare test from action.
         const action = DefaultValues.actionData({attribute: name, test: AttributeOnlyTest.name});
-        const test = await TestCreator.fromAction(action, this);
+        const test = await this.tests.fromAction(action, this);
         if (!test) return;
 
         await test.execute();

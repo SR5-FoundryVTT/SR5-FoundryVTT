@@ -7,7 +7,7 @@ export class WoundsPrep {
     static prepareWounds(system: ActorTypesData & TwoTrackActorData & WoundsActorData) {
         const { modifiers, track } = system;
         
-        // The actor overall has a 
+        // The actor overall has a wound tolerance.
         const damageTolerance = Number(modifiers['wound_tolerance']);
         const woundBoxesThreshold = MonitorRules.woundModifierBoxesThreshold(damageTolerance);
 
