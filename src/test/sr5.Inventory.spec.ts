@@ -1,8 +1,9 @@
 import {SR5TestingDocuments} from "./utils";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
+import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
-export const shadowrunInventoryFlow = context => {
+export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
     const {describe, it, assert, should, before, after} = context;
 
     let testActor;

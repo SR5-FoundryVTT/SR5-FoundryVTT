@@ -7,8 +7,9 @@ import SpiritActorData = Shadowrun.SpiritActorData;
 import SpriteActorData = Shadowrun.SpriteActorData;
 import ICActorData = Shadowrun.ICActorData;
 import VehicleActorData = Shadowrun.VehicleActorData;
+import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
-export const shadowrunSR5ActorDataPrep = context => {
+export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
     const {describe, it, assert, before, after} = context;
 
     let testActor;

@@ -1,8 +1,6 @@
 import FireModeData = Shadowrun.FireModeData;
 import FiringModeData = Shadowrun.FiringModeData;
-import RangedWeaponMode = Shadowrun.RangedWeaponMode;
 import { SR5 } from "../config";
-import { Helpers } from "../helpers";
 
 export const FireModeRules = {
     /**
@@ -48,6 +46,8 @@ export const FireModeRules = {
     recoilAttackModifier: function(fireMode: FireModeData, compensation: number, ammo: number = 0): { compensation: number, recoilModifier: number } {
         // Some firemodes don't cause recoil.
         if (!fireMode.recoil) return {compensation, recoilModifier: 0};
+        // Sanitze negative ammo values by pretending not to shoot
+        if (fireMode.value < 0) return {compensation, recoilModifier: 0};
         // Sanitaze negative ammo values by pretending to have just enough.
         if (ammo <= 0) ammo = fireMode.value;
 

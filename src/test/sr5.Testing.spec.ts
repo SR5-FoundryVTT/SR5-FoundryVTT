@@ -2,8 +2,9 @@ import {SR5TestingDocuments} from "./utils";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
 import {TestCreator} from "../module/tests/TestCreator";
+import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
-export const shadowrunTesting = context => {
+export const shadowrunTesting = (context: QuenchBatchContext) => {
     const {describe, it, assert, before, after} = context;
 
     let testActor;

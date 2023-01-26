@@ -1,7 +1,8 @@
+import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import {SR5Item} from "../module/item/SR5Item";
 import {SR5TestingDocuments} from "./utils";
 
-export const shadowrunSR5Item = context => {
+export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     /**
      * Setup handling for all items within this test.
      */
