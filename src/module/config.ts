@@ -667,7 +667,7 @@ export const SR5 = {
         label: "SR5.WeaponModeBurstFireLong",
         value: 6,
         recoil: true,
-        defense: -2,
+        defense: -5,
         suppression: false,
         action: 'complex',
         mode: 'burst_fire',
