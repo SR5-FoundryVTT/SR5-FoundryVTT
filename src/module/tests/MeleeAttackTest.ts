@@ -40,7 +40,7 @@ export class MeleeAttackTest extends SuccessTest {
     }
 
     async prepareDocumentData() {
-        if (!this.item || !this.item.isMeleeWeapon()) return;
+        if (!this.item || !this.item.isMeleeWeapon) return;
 
         this.data.reach = this.item.getReach();
 

@@ -25,7 +25,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
     static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<MinimalActionData> {
         const action = DefaultValues.minimalActionData(await super._getDocumentTestAction(item, actor));
 
-        const spellData = item.asSpell();
+        const spellData = item.asSpell
         if (!spellData) return action;
 
         const itemAction = CombatSpellRules.defenseTestAction(spellData.system.type, spellData.system.combat.type);
@@ -38,16 +38,16 @@ export class CombatSpellDefenseTest extends DefenseTest {
     }
 
     get testModifiers(): ModifierTypes[] {
-        const spellData = this.item?.asSpell();
-        if (!spellData) return ['global'];
+        const spell = this.item?.asSpell;
+        if (!spell) return ['global'];
 
-        if (spellData.system.type === 'mana' && spellData.system.combat.type === 'direct') {
+        if (spell.system.type === 'mana' && spell.system.combat.type === 'direct') {
             return ['global'];
         }
-        if (spellData.system.type === 'physical' && spellData.system.combat.type === 'direct') {
+        if (spell.system.type === 'physical' && spell.system.combat.type === 'direct') {
             return ['global'];
         }
-        if (spellData.system.combat.type === 'indirect') {
+        if (spell.system.combat.type === 'indirect') {
             return ['global', 'defense', 'wounds'];
         }
 
@@ -58,10 +58,10 @@ export class CombatSpellDefenseTest extends DefenseTest {
      * A combat spells damage depends on
      */
     calculateCombatSpellDamage() {
-        const spellData = this.item?.asSpell();
-        if (!spellData) return;
+        const spell = this.item?.asSpell;
+        if (!spell) return;
 
-        this.data.incomingDamage = CombatSpellRules.calculateBaseDamage(spellData.system.combat.type, this.data.incomingDamage, this.data.against.force);
+        this.data.incomingDamage = CombatSpellRules.calculateBaseDamage(spell.system.combat.type, this.data.incomingDamage, this.data.against.force);
     }
 
 
@@ -78,11 +78,11 @@ export class CombatSpellDefenseTest extends DefenseTest {
      * A failure on a defense test is a HIT on the initial attack.
      */
     async processFailure() {
-        const spellData = this.item?.asSpell();
-        if (!spellData) return;
+        const spell = this.item?.asSpell;
+        if (!spell) return;
         if (!this.actor) return;
 
-        this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(this.actor, spellData.system.type, spellData.system.combat.type,
+        this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(this.actor, spell.system.type, spell.system.combat.type,
             this.data.incomingDamage, this.against.hits.value, this.hits.value);
 
         await super.processFailure();
@@ -92,11 +92,11 @@ export class CombatSpellDefenseTest extends DefenseTest {
      * Combat Spell Defense allows a resist test for the defending actor.
      */
     async afterFailure() {
-        const spellData = this.item?.asSpell();
-        if (!spellData) return;
+        const spell = this.item?.asSpell;
+        if (!spell) return;
 
         // Only allow a defense test for in
-        if (CombatSpellRules.allowDamageResist(spellData.system.combat.type)) {
+        if (CombatSpellRules.allowDamageResist(spell.system.combat.type)) {
             const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
             if (!test) return;
             await test.execute();

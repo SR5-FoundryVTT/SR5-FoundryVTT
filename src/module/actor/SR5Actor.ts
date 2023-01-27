@@ -457,7 +457,7 @@ export class SR5Actor extends Actor {
     }
 
     getEquippedWeapons(): SR5Item[] {
-        return this.items.filter((item: SR5Item) => item.isEquipped() && item.isWeapon());
+        return this.items.filter((item: SR5Item) => item.isEquipped() && item.isWeapon);
     }
 
     /**
@@ -1667,11 +1667,11 @@ export class SR5Actor extends Actor {
 
         // Check if the given item id is valid.
         const item = await fromUuid(uuid) as SR5Item;
-        if (!item || !item.isHost()) return;
+        if (!item || !item.isHost) return;
 
-        const hostData = item.asHost();
-        if (!hostData) return;
-        await this._updateICHostData(hostData);
+        const host = item.asHost;
+        if (!host) return;
+        await this._updateICHostData(host);
     }
 
     async _updateICHostData(hostData: HostItemData) {

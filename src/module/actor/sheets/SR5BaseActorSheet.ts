@@ -1370,12 +1370,12 @@ export class SR5BaseActorSheet extends ActorSheet {
             const newItems = [] as any[];
 
             // Handle the equipped state.
-            if (item.isDevice()) {
+            if (item.isDevice) {
                 // Only allow one equipped device item. Unequip all other.
-                for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
+                for (const item of this.actor.items.filter(actorItem => actorItem.isDevice)) {
                     newItems.push({
                         '_id': item.id,
-                        'data.technology.equipped': item.id === iid,
+                        'system.technology.equipped': item.id === iid,
                     });
                 }
 
@@ -1383,7 +1383,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 // Toggle equip status.
                 newItems.push({
                     '_id': iid,
-                    'data.technology.equipped': !item.isEquipped(),
+                    'system.technology.equipped': !item.isEquipped(),
                 });
             }
 

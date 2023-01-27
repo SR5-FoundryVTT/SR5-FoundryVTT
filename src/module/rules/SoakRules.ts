@@ -31,7 +31,7 @@ export class SoakRules {
     private static applyPhysicalAndStunSoakParts(soakParts: PartsList<number>, actor: SR5Actor, damageData: DamageData) {
         // Apply special rules for direct combat spells
         const damageSourceItem = Helpers.findDamageSource(damageData);
-        if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
+        if (damageSourceItem && damageSourceItem.isDirectCombatSpell) {
             return SoakRules.applyDirectCombatSpellParts(damageSourceItem.data as SpellItemData, soakParts, actor);
         }
 

@@ -380,7 +380,7 @@ ___________________
     static async updateIcConnectedToHostItem(item: SR5Item, data: ShadowrunItemDataData, id: string) {
         if (!canvas.ready || !game.actors) return;
 
-        if (item.isHost()) {
+        if (item.isHost) {
             // Collect actors from sidebar and active scene to update / rerender
             let connectedIC = [
                 // All sidebar actors should also include tokens with linked actors.
@@ -391,11 +391,11 @@ ___________________
             ];
 
             // Update host data on the ic actor.
-            const hostData = item.asHost();
-            if (!hostData) return;
+            const host = item.asHost;
+            if (!host) return;
             for (const ic of connectedIC) {
                 if (!ic) continue;
-                await ic._updateICHostData(hostData);
+                await ic._updateICHostData(host);
             }
         }
     }

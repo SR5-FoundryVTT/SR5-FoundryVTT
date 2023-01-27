@@ -218,7 +218,7 @@ export class SR5Item extends Item {
         return !!(action && action.type !== '' && (action.skill || action.attribute || action.attribute2 || action.dice_pool_mod));
     }
     get hasTemplate(): boolean {
-        return this.isAreaOfEffect();
+        return this.isAreaOfEffect;
     }
 
     /**
@@ -453,7 +453,7 @@ export class SR5Item extends Item {
         const parts = new PartsList<number>();
 
         if (this.hasOpposedTest()) {
-            if (this.isAreaOfEffect()) {
+            if (this.isAreaOfEffect) {
                 parts.addUniquePart('SR5.Aoe', -2);
             }
         }
@@ -462,7 +462,7 @@ export class SR5Item extends Item {
     }
 
     getBlastData(actionTestData?: any): BlastData | undefined {
-        if (this.isSpell() && this.isAreaOfEffect()) {
+        if (this.isSpell && this.isAreaOfEffect) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as SpellData;
 
@@ -483,7 +483,7 @@ export class SR5Item extends Item {
                 dropoff
             }
 
-        } else if (this.isGrenade()) {
+        } else if (this.isGrenade) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as WeaponData;
 
@@ -496,15 +496,15 @@ export class SR5Item extends Item {
             }
 
         } else if (this.hasExplosiveAmmo()) {
-            const ammo = this.getEquippedAmmo();
-            const ammoData = ammo.asAmmo();
+            const item = this.getEquippedAmmo();
+            const ammo = item.asAmmo;
 
-            if (!ammoData) return {radius: 0, dropoff: 0};
+            if (!ammo) return {radius: 0, dropoff: 0};
 
             //@ts-ignore // TODO: foundry-vtt-types v10 
-            const distance = ammoData.system.blast.radius;
+            const distance = ammo.system.blast.radius;
             //@ts-ignore // TODO: foundry-vtt-types v10 
-            const dropoff = ammoData.system.blast.dropoff;
+            const dropoff = ammo.system.blast.dropoff;
 
             return {
                 radius: distance,
@@ -515,7 +515,7 @@ export class SR5Item extends Item {
 
     getEquippedAmmo(): SR5Item {
         const equippedAmmos = (this.items || []).filter((item) =>
-            item.isAmmo() &&
+            item.isAmmo &&
             item.isEquipped());
 
         // Cast Typing isn't a mistake, so long as isAmmo is filtered.
@@ -524,7 +524,7 @@ export class SR5Item extends Item {
 
     getEquippedMods(): SR5Item[] {
         return (this.items || []).filter((item) =>
-            item.isWeaponModification() &&
+            item.isWeaponModification &&
             item.isEquipped());
     }
 
@@ -732,103 +732,103 @@ export class SR5Item extends Item {
     }
 
     _addWeaponParts(parts: PartsList<number>) {
-        if (this.isRangedWeapon()) {
+        if (this.isRangedWeapon) {
             const recoil = this.calculateRecoil();
             if (recoil) parts.addUniquePart('SR5.Recoil', recoil);
         }
     }
 
-    isSin(): boolean {
+    get isSin(): boolean {
         return this.wrapper.isSin();
     }
 
-    asSin(): SinItemData | undefined {
-        if (this.isSin()) {
+    get asSin(): SinItemData | undefined {
+        if (this.isSin) {
             //@ts-ignore TODO: foundry-vtt-types v10
             return this as SinItemData;
         }
     }
 
-    isLifestyle(): boolean {
+    get isLifestyle(): boolean {
         return this.wrapper.isLifestyle();
     }
 
-    asLifestyle(): LifestyleItemData | undefined {
-        if (this.isLifestyle()) {
+    get asLifestyle(): LifestyleItemData | undefined {
+        if (this.isLifestyle) {
             //@ts-ignore TODO: foundry-vtt-types v10
             return this as LifestyleItemData;
         }
     }
 
-    isAmmo(): boolean {
+    get isAmmo(): boolean {
         return this.wrapper.isAmmo();
     }
 
-    asAmmo(): AmmoItemData | undefined {
-        if (this.isAmmo()) {
+    get asAmmo(): AmmoItemData | undefined {
+        if (this.isAmmo) {
             //@ts-ignore TODO: foundry-vtt-types v10
             return this as AmmoItemData;
         }
     }
 
-    isModification(): boolean {
+    get isModification(): boolean {
         return this.wrapper.isModification();
     }
 
     asModification(): ModificationItemData | undefined {
-        if (this.isModification()) {
+        if (this.isModification) {
             //@ts-ignore TODO: foundry-vtt-types v10
             return this as ModificationItemData;
         }
     }
 
-    isWeaponModification(): boolean {
+    get isWeaponModification(): boolean {
         return this.wrapper.isWeaponModification();
     }
 
-    isArmorModification(): boolean {
+    get isArmorModification(): boolean {
         return this.wrapper.isArmorModification();
     }
 
-    isProgram(): boolean {
+    get isProgram(): boolean {
         return this.wrapper.isProgram();
     }
 
-    asProgram(): ProgramItemData | undefined {
-        if (this.isProgram()) {
+    get asProgram(): ProgramItemData | undefined {
+        if (this.isProgram) {
             //@ts-ignore TODO: foundry-vtt-types v10
             return this as ProgramItemData;
         }
     }
 
-    isQuality(): boolean {
+    get isQuality(): boolean {
         return this.wrapper.isQuality();
     }
 
-    asQuality(): QualityItemData | undefined {
-        if (this.isQuality()) {
+    get asQuality(): QualityItemData | undefined {
+        if (this.isQuality) {
             //@ts-ignore TODO: foundry-vtt-types v10
             return this as QualityItemData;
         }
     }
 
-    isAdeptPower(): boolean {
+    get isAdeptPower(): boolean {
         return this.type === 'adept_power';
     }
 
     asAdeptPower(): AdeptPowerItemData|undefined {
-        if (this.isAdeptPower())
+        if (this.isAdeptPower)
         //@ts-ignore TODO: foundry-vtt-types v10
             return this as AdeptPowerItemData;
     }
 
 
-    isHost(): boolean {
+    get isHost(): boolean {
         return this.type === 'host';
     }
 
-    asHost(): HostItemData|undefined {
-        if (this.isHost()) {
+    get asHost(): HostItemData|undefined {
+        if (this.isHost) {
             //@ts-ignore TODO: foundry-vtt-types v10
             return this as HostItemData;
         }
@@ -1110,21 +1110,21 @@ export class SR5Item extends Item {
     }
 
     getWeaponRange(): RangeWeaponData|undefined {
-        if (this.isRangedWeapon())
+        if (this.isRangedWeapon)
             return this.getRange() as RangeWeaponData;
     }
 
     getRollName(): string {
-        if (this.isRangedWeapon()) {
+        if (this.isRangedWeapon) {
             return game.i18n.localize('SR5.RangeWeaponAttack');
         }
-        if (this.isMeleeWeapon()) {
+        if (this.isMeleeWeapon) {
             return game.i18n.localize('SR5.MeleeWeaponAttack');
         }
-        if (this.isCombatSpell()) {
+        if (this.isCombatSpell) {
             return game.i18n.localize('SR5.SpellAttack');
         }
-        if (this.isSpell()) {
+        if (this.isSpell) {
             return game.i18n.localize('SR5.SpellCast');
         }
         if (this.hasRoll) {
@@ -1134,155 +1134,152 @@ export class SR5Item extends Item {
         return DEFAULT_ROLL_NAME;
     }
 
-    /**
-     * Passthrough functions
-     */
-    isAreaOfEffect(): boolean {
+    get isAreaOfEffect(): boolean {
         return this.wrapper.isAreaOfEffect();
     }
 
-    isArmor(): boolean {
+    get isArmor(): boolean {
         return this.wrapper.isArmor();
     }
 
-    asArmor(): ArmorItemData | undefined {
-        if (this.isArmor()) {
+    get asArmor(): ArmorItemData | undefined {
+        if (this.isArmor) {
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this as ArmorItemData;
         }
     }
 
-    hasArmorBase(): boolean {
+    get hasArmorBase(): boolean {
         return this.wrapper.hasArmorBase();
     }
 
-    hasArmorAccessory(): boolean {
+    get hasArmorAccessory(): boolean {
         return this.wrapper.hasArmorAccessory();
     }
 
-    hasArmor(): boolean {
+    get hasArmor(): boolean {
         return this.wrapper.hasArmor();
     }
 
-    isGrenade(): boolean {
+    get isGrenade(): boolean {
         return this.wrapper.isGrenade();
     }
 
-    isWeapon(): boolean {
+    get isWeapon(): boolean {
         return this.wrapper.isWeapon();
     }
 
-    asWeapon(): WeaponItemData | undefined {
-        if (this.wrapper.isWeapon()) {
+    get asWeapon(): WeaponItemData | undefined {
+        if (this.isWeapon) {
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this as WeaponItemData;
         }
     }
 
-    isCyberware(): boolean {
+    get isRangedWeapon(): boolean {
+        return this.wrapper.isRangedWeapon();
+    }
+
+    get isMeleeWeapon(): boolean {
+        return this.wrapper.isMeleeWeapon();
+    }
+
+    get isCyberware(): boolean {
         return this.wrapper.isCyberware();
     }
 
-    asCyberware(): CyberwareItemData | undefined {
-        if (this.isCyberware()) {
+    get asCyberware(): CyberwareItemData | undefined {
+        if (this.isCyberware) {
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this as CyberwareItemData;
         }
     }
 
-    isCombatSpell(): boolean {
+    get isCombatSpell(): boolean {
         return this.wrapper.isCombatSpell();
     }
 
-    isDirectCombatSpell(): boolean {
+    get isDirectCombatSpell(): boolean {
         return this.wrapper.isDirectCombatSpell();
     }
 
-    isIndirectCombatSpell(): boolean {
+    get isIndirectCombatSpell(): boolean {
         return this.wrapper.isIndirectCombatSpell();
     }
 
-    isManaSpell(): boolean {
+    get isManaSpell(): boolean {
         return this.wrapper.isManaSpell();
     }
 
-    isPhysicalSpell(): boolean {
+    get isPhysicalSpell(): boolean {
         return this.wrapper.isPhysicalSpell();
     }
 
-    isRangedWeapon(): boolean {
-        return this.wrapper.isRangedWeapon();
-    }
-
-    isSpell(): boolean {
+    get isSpell(): boolean {
         return this.wrapper.isSpell();
     }
 
-    asSpell(): SpellItemData | undefined {
-        if (this.isSpell()) {
+    get asSpell(): SpellItemData | undefined {
+        if (this.isSpell) {
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this as SpellItemData;
         }
     }
 
-    isSpritePower(): boolean {
+    get isSpritePower(): boolean {
         return this.wrapper.isSpritePower();
     }
 
-    asSpritePower(): SpritePowerItemData | undefined {
-        if (this.isSpritePower()) {
+    get asSpritePower(): SpritePowerItemData | undefined {
+        if (this.isSpritePower) {
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this as SpritePowerItemData;
         }
     }
 
-    isBioware(): boolean {
+    get isBioware(): boolean {
         return this.wrapper.isBioware();
     }
 
-    isComplexForm(): boolean {
+    get isComplexForm(): boolean {
         return this.wrapper.isComplexForm();
     }
 
-    asComplexForm(): ComplexFormItemData | undefined {
-        if (this.isComplexForm()) {
+    get asComplexForm(): ComplexFormItemData | undefined {
+        if (this.isComplexForm) {
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this as ComplexFormItemData;
         }
     }
 
-    isContact(): boolean {
+    get isContact(): boolean {
         return this.wrapper.isContact();
     }
 
-    asContact(): ContactItemData | undefined {
-        if (this.isContact()) {
+    get asContact(): ContactItemData | undefined {
+        if (this.isContact) {
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this as ContactItemData;
         }
     }
 
-    isCritterPower(): boolean {
+    get isCritterPower(): boolean {
         return this.wrapper.isCritterPower();
     }
 
-    asCritterPower(): CritterPowerItemData | undefined {
-        if (this.isCritterPower()) {
+    get asCritterPower(): CritterPowerItemData | undefined {
+        if (this.isCritterPower) {
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this as CritterPowerItemData;
         }
     }
 
-    isMeleeWeapon(): boolean {
-        return this.wrapper.isMeleeWeapon();
-    }
-
-    isDevice(): boolean {
+    get isDevice(): boolean {
         return this.wrapper.isDevice();
     }
 
-    asDevice(): DeviceItemData | undefined {
-        if (this.isDevice()) {
+    get asDevice(): DeviceItemData | undefined {
+        if (this.isDevice) {
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this as DeviceItemData;
         }
@@ -1290,7 +1287,7 @@ export class SR5Item extends Item {
 
     //@ts-ignore // TODO: foundry-vtt-types v10
     asController(): HostItemData | DeviceItemData | undefined {
-        return this.asHost() || this.asDevice() || undefined;
+        return this.asHost || this.asDevice || undefined;
     }
 
     isEquipment(): boolean {
@@ -1385,7 +1382,7 @@ export class SR5Item extends Item {
     }
 
     getReach(): number {
-        if (this.isMeleeWeapon()) {
+        if (this.isMeleeWeapon) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as WeaponData;
             return system.melee.reach ?? 0;
@@ -1412,8 +1409,8 @@ export class SR5Item extends Item {
      * @param pack Optional pack collection to fetch from
      */
     async addIC(id: string, pack: string|null = null) {
-        const hostData = this.asHost();
-        if (!hostData || !id) return;
+        const host = this.asHost;
+        if (!host || !id) return;
 
         // Check if actor exists before adding.
         const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors?.get(id)) as SR5Actor;
@@ -1434,9 +1431,9 @@ export class SR5Item extends Item {
             // Custom fields for IC
             data: {icType: icData.data.icType},
         });
-        hostData.system.ic.push(sourceEntity);
+        host.system.ic.push(sourceEntity);
 
-        await this.update({'system.ic': hostData.system.ic});
+        await this.update({'system.ic': host.system.ic});
     }
 
     /**
@@ -1446,13 +1443,13 @@ export class SR5Item extends Item {
     async removeIC(index: number) {
         if (isNaN(index) || index < 0) return;
 
-        const hostData = this.asHost();
-        if (!hostData) return;
-        if (hostData.system.ic.length <= index) return;
+        const host = this.asHost;
+        if (!host) return;
+        if (host.system.ic.length <= index) return;
 
-        hostData.system.ic.splice(index, 1);
+        host.system.ic.splice(index, 1);
 
-        await this.update({'system.ic': hostData.system.ic});
+        await this.update({'system.ic': host.system.ic});
     }
 
     get _isNestedItem(): boolean {
@@ -1508,7 +1505,7 @@ export class SR5Item extends Item {
     async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: Item, overwrite?: boolean}) {
         if (!canvas.ready) return;
 
-        if (!this.isHost()) {
+        if (!this.isHost) {
             console.error('Only Host item types can place matrix marks!');
             return;
         }
@@ -1520,25 +1517,25 @@ export class SR5Item extends Item {
         // Build the markId string. If no item has been given, there still will be a third split element.
         // Use Helpers.deconstructMarkId to get the elements.
         const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        const hostData = this.asHost();
+        const host = this.asHost;
 
-        if (!hostData) return;
+        if (!host) return;
 
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
-        hostData.system.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
+        host.system.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
-        await this.update({'system.marks': hostData.system.marks});
+        await this.update({'system.marks': host.system.marks});
     }
 
     getMarksById(markId: string): number {
-        const hostData = this.asHost();
-        return hostData ? hostData.system.marks[markId] : 0;
+        const host = this.asHost;
+        return host ? host.system.marks[markId] : 0;
     }
 
     getAllMarks(): MatrixMarks|undefined {
-        const hostData = this.asHost();
-        if (!hostData) return;
-        return hostData.system.marks;
+        const host = this.asHost;
+        if (!host) return;
+        return host.system.marks;
     }
 
     /**
@@ -1554,18 +1551,18 @@ export class SR5Item extends Item {
      */
     getMarks(target: SR5Actor, item?: SR5Item, options?: {scene?: Scene}): number {
         if (!canvas.ready) return 0;
-        if (!this.isHost()) return 0;
+        if (!this.isHost) return 0;
 
         // Scene is optional.
         const scene = options?.scene || canvas.scene as Scene;
         item = item || target.getMatrixDevice();
 
         const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);
-        const hostData = this.asHost();
+        const host = this.asHost;
 
-        if (!hostData) return 0
+        if (!host) return 0
 
-        return hostData.system.marks[markId] || 0;
+        return host.system.marks[markId] || 0;
     }
 
     /**
@@ -1574,15 +1571,15 @@ export class SR5Item extends Item {
      * TODO: Allow partial deletion based on target / item
      */
     async clearMarks() {
-        if (!this.isHost()) return;
+        if (!this.isHost) return;
 
-        const hostData = this.asHost();
+        const host = this.asHost;
 
-        if (!hostData) return;
+        if (!host) return;
 
         // Delete all markId properties from ActorData
         const updateData = {}
-        for (const markId of Object.keys(hostData.system.marks)) {
+        for (const markId of Object.keys(host.system.marks)) {
             updateData[`-=${markId}`] = null;
         }
 
@@ -1593,12 +1590,12 @@ export class SR5Item extends Item {
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
      */
     async clearMark(markId: string) {
-        if (!this.isHost()) return;
+        if (!this.isHost) return;
 
         const updateData = {}
         updateData[`-=${markId}`] = null;
 
-        await this.update({'data.marks': updateData});
+        await this.update({'system.marks': updateData});
     }
 
     /**
@@ -1639,7 +1636,7 @@ export class SR5Item extends Item {
     }
 
     getAllMarkedDocuments(): MarkedDocument[] {
-        if (!this.isHost()) return [];
+        if (!this.isHost) return [];
 
         const marks = this.getAllMarks();
         if (!marks) return [];
@@ -1670,8 +1667,8 @@ export class SR5Item extends Item {
      * Return all network device items within a possible PAN or WAN.
      */
     get networkDevices(): SR5Item[] {
-        const controllerData = this.asDevice() || this.asHost();
-        if (!controllerData) return [];
+        const controller = this.asDevice || this.asHost;
+        if (!controller) return [];
 
         return NetworkDeviceFlow.getNetworkDevices(this);
     }
@@ -1680,7 +1677,7 @@ export class SR5Item extends Item {
      * Only devices can control a network.
      */
     get canBeNetworkController(): boolean {
-        return this.isDevice() || this.isHost();
+        return this.isDevice || this.isHost;
     }
 
     /**
