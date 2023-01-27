@@ -298,7 +298,7 @@ export const ChatData = {
             if (blast?.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} ${blast.dropoff}/m`);
 
             if (data.thrown.ranges) {
-                const mult = data.thrown.ranges.attribute && item?.actor ? item.actor.data.data.attributes[data.thrown.ranges.attribute].value : 1;
+                const mult = data.thrown.ranges.attribute && item?.actor ? item.actor.system.attributes[data.thrown.ranges.attribute].value : 1;
                 const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
                 props.push(ranges.map((v) => v * mult).join('/'));
             }

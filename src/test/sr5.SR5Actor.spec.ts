@@ -36,11 +36,11 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
         it('update an actor of any time', async () => {
             const actor = await testActor.create({type: 'character'});
 
-            assert.notProperty(actor.data.data, 'test');
+            assert.notProperty(actor.system, 'test');
             await actor.update({'data.test': true});
 
-            assert.property(actor.data.data, 'test');
-            assert.propertyVal(actor.data.data, 'test', true);
+            assert.property(actor.system, 'test');
+            assert.propertyVal(actor.system, 'test', true);
         });
 
         it('embedd a weapon into an actor and not the global item colection', async () => {

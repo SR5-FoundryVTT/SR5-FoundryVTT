@@ -286,8 +286,7 @@ export class SR5Item extends Item {
             }
 
             // Item.prepareData is called once (first) with an empty SR5Actor instance without .data and once (second) with .data.
-            //@ts-ignore // TODO: foundry-vtt-types v10 Is there way with v10 to determine if data has been set? (second round)
-            if (this.actor?.data) {
+            if (this.actor?.system) {
                 action.damage.source = {
                     actorId: this.actor.id as string,
                     itemId: this.id as string,

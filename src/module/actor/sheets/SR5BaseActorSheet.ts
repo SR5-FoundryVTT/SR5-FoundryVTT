@@ -172,10 +172,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         const path = 'systems/shadowrun5e/dist/templates';
 
         if (this.actor.limited) {
-            return `${path}/actor-limited/${this.actor.data.type}.html`;
+            return `${path}/actor-limited/${this.actor.type}.html`;
         }
 
-        return `${path}/actor/${this.actor.data.type}.html`;
+        return `${path}/actor/${this.actor.type}.html`;
     }
 
     /** SheetData used by _all_ actor types! */

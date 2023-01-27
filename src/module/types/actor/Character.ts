@@ -96,7 +96,7 @@ declare namespace Shadowrun {
     };
 
     export type SkillEditFormData = {
-        data?: SkillField
+        skill: SkillField
         editable_name?: boolean
         editable_canDefault: boolean
         editable_attribute: boolean

@@ -79,8 +79,6 @@ import KnowledgeSkills = Shadowrun.KnowledgeSkills;
  *
  */
 export class SR5Actor extends Actor {
-    static LOG_V10_COMPATIBILITY_WARNINGS = false;
-    
     // This is the default inventory name and label for when no other inventory has been created.
     defaultInventory: InventoryData = {
         name: 'Carried',

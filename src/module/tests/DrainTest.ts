@@ -69,7 +69,7 @@ export class DrainTest extends SuccessTest {
         }
 
         // Get magic school attribute.
-        const attribute = actor.data.data.magic.attribute;
+        const attribute = actor.system.magic.attribute;
         foundry.utils.mergeObject(documentAction, {attribute});
 
         // Return the school attribute based on actor configuration.

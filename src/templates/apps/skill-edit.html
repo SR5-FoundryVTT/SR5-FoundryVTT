@@ -9,7 +9,7 @@
             </div>
             <div class="item-right">
                 <div class="item-text item-name">
-                    <input class="display" type="text" value="{{data.name}}" name="data.name" />
+                    <input class="display" type="text" value="{{skill.name}}" name="skill.name" />
                 </div>
             </div>
         </div>
@@ -25,8 +25,8 @@
                 <div class="item-text item-name">
                     {{> "systems/shadowrun5e/dist/templates/common/Select.html"
                             options=attributes
-                            value=data.attribute
-                            path="data.attribute"
+                            value=skill.attribute
+                            path="skill.attribute"
                     }}
                 </div>
             </div>
@@ -41,7 +41,7 @@
             </div>
             <div class="item-right">
                 <div class="item-text item-name">
-                    <input type="checkbox" class="checkbox" name="data.canDefault" {{checked data.canDefault}}/>
+                    <input type="checkbox" class="checkbox" name="skill.canDefault" {{checked skill.canDefault}}/>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
                     <input
                         class="display"
                         type="text"
-                        value="{{data.value}}"
+                        value="{{skill.value}}"
                         disabled
                         data-dtype="Number"
                     />
@@ -76,8 +76,8 @@
                     <input
                         class="display"
                         type="text"
-                        value="{{data.base}}"
-                        name="data.base"
+                        value="{{skill.base}}"
+                        name="skill.base"
                         placeholder="0"
                         data-dtype="Number"
                     />
@@ -95,7 +95,7 @@
                     <input
                         class="display"
                         type="text"
-                        value="{{data.item}}"
+                        value="{{skill.item}}"
                         disabled
                         placeholder="-"
                         data-dtype="Number"
@@ -118,20 +118,20 @@
             </div>
         </div>
         <div class="scroll-area">
-            {{#each data.bonus as |bonus id|}}
+            {{#each skill.bonus as |bonus id|}}
             <div class="list-item">
                 <div class="item-left flex1">
                     <input
                             class="display"
                             type="text"
-                            name="data.bonus.{{id}}.key"
+                            name="skill.bonus.{{id}}.key"
                             value="{{bonus.key}}"
                             placeholder='{{localize "SR5.Bonus"}}'
                     />
                     <input
                             class="display"
                             type="text"
-                            name="data.bonus.{{id}}.value"
+                            name="skill.bonus.{{id}}.value"
                             value="{{bonus.value}}"
                             placeholder='0'
                     />
@@ -161,13 +161,13 @@
             </div>
         </div>
         <div class="scroll-area">
-            {{#each data.specs as |spec id|}}
+            {{#each skill.specs as |spec id|}}
             <div class="list-item">
                 <div class="item-left flex1">
                     <input
                         class="display"
                         type="text"
-                        name="data.specs.{{id}}"
+                        name="skill.specs.{{id}}"
                         value="{{spec}}"
                         placeholder='{{localize "SR5.Specialization"}}'
                     />

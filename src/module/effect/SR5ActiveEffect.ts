@@ -6,7 +6,7 @@ import {EffectChangeData} from "@league-of-foundry-developers/foundry-vtt-types/
 
 
 export class SR5ActiveEffect extends ActiveEffect {
-    // TODO: foundry-vtt-types v10 - getProperty(actor.data works with 'data.attributes' and 'system.attributes')
+    // TODO: foundry-vtt-types v10 - getProperty(actor.system works with 'data.attributes' and 'system.attributes')
     //                               changing it to actor works with 'system.attributes' but 'data.attributes' will break.
     static LOG_V10_COMPATIBILITY_WARNINGS = false;
     /**
@@ -68,7 +68,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     protected _applyModify(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
-            const value = foundry.utils.getProperty(actor.data, change.key) as ModifiableValue;
+            const value = foundry.utils.getProperty(actor, change.key) as ModifiableValue;
             //@ts-ignore // TODO: foundry-vtt-types v10
             value.mod.push({name: this.label, value: Number(change.value)});
 
@@ -82,7 +82,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Don't apply any changes if it's also not a indirect match.
         if (this._isKeyModifiableValue(actor, indirectKey)) {
-            const value = foundry.utils.getProperty(actor.data, indirectKey) as ModifiableValue;
+            const value = foundry.utils.getProperty(actor, indirectKey) as ModifiableValue;
             //@ts-ignore // TODO: foundry-vtt-types v10
             value.mod.push({name: this.label, value: Number(change.value)});
 
@@ -106,7 +106,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     protected _applyOverride(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
-            const value = foundry.utils.getProperty(actor.data, change.key);
+            const value = foundry.utils.getProperty(actor, change.key);
             //@ts-ignore // TODO: foundry-vtt-types v10
             value.override = {name: this.label, value: Number(change.value)};
             value.value = change.value;
@@ -120,7 +120,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         const indirectKey = nodes.join('.');
 
         if (this._isKeyModifiableValue(actor, indirectKey)) {
-            const value = foundry.utils.getProperty(actor.data, indirectKey);
+            const value = foundry.utils.getProperty(actor, indirectKey);
             //@ts-ignore // TODO: foundry-vtt-types v10
             value.override = {name: this.label, value: Number(change.value)};
 
@@ -133,7 +133,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     _isKeyModifiableValue(actor: SR5Actor, key: string): boolean {
-        const possibleValue = foundry.utils.getProperty(actor.data, key);
+        const possibleValue = foundry.utils.getProperty(actor, key);
         const possibleValueType = foundry.utils.getType(possibleValue);
 
         return possibleValue && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, this.minValueKeys);

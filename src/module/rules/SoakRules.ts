@@ -84,7 +84,7 @@ export class SoakRules {
     }
 
     private static applyMatrixSoakParts(soakParts: PartsList<number>, actor: SR5Actor) {
-        const actorData = actor.data.data as CharacterActorData;
+        const actorData = actor.system as CharacterActorData;
 
         // All actors have the same soak rules when they are not active in the matrix
         // TODO Technomancer and Sprites special rules?
@@ -193,7 +193,7 @@ export class SoakRules {
         const updatedDamage = duplicate(damage) as DamageData;
 
         if (damage.type.value === 'matrix') {
-            const actorData = actor.data.data as CharacterActorData;
+            const actorData = actor.system as CharacterActorData;
 
             // Only characters can receive biofeedback damage at the moment.
             // TODO Technomancer and Sprites special rules?
