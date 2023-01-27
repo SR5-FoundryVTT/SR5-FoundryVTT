@@ -520,7 +520,7 @@ export const registerItemLineHelpers = () => {
             data: {action: 'delete'}
         };
         const disableIcon = {
-            icon: `${effect.data.disabled ? 'far fa-circle' : 'fas fa-check-circle'} effect-control`,
+            icon: `${effect.disabled ? 'far fa-circle' : 'fas fa-check-circle'} effect-control`,
             title: game.i18n.localize('SR5.ToggleActive'),
             data: {action: "toggle"}
         };

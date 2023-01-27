@@ -85,7 +85,7 @@ export function prepareActiveEffectCategories(effects): EffectsSheetData {
     // Iterate over active effects, classifying them into categories
     for (let effect of effects) {
         effect._getSourceName(); // Trigger a lookup for the source name
-        if (effect.data.disabled) categories.inactive.effects.push(effect);
+        if (effect.disabled) categories.inactive.effects.push(effect);
         else if (effect.isTemporary) categories.temporary.effects.push(effect);
         else categories.passive.effects.push(effect);
     }
