@@ -28,7 +28,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     get template() {
         const path = 'systems/shadowrun5e/dist/templates/item/';
-        return `${path}${this.item.data.type}.html`;
+        return `${path}${this.item.type}.html`;
     }
 
     /* -------------------------------------------- */

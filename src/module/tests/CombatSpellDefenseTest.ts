@@ -28,7 +28,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
         const spellData = item.asSpell();
         if (!spellData) return action;
 
-        const itemAction = CombatSpellRules.defenseTestAction(spellData.data.type, spellData.data.combat.type);
+        const itemAction = CombatSpellRules.defenseTestAction(spellData.system.type, spellData.system.combat.type);
         return TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
     }
 
@@ -41,13 +41,13 @@ export class CombatSpellDefenseTest extends DefenseTest {
         const spellData = this.item?.asSpell();
         if (!spellData) return ['global'];
 
-        if (spellData.data.type === 'mana' && spellData.data.combat.type === 'direct') {
+        if (spellData.system.type === 'mana' && spellData.system.combat.type === 'direct') {
             return ['global'];
         }
-        if (spellData.data.type === 'physical' && spellData.data.combat.type === 'direct') {
+        if (spellData.system.type === 'physical' && spellData.system.combat.type === 'direct') {
             return ['global'];
         }
-        if (spellData.data.combat.type === 'indirect') {
+        if (spellData.system.combat.type === 'indirect') {
             return ['global', 'defense', 'wounds'];
         }
 
@@ -61,7 +61,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
         const spellData = this.item?.asSpell();
         if (!spellData) return;
 
-        this.data.incomingDamage = CombatSpellRules.calculateBaseDamage(spellData.data.combat.type, this.data.incomingDamage, this.data.against.force);
+        this.data.incomingDamage = CombatSpellRules.calculateBaseDamage(spellData.system.combat.type, this.data.incomingDamage, this.data.against.force);
     }
 
 
@@ -82,7 +82,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
         if (!spellData) return;
         if (!this.actor) return;
 
-        this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(this.actor, spellData.data.type, spellData.data.combat.type,
+        this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterHit(this.actor, spellData.system.type, spellData.system.combat.type,
             this.data.incomingDamage, this.against.hits.value, this.hits.value);
 
         await super.processFailure();
@@ -96,7 +96,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
         if (!spellData) return;
 
         // Only allow a defense test for in
-        if (CombatSpellRules.allowDamageResist(spellData.data.combat.type)) {
+        if (CombatSpellRules.allowDamageResist(spellData.system.combat.type)) {
             const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
             if (!test) return;
             await test.execute();

@@ -61,6 +61,7 @@ import ActionRollData = Shadowrun.ActionRollData;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
+import ShadowrunItemData= Shadowrun.ShadowrunItemData
 
 
 /**
@@ -203,7 +204,7 @@ export class SR5Actor extends Actor {
         super.prepareDerivedData();
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
-        const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item.data));
+        const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item as unknown as ShadowrunItemData));
         switch (this.type) {
             case 'character':
                 //@ts-ignore // TODO: foundry-vtt-types v10
@@ -1668,7 +1669,7 @@ export class SR5Actor extends Actor {
         const item = await fromUuid(uuid) as SR5Item;
         if (!item || !item.isHost()) return;
 
-        const hostData = item.asHostData();
+        const hostData = item.asHost();
         if (!hostData) return;
         await this._updateICHostData(hostData);
     }
@@ -1677,8 +1678,7 @@ export class SR5Actor extends Actor {
         const updateData = {
             // @ts-ignore _id is missing on internal typing...
             id: hostData._id,
-            rating: hostData.data.rating,
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            rating: hostData.system.rating,
             atts: duplicate(hostData.system.atts)
         }
 

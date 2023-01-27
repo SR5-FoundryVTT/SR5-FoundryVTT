@@ -391,7 +391,7 @@ ___________________
             ];
 
             // Update host data on the ic actor.
-            const hostData = item.asHostData();
+            const hostData = item.asHost();
             if (!hostData) return;
             for (const ic of connectedIC) {
                 if (!ic) continue;

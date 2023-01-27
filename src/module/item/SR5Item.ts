@@ -89,8 +89,6 @@ ActionResultFlow; // DON'T TOUCH!
  *       Be wary of SR5Item.actor for this reason!
  */
 export class SR5Item extends Item {
-    static LOG_V10_COMPATIBILITY_WARNINGS = false;
-    
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
     // to allow for embedded items in items in actors.
     items: SR5Item[];
@@ -135,7 +133,7 @@ export class SR5Item extends Item {
 
     private get wrapper(): SR5ItemDataWrapper {
         // we need to cast here to unknown first to make ts happy
-        return new SR5ItemDataWrapper((this.data as unknown) as ShadowrunItemData);
+        return new SR5ItemDataWrapper(this as unknown as ShadowrunItemData);
     }
 
     // Flag Functions
@@ -299,7 +297,7 @@ export class SR5Item extends Item {
             const limitParts = new PartsList(action.limit.mod);
             const dpParts = new PartsList(action.dice_pool_mod);
             equippedMods.forEach((mod) => {
-                const modification = mod.asModificationData();
+                const modification = mod.asModification();
                 if (!modification) return;
 
                 //@ts-ignore // TODO: foundry-vtt-types v10 
@@ -362,7 +360,7 @@ export class SR5Item extends Item {
             }
         }
 
-        const adeptPower = this.asAdeptPowerData();
+        const adeptPower = this.asAdeptPower();
         if (adeptPower) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             adeptPower.system.type = adeptPower.system.action.type ? 'active' : 'passive';
@@ -499,7 +497,7 @@ export class SR5Item extends Item {
 
         } else if (this.hasExplosiveAmmo()) {
             const ammo = this.getEquippedAmmo();
-            const ammoData = ammo.asAmmoData();
+            const ammoData = ammo.asAmmo();
 
             if (!ammoData) return {radius: 0, dropoff: 0};
 
@@ -744,10 +742,10 @@ export class SR5Item extends Item {
         return this.wrapper.isSin();
     }
 
-    asSinData(): SinItemData | undefined {
+    asSin(): SinItemData | undefined {
         if (this.isSin()) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as SinItemData;
+            return this as SinItemData;
         }
     }
 
@@ -755,10 +753,10 @@ export class SR5Item extends Item {
         return this.wrapper.isLifestyle();
     }
 
-    asLifestyleData(): LifestyleItemData | undefined {
+    asLifestyle(): LifestyleItemData | undefined {
         if (this.isLifestyle()) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as LifestyleItemData;
+            return this as LifestyleItemData;
         }
     }
 
@@ -766,10 +764,10 @@ export class SR5Item extends Item {
         return this.wrapper.isAmmo();
     }
 
-    asAmmoData(): AmmoItemData | undefined {
+    asAmmo(): AmmoItemData | undefined {
         if (this.isAmmo()) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as AmmoItemData;
+            return this as AmmoItemData;
         }
     }
 
@@ -777,10 +775,10 @@ export class SR5Item extends Item {
         return this.wrapper.isModification();
     }
 
-    asModificationData(): ModificationItemData | undefined {
+    asModification(): ModificationItemData | undefined {
         if (this.isModification()) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as ModificationItemData;
+            return this as ModificationItemData;
         }
     }
 
@@ -796,10 +794,10 @@ export class SR5Item extends Item {
         return this.wrapper.isProgram();
     }
 
-    asProgramData(): ProgramItemData | undefined {
+    asProgram(): ProgramItemData | undefined {
         if (this.isProgram()) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as ProgramItemData;
+            return this as ProgramItemData;
         }
     }
 
@@ -807,10 +805,10 @@ export class SR5Item extends Item {
         return this.wrapper.isQuality();
     }
 
-    asQualityData(): QualityItemData | undefined {
+    asQuality(): QualityItemData | undefined {
         if (this.isQuality()) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as QualityItemData;
+            return this as QualityItemData;
         }
     }
 
@@ -818,10 +816,10 @@ export class SR5Item extends Item {
         return this.type === 'adept_power';
     }
 
-    asAdeptPowerData(): AdeptPowerItemData|undefined {
+    asAdeptPower(): AdeptPowerItemData|undefined {
         if (this.isAdeptPower())
         //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as AdeptPowerItemData;
+            return this as AdeptPowerItemData;
     }
 
 
@@ -829,10 +827,10 @@ export class SR5Item extends Item {
         return this.type === 'host';
     }
 
-    asHostData(): HostItemData|undefined {
+    asHost(): HostItemData|undefined {
         if (this.isHost()) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as HostItemData;
+            return this as HostItemData;
         }
     }
 
@@ -853,14 +851,12 @@ export class SR5Item extends Item {
         return this.wrapper.isAction();
     }
 
-    asActionData(): ActionItemData | undefined {
+    asAction(): ActionItemData | undefined {
         if (this.isAction()) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as ActionItemData;
+            return this as ActionItemData;
         }
     }
-
-
 
     async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<void> {
         console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
@@ -1149,9 +1145,10 @@ export class SR5Item extends Item {
         return this.wrapper.isArmor();
     }
 
-    asArmorData(): ArmorItemData | undefined {
+    asArmor(): ArmorItemData | undefined {
         if (this.isArmor()) {
-            return this.data as ArmorItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as ArmorItemData;
         }
     }
 
@@ -1175,10 +1172,10 @@ export class SR5Item extends Item {
         return this.wrapper.isWeapon();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
     asWeapon(): WeaponItemData | undefined {
         if (this.wrapper.isWeapon()) {
-            return this.data as WeaponItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as WeaponItemData;
         }
     }
 
@@ -1186,10 +1183,10 @@ export class SR5Item extends Item {
         return this.wrapper.isCyberware();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
     asCyberware(): CyberwareItemData | undefined {
         if (this.isCyberware()) {
-            return this.data as CyberwareItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as CyberwareItemData;
         }
     }
 
@@ -1221,10 +1218,10 @@ export class SR5Item extends Item {
         return this.wrapper.isSpell();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
     asSpell(): SpellItemData | undefined {
         if (this.isSpell()) {
-            return this.data as SpellItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as SpellItemData;
         }
     }
 
@@ -1232,10 +1229,10 @@ export class SR5Item extends Item {
         return this.wrapper.isSpritePower();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
     asSpritePower(): SpritePowerItemData | undefined {
         if (this.isSpritePower()) {
-            return this.data as SpritePowerItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as SpritePowerItemData;
         }
     }
 
@@ -1247,10 +1244,10 @@ export class SR5Item extends Item {
         return this.wrapper.isComplexForm();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
     asComplexForm(): ComplexFormItemData | undefined {
         if (this.isComplexForm()) {
-            return this.data as ComplexFormItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as ComplexFormItemData;
         }
     }
 
@@ -1258,10 +1255,10 @@ export class SR5Item extends Item {
         return this.wrapper.isContact();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
     asContact(): ContactItemData | undefined {
         if (this.isContact()) {
-            return this.data as ContactItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as ContactItemData;
         }
     }
 
@@ -1269,10 +1266,10 @@ export class SR5Item extends Item {
         return this.wrapper.isCritterPower();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
     asCritterPower(): CritterPowerItemData | undefined {
         if (this.isCritterPower()) {
-            return this.data as CritterPowerItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as CritterPowerItemData;
         }
     }
 
@@ -1284,26 +1281,26 @@ export class SR5Item extends Item {
         return this.wrapper.isDevice();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
     asDevice(): DeviceItemData | undefined {
         if (this.isDevice()) {
-            return this.data as DeviceItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as DeviceItemData;
         }
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10
     asController(): HostItemData | DeviceItemData | undefined {
-        return this.asHostData() || this.asDevice() || undefined;
+        return this.asHost() || this.asDevice() || undefined;
     }
 
     isEquipment(): boolean {
         return this.wrapper.isEquipment();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asEquipment(): EquipmentItemData | undefined {
+    get asEquipment(): EquipmentItemData | undefined {
         if (this.isEquipment()) {
-            return this.data as EquipmentItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as EquipmentItemData;
         }
     }
 
@@ -1415,7 +1412,7 @@ export class SR5Item extends Item {
      * @param pack Optional pack collection to fetch from
      */
     async addIC(id: string, pack: string|null = null) {
-        const hostData = this.asHostData();
+        const hostData = this.asHost();
         if (!hostData || !id) return;
 
         // Check if actor exists before adding.
@@ -1437,9 +1434,9 @@ export class SR5Item extends Item {
             // Custom fields for IC
             data: {icType: icData.data.icType},
         });
-        hostData.data.ic.push(sourceEntity);
+        hostData.system.ic.push(sourceEntity);
 
-        await this.update({'data.ic': hostData.data.ic});
+        await this.update({'system.ic': hostData.system.ic});
     }
 
     /**
@@ -1449,13 +1446,13 @@ export class SR5Item extends Item {
     async removeIC(index: number) {
         if (isNaN(index) || index < 0) return;
 
-        const hostData = this.asHostData();
+        const hostData = this.asHost();
         if (!hostData) return;
-        if (hostData.data.ic.length <= index) return;
+        if (hostData.system.ic.length <= index) return;
 
-        hostData.data.ic.splice(index, 1);
+        hostData.system.ic.splice(index, 1);
 
-        await this.update({'data.ic': hostData.data.ic});
+        await this.update({'system.ic': hostData.system.ic});
     }
 
     get _isNestedItem(): boolean {
@@ -1523,25 +1520,25 @@ export class SR5Item extends Item {
         // Build the markId string. If no item has been given, there still will be a third split element.
         // Use Helpers.deconstructMarkId to get the elements.
         const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        const hostData = this.asHostData();
+        const hostData = this.asHost();
 
         if (!hostData) return;
 
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
-        hostData.data.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
+        hostData.system.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
-        await this.update({'data.marks': hostData.data.marks});
+        await this.update({'system.marks': hostData.system.marks});
     }
 
     getMarksById(markId: string): number {
-        const hostData = this.asHostData();
-        return hostData ? hostData.data.marks[markId] : 0;
+        const hostData = this.asHost();
+        return hostData ? hostData.system.marks[markId] : 0;
     }
 
     getAllMarks(): MatrixMarks|undefined {
-        const hostData = this.asHostData();
+        const hostData = this.asHost();
         if (!hostData) return;
-        return hostData.data.marks;
+        return hostData.system.marks;
     }
 
     /**
@@ -1564,11 +1561,11 @@ export class SR5Item extends Item {
         item = item || target.getMatrixDevice();
 
         const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);
-        const hostData = this.asHostData();
+        const hostData = this.asHost();
 
         if (!hostData) return 0
 
-        return hostData.data.marks[markId] || 0;
+        return hostData.system.marks[markId] || 0;
     }
 
     /**
@@ -1579,17 +1576,17 @@ export class SR5Item extends Item {
     async clearMarks() {
         if (!this.isHost()) return;
 
-        const hostData = this.asHostData();
+        const hostData = this.asHost();
 
         if (!hostData) return;
 
         // Delete all markId properties from ActorData
         const updateData = {}
-        for (const markId of Object.keys(hostData.data.marks)) {
+        for (const markId of Object.keys(hostData.system.marks)) {
             updateData[`-=${markId}`] = null;
         }
 
-        await this.update({'data.marks': updateData});
+        await this.update({'system.marks': updateData});
     }
 
     /**
@@ -1628,8 +1625,8 @@ export class SR5Item extends Item {
         if (!controllerData) return;
 
         // Convert the index to a device link.
-        if (controllerData.data.networkDevices[index] === undefined) return;
-        const networkDeviceLink = controllerData.data.networkDevices[index];
+        if (controllerData.system.networkDevices[index] === undefined) return;
+        const networkDeviceLink = controllerData.system.networkDevices[index];
         const controller = this;
         return await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, networkDeviceLink);
     }
@@ -1673,7 +1670,7 @@ export class SR5Item extends Item {
      * Return all network device items within a possible PAN or WAN.
      */
     get networkDevices(): SR5Item[] {
-        const controllerData = this.asDevice() || this.asHostData();
+        const controllerData = this.asDevice() || this.asHost();
         if (!controllerData) return [];
 
         return NetworkDeviceFlow.getNetworkDevices(this);

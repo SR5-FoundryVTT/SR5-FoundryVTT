@@ -250,7 +250,7 @@ export const ChatData = {
         const equippedAmmo = item.getEquippedAmmo();
         if (equippedAmmo && data.ammo && data.ammo.current?.max) {
             if (equippedAmmo) {
-                const ammoData = equippedAmmo.data.data as AmmoData;
+                const ammoData = equippedAmmo.system as AmmoData;
                 const { current, spare_clips } = data.ammo;
                 if (equippedAmmo.name) props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
                 if (ammoData.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${ammoData.blast.radius}m`);

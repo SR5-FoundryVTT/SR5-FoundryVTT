@@ -20,7 +20,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data.type;
     }
     getData(): ShadowrunItemDataData {
-        return this.data.data as ShadowrunItemDataData;
+        return this.data.system as ShadowrunItemDataData;
     }
 
     isAreaOfEffect(): boolean {
@@ -75,13 +75,13 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     isWeaponModification(): boolean {
         if (!this.isModification()) return false;
         const modification = this.data as ModificationItemData;
-        return modification.data.type === 'weapon';
+        return modification.system.type === 'weapon';
     }
 
     isArmorModification(): boolean {
         if (!this.isModification()) return false;
         const modification = this.data as ModificationItemData;
-        return modification.data.type === 'armor';
+        return modification.system.type === 'armor';
     }
 
     isProgram(): boolean {
@@ -348,21 +348,21 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getTechnology(): TechnologyData|undefined {
-        if ("technology" in this.data.data)
-            return this.data.data.technology;
+        if ("technology" in this.data.system)
+            return this.data.system.technology;
     }
 
     getRange(): CritterPowerRange|SpellRange|RangeWeaponData|undefined {
-        if (!("range" in this.data.data)) return;
+        if (!("range" in this.data.system)) return;
 
         if (this.data.type === 'critter_power')
-            return this.data.data.range as CritterPowerRange;
+            return this.data.system.range as CritterPowerRange;
 
         if (this.data.type === 'spell')
-            return this.data.data.range as SpellRange;
+            return this.data.system.range as SpellRange;
 
         if (this.data.type === 'weapon')
-            return this.data.data.range as RangeWeaponData;
+            return this.data.system.range as RangeWeaponData;
     }
 
     hasDefenseTest(): boolean {

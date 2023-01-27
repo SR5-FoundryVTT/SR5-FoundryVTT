@@ -87,11 +87,11 @@ export class RangedAttackTest extends SuccessTest {
 
     async _prepareWeaponRanges() {
         // Don't let missing weapon ranges break test.
-        const itemData = this.item?.asWeapon();
-        if (!itemData) return;
+        const weaponData = this.item?.asWeapon();
+        if (!weaponData) return;
 
         // Transform weapon ranges to something usable
-        const {ranges} = itemData.data.range;
+        const {ranges} = weaponData.system.range;
         const {range_modifiers} = SR.combat.environmental;
         const newRanges = {} as RangesTemplateData;
         for (const [key, value] of Object.entries(ranges)) {
