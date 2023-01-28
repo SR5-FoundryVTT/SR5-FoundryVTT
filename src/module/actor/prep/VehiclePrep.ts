@@ -23,6 +23,7 @@ export class VehiclePrep {
     static prepareDerivedData(system: VehicleData, items: SR5ItemDataWrapper[]) {
         VehiclePrep.prepareVehicleStats(system);
         VehiclePrep.prepareAttributes(system);
+        VehiclePrep.prepareDeviceAttributes(system);
         VehiclePrep.prepareLimits(system);
 
         AttributesPrep.prepareAttributes(system);
@@ -32,8 +33,7 @@ export class VehiclePrep {
         VehiclePrep.prepareConditionMonitor(system);
 
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
-        const deviceRating = 2;
-        MatrixPrep.prepareMatrixAttributesForDevice(system, deviceRating);
+        MatrixPrep.prepareMatrixAttributesForDevice(system);
 
         VehiclePrep.prepareMovement(system);
 
@@ -76,6 +76,9 @@ export class VehiclePrep {
         }
     }
 
+    /**
+     * Apply SR5#199 'Pilot' rules.
+     */
     static prepareAttributes(system: VehicleActorData) {
         const { attributes, vehicle_stats } = system;
 
@@ -100,6 +103,15 @@ export class VehiclePrep {
         limits.sensor = { ...vehicle_stats.sensor, hidden: true };
         limits.handling = { ...(isOffRoad ? vehicle_stats.off_road_handling : vehicle_stats.handling), hidden: true };
         limits.speed = { ...(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed), hidden: true };
+    }
+
+    /**
+     * Apply SR5#269 'Drones in the matrix' rules.
+     */
+    static prepareDeviceAttributes(system: VehicleActorData) {
+        const {matrix, vehicle_stats} = system;
+
+        matrix.rating = vehicle_stats.pilot.value;
     }
 
     static prepareConditionMonitor(system: VehicleActorData) {
