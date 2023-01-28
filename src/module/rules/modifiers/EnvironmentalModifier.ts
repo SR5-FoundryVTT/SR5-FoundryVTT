@@ -18,10 +18,12 @@ export class EnvironmentalModifier extends SituationModifier {
     }
 
     /**
-     * TODO: Documentation.
+     * How many selectios / modifiers are active per level of enviornmental modifiers.
      * 
-     * @param values 
-     * @returns 
+     * A level would be light and fitting modifiers would be 'Light Rain', 'Light Winds' or Medium Range.
+     * 
+     * @param values Active modifier values to be matched to level values
+     * @returns A count per level of modifiers on that level
      */
     activeLevels(values: Number[]): Record<string, number> {
         return {
@@ -35,11 +37,9 @@ export class EnvironmentalModifier extends SituationModifier {
     /**
      * Apply rules for environmental modifier selection to calculate a total modifier value.
      * 
-     * TODO: Add SR5 rules reference
+     * SR5#173 'Environmental Modifiers'
      */
     _calcActiveTotal(): number {
-        // TODO: Rework this, to make it understandable in a way the rules are written.
-
         // A fixed value selection overrides other selections.
         if (this.applied.active.value)
             return this.applied.active.value;
