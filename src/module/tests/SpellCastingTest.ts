@@ -6,7 +6,6 @@ import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
-import { SR5Actor } from "../actor/SR5Actor";
 
 
 export interface SpellCastingTestData extends SuccessTestData {

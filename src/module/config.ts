@@ -406,28 +406,47 @@ export const SR5 = {
         'thrown': 'ThrownAttackTest'
     },
 
-    spellOpposedTests: {
-        'combat': 'CombatSpellDefenseTest'
-    },
-
+    /**
+     * When casting tests from these item types, use these tests as active tests
+     */
     activeTests: {
         'spell': 'SpellCastingTest',
         'complex_form': 'ComplexFormTest'
     },
 
+    /**
+     * Using different active test details should result in these opposed tests
+     * 
+     * Structure: {
+     *  [item.type]: {[item.system.type]}: 'OpposedTest'
+     * }
+     */
     opposedTests: {
         'spell': {
             'combat': 'CombatSpellDefenseTest'
         }
     },
 
+    /**
+     * Using different resist tests for the oppositing depending on active tests details
+     *  Structure: {
+     *  [item.type]: {[item.system.type]}: 'OpposedTest'
+     * }
+     */
     opposedResistTests: {
         'spell': {
             'combat': 'PhysicalResistTest'
         }
     },
 
-    // When a firemode with suppression is used, this test should defense against it.
+    /**
+     * When a test is cast an active test this defines what tests should follow that tests completion
+     */
+    followedTests: {
+        'SpellCastingTest': 'DrainTest'
+    },
+
+    // When a firemode with suppression is used, this test should defend against it.
     supressionDefenseTest: 'SupressionDefenseTest',
 
     /**

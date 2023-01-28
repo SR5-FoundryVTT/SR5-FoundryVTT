@@ -984,10 +984,12 @@ export class Helpers {
         const opposedTest = SR5.opposedTests[type][changeData.system.category] || 'OpposedTest';
         //@ts-ignore // TODO: foundry-vtt-types v10
         const resistTest = SR5.opposedResistTests[type][changeData.system.category] || '';
+        const drainTest = SR5.followedTests[test] ?? '';
 
         foundry.utils.setProperty(applyData, 'system.action.test', test);
         foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
         foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', resistTest);
+        foundry.utils.setProperty(applyData, 'system.action.followed.test', drainTest);
     }
 
     /**
