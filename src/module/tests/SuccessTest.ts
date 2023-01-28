@@ -404,6 +404,14 @@ export class SuccessTest {
     }
 
     /**
+     * Supress dialog during execution
+     */
+    hideDialog() {
+        if (!this.data.options) this.data.options = {};
+        this.data.options.showDialog = false;
+    }
+
+    /**
      * Show the dialog class for this test type and alter test according to user selection.
      */
     async showDialog(): Promise<boolean> {
