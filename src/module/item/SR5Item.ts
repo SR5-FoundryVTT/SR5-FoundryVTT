@@ -89,8 +89,6 @@ ActionResultFlow; // DON'T TOUCH!
  *       Be wary of SR5Item.actor for this reason!
  */
 export class SR5Item extends Item {
-    static LOG_V10_COMPATIBILITY_WARNINGS = false;
-    
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
     // to allow for embedded items in items in actors.
     items: SR5Item[];
@@ -135,7 +133,7 @@ export class SR5Item extends Item {
 
     private get wrapper(): SR5ItemDataWrapper {
         // we need to cast here to unknown first to make ts happy
-        return new SR5ItemDataWrapper((this.data as unknown) as ShadowrunItemData);
+        return new SR5ItemDataWrapper(this as unknown as ShadowrunItemData);
     }
 
     // Flag Functions
@@ -219,8 +217,12 @@ export class SR5Item extends Item {
         const action = this.getAction();
         return !!(action && action.type !== '' && (action.skill || action.attribute || action.attribute2 || action.dice_pool_mod));
     }
-    get hasTemplate(): boolean {
-        return this.isAreaOfEffect();
+
+    /**
+     * Determine if a blast area should be placed using FoundryVTT area templates.
+     */
+    get hasBlastTemplate(): boolean {
+        return this.isAreaOfEffect;
     }
 
     /**
@@ -286,8 +288,7 @@ export class SR5Item extends Item {
             }
 
             // Item.prepareData is called once (first) with an empty SR5Actor instance without .data and once (second) with .data.
-            //@ts-ignore // TODO: foundry-vtt-types v10 Is there way with v10 to determine if data has been set? (second round)
-            if (this.actor?.data) {
+            if (this.actor?.system) {
                 action.damage.source = {
                     actorId: this.actor.id as string,
                     itemId: this.id as string,
@@ -300,7 +301,7 @@ export class SR5Item extends Item {
             const limitParts = new PartsList(action.limit.mod);
             const dpParts = new PartsList(action.dice_pool_mod);
             equippedMods.forEach((mod) => {
-                const modification = mod.asModificationData();
+                const modification = mod.asModification();
                 if (!modification) return;
 
                 //@ts-ignore // TODO: foundry-vtt-types v10 
@@ -363,7 +364,7 @@ export class SR5Item extends Item {
             }
         }
 
-        const adeptPower = this.asAdeptPowerData();
+        const adeptPower = this.asAdeptPower();
         if (adeptPower) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             adeptPower.system.type = adeptPower.system.action.type ? 'active' : 'passive';
@@ -383,7 +384,7 @@ export class SR5Item extends Item {
             actor: this.actor,
             description: this.getChatData(),
             item: this,
-            previewTemplate: this.hasTemplate,
+            previewTemplate: this.hasBlastTemplate,
             tests: this.getActionTests()
         };
         return await createItemChatMessage(options);
@@ -456,7 +457,7 @@ export class SR5Item extends Item {
         const parts = new PartsList<number>();
 
         if (this.hasOpposedTest()) {
-            if (this.isAreaOfEffect()) {
+            if (this.isAreaOfEffect) {
                 parts.addUniquePart('SR5.Aoe', -2);
             }
         }
@@ -465,7 +466,7 @@ export class SR5Item extends Item {
     }
 
     getBlastData(actionTestData?: any): BlastData | undefined {
-        if (this.isSpell() && this.isAreaOfEffect()) {
+        if (this.isSpell && this.isAreaOfEffect) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as SpellData;
 
@@ -486,7 +487,7 @@ export class SR5Item extends Item {
                 dropoff
             }
 
-        } else if (this.isGrenade()) {
+        } else if (this.isGrenade) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as WeaponData;
 
@@ -498,16 +499,16 @@ export class SR5Item extends Item {
                 dropoff
             }
 
-        } else if (this.hasExplosiveAmmo()) {
-            const ammo = this.getEquippedAmmo();
-            const ammoData = ammo.asAmmoData();
+        } else if (this.hasExplosiveAmmo) {
+            const item = this.getEquippedAmmo();
+            const ammo = item.asAmmo;
 
-            if (!ammoData) return {radius: 0, dropoff: 0};
+            if (!ammo) return {radius: 0, dropoff: 0};
 
             //@ts-ignore // TODO: foundry-vtt-types v10 
-            const distance = ammoData.system.blast.radius;
+            const distance = ammo.system.blast.radius;
             //@ts-ignore // TODO: foundry-vtt-types v10 
-            const dropoff = ammoData.system.blast.dropoff;
+            const dropoff = ammo.system.blast.dropoff;
 
             return {
                 radius: distance,
@@ -518,7 +519,7 @@ export class SR5Item extends Item {
 
     getEquippedAmmo(): SR5Item {
         const equippedAmmos = (this.items || []).filter((item) =>
-            item.isAmmo() &&
+            item.isAmmo &&
             item.isEquipped());
 
         // Cast Typing isn't a mistake, so long as isAmmo is filtered.
@@ -527,11 +528,11 @@ export class SR5Item extends Item {
 
     getEquippedMods(): SR5Item[] {
         return (this.items || []).filter((item) =>
-            item.isWeaponModification() &&
+            item.isWeaponModification &&
             item.isEquipped());
     }
 
-    hasExplosiveAmmo(): boolean {
+    get hasExplosiveAmmo(): boolean {
         const ammo = this.getEquippedAmmo();
         if (!ammo) return false;
         //@ts-ignore // TODO: foundry-vtt-types v10 
@@ -735,105 +736,109 @@ export class SR5Item extends Item {
     }
 
     _addWeaponParts(parts: PartsList<number>) {
-        if (this.isRangedWeapon()) {
+        if (this.isRangedWeapon) {
             const recoil = this.calculateRecoil();
             if (recoil) parts.addUniquePart('SR5.Recoil', recoil);
         }
     }
 
-    isSin(): boolean {
+    get isSin(): boolean {
         return this.wrapper.isSin();
     }
 
-    asSinData(): SinItemData | undefined {
-        if (this.isSin()) {
+    get asSin(): SinItemData | undefined {
+        if (this.isSin) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as SinItemData;
+            return this as SinItemData;
         }
     }
 
-    isLifestyle(): boolean {
+    get isLifestyle(): boolean {
         return this.wrapper.isLifestyle();
     }
 
-    asLifestyleData(): LifestyleItemData | undefined {
-        if (this.isLifestyle()) {
+    get asLifestyle(): LifestyleItemData | undefined {
+        if (this.isLifestyle) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as LifestyleItemData;
+            return this as LifestyleItemData;
         }
     }
 
-    isAmmo(): boolean {
+    get isAmmo(): boolean {
         return this.wrapper.isAmmo();
     }
 
-    asAmmoData(): AmmoItemData | undefined {
-        if (this.isAmmo()) {
+    get isAoEAmmo(): boolean {
+        return this.wrapper.isAoEAmmo();
+    }
+
+    get asAmmo(): AmmoItemData | undefined {
+        if (this.isAmmo) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as AmmoItemData;
+            return this as AmmoItemData;
         }
     }
 
-    isModification(): boolean {
+    get isModification(): boolean {
         return this.wrapper.isModification();
     }
 
-    asModificationData(): ModificationItemData | undefined {
-        if (this.isModification()) {
+    asModification(): ModificationItemData | undefined {
+        if (this.isModification) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as ModificationItemData;
+            return this as ModificationItemData;
         }
     }
 
-    isWeaponModification(): boolean {
+    get isWeaponModification(): boolean {
         return this.wrapper.isWeaponModification();
     }
 
-    isArmorModification(): boolean {
+    get isArmorModification(): boolean {
         return this.wrapper.isArmorModification();
     }
 
-    isProgram(): boolean {
+    get isProgram(): boolean {
         return this.wrapper.isProgram();
     }
 
-    asProgramData(): ProgramItemData | undefined {
-        if (this.isProgram()) {
+    get asProgram(): ProgramItemData | undefined {
+        if (this.isProgram) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as ProgramItemData;
+            return this as ProgramItemData;
         }
     }
 
-    isQuality(): boolean {
+    get isQuality(): boolean {
         return this.wrapper.isQuality();
     }
 
-    asQualityData(): QualityItemData | undefined {
-        if (this.isQuality()) {
+    get asQuality(): QualityItemData | undefined {
+        if (this.isQuality) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as QualityItemData;
+            return this as QualityItemData;
         }
     }
 
-    isAdeptPower(): boolean {
+    get isAdeptPower(): boolean {
         return this.type === 'adept_power';
     }
 
-    asAdeptPowerData(): AdeptPowerItemData|undefined {
-        if (this.isAdeptPower())
+    asAdeptPower(): AdeptPowerItemData|undefined {
+        if (this.isAdeptPower)
         //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as AdeptPowerItemData;
+            return this as AdeptPowerItemData;
     }
 
 
-    isHost(): boolean {
+    get isHost(): boolean {
         return this.type === 'host';
     }
 
-    asHostData(): HostItemData|undefined {
-        if (this.isHost()) {
+    get asHost(): HostItemData|undefined {
+        if (this.isHost) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as HostItemData;
+            return this as HostItemData;
         }
     }
 
@@ -854,14 +859,12 @@ export class SR5Item extends Item {
         return this.wrapper.isAction();
     }
 
-    asActionData(): ActionItemData | undefined {
+    asAction(): ActionItemData | undefined {
         if (this.isAction()) {
             //@ts-ignore TODO: foundry-vtt-types v10
-            return this.data as ActionItemData;
+            return this as ActionItemData;
         }
     }
-
-
 
     async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<void> {
         console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
@@ -1071,14 +1074,31 @@ export class SR5Item extends Item {
         return true;
     }
 
-    async openPdfSource() {
+    /**
+     * Use the items source field to open it as another browser tab.
+     * 
+     * This is meant to allow for wikis to be used as sources.
+     */
+    openSourceURL() {
+        const source = this.getSource();
+        if (source === '') {
+            ui.notifications?.error('SR5.SourceFieldEmptyError', {localize: true});
+        }
+
+        window.open(source);
+    }
+
+    /**
+     * Use the items source field to try matching it against a PDF document and display that within FoundryVTT.
+     */
+    openSourcePDF() {
         // Check for pdfpager module hook: https://github.com/farling42/fvtt-pdf-pager
         if (!ui['pdfpager']) {
             ui.notifications?.warn('SR5.DIALOG.MissingModuleContent', {localize: true});
             return;
         }
 
-        const source = this.getBookSource();
+        const source = this.getSource();
         if (source === '') {
             ui.notifications?.error('SR5.SourceFieldEmptyError', {localize: true});
         }
@@ -1087,6 +1107,19 @@ export class SR5Item extends Item {
 
         //@ts-ignore
         ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
+    }
+
+    /**
+     * Use the items source field and try different means of opening it.
+     */
+    openSource() {
+        const source = this.getSource();
+
+        if (Helpers.isURL(source)) {
+            return this.openSourceURL();
+        }
+
+        return this.openSourcePDF();
     }
 
     _canDealDamage(): boolean {
@@ -1115,21 +1148,21 @@ export class SR5Item extends Item {
     }
 
     getWeaponRange(): RangeWeaponData|undefined {
-        if (this.isRangedWeapon())
+        if (this.isRangedWeapon)
             return this.getRange() as RangeWeaponData;
     }
 
     getRollName(): string {
-        if (this.isRangedWeapon()) {
+        if (this.isRangedWeapon) {
             return game.i18n.localize('SR5.RangeWeaponAttack');
         }
-        if (this.isMeleeWeapon()) {
+        if (this.isMeleeWeapon) {
             return game.i18n.localize('SR5.MeleeWeaponAttack');
         }
-        if (this.isCombatSpell()) {
+        if (this.isCombatSpell) {
             return game.i18n.localize('SR5.SpellAttack');
         }
-        if (this.isSpell()) {
+        if (this.isSpell) {
             return game.i18n.localize('SR5.SpellCast');
         }
         if (this.hasRoll) {
@@ -1140,171 +1173,176 @@ export class SR5Item extends Item {
     }
 
     /**
-     * Passthrough functions
+     * An attack with this weapon will create an area of effect / blast.
+     * 
+     * There is a mulitide of possibilties as to HOW an item can create an AoE, 
+     * both directly connected to the item and / or some of it's nested items.
+     * 
      */
-    isAreaOfEffect(): boolean {
-        return this.wrapper.isAreaOfEffect();
+    get isAreaOfEffect(): boolean {
+        return this.wrapper.isAreaOfEffect() || this.hasExplosiveAmmo;
     }
 
-    isArmor(): boolean {
+    get isArmor(): boolean {
         return this.wrapper.isArmor();
     }
 
-    asArmorData(): ArmorItemData | undefined {
-        if (this.isArmor()) {
-            return this.data as ArmorItemData;
+    get asArmor(): ArmorItemData | undefined {
+        if (this.isArmor) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as ArmorItemData;
         }
     }
 
-    hasArmorBase(): boolean {
+    get hasArmorBase(): boolean {
         return this.wrapper.hasArmorBase();
     }
 
-    hasArmorAccessory(): boolean {
+    get hasArmorAccessory(): boolean {
         return this.wrapper.hasArmorAccessory();
     }
 
-    hasArmor(): boolean {
+    get hasArmor(): boolean {
         return this.wrapper.hasArmor();
     }
 
-    isGrenade(): boolean {
+    get isGrenade(): boolean {
         return this.wrapper.isGrenade();
     }
 
-    isWeapon(): boolean {
+    get isWeapon(): boolean {
         return this.wrapper.isWeapon();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asWeapon(): WeaponItemData | undefined {
-        if (this.wrapper.isWeapon()) {
-            return this.data as WeaponItemData;
+    get asWeapon(): WeaponItemData | undefined {
+        if (this.isWeapon) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as WeaponItemData;
         }
     }
 
-    isCyberware(): boolean {
-        return this.wrapper.isCyberware();
-    }
-
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asCyberware(): CyberwareItemData | undefined {
-        if (this.isCyberware()) {
-            return this.data as CyberwareItemData;
-        }
-    }
-
-    isCombatSpell(): boolean {
-        return this.wrapper.isCombatSpell();
-    }
-
-    isDirectCombatSpell(): boolean {
-        return this.wrapper.isDirectCombatSpell();
-    }
-
-    isIndirectCombatSpell(): boolean {
-        return this.wrapper.isIndirectCombatSpell();
-    }
-
-    isManaSpell(): boolean {
-        return this.wrapper.isManaSpell();
-    }
-
-    isPhysicalSpell(): boolean {
-        return this.wrapper.isPhysicalSpell();
-    }
-
-    isRangedWeapon(): boolean {
+    get isRangedWeapon(): boolean {
         return this.wrapper.isRangedWeapon();
     }
 
-    isSpell(): boolean {
-        return this.wrapper.isSpell();
-    }
-
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asSpell(): SpellItemData | undefined {
-        if (this.isSpell()) {
-            return this.data as SpellItemData;
-        }
-    }
-
-    isSpritePower(): boolean {
-        return this.wrapper.isSpritePower();
-    }
-
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asSpritePower(): SpritePowerItemData | undefined {
-        if (this.isSpritePower()) {
-            return this.data as SpritePowerItemData;
-        }
-    }
-
-    isBioware(): boolean {
-        return this.wrapper.isBioware();
-    }
-
-    isComplexForm(): boolean {
-        return this.wrapper.isComplexForm();
-    }
-
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asComplexForm(): ComplexFormItemData | undefined {
-        if (this.isComplexForm()) {
-            return this.data as ComplexFormItemData;
-        }
-    }
-
-    isContact(): boolean {
-        return this.wrapper.isContact();
-    }
-
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asContact(): ContactItemData | undefined {
-        if (this.isContact()) {
-            return this.data as ContactItemData;
-        }
-    }
-
-    isCritterPower(): boolean {
-        return this.wrapper.isCritterPower();
-    }
-
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asCritterPower(): CritterPowerItemData | undefined {
-        if (this.isCritterPower()) {
-            return this.data as CritterPowerItemData;
-        }
-    }
-
-    isMeleeWeapon(): boolean {
+    get isMeleeWeapon(): boolean {
         return this.wrapper.isMeleeWeapon();
     }
 
-    isDevice(): boolean {
+    get isCyberware(): boolean {
+        return this.wrapper.isCyberware();
+    }
+
+    get asCyberware(): CyberwareItemData | undefined {
+        if (this.isCyberware) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as CyberwareItemData;
+        }
+    }
+
+    get isCombatSpell(): boolean {
+        return this.wrapper.isCombatSpell();
+    }
+
+    get isDirectCombatSpell(): boolean {
+        return this.wrapper.isDirectCombatSpell();
+    }
+
+    get isIndirectCombatSpell(): boolean {
+        return this.wrapper.isIndirectCombatSpell();
+    }
+
+    get isManaSpell(): boolean {
+        return this.wrapper.isManaSpell();
+    }
+
+    get isPhysicalSpell(): boolean {
+        return this.wrapper.isPhysicalSpell();
+    }
+
+    get isSpell(): boolean {
+        return this.wrapper.isSpell();
+    }
+
+    get asSpell(): SpellItemData | undefined {
+        if (this.isSpell) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as SpellItemData;
+        }
+    }
+
+    get isSpritePower(): boolean {
+        return this.wrapper.isSpritePower();
+    }
+
+    get asSpritePower(): SpritePowerItemData | undefined {
+        if (this.isSpritePower) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as SpritePowerItemData;
+        }
+    }
+
+    get isBioware(): boolean {
+        return this.wrapper.isBioware();
+    }
+
+    get isComplexForm(): boolean {
+        return this.wrapper.isComplexForm();
+    }
+
+    get asComplexForm(): ComplexFormItemData | undefined {
+        if (this.isComplexForm) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as ComplexFormItemData;
+        }
+    }
+
+    get isContact(): boolean {
+        return this.wrapper.isContact();
+    }
+
+    get asContact(): ContactItemData | undefined {
+        if (this.isContact) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as ContactItemData;
+        }
+    }
+
+    get isCritterPower(): boolean {
+        return this.wrapper.isCritterPower();
+    }
+
+    get asCritterPower(): CritterPowerItemData | undefined {
+        if (this.isCritterPower) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as CritterPowerItemData;
+        }
+    }
+
+    get isDevice(): boolean {
         return this.wrapper.isDevice();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asDevice(): DeviceItemData | undefined {
-        if (this.isDevice()) {
-            return this.data as DeviceItemData;
+    get asDevice(): DeviceItemData | undefined {
+        if (this.isDevice) {
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as DeviceItemData;
         }
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10
     asController(): HostItemData | DeviceItemData | undefined {
-        return this.asHostData() || this.asDevice() || undefined;
+        return this.asHost || this.asDevice || undefined;
     }
 
     isEquipment(): boolean {
         return this.wrapper.isEquipment();
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
-    asEquipment(): EquipmentItemData | undefined {
+    get asEquipment(): EquipmentItemData | undefined {
         if (this.isEquipment()) {
-            return this.data as EquipmentItemData;
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as EquipmentItemData;
         }
     }
 
@@ -1324,8 +1362,8 @@ export class SR5Item extends Item {
         return this.wrapper.isMatrixAction();
     }
 
-    getBookSource(): string {
-        return this.wrapper.getBookSource();
+    getSource(): string {
+        return this.wrapper.getSource();
     }
 
     getConditionMonitor(): ConditionData {
@@ -1389,7 +1427,7 @@ export class SR5Item extends Item {
     }
 
     getReach(): number {
-        if (this.isMeleeWeapon()) {
+        if (this.isMeleeWeapon) {
             //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as WeaponData;
             return system.melee.reach ?? 0;
@@ -1416,8 +1454,8 @@ export class SR5Item extends Item {
      * @param pack Optional pack collection to fetch from
      */
     async addIC(id: string, pack: string|null = null) {
-        const hostData = this.asHostData();
-        if (!hostData || !id) return;
+        const host = this.asHost;
+        if (!host || !id) return;
 
         // Check if actor exists before adding.
         const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors?.get(id)) as SR5Actor;
@@ -1438,9 +1476,9 @@ export class SR5Item extends Item {
             // Custom fields for IC
             data: {icType: icData.data.icType},
         });
-        hostData.data.ic.push(sourceEntity);
+        host.system.ic.push(sourceEntity);
 
-        await this.update({'data.ic': hostData.data.ic});
+        await this.update({'system.ic': host.system.ic});
     }
 
     /**
@@ -1450,13 +1488,13 @@ export class SR5Item extends Item {
     async removeIC(index: number) {
         if (isNaN(index) || index < 0) return;
 
-        const hostData = this.asHostData();
-        if (!hostData) return;
-        if (hostData.data.ic.length <= index) return;
+        const host = this.asHost;
+        if (!host) return;
+        if (host.system.ic.length <= index) return;
 
-        hostData.data.ic.splice(index, 1);
+        host.system.ic.splice(index, 1);
 
-        await this.update({'data.ic': hostData.data.ic});
+        await this.update({'system.ic': host.system.ic});
     }
 
     get _isNestedItem(): boolean {
@@ -1512,7 +1550,7 @@ export class SR5Item extends Item {
     async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: Item, overwrite?: boolean}) {
         if (!canvas.ready) return;
 
-        if (!this.isHost()) {
+        if (!this.isHost) {
             console.error('Only Host item types can place matrix marks!');
             return;
         }
@@ -1524,25 +1562,25 @@ export class SR5Item extends Item {
         // Build the markId string. If no item has been given, there still will be a third split element.
         // Use Helpers.deconstructMarkId to get the elements.
         const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        const hostData = this.asHostData();
+        const host = this.asHost;
 
-        if (!hostData) return;
+        if (!host) return;
 
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
-        hostData.data.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
+        host.system.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
-        await this.update({'data.marks': hostData.data.marks});
+        await this.update({'system.marks': host.system.marks});
     }
 
     getMarksById(markId: string): number {
-        const hostData = this.asHostData();
-        return hostData ? hostData.data.marks[markId] : 0;
+        const host = this.asHost;
+        return host ? host.system.marks[markId] : 0;
     }
 
     getAllMarks(): MatrixMarks|undefined {
-        const hostData = this.asHostData();
-        if (!hostData) return;
-        return hostData.data.marks;
+        const host = this.asHost;
+        if (!host) return;
+        return host.system.marks;
     }
 
     /**
@@ -1558,18 +1596,18 @@ export class SR5Item extends Item {
      */
     getMarks(target: SR5Actor, item?: SR5Item, options?: {scene?: Scene}): number {
         if (!canvas.ready) return 0;
-        if (!this.isHost()) return 0;
+        if (!this.isHost) return 0;
 
         // Scene is optional.
         const scene = options?.scene || canvas.scene as Scene;
         item = item || target.getMatrixDevice();
 
         const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);
-        const hostData = this.asHostData();
+        const host = this.asHost;
 
-        if (!hostData) return 0
+        if (!host) return 0
 
-        return hostData.data.marks[markId] || 0;
+        return host.system.marks[markId] || 0;
     }
 
     /**
@@ -1578,31 +1616,31 @@ export class SR5Item extends Item {
      * TODO: Allow partial deletion based on target / item
      */
     async clearMarks() {
-        if (!this.isHost()) return;
+        if (!this.isHost) return;
 
-        const hostData = this.asHostData();
+        const host = this.asHost;
 
-        if (!hostData) return;
+        if (!host) return;
 
         // Delete all markId properties from ActorData
         const updateData = {}
-        for (const markId of Object.keys(hostData.data.marks)) {
+        for (const markId of Object.keys(host.system.marks)) {
             updateData[`-=${markId}`] = null;
         }
 
-        await this.update({'data.marks': updateData});
+        await this.update({'system.marks': updateData});
     }
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
      */
     async clearMark(markId: string) {
-        if (!this.isHost()) return;
+        if (!this.isHost) return;
 
         const updateData = {}
         updateData[`-=${markId}`] = null;
 
-        await this.update({'data.marks': updateData});
+        await this.update({'system.marks': updateData});
     }
 
     /**
@@ -1629,8 +1667,8 @@ export class SR5Item extends Item {
         if (!controllerData) return;
 
         // Convert the index to a device link.
-        if (controllerData.data.networkDevices[index] === undefined) return;
-        const networkDeviceLink = controllerData.data.networkDevices[index];
+        if (controllerData.system.networkDevices[index] === undefined) return;
+        const networkDeviceLink = controllerData.system.networkDevices[index];
         const controller = this;
         return await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, networkDeviceLink);
     }
@@ -1643,7 +1681,7 @@ export class SR5Item extends Item {
     }
 
     getAllMarkedDocuments(): MarkedDocument[] {
-        if (!this.isHost()) return [];
+        if (!this.isHost) return [];
 
         const marks = this.getAllMarks();
         if (!marks) return [];
@@ -1674,8 +1712,8 @@ export class SR5Item extends Item {
      * Return all network device items within a possible PAN or WAN.
      */
     get networkDevices(): SR5Item[] {
-        const controllerData = this.asDevice() || this.asHostData();
-        if (!controllerData) return [];
+        const controller = this.asDevice || this.asHost;
+        if (!controller) return [];
 
         return NetworkDeviceFlow.getNetworkDevices(this);
     }
@@ -1684,7 +1722,7 @@ export class SR5Item extends Item {
      * Only devices can control a network.
      */
     get canBeNetworkController(): boolean {
-        return this.isDevice() || this.isHost();
+        return this.isDevice || this.isHost;
     }
 
     /**

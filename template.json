@@ -835,12 +835,14 @@
                         "base": 0,
                         "value": 0,
                         "max": 0,
+                        "pain_tolerance": 0,
                         "disabled": false
                     },
                     "physical": {
                         "base": 0,
                         "value": 0,
                         "max": 0,
+                        "pain_tolerance": 0,
                         "disabled": false,
                         "overflow": {
                             "value": 0,

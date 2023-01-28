@@ -13,38 +13,39 @@ import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
 
 export class VehiclePrep {
-    static prepareBaseData(data: VehicleData) {
-        ModifiersPrep.prepareModifiers(data);
-        ModifiersPrep.clearAttributeMods(data);
-        ModifiersPrep.clearArmorMods(data);
-        ModifiersPrep.clearLimitMods(data);
+    static prepareBaseData(system: VehicleData) {
+        ModifiersPrep.prepareModifiers(system);
+        ModifiersPrep.clearAttributeMods(system);
+        ModifiersPrep.clearArmorMods(system);
+        ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(data: VehicleData, items: SR5ItemDataWrapper[]) {
-        VehiclePrep.prepareVehicleStats(data);
-        VehiclePrep.prepareAttributes(data);
-        VehiclePrep.prepareLimits(data);
+    static prepareDerivedData(system: VehicleData, items: SR5ItemDataWrapper[]) {
+        VehiclePrep.prepareVehicleStats(system);
+        VehiclePrep.prepareAttributes(system);
+        VehiclePrep.prepareDeviceAttributes(system);
+        VehiclePrep.prepareLimits(system);
 
-        AttributesPrep.prepareAttributes(data);
-        SkillsPrep.prepareSkills(data);
+        AttributesPrep.prepareAttributes(system);
+        SkillsPrep.prepareSkills(system);
 
-        LimitsPrep.prepareLimits(data);
-        VehiclePrep.prepareConditionMonitor(data);
+        LimitsPrep.prepareLimits(system);
+        VehiclePrep.prepareConditionMonitor(system);
 
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-        MatrixPrep.prepareAttributesForDevice(data);
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
+        MatrixPrep.prepareMatrixAttributesForDevice(system);
 
-        VehiclePrep.prepareMovement(data);
+        VehiclePrep.prepareMovement(system);
 
-        VehiclePrep.prepareMeatspaceInit(data);
-        InitiativePrep.prepareMatrixInit(data);
-        InitiativePrep.prepareCurrentInitiative(data);
+        VehiclePrep.prepareMeatspaceInit(system);
+        InitiativePrep.prepareMatrixInit(system);
+        InitiativePrep.prepareCurrentInitiative(system);
 
-        VehiclePrep.prepareArmor(data);
+        VehiclePrep.prepareArmor(system);
     }
 
-    static prepareVehicleStats(data: VehicleData) {
-        const { vehicle_stats, isOffRoad } = data;
+    static prepareVehicleStats(system: VehicleData) {
+        const { vehicle_stats, isOffRoad } = system;
         // set the value for the stats
         for (let [key, stat] of Object.entries(vehicle_stats)) {
             // this turns the Object model into the list mod
@@ -75,10 +76,14 @@ export class VehiclePrep {
         }
     }
 
-    static prepareAttributes(data: VehicleActorData) {
-        const { attributes, vehicle_stats } = data;
+    /**
+     * Apply SR5#199 'Pilot' rules.
+     */
+    static prepareAttributes(system: VehicleActorData) {
+        const { attributes, vehicle_stats } = system;
 
-        const attributeIds = ['agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma'];
+        // SR5#199 - 'Pilot' => All  mental attributes and reaction.
+        const attributeIds = ['reaction', 'willpower', 'logic', 'intuition', 'charisma'];
 
         const totalPilot = Helpers.calcTotal(vehicle_stats.pilot);
 
@@ -89,8 +94,8 @@ export class VehiclePrep {
         });
     }
 
-    static prepareLimits(data: VehicleActorData) {
-        const { limits, vehicle_stats, isOffRoad } = data;
+    static prepareLimits(system: VehicleActorData) {
+        const { limits, vehicle_stats, isOffRoad } = system;
 
         limits.mental.base = Helpers.calcTotal(vehicle_stats.sensor);
 
@@ -100,8 +105,17 @@ export class VehiclePrep {
         limits.speed = { ...(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed), hidden: true };
     }
 
-    static prepareConditionMonitor(data: VehicleActorData) {
-        const { track, attributes, matrix, isDrone, modifiers } = data;
+    /**
+     * Apply SR5#269 'Drones in the matrix' rules.
+     */
+    static prepareDeviceAttributes(system: VehicleActorData) {
+        const {matrix, vehicle_stats} = system;
+
+        matrix.rating = vehicle_stats.pilot.value;
+    }
+
+    static prepareConditionMonitor(system: VehicleActorData) {
+        const { track, attributes, matrix, isDrone, modifiers } = system;
 
         const halfBody = Math.ceil(Helpers.calcTotal(attributes.body) / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
@@ -118,8 +132,8 @@ export class VehiclePrep {
         matrix.condition_monitor.max = 8 + Math.ceil(rating / 2) + Number(modifiers.matrix_track);
     }
 
-    static prepareMovement(data: VehicleActorData) {
-        const { vehicle_stats, movement, isOffRoad } = data;
+    static prepareMovement(system: VehicleActorData) {
+        const { vehicle_stats, movement, isOffRoad } = system;
 
         let speedTotal = Helpers.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
 
@@ -131,8 +145,8 @@ export class VehiclePrep {
         movement.run.value = movement.run.base;
     }
 
-    static prepareMeatspaceInit(data: VehicleActorData) {
-        const { vehicle_stats, initiative, modifiers } = data;
+    static prepareMeatspaceInit(system: VehicleActorData) {
+        const { vehicle_stats, initiative, modifiers } = system;
 
         const pilot = Helpers.calcTotal(vehicle_stats.pilot);
 
@@ -145,8 +159,8 @@ export class VehiclePrep {
         Helpers.calcTotal(initiative.meatspace.dice);
     }
 
-    static prepareArmor(data: VehicleActorData) {
-        const { armor, modifiers } = data;
+    static prepareArmor(system: VehicleActorData) {
+        const { armor, modifiers } = system;
 
         armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp']));
         armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', Number(modifiers['armor']));

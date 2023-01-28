@@ -3,7 +3,6 @@ import {SR} from "../../../constants";
 import {SR5} from "../../../config";
 import AttributeField = Shadowrun.AttributeField;
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
-import {ModifiersPrep} from "./ModifiersPrep";
 
 export class AttributesPrep {
     /**

@@ -4,7 +4,6 @@ import Modifier = Shadowrun.ModifierData;
 import SourceModifierData = Shadowrun.SourceModifierData;
 import ActiveModifierValue = Shadowrun.ActiveModifierValue;
 import SituationModifiersSourceData = Shadowrun.SituationModifiersSourceData;
-import ModifierTypes = Shadowrun.ModifierTypes;
 
 
 
@@ -37,20 +36,14 @@ export type SituationModifierCategory = keyof SituationModifiersSourceData;
  * globally for the scene or local token position. These selections override each other and can
  * be modified by an ActiveEffect.
  * 
- * TODO: What is a modifier overwride and is it still needed?
- * TODO: Differentiate between source and applied data
- * TODO: Is SituaionalModifierHandler a good name? ModifierCategoryHandler? ModifierHandler?
  */
 export class SituationModifier {
     category: SituationModifierCategory;
     // A reference to the modifiers this handler is used within.
     modifiers?: DocumentSituationModifiers
-    // TODO: Use or remove
-    documents: Document[]
     // The original source modifier data. This shouldn't be altered.
     source: SourceModifierData
     // The applied modifier data, originating from the original source data.
-    // TODO: Move typing into Shadowrun.Modifiers
     applied: Modifier
 
     globalActivesApplied: boolean;
@@ -179,8 +172,6 @@ export class SituationModifier {
     /**
      * When using a selection this method will toggle an active modifier on and off.
      * 
-     * #TODO: Must it be a combination of modifier name and value?
-     * 
      * @param modifier The active modifier name
      * @param value The value the modifier uses currently.
      */
@@ -225,14 +216,7 @@ export class SituationModifier {
             if (!this.category) return console.error(`Shadowrun 5e | ${this.constructor.name} can't interact with documents without a modifier category set.`)
 
             const actor = this.modifiers.document as SR5Actor;
-            const scene = actor.getToken()?.parent;
-
-            if (!scene) return;
-            const sceneSource = this._getDocumentsSourceData(scene);
-            if (!sceneSource) return;
-
-            // Add parent scene (top most) into order.
-            sources.push(sceneSource);
+            this._addSceneSourceDataFromActor(actor, sources);
         }
 
         // Add local source (last) into order.
@@ -256,6 +240,23 @@ export class SituationModifier {
         else this.applied.total = this._calcActiveTotal();
 
         console.debug(`Shadowrun 5e | Totalled situational modifiers for ${this.modifiers?.document?.name} to be: ${this.applied.total}`, this.applied);
+    }
+
+    /**
+     * Add scene modifier sources into the applicable sources, when an actor is present on scene
+     * 
+     * @param actor The actor to check for tokens
+     * @param sources The sources list, as used within #apply
+     */
+    _addSceneSourceDataFromActor(actor: SR5Actor, sources: SourceModifierData[]) {
+        const scene = actor.getToken()?.parent;
+
+        if (!scene) return;
+        const sceneSource = this._getDocumentsSourceData(scene);
+        if (!sceneSource) return;
+
+        // Add parent scene (top most) into order.
+        sources.push(sceneSource);
     }
 
     _getDocumentsSourceData(document: ModifiableDocumentTypes): SourceModifierData|undefined {

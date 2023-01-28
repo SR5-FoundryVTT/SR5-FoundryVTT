@@ -65,11 +65,11 @@ export class RangedAttackTest extends SuccessTest {
 
     _prepareFireMode() {        
         // No firemodes selectable on dialog for invalid item provided.
-        const weaponData = this.item.asWeapon();
-        if (!weaponData) return;
+        const weapon = this.item.asWeapon;
+        if (!weapon) return;
 
         //@ts-ignore // TODO: foundry-vtt-types v10 
-        this.data.fireModes = FireModeRules.availableFireModes(weaponData.system.range.modes);
+        this.data.fireModes = FireModeRules.availableFireModes(weapon.system.range.modes);
 
         // To avoid problems when no firemode is configured on the weapon, add at least one to what's available
         if (this.data.fireModes.length === 0) {
@@ -87,11 +87,11 @@ export class RangedAttackTest extends SuccessTest {
 
     async _prepareWeaponRanges() {
         // Don't let missing weapon ranges break test.
-        const itemData = this.item?.asWeapon();
-        if (!itemData) return;
+        const weapon = this.item?.asWeapon;
+        if (!weapon) return;
 
         // Transform weapon ranges to something usable
-        const {ranges} = itemData.data.range;
+        const {ranges} = weapon.system.range;
         const {range_modifiers} = SR.combat.environmental;
         const newRanges = {} as RangesTemplateData;
         for (const [key, value] of Object.entries(ranges)) {
@@ -252,7 +252,7 @@ export class RangedAttackTest extends SuccessTest {
      *       It's done this way as no matter the fire mode, you can fire it.
      */
     canConsumeDocumentRessources() {
-        if (!this.item.isRangedWeapon()) return true;
+        if (!this.item.isRangedWeapon) return true;
         
         // Ammo consumption
         const fireMode = this.data.fireMode;
@@ -282,7 +282,7 @@ export class RangedAttackTest extends SuccessTest {
      */
     async consumeWeaponAmmo(): Promise<boolean> {
         if (!this.item) return true;
-        if (!this.item.isRangedWeapon()) return true;
+        if (!this.item.isRangedWeapon) return true;
 
         const fireMode = this.data.fireMode;
         if (fireMode.value === 0) return true;

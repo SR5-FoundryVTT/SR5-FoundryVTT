@@ -15,7 +15,7 @@ export class SkillEditSheet extends DocumentSheet {
     }
 
     _updateString() {
-        return `data.skills.active.${this.skillId}`;
+        return `system.skills.active.${this.skillId}`;
     }
 
     static get defaultOptions() {
@@ -42,19 +42,19 @@ export class SkillEditSheet extends DocumentSheet {
     _onUpdateObject(event, formData, updateData) {
         // get skill name.
         // NOTE: This differs from the skill id, which is used to identify the skill internally.
-        const name = formData['data.name'];
+        const name = formData['skill.name'];
 
         // get attribute name
-        const attribute = formData['data.attribute'];
+        const attribute = formData['skill.attribute'];
 
         // get base value
-        const base = formData['data.base'];
+        const base = formData['skill.base'];
 
         // get can default
-        const canDefault = formData['data.canDefault'];
+        const canDefault = formData['skill.canDefault'];
 
         // process specializations
-        const specsRegex = /data\.specs\.(\d+)/;
+        const specsRegex = /skill\.specs\.(\d+)/;
         const specs = Object.entries(formData).reduce((running, [key, val]: [string, any]) => {
             const found = key.match(specsRegex);
             if (found && found[0]) {
@@ -64,8 +64,8 @@ export class SkillEditSheet extends DocumentSheet {
         }, [] as any[]);
 
         // process bonuses
-        const bonusKeyRegex = /data\.bonus\.(\d+).key/;
-        const bonusValueRegex = /data\.bonus\.(\d+).value/;
+        const bonusKeyRegex = /skill\.bonus\.(\d+).key/;
+        const bonusValueRegex = /skill\.bonus\.(\d+).value/;
         const bonus = Object.entries(formData).reduce((running, [key, value]: [string, any]) => {
             const foundKey = key.match(bonusKeyRegex);
             const foundVal = key.match(bonusValueRegex);
@@ -92,7 +92,7 @@ export class SkillEditSheet extends DocumentSheet {
 
         // Avoid re-applying active effects without actual base level changes.
         // An actual base level change will come without an active effect, since it's user input.
-        if (event.currentTarget.name === 'data.base') updateData[this._updateString()].base = base;
+        if (event.currentTarget.name === 'skill.base') updateData[this._updateString()].base = base;
     }
 
 
@@ -119,9 +119,9 @@ export class SkillEditSheet extends DocumentSheet {
     async _addNewBonus(event) {
         event.preventDefault();
         const updateData = {};
-        const data = this.getData().data;
-        if (!data) return;
-        const { bonus = [] } = data;
+        const skill = this.getData().skill;
+        if (!skill) return;
+        const { bonus = [] } = skill;
         // add blank line for new bonus
         updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: 0 }];
         await this.document.update(updateData);
@@ -130,7 +130,7 @@ export class SkillEditSheet extends DocumentSheet {
     async _removeBonus(event) {
         event.preventDefault();
         const updateData = {};
-        const data = this.getData().data;
+        const data = this.getData().skill;
         if (data?.bonus) {
             const { bonus } = data;
             const index = event.currentTarget.dataset.spec;
@@ -145,7 +145,7 @@ export class SkillEditSheet extends DocumentSheet {
     async _addNewSpec(event) {
         event.preventDefault();
         const updateData = {};
-        const data = this.getData().data;
+        const data = this.getData().skill;
         if (data?.specs) {
             // add a blank line to specs
             const { specs } = data;
@@ -157,7 +157,7 @@ export class SkillEditSheet extends DocumentSheet {
     async _removeSpec(event) {
         event.preventDefault();
         const updateData = {};
-        const data = this.getData().data;
+        const data = this.getData().skill;
         if (data?.specs) {
             const { specs } = data;
             const index = event.currentTarget.dataset.spec;
@@ -184,10 +184,10 @@ export class SkillEditSheet extends DocumentSheet {
     // @ts-ignore // Missing DocumentSheetData typing
     getData(): SkillEditFormData {
         const data = super.getData();
-        // @ts-ignore
-        const actor = data.data;
 
-        data['data'] = actor ? getProperty(actor, this._updateString()) : {};
+        //@ts-ignore TODO: foundry-vtt-types v10'
+        // skill property will hold a direct skill reference
+        data['skill'] = foundry.utils.getProperty(data.data, this._updateString());
         data['editable_name'] = this._allowSkillNameEditing();
         data['editable_canDefault'] = true;
         data['editable_attribute'] = true;

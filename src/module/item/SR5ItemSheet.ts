@@ -28,7 +28,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     get template() {
         const path = 'systems/shadowrun5e/dist/templates/item/';
-        return `${path}${this.item.data.type}.html`;
+        return `${path}${this.item.type}.html`;
     }
 
     /* -------------------------------------------- */
@@ -107,8 +107,8 @@ export class SR5ItemSheet extends ItemSheet {
         // Active Effects data.
         data['effects'] = prepareActiveEffectCategories(this.document.effects);
 
-        if (this.object.isHost()) {
-            data['markedDocuments'] = this.object.getAllMarkedDocuments();
+        if (this.item.isHost) {
+            data['markedDocuments'] = this.item.getAllMarkedDocuments();
         }
 
         if (this.item.canBeNetworkController) {
@@ -214,7 +214,7 @@ export class SR5ItemSheet extends ItemSheet {
          * General item handling
          */
         html.find('.edit-item').click(this._onEditItem.bind(this));
-        html.find('.open-source-pdf').on('click', this._onOpenSourcePdf.bind(this));
+        html.find('.open-source').on('click', this._onOpenSource.bind(this));
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.list-item');
@@ -285,7 +285,7 @@ export class SR5ItemSheet extends ItemSheet {
         if (!data) return;
 
         // Add items to a weapons modification / ammo
-        if (this.item.isWeapon() && data.type === 'Item') {
+        if (this.item.isWeapon && data.type === 'Item') {
             let item;
             // Case 1 - Data explicitly provided
             if (data.data) {
@@ -308,7 +308,7 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // Add items to hosts WAN.
-        if (this.item.isHost() && data.type === 'Actor') {
+        if (this.item.isHost && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid);
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
             return await this.item.addIC(actor.id , data.pack);
@@ -329,9 +329,9 @@ export class SR5ItemSheet extends ItemSheet {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
-    async _onOpenSourcePdf(event) {
+    _onOpenSource(event) {
         event.preventDefault();
-        await this.item.openPdfSource();
+        this.item.openSource();
     }
 
     async _onEditItem(event) {
@@ -542,7 +542,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
-        if (!this.object.isHost()) return;
+        if (!this.object.isHost) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -559,7 +559,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
-        if (!this.object.isHost()) return;
+        if (!this.object.isHost) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -575,7 +575,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksDelete(event) {
         event.stopPropagation();
 
-        if (!this.object.isHost()) return;
+        if (!this.object.isHost) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -589,7 +589,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksClearAll(event) {
         event.stopPropagation();
 
-        if (!this.object.isHost()) return;
+        if (!this.object.isHost) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;

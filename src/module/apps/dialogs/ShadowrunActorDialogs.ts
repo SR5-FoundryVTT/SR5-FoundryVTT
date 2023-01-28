@@ -50,7 +50,7 @@ export class ShadowrunActorDialogs {
             },
         };
 
-        const equippedMeleeWeapons = actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+        const equippedMeleeWeapons = actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon);
         let defenseReach = 0;
         equippedMeleeWeapons.forEach((weapon) => {
             activeDefenses[`parry-${weapon.name}`] = {

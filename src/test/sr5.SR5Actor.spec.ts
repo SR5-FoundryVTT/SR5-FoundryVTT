@@ -1,8 +1,9 @@
+import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
 import {SR5TestingDocuments} from "./utils";
 
-export const shadowrunSR5Actor = context => {
+export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
     const {describe, it, assert, before, after} = context;
     let  testActor;
     let testItem;
@@ -35,11 +36,11 @@ export const shadowrunSR5Actor = context => {
         it('update an actor of any time', async () => {
             const actor = await testActor.create({type: 'character'});
 
-            assert.notProperty(actor.data.data, 'test');
+            assert.notProperty(actor.system, 'test');
             await actor.update({'data.test': true});
 
-            assert.property(actor.data.data, 'test');
-            assert.propertyVal(actor.data.data, 'test', true);
+            assert.property(actor.system, 'test');
+            assert.propertyVal(actor.system, 'test', true);
         });
 
         it('embedd a weapon into an actor and not the global item colection', async () => {

@@ -82,7 +82,7 @@ export class PhysicalDefenseTest extends DefenseTest {
 
         // Collect weapon based defense options.
         // NOTE: This would be way better if the current weapon (this.item) would be used.
-        const equippedMeleeWeapons = actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+        const equippedMeleeWeapons = actor.getEquippedWeapons().filter((weapon) => weapon.isMeleeWeapon);
         equippedMeleeWeapons.forEach((weapon) => {
             this.data.activeDefenses[`parry-${weapon.name}`] = {
                 label: 'SR5.Parry',
@@ -95,7 +95,7 @@ export class PhysicalDefenseTest extends DefenseTest {
 
     prepareMeleeReach() {
         if (!this.against.item) return;
-        this.data.isMeleeAttack = this.against.item.isMeleeWeapon();
+        this.data.isMeleeAttack = this.against.item.isMeleeWeapon;
         if (!this.data.isMeleeAttack) return;
 
         if (!this.actor) return;
@@ -104,7 +104,7 @@ export class PhysicalDefenseTest extends DefenseTest {
         // NOTE: ... this should be a choice of the player
         // TODO: This is a legacy selection approach as there wasn't a way to access to used item in the original attack test.
         //       Instead this might be replaced with a direct reference with this.against.item.data.defenseReach?
-        const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+        const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((weapon) => weapon.isMeleeWeapon);
         equippedMeleeWeapons.forEach(weapon => {
             this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());
         });
@@ -156,7 +156,7 @@ export class PhysicalDefenseTest extends DefenseTest {
      */
     applyPoolRangedFireModModifier() {
         if (!this.against.item) return;
-        if (!this.against.item.isRangedWeapon()) return;
+        if (!this.against.item.isRangedWeapon) return;
 
         const fireMode = this.against.item.getLastFireMode();
 

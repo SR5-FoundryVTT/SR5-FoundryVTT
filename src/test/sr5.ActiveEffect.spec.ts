@@ -1,8 +1,9 @@
 import {SR5TestingDocuments} from "./utils";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
+import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
-export const shadowrunSR5ActiveEffect = context => {
+export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     const {describe, it, assert, before, after} = context;
 
     let testActor;
@@ -32,11 +33,11 @@ export const shadowrunSR5ActiveEffect = context => {
                     {key: 'data.attributes.body', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM}]
             });
 
-            assert.deepEqual(actor.data.data.attributes.body.mod, [{
+            assert.deepEqual(actor.system.attributes.body.mod, [{
                 name: 'Test Effect',
                 value: 2
             }, {name: 'Test Effect', value: 2}]);
-            assert.strictEqual(actor.data.data.attributes.body.value, 4);
+            assert.strictEqual(actor.system.attributes.body.value, 4);
 
             await effect[0].update({
                 'changes': [{key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM},
@@ -59,9 +60,9 @@ export const shadowrunSR5ActiveEffect = context => {
                 }]
             });
 
-            assert.strictEqual(actor.data.data.modifiers.global, 3);
-            assert.strictEqual(actor.data.data.modifiers.global.mod, undefined);
-            assert.strictEqual(actor.data.data.modifiers.global.override, undefined);
+            assert.strictEqual(actor.system.modifiers.global, 3);
+            assert.strictEqual(actor.system.modifiers.global.mod, undefined);
+            assert.strictEqual(actor.system.modifiers.global.override, undefined);
 
 
             it('apply the custom override mode', async () => {
@@ -76,9 +77,9 @@ export const shadowrunSR5ActiveEffect = context => {
                         {key: 'data.attributes.body.value', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE}]
                 });
 
-                assert.deepEqual(actor.data.data.attributes.body.override, {name: 'Test Effect', value: 3});
-                assert.deepEqual(actor.data.data.attributes.body.mod, []);
-                assert.strictEqual(actor.data.data.attributes.body.value, 3);
+                assert.deepEqual(actor.system.attributes.body.override, {name: 'Test Effect', value: 3});
+                assert.deepEqual(actor.system.attributes.body.mod, []);
+                assert.strictEqual(actor.system.attributes.body.value, 3);
             });
 
             it('apply custom override mode, should override all existing .mod values', async () => {
@@ -94,10 +95,10 @@ export const shadowrunSR5ActiveEffect = context => {
                             {key: 'data.attributes.body.value', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE}]
                     });
 
-                    assert.strictEqual(actor.data.data.attributes.body.mod.length, 1);
-                    assert.deepEqual(actor.data.data.attributes.body.override, {name: 'Test Effect', value: 3});
-                    assert.deepEqual(actor.data.data.attributes.body.mod, [{name: 'Test Effect', value: 5}]);
-                    assert.strictEqual(actor.data.data.attributes.body.value, 3);
+                    assert.strictEqual(actor.system.attributes.body.mod.length, 1);
+                    assert.deepEqual(actor.system.attributes.body.override, {name: 'Test Effect', value: 3});
+                    assert.deepEqual(actor.system.attributes.body.mod, [{name: 'Test Effect', value: 5}]);
+                    assert.strictEqual(actor.system.attributes.body.value, 3);
                 });
             });
 
@@ -116,9 +117,9 @@ export const shadowrunSR5ActiveEffect = context => {
                     }]
                 });
 
-                assert.strictEqual(actor.data.data.modifiers.global, 3);
-                assert.strictEqual(actor.data.data.modifiers.global.mod, undefined);
-                assert.strictEqual(actor.data.data.modifiers.global.override, undefined);
+                assert.strictEqual(actor.system.modifiers.global, 3);
+                assert.strictEqual(actor.system.modifiers.global.mod, undefined);
+                assert.strictEqual(actor.system.modifiers.global.override, undefined);
             });
         });
     });

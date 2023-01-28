@@ -172,10 +172,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         const path = 'systems/shadowrun5e/dist/templates';
 
         if (this.actor.limited) {
-            return `${path}/actor-limited/${this.actor.data.type}.html`;
+            return `${path}/actor-limited/${this.actor.type}.html`;
         }
 
-        return `${path}/actor/${this.actor.data.type}.html`;
+        return `${path}/actor/${this.actor.type}.html`;
     }
 
     /** SheetData used by _all_ actor types! */
@@ -307,7 +307,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
-        html.find('.open-source-pdf').on('click', this._onOpenSourcePDF.bind(this));
+        html.find('.open-source').on('click', this._onOpenSource.bind(this));
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
         html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
 
@@ -721,11 +721,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param data ActorSheetData as created within getData method
      */
     _prepareSpecialFields(data: SR5ActorSheetData) {
-        const {modifiers} = data.system;
-
         data.awakened = data.system.special === 'magic';
         data.emerged = data.system.special === 'resonance';
-        data.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
     }
 
     /**
@@ -735,10 +732,12 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _prepareActorModifiers(data: SR5ActorSheetData) {
          // Empty zero value modifiers for display purposes.
-        const { modifiers: mods } = data.system;
-        for (let [key, value] of Object.entries(mods)) {
-            if (value === 0) mods[key] = '';
+        const { modifiers } = data.system;
+        for (let [key, value] of Object.entries(modifiers)) {
+            if (value === 0) modifiers[key] = '';
         }
+
+        data.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
     }
 
     _prepareActorAttributes(data: SR5ActorSheetData) {
@@ -1309,13 +1308,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.actor.showHiddenSkills();
     }
 
-    async _onOpenSourcePDF(event) {
+    _onOpenSource(event) {
         event.preventDefault();
         const field = $(event.currentTarget).parents('.list-item');
         const iid = $(field).data().itemId;
         const item = this.actor.items.get(iid);
         if (item) {
-            await item.openPdfSource();
+            item.openSource();
         }
     }
     /**
@@ -1371,12 +1370,12 @@ export class SR5BaseActorSheet extends ActorSheet {
             const newItems = [] as any[];
 
             // Handle the equipped state.
-            if (item.isDevice()) {
+            if (item.isDevice) {
                 // Only allow one equipped device item. Unequip all other.
-                for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
+                for (const item of this.actor.items.filter(actorItem => actorItem.isDevice)) {
                     newItems.push({
                         '_id': item.id,
-                        'data.technology.equipped': item.id === iid,
+                        'system.technology.equipped': item.id === iid,
                     });
                 }
 
@@ -1384,7 +1383,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 // Toggle equip status.
                 newItems.push({
                     '_id': iid,
-                    'data.technology.equipped': !item.isEquipped(),
+                    'system.technology.equipped': !item.isEquipped(),
                 });
             }
 

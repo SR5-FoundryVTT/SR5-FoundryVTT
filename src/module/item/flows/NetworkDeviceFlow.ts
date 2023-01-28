@@ -109,7 +109,7 @@ export class NetworkDeviceFlow {
     private static async _handleAddDeviceToNetwork(controller: SR5Item, device: SR5Item): Promise<any> {
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller) && !NetworkDeviceFlow._currentUserCanModifyDevice(device)) return console.error(`User isn't owner or GM of this device`, controller);
 
-        const controllerData = controller.asDevice() || controller.asHostData();
+        const controllerData = controller.asDevice || controller.asHost;
         if (!controllerData) return console.error(`Device isn't capable of accepting network devices`, controller);
         const technologyData = device.getTechnologyData();
         if (!technologyData) return console.error(`'Device can't be added to a network`);
@@ -123,7 +123,7 @@ export class NetworkDeviceFlow {
 
         // Add the device to the list of devices of the controller.
         const networkDeviceLink = NetworkDeviceFlow.buildLink(device);
-        const networkDevices = controllerData.data.networkDevices;
+        const networkDevices = controllerData.system.networkDevices;
         if (networkDevices.includes(networkDeviceLink)) return;
 
         return NetworkDeviceFlow._setDevicesOnController(controller, [...networkDevices, networkDeviceLink]);
@@ -162,7 +162,7 @@ export class NetworkDeviceFlow {
 
         // Remove the deviceLink from the controller.
         if (!controllerData) return;
-        const deviceLinks = controllerData.data.networkDevices.filter(existingLink => existingLink !== deviceLink);
+        const deviceLinks = controllerData.system.networkDevices.filter(existingLink => existingLink !== deviceLink);
         await NetworkDeviceFlow._setDevicesOnController(controller, deviceLinks);
     }
 
@@ -226,7 +226,7 @@ export class NetworkDeviceFlow {
 
         // Remove device from it's controller.
         const deviceLink = NetworkDeviceFlow.buildLink(device);
-        const deviceLinks = controllerData.data.networkDevices.filter(existingLink => existingLink !== deviceLink);
+        const deviceLinks = controllerData.system.networkDevices.filter(existingLink => existingLink !== deviceLink);
         await NetworkDeviceFlow._setDevicesOnController(controller, deviceLinks);
     }
 
@@ -235,7 +235,7 @@ export class NetworkDeviceFlow {
         const controllerData = controller.asController();
         if (!controllerData) return;
 
-        const networkDevices = controllerData.data.networkDevices;
+        const networkDevices = controllerData.system.networkDevices;
 
         // Remove controller from all it's connected devices.
         if (networkDevices) {
@@ -258,7 +258,7 @@ export class NetworkDeviceFlow {
         const controllerData = controller.asController();
         if (!controllerData) return devices;
 
-        controllerData.data.networkDevices.forEach(link => {
+        controllerData.system.networkDevices.forEach(link => {
             const device = NetworkDeviceFlow.resolveLink(link);
             if (!device) return console.warn(`Shadowrun5e | Controller ${controller.name} has a network device ${link} that doesn't exist anymore`);
             devices.push(device);

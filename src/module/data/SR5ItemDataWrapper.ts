@@ -14,17 +14,18 @@ import ActionResultData = Shadowrun.ActionResultData;
 import AmmunitionData = Shadowrun.AmmunitionData;
 import WeaponData = Shadowrun.WeaponData;
 import DeviceData = Shadowrun.DeviceData;
+import AmmoData = Shadowrun.AmmoData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
         return this.data.type;
     }
     getData(): ShadowrunItemDataData {
-        return this.data.data as ShadowrunItemDataData;
+        return this.data.system as ShadowrunItemDataData;
     }
 
     isAreaOfEffect(): boolean {
-        return this.isGrenade() || (this.isSpell() && this.getData().range === 'los_a'); //|| this.hasExplosiveAmmo();
+        return this.isGrenade() || this.isAoESpell() || this.isAoEAmmo();
     }
 
     /** Should only be used to check for actual armor item type.
@@ -75,13 +76,13 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     isWeaponModification(): boolean {
         if (!this.isModification()) return false;
         const modification = this.data as ModificationItemData;
-        return modification.data.type === 'weapon';
+        return modification.system.type === 'weapon';
     }
 
     isArmorModification(): boolean {
         if (!this.isModification()) return false;
         const modification = this.data as ModificationItemData;
-        return modification.data.type === 'armor';
+        return modification.system.type === 'armor';
     }
 
     isProgram(): boolean {
@@ -94,6 +95,12 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
     isAmmo(): boolean {
         return this.data.type === 'ammo';
+    }
+
+    isAoEAmmo(): boolean {
+        if (!this.isAmmo()) return false;
+        const ammoData = this.getData() as AmmoData;
+        return (ammoData.blast.radius ?? 0) > 0;
     }
 
     isCyberware(): boolean {
@@ -146,6 +153,10 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
     isSpell(): boolean {
         return this.data.type === 'spell';
+    }
+
+    isAoESpell(): boolean {
+        return this.isSpell() && this.getData().range === 'los_a';
     }
 
     isSpritePower(): boolean {
@@ -212,7 +223,11 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data._id;
     }
 
-    getBookSource(): string {
+    get hasSource(): boolean {
+        return !!this.getData().description?.source;
+    }
+
+    getSource(): string {
         return this.getData().description?.source ?? '';
     }
 
@@ -348,21 +363,21 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getTechnology(): TechnologyData|undefined {
-        if ("technology" in this.data.data)
-            return this.data.data.technology;
+        if ("technology" in this.data.system)
+            return this.data.system.technology;
     }
 
     getRange(): CritterPowerRange|SpellRange|RangeWeaponData|undefined {
-        if (!("range" in this.data.data)) return;
+        if (!("range" in this.data.system)) return;
 
         if (this.data.type === 'critter_power')
-            return this.data.data.range as CritterPowerRange;
+            return this.data.system.range as CritterPowerRange;
 
         if (this.data.type === 'spell')
-            return this.data.data.range as SpellRange;
+            return this.data.system.range as SpellRange;
 
         if (this.data.type === 'weapon')
-            return this.data.data.range as RangeWeaponData;
+            return this.data.system.range as RangeWeaponData;
     }
 
     hasDefenseTest(): boolean {

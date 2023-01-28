@@ -115,27 +115,37 @@ export class MatrixPrep {
         });
     }
 
-    /**
-     * Prepare the mental attributes for a sheet that just has a device rating
-     * @param system
-     */
-    static prepareAttributesForDevice(system: CommonData & MatrixActorData) {
+    static prepareMentalAttributesForDevice(system: CommonData & MatrixActorData, rating?: number) {
         const { matrix, attributes } = system;
-        const rating = matrix.rating || 0;
+        rating = rating ?? matrix.rating;
         const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];
 
         mentalAttributes.forEach((attLabel) => {
             if (attributes[attLabel] !== undefined) {
-                attributes[attLabel].base = rating;
+                attributes[attLabel].base = rating ?? 0; // TypeScript got confused otherwise...
                 Helpers.calcTotal(attributes[attLabel]);
             }
         });
-        const basic = ['firewall', 'data_processing'];
-        basic.forEach((attId) => {
-            matrix[attId].base = rating;
+    }
+
+    static prepareMatrixAttributesForDevice(system: CommonData & MatrixActorData, rating?: number) {
+        const { matrix } = system;
+        rating = rating ?? matrix.rating;
+        const matrixAttributes = ['firewall', 'data_processing'];
+        matrixAttributes.forEach((attribute) => {
+            matrix[attribute].base = rating;
         });
-        [...basic, 'sleaze', 'attack'].forEach((attId) => {
+        [...matrixAttributes, 'sleaze', 'attack'].forEach((attId) => {
             Helpers.calcTotal(matrix[attId]);
         });
+    }
+
+    /**
+     * Prepare the mental attributes for a sheet that just has a device rating
+     * @param system
+     */
+    static prepareAttributesForDevice(system: CommonData & MatrixActorData, rating: number = 0) {
+        MatrixPrep.prepareMentalAttributesForDevice(system, rating);
+        MatrixPrep.prepareMatrixAttributesForDevice(system, rating);
     }
 }

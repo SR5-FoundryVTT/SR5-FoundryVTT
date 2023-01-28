@@ -331,6 +331,8 @@ export const SR5 = {
 
     /**
      * Labels for ALL actor types actor based local modifiers.
+     * 
+     * All modifiers across all actor types must be included here, this is only used for display.
      */
     actorModifiers: {
         soak: 'SR5.RollSoak',
@@ -358,6 +360,8 @@ export const SR5 = {
         run: 'SR5.Run',
         defense: 'SR5.RollDefense',
         wound_tolerance: 'SR5.WoundTolerance',
+        pain_tolerance_stun: 'SR5.PainToleranceStun',
+        pain_tolerance_physical: 'SR5.PainTolerancePhysical',
         essence: 'SR5.AttrEssence',
         fade: 'SR5.RollFade',
         global: 'SR5.Global',
@@ -402,28 +406,47 @@ export const SR5 = {
         'thrown': 'ThrownAttackTest'
     },
 
-    spellOpposedTests: {
-        'combat': 'CombatSpellDefenseTest'
-    },
-
+    /**
+     * When casting tests from these item types, use these tests as active tests
+     */
     activeTests: {
         'spell': 'SpellCastingTest',
         'complex_form': 'ComplexFormTest'
     },
 
+    /**
+     * Using different active test details should result in these opposed tests
+     * 
+     * Structure: {
+     *  [item.type]: {[item.system.type]}: 'OpposedTest'
+     * }
+     */
     opposedTests: {
         'spell': {
             'combat': 'CombatSpellDefenseTest'
         }
     },
 
+    /**
+     * Using different resist tests for the oppositing depending on active tests details
+     *  Structure: {
+     *  [item.type]: {[item.system.type]}: 'OpposedTest'
+     * }
+     */
     opposedResistTests: {
         'spell': {
             'combat': 'PhysicalResistTest'
         }
     },
 
-    // When a firemode with suppression is used, this test should defense against it.
+    /**
+     * When a test is cast an active test this defines what tests should follow that tests completion
+     */
+    followedTests: {
+        'SpellCastingTest': 'DrainTest'
+    },
+
+    // When a firemode with suppression is used, this test should defend against it.
     supressionDefenseTest: 'SupressionDefenseTest',
 
     /**
@@ -663,7 +686,7 @@ export const SR5 = {
         label: "SR5.WeaponModeBurstFireLong",
         value: 6,
         recoil: true,
-        defense: -2,
+        defense: -5,
         suppression: false,
         action: 'complex',
         mode: 'burst_fire',

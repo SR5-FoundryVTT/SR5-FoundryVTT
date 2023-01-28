@@ -1,3 +1,4 @@
+import { shadowrunAttackTesting } from './sr5.AttackTests.spec';
 import {shadowrunRulesModifiers} from "./sr5.Modifiers.spec";
 import {shadowrunSR5Item} from "./sr5.SR5Item.spec";
 import {shadowrunMatrix} from "./sr5.Matrix.spec";
@@ -31,4 +32,5 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch("shadowrun5e.flow.networkDevices", shadowrunNetworkDevices, {displayName: "SHADOWRUN5e: Matrix Network Devices Test"});
     quench.registerBatch("shadowrun5e.flow.inventory", shadowrunInventoryFlow, {displayName: "SHADOWRUN5e: InventoryFlow Test"});
     quench.registerBatch("shadowrun5e.flow.tests", shadowrunTesting, {displayName: "SHADOWRUN5e: SuccessTest Test"});
+    quench.registerBatch("shadowrun5e.flow.tests_attack", shadowrunAttackTesting, {displayName: "SHADOWRUN5e: Attack Test"});
 };

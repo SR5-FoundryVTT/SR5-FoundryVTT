@@ -1,6 +1,7 @@
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
+import GenericValueField = Shadowrun.GenericValueField;
 import LabelField = Shadowrun.LabelField;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
 import DamageData = Shadowrun.DamageData;
@@ -67,6 +68,20 @@ export class Helpers {
         }
 
         value.mod = parts.list;
+
+        return value.value;
+    }
+
+    static calcValue<ValueType>(value: GenericValueField): any {
+        if (value.mod === undefined) value.mod = [];
+
+        if (value.override) {
+            value.value = value.override.value;
+
+            return value.value;
+        }
+
+        value.value = value.base;
 
         return value.value;
     }
@@ -875,7 +890,7 @@ export class Helpers {
      * @param actionName The name of the action within that pack
      */
     static async getPackAction(packName, actionName): Promise<SR5Item | undefined> {
-        console.info(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
+        console.debug(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
         const pack = game.packs.find(pack =>
             pack.metadata.system === SYSTEM_NAME &&
             pack.metadata.name === packName);
@@ -888,7 +903,7 @@ export class Helpers {
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
         if (!item || item.type !== 'action') return;
 
-        console.info(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
+        console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;
     }
 
@@ -969,10 +984,12 @@ export class Helpers {
         const opposedTest = SR5.opposedTests[type][changeData.system.category] || 'OpposedTest';
         //@ts-ignore // TODO: foundry-vtt-types v10
         const resistTest = SR5.opposedResistTests[type][changeData.system.category] || '';
+        const drainTest = SR5.followedTests[test] ?? '';
 
         foundry.utils.setProperty(applyData, 'system.action.test', test);
         foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
         foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', resistTest);
+        foundry.utils.setProperty(applyData, 'system.action.followed.test', drainTest);
     }
 
     /**
@@ -1027,4 +1044,16 @@ export class Helpers {
         spicyCharacters.forEach(character => key = key.replace(character, replace));
         return key;
     }
+
+    /**
+     * Determine if given string contains a url pattern.
+     * 
+     * @param candidate The string that might contain a url
+     * @returns true, when candidate contains a url pattern
+     */
+    static isURL(candidate: string): boolean {
+        var urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)?(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
+        var url = new RegExp(urlRegex, 'i');
+        return url.test(candidate);
+   }
 }

@@ -15,6 +15,6 @@ export class SR5TestingDocuments<T extends foundry.abstract.Document<any, any>> 
 
         async teardown() {
             // @ts-ignore
-            await this.documentClass.deleteDocuments(this.documents.map(document => document.id));
+            this.documents.forEach(document => document.delete());
         }
     }

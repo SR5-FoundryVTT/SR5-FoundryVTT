@@ -1,6 +1,7 @@
+import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import {MatrixRules} from "../module/rules/MatrixRules";
 
-export const shadowrunMatrix = context => {
+export const shadowrunMatrix = (context: QuenchBatchContext) => {
     const {describe, it, assert, before, after} = context;
 
     describe('Matrix Rules', () => {

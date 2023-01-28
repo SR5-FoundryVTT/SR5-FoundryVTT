@@ -63,12 +63,12 @@
         </div>
         {{/if}}
         <div class="card-test-content">
-            {{! Some tests will not determine an outcome }}
-            {{#unless test.showSuccessLabel}} 
+            {{! Some tests will not determine an outcome, but a failure will always be a failure }}
+            {{#unless test.showSuccessLabel}}{{#unless test.failure}}
             <div class="glitch-content clickable show-roll"><div class="glitch">Results</div></div>
-            {{/unless}}
+            {{/unless}}{{/unless}}
 
-            {{! Some tests will determine an outcome }}
+            {{! Some tests will determine an outcome and success state }}
             {{#if test.canSucceed}} {{#if test.showSuccessLabel}}
             <div class="glitch-content">
                 <div class="glitch clickable show-roll">
