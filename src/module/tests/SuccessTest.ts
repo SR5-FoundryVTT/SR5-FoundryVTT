@@ -1438,7 +1438,7 @@ export class SuccessTest {
      * of test is used.
      */
     get _canPlaceBlastTemplate(): boolean {
-        return this.item?.hasTemplate || false;
+        return this.item?.hasBlastTemplate || false;
     }
 
     /**

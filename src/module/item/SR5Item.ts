@@ -217,7 +217,11 @@ export class SR5Item extends Item {
         const action = this.getAction();
         return !!(action && action.type !== '' && (action.skill || action.attribute || action.attribute2 || action.dice_pool_mod));
     }
-    get hasTemplate(): boolean {
+
+    /**
+     * Determine if a blast area should be placed using FoundryVTT area templates.
+     */
+    get hasBlastTemplate(): boolean {
         return this.isAreaOfEffect;
     }
 
@@ -380,7 +384,7 @@ export class SR5Item extends Item {
             actor: this.actor,
             description: this.getChatData(),
             item: this,
-            previewTemplate: this.hasTemplate,
+            previewTemplate: this.hasBlastTemplate,
             tests: this.getActionTests()
         };
         return await createItemChatMessage(options);
@@ -495,7 +499,7 @@ export class SR5Item extends Item {
                 dropoff
             }
 
-        } else if (this.hasExplosiveAmmo()) {
+        } else if (this.hasExplosiveAmmo) {
             const item = this.getEquippedAmmo();
             const ammo = item.asAmmo;
 
@@ -528,7 +532,7 @@ export class SR5Item extends Item {
             item.isEquipped());
     }
 
-    hasExplosiveAmmo(): boolean {
+    get hasExplosiveAmmo(): boolean {
         const ammo = this.getEquippedAmmo();
         if (!ammo) return false;
         //@ts-ignore // TODO: foundry-vtt-types v10 
@@ -762,6 +766,10 @@ export class SR5Item extends Item {
 
     get isAmmo(): boolean {
         return this.wrapper.isAmmo();
+    }
+
+    get isAoEAmmo(): boolean {
+        return this.wrapper.isAoEAmmo();
     }
 
     get asAmmo(): AmmoItemData | undefined {
@@ -1164,8 +1172,15 @@ export class SR5Item extends Item {
         return DEFAULT_ROLL_NAME;
     }
 
+    /**
+     * An attack with this weapon will create an area of effect / blast.
+     * 
+     * There is a mulitide of possibilties as to HOW an item can create an AoE, 
+     * both directly connected to the item and / or some of it's nested items.
+     * 
+     */
     get isAreaOfEffect(): boolean {
-        return this.wrapper.isAreaOfEffect();
+        return this.wrapper.isAreaOfEffect() || this.hasExplosiveAmmo;
     }
 
     get isArmor(): boolean {

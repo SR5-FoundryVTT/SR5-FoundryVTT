@@ -14,6 +14,7 @@ import ActionResultData = Shadowrun.ActionResultData;
 import AmmunitionData = Shadowrun.AmmunitionData;
 import WeaponData = Shadowrun.WeaponData;
 import DeviceData = Shadowrun.DeviceData;
+import AmmoData = Shadowrun.AmmoData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
@@ -24,7 +25,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isAreaOfEffect(): boolean {
-        return this.isGrenade() || (this.isSpell() && this.getData().range === 'los_a'); //|| this.hasExplosiveAmmo();
+        return this.isGrenade() || this.isAoESpell() || this.isAoEAmmo();
     }
 
     /** Should only be used to check for actual armor item type.
@@ -96,6 +97,12 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data.type === 'ammo';
     }
 
+    isAoEAmmo(): boolean {
+        if (!this.isAmmo()) return false;
+        const ammoData = this.getData() as AmmoData;
+        return (ammoData.blast.radius ?? 0) > 0;
+    }
+
     isCyberware(): boolean {
         return this.data.type === 'cyberware';
     }
@@ -146,6 +153,10 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
     isSpell(): boolean {
         return this.data.type === 'spell';
+    }
+
+    isAoESpell(): boolean {
+        return this.isSpell() && this.getData().range === 'los_a';
     }
 
     isSpritePower(): boolean {
