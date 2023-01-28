@@ -1408,6 +1408,8 @@ select.display {
       background: rgba(0, 0, 0, 0.05); }
   .sr5 .editor.prosemirror textarea {
     color: white; }
+  .sr5 .full-height {
+    height: 100%; }
   .sr5 .parts-list {
     font-size: 12px;
     display: flex;
@@ -1434,7 +1436,7 @@ select.display {
     overflow: hidden;
     font-size: 115%; }
   .sr5 .description > .editor {
-    height: 15em;
+    height: 100%;
     width: 100%;
     color: white; }
   .sr5 .border-right {
