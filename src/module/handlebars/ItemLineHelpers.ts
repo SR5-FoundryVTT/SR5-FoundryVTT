@@ -436,15 +436,11 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
         const pdfIcon = {
-            icon: 'fas fa-file open-source-pdf',
+            icon: 'fas fa-file open-source',
             title: game.i18n.localize('SR5.OpenSourcePdf'),
         };
 
-        const icons = [editIcon, removeIcon];
-
-        if (ui['PDFoundry']) {
-            icons.unshift(pdfIcon);
-        }
+        const icons = [pdfIcon, editIcon, removeIcon];
 
         switch (wrapper.getType()) {
             case 'program':
@@ -479,15 +475,11 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
         const pdfIcon = {
-            icon: 'fas fa-file open-source-pdf',
-            title: game.i18n.localize('SR5.OpenSourcePdf'),
+            icon: 'fas fa-file open-source',
+            title: game.i18n.localize('SR5.OpenSource'),
         };
 
-        const icons = [moveIcon, editIcon, removeIcon];
-
-        if (ui['PDFoundry']) {
-            icons.unshift(pdfIcon);
-        }
+        const icons = [pdfIcon, moveIcon, editIcon, removeIcon];
 
         switch (wrapper.getType()) {
             case 'program':

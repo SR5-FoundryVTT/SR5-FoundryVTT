@@ -212,7 +212,11 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data._id;
     }
 
-    getBookSource(): string {
+    get hasSource(): boolean {
+        return !!this.getData().description?.source;
+    }
+
+    getSource(): string {
         return this.getData().description?.source ?? '';
     }
 

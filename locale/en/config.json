@@ -640,7 +640,7 @@
     "SR5.Notoriety": "Notoriety",
     "SR5.Nuyen": "Nuyen",
     "SR5.OpenOrigin": "Open item",
-    "SR5.OpenSourcePdf": "Open Source PDF to the item",
+    "SR5.OpenSource": "Open items source as pdfpager pdf or website",
     "SR5.OpposedType": "Type",
     "SR5.OpposingHits": "Opposing Hits",
     "SR5.OriginalDicePool": "Original Dice Pool",

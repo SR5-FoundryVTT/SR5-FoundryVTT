@@ -307,7 +307,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
-        html.find('.open-source-pdf').on('click', this._onOpenSourcePDF.bind(this));
+        html.find('.open-source').on('click', this._onOpenSource.bind(this));
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
         html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
 
@@ -1308,13 +1308,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.actor.showHiddenSkills();
     }
 
-    async _onOpenSourcePDF(event) {
+    _onOpenSource(event) {
         event.preventDefault();
         const field = $(event.currentTarget).parents('.list-item');
         const iid = $(field).data().itemId;
         const item = this.actor.items.get(iid);
         if (item) {
-            await item.openPdfSource();
+            item.openSource();
         }
     }
     /**

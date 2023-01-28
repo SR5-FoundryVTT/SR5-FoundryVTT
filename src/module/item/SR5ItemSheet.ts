@@ -214,7 +214,7 @@ export class SR5ItemSheet extends ItemSheet {
          * General item handling
          */
         html.find('.edit-item').click(this._onEditItem.bind(this));
-        html.find('.open-source-pdf').on('click', this._onOpenSourcePdf.bind(this));
+        html.find('.open-source').on('click', this._onOpenSource.bind(this));
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.list-item');
@@ -329,9 +329,9 @@ export class SR5ItemSheet extends ItemSheet {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
-    async _onOpenSourcePdf(event) {
+    _onOpenSource(event) {
         event.preventDefault();
-        await this.item.openPdfSource();
+        this.item.openSource();
     }
 
     async _onEditItem(event) {
