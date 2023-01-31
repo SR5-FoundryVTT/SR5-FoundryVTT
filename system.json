@@ -18,7 +18,7 @@
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.8.9",
+  "version": "0.8.10",
   "compatibility": {
     "minimum": "10",
     "maximum": "10",
@@ -79,7 +79,7 @@
   ],
   "socket": true,
   "manifest": "https://github.com/smilligan93/SR5-FoundryVTT/releases/latest/download/system.json",
-  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.8.9.zip",
+  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.8.10.zip",
   "protected": false,
   "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
   "gridDistance": 1,

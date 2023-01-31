@@ -1437,6 +1437,7 @@ select.display {
     font-size: 115%; }
   .sr5 .description > .editor {
     height: 100%;
+    min-height: 15em;
     width: 100%;
     color: white; }
   .sr5 .border-right {
