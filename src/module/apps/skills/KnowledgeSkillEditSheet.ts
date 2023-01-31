@@ -8,6 +8,6 @@ export class KnowledgeSkillEditSheet extends LanguageSkillEditSheet {
         this.category = category;
     }
     _updateString() {
-        return `data.skills.knowledge.${this.category}.value.${this.skillId}`;
+        return `system.skills.knowledge.${this.category}.value.${this.skillId}`;
     }
 }
