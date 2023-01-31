@@ -10,20 +10,22 @@ export const SR5 = {
         adept_power: 'SR5.ItemTypes.AdeptPower',
         ammo: 'SR5.ItemTypes.Ammo',
         armor: 'SR5.ItemTypes.Armor',
+        bioware: 'SR5.ItemTypes.Bioware',
         complex_form: 'SR5.ItemTypes.ComplexForm',
         contact: 'SR5.ItemTypes.Contact',
         critter_power: 'SR5.ItemTypes.CritterPower',
         cyberware: 'SR5.ItemTypes.Cyberware',
-        bioware: 'SR5.ItemTypes.Bioware',
         device: 'SR5.ItemTypes.Device',
         equipment: 'SR5.ItemTypes.Equipment',
+        host: 'SR5.ItemTypes.Host',
         lifestyle: 'SR5.ItemTypes.Lifestyle',
         modification: 'SR5.ItemTypes.Modification',
+        program: 'SR5.ItemTypes.Program',
         quality: 'SR5.ItemTypes.Quality',
         sin: 'SR5.ItemTypes.Sin',
         spell: 'SR5.ItemTypes.Spell',
-        weapon: 'SR5.ItemTypes.Weapon',
-        host: 'SR5.ItemTypes.Host'
+        sprite_power: 'SR5.ItemTypes.SpritePower',
+        weapon: 'SR5.ItemTypes.Weapon'
     },
 
     // All available character attributes. Sorted alphabetically. :-)
