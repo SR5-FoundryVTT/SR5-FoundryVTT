@@ -474,7 +474,8 @@
                 "Sin": "SIN",
                 "Spell": "Zauberspruch",
                 "SpritePower": "Sprite Kraft",
-                "Weapon": "Waffe"
+                "Weapon": "Waffe",
+                "Program": "Programm"
         },
         "SR5.Karma": "Karma",
         "SR5.Keybinding": {
