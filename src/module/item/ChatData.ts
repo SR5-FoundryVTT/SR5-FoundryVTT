@@ -273,7 +273,7 @@ export const ChatData = {
             if (system.range.rc) {
                 let rcString = `${game.i18n.localize('SR5.RecoilCompensation')} ${system.range.rc.value}`;
                 if (item?.actor) {
-                    rcString += ` (${game.i18n.localize('SR5.Total')} ${item.actor.getRecoilCompensation()})`;
+                    rcString += ` (${game.i18n.localize('SR5.Total')} ${item.totalRecoilCompensation})`;
                 }
                 props.push(rcString);
             }

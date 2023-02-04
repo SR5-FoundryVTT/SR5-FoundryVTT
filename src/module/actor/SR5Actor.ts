@@ -1,3 +1,4 @@
+import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import {Helpers} from '../helpers';
 import {SR5Item} from '../item/SR5Item';
 import {SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
@@ -21,7 +22,6 @@ import {
 } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import {InventoryFlow} from "./flows/InventoryFlow";
 import {ModifierFlow} from "./flows/ModifierFlow";
-import {SuccessTest} from "../tests/SuccessTest";
 import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
@@ -461,16 +461,10 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Amount of recoil compensation this actor has.
+     * Amount of recoil compensation this actor has available (without the weapon used).
      */
-    getRecoilCompensation(): number {
-        // Each new attack allows one free compensation.
-        let total = 1;
-        const strength = this.findAttribute('strength');
-        if (strength) {
-            total += Math.ceil(strength.value / 3);
-        }
-        return total;
+    get recoilCompensation(): number {
+        return RangedWeaponRules.actorRecoilCompensation(this);
     }
 
     getDeviceRating(): number {

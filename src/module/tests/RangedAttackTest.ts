@@ -151,7 +151,7 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     _prepareRecoilCompensation() {
-        this.data.recoilCompensation = this.item?.getRecoilCompensation(true) || 0;
+        this.data.recoilCompensation = this.item?.totalRecoilCompensation || 0;
     }
 
     get testModifiers(): ModifierTypes[] {

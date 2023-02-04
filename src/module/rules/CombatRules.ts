@@ -1,3 +1,4 @@
+import { SR5Item } from './../item/SR5Item';
 import {SR} from "../constants";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
