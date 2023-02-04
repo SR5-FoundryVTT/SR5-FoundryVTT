@@ -23,6 +23,9 @@ export class SkillTest extends SuccessTest {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.html';
     }
 
+    /**
+     * Show skill label as title instead of the generic success test label.
+     */
     get title() {
         const skill = this.actor?.getSkill(this.data.action.skill);
         if (!skill) return super.title;
@@ -47,8 +50,7 @@ export class SkillTest extends SuccessTest {
     }
 
     /**
-     * TODO:
-     * @returns 
+     * Rebuild pool after attribute selection.
      */
     prepareAttributeSelection() {
         if (!this.actor) return;
@@ -65,6 +67,9 @@ export class SkillTest extends SuccessTest {
         if (attribute && this.actor._isMatrixAttribute(this.data.attribute)) this.actor._addMatrixParts(pool, true);
     }
 
+    /**
+     * Rebuild limit after limit selection.
+     */
     prepareLimitSelection() {
         if (!this.actor) return;
 
