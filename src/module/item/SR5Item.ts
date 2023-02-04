@@ -314,8 +314,14 @@ export class SR5Item extends Item {
             if (equippedAmmo) {
                 //@ts-ignore // TODO: foundry-vtt-types v10 
                 const ammoData = equippedAmmo.system as AmmoData;
-                // add mods to damage from ammo
-                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
+
+                // Some ammunition want to replace the weapons damage, others modify it.
+                if (ammoData.replaceDamage) {
+                    action.damage.override = {name: equippedAmmo.name as string, value: Number(ammoData.damage)};
+                } else {
+                    action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);    
+                }
+                
                 // add mods to ap from ammo
                 action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
 

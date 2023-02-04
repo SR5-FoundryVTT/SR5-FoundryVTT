@@ -261,6 +261,7 @@
         "ApplyUnmodifiedDamage": "Apply Unmod. Damage",
         "Title": "Damage Application"
     },
+    "SR5.DamageReplace": "Replace Damage",
     "SR5.DamageType": "Type",
     "SR5.DamageValue": "Damage Value",
     "SR5.Defaulting": "Defaulting",
@@ -470,10 +471,10 @@
         "Host": "Host",
         "Lifestyle": "Lifestyle",
         "Modification": "Modification",
+        "Program": "Program",
         "Quality": "Quality",
         "Sin": "SIN",
         "Spell": "Spell",
-        "Program": "Program",
         "SpritePower": "Sprite Power",
         "Weapon": "Weapon"
     },
@@ -955,18 +956,19 @@
         "PhysicalResistTest": "Physical Damage Resist",
         "PilotVehicleTest": "Pilot Vehicle Test",
         "RangedAttackTest": "Ranged Weapon Attack",
+        "SkillTest": "Skill Test",
         "SpellCastingTest": "Spellcasting",
         "SuccessTest": "Success Test",
         "SupressionDefenseTest": "Supression Defense",
-        "ThrownAttackTest": "Thrown Weapon Attack",
-        "SkillTest": "Skill Test"
+        "ThrownAttackTest": "Thrown Weapon Attack"
     },
     "SR5.Threshold": "Threshold",
     "SR5.ToggleActive": "Toggle Active",
     "SR5.ToggleEquip": "Toggle Equipped",
     "SR5.Tooltips": {
         "Item": {
-            "ActionModifier": "Select pool modifiers to use instead of test's default modifiers."
+            "ActionModifier": "Select pool modifiers to use instead of test's default modifiers.",
+            "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it"
         }
     },
     "SR5.Top": "Top",
