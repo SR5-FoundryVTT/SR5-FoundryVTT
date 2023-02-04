@@ -958,7 +958,8 @@
                 "SpellcastingTest": "Spruchzauberei",
                 "SuccessTest": "Erfolgsprobe",
                 "SupressionDefenseTest": "Unterdrückungsfeuer Verteidigung",
-                "ThrownAttackTest": "Wurfwaffen Angriff"
+                "ThrownAttackTest": "Wurfwaffen Angriff",
+                "SkillTest": "Fertigkeitenprobe"
         },
         "SR5.Threshold": "Schwellenwert",
         "SR5.ToggleActive": "De/aktivieren",

@@ -1173,7 +1173,7 @@ export class SR5Actor extends Actor {
                 attribute: limit
             },
 
-            test: SuccessTest.name
+            test: 'SkillTest'
         });
     }
 

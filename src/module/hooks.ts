@@ -50,6 +50,7 @@ import SocketMessageData = Shadowrun.SocketMessageData;
 import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import { NetworkDeviceFlow } from './item/flows/NetworkDeviceFlow';
 import { registerSystemKeybindings } from './keybindings';
+import { SkillTest } from './tests/SkillTest';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -137,6 +138,7 @@ ___________________
                 FadeTest,
                 ComplexFormTest,
                 AttributeOnlyTest,
+                SkillTest,
                 NaturalRecoveryStunTest,
                 NaturalRecoveryPhysicalTest,
                 PilotVehicleTest,

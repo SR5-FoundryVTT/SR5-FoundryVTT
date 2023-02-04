@@ -958,7 +958,8 @@
         "SpellCastingTest": "Spellcasting",
         "SuccessTest": "Success Test",
         "SupressionDefenseTest": "Supression Defense",
-        "ThrownAttackTest": "Thrown Weapon Attack"
+        "ThrownAttackTest": "Thrown Weapon Attack",
+        "SkillTest": "Skill Test"
     },
     "SR5.Threshold": "Threshold",
     "SR5.ToggleActive": "Toggle Active",
