@@ -360,6 +360,8 @@ export class Helpers {
      * 
      * Depending on the scene distance unit the result will be converted.
      * 
+     * If wall-height is installed and using tokenHeight, it will be used for elevation.
+     * 
      * @param tokenOrigin 
      * @param tokenDest 
      * @returns Distance in scene distance unit
@@ -370,21 +372,26 @@ export class Helpers {
         if (!tokenOrigin || !tokenDest) return 0;
 
         // 2d coordinates and distance
-        const origin2D = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
-        const dest2D = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
+        // @ts-ignore TODO: foundry-vtt-types v10
+        const origin2D = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.x, tokenOrigin.y));
+        // @ts-ignore TODO: foundry-vtt-types v10
+        const dest2D = new PIXI.Point(...canvas.grid.getCenter(tokenDest.x, tokenDest.y));
 
         // Use gridSpace to measure in grids instead of distance. This will give results parity to FoundryVTTs canvas ruler.
-        const distanceInGridUnits2D = canvas.grid.measureDistance(origin2D, dest2D, {gridSpaces: true});
+        const distanceInGridUnits2D = canvas.grid.measureDistance(origin2D, dest2D);
 
         // 3d coordinates and distance
+        const originLOSHeight = Helpers.getTokenLOSHeight(tokenOrigin);
+        const destLOSHeight = Helpers.getTokenLOSHeight(tokenDest);
         // @ts-ignore TODO: foundry-vtt-types v10
-        const elevationDifference = tokenOrigin.elevation - tokenDest.elevation;
+        const elevationDifference = (tokenOrigin.elevation + originLOSHeight) - (tokenDest.elevation + destLOSHeight);
         const origin3D = new PIXI.Point(0, 0);
         const dest3D = new PIXI.Point(distanceInGridUnits2D, elevationDifference);
         
-        const distanceInGridUnits3D = Math.floor(Helpers.measurePointDistance(origin3D, dest3D));
+        const distanceInGridUnits3D = Math.round(Helpers.measurePointDistance(origin3D, dest3D));
 
-        const sceneUnit = canvas.scene.data.gridUnits;
+        //@ts-ignore TODO: foundry-vtt-types v10
+        const sceneUnit = canvas.scene.grid.units;
         return Helpers.convertLengthUnit(distanceInGridUnits3D, sceneUnit);
     }
 
@@ -399,6 +406,21 @@ export class Helpers {
         const sideA = origin.x + destination.x;
         const sideB = origin.y + destination.y;
         return Math.sqrt(Math.pow(sideA, 2) + Math.pow(sideB, 2))
+    }
+
+    /**
+     * Determine a tokens line of sight height.
+     * 
+     * Default Foundry will use 0, while wall-height might have defined another value on the token.
+     * 
+     * The auto height generation of wall-height isn't supported.
+     * 
+     * @param token 
+     * @returns 
+     */
+    static getTokenLOSHeight(token: TokenDocument): number {
+        //@ts-ignore TODO: foundry-vtt-types v10
+        return token.flags['wall-height']?.tokenHeight ?? 0;
     }
 
     static convertLengthUnit(length: number, fromUnit: string): number {
