@@ -1574,6 +1574,25 @@ export class SR5Actor extends Actor {
         await combat.adjustInitiative(combatant, modifier);
     }
 
+    /**
+     * Determine if this actor is an active combatant.
+     * 
+     * @returns true, when active. false, when not in combat.
+     */
+    get combatActive(): boolean {
+        return !!(game.combat as SR5Combat)?.getActorCombatant(this);
+    }
+
+    /**
+     * Return the initiative score for a currently active combat
+     * 
+     * @returns The score or zero.
+     */
+    get combatInitiativeScore(): number {
+        const combatant = (game.combat as SR5Combat)?.getActorCombatant(this);
+        return combatant ? combatant.initiative : 0;
+    }
+
     hasDamageTracks(): boolean {
         //@ts-ignore // TODO: foundry-vtt-types v10
         return "track" in this.system;

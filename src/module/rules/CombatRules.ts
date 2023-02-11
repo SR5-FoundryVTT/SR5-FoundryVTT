@@ -225,4 +225,15 @@ export class CombatRules {
         // Make sure no positive values are passed into.
         return Math.min(woundModBefore, 0) - Math.min(woundModAfter, 0);
     }
+
+    /**
+     * Can a defense mode be used with a specific initiative score
+     * 
+     * @param iniScore The combatants ini score
+     * @param defenseIniScoreMod  The defense modes ini score modifier
+     */
+    static canUseActiveDefense(iniScore: number, defenseIniScoreMod: number): boolean {
+        // Validate input values against valid value range.
+        return (Math.max(iniScore, 0) + Math.min(defenseIniScoreMod, 0)) < 0
+    }
 }

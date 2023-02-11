@@ -20,9 +20,9 @@
                         <select name="test.data.activeDefense">
                             {{#select test.data.activeDefense}}
                             <option value="">{{localize 'SR5.None'}}</option>
-                            {{#each test.data.activeDefenses as |val key|}}
-                            <option value="{{key}}">(+{{val.value}}) {{localize val.label}}{{#if val.weapon}} -
-                                {{val.weapon}}{{/if}}
+                            {{#each test.data.activeDefenses as |mode key|}}
+                            <option value="{{key}}" {{#if mode.disabled}}disabled{{/if}}>(+{{mode.value}}) {{localize mode.label}}{{#if mode.weapon}} -
+                                {{mode.weapon}}{{/if}}
                             </option>
                             {{/each}}
                             {{/select}}
