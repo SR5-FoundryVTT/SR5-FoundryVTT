@@ -211,4 +211,18 @@ export class CombatRules {
         updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
         return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
     }
+
+    /**
+     * Determine the amount of inititative score modifier change.
+     * 
+     * According to SR5#170 'Wound Modifiers'.
+     * 
+     * @param woundModBefore A negative wound modifier, before taking latest damage.
+     * @param woundModAfter A negative wound modifier, after takting latest damage.
+     * @return An to be applied initiative score modifier
+     */
+    static combatInitiativeScoreModifierAfterDamage(woundModBefore: number, woundModAfter: number): number {
+        // Make sure no positive values are passed into.
+        return Math.min(woundModBefore, 0) - Math.min(woundModAfter, 0);
+    }
 }

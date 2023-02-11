@@ -1405,6 +1405,27 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Apply damage of any type to this actor.
+     * 
+     * @param damage Damage to be applied
+     * @returns overflow damage.
+     */
+    async addDamage(damage: DamageData): Promise<DamageData|undefined> {
+        switch(damage.type.value) {
+            case 'matrix':
+                return await this.addMatrixDamage(damage);
+            case 'stun':
+                return await this.addStunDamage(damage);
+            case 'physical':
+                return await this.addPhysicalDamage(damage);
+        }
+
+        console.error('Shadowrun 5e | Actor does not support given damage type: ', damage);
+
+        // TODO: Add automated combat ini score modifier here.
+    }
+
+    /**
      * Directly set the matrix damage track of this actor to a set amount.
      *
      * This is mainly used for manual user input on an actor sheet.
