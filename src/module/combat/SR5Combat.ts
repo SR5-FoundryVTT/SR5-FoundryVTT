@@ -316,6 +316,9 @@ export class SR5Combat extends Combat {
         } else {
             await SR5Combat.handleNextRound(this.id as string);
         }
+
+        // Don't wait on actor updates.
+        this.removeActorEffectsForDefense();
     }
 
     /**
@@ -409,6 +412,15 @@ export class SR5Combat extends Combat {
 
     async _createDoIniPassSocketMessage() {
         await SocketMessage.emitForGM(FLAGS.DoInitPass, {id: this.id});
+    }
+
+    /**
+     * Remove defense modifiers / effects applied to all combatants.
+     */
+    async removeActorEffectsForDefense() {
+        for (const combatant of this.combatants) {
+            await combatant.actor?.removeDefenseMultiModifier();
+        }
     }
 }
 

@@ -103,12 +103,19 @@ declare namespace Shadowrun {
         attributes: object
     };
 
+    export interface CommonModifiers extends Modifiers {
+        // Meant to be applied on all defense tests.
+        defense: NumberOrEmpty
+        // Meant to be applied on physical resist (soak) tests.
+        soak: NumberOrEmpty
+    }
+
     /**
      * These modifiers are available for Character type actors.
      * 
      * This interface must correspond with modifiers inject during character data prep.
      */
-    export interface CharacterModifiers extends Modifiers {
+    export interface CharacterModifiers extends CommonModifiers {
         drain: NumberOrEmpty
         armor: NumberOrEmpty
         physical_limit: NumberOrEmpty
@@ -132,5 +139,8 @@ declare namespace Shadowrun {
         pain_tolerance_physical: NumberOrEmpty
         essence: NumberOrEmpty
         fade: NumberOrEmpty
+
+        // Meant to be applied on all defense test, for defense modifiers after multiple attacks.
+        multi_defense: NumberOrEmpty
     }
 }

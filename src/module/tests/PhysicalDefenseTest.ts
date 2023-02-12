@@ -49,7 +49,7 @@ export class PhysicalDefenseTest extends DefenseTest {
     }
 
     get testModifiers(): ModifierTypes[] {
-        return ['global', 'wounds', 'defense'];
+        return ['global', 'wounds', 'defense', 'multi_defense'];
     }
 
     async prepareDocumentData() {
@@ -177,6 +177,12 @@ export class PhysicalDefenseTest extends DefenseTest {
         return CombatRules.attackHits(this.against.hits.value, this.hits.value)
     }
 
+    async processResults() {
+        await super.processResults();
+
+        await this.applyActorEffectsForDefense();
+    }
+
     async processSuccess() {
         this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
 
@@ -241,6 +247,15 @@ export class PhysicalDefenseTest extends DefenseTest {
         });
 
         return actions;
+    }
+
+    /**
+     * Increase the actors multi defense modifier.
+     */
+    async applyActorEffectsForDefense() {
+        if (!this.actor) return;
+
+        this.actor.calculateNextDefenseMultiModifier();
     }
 
     /**

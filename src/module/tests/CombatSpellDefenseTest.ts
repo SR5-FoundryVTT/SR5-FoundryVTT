@@ -48,7 +48,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
             return ['global'];
         }
         if (spell.system.combat.type === 'indirect') {
-            return ['global', 'defense', 'wounds'];
+            return ['global', 'defense', 'multi_defense', 'wounds'];
         }
 
         return ['global'];
@@ -62,6 +62,12 @@ export class CombatSpellDefenseTest extends DefenseTest {
         if (!spell) return;
 
         this.data.incomingDamage = CombatSpellRules.calculateBaseDamage(spell.system.combat.type, this.data.incomingDamage, this.data.against.force);
+    }
+
+    async processResults() {
+        await super.processResults();
+
+        await this.applyActorEffectsForDefense();
     }
 
 
@@ -101,6 +107,18 @@ export class CombatSpellDefenseTest extends DefenseTest {
             if (!test) return;
             await test.execute();
         }
+    }
 
+    /**
+     * Increase the actors multi defense modifier for indirect combat spells.
+     */
+    async applyActorEffectsForDefense() {
+        if (!this.actor) return;
+
+        const spell = this.item?.asSpell;
+        if (!spell) return;
+        if (spell.system.category !== 'combat' || spell.system.combat.type === 'direct') return;
+
+        this.actor.calculateNextDefenseMultiModifier();
     }
 }

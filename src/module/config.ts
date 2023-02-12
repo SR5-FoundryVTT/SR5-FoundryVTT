@@ -419,7 +419,8 @@ export const SR5 = {
     modifierTypes: {
         armor: 'SR5.Armor',
         composure: 'SR5.RollComposure',
-        defense: 'SR5.RollDefense',
+        defense: 'SR5.Defense',
+        multi_defense: 'SR5.DefenseMulti',
         drain: 'SR5.Drain',
         environmental: 'SR5.ModifierTypes.Environmental',
         ['environmental.light']: 'SR5.ModifierTypes.EnvironmentalLight',

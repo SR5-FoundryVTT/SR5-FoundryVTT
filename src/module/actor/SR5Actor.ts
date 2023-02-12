@@ -62,6 +62,7 @@ import ActorAttribute = Shadowrun.ActorAttribute;
 import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import ShadowrunItemData= Shadowrun.ShadowrunItemData
+import { CombatRules } from '../rules/CombatRules';
 
 
 /**
@@ -1945,5 +1946,36 @@ export class SR5Actor extends Actor {
                 marks,
                 markId
             }))
+    }
+
+    /**
+     * How many previous attacks has this actor been subjected to?
+     * 
+     * @returns A positive number or zero.
+     */
+    get previousAttacks(): number {
+        //@ts-ignore TODO: foundry-vtt-types v10
+        return Math.max(this.system.modifiers.multi_defense * -1, 0);
+    }
+
+    /**
+     * Apply a new consecutive defense multiplier based on the amount of attacks given
+     * 
+     * @param previousAttacks Attacks within a combat turn. If left out, will guess based on current modifier.
+     */
+    async calculateNextDefenseMultiModifier(previousAttacks: number=this.previousAttacks) {
+        console.debug('Shadowrun 5e | Applying consecutive defense modifier for. Last amount of attacks: ', previousAttacks)
+
+        const multiDefenseModi = CombatRules.defenseModifierForPreviousAttacks(previousAttacks + 1);
+
+        // Don't let test wait on actor update.
+        await this.update({'system.modifiers.multi_defense': multiDefenseModi});
+    }
+
+    /**
+     * Remove the consecutive defense per turn modifier.
+     */
+    async removeDefenseMultiModifier() {
+        await this.update({'system.modifiers.multi_defense': 0});
     }
 }

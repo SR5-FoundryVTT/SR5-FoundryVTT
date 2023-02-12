@@ -236,4 +236,16 @@ export class CombatRules {
         // Validate input values against valid value range.
         return (Math.max(iniScore, 0) + Math.min(defenseIniScoreMod, 0)) < 0
     }
+
+    /**
+     * Calculate defense modifier for multiple previous attacks in a combat turn. 
+     * 
+     * See SR5#189 'Defense Modifiers Table'.
+     * 
+     * @param attacks Amount of attacks within the current combat turn
+     * @returns A negative modifier or zero to be applied on physical defense tests.
+     */
+    static defenseModifierForPreviousAttacks(attacks: number): number {
+        return Math.max(attacks, 0) * -1;
+    }
 }
