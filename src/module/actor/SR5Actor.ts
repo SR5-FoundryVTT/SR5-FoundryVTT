@@ -1,3 +1,4 @@
+import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import {Helpers} from '../helpers';
 import {SR5Item} from '../item/SR5Item';
 import {SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
@@ -21,7 +22,6 @@ import {
 } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import {InventoryFlow} from "./flows/InventoryFlow";
 import {ModifierFlow} from "./flows/ModifierFlow";
-import {SuccessTest} from "../tests/SuccessTest";
 import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
@@ -62,6 +62,7 @@ import ActorAttribute = Shadowrun.ActorAttribute;
 import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import ShadowrunItemData= Shadowrun.ShadowrunItemData
+import { CombatRules } from '../rules/CombatRules';
 
 
 /**
@@ -461,16 +462,10 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Amount of recoil compensation this actor has.
+     * Amount of recoil compensation this actor has available (without the weapon used).
      */
-    getRecoilCompensation(): number {
-        // Each new attack allows one free compensation.
-        let total = 1;
-        const strength = this.findAttribute('strength');
-        if (strength) {
-            total += Math.ceil(strength.value / 3);
-        }
-        return total;
+    get recoilCompensation(): number {
+        return RangedWeaponRules.actorRecoilCompensation(this);
     }
 
     getDeviceRating(): number {
@@ -1173,7 +1168,7 @@ export class SR5Actor extends Actor {
                 attribute: limit
             },
 
-            test: SuccessTest.name
+            test: 'SkillTest'
         });
     }
 
@@ -1411,6 +1406,27 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Apply damage of any type to this actor.
+     * 
+     * @param damage Damage to be applied
+     * @returns overflow damage.
+     */
+    async addDamage(damage: DamageData): Promise<DamageData|undefined> {
+        switch(damage.type.value) {
+            case 'matrix':
+                return await this.addMatrixDamage(damage);
+            case 'stun':
+                return await this.addStunDamage(damage);
+            case 'physical':
+                return await this.addPhysicalDamage(damage);
+        }
+
+        console.error('Shadowrun 5e | Actor does not support given damage type: ', damage);
+
+        // TODO: Add automated combat ini score modifier here.
+    }
+
+    /**
      * Directly set the matrix damage track of this actor to a set amount.
      *
      * This is mainly used for manual user input on an actor sheet.
@@ -1557,6 +1573,25 @@ export class SR5Actor extends Actor {
         }
 
         await combat.adjustInitiative(combatant, modifier);
+    }
+
+    /**
+     * Determine if this actor is an active combatant.
+     * 
+     * @returns true, when active. false, when not in combat.
+     */
+    get combatActive(): boolean {
+        return !!(game.combat as SR5Combat)?.getActorCombatant(this);
+    }
+
+    /**
+     * Return the initiative score for a currently active combat
+     * 
+     * @returns The score or zero.
+     */
+    get combatInitiativeScore(): number {
+        const combatant = (game.combat as SR5Combat)?.getActorCombatant(this);
+        return combatant ? combatant.initiative : 0;
     }
 
     hasDamageTracks(): boolean {
@@ -1911,5 +1946,36 @@ export class SR5Actor extends Actor {
                 marks,
                 markId
             }))
+    }
+
+    /**
+     * How many previous attacks has this actor been subjected to?
+     * 
+     * @returns A positive number or zero.
+     */
+    get previousAttacks(): number {
+        //@ts-ignore TODO: foundry-vtt-types v10
+        return Math.max(this.system.modifiers.multi_defense * -1, 0);
+    }
+
+    /**
+     * Apply a new consecutive defense multiplier based on the amount of attacks given
+     * 
+     * @param previousAttacks Attacks within a combat turn. If left out, will guess based on current modifier.
+     */
+    async calculateNextDefenseMultiModifier(previousAttacks: number=this.previousAttacks) {
+        console.debug('Shadowrun 5e | Applying consecutive defense modifier for. Last amount of attacks: ', previousAttacks)
+
+        const multiDefenseModi = CombatRules.defenseModifierForPreviousAttacks(previousAttacks + 1);
+
+        // Don't let test wait on actor update.
+        await this.update({'system.modifiers.multi_defense': multiDefenseModi});
+    }
+
+    /**
+     * Remove the consecutive defense per turn modifier.
+     */
+    async removeDefenseMultiModifier() {
+        await this.update({'system.modifiers.multi_defense': 0});
     }
 }

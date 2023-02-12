@@ -1,4 +1,3 @@
-import { SkillFlow } from "../actor/flows/SkillFlow";
 import { SR5Actor } from '../actor/SR5Actor';
 import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
@@ -13,8 +12,6 @@ import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
 import { HostDataPreparation } from "./prep/HostPrep";
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
-import AttributeField = Shadowrun.AttributeField;
-import SkillField = Shadowrun.SkillField;
 import FireModeData = Shadowrun.FireModeData;
 import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
@@ -55,6 +52,8 @@ import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
+import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
+import { RangedWeaponRules } from "../rules/RangedWeaponRules";
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
@@ -68,7 +67,6 @@ import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
  * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
-import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -314,8 +312,14 @@ export class SR5Item extends Item {
             if (equippedAmmo) {
                 //@ts-ignore // TODO: foundry-vtt-types v10 
                 const ammoData = equippedAmmo.system as AmmoData;
-                // add mods to damage from ammo
-                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
+
+                // Some ammunition want to replace the weapons damage, others modify it.
+                if (ammoData.replaceDamage) {
+                    action.damage.override = {name: equippedAmmo.name as string, value: Number(ammoData.damage)};
+                } else {
+                    action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);    
+                }
+                
                 // add mods to ap from ammo
                 action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
 
@@ -684,62 +688,6 @@ export class SR5Item extends Item {
         });
 
         await this.update({'system.licenses': licenses});
-    }
-
-    getRollPartsList(): ModList<number> {
-        // we only have a roll if we have an action or an actor
-        const action = this.getAction();
-        if (!action || !this.actor) return [];
-
-        // @ts-ignore
-        const parts = new PartsList(duplicate(this.getModifierList()));
-
-        const skill = this.actor.findActiveSkill(this.getActionSkill());
-        const attribute = this.actor.findAttribute(this.getActionAttribute());
-        const attribute2 = this.actor.findAttribute(this.getActionAttribute2());
-
-        if (attribute && attribute.label) parts.addPart(attribute.label, attribute.value);
-
-        // if we have a valid skill, don't look for a second attribute
-        if (skill) {
-            parts.addUniquePart(skill.label || skill.name, skill.value);
-            SkillFlow.handleDefaulting(skill, parts);
-        }
-        else if (attribute2 && attribute2.label) {
-            parts.addPart(attribute2.label, attribute2.value);
-        }
-
-        const spec = this.getActionSpecialization();
-        if (spec) parts.addUniquePart(spec, 2);
-
-        //@ts-ignore parseInt does allow for number type parameter. // TODO: foundry-vtt-types v10
-        const mod = parseInt(this.system.action.mod || 0);
-        if (mod) parts.addUniquePart('SR5.ItemMod', mod);
-
-        const atts: (AttributeField | SkillField)[] | boolean = [];
-        if (attribute !== undefined) atts.push(attribute);
-        if (attribute2 !== undefined) atts.push(attribute2);
-        if (skill !== undefined) atts.push(skill);
-        // add global parts from actor
-        this.actor._addGlobalParts(parts);
-        this.actor._addMatrixParts(parts, atts);
-        this._addWeaponParts(parts);
-
-        return parts.list;
-    }
-
-    calculateRecoil() {
-        const lastFireMode = this.getLastFireMode();
-        if (!lastFireMode) return 0;
-        if (lastFireMode.value === 20) return 0;
-        return Math.min(this.getRecoilCompensation(true) - (this.getLastFireMode()?.value || 0), 0);
-    }
-
-    _addWeaponParts(parts: PartsList<number>) {
-        if (this.isRangedWeapon) {
-            const recoil = this.calculateRecoil();
-            if (recoil) parts.addUniquePart('SR5.Recoil', recoil);
-        }
     }
 
     get isSin(): boolean {
@@ -1418,12 +1366,17 @@ export class SR5Item extends Item {
         return this.wrapper.getFade();
     }
 
-    getRecoilCompensation(includeActor: boolean = true): number {
-        let rc = this.wrapper.getRecoilCompensation();
-        if (includeActor && this.actor) {
-            rc += this.actor.getRecoilCompensation();
-        }
-        return rc;
+    get recoilCompensation(): number {
+        return this.wrapper.getRecoilCompensation();
+    }
+
+    /**
+     * Apply recoil compensation rules to this item.
+     * 
+     * @returns The total amount of rc available to this item.
+     */
+    get totalRecoilCompensation(): number {
+        return RangedWeaponRules.recoilCompensation(this);
     }
 
     getReach(): number {

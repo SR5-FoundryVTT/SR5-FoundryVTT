@@ -1283,6 +1283,7 @@
             "ap": 0,
             "damage": 0,
             "damageType": "",
+            "replaceDamage": false,
             "blast": {
                 "radius": 0,
                 "dropoff": 0

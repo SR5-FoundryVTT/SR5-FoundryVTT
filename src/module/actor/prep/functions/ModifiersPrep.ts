@@ -50,6 +50,7 @@ export class ModifiersPrep {
             'pain_tolerance_physical',
             'essence',
             'fade',
+            'multi_defense'
         ];
     }
 

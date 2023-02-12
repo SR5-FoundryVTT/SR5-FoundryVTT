@@ -28,6 +28,7 @@ export class AmmoImporter extends DataImporter {
                 ap: 0,
                 damage: 0,
                 damageType: 'physical',
+                replaceDamage: false,
                 blast: {
                     radius: 0,
                     dropoff: 0,

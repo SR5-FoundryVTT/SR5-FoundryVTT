@@ -12,6 +12,9 @@ declare namespace Shadowrun {
         ap: number
         damage: number
         damageType: DamageType
+        // Allow for ammo to replace weapon damage instead modifying it.
+        // This is needed for underbarrel grenades.
+        replaceDamage: boolean
         blast: BlastData
         accuracy: number
     }

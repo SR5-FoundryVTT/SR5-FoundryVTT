@@ -1,0 +1,40 @@
+name: Release Creation
+
+on: 
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Substitute Manifest and Download Links
+      id: sub_manifest_link_version
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: 'system.json'
+      env:
+        version: ${{github.event.release.tag_name}}
+        url: https://github.com/${{github.repository}}
+        manifest: https://github.com/${{github.repository}}/releases/latest/download/system.json
+        download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/shadowrun5e.zip
+
+    - run: |
+          npm ci
+          gulp build     
+          zip -r ./shadowrun5e.zip system.json template.json LICENSE README.md README-DEV.md dist/ packs/
+    
+    - name: Update Release with Files
+      id: create_version_release
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true # Must be true, to allow updating existing releases
+        name: ${{ github.event.release.name }}
+        draft: false
+        prerelease: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: './system.json, ./shadowrun5e.zip'
+        tag: ${{ github.event.release.tag_name }}
+        body: ${{ github.event.release.body }}

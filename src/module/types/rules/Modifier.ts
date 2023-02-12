@@ -8,6 +8,7 @@ declare namespace Shadowrun {
         'armor' |
         'composure'|
         'defense'|
+        'multi_defense'|
         'drain'|
         'environmental'|
         'environmental.light'|

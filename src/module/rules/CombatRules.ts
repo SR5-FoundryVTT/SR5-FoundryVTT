@@ -1,3 +1,4 @@
+import { SR5Item } from './../item/SR5Item';
 import {SR} from "../constants";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
@@ -209,5 +210,42 @@ export class CombatRules {
 
         updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
         return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
+    }
+
+    /**
+     * Determine the amount of inititative score modifier change.
+     * 
+     * According to SR5#170 'Wound Modifiers'.
+     * 
+     * @param woundModBefore A negative wound modifier, before taking latest damage.
+     * @param woundModAfter A negative wound modifier, after takting latest damage.
+     * @return An to be applied initiative score modifier
+     */
+    static combatInitiativeScoreModifierAfterDamage(woundModBefore: number, woundModAfter: number): number {
+        // Make sure no positive values are passed into.
+        return Math.min(woundModBefore, 0) - Math.min(woundModAfter, 0);
+    }
+
+    /**
+     * Can a defense mode be used with a specific initiative score
+     * 
+     * @param iniScore The combatants ini score
+     * @param defenseIniScoreMod  The defense modes ini score modifier
+     */
+    static canUseActiveDefense(iniScore: number, defenseIniScoreMod: number): boolean {
+        // Validate input values against valid value range.
+        return (Math.max(iniScore, 0) + Math.min(defenseIniScoreMod, 0)) < 0
+    }
+
+    /**
+     * Calculate defense modifier for multiple previous attacks in a combat turn. 
+     * 
+     * See SR5#189 'Defense Modifiers Table'.
+     * 
+     * @param attacks Amount of attacks within the current combat turn
+     * @returns A negative modifier or zero to be applied on physical defense tests.
+     */
+    static defenseModifierForPreviousAttacks(attacks: number): number {
+        return Math.max(attacks, 0) * -1;
     }
 }

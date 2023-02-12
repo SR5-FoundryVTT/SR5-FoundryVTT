@@ -84,9 +84,10 @@ export class DrainTest extends SuccessTest {
 
         Helpers.calcValue<typeof this.data.incomingDrain.type.base>(this.data.incomingDrain.type as GenericValueField);
 
-        // Don't duplicate incomingDrain to avoild using a override, only transfer needed values.
+        // Copy to get all values changed by user (override) but also remove all.
         this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain);
         this.data.modifiedDrain.base = Helpers.calcTotal(this.data.incomingDrain, {min: 0});
+        delete this.data.modifiedDrain.override;
     }
 
     /**

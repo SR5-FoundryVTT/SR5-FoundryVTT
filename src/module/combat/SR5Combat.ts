@@ -83,11 +83,12 @@ export class SR5Combat extends Combat {
     }
 
     /**
-     *
-     * @param combatant
-     * @param adjustment
+     * Adjust a combatants initiative score in combat.
+     * 
+     * @param combatant Combatant to adjust
+     * @param adjustment The adjustment that's to be added onto the current ini score.
      */
-    async adjustInitiative(combatant: string | any, adjustment: number): Promise<void> {
+    async adjustInitiative(combatant: string | any, adjustment: number) {
         combatant = typeof combatant === 'string' ? this.combatants.find((c) => c.id === combatant) : combatant;
         if (!combatant || typeof combatant === 'string') {
             console.error('Could not find combatant with id ', combatant);
@@ -315,6 +316,9 @@ export class SR5Combat extends Combat {
         } else {
             await SR5Combat.handleNextRound(this.id as string);
         }
+
+        // Don't wait on actor updates.
+        this.removeActorEffectsForDefense();
     }
 
     /**
@@ -408,6 +412,15 @@ export class SR5Combat extends Combat {
 
     async _createDoIniPassSocketMessage() {
         await SocketMessage.emitForGM(FLAGS.DoInitPass, {id: this.id});
+    }
+
+    /**
+     * Remove defense modifiers / effects applied to all combatants.
+     */
+    async removeActorEffectsForDefense() {
+        for (const combatant of this.combatants) {
+            await combatant.actor?.removeDefenseMultiModifier();
+        }
     }
 }
 

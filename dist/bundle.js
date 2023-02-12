@@ -10155,65 +10155,42 @@ var SR = {
   }
 };
 
-// src/module/rules/SkillRules.ts
-var SkillRules = class {
-  static mustDefaultToRoll(skill) {
-    return skill.value === 0;
-  }
-  static allowDefaultingRoll(skill) {
-    return skill.canDefault;
-  }
-  static allowRoll(skill) {
-    return !SkillRules.mustDefaultToRoll(skill) || SkillRules.allowDefaultingRoll(skill);
-  }
-  static addDefaultingPart(parts) {
-    parts.addUniquePart("SR5.Defaulting", SkillRules.defaultingModifier);
-  }
-  static level(skill, options = { specialization: false }) {
-    if (this.mustDefaultToRoll(skill) && this.allowDefaultingRoll(skill)) {
-      return SkillRules.defaultingModifier;
+// src/module/rules/RangedWeaponRules.ts
+var RangedWeaponRules = {
+  getRangeForTargetDistance(distance, ranges) {
+    const rangeKey = Object.keys(ranges).find((range) => distance <= ranges[range].distance);
+    if (rangeKey) {
+      return ranges[rangeKey];
+    } else {
+      const { extreme } = ranges;
+      return Helpers.createRangeDescription("SR5.OutOfRange", extreme.distance, SR.combat.environmental.range_modifiers.out_of_range);
     }
-    const skillValue = typeof skill.value === "number" ? skill.value : 0;
-    const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
-    return skillValue + specializationBonus;
-  }
-  static get defaultingModifier() {
-    return SR.skill.DEFAULTING_MODIFIER;
-  }
-  static get SpecializationModifier() {
-    return SR.skill.SPECIALIZATION_MODIFIER;
-  }
-};
-
-// src/module/actor/flows/SkillFlow.ts
-var SkillFlow = class {
-  static handleDefaulting(skill, parts) {
-    var _a;
-    if (!SkillRules.mustDefaultToRoll(skill))
-      return;
-    if (!SkillFlow.allowDefaultingRoll(skill)) {
-      (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.SkillCantBeDefault"));
-      return;
+  },
+  recoilCompensation(item) {
+    let compensation = item.recoilCompensation;
+    if (item.actor) {
+      compensation += item.actor.recoilCompensation;
     }
-    SkillRules.addDefaultingPart(parts);
-  }
-  static allowDefaultingRoll(skill) {
-    const allowUnimproviseable = game.settings.get(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills) === false;
-    if (allowUnimproviseable)
-      return true;
-    return SkillRules.allowDefaultingRoll(skill);
-  }
-  static allowRoll(skill) {
-    if (SkillRules.mustDefaultToRoll(skill) && SkillFlow.allowDefaultingRoll(skill)) {
-      return true;
-    }
-    return SkillRules.allowRoll(skill);
-  }
-  static isCustomSkill(skill) {
-    return skill.name !== void 0 && skill.name !== "";
-  }
-  static isLegacySkill(skill) {
-    return !SkillFlow.isCustomSkill(skill);
+    return compensation;
+  },
+  actorRecoilCompensation(actor) {
+    if (actor.isVehicle())
+      return RangedWeaponRules._vehicleRecoilCompensation(actor);
+    else
+      return this._humanoidRecoilCompensation(actor);
+  },
+  _vehicleRecoilCompensation(actor) {
+    if (!actor.isVehicle())
+      return 0;
+    const body = actor.getAttribute("body");
+    return body ? body.value : 0;
+  },
+  _humanoidRecoilCompensation(actor) {
+    if (actor.isVehicle() || actor.isIC() || actor.isSprite())
+      return 0;
+    const baseRc = 1;
+    const strength = actor.getAttribute("strength");
+    return strength ? Math.ceil(strength.value / 3) + baseRc : baseRc;
   }
 };
 
@@ -11005,6 +10982,36 @@ var MatrixRules = class {
   }
 };
 
+// src/module/rules/SkillRules.ts
+var SkillRules = class {
+  static mustDefaultToRoll(skill) {
+    return skill.value === 0;
+  }
+  static allowDefaultingRoll(skill) {
+    return skill.canDefault;
+  }
+  static allowRoll(skill) {
+    return !SkillRules.mustDefaultToRoll(skill) || SkillRules.allowDefaultingRoll(skill);
+  }
+  static addDefaultingPart(parts) {
+    parts.addUniquePart("SR5.Defaulting", SkillRules.defaultingModifier);
+  }
+  static level(skill, options = { specialization: false }) {
+    if (this.mustDefaultToRoll(skill) && this.allowDefaultingRoll(skill)) {
+      return SkillRules.defaultingModifier;
+    }
+    const skillValue = typeof skill.value === "number" ? skill.value : 0;
+    const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
+    return skillValue + specializationBonus;
+  }
+  static get defaultingModifier() {
+    return SR.skill.DEFAULTING_MODIFIER;
+  }
+  static get SpecializationModifier() {
+    return SR.skill.SPECIALIZATION_MODIFIER;
+  }
+};
+
 // src/module/rolls/SR5Roll.ts
 var SR5Roll = class extends Roll {
   get sides() {
@@ -11351,41 +11358,76 @@ var SR5 = {
     HIDE_DIALOG: "shiftKey"
   },
   actorModifiers: {
-    soak: "SR5.RollSoak",
-    drain: "SR5.Drain",
     armor: "SR5.Armor",
-    physical_limit: "SR5.PhysicalLimit",
-    social_limit: "SR5.SocialLimit",
-    mental_limit: "SR5.MentalLimit",
-    astral_limit: "SR5.AstralLimit",
-    stun_track: "SR5.StunTrack",
-    physical_track: "SR5.PhysicalTrack",
-    physical_overflow_track: "SR5.PhysicalOverflowTrack",
-    meat_initiative: "SR5.MeatSpaceInit",
-    meat_initiative_dice: "SR5.MeatSpaceDice",
-    astral_initiative: "SR5.AstralInit",
     astral_initiative_dice: "SR5.AstralDice",
-    matrix_initiative: "SR5.MatrixInit",
-    matrix_initiative_dice: "SR5.MatrixDice",
-    matrix_track: "SR5.MatrixTrack",
+    astral_initiative: "SR5.AstralInit",
+    astral_limit: "SR5.AstralLimit",
     composure: "SR5.RollComposure",
-    lift_carry: "SR5.RollLiftCarry",
-    judge_intentions: "SR5.RollJudgeIntentions",
-    memory: "SR5.RollMemory",
-    walk: "SR5.Walk",
-    run: "SR5.Run",
-    defense: "SR5.RollDefense",
-    wound_tolerance: "SR5.WoundTolerance",
-    pain_tolerance_stun: "SR5.PainToleranceStun",
-    pain_tolerance_physical: "SR5.PainTolerancePhysical",
+    defense: "SR5.Defense",
+    drain: "SR5.Drain",
     essence: "SR5.AttrEssence",
     fade: "SR5.RollFade",
-    global: "SR5.Global"
+    global: "SR5.Global",
+    judge_intentions: "SR5.RollJudgeIntentions",
+    lift_carry: "SR5.RollLiftCarry",
+    matrix_initiative_dice: "SR5.MatrixDice",
+    matrix_initiative: "SR5.MatrixInit",
+    matrix_track: "SR5.MatrixTrack",
+    meat_initiative_dice: "SR5.MeatSpaceDice",
+    meat_initiative: "SR5.MeatSpaceInit",
+    memory: "SR5.RollMemory",
+    mental_limit: "SR5.MentalLimit",
+    multi_defense: "SR5.DefenseMulti",
+    pain_tolerance_physical: "SR5.PainTolerancePhysical",
+    pain_tolerance_stun: "SR5.PainToleranceStun",
+    physical_limit: "SR5.PhysicalLimit",
+    physical_overflow_track: "SR5.PhysicalOverflowTrack",
+    physical_track: "SR5.PhysicalTrack",
+    run: "SR5.Run",
+    soak: "SR5.RollSoak",
+    social_limit: "SR5.SocialLimit",
+    stun_track: "SR5.StunTrack",
+    walk: "SR5.Walk",
+    wound_tolerance: "SR5.WoundTolerance"
+  },
+  actorModifiersTooltip: {
+    armor: "SR5.Tooltips.Modifiers.armor",
+    astral_initiative_dice: "SR5.Tooltips.Modifiers.astral_initiative_dice",
+    astral_initiative: "SR5.Tooltips.Modifiers.astral_initiative",
+    astral_limit: "SR5.Tooltips.Modifiers.astral_limit",
+    composure: "SR5.Tooltips.Modifiers.composure",
+    defense: "SR5.Tooltips.Modifiers.defense",
+    drain: "SR5.Tooltips.Modifiers.drain",
+    essence: "SR5.Tooltips.Modifiers.essence",
+    fade: "SR5.Tooltips.Modifiers.fade",
+    global: "SR5.Tooltips.Modifiers.global",
+    judge_intentions: "SR5.Tooltips.Modifiers.judge_intentions",
+    lift_carry: "SR5.Tooltips.Modifiers.lift_carry",
+    matrix_initiative_dice: "SR5.Tooltips.Modifiers.matrix_initiative_dice",
+    matrix_initiative: "SR5.Tooltips.Modifiers.matrix_initiative",
+    matrix_track: "SR5.Tooltips.Modifiers.matrix_track",
+    meat_initiative_dice: "SR5.Tooltips.Modifiers.meat_initiative_dice",
+    meat_initiative: "SR5.Tooltips.Modifiers.meat_initiative",
+    memory: "SR5.Tooltips.Modifiers.memory",
+    mental_limit: "SR5.Tooltips.Modifiers.mental_limit",
+    multi_defense: "SR5.Tooltips.Modifiers.multi_defense",
+    pain_tolerance_physical: "SR5.Tooltips.Modifiers.pain_tolerance_physical",
+    pain_tolerance_stun: "SR5.Tooltips.Modifiers.pain_tolerance_stun",
+    physical_limit: "SR5.Tooltips.Modifiers.physical_limit",
+    physical_overflow_track: "SR5.Tooltips.Modifiers.physical_overflow_track",
+    physical_track: "SR5.Tooltips.Modifiers.physical_track",
+    run: "SR5.Tooltips.Modifiers.run",
+    soak: "SR5.Tooltips.Modifiers.soak",
+    social_limit: "SR5.Tooltips.Modifiers.social_limit",
+    stun_track: "SR5.Tooltips.Modifiers.stun_track",
+    walk: "SR5.Tooltips.Modifiers.walk",
+    wound_tolerance: "SR5.Tooltips.Modifiers.wound_tolerance"
   },
   modifierTypes: {
     armor: "SR5.Armor",
     composure: "SR5.RollComposure",
-    defense: "SR5.RollDefense",
+    defense: "SR5.Defense",
+    multi_defense: "SR5.DefenseMulti",
     drain: "SR5.Drain",
     environmental: "SR5.ModifierTypes.Environmental",
     ["environmental.light"]: "SR5.ModifierTypes.EnvironmentalLight",
@@ -11654,6 +11696,38 @@ var SR5 = {
       mode: "full_auto"
     }
   ]
+};
+
+// src/module/actor/flows/SkillFlow.ts
+var SkillFlow = class {
+  static handleDefaulting(skill, parts) {
+    var _a;
+    if (!SkillRules.mustDefaultToRoll(skill))
+      return;
+    if (!SkillFlow.allowDefaultingRoll(skill)) {
+      (_a = ui.notifications) == null ? void 0 : _a.warn(game.i18n.localize("SR5.Warnings.SkillCantBeDefault"));
+      return;
+    }
+    SkillRules.addDefaultingPart(parts);
+  }
+  static allowDefaultingRoll(skill) {
+    const allowUnimproviseable = game.settings.get(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills) === false;
+    if (allowUnimproviseable)
+      return true;
+    return SkillRules.allowDefaultingRoll(skill);
+  }
+  static allowRoll(skill) {
+    if (SkillRules.mustDefaultToRoll(skill) && SkillFlow.allowDefaultingRoll(skill)) {
+      return true;
+    }
+    return SkillRules.allowRoll(skill);
+  }
+  static isCustomSkill(skill) {
+    return skill.name !== void 0 && skill.name !== "";
+  }
+  static isLegacySkill(skill) {
+    return !SkillFlow.isCustomSkill(skill);
+  }
 };
 
 // src/module/item/flows/ActionFlow.ts
@@ -12341,7 +12415,7 @@ var ChatData = {
       if (system.range.rc) {
         let rcString = `${game.i18n.localize("SR5.RecoilCompensation")} ${system.range.rc.value}`;
         if (item == null ? void 0 : item.actor) {
-          rcString += ` (${game.i18n.localize("SR5.Total")} ${item.actor.getRecoilCompensation()})`;
+          rcString += ` (${game.i18n.localize("SR5.Total")} ${item.totalRecoilCompensation})`;
         }
         props.push(rcString);
       }
@@ -12864,6 +12938,15 @@ var CombatRules = class {
     updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
     return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
   }
+  static combatInitiativeScoreModifierAfterDamage(woundModBefore, woundModAfter) {
+    return Math.min(woundModBefore, 0) - Math.min(woundModAfter, 0);
+  }
+  static canUseActiveDefense(iniScore, defenseIniScoreMod) {
+    return Math.max(iniScore, 0) + Math.min(defenseIniScoreMod, 0) < 0;
+  }
+  static defenseModifierForPreviousAttacks(attacks) {
+    return Math.max(attacks, 0) * -1;
+  }
 };
 
 // src/module/rules/MeleeRules.ts
@@ -13053,15 +13136,7 @@ var DamageApplicationFlow = class {
         return;
       }
       damage = this.changeStunToPhysicalForGrunts(actor, damage);
-      if (damage.type.value === "matrix") {
-        damage = yield actor.addMatrixDamage(damage);
-      }
-      if (damage.type.value === "stun") {
-        damage = yield actor.addStunDamage(damage);
-      }
-      if (damage.type.value === "physical") {
-        yield actor.addPhysicalDamage(damage);
-      }
+      const overflow = actor.addDamage(damage);
     });
   }
   changeStunToPhysicalForGrunts(actor, damage) {
@@ -14425,7 +14500,7 @@ var PhysicalDefenseTest = class extends DefenseTest {
     };
   }
   get testModifiers() {
-    return ["global", "wounds", "defense"];
+    return ["global", "wounds", "defense", "multi_defense"];
   }
   prepareDocumentData() {
     return __async(this, null, function* () {
@@ -14466,6 +14541,7 @@ var PhysicalDefenseTest = class extends DefenseTest {
         initMod: -5
       };
     });
+    this._filterActiveDefenses();
   }
   prepareMeleeReach() {
     if (!this.against.item)
@@ -14524,6 +14600,12 @@ var PhysicalDefenseTest = class extends DefenseTest {
   get failure() {
     return CombatRules.attackHits(this.against.hits.value, this.hits.value);
   }
+  processResults() {
+    return __async(this, null, function* () {
+      yield __superGet(PhysicalDefenseTest.prototype, this, "processResults").call(this);
+      yield this.applyActorEffectsForDefense();
+    });
+  }
   processSuccess() {
     return __async(this, null, function* () {
       this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
@@ -14581,6 +14663,24 @@ var PhysicalDefenseTest = class extends DefenseTest {
       value: String(activeDefense.initMod)
     });
     return actions;
+  }
+  applyActorEffectsForDefense() {
+    return __async(this, null, function* () {
+      if (!this.actor)
+        return;
+      this.actor.calculateNextDefenseMultiModifier();
+    });
+  }
+  _filterActiveDefenses() {
+    if (!this.actor)
+      return;
+    const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
+    if (!mustHaveRessouces)
+      return;
+    const iniScore = this.actor.combatInitiativeScore;
+    Object.values(this.data.activeDefenses).forEach(
+      (mode) => mode.disabled = CombatRules.canUseActiveDefense(iniScore, mode.initMod)
+    );
   }
 };
 
@@ -14775,7 +14875,11 @@ var SR5Item = class extends Item {
       });
       if (equippedAmmo) {
         const ammoData = equippedAmmo.system;
-        action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
+        if (ammoData.replaceDamage) {
+          action.damage.override = { name: equippedAmmo.name, value: Number(ammoData.damage) };
+        } else {
+          action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
+        }
         action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, ammoData.ap);
         if (ammoData.accuracy)
           limitParts.addUniquePart(equippedAmmo.name, ammoData.accuracy);
@@ -15010,56 +15114,6 @@ var SR5Item = class extends Item {
       });
       yield this.update({ "system.licenses": licenses });
     });
-  }
-  getRollPartsList() {
-    const action = this.getAction();
-    if (!action || !this.actor)
-      return [];
-    const parts = new PartsList(duplicate(this.getModifierList()));
-    const skill = this.actor.findActiveSkill(this.getActionSkill());
-    const attribute = this.actor.findAttribute(this.getActionAttribute());
-    const attribute2 = this.actor.findAttribute(this.getActionAttribute2());
-    if (attribute && attribute.label)
-      parts.addPart(attribute.label, attribute.value);
-    if (skill) {
-      parts.addUniquePart(skill.label || skill.name, skill.value);
-      SkillFlow.handleDefaulting(skill, parts);
-    } else if (attribute2 && attribute2.label) {
-      parts.addPart(attribute2.label, attribute2.value);
-    }
-    const spec = this.getActionSpecialization();
-    if (spec)
-      parts.addUniquePart(spec, 2);
-    const mod = parseInt(this.system.action.mod || 0);
-    if (mod)
-      parts.addUniquePart("SR5.ItemMod", mod);
-    const atts = [];
-    if (attribute !== void 0)
-      atts.push(attribute);
-    if (attribute2 !== void 0)
-      atts.push(attribute2);
-    if (skill !== void 0)
-      atts.push(skill);
-    this.actor._addGlobalParts(parts);
-    this.actor._addMatrixParts(parts, atts);
-    this._addWeaponParts(parts);
-    return parts.list;
-  }
-  calculateRecoil() {
-    var _a;
-    const lastFireMode = this.getLastFireMode();
-    if (!lastFireMode)
-      return 0;
-    if (lastFireMode.value === 20)
-      return 0;
-    return Math.min(this.getRecoilCompensation(true) - (((_a = this.getLastFireMode()) == null ? void 0 : _a.value) || 0), 0);
-  }
-  _addWeaponParts(parts) {
-    if (this.isRangedWeapon) {
-      const recoil = this.calculateRecoil();
-      if (recoil)
-        parts.addUniquePart("SR5.Recoil", recoil);
-    }
   }
   get isSin() {
     return this.wrapper.isSin();
@@ -15556,12 +15610,11 @@ var SR5Item = class extends Item {
   getFade() {
     return this.wrapper.getFade();
   }
-  getRecoilCompensation(includeActor = true) {
-    let rc = this.wrapper.getRecoilCompensation();
-    if (includeActor && this.actor) {
-      rc += this.actor.getRecoilCompensation();
-    }
-    return rc;
+  get recoilCompensation() {
+    return this.wrapper.getRecoilCompensation();
+  }
+  get totalRecoilCompensation() {
+    return RangedWeaponRules.recoilCompensation(this);
   }
   getReach() {
     var _a;
@@ -15878,7 +15931,8 @@ var ModifiersPrep = class {
       "pain_tolerance_stun",
       "pain_tolerance_physical",
       "essence",
-      "fade"
+      "fade",
+      "multi_defense"
     ];
   }
   static get matrixModifiers() {
@@ -17859,13 +17913,8 @@ var SR5Actor = class extends Actor {
   getEquippedWeapons() {
     return this.items.filter((item) => item.isEquipped() && item.isWeapon);
   }
-  getRecoilCompensation() {
-    let total = 1;
-    const strength = this.findAttribute("strength");
-    if (strength) {
-      total += Math.ceil(strength.value / 3);
-    }
-    return total;
+  get recoilCompensation() {
+    return RangedWeaponRules.actorRecoilCompensation(this);
   }
   getDeviceRating() {
     if (!("matrix" in this.system))
@@ -18300,7 +18349,7 @@ var SR5Actor = class extends Actor {
         mod: [],
         attribute: limit
       },
-      test: SuccessTest.name
+      test: "SkillTest"
     });
   }
   setFlag(scope, key, value) {
@@ -18473,6 +18522,19 @@ var SR5Actor = class extends Actor {
       return overflow;
     });
   }
+  addDamage(damage) {
+    return __async(this, null, function* () {
+      switch (damage.type.value) {
+        case "matrix":
+          return yield this.addMatrixDamage(damage);
+        case "stun":
+          return yield this.addStunDamage(damage);
+        case "physical":
+          return yield this.addPhysicalDamage(damage);
+      }
+      console.error("Shadowrun 5e | Actor does not support given damage type: ", damage);
+    });
+  }
   setMatrixDamage(value) {
     return __async(this, null, function* () {
       value = Math.max(value, 0);
@@ -18555,6 +18617,15 @@ var SR5Actor = class extends Actor {
       }
       yield combat.adjustInitiative(combatant, modifier);
     });
+  }
+  get combatActive() {
+    var _a;
+    return !!((_a = game.combat) == null ? void 0 : _a.getActorCombatant(this));
+  }
+  get combatInitiativeScore() {
+    var _a;
+    const combatant = (_a = game.combat) == null ? void 0 : _a.getActorCombatant(this);
+    return combatant ? combatant.initiative : 0;
   }
   hasDamageTracks() {
     return "track" in this.system;
@@ -18789,6 +18860,21 @@ var SR5Actor = class extends Actor {
       marks: marks2,
       markId
     }));
+  }
+  get previousAttacks() {
+    return Math.max(this.system.modifiers.multi_defense * -1, 0);
+  }
+  calculateNextDefenseMultiModifier() {
+    return __async(this, arguments, function* (previousAttacks = this.previousAttacks) {
+      console.debug("Shadowrun 5e | Applying consecutive defense modifier for. Last amount of attacks: ", previousAttacks);
+      const multiDefenseModi = CombatRules.defenseModifierForPreviousAttacks(previousAttacks + 1);
+      yield this.update({ "system.modifiers.multi_defense": multiDefenseModi });
+    });
+  }
+  removeDefenseMultiModifier() {
+    return __async(this, null, function* () {
+      yield this.update({ "system.modifiers.multi_defense": 0 });
+    });
   }
 };
 
@@ -19103,11 +19189,26 @@ var Helpers = class {
       return 0;
     if (!tokenOrigin || !tokenDest)
       return 0;
-    const origin = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
-    const dest = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
-    const distanceInGridUnits = canvas.grid.measureDistance(origin, dest);
-    const sceneUnit = canvas.scene.data.gridUnits;
-    return Helpers.convertLengthUnit(distanceInGridUnits, sceneUnit);
+    const origin2D = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.x, tokenOrigin.y));
+    const dest2D = new PIXI.Point(...canvas.grid.getCenter(tokenDest.x, tokenDest.y));
+    const distanceInGridUnits2D = canvas.grid.measureDistance(origin2D, dest2D);
+    const originLOSHeight = Helpers.getTokenLOSHeight(tokenOrigin);
+    const destLOSHeight = Helpers.getTokenLOSHeight(tokenDest);
+    const elevationDifference = tokenOrigin.elevation + originLOSHeight - (tokenDest.elevation + destLOSHeight);
+    const origin3D = new PIXI.Point(0, 0);
+    const dest3D = new PIXI.Point(distanceInGridUnits2D, elevationDifference);
+    const distanceInGridUnits3D = Math.round(Helpers.measurePointDistance(origin3D, dest3D));
+    const sceneUnit = canvas.scene.grid.units;
+    return Helpers.convertLengthUnit(distanceInGridUnits3D, sceneUnit);
+  }
+  static measurePointDistance(origin, destination) {
+    const sideA = origin.x + destination.x;
+    const sideB = origin.y + destination.y;
+    return Math.sqrt(Math.pow(sideA, 2) + Math.pow(sideB, 2));
+  }
+  static getTokenLOSHeight(token) {
+    var _a, _b;
+    return (_b = (_a = token.flags["wall-height"]) == null ? void 0 : _a.tokenHeight) != null ? _b : 0;
   }
   static convertLengthUnit(length, fromUnit) {
     fromUnit = fromUnit.toLowerCase();
@@ -21823,6 +21924,7 @@ var SR5Combat = class extends Combat {
       } else {
         yield SR5Combat.handleNextRound(this.id);
       }
+      this.removeActorEffectsForDefense();
     });
   }
   rollAll(options) {
@@ -21887,6 +21989,14 @@ var SR5Combat = class extends Combat {
   _createDoIniPassSocketMessage() {
     return __async(this, null, function* () {
       yield SocketMessage.emitForGM(FLAGS.DoInitPass, { id: this.id });
+    });
+  }
+  removeActorEffectsForDefense() {
+    return __async(this, null, function* () {
+      var _a;
+      for (const combatant of this.combatants) {
+        yield (_a = combatant.actor) == null ? void 0 : _a.removeDefenseMultiModifier();
+      }
     });
   }
 };
@@ -22938,6 +23048,7 @@ var AmmoImporter = class extends DataImporter {
         ap: 0,
         damage: 0,
         damageType: "physical",
+        replaceDamage: false,
         blast: {
           radius: 0,
           dropoff: 0
@@ -26960,19 +27071,6 @@ var SR5SpriteActorSheet = class extends SR5BaseActorSheet {
   }
 };
 
-// src/module/rules/RangedWeaponRules.ts
-var RangedWeaponRules = {
-  getRangeForTargetDistance(distance, ranges) {
-    const rangeKey = Object.keys(ranges).find((range) => distance <= ranges[range].distance);
-    if (rangeKey) {
-      return ranges[rangeKey];
-    } else {
-      const { extreme } = ranges;
-      return Helpers.createRangeDescription("SR5.OutOfRange", extreme.distance, SR.combat.environmental.range_modifiers.out_of_range);
-    }
-  }
-};
-
 // src/module/rules/FireModeRules.ts
 var FireModeRules = {
   fireModeDefenseModifier: function(fireMode, ammo = 0) {
@@ -27105,7 +27203,7 @@ var RangedAttackTest = class extends SuccessTest {
   }
   _prepareRecoilCompensation() {
     var _a;
-    this.data.recoilCompensation = ((_a = this.item) == null ? void 0 : _a.getRecoilCompensation(true)) || 0;
+    this.data.recoilCompensation = ((_a = this.item) == null ? void 0 : _a.totalRecoilCompensation) || 0;
   }
   get testModifiers() {
     return ["global", "wounds", "environmental"];
@@ -27768,6 +27866,7 @@ var DrainTest = class extends SuccessTest {
     Helpers.calcValue(this.data.incomingDrain.type);
     this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain);
     this.data.modifiedDrain.base = Helpers.calcTotal(this.data.incomingDrain, { min: 0 });
+    delete this.data.modifiedDrain.override;
   }
   get success() {
     return this.data.modifiedDrain.value <= 0;
@@ -27894,7 +27993,7 @@ var CombatSpellDefenseTest = class extends DefenseTest {
       return ["global"];
     }
     if (spell.system.combat.type === "indirect") {
-      return ["global", "defense", "wounds"];
+      return ["global", "defense", "multi_defense", "wounds"];
     }
     return ["global"];
   }
@@ -27904,6 +28003,12 @@ var CombatSpellDefenseTest = class extends DefenseTest {
     if (!spell)
       return;
     this.data.incomingDamage = CombatSpellRules.calculateBaseDamage(spell.system.combat.type, this.data.incomingDamage, this.data.against.force);
+  }
+  processResults() {
+    return __async(this, null, function* () {
+      yield __superGet(CombatSpellDefenseTest.prototype, this, "processResults").call(this);
+      yield this.applyActorEffectsForDefense();
+    });
   }
   processSuccess() {
     return __async(this, null, function* () {
@@ -27942,6 +28047,19 @@ var CombatSpellDefenseTest = class extends DefenseTest {
           return;
         yield test.execute();
       }
+    });
+  }
+  applyActorEffectsForDefense() {
+    return __async(this, null, function* () {
+      var _a;
+      if (!this.actor)
+        return;
+      const spell = (_a = this.item) == null ? void 0 : _a.asSpell;
+      if (!spell)
+        return;
+      if (spell.system.category !== "combat" || spell.system.combat.type === "direct")
+        return;
+      this.actor.calculateNextDefenseMultiModifier();
     });
   }
 };
@@ -29683,6 +29801,57 @@ var registerSystemKeybindings = () => {
   });
 };
 
+// src/module/tests/SkillTest.ts
+var SkillTest = class extends SuccessTest {
+  get _dialogTemplate() {
+    return "systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.html";
+  }
+  get title() {
+    var _a;
+    const skill = (_a = this.actor) == null ? void 0 : _a.getSkill(this.data.action.skill);
+    if (!skill)
+      return super.title;
+    return `${game.i18n.localize(skill.label)} ${game.i18n.localize("SR5.Test")}`;
+  }
+  _prepareData(data, options) {
+    data = super._prepareData(data, options);
+    data.attribute = data.action.attribute;
+    data.limitSelection = data.action.limit.attribute;
+    return data;
+  }
+  prepareBaseValues() {
+    this.prepareAttributeSelection();
+    this.prepareLimitSelection();
+    super.prepareBaseValues();
+  }
+  prepareAttributeSelection() {
+    if (!this.actor)
+      return;
+    this.data.pool.mod = [];
+    const pool = new PartsList(this.pool.mod);
+    const skill = this.actor.getSkill(this.data.action.skill);
+    const attribute = this.actor.getAttribute(this.data.attribute);
+    if (skill)
+      pool.addPart(skill.label, skill.value);
+    if (attribute)
+      pool.addPart(attribute.label, attribute.value);
+    if (attribute && this.actor._isMatrixAttribute(this.data.attribute))
+      this.actor._addMatrixParts(pool, true);
+  }
+  prepareLimitSelection() {
+    if (!this.actor)
+      return;
+    this.data.limit.mod = [];
+    const limitMod = new PartsList(this.limit.mod);
+    const poolMod = new PartsList(this.pool.mod);
+    const limit = this.actor.getLimit(this.data.limitSelection);
+    if (limit)
+      limitMod.addUniquePart(limit.label, limit.value);
+    if (limit && this.actor._isMatrixAttribute(this.data.limitSelection))
+      this.actor._addMatrixParts(poolMod, true);
+  }
+};
+
 // src/module/hooks.ts
 var HooksManager = class {
   static registerHooks() {
@@ -29738,6 +29907,7 @@ ___________________
         FadeTest,
         ComplexFormTest,
         AttributeOnlyTest,
+        SkillTest,
         NaturalRecoveryStunTest,
         NaturalRecoveryPhysicalTest,
         PilotVehicleTest,

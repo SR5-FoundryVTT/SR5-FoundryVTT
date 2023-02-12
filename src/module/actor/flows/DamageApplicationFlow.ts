@@ -41,19 +41,8 @@ export class DamageApplicationFlow {
         // We are not doing this earlier in the soak flow to avoid confusing the user
         damage = this.changeStunToPhysicalForGrunts(actor, damage);
 
-        // Apply damage and resulting overflow to the according track.
-        // The amount and type damage can value in the process.
-        if (damage.type.value === 'matrix') {
-            damage = await actor.addMatrixDamage(damage);
-        }
-
-        if (damage.type.value === 'stun') {
-            damage = await actor.addStunDamage(damage);
-        }
-
-        if (damage.type.value === 'physical') {
-            await actor.addPhysicalDamage(damage);
-        }
+        const overflow = actor.addDamage(damage);
+        
 
         // NOTE: For stuff like healing the last wound by magic, it might also be interesting to store and give
         //       an overview of each damage/wound applied to select from.

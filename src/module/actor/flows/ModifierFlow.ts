@@ -1,4 +1,3 @@
-import { DocumentSituationModifiers } from './../../rules/DocumentSituationModifiers';
 import {SR5Actor} from "../SR5Actor";
 
 
@@ -36,7 +35,7 @@ export class ModifierFlow {
         if (this[name] !== undefined) return this[name];
 
         // Get global modifiers that can come from the general modifier system.
-         const modifiers = this.document.getSituationModifiers();
+        const modifiers = this.document.getSituationModifiers();
         //@ts-ignore
         if (modifiers.source.hasOwnProperty(name)) return modifiers.getTotalFor(name, {applicable: options.applicable});
 
