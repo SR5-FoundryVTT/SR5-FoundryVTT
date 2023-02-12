@@ -55,9 +55,8 @@ async function buildJS() {
  * COPY ASSETS
  */
 async function copyAssets() {
-    gulp.src('assets/**/*').pipe(gulp.dest(path.resolve(destFolder, 'assets')));
+    gulp.src('public/**/*').pipe(gulp.dest(destFolder));
     gulp.src('src/templates/**/*').pipe(gulp.dest(path.resolve(destFolder, 'templates')));
-    gulp.src('locale/**/*').pipe(gulp.dest(path.resolve(destFolder, 'locale')));
 }
 
 /**
@@ -69,9 +68,8 @@ async function watch() {
         gulp.watch(pattern).on('change', () => gulp.src(pattern).pipe(gulp.dest(path.resolve(destFolder, out))));
     }
 
-    watch('assets/**/*', 'assets');
+    gulp.watch('public/**/*').on('change', () => gulp.src('public/**/*').pipe(gulp.dest(destFolder)));
     watch('src/templates/**/*', 'templates');
-    watch('locale/**/*', 'locale');
 
     gulp.watch('src/**/*.scss').on('change', async () => await buildSass());
 
@@ -139,6 +137,6 @@ exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
 exports.build = gulp.series(copyAssets, buildSass, buildJS);
-exports.watch = gulp.series(watch);
+exports.watch = gulp.series(copyAssets, buildSass, watch);
 exports.rebuild = gulp.series(cleanDist, exports.build);
 exports.link = linkUserData;
