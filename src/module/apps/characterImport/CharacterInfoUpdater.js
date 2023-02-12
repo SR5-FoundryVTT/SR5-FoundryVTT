@@ -95,7 +95,8 @@ export class CharacterInfoUpdater {
 
         try {
             if (chummerChar.metatype) {
-                system.metatype = chummerChar.metatype;
+                // Avoid i18n metatype field issues. Chummer metatype aren't lowercase but foundry system metatypes are.
+                system.metatype = chummerChar.metatype_english.toLowerCase();
             }
             if (chummerChar.sex) {
                 system.sex = chummerChar.sex;
