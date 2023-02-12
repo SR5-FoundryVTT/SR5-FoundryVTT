@@ -316,9 +316,6 @@ export class SR5Combat extends Combat {
         } else {
             await SR5Combat.handleNextRound(this.id as string);
         }
-
-        // Don't wait on actor updates.
-        this.removeActorEffectsForDefense();
     }
 
     /**
@@ -334,13 +331,21 @@ export class SR5Combat extends Combat {
 
     /**
      * Shadowrun starts at the top, except for subsequent initiative passes, then it depends on the new values.
+     * 
+     * @param ids
+     * @param options
      */
     // @ts-ignore
-    async rollInitiative(ids, options?): Promise<SR5Combat> {
+    async rollInitiative(ids: string | string[], options?: InitiativeOptions): Promise<SR5Combat> {
+        // Structure input data
+        ids = typeof ids === "string" ? [ids] : ids;
+
         const combat = await super.rollInitiative(ids, options) as SR5Combat;
 
         if (this.initiativePass === SR.combat.INITIAL_INI_PASS)
             await combat.update({turn: 0});
+
+        this.removeActorEffectsForDefense(ids);
 
         return combat;
     }
@@ -416,9 +421,25 @@ export class SR5Combat extends Combat {
 
     /**
      * Remove defense modifiers / effects applied to all combatants.
+     * 
+     * @param combatantIds to remove defense effects from.
      */
-    async removeActorEffectsForDefense() {
-        for (const combatant of this.combatants) {
+    async removeActorEffectsForDefense(combatantIds: string[]) {
+        const ownedIds = combatantIds.filter(id => this.combatants.get(id)?.isOwner);
+        await this._removeDefenseMultiModifier(ownedIds);
+    }
+
+    /**
+     * Remove the actor modifier multi_defense from owned actors.
+     * 
+     * NOTE: This method expects to be called with owned combatant / actor ids only.
+     * 
+     * @param combatantIds to remove modifier from.
+     */
+    async _removeDefenseMultiModifier(combatantIds: string[]) {
+        for (const id of combatantIds) {
+            const combatant = this.combatants.get(id);
+            if (!combatant || !combatant.actor) continue;
             await combatant.actor?.removeDefenseMultiModifier();
         }
     }
