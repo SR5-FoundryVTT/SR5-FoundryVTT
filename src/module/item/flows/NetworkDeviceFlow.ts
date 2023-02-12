@@ -276,7 +276,7 @@ export class NetworkDeviceFlow {
      * @param id
      */
     static async handleOnDeleteItem(item: SR5Item, data: ShadowrunItemDataData, id: string) {
-        console.log(`Shadowrun 5e | Checking for network on deleted item ${item.name}`, item);
+        console.debug(`Shadowrun 5e | Checking for network on deleted item ${item.name}`, item);
         // A deleted controller must be removed from all it's devices.
         if (item.canBeNetworkController) return await NetworkDeviceFlow._removeControllerFromAllDevices(item);
         // A deleted device must be removed from it's controller.

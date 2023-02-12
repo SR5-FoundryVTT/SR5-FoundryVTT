@@ -1,3 +1,4 @@
+import { ProgramImporter } from './../importer/ProgramImporter';
 import { WeaponImporter } from '../importer/WeaponImporter';
 import { ArmorImporter } from '../importer/ArmorImporter';
 import { DataImporter } from '../importer/DataImporter';
@@ -87,7 +88,8 @@ export class Import extends Application {
         new WareImporter(),
         new CritterPowerImporter(),
         new DeviceImporter(),
-        new EquipmentImporter()
+        new EquipmentImporter(),
+        new ProgramImporter()
     ];
 
     async parseXML(xmlSource, fileName) {
