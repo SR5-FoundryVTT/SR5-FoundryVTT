@@ -37,11 +37,13 @@ export const FLAGS = {
     Modifier: 'modifier',
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
+    DoNewActionPhase: 'doNewActionPhase',
     addNetworkController: 'addNetworkController',
     TokenHealthBars: 'tokenHealthBars',
     Test: 'TestData',
     HideGMOnlyChatContent: 'HideGMOnlyChatContent',
-    MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest'
+    MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest',
+    AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

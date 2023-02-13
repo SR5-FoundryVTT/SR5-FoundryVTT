@@ -125,6 +125,8 @@ export class SR5Combat extends Combat {
 
         await SR5Combat.setInitiativePass(combat, initiativePass);
         await combat.update({turn, combatants: combatantsData});
+        await combat.handleActionPhase();
+
         return;
     }
 
@@ -146,6 +148,29 @@ export class SR5Combat extends Combat {
 
         const turn = 0;
         await combat.update({turn});
+        await combat.handleActionPhase();
+    }
+
+    /**
+     * New action phase might need changes on the actor that only the GM can reliable make.
+     */
+    async handleActionPhase() {
+        if (!game.user?.isGM)            
+            await this._createNewActionPhaseSocketMessage();
+        else 
+            await SR5Combat.handleActionPhase(this.id as string);
+    }
+
+    /**
+     * When combat enters a new combat phase, apply necessary changes.
+     * @param combatId 
+     */
+    static async handleActionPhase(combatId: string) {
+        const combat = game.combats?.get(combatId) as SR5Combat;
+        if (!combat) return;
+
+        // Defense modifiers reset on a new action phase.
+        combat.combatant?.actor?.removeDefenseMultiModifier();
     }
 
     /**
@@ -268,6 +293,7 @@ export class SR5Combat extends Combat {
         // Just step from one combatant to the next!
         if (nextTurn < this.turns.length) {
             await this.update({turn: nextTurn});
+            await this.handleActionPhase();
             return;
         }
 
@@ -278,12 +304,13 @@ export class SR5Combat extends Combat {
         }
 
         if (game.user?.isGM && this.doIniPass(nextTurn)) {
-            await SR5Combat.handleIniPass(this.id as string)
+            await SR5Combat.handleIniPass(this.id as string);
             return;
         }
 
+
         // Initiative Round Handling.
-        // NOTE: It's not checked if the next is needed. This should result int he user noticing the turn going up, when it
+        // NOTE: It's not checked if the next is needed. This should result in the user noticing the turn going up, when it
         //       maybe shouldn't and reporting a unhandled combat phase flow case.
         return this.nextRound();
     }
@@ -303,6 +330,8 @@ export class SR5Combat extends Combat {
             await this.rollAll();
         }
 
+        await this.handleActionPhase();
+
         return this;
     }
 
@@ -316,9 +345,6 @@ export class SR5Combat extends Combat {
         } else {
             await SR5Combat.handleNextRound(this.id as string);
         }
-
-        // Don't wait on actor updates.
-        this.removeActorEffectsForDefense();
     }
 
     /**
@@ -334,9 +360,15 @@ export class SR5Combat extends Combat {
 
     /**
      * Shadowrun starts at the top, except for subsequent initiative passes, then it depends on the new values.
+     * 
+     * @param ids
+     * @param options
      */
     // @ts-ignore
-    async rollInitiative(ids, options?): Promise<SR5Combat> {
+    async rollInitiative(ids: string | string[], options?: InitiativeOptions): Promise<SR5Combat> {
+        // Structure input data
+        ids = typeof ids === "string" ? [ids] : ids;
+
         const combat = await super.rollInitiative(ids, options) as SR5Combat;
 
         if (this.initiativePass === SR.combat.INITIAL_INI_PASS)
@@ -406,6 +438,19 @@ export class SR5Combat extends Combat {
         return await SR5Combat.handleIniPass(message.data.id);
     }
 
+    /**
+     * Apply changes on the given combat for new action phase
+     * @param message 
+     */
+    static async _handleDoNewActionPhaseSocketMessage(message: SocketMessageData) {
+        if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+            console.error(`SR5Combat Socket Message ${FLAGS.DoNewActionPhase} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
+            return;
+        }
+
+        return await SR5Combat.handleActionPhase(message.data.id);
+    }
+
     async _createDoNextRoundSocketMessage() {
         await SocketMessage.emitForGM(FLAGS.DoNextRound, {id: this.id});
     }
@@ -414,13 +459,14 @@ export class SR5Combat extends Combat {
         await SocketMessage.emitForGM(FLAGS.DoInitPass, {id: this.id});
     }
 
-    /**
-     * Remove defense modifiers / effects applied to all combatants.
-     */
-    async removeActorEffectsForDefense() {
-        for (const combatant of this.combatants) {
-            await combatant.actor?.removeDefenseMultiModifier();
-        }
+    async _createNewActionPhaseSocketMessage() {
+        await SocketMessage.emitForGM(FLAGS.DoNewActionPhase, {id: this.id});
+    }
+
+    delete(...args): Promise<this | undefined> {
+        // Remove all combat related modifiers.
+        this.combatants.contents.forEach(combatant => combatant.actor?.removeDefenseMultiModifier());
+        return super.delete(...args);
     }
 }
 

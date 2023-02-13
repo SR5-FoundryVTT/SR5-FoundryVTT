@@ -4,6 +4,7 @@ import FireModeData = Shadowrun.FireModeData;
 import TechnologyData = Shadowrun.TechnologyData;
 import DescriptionData = Shadowrun.DescriptionData;
 import EquipmentData = Shadowrun.EquipmentData;
+import ProgramItemData = Shadowrun.ProgramItemData;
 import QualityData = Shadowrun.QualityData;
 import ActionRollData = Shadowrun.ActionRollData;
 import LimitData = Shadowrun.LimitData;
@@ -16,7 +17,6 @@ import DevicePartData = Shadowrun.DevicePartData;
 import SourceEntityField = Shadowrun.SourceEntityField;
 import ActionResultData = Shadowrun.ActionResultData;
 import {SKILL_DEFAULT_NAME} from "../constants";
-import DeviceData = Shadowrun.DeviceData;
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import DeviceItemData = Shadowrun.DeviceItemData;
 import ValueField = Shadowrun.ValueField;
@@ -262,6 +262,38 @@ export class DefaultValues {
                 technology: DefaultValues.technologyData(partialEquipmentItemData.data?.technology || {})
             }
         }, partialEquipmentItemData) as EquipmentItemData;
+    }
+
+    static programItemData(partial: Partial<ProgramItemData> = {}): ProgramItemData {
+        return mergeObject({
+            type: "program",
+            name: "",
+            system: {
+                description: {
+                    value: "",
+                    chat: "",
+                    source: ""
+                },
+                technology: {
+                    rating: 1,
+                    availability: "",
+                    quantity: 1,
+                    cost: 0,
+                    equipped: false,
+                    conceal: {
+                        base: 0,
+                        value: 0
+                    },
+                    condition_monitor: {
+                        value: 0,
+                        max: 9
+                    },
+                    wireless: true,
+                    networkController: null
+                },
+                type: "common_program"
+            }
+        }, partial) as ProgramItemData;
     }
 
     static deviceItemData(partialDeviceItemData: Partial<DeviceItemData> = {}): DeviceItemData {

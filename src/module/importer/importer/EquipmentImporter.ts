@@ -59,12 +59,18 @@ export class EquipmentImporter extends DataImporter {
         return items;
     }
 
+    /**
+     * gear.xml contains gear that isn't handled by the systems equipment item.
+     * @param jsonObject
+     * @returns 
+     */
     FilterJsonObjects(jsonObject) {
         const unsupportedCategories = [
             'Ammunition',
             'Commlinks',
             'Cyberdecks',
             'Hacking Programs',
+            'Common Programs',
             'Rigger Command Consoles',
             'Custom'
         ]

@@ -418,6 +418,7 @@ ___________________
             [FLAGS.addNetworkController]: [NetworkDeviceFlow._handleAddNetworkControllerSocketMessage],
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
+            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage]
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: SocketMessageData) => {

@@ -214,4 +214,9 @@ export class Constants {
     };
 
     public static readonly ROOT_IMPORT_FOLDER_NAME = 'SR5e';
+
+    public static readonly MAP_CHUMMER_PROGRAMM_CATEGORY = {
+        'Hacking Programs': 'hacking_program',
+        'Common Programs': 'common_program'
+    }
 }

@@ -154,5 +154,20 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: false
-    })
+    });
+
+    /**
+     * Control automation of creating the defense modification after mulitple attacks 
+     * on an actor unti their next action phase.
+     * 
+     * See SR5.189 'Defender has defended against previous attacks'
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier, {
+        name: 'SETTINGS.AutomateMultiDefenseModifier',
+        hint: 'SETTINGS.AutomateMultiDefenseModifierDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true
+    });
 };
