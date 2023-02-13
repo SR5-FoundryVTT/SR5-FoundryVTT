@@ -1,4 +1,4 @@
-import {FLAGS, SYSTEM_SOCKET} from "./constants";
+import {SYSTEM_SOCKET} from "./constants";
 import SocketMessageBody = Shadowrun.SocketMessageData;
 
 /**
@@ -8,6 +8,8 @@ import SocketMessageBody = Shadowrun.SocketMessageData;
  *
  * Use emitForGM for messages meant only for ONE gm
  * > SocketMessage.emitGM(FLAGS.<yourFlag>, {yourDataField: 'yourData'})
+ * 
+ * To listen to these socket messages see Hooks#registerSocketListeners
  */
 export class SocketMessage {
     static _createMessage(type, data, userId?): SocketMessageBody {

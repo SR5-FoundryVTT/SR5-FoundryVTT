@@ -37,6 +37,7 @@ export const FLAGS = {
     Modifier: 'modifier',
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
+    DoNewActionPhase: 'doNewActionPhase',
     addNetworkController: 'addNetworkController',
     TokenHealthBars: 'tokenHealthBars',
     Test: 'TestData',

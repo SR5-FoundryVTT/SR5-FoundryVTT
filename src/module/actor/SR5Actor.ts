@@ -1976,6 +1976,12 @@ export class SR5Actor extends Actor {
      * Remove the consecutive defense per turn modifier.
      */
     async removeDefenseMultiModifier() {
+        const automateDefenseMod = game.settings.get(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier);
+        if (!automateDefenseMod || !this.combatActive) return;
+
+        console.error('Shadowrun 5e | Removing consecutive defense modifier.', this);
+        if (this.system.modifiers.multi_defense === 0) return;
+
         await this.update({'system.modifiers.multi_defense': 0});
     }
 }
