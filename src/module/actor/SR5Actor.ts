@@ -1,7 +1,7 @@
 import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import {Helpers} from '../helpers';
 import {SR5Item} from '../item/SR5Item';
-import {SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
+import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
 import {PartsList} from '../parts/PartsList';
 import {SR5Combat} from "../combat/SR5Combat";
 import {DefaultValues} from '../data/DataDefaults';
@@ -1957,18 +1957,18 @@ export class SR5Actor extends Actor {
         //@ts-ignore TODO: foundry-vtt-types v10
         return Math.max(this.system.modifiers.multi_defense * -1, 0);
     }
-
     /**
      * Apply a new consecutive defense multiplier based on the amount of attacks given
      * 
      * @param previousAttacks Attacks within a combat turn. If left out, will guess based on current modifier.
      */
     async calculateNextDefenseMultiModifier(previousAttacks: number=this.previousAttacks) {
-        console.debug('Shadowrun 5e | Applying consecutive defense modifier for. Last amount of attacks: ', previousAttacks)
+        console.debug('Shadowrun 5e | Applying consecutive defense modifier for. Last amount of attacks: ', previousAttacks);
+
+        const automateDefenseMod = game.settings.get(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier);
+        if (!automateDefenseMod || !this.combatActive) return;
 
         const multiDefenseModi = CombatRules.defenseModifierForPreviousAttacks(previousAttacks + 1);
-
-        // Don't let test wait on actor update.
         await this.update({'system.modifiers.multi_defense': multiDefenseModi});
     }
 
