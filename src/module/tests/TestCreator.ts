@@ -288,7 +288,7 @@ export const TestCreator = {
         data.against = test.data;
 
         const action = TestCreator._mergeMinimalActionDataInOrder(
-            DataDefaults.actionData({test: testCls.name}),
+            DataDefaults.actionRollData({test: testCls.name}),
             await testCls._getDocumentTestAction(test.item, test.actor),
             testCls._getDefaultTestAction());
 
@@ -519,7 +519,7 @@ export const TestCreator = {
         data.targetActorsUuid = [];
 
         // Setup the original item actions minimal action resist configuration as a complete item action.
-        let action = DataDefaults.actionData({
+        let action = DataDefaults.actionRollData({
             ...opposedData.against.opposed.resist
         });
         // Provide default action information.
@@ -544,7 +544,7 @@ export const TestCreator = {
             damage: DataDefaults.damageData(),
             modifiers: DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'}),
             values: {},
-            action: DataDefaults.actionData(),
+            action: DataDefaults.actionRollData(),
             opposed: {}
         };
     },

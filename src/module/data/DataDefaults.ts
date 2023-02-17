@@ -172,6 +172,11 @@ export class DataDefaults {
         }, partialMatrixData) as DevicePartData;
     }
 
+    /**
+     * Build a action data capable of rolling a test.
+     * @param partialActionRollData 
+     * @returns 
+     */
     static actionRollData(partialActionRollData: Partial<ActionRollData> = {}): ActionRollData {
         return mergeObject({
             type: '',
@@ -182,10 +187,22 @@ export class DataDefaults {
             spec: false,
             mod: 0,
             mod_description: '',
-            limit: this.limitData(),
-            extended: false,
             damage: this.damageData(),
+            modifiers: [],
+            limit: this.limitData(),
+            threshold: {
+                value: 0,
+                base: 0
+            },
+            extended: false,
             opposed: this.opposedTestData(),
+            followed: {
+                test: '',
+                attribute: '',
+                attribute2: '',
+                skill: '',
+                mod: 0,
+            },
             alt_mod: 0,
             dice_pool_mod: []
         }, partialActionRollData) as ActionRollData;
@@ -224,6 +241,7 @@ export class DataDefaults {
 
     static opposedTestData(partialOpposedTestData: Partial<OpposedTestData> = {}): OpposedTestData {
         return mergeObject({
+            test: '',
             type: '',
             attribute: '',
             attribute2: '',
@@ -367,51 +385,6 @@ export class DataDefaults {
                 base: 0,
             }
         }, partialActionData) as MinimalActionData;
-    }
-
-    static actionData(partialActionData: Partial<ActionRollData> = {}) {
-        return mergeObject({
-            test: "",
-            type: '',
-            category: '',
-            attribute: '',
-            attribute2: '',
-            skill: '',
-            spec: false,
-            mod: 0,
-            mod_description: '',
-            damage: DataDefaults.damageData(),
-            modifiers: [],
-            limit: {
-                value: 0,
-                attribute: '',
-                mod: [],
-                base: 0,
-            },
-            threshold: {
-                value: 0,
-                base: 0
-            },
-            extended: false,
-            opposed: {
-                type: '',
-                test: '',
-                attribute: '',
-                attribute2: '',
-                skill: '',
-                mod: 0,
-                description: '',
-            },
-            followed: {
-                test: '',
-                attribute: '',
-                attribute2: '',
-                skill: '',
-                mod: 0,
-            },
-            alt_mod: 0,
-            dice_pool_mod: []
-        }, partialActionData) as ActionRollData;
     }
 
     static fireModeData(partialFireModeData: Partial<FireModeData> = {}): FireModeData {

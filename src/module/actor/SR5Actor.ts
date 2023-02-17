@@ -1049,7 +1049,7 @@ export class SR5Actor extends Actor {
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
-        const action = DataDefaults.actionData({attribute: name, test: AttributeOnlyTest.name});
+        const action = DataDefaults.actionRollData({attribute: name, test: AttributeOnlyTest.name});
         const test = await this.tests.fromAction(action, this);
         if (!test) return;
 
@@ -1159,7 +1159,7 @@ export class SR5Actor extends Actor {
         // Should a specialization be used?
         const spec = options.specialization || false;
 
-        return DataDefaults.actionData({
+        return DataDefaults.actionRollData({
             skill: skillId,
             spec,
             attribute: skill.attribute,
