@@ -1,6 +1,5 @@
 import CharacterActorData = Shadowrun.CharacterData;
-import {DataDefaults} from "../../../data/DataDefaults";
-import {METATYPEMODIFIER} from "../../../constants";
+import {METATYPEMODIFIER, SR} from "../../../constants";
 import {PartsList} from "../../../parts/PartsList";
 import {AttributesPrep} from "./AttributesPrep";
 
@@ -17,7 +16,7 @@ export class NPCPrep {
     static applyMetatypeModifiers(system: CharacterActorData) {
         // Extract needed data.
         const {attributes, metatype} = system;
-        const metatypeModifier = DataDefaults.grunt.metatype_modifiers[metatype] || {};
+        const metatypeModifier = SR.grunt.metatype_modifiers[metatype];
 
         for (const [name, attribute] of Object.entries(attributes)) {
             // old-style object mod transformation is happening in AttributePrep and is needed here. Order is important.
