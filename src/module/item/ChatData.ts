@@ -67,7 +67,8 @@ export const ChatData = {
                 const { damage } = system.action;
                 let damageString = '';
                 let elementString = '';
-                const attribute = damage.attribute ? `${game.i18n.localize(SR5.attributes[damage.attribute])} + ` : '';
+                const operator = SR5.actionDamageFormulaOperators[damage.base_formula_operator] ?? '';
+                const attribute = damage.attribute ? `${game.i18n.localize(SR5.attributes[damage.attribute])} ${operator} ` : '';
                 if (damage.value || attribute) {
                     const type = damage.type.value ? damage.type.value.toUpperCase().charAt(0) : '';
                     damageString = `DV ${attribute}${damage.value}${type}`;
