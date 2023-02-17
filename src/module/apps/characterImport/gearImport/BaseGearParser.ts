@@ -32,14 +32,8 @@ export class BaseGearParser implements GearParser {
         return parsedGear;
     }
 
-    private getDefaultData() : EquipmentItemData {
-        console.error('Gear');
-        return new CONFIG.Item.documentClass({name: 'Unnamed', type: 'equipment'}).toObject() as EquipmentItemData;
-        // return {
-        //     name: '',
-        //     type: 'equipment',
-        //     system: DefaultValues.equipmentData(),
-        // } as EquipmentItemData;
+    private getDefaultData() {
+        return DefaultValues.baseItemData<EquipmentItemData>({type: 'equipment'});
     }
 }
 

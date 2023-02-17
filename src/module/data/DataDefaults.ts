@@ -24,7 +24,33 @@ import GenericValueField = Shadowrun.GenericValueField;
 import MinimalActionData = Shadowrun.MinimalActionData;
 
 
+interface MinimalItemData {
+    // Whatever name you want to give but not ''.
+    name?: string
+    // Whatever item type you want to have.
+    type: string
+}
 export class DefaultValues {
+    /**
+     * Return a base item data structure with minimal necessary FoundryVTT ItemDataModel fields.
+     * 
+     * @param name Whatever name you want to give but not ''.
+     * @param type Whatever item type you want to have
+     * @param systemData Whatever partial item system data you want to inject into general model system data.
+     * @returns A minimum viable item data structure to use with Item#create
+     */
+    static baseItemData<ItemData>(itemData: MinimalItemData, systemData: Partial<ItemData>={}) {
+        const name = itemData.name ?? 'Unnamed';
+        const type = itemData.type;
+
+        //@ts-ignore foundry-vtt-type v10
+        const modelSystemData = game.model['Item'][type];
+        if (!modelSystemData) throw new Error(`FoundryVTT doesn't have item type: ${type} registered`);
+        return {
+            name, type,
+            system: mergeObject(modelSystemData, systemData)
+        } as ItemData;
+    }
     /**
      *
      * @param partialDamageData give partial DamageData fields to overwrite default values

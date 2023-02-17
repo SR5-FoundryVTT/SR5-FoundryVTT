@@ -1,7 +1,13 @@
+import { DefaultValues } from './../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
 
 const xml2js = require('xml2js');
 
+/**
+ * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
+ * 
+ * Generic type ItemDataType is the items data type DataImporter creates per entry in that Chummer5a data .xml file.
+ */
 export abstract class DataImporter<ItemDataType> {
     public abstract files: string[];
     public static jsoni18n: any;
@@ -16,7 +22,7 @@ export abstract class DataImporter<ItemDataType> {
      *       system model data that game.model.Item would give us.
      */
     public GetDefaultData({type}:{type:any}) {
-        return new CONFIG.Item.documentClass({name: 'Unnamed', type}).toObject() as ItemDataType;
+        return DefaultValues.baseItemData<ItemDataType>({type});
     }
 
     /**
