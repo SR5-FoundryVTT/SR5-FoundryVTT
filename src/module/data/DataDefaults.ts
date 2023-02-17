@@ -174,6 +174,9 @@ export class DataDefaults {
 
     /**
      * Build a action data capable of rolling a test.
+     * 
+     * This is used instead of game.model.Item.action.action as fields like armor don't mesh well with TestCreator._mergeMinimalActionDataInOrder
+     * 
      * @param partialActionRollData 
      * @returns 
      */
