@@ -5,31 +5,13 @@ import {DefaultValues} from "../../data/DataDefaults";
 import QualityItemData = Shadowrun.QualityItemData;
 import {Helpers} from "../../helpers";
 
-export class QualityImporter extends DataImporter {
+export class QualityImporter extends DataImporter<QualityItemData> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public files = ['qualities.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('qualities') && jsonObject['qualities'].hasOwnProperty('quality');
-    }
-
-    GetDefaultData(): QualityItemData {
-        return {
-            name: 'Unnamed Quality',
-            type: 'quality',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                action: DefaultValues.actionData({
-                    damage: DefaultValues.damageData({type: {base: '', value: ''}}),
-                }),
-                type: '',
-            },
-        } as QualityItemData;
     }
 
     ExtractTranslation() {
@@ -57,7 +39,7 @@ export class QualityImporter extends DataImporter {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'quality'}), this.itemTranslations);
 
             let category = ImportHelper.StringValue(jsonData, 'category');
             //@ts-ignore TODO: Foundry Where is my foundry base data?

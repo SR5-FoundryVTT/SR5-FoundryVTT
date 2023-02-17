@@ -1,4 +1,3 @@
-import { DataDefaults, DefaultValues } from './../../data/DataDefaults';
 import { ImportHelper } from "../helper/ImportHelper";
 import { DataImporter } from "./DataImporter";
 
@@ -8,15 +7,11 @@ import { Constants } from './Constants';
 /**
  * Programs are part of the Chummer5 gear.xml
  */
-export class ProgramImporter extends DataImporter {
+export class ProgramImporter extends DataImporter<ProgramItemData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
-    }
-
-    GetDefaultData(): ProgramItemData {
-        return DefaultValues.programItemData();
     }
 
     ExtractTranslation(fileName?: string) {
@@ -44,7 +39,7 @@ export class ProgramImporter extends DataImporter {
         for (const program of programs) {
             if (DataImporter.unsupportedEntry(program)) continue;
 
-            const item = this.GetDefaultData();
+            const item = this.GetDefaultData({type: 'program'});
 
             item.name = ImportHelper.StringValue(program, 'name');
             item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);

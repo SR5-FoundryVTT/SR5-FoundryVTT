@@ -5,37 +5,13 @@ import ArmorItemData = Shadowrun.ArmorItemData;
 import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
-export class ArmorImporter extends DataImporter {
+export class ArmorImporter extends DataImporter<ArmorItemData> {
     public armorTranslations: any;
     public categoryTranslations: any;
     public files = ['armor.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('armors') && jsonObject['armors'].hasOwnProperty('armor');
-    }
-
-    GetDefaultData(): ArmorItemData {
-        return {
-            name: 'Unnamed Armor',
-            type: 'armor',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                technology: DefaultValues.technologyData({rating: 1, equipped: true, wireless: false}),
-                armor: {
-                    value: 0,
-                    mod: false,
-                    acid: 0,
-                    cold: 0,
-                    fire: 0,
-                    electricity: 0,
-                    radiation: 0,
-                },
-            },
-        } as ArmorItemData;
     }
 
     ExtractTranslation() {
@@ -61,7 +37,7 @@ export class ArmorImporter extends DataImporter {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData());
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'armor'}));
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
             // @ts-ignore TODO: Foundry Where is my foundry base data?

@@ -1,12 +1,12 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { CyberwareParser } from '../parser/ware/CyberwareParser';
-import Ware = Shadowrun.WareItemData;
-import {DefaultValues} from "../../data/DataDefaults";
-import CyberwareItemData = Shadowrun.CyberwareItemData;
 import {Helpers} from "../../helpers";
+import Ware = Shadowrun.WareItemData;
+import CyberwareItemData = Shadowrun.CyberwareItemData;
+import BiowareItemData = Shadowrun.BiowareItemData;
 
-export class WareImporter extends DataImporter {
+export class WareImporter extends DataImporter<Ware> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public files = ['cyberware.xml', 'bioware.xml'];
@@ -17,42 +17,14 @@ export class WareImporter extends DataImporter {
     }
 
     GetDefaultCyberwareData(): CyberwareItemData {
-        //@ts-ignore // Bio/Cyberware conflicts on 'type'...
-        return {...this.GetDefaultData(), type: 'cyberware'};
+        return this.GetDefaultData({type: 'cyberware'}) as CyberwareItemData;
     }
 
-    GetDefaultBiowareData(): CyberwareItemData {
-        //@ts-ignore // Bio/Cyberware conflicts on 'type'...
-        return {...this.GetDefaultData(), type: 'bioware'};
+    GetDefaultBiowareData(): BiowareItemData {
+        return this.GetDefaultData({type: 'bioware'}) as BiowareItemData;
+    
     }
 
-    GetDefaultData(): Ware {
-        return {
-            name: 'Unnamed Form',
-            type: 'cyberware',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                technology: DefaultValues.technologyData({rating: 1}),
-                armor: {
-                    value: 0,
-                    mod: false,
-                    acid: 0,
-                    cold: 0,
-                    fire: 0,
-                    electricity: 0,
-                    radiation: 0,
-                },
-                action: DefaultValues.actionData(),
-                grade: 'standard',
-                essence: 0,
-                capacity: 0,
-            },
-        } as Ware;
-    }
     ExtractTranslation(fileName) {
         if (!DataImporter.jsoni18n) {
             return;

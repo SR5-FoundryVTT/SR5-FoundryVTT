@@ -2,48 +2,16 @@ import {DataImporter} from './DataImporter';
 import {ImportHelper} from '../helper/ImportHelper';
 import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParserBase';
 import {Constants} from './Constants';
-import {DefaultValues} from "../../data/DataDefaults";
 import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 import {Helpers} from "../../helpers";
 
-export class CritterPowerImporter extends DataImporter {
+export class CritterPowerImporter extends DataImporter<CritterPowerItemData> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public files = ['critterpowers.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
-    }
-
-    GetDefaultData(): CritterPowerItemData {
-        return {
-            name: 'Unnamed Item',
-            type: 'critter_power',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                action: DefaultValues.actionData({
-                    damage: DefaultValues.damageData({type: {base: '', value: ''}}),
-                }),
-                armor: {
-                    value: 0,
-                    mod: false,
-                    acid: 0,
-                    cold: 0,
-                    fire: 0,
-                    electricity: 0,
-                    radiation: 0,
-                },
-                category: '',
-                powerType: '',
-                range: '',
-                duration: '',
-                karma: 0,
-            },
-        } as CritterPowerItemData;
     }
 
     ExtractTranslation() {
@@ -65,9 +33,9 @@ export class CritterPowerImporter extends DataImporter {
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
-            let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'critter_power'}), this.itemTranslations);
 
-            // @ts-ignore TODO: Foundry Where is my foundry base data?
+            // @ts-ignore TODO: foundry-vtt-type v10
             item.folder = folder.id;
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 

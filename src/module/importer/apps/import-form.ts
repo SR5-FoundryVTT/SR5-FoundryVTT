@@ -13,6 +13,8 @@ import { ImportHelper, ImportMode } from '../helper/ImportHelper';
 import {DeviceImporter} from "../importer/DeviceImporter";
 import {EquipmentImporter} from "../importer/EquipmentImporter";
 
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+
 
 export class Import extends Application {
     private supportedDataFiles: string[] = [];
@@ -77,7 +79,7 @@ export class Import extends Application {
     }
 
     //Order is important, ex. some weapons need mods to fully import
-    static Importers: DataImporter[] = [
+    static Importers: DataImporter<ShadowrunItemData>[] = [
         new ModImporter(),
         new WeaponImporter(),
         new ArmorImporter(),

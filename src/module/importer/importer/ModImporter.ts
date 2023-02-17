@@ -6,33 +6,13 @@ import ModificationItemData = Shadowrun.ModificationItemData;
 import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
-export class ModImporter extends DataImporter {
+export class ModImporter extends DataImporter<ModificationItemData> {
     public categoryTranslations: any;
     public accessoryTranslations: any;
     public files = ['weapons.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('accessories') && jsonObject['accessories'].hasOwnProperty('accessory');
-    }
-
-    GetDefaultData(): ModificationItemData {
-        return {
-            name: '',
-            type: 'modification',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                technology: DefaultValues.technologyData({rating: 1, equipped: true}),
-                type: '',
-                mount_point: '',
-                dice_pool: 0,
-                accuracy: 0,
-                rc: 0,
-            }
-        } as ModificationItemData;
     }
 
     ExtractTranslation() {
@@ -57,7 +37,7 @@ export class ModImporter extends DataImporter {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData());
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'modification'}));
             item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
 
             let folderName = item.system.mount_point !== undefined ? item.system.mount_point : 'Other';

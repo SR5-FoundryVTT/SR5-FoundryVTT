@@ -10,77 +10,13 @@ import {DefaultValues} from "../../data/DataDefaults";
 import WeaponItemData = Shadowrun.WeaponItemData;
 import {Helpers} from "../../helpers";
 
-export class WeaponImporter extends DataImporter {
+export class WeaponImporter extends DataImporter<WeaponItemData> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public files = ['weapons.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('weapons') && jsonObject['weapons'].hasOwnProperty('weapon');
-    }
-
-    GetDefaultData(): WeaponItemData {
-        return {
-            name: 'Unnamed Item',
-            type: 'weapon',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                action: DefaultValues.actionData({type: 'varies', attribute: 'agility'}),
-                technology: DefaultValues.technologyData({rating: 1}),
-                ammo: {
-                    spare_clips: {
-                        value: 0,
-                        max: 0,
-                    },
-                    current: {
-                        value: 0,
-                        max: 0,
-                    },
-                },
-                range: {
-                    category: '',
-                    ranges: {
-                        short: 0,
-                        medium: 0,
-                        long: 0,
-                        extreme: 0,
-                    },
-                    rc: {
-                        value: 0,
-                        base: 0,
-                        mod: [],
-                    },
-                    modes: {
-                        single_shot: false,
-                        semi_auto: false,
-                        burst_fire: false,
-                        full_auto: false,
-                    },
-                },
-                melee: {
-                    reach: 0,
-                },
-                thrown: {
-                    ranges: {
-                        short: 0,
-                        medium: 0,
-                        long: 0,
-                        extreme: 0,
-                        attribute: '',
-                    },
-                    blast: {
-                        radius: 0,
-                        dropoff: 0,
-                    },
-                },
-                category: 'range',
-                subcategory: '',
-            },
-        } as unknown as WeaponItemData;
     }
 
     ExtractTranslation() {
@@ -114,7 +50,7 @@ export class WeaponImporter extends DataImporter {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'weapon'}), this.itemTranslations);
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.subcategory].id;
 

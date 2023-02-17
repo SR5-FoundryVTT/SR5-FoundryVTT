@@ -5,15 +5,11 @@ import EquipmentItemData = Shadowrun.EquipmentItemData;
 import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
-export class EquipmentImporter extends DataImporter {
+export class EquipmentImporter extends DataImporter<EquipmentItemData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
-    }
-
-    GetDefaultData(): EquipmentItemData {
-        return DefaultValues.equipmentItemData();
     }
 
     ExtractTranslation(fileName?: string) {
@@ -38,7 +34,7 @@ export class EquipmentImporter extends DataImporter {
             const category = ImportHelper.TranslateCategory(ImportHelper.StringValue(equipment, 'category'), this.categoryTranslations).replace('/', ' ');
             let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
 
-            const item = this.GetDefaultData();
+            const item = this.GetDefaultData({type: 'equipment'});
             item.name = ImportHelper.StringValue(equipment, 'name');
             item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
 

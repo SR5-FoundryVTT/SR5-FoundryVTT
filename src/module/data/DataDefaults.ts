@@ -24,7 +24,6 @@ import GenericValueField = Shadowrun.GenericValueField;
 import MinimalActionData = Shadowrun.MinimalActionData;
 
 
-// TODO: reimplemented methods based on .damageData or use template data somehow
 export class DefaultValues {
     /**
      *

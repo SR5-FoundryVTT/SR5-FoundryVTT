@@ -2,7 +2,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 
 const xml2js = require('xml2js');
 
-export abstract class DataImporter {
+export abstract class DataImporter<ItemDataType> {
     public abstract files: string[];
     public static jsoni18n: any;
     public categoryTranslations: any;
@@ -10,9 +10,14 @@ export abstract class DataImporter {
     public static unsupportedBooks: string[] = ['2050'];
 
     /**
-     * Get default data for constructing a TItem.
+     * Get complete item data.
+     * 
+     * NOTE: We use temporary items to have a full set of item data instead of just
+     *       system model data that game.model.Item would give us.
      */
-    public abstract GetDefaultData(): any;
+    public GetDefaultData({type}:{type:any}) {
+        return new CONFIG.Item.documentClass({name: 'Unnamed', type}).toObject() as ItemDataType;
+    }
 
     /**
      *
