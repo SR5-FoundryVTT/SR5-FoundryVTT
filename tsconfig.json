@@ -13,6 +13,7 @@
     ],
     "moduleResolution": "node",
     "strictNullChecks": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noEmitOnError": false
   }
 }
