@@ -1082,6 +1082,15 @@ export class SR5Actor extends Actor {
         }
     }
 
+    /**
+     * Remove matrix modifier values to the given modifier part
+     * 
+     * @param parts A Value.mod field as a PartsList
+     */
+    _removeMatrixParts(parts: PartsList<number>) {
+        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.removePart(part));
+    }
+
     // TODO: Check for legacy removal
     _addGlobalParts(parts: PartsList<number>) {
         //@ts-ignore // TODO: foundry-vtt-types v10
@@ -1143,10 +1152,6 @@ export class SR5Actor extends Actor {
         if (!skill) {
             console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
             return;
-        }
-
-        if (!SkillFlow.allowRoll(skill)) {
-            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
         }
 
         // When fetched by label, getSkillByLabel will inject the id into SkillField.
