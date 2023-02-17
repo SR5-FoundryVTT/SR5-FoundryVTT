@@ -18,6 +18,13 @@ export interface SkillTestData extends SuccessTestData {
  */
 export class SkillTest extends SuccessTest {
     data: SkillTestData
+    lastUsedAttribute: string;
+
+    constructor(data, documents, options) {
+        super(data, documents, options);
+
+        this.lastUsedAttribute = this.data.attribute;
+    }
 
     get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.html';
@@ -27,9 +34,8 @@ export class SkillTest extends SuccessTest {
      * Show skill label as title instead of the generic success test label.
      */
     get title() {
-        const skill = this.actor?.getSkill(this.data.action.skill);
-        if (!skill) return super.title;
-        return `${game.i18n.localize(skill.label)} ${game.i18n.localize('SR5.Test')}`;
+        if (!this.actor) return super.title;
+        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill))} ${game.i18n.localize('SR5.Test')}`;
     }
 
     _prepareData(data: any, options: TestOptions) {
@@ -50,21 +56,33 @@ export class SkillTest extends SuccessTest {
     }
 
     /**
-     * Rebuild pool after attribute selection.
+     * Only add selected attribute values to the pool
+     * 
      */
     prepareAttributeSelection() {
         if (!this.actor) return;
 
-        this.data.pool.mod = [];
+        // Remove last used attribute and it's modifiers and replace with new selection.
+        const useSelection = this.data.attribute !== this.data.action.attribute;
+        const usedAttribute = useSelection ? this.data.attribute : this.data.action.attribute;
+        const attribute = this.actor.getAttribute(usedAttribute);
+        const lastUsedAttribute = this.actor.getAttribute(this.lastUsedAttribute);
+
+        if (!attribute || !lastUsedAttribute) return console.error('Shadowrun 5e | An attribute was used that does not exist on', this.actor, attribute, lastUsedAttribute);
+
+
         const pool = new PartsList(this.pool.mod);
 
-        const skill = this.actor.getSkill(this.data.action.skill);
-        const attribute = this.actor.getAttribute(this.data.attribute);
+        // Remove both original action and .
+        pool.removePart(lastUsedAttribute.label);
+        this.actor._removeMatrixParts(pool);
 
-        if (skill) pool.addPart(skill.label, skill.value);
-        if (attribute) pool.addPart(attribute.label, attribute.value);
+        // Add pool values related to either selected or action attribute
+        pool.addPart(attribute.label, attribute.value);
+        if (this.actor._isMatrixAttribute(usedAttribute)) this.actor._addMatrixParts(pool, true);
 
-        if (attribute && this.actor._isMatrixAttribute(this.data.attribute)) this.actor._addMatrixParts(pool, true);
+        // Save this attribtue selection as last used for next selection cycle
+        this.lastUsedAttribute = usedAttribute;
     }
 
     /**
