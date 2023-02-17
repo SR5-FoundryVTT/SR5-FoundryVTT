@@ -4,7 +4,7 @@ import {SR5Item} from '../item/SR5Item';
 import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
 import {PartsList} from '../parts/PartsList';
 import {SR5Combat} from "../combat/SR5Combat";
-import {DefaultValues} from '../data/DataDefaults';
+import {DataDefaults} from '../data/DataDefaults';
 import {SkillFlow} from "./flows/SkillFlow";
 import {SR5} from "../config";
 import {CharacterPrep} from "./prep/CharacterPrep";
@@ -412,9 +412,9 @@ export class SR5Actor extends Actor {
         const armor = "armor" in this.system ? 
             //@ts-ignore // TODO: foundry-vtt-types v10
             foundry.utils.duplicate(this.system.armor) : 
-            DefaultValues.actorArmorData();
+            DataDefaults.actorArmorData();
         // Prepare damage to apply to armor.
-        damage = damage || DefaultValues.damageData();
+        damage = damage || DataDefaults.damageData();
 
         Helpers.calcTotal(damage);
         Helpers.calcTotal(damage.ap);
@@ -768,7 +768,7 @@ export class SR5Actor extends Actor {
             return;
         }
         
-        skill = DefaultValues.skillData(skill);
+        skill = DataDefaults.skillData(skill);
         const id = randomID(16);
         const value = {};
         value[id] = skill;
@@ -788,7 +788,7 @@ export class SR5Actor extends Actor {
      * @returns The new active skill id.
      */
     async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
-        const skill = DefaultValues.skillData(skillData);
+        const skill = DataDefaults.skillData(skillData);
 
         const activeSkillsPath = 'system.skills.active';
         const updateSkillDataResult = Helpers.getRandomIdSkillFieldDataEntry(activeSkillsPath, skill);
@@ -1049,7 +1049,7 @@ export class SR5Actor extends Actor {
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
-        const action = DefaultValues.actionData({attribute: name, test: AttributeOnlyTest.name});
+        const action = DataDefaults.actionData({attribute: name, test: AttributeOnlyTest.name});
         const test = await this.tests.fromAction(action, this);
         if (!test) return;
 
@@ -1159,7 +1159,7 @@ export class SR5Actor extends Actor {
         // Should a specialization be used?
         const spec = options.specialization || false;
 
-        return DefaultValues.actionData({
+        return DataDefaults.actionData({
             skill: skillId,
             spec,
             attribute: skill.attribute,
@@ -1440,7 +1440,7 @@ export class SR5Actor extends Actor {
         value = Math.max(value, 0);
 
         // Use artificial damage to be consistent across other damage application Actor methods.
-        const damage = DefaultValues.damageData({
+        const damage = DataDefaults.damageData({
             type: {base: 'matrix', value: 'matrix'},
             base: value,
             value: value

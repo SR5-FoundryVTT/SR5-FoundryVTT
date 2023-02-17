@@ -1,7 +1,7 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
-import { DefaultValues } from "../data/DataDefaults";
+import { DataDefaults } from "../data/DataDefaults";
 import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
@@ -136,7 +136,7 @@ export class SR5Item extends Item {
 
     // Flag Functions
     getLastFireMode(): FireModeData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) as FireModeData || DefaultValues.fireModeData();
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) as FireModeData || DataDefaults.fireModeData();
     }
     async setLastFireMode(fireMode: FireModeData) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
@@ -1421,7 +1421,7 @@ export class SR5Item extends Item {
         if (!icData) return;
 
         // Add IC to the hosts IC order
-        const sourceEntity = DefaultValues.sourceEntityData({
+        const sourceEntity = DataDefaults.sourceEntityData({
             id: actor.id as string,
             name: actor.name as string,
             type: 'Actor',

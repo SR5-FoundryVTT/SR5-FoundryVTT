@@ -1,6 +1,6 @@
 import { parseDescription, parseTechnology } from "../BaseParserFunctions.js"
 import EquipmentItemData = Shadowrun.EquipmentItemData;
-import {DefaultValues} from "../../../data/DataDefaults";
+import {DataDefaults} from "../../../data/DataDefaults";
 
 
 /**
@@ -33,7 +33,7 @@ export class BaseGearParser implements GearParser {
     }
 
     private getDefaultData() {
-        return DefaultValues.baseItemData<EquipmentItemData>({type: 'equipment'});
+        return DataDefaults.baseItemData<EquipmentItemData>({type: 'equipment'});
     }
 }
 

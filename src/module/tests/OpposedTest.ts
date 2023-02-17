@@ -1,5 +1,5 @@
 import {SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments, TestOptions} from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {TestCreator} from "./TestCreator";
 import {SR5Item} from "../item/SR5Item";
 import {PartsList} from "../parts/PartsList";
@@ -72,9 +72,9 @@ export class OpposedTest extends SuccessTest {
 
             previousMessageId,
 
-            pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
-            limit: DefaultValues.valueData({label: 'SR5.Limit'}),
-            threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
+            pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
+            limit: DataDefaults.valueData({label: 'SR5.Limit'}),
+            threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
             values: {},
 
             sourceItemUuid: againstData.sourceItemUuid,
@@ -88,7 +88,7 @@ export class OpposedTest extends SuccessTest {
 
         // Casting an opposed action doesn't give as complete ActionData from the original.
         // Therefore we must create an empty dummy action.
-        let action = DefaultValues.actionData();
+        let action = DataDefaults.actionData();
 
         // Allow the OpposedTest to overwrite action data using its class default action.
         action = TestCreator._mergeMinimalActionDataInOrder(action,

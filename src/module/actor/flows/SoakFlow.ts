@@ -1,7 +1,7 @@
 import {SR5Actor} from "../SR5Actor";
 import {Helpers} from '../../helpers';
 import {PartsList} from "../../parts/PartsList";
-import {DefaultValues} from "../../data/DataDefaults";
+import {DataDefaults} from "../../data/DataDefaults";
 import {ShadowrunActorDialogs} from '../../apps/dialogs/ShadowrunActorDialogs';
 import {SR5Item} from '../../item/SR5Item';
 import SoakRollOptions = Shadowrun.SoakRollOptions;
@@ -19,7 +19,7 @@ export class SoakFlow {
      * @param partsProps Optional modifiers for the soak test
      */
     async runSoakTest(actor: SR5Actor, soakRollOptions: SoakRollOptions, partsProps: ModList<number> = []): Promise<void> {
-        // const initialDamageData = soakRollOptions.damage ? soakRollOptions.damage : DefaultValues.damageData();
+        // const initialDamageData = soakRollOptions.damage ? soakRollOptions.damage : DataDefaults.damageData();
         // const previewSoakDefenseParts = new PartsList<number>(duplicate(partsProps) as ModList<number>);
         // SoakRules.applyAllSoakParts(previewSoakDefenseParts, actor, initialDamageData);
         //
@@ -108,7 +108,7 @@ export class SoakFlow {
         // Update damage with the user input
         const initialDamageData: DamageData = soakRollOptions?.damage
                 ? soakRollOptions.damage
-                : DefaultValues.damageData();
+                : DataDefaults.damageData();
 
         return this.updateDamageWithUserData(initialDamageData, userData.incomingDamage, userData.damageType, userData.ap, userData.element);
     }

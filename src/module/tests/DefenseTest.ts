@@ -1,6 +1,6 @@
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {SoakFlow} from "../actor/flows/SoakFlow";
 
 
@@ -27,7 +27,7 @@ export class DefenseTest extends OpposedTest {
     _prepareData(data, options?) {
         data = super._prepareData(data, options);
 
-        const damage = data.against ? data.against.damage : DefaultValues.damageData();
+        const damage = data.against ? data.against.damage : DataDefaults.damageData();
 
         data.incomingDamage = foundry.utils.duplicate(damage);
         data.modifiedDamage = foundry.utils.duplicate(damage);

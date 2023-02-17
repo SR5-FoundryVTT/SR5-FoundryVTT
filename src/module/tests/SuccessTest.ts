@@ -1,7 +1,7 @@
 import { DamageApplicationFlow } from './../actor/flows/DamageApplicationFlow';
 import {SR5Actor} from "../actor/SR5Actor";
 import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from "../constants";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {Helpers} from "../helpers";
 import {SR5Item} from "../item/SR5Item";
 import {SR5Roll} from "../rolls/SR5Roll";
@@ -179,23 +179,23 @@ export class SuccessTest {
         data.secondChance = data.secondChance !== undefined ? data.secondChance : false;
 
         // Set possible missing values.
-        data.pool = data.pool || DefaultValues.valueData({label: 'SR5.DicePool'});
-        data.threshold = data.threshold || DefaultValues.valueData({label: 'SR5.Threshold'});
-        data.limit = data.limit || DefaultValues.valueData({label: 'SR5.Limit'});
+        data.pool = data.pool || DataDefaults.valueData({label: 'SR5.DicePool'});
+        data.threshold = data.threshold || DataDefaults.valueData({label: 'SR5.Threshold'});
+        data.limit = data.limit || DataDefaults.valueData({label: 'SR5.Limit'});
 
         data.values = data.values || {};
 
         // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
         // active tests.
-        data.values.hits = data.values.hits || DefaultValues.valueData({label: "SR5.Hits"});
-        data.values.extendedHits = data.values.extendedHits || DefaultValues.valueData({label: "SR5.ExtendedHits"});
-        data.values.netHits = data.values.netHits || DefaultValues.valueData({label: "SR5.NetHits"});
-        data.values.glitches = data.values.glitches || DefaultValues.valueData({label: "SR5.Glitches"});
+        data.values.hits = data.values.hits || DataDefaults.valueData({label: "SR5.Hits"});
+        data.values.extendedHits = data.values.extendedHits || DataDefaults.valueData({label: "SR5.ExtendedHits"});
+        data.values.netHits = data.values.netHits || DataDefaults.valueData({label: "SR5.NetHits"});
+        data.values.glitches = data.values.glitches || DataDefaults.valueData({label: "SR5.Glitches"});
 
         data.opposed = data.opposed || undefined;
         data.modifiers = this._prepareModifiersData(data.modifiers);
 
-        data.damage = data.damage || DefaultValues.damageData();
+        data.damage = data.damage || DataDefaults.damageData();
 
         return data;
     }
@@ -206,7 +206,7 @@ export class SuccessTest {
      * This should be used for whenever a Test doesn't modifiers specified externally.
      */
     _prepareModifiersData(modifiers?: ValueField) {
-        return modifiers || DefaultValues.valueData({label: 'SR5.Labels.Action.Modifiers'});
+        return modifiers || DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'});
     }
 
     get type(): string {
@@ -687,7 +687,7 @@ export class SuccessTest {
             hits.value;
 
         // Calculate a ValueField for standardisation.
-        const netHits = DefaultValues.valueData({
+        const netHits = DataDefaults.valueData({
             label: "SR5.NetHits",
             base
         });
@@ -705,7 +705,7 @@ export class SuccessTest {
      */
     calculateHits(): ValueField {
         const rollHits = this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
-        const hits = DefaultValues.valueData({
+        const hits = DataDefaults.valueData({
             label: "SR5.Hits",
             base: this.hasLimit ?
                 Math.min(this.limit.value, rollHits) :
@@ -722,7 +722,7 @@ export class SuccessTest {
 
     get extendedHits(): ValueField {
         // Return a default value field, for when no extended hits have been derived yet (or ever).
-        return this.data.values.extendedHits || DefaultValues.valueData({label: 'SR5.ExtendedHits'});
+        return this.data.values.extendedHits || DataDefaults.valueData({label: 'SR5.ExtendedHits'});
     }
 
     /**
@@ -730,7 +730,7 @@ export class SuccessTest {
      */
     calculateGlitches(): ValueField {
         const rollGlitches = this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
-        const glitches = DefaultValues.valueData({
+        const glitches = DataDefaults.valueData({
             label: "SR5.Glitches",
             base: rollGlitches
         })
@@ -743,7 +743,7 @@ export class SuccessTest {
      * Gather hits across multiple extended test executions.
      */
     calculateExtendedHits(): ValueField {
-        if (!this.extended) return DefaultValues.valueData({label: 'SR5.ExtendedHits'});
+        if (!this.extended) return DataDefaults.valueData({label: 'SR5.ExtendedHits'});
 
         const extendedHits = this.extendedHits;
         extendedHits.mod = PartsList.AddPart(extendedHits.mod, 'SR5.Hits', this.hits.value);

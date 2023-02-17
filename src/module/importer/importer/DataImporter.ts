@@ -1,4 +1,4 @@
-import { DefaultValues } from './../../data/DataDefaults';
+import { DataDefaults } from './../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
 
 const xml2js = require('xml2js');
@@ -22,7 +22,7 @@ export abstract class DataImporter<ItemDataType> {
      *       system model data that game.model.Item would give us.
      */
     public GetDefaultData({type}:{type:any}) {
-        return DefaultValues.baseItemData<ItemDataType>({type});
+        return DataDefaults.baseItemData<ItemDataType>({type});
     }
 
     /**

@@ -1,5 +1,5 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {CombatRules} from "../rules/CombatRules";
 import {Helpers} from "../helpers";
@@ -34,7 +34,7 @@ export class PhysicalResistTest extends SuccessTest {
         data = super._prepareData(data, options);
 
         // Get incoming damage from test before or default.
-        data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DefaultValues.damageData());
+        data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.damageData());
         data.modifiedDamage = duplicate(data.incomingDamage);
 
         return data;

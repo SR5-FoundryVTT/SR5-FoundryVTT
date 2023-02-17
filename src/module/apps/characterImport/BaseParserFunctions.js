@@ -1,4 +1,4 @@
-import { DefaultValues } from "../../data/DataDefaults";
+import { DataDefaults } from "../../data/DataDefaults";
 
 export const getValues = (val) => {
     const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
@@ -15,7 +15,7 @@ export const getArray = (value) => {
  *  @param chummerEntry The chummer entry (the item)
  */
 export const parseDescription = (chummerEntry) => {
-    const parsedDescription = DefaultValues.descriptionData();
+    const parsedDescription = DataDefaults.descriptionData();
 
     if (chummerEntry.source && chummerEntry.page) {
         parsedDescription.source = `${chummerEntry.source} ${chummerEntry.page}`
@@ -33,7 +33,7 @@ export const parseDescription = (chummerEntry) => {
  *  @param chummerEntry The chummer entry (the item)
  */
 export const parseTechnology = (chummerEntry) => {
-    const parsedTechnology = DefaultValues.technologyData();
+    const parsedTechnology = DataDefaults.technologyData();
 
     if (chummerEntry.rating) {
         parsedTechnology.rating = chummerEntry.rating;

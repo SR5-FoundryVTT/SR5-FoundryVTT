@@ -381,7 +381,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onAddWeaponMod(event) {
         event.preventDefault();
         const type = 'modification';
-        // TODO: Move this into DefaultValues...
+        // TODO: Move this into DataDefaults...
         const itemData = {
             name: `New ${Helpers.label(type)}`,
             type: type,

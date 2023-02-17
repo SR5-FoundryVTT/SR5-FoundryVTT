@@ -5,7 +5,7 @@ import {CombatRules} from "./CombatRules";
 import CombatSpellType = Shadowrun.CombatSpellType;
 import SpellType = Shadowrun.SpellType;
 import MinimalActionData = Shadowrun.MinimalActionData;
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
 
 export class CombatSpellRules {
@@ -139,7 +139,7 @@ export class CombatSpellRules {
         if (spellType === '' || combatType === '')
             console.warn(`Shadowrun5e | The given spell or combat spell types are empty and won't form a complete defense test action`);
 
-        const itemAction = DefaultValues.minimalActionData();
+        const itemAction = DataDefaults.minimalActionData();
 
         if (spellType === 'mana' && combatType === 'direct') {
             itemAction.attribute = 'willpower';

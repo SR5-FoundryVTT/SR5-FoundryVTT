@@ -2,7 +2,7 @@ import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import {SpellCastingTest, SpellCastingTestData} from "./SpellCastingTest";
 import {SR5Item} from "../item/SR5Item";
 import {SR5Actor} from "../actor/SR5Actor";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {CombatSpellRules} from "../rules/CombatSpellRules";
 import {TestCreator} from "./TestCreator";
 import MinimalActionData = Shadowrun.MinimalActionData;
@@ -23,7 +23,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
      * @param actor The actor to defend with.
      */
     static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<MinimalActionData> {
-        const action = DefaultValues.minimalActionData(await super._getDocumentTestAction(item, actor));
+        const action = DataDefaults.minimalActionData(await super._getDocumentTestAction(item, actor));
 
         const spellData = item.asSpell
         if (!spellData) return action;

@@ -1,6 +1,6 @@
 import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import {LENGTH_UNIT, SR} from "../constants";
@@ -47,7 +47,7 @@ export class RangedAttackTest extends SuccessTest {
         data.targetRanges = [];
         data.targetRangesSelected = 0;
         data.recoilCompensation = 0;
-        data.damage = data.damage || DefaultValues.damageData();
+        data.damage = data.damage || DataDefaults.damageData();
 
         return data;
     }
@@ -78,7 +78,7 @@ export class RangedAttackTest extends SuccessTest {
         }
 
         // Current firemode selected
-        const lastFireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
+        const lastFireMode = this.item.getLastFireMode() || DataDefaults.fireModeData();
         // Try pre-selection based on last fire mode.
         this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
         if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;

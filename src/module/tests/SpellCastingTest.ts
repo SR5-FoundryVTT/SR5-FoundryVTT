@@ -1,7 +1,7 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellcastingRules} from "../rules/SpellcastingRules";
 import {PartsList} from "../parts/PartsList";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
@@ -30,7 +30,7 @@ export class SpellCastingTest extends SuccessTest {
         data.force = data.force || 0;
         data.drain = data.drain || 0;
         data.reckless = data.reckless || false;
-        data.drainDamage = data.drainDamage || DefaultValues.damageData();
+        data.drainDamage = data.drainDamage || DataDefaults.damageData();
 
         return data;
     }
@@ -122,7 +122,7 @@ export class SpellCastingTest extends SuccessTest {
      * Derive the actual drain damage from spellcasting values.
      */
     calcDrainDamage() {
-        if (!this.actor) return DefaultValues.damageData();
+        if (!this.actor) return DataDefaults.damageData();
 
         const force = Number(this.data.force);
         const drain = Number(this.data.drain);

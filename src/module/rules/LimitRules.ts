@@ -1,5 +1,5 @@
 import { SR5 } from '../config';
-import { DefaultValues } from './../data/DataDefaults';
+import { DataDefaults } from './../data/DataDefaults';
 import AttributeField = Shadowrun.AttributeField;
 import LimitField = Shadowrun.LimitField;
 
@@ -36,7 +36,7 @@ export const LimitRules = {
      * @returns A magic limit field based on the magic attribute
      */
      calculateMagicLimit(magic: AttributeField): LimitField {
-        return DefaultValues.limitField({
+        return DataDefaults.limitField({
             base: magic.value,
             label: magic.label
         });

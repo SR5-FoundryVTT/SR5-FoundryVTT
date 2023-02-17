@@ -151,9 +151,6 @@ export const SR = {
      */
     grunt: {
         metatype_modifiers: {
-            human: {
-                attributes: {}
-            },
             elf: {
                 attributes: {
                     agility: +1,

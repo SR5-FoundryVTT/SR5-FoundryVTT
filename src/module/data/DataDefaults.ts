@@ -30,7 +30,7 @@ interface MinimalItemData {
     // Whatever item type you want to have.
     type: string
 }
-export class DefaultValues {
+export class DataDefaults {
     /**
      * Return a base item data structure with minimal necessary FoundryVTT ItemDataModel fields.
      * 
@@ -261,8 +261,8 @@ export class DefaultValues {
 
     static hostData(partialHostData: Partial<HostData> = {}): HostData {
         return mergeObject({
-            description: DefaultValues.descriptionData(partialHostData.description),
-            ...DefaultValues.matrixData({category: partialHostData.category, atts: partialHostData.atts}),
+            description: DataDefaults.descriptionData(partialHostData.description),
+            ...DataDefaults.matrixData({category: partialHostData.category, atts: partialHostData.atts}),
             rating: 0,
             ic: []
         }, partialHostData) as HostData;
@@ -283,8 +283,8 @@ export class DefaultValues {
             name: '',
             type: 'equipment',
             system: {
-                description: DefaultValues.descriptionData(partialEquipmentItemData.data?.description || {}),
-                technology: DefaultValues.technologyData(partialEquipmentItemData.data?.technology || {})
+                description: DataDefaults.descriptionData(partialEquipmentItemData.data?.description || {}),
+                technology: DataDefaults.technologyData(partialEquipmentItemData.data?.technology || {})
             }
         }, partialEquipmentItemData) as EquipmentItemData;
     }
@@ -326,9 +326,9 @@ export class DefaultValues {
             name: '',
             type: 'device',
             system: {
-                description: DefaultValues.descriptionData(partialDeviceItemData.data?.description || {}),
-                technology: DefaultValues.technologyData(partialDeviceItemData.data?.technology || {}),
-                ...DefaultValues.matrixData({category: partialDeviceItemData.data?.category, atts: partialDeviceItemData.data?.atts}),
+                description: DataDefaults.descriptionData(partialDeviceItemData.data?.description || {}),
+                technology: DataDefaults.technologyData(partialDeviceItemData.data?.technology || {}),
+                ...DataDefaults.matrixData({category: partialDeviceItemData.data?.category, atts: partialDeviceItemData.data?.atts}),
             }
         }, partialDeviceItemData) as DeviceItemData;
     }
@@ -380,7 +380,7 @@ export class DefaultValues {
             spec: false,
             mod: 0,
             mod_description: '',
-            damage: DefaultValues.damageData(),
+            damage: DataDefaults.damageData(),
             modifiers: [],
             limit: {
                 value: 0,

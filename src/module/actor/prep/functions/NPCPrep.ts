@@ -16,7 +16,8 @@ export class NPCPrep {
     static applyMetatypeModifiers(system: CharacterActorData) {
         // Extract needed data.
         const {attributes, metatype} = system;
-        const metatypeModifier = SR.grunt.metatype_modifiers[metatype];
+        // Fallback to empty object if no metatype modifiers exist.
+        const metatypeModifier = SR.grunt.metatype_modifiers[metatype] || {};
 
         for (const [name, attribute] of Object.entries(attributes)) {
             // old-style object mod transformation is happening in AttributePrep and is needed here. Order is important.

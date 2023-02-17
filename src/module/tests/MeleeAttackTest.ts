@@ -1,6 +1,6 @@
 import { EnvironmentalModifier } from './../rules/modifiers/EnvironmentalModifier';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import EnvironmentalModifiersSourceData = Shadowrun.EnvironmentalModifiersSourceData;
@@ -15,7 +15,7 @@ export class MeleeAttackTest extends SuccessTest {
     _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
-        data.damage = data.damage || DefaultValues.damageData();
+        data.damage = data.damage || DataDefaults.damageData();
 
         return data;
     }

@@ -1,5 +1,5 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {ComplexFormRules} from "../rules/ComplexFormRules";
 import {PartsList} from "../parts/PartsList";
 import {FadeRules} from "../rules/FadeRules";
@@ -24,7 +24,7 @@ export class ComplexFormTest extends SuccessTest {
 
         data.level =  data.level || 0;
         data.fade = data.face || 0;
-        data.fadeDamage = DefaultValues.damageData();
+        data.fadeDamage = DataDefaults.damageData();
 
         return data;
     }
@@ -109,7 +109,7 @@ export class ComplexFormTest extends SuccessTest {
     }
 
     calculateFadeDamage() {
-        if (!this.actor) return DefaultValues.valueData();
+        if (!this.actor) return DataDefaults.valueData();
 
         const fade = Number(this.data.fade);
         const resonance = this.actor.getAttribute('resonance').value;
