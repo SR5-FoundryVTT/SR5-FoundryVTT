@@ -30,6 +30,15 @@ interface MinimalItemData {
     // Whatever item type you want to have.
     type: string
 }
+
+/**
+ * Data Defaults are used for partial template data that can't easily be gotten by instead
+ * using game.model.Item.<type>.<whatver> or game.mode.Actor.<type>.<whatever>
+ * 
+ * This is mostly the case when the system doesn't define data in the system template
+ * for fields like track, skill that aren't known during document creation by Foundry.
+ * 
+ */
 export class DataDefaults {
     /**
      * Return a base item data structure with minimal necessary FoundryVTT ItemDataModel fields.
@@ -52,7 +61,8 @@ export class DataDefaults {
         } as ItemData;
     }
     /**
-     *
+     * Damage data to hold everything around damaging actors.
+     * 
      * @param partialDamageData give partial DamageData fields to overwrite default values
      */
     static damageData(partialDamageData: Partial<DamageData> = {}): DamageData {
@@ -85,6 +95,11 @@ export class DataDefaults {
         return mergeObject(data, partialDamageData) as DamageData;
     }
 
+    /**
+     * Armor data used within actor documents.
+     * 
+     * @param partialActorArmorData Inject partial armor data
+     */
     static actorArmorData(partialActorArmorData: Partial<ActorArmorData> = {}): ActorArmorData {
         return mergeObject({
             value: 0,
@@ -94,82 +109,25 @@ export class DataDefaults {
         }, partialActorArmorData) as ActorArmorData;
     }
 
-    static equipmentData(partialEquipmentData: Partial<EquipmentData> = {}): EquipmentData {
+    /**
+     * Build a minimal viable action roll data structure.
+     * 
+     * @param partialActionData Inject any minimal action property
+     */
+    static minimalActionData(partialActionData: Partial<MinimalActionData> = {}) {
         return mergeObject({
-            description: this.descriptionData(),
-            technology: this.technologyData(),
-        }, partialEquipmentData) as EquipmentData;
-    }
-
-    static qualityData(partialQualityData: Partial<QualityData> = {}): QualityData {
-        return mergeObject({
-            type: '',
-            description: this.descriptionData(),
-            action: this.actionRollData(),
-        }, partialQualityData) as QualityData;
-    }
-
-    static technologyData(partialTechnologyData: Partial<TechnologyData> = {}): TechnologyData {
-        return mergeObject({
-            rating: '',
-            availability: '',
-            quantity: 1,
-            cost: 0,
-            equipped: false,
-            conceal: {
-                base: 0,
+            attribute: '',
+            attribute2: '',
+            skill: '',
+            mod: 0,
+            armor: false,
+            limit: {
                 value: 0,
+                attribute: '',
                 mod: [],
-            },
-            condition_monitor: {
-                label: '',
-                value: 0,
-                max: 0,
-            },
-            wireless: true,
-            networkController: undefined
-        }, partialTechnologyData) as TechnologyData;
-    }
-
-    static descriptionData(partialDescriptionData: Partial<DescriptionData> = {}): DescriptionData {
-        return mergeObject({
-            value: '',
-            chat: '',
-            source: ''
-        }, partialDescriptionData) as DescriptionData;
-    }
-
-    static matrixData(partialMatrixData: Partial<DevicePartData> = {}): DevicePartData {
-        // Remove incomplete properties for ease of use of callers.
-        if (partialMatrixData.category === undefined) delete partialMatrixData.category;
-        if (partialMatrixData.atts === undefined) delete partialMatrixData.atts;
-
-        return mergeObject({
-            category: "",
-            atts: {
-                att1: {
-                    value: 0,
-                    att: "attack",
-                    editable: true
-                },
-                att2: {
-                    value: 0,
-                    att: "attack",
-                    editable: true
-                },
-                att3: {
-                    value: 0,
-                    att: "attack",
-                    editable: true
-                },
-                att4: {
-                    value: 0,
-                    att: "attack",
-                    editable: true
-                }
-            },
-            networkDevices: []
-        }, partialMatrixData) as DevicePartData;
+                base: 0,
+            }
+        }, partialActionData) as MinimalActionData;
     }
 
     /**
@@ -192,13 +150,26 @@ export class DataDefaults {
             mod_description: '',
             damage: this.damageData(),
             modifiers: [],
-            limit: this.limitData(),
+            limit: {
+                value: 0,
+                base: 0,
+                attribute: '',
+                mod: []
+            },
             threshold: {
                 value: 0,
                 base: 0
             },
             extended: false,
-            opposed: this.opposedTestData(),
+            opposed: {
+                test: '',
+                type: '',
+                attribute: '',
+                attribute2: '',
+                skill: '',
+                mod: 0,
+                description: ''
+            },
             followed: {
                 test: '',
                 attribute: '',
@@ -211,26 +182,11 @@ export class DataDefaults {
         }, partialActionRollData) as ActionRollData;
     }
 
-    static actionResultData(partialActionResultData: Partial<ActionResultData> = {}): ActionResultData {
-        // @ts-ignore
-        return mergeObject({
-            success: {
-                matrix: {
-                    placeMarks: false
-                }
-            }
-        })
-    }
-
-    static limitData(partialLimitData: Partial<LimitData> = {}): LimitData {
-        return mergeObject({
-            value: 0,
-            base: 0,
-            attribute: '',
-            mod: []
-        }, partialLimitData) as LimitData;
-    }
-
+    /**
+     * Build a full limit value field for use in document data
+     * 
+     * @param partialLimitField Inject any limit property
+     */
     static limitField(partialLimitField: Partial<LimitField> = {}): LimitField {
         return mergeObject({
             value: 0,
@@ -242,18 +198,11 @@ export class DataDefaults {
         }, partialLimitField) as LimitField;
     }
 
-    static opposedTestData(partialOpposedTestData: Partial<OpposedTestData> = {}): OpposedTestData {
-        return mergeObject({
-            test: '',
-            type: '',
-            attribute: '',
-            attribute2: '',
-            skill: '',
-            mod: 0,
-            description: ''
-        }, partialOpposedTestData) as OpposedTestData;
-    }
-
+    /**
+     * Build a skill field for use in document data
+     * 
+     * @param partialSkillData Inject any skill property
+     */
     static skillData(partialSkillData: Partial<SkillField> = {}): SkillField {
         return mergeObject({
             name: SKILL_DEFAULT_NAME,
@@ -269,6 +218,11 @@ export class DataDefaults {
         }, partialSkillData) as SkillField;
     }
 
+    /**
+     * Build a damage track field for use in document data.
+     * @param partialTrackData Injet any track property
+     * @returns 
+     */
     static trackData(partialTrackData: Partial<TrackType> = {}): TrackType {
         return mergeObject({
             value: 0,
@@ -280,16 +234,18 @@ export class DataDefaults {
         }, partialTrackData) as TrackType;
     }
 
-    static hostData(partialHostData: Partial<HostData> = {}): HostData {
-        return mergeObject({
-            description: DataDefaults.descriptionData(partialHostData.description),
-            ...DataDefaults.matrixData({category: partialHostData.category, atts: partialHostData.atts}),
-            rating: 0,
-            ic: []
-        }, partialHostData) as HostData;
-    }
-
-    static sourceEntityData(partialSourceEntityData: Partial<SourceEntityField> = {}): SourceEntityField {
+    /**
+     * Data structure used to reference other document types.
+     * 
+     * Example usage:
+     * Host references other IC actors it's able to start in combat.
+     * 
+     * TODO: This uses the v8 old style Document.id pattern instead of v9 style uuid pattern.
+     * 
+     * @param partialSourceEntityData 
+     * @returns 
+     */
+    static sourceItemData(partialSourceEntityData: Partial<SourceEntityField> = {}): SourceEntityField {
         return mergeObject({
             id: '',
             name: '',
@@ -299,61 +255,11 @@ export class DataDefaults {
         }, partialSourceEntityData) as SourceEntityField;
     }
 
-    static equipmentItemData(partialEquipmentItemData: Partial<EquipmentItemData> = {}): EquipmentItemData {
-        return  mergeObject({
-            name: '',
-            type: 'equipment',
-            system: {
-                description: DataDefaults.descriptionData(partialEquipmentItemData.data?.description || {}),
-                technology: DataDefaults.technologyData(partialEquipmentItemData.data?.technology || {})
-            }
-        }, partialEquipmentItemData) as EquipmentItemData;
-    }
-
-    static programItemData(partial: Partial<ProgramItemData> = {}): ProgramItemData {
-        return mergeObject({
-            type: "program",
-            name: "",
-            system: {
-                description: {
-                    value: "",
-                    chat: "",
-                    source: ""
-                },
-                technology: {
-                    rating: 1,
-                    availability: "",
-                    quantity: 1,
-                    cost: 0,
-                    equipped: false,
-                    conceal: {
-                        base: 0,
-                        value: 0
-                    },
-                    condition_monitor: {
-                        value: 0,
-                        max: 9
-                    },
-                    wireless: true,
-                    networkController: null
-                },
-                type: "common_program"
-            }
-        }, partial) as ProgramItemData;
-    }
-
-    static deviceItemData(partialDeviceItemData: Partial<DeviceItemData> = {}): DeviceItemData {
-        return mergeObject({
-            name: '',
-            type: 'device',
-            system: {
-                description: DataDefaults.descriptionData(partialDeviceItemData.data?.description || {}),
-                technology: DataDefaults.technologyData(partialDeviceItemData.data?.technology || {}),
-                ...DataDefaults.matrixData({category: partialDeviceItemData.data?.category, atts: partialDeviceItemData.data?.atts}),
-            }
-        }, partialDeviceItemData) as DeviceItemData;
-    }
-
+    /**
+     * Build a numerical value field for use anywhere necessary
+     * 
+     * @param partialValueData Inject any value property
+     */
     static valueData(partialValueData: Partial<ValueField> = {}) {
         return mergeObject({
             base: 0,
@@ -364,6 +270,11 @@ export class DataDefaults {
         }, partialValueData) as ValueField;
     }
 
+    /**
+     * Build a value field holding any value for use anywhere necessary
+     * Differs from valueData as it's not only allowing number type values.
+     * @param partialGenericValueData Inject any value property
+     */
     static genericValueData(partialGenericValueData: Partial<GenericValueField> = {}) {
         return mergeObject({
             base: 0,
@@ -374,22 +285,11 @@ export class DataDefaults {
         }, partialGenericValueData) as GenericValueField;
     }
 
-    static minimalActionData(partialActionData: Partial<MinimalActionData> = {}) {
-        return mergeObject({
-            attribute: '',
-            attribute2: '',
-            skill: '',
-            mod: 0,
-            armor: false,
-            limit: {
-                value: 0,
-                attribute: '',
-                mod: [],
-                base: 0,
-            }
-        }, partialActionData) as MinimalActionData;
-    }
-
+    /**
+     * Build a fire mode field for use in range weapon data or testing
+     * 
+     * @param partialFireModeData Inject any fire mode property
+     */
     static fireModeData(partialFireModeData: Partial<FireModeData> = {}): FireModeData {
         return mergeObject({
             value: 0,

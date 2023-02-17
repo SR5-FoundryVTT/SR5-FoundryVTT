@@ -1421,7 +1421,7 @@ export class SR5Item extends Item {
         if (!icData) return;
 
         // Add IC to the hosts IC order
-        const sourceEntity = DataDefaults.sourceEntityData({
+        const sourceEntity = DataDefaults.sourceItemData({
             id: actor.id as string,
             name: actor.name as string,
             type: 'Actor',
