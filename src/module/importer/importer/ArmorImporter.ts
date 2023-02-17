@@ -2,7 +2,6 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
 import ArmorItemData = Shadowrun.ArmorItemData;
-import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
 export class ArmorImporter extends DataImporter<ArmorItemData> {

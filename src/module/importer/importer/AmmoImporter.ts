@@ -3,7 +3,6 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import WeaponData = Shadowrun.WeaponData;
 import AmmoItemData = Shadowrun.AmmoItemData;
-import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
 export class AmmoImporter extends DataImporter<AmmoItemData> {

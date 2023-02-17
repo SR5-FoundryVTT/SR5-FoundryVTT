@@ -1,7 +1,6 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
-import {DefaultValues} from "../../data/DataDefaults";
 import QualityItemData = Shadowrun.QualityItemData;
 import {Helpers} from "../../helpers";
 

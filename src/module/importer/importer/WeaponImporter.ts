@@ -6,7 +6,6 @@ import { MeleeParser } from '../parser/weapon/MeleeParser';
 import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { ParserMap } from '../parser/ParserMap';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
-import {DefaultValues} from "../../data/DataDefaults";
 import WeaponItemData = Shadowrun.WeaponItemData;
 import {Helpers} from "../../helpers";
 

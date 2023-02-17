@@ -3,7 +3,6 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ModParserBase } from '../parser/mod/ModParserBase';
 import ModificationItemData = Shadowrun.ModificationItemData;
-import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
 export class ModImporter extends DataImporter<ModificationItemData> {

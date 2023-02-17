@@ -2,7 +2,6 @@ import {DataImporter} from "./DataImporter";
 import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
 import EquipmentItemData = Shadowrun.EquipmentItemData;
-import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
 export class EquipmentImporter extends DataImporter<EquipmentItemData> {
