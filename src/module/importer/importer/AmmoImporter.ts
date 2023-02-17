@@ -19,7 +19,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData> {
 
         let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonGeari18n);
-        this.entryTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
+        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
     async Parse(jsonObject: object): Promise<Item> {
@@ -37,7 +37,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData> {
 
             let item = this.GetDefaultData({type: 'ammo'});
             item.name = ImportHelper.StringValue(jsonData, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
             item.system.technology.rating = 2;

@@ -12,8 +12,13 @@ export abstract class DataImporter<ItemDataType> {
     public abstract files: string[];
     public static jsoni18n: any;
     public categoryTranslations: any;
-    public entryTranslations: any;
+    public itemTranslations: any;
     public static unsupportedBooks: string[] = ['2050'];
+
+    // Used to filter down a files entries based on category.
+    // See filterObjects for use.
+    // Leave on null to support all categories.
+    public unsupportedCategories: string[]|null = [];
 
     /**
      * Get complete item data.
@@ -56,10 +61,10 @@ export abstract class DataImporter<ItemDataType> {
 
     /**
      * Parse the specified jsonObject and return Item representations.
-     * @param jsonObject The JSON data to parse.
+     * @param chummerData The JSON data to parse.
      * @returns An array of created objects.
      */
-    public abstract Parse(jsonObject: object): Promise<Item>;
+    public abstract Parse(chummerData: object): Promise<Item>;
 
     /**
      * Parse an XML string into a JSON object.
@@ -88,5 +93,19 @@ export abstract class DataImporter<ItemDataType> {
         }
 
         return false;
+    }
+
+    /**
+     * Filter down objects to those actaully imported.
+     * 
+     * Sometimes a single Chummer xml file contains mulitple 'categories' that don't mix with system types
+     * 
+     * @param objects 
+     * @returns A subset of objects
+     */
+    filterObjects(objects: any[]) {
+        if (!this.unsupportedCategories) return objects;
+        //@ts-ignore
+        return objects.filter(object => !this.unsupportedCategories.includes(ImportHelper.StringValue(object, 'category', '')));
     }
 }

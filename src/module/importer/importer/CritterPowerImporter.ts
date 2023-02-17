@@ -2,14 +2,15 @@ import {DataImporter} from './DataImporter';
 import {ImportHelper} from '../helper/ImportHelper';
 import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParserBase';
 import {Constants} from './Constants';
-import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 import {Helpers} from "../../helpers";
 
-export class CritterPowerImporter extends DataImporter<CritterPowerItemData> {
-    public categoryTranslations: any;
-    public itemTranslations: any;
+export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData> {
     public files = ['critterpowers.xml'];
 
+    public unsupportedCategories = [
+        'Emergent',
+    ];
+    
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
     }
@@ -24,16 +25,16 @@ export class CritterPowerImporter extends DataImporter<CritterPowerItemData> {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonCritterPoweri18n, 'powers', 'power');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+
+    async Parse(chummerPowers: object): Promise<Item> {
         const parser = new CritterPowerParserBase();
-        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
+        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('ITEM.TypeCritter_power')}`, true);
 
-        let items: CritterPowerItemData[] = [];
-        let jsonDatas = jsonObject['powers']['power'];
-        for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+        const items: Shadowrun.CritterPowerItemData[] = [];
+        const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
 
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'critter_power'}), this.itemTranslations);
+        for (const chummerCritterPower of chummerCritterPowers) {
+            let item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: 'critter_power'}), this.itemTranslations);
 
             // @ts-ignore TODO: foundry-vtt-type v10
             item.folder = folder.id;
