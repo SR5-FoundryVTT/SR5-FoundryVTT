@@ -54,7 +54,7 @@ export class SkillRules {
      * @param options.specialization If true will add the default specialization bonus onto the level.
      */
     static level(skill: SkillField, options = {specialization: false}): number {
-        if (this.mustDefaultToRoll(skill) && this.allowDefaultingRoll(skill)) {
+        if (this.mustDefaultToRoll(skill)) {
             return SkillRules.defaultingModifier;
         }
 
