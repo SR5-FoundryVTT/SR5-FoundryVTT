@@ -31,6 +31,8 @@
     "SETTINGS": {
         "ApplyLimitsDescription": "Should limits be applied to roll",
         "ApplyLimitsName": "Apply Limits to Rolls",
+        "AutomateMultiDefenseModifier": "Automate defense modifier",
+        "AutomateMultiDefenseModifierDescription": "Will automatically apply defense modi. for mulitple attacks",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
         "DiagonalMovementName": "Diagonal Movement",
         "DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the shadowrun roll-card",
@@ -55,9 +57,7 @@
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring.",
         "WhisperOpposedTestsToTargetedPlayers": "Whisper tests to targeted players",
-        "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to a online player target",
-        "AutomateMultiDefenseModifier":  "Automate defense modifier",
-        "AutomateMultiDefenseModifierDescription": "Will automatically apply defense modi. for mulitple attacks"
+        "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to a online player target"
     },
     "SR5.AP": "AP",
     "SR5.Accessory": "Accessory",
@@ -969,10 +969,10 @@
     "SR5.ToggleActive": "Toggle Active",
     "SR5.ToggleEquip": "Toggle Equipped",
     "SR5.Tooltips": {
-        "Actor": {
-        },
+        "Actor": {},
         "Item": {
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers.",
+            "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting.",
             "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it."
         },
         "Modifiers": {

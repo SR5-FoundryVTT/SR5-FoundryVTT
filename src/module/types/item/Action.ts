@@ -49,6 +49,8 @@ declare namespace Shadowrun {
         // Modification values for the test dice pool applied to this action item.
         // These can come from both the item itself and nested items.
         dice_pool_mod: ModList<number>
+        // Predefine FoundryVTT roll mode within an action, if you chooses so
+        roll_mode: ActionRollMode
     }
 
     export interface ActionPartData {
@@ -156,4 +158,13 @@ declare namespace Shadowrun {
         label: string;
         uuid: string;
     }
+
+    /**
+     * Copy of FoundryVTT RollMode for messages and rolls.
+     */
+    type FoundyRollMode = 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll'
+    /**
+     * The actual usable values for an action.
+     */
+    type ActionRollMode = FoundyRollMode | ''
 }

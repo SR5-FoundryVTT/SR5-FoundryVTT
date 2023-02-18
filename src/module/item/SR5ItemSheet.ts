@@ -2,8 +2,55 @@ import {Helpers} from '../helpers';
 import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
-import {ItemData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
 import { createTagify } from '../utils/sheets';
+
+/**
+ * Template fields for item sheet
+ */
+interface SR5ItemSheetData {
+    // Item Type
+    type: string
+    // Legacy Item Document Data
+    data: Shadowrun.ShadowrunItemDataData
+    // Item Document System Data
+    system: Shadowrun.ShadowrunItemDataData
+
+    // SR5-FoundryVTT configuration
+    config: typeof SR5
+
+    // Nested item typing for different sheets
+    ammunition: Shadowrun.AmmoItemData[]
+    weaponMods: Shadowrun.ModificationItemData[]
+    armorMods: Shadowrun.ModificationItemData[]
+    
+    // Sorted lists for usage in select elements.
+    activeSkills: Record<string, string> // skill id: label
+    attributes: Record<string, string>  // key: label
+    limits: Record<string, string> // key: label
+    
+    effects: Shadowrun.EffectsSheetData
+
+    // Host Item.
+    markedDocuments: Shadowrun.MarkedDocument[]
+    networkDevices: SR5Item[]
+    networkController: SR5Item | undefined
+
+    // Action Items. (not only type = action)
+    //@ts-ignore
+    tests: typeof game.shadowrun5e.tests
+    // @ts-ignore
+    opposedTests: typeof game.shadowrun5e.opposedTests
+    // @ts-ignore
+    activeTests: typeof game.shadowrun5e.activeTests
+    // @ts-ignore
+    resistTests: typeof game.shadowrun5e.resistTests
+
+    // Rendered description field
+    descriptionHTML: string
+
+    // FoundryVTT rollmodes
+    rollModes: CONFIG.Dice.RollModes
+}
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -37,8 +84,8 @@ export class SR5ItemSheet extends ItemSheet {
      * Prepare data for rendering the Item sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
-    async getData(options) {
-        let data = super.getData(options);
+    async getData(options): Promise<any> {
+        const data = super.getData(options) as unknown as SR5ItemSheetData;
 
         // Rework v9 style data mapping to v10 style, while waiting for foundry-vtt-types to be update to v10.
         //@ts-ignore
@@ -79,21 +126,24 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         data['config'] = SR5;
-        const items = this.item.items;
-        const [ammunition, weaponMods, armorMods] = items.reduce(
-            (parts: [ItemData[], ItemData[], ItemData[]], item: SR5Item) => {
-                const itemData = item.toObject();
+
+        /**
+         * Reduce nested items into typed lists.
+         */
+        const [ammunition, weaponMods, armorMods] = this.item.items.reduce(
+            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
+                const itemData = nestedItem.toObject();
                 //@ts-ignore
                 itemData.descriptionHTML = this.enrichEditorFieldToHTML(itemData.system.description.value);
 
                 //@ts-ignore
-                if (item.type === 'ammo') parts[0].push(itemData); // TODO: foundry-vtt-types v10
+                if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData); // TODO: foundry-vtt-types v10
                 //@ts-ignore TODO: foundry-vtt-types v10
-                if (item.type === 'modification' && "type" in item.system && item.system.type === 'weapon') parts[1].push(itemData);
+                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
                 //@ts-ignore TODO: foundry-vtt-types v10
-                if (item.type === 'modification' && "type" in item.system && item.system.type === 'armor') parts[2].push(itemData);
+                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
                 
-                return parts;
+                return sheetItemData;
             },
             [[], [], []],
         );
@@ -131,6 +181,8 @@ export class SR5ItemSheet extends ItemSheet {
 
         // @ts-ignore TODO: foundry-vtt-types v10
         data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
+
+        data.rollModes = CONFIG.Dice.rollModes
 
         return data;
     }
@@ -171,7 +223,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         const activeSkills = Helpers.sortSkills(actor.getActiveSkills());
 
-        const activeSkillsForSelect = {};
+        const activeSkillsForSelect: Record<string, string> = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
             // Legacy skills have no name, but their name is their id!
             // Custom skills have a name and their id is random.

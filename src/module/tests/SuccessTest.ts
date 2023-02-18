@@ -165,7 +165,7 @@ export class SuccessTest {
         data.title = data.title || this.constructor.label;
 
         // @ts-ignore // In FoundryVTT core settings we shall trust.
-        options.rollMode = options.rollMode !== undefined ? options.rollMode : game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+        options.rollMode = this._prepareRollMode(data, options);
         options.showDialog = options.showDialog !== undefined ? options.showDialog : true;
         options.showMessage = options.showMessage !== undefined ? options.showMessage : true;
 
@@ -198,6 +198,16 @@ export class SuccessTest {
         data.damage = data.damage || DataDefaults.damageData();
 
         return data;
+    }
+
+    /**
+     * The tests roll mode can be given by specific option, action setting or global configuration.
+     * @param options The test options for the whole test
+     */
+    _prepareRollMode(data, options: TestOptions): Shadowrun.FoundyRollMode {
+        if (options.rollMode !== undefined) return options.rollMode;
+        if (data.action.roll_mode) return data.action.roll_mode;
+        else return game.settings.get(CORE_NAME, CORE_FLAGS.RollMode) as Shadowrun.FoundyRollMode;
     }
 
     /**

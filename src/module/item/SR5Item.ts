@@ -1633,7 +1633,7 @@ export class SR5Item extends Item {
         return await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
     }
 
-    getAllMarkedDocuments(): MarkedDocument[] {
+    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
         if (!this.isHost) return [];
 
         const marks = this.getAllMarks();
@@ -1647,7 +1647,7 @@ export class SR5Item extends Item {
                 ...Helpers.getMarkIdDocuments(markId),
                 marks,
                 markId
-            }))
+            })) 
     }
 
     /**

@@ -31,6 +31,8 @@
         "SETTINGS": {
                 "ApplyLimitsDescription": "Sollten Limits verwendet werden?",
                 "ApplyLimitsName": "Verwende Limits bei Würfen",
+                "AutomateMultiDefenseModifier": "Automatisiere Verteidigungs modi.",
+                "AutomateMultiDefenseModifierDescription": "Im Kampf erzeugen mehrere Angriffe auf einen Verteidiger automatisch Verteidungsmodi.",
                 "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
                 "DiagonalMovementName": "Diagonale Bewegung",
                 "DisplayDefaultRollCardDescription": "Soll die standard Würfelkarte zusammen mit der Shadowrun Würfelkarte angezeigt werden",
@@ -55,9 +57,7 @@
                 "TokenHealthBars": "Token Lebensbalken",
                 "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige",
                 "WhisperOpposedTestsToTargetedPlayers": "Flüstere VS Anteil an anvisierte Spieler",
-                "WhisperOpposedTestsToTargetedPlayersDescription": "Bei Proben mit VS Proben wird eine geflüsterte Nachricht an anvisierte Spieler (online) versendet",
-                "AutomateMultiDefenseModifier":  "Automatisiere Verteidigungs modi.",
-                "AutomateMultiDefenseModifierDescription": "Im Kampf erzeugen mehrere Angriffe auf einen Verteidiger automatisch Verteidungsmodi."
+                "WhisperOpposedTestsToTargetedPlayersDescription": "Bei Proben mit VS Proben wird eine geflüsterte Nachricht an anvisierte Spieler (online) versendet"
         },
         "SR5.AP": "DK",
         "SR5.Accessory": "Zubehör",
@@ -972,6 +972,7 @@
                 "Actor": {},
                 "Item": {
                         "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl.",
+                        "ActionRollMode": "Standard Rollmodus für diese Aktion. Überschreibt globale Chat Einstellung.",
                         "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren."
                 },
                 "Modifiers": {
