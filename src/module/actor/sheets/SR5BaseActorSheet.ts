@@ -221,7 +221,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             // @ts-ignore TODO: foundry-vtt-types v10
             async: true,
             relativeTo: this.actor
-          });
+        });
 
         return data;
     }

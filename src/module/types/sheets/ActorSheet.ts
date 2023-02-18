@@ -18,14 +18,15 @@ declare namespace Shadowrun {
 
     interface EffectsSheetData {
         temporary: EffectsCategoryData
-        passive: EffectsCategoryData
+        persistant: EffectsCategoryData
         inactive: EffectsCategoryData
     }
 
     interface EffectsCategoryData {
-        type: "temporary"|"passive"|"inactive"
+        type: "temporary"|"persistant"|"inactive"
         label: string
-        effects: any[] // TODO: How to include ActiveEffect type here...
+        tooltip: string
+        effects: any[]
     }
 
     export interface SR5SheetFilters {

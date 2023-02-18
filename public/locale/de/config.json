@@ -78,9 +78,9 @@
                 },
                 "New": "New Effect",
                 "Types": {
-                        "Inactive": "Inactive Effects",
-                        "Passive": "Passive Effects",
-                        "Temporary": "Temporary Effects"
+                        "Inactive": "Inaktive Effekte",
+                        "Persistant": "Anhaltende Effekte",
+                        "Temporary": "Temporäre Effekte"
                 }
         },
         "SR5.ActiveSkills": "Aktive Fertigkeiten",
@@ -970,6 +970,11 @@
         "SR5.ToggleEquip": "Anlegen/Ablegen",
         "SR5.Tooltips": {
                 "Actor": {},
+                "Effect": {
+                        "Temporary": "Effekte mit zeitlicher Begrenzung",
+                        "Persistant": "Effekte ohne zeitliche Begrenzung",
+                        "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden"
+                },
                 "Item": {
                         "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl.",
                         "ActionRollMode": "Standard Rollmodus für diese Aktion. Überschreibt globale Chat Einstellung.",

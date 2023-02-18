@@ -79,7 +79,7 @@
         "New": "New Effect",
         "Types": {
             "Inactive": "Inactive Effects",
-            "Passive": "Passive Effects",
+            "Persistant": "Persistant Effects",
             "Temporary": "Temporary Effects"
         }
     },
@@ -970,6 +970,11 @@
     "SR5.ToggleEquip": "Toggle Equipped",
     "SR5.Tooltips": {
         "Actor": {},
+        "Effect": {
+            "Temporary": "Effects with a limited life span",
+            "Persistant": "Effects with an unlimited life span",
+            "Inactive": "Inactive effects don't apply their changes until they are enabled"
+        },
         "Item": {
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers.",
             "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting.",
