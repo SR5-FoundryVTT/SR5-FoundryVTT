@@ -12,37 +12,41 @@ import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import {SkillFlow} from "../flows/SkillFlow";
 import SpiritType = Shadowrun.SpiritType;
 import SpiritData = Shadowrun.SpiritData;
+import { CharacterPrep } from './CharacterPrep';
 
 
 export class SpiritPrep {
-    static prepareBaseData(data: SpiritData) {
-        SpiritPrep.prepareSpiritSpecial(data);
+    static prepareBaseData(system: SpiritData) {
+        SpiritPrep.prepareSpiritSpecial(system);
 
-        ModifiersPrep.prepareModifiers(data);
-        ModifiersPrep.clearAttributeMods(data);
-        ModifiersPrep.clearArmorMods(data);
-        ModifiersPrep.clearLimitMods(data);
+        ModifiersPrep.prepareModifiers(system);
+        ModifiersPrep.clearAttributeMods(system);
+        ModifiersPrep.clearArmorMods(system);
+        ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(data: SpiritData, items: SR5ItemDataWrapper[]) {
-        SpiritPrep.prepareSpiritBaseData(data);
+    static prepareDerivedData(system: SpiritData, items: SR5ItemDataWrapper[]) {
+        SpiritPrep.prepareSpiritBaseData(system);
 
-        AttributesPrep.prepareAttributes(data);
-        SkillsPrep.prepareSkills(data);
+        AttributesPrep.prepareAttributes(system);
+        SkillsPrep.prepareSkills(system);
 
-        LimitsPrep.prepareLimitBaseFromAttributes(data);
-        LimitsPrep.prepareLimits(data);
-        LimitsPrep.prepareDerivedLimits(data);
+        LimitsPrep.prepareLimitBaseFromAttributes(system);
+        LimitsPrep.prepareLimits(system);
+        LimitsPrep.prepareDerivedLimits(system);
 
-        SpiritPrep.prepareSpiritArmor(data);
+        SpiritPrep.prepareSpiritArmor(system);
 
-        ConditionMonitorsPrep.prepareStun(data);
-        ConditionMonitorsPrep.preparePhysical(data);
+        ConditionMonitorsPrep.prepareStun(system);
+        ConditionMonitorsPrep.preparePhysical(system);
 
-        MovementPrep.prepareMovement(data);
-        WoundsPrep.prepareWounds(data);
+        MovementPrep.prepareMovement(system);
+        WoundsPrep.prepareWounds(system);
 
-        InitiativePrep.prepareCurrentInitiative(data);
+        InitiativePrep.prepareCurrentInitiative(system);
+
+        CharacterPrep.prepareRecoil(system);
+        CharacterPrep.prepareRecoilCompensation(system);
     }
 
     static prepareSpiritSpecial(data: SpiritData) {

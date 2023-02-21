@@ -1,4 +1,3 @@
-import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import {Helpers} from '../helpers';
 import {SR5Item} from '../item/SR5Item';
 import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
@@ -99,6 +98,7 @@ export class SR5Actor extends Actor {
     // Holds all operations related to fetching an actors modifiers.
     modifiers: ModifierFlow;
 
+    // TODO: foundry-vtt-types v10. Allows for {system: ...} to be given without type error
     constructor(data, context?) {
         super(data, context);
 
@@ -465,7 +465,28 @@ export class SR5Actor extends Actor {
      * Amount of recoil compensation this actor has available (without the weapon used).
      */
     get recoilCompensation(): number {
-        return RangedWeaponRules.actorRecoilCompensation(this);
+        if(!this.system.values.hasOwnProperty('recoil_compensation')) return 0;
+        //@ts-ignore
+        return this.system.values.recoil_compensation.value;
+    }
+
+    
+    /**
+     * Current recoil compensation with current recoil included.
+     * 
+     * @returns A positive number or zero.
+    */
+    get currentRecoilCompensation(): number {
+        return Math.max(this.recoilCompensation - this.recoil, 0);
+    }
+    
+    /**
+     * Amount of progressive recoil this actor has accrued.
+     */
+    get recoil(): number {
+        if(!this.system.values.hasOwnProperty('recoil')) return 0;
+        //@ts-ignore
+        return this.system.values.recoil.value;
     }
 
     getDeviceRating(): number {
@@ -1571,6 +1592,7 @@ export class SR5Actor extends Actor {
 
         // Token might not be part of active combat.
         if (!combatant) return;
+        if (!combatant.initiative) return;
 
         // While not prohibiting, inform user about missing ressource.
         if (combatant.initiative + modifier < 0) {
@@ -1586,7 +1608,17 @@ export class SR5Actor extends Actor {
      * @returns true, when active. false, when not in combat.
      */
     get combatActive(): boolean {
-        return !!(game.combat as SR5Combat)?.getActorCombatant(this);
+        if (!game.combat) return false;
+        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
+        if (!combatant) return false;
+        if (!combatant.initiative) return false;
+
+        return true;
+    }
+
+    get combatant(): Combatant | undefined {
+        if (!this.combatActive) return;
+        return (game.combat as SR5Combat).getActorCombatant(this);
     }
 
     /**
@@ -1595,8 +1627,9 @@ export class SR5Actor extends Actor {
      * @returns The score or zero.
      */
     get combatInitiativeScore(): number {
-        const combatant = (game.combat as SR5Combat)?.getActorCombatant(this);
-        return combatant ? combatant.initiative : 0;
+        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
+        if (!combatant || !combatant.initiative) return 0;
+        return combatant.initiative;
     }
 
     hasDamageTracks(): boolean {
@@ -1773,9 +1806,9 @@ export class SR5Actor extends Actor {
     /** 
      * Get all situaitional modifiers from this actor.
      */
-    getSituationModifiers(): DocumentSituationModifiers {
+    getSituationModifiers(options?): DocumentSituationModifiers {
         const modifiers = DocumentSituationModifiers.getDocumentModifiers(this);
-        modifiers.applyAll();
+        modifiers.applyAll(options);
         return modifiers;
     }
 
@@ -1988,5 +2021,47 @@ export class SR5Actor extends Actor {
         if (this.system.modifiers.multi_defense === 0) return;
 
         await this.update({'system.modifiers.multi_defense': 0});
+    }
+
+    /**
+     * Add a firemodes recoil to the progressive recoil.
+     * 
+     * @param fireMode Ranged Weapon firemode used to attack with.
+     */
+    async addProgressiveRecoil(fireMode: Shadowrun.FireModeData) {
+        const automateProgressiveRecoil = game.settings.get(SYSTEM_NAME, FLAGS.AutomateProgressiveRecoil);
+        if (!automateProgressiveRecoil) return;
+
+        if (!this.hasPhysicalBody) return;
+        if (!fireMode.recoil) return;
+        
+        await this.addRecoil(fireMode.value);
+    }
+
+    /**
+     * Add a flat value on top of existing progressive recoil
+     * @param additional New recoil to be added
+     */
+    async addRecoil(additional: number) {
+        const base = this.recoil + additional;
+        await this.update({'system.values.recoil.base': base});
+    }
+
+    /**
+     * Clear whatever progressive recoil this actor holds.
+     */
+    async clearProgressiveRecoil() {
+        if (!this.hasPhysicalBody) return;
+        if (this.recoil === 0) return;
+        await this.update({'system.values.recoil.base': 0});
+    }
+
+    /**
+     * Determinal if the actor has a physical body
+     * 
+     * @returns true, if the actor can interact with the physical plane
+     */
+    get hasPhysicalBody() {
+        return this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle();
     }
 }

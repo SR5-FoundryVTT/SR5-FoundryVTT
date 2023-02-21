@@ -70,19 +70,19 @@ import { ActionResultFlow } from './flows/ActionResultFlow';
 ActionResultFlow; // DON'T TOUCH!
 
 /**
- * Implementation of Shadowrun5e items (owned, unowned and embedded).
+ * Implementation of Shadowrun5e items (owned, unowned and nested).
  *
- *       tamIf here: The current legacy embedded items approach has been cleaned up a bit but is still causing some issues
+ *       tamIf here: The current legacy nested items approach has been cleaned up a bit but is still causing some issues
  *       with typing and ease of use.
  *
- *       SR5Item.items currently overwrites foundries internal DocumentCollection mechanism of embedded documents. Partially
- *       due to legacy reasons and since Foundry 0.8 SR5Item.update can't be used for embedded items in items anymore.
+ *       SR5Item.items currently overwrites foundries internal DocumentCollection mechanism of nested documents. Partially
+ *       due to legacy reasons and since Foundry 0.8 SR5Item.update can't be used for nested items in items anymore.
  *
  *        At the moment this means, that this.actor can actually be an SR5Actor as well as an SR5Item, depending on who
- *       'owns' the embedded item as they are created using Item.createOwned during the embedded item prep phase.
+ *       'owns' the nested item as they are created using Item.createOwned during the nested item prep phase.
  *
  *       For this reason SR5Item.actorOwner has been introduced to allow access to the actual owning actor, no matter
- *       how deep embedded into other items an item is.
+ *       how deep nested into other items an item is.
  *
  *       Be wary of SR5Item.actor for this reason!
  */
@@ -96,7 +96,6 @@ export class SR5Item extends Item {
 
     // Add v10 type helper
     system: ShadowrunItemDataData; // TODO: foundry-vtt-types v10
-
 
     /**
      * Return the owner of this item, which can either be
@@ -1366,17 +1365,42 @@ export class SR5Item extends Item {
         return this.wrapper.getFade();
     }
 
+    /**
+     * Amount of current recoil left after recoil compensation.
+     */
+    get unhandledRecoil(): number {
+        if (!this.isRangedWeapon) return 0;
+        return Math.max(this.actor.recoil - this.totalRecoilCompensation, 0);
+    }
+
+    /**
+     * Amount of recoil compensation configured via weapon system data.
+     */
     get recoilCompensation(): number {
+        if (!this.isRangedWeapon) return 0;
         return this.wrapper.getRecoilCompensation();
     }
 
     /**
-     * Apply recoil compensation rules to this item.
+     * Amount of recoil compensation totally available when using weapon
      * 
-     * @returns The total amount of rc available to this item.
+     * This includes both actor and item recoil compensation.
      */
     get totalRecoilCompensation(): number {
+        if (!this.isRangedWeapon) return 0;
         return RangedWeaponRules.recoilCompensation(this);
+    }
+
+    /**
+     * Current TOTAL recoil compensation with current recoil included.
+     * 
+     * This includes both the items and it's parent actors recoil compensation and total progressive recoil.
+     * 
+     * @returns A positive number or zero.
+     */
+    get currentRecoilCompensation(): number {
+        if (!this.actor || !this.isRangedWeapon) return 0;
+        return Math.max(this.totalRecoilCompensation - this.actor.recoil, 0);
     }
 
     getReach(): number {
@@ -1710,7 +1734,7 @@ export class SR5Item extends Item {
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-     async _preUpdate(changed, options: DocumentModificationOptions, user: User) {
+    async _preUpdate(changed, options: DocumentModificationOptions, user: User) {
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff !== false && options.recursive !== false) {

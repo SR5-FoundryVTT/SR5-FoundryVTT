@@ -33,6 +33,8 @@
                 "ApplyLimitsName": "Verwende Limits bei Würfen",
                 "AutomateMultiDefenseModifier": "Automatisiere Verteidigungs modi.",
                 "AutomateMultiDefenseModifierDescription": "Im Kampf erzeugen mehrere Angriffe auf einen Verteidiger automatisch Verteidungsmodi.",
+                "AutomateProgressiveRecoil": "Automatisiere Kumulativen Rückstoß",
+                "AutomateProgressiveRecoilDescription": "Summiere Rückstoß so lange auf wie attackiert wird",
                 "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
                 "DiagonalMovementName": "Diagonale Bewegung",
                 "DisplayDefaultRollCardDescription": "Soll die standard Würfelkarte zusammen mit der Shadowrun Würfelkarte angezeigt werden",
@@ -446,7 +448,8 @@
         "SR5.Information": "Info",
         "SR5.Infos": {
                 "CantModifyHostContent": "Host daten können nicht von einem IC Akteur aus verändert werden",
-                "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen"
+                "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen",
+                "ResetProgressiveRecoil": "Kummulativer Rückstoß zurückgesetzt auf 0 abgefeuerte Kugeln"
         },
         "SR5.InitCatAstral": "Astrale Initiative",
         "SR5.InitCatMatrix": "Matrix-Initiative",
@@ -622,6 +625,7 @@
                 "EnvironmentalWind": "Umgebung (Wind)",
                 "Magic": "Hintergrundstrahlung",
                 "Matrix": "Rauschen",
+                "Recoil": "Rückstoß",
                 "Wounds": "Wunden"
         },
         "SR5.MountPoint": "Haltepunkt",
@@ -690,7 +694,7 @@
         "SR5.Reach": "Reichweite",
         "SR5.RecklessSpellButton": "Schnell",
         "SR5.Recoil": "Rückstoß",
-        "SR5.RecoilCompensation": "RK",
+        "SR5.RecoilCompensation": "Rückstoßkomp.",
         "SR5.ResetOverwatchScore": "Nulle Overwatch Wert",
         "SR5.Resist": "Widerstehen",
         "SR5.ResistedAllDamage": "Kein Schaden!",
@@ -971,9 +975,9 @@
         "SR5.Tooltips": {
                 "Actor": {},
                 "Effect": {
-                        "Temporary": "Effekte mit zeitlicher Begrenzung",
+                        "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden",
                         "Persistant": "Effekte ohne zeitliche Begrenzung",
-                        "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden"
+                        "Temporary": "Effekte mit zeitlicher Begrenzung"
                 },
                 "Item": {
                         "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl.",
@@ -1012,6 +1016,16 @@
                         "stun_track": "Modifiziert den Geistigen Monitor",
                         "walk": "Modifiziert die Gehreichweite um das Vielfache des Geschicklichkeit Attributs.",
                         "wound_tolerance": "Modifiziert die Schadensmenge pro Wundenmodi."
+                },
+                "RangedAttack": {
+                        "Recoil": "Kummulativer Rückstoß",
+                        "RecoilAfterAttack": "Kummulativer Rückstoß nach der diesem Angriff",
+                        "RecoilBeforeAttack": "Kummulativer Rückstoß jetzt, vor dem Angriff",
+                        "RecoilCompensation": "Gesamter RK, inklus. RK der Waffe",
+                        "ResetRecoil": "Setzte kumulativen Rückstoß zurück"
+                },
+                "SituationalModifier": {
+                        "Recoil": "Anzahl abgefeuerter Kugeln"
                 }
         },
         "SR5.Top": "Oberseite",

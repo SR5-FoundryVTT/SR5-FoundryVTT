@@ -20,10 +20,16 @@ export class ModifiersPrep {
         ModifiersPrep.setupModifiers(system, modifiers);
     }
 
+    /**
+     * Modifiers that appear on all actor types.
+     */
     static get commonModifiers() {
-        return ['soak', 'defense'];
+        return ['soak', 'defense', 'recoil'];
     }
 
+    /**
+     * Modifiers that appear on all character actors.
+     */
     static get characterModifiers() {
         return [
             'drain',
@@ -54,6 +60,9 @@ export class ModifiersPrep {
         ];
     }
 
+    /**
+     * Modifiers that appear on all matrix actor types.
+     */
     static get matrixModifiers() {
         return [
             'matrix_initiative',
@@ -104,6 +113,19 @@ export class ModifiersPrep {
             if (!SR5.limits.hasOwnProperty(name) || !limit) return;
 
             limit.mod = [];
+        }
+    }
+
+    /**
+     * Clear out modifierse from all calculate values, no matter where from and what.
+     * 
+     * This is necessary to avoid items and naive modifications doubling up shoudl they be
+     * saved with update calls
+     * 
+     */
+    static clearValueMods(system: ShadowrunActorDataData) {
+        for (const [name, values] of Object.entries(system.values)) {
+            values.mod = [];
         }
     }
 }

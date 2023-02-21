@@ -279,13 +279,6 @@ select.display {
                 vertical-align: middle;
                 text-align: center;
             }
-            // input {
-            //     width: 35px;
-            //     height: 25px;
-            //     line-height: inherit;
-            //     vertical-align: middle;
-            //     text-align: center;
-            // }
         }
     }
     /**
@@ -304,13 +297,13 @@ select.display {
 
     // An origin link is a uuid based entity link, without drag support.
     .origin-link {
-          background: #DDD;
-          padding: 1px 4px;
-          border: 1px solid #4b4a44;
-          border-radius: 2px;
-          white-space: nowrap;
-          word-break: break-all;
-          color: $black;
+        background: #DDD;
+        padding: 1px 4px;
+        border: 1px solid #4b4a44;
+        border-radius: 2px;
+        white-space: nowrap;
+        word-break: break-all;
+        color: $black;
     }
 
     .roll {

@@ -68,7 +68,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         it('apply attack modifier per fire mode', () => {
             // A mode without recoil, shouldn't cause recoil modifiers.
-            assert.deepEqual(FireModeRules.recoilAttackModifier({
+            assert.strictEqual(FireModeRules.recoilModifierAfterAttack({
                 label: "SR5.WeaponModeBurstFireLong",
                 value: 6,
                 recoil: false,
@@ -76,10 +76,10 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 suppression: false,
                 action: 'complex',
                 mode: 'burst_fire',
-            }, 0), {compensation: 0, recoilModifier: 0});
+            }, 0), 0);
             
             // No compensation should cause full recoil modifier
-            assert.deepEqual(FireModeRules.recoilAttackModifier({
+            assert.strictEqual(FireModeRules.recoilModifierAfterAttack({
                 label: "SR5.WeaponModeBurstFireLong",
                 value: 6,
                 recoil: true,
@@ -87,11 +87,11 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 suppression: false,
                 action: 'complex',
                 mode: 'burst_fire',
-            }, 0), {compensation: 0, recoilModifier: -6});
+            }, 0), -6);
 
             // recoil modifier should be reduced by compensation,
             // compensation shouldbe reduced
-            assert.deepEqual(FireModeRules.recoilAttackModifier({
+            assert.strictEqual(FireModeRules.recoilModifierAfterAttack({
                 label: "SR5.WeaponModeBurstFireLong",
                 value: 6,
                 recoil: true,
@@ -99,10 +99,10 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 suppression: false,
                 action: 'complex',
                 mode: 'burst_fire',
-            }, 3), {compensation: 0, recoilModifier: -3});
+            }, 3), -3);
 
             // handle faulty value input gracefully, don't fire. Keep compensation.
-            assert.deepEqual(FireModeRules.recoilAttackModifier({
+            assert.strictEqual(FireModeRules.recoilModifierAfterAttack({
                 label: "SR5.WeaponModeBurstFireLong",
                 value: -6,
                 recoil: true,
@@ -110,7 +110,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 suppression: false,
                 action: 'complex',
                 mode: 'burst_fire',
-            }, 3), {compensation: 3, recoilModifier: 0});
+            }, 3), 0);
         })
 
         it('reduce the available fire modes', () => {            

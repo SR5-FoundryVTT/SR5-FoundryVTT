@@ -1,9 +1,15 @@
+import { SuccessTest } from './../../tests/SuccessTest';
 import {SR5Actor} from "../SR5Actor";
 
-
+/**
+ * Options for calling the general modifier access helper method ModifierFlow#totalFor.
+ */
 export interface ModifierFlowOptions {
     // See SituationModifier applicable
     applicable?: string[]
+    // If called from SuccessTest or sub-class context, allow it's documents and data to 
+    // influence modifier calculation.
+    test?: SuccessTest
 }
 
 /**
@@ -30,14 +36,14 @@ export class ModifierFlow {
      * @param options 
      * @returns Total value requested or zero, should the requested modifier not exist.
      */
-    async totalFor(name: string, options: ModifierFlowOptions={}): Promise<number> {
+    totalFor(name: string, options: ModifierFlowOptions={}): number {
         // Get special cases that need local handling.
         if (this[name] !== undefined) return this[name];
 
         // Get global modifiers that can come from the general modifier system.
-        const modifiers = this.document.getSituationModifiers();
+        const modifiers = this.document.getSituationModifiers(options);
         //@ts-ignore
-        if (modifiers.source.hasOwnProperty(name)) return modifiers.getTotalFor(name, {applicable: options.applicable});
+        if (modifiers.handlesTotalFor(name)) return modifiers.getTotalFor(name, options);
 
         // Get global modifiers that come from the legacy actor modifier system.
         return this.document.getModifier(name) || 0;

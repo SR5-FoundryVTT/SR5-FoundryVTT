@@ -23,9 +23,17 @@ declare namespace Shadowrun {
         'lift_carry'|
         'memory'|
         'soak'|
-        'wounds'
+        'wounds' |
+        'recoil'
 
-    /** All situational modifiers affecting any actor placed on the canvas.
+
+    export type SituationModifierType = keyof SituationModifiersSourceData;
+    
+    /** 
+     * All situational modifier types of a document that selections can be made for.
+     * 
+     * They are the 'source' of that documents selections and only include those
+     * values actually selected for the document.
      */
     export interface SituationModifiersSourceData {
         environmental: EnvironmentalModifiersSourceData
@@ -33,10 +41,17 @@ declare namespace Shadowrun {
         background_count: BackgroundCountModifiersSourceData
     }
 
+    /**
+     * All situational modifier types of a document that selections can be made for.
+     * 
+     * These are the 'applied' selections based on all 'source' selections of this 
+     * document and all other documents above it in it's application order.
+     */
     export interface SituationModifiersData {
         environmental: EnvironmentalModifiersData
         noise: NoiseModifiersData
         background_count: BackgroundCountModifiersData
+        recoil: RecoilModifierData
     }
 
     export type ActiveModifierValue = Record<string, number>
@@ -44,7 +59,7 @@ declare namespace Shadowrun {
     /**
      * A source modifier can contain modifier selections or fixed values
      */
-     export interface SourceModifierData {
+    export interface SourceModifierData {
         // Merged active modifier selections by both the local and all global modifier selections.
         active: ActiveModifierValue
         // A user set default / fixed value to be applied instead of what's selected.
@@ -117,5 +132,14 @@ declare namespace Shadowrun {
 
     export interface BackgroundCountModifiersData extends ModifierData {
         active: Partial<BackgroundCountModifierCategories>
+    }
+
+    /**
+     * Situational Modifier - RECOIL and PROGRESSIVE RECOIL
+     */
+    type RecoilModifiersSourceData = undefined;
+    interface RecoilModifierCategories {}
+    interface RecoilModifierData extends ModifierData {
+        active: Partial<RecoilModifierCategories>
     }
 }

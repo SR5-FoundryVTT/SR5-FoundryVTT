@@ -1,3 +1,5 @@
+import { SuccessTest } from './../tests/SuccessTest';
+import { RecoilModifier } from './modifiers/RecoilModifier';
 import { BackgroundCountModifier as BackgroundCountModifier } from './modifiers/BackgroundCountModifier';
 import { NoiseModifier as NoiseModifer } from './modifiers/NoiseModifier';
 import { SituationalModifierApplyOptions, SituationModifier } from './modifiers/SituationModifier';
@@ -8,14 +10,17 @@ import SituationModifiersSourceData = Shadowrun.SituationModifiersSourceData;
 import SituationModifiersData = Shadowrun.SituationModifiersData;
 
 
-export interface DocumentSituationModifiersTotalForOptions {
+interface DocumentSituationModifiersTotalForOptions {
+    // Only apply these modifier categories.
     applicable?: string[]
+    // Modifiers are calculated within this tests context.
+    test?: SuccessTest
 }
 
 /**
  * These documents can store situational modifiers
  */
- export type ModifiableDocumentTypes = SR5Actor | Scene;
+export type ModifiableDocumentTypes = SR5Actor | Scene;
 
 /**
  * Handle all per document situation modifiers.
@@ -36,8 +41,8 @@ export interface DocumentSituationModifiersTotalForOptions {
  * document source data applied first. The resulting applied data is what's actually used to
  * calculate a modifiers total.
  * 
- * This allows for modifiers to be defined globally (scene) for all other documents (actors), while
- * also allowing as many documents in that apply chain as necessary.
+ * This allows for modifiers to be defined globally (scene), while also locally (actor) and, in theory,
+ * add more other other modifier sources in that chain of application to reach the actual modifier.
  * 
  */
 export class DocumentSituationModifiers {
@@ -48,11 +53,12 @@ export class DocumentSituationModifiers {
     // The applied data from the document and it's apply chain.
     applied: SituationModifiersData;
     // Handlers for the different modifier categories.
-    handlers: {
+    _modifiers: {
         noise: NoiseModifer,
         background_count: BackgroundCountModifier,
-        environmental: EnvironmentalModifier
-    }
+        environmental: EnvironmentalModifier,
+        recoil: RecoilModifier
+    };
 
     /**
      * Prepare a Modifiers instance for a and allow handling of the resulting modifiers.
@@ -70,33 +76,51 @@ export class DocumentSituationModifiers {
         this.source = this. _completeSourceData(data);
         this.document = document;
 
-        // Provide all categories to their respective handlers.
-        this.handlers = {
+        // Map all modifier types to their respectiv implementation.
+        this._modifiers = {
             noise: new NoiseModifer(this.source.noise, this),
             background_count: new BackgroundCountModifier(this.source.background_count, this),
-            environmental: new EnvironmentalModifier(this.source.environmental, this)
+            environmental: new EnvironmentalModifier(this.source.environmental, this),
+            recoil: new RecoilModifier({}, this)
         }
     }
 
     /**
-     * A factory for the SituationalModifier handler of the matrix modifier category
+     * Does this document have a handle a situation modifier category
+     * 
+     * @param category A category found within the handler registry
+     * @returns true, when a total modifier can be calculated by a handler.
+     */
+    handlesTotalFor(category: string) {
+        return this._modifiers.hasOwnProperty(category);
+    }
+
+    /**
+     * Access helper for the SituationalModifier handler of the matrix modifier category
      */
     get noise(): NoiseModifer {
-        return this.handlers.noise;
+        return this._modifiers.noise;
     }
 
     /**
-     * A factory for the MagicModifier handler of the magic modifier category.
+     * Access helper for the MagicModifier handler of the magic modifier category.
      */
     get background_count(): BackgroundCountModifier {
-        return this.handlers.background_count;
+        return this._modifiers.background_count;
     }
 
     /**
-     * A factory for the EnvironmentalModifier handler of the environmental modifier category.
+     * Access helper for the EnvironmentalModifier handler of the environmental modifier category.
      */
     get environmental(): EnvironmentalModifier {
-        return this.handlers.environmental;
+        return this._modifiers.environmental;
+    }
+
+    /**
+     * Access helper for the recoilModifier handler of the recoil modifier category.
+     */
+    get recoil(): RecoilModifier {
+        return this._modifiers.recoil;
     }
 
     /**
@@ -122,12 +146,12 @@ export class DocumentSituationModifiers {
      * @param category A string matching a situation modifiers category.
      * @param options
      */
-    getTotalFor(category: keyof SituationModifiersSourceData, options:DocumentSituationModifiersTotalForOptions={}): number {
-        const modifier = this.handlers[category];
+    getTotalFor(category: keyof SituationModifiersSourceData|string, options:DocumentSituationModifiersTotalForOptions={}): number {
+        const modifier = this._modifiers[category];
 
         // re-apply to limit applicable selections.
         if (options.applicable) {
-            modifier.apply({applicable: options.applicable})
+            modifier.apply({applicable: options.applicable, test: options.test})
         }
 
         return modifier.total;
@@ -150,16 +174,19 @@ export class DocumentSituationModifiers {
         this.applied = {};
 
         // Let all handlers apply their modifier rules on the documents source data.
-        Object.entries(this.handlers).forEach(([category, handler]) => {
-            // Befor application, remove invalid selections. 
-            // This happens when a selection has been set with an empty input DOM element.
-            Object.entries(this.source[category].active).forEach(([modifier, value]) => {
-                switch (value) {
-                    case null:
-                    case undefined:
-                        delete this.source[category].active[modifier];
-                }
-            })
+        Object.entries(this._modifiers).forEach(([category, handler]) => {
+            // Some situational modifiers might choose not to apply any source data.
+            if (handler.hasSourceData) {
+                // Befor application, remove invalid selections. 
+                // This happens when a selection has been set with an empty input DOM element.
+                Object.entries(this.source[category].active).forEach(([modifier, value]) => {
+                    switch (value) {
+                        case null:
+                        case undefined:
+                            delete this.source[category].active[modifier];
+                    }
+                })
+            }
 
             // Update category modifier source data and reapply.
             options.reapply = options.reapply ?? true;
@@ -177,7 +204,7 @@ export class DocumentSituationModifiers {
      * @param document The document to clear.
      * @returns A new instance with the resulting modifiers structure
      */
-    static async clearAllOnDocument(document: ModifiableDocumentTypes) {
+    static async clearAllOn(document: ModifiableDocumentTypes) {
         if (document instanceof SR5Actor) {
             // Overwrite all selections with default values.
             await document.update({'system.-=situation_modifiers': null}, {render: false});
@@ -195,7 +222,7 @@ export class DocumentSituationModifiers {
      * @param category Modifiers category to clear
      * @returns A new instance with the resulting modifiers structure
      */
-    static async clearCategoryOnDocument(document: ModifiableDocumentTypes, category: keyof SituationModifiersSourceData): Promise<DocumentSituationModifiers> {
+    static async clearTypeOn(document: ModifiableDocumentTypes, category: keyof SituationModifiersSourceData): Promise<DocumentSituationModifiers> {
         const modifiers = DocumentSituationModifiers.getDocumentModifiers(document);
 
         if (!modifiers.source.hasOwnProperty(category)) return modifiers;
@@ -203,36 +230,6 @@ export class DocumentSituationModifiers {
 
         await DocumentSituationModifiers.setDocumentModifiers(document, modifiers.source);
         return modifiers;
-    }
-
-    /**
-     * Clear the environmental modifier selection for a document.
-     * 
-     * @param document The document to clear.
-     * @returns A new instance with the resulting modifiers structure
-     */
-    static async clearEnvironmentalOn(document: ModifiableDocumentTypes): Promise<DocumentSituationModifiers> {
-        return await DocumentSituationModifiers.clearCategoryOnDocument(document, 'environmental');
-    }
-
-    /**
-     * Clear the background count modifier selection for a document.
-     * 
-     * @param document The document to clear.
-     * @returns A new instance with the resulting modifiers structure
-     */
-    static async clearBackgroundCountOn(document: ModifiableDocumentTypes): Promise<DocumentSituationModifiers> {
-        return await DocumentSituationModifiers.clearCategoryOnDocument(document, 'background_count');
-    }
-
-    /**
-     * Clear the noise modifier selection for a document.
-     * 
-     * @param document The document to clear.
-     * @returns A new instance with the resulting modifiers structure
-     */
-    static async clearNoiseOn(document: ModifiableDocumentTypes): Promise<DocumentSituationModifiers> {
-        return await DocumentSituationModifiers.clearCategoryOnDocument(document, 'noise');
     }
 
     /**
@@ -275,7 +272,7 @@ export class DocumentSituationModifiers {
      * @param document Any document with flags support.
      * @returns The raw modifier data of a document
      */
-     static getDocumentModifiersData(document: ModifiableDocumentTypes): SituationModifiersSourceData {
+    static getDocumentModifiersData(document: ModifiableDocumentTypes): SituationModifiersSourceData {
         if (document instanceof SR5Actor) {
             return document.system.situation_modifiers;
         } else {
@@ -299,14 +296,12 @@ export class DocumentSituationModifiers {
     }
 
     /**
-     * Retrieve the situational modifiers data.
+     * Build a full set of situational modifiers for a document.
      * 
-     * @param document Any document with flags support.
-     * @returns The raw modifier data of a document
+     * @param document Any document that may contain situational modifiers.
+     * @returns A full set of situational modifiers.
      */
     static getDocumentModifiers(document: ModifiableDocumentTypes): DocumentSituationModifiers {
-        // It's possible for scene modifiers to chosen, while no scene is actually opened.
-        // if (!document) return new Modifiers(Modifiers.getDefaultModifiers());
         const data = DocumentSituationModifiers.getDocumentModifiersData(document);
         return new DocumentSituationModifiers(data, document);
     }
@@ -342,7 +337,7 @@ export class DocumentSituationModifiers {
      */
     async clearAll() {
         if (!this.document) return console.error(`'Shadowrun 5e | ${this.constructor.name} can't clear without connected document'`);
-        await DocumentSituationModifiers.clearAllOnDocument(this.document);
+        await DocumentSituationModifiers.clearAllOn(this.document);
         // Reset local source data.
         this.source = DocumentSituationModifiers.getDocumentModifiersData(this.document);
     }

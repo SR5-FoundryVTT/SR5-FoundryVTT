@@ -208,6 +208,8 @@ export class PhysicalDefenseTest extends DefenseTest {
         if (this.actor && this.data.iniMod && game.combat) {
             const combat: SR5Combat = game.combat as unknown as SR5Combat;
             const combatant = combat.getActorCombatant(this.actor);
+            if (!combatant || !combatant.initiative) return true;
+            
             if (combatant && combatant.initiative + this.data.iniMod < 0) {
                 ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
                 return false;

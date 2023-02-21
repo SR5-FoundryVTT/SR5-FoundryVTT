@@ -16,7 +16,7 @@ declare namespace Shadowrun {
         WoundsActorData,
         MovementActorData,
         NPCActorData {
-            recoil_compensation: number;
+            values: PhysicalCombatValues
             metatype: string | keyof typeof SR5CONFIG.character.types;
             full_defense_attribute: string;
             // Can a character have critter powers?
@@ -108,6 +108,8 @@ declare namespace Shadowrun {
         defense: NumberOrEmpty
         // Meant to be applied on physical resist (soak) tests.
         soak: NumberOrEmpty
+        // Meant to be applied to all ranged attack tests.
+        recoil: NumberOrEmpty
     }
 
     /**

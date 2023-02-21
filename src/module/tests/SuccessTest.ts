@@ -1,3 +1,4 @@
+import { TestDialogListener } from './../apps/dialogs/TestDialog';
 import { DamageApplicationFlow } from './../actor/flows/DamageApplicationFlow';
 import {SR5Actor} from "../actor/SR5Actor";
 import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from "../constants";
@@ -410,7 +411,11 @@ export class SuccessTest {
      * @override This method if you want to use a different TestDialog.
      */
     _createTestDialog() {
-        return new TestDialog({test: this, templatePath: this._dialogTemplate});
+        return new TestDialog({test: this, templatePath: this._dialogTemplate}, undefined, this._testDialogListeners());
+    }
+
+    _testDialogListeners() {
+        return [] as TestDialogListener[]
     }
 
     /**
@@ -471,6 +476,8 @@ export class SuccessTest {
      *       a modifier. Rather set it to zero, causing it to not be shown.
      */
     applyPoolModifiers() {
+        this.prepareDocumentModifiers();
+        
         const pool = new PartsList(this.pool.mod);
 
         // Remove override modifier from pool.
@@ -578,24 +585,26 @@ export class SuccessTest {
 
     /**
      * Prepare modifiers based on connected documents.
+     * 
+     * Documents MUST've been be populated before hand.
      *
      * Main purpose is to populate the configured modifiers for this test based on actor / items used.
      */
-    async prepareDocumentModifiers()  {
-        await this.prepareActorModifiers();
-        await this.prepareItemModifiers();
+    prepareDocumentModifiers()  {
+        this.prepareActorModifiers();
+        this.prepareItemModifiers();
     }
 
     /**
      * Prepare general modifiers based on the actor, as defined within the action or test implementation.
      */
-    async prepareActorModifiers() {
+    prepareActorModifiers() {
         if (!this.actor) return;
         // Don't use default test actions when source action provides modifiers.
         if (this.data.action.modifiers.length > 0) return;
 
         for (const type of this.testModifiers) {
-            const {name, value} = await this.prepareActorModifier(this.actor, type);
+            const {name, value} = this.prepareActorModifier(this.actor, type);
             PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
         }
     }
@@ -608,8 +617,10 @@ export class SuccessTest {
      * @param actor The actor to fetch modifier information for.
      * @param type The modifier type to be prepared.
      */
-    async prepareActorModifier(actor: SR5Actor, type: ModifierTypes): Promise<{name: string, value: number}> {
-        const value = await actor.modifiers.totalFor(type);
+    prepareActorModifier(actor: SR5Actor, type: ModifierTypes): {name: string, value: number} {
+        const options = {test: this};
+        // TODO: ModifierFlow ALWAYS recalculates a total for ALL it's modifiers, even if not necessary... fix that
+        const value = actor.modifiers.totalFor(type, options);
         const name = this._getModifierTypeLabel(type);
 
         return {name, value};
@@ -1108,7 +1119,6 @@ export class SuccessTest {
     async execute(): Promise<this> {
         await this.populateTests();
         await this.populateDocuments();
-        await this.prepareDocumentModifiers();
         await this.prepareDocumentData();
 
         this.alterBaseValues();

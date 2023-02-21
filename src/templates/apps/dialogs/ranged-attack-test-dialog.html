@@ -8,12 +8,18 @@
                     <div class="form-group">
                         <label>{{localize "ITEM.TypeAmmo"}}</label>
                         <input type="text" class="disabled-for-display" disabled
-                               value="{{test.item.system.ammo.current.value}}/{{test.item.system.ammo.current.max}}"/>
+                            value="{{test.item.system.ammo.current.value}}/{{test.item.system.ammo.current.max}}"/>
                     </div>
                     <div class="form-group">
-                        <label>{{localize 'SR5.RecoilCompensation'}}</label>
+                        <label data-tooltip="SR5.Tooltips.RangedAttack.RecoilCompensation">{{localize 'SR5.RecoilCompensation'}}</label>
                         <input type="text" class="disabled-for-display" disabled
-                               value="{{test.data.recoilCompensation}}"/>
+                            value="{{test.item.totalRecoilCompensation}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label data-tooltip="SR5.Tooltips.RangedAttack.Recoil">{{localize 'SR5.Recoil'}}</label>
+                        <div class="form-group-element-2">
+                            <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilBeforeAttack">{{test.recoilBeforeAttack}}</span><span data-tooltip="SR5.Tooltips.RangedAttack.RecoilAfterAttack"> => {{test.recoilAfterAttack}}</span></div>
+                        <div id="reset-progressive-recoil" class="form-group-element-1-right roll" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil">Reset</div>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'SR5.FireMode'}}</label>
@@ -50,7 +56,7 @@
                     {{/if}}
                 </div>
             </div>
-             <div class="container__col-half dialog-content-column sunken">
+            <div class="container__col-half dialog-content-column sunken">
                 {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
             </div>
         </div>

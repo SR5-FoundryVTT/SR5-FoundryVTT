@@ -170,4 +170,18 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: true
     });
+
+    /**
+     * Control automation of progressive recoil when continuously firing
+     * 
+     * See SR5.175 'Progressive Recoil'
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.AutomateProgressiveRecoil, {
+        name: 'SETTINGS.AutomateProgressiveRecoil',
+        hint: 'SETTINGS.AutomateProgressiveRecoilDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true
+    });
 };

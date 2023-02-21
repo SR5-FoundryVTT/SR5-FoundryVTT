@@ -480,7 +480,8 @@ export const TestCreator = {
         for (const [modifier, applicable] of Object.entries(modifiers)) {
             // Setup the resulting modifier value.
             const label = SR5.modifierTypes[modifier];
-            const value = await actor.modifiers.totalFor(modifier, {applicable});
+            const options = {applicable};
+            const value = actor.modifiers.totalFor(modifier, options);
             data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
         }
         

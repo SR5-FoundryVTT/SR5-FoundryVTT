@@ -1,10 +1,9 @@
+import { SuccessTest } from './../../tests/SuccessTest';
 import { SR5Actor } from './../../actor/SR5Actor';
 import { DocumentSituationModifiers, ModifiableDocumentTypes } from '../DocumentSituationModifiers';
 import Modifier = Shadowrun.ModifierData;
 import SourceModifierData = Shadowrun.SourceModifierData;
 import ActiveModifierValue = Shadowrun.ActiveModifierValue;
-import SituationModifiersSourceData = Shadowrun.SituationModifiersSourceData;
-
 
 
 export interface SituationalModifierApplyOptions {
@@ -12,33 +11,36 @@ export interface SituationalModifierApplyOptions {
     reapply?: boolean
     // When new source data is given, internal source is overwritten.
     source?: SourceModifierData
-    // When given will be used to ONLY applied active selections within.
+    // When given will be used to ONLY use applied active selections of a modifier.
     // keys should be included as applied.active.<applicable>
+    // <applicable> would be <light> or <wind> based on modifier 'environmental.light'/'.wind'.
     applicable?: string[]
+    // Apply modifier within this tests context.
+    test?: SuccessTest
 }
 
-export type SituationModifierCategory = keyof SituationModifiersSourceData;
 /**
- * Base class for handling a single category of situational modifiers, to be used in conjungtion with
- * the Modifiers class.
+ * Base class for handling a single modifier of situational modifiers applied to a document. The 
  * 
  * Each situational modifier allows for a generic handling of it's active selections, totals and manual
  * override values, while also allowing to apply custom rules to each.
  * 
  * A modifier category would be: environmental, matrix, magic/astral, social, ...
  * 
- * Each handler works on the document level, which might have local source modifier data containing
+ * Each modifier works on the document level, which might have local source modifier data containing
  * selections for a scene, a position, an actor or else.
  * 
- * A user/GM can select specific modifier values (so called active modifiers).
+ * A user/GM can select specific modifier values (so called active modifiers) via GUI.
  * 
  * It's allowed to have user selections for their character, while the gm has selections made
  * globally for the scene or local token position. These selections override each other and can
  * be modified by an ActiveEffect.
  * 
+ * A SituationModifier 
+ * 
  */
 export class SituationModifier {
-    category: SituationModifierCategory;
+    type: Shadowrun.SituationModifierType;
     // A reference to the modifiers this handler is used within.
     modifiers?: DocumentSituationModifiers
     // The original source modifier data. This shouldn't be altered.
@@ -95,6 +97,17 @@ export class SituationModifier {
      */
     get active(): ActiveModifierValue {
         return this.source.active;
+    }
+
+    /**
+     * Allow a situational modifier to NOT need any source data to apply it's modifiers.
+     * 
+     * This can be used to implement a modifier that IS situational but doesn't need data structures for selection.
+     * 
+     * @returns false, when a handler doesn't use any document source data.
+     */
+    get hasSourceData(): boolean {
+        return true;
     }
 
     /**
@@ -211,9 +224,9 @@ export class SituationModifier {
 
         // CASE 1 - Actor document class - apply all top level documents first.
         // Note, instance against configured class to be change resistant.
-        if (this.modifiers && this.sourceDocumentIsActor) {
+        if (this.hasSourceData && this.modifiers && this.sourceDocumentIsActor) {
             // Using a document source, a category is necessary to extract the right source modifiers.
-            if (!this.category) return console.error(`Shadowrun 5e | ${this.constructor.name} can't interact with documents without a modifier category set.`)
+            if (!this.type) return console.error(`Shadowrun 5e | ${this.constructor.name} can't interact with documents without a modifier category set.`)
 
             const actor = this.modifiers.document as SR5Actor;
             this._addSceneSourceDataFromActor(actor, sources);
@@ -237,7 +250,7 @@ export class SituationModifier {
 
         // After merging active and fixed value, derive total.
         if (this.hasFixed) this.applied.total = this.applied.fixed as number;
-        else this.applied.total = this._calcActiveTotal();
+        else this.applied.total = this._calcActiveTotal(options);
 
         console.debug(`Shadowrun 5e | Totalled situational modifiers for ${this.modifiers?.document?.name} to be: ${this.applied.total}`, this.applied);
     }
@@ -261,11 +274,11 @@ export class SituationModifier {
 
     _getDocumentsSourceData(document: ModifiableDocumentTypes): SourceModifierData|undefined {
         // To access another objects
-        if (!this.category) return;
+        if (!this.type) return;
         // A placed token must apply it's scene modifiers first.
         const modifiers = DocumentSituationModifiers.getDocumentModifiers(document);
         // Select the modifier category only.
-        return modifiers.source[this.category];
+        return modifiers.source[this.type];
     }
 
     /**
@@ -277,7 +290,7 @@ export class SituationModifier {
      * 
      * @returns The total modifier value to be used for this situational modifier category.
      */
-    _calcActiveTotal(): number {
+    _calcActiveTotal(options: SituationalModifierApplyOptions={}): number {
         return Object.values(this.applied.active).reduce((sum, current) => sum + current, 0) || 0;
     }
 
@@ -307,13 +320,13 @@ export class SituationModifier {
     }
 
     _updateDocumentSourceModifiers() {
-        if (!this.category || !this.modifiers) return;
-        this.modifiers.source[this.category] = this.source;
+        if (!this.type || !this.modifiers) return;
+        this.modifiers.source[this.type] = this.source;
     }
     
     _updateDocumentAppliedModifiers() {
-        if (!this.category || !this.modifiers) return;
-        this.modifiers.applied[this.category] = this.applied;
+        if (!this.type || !this.modifiers) return;
+        this.modifiers.applied[this.type] = this.applied;
     }
 
     _updateDocumentModifiers() {

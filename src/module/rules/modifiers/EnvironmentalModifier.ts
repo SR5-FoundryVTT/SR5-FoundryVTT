@@ -1,5 +1,5 @@
 import { SR } from '../../constants';
-import { SituationModifier, SituationModifierCategory } from './SituationModifier';
+import { SituationModifier } from './SituationModifier';
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifiersSourceData = Shadowrun.EnvironmentalModifiersSourceData;
 import EnvironmentalModifiersData = Shadowrun.EnvironmentalModifiersData;
@@ -10,7 +10,7 @@ import EnvironmentalModifiersData = Shadowrun.EnvironmentalModifiersData;
 export class EnvironmentalModifier extends SituationModifier {
     source: EnvironmentalModifiersSourceData
     applied: EnvironmentalModifiersData
-    category: SituationModifierCategory = 'environmental';
+    type: Shadowrun.SituationModifierType = 'environmental';
 
     
     get levels(): EnvironmentalModifierLevels {

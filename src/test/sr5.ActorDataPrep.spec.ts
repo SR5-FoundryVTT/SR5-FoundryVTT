@@ -240,6 +240,19 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 assert.strictEqual(character.system.track.physical.value, 9);
                 assert.strictEqual(character.system.track.physical.wounds, 1);
             });
+            it('Character recoil compensation', () => {
+                let actor = new SR5Actor({name: 'Testing', type: 'character', system: {attributes: {strength: {base: 5}}}});
+                let character = actor.asCharacter();
+                if (!character) return assert.fail();
+                
+                assert.strictEqual(character.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
+    
+                actor = new SR5Actor({name: 'Testing', type: 'character', system: {attributes: {strength: {base: 1}}}});
+                character = actor.asCharacter();
+                if (!character) return assert.fail();
+                
+                assert.strictEqual(character.system.values.recoil_compensation.value, 2); // SR5#175: 1 / 3 = 0,3 (rounded up) = 1 => 1 + 1
+            });
         });
         describe('SpiritDataPrep', () => {
             it('Spirits are always magical', async () => {
@@ -279,6 +292,14 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
 
                 assert.strictEqual(spirit.system.skills.active.assensing.base, 6);
                 assert.strictEqual(spirit.system.skills.active.arcana.base, 0); // not for this spirit type.
+            });
+
+            it('Spirit recoil compensation', () => {
+                let actor = new SR5Actor({name: 'Testing', type: 'spirit', system: {attributes: {strength: {base: 5}}}});
+                let spirit = actor.asSpirit();
+                if (!spirit) return assert.fail();
+                
+                assert.strictEqual(spirit.system.values.recoil_compensation.value, 2);
             });
         });
         describe('SpriteDataPrep', () => {
@@ -333,7 +354,7 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
             });
         });
         describe('VehicleDataPrep', () => {
-                it('Matrix condition monitor track calculation with modifiers', async () => {
+            it('Matrix condition monitor track calculation with modifiers', async () => {
                 const actor = await testActor.create({type: 'vehicle'}) as SR5Actor;
                 
                 let vehicle = actor.asVehicle() as VehicleActorData;
@@ -342,6 +363,14 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 await actor.update({'system.modifiers.matrix_track': 1});
                 vehicle = actor.asVehicle() as VehicleActorData;
                 assert.equal(vehicle.system.matrix.condition_monitor.max, 9);
+            });
+
+            it('Vehicle recoil compensation', () => {
+                let actor = new SR5Actor({name: 'Testing', type: 'vehicle', system: {attributes: {body: {base: 5}}}});
+                let vehicle = actor.asVehicle();
+                if (!vehicle) return assert.fail();
+                
+                assert.strictEqual(vehicle.system.values.recoil_compensation.value, 5); // SR5#175: 5
             });
         });
         describe('ICDataPrep', () => {
@@ -354,6 +383,22 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 await actor.update({'system.modifiers.matrix_track': 1});
                 ic = actor.asIC() as ICActorData;
                 assert.equal(ic.system.matrix.condition_monitor.max, 9);
+            });
+        });
+
+        describe('CritterDataPrep', () => {
+            it('Critter character recoil compensation', () => {
+                let actor = new SR5Actor({name: 'Testing', type: 'critter', system: {attributes: {strength: {base: 5}}}});
+                let critter = actor.asCritter();
+                if (!critter) return assert.fail();
+                
+                assert.strictEqual(critter.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
+    
+                actor = new SR5Actor({name: 'Testing', type: 'critter', system: {attributes: {strength: {base: 1}}}});
+                critter = actor.asCritter();
+                if (!critter) return assert.fail();
+                
+                assert.strictEqual(critter.system.values.recoil_compensation.value, 2); // SR5#175: 1 / 3 = 0,3 (rounded up) = 1 => 1 + 1
             });
         });
 }

@@ -2,6 +2,7 @@ import FireModeData = Shadowrun.FireModeData;
 import FiringModeData = Shadowrun.FiringModeData;
 import { SR5 } from "../config";
 
+
 export const FireModeRules = {
     /**
      * Give a defense modifier according to rounds consumed and SR5#180.
@@ -10,11 +11,11 @@ export const FireModeRules = {
      * will be applied.
      *
      * @param fireMode The selected fireMode 
-     * @param ammo How many rounds can be fired
+     * @param ammoLeft How many rounds can be fired
      *
      * @returns a negative defense modifier value
      */
-    fireModeDefenseModifier: function(fireMode: FireModeData, ammo: number=0): number {
+    fireModeDefenseModifier: function(fireMode: FireModeData, ammoLeft: number=0): number {
         // For negative rounds use a sane default.
         const rounds = fireMode.value < 0 ? fireMode.value * -1 : fireMode.value;
         // Due to legecy value, sometimes a string numerical sneaks in...
@@ -23,11 +24,11 @@ export const FireModeRules = {
         if (modifier === 0) return 0;
 
         // Reduce modifier by avaiable ammunition.
-        if (ammo <= 0) ammo = rounds;
-        if (ammo >= rounds) return modifier;
+        if (ammoLeft <= 0) ammoLeft = rounds;
+        if (ammoLeft >= rounds) return modifier;
 
         // Reduce negative modifier by one for each missing unit.
-        return Math.min(modifier + rounds - ammo, 0);
+        return Math.min(modifier + rounds - ammoLeft, 0);
     },
 
     /**
@@ -36,39 +37,59 @@ export const FireModeRules = {
      * NOTE: Reducing recoil compensation here is a bit unintuitive and might be easier to read
      *       with its own rule function.
      *
-     * @param fireMode The chosen fire mode
-     * @param compensation Remaining recoil compensation
-     * @param ammo Amount of ammunition available
+     * @param fireMode The chosen fire mode for the attack
+     * @param compensation Actors recoil compensation
+     * @param recoil Accured progressive recoil of the actor before current attack
+     * @param ammoLeft Amount of ammunition available
      *
      * @return compensation Amount of compensation left.
-     * @return recoilModifier Attack modifier to be applied on the attack.
+     * @return new recoil modifier.
      */
-    recoilAttackModifier: function(fireMode: FireModeData, compensation: number, ammo: number = 0): { compensation: number, recoilModifier: number } {
-        // Some firemodes don't cause recoil.
-        if (!fireMode.recoil) return {compensation, recoilModifier: 0};
-        // Sanitze negative ammo values by pretending not to shoot
-        if (fireMode.value < 0) return {compensation, recoilModifier: 0};
+    recoilModifierAfterAttack: function(fireMode: FireModeData, compensation: number, recoil: number=0, ammoLeft: number = 0): number {
+        // Sanitze negative fire mode values by pretending not to shoot.
+        if (fireMode.value < 0) return 0;
         // Sanitaze negative ammo values by pretending to have just enough.
-        if (ammo <= 0) ammo = fireMode.value;
-
+        if (ammoLeft <= 0) ammoLeft = fireMode.value;
         // Only fire amount of rounds available.
-        const rounds = Math.min(fireMode.value, ammo);
+        const additionalRecoil = FireModeRules.additionalRecoil(fireMode, ammoLeft);
         // Compensate recoil to get modifier.
-        const recoilModifier = Math.min(compensation - rounds, 0);
-        // Reduce compensation for additional attacks this combat turn.
-        compensation = Math.max(compensation - rounds, 0);
-
-        return {compensation, recoilModifier};
+        return FireModeRules.recoilModifier(compensation, recoil, additionalRecoil);
+    },
+    
+    /**
+     * Calculate the amount of additional recoil possible depending on recoil of the firemode and
+     * ammunition left.
+     * 
+     * @param fireMode Choosen fire mode to attack with
+     * @param ammoLeft Ammunition left in the weapon
+     * @returns A positive number or zero, if no additional recoil will be caused.
+     */
+    additionalRecoil: function(fireMode: FireModeData, ammoLeft: number): number {
+        return fireMode.recoil ? Math.min(fireMode.value, ammoLeft) : 0;
     },
 
     /**
-     * Available firemodes for a weapon
+     * Calculate the revoil modifier value according to SR5#175 'Recoil' and 'Progressive Recoil'
+     * 
+     * @param compensation Amount of total recoil compensation available.
+     * @param recoil Current Amount of total progressive recoil.
+     * @param additionalRecoil Amount of additional fired ammunition.
+     * 
+     * @returns a negative number or zero.
+     */
+    recoilModifier: function(compensation: number, recoil: number, additionalRecoil: number=0) {
+        return Math.min(compensation - (recoil + additionalRecoil), 0);
+    },
+
+    /**
+     * Determine what firemodes are available to a ranged weapon user.
+     * 
      * @param rangedWeaponModes The weapon modes on the actual gun 
-     * @param rounds The amount of rounds left. If not given, all firemodes will returned.
+     * @param ammoLeft The amount of rounds left. If not given, all firemodes will returned.
      * 
      * @returns A list of firemodes sorted by weapon mode and rounds necessary.
      */
-    availableFireModes: function (rangedWeaponModes: FiringModeData, rounds?: number): FireModeData[] {
+    availableFireModes: function (rangedWeaponModes: FiringModeData, ammoLeft?: number): FireModeData[] {
         // Reduce all fire modes to what's available on weapon
         // TODO: rounds check
         return SR5.fireModes

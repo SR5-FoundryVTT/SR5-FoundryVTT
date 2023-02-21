@@ -1,4 +1,4 @@
-import { SituationModifier, SituationModifierCategory } from './../../rules/modifiers/SituationModifier';
+import { SituationModifier } from './../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from './../../apps/SituationModifiersApplication';
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
@@ -1674,7 +1674,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const modifiers = this.document.getSituationModifiers();
         if (!modifiers) return [];
 
-        return Object.entries(modifiers.handlers).map(([category, modifier]: [SituationModifierCategory, SituationModifier]) => {
+        return Object.entries(modifiers._modifiers).map(([category, modifier]: [Shadowrun.SituationModifierType, SituationModifier]) => {
             const hidden = this._hideSituationModifier(category);
 
             const label = SR5.modifierTypes[category];
@@ -1688,7 +1688,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param category Modifier category to maybe hide
      * @returns true, hide this category from the actors sheet.
      */
-    _hideSituationModifier(category: SituationModifierCategory): boolean {
+    _hideSituationModifier(category: Shadowrun.SituationModifierType): boolean {
         switch (category) {
             case 'background_count':
                 return !this.document.isAwakened;

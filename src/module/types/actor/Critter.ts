@@ -10,6 +10,7 @@ declare namespace Shadowrun {
         WoundsActorData,
         MatrixActorData,
         MovementActorData {
+            values: PhysicalCombatValues
             limits: CharacterLimits
     }
 }

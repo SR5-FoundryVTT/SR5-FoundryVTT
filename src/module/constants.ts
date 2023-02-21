@@ -43,7 +43,8 @@ export const FLAGS = {
     Test: 'TestData',
     HideGMOnlyChatContent: 'HideGMOnlyChatContent',
     MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest',
-    AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier'
+    AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier',
+    AutomateProgressiveRecoil: 'AutomateProgressiveRecoil'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

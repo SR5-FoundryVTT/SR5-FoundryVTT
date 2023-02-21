@@ -1,4 +1,4 @@
-import { SituationModifier, SituationModifierCategory } from './SituationModifier';
+import { SituationModifier } from './SituationModifier';
 import BackgroundCountModifiersSourceData = Shadowrun.BackgroundCountModifiersSourceData;
 import BackgroundCountModifiersData = Shadowrun.BackgroundCountModifiersData;
 
@@ -8,5 +8,5 @@ import BackgroundCountModifiersData = Shadowrun.BackgroundCountModifiersData;
 export class BackgroundCountModifier extends SituationModifier {
     source: BackgroundCountModifiersSourceData
     applied: BackgroundCountModifiersData
-    category: SituationModifierCategory = 'background_count';
+    type: Shadowrun.SituationModifierType = 'background_count';
 }

@@ -10,6 +10,7 @@ declare namespace Shadowrun {
         ArmorActorData,
         WoundsActorData,
         MovementActorData {
+            values: PhysicalCombatValues
             spiritType: SpiritType
             force: number
             limits: AwakendLimits

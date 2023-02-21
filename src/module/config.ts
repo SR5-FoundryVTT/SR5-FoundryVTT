@@ -436,6 +436,7 @@ export const SR5 = {
         memory: 'SR5.RollMemory',
         soak: 'SR5.RollSoak',
         wounds: 'SR5.ModifierTypes.Wounds',
+        recoil: 'SR5.ModifierTypes.Recoil'
     },
 
     /**

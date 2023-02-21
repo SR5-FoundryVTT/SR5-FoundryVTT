@@ -32,7 +32,7 @@ export class SR5Combat extends Combat {
      * Use the given actors token to get the combatant.
      * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
      */
-    getActorCombatant(actor: SR5Actor): undefined | any {
+    getActorCombatant(actor: SR5Actor): undefined | Combatant {
         const token = actor.getToken();
         if (!token) return;
         return this.getCombatantByToken(token.id as string);
@@ -163,14 +163,27 @@ export class SR5Combat extends Combat {
 
     /**
      * When combat enters a new combat phase, apply necessary changes.
-     * @param combatId 
+     * 
+     * This action phase change can occur through phase/turn/round changes.
+     * 
+     * @param combatId Combat with the current combatant entering it's next action phase.
      */
     static async handleActionPhase(combatId: string) {
         const combat = game.combats?.get(combatId) as SR5Combat;
         if (!combat) return;
 
+        const combatant = combat.combatant;
+        if (!combatant) return;
+
         // Defense modifiers reset on a new action phase.
-        combat.combatant?.actor?.removeDefenseMultiModifier();
+        await combatant.actor?.removeDefenseMultiModifier();
+
+        const turnsSinceLastAttackSetting = combatant.getFlag(SYSTEM_NAME, 'turnsSinceLastAttack');
+        if (foundry.utils.getType(turnsSinceLastAttackSetting) !== 'number') return await combatant.actor?.clearProgressiveRecoil();
+        
+        const turnsSinceLastAttack = Number(turnsSinceLastAttackSetting);
+        if (turnsSinceLastAttack > 0) await combatant.actor?.clearProgressiveRecoil();
+        else await combatant.setFlag(SYSTEM_NAME, 'turnsSinceLastAttack', 1);
     }
 
     /**

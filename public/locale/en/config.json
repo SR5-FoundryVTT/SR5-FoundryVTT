@@ -33,6 +33,8 @@
         "ApplyLimitsName": "Apply Limits to Rolls",
         "AutomateMultiDefenseModifier": "Automate defense modifier",
         "AutomateMultiDefenseModifierDescription": "Will automatically apply defense modi. for mulitple attacks",
+        "AutomateProgressiveRecoil": "Automate progressive recoil",
+        "AutomateProgressiveRecoilDescription": "Accure progressive recoil until reset",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
         "DiagonalMovementName": "Diagonal Movement",
         "DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the shadowrun roll-card",
@@ -446,7 +448,8 @@
     "SR5.Information": "Info",
     "SR5.Infos": {
         "CantModifyHostContent": "Can't change host data from within an IC actor.",
-        "ConsumedEquippedAmmo": "Consumed rounds from equipped ammunition"
+        "ConsumedEquippedAmmo": "Consumed rounds from equipped ammunition",
+        "ResetProgressiveRecoil": "Reset progressive recoil to zero bullets fired"
     },
     "SR5.InitCatAstral": "Astral",
     "SR5.InitCatMatrix": "Matrix",
@@ -622,6 +625,7 @@
         "EnvironmentalWind": "Environmental (Wind)",
         "Magic": "Background Count",
         "Matrix": "Noise",
+        "Recoil": "Recoil",
         "Wounds": "Wounds"
     },
     "SR5.MountPoint": "Mount Point",
@@ -690,7 +694,7 @@
     "SR5.Reach": "Reach",
     "SR5.RecklessSpellButton": "Reckless",
     "SR5.Recoil": "Recoil",
-    "SR5.RecoilCompensation": "RC",
+    "SR5.RecoilCompensation": "Recoil Comp.",
     "SR5.ResetOverwatchScore": "Reset Overwatch Score",
     "SR5.Resist": "Resist",
     "SR5.ResistedAllDamage": "No Damage taken!",
@@ -971,9 +975,9 @@
     "SR5.Tooltips": {
         "Actor": {},
         "Effect": {
-            "Temporary": "Effects with a limited life span",
+            "Inactive": "Inactive effects don't apply their changes until they are enabled",
             "Persistant": "Effects with an unlimited life span",
-            "Inactive": "Inactive effects don't apply their changes until they are enabled"
+            "Temporary": "Effects with a limited life span"
         },
         "Item": {
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers.",
@@ -1012,6 +1016,16 @@
             "stun_track": "Modifies stun damage track.",
             "walk": "Modifies walking distance by multiples of the agility attribute.",
             "wound_tolerance": "Modifies damage per wound modifier."
+        },
+        "RangedAttack": {
+            "Recoil": "Progressive Recoil",
+            "RecoilAfterAttack": "Progressive Recoil including this attack",
+            "RecoilBeforeAttack": "Progressive Recoil now, befor attacking.",
+            "RecoilCompensation": "Total RC, including actor and item RC",
+            "ResetRecoil": "Reset progressive recoil to none"
+        },
+        "SituationalModifier": {
+            "Recoil": "Amount of bullets fired"
         }
     },
     "SR5.Top": "Top",
