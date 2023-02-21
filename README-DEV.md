@@ -1,13 +1,13 @@
 # Local development environment
 
 ## General development
-The main development workflow uses a build system using npm and gulp with Github pull requests required for changes made. None of this is required for issues, content or translations described above! This process can be involved and should a step fail with errors please search the web first.
+The main development workflow uses a build system using npm and gulp with Github pull requests required for changes made. Should you have issues while setting it up, please web search first.
 
 Shadowrun5e uses Typescript (with esbuild), npm with gulp and git. Follow these installation manuals: 
 * [https://www.npmjs.com/get-npm](https://www.npmjs.com/get-npm)
 * [https://github.com/git-guides/install-git#:~:text=To%20install%20Git%2C%20navigate%20to,installation%20by%20typing%3A%20git%20version%20.](https://github.com/git-guides/install-git#:~:text=To%20install%20Git%2C%20navigate%20to,installation%20by%20typing%3A%20git%20version%20.)
 
-Afterwards follow these steps using your terminal (cmd.exe on Windows):
+After follow these steps using your terminal (cmd.exe on Windows):
 * `npm install --global gulp-cli`
 * Follow this manual on how to work with a Github forking and cloning, git branches and Github pull requests ([https://opensource.com/article/19/7/create-pull-request-github](https://opensource.com/article/19/7/create-pull-request-github))
 * `cd <the_cloned_fork_directory>`
@@ -16,11 +16,42 @@ Afterwards follow these steps using your terminal (cmd.exe on Windows):
 * Start developing
 
 There are multiple gulp tasks available to help development:
-* watch => rebuild the system after a change is detected
-* build => rebuild the system once, manually
+* watch => rebuild the system after a change is detected (code and `/public` data)
+* build => rebuild the system once
 * link => See section below
 
-In general the application within FoundryVTT will use what's the build process puts into _dist/_, while most else isn't needed to function but only to provide sources.
+In general the application within FoundryVTT will only use contents in `/dist`.
+
+
+# System Architecture
+
+## Folder structure
+Everything needed to execute the system within foundry must live under 
+* `/dist`
+FoundryVTT compendium packs are used as is:
+- `/packs`
+Data that needs to be copied into `/dist` as is during build:
+* `/public`
+Source code 
+- `/src`
+
+
+## Translations
+The FoundryVTT language config files used by Foundry will be at `/dist/lang/<language>/config.json`. The `/dist` directory does only exist on releases and changes made here to language files won't be accepted into the GitHub repository. Instead use `/public/lang/<language>/config.json` as these are copied over to `/dist/lang` when running `gulp build` or `gulp watch`.
+
+In order to get your translation changes to the `/public` language files into the system, you'll have to create a GitHub pull request against the systems `master`/`main` branch. 
+
+## Design
+More and more parts of the system move to separate modules organized into these broad layers:
+All following folder reference are relative to src\module\*
+* Rules layer. Shouldn't contain any references to Foundry objects. At best system objects should be used (like a PartsList)
+  These live in the rules\ folder
+* Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects. These live in item\flows and actor\flows.
+* Application layer. Handle interface operations. Dialogs. Application windows. Chat Message creation and so forth.
+* Tests layer. Whenever any Shadowrun test is implemented it should extend the SuccessTest class. All tests live in the tests\ folder.   
+
+Additional separations are made for
+* Initial data generation of items or template partials
 
 ## Branches and Pull Requests
 We'll gladly accept pull requests for all things moving the system forward. :)
@@ -84,24 +115,3 @@ If you need to restart the instance:
 docker-compose down
 docker-compose up
 ```
-
-# System Architecture
-
-## Folder structure
-Everything needed to execute the system within foundry must live under 
-* dist\
-
-All other folders are used during development.
-
-## Design
-More and more parts of the system move to separate modules organized into these broad layers:
-All following folder reference are relative to src\module\*
-* Rules layer. Shouldn't contain any references to Foundry objects. At best system objects should be used (like a PartsList)
-  These live in the rules\ folder
-* Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects. These live in item\flows and actor\flows.
-* Application layer. Handle interface operations. Dialogs. Application windows. Chat Message creation and so forth.
-* Tests layer. Whenever any Shadowrun test is implemented it should extend the SuccessTest class. All tests live in the tests\ folder.   
-
-Additional separations are made for
-* Initial data generation of items or template partials
-
