@@ -319,11 +319,6 @@ export class SR5Actor extends Actor {
         return changes;
     }
 
-    getModifier(modifierName: string): NumberOrEmpty {
-        //@ts-ignore // TODO: foundry-vtt-types v10
-        return Number(this.system.modifiers[modifierName]);
-    }
-
     /**
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */
@@ -983,10 +978,10 @@ export class SR5Actor extends Actor {
         pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
         pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
 
+
         // Build modifiers values.
-        const mods = new PartsList<number>();
-        this._addGlobalParts(mods);
-        test.data.modifiers.mod = mods.list;
+        const mods = new PartsList<number>(test.data.modifiers.mod);
+        mods.addUniquePart('SR5.Global', this.modifiers.totalFor('global'))
 
         await test.execute();
     }
@@ -1110,55 +1105,6 @@ export class SR5Actor extends Actor {
      */
     _removeMatrixParts(parts: PartsList<number>) {
         ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.removePart(part));
-    }
-
-    // TODO: Check for legacy removal
-    _addGlobalParts(parts: PartsList<number>) {
-        //@ts-ignore // TODO: foundry-vtt-types v10
-        if (this.system.modifiers.global) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
-            parts.addUniquePart('SR5.Global', this.system.modifiers.global);
-        }
-    }
-
-    // TODO: check for legacy removal.
-    _addDefenseParts(parts: PartsList<number>) {
-        if (this.isVehicle()) {
-            const pilot = this.findVehicleStat('pilot');
-            if (pilot) {
-                parts.addUniquePart(pilot.label, Helpers.calcTotal(pilot));
-            }
-            const skill = this.getVehicleTypeSkill();
-            if (skill) {
-                parts.addUniquePart('SR5.Vehicle.Maneuvering', Helpers.calcTotal(skill));
-            }
-        } else {
-            const reaction = this.findAttribute('reaction');
-            const intuition = this.findAttribute('intuition');
-
-            if (reaction) {
-                parts.addUniquePart(reaction.label || 'SR5.Reaction', reaction.value);
-            }
-            if (intuition) {
-                parts.addUniquePart(intuition.label || 'SR5.Intuition', intuition.value);
-            }
-        }
-
-        const mod = this.getModifier('defense');
-        if (mod) {
-            parts.addUniquePart('SR5.Bonus', mod);
-        }
-    }
-
-    // TODO: Check for legacy removal.
-    _addArmorParts(parts: PartsList<number>) {
-        const armor = this.getArmor();
-        if (armor) {
-            parts.addUniquePart(armor.label || 'SR5.Armor', armor.base);
-            for (let part of armor.mod) {
-                parts.addUniquePart(part.name, part.value);
-            }
-        }
     }
 
     /**

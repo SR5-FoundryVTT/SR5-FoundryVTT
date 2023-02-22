@@ -46,7 +46,7 @@ export class ModifierFlow {
         if (modifiers.handlesTotalFor(name)) return modifiers.getTotalFor(name, options);
 
         // Get global modifiers that come from the legacy actor modifier system.
-        return this.document.getModifier(name) || 0;
+        return Number(this.document.system.modifiers[name] ?? 0);
     }
 
     /**

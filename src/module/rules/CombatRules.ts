@@ -194,7 +194,7 @@ export class CombatRules {
      * @param actor The actor affected by the damage
      * @returns The updated damage data
      */
-     static modifyDamageTypeAfterHit(damage: DamageData, actor : SR5Actor) : DamageData {
+    static modifyDamageTypeAfterHit(damage: DamageData, actor : SR5Actor) : DamageData {
         // Careful, order of damage conversion is very important
         // Electricity stun damage is considered physical for vehicles
         let updatedDamage = duplicate(damage) as DamageData;
