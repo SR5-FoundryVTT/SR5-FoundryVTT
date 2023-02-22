@@ -515,6 +515,7 @@
             "ICConfiguration": "IC Configuration",
             "Matrix": "Matrix",
             "PersonalInventory": "On Person",
+            "ResetActorForNewRun": "New Run Reset",
             "RollDroneInfiltration": "Drone Infiltration",
             "RollDronePerception": "Drone Perception",
             "RollPilotVehicleTest": "Pilot Vehicle",
@@ -523,10 +524,10 @@
             "SpiritConfiguration": "Spirit Configuration",
             "SpritePowers": "Sprite Powers",
             "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
-            "VehicleConfiguration": "Vehicle Configuration",
-            "ResetActorForNewRun": "New Run Reset"
+            "VehicleConfiguration": "Vehicle Configuration"
         },
         "Inventory": {
+            "All": "Any",
             "Carried": "Carried",
             "OpenInventory": "Inventory"
         },
@@ -997,10 +998,10 @@
             "astral_limit": "Modifies astral limit.",
             "composure": "Modifies composure tests pool.",
             "defense": "Modifies defense tests pool.",
-            "drain": "Modifies drain tests pool.",
-            "defense_dodge": "Modifies the defense modifier for active dodging",
             "defense_block": "Modifies the defense modifier for active blocking",
+            "defense_dodge": "Modifies the defense modifier for active dodging",
             "defense_parry": "Modifies the defense modifier for active parrying",
+            "drain": "Modifies drain tests pool.",
             "essence": "Modifies essence attribute.",
             "fade": "Modifies fade tests pool",
             "global": "Modifies all tests pool, excluding damage reducing tests.",

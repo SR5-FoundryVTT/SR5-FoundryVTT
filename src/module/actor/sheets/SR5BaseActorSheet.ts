@@ -779,6 +779,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Simple item to inventory mapping.
         const itemIdInventory = {};
 
+        // All inventories for showing all items, but not as default
+        inventories[this.document.allInventories.name] = {
+            name: this.document.allInventories.name,
+            label: this.document.allInventories.label,
+            types: {}
+        };
+        this._addInventoryTypes(inventories[this.document.allInventories.name]);
+
         // Default inventory for items without a defined one.
         // Add first for display purposes on sheet.
         inventories[this.document.defaultInventory.name] = {
@@ -833,6 +841,9 @@ export class SR5BaseActorSheet extends ActorSheet {
             // Add the item to this inventory.
             // @ts-ignore
             inventory.types[item.type].items.push(sheetItem as SheetItemData);
+
+            const allInventories = inventories[this.document.allInventories.name];
+            allInventories.types[item.type].items.push(sheetItem as SheetItemData);
         });
 
         Object.values(inventories).forEach(inventory => {
@@ -1459,7 +1470,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
 
         // Disallow editing of default inventory.
-        if (action === 'edit' && this.selectedInventory === this.document.defaultInventory.name)
+        if (action === 'edit' && this.document.inventory.disallowRename(this.selectedInventory))
             return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
 
 

@@ -86,6 +86,13 @@ export class SR5Actor extends Actor {
         label: 'SR5.Labels.Inventory.Carried',
         itemIds: []
     }
+    // This is a dummy inventory
+    allInventories: InventoryData = {
+        name: 'All',
+        label: 'SR5.Labels.Inventory.All',
+        itemIds: [],
+        showAll: true
+    }
 
     // Allow users to access to tests creation.
     tests: typeof TestCreator = TestCreator;

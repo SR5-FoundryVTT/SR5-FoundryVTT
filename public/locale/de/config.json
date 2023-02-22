@@ -515,6 +515,7 @@
                         "ICConfiguration": "IC Configuration",
                         "Matrix": "Matrix",
                         "PersonalInventory": "Am Körper",
+                        "ResetActorForNewRun": "Neuer Run Reset",
                         "RollDroneInfiltration": "Drohne infiltrieren",
                         "RollDronePerception": "Drohnenwahrnehmung",
                         "RollPilotVehicleTest": "Fahrzeug steuern",
@@ -523,10 +524,10 @@
                         "SpiritConfiguration": "Geist Konfiguration",
                         "SpritePowers": "Sprite Kräfte",
                         "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung.",
-                        "VehicleConfiguration": "Fahrzeug Konfiguration",
-                        "ResetActorForNewRun": "Neuer Run Reset"
+                        "VehicleConfiguration": "Fahrzeug Konfiguration"
                 },
                 "Inventory": {
+                        "All": "Alle",
                         "Carried": "Mitgeführt",
                         "OpenInventory": "Inventar"
                 },

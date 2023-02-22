@@ -78,6 +78,7 @@ declare namespace Shadowrun {
         name: string  // Internal name.
         label: string // Displayed name, can be the same as 'name' when user created.
         itemIds: string[] // Item ids to show within this inventory.
+        showAll?: boolean // When set to true, show all items from all inventories.
     }
 
     /**
