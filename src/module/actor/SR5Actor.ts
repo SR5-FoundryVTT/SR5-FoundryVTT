@@ -2010,4 +2010,27 @@ export class SR5Actor extends Actor {
     get hasPhysicalBody() {
         return this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle();
     }
+
+    /**
+     * Reset damage, edge, etc. and prepare this actor for a new run.
+     */
+    async resetRunData() {
+        const updateData: Record<string, any> = {};
+
+        if (this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle()) {
+            updateData['system.track.physical.value'] = 0;
+            updateData['system.track.physical.overflow.value'] = 0;
+        }
+
+        if (this.isCharacter() || this.isCritter() || this.isSpirit()) {
+            updateData['system.track.stun.value'] = 0;
+        }
+
+        if (this.isCharacter() || this.isCritter()) {
+            updateData['system.attributes.edge.uses'] = this.getEdge().value;
+        }
+
+        if (this.isMatrixActor) await this.setMatrixDamage(0);
+        if (updateData) await this.update(updateData);
+    }
 }

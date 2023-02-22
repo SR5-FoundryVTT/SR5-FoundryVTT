@@ -523,7 +523,8 @@
             "SpiritConfiguration": "Spirit Configuration",
             "SpritePowers": "Sprite Powers",
             "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
-            "VehicleConfiguration": "Vehicle Configuration"
+            "VehicleConfiguration": "Vehicle Configuration",
+            "ResetActorForNewRun": "New Run Reset"
         },
         "Inventory": {
             "Carried": "Carried",
@@ -976,7 +977,9 @@
     "SR5.ToggleActive": "Toggle Active",
     "SR5.ToggleEquip": "Toggle Equipped",
     "SR5.Tooltips": {
-        "Actor": {},
+        "Actor": {
+            "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
+        },
         "Effect": {
             "Inactive": "Inactive effects don't apply their changes until they are enabled",
             "Persistant": "Effects with an unlimited life span",

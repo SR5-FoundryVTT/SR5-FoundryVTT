@@ -317,6 +317,8 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Situation modifiers application
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
+
+        html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
     }
 
     /**
@@ -1697,6 +1699,8 @@ export class SR5BaseActorSheet extends ActorSheet {
             // Defense modifier is already shown in general modifier section.
             case 'defense':
                 return true;
+            case 'recoil':
+                return !this.document.hasPhysicalBody
             default:
                 return false;
         }
@@ -1709,5 +1713,14 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _onShowSituationModifiersApplication(event) {
         new SituationModifiersApplication(this.document).render(true);
+    }
+
+    /**
+     * Trigger a full reset of all run related actor data.
+     * 
+     * @param event 
+     */
+    _onResetActorRunData(event) {
+        this.actor.resetRunData()
     }
 }
