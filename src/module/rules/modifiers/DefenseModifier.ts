@@ -17,6 +17,7 @@ export class DefenseModifier extends SituationModifier {
 
     /**
      * Depending on the test context additional defense modifiers might apply
+     * 
      */
     _calcActiveTotal(options:SituationalModifierApplyOptions): number {
         if (!this.modifiers || !this.modifiers.documentIsActor) return 0;
@@ -27,9 +28,9 @@ export class DefenseModifier extends SituationModifier {
         const test = options.test as PhysicalDefenseTest;
 
         switch (test.data.activeDefense) {
-            case 'dodge': return Number(actor.system.modifiers.defense) + Number(actor.system.modifiers['defense_dodge']);
-            case 'block': return Number(actor.system.modifiers.defense) + Number(actor.system.modifiers['defense_block']);
-            case 'parry': return Number(actor.system.modifiers.defense) + Number(actor.system.modifiers['defense_parry']);
+            case 'dodge': return Number(actor.system.modifiers.defense) + actor.modifiers.totalFor('defense_dodge');
+            case 'block': return Number(actor.system.modifiers.defense) + actor.modifiers.totalFor('defense_block');
+            case 'parry': return Number(actor.system.modifiers.defense) + actor.modifiers.totalFor('defense_parry');
             default: return Number(actor.system.modifiers.defense);
         }
     }
