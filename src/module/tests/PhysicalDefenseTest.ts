@@ -85,7 +85,7 @@ export class PhysicalDefenseTest extends DefenseTest {
         // NOTE: This would be way better if the current weapon (this.item) would be used.
         const equippedMeleeWeapons = actor.getEquippedWeapons().filter((weapon) => weapon.isMeleeWeapon);
         equippedMeleeWeapons.forEach((weapon) => {
-            this.data.activeDefenses[`parry-${weapon.name}`] = {
+            this.data.activeDefenses['parry'] = {
                 label: 'SR5.Parry',
                 weapon: weapon.name || '',
                 value: actor.findActiveSkill(weapon.getActionSkill())?.value,

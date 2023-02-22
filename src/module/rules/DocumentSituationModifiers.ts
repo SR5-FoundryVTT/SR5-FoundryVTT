@@ -1,13 +1,14 @@
 import { SuccessTest } from './../tests/SuccessTest';
 import { RecoilModifier } from './modifiers/RecoilModifier';
-import { BackgroundCountModifier as BackgroundCountModifier } from './modifiers/BackgroundCountModifier';
-import { NoiseModifier as NoiseModifer } from './modifiers/NoiseModifier';
-import { SituationalModifierApplyOptions, SituationModifier } from './modifiers/SituationModifier';
+import { BackgroundCountModifier } from './modifiers/BackgroundCountModifier';
+import { NoiseModifier } from './modifiers/NoiseModifier';
+import { SituationalModifierApplyOptions, } from './modifiers/SituationModifier';
 import { EnvironmentalModifier } from './modifiers/EnvironmentalModifier';
 import { SR5Actor } from "../actor/SR5Actor";
-import {FLAGS, SR, SYSTEM_NAME} from "../constants";
+import {FLAGS, SYSTEM_NAME} from "../constants";
 import SituationModifiersSourceData = Shadowrun.SituationModifiersSourceData;
 import SituationModifiersData = Shadowrun.SituationModifiersData;
+import { DefenseModifier } from './modifiers/DefenseModifier';
 
 
 interface DocumentSituationModifiersTotalForOptions {
@@ -54,10 +55,11 @@ export class DocumentSituationModifiers {
     applied: SituationModifiersData;
     // Handlers for the different modifier categories.
     _modifiers: {
-        noise: NoiseModifer,
+        noise: NoiseModifier,
         background_count: BackgroundCountModifier,
         environmental: EnvironmentalModifier,
-        recoil: RecoilModifier
+        recoil: RecoilModifier,
+        defense: DefenseModifier
     };
 
     /**
@@ -77,11 +79,20 @@ export class DocumentSituationModifiers {
         this.document = document;
 
         // Map all modifier types to their respectiv implementation.
+        this._prepareModifiers();
+        
+    }
+
+    /**
+     * Prepare modifier handlers and their source data.
+     */
+    _prepareModifiers() {
         this._modifiers = {
-            noise: new NoiseModifer(this.source.noise, this),
+            noise: new NoiseModifier(this.source.noise, this),
             background_count: new BackgroundCountModifier(this.source.background_count, this),
             environmental: new EnvironmentalModifier(this.source.environmental, this),
-            recoil: new RecoilModifier({}, this)
+            recoil: new RecoilModifier({}, this),
+            defense: new DefenseModifier({}, this)
         }
     }
 
@@ -96,31 +107,38 @@ export class DocumentSituationModifiers {
     }
 
     /**
-     * Access helper for the SituationalModifier handler of the matrix modifier category
+     * Access helper for the noise modifier handler.
      */
-    get noise(): NoiseModifer {
+    get noise(): NoiseModifier {
         return this._modifiers.noise;
     }
 
     /**
-     * Access helper for the MagicModifier handler of the magic modifier category.
+     * Access helper for the background modifier handler.
      */
     get background_count(): BackgroundCountModifier {
         return this._modifiers.background_count;
     }
 
     /**
-     * Access helper for the EnvironmentalModifier handler of the environmental modifier category.
+     * Access helper for the environmental modifier handler.
      */
     get environmental(): EnvironmentalModifier {
         return this._modifiers.environmental;
     }
 
     /**
-     * Access helper for the recoilModifier handler of the recoil modifier category.
+     * Access helper for the recoilModifier handler.
      */
     get recoil(): RecoilModifier {
         return this._modifiers.recoil;
+    }
+
+    /**
+     * Access helper for the defense modifier handler
+     */
+    get defense(): DefenseModifier {
+        return this._modifiers.defense;
     }
 
     /**
@@ -176,7 +194,7 @@ export class DocumentSituationModifiers {
         // Let all handlers apply their modifier rules on the documents source data.
         Object.entries(this._modifiers).forEach(([category, handler]) => {
             // Some situational modifiers might choose not to apply any source data.
-            if (handler.hasSourceData) {
+            if (Object.getPrototypeOf(handler).constructor.hasSourceData) {
                 // Befor application, remove invalid selections. 
                 // This happens when a selection has been set with an empty input DOM element.
                 Object.entries(this.source[category].active).forEach(([modifier, value]) => {

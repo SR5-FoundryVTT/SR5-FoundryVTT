@@ -106,7 +106,7 @@ export class SituationModifier {
      * 
      * @returns false, when a handler doesn't use any document source data.
      */
-    get hasSourceData(): boolean {
+    static get hasSourceData(): boolean {
         return true;
     }
 
@@ -224,7 +224,7 @@ export class SituationModifier {
 
         // CASE 1 - Actor document class - apply all top level documents first.
         // Note, instance against configured class to be change resistant.
-        if (this.hasSourceData && this.modifiers && this.sourceDocumentIsActor) {
+        if (Object.getPrototypeOf(this).constructor.hasSourceData && this.modifiers && this.sourceDocumentIsActor) {
             // Using a document source, a category is necessary to extract the right source modifiers.
             if (!this.type) return console.error(`Shadowrun 5e | ${this.constructor.name} can't interact with documents without a modifier category set.`)
 
@@ -287,6 +287,8 @@ export class SituationModifier {
      * Override this method if you want to apply different rules depending on the situational modifier category.
      * 
      * By default the active modifiers will simply be sumed up.
+     * 
+     * @param options.test The SuccessTest implementation used to access this modifier. Use if the modifier changes based on test configuration.
      * 
      * @returns The total modifier value to be used for this situational modifier category.
      */

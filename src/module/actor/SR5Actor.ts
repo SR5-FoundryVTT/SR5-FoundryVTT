@@ -321,7 +321,7 @@ export class SR5Actor extends Actor {
 
     getModifier(modifierName: string): NumberOrEmpty {
         //@ts-ignore // TODO: foundry-vtt-types v10
-        return this.system.modifiers[modifierName];
+        return Number(this.system.modifiers[modifierName]);
     }
 
     /**

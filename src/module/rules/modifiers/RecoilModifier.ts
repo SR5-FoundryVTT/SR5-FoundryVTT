@@ -9,12 +9,10 @@ import { SituationalModifierApplyOptions, SituationModifier } from './SituationM
  * NOTE: This is actor local modifier type that doesn't have a scene wide equivalent for all scene tokens.
  */
 export class RecoilModifier extends SituationModifier  {
-    applied: Shadowrun.RecoilModifierData;
-
     /**
      * Recoil modifiers don't allow for any selection.
      */
-    get hasSourceData() {
+    static get hasSourceData() {
         return false;
     }
 

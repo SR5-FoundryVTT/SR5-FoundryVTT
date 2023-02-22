@@ -1694,6 +1694,9 @@ export class SR5BaseActorSheet extends ActorSheet {
                 return !this.document.isAwakened;
             case 'environmental':
                 return this.document.isSprite();
+            // Defense modifier is already shown in general modifier section.
+            case 'defense':
+                return true;
             default:
                 return false;
         }

@@ -8,6 +8,9 @@ declare namespace Shadowrun {
         'armor' |
         'composure'|
         'defense'|
+        'defense_dodge' |
+        'defense_parry' |
+        'defense_block' |
         'multi_defense'|
         'drain'|
         'environmental'|
@@ -27,7 +30,7 @@ declare namespace Shadowrun {
         'recoil'
 
 
-    export type SituationModifierType = keyof SituationModifiersSourceData;
+    export type SituationModifierType = keyof SituationModifiersData;
     
     /** 
      * All situational modifier types of a document that selections can be made for.
@@ -51,7 +54,8 @@ declare namespace Shadowrun {
         environmental: EnvironmentalModifiersData
         noise: NoiseModifiersData
         background_count: BackgroundCountModifiersData
-        recoil: RecoilModifierData
+        recoil: ModifierData
+        defense: ModifierData
     }
 
     export type ActiveModifierValue = Record<string, number>
@@ -132,14 +136,5 @@ declare namespace Shadowrun {
 
     export interface BackgroundCountModifiersData extends ModifierData {
         active: Partial<BackgroundCountModifierCategories>
-    }
-
-    /**
-     * Situational Modifier - RECOIL and PROGRESSIVE RECOIL
-     */
-    type RecoilModifiersSourceData = undefined;
-    interface RecoilModifierCategories {}
-    interface RecoilModifierData extends ModifierData {
-        active: Partial<RecoilModifierCategories>
     }
 }

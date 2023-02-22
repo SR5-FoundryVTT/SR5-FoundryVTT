@@ -106,6 +106,11 @@ declare namespace Shadowrun {
     export interface CommonModifiers extends Modifiers {
         // Meant to be applied on all defense tests.
         defense: NumberOrEmpty
+        // Meant to be applied on some defense tests that apply the defense modifier.
+        ['defense_dodge']: NumberOrEmpty
+        ['defense_parry']: NumberOrEmpty
+        ['defense_block']: NumberOrEmpty
+
         // Meant to be applied on physical resist (soak) tests.
         soak: NumberOrEmpty
         // Meant to be applied to all ranged attack tests.

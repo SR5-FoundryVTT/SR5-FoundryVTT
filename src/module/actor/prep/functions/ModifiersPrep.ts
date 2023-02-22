@@ -24,7 +24,14 @@ export class ModifiersPrep {
      * Modifiers that appear on all actor types.
      */
     static get commonModifiers() {
-        return ['soak', 'defense', 'recoil'];
+        return [
+            'defense', 
+            'defense_dodge',
+            'defense_block', 
+            'defense_parry',
+            'recoil', 
+            'soak'
+        ];
     }
 
     /**
