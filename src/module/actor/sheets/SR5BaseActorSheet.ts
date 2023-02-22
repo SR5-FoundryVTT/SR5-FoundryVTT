@@ -46,7 +46,7 @@ export type InventoriesSheetData = Record<string, InventorySheetData>;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
-// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
+// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong system.
 let globalSkillAppId: number = -1;
 
 
@@ -65,8 +65,8 @@ const sortByEquipped = (left, right) => {
     return 0;
 };
 const sortyByQuality = (a: any, b: any) => {
-    if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
-    if (a.data.type === 'negative' && b.data.type === 'positive') return 1;
+    if (a.system.type === 'positive' && b.system.type === 'negative') return -1;
+    if (a.system.type === 'negative' && b.system.type === 'positive') return 1;
     return a.name < b.name ? -1 : 1;
 }
 
@@ -668,13 +668,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
         const data = {};
         if (cmId === 'stun' || cmId === 'physical') {
-            const property = `data.track.${cmId}.value`;
+            const property = `system.track.${cmId}.value`;
             data[property] = value;
         } else if (cmId === 'edge') {
-            const property = `data.attributes.edge.uses`;
+            const property = `system.attributes.edge.uses`;
             data[property] = value;
         } else if (cmId === 'overflow') {
-            const property = 'data.track.physical.overflow.value';
+            const property = 'system.track.physical.overflow.value';
             data[property] = value;
         } else if (cmId === 'matrix') {
             // Sprites don't have a matrix device, but still use the matrix condition monitor, not matrix track.
@@ -693,18 +693,18 @@ export class SR5BaseActorSheet extends ActorSheet {
         const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
         const data = {};
         if (cmId === 'stun') {
-            data[`data.track.stun.value`] = 0;
+            data[`system.track.stun.value`] = 0;
         }
         // Clearing the physical monitor should also clear the overflow.
         else if (cmId === 'physical') {
-            data[`data.track.physical.value`] = 0;
-            data['data.track.physical.overflow.value'] = 0;
+            data[`system.track.physical.value`] = 0;
+            data['system.track.physical.overflow.value'] = 0;
 
         } else if (cmId === 'edge') {
-            data[`data.attributes.edge.uses`] = 0;
+            data[`system.attributes.edge.uses`] = 0;
 
         } else if (cmId === 'overflow') {
-            data['data.track.physical.overflow.value'] = 0;
+            data['system.track.physical.overflow.value'] = 0;
 
         } else if (cmId === 'matrix') {
             await this.actor.setMatrixDamage(0);
@@ -718,31 +718,31 @@ export class SR5BaseActorSheet extends ActorSheet {
      * 
      * These are used as indicators about what kind of 'special' a character might be.
      *
-     * @param data ActorSheetData as created within getData method
+     * @param sheetData ActorSheetData as created within getData method
      */
-    _prepareSpecialFields(data: SR5ActorSheetData) {
-        data.awakened = data.system.special === 'magic';
-        data.emerged = data.system.special === 'resonance';
+    _prepareSpecialFields(sheetData: SR5ActorSheetData) {
+        sheetData.awakened = sheetData.system.special === 'magic';
+        sheetData.emerged = sheetData.system.special === 'resonance';
     }
 
     /**
      * Pretty up display of zero value actor modifiers.
      *
-     * @param data ActorSheetData as created within getData method
+     * @param sheetData ActorSheetData as created within getData method
      */
-    _prepareActorModifiers(data: SR5ActorSheetData) {
+    _prepareActorModifiers(sheetData: SR5ActorSheetData) {
          // Empty zero value modifiers for display purposes.
-        const { modifiers } = data.system;
+        const { modifiers } = sheetData.system;
         for (let [key, value] of Object.entries(modifiers)) {
             if (value === 0) modifiers[key] = '';
         }
 
-        data.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
+        sheetData.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
     }
 
-    _prepareActorAttributes(data: SR5ActorSheetData) {
+    _prepareActorAttributes(sheetData: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attributes = data.system.attributes;
+        const attributes = sheetData.system.attributes;
         for (let [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
                 if (attribute.temp === 0) delete attribute.temp;
@@ -750,9 +750,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         }
     }
 
-    _prepareMatrixAttributes(data: SR5ActorSheetData) {
+    _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
         //@ts-ignore Since we're field checking, we can ignore typing...
-        const { matrix } = data.system;
+        const { matrix } = sheetData.system;
         if (matrix) {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
                 const att = matrix[attribute];
@@ -813,7 +813,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
             // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
             // @ts-ignore
-            // sheetItem.isStack = sheetItem.data.quantity ? item.data.quantity > 1 : false;
+            // sheetItem.isStack = sheetItem.system.quantity ? item.system.quantity > 1 : false;
 
             // Determine what inventory the item sits in.
             const inventoryName = itemIdInventory[item.id] || this.document.defaultInventory.name;
@@ -925,15 +925,15 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
+     * @param sheetData An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
-    _prepareActorTypeFields(data) {
-        data.isCharacter = this.actor.isCharacter();
-        data.isSpirit = this.actor.isSpirit();
-        data.isCritter = this.actor.isCritter();
-        data.hasSkills = this.actor.hasSkills;
-        data.hasSpecial = this.actor.hasSpecial;
-        data.hasFullDefense = this.actor.hasFullDefense;
+    _prepareActorTypeFields(sheetData: SR5ActorSheetData) {
+        sheetData.isCharacter = this.actor.isCharacter();
+        sheetData.isSpirit = this.actor.isSpirit();
+        sheetData.isCritter = this.actor.isCritter();
+        sheetData.hasSkills = this.actor.hasSkills;
+        sheetData.hasSpecial = this.actor.hasSpecial;
+        sheetData.hasFullDefense = this.actor.hasFullDefense;
     }
 
     async _onMarksQuantityChange(event) {
@@ -1039,12 +1039,12 @@ export class SR5BaseActorSheet extends ActorSheet {
         return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
     }
 
-    _showMagicSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
-        return this._isSkillMagic(skillId, skill) && data.system.special === 'magic' && this._isSkillFiltered(skillId, skill);
+    _showMagicSkills(skillId, skill: SkillField, sheetData: SR5ActorSheetData) {
+        return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic' && this._isSkillFiltered(skillId, skill);
     }
 
-    _showResonanceSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
-        return this._isSkillResonance(skill) && data.system.special === 'resonance' && this._isSkillFiltered(skillId, skill);
+    _showResonanceSkills(skillId, skill: SkillField, sheetData: SR5ActorSheetData) {
+        return this._isSkillResonance(skill) && sheetData.system.special === 'resonance' && this._isSkillFiltered(skillId, skill);
     }
 
     _isSkillFiltered(skillId, skill) {
@@ -1076,25 +1076,25 @@ export class SR5BaseActorSheet extends ActorSheet {
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
     }
 
-    _filterKnowledgeSkills(data: SR5ActorSheetData) {
+    _filterKnowledgeSkills(sheetData: SR5ActorSheetData) {
         // Knowledge skill have separate sub-categories.
         Object.keys(SR5.knowledgeSkillCategories).forEach((category) => {
-            if (!data.system.skills.knowledge.hasOwnProperty(category)) {
+            if (!sheetData.system.skills.knowledge.hasOwnProperty(category)) {
                 console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
                 return;
             }
-            data.system.skills.knowledge[category].value = this._filterSkills(data, data.system.skills.knowledge[category].value);
+            sheetData.system.skills.knowledge[category].value = this._filterSkills(sheetData, sheetData.system.skills.knowledge[category].value);
         });
     }
 
-    _filterLanguageSkills(data: SR5ActorSheetData) {
+    _filterLanguageSkills(sheetData: SR5ActorSheetData) {
         // Language Skills have no sub-categories.
-        data.system.skills.language.value = this._filterSkills(data, data.system.skills.language.value);
+        sheetData.system.skills.language.value = this._filterSkills(sheetData, sheetData.system.skills.language.value);
     }
 
-    _filterActiveSkills(data: SR5ActorSheetData) {
+    _filterActiveSkills(sheetData: SR5ActorSheetData) {
         // Handle active skills directly, as it doesn't use sub-categories.
-        data.system.skills.active = this._filterSkills(data, data.system.skills.active);
+        sheetData.system.skills.active = this._filterSkills(sheetData, sheetData.system.skills.active);
     }
 
     _isSkillMagic(id, skill) {
@@ -1355,7 +1355,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const item = this.actor.items.get(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
-            await item.update({ 'data.technology.rating': rtg });
+            await item.update({ 'system.technology.rating': rtg });
         }
     }
 
@@ -1391,7 +1391,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             // NOTE: This is commented out for later ease of enabling effects based on equip status AND if they are
             //       meant to enable on eqiup or not.
             // this.actor.effects.forEach(effect => {
-            //     if (effect.data.origin !== item.uuid) return;
+            //     if (effect.system.origin !== item.uuid) return;
             //
             //     // @ts-ignore
             //     effect.disable(item.isEquipped());
@@ -1621,7 +1621,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         // go through atts on device, setup matrix attributes on it
         for (let i = 1; i <= 4; i++) {
             let tmp = `att${i}`;
-            let key = `data.atts.att${i}.att`;
+            let key = `system.atts.att${i}.att`;
             if (tmp === deviceAtt) {
                 data[key] = att;
             } else if (deviceData.atts[`att${i}`].att === att) {

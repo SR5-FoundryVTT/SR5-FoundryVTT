@@ -313,7 +313,7 @@ export class SR5Actor extends Actor {
                 }));
         }, []);
         // Sort changes according to priority, in case it's ever needed.
-        // @ts-ignore // TODO: v9
+        // @ts-ignore // TODO: foundry-vtt-types v10
         changes.sort((a, b) => a.priority - b.priority);
 
         return changes;
