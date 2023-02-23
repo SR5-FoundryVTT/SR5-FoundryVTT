@@ -1970,9 +1970,9 @@ export class SR5Actor extends Actor {
         const automateDefenseMod = game.settings.get(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier);
         if (!automateDefenseMod || !this.combatActive) return;
 
-        console.debug('Shadowrun 5e | Removing consecutive defense modifier.', this);
         if (this.system.modifiers.multi_defense === 0) return;
 
+        console.debug('Shadowrun 5e | Removing consecutive defense modifier.', this);
         await this.update({'system.modifiers.multi_defense': 0});
     }
 

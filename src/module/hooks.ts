@@ -431,7 +431,7 @@ ___________________
             if (message.userId && game.user?.id) console.log('Shadowrun 5e | GM is handling system socket message');
 
             for (const handler of handlers) {
-                console.log('Shadowrun 5e | Handover system socket message to handler', handler);
+                console.debug(`Shadowrun 5e | Handover system socket message to handler: ${handler.name}`);
                 await handler(message);
             }
         });

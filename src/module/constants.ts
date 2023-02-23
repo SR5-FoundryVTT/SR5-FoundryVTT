@@ -44,7 +44,8 @@ export const FLAGS = {
     HideGMOnlyChatContent: 'HideGMOnlyChatContent',
     MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest',
     AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier',
-    AutomateProgressiveRecoil: 'AutomateProgressiveRecoil'
+    AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
+    TurnsSinceLastAttack: 'turnsSinceLastAttack'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
