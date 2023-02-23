@@ -60,13 +60,17 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     /**
-     * @param event 
+     * User want's to manually reset progressive recoil before casting the attack test.
      */
     async _handleResetProgressiveRecoil(event: JQuery<HTMLElement>, test: TestDialog) {
         if (!this.actor) return;
         await this.actor.clearProgressiveRecoil();
 
+        // Refresh test values.
         this.prepareBaseValues();
+        this.calculateBaseValues();
+
+        // Inform user about changes.
         test.render();
     }
 
