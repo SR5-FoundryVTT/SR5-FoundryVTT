@@ -23,10 +23,11 @@ export class CritterPrep {
 
     static prepareDerivedData(system: CritterData, items: SR5ItemDataWrapper[]) {
         AttributesPrep.prepareAttributes(system);
+        AttributesPrep.prepareEssence(system, items);
+        
         SkillsPrep.prepareSkills(system);
 
         ItemPrep.prepareArmor(system, items);
-        ItemPrep.prepareBodyware(system, items);
 
         MatrixPrep.prepareMatrix(system, items);
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system);

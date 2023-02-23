@@ -252,8 +252,21 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data.name;
     }
 
+    /**
+     * Essence loss of an item is flat value and depends on the quantity of that item
+     * 
+     * Using quantity allows for two approaches:
+     * - Add an item twice while still having book essence values
+     * - Add an itwm with quantity 2 while also having book essence values
+     * Both are valid.
+     * 
+     * @returns A decimal as essence modifier
+     */
     getEssenceLoss(): number {
-        return this.getData()?.essence ?? 0;
+        const loss = Number(this.getData()?.essence) ?? 0;
+        const quantity = Number(this.getData()?.technology?.quantity) ?? 1;
+
+        return loss * quantity
     }
 
     getAmmo(): AmmunitionData|undefined {

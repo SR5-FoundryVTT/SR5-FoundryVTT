@@ -33,13 +33,14 @@ export class CharacterPrep {
      */
     static prepareDerivedData(system: Shadowrun.CharacterData, items: SR5ItemDataWrapper[]) {
         AttributesPrep.prepareAttributes(system);
+        AttributesPrep.prepareEssence(system, items);
+
         // NPCPrep is reliant to be called after AttributesPrep.
         NPCPrep.prepareNPCData(system);
 
         SkillsPrep.prepareSkills(system);
 
         ItemPrep.prepareArmor(system, items);
-        ItemPrep.prepareBodyware(system, items);
 
         MatrixPrep.prepareMatrix(system, items);
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
