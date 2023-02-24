@@ -81,7 +81,7 @@
         "New": "New Effect",
         "Types": {
             "Inactive": "Inactive Effects",
-            "Persistant": "Persistant Effects",
+            "Persistent": "Persistent Effects",
             "Temporary": "Temporary Effects"
         }
     },

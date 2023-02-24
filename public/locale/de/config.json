@@ -81,7 +81,7 @@
                 "New": "New Effect",
                 "Types": {
                         "Inactive": "Inaktive Effekte",
-                        "Persistant": "Anhaltende Effekte",
+                        "Persistent": "Anhaltende Effekte",
                         "Temporary": "Temporäre Effekte"
                 }
         },
@@ -1008,7 +1008,7 @@
                 },
                 "Effect": {
                         "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden",
-                        "Persistant": "Effekte ohne zeitliche Begrenzung",
+                        "Persistent": "Effekte ohne zeitliche Begrenzung",
                         "Temporary": "Effekte mit zeitlicher Begrenzung"
                 },
                 "Item": {
