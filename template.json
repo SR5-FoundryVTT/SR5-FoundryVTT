@@ -909,7 +909,14 @@
                     "noise": {"active": {}},
                     "background_count": {"active": {}}
                 },
-                "inventories": {}
+                "inventories": {
+                    "All": {
+                        "name": "All",
+                        "label": "SR5.Labels.Inventory.All",
+                        "itemIds": [],
+                        "showAll": true
+                    }
+                }
             },
             "physical_combat_values": {
                 "values": {

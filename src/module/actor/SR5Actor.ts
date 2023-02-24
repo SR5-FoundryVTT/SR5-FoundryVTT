@@ -80,13 +80,15 @@ import { CombatRules } from '../rules/CombatRules';
  *
  */
 export class SR5Actor extends Actor {
-    // This is the default inventory name and label for when no other inventory has been created.
+    // Default inventory name and label for when no other inventory has been created.
     defaultInventory: InventoryData = {
         name: 'Carried',
         label: 'SR5.Labels.Inventory.Carried',
         itemIds: []
     }
-    // This is a dummy inventory
+    // Catch all inventory for these use cases:
+    // - When selected show all items across all inventories.
+    // - When item is added to it, will show that item on all inventories.
     allInventories: InventoryData = {
         name: 'All',
         label: 'SR5.Labels.Inventory.All',

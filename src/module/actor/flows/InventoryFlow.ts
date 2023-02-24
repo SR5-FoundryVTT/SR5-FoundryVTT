@@ -15,6 +15,10 @@ import {SR5Item} from "../../item/SR5Item";
  * is where all items without an inventory will be placed. This default inventory won't be
  * stored on the document. This allows for the inventory system to be drop in, without any
  * migration needed.
+ * 
+ * Furthermore a default Inventory (document.allInventories) exists on all inventory actors
+ * that has showAll set to true. An item can either be on no inventory, one custom inventory
+ * or this allInventories, which will let it appear on all inventories.
  */
 export class InventoryFlow {
     document: SR5Actor;

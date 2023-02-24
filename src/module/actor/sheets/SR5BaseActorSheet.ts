@@ -775,88 +775,107 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _prepareItemsInventory() {
         // All custom and default actor inventories.
-        const inventories: InventoriesSheetData = {};
+        const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
-        const itemIdInventory = {};
+        const itemIdInventory: Record<string, Shadowrun.InventoryData> = {};
 
         // All inventories for showing all items, but not as default
-        inventories[this.document.allInventories.name] = {
+        // Add first, for it to appear on top.
+        inventoriesSheet[this.document.allInventories.name] = {
             name: this.document.allInventories.name,
             label: this.document.allInventories.label,
             types: {}
         };
-        this._addInventoryTypes(inventories[this.document.allInventories.name]);
+        this._addInventoryTypes(inventoriesSheet[this.document.allInventories.name]);
 
         // Default inventory for items without a defined one.
         // Add first for display purposes on sheet.
-        inventories[this.document.defaultInventory.name] = {
+        inventoriesSheet[this.document.defaultInventory.name] = {
             name: this.document.defaultInventory.name,
             label: this.document.defaultInventory.label,
             types: {}
         };
-        this._addInventoryTypes(inventories[this.document.defaultInventory.name]);
+        this._addInventoryTypes(inventoriesSheet[this.document.defaultInventory.name]);
 
-        // Build all inventories, group items by their types.
-        Object.values(this.document.system.inventories).forEach(({name, label, itemIds}) => {
-            inventories[name] = {
-                name,
-                label,
-                types: {}
+        // Build inventory sheet data, and store a item to inventory mapping.
+        let showAllFound: boolean = false;
+        Object.values(this.document.system.inventories).forEach(inventory => {
+            // Sanitize faulty document data. 
+            if (showAllFound) {
+                console.error('Shadowrun 5e | Only one inventory with the showAll property should exist.');
+                inventory.showAll = false;
+            };
+            showAllFound = inventory.showAll ? true : false; // it can be undefined.
+
+            const {name, label, itemIds} = inventory
+
+            // Avoid re-adding default inventories.
+            if (!inventoriesSheet.hasOwnProperty(name)) {
+                inventoriesSheet[name] = {
+                    name,
+                    label,
+                    types: {}
+                }
             }
+            
             // Add default inventory types for this sheet type first, so they appear on top.
-            this._addInventoryTypes(inventories[name]);
-
+            this._addInventoryTypes(inventoriesSheet[name]);
+            
+            // Inform user about duplicate inventory mapping for a single item.
             itemIds.forEach(id => {
-                if (itemIdInventory[id]) console.warn(`Shadowrun5e | Item id ${id} has been added to both ${name} and ${itemIdInventory[id]}. Will only show in ${name}`);
-                itemIdInventory[id] = name;
+                itemIdInventory[id] = inventory;
             });
         });
 
         const handledTypes = this.getHandledItemTypes();
 
-        // Fill all inventories with items grouped by their type.
-        this.document.items.forEach(item => {
+        // Check all items and using the item to inventory mapping add them to that inventory.
+        this.document.items.forEach((item) => {
+            if (!item.id) return;
+
             // Handled types are on the sheet outside the inventory.
             if (handledTypes.includes(item.type)) return;
 
             const sheetItem = this._prepareSheetItem(item);
 
-            // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
-            // @ts-ignore
-            // sheetItem.isStack = sheetItem.system.quantity ? item.system.quantity > 1 : false;
-
             // Determine what inventory the item sits in.
-            const inventoryName = itemIdInventory[item.id] || this.document.defaultInventory.name;
-            const inventory = inventories[inventoryName];
+            const inventory = itemIdInventory[item.id] || this.document.defaultInventory;
+            // Build inventory list this item should be shown an.
+            const addTo: string[] = inventory.showAll ? Object.keys(inventoriesSheet) : [inventory.name];
 
-            // Should an item of an abnormal type have been added, build type structure.
-            if (!inventory.types[item.type]) {
-                inventory.types[item.type] = {
-                    type: item.type,
-                    label: SR5.itemTypes[item.type],
-                    items: []
-                };
+            addTo.forEach(name => {
+                const inventorySheet = inventoriesSheet[name];
+
+                // Should an item have been added to any inventory that wouldn't cary it's type normaly
+                // add missing type so the user can interact with it.
+                if (!inventorySheet.types[item.type]) {
+                    inventorySheet.types[item.type] = {
+                        type: item.type,
+                        label: SR5.itemTypes[item.type],
+                        items: []
+                    };
+                }
+
+                inventorySheet.types[item.type].items.push(sheetItem);
+            })
+
+            if (!inventory.showAll) {
+                // Add the item to the overall 'show any item' inventory.
+                const allInventories = inventoriesSheet[this.document.allInventories.name];
+                allInventories.types[item.type].items.push(sheetItem);
             }
-
-            // Add the item to this inventory.
-            // @ts-ignore
-            inventory.types[item.type].items.push(sheetItem as SheetItemData);
-
-            const allInventories = inventories[this.document.allInventories.name];
-            allInventories.types[item.type].items.push(sheetItem as SheetItemData);
         });
 
-        Object.values(inventories).forEach(inventory => {
+        Object.values(inventoriesSheet).forEach(inventory => {
             this._addInventoryItemTypes(inventory);
 
             // Sort the items.
             Object.values(inventory.types).forEach((type) => {
-                // TODO: Check if some / all should be sort by equipped.
                 type.items.sort(sortByName);
             })
         });
 
-        return inventories;
+        return inventoriesSheet;
     }
 
     /**
