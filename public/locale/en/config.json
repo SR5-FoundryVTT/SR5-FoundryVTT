@@ -1000,7 +1000,7 @@
         },
         "Effect": {
             "Inactive": "Inactive effects don't apply their changes until they are enabled",
-            "Persistant": "Effects with an unlimited life span",
+            "Persistent": "Effects with an unlimited life span",
             "Temporary": "Effects with a limited life span"
         },
         "Item": {
