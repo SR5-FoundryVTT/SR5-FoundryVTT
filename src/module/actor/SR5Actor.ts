@@ -988,7 +988,7 @@ export class SR5Actor extends Actor {
 
         // Build modifiers values.
         const mods = new PartsList<number>(test.data.modifiers.mod);
-        mods.addUniquePart('SR5.Global', this.modifiers.totalFor('global'))
+        mods.addUniquePart('SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
         await test.execute();
     }
