@@ -104,7 +104,11 @@ export class RangedAttackTest extends SuccessTest {
         // Try pre-selection based on last fire mode.
         this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
         if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;
-        this.data.fireMode = this.data.fireModes[this.data.fireModeSelected];
+        this._selectFireMode(this.data.fireModeSelected);
+    }
+
+    _selectFireMode(index: number) {
+        this.data.fireMode = this.data.fireModes[index];
     }
 
     async _prepareWeaponRanges() {
@@ -220,12 +224,8 @@ export class RangedAttackTest extends SuccessTest {
         const poolMods = new PartsList(this.data.modifiers.mod);
 
         // Apply recoil modification to general modifiers before calculating base values.
-        // TODO: Actual recoil calculation with consumption of recoil compensation.
-        const {fireModes, fireModeSelected} = this.data;
-
         // Use selection for actual fireMode, overwriting possible previous selection for item.
-        // TODO: Suppression fire mode causes dice pool modifiers against all actions. Add an active effect to the chat message.
-        this.data.fireMode = fireModes[fireModeSelected];
+        this._selectFireMode(this.data.fireModeSelected);
 
         // Alter fire mode by ammunition constraints.
         this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft);
