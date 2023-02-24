@@ -117,7 +117,7 @@ class MatrixModifiersHandler extends ModifiersHandler {
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-matrix">${modifiers.noise.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Matrix")}</div>`);
+        const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Noise")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'matrix'));
 
         modifierColumn.append(modifier);
@@ -144,7 +144,7 @@ class MagicModifiersHandler extends ModifiersHandler {
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-magic">${modifiers.background_count.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-magic-modifier">${game.i18n.localize("SR5.ModifierTypes.Magic")}</div>`);
+        const modifierDescription = $(`<div class="modifier-description open-magic-modifier">${game.i18n.localize("SR5.ModifierTypes.BackgroundCount")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'magic'));
 
         modifierColumn.append(modifier);
