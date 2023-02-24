@@ -56,7 +56,7 @@ export class VehiclePrep {
             }
             const parts = new PartsList(stat.mod);
 
-            parts.addUniquePart('SR5.Temporary', stat.temp ?? 0);
+            if (stat.temp) parts.addUniquePart('SR5.Temporary', stat.temp);
 
             stat.mod = parts.list;
             Helpers.calcTotal(stat);
