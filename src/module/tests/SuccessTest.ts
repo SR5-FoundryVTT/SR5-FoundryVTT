@@ -207,7 +207,7 @@ export class SuccessTest {
      */
     _prepareRollMode(data, options: TestOptions): Shadowrun.FoundyRollMode {
         if (options.rollMode !== undefined) return options.rollMode;
-        if (data.action.roll_mode) return data.action.roll_mode;
+        if (data.action && data.action.roll_mode) return data.action.roll_mode;
         else return game.settings.get(CORE_NAME, CORE_FLAGS.RollMode) as Shadowrun.FoundyRollMode;
     }
 
