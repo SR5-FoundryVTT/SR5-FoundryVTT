@@ -2022,6 +2022,8 @@ export class SR5Actor extends Actor {
      * Reset damage, edge, etc. and prepare this actor for a new run.
      */
     async resetRunData() {
+        console.log(`Shadowrun 5e | Resetting actor ${this.name} (${this.id}) for a new run`);
+        
         const updateData: Record<string, any> = {};
 
         if (this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle()) {

@@ -75,6 +75,14 @@
       "private": false,
       "type": "Item",
       "system": "shadowrun5e"
+    },
+    {
+      "name": "System Macros",
+      "label": "SR5e System Macros",
+      "path": "./packs/sr5e-system-macros.db",
+      "private": true,
+      "type": "Macro",
+      "system": "shadowrun5e"
     }
   ],
   "socket": true,
