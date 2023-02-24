@@ -1,5 +1,5 @@
 import { parseDescription, getArray, createItemData } from "./BaseParserFunctions.js"
-import { DefaultValues } from "../../data/DataDefaults";
+import { DataDefaults } from "../../data/DataDefaults";
 
 export class QualityParser {
 
@@ -20,7 +20,7 @@ export class QualityParser {
     }
 
     parseQuality(chummerQuality) {
-        const system = DefaultValues.qualityData();
+        const system = DataDefaults.qualityData();
         system.type = chummerQuality.qualitytype.toLowerCase();
         system.description = parseDescription(chummerQuality);
 

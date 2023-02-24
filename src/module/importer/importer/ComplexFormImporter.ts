@@ -2,39 +2,16 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
-import {DefaultValues} from "../../data/DataDefaults";
 import ComplexFormItemData = Shadowrun.ComplexFormItemData;
 import {Helpers} from "../../helpers";
 
-export class ComplexFormImporter extends DataImporter {
+export class ComplexFormImporter extends DataImporter<ComplexFormItemData> {
     public categoryTranslations: any;
     public nameTranslations: any;
     public files = ['complexforms.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('complexforms') && jsonObject['complexforms'].hasOwnProperty('complexform');
-    }
-
-    GetDefaultData(): ComplexFormItemData {
-        return {
-            name: 'Unnamed Form',
-            type: 'complex_form',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                action: DefaultValues.actionData({
-                    type: 'complex',
-                    attribute: 'resonance',
-                    skill: 'compiling'
-                }),
-                target: '',
-                duration: '',
-                fade: 0,
-            },
-        } as ComplexFormItemData;
     }
 
     ExtractTranslation() {
@@ -59,7 +36,7 @@ export class ComplexFormImporter extends DataImporter {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData(), this.nameTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'complex_form'}), this.nameTranslations);
 
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;

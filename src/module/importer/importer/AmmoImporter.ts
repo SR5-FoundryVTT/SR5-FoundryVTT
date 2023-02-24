@@ -3,38 +3,13 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import WeaponData = Shadowrun.WeaponData;
 import AmmoItemData = Shadowrun.AmmoItemData;
-import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
-export class AmmoImporter extends DataImporter {
+export class AmmoImporter extends DataImporter<AmmoItemData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
-    }
-
-    GetDefaultData(): AmmoItemData {
-        return {
-            name: '',
-            type: 'ammo',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                technology: DefaultValues.technologyData({rating: 1, equipped: true, wireless: false}),
-                element: '',
-                ap: 0,
-                damage: 0,
-                damageType: 'physical',
-                replaceDamage: false,
-                blast: {
-                    radius: 0,
-                    dropoff: 0,
-                },
-            }
-        } as AmmoItemData;
     }
 
     ExtractTranslation() {
@@ -44,7 +19,7 @@ export class AmmoImporter extends DataImporter {
 
         let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonGeari18n);
-        this.entryTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
+        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
     async Parse(jsonObject: object): Promise<Item> {
@@ -60,9 +35,9 @@ export class AmmoImporter extends DataImporter {
                 continue;
             }
 
-            let item = this.GetDefaultData();
+            let item = this.GetDefaultData({type: 'ammo'});
             item.name = ImportHelper.StringValue(jsonData, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
             item.system.technology.rating = 2;

@@ -1,10 +1,9 @@
-import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import {Helpers} from '../helpers';
 import {SR5Item} from '../item/SR5Item';
 import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
 import {PartsList} from '../parts/PartsList';
 import {SR5Combat} from "../combat/SR5Combat";
-import {DefaultValues} from '../data/DataDefaults';
+import {DataDefaults} from '../data/DataDefaults';
 import {SkillFlow} from "./flows/SkillFlow";
 import {SR5} from "../config";
 import {CharacterPrep} from "./prep/CharacterPrep";
@@ -87,6 +86,13 @@ export class SR5Actor extends Actor {
         label: 'SR5.Labels.Inventory.Carried',
         itemIds: []
     }
+    // This is a dummy inventory
+    allInventories: InventoryData = {
+        name: 'All',
+        label: 'SR5.Labels.Inventory.All',
+        itemIds: [],
+        showAll: true
+    }
 
     // Allow users to access to tests creation.
     tests: typeof TestCreator = TestCreator;
@@ -99,6 +105,7 @@ export class SR5Actor extends Actor {
     // Holds all operations related to fetching an actors modifiers.
     modifiers: ModifierFlow;
 
+    // TODO: foundry-vtt-types v10. Allows for {system: ...} to be given without type error
     constructor(data, context?) {
         super(data, context);
 
@@ -313,15 +320,10 @@ export class SR5Actor extends Actor {
                 }));
         }, []);
         // Sort changes according to priority, in case it's ever needed.
-        // @ts-ignore // TODO: v9
+        // @ts-ignore // TODO: foundry-vtt-types v10
         changes.sort((a, b) => a.priority - b.priority);
 
         return changes;
-    }
-
-    getModifier(modifierName: string): NumberOrEmpty {
-        //@ts-ignore // TODO: foundry-vtt-types v10
-        return this.system.modifiers[modifierName];
     }
 
     /**
@@ -412,9 +414,9 @@ export class SR5Actor extends Actor {
         const armor = "armor" in this.system ? 
             //@ts-ignore // TODO: foundry-vtt-types v10
             foundry.utils.duplicate(this.system.armor) : 
-            DefaultValues.actorArmorData();
+            DataDefaults.actorArmorData();
         // Prepare damage to apply to armor.
-        damage = damage || DefaultValues.damageData();
+        damage = damage || DataDefaults.damageData();
 
         Helpers.calcTotal(damage);
         Helpers.calcTotal(damage.ap);
@@ -465,7 +467,28 @@ export class SR5Actor extends Actor {
      * Amount of recoil compensation this actor has available (without the weapon used).
      */
     get recoilCompensation(): number {
-        return RangedWeaponRules.actorRecoilCompensation(this);
+        if(!this.system.values.hasOwnProperty('recoil_compensation')) return 0;
+        //@ts-ignore
+        return this.system.values.recoil_compensation.value;
+    }
+
+    
+    /**
+     * Current recoil compensation with current recoil included.
+     * 
+     * @returns A positive number or zero.
+    */
+    get currentRecoilCompensation(): number {
+        return Math.max(this.recoilCompensation - this.recoil, 0);
+    }
+    
+    /**
+     * Amount of progressive recoil this actor has accrued.
+     */
+    get recoil(): number {
+        if(!this.system.values.hasOwnProperty('recoil')) return 0;
+        //@ts-ignore
+        return this.system.values.recoil.value;
     }
 
     getDeviceRating(): number {
@@ -768,7 +791,7 @@ export class SR5Actor extends Actor {
             return;
         }
         
-        skill = DefaultValues.skillData(skill);
+        skill = DataDefaults.skillData(skill);
         const id = randomID(16);
         const value = {};
         value[id] = skill;
@@ -788,7 +811,7 @@ export class SR5Actor extends Actor {
      * @returns The new active skill id.
      */
     async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
-        const skill = DefaultValues.skillData(skillData);
+        const skill = DataDefaults.skillData(skillData);
 
         const activeSkillsPath = 'system.skills.active';
         const updateSkillDataResult = Helpers.getRandomIdSkillFieldDataEntry(activeSkillsPath, skill);
@@ -962,10 +985,10 @@ export class SR5Actor extends Actor {
         pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
         pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
 
+
         // Build modifiers values.
-        const mods = new PartsList<number>();
-        this._addGlobalParts(mods);
-        test.data.modifiers.mod = mods.list;
+        const mods = new PartsList<number>(test.data.modifiers.mod);
+        mods.addUniquePart('SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
         await test.execute();
     }
@@ -1049,7 +1072,7 @@ export class SR5Actor extends Actor {
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
-        const action = DefaultValues.actionData({attribute: name, test: AttributeOnlyTest.name});
+        const action = DataDefaults.actionRollData({attribute: name, test: AttributeOnlyTest.name});
         const test = await this.tests.fromAction(action, this);
         if (!test) return;
 
@@ -1091,55 +1114,6 @@ export class SR5Actor extends Actor {
         ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.removePart(part));
     }
 
-    // TODO: Check for legacy removal
-    _addGlobalParts(parts: PartsList<number>) {
-        //@ts-ignore // TODO: foundry-vtt-types v10
-        if (this.system.modifiers.global) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
-            parts.addUniquePart('SR5.Global', this.system.modifiers.global);
-        }
-    }
-
-    // TODO: check for legacy removal.
-    _addDefenseParts(parts: PartsList<number>) {
-        if (this.isVehicle()) {
-            const pilot = this.findVehicleStat('pilot');
-            if (pilot) {
-                parts.addUniquePart(pilot.label, Helpers.calcTotal(pilot));
-            }
-            const skill = this.getVehicleTypeSkill();
-            if (skill) {
-                parts.addUniquePart('SR5.Vehicle.Maneuvering', Helpers.calcTotal(skill));
-            }
-        } else {
-            const reaction = this.findAttribute('reaction');
-            const intuition = this.findAttribute('intuition');
-
-            if (reaction) {
-                parts.addUniquePart(reaction.label || 'SR5.Reaction', reaction.value);
-            }
-            if (intuition) {
-                parts.addUniquePart(intuition.label || 'SR5.Intuition', intuition.value);
-            }
-        }
-
-        const mod = this.getModifier('defense');
-        if (mod) {
-            parts.addUniquePart('SR5.Bonus', mod);
-        }
-    }
-
-    // TODO: Check for legacy removal.
-    _addArmorParts(parts: PartsList<number>) {
-        const armor = this.getArmor();
-        if (armor) {
-            parts.addUniquePart(armor.label || 'SR5.Armor', armor.base);
-            for (let part of armor.mod) {
-                parts.addUniquePart(part.name, part.value);
-            }
-        }
-    }
-
     /**
      * Build an action for the given skill id based on it's configured values.
      *
@@ -1164,7 +1138,7 @@ export class SR5Actor extends Actor {
         // Should a specialization be used?
         const spec = options.specialization || false;
 
-        return DefaultValues.actionData({
+        return DataDefaults.actionRollData({
             skill: skillId,
             spec,
             attribute: skill.attribute,
@@ -1445,7 +1419,7 @@ export class SR5Actor extends Actor {
         value = Math.max(value, 0);
 
         // Use artificial damage to be consistent across other damage application Actor methods.
-        const damage = DefaultValues.damageData({
+        const damage = DataDefaults.damageData({
             type: {base: 'matrix', value: 'matrix'},
             base: value,
             value: value
@@ -1571,6 +1545,7 @@ export class SR5Actor extends Actor {
 
         // Token might not be part of active combat.
         if (!combatant) return;
+        if (!combatant.initiative) return;
 
         // While not prohibiting, inform user about missing ressource.
         if (combatant.initiative + modifier < 0) {
@@ -1586,7 +1561,17 @@ export class SR5Actor extends Actor {
      * @returns true, when active. false, when not in combat.
      */
     get combatActive(): boolean {
-        return !!(game.combat as SR5Combat)?.getActorCombatant(this);
+        if (!game.combat) return false;
+        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
+        if (!combatant) return false;
+        if (!combatant.initiative) return false;
+
+        return true;
+    }
+
+    get combatant(): Combatant | undefined {
+        if (!this.combatActive) return;
+        return (game.combat as SR5Combat).getActorCombatant(this);
     }
 
     /**
@@ -1595,8 +1580,9 @@ export class SR5Actor extends Actor {
      * @returns The score or zero.
      */
     get combatInitiativeScore(): number {
-        const combatant = (game.combat as SR5Combat)?.getActorCombatant(this);
-        return combatant ? combatant.initiative : 0;
+        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
+        if (!combatant || !combatant.initiative) return 0;
+        return combatant.initiative;
     }
 
     hasDamageTracks(): boolean {
@@ -1773,9 +1759,9 @@ export class SR5Actor extends Actor {
     /** 
      * Get all situaitional modifiers from this actor.
      */
-    getSituationModifiers(): DocumentSituationModifiers {
+    getSituationModifiers(options?): DocumentSituationModifiers {
         const modifiers = DocumentSituationModifiers.getDocumentModifiers(this);
-        modifiers.applyAll();
+        modifiers.applyAll(options);
         return modifiers;
     }
 
@@ -1984,9 +1970,76 @@ export class SR5Actor extends Actor {
         const automateDefenseMod = game.settings.get(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier);
         if (!automateDefenseMod || !this.combatActive) return;
 
-        console.debug('Shadowrun 5e | Removing consecutive defense modifier.', this);
         if (this.system.modifiers.multi_defense === 0) return;
 
+        console.debug('Shadowrun 5e | Removing consecutive defense modifier.', this);
         await this.update({'system.modifiers.multi_defense': 0});
+    }
+
+    /**
+     * Add a firemodes recoil to the progressive recoil.
+     * 
+     * @param fireMode Ranged Weapon firemode used to attack with.
+     */
+    async addProgressiveRecoil(fireMode: Shadowrun.FireModeData) {
+        const automateProgressiveRecoil = game.settings.get(SYSTEM_NAME, FLAGS.AutomateProgressiveRecoil);
+        if (!automateProgressiveRecoil) return;
+
+        if (!this.hasPhysicalBody) return;
+        if (!fireMode.recoil) return;
+        
+        await this.addRecoil(fireMode.value);
+    }
+
+    /**
+     * Add a flat value on top of existing progressive recoil
+     * @param additional New recoil to be added
+     */
+    async addRecoil(additional: number) {
+        const base = this.recoil + additional;
+        await this.update({'system.values.recoil.base': base});
+    }
+
+    /**
+     * Clear whatever progressive recoil this actor holds.
+     */
+    async clearProgressiveRecoil() {
+        if (!this.hasPhysicalBody) return;
+        if (this.recoil === 0) return;
+        await this.update({'system.values.recoil.base': 0});
+    }
+
+    /**
+     * Determinal if the actor has a physical body
+     * 
+     * @returns true, if the actor can interact with the physical plane
+     */
+    get hasPhysicalBody() {
+        return this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle();
+    }
+
+    /**
+     * Reset damage, edge, etc. and prepare this actor for a new run.
+     */
+    async resetRunData() {
+        console.log(`Shadowrun 5e | Resetting actor ${this.name} (${this.id}) for a new run`);
+        
+        const updateData: Record<string, any> = {};
+
+        if (this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle()) {
+            updateData['system.track.physical.value'] = 0;
+            updateData['system.track.physical.overflow.value'] = 0;
+        }
+
+        if (this.isCharacter() || this.isCritter() || this.isSpirit()) {
+            updateData['system.track.stun.value'] = 0;
+        }
+
+        if (this.isCharacter() || this.isCritter()) {
+            updateData['system.attributes.edge.uses'] = this.getEdge().value;
+        }
+
+        if (this.isMatrixActor) await this.setMatrixDamage(0);
+        if (updateData) await this.update(updateData);
     }
 }

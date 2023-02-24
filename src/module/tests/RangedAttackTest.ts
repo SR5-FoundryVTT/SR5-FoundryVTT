@@ -1,9 +1,10 @@
+import { TestDialog } from './../apps/dialogs/TestDialog';
 import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
-import {LENGTH_UNIT, SR} from "../constants";
+import {LENGTH_UNIT, SR, SYSTEM_NAME} from "../constants";
 import {SR5} from "../config";
 import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import {FireModeRules} from "../rules/FireModeRules";
@@ -21,7 +22,6 @@ export interface RangedAttackTestData extends SuccessTestData {
     fireMode: FireModeData
     // index of selceted fireMode in fireModes
     fireModeSelected: number
-    recoilCompensation: number
     ranges: RangesTemplateData
     range: number
     targetRanges: TargetRangeTemplateData[]
@@ -46,10 +46,32 @@ export class RangedAttackTest extends SuccessTest {
         data.range = 0;
         data.targetRanges = [];
         data.targetRangesSelected = 0;
-        data.recoilCompensation = 0;
-        data.damage = data.damage || DefaultValues.damageData();
+        data.damage = data.damage || DataDefaults.damageData();
 
         return data;
+    }
+
+    _testDialogListeners() {
+        return [{
+            query: '#reset-progressive-recoil',
+            on: 'click',
+            callback: this._handleResetProgressiveRecoil
+        }]
+    }
+
+    /**
+     * User want's to manually reset progressive recoil before casting the attack test.
+     */
+    async _handleResetProgressiveRecoil(event: JQuery<HTMLElement>, test: TestDialog) {
+        if (!this.actor) return;
+        await this.actor.clearProgressiveRecoil();
+
+        // Refresh test values.
+        this.prepareBaseValues();
+        this.calculateBaseValues();
+
+        // Inform user about changes.
+        test.render();
     }
 
     /**
@@ -78,11 +100,15 @@ export class RangedAttackTest extends SuccessTest {
         }
 
         // Current firemode selected
-        const lastFireMode = this.item.getLastFireMode() || DefaultValues.fireModeData();
+        const lastFireMode = this.item.getLastFireMode() || DataDefaults.fireModeData();
         // Try pre-selection based on last fire mode.
         this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
         if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;
-        this.data.fireMode = this.data.fireModes[this.data.fireModeSelected];
+        this._selectFireMode(this.data.fireModeSelected);
+    }
+
+    _selectFireMode(index: number) {
+        this.data.fireMode = this.data.fireModes[index];
     }
 
     async _prepareWeaponRanges() {
@@ -150,19 +176,14 @@ export class RangedAttackTest extends SuccessTest {
         this.data.range = modifiers.environmental.applied.active.range || this.data.targetRanges[0].range.modifier;
     }
 
-    _prepareRecoilCompensation() {
-        this.data.recoilCompensation = this.item?.totalRecoilCompensation || 0;
-    }
-
     get testModifiers(): ModifierTypes[] {
-        return ['global', 'wounds', 'environmental'];
+        return ['global', 'wounds', 'environmental', 'recoil'];
     }
 
     async prepareDocumentData(){
         await this._prepareWeaponRanges();
         await this._prepareTargetRanges();
         this._prepareFireMode();
-        this._prepareRecoilCompensation();
 
         await super.prepareDocumentData();
     }
@@ -203,19 +224,11 @@ export class RangedAttackTest extends SuccessTest {
         const poolMods = new PartsList(this.data.modifiers.mod);
 
         // Apply recoil modification to general modifiers before calculating base values.
-        // TODO: Actual recoil calculation with consumption of recoil compensation.
-        const {fireModes, fireModeSelected, recoilCompensation} = this.data;
-
         // Use selection for actual fireMode, overwriting possible previous selection for item.
-        // TODO: Suppression fire mode causes dice pool modifiers against all actions. Add an active effect to the chat message.
-        this.data.fireMode = fireModes[fireModeSelected];
+        this._selectFireMode(this.data.fireModeSelected);
 
         // Alter fire mode by ammunition constraints.
         this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft);
-        // Alter recoil modifier by ammunition constraints.
-        const {compensation, recoilModifier} = FireModeRules.recoilAttackModifier(this.data.fireMode, recoilCompensation, this.item.ammoLeft);
-
-        poolMods.addUniquePart('SR5.Recoil', recoilModifier);
 
         // Get range modifier from selected target instead of selected range.
         if (this.hasTargets) {
@@ -293,7 +306,42 @@ export class RangedAttackTest extends SuccessTest {
         }
 
         await this.item.useAmmo(fireMode.value);
+        await this.actor?.addProgressiveRecoil(fireMode);
 
         return true;
+    }
+
+    async processResults() {
+        super.processResults();
+
+        await this.markActionPhaseAsAttackUsed();
+    }
+
+    async markActionPhaseAsAttackUsed() {
+        if (!this.actor! || !this.actor.combatActive) return;
+        
+        const combatant = this.actor.combatant;
+        if (!combatant) return;
+        
+        await combatant.setFlag(SYSTEM_NAME, 'turnsSinceLastAttack', 0);
+    }
+
+    /**
+     * Template helper for showing recoil before attack
+     */
+    get recoilBeforeAttack(): number {
+        if (!this.actor) return 0;
+        return this.actor.recoil;
+    }
+
+    /**
+     * Template helper for showing recoil after attack
+     */
+    get recoilAfterAttack(): number {
+        if (!this.actor) return 0;
+        
+        const fireMode = this.data.fireMode;
+        const fireModeRecoil = fireMode.recoil ? fireMode.value : 0;
+        return this.actor.recoil + fireModeRecoil;
     }
 }

@@ -2,48 +2,17 @@ import {DataImporter} from './DataImporter';
 import {ImportHelper} from '../helper/ImportHelper';
 import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParserBase';
 import {Constants} from './Constants';
-import {DefaultValues} from "../../data/DataDefaults";
-import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 import {Helpers} from "../../helpers";
 
-export class CritterPowerImporter extends DataImporter {
-    public categoryTranslations: any;
-    public itemTranslations: any;
+export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData> {
     public files = ['critterpowers.xml'];
 
+    public unsupportedCategories = [
+        'Emergent',
+    ];
+    
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
-    }
-
-    GetDefaultData(): CritterPowerItemData {
-        return {
-            name: 'Unnamed Item',
-            type: 'critter_power',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                action: DefaultValues.actionData({
-                    damage: DefaultValues.damageData({type: {base: '', value: ''}}),
-                }),
-                armor: {
-                    value: 0,
-                    mod: false,
-                    acid: 0,
-                    cold: 0,
-                    fire: 0,
-                    electricity: 0,
-                    radiation: 0,
-                },
-                category: '',
-                powerType: '',
-                range: '',
-                duration: '',
-                karma: 0,
-            },
-        } as CritterPowerItemData;
     }
 
     ExtractTranslation() {
@@ -56,18 +25,18 @@ export class CritterPowerImporter extends DataImporter {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonCritterPoweri18n, 'powers', 'power');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+
+    async Parse(chummerPowers: object): Promise<Item> {
         const parser = new CritterPowerParserBase();
-        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
+        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('ITEM.TypeCritter_power')}`, true);
 
-        let items: CritterPowerItemData[] = [];
-        let jsonDatas = jsonObject['powers']['power'];
-        for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+        const items: Shadowrun.CritterPowerItemData[] = [];
+        const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
 
-            let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+        for (const chummerCritterPower of chummerCritterPowers) {
+            let item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: 'critter_power'}), this.itemTranslations);
 
-            // @ts-ignore TODO: Foundry Where is my foundry base data?
+            // @ts-ignore TODO: foundry-vtt-type v10
             item.folder = folder.id;
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 

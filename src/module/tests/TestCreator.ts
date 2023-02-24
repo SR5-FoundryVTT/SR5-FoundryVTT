@@ -12,7 +12,7 @@ import {
     TestDocuments,
     TestOptions
 } from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
@@ -288,7 +288,7 @@ export const TestCreator = {
         data.against = test.data;
 
         const action = TestCreator._mergeMinimalActionDataInOrder(
-            DefaultValues.actionData({test: testCls.name}),
+            DataDefaults.actionRollData({test: testCls.name}),
             await testCls._getDocumentTestAction(test.item, test.actor),
             testCls._getDefaultTestAction());
 
@@ -480,7 +480,8 @@ export const TestCreator = {
         for (const [modifier, applicable] of Object.entries(modifiers)) {
             // Setup the resulting modifier value.
             const label = SR5.modifierTypes[modifier];
-            const value = await actor.modifiers.totalFor(modifier, {applicable});
+            const options = {applicable};
+            const value = actor.modifiers.totalFor(modifier, options);
             data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
         }
         
@@ -519,7 +520,7 @@ export const TestCreator = {
         data.targetActorsUuid = [];
 
         // Setup the original item actions minimal action resist configuration as a complete item action.
-        let action = DefaultValues.actionData({
+        let action = DataDefaults.actionRollData({
             ...opposedData.against.opposed.resist
         });
         // Provide default action information.
@@ -538,13 +539,13 @@ export const TestCreator = {
      */
     _minimalTestData: function(): any {
         return {
-            pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
-            limit: DefaultValues.valueData({label: 'SR5.Limit'}),
-            threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
-            damage: DefaultValues.damageData(),
-            modifiers: DefaultValues.valueData({label: 'SR5.Labels.Action.Modifiers'}),
+            pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
+            limit: DataDefaults.valueData({label: 'SR5.Limit'}),
+            threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
+            damage: DataDefaults.damageData(),
+            modifiers: DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'}),
             values: {},
-            action: DefaultValues.actionData(),
+            action: DataDefaults.actionRollData(),
             opposed: {}
         };
     },
@@ -574,7 +575,7 @@ export const TestCreator = {
 
             // Iterate over complete MinimalActionData to avoid tests providing other ActionRollData fields they're not
             // supposed to override.
-            for (const key of Object.keys(DefaultValues.minimalActionData())) {
+            for (const key of Object.keys(DataDefaults.minimalActionData())) {
                 if (TestCreator._keepItemActionValue(sourceAction, defaultAction, key)) continue;
 
                 resultAction[key] = defaultAction[key];

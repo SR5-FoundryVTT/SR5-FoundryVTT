@@ -67,8 +67,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             if (test) {
                 await test.evaluate();
 
-                console.error(test.data);
-
                 assert.strictEqual(test.pool.value, 50); // 5 body, 45 automatics
                 assert.strictEqual(test.threshold.value, 1); // 1
                 assert.strictEqual(test.limit.value, 4); // 4 Physical + 1

@@ -1,4 +1,4 @@
-import { SituationModifier, SituationModifierCategory } from './SituationModifier';
+import { SituationModifier } from './SituationModifier';
 import NoiseModifiersSourceData = Shadowrun.NoiseModifiersSourceData;
 import NoiseModifiersData = Shadowrun.NoiseModifiersData;
 
@@ -8,5 +8,5 @@ import NoiseModifiersData = Shadowrun.NoiseModifiersData;
 export class NoiseModifier extends SituationModifier {
     source: NoiseModifiersSourceData
     applied: NoiseModifiersData
-    category: SituationModifierCategory = 'noise'
+    type: Shadowrun.SituationModifierType = 'noise'
 }

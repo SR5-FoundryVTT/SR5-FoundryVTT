@@ -13,16 +13,29 @@ export interface TestDialogData extends FormDialogData {
 }
 
 /**
+ * A way of allowing tests to inject handlers without having to sub-class the whole dialog
+ */
+export interface TestDialogListener {
+    query: string
+    on: string
+    callback: (event: JQuery<HTMLElement>, dialog: TestDialog) => void
+}
+
+/**
  * TODO: Add TestDialog JSDoc
  */
 export class TestDialog extends FormDialog {
     data: TestDialogData
+    // Listeners as given by the dialogs creator.
+    listeners: TestDialogListener[]
 
     // @ts-ignore // TODO: default option value with all the values...
-    constructor(data, options?: FormDialogOptions = {}) {
+    constructor(data, options: FormDialogOptions = {}, listeners: TestDialogListener[]=[]) {
         // Allow for Sheet style form submit value handling.
         options.applyFormChangesOnSubmit = true;
         super(data, options);
+
+        this.listeners = listeners;
     }
 
     static get defaultOptions() {
@@ -42,6 +55,18 @@ export class TestDialog extends FormDialog {
 
         // Handle in-dialog entity links to render the respective sheets.
         html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet)
+
+        this._injectExternalActiveListeners(html);
+    }
+
+    /**
+     * Inject the listeners while binding local `this` to them.
+     */
+    _injectExternalActiveListeners(html: JQuery) {
+        for (const listener of this.listeners) {
+            //@ts-ignore
+            html.find(listener.query).on(listener.on, (event: JQuery<HTMLElement>) => listener.callback.bind(this.data.test)(event, this));
+        }
     }
 
     /**

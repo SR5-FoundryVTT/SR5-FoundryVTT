@@ -5,7 +5,7 @@ import BlastData = Shadowrun.BlastData;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
-import {DefaultValues} from "../../../data/DataDefaults";
+import {DataDefaults} from "../../../data/DataDefaults";
 import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class ThrownParser extends WeaponParserBase {
@@ -40,7 +40,7 @@ export class ThrownParser extends WeaponParserBase {
                         value: 'physical' as DamageType
                     }
                 }
-                return DefaultValues.damageData(partialDamageData);
+                return DataDefaults.damageData(partialDamageData);
             }
         }
         damageType = jsonDamage.includes('P') ? 'physical' : 'stun';
@@ -61,7 +61,7 @@ export class ThrownParser extends WeaponParserBase {
             },
             attribute: damageAttribute as ActorAttribute,
         }
-        return DefaultValues.damageData(partialDamageData);
+        return DataDefaults.damageData(partialDamageData);
     }
 
     public GetBlast(jsonData: object, item: WeaponItemData): BlastData {

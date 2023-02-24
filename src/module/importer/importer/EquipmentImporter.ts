@@ -2,18 +2,22 @@ import {DataImporter} from "./DataImporter";
 import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
 import EquipmentItemData = Shadowrun.EquipmentItemData;
-import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
-export class EquipmentImporter extends DataImporter {
-    public files = ['gear.xml'];
+export class EquipmentImporter extends DataImporter<EquipmentItemData> {
+    files = ['gear.xml'];
+    unsupportedCategories = [
+        'Ammunition',
+        'Commlinks',
+        'Cyberdecks',
+        'Hacking Programs',
+        'Common Programs',
+        'Rigger Command Consoles',
+        'Custom'
+    ];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
-    }
-
-    GetDefaultData(): EquipmentItemData {
-        return DefaultValues.equipmentItemData();
     }
 
     ExtractTranslation(fileName?: string) {
@@ -23,7 +27,7 @@ export class EquipmentImporter extends DataImporter {
 
         let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonGeari18n);
-        this.entryTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
+        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
     async ParseEquipments(equipments) {
@@ -38,11 +42,11 @@ export class EquipmentImporter extends DataImporter {
             const category = ImportHelper.TranslateCategory(ImportHelper.StringValue(equipment, 'category'), this.categoryTranslations).replace('/', ' ');
             let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
 
-            const item = this.GetDefaultData();
+            const item = this.GetDefaultData({type: 'equipment'});
             item.name = ImportHelper.StringValue(equipment, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            item.system.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;
+            item.system.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(equipment, 'rating', 0);
             item.system.technology.availability = ImportHelper.StringValue(equipment, 'avail');
             item.system.technology.cost = ImportHelper.IntValue(equipment, 'cost', 0);
@@ -59,28 +63,8 @@ export class EquipmentImporter extends DataImporter {
         return items;
     }
 
-    /**
-     * gear.xml contains gear that isn't handled by the systems equipment item.
-     * @param jsonObject
-     * @returns 
-     */
-    FilterJsonObjects(jsonObject) {
-        const unsupportedCategories = [
-            'Ammunition',
-            'Commlinks',
-            'Cyberdecks',
-            'Hacking Programs',
-            'Common Programs',
-            'Rigger Command Consoles',
-            'Custom'
-        ]
-
-        return jsonObject['gears']['gear'].filter(gear => !unsupportedCategories.includes(ImportHelper.StringValue(gear, 'category', '')));
-    }
-
     async Parse(jsonObject: object): Promise<Item> {
-        const equipments = this.FilterJsonObjects(jsonObject);
-
+        const equipments = this.filterObjects(jsonObject['gears']['gear']);
         const items = await this.ParseEquipments(equipments);
 
         // @ts-ignore // TODO: TYPE: Remove this.

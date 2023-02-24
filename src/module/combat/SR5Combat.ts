@@ -1,4 +1,3 @@
-import { CombatantData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import {SR5Actor} from "../actor/SR5Actor";
 import {FLAGS, SR, SYSTEM_NAME} from "../constants";
 import {CombatRules} from "../rules/CombatRules";
@@ -32,7 +31,7 @@ export class SR5Combat extends Combat {
      * Use the given actors token to get the combatant.
      * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
      */
-    getActorCombatant(actor: SR5Actor): undefined | any {
+    getActorCombatant(actor: SR5Actor): undefined | Combatant {
         const token = actor.getToken();
         if (!token) return;
         return this.getCombatantByToken(token.id as string);
@@ -113,21 +112,23 @@ export class SR5Combat extends Combat {
         const turn = 0;
 
         // Collect all combatants ini changes for singular update.
-        const combatantsData: {_id: string|null, initiative: number}[] = [];
+        const combatants: {_id: string|null, initiative: number}[] = [];
         for (const combatant of combat.combatants) {
             const initiative = CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
             
-            combatantsData.push({
+            combatants.push({
                 _id: combatant.id,
                 initiative
             });
         }
 
-        await SR5Combat.setInitiativePass(combat, initiativePass);
-        await combat.update({turn, combatants: combatantsData});
-        await combat.handleActionPhase();
+        await combat.update({
+            turn, 
+            combatants, 
+            [`flags.${SYSTEM_NAME}.${FLAGS.CombatInitiativePass}`]: initiativePass
+        });
 
-        return;
+        await combat.handleActionPhase();
     }
 
     /**
@@ -163,14 +164,27 @@ export class SR5Combat extends Combat {
 
     /**
      * When combat enters a new combat phase, apply necessary changes.
-     * @param combatId 
+     * 
+     * This action phase change can occur through phase/turn/round changes.
+     * 
+     * @param combatId Combat with the current combatant entering it's next action phase.
      */
     static async handleActionPhase(combatId: string) {
         const combat = game.combats?.get(combatId) as SR5Combat;
         if (!combat) return;
 
+        const combatant = combat.combatant;
+        if (!combatant) return;
+
         // Defense modifiers reset on a new action phase.
-        combat.combatant?.actor?.removeDefenseMultiModifier();
+        await combatant.actor?.removeDefenseMultiModifier();
+
+        const turnsSinceLastAttackSetting = combatant.getFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack);
+        if (foundry.utils.getType(turnsSinceLastAttackSetting) !== 'number') return await combatant.actor?.clearProgressiveRecoil();
+        
+        const turnsSinceLastAttack = Number(turnsSinceLastAttackSetting);
+        if (turnsSinceLastAttack > 0) await combatant.actor?.clearProgressiveRecoil();
+        else await combatant.setFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack, 1);
     }
 
     /**
@@ -181,7 +195,23 @@ export class SR5Combat extends Combat {
         return turns.sort(SR5Combat.sortByRERIC);
     }
 
-    static sortByRERIC(left, right): number {
+    /**
+     * Sort combatants by Shadowrun5e attribute order of
+     *  - initiative score
+     *  - edge 
+     *  - reaction
+     *  - intuition
+     *  - coin toss
+     * 
+     * @param left A combatant in order
+     * @param right A combatant in order
+     * @returns A Array.sort result determining sort order: -1, 1, 0
+     */
+    static sortByRERIC(left: Combatant, right: Combatant): number {
+        // Sanitize missing actors by not re-ordering
+        if (!left.actor) return 0;
+        if (!right.actor) return 0;
+
         // First sort by initiative value if different
         const leftInit = Number(left.initiative);
         const rightInit = Number(right.initiative);
@@ -191,7 +221,7 @@ export class SR5Combat extends Combat {
         if (leftInit < rightInit) return 1;
 
         // now we sort by ERIC
-        const genData = (actor): number[] => {
+        const genData = (actor: SR5Actor): number[] => {
             // There are broken scenes out there, which will try setting up a combat without valid actors.
             if (!actor) return [0, 0, 0, 0];
             // edge, reaction, intuition, coin flip
@@ -316,13 +346,16 @@ export class SR5Combat extends Combat {
     }
 
     async startCombat() {
-        const nextRound = SR.combat.INITIAL_INI_ROUND;
+        // By default, no actor starts. Pre-selet top.
+        const turn = 0;
+        const round = SR.combat.INITIAL_INI_ROUND;
         const initiativePass = SR.combat.INITIAL_INI_PASS;
-        // Start at the top!
-        const nextTurn = 0;
 
-        await SR5Combat.setInitiativePass(this, initiativePass);
-        await this.update({round: nextRound, turn: nextTurn});
+        await this.update({
+            turn,
+            round,
+            [`flags.${SYSTEM_NAME}.${FLAGS.CombatInitiativePass}`]: initiativePass
+        });
 
         if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
             await this.rollNPC();
@@ -345,36 +378,6 @@ export class SR5Combat extends Combat {
         } else {
             await SR5Combat.handleNextRound(this.id as string);
         }
-    }
-
-    /**
-     * use default behaviour but ALWAYS start at the top!
-     */
-    // @ts-ignore
-    async rollAll(options?): Promise<SR5Combat> {
-        const combat = await super.rollAll() as unknown as SR5Combat;
-        if (combat.turn !== 0)
-            await combat.update({turn: 0});
-        return combat;
-    }
-
-    /**
-     * Shadowrun starts at the top, except for subsequent initiative passes, then it depends on the new values.
-     * 
-     * @param ids
-     * @param options
-     */
-    // @ts-ignore
-    async rollInitiative(ids: string | string[], options?: InitiativeOptions): Promise<SR5Combat> {
-        // Structure input data
-        ids = typeof ids === "string" ? [ids] : ids;
-
-        const combat = await super.rollInitiative(ids, options) as SR5Combat;
-
-        if (this.initiativePass === SR.combat.INITIAL_INI_PASS)
-            await combat.update({turn: 0});
-
-        return combat;
     }
 
     /**

@@ -2,18 +2,13 @@ import {DataImporter} from "./DataImporter";
 import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
 import DeviceItemData = Shadowrun.DeviceItemData;
-import {DefaultValues} from "../../data/DataDefaults";
 import {Helpers} from "../../helpers";
 
-export class DeviceImporter extends DataImporter {
+export class DeviceImporter extends DataImporter<DeviceItemData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
-    }
-
-    GetDefaultData(): DeviceItemData {
-        return DefaultValues.deviceItemData();
     }
 
     ExtractTranslation(fileName?: string) {
@@ -23,7 +18,7 @@ export class DeviceImporter extends DataImporter {
 
         let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonGeari18n);
-        this.entryTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
+        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
     ParseCommlinkDevices(commlinks, folder) {
@@ -33,12 +28,12 @@ export class DeviceImporter extends DataImporter {
             if (DataImporter.unsupportedEntry(commlink)) {
                 continue;
             }
-            const item = this.GetDefaultData();
+            const item = this.GetDefaultData({type: 'device'});
             
             item.name = ImportHelper.StringValue(commlink, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            item.system.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
+            item.system.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(commlink, 'devicerating', 0);
             item.system.technology.availability = ImportHelper.StringValue(commlink, 'avail');
             item.system.technology.cost = ImportHelper.IntValue(commlink, 'cost', 0);
@@ -65,13 +60,13 @@ export class DeviceImporter extends DataImporter {
                 continue;
             }
 
-            const item = this.GetDefaultData();
+            const item = this.GetDefaultData({type: 'device'});
 
             item.system.category = 'cyberdeck';
             item.name = ImportHelper.StringValue(cyberdeck, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            item.system.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;
+            item.system.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(cyberdeck, 'devicerating', 0);
             item.system.technology.availability = ImportHelper.StringValue(cyberdeck, 'avail');
             item.system.technology.cost = ImportHelper.IntValue(cyberdeck, 'cost', 0);

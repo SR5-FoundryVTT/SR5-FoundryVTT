@@ -137,9 +137,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         // Test chat messages and their parts
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.html',
-
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
-        'systems/shadowrun5e/dist/templates/rolls/parts/test-opposed-resist.html',
 
         // Modifier management parts
         'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'

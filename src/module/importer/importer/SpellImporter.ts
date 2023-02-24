@@ -6,60 +6,16 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
-import {DefaultValues} from "../../data/DataDefaults";
 import SpellItemData = Shadowrun.SpellItemData;
 import {Helpers} from "../../helpers";
 
-export class SpellImporter extends DataImporter {
+export class SpellImporter extends DataImporter<SpellItemData> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public files = ['spells.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('spells') && jsonObject['spells'].hasOwnProperty('spell');
-    }
-
-    GetDefaultData(): SpellItemData {
-        return {
-            name: 'Unnamed Item',
-            type: 'spell',
-            system: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                action: DefaultValues.actionData({
-                    type: 'varies',
-                    attribute: 'magic',
-                    skill: 'spellcasting',
-                    damage: DefaultValues.damageData({type: {base: '', value: ''}})}),
-                drain: 0,
-                category: '',
-                type: '',
-                range: '',
-                duration: '',
-                extended: false,
-                combat: {
-                    type: '',
-                },
-                detection: {
-                    passive: false,
-                    type: '',
-                    extended: false,
-                },
-                illusion: {
-                    type: '',
-                    sense: '',
-                },
-                manipulation: {
-                    damaging: false,
-                    mental: false,
-                    environmental: false,
-                    physical: false,
-                },
-            },
-        } as SpellItemData;
     }
 
     ExtractTranslation() {
@@ -93,7 +49,7 @@ export class SpellImporter extends DataImporter {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'spell'}), this.itemTranslations);
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.category].id;
 

@@ -575,7 +575,7 @@ export class Helpers {
     }
 
     static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem?: SR5Item): DamageData {
-        const damage = duplicate(DataDefaults.damage) as DamageData;
+        const damage = DataDefaults.damageData({type: {base: '', value: ''}});
         damage.base = value;
         damage.value = value;
         damage.type.base = type;
@@ -682,7 +682,7 @@ export class Helpers {
      * This can be used to create an SkillField into the Skills data path during the Skill creation process.
      *
      * @param skillDataPath Could be 'data.skills.active' or 'data.skill.language.value' or more
-     * @param skillField A SkillField with whatever values. You could use DefaultValues.skillData to create one.
+     * @param skillField A SkillField with whatever values. You could use DataDefaults.skillData to create one.
      * @param idLength How long should the id (GUID) be?
      */
     static getRandomIdSkillFieldDataEntry(skillDataPath: string, skillField: SkillField, idLength: number = DEFAULT_ID_LENGTH): { id: string, updateSkillData: { [skillDataPath: string]: { [id: string]: SkillField } } } | undefined {

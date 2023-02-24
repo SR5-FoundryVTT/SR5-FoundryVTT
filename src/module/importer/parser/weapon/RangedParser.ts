@@ -3,7 +3,7 @@ import { WeaponParserBase } from './WeaponParserBase';
 import { Constants } from '../../importer/Constants';
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
-import {DefaultValues} from "../../../data/DataDefaults";
+import {DataDefaults} from "../../../data/DataDefaults";
 import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class RangedParser extends WeaponParserBase {
@@ -12,7 +12,7 @@ export class RangedParser extends WeaponParserBase {
         let damageCode = jsonDamage.match(/[0-9]+[PS]/g)?.[0];
 
         if (damageCode == null) {
-            return DefaultValues.damageData();
+            return DataDefaults.damageData();
         }
 
         let damageType = damageCode.includes('P') ? 'physical' : 'stun';
@@ -32,7 +32,7 @@ export class RangedParser extends WeaponParserBase {
                 mod: []
             }
         }
-        return DefaultValues.damageData(partialDamageData);
+        return DataDefaults.damageData(partialDamageData);
     }
 
     protected GetAmmo(weaponJson: object) {

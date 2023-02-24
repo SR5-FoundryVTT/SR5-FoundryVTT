@@ -3,7 +3,7 @@ import { WeaponParserBase } from './WeaponParserBase';
 import ActorAttribute = Shadowrun.ActorAttribute;
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
-import {DefaultValues} from "../../../data/DataDefaults";
+import {DataDefaults} from "../../../data/DataDefaults";
 import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class MeleeParser extends WeaponParserBase {
@@ -12,7 +12,7 @@ export class MeleeParser extends WeaponParserBase {
         let damageCode: any = jsonDamage.match(/(STR)([+-]?)([1-9]*)\)([PS])/g)?.[0];
 
         if (damageCode == null) {
-            return DefaultValues.damageData();
+            return DataDefaults.damageData();
         }
 
         let damageBase = 0;
@@ -41,7 +41,7 @@ export class MeleeParser extends WeaponParserBase {
             },
             attribute: damageAttribute as ActorAttribute,
         }
-        return DefaultValues.damageData(partialDamageData);
+        return DataDefaults.damageData(partialDamageData);
     }
 
     Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {

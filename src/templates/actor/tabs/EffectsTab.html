@@ -3,14 +3,14 @@
         <div class="scroll-area">
         {{#each effects as |section sid|}}
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                name=(localize section.label)
+                name=section.label
+                tooltip=section.tooltip
                 icons=(ItemHeaderIcons 'effect')
-                rightSide=(ItemHeaderRightSide 'TODO')
                 itemData=(EffectData section.type)
             }}
 
             {{#each section.effects as |effect|}}
-                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                     img=effect.icon
                     name=effect.label
                     itemId=effect.id

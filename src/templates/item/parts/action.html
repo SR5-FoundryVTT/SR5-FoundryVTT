@@ -163,5 +163,19 @@
             />
         </div>
     </div>
+    <div class="form-line">
+        <div class="label" data-tooltip="{{localize 'SR5.Tooltips.Item.ActionRollMode'}}">
+            {{localize "SR5.RollMode"}}
+        </div>
+        <div class="inputs">
+            <select name="system.action.roll_mode">
+                {{#select system.action.roll_mode}} 
+                <option value=""></option>
+                {{#each rollModes as |label mode|}}
+                <option value="{{mode}}">{{localize label}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
     {{/ifne}} {{/ifne}} {{/if}}
 </div>

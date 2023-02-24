@@ -18,7 +18,7 @@ interface SituationalModifiersTemplateData extends FormApplication.Data<{}> {
 /**
  * General abstract handler for sheet actions for a specific situational modifier category.
  */
- abstract class ModifiersHandler {
+class ModifiersHandler {
     app: SituationModifiersApplication
 
     constructor(situationModifiersApp: SituationModifiersApplication) {
@@ -29,11 +29,13 @@ interface SituationalModifiersTemplateData extends FormApplication.Data<{}> {
      * Provide template data fields necessary for the extending modifier type to be added to a
      * general template data object.
      */
-    abstract getData(options?: object): any;
+    getData(options?: object) {
+        return {}
+    };
     /**
      * Define what event listeners to register for the extending modifier type.
      */
-    abstract activateListeners(html: JQuery<HTMLElement>): void;
+    activateListeners(html: JQuery<HTMLElement>) {};
     /**
      * Define what token hud buttons to register for the extending modifier type.
      * 
@@ -48,9 +50,6 @@ interface SituationalModifiersTemplateData extends FormApplication.Data<{}> {
  * Handle all sheet action for environmental modifiers.
  */
 class EnvironmentalModifiersHandler extends ModifiersHandler {
-    getData(options?: object | undefined) {
-        return {}
-    }
 
     activateListeners(html: JQuery<HTMLElement>) {
         console.log(`Shadowrun5e | Registering modifier handler ${this.constructor.name} listeners`);
@@ -84,8 +83,6 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
         this.app.modifiers.environmental.toggleSelection(category, value);
         await this.app.modifiers.updateDocument();
 
-        // this._updateTokenHUDTotalDisplay();
-
         await this.app.render();
     }
 
@@ -95,29 +92,13 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
         this.app.modifiers.environmental.clear();
         await this.clearModifiersOnTarget();
 
-        // this._updateTokenHUDTotalDisplay();
-
         await this.app.render();
     }
 
     async clearModifiersOnTarget() {
-        await DocumentSituationModifiers.clearEnvironmentalOn(this.app.target);
+        await DocumentSituationModifiers.clearTypeOn(this.app.target, 'environmental');
         // Refresh modifiers. This can be necessary for Actor targets without modifiers when Scene modifiers are present.
         this.app.modifiers = this.app._getModifiers();
-    }
-
-    /** Updates opened tokenHUD modifier values.
-     *
-     * Doing it this way is just easier as relying on any update / hook workflow.
-     */
-     _updateTokenHUDTotalDisplay() {
-        console.error('FIXME: TokenHUD Update is disabled');
-        
-        // if (this.app.target instanceof SR5Actor) {
-        //     $('.modifier-value-environmental').each((index, element) => {
-        //         $(element).html(this.app.modifiers.environmental.total.toString());
-        //     });
-        // }
     }
 }
 
@@ -174,7 +155,60 @@ class MagicModifiersHandler extends ModifiersHandler {
     async handleClearMagicModifiers(event) {
         event.preventDefault();
 
-        this.app.modifiers = await DocumentSituationModifiers.clearCategoryOnDocument(this.app.target, 'background_count');
+        this.app.modifiers = await DocumentSituationModifiers.clearTypeOn(this.app.target, 'background_count');
+        this.app.render();
+    }
+}
+
+
+/**
+ * Recoil Modifier is a physical combat modifier for Ranged Weapon Attacks.
+ * 
+ */
+class RecoilModifiersHandler extends ModifiersHandler {
+    getData(options?: object | undefined) {
+        return {}
+    }
+
+    activateListeners(html: JQuery<HTMLElement>): void {
+        html.find('.recoil-delta button').on('click', this.applyRecoilDelta.bind(this));
+        html.find('button#modifiers-recoil-total').on('click', async event => {
+            if (this.app.modifiers.documentIsScene) return;
+            const actor = this.app.modifiers.document as SR5Actor;
+            await actor.clearProgressiveRecoil();
+            ui.notifications?.info('SR5.Infos.ResetProgressiveRecoil', {localize: true});
+
+            this.app.render();
+        })
+    }
+
+    /**
+     * Apply actor system recoil data back to the actor.
+     * 
+     * A delta is a numerical difference to be applied onto the base value
+     * 
+     * This method is related to SituationModifierApplication#applyModifierDelta
+     */
+    async applyRecoilDelta(event) {
+        event.preventDefault();
+
+        if (!this.app.modifiers.documentIsActor) return;
+
+        const actor = this.app.modifiers.document as SR5Actor;
+
+        // Expect the element group to siblings.
+        // Triggering DOMElement should contain the delta...
+        const triggerElement = event.target;
+        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+            return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
+
+        const delta = Number(triggerElement.dataset['delta']);
+        if (delta === 0) return;
+
+        // Update source data and update display information.
+        await actor.addRecoil(delta);
+
+        this.app.modifiers.applyAll();
         this.app.render();
     }
 }
@@ -193,7 +227,8 @@ export class SituationModifiersApplication extends FormApplication {
     static _staticHandlers: typeof ModifiersHandler[] = [
         MatrixModifiersHandler, 
         MagicModifiersHandler,
-        EnvironmentalModifiersHandler
+        EnvironmentalModifiersHandler,
+        RecoilModifiersHandler
     ];
     // The default sheet tab to open.
     static _defaultTabId: string = 'physical';
@@ -272,7 +307,7 @@ export class SituationModifiersApplication extends FormApplication {
 
         this.handlers.forEach(handler => handler.activateListeners(html));
 
-        html.find('.form-group-element-numerical button').on('click', this.applyModifierDelta.bind(this));
+        html.find('.modifier-delta button').on('click', this.applyModifierDelta.bind(this));
         html.find('.remove-modifiers-from-target').on('click', this.clearModifierData.bind(this));
         html.find('.remove-token-modifiers-from-scene').on('click', this.clearTokenModifiersData.bind(this));
     }
@@ -311,11 +346,10 @@ export class SituationModifiersApplication extends FormApplication {
             [sourceKey]: value
         }
         
-        // Update active modifiers.
+        // Update source data and update display information.
         await this._updateObject(event, formData);
-        // Update total modifiers.
         this.modifiers.applyAll();
-        // Show new modifiers
+
         this.render();
     }
 

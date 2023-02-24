@@ -1,18 +1,34 @@
+import { DataDefaults } from './../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
 
 const xml2js = require('xml2js');
 
-export abstract class DataImporter {
+/**
+ * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
+ * 
+ * Generic type ItemDataType is the items data type DataImporter creates per entry in that Chummer5a data .xml file.
+ */
+export abstract class DataImporter<ItemDataType> {
     public abstract files: string[];
     public static jsoni18n: any;
     public categoryTranslations: any;
-    public entryTranslations: any;
+    public itemTranslations: any;
     public static unsupportedBooks: string[] = ['2050'];
 
+    // Used to filter down a files entries based on category.
+    // See filterObjects for use.
+    // Leave on null to support all categories.
+    public unsupportedCategories: string[]|null = [];
+
     /**
-     * Get default data for constructing a TItem.
+     * Get complete item data.
+     * 
+     * NOTE: We use temporary items to have a full set of item data instead of just
+     *       system model data that game.model.Item would give us.
      */
-    public abstract GetDefaultData(): any;
+    public GetDefaultData({type}:{type:any}) {
+        return DataDefaults.baseItemData<ItemDataType>({type});
+    }
 
     /**
      *
@@ -45,10 +61,10 @@ export abstract class DataImporter {
 
     /**
      * Parse the specified jsonObject and return Item representations.
-     * @param jsonObject The JSON data to parse.
+     * @param chummerData The JSON data to parse.
      * @returns An array of created objects.
      */
-    public abstract Parse(jsonObject: object): Promise<Item>;
+    public abstract Parse(chummerData: object): Promise<Item>;
 
     /**
      * Parse an XML string into a JSON object.
@@ -77,5 +93,19 @@ export abstract class DataImporter {
         }
 
         return false;
+    }
+
+    /**
+     * Filter down objects to those actaully imported.
+     * 
+     * Sometimes a single Chummer xml file contains mulitple 'categories' that don't mix with system types
+     * 
+     * @param objects 
+     * @returns A subset of objects
+     */
+    filterObjects(objects: any[]) {
+        if (!this.unsupportedCategories) return objects;
+        //@ts-ignore
+        return objects.filter(object => !this.unsupportedCategories.includes(ImportHelper.StringValue(object, 'category', '')));
     }
 }

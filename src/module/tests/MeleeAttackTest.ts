@@ -1,6 +1,6 @@
 import { EnvironmentalModifier } from './../rules/modifiers/EnvironmentalModifier';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import EnvironmentalModifiersSourceData = Shadowrun.EnvironmentalModifiersSourceData;
@@ -15,7 +15,7 @@ export class MeleeAttackTest extends SuccessTest {
     _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
-        data.damage = data.damage || DefaultValues.damageData();
+        data.damage = data.damage || DataDefaults.damageData();
 
         return data;
     }
@@ -55,8 +55,8 @@ export class MeleeAttackTest extends SuccessTest {
      * @param actor 
      * @param type 
      */
-     async prepareActorModifier(actor: SR5Actor, type: ModifierTypes): Promise<{ name: string; value: number; }> {
-        if (type !== 'environmental') return await super.prepareActorModifier(actor, type);
+    prepareActorModifier(actor: SR5Actor, type: ModifierTypes): { name: string; value: number; } {
+        if (type !== 'environmental') return super.prepareActorModifier(actor, type);
 
         // Only light and visibility apply.
         const modifiers = actor.getSituationModifiers();

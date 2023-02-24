@@ -2,7 +2,7 @@
  * Handle all rules related to Shadowrun 5 magic drain.
  */
 import DamageData = Shadowrun.DamageData;
-import {DefaultValues} from "../data/DataDefaults";
+import {DataDefaults} from "../data/DataDefaults";
 import {Helpers} from "../helpers";
 import DamageType = Shadowrun.DamageType;
 import {PartsList} from "../parts/PartsList";
@@ -21,7 +21,7 @@ export class DrainRules {
         if (magic < 0) magic = 1;
         if (hits < 0) hits = 0;
 
-        const damage = DefaultValues.damageData();
+        const damage = DataDefaults.damageData();
         damage.base = drain;
         Helpers.calcTotal(damage, {min: 0});
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);

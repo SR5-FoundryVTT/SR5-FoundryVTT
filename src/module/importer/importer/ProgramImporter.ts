@@ -1,4 +1,3 @@
-import { DataDefaults, DefaultValues } from './../../data/DataDefaults';
 import { ImportHelper } from "../helper/ImportHelper";
 import { DataImporter } from "./DataImporter";
 
@@ -8,15 +7,11 @@ import { Constants } from './Constants';
 /**
  * Programs are part of the Chummer5 gear.xml
  */
-export class ProgramImporter extends DataImporter {
+export class ProgramImporter extends DataImporter<ProgramItemData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
-    }
-
-    GetDefaultData(): ProgramItemData {
-        return DefaultValues.programItemData();
     }
 
     ExtractTranslation(fileName?: string) {
@@ -26,7 +21,7 @@ export class ProgramImporter extends DataImporter {
 
         let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonGeari18n);
-        this.entryTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
+        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
     filterGearToPrograms(jsonObject: object) {
@@ -44,13 +39,13 @@ export class ProgramImporter extends DataImporter {
         for (const program of programs) {
             if (DataImporter.unsupportedEntry(program)) continue;
 
-            const item = this.GetDefaultData();
+            const item = this.GetDefaultData({type: 'program'});
 
             item.name = ImportHelper.StringValue(program, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.entryTranslations, item.name);
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             item.system.technology.rating = ImportHelper.IntValue(program, 'rating', 0);
-            item.system.description.source = `${ImportHelper.StringValue(program, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(program, 'name'), ImportHelper.StringValue(program, 'page'))}`;
+            item.system.description.source = `${ImportHelper.StringValue(program, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(program, 'name'), ImportHelper.StringValue(program, 'page'))}`;
             item.system.technology.availability = ImportHelper.StringValue(program, 'avail');
             item.system.technology.cost = ImportHelper.IntValue(program, 'cost', 0);
             item.system.type = Constants.MAP_CHUMMER_PROGRAMM_CATEGORY[ImportHelper.StringValue(program, 'category')]

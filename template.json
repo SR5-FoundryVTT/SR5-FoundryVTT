@@ -856,10 +856,11 @@
                 "metatype": "",
                 "special": "mundane",
                 "full_defense_attribute": "willpower",
+                "nuyen": 0,
+                "values": {},
                 "description": {
                     "value": ""
                 },
-                "nuyen": 0,
                 "wounds": {
                     "value": 0
                 },
@@ -909,10 +910,24 @@
                     "background_count": {"active": {}}
                 },
                 "inventories": {}
+            },
+            "physical_combat_values": {
+                "values": {
+                    "recoil": {
+                        "base": 0,
+                        "value": 0,
+                        "mod": []
+                    },
+                    "recoil_compensation": {
+                        "base": 0,
+                        "value": 0,
+                        "mod": []
+                    }
+                }
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors"],
+            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values"],
             "ethnicity": "",
             "age": "",
             "sex": "",
@@ -937,7 +952,7 @@
             }
         },
         "spirit": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values"],
             "services": 0,
             "bound": false,
             "force": 0,
@@ -945,7 +960,7 @@
             "special": "magic"
         },
         "critter": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors"]
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values"]
         },
         "sprite": {
             "templates": ["common", "skills", "attributes", "limits", "matrix"],
@@ -956,7 +971,7 @@
             "special": "resonance"
         },
         "vehicle": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values"],
             "vehicleType": "ground",
             "controlMode": "autopilot",
             "environment": "speed",
@@ -1163,6 +1178,7 @@
                     "spec": "",
                     "mod": 0,
                     "mod_description": "",
+                    "roll_mode": "",
                     "limit": {
                         "value": 0,
                         "base": 0,

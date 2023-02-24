@@ -3,6 +3,9 @@ import {SR} from "../../../constants";
 import {SR5} from "../../../config";
 import AttributeField = Shadowrun.AttributeField;
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import { PartsList } from '../../../parts/PartsList';
+import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
+import { ItemPrep } from './ItemPrep';
 
 export class AttributesPrep {
     /**
@@ -58,5 +61,30 @@ export class AttributesPrep {
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = SR.attributes.ranges[name];
         Helpers.calcTotal(attribute, range);
+    }
+
+    /**
+     * Calculate the Essence attribute and it's modifiers.
+     * 
+     * @param system A system actor having an essence attribute
+     * @param items The items that might cause an essence loss.
+     */
+    static prepareEssence(system: ActorTypesData, items: SR5ItemDataWrapper[]) {
+        // The essence base is fixed. Changes should be made through the attribute.temp field.
+        system.attributes.essence.base = SR.attributes.defaults.essence;
+
+        // Modify essence by actor modifer
+        const parts = new PartsList<number>(system.attributes.essence.mod);
+        
+        const essenceMod = system.modifiers['essence'];
+        if (essenceMod && !Number.isNaN(essenceMod)) {
+            parts.addUniquePart('SR5.Bonus', Number(essenceMod));
+        }
+
+        system.attributes.essence.mod = parts.list;
+
+        ItemPrep.prepareWareEssenceLoss(system, items);
+
+        system.attributes.essence.value = Helpers.calcTotal(system.attributes.essence);
     }
 }

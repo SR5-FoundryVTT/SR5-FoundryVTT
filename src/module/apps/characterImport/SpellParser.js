@@ -1,5 +1,5 @@
 import { parseDescription, getArray, createItemData } from "./BaseParserFunctions.js"
-import { DefaultValues } from "../../data/DataDefaults";
+import { DataDefaults } from "../../data/DataDefaults";
 
 export class SpellParser {
     parseSpells(chummerChar) {
@@ -51,7 +51,7 @@ export class SpellParser {
         action.type = 'varies';
         action.skill = 'spellcasting';
         action.attribute = 'magic';
-        action.damage = DefaultValues.damageData();
+        action.damage = DataDefaults.damageData();
         action.damage.type.base = '';
         action.damage.type.value = '';
 

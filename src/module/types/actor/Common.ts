@@ -9,6 +9,7 @@ declare namespace Shadowrun {
         initiative: Initiative
         modifiers: Modifiers
         situation_modifiers: SituationModifiersSourceData
+        values: CommonValues
         /**
          * Actor inventories allow to show items separated out into different places / inventories.
          */
@@ -77,5 +78,21 @@ declare namespace Shadowrun {
         name: string  // Internal name.
         label: string // Displayed name, can be the same as 'name' when user created.
         itemIds: string[] // Item ids to show within this inventory.
+        showAll?: boolean // When set to true, show all items from all inventories.
+    }
+
+    /**
+     * Contains modifable values held by each actor, differs per type.
+     */
+    export interface CommonValues {string: ModifiableValue}
+    
+    /**
+     * Values used for physical combat actors only
+     */
+    export interface PhysicalCombatValues extends CommonValues {
+        // The current amount of progressive recoil (bullets fired) without any compensation.
+        recoil: ModifiableValue
+        // The base amount of recoil compensation of an actor, without recoil reducing it.
+        recoil_compensation: ModifiableValue
     }
 }

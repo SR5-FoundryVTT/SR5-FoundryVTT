@@ -19,6 +19,7 @@ declare namespace Shadowrun {
         MatrixActorData,
         MovementActorData,
         PhysicalTrackActorData {
+            values: PhysicalCombatValues
             vehicleType: VehicleTypes
             controlMode: VehicleControlModeTypes
             isDrone: boolean

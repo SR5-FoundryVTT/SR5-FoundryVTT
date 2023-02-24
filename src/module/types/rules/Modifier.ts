@@ -8,6 +8,9 @@ declare namespace Shadowrun {
         'armor' |
         'composure'|
         'defense'|
+        'defense_dodge' |
+        'defense_parry' |
+        'defense_block' |
         'multi_defense'|
         'drain'|
         'environmental'|
@@ -23,9 +26,17 @@ declare namespace Shadowrun {
         'lift_carry'|
         'memory'|
         'soak'|
-        'wounds'
+        'wounds' |
+        'recoil'
 
-    /** All situational modifiers affecting any actor placed on the canvas.
+
+    export type SituationModifierType = keyof SituationModifiersData;
+    
+    /** 
+     * All situational modifier types of a document that selections can be made for.
+     * 
+     * They are the 'source' of that documents selections and only include those
+     * values actually selected for the document.
      */
     export interface SituationModifiersSourceData {
         environmental: EnvironmentalModifiersSourceData
@@ -33,10 +44,18 @@ declare namespace Shadowrun {
         background_count: BackgroundCountModifiersSourceData
     }
 
+    /**
+     * All situational modifier types of a document that selections can be made for.
+     * 
+     * These are the 'applied' selections based on all 'source' selections of this 
+     * document and all other documents above it in it's application order.
+     */
     export interface SituationModifiersData {
         environmental: EnvironmentalModifiersData
         noise: NoiseModifiersData
         background_count: BackgroundCountModifiersData
+        recoil: ModifierData
+        defense: ModifierData
     }
 
     export type ActiveModifierValue = Record<string, number>
@@ -44,7 +63,7 @@ declare namespace Shadowrun {
     /**
      * A source modifier can contain modifier selections or fixed values
      */
-     export interface SourceModifierData {
+    export interface SourceModifierData {
         // Merged active modifier selections by both the local and all global modifier selections.
         active: ActiveModifierValue
         // A user set default / fixed value to be applied instead of what's selected.

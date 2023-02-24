@@ -6,7 +6,7 @@ import {SR5} from "../../config";
 import {MatrixPrep} from "./functions/MatrixPrep";
 import ICData = Shadowrun.ICData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
-import {DefaultValues} from "../../data/DataDefaults";
+import {DataDefaults} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
 import DeviceAttribute = Shadowrun.DeviceAttribute;
 import {SkillsPrep} from "./functions/SkillsPrep";
@@ -50,7 +50,7 @@ export class ICPrep {
         // Legacy actors MIGHT not have it, therefore make sure it's their.
         const track = data.track || {};
         // @ts-ignore
-        if (!track.matrix) track.matrix = DefaultValues.trackData();
+        if (!track.matrix) track.matrix = DataDefaults.trackData();
         // @ts-ignore
         data.track = track;
     }

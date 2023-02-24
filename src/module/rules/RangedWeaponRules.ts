@@ -73,6 +73,15 @@ export const RangedWeaponRules = {
     },
 
     /**
+     * Calculate the actual recoil compensation for vehicles number from source values according to SR5#175 'Recoil'
+     * 
+     * @param body The body level of the vehicle
+     */
+    _vehicleRecoilCompensationValue(body: number): number {
+        return Math.max(body, 0);
+    },
+
+    /**
      * Humanoid characters use the default rc calculation according to SR5#175 'Recoil'
      * 
      * A humanoid in this case is anything with physical attributes that's not a vehicle.
@@ -80,13 +89,30 @@ export const RangedWeaponRules = {
      * 
      * @returns The recoil compensation part a humanoid will add to the total recoil compensation.
      */
-    _humanoidRecoilCompensation(actor: SR5Actor): number {
+    humanoidRecoilCompensation(actor: SR5Actor): number {
         if (actor.isVehicle() || actor.isIC() || actor.isSprite()) return 0;
 
-        const baseRc = 1;
         const strength = actor.getAttribute('strength');
-        return strength ? 
-            Math.ceil(strength.value / 3) + baseRc:
-            baseRc;
+        if (!strength) return 0;
+        return this._humandRecoilCompensationValue(strength.value);
+    },
+
+    /**
+     * Calculate the actual recoil compensation for humanids number from source values according to SR5#175 'Recoil'
+     * 
+     * @param strength The strength level of the humanoid
+     * @param baseRc The base recoil compensation 
+     * @returns The recoil compensation for a humanoid
+     */
+    humanoiddRecoilCompensationValue(strength: number): number {
+        return Math.max(Math.ceil(strength / 3), 0);
+    },
+
+    /**
+     * Free recoil compensation according to SR5#175 'Recoi'
+     * @param baseRc Optional parameter allowing you to define a custom base rc.
+     */
+    humanoidBaseRecoilCompensation(baseRc:number=1): number {
+        return baseRc;
     }
 }

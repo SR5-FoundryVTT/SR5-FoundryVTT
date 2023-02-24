@@ -1,3 +1,4 @@
+import { CharacterPrep } from './CharacterPrep';
 import {InitiativePrep} from './functions/InitiativePrep';
 import {ModifiersPrep} from './functions/ModifiersPrep';
 import {MatrixPrep} from './functions/MatrixPrep';
@@ -13,37 +14,41 @@ import CritterData = Shadowrun.CritterData;
 
 
 export class CritterPrep {
-    static prepareBaseData(data: CritterData) {
-        ModifiersPrep.prepareModifiers(data);
-        ModifiersPrep.clearAttributeMods(data);
-        ModifiersPrep.clearArmorMods(data);
-        ModifiersPrep.clearLimitMods(data);
+    static prepareBaseData(system: CritterData) {
+        ModifiersPrep.prepareModifiers(system);
+        ModifiersPrep.clearAttributeMods(system);
+        ModifiersPrep.clearArmorMods(system);
+        ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(data: CritterData, items: SR5ItemDataWrapper[]) {
-        AttributesPrep.prepareAttributes(data);
-        SkillsPrep.prepareSkills(data);
+    static prepareDerivedData(system: CritterData, items: SR5ItemDataWrapper[]) {
+        AttributesPrep.prepareAttributes(system);
+        AttributesPrep.prepareEssence(system, items);
+        
+        SkillsPrep.prepareSkills(system);
 
-        ItemPrep.prepareArmor(data, items);
-        ItemPrep.prepareBodyware(data, items);
+        ItemPrep.prepareArmor(system, items);
 
-        MatrixPrep.prepareMatrix(data, items);
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+        MatrixPrep.prepareMatrix(system, items);
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
 
         // Limits depend on attributes and active effects.
-        LimitsPrep.prepareLimitBaseFromAttributes(data);
-        LimitsPrep.prepareLimits(data);
-        LimitsPrep.prepareDerivedLimits(data);
+        LimitsPrep.prepareLimitBaseFromAttributes(system);
+        LimitsPrep.prepareLimits(system);
+        LimitsPrep.prepareDerivedLimits(system);
 
-        ConditionMonitorsPrep.preparePhysical(data);
-        ConditionMonitorsPrep.prepareStun(data);
+        ConditionMonitorsPrep.preparePhysical(system);
+        ConditionMonitorsPrep.prepareStun(system);
 
-        MovementPrep.prepareMovement(data);
-        WoundsPrep.prepareWounds(data);
+        MovementPrep.prepareMovement(system);
+        WoundsPrep.prepareWounds(system);
 
-        InitiativePrep.prepareMeatspaceInit(data);
-        InitiativePrep.prepareAstralInit(data);
-        InitiativePrep.prepareMatrixInit(data);
-        InitiativePrep.prepareCurrentInitiative(data);
+        InitiativePrep.prepareMeatspaceInit(system);
+        InitiativePrep.prepareAstralInit(system);
+        InitiativePrep.prepareMatrixInit(system);
+        InitiativePrep.prepareCurrentInitiative(system);
+
+        CharacterPrep.prepareRecoil(system);
+        CharacterPrep.prepareRecoilCompensation(system);
     }
 }

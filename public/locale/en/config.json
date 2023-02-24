@@ -31,6 +31,10 @@
     "SETTINGS": {
         "ApplyLimitsDescription": "Should limits be applied to roll",
         "ApplyLimitsName": "Apply Limits to Rolls",
+        "AutomateMultiDefenseModifier": "Automate defense modifier",
+        "AutomateMultiDefenseModifierDescription": "Will automatically apply defense modi. for mulitple attacks",
+        "AutomateProgressiveRecoil": "Automate progressive recoil",
+        "AutomateProgressiveRecoilDescription": "Accure progressive recoil until reset",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
         "DiagonalMovementName": "Diagonal Movement",
         "DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the shadowrun roll-card",
@@ -55,9 +59,7 @@
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring.",
         "WhisperOpposedTestsToTargetedPlayers": "Whisper tests to targeted players",
-        "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to a online player target",
-        "AutomateMultiDefenseModifier":  "Automate defense modifier",
-        "AutomateMultiDefenseModifierDescription": "Will automatically apply defense modi. for mulitple attacks"
+        "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to a online player target"
     },
     "SR5.AP": "AP",
     "SR5.Accessory": "Accessory",
@@ -79,7 +81,7 @@
         "New": "New Effect",
         "Types": {
             "Inactive": "Inactive Effects",
-            "Passive": "Passive Effects",
+            "Persistant": "Persistant Effects",
             "Temporary": "Temporary Effects"
         }
     },
@@ -110,9 +112,6 @@
     "SR5.ApplyWounds": "Apply Wounds",
     "SR5.Armor": "Armor",
     "SR5.ArmorValue": "Armor Value",
-    "SR5.AstralDice": "Astral Init Dice",
-    "SR5.AstralInit": "Astral Init",
-    "SR5.AstralLimit": "Astral Limit",
     "SR5.AttackDodged": "Attack Dodged",
     "SR5.AttackHits": "Attack Hits",
     "SR5.Attacker": "Attacker",
@@ -269,8 +268,6 @@
     "SR5.Defaulting": "Defaulting",
     "SR5.Defender": "Defender",
     "SR5.DefenderNetHits": "Defender Net Hits",
-    "SR5.Defense": "Defense",
-    "SR5.DefenseMulti": "Defense (Multi)",
     "SR5.DefenseTest": "Defense Test",
     "SR5.Del": "Del",
     "SR5.DeleteConfirmationApplication": {
@@ -303,7 +300,6 @@
     "SR5.DmgTypeStun": "Stun",
     "SR5.Dodge": "Dodge",
     "SR5.DontApplyWounds": "Don't Apply Wounds",
-    "SR5.Drain": "Drain",
     "SR5.DrainResist": "Drain Resist",
     "SR5.DrainValue": "Drain Value",
     "SR5.Dropoff": "Dropoff",
@@ -405,7 +401,6 @@
     "SR5.Glitch": "Glitch!",
     "SR5.GlitchCritical": "Critical Glitch!",
     "SR5.Glitches": "Glitches:",
-    "SR5.Global": "Global",
     "SR5.GoodCover": "Good Cover",
     "SR5.HackingProgram": "Hacking Program",
     "SR5.Help": "Help",
@@ -446,7 +441,8 @@
     "SR5.Information": "Info",
     "SR5.Infos": {
         "CantModifyHostContent": "Can't change host data from within an IC actor.",
-        "ConsumedEquippedAmmo": "Consumed rounds from equipped ammunition"
+        "ConsumedEquippedAmmo": "Consumed rounds from equipped ammunition",
+        "ResetProgressiveRecoil": "Reset progressive recoil to zero bullets fired"
     },
     "SR5.InitCatAstral": "Astral",
     "SR5.InitCatMatrix": "Matrix",
@@ -512,6 +508,7 @@
             "ICConfiguration": "IC Configuration",
             "Matrix": "Matrix",
             "PersonalInventory": "On Person",
+            "ResetActorForNewRun": "New Run Reset",
             "RollDroneInfiltration": "Drone Infiltration",
             "RollDronePerception": "Drone Perception",
             "RollPilotVehicleTest": "Pilot Vehicle",
@@ -523,6 +520,7 @@
             "VehicleConfiguration": "Vehicle Configuration"
         },
         "Inventory": {
+            "All": "Any",
             "Carried": "Carried",
             "OpenInventory": "Inventory"
         },
@@ -587,12 +585,8 @@
     "SR5.MatrixAttrDataProc": "Data Proc.",
     "SR5.MatrixAttrFirewall": "Firewall",
     "SR5.MatrixAttrSleaze": "Sleaze",
-    "SR5.MatrixDice": "Matrix Init Dice",
-    "SR5.MatrixInit": "Matrix Init",
     "SR5.MatrixTarget": "Matrix Target",
     "SR5.MatrixTrack": "Matrix Track",
-    "SR5.MeatSpaceDice": "Meatspace Init Dice",
-    "SR5.MeatSpaceInit": "Meatspace Init",
     "SR5.MeleeWeaponAttack": "Melee Weapon Attack",
     "SR5.MentalLimit": "Mental Limit",
     "SR5.Metatype": "Metatype",
@@ -615,13 +609,47 @@
     "SR5.ModifiedFade": "Mod. Fade",
     "SR5.Modifier": "Modifier",
     "SR5.ModifierTypes": {
+        "Armor": "Armor",
+        "AstralDice": "Astral Init Dice",
+        "AstralInit": "Astral Init",
+        "AstralLimit": "Astral Limit",
+        "BackgroundCount": "Background Count",
+        "Composure": "Composure",
+        "Defense": "Defense",
+        "DefenseBlock": "Defense (Block)",
+        "DefenseDodge": "Defense (Dodge)",
+        "DefenseMulti": "Defense (Multi)",
+        "DefenseParry": "Defense (Parry)",
+        "Drain": "Drain",
         "Environmental": "Environmental",
         "EnvironmentalLight": "Environmental (Light)",
         "EnvironmentalRange": "Environmental (Range)",
         "EnvironmentalVisibility": "Environmental (Visibility)",
         "EnvironmentalWind": "Environmental (Wind)",
-        "Magic": "Background Count",
-        "Matrix": "Noise",
+        "Essence": "Essence",
+        "Fade": "Fade",
+        "Global": "Global",
+        "JudgeIntentions": "J.Intentions",
+        "LiftCarry": "Lift&Carry",
+        "MatrixDice": "Matrix Init Dice",
+        "MatrixInit": "Matrix Init",
+        "MeatSpaceDice": "Meatspace Init Dice",
+        "MeatSpaceInit": "Meatspace Init",
+        "Memory": "Memory",
+        "MentalLimit": "Mental Limit",
+        "Noise": "Noise",
+        "PainTolerancePhysical": "Pain Tolerance Physical",
+        "PainToleranceStun": "Pain Tolerance Stun",
+        "PhysicalLimit": "Physical Limit",
+        "PhysicalOverflowTrack": "Physical Overflow Track",
+        "PhysicalTrack": "Physical Track",
+        "Recoil": "Recoil",
+        "Run": "Run",
+        "Soak": "Soak",
+        "SocialLimit": "Social Limit",
+        "StunTrack": "Stun Track",
+        "Walk": "Walk",
+        "WoundTolerance": "Wound Tolerance",
         "Wounds": "Wounds"
     },
     "SR5.MountPoint": "Mount Point",
@@ -658,8 +686,6 @@
         "OnlyLinkedActorsSupported": "Only linked actors are supported. Selected tokens with unlinked actors will be ignored."
     },
     "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
-    "SR5.PainTolerancePhysical": "Pain Tolerance Physical",
-    "SR5.PainToleranceStun": "Pain Tolerance Stun",
     "SR5.Parry": "Parry",
     "SR5.PartialCover": "Partial Cover",
     "SR5.Passive": "Passive",
@@ -690,7 +716,7 @@
     "SR5.Reach": "Reach",
     "SR5.RecklessSpellButton": "Reckless",
     "SR5.Recoil": "Recoil",
-    "SR5.RecoilCompensation": "RC",
+    "SR5.RecoilCompensation": "Recoil Comp.",
     "SR5.ResetOverwatchScore": "Reset Overwatch Score",
     "SR5.Resist": "Resist",
     "SR5.ResistedAllDamage": "No Damage taken!",
@@ -970,9 +996,16 @@
     "SR5.ToggleEquip": "Toggle Equipped",
     "SR5.Tooltips": {
         "Actor": {
+            "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
+        },
+        "Effect": {
+            "Inactive": "Inactive effects don't apply their changes until they are enabled",
+            "Persistant": "Effects with an unlimited life span",
+            "Temporary": "Effects with a limited life span"
         },
         "Item": {
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers.",
+            "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting.",
             "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it."
         },
         "Modifiers": {
@@ -982,6 +1015,9 @@
             "astral_limit": "Modifies astral limit.",
             "composure": "Modifies composure tests pool.",
             "defense": "Modifies defense tests pool.",
+            "defense_block": "Modifies the defense modifier for active blocking",
+            "defense_dodge": "Modifies the defense modifier for active dodging",
+            "defense_parry": "Modifies the defense modifier for active parrying",
             "drain": "Modifies drain tests pool.",
             "essence": "Modifies essence attribute.",
             "fade": "Modifies fade tests pool",
@@ -1007,6 +1043,16 @@
             "stun_track": "Modifies stun damage track.",
             "walk": "Modifies walking distance by multiples of the agility attribute.",
             "wound_tolerance": "Modifies damage per wound modifier."
+        },
+        "RangedAttack": {
+            "Recoil": "Progressive Recoil",
+            "RecoilAfterAttack": "Progressive Recoil including this attack",
+            "RecoilBeforeAttack": "Progressive Recoil now, befor attacking.",
+            "RecoilCompensation": "Total RC, including actor and item RC",
+            "ResetRecoil": "Reset progressive recoil to none"
+        },
+        "SituationalModifier": {
+            "Recoil": "Amount of bullets fired"
         }
     },
     "SR5.Top": "Top",
@@ -1099,8 +1145,5 @@
     "SR5.WeaponReach": "Reach",
     "SR5.WeaponReload": "Reload",
     "SR5.WeaponType": "Type",
-    "SR5.Wireless": "Wireless",
-    "SR5.WoundModifier": "Wound Mod",
-    "SR5.WoundTolerance": "Wound Tolerance",
-    "SR5.Wounds": "Wounds"
+    "SR5.Wireless": "Wireless"
 }

@@ -68,7 +68,7 @@ export class InventoryFlow {
     async remove(name: string, moveTo: string = this.document.defaultInventory.name) {
         console.log(`Shadowrun 5e | Removing inventory ${name}. Moving items over to ${moveTo}`);
 
-        if (this.document.defaultInventory.name === name)
+        if (this.disallowRemove(name))
             return ui.notifications?.error(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
 
         if (!this.exists(name))
@@ -107,7 +107,7 @@ export class InventoryFlow {
     exists(name): boolean {
         //@ts-ignore // TODO: foundry-vtt-types v10
         return name === Object.keys(this.document.system.inventories)
-                              .find(inventory => inventory.toLowerCase() === name.toLowerCase());
+                            .find(inventory => inventory.toLowerCase() === name.toLowerCase());
     }
 
     /**
@@ -136,6 +136,10 @@ export class InventoryFlow {
      */
     async rename(current: string, newName: string): Promise<string|void> {
         console.log(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
+
+        // Disallow editing of default inventory.
+        if (this.disallowRename(current))
+            return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
 
         newName = InventoryFlow._sanitzeName(newName);
 
@@ -240,5 +244,28 @@ export class InventoryFlow {
      */
     static _sanitzeName(name: string): string {
         return Helpers.sanitizeDataKey(name);
+    }
+
+    /**
+     * Check if a rename would be allowed
+     * @param name The current name of the to be renamed invenotry
+     * @returns true, when it's not and false when it is.
+     */
+    disallowRename(name: string): boolean {
+        // Sanitize falsy by disallowing
+        if (!name) return true;
+        return [this.document.defaultInventory.name, this.document.allInventories.name].includes(name);
+    }
+
+    /**
+     * Check if a remove would be allowed.
+     * 
+     * @param name The current name of the to be removed invenotry
+     * @returns true, when it's not and false when it is.
+     */
+    disallowRemove(name: string): boolean {
+        // Sanitize falsy by disallowing
+        if (!name) return true;
+        return [this.document.defaultInventory.name, this.document.allInventories.name].includes(name);
     }
 }

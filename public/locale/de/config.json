@@ -31,6 +31,10 @@
         "SETTINGS": {
                 "ApplyLimitsDescription": "Sollten Limits verwendet werden?",
                 "ApplyLimitsName": "Verwende Limits bei Würfen",
+                "AutomateMultiDefenseModifier": "Automatisiere Verteidigungs modi.",
+                "AutomateMultiDefenseModifierDescription": "Im Kampf erzeugen mehrere Angriffe auf einen Verteidiger automatisch Verteidungsmodi.",
+                "AutomateProgressiveRecoil": "Automatisiere Kumulativen Rückstoß",
+                "AutomateProgressiveRecoilDescription": "Summiere Rückstoß so lange auf wie attackiert wird",
                 "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
                 "DiagonalMovementName": "Diagonale Bewegung",
                 "DisplayDefaultRollCardDescription": "Soll die standard Würfelkarte zusammen mit der Shadowrun Würfelkarte angezeigt werden",
@@ -55,9 +59,7 @@
                 "TokenHealthBars": "Token Lebensbalken",
                 "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige",
                 "WhisperOpposedTestsToTargetedPlayers": "Flüstere VS Anteil an anvisierte Spieler",
-                "WhisperOpposedTestsToTargetedPlayersDescription": "Bei Proben mit VS Proben wird eine geflüsterte Nachricht an anvisierte Spieler (online) versendet",
-                "AutomateMultiDefenseModifier":  "Automatisiere Verteidigungs modi.",
-                "AutomateMultiDefenseModifierDescription": "Im Kampf erzeugen mehrere Angriffe auf einen Verteidiger automatisch Verteidungsmodi."
+                "WhisperOpposedTestsToTargetedPlayersDescription": "Bei Proben mit VS Proben wird eine geflüsterte Nachricht an anvisierte Spieler (online) versendet"
         },
         "SR5.AP": "DK",
         "SR5.Accessory": "Zubehör",
@@ -78,9 +80,9 @@
                 },
                 "New": "New Effect",
                 "Types": {
-                        "Inactive": "Inactive Effects",
-                        "Passive": "Passive Effects",
-                        "Temporary": "Temporary Effects"
+                        "Inactive": "Inaktive Effekte",
+                        "Persistant": "Anhaltende Effekte",
+                        "Temporary": "Temporäre Effekte"
                 }
         },
         "SR5.ActiveSkills": "Aktive Fertigkeiten",
@@ -108,11 +110,8 @@
         "SR5.AmmoFull": "Vollgeladen",
         "SR5.Aoe": "Fläche",
         "SR5.ApplyWounds": "Anwenden",
-        "SR5.Armor": "Panzerung",
+        "SR5.Armor": "Armor",
         "SR5.ArmorValue": "Panzerungswert",
-        "SR5.AstralDice": "Astrale Ini Würfel",
-        "SR5.AstralInit": "Astrale Ini",
-        "SR5.AstralLimit": "Astrales Limit",
         "SR5.AttackDodged": "Ausgewichen",
         "SR5.AttackHits": "Treffer",
         "SR5.Attacker": "Angreifer",
@@ -446,7 +445,8 @@
         "SR5.Information": "Info",
         "SR5.Infos": {
                 "CantModifyHostContent": "Host daten können nicht von einem IC Akteur aus verändert werden",
-                "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen"
+                "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen",
+                "ResetProgressiveRecoil": "Kummulativer Rückstoß zurückgesetzt auf 0 abgefeuerte Kugeln"
         },
         "SR5.InitCatAstral": "Astrale Initiative",
         "SR5.InitCatMatrix": "Matrix-Initiative",
@@ -512,6 +512,7 @@
                         "ICConfiguration": "IC Configuration",
                         "Matrix": "Matrix",
                         "PersonalInventory": "Am Körper",
+                        "ResetActorForNewRun": "Neuer Run Reset",
                         "RollDroneInfiltration": "Drohne infiltrieren",
                         "RollDronePerception": "Drohnenwahrnehmung",
                         "RollPilotVehicleTest": "Fahrzeug steuern",
@@ -523,6 +524,7 @@
                         "VehicleConfiguration": "Fahrzeug Konfiguration"
                 },
                 "Inventory": {
+                        "All": "Alle",
                         "Carried": "Mitgeführt",
                         "OpenInventory": "Inventar"
                 },
@@ -615,13 +617,47 @@
         "SR5.ModifiedFade": "Mod. Schwund",
         "SR5.Modifier": "Modifikatoren",
         "SR5.ModifierTypes": {
+                "Armor": "Panzerung",
+                "AstralDice": "Astrale Würfel",
+                "AstralInit": "Astrale Ini",
+                "AstralLimit": "Astrales Limit",
+                "BackgroundCount": "Hintergrundstrahlung",
+                "Composure": "Selbstbeherr.",
+                "Defense": "Verteidung",
+                "DefenseBlock": "Verteidung (Blocken)",
+                "DefenseDodge": "Verteidung (Ausweichen)",
+                "DefenseMulti": "Verteidung (Mehrf.)",
+                "DefenseParry": "Verteidung (Parieren)",
+                "Drain": "Entzug",
                 "Environmental": "Umgebung",
                 "EnvironmentalLight": "Umgebung (Licht)",
                 "EnvironmentalRange": "Umgebung (Reichweite)",
                 "EnvironmentalVisibility": "Umgebung (Sicht)",
                 "EnvironmentalWind": "Umgebung (Wind)",
-                "Magic": "Hintergrundstrahlung",
-                "Matrix": "Rauschen",
+                "Essence": "Essenz",
+                "Fade": "Schwund",
+                "Global": "Global",
+                "JudgeIntentions": "Menschenkenntnis",
+                "LiftCarry": "Heben&Tragen",
+                "MatrixDice": "Matrix Würfel",
+                "MatrixInit": "Matrix Ini",
+                "MeatSpaceDice": "Physische Würfel",
+                "MeatSpaceInit": "Physische Ini",
+                "Memory": "Erinnerung",
+                "MentalLimit": "Mentales Limit",
+                "Noise": "Rauschen",
+                "PainTolerancePhysical": "Schmerztoleranz (Physisch)",
+                "PainToleranceStun": "Schmerztoleranz (Geistig)",
+                "PhysicalLimit": "Physisches Limit",
+                "PhysicalOverflowTrack": "Körperlicher Überschuss Monitor",
+                "PhysicalTrack": "Körperlicher Monitor",
+                "Recoil": "Rückstoß",
+                "Run": "Laufen",
+                "Soak": "Einstecken",
+                "SocialLimit": "Soziales Limit",
+                "StunTrack": "Gesitiger Monitor",
+                "Walk": "Gehen",
+                "WoundTolerance": "Wunden Toleranz",
                 "Wounds": "Wunden"
         },
         "SR5.MountPoint": "Haltepunkt",
@@ -658,8 +694,6 @@
                 "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert."
         },
         "SR5.OverwatchScoreTrackerTitle": "Mr. Johnsons Baby Monitor",
-        "SR5.PainTolerancePhysical": "Schmerz Toleranz Physisch",
-        "SR5.PainToleranceStun": "Schmerz Toleranz Geistig",
         "SR5.Parry": "Parieren",
         "SR5.PartialCover": "Teildeckung",
         "SR5.Passive": "Passiv",
@@ -690,7 +724,7 @@
         "SR5.Reach": "Reichweite",
         "SR5.RecklessSpellButton": "Schnell",
         "SR5.Recoil": "Rückstoß",
-        "SR5.RecoilCompensation": "RK",
+        "SR5.RecoilCompensation": "Rückstoßkomp.",
         "SR5.ResetOverwatchScore": "Nulle Overwatch Wert",
         "SR5.Resist": "Widerstehen",
         "SR5.ResistedAllDamage": "Kein Schaden!",
@@ -969,9 +1003,17 @@
         "SR5.ToggleActive": "De/aktivieren",
         "SR5.ToggleEquip": "Anlegen/Ablegen",
         "SR5.Tooltips": {
-                "Actor": {},
+                "Actor": {
+                        "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück"
+                },
+                "Effect": {
+                        "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden",
+                        "Persistant": "Effekte ohne zeitliche Begrenzung",
+                        "Temporary": "Effekte mit zeitlicher Begrenzung"
+                },
                 "Item": {
                         "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl.",
+                        "ActionRollMode": "Standard Rollmodus für diese Aktion. Überschreibt globale Chat Einstellung.",
                         "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren."
                 },
                 "Modifiers": {
@@ -981,6 +1023,9 @@
                         "astral_limit": "Modifiziert das astrale Limit",
                         "composure": "Modifiziert den Pool von Selbstherrschungsproben",
                         "defense": "Modifiziert den Pool von Verteidigungsproben",
+                        "defense_block": "Modifiziert den Verteidungsmodifikator wenn aktiv geblockt wird",
+                        "defense_dodge": "Modifiziert den Verteidungsmodifikator wenn aktiv ausgewichen wird",
+                        "defense_parry": "Modifiziert den Verteidungsmodifikator wenn aktiv parriert wird",
                         "drain": "Modifiziert den Pool von Entzugsproben",
                         "essence": "Modifiziert das Essenz Attribut",
                         "fade": "Modifiziert den Pool von Schwundproben.",
@@ -1006,6 +1051,16 @@
                         "stun_track": "Modifiziert den Geistigen Monitor",
                         "walk": "Modifiziert die Gehreichweite um das Vielfache des Geschicklichkeit Attributs.",
                         "wound_tolerance": "Modifiziert die Schadensmenge pro Wundenmodi."
+                },
+                "RangedAttack": {
+                        "Recoil": "Kummulativer Rückstoß",
+                        "RecoilAfterAttack": "Kummulativer Rückstoß nach der diesem Angriff",
+                        "RecoilBeforeAttack": "Kummulativer Rückstoß jetzt, vor dem Angriff",
+                        "RecoilCompensation": "Gesamter RK, inklus. RK der Waffe",
+                        "ResetRecoil": "Setzte kumulativen Rückstoß zurück"
+                },
+                "SituationalModifier": {
+                        "Recoil": "Anzahl abgefeuerter Kugeln"
                 }
         },
         "SR5.Top": "Oberseite",
@@ -1098,8 +1153,5 @@
         "SR5.WeaponReach": "Reichweite",
         "SR5.WeaponReload": "Nachladen",
         "SR5.WeaponType": "Typ",
-        "SR5.Wireless": "Wireless",
-        "SR5.WoundModifier": "Verletzungsmodi",
-        "SR5.WoundTolerance": "Schmerztoleranz",
-        "SR5.Wounds": "Wunden"
+        "SR5.Wireless": "Wireless"
 }

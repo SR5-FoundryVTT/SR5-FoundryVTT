@@ -53,29 +53,21 @@ export class ItemPrep {
         armor.value = Helpers.calcTotal(armor);
     }
     /**
-     * Prepare actor data for ware changes
-     * - this calculates the actors essence
+     * Apply all changes to an actor by their 'ware items.
+     * 
+     * Modifiy essence by items essence loss
      */
-    static prepareBodyware(system: ActorTypesData, items: SR5ItemDataWrapper[]) {
-        const { attributes } = system;
-        const parts = new PartsList<number>();
-        // add Items as values to lower the total value of essence
+    static prepareWareEssenceLoss(system: ActorTypesData, items: SR5ItemDataWrapper[]) {
+        const parts = new PartsList<number>(system.attributes.essence.mod);
+        
         items
             .filter((item) => item.isBodyware() && item.isEquipped())
             .forEach((item) => {
                 if (item.getEssenceLoss()) {
-                    parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));
+                    parts.addPart(item.getName(), -item.getEssenceLoss());
                 }
             });
-        // add the bonus from the misc tab if applied
-        const essenceMod = system.modifiers['essence'];
-        if (essenceMod && !Number.isNaN(essenceMod)) {
-            parts.addUniquePart('SR5.Bonus', Number(essenceMod));
-        }
 
-        // The essence base is fixed. Changes should be made through the attribute.temp field.
-        attributes.essence.base = SR.attributes.defaults.essence;
-        attributes.essence.mod = parts.list;
-        attributes.essence.value = Helpers.calcTotal(attributes.essence);
+        system.attributes.essence.mod = parts.list;
     }
 }

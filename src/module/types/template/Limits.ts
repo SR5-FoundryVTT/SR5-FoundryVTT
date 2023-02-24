@@ -26,5 +26,9 @@ declare namespace Shadowrun {
         data_processing: LimitField
     }
 
+    /**
+     * Describes a limit used in actor data.
+     * Differes from LimitValue which is used in item action data and contains less fields.
+     */
     export type LimitField = BaseValuePair<number> & ModifiableValue & CanHideFiled & LabelField;
 }
