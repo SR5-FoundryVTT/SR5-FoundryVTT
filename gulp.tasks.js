@@ -45,6 +45,7 @@ async function buildJS() {
         sourcemap: true,
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
+        // Don't typescheck on build. Instead typecheck on PR and push and assume releases to build.
         plugins: [],
     }).catch((err) => {
         console.error(err)
