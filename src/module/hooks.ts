@@ -45,12 +45,11 @@ import { SuppressionDefenseTest } from './tests/SuppressionDefenseTest';
 import { quenchRegister } from '../test/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
-import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
-import SocketMessageData = Shadowrun.SocketMessageData;
-import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import { NetworkDeviceFlow } from './item/flows/NetworkDeviceFlow';
 import { registerSystemKeybindings } from './keybindings';
 import { SkillTest } from './tests/SkillTest';
+
+import {canvasInit} from './canvas';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -63,7 +62,7 @@ export class HooksManager {
         Hooks.once('init', HooksManager.init);
         Hooks.once('setup', HooksManager.setupAutocompleteInlinePropertiesSupport);
 
-        Hooks.on('canvasInit', HooksManager.canvasInit);
+        Hooks.on('canvasInit', canvasInit);
         Hooks.on('ready', HooksManager.ready);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
@@ -302,14 +301,6 @@ ___________________
         HooksManager.registerSocketListeners();
     }
 
-    static canvasInit() {
-        if (!canvas?.ready) return;
-        //@ts-ignore
-        canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
-        //@ts-ignore
-        SquareGrid.prototype.measureDistances = canvas.measureDistances;;
-    }
-
     /**
      * Hanlde drop events on the hotbar creating different macros.
      * 
@@ -379,7 +370,7 @@ ___________________
      * @param data
      * @param id
      */
-    static async updateIcConnectedToHostItem(item: SR5Item, data: ShadowrunItemDataData, id: string) {
+    static async updateIcConnectedToHostItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
         if (!canvas.ready || !game.actors) return;
 
         if (item.isHost) {
@@ -402,7 +393,7 @@ ___________________
         }
     }
 
-    static async removeDeletedItemsFromNetworks(item: SR5Item, data: ShadowrunItemDataData, id: string) {
+    static async removeDeletedItemsFromNetworks(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
         await NetworkDeviceFlow.handleOnDeleteItem(item, data, id);
     }
 
@@ -414,14 +405,14 @@ ___________________
     static registerSocketListeners() {
         if (!game.socket || !game.user) return;
         console.log('Registering Shadowrun5e system socket messages...');
-        const hooks: SocketMessageHooks = {
+        const hooks: Shadowrun.SocketMessageHooks = {
             [FLAGS.addNetworkController]: [NetworkDeviceFlow._handleAddNetworkControllerSocketMessage],
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
             [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage]
         }
 
-        game.socket.on(SYSTEM_SOCKET, async (message: SocketMessageData) => {
+        game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {
             console.log('Shadowrun 5e | Received system socket message.', message);
 
             const handlers = hooks[message.type];
