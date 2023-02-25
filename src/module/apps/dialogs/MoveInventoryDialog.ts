@@ -29,7 +29,9 @@ export class MoveInventoryDialog extends FormDialog {
     static getDialogData(actor: SR5Actor, sourceInventory: string) {
         // Get all inventories, excluding the currently shown one.
         const inventories = Object.values(actor.data.data.inventories)
-                                  .filter(inventory => inventory.name !== sourceInventory);
+            .filter(inventory => inventory.name !== sourceInventory)
+            .sort();
+            
         // Add the default inventories for selection when necessary.
         if (sourceInventory !== actor.defaultInventory.name) inventories.unshift(actor.defaultInventory);
 

@@ -23,7 +23,7 @@ declare namespace Shadowrun {
     }
 
     interface EffectsCategoryData {
-        type: "temporary"|"persistant"|"inactive"
+        type: "temporary"|"persistent"|"inactive"
         label: string
         tooltip: string
         effects: any[]

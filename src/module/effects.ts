@@ -71,10 +71,10 @@ export function prepareActiveEffectCategories(effects): EffectsSheetData {
             tooltip: game.i18n.localize("SR5.Tooltips.Effect.Temporary"),
             effects: []
         },
-        persistant: {
-            type: "persistant",
-            label: game.i18n.localize("SR5.ActiveEffect.Types.Persistant"),
-            tooltip: game.i18n.localize("SR5.Tooltips.Effect.Persistant"),
+        persistent: {
+            type: "persistent",
+            label: game.i18n.localize("SR5.ActiveEffect.Types.Persistent"),
+            tooltip: game.i18n.localize("SR5.Tooltips.Effect.Persistent"),
             effects: []
         },
         inactive: {
@@ -90,7 +90,7 @@ export function prepareActiveEffectCategories(effects): EffectsSheetData {
         effect._getSourceName(); // Trigger a lookup for the source name
         if (effect.disabled) categories.inactive.effects.push(effect);
         else if (effect.isTemporary) categories.temporary.effects.push(effect);
-        else categories.persistant.effects.push(effect);
+        else categories.persistent.effects.push(effect);
     }
 
     return categories;

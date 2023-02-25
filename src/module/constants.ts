@@ -13,6 +13,7 @@
 export const SYSTEM_NAME = 'shadowrun5e';
 export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}`;
 export const FLAGS = {
+    DiagonalMovement: 'diagonalMovement',
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
     WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',

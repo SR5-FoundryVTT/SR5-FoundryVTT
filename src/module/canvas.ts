@@ -1,7 +1,11 @@
-// directly pulled from DND5e, just changed the
-export const measureDistance = function (segments, options = {}) {
-    if (!game || !game.ready || !canvas || !canvas.ready) return 0;
+import {FLAGS, SYSTEM_NAME} from './constants';
 
+interface DistanceOptions {
+    gridSpaces?: boolean
+}
+
+// directly pulled from DND5e, just changed the
+const measureDistances = function (segments, options: DistanceOptions = {}) {
     //@ts-ignore
     // basegrid isn't typed, options aren't really important
     if (!options.gridSpaces) return BaseGrid.prototype.measureDistances.call(this, segments, options);
@@ -24,7 +28,7 @@ export const measureDistance = function (segments, options = {}) {
         let ns = Math.abs(ny - nx);
         nDiagonal += nd;
 
-        // Common houserule variant
+        // Estimate diagonal like other battle grid systems do. (DnD5e)
         if (rule === '1-2-1') {
             let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
             let spaces = nd10 * 2 + (nd - nd10) + ns;
@@ -32,14 +36,24 @@ export const measureDistance = function (segments, options = {}) {
             return spaces * canvas.dimensions.distance;
         }
 
-        // Euclidean Measurement
+        // Treat diagonal as straight line
         else if (rule === 'EUCL') {
             // @ts-ignore
             return Math.round(Math.hypot(nx, ny) * canvas.scene.data.gridDistance);
         }
 
-        // diag and straight are same space count
+        // Treat diagonal as straight movement
         // @ts-ignore
         else return (ns + nd) * canvas.scene.data.gridDistance;
     });
 };
+
+
+export function canvasInit() {
+    //@ts-ignore
+    // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
+    canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, FLAGS.DiagonalMovement);
+    // Add a custom measureDistances function, overwriting default to add more movement styles.
+    //@ts-ignore
+    SquareGrid.prototype.measureDistances = measureDistances;
+}

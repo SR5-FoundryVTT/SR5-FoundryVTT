@@ -8,13 +8,13 @@ export const registerSystemSettings = () => {
     /**
      * Register diagonal movement rule setting
      */
-    game.settings.register(SYSTEM_NAME, 'diagonalMovement', {
+    game.settings.register(SYSTEM_NAME, FLAGS.DiagonalMovement, {
         name: 'SETTINGS.DiagonalMovementName',
         hint: 'SETTINGS.DiagonalMovementDescription',
         scope: 'world',
         config: true,
         type: String,
-        default: '1-2-1',
+        default: 'EUCL',
         // @ts-ignore
         choices: {
             '1-1-1': 'SETTINGS.IgnoreDiagonal',
@@ -22,10 +22,9 @@ export const registerSystemSettings = () => {
             'EUCL': 'SETTINGS.Euclidean',
         },
         onChange: (rule) => {
-            if (canvas.ready){
-                // @ts-ignore // TODO: foundry-vtt-types diagonalRule doesn't exist anymore. Is it even working?
-                canvas.grid.diagonalRule = rule
-            }
+            // @ts-ignore 
+            // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
+            canvas.grid.diagonalRule = rule
         },
     });
 
