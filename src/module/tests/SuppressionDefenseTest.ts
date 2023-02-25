@@ -3,7 +3,7 @@ import { PhysicalDefenseTest, PhysicalDefenseTestData } from "./PhysicalDefenseT
 import MinimalActionData = Shadowrun.MinimalActionData;
 
 
-export class SupressionDefenseTest extends PhysicalDefenseTest {
+export class SuppressionDefenseTest extends PhysicalDefenseTest {
     public data: PhysicalDefenseTestData;
 
     static _getDefaultTestAction(): Partial<MinimalActionData> {

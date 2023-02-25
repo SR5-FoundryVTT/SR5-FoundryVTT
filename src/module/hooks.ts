@@ -41,7 +41,7 @@ import {ThrownAttackTest} from "./tests/ThrownAttackTest";
 import {PilotVehicleTest} from "./tests/PilotVehicleTest";
 import {DronePerceptionTest} from "./tests/DronePerceptionTest";
 import {DroneInfiltrationTest} from "./tests/DroneInfiltrationTest";
-import { SupressionDefenseTest } from './tests/SupressionDefenseTest';
+import { SuppressionDefenseTest } from './tests/SuppressionDefenseTest';
 import { quenchRegister } from '../test/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
@@ -130,7 +130,7 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalDefenseTest,
-                SupressionDefenseTest,
+                SuppressionDefenseTest,
                 PhysicalResistTest,
                 SpellCastingTest,
                 CombatSpellDefenseTest,
@@ -156,7 +156,7 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalResistTest,
-                SupressionDefenseTest,
+                SuppressionDefenseTest,
                 SpellCastingTest,
                 ComplexFormTest,
                 PhysicalDefenseTest,
@@ -176,7 +176,7 @@ ___________________
             opposedTests: {
                 OpposedTest,
                 PhysicalDefenseTest,
-                SupressionDefenseTest,
+                SuppressionDefenseTest,
                 CombatSpellDefenseTest
             },
             /**
@@ -304,10 +304,10 @@ ___________________
 
     static canvasInit() {
         if (!canvas?.ready) return;
-        // @ts-ignore // TODO: canvas.grid.diagonaleRule doesn't exist on  anymore... does this even work anymore?
+        //@ts-ignore
         canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
-        //@ts-ignore // TODO: TYPE SquareGrid isn't typed.
-        SquareGrid.prototype.measureDistances = measureDistance;
+        //@ts-ignore
+        SquareGrid.prototype.measureDistances = canvas.measureDistances;;
     }
 
     /**
