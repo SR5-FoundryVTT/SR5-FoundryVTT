@@ -797,16 +797,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         };
         this._addInventoryTypes(inventoriesSheet[this.document.defaultInventory.name]);
 
-        // Build inventory sheet data, and store a item to inventory mapping.
-        let showAllFound: boolean = false;
         Object.values(this.document.system.inventories).forEach(inventory => {
-            // Sanitize faulty document data. 
-            if (showAllFound) {
-                console.error('Shadowrun 5e | Only one inventory with the showAll property should exist.');
-                inventory.showAll = false;
-            };
-            showAllFound = inventory.showAll ? true : false; // it can be undefined.
-
             const {name, label, itemIds} = inventory
 
             // Avoid re-adding default inventories.
