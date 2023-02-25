@@ -858,12 +858,6 @@ export class SR5BaseActorSheet extends ActorSheet {
 
                 inventorySheet.types[item.type].items.push(sheetItem);
             })
-
-            if (!inventory.showAll) {
-                // Add the item to the overall 'show any item' inventory.
-                const allInventories = inventoriesSheet[this.document.allInventories.name];
-                allInventories.types[item.type].items.push(sheetItem);
-            }
         });
 
         Object.values(inventoriesSheet).forEach(inventory => {

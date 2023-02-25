@@ -520,7 +520,7 @@
             "VehicleConfiguration": "Vehicle Configuration"
         },
         "Inventory": {
-            "All": "Any",
+            "All": "All",
             "Carried": "Carried",
             "OpenInventory": "Inventory"
         },
