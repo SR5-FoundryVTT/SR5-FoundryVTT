@@ -8,7 +8,7 @@ const xml2js = require('xml2js');
  * 
  * Generic type ItemDataType is the items data type DataImporter creates per entry in that Chummer5a data .xml file.
  */
-export abstract class DataImporter<ItemDataType> {
+export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
     public abstract files: string[];
     public static jsoni18n: any;
     public categoryTranslations: any;
@@ -27,7 +27,7 @@ export abstract class DataImporter<ItemDataType> {
      *       system model data that game.model.Item would give us.
      */
     public GetDefaultData({type}:{type:any}) {
-        return DataDefaults.baseItemData<ItemDataType>({type});
+        return DataDefaults.baseItemData<ItemDataType, ItemSystemDataType>({type});
     }
 
     /**

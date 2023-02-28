@@ -8,14 +8,20 @@ import { ParserMap } from '../parser/ParserMap';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import WeaponItemData = Shadowrun.WeaponItemData;
 import {Helpers} from "../../helpers";
+import { DataDefaults } from '../../data/DataDefaults';
 
-export class WeaponImporter extends DataImporter<WeaponItemData> {
+export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.WeaponData> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public files = ['weapons.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('weapons') && jsonObject['weapons'].hasOwnProperty('weapon');
+    }
+
+    public GetDefaultData({ type }: { type: any; }): WeaponItemData {
+        const systemData = {action: {type: 'varies', attribute: 'agility'}} as Shadowrun.WeaponData;
+        return DataDefaults.baseItemData<Shadowrun.WeaponItemData, Shadowrun.WeaponData>({type}, systemData);
     }
 
     ExtractTranslation() {

@@ -12,8 +12,6 @@ import { CritterPowerImporter } from '../importer/CritterPowerImporter';
 import { ImportHelper, ImportMode } from '../helper/ImportHelper';
 import {DeviceImporter} from "../importer/DeviceImporter";
 import {EquipmentImporter} from "../importer/EquipmentImporter";
-
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import { SpritePowerImporter } from '../importer/SpritePowerImporter';
 
 
@@ -80,7 +78,7 @@ export class Import extends Application {
     }
 
     //Order is important, ex. some weapons need mods to fully import
-    static Importers: DataImporter<ShadowrunItemData>[] = [
+    static Importers: DataImporter<Shadowrun.ShadowrunItemData, Shadowrun.ShadowrunItemDataData>[] = [
         new ModImporter(),
         new WeaponImporter(),
         new ArmorImporter(),

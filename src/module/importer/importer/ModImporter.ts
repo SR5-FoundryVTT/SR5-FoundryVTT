@@ -5,7 +5,7 @@ import { ModParserBase } from '../parser/mod/ModParserBase';
 import ModificationItemData = Shadowrun.ModificationItemData;
 import {Helpers} from "../../helpers";
 
-export class ModImporter extends DataImporter<ModificationItemData> {
+export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.ModificationData> {
     public categoryTranslations: any;
     public accessoryTranslations: any;
     public files = ['weapons.xml'];

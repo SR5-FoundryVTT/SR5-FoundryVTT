@@ -4,7 +4,7 @@ import {Constants} from "./Constants";
 import DeviceItemData = Shadowrun.DeviceItemData;
 import {Helpers} from "../../helpers";
 
-export class DeviceImporter extends DataImporter<DeviceItemData> {
+export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.DeviceData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {

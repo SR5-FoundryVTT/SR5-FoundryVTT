@@ -4,7 +4,7 @@ import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParser
 import {Constants} from './Constants';
 import {Helpers} from "../../helpers";
 
-export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData> {
+export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
     public files = ['critterpowers.xml'];
 
     public unsupportedCategories = [

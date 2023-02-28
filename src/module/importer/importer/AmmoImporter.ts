@@ -5,7 +5,7 @@ import WeaponData = Shadowrun.WeaponData;
 import AmmoItemData = Shadowrun.AmmoItemData;
 import {Helpers} from "../../helpers";
 
-export class AmmoImporter extends DataImporter<AmmoItemData> {
+export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {

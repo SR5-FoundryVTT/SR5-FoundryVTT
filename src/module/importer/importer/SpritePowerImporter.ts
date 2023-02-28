@@ -8,7 +8,7 @@ import { DataImporter } from "./DataImporter";
 /**
  * Handle importing Chummer5a sprite powers as system items
  */
-export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemData> {
+export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemData, Shadowrun.SpritePowerData> {
     public files = ['critterpowers.xml'];
     public unsupportedCategories = [
         'Drake',

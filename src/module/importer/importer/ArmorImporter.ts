@@ -4,7 +4,7 @@ import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
 import ArmorItemData = Shadowrun.ArmorItemData;
 import {Helpers} from "../../helpers";
 
-export class ArmorImporter extends DataImporter<ArmorItemData> {
+export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorData> {
     public armorTranslations: any;
     public categoryTranslations: any;
     public files = ['armor.xml'];
