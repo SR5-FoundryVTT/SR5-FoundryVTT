@@ -4,7 +4,7 @@ import { QualityParserBase } from '../parser/quality/QualityParserBase';
 import QualityItemData = Shadowrun.QualityItemData;
 import {Helpers} from "../../helpers";
 
-export class QualityImporter extends DataImporter<QualityItemData> {
+export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.QualityData> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public files = ['qualities.xml'];

@@ -6,16 +6,21 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
-import SpellItemData = Shadowrun.SpellItemData;
 import {Helpers} from "../../helpers";
+import { DataDefaults } from '../../data/DataDefaults';
 
-export class SpellImporter extends DataImporter<SpellItemData> {
+export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowrun.SpellData> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public files = ['spells.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('spells') && jsonObject['spells'].hasOwnProperty('spell');
+    }
+
+    public GetDefaultData({ type }: { type: any; }): Shadowrun.SpellItemData {
+        const systemData = {action: {type: 'varies', attribute: 'magic', skill: 'spellcasting'}} as Shadowrun.SpellData;
+        return DataDefaults.baseItemData<Shadowrun.SpellItemData, Shadowrun.SpellData>({type}, systemData);
     }
 
     ExtractTranslation() {
@@ -31,7 +36,7 @@ export class SpellImporter extends DataImporter<SpellItemData> {
     async Parse(jsonObject: object): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Spells', this.categoryTranslations);
 
-        const parser = new ParserMap<SpellItemData>('category', [
+        const parser = new ParserMap<Shadowrun.SpellItemData>('category', [
             { key: 'Combat', value: new CombatSpellParser() },
             { key: 'Manipulation', value: new ManipulationSpellParser() },
             { key: 'Illusion', value: new IllusionSpellParser() },
@@ -41,7 +46,7 @@ export class SpellImporter extends DataImporter<SpellItemData> {
             { key: 'Rituals', value: new SpellParserBase() },
         ]);
 
-        let items: SpellItemData[] = [];
+        let items: Shadowrun.SpellItemData[] = [];
         let jsonDatas = jsonObject['spells']['spell'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];

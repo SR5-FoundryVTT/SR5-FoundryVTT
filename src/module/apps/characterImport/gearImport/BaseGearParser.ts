@@ -33,7 +33,7 @@ export class BaseGearParser implements GearParser {
     }
 
     private getDefaultData() {
-        return DataDefaults.baseItemData<EquipmentItemData>({type: 'equipment'});
+        return DataDefaults.baseItemData<EquipmentItemData, Shadowrun.EquipmentData>({type: 'equipment'});
     }
 }
 

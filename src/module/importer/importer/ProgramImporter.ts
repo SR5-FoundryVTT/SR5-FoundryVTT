@@ -7,7 +7,7 @@ import { Constants } from './Constants';
 /**
  * Programs are part of the Chummer5 gear.xml
  */
-export class ProgramImporter extends DataImporter<ProgramItemData> {
+export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.ProgramData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {

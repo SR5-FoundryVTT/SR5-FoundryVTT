@@ -4,7 +4,7 @@ import {Constants} from "./Constants";
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import {Helpers} from "../../helpers";
 
-export class EquipmentImporter extends DataImporter<EquipmentItemData> {
+export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun.EquipmentData> {
     files = ['gear.xml'];
     unsupportedCategories = [
         'Ammunition',
