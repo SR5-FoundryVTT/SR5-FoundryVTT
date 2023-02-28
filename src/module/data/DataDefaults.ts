@@ -1,24 +1,12 @@
+import {SKILL_DEFAULT_NAME} from "../constants";
 import DamageData = Shadowrun.DamageData;
 import ActorArmorData = Shadowrun.ActorArmorData;
 import FireModeData = Shadowrun.FireModeData;
-import TechnologyData = Shadowrun.TechnologyData;
-import DescriptionData = Shadowrun.DescriptionData;
-import EquipmentData = Shadowrun.EquipmentData;
-import ProgramItemData = Shadowrun.ProgramItemData;
-import QualityData = Shadowrun.QualityData;
 import ActionRollData = Shadowrun.ActionRollData;
-import LimitData = Shadowrun.LimitData;
 import LimitField = Shadowrun.LimitField;
-import OpposedTestData = Shadowrun.OpposedTestData;
 import SkillField = Shadowrun.SkillField;
 import TrackType = Shadowrun.TrackType;
-import HostData = Shadowrun.HostData;
-import DevicePartData = Shadowrun.DevicePartData;
 import SourceEntityField = Shadowrun.SourceEntityField;
-import ActionResultData = Shadowrun.ActionResultData;
-import {SKILL_DEFAULT_NAME} from "../constants";
-import EquipmentItemData = Shadowrun.EquipmentItemData;
-import DeviceItemData = Shadowrun.DeviceItemData;
 import ValueField = Shadowrun.ValueField;
 import GenericValueField = Shadowrun.GenericValueField;
 import MinimalActionData = Shadowrun.MinimalActionData;
@@ -48,12 +36,13 @@ export class DataDefaults {
      * @param systemData Whatever partial item system data you want to inject into general model system data.
      * @returns A minimum viable item data structure to use with Item#create
      */
-    static baseItemData<ItemData>(itemData: MinimalItemData, systemData: Partial<ItemData>={}) {
+    static baseItemData<ItemData, ItemSystemData>(itemData: MinimalItemData, systemData: Partial<ItemSystemData>={}) {
         const name = itemData.name ?? 'Unnamed';
         const type = itemData.type;
 
+        // Duplicate source to avoid keeping reference to model data.
         //@ts-ignore foundry-vtt-type v10
-        const modelSystemData = game.model['Item'][type];
+        const modelSystemData = duplicate(game.model['Item'][type]);
         if (!modelSystemData) throw new Error(`FoundryVTT doesn't have item type: ${type} registered`);
         return {
             name, type,
