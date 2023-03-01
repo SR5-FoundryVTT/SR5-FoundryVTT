@@ -290,4 +290,46 @@ export class DataDefaults {
             action: 'simple'
         }, partialFireModeData);
     }
+
+    /**
+     * Build a description data segment
+     * 
+     * @param partialDescriptionData 
+     * @returns 
+     */
+    static descriptionData(partialDescriptionData: Partial<Shadowrun.DescriptionData> = {}) {
+        return mergeObject({
+            value: '',
+            chat: '',
+            source: ''
+        }, partialDescriptionData) as Shadowrun.DescriptionData;
+    }
+
+    /**
+     * Build a technology data segment
+     * 
+     * @param partialTechnologyData 
+     * @returns 
+     */
+    static technologyData(partialTechnologyData: Partial<Shadowrun.TechnologyData> = {}) {
+        return mergeObject({
+            rating: '',
+            availability: '',
+            quantity: 1,
+            cost: 0,
+            equipped: false,
+            conceal: {
+                base: 0,
+                value: 0,
+                mod: [],
+            },
+            condition_monitor: {
+                label: '',
+                value: 0,
+                max: 0,
+            },
+            wireless: true,
+            networkController: undefined
+        }, partialTechnologyData) as Shadowrun.TechnologyData;
+    }
 }
