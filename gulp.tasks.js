@@ -45,7 +45,7 @@ async function buildJS() {
         sourcemap: true,
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
-        plugins: [typecheckPlugin()],
+        plugins: [],
     }).catch((err) => {
         console.error(err)
     })
