@@ -49,7 +49,7 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         it('resolve a network link back to a embedded collection document', async () => {
             const actor = await testActor.create({'type': 'character'});
             const item = await testItem.create({type: 'weapon'});
-            const embeddedItems = await actor.createEmbeddedDocuments('Item', [item.data]);
+            const embeddedItems = await actor.createEmbeddedDocuments('Item', [item.toObject()]);
             const embeddedItem = embeddedItems[0];
             // @ts-ignore // ignore undefined
             const link = NetworkDeviceFlow.buildLink(embeddedItem);

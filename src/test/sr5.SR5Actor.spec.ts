@@ -47,14 +47,14 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
             const actor = await testActor.create({type: 'character'});
             const weapon = await testItem.create({type: 'weapon'});
 
-            await actor.createEmbeddedDocuments('Item', [weapon.data]);
+            await actor.createEmbeddedDocuments('Item', [weapon.toObject()]);
 
             const ownedItems = Array.from(actor.items) as SR5Item[];
             assert.isNotEmpty(ownedItems);
             assert.lengthOf(ownedItems, 1);
 
             const ownedItem = ownedItems[0];
-            assert.strictEqual(ownedItem.type, weapon.data.type);
+            assert.strictEqual(ownedItem.type, weapon.type);
 
             // An owned item should NOT appear in the items collection.
             const ownedInCollection = game.items?.get(ownedItem.id as string);

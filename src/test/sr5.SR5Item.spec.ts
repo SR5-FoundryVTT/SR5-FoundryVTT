@@ -35,25 +35,25 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
         it('update an item of any type', async () => {
             const item = await testItem.create({type: 'action'});
 
-            assert.notProperty(item.data.data, 'test');
-            await item.update({'data.test': true});
+            assert.notProperty(item.system, 'test');
+            await item.update({'system.test': true});
 
-            assert.property(item.data.data, 'test');
-            assert.propertyVal(item.data.data, 'test', true);
+            assert.property(item.system, 'test');
+            assert.propertyVal(item.system, 'test', true);
         });
 
         it('embedd a ammo into a weapon and not the global item collection', async () => {
             const weapon = await testItem.create({type: 'weapon'}) as SR5Item;
             const ammo = await testItem.create({type: 'ammo'}) as SR5Item;
 
-            await weapon.createNestedItem(ammo.data);
+            await weapon.createNestedItem(ammo.toObject());
 
             const embeddedItemDatas = weapon.getNestedItems();
             assert.isNotEmpty(embeddedItemDatas);
             assert.lengthOf(embeddedItemDatas, 1);
 
             const embeddedAmmoData = embeddedItemDatas[0];
-            assert.strictEqual(embeddedAmmoData.type, ammo.data.type);
+            assert.strictEqual(embeddedAmmoData.type, ammo.type);
 
             // An embedded item should NOT appear in the items collection.
             const embeddedAmmoInCollection = game.items?.get(embeddedAmmoData._id);
@@ -65,7 +65,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             const ammo = await testItem.create({type: 'ammo'}) as SR5Item;
 
             // Embed the item and get
-            await weapon.createNestedItem(ammo.data);
+            await weapon.createNestedItem(ammo.toObject());
             const embeddedItemDatas = weapon.getNestedItems();
             assert.lengthOf(embeddedItemDatas, 1);
             const embeddedAmmoData = embeddedItemDatas[0];
