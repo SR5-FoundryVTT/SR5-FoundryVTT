@@ -135,6 +135,15 @@ export const SR = {
         // Reaction would be displayed as REA, when set to 3.
         SHORT_NAME_LENGTH: 3
     },
+    /**
+     * Instead of general attributes, these are the attribute values for specific actor types
+     */
+    actorTypeAttributes: {
+        vehicle: {
+            strength: {min: 0},
+            agility: {min: 0}
+        }
+    },
     skill: {
         // @PDF SR5#130
         DEFAULTING_MODIFIER: -1,

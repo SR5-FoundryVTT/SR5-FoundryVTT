@@ -10,6 +10,7 @@ import { PartsList } from '../../parts/PartsList';
 import {SR5} from "../../config";
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import { RangedWeaponRules } from '../../rules/RangedWeaponRules';
+import { SR } from '../../constants';
 
 
 export class VehiclePrep {
@@ -27,6 +28,7 @@ export class VehiclePrep {
         VehiclePrep.prepareLimits(system);
 
         AttributesPrep.prepareAttributes(system);
+        VehiclePrep.prepareAttributeRanges(system)
         SkillsPrep.prepareSkills(system);
 
         LimitsPrep.prepareLimits(system);
@@ -179,5 +181,19 @@ export class VehiclePrep {
         PartsList.AddUniquePart(system.values.recoil_compensation.mod, 'SR5.RecoilCompensation', recoilCompensation);
 
         Helpers.calcTotal(system.values.recoil_compensation, {min: 0});
+    }
+
+    /**
+     * Some attributes don't exist on vehicle actors.
+     * 
+     * Instead of default character range, use vehicle specific ranges.
+     * 
+     * NOTE: This is a hack around the actor type character centric preparation design still present in the system.
+     *       Times is short, perfect solutions are costly.
+     */
+    static prepareAttributeRanges(system: Shadowrun.VehicleData) {
+        const ranges = SR.actorTypeAttributes['vehicle'];
+        Helpers.calcTotal(system.attributes.strength, ranges.strength);
+        Helpers.calcTotal(system.attributes.agility, ranges.agility);
     }
 }
