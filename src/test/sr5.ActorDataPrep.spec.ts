@@ -365,12 +365,38 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 assert.equal(vehicle.system.matrix.condition_monitor.max, 9);
             });
 
-            it('Vehicle recoil compensation', () => {
-                let actor = new SR5Actor({name: 'Testing', type: 'vehicle', system: {attributes: {body: {base: 5}}}});
+            it('Vehicle recoil compensation', async () => {
+                let actor = await testActor.create({type: 'vehicle', system: {attributes: {body: {base: 5}}}});
                 let vehicle = actor.asVehicle();
                 if (!vehicle) return assert.fail();
                 
                 assert.strictEqual(vehicle.system.values.recoil_compensation.value, 5); // SR5#175: 5
+            })
+
+            it('Pilot Rating is used for device rating, matrix and mental attributes', async () => {
+                const rating = 3;
+                const actor = await testActor.create({type: 'vehicle', 'system.vehicle_stats.pilot.base': rating}) as SR5Actor;
+
+                const vehicle = actor.asVehicle() as VehicleActorData;
+                assert.equal(vehicle.system.vehicle_stats.pilot.value, rating);
+                assert.equal(vehicle.system.matrix.rating, rating);
+                assert.equal(vehicle.system.matrix.data_processing.value, rating);
+                assert.equal(vehicle.system.matrix.firewall.value, rating);
+                
+                assert.equal(vehicle.system.attributes.logic.value, rating);
+                assert.equal(vehicle.system.attributes.willpower.value, rating);
+                assert.equal(vehicle.system.attributes.intuition.value, rating);
+                assert.equal(vehicle.system.attributes.charisma.value, rating);
+
+                assert.equal(vehicle.system.attributes.reaction.value, rating);
+            })
+
+            it('Physical Attributes not defined should not have a value', async () => {
+                const actor = await testActor.create({type: 'vehicle', 'system.vehicle_stats.pilot.base': 3}) as SR5Actor;
+                const vehicle = actor.asVehicle() as VehicleActorData;
+
+                assert.equal(vehicle.system.attributes.strength.value, 0);
+                assert.equal(vehicle.system.attributes.agility.value, 0);
             });
         });
         describe('ICDataPrep', () => {
