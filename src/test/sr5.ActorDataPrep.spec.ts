@@ -363,7 +363,29 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 await actor.update({'system.modifiers.matrix_track': 1});
                 vehicle = actor.asVehicle() as VehicleActorData;
                 assert.equal(vehicle.system.matrix.condition_monitor.max, 9);
-            });
+            })
+
+            it('Physical track for vehicle actors', async () => {
+                const actor = await testActor.create({
+                    type: 'vehicle', 
+                    'system.isDrone': false,
+                    'system.attributes.body.base': 3
+                }) as SR5Actor;
+                const vehicle = actor.asVehicle() as VehicleActorData;
+
+                assert.equal(vehicle.system.track.physical.max, 14);
+            })
+
+            it('Physical track for drone actors', async () => {
+                const actor = await testActor.create({
+                    type: 'vehicle', 
+                    'system.isDrone': true,
+                    'system.attributes.body.base': 3
+                }) as SR5Actor;
+                const vehicle = actor.asVehicle() as VehicleActorData;
+
+                assert.equal(vehicle.system.track.physical.max, 8);
+            })
 
             it('Vehicle recoil compensation', async () => {
                 let actor = await testActor.create({type: 'vehicle', system: {attributes: {body: {base: 5}}}});
