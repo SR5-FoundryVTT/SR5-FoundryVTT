@@ -1556,40 +1556,40 @@ export class SR5Actor extends Actor {
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asVehicle(): Shadowrun.VehicleActorData | undefined {
         if (this.isVehicle())
-            return this.data as Shadowrun.VehicleActorData;
+            return this as unknown as Shadowrun.VehicleActorData;
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asCharacter(): Shadowrun.CharacterActorData | undefined {
         if (this.isCharacter())
-            return this.data as Shadowrun.CharacterActorData;
+            return this as unknown as Shadowrun.CharacterActorData;
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asSpirit(): Shadowrun.SpiritActorData | undefined {
         if (this.isSpirit()) {
-            return this.data as Shadowrun.SpiritActorData;
+            return this as unknown as Shadowrun.SpiritActorData;
         }
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asSprite(): Shadowrun.SpriteActorData | undefined {
         if (this.isSprite()) {
-            return this.data as Shadowrun.SpriteActorData;
+            return this as unknown as Shadowrun.SpriteActorData;
         }
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asCritter(): Shadowrun.CritterActorData | undefined {
         if (this.isCritter()) {
-            return this.data as Shadowrun.CritterActorData;
+            return this as unknown as Shadowrun.CritterActorData;
         }
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asIC(): Shadowrun.ICActorData | undefined {
         if (this.isIC()) {
-            return this.data as Shadowrun.ICActorData;
+            return this as unknown as Shadowrun.ICActorData;
         }
     }
 
@@ -1624,8 +1624,8 @@ export class SR5Actor extends Actor {
     }
 
     hasDriver(): boolean {
-        const data = this.asVehicle();
-        if (!data) return false;
+        const vehicle = this.asVehicle();
+        if (!vehicle) return false;
 
         //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.driver.length > 0;
@@ -1633,8 +1633,8 @@ export class SR5Actor extends Actor {
 
     getVehicleDriver(): SR5Actor | undefined {
         if (!this.hasDriver()) return;
-        const data = this.asVehicle();
-        if (!data) return;
+        const vehicle = this.asVehicle();
+        if (!vehicle) return;
 
         //@ts-ignore // TODO: foundry-vtt-types v10
         const driver = game.actors?.get(this.system.driver) as SR5Actor;
