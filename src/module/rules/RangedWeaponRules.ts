@@ -104,7 +104,7 @@ export const RangedWeaponRules = {
      * @param baseRc The base recoil compensation 
      * @returns The recoil compensation for a humanoid
      */
-    humanoiddRecoilCompensationValue(strength: number): number {
+    humanoidRecoilCompensationValue(strength: number): number {
         return Math.max(Math.ceil(strength / 3), 0);
     },
 
