@@ -56,8 +56,8 @@ export const RangedWeaponRules = {
      */
     actorRecoilCompensation(actor: SR5Actor): number {
         // Each new attack allows one free compensation.
-        if (actor.isVehicle()) return RangedWeaponRules._vehicleRecoilCompensation(actor);
-        else return this._humanoidRecoilCompensation(actor);
+        if (actor.isVehicle()) return RangedWeaponRules.vehicleRecoilCompensation(actor);
+        else return RangedWeaponRules.humanoidRecoilCompensation(actor);
     },
 
     /**
@@ -65,7 +65,7 @@ export const RangedWeaponRules = {
      * 
      * @returns The recoil compensation part a vehicle will add to the total recoil compensation.
      */
-    _vehicleRecoilCompensation(actor: SR5Actor): number {
+    vehicleRecoilCompensation(actor: SR5Actor): number {
         if (!actor.isVehicle()) return 0;
 
         const body = actor.getAttribute('body');
@@ -77,7 +77,7 @@ export const RangedWeaponRules = {
      * 
      * @param body The body level of the vehicle
      */
-    _vehicleRecoilCompensationValue(body: number): number {
+    vehicleRecoilCompensationValue(body: number): number {
         return Math.max(body, 0);
     },
 
@@ -94,22 +94,22 @@ export const RangedWeaponRules = {
 
         const strength = actor.getAttribute('strength');
         if (!strength) return 0;
-        return this._humandRecoilCompensationValue(strength.value);
+        return RangedWeaponRules.humanoidRecoilCompensationValue(strength.value);
     },
 
     /**
-     * Calculate the actual recoil compensation for humanids number from source values according to SR5#175 'Recoil'
+     * Calculate the actual recoil compensation for humanoids number from source values according to SR5#175 'Recoil'
      * 
      * @param strength The strength level of the humanoid
      * @param baseRc The base recoil compensation 
      * @returns The recoil compensation for a humanoid
      */
-    humanoiddRecoilCompensationValue(strength: number): number {
+    humanoidRecoilCompensationValue(strength: number): number {
         return Math.max(Math.ceil(strength / 3), 0);
     },
 
     /**
-     * Free recoil compensation according to SR5#175 'Recoi'
+     * Free recoil compensation according to SR5#175 'Recoil'
      * @param baseRc Optional parameter allowing you to define a custom base rc.
      */
     humanoidBaseRecoilCompensation(baseRc:number=1): number {

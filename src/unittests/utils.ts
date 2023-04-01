@@ -1,4 +1,4 @@
-export class SR5TestingDocuments<DocumentType extends foundry.abstract.Document<any, any>> {
+export class SR5TestingDocuments<DocumentType> {
         documentClass: DocumentType;
         documents: foundry.abstract.Document<any>[] = [];
 
