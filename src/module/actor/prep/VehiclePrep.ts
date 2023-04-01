@@ -22,11 +22,13 @@ export class VehiclePrep {
 
     static prepareDerivedData(system: Shadowrun.VehicleData, items: SR5ItemDataWrapper[]) {
         VehiclePrep.prepareVehicleStats(system);
-        VehiclePrep.prepareAttributes(system);
         VehiclePrep.prepareDeviceAttributes(system);
         VehiclePrep.prepareLimits(system);
-
+        
         AttributesPrep.prepareAttributes(system);
+        VehiclePrep.prepareAttributesWithPilot(system);
+        VehiclePrep.prepareAttributesWithBody(system);
+        
         SkillsPrep.prepareSkills(system);
 
         LimitsPrep.prepareLimits(system);
@@ -79,19 +81,41 @@ export class VehiclePrep {
     }
 
     /**
-     * Apply SR5#199 'Pilot' rules.
+     * Apply SR5#199 'Pilot' and SR5#269 'Pilot Program' rules.
+     * 
+     * Rulings here are a bit vague and current system implementation makes it more vague.
+     * 
      */
-    static prepareAttributes(system: Shadowrun.VehicleData) {
+    static prepareAttributesWithPilot(system: Shadowrun.VehicleData) {
         const { attributes, vehicle_stats } = system;
 
-        // SR5#199 - 'Pilot' => All  mental attributes and reaction.
-        const attributeIds = ['reaction', 'willpower', 'logic', 'intuition', 'charisma'];
 
-        const totalPilot = Helpers.calcTotal(vehicle_stats.pilot);
+        const attributeIds = [
+            // SR5#199 - 'Pilot' => All  mental attributes and reaction.
+            'reaction', 'willpower', 'logic', 'intuition', 'charisma',
+            // No actual rule, a typical skill check would be 'Autosoft Rating + Pilot'
+            // Setting agility to pilot, helps the current unpolished way vehicles use character skills.
+            'agility'
+        ];
 
         attributeIds.forEach((attId) => {
             if (attributes[attId] !== undefined) {
-                attributes[attId].base = totalPilot;
+                attributes[attId].base = vehicle_stats.pilot.value;
+                AttributesPrep.calculateAttribute(attId, attributes[attId]);
+            }
+        });
+    }
+
+    static prepareAttributesWithBody(system: Shadowrun.VehicleData) {
+        const { attributes } = system;
+
+        // R5.0#125 'Drone Arm' - while not ALL vehicles have arms, leave it up to the user to NOT cast if they shouldn't.
+        const attributeIds = ['strength']
+
+        attributeIds.forEach((attId) => {
+            if (attributes[attId] !== undefined) {
+                attributes[attId].base = attributes.body.value;
+                AttributesPrep.calculateAttribute(attId, attributes[attId]);
             }
         });
     }
