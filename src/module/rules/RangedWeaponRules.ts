@@ -98,7 +98,7 @@ export const RangedWeaponRules = {
     },
 
     /**
-     * Calculate the actual recoil compensation for humanids number from source values according to SR5#175 'Recoil'
+     * Calculate the actual recoil compensation for humanoids number from source values according to SR5#175 'Recoil'
      * 
      * @param strength The strength level of the humanoid
      * @param baseRc The base recoil compensation 
@@ -109,7 +109,7 @@ export const RangedWeaponRules = {
     },
 
     /**
-     * Free recoil compensation according to SR5#175 'Recoi'
+     * Free recoil compensation according to SR5#175 'Recoil'
      * @param baseRc Optional parameter allowing you to define a custom base rc.
      */
     humanoidBaseRecoilCompensation(baseRc:number=1): number {
