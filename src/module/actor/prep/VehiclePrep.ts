@@ -199,7 +199,7 @@ export class VehiclePrep {
     static prepareRecoilCompensation(system: Shadowrun.VehicleData) {
         const {attributes} = system;
 
-        const recoilCompensation = RangedWeaponRules._vehicleRecoilCompensationValue(attributes.body.value);
+        const recoilCompensation = RangedWeaponRules.vehicleRecoilCompensationValue(attributes.body.value);
         PartsList.AddUniquePart(system.values.recoil_compensation.mod, 'SR5.RecoilCompensation', recoilCompensation);
 
         Helpers.calcTotal(system.values.recoil_compensation, {min: 0});
