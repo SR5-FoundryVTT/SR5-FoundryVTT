@@ -27,9 +27,9 @@ export class VehiclePrep {
         VehiclePrep.prepareLimits(system);
         
         AttributesPrep.prepareAttributes(system);
-        VehiclePrep.prepareAttributeRanges(system);
         VehiclePrep.prepareAttributesWithPilot(system);
         VehiclePrep.prepareAttributesWithBody(system);
+        VehiclePrep.prepareAttributeRanges(system);
         
         SkillsPrep.prepareSkills(system);
 
@@ -101,10 +101,13 @@ export class VehiclePrep {
         ];
 
         attributeIds.forEach((attId) => {
-            if (attributes[attId] !== undefined) {
-                attributes[attId].base = vehicle_stats.pilot.value;
-                AttributesPrep.calculateAttribute(attId, attributes[attId]);
-            }
+            const attribute = attributes[attId];
+            if (!attribute) return;
+
+            // Allow value to be understandable when displayed.
+            attribute.base = 0;
+            PartsList.AddUniquePart(attribute.mod, vehicle_stats.pilot.label, vehicle_stats.pilot.value);
+            AttributesPrep.calculateAttribute(attId, attribute);
         });
     }
 
@@ -115,10 +118,13 @@ export class VehiclePrep {
         const attributeIds = ['strength']
 
         attributeIds.forEach((attId) => {
-            if (attributes[attId] !== undefined) {
-                attributes[attId].base = attributes.body.value;
-                AttributesPrep.calculateAttribute(attId, attributes[attId]);
-            }
+            const attribute = attributes[attId];
+            if (!attribute) return;
+
+            // Allow value to be understandable when displayed.
+            attribute.base = 0;
+            PartsList.AddUniquePart(attribute.mod, attributes.body.label, attributes.body.value);
+            AttributesPrep.calculateAttribute(attId, attribute);
         });
     }
 
