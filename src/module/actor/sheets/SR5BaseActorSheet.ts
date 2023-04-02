@@ -50,20 +50,44 @@ export type InventoriesSheetData = Record<string, InventorySheetData>;
 let globalSkillAppId: number = -1;
 
 
-const sortByName = (i1, i2) => {
-            if (i1.name > i2.name) return 1;
-            if (i1.name < i2.name) return -1;
-            return 0;
-        };
-const sortByEquipped = (left, right) => {
-    const leftEquipped = left.data?.technology?.equipped;
-    const rightEquipped = right.data?.technology?.equipped;
-    if (leftEquipped && !rightEquipped) return -1;
-    if (rightEquipped && !leftEquipped) return 1;
-    if (left.name > right.name) return 1;
-    if (left.name < right.name) return -1;
+/**
+ * Sort a list of items by name in ascending alphabetical order.
+ * 
+ * @param a Any type of item data
+ * @param b Any type of item data
+ * @returns 
+ */
+const sortByName = (a, b) => {
+    if (a.name > b.name) return 1;
+    if (a.name < b.name) return -1;
     return 0;
 };
+
+/**
+ * Sort a list of items by equipped and name in ascending alphabetical order.
+ * 
+ * @param a Any type of item data
+ * @param b Any type of item data
+ * @returns 
+ */
+const sortByEquipped = (a, b) => {
+    const leftEquipped = a.system?.technology?.equipped;
+    const rightEquipped = b.system?.technology?.equipped;
+    
+    if (leftEquipped && !rightEquipped) return -1;
+    if (rightEquipped && !leftEquipped) return 1;
+    if (a.name > b.name) return 1;
+    if (a.name < b.name) return -1;
+    return 0;
+};
+
+/**
+ * Sort a list of items by quality type and name in ascending alphabetical order.
+ * 
+ * @param a A quality item data
+ * @param b A quality item data
+ * @returns 
+ */
 const sortyByQuality = (a: any, b: any) => {
     if (a.system.type === 'positive' && b.system.type === 'negative') return -1;
     if (a.system.type === 'negative' && b.system.type === 'positive') return 1;
