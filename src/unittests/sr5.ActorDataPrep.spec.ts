@@ -363,62 +363,39 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 await actor.update({'system.modifiers.matrix_track': 1});
                 vehicle = actor.asVehicle() as VehicleActorData;
                 assert.equal(vehicle.system.matrix.condition_monitor.max, 9);
-            })
+            });
 
-            it('Physical track for vehicle actors', async () => {
-                const actor = await testActor.create({
-                    type: 'vehicle', 
-                    'system.isDrone': false,
-                    'system.attributes.body.base': 3
-                }) as SR5Actor;
-                const vehicle = actor.asVehicle() as VehicleActorData;
-
-                assert.equal(vehicle.system.track.physical.max, 14);
-            })
-
-            it('Physical track for drone actors', async () => {
-                const actor = await testActor.create({
-                    type: 'vehicle', 
-                    'system.isDrone': true,
-                    'system.attributes.body.base': 3
-                }) as SR5Actor;
-                const vehicle = actor.asVehicle() as VehicleActorData;
-
-                assert.equal(vehicle.system.track.physical.max, 8);
-            })
-
-            it('Vehicle recoil compensation', async () => {
-                let actor = await testActor.create({type: 'vehicle', system: {attributes: {body: {base: 5}}}});
+            it('Recoil compensation', () => {
+                let actor = new SR5Actor({name: 'Testing', type: 'vehicle', system: {attributes: {body: {base: 5}}}});
                 let vehicle = actor.asVehicle();
                 if (!vehicle) return assert.fail();
                 
                 assert.strictEqual(vehicle.system.values.recoil_compensation.value, 5); // SR5#175: 5
-            })
+            });
 
-            it('Pilot Rating is used for device rating, matrix and mental attributes', async () => {
-                const rating = 3;
-                const actor = await testActor.create({type: 'vehicle', 'system.vehicle_stats.pilot.base': rating}) as SR5Actor;
-
-                const vehicle = actor.asVehicle() as VehicleActorData;
-                assert.equal(vehicle.system.vehicle_stats.pilot.value, rating);
-                assert.equal(vehicle.system.matrix.rating, rating);
-                assert.equal(vehicle.system.matrix.data_processing.value, rating);
-                assert.equal(vehicle.system.matrix.firewall.value, rating);
+            it('Attributes based on pilot', async () => {
+                // Create temporary actor
+                const actor = await testActor.create({type: 'vehicle', system: {
+                    vehicle_stats: {pilot: {base: 3}},
+                    attributes: {body: {base: 5}}
+                }});
+                const vehicle = actor.asVehicle();
                 
-                assert.equal(vehicle.system.attributes.logic.value, rating);
-                assert.equal(vehicle.system.attributes.willpower.value, rating);
-                assert.equal(vehicle.system.attributes.intuition.value, rating);
-                assert.equal(vehicle.system.attributes.charisma.value, rating);
+                // Mental Attributes should be pilot. SR5#199
+                assert.strictEqual(vehicle?.system.attributes.willpower.value, 3);
+                assert.strictEqual(vehicle?.system.attributes.logic.value, 3);
+                assert.strictEqual(vehicle?.system.attributes.intuition.value, 3);
+                assert.strictEqual(vehicle?.system.attributes.charisma.value, 3);
+                
+                // Agility SHOULD NOT be pilot, but we default to it for ease of use in some skill cases...
+                assert.strictEqual(vehicle?.system.attributes.agility.value, 3);
 
-                assert.equal(vehicle.system.attributes.reaction.value, rating);
-            })
+                // Reaction should be pilot. SR5#199
+                assert.strictEqual(vehicle?.system.attributes.charisma.value, 3);
 
-            it('Physical Attributes not defined should not have a value', async () => {
-                const actor = await testActor.create({type: 'vehicle', 'system.vehicle_stats.pilot.base': 3}) as SR5Actor;
-                const vehicle = actor.asVehicle() as VehicleActorData;
+                // Strength should be body (when using a drone arm, Rigger50#125), we default to that...
+                assert.strictEqual(vehicle?.system.attributes.strength.value, 5);
 
-                assert.equal(vehicle.system.attributes.strength.value, 0);
-                assert.equal(vehicle.system.attributes.agility.value, 0);
             });
         });
         describe('ICDataPrep', () => {

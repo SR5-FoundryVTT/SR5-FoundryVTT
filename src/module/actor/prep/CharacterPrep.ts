@@ -84,7 +84,7 @@ export class CharacterPrep {
      * @param system Character system data
      */
     static prepareRecoilCompensation(system: Shadowrun.CharacterData|Shadowrun.CritterData|Shadowrun.SpiritData) {
-        const recoilCompensation = RangedWeaponRules.humanoiddRecoilCompensationValue(system.attributes.strength.value);
+        const recoilCompensation = RangedWeaponRules.humanoidRecoilCompensationValue(system.attributes.strength.value);
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
         system.values.recoil_compensation.base = baseRc;
         PartsList.AddUniquePart(system.values.recoil_compensation.mod, 'SR5.RecoilCompensation', recoilCompensation);
