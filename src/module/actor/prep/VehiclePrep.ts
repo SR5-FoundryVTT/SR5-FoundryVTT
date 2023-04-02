@@ -27,7 +27,7 @@ export class VehiclePrep {
         VehiclePrep.prepareLimits(system);
         
         AttributesPrep.prepareAttributes(system);
-        VehiclePrep.prepareAttributeRanges(system)
+        VehiclePrep.prepareAttributeRanges(system);
         VehiclePrep.prepareAttributesWithPilot(system);
         VehiclePrep.prepareAttributesWithBody(system);
         
