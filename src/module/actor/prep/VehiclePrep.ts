@@ -27,7 +27,6 @@ export class VehiclePrep {
         VehiclePrep.prepareLimits(system);
         
         AttributesPrep.prepareAttributes(system);
-        // #TODO: Check order of calls
         VehiclePrep.prepareAttributeRanges(system)
         VehiclePrep.prepareAttributesWithPilot(system);
         VehiclePrep.prepareAttributesWithBody(system);
