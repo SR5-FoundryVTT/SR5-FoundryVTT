@@ -20,7 +20,7 @@ declare namespace Shadowrun {
      * - resist (a test to resist damage after an opposed test, i.e. Soak)
      */
     export interface ActionRollData extends MinimalActionData {
-        // Test class used for the active action test
+        // Test test class used for the active action test
         // Should be defined in game.shadowrun5e.activeTests
         test: string
         // The type of combat action to be performed.
