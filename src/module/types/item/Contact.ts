@@ -1,5 +1,7 @@
 declare namespace Shadowrun {
-    export interface ContactData extends ContactPartData, DescriptionPartData {
+    export interface ContactData extends
+        ContactPartData,
+        DescriptionPartData {
 
     }
 
