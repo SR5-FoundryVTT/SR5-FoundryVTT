@@ -30,15 +30,18 @@ export interface SheetItemData {
     description: any
 }
 
+export interface InventorySheetDataByType {
+    type: string;
+    label: string;
+    isOpen: boolean;
+    items: SheetItemData[];
+}
+
 export interface InventorySheetData {
     name: string,
     label: string,
     types: {
-        [type: string]: {
-            type: string,
-            label: string,
-            items: SheetItemData[]
-        }
+        [type: string]: InventorySheetDataByType
     }
 }
 
@@ -94,9 +97,10 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
     _scroll: string;
+    _inventoryOpenClose:Record<string, boolean> = {};
+
     // Store the currently selected inventory.
     selectedInventory: string;
-
 
     constructor(...args) {
         // @ts-ignore // Since we don't need any actual data, don't define args to avoid breaking changes.
@@ -104,6 +108,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Preselect default inventory.
         this.selectedInventory = this.document.defaultInventory.name;
+        this._setInventoryVisibility(true);
     }
 
     /**
@@ -235,6 +240,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Active Effect management
         html.find(".effect-control").on('click',event => onManageActiveEffect(event, this.document));
 
+        // Inventory visibility switch
+        html.find('.item-toggle').on('click', this._onInventorySectionVisiblitySwitch.bind(this));
+
         // General item CRUD management...
         html.find('.item-create').on('click', this._onItemCreate.bind(this));
         html.find('.item-edit').on('click', this._onItemEdit.bind(this));
@@ -255,6 +263,8 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Actor inventory handling....
         html.find('.inventory-inline-create').on('click', this._onInventoryCreate.bind(this));
+        html.find('.inventory-collapse').on('click', this._onInventorySectionVisibilityChange.bind(this, false));
+        html.find('.inventory-expand').on('click', this._onInventorySectionVisibilityChange.bind(this, true));
         html.find('.inventory-remove').on('click', this._onInventoryRemove.bind(this));
         html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
         html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
@@ -344,13 +354,14 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param inventory The inventory to check and add types to.
      */
-    _addInventoryTypes(inventory) {
+    _addInventoryTypes(inventory: InventorySheetData) {
         for (const type of this.getInventoryItemTypes()) {
             if (inventory.types.hasOwnProperty(type)) continue;
 
             inventory.types[type] = {
                 type: type,
                 label: SR5.itemTypes[type],
+                isOpen: this._inventoryOpenClose[type],
                 items: []
             };
         }
@@ -510,9 +521,35 @@ export class SR5BaseActorSheet extends ActorSheet {
         return $(this.element).find('.tab.active .scroll-area');
     }
 
+    async _onInventorySectionVisibilityChange(isOpen: boolean, event) {
+        event.preventDefault();
+        this._setInventoryVisibility(isOpen);
+        this.render();
+    }
+
+    async _onInventorySectionVisiblitySwitch(event) {
+        event.preventDefault();
+        const type = Helpers.listItemId(event);
+
+        this._setInventoryTypeVisibility(type, !this._inventoryOpenClose[type]);
+        this.render();
+    }
+
+    _setInventoryVisibility(isOpen: boolean) {
+        Object.keys(CONFIG.Item.typeLabels)
+            .forEach(type => this._setInventoryTypeVisibility(type, isOpen));
+    }
+
+    _setInventoryTypeVisibility(type: string, isOpen: boolean) {
+        this._inventoryOpenClose[type] = isOpen
+    }
+
     async _onItemCreate(event) {
         event.preventDefault();
         const type = Helpers.listItemId(event);
+        
+        // Unhide section it it was
+        this._setInventoryTypeVisibility(type, true);
 
         // TODO: Add translation for item names...
         const itemData = {
@@ -843,6 +880,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                     inventorySheet.types[item.type] = {
                         type: item.type,
                         label: SR5.itemTypes[item.type],
+                        isOpen: this._inventoryOpenClose[item.type],
                         items: []
                     };
                 }

@@ -2,9 +2,33 @@ import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
 import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
+import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
 
 export const registerItemLineHelpers = () => {
-    Handlebars.registerHelper('ItemHeaderIcons', function (type) {
+    Handlebars.registerHelper('InventoryHeaderIcons', function (section: InventorySheetDataByType) {
+        var icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
+
+        icons.push(section.isOpen
+            ? {
+                icon: 'fas fa-square-chevron-up',
+                title: game.i18n.localize('SR5.Collapse'),
+                cssClass: 'item-toggle',
+                // Add HTML data attributes using a key<string>:value<string> structure
+                data: {}
+            }
+            : {
+                icon: 'fas fa-square-chevron-down',
+                title: game.i18n.localize('SR5.Expand'),
+                cssClass: 'item-toggle',
+                // Add HTML data attributes using a key<string>:value<string> structure
+                data: {}
+            }
+        );
+
+        return icons;
+    })
+
+    Handlebars.registerHelper('ItemHeaderIcons', function (type: string) {
         const PlusIcon = 'fas fa-plus';
         const AddText = game.i18n.localize('SR5.Add');
         const addIcon = {
@@ -89,7 +113,7 @@ export const registerItemLineHelpers = () => {
         }
     });
 
-    Handlebars.registerHelper('InventoryIcons', function(name) {
+    Handlebars.registerHelper('InventoryIcons', function(name: string) {
         const addItemIcon = {
             icon: 'fas fa-plus',
             text: game.i18n.localize('SR5.Add'),
@@ -102,7 +126,7 @@ export const registerItemLineHelpers = () => {
         return [addItemIcon];
     });
 
-    Handlebars.registerHelper('ItemHeaderRightSide', function (id) {
+    Handlebars.registerHelper('ItemHeaderRightSide', function (id: string) {
         switch (id) {
             case 'action':
                 return [
