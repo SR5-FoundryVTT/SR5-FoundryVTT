@@ -26,11 +26,11 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         const data = await super.getData(options) as ICActorSheetData;
 
         // Fetch a connected host.
-        data.host = this.object.getICHost();
+        data.host = this.actor.getICHost();
 
         // Display Matrix Marks
-        data.markedDocuments = this.object.getAllMarkedDocuments();
-        data.disableMarksEdit = this.object.hasHost();
+        data.markedDocuments = this.actor.getAllMarkedDocuments();
+        data.disableMarksEdit = this.actor.hasHost();
 
         return data;
     }
@@ -47,7 +47,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
      */
     async _removeHost(event) {
         event.stopPropagation();
-        await this.object.removeICHost();
+        await this.actor.removeICHost();
     }
 
     async _onDrop(event: DragEvent) {
@@ -63,7 +63,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         switch(dropData.type) {
             case 'Item':
                 // We don't have to narrow down type here, the SR5Actor will handle this for us.
-                return await this.object.addICHost(dropData.uuid);
+                return await this.actor.addICHost(dropData.uuid);
         }
 
         // Let Foundry handle default cases.
