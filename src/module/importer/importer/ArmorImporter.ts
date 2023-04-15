@@ -6,7 +6,7 @@ import {Helpers} from "../../helpers";
 
 export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorData> {
     public armorTranslations: any;
-    public categoryTranslations: any;
+    public override categoryTranslations: any;
     public files = ['armor.xml'];
 
     CanParse(jsonObject: object): boolean {

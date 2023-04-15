@@ -6,7 +6,7 @@ import ModificationItemData = Shadowrun.ModificationItemData;
 import {Helpers} from "../../helpers";
 
 export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.ModificationData> {
-    public categoryTranslations: any;
+    public override categoryTranslations: any;
     public accessoryTranslations: any;
     public files = ['weapons.xml'];
 

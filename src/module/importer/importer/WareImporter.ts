@@ -7,8 +7,8 @@ import CyberwareItemData = Shadowrun.CyberwareItemData;
 import BiowareItemData = Shadowrun.BiowareItemData;
 
 export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
-    public categoryTranslations: any;
-    public itemTranslations: any;
+    public override categoryTranslations: any;
+    public override itemTranslations: any;
     public files = ['cyberware.xml', 'bioware.xml'];
 
     CanParse(jsonObject: object): boolean {

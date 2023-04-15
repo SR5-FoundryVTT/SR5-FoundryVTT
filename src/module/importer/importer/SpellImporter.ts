@@ -10,15 +10,15 @@ import {Helpers} from "../../helpers";
 import { DataDefaults } from '../../data/DataDefaults';
 
 export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowrun.SpellData> {
-    public categoryTranslations: any;
-    public itemTranslations: any;
+    public override categoryTranslations: any;
+    public override itemTranslations: any;
     public files = ['spells.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('spells') && jsonObject['spells'].hasOwnProperty('spell');
     }
 
-    public GetDefaultData({ type }: { type: any; }): Shadowrun.SpellItemData {
+    public override GetDefaultData({ type }: { type: any; }): Shadowrun.SpellItemData {
         const systemData = {action: {type: 'varies', attribute: 'magic', skill: 'spellcasting'}} as Shadowrun.SpellData;
         return DataDefaults.baseItemData<Shadowrun.SpellItemData, Shadowrun.SpellData>({type}, systemData);
     }
