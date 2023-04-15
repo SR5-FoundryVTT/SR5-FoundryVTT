@@ -12,11 +12,11 @@ export class RecoilModifier extends SituationModifier  {
     /**
      * Recoil modifiers don't allow for any selection.
      */
-    static get hasSourceData() {
+    static override get hasSourceData() {
         return false;
     }
 
-    _calcActiveTotal(options: SituationalModifierApplyOptions): number {
+    override _calcActiveTotal(options: SituationalModifierApplyOptions): number {
         if (!this.modifiers || !this.modifiers.documentIsActor) return 0;
 
         if (!options.test || options.test.type !== 'RangedAttackTest') return (this.modifiers.document as SR5Actor)?.recoil ?? 0;
