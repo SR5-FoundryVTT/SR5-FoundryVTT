@@ -95,7 +95,7 @@ export class ThrownParser extends WeaponParserBase {
         return blastData;
     }
 
-    Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+    override Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         item = super.Parse(jsonData, item, jsonTranslation);
 
         if (jsonData.hasOwnProperty('range')) {

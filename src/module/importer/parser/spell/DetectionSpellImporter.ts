@@ -3,7 +3,7 @@ import { ImportHelper } from '../../helper/ImportHelper';
 import SpellItemData = Shadowrun.SpellItemData;
 
 export class DetectionSpellImporter extends SpellParserBase {
-    Parse(jsonData: object, item: SpellItemData, jsonTranslation?: object): SpellItemData {
+    override Parse(jsonData: object, item: SpellItemData, jsonTranslation?: object): SpellItemData {
         item = super.Parse(jsonData, item, jsonTranslation);
 
         let descriptor = ImportHelper.StringValue(jsonData, 'descriptor');

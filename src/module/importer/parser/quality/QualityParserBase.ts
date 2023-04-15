@@ -3,7 +3,7 @@ import { ItemParserBase } from '../item/ItemParserBase';
 import QualityItemData = Shadowrun.QualityItemData;
 
 export class QualityParserBase extends ItemParserBase<QualityItemData> {
-    public Parse(jsonData: object, item: QualityItemData, jsonTranslation?): QualityItemData {
+    public override Parse(jsonData: object, item: QualityItemData, jsonTranslation?): QualityItemData {
         // @ts-ignore // TODO: Foundry Where is my foundry base data?
         item.name = ImportHelper.StringValue(jsonData, 'name');
 

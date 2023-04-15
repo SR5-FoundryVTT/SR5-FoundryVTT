@@ -4,7 +4,7 @@ import ComplexFormTarget = Shadowrun.ComplexFormTarget;
 import ComplexFormItemData = Shadowrun.ComplexFormItemData;
 
 export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
-    Parse(jsonData: object, item: ComplexFormItemData, jsonTranslation?: object): ComplexFormItemData {
+    override Parse(jsonData: object, item: ComplexFormItemData, jsonTranslation?: object): ComplexFormItemData {
         // @ts-ignore // TODO: Foundry Where is my foundry base data?
         item.name = ImportHelper.StringValue(jsonData, 'name');
 
