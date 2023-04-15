@@ -23,7 +23,7 @@ export interface OpposedTestData extends
  * An opposed test results from a normal success test as an opposed action.
  */
 export class OpposedTest extends SuccessTest {
-    public data: OpposedTestData;
+    public override data: OpposedTestData;
     public against: SuccessTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
@@ -36,7 +36,7 @@ export class OpposedTest extends SuccessTest {
         this.against = new AgainstCls(data.against || {});
     }
 
-    _prepareData(data, options?): any {
+    override _prepareData(data, options?): any {
         data = super._prepareData(data, options);
 
         // TODO: this isn't needed if opposed is always taken from data.action.opposed
@@ -46,12 +46,12 @@ export class OpposedTest extends SuccessTest {
         return data;
     }
 
-    async populateDocuments() {
+    override async populateDocuments() {
         await super.populateDocuments();
         await this.against.populateDocuments();
     }
 
-    static async _getOpposedActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
+    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;
@@ -113,42 +113,42 @@ export class OpposedTest extends SuccessTest {
     /**
      * Overwrite SuccessTest#opposed behavior as an OpposedTest can't have another opposed test.
      */
-    get opposed() {
+    override get opposed() {
         return false;
     }
 
     /**
      * Overwrite SuccessTest#opposing behavior as an OpposedTest is opposing another test.
      */
-    get opposing() {
+    override get opposing() {
         return true;
     }
 
     /**
      * This test type can't be extended.
      */
-    get canBeExtended() {
+    override get canBeExtended() {
         return false;
     }
 
     /**
      * Opposed tests shouldn't show item description from the active tests source item.
      */
-    get _canShowDescription(): boolean {
+    override get _canShowDescription(): boolean {
         return false;
     }
 
     /**
      * Opposed tests can't cause any blast template.
      */
-    get _canPlaceBlastTemplate(): boolean {
+    override get _canPlaceBlastTemplate(): boolean {
         return false;
     }
 
     /**
      * Apply opposed test modifiers based on the item implementation
      */
-    async prepareItemModifiers() {
+    override async prepareItemModifiers() {
         if (!this.item) return;
 
         // NOTE: This is a legacy method for applying item data based modifiers, but it will do.
@@ -179,7 +179,7 @@ export class OpposedTest extends SuccessTest {
         await TestCreator.fromMessageAction(messageId, opposedActionTest, {showDialog});
     }
 
-    static async chatMessageListeners(message: ChatMessage, html, data) {
+    static override async chatMessageListeners(message: ChatMessage, html, data) {
         html.find('.opposed-action').on('click', OpposedTest._castOpposedAction);
     }
 }

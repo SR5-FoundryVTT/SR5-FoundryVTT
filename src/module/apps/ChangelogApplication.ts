@@ -1,11 +1,11 @@
 import {FLAGS, SYSTEM_NAME} from "../constants";
 
 export class ChangelogApplication extends Application {
-    get template(): string {
+    override get template(): string {
         return 'systems/shadowrun5e/dist/templates/apps/changelog.html';
     }
 
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         options.classes = ['shadowrun5e'];
         options.title = game.i18n.localize('SR5.ChangelogApplication.Title');
@@ -14,7 +14,7 @@ export class ChangelogApplication extends Application {
         return options;
     }
 
-    render(force?: boolean, options?: Application.RenderOptions) {
+    override render(force?: boolean, options?: Application.RenderOptions) {
         ChangelogApplication.setRenderForCurrentVersion();
         return super.render(force, options);
     }

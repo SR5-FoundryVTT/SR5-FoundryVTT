@@ -22,9 +22,9 @@ export interface DefenseTestData extends OpposedTestData {
  * Handle general damage data as well as general defense rules.
  */
 export class DefenseTest extends OpposedTest {
-    data: DefenseTestData
+    override data: DefenseTestData
 
-    _prepareData(data, options?) {
+    override _prepareData(data, options?) {
         data = super._prepareData(data, options);
 
         const damage = data.against ? data.against.damage : DataDefaults.damageData();
@@ -35,15 +35,15 @@ export class DefenseTest extends OpposedTest {
         return data;
     }
 
-    get _chatMessageTemplate() {
+    override get _chatMessageTemplate() {
         return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html'
     }
 
-    get successLabel() {
+    override get successLabel() {
         return 'SR5.AttackDodged';
     }
 
-    get failureLabel() {
+    override get failureLabel() {
         return 'SR5.AttackHits';
     }
 

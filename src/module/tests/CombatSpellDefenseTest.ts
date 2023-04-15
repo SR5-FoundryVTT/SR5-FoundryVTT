@@ -13,8 +13,8 @@ export interface CombatSpellDefenseTestData extends DefenseTestData {
 }
 
 export class CombatSpellDefenseTest extends DefenseTest {
-    data: CombatSpellDefenseTestData
-    against: SpellCastingTest
+    override data: CombatSpellDefenseTestData
+    override against: SpellCastingTest
 
     /**
      * A combat spell defense test changes it's behaviour based on the spell it's defending against.
@@ -22,7 +22,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
      * @param item A spell item.
      * @param actor The actor to defend with.
      */
-    static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<MinimalActionData> {
+    static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<MinimalActionData> {
         const action = DataDefaults.minimalActionData(await super._getDocumentTestAction(item, actor));
 
         const spellData = item.asSpell
@@ -32,12 +32,12 @@ export class CombatSpellDefenseTest extends DefenseTest {
         return TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
     }
 
-    prepareBaseValues() {
+    override prepareBaseValues() {
         super.prepareBaseValues();
         this.calculateCombatSpellDamage();
     }
 
-    get testModifiers(): ModifierTypes[] {
+    override get testModifiers(): ModifierTypes[] {
         const spell = this.item?.asSpell;
         if (!spell) return ['global'];
 
@@ -64,7 +64,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
         this.data.incomingDamage = CombatSpellRules.calculateBaseDamage(spell.system.combat.type, this.data.incomingDamage, this.data.against.force);
     }
 
-    async processResults() {
+    override async processResults() {
         await super.processResults();
 
         await this.applyActorEffectsForDefense();
@@ -74,7 +74,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
     /**
      * A success on a defense test is a MISS on the initial attack.
      */
-    async processSuccess() {
+    override async processSuccess() {
         this.data.modifiedDamage = CombatSpellRules.modifyDamageAfterMiss(this.data.incomingDamage);
 
         await super.processSuccess();
@@ -83,7 +83,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
     /**
      * A failure on a defense test is a HIT on the initial attack.
      */
-    async processFailure() {
+    override async processFailure() {
         const spell = this.item?.asSpell;
         if (!spell) return;
         if (!this.actor) return;
@@ -97,7 +97,7 @@ export class CombatSpellDefenseTest extends DefenseTest {
     /**
      * Combat Spell Defense allows a resist test for the defending actor.
      */
-    async afterFailure() {
+    override async afterFailure() {
         const spell = this.item?.asSpell;
         if (!spell) return;
 

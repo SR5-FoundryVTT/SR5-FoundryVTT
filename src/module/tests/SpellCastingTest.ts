@@ -22,9 +22,9 @@ export interface SpellCastingTestData extends SuccessTestData {
  *
  */
 export class SpellCastingTest extends SuccessTest {
-    data: SpellCastingTestData
+    override data: SpellCastingTestData
 
-    _prepareData(data, options): any {
+    override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
         data.force = data.force || 0;
@@ -35,33 +35,33 @@ export class SpellCastingTest extends SuccessTest {
         return data;
     }
 
-    get _dialogTemplate()  {
+    override get _dialogTemplate()  {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
     }
 
-    get _chatMessageTemplate(): string {
+    override get _chatMessageTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/rolls/spellcasting-test-message.html';
     }
 
     /**
      * This test type can't be extended.
      */
-    get canBeExtended() {
+    override get canBeExtended() {
         return false;
     }
 
-    static _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
             skill: 'spellcasting',
             attribute: 'magic'
         };
     }
 
-    get testModifiers(): ModifierTypes[] {
+    override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'background_count'];
     }
 
-    async prepareDocumentData() {
+    override async prepareDocumentData() {
         this.prepareInitialForceValue();
 
         await super.prepareDocumentData();
@@ -78,7 +78,7 @@ export class SpellCastingTest extends SuccessTest {
         this.data.force = lastUsedForce.value || suggestedForce;
     }
 
-    prepareBaseValues() {
+    override prepareBaseValues() {
         super.prepareBaseValues();
         this.prepareLimitValue();
     }
@@ -103,7 +103,7 @@ export class SpellCastingTest extends SuccessTest {
     //     const modifiers = actor.getSituationModifiers();
     // }
 
-    calculateBaseValues() {
+    override calculateBaseValues() {
         super.calculateBaseValues();
         this.calculateDrainValue();
     }
@@ -131,7 +131,7 @@ export class SpellCastingTest extends SuccessTest {
         this.data.drainDamage = DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
     }
 
-    async processResults() {
+    override async processResults() {
         this.calcDrainDamage();
 
         await super.processResults();
@@ -140,7 +140,7 @@ export class SpellCastingTest extends SuccessTest {
     /**
      * Allow the currently used force value of this spell item to be reused next time.
      */
-    async saveUserSelectionAfterDialog() {
+    override async saveUserSelectionAfterDialog() {
         if (!this.item) return;
 
         await this.item.setLastSpellForce({value: this.data.force, reckless: false});

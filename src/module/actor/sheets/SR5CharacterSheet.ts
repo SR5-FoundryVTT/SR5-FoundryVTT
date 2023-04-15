@@ -21,7 +21,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    getHandledItemTypes(): string[] {
+    override getHandledItemTypes(): string[] {
         let itemTypes = super.getHandledItemTypes();
 
         return [
@@ -45,7 +45,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    getInventoryItemTypes(): string[] {
+    override getInventoryItemTypes(): string[] {
         const itemTypes = super.getInventoryItemTypes();
 
         return [
@@ -61,7 +61,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         ];
     }
 
-    async getData(options) {
+    override async getData(options) {
         const data = await super.getData(options) as CharacterSheetData;
 
         // Character actor types are matrix actors.

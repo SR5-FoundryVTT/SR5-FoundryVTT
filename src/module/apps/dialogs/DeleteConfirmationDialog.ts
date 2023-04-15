@@ -24,7 +24,7 @@ export class DeleteConfirmationDialog extends FormDialog {
         }
     }
 
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'delete-confirmation-application';
         // Class Dialog here is needed for dialog button styling.

@@ -18,7 +18,7 @@ export class MoveInventoryDialog extends FormDialog {
         super(dialogData, options);
     }
 
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'move-inventory-application';
         options.classes = ['sr5', 'form-dialog'];

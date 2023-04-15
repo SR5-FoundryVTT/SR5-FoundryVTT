@@ -143,7 +143,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Extend and override the default options used by the 5e Actor Sheet
      * @returns {Object}
      */
-    static get defaultOptions() {
+    static override get defaultOptions() {
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
             width: 905,
@@ -167,7 +167,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @override
      */
-    get template() {
+    override get template() {
         const path = 'systems/shadowrun5e/dist/templates';
 
         if (this.actor.limited) {
@@ -178,7 +178,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /** SheetData used by _all_ actor types! */
-    async getData(options) {
+    override async getData(options) {
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
         let data = super.getData() as any;
@@ -226,7 +226,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /** Listeners used by _all_ actor types! */
-    activateListeners(html) {
+    override activateListeners(html) {
         super.activateListeners(html);
 
         Helpers.setupCustomCheckbox(this, html)
@@ -359,7 +359,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @override Default drag start handler to add Skill support
      * @param event
      */
-    async _onDragStart(event) {
+    override async _onDragStart(event) {
         // Create drag data
         const dragData = {
             actorId: this.actor.id,
@@ -439,7 +439,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Enhance Foundry state restore on rerender by more user interaction state.
      * @override
      */
-    async _render(...args) {
+    override async _render(...args) {
         const focus = this._saveInputCursorPosition();
         this._saveScrollPositions();
 
@@ -483,7 +483,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Used together with _restoreScrollPositions during render calls.
      * @private
      */
-    _saveScrollPositions() {
+    override _saveScrollPositions() {
         const activeList = this._findActiveList();
         if (activeList.length) {
             this._scroll = activeList.prop('scrollTop');
@@ -494,7 +494,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Used together with _storeScrollPositions during render calls.
      * @private
      */
-    _restoreScrollPositions() {
+    override _restoreScrollPositions() {
         const activeList = this._findActiveList();
         if (activeList.length && this._scroll != null) {
             activeList.prop('scrollTop', this._scroll);

@@ -63,7 +63,7 @@ export class SR5ItemSheet extends ItemSheet {
      * Extend and override the default options used by the Simple Item Sheet
      * @returns {Object}
      */
-    static get defaultOptions() {
+    static override get defaultOptions() {
         // @ts-ignore // mergeObject breaks TypeScript typing. Should be fine.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'item'],
@@ -73,7 +73,7 @@ export class SR5ItemSheet extends ItemSheet {
         });
     }
 
-    get template() {
+    override get template() {
         const path = 'systems/shadowrun5e/dist/templates/item/';
         return `${path}${this.item.type}.html`;
     }
@@ -84,7 +84,7 @@ export class SR5ItemSheet extends ItemSheet {
      * Prepare data for rendering the Item sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
-    async getData(options): Promise<any> {
+    override async getData(options): Promise<any> {
         const data = super.getData(options) as unknown as SR5ItemSheetData;
 
         // Rework v9 style data mapping to v10 style, while waiting for foundry-vtt-types to be update to v10.
@@ -246,7 +246,7 @@ export class SR5ItemSheet extends ItemSheet {
      * Activate event listeners using the prepared sheet HTML
      * @param html -  The prepared HTML object ready to be rendered into the DOM
      */
-    activateListeners(html) {
+    override activateListeners(html) {
         super.activateListeners(html);
 
         Helpers.setupCustomCheckbox(this, html);
@@ -314,13 +314,13 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
         // Prepare listeners only applied to item type action
-        if (this.document.isAction()) {
+        if (this.item.isAction()) {
             this._createActionModifierTagify(html);
             
         }
     }
 
-    async _onDrop(event) {
+    override async _onDrop(event) {
         if (!game.items || !game.actors || !game.scenes) return;
 
         event.preventDefault();
@@ -562,7 +562,7 @@ export class SR5ItemSheet extends ItemSheet {
     /**
      * @private
      */
-    async _render(force = false, options = {}) {
+    override async _render(force = false, options = {}) {
         // NOTE: This is for a timing bug. See function doc for code removal. Good luck, there be dragons here. - taM
         // this.fixStaleRenderedState();
 
@@ -574,7 +574,7 @@ export class SR5ItemSheet extends ItemSheet {
     /**
      * @private
      */
-    _restoreScrollPositions() {
+    override _restoreScrollPositions() {
         const activeList = this._findActiveList();
         if (activeList.length && this._scroll != null) {
             activeList.prop('scrollTop', this._scroll);
@@ -584,7 +584,7 @@ export class SR5ItemSheet extends ItemSheet {
     /**
      * @private
      */
-    _saveScrollPositions() {
+    override _saveScrollPositions() {
         const activeList = this._findActiveList();
         if (activeList.length) {
             this._scroll = activeList.prop('scrollTop');

@@ -17,12 +17,11 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    getHandledItemTypes(): string[] {
+    override getHandledItemTypes(): string[] {
         return super.getHandledItemTypes();
     }
 
-
-    async getData(options) {
+    override async getData(options) {
         const data = await super.getData(options) as ICActorSheetData;
 
         // Fetch a connected host.
@@ -35,7 +34,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         return data;
     }
 
-    activateListeners(html) {
+    override activateListeners(html) {
         super.activateListeners(html);
 
         html.find('.entity-remove').on('click', this._removeHost.bind(this));
@@ -50,7 +49,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         await this.actor.removeICHost();
     }
 
-    async _onDrop(event: DragEvent) {
+    override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 

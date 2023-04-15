@@ -25,7 +25,7 @@ export interface TestDialogListener {
  * TODO: Add TestDialog JSDoc
  */
 export class TestDialog extends FormDialog {
-    data: TestDialogData
+    override data: TestDialogData
     // Listeners as given by the dialogs creator.
     listeners: TestDialogListener[]
 
@@ -38,7 +38,7 @@ export class TestDialog extends FormDialog {
         this.listeners = listeners;
     }
 
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'test-dialog';
         // TODO: Class Dialog here is needed for dialog button styling.
@@ -50,7 +50,7 @@ export class TestDialog extends FormDialog {
         return options;
     }
 
-    activateListeners(html: JQuery) {
+    override activateListeners(html: JQuery) {
         super.activateListeners(html);
 
         // Handle in-dialog entity links to render the respective sheets.
@@ -74,7 +74,7 @@ export class TestDialog extends FormDialog {
      *
      * data.templatePath work's the same and can be used as well.
      */
-    get templateContent(): string {
+    override get templateContent(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html';
     }
 
@@ -96,7 +96,7 @@ export class TestDialog extends FormDialog {
     /**
      * Overwrite this method to provide the dialog application title.
      */
-    get title() {
+    override get title() {
         const data = this.data as unknown as TestDialogData;
         return game.i18n.localize(data.test.title);
     }
@@ -104,7 +104,7 @@ export class TestDialog extends FormDialog {
     /**
      * Overwrite this method to provide dialog buttons.
      */
-    get buttons() {
+    override get buttons() {
         return {
             roll: {
                 label: game.i18n.localize('SR5.Roll'),
@@ -120,7 +120,7 @@ export class TestDialog extends FormDialog {
      * Callback for after the dialoge has closed.
      * @param html
      */
-    onAfterClose(html: JQuery<HTMLElement>): SuccessTestData {
+    override onAfterClose(html: JQuery<HTMLElement>): SuccessTestData {
         return this.data.test.data;
     }
 
@@ -130,7 +130,7 @@ export class TestDialog extends FormDialog {
      *
      * @param data An object with keys in Foundry UpdateData style {'key.key.key': value}
      */
-    _updateData(data) {
+    override _updateData(data) {
         // The user canceled their interaction by cancenling, don't apply form changes.
         if (this.selectedButton === 'cancel') return;
 
