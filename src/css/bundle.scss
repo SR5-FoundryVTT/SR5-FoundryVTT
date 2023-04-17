@@ -639,6 +639,9 @@ select.display {
             background: rgba($grey, 0.2);
             padding: 0.25em;
             border-radius: 0.2em;
+            &.faded {
+                color: $grey;
+            }
         }
         .item-center {
             display: flex;
@@ -761,6 +764,7 @@ select.display {
             }
         }
         .item-create,
+        .item-toggle,
         .add-new-ammo,
         .add-new-mod,
         .add-new-license {

@@ -177,6 +177,8 @@
     },
     "SR5.ClearMarks": "Clear All Marks",
     "SR5.Close": "Close",
+    "SR5.Collapse": "Collapse",
+    "SR5.CollapseAll": "Collapse All",
     "SR5.CommonProgram": "Common Program",
     "SR5.ComplexForm": "Complex Form",
     "SR5.ComplexForms": "Complex Forms",
@@ -379,6 +381,8 @@
         "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor"
     },
     "SR5.EssenceCost": "Essence",
+    "SR5.Expand": "Expand",
+    "SR5.ExpandAll": "Expand All",
     "SR5.Extend": "Extend",
     "SR5.Extended": "Extended",
     "SR5.ExtendedHits": "Extended Hits",
