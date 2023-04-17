@@ -7,7 +7,7 @@ import {Helpers} from "../../helpers";
 export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
     public files = ['critterpowers.xml'];
 
-    public unsupportedCategories = [
+    public override unsupportedCategories = [
         'Emergent',
     ];
     

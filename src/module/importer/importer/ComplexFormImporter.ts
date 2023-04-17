@@ -6,7 +6,7 @@ import {Helpers} from "../../helpers";
 import { DataDefaults } from '../../data/DataDefaults';
 
 export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData> {
-    public categoryTranslations: any;
+    public override categoryTranslations: any;
     public nameTranslations: any;
     public files = ['complexforms.xml'];
 
@@ -14,7 +14,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
         return jsonObject.hasOwnProperty('complexforms') && jsonObject['complexforms'].hasOwnProperty('complexform');
     }
 
-    public GetDefaultData({ type }: { type: any; }): Shadowrun.ComplexFormItemData {
+    public override GetDefaultData({ type }: { type: any; }): Shadowrun.ComplexFormItemData {
         const systemData = {action: {type: 'complex', attribute: 'resonance', skill: 'compiling'}} as Shadowrun.ComplexFormData;
         return DataDefaults.baseItemData<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData>({type}, systemData);
     }

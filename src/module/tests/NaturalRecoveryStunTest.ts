@@ -2,7 +2,7 @@ import {SuccessTest} from "./SuccessTest";
 import {PartsList} from "../parts/PartsList";
 
 export class NaturalRecoveryStunTest extends SuccessTest {
-    prepareBaseValues() {
+    override prepareBaseValues() {
         super.prepareBaseValues();
         this.prepareThreshold();
     }
@@ -23,7 +23,7 @@ export class NaturalRecoveryStunTest extends SuccessTest {
     /**
      * A recovery test will heal on each test iteration
      */
-    async processResults() {
+    override async processResults() {
         await super.processResults();
 
         // Don't bother healing if the actor can't.

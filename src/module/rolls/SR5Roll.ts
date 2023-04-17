@@ -26,7 +26,7 @@ interface ShadowrunChatMessageData {
  * TODO: A chat message should contain all data needed to cast resulting actions.
  */
 export class SR5Roll extends Roll {
-    data: ShadowrunRollData
+    override data: ShadowrunRollData
 
     // toJSON(): any {
     //     // TODO: Check if data includes custom ShadowrunRollData
@@ -113,7 +113,7 @@ export class SR5Roll extends Roll {
         return this.glitches > Math.floor(this.pool / 2);
     }
 
-    get total(): number {
+    override get total(): number {
         return this.hits;
     }
 }

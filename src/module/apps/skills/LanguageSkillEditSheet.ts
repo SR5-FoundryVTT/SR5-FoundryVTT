@@ -2,11 +2,11 @@ import { SkillEditSheet } from './SkillEditSheet';
 import SkillEditFormData = Shadowrun.SkillEditFormData;
 
 export class LanguageSkillEditSheet extends SkillEditSheet {
-    _updateString() {
+    override _updateString() {
         return `system.skills.language.value.${this.skillId}`;
     }
 
-    getData() {
+    override getData() {
         return mergeObject(super.getData(), {
             editable_name: true,
             editable_canDefault: false,
@@ -15,7 +15,7 @@ export class LanguageSkillEditSheet extends SkillEditSheet {
     }
 
     /** @override */
-    _onUpdateObject(event, formData, updateData) {
+    override _onUpdateObject(event, formData, updateData) {
         super._onUpdateObject(event, formData, updateData);
         const name = formData['skill.name'];
         const currentData = updateData[this._updateString()] || {};

@@ -23,9 +23,9 @@ export interface PhysicalDefenseTestData extends DefenseTestData {
 
 
 export class PhysicalDefenseTest extends DefenseTest {
-    public data: PhysicalDefenseTestData;
+    public override data: PhysicalDefenseTestData;
 
-    _prepareData(data, options?): any {
+    override _prepareData(data, options?): any {
         data = super._prepareData(data, options);
 
         data.cover = 0;
@@ -37,22 +37,22 @@ export class PhysicalDefenseTest extends DefenseTest {
         return data;
     }
 
-    get _dialogTemplate(): string {
+    override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
     }
 
-    static _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
             'attribute': 'reaction',
             'attribute2': 'intuition'
         };
     }
 
-    get testModifiers(): ModifierTypes[] {
+    override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'defense', 'multi_defense'];
     }
 
-    async prepareDocumentData() {
+    override async prepareDocumentData() {
         this.prepareActiveDefense();
         this.prepareMeleeReach();
         await super.prepareDocumentData();
@@ -119,12 +119,12 @@ export class PhysicalDefenseTest extends DefenseTest {
         this.data.defenseReach = MeleeRules.defenseReachModifier(incomingReach, defenseReach);
     }
 
-    calculateBaseValues() {
+    override calculateBaseValues() {
         super.calculateBaseValues();
         this.applyIniModFromActiveDefense();
     }
 
-    applyPoolModifiers() {
+    override applyPoolModifiers() {
         this.applyPoolCoverModifier();
         this.applyPoolActiveDefenseModifier();
         this.applyPoolMeleeReachModifier();
@@ -169,27 +169,27 @@ export class PhysicalDefenseTest extends DefenseTest {
         PartsList.AddUniquePart(this.data.modifiers.mod, fireMode.label, Number(fireMode.defense));
     }
 
-    get success() {
+    override get success() {
         return CombatRules.attackMisses(this.against.hits.value, this.hits.value);
     }
 
-    get failure() {
+    override get failure() {
         return CombatRules.attackHits(this.against.hits.value, this.hits.value)
     }
 
-    async processResults() {
+    override async processResults() {
         await super.processResults();
 
         await this.applyActorEffectsForDefense();
     }
 
-    async processSuccess() {
+    override async processSuccess() {
         this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage);
 
         await super.processSuccess();
     }
 
-    async processFailure() {
+    override async processFailure() {
         if (!this.actor) return;
 
         this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.actor, this.against.hits.value, this.hits.value, this.data.incomingDamage);
@@ -197,13 +197,13 @@ export class PhysicalDefenseTest extends DefenseTest {
         await super.processFailure();
     }
 
-    async afterFailure() {
+    override async afterFailure() {
         const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
         if (!test) return;
         await test.execute();
     }
 
-    canConsumeDocumentRessources() {
+    override canConsumeDocumentRessources() {
         // Check if the actor is in active combat situation and has enough initiative score left.
         if (this.actor && this.data.iniMod && game.combat) {
             const combat: SR5Combat = game.combat as unknown as SR5Combat;
@@ -233,7 +233,7 @@ export class PhysicalDefenseTest extends DefenseTest {
         this.data.iniMod = activeDefense.initMod;
     }
 
-    _prepareResultActionsTemplateData() {
+    override _prepareResultActionsTemplateData() {
         const actions = super._prepareResultActionsTemplateData();
 
         // Don't add an action if no active defense was selected.

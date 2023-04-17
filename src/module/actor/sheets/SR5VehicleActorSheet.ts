@@ -19,7 +19,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    getHandledItemTypes(): string[] {
+    override getHandledItemTypes(): string[] {
         let itemTypes = super.getHandledItemTypes();
 
         return [
@@ -35,7 +35,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    getInventoryItemTypes(): string[] {
+    override getInventoryItemTypes(): string[] {
         const itemTypes = super.getInventoryItemTypes();
 
         return [
@@ -51,7 +51,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         ];
     }
 
-    async getData(options) {
+    override async getData(options) {
         const data = await super.getData(options);
 
         // Vehicle actor type specific fields.
@@ -60,7 +60,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         return data;
     }
 
-    activateListeners(html: JQuery) {
+    override activateListeners(html: JQuery) {
         super.activateListeners(html);
 
         // Vehicle Sheet related handlers...
@@ -71,7 +71,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
      * Vehicle specific drop events
      * @param event A DataTransferEvent containing some form of FoundryVTT Document / Data
      */
-    async _onDrop(event) {
+    override async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
 

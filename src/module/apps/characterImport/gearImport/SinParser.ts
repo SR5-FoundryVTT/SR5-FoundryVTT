@@ -5,7 +5,7 @@ import { BaseGearParser } from "./BaseGearParser"
  * Licenses that are not attached to a SIN are not handled.
  */
 export class SinParser extends BaseGearParser {
-    parse(chummerGear : any) : any {
+    override parse(chummerGear : any) : any {
         const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'sin';
 

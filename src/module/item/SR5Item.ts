@@ -104,7 +104,7 @@ export class SR5Item extends Item {
      *
      * If you need the actual actor owner, no matter how deep into item embedding, this current item is use SR5item.actorOwner
      */
-    get actor(): SR5Actor {
+    override get actor(): SR5Actor {
         return super.actor as unknown as SR5Actor;
     }
 
@@ -227,7 +227,7 @@ export class SR5Item extends Item {
      * - as of foundry v0.7.4, actor data isn't prepared by the time we prepare items
      * - this caused issues with Actions that have a Limit or Damage attribute and so those were moved
      */
-    prepareData() {
+    override prepareData() {
         super.prepareData();
         this.prepareNestedItems();
 
@@ -1501,7 +1501,7 @@ export class SR5Item extends Item {
         return this;
     }
 
-    async update(data, options?): Promise<this> {
+    override async update(data, options?): Promise<this> {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem) {
             return this.updateNestedItem(data);
@@ -1718,7 +1718,7 @@ export class SR5Item extends Item {
         if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
     }
 
-    async _onCreate(changed, options, user) {
+    override async _onCreate(changed, options, user) {
         const applyData = {};
         //@ts-ignore
         Helpers.injectActionTestsIntoChangeData(this.type, changed, applyData);
@@ -1734,7 +1734,7 @@ export class SR5Item extends Item {
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-    async _preUpdate(changed, options: DocumentModificationOptions, user: User) {
+    override async _preUpdate(changed, options: DocumentModificationOptions, user: User) {
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff !== false && options.recursive !== false) {

@@ -8,9 +8,9 @@ import EnvironmentalModifiersData = Shadowrun.EnvironmentalModifiersData;
   * Rules application of situation modifieres for matrix.
  */
 export class EnvironmentalModifier extends SituationModifier {
-    source: EnvironmentalModifiersSourceData
-    applied: EnvironmentalModifiersData
-    type: Shadowrun.SituationModifierType = 'environmental';
+    override source: EnvironmentalModifiersSourceData
+    override applied: EnvironmentalModifiersData
+    override type: Shadowrun.SituationModifierType = 'environmental';
 
     
     get levels(): EnvironmentalModifierLevels {
@@ -39,7 +39,7 @@ export class EnvironmentalModifier extends SituationModifier {
      * 
      * SR5#173 'Environmental Modifiers'
      */
-    _calcActiveTotal(): number {
+    override _calcActiveTotal(): number {
         // A fixed value selection overrides other selections.
         if (this.applied.active.value)
             return this.applied.active.value;
@@ -67,7 +67,7 @@ export class EnvironmentalModifier extends SituationModifier {
         return this.levels.good;
     }
 
-    setInactive(modifier: string): void {
+    override setInactive(modifier: string): void {
         if (this.source.active[modifier] !== this.applied.active[modifier]) this.setActive(modifier, 0);
         else delete this.source.active[modifier];
     }

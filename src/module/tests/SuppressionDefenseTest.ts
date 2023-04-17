@@ -4,16 +4,16 @@ import MinimalActionData = Shadowrun.MinimalActionData;
 
 
 export class SuppressionDefenseTest extends PhysicalDefenseTest {
-    public data: PhysicalDefenseTestData;
+    public override data: PhysicalDefenseTestData;
 
-    static _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
             'attribute': 'reaction',
             'attribute2': 'edge'
         };
     }
 
-    async processFailure() {
+    override async processFailure() {
         this.data.modifiedDamage = CombatRules.modifyDamageAfterSupressionHit(this.data.incomingDamage);
     }
 }

@@ -6,7 +6,7 @@ import {Helpers} from "../../helpers";
 
 export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun.EquipmentData> {
     files = ['gear.xml'];
-    unsupportedCategories = [
+    override unsupportedCategories = [
         'Ammunition',
         'Commlinks',
         'Cyberdecks',

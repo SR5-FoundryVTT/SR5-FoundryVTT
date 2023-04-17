@@ -93,7 +93,7 @@ export class SR5Actor extends Actor {
      * Check base, embeddedEntities and derived methods (see super.prepareData implementation for order)
      * Only implement data preparation here that doesn't fall into the other three categories.
      */
-    prepareData() {
+    override prepareData() {
         super.prepareData();
     }
 
@@ -104,7 +104,7 @@ export class SR5Actor extends Actor {
      *  Shadowrun data preparation is separate from the actor entity see the different <>Prep classes like
      *  CharacterPrep
      */
-    prepareBaseData() {
+    override prepareBaseData() {
         super.prepareBaseData();
 
         switch (this.type) {
@@ -138,7 +138,7 @@ export class SR5Actor extends Actor {
     /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
      */
-    prepareEmbeddedDocuments() {
+    override prepareEmbeddedDocuments() {
         // This will apply ActiveEffects, which is okay for modify (custom) effects, however add/multiply on .value will be
         // overwritten.
         super.prepareEmbeddedDocuments();
@@ -153,7 +153,7 @@ export class SR5Actor extends Actor {
      * Should some ActiveEffects need to be excluded from the general application, do so here.
      * @override
      */
-    applyActiveEffects() {
+    override applyActiveEffects() {
         // Shadowrun uses prepareDerivedData to calculate lot's of things that don't exist on the data model in full.
         // Errors during change application will stop that process and cause a broken sheet.
         try {
@@ -171,7 +171,7 @@ export class SR5Actor extends Actor {
      * At the moment general actor data preparation has been moved to derived data preparation, due it's dependence
      * on prepareEmbeddedEntities and prepareEmbeddedItems for items modifying attribute values and more.
      */
-    prepareDerivedData() {
+    override prepareDerivedData() {
         super.prepareDerivedData();
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.

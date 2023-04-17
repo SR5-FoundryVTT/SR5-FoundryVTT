@@ -51,12 +51,12 @@ class ModifiersHandler {
  */
 class EnvironmentalModifiersHandler extends ModifiersHandler {
 
-    activateListeners(html: JQuery<HTMLElement>) {
+    override activateListeners(html: JQuery<HTMLElement>) {
         console.log(`Shadowrun5e | Registering modifier handler ${this.constructor.name} listeners`);
         $(html).find('button.env-modifier').on('click', this._handleModifierChange.bind(this));
     }
 
-    static addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+    static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
         console.log(`${SYSTEM_NAME} | Environmental modifier HUD on renderTokenHUD`);
 
         // Setup and connect tokenHUD elements.
@@ -104,14 +104,14 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
 
 
 class MatrixModifiersHandler extends ModifiersHandler {
-    getData(options?: object | undefined) {
+    override getData(options?: object | undefined) {
         return {}
     }
 
-    activateListeners(html: JQuery<HTMLElement>) {
+    override activateListeners(html: JQuery<HTMLElement>) {
     }
 
-    static addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+    static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
         console.log(`${SYSTEM_NAME} | Matrix modifier HUD on renderTokenHUD`);
 
         // Setup and connect tokenHUD elements.
@@ -127,15 +127,15 @@ class MatrixModifiersHandler extends ModifiersHandler {
 }
 
 class MagicModifiersHandler extends ModifiersHandler {
-    getData(options?: object | undefined) {
+    override getData(options?: object | undefined) {
         return {}
     }
 
-    activateListeners(html: JQuery<HTMLElement>) {
+    override activateListeners(html: JQuery<HTMLElement>) {
         html.find('.remove-magical-from-target').on('click', this.handleClearMagicModifiers.bind(this));
     }
 
-    static addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+    static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
         console.log(`${SYSTEM_NAME} | Magic modifier HUD on renderTokenHUD`);
 
         // Don't add awakend modifiers to token hud for mundane actors.
@@ -166,11 +166,11 @@ class MagicModifiersHandler extends ModifiersHandler {
  * 
  */
 class RecoilModifiersHandler extends ModifiersHandler {
-    getData(options?: object | undefined) {
+    override getData(options?: object | undefined) {
         return {}
     }
 
-    activateListeners(html: JQuery<HTMLElement>): void {
+    override activateListeners(html: JQuery<HTMLElement>): void {
         html.find('.recoil-delta button').on('click', this.applyRecoilDelta.bind(this));
         html.find('button#modifiers-recoil-total').on('click', async event => {
             if (this.app.modifiers.documentIsScene) return;
@@ -257,11 +257,11 @@ export class SituationModifiersApplication extends FormApplication {
         return SituationModifiersApplication._staticHandlers.map(staticHandler => new staticHandler(this));
     }
 
-    get template() {
+    override get template() {
         return 'systems/shadowrun5e/dist/templates/apps/situational-modifiers.hbs';
     }
 
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
 
         options.classes = ['sr5'];
@@ -287,7 +287,7 @@ export class SituationModifiersApplication extends FormApplication {
         return options;
     }
 
-    async getData(options?: any): Promise<SituationalModifiersTemplateData> {
+    override async getData(options?: any): Promise<SituationalModifiersTemplateData> {
         // Update all modifiers before displaying.
         this.modifiers.applyAll();
 
@@ -302,7 +302,7 @@ export class SituationModifiersApplication extends FormApplication {
         }
     }
 
-    activateListeners(html: JQuery<HTMLElement>): void {
+    override activateListeners(html: JQuery<HTMLElement>): void {
         super.activateListeners(html);
 
         this.handlers.forEach(handler => handler.activateListeners(html));
@@ -383,7 +383,7 @@ export class SituationModifiersApplication extends FormApplication {
     /**
      * Override _onChangeInput to include a render on changing modifier values.
      */
-    async _onChangeInput(event) {
+    override async _onChangeInput(event) {
         await super._onChangeInput(event);
         this.render(true);
     }

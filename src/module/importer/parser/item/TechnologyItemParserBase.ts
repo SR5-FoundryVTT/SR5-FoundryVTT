@@ -3,7 +3,7 @@ import { ImportHelper } from '../../helper/ImportHelper';
 import ShadowrunTechnologyItemData = Shadowrun.ShadowrunTechnologyItemData;
 
 export abstract class TechnologyItemParserBase<TResult extends ShadowrunTechnologyItemData> extends ItemParserBase<TResult> {
-    Parse(jsonData: object, item: TResult, jsonTranslation?: object): TResult {
+    override Parse(jsonData: object, item: TResult, jsonTranslation?: object): TResult {
         item = super.Parse(jsonData, item, jsonTranslation);
 
         item.system.technology.availability = ImportHelper.StringValue(jsonData, 'avail', '0');

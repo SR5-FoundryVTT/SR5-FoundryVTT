@@ -14,7 +14,7 @@ import SocketMessageData = Shadowrun.SocketMessageData;
  */
 export class SR5Combat extends Combat {
     // Overwrite foundry-vtt-types v9 combatTrackerSettings type definitions.
-    get settings() {
+    override get settings() {
         return super.settings as {resource: string, skipDefeated: boolean};
     }
 
@@ -190,7 +190,7 @@ export class SR5Combat extends Combat {
     /**
      * Make sure Shadowrun initiative order is applied.
      */
-    setupTurns(): any[] {
+    override setupTurns(): any[] {
         const turns = super.setupTurns();
         return turns.sort(SR5Combat.sortByRERIC);
     }
@@ -305,7 +305,7 @@ export class SR5Combat extends Combat {
      *
      * * @Override
      */
-    async nextTurn(): Promise<this | undefined> {
+    override async nextTurn(): Promise<this | undefined> {
         // Maybe advance to the next round/init pass
         let nextRound = this.round;
         let initiativePass = this.initiativePass;
@@ -345,7 +345,7 @@ export class SR5Combat extends Combat {
         return this.nextRound();
     }
 
-    async startCombat() {
+    override async startCombat() {
         // By default, no actor starts. Pre-selet top.
         const turn = 0;
         const round = SR.combat.INITIAL_INI_ROUND;
@@ -368,7 +368,7 @@ export class SR5Combat extends Combat {
         return this;
     }
 
-    async nextRound(): Promise<any> {
+    override async nextRound(): Promise<any> {
         // Let Foundry handle time and some other things.
         await super.nextRound();
 
@@ -466,7 +466,7 @@ export class SR5Combat extends Combat {
         await SocketMessage.emitForGM(FLAGS.DoNewActionPhase, {id: this.id});
     }
 
-    delete(...args): Promise<this | undefined> {
+    override delete(...args): Promise<this | undefined> {
         // Remove all combat related modifiers.
         this.combatants.contents.forEach(combatant => combatant.actor?.removeDefenseMultiModifier());
         return super.delete(...args);

@@ -2,7 +2,7 @@ import {SuccessTest} from "./SuccessTest";
 import {PartsList} from "../parts/PartsList";
 
 export class NaturalRecoveryPhysicalTest extends SuccessTest {
-    async execute(): Promise<this> {
+    override async execute(): Promise<this> {
         if (!this.actor) return this;
         if (!this.actor.canRecoverPhysicalDamage) {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantRecoverPhysicalWithStunDamage'));
@@ -12,7 +12,7 @@ export class NaturalRecoveryPhysicalTest extends SuccessTest {
         return super.execute();
     }
 
-    prepareBaseValues() {
+    override prepareBaseValues() {
         super.prepareBaseValues();
         this.prepareThreshold();
     }
@@ -33,7 +33,7 @@ export class NaturalRecoveryPhysicalTest extends SuccessTest {
     /**
      * A recovery test will heal on each test iteration
      */
-    async processResults() {
+    override async processResults() {
         await super.processResults();
 
         // Don't bother healing if the actor can't.

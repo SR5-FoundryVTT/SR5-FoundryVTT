@@ -4,7 +4,7 @@ import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
 import ModificationItemData = Shadowrun.ModificationItemData;
 
 export class ModParserBase extends TechnologyItemParserBase<ModificationItemData> {
-    Parse(jsonData: object, item: ModificationItemData): ModificationItemData {
+    override Parse(jsonData: object, item: ModificationItemData): ModificationItemData {
         item = super.Parse(jsonData, item);
 
         item.system.type = 'weapon';

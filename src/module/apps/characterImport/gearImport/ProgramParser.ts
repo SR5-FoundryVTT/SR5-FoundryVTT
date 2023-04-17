@@ -4,7 +4,7 @@ import { BaseGearParser } from "./BaseGearParser"
  * Parses common, hacking and agent programs.
  */
 export class ProgramParser extends BaseGearParser {
-    parse(chummerGear : any) : any {
+    override parse(chummerGear : any) : any {
         const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'program';
 

@@ -63,7 +63,7 @@ export class SR5ItemSheet extends ItemSheet {
      * Extend and override the default options used by the Simple Item Sheet
      * @returns {Object}
      */
-    static get defaultOptions() {
+    static override get defaultOptions() {
         // @ts-ignore // mergeObject breaks TypeScript typing. Should be fine.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'item'],
@@ -73,7 +73,7 @@ export class SR5ItemSheet extends ItemSheet {
         });
     }
 
-    get template() {
+    override get template() {
         const path = 'systems/shadowrun5e/dist/templates/item/';
         return `${path}${this.item.type}.html`;
     }
@@ -84,7 +84,7 @@ export class SR5ItemSheet extends ItemSheet {
      * Prepare data for rendering the Item sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
-    async getData(options): Promise<any> {
+    override async getData(options): Promise<any> {
         const data = super.getData(options) as unknown as SR5ItemSheetData;
 
         // Rework v9 style data mapping to v10 style, while waiting for foundry-vtt-types to be update to v10.
@@ -95,7 +95,7 @@ export class SR5ItemSheet extends ItemSheet {
         data.system = data.item.system;
         //@ts-ignore // TODO: remove TODO: foundry-vtt-types v10
         data.data = data.item.system;
-        const itemData = this.document.system;
+        const itemData = this.item.system;
 
         if (itemData.action) {
             try {
@@ -155,7 +155,7 @@ export class SR5ItemSheet extends ItemSheet {
         data['limits'] = this._getSortedLimitsForSelect();
 
         // Active Effects data.
-        data['effects'] = prepareActiveEffectCategories(this.document.effects);
+        data['effects'] = prepareActiveEffectCategories(this.item.effects);
 
         if (this.item.isHost) {
             data['markedDocuments'] = this.item.getAllMarkedDocuments();
@@ -236,7 +236,7 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     _getNetworkDevices(): SR5Item[] {
-        // return NetworkDeviceFlow.getNetworkDevices(this.document);
+        // return NetworkDeviceFlow.getNetworkDevices(this.item);
         return [];
     }
 
@@ -246,7 +246,7 @@ export class SR5ItemSheet extends ItemSheet {
      * Activate event listeners using the prepared sheet HTML
      * @param html -  The prepared HTML object ready to be rendered into the DOM
      */
-    activateListeners(html) {
+    override activateListeners(html) {
         super.activateListeners(html);
 
         Helpers.setupCustomCheckbox(this, html);
@@ -260,7 +260,7 @@ export class SR5ItemSheet extends ItemSheet {
         this.form.ondrop = (event) => this._onDrop(event);
 
         // Active Effect management
-        html.find(".effect-control").click(event => onManageActiveEffect(event, this.document));
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.item));
 
         /**
          * General item handling
@@ -304,8 +304,7 @@ export class SR5ItemSheet extends ItemSheet {
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
         html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) =>
-         this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
 
@@ -316,7 +315,7 @@ export class SR5ItemSheet extends ItemSheet {
         this._activateTagifyListeners(html);        
     }
 
-    async _onDrop(event) {
+    override async _onDrop(event) {
         if (!game.items || !game.actors || !game.scenes) return;
 
         event.preventDefault();
@@ -525,7 +524,7 @@ export class SR5ItemSheet extends ItemSheet {
         const maxItems = Object.keys(SR5.modifierTypes).length;
 
         // Use localized label as value, and modifier as the later to be extracted value 
-        const modifiers = this.document.system.action?.modifiers ?? []; 
+        const modifiers = this.item.system.action?.modifiers ?? []; 
         const tags = modifiers.map(modifier => ({
             value: game.i18n.localize(SR5.modifierTypes[modifier]),
             id: modifier
@@ -536,7 +535,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('input#action-modifier').on('change', async (event) => {
             const modifiers = tagify.value.map(tag => tag.id);
             // render would loose tagify input focus. submit on close will save.
-            await this.document.update({'system.action.modifiers': modifiers}, {render:false});
+            await this.item.update({'system.action.modifiers': modifiers}, {render:false});
         });
     }
 
@@ -549,7 +548,7 @@ export class SR5ItemSheet extends ItemSheet {
      */
     private fixStaleRenderedState() {
         if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
-            console.warn(`SR5ItemSheet app for ${this.document.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
+            console.warn(`SR5ItemSheet app for ${this.item.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
             // Hotfixing instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
             this._state = Application.RENDER_STATES.CLOSED;
         }
@@ -558,7 +557,7 @@ export class SR5ItemSheet extends ItemSheet {
     /**
      * @private
      */
-    async _render(force = false, options = {}) {
+    override async _render(force = false, options = {}) {
         // NOTE: This is for a timing bug. See function doc for code removal. Good luck, there be dragons here. - taM
         // this.fixStaleRenderedState();
 
@@ -570,7 +569,7 @@ export class SR5ItemSheet extends ItemSheet {
     /**
      * @private
      */
-    _restoreScrollPositions() {
+    override _restoreScrollPositions() {
         const activeList = this._findActiveList();
         if (activeList.length && this._scroll != null) {
             activeList.prop('scrollTop', this._scroll);
@@ -580,7 +579,7 @@ export class SR5ItemSheet extends ItemSheet {
     /**
      * @private
      */
-    _saveScrollPositions() {
+    override _saveScrollPositions() {
         const activeList = this._findActiveList();
         if (activeList.length) {
             this._scroll = activeList.prop('scrollTop');
@@ -590,7 +589,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
-        if (!this.object.isHost) return;
+        if (!this.item.isHost) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -601,13 +600,13 @@ export class SR5ItemSheet extends ItemSheet {
         if (!scene || !target) return; // item can be undefined.
 
         const marks = parseInt(event.currentTarget.value);
-        await this.object.setMarks(target, marks, {scene, item, overwrite: true});
+        await this.item.setMarks(target, marks, {scene, item, overwrite: true});
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
-        if (!this.object.isHost) return;
+        if (!this.item.isHost) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -617,13 +616,13 @@ export class SR5ItemSheet extends ItemSheet {
         const {scene, target, item} = markedIdDocuments;
         if (!scene || !target) return; // item can be undefined.
 
-        await this.object.setMarks(target, by, {scene, item});
+        await this.item.setMarks(target, by, {scene, item});
     }
 
     async _onMarksDelete(event) {
         event.stopPropagation();
 
-        if (!this.object.isHost) return;
+        if (!this.item.isHost) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -631,18 +630,18 @@ export class SR5ItemSheet extends ItemSheet {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.object.clearMark(markId);
+        await this.item.clearMark(markId);
     }
 
     async _onMarksClearAll(event) {
         event.stopPropagation();
 
-        if (!this.object.isHost) return;
+        if (!this.item.isHost) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.object.clearMarks();
+        await this.item.clearMarks();
     }
 
     async _onOpenOriginLink(event) {

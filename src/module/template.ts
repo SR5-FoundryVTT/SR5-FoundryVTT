@@ -1,8 +1,8 @@
 import { SR5Item } from './item/SR5Item';
 
 export default class Template extends MeasuredTemplate {
-    x: number;
-    y: number;
+    override x: number;
+    override y: number;
     item?: SR5Item;
     onComplete?: () => void;
 
