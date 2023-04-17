@@ -88,6 +88,8 @@ declare namespace Shadowrun {
      */
     export type ModifiableValueLinked = ModifiableValue & {
         attribute: ActorAttribute;
+        // See config.actionDamageFormulaOperators for operator mapping.
+        base_formula_operator: FormulaOperator;
     };
 
     export type RemovableField = {

@@ -54,7 +54,7 @@ export class DataDefaults {
      * 
      * @param partialDamageData give partial DamageData fields to overwrite default values
      */
-    static damageData(partialDamageData: Partial<DamageData> = {}): DamageData {
+    static damageData(partialDamageData: RecursivePartial<DamageData> = {}): DamageData {
         const data: DamageData = {
             type: {
                 base: 'physical',
@@ -70,6 +70,8 @@ export class DataDefaults {
                 base: 0,
                 value: 0,
                 mod: [],
+                attribute: '',
+                base_formula_operator: 'add',
             },
             attribute: '',
             mod: [],
