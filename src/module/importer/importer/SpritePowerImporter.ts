@@ -10,7 +10,7 @@ import { DataImporter } from "./DataImporter";
  */
 export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemData, Shadowrun.SpritePowerData> {
     public files = ['critterpowers.xml'];
-    public unsupportedCategories = [
+    public override unsupportedCategories = [
         'Drake',
         'Echoes',
         'Free Spirit',

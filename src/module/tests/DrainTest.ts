@@ -22,9 +22,9 @@ export interface DrainTestData extends SuccessTestData {
  * both of which the user can apply.
  */
 export class DrainTest extends SuccessTest {
-    data: DrainTestData
+    override data: DrainTestData
 
-    _prepareData(data, options): any {
+    override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
         data.against = data.against || new SpellCastingTest({}, {}, options).data;
@@ -35,15 +35,15 @@ export class DrainTest extends SuccessTest {
         return data;
     }
 
-    get _dialogTemplate(): string {
+    override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/drain-test-dialog.html';
     }
 
-    get _chatMessageTemplate(): string {
+    override get _chatMessageTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.html';
     }
 
-    static _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
             'attribute2': 'willpower'
         };
@@ -52,15 +52,15 @@ export class DrainTest extends SuccessTest {
     /**
      * This test type can't be extended.
      */
-    get canBeExtended() {
+    override get canBeExtended() {
         return false;
     }
 
-    get testModifiers(): ModifierTypes[] {
+    override get testModifiers(): ModifierTypes[] {
         return ['global', 'drain']
     }
 
-    static async _getDocumentTestAction(item, actor) {
+    static override async _getDocumentTestAction(item, actor) {
         const documentAction = await super._getDocumentTestAction(item, actor);
 
         if (!actor.isAwakened) {
@@ -79,7 +79,7 @@ export class DrainTest extends SuccessTest {
     /**
      * Re-calculate incomingDrain in case of user input
      */
-    calculateBaseValues() {
+    override calculateBaseValues() {
         super.calculateBaseValues();
 
         Helpers.calcValue<typeof this.data.incomingDrain.type.base>(this.data.incomingDrain.type as GenericValueField);
@@ -93,19 +93,19 @@ export class DrainTest extends SuccessTest {
     /**
      * A drain test is successful whenever it has more hits than drain damage
      */
-    get success(): boolean {
+    override get success(): boolean {
         return this.data.modifiedDrain.value <= 0;
     }
 
-    get successLabel(): string {
+    override get successLabel(): string {
         return 'SR5.ResistedAllDamage';
     }
 
-    get failureLabel(): string {
+    override get failureLabel(): string {
         return 'SR5.ResistedSomeDamage'
     }
 
-    async processResults() {
+    override async processResults() {
         // Don't use incomingDrain as it might have a user value override applied.
         this.data.modifiedDrain = DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
 

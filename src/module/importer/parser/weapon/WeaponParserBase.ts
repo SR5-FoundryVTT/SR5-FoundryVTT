@@ -47,7 +47,7 @@ export abstract class WeaponParserBase extends TechnologyItemParserBase<WeaponIt
         }
     }
 
-    public Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+    public override Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         item = super.Parse(jsonData, item, jsonTranslation);
 
         let category = ImportHelper.StringValue(jsonData, 'category');

@@ -14,7 +14,7 @@ export class SpritePowerParser extends ItemParserBase<Shadowrun.SpritePowerItemD
         else return '';
     }
 
-    public Parse(chummerData: object, itemData: Shadowrun.SpritePowerItemData, dataTranslation?: object): Shadowrun.SpritePowerItemData {
+    public override Parse(chummerData: object, itemData: Shadowrun.SpritePowerItemData, dataTranslation?: object): Shadowrun.SpritePowerItemData {
         itemData = super.Parse(chummerData, itemData, dataTranslation);
 
         // Chummer has camel case for action, system uses lowercase for type. ('Complex' => 'complex', ...)

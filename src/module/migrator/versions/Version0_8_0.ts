@@ -23,7 +23,7 @@ export class Version0_8_0 extends VersionMigration {
         return "0.8.0";
     }
 
-    protected async ShouldMigrateItemData(data: ShadowrunItemData) {
+    protected override async ShouldMigrateItemData(data: ShadowrunItemData) {
         return this._ShouldMigrateItemData(data);
     }
 
@@ -31,16 +31,16 @@ export class Version0_8_0 extends VersionMigration {
         return ['weapon', 'spell'].includes(data.type);
     }
 
-    protected async ShouldMigrateSceneData(scene: Scene) {
+    protected override async ShouldMigrateSceneData(scene: Scene) {
         return scene.tokens.size > 0;
     }
 
-    protected async ShouldMigrateActorData(data: ShadowrunActorData) {
+    protected override async ShouldMigrateActorData(data: ShadowrunActorData) {
         // @ts-ignore
         return data.items.contents.filter(i => this._ShouldMigrateItemData(i.data)).length > 0;
     }
 
-    protected async MigrateItemData(data: ShadowrunItemData) {
+    protected override async MigrateItemData(data: ShadowrunItemData) {
         const updateData: {
             data?: object
         } = {};
@@ -50,7 +50,7 @@ export class Version0_8_0 extends VersionMigration {
         return updateData;
     }
 
-    protected async MigrateActorData(data: ShadowrunActorData) {
+    protected override async MigrateActorData(data: ShadowrunActorData) {
         let updateData: {
             data?: object,
             items?: object[]

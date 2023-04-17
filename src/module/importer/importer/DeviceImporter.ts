@@ -121,7 +121,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
 
     /* List of unsupported Commlinks, due to dynamics value calculations.
      */
-    static unsupportedEntry(jsonData): boolean {
+    static override unsupportedEntry(jsonData): boolean {
         if (DataImporter.unsupportedEntry(jsonData)) {
             return true;
         }

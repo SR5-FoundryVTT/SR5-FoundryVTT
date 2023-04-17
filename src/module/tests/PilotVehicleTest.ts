@@ -7,7 +7,7 @@ export class PilotVehicleTest extends SuccessTest {
      * @param item The testing item to cast
      * @param actor The vehicle actor to be casting with
      */
-    static async _getDocumentTestAction(item, actor) {
+    static override async _getDocumentTestAction(item, actor) {
         // Both item and actor are needed to determine what to roll.
         if (!item || !actor) return {};
 

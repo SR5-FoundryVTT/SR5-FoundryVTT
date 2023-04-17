@@ -7,7 +7,7 @@ export class KnowledgeSkillEditSheet extends LanguageSkillEditSheet {
         super(actor, options, skillId);
         this.category = category;
     }
-    _updateString() {
+    override _updateString() {
         return `system.skills.knowledge.${this.category}.value.${this.skillId}`;
     }
 }

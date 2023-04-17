@@ -10,9 +10,9 @@ export interface MeleeAttackData extends SuccessTestData {
 }
 
 export class MeleeAttackTest extends SuccessTest {
-    data: MeleeAttackData;
+    override data: MeleeAttackData;
 
-    _prepareData(data, options): any {
+    override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
         data.damage = data.damage || DataDefaults.damageData();
@@ -23,23 +23,23 @@ export class MeleeAttackTest extends SuccessTest {
     /**
      * This test type can't be extended.
      */
-    get canBeExtended() {
+    override get canBeExtended() {
         return false;
     }
 
-     get testModifiers(): ModifierTypes[] {
+     override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'environmental'];
     }
 
-     get _dialogTemplate(): string {
+     override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.html';
     }
 
-    get showSuccessLabel(): boolean {
+    override get showSuccessLabel(): boolean {
         return this.success;
     }
 
-    async prepareDocumentData() {
+    override async prepareDocumentData() {
         if (!this.item || !this.item.isMeleeWeapon) return;
 
         this.data.reach = this.item.getReach();
@@ -55,7 +55,7 @@ export class MeleeAttackTest extends SuccessTest {
      * @param actor 
      * @param type 
      */
-    prepareActorModifier(actor: SR5Actor, type: ModifierTypes): { name: string; value: number; } {
+    override prepareActorModifier(actor: SR5Actor, type: ModifierTypes): { name: string; value: number; } {
         if (type !== 'environmental') return super.prepareActorModifier(actor, type);
 
         // Only light and visibility apply.

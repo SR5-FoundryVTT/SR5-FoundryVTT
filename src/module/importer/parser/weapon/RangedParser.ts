@@ -41,7 +41,7 @@ export class RangedParser extends WeaponParserBase {
         return match !== undefined ? parseInt(match) : 0;
     }
 
-    Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+    override Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         item = super.Parse(jsonData, item, jsonTranslation);
 
         // Some new weapons don't have any rc defined in XML.

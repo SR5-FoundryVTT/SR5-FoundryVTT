@@ -9,7 +9,7 @@ export class DamageApplicationDialog extends FormDialog {
         super(dialogData, options);
     }
 
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'damage-application';
         // TODO: Class Dialog here is needed for dialog button styling.

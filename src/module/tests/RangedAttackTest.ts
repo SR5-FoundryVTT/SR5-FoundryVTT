@@ -34,10 +34,10 @@ export interface RangedAttackTestData extends SuccessTestData {
  * TODO: Move rules into CombatRules
  */
 export class RangedAttackTest extends SuccessTest {
-    public data: RangedAttackTestData;
-    public item: SR5Item;
+    public override data: RangedAttackTestData;
+    public override item: SR5Item;
 
-    _prepareData(data, options): RangedAttackTestData {
+    override _prepareData(data, options): RangedAttackTestData {
         data = super._prepareData(data, options);
 
         data.fireModes = [];
@@ -51,7 +51,7 @@ export class RangedAttackTest extends SuccessTest {
         return data;
     }
 
-    _testDialogListeners() {
+    override _testDialogListeners() {
         return [{
             query: '#reset-progressive-recoil',
             on: 'click',
@@ -77,11 +77,11 @@ export class RangedAttackTest extends SuccessTest {
     /**
      * This test type can't be extended.
      */
-    get canBeExtended() {
+    override get canBeExtended() {
         return false;
     }
 
-    get showSuccessLabel(): boolean {
+    override get showSuccessLabel(): boolean {
         return this.success;
     }
 
@@ -176,11 +176,11 @@ export class RangedAttackTest extends SuccessTest {
         this.data.range = modifiers.environmental.applied.active.range || this.data.targetRanges[0].range.modifier;
     }
 
-    get testModifiers(): ModifierTypes[] {
+    override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'environmental', 'recoil'];
     }
 
-    async prepareDocumentData(){
+    override async prepareDocumentData(){
         await this._prepareWeaponRanges();
         await this._prepareTargetRanges();
         this._prepareFireMode();
@@ -188,19 +188,19 @@ export class RangedAttackTest extends SuccessTest {
         await super.prepareDocumentData();
     }
 
-    get _dialogTemplate(): string {
+    override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html';
     }
 
     /**
      * If a supression fire mode is used, ignore action opposed test configuration.
      */
-    get _opposedTestClass() {
+    override get _opposedTestClass() {
         if (this.data.fireMode.suppression) return TestCreator._getTestClass(SR5.supressionDefenseTest);
         return super._opposedTestClass;
     }
 
-    async saveUserSelectionAfterDialog() {
+    override async saveUserSelectionAfterDialog() {
         if (!this.item) return;
 
         // Store for next usage.
@@ -217,7 +217,7 @@ export class RangedAttackTest extends SuccessTest {
         await this.actor.setSituationModifiers(modifiers);
     }
 
-    prepareBaseValues() {
+    override prepareBaseValues() {
         if (!this.actor) return;
         if (!this.item) return;
 
@@ -264,7 +264,7 @@ export class RangedAttackTest extends SuccessTest {
      * NOTE: In this case it's only checked if at least ONE bullet exists.
      *       It's done this way as no matter the fire mode, you can fire it.
      */
-    canConsumeDocumentRessources() {
+    override canConsumeDocumentRessources() {
         if (!this.item.isRangedWeapon) return true;
         
         // Ammo consumption
@@ -283,7 +283,7 @@ export class RangedAttackTest extends SuccessTest {
      * Ranged Attacks not only can consume edge but also reduce ammunition.
      * 
      */
-    async consumeDocumentRessources() {        
+    override async consumeDocumentRessources() {        
         if (!await super.consumeDocumentRessources()) return false;
         if (!await this.consumeWeaponAmmo()) return false;
 
@@ -311,7 +311,7 @@ export class RangedAttackTest extends SuccessTest {
         return true;
     }
 
-    async processResults() {
+    override async processResults() {
         super.processResults();
 
         await this.markActionPhaseAsAttackUsed();

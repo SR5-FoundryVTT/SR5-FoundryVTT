@@ -5,7 +5,7 @@ import { BaseGearParser } from "./BaseGearParser"
  */
 export class DeviceParser extends BaseGearParser {
    
-    parse(chummerGear : any) : any {
+    override parse(chummerGear : any) : any {
         const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'device';
         parsedGear.system.technology.rating = chummerGear.devicerating;

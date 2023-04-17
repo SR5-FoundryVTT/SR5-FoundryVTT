@@ -46,7 +46,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         });
     }
 
-    async close() {
+    override async close() {
         await super.close();
 
         if (this.canceled) {
@@ -55,14 +55,14 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         }
     }
 
-    activateListeners(html: JQuery) {
+    override activateListeners(html: JQuery) {
         super.activateListeners(html);
 
         html.on("change", "input,select,textarea", this._onChangeInput.bind(this));
     }
 
 
-    async submit(button) {
+    override async submit(button) {
         this.selectedButton = button.name ?? button.label;
 
         this.applyFormData();
@@ -174,7 +174,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
     /**
      * See FormApplication._renderInner
      */
-    async _renderInner(data): Promise<JQuery<HTMLElement>> {
+    override async _renderInner(data): Promise<JQuery<HTMLElement>> {
         const templatePath = data.templatePath || this.templateContent;
         if (templatePath)
             data.content = await renderTemplate(data.templatePath || this.templateContent,

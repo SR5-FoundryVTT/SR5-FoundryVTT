@@ -28,9 +28,9 @@ export interface PhysicalResistTestData extends SuccessTestData {
  * Physical resist specifically handles physical damage dealt by ranged, melee and physical spell attacks.
  */
 export class PhysicalResistTest extends SuccessTest {
-    data: PhysicalResistTestData
+    override data: PhysicalResistTestData
 
-    _prepareData(data, options): any {
+    override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
         // Get incoming damage from test before or default.
@@ -40,33 +40,33 @@ export class PhysicalResistTest extends SuccessTest {
         return data;
     }
 
-    get _chatMessageTemplate() {
+    override get _chatMessageTemplate() {
         return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
     }
 
-    get _dialogTemplate(): string {
+    override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-resist-test-dialog.html';
     }
 
     /**
      * This test type can't be extended.
      */
-    get canBeExtended() {
+    override get canBeExtended() {
         return false;
     }
 
-    static _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
             'attribute': 'body',
             'armor': true
         };
     }
 
-    get testModifiers(): ModifierTypes[] {
+    override get testModifiers(): ModifierTypes[] {
         return ['soak'];
     }
 
-    applyPoolModifiers() {
+    override applyPoolModifiers() {
         super.applyPoolModifiers();
         this.applyArmorPoolModifier();
     }
@@ -83,7 +83,7 @@ export class PhysicalResistTest extends SuccessTest {
         }
     }
 
-    calculateBaseValues() {
+    override calculateBaseValues() {
         super.calculateBaseValues();
 
         // Calculate damage values in case of user dialog interaction.
@@ -103,26 +103,26 @@ export class PhysicalResistTest extends SuccessTest {
         Helpers.calcTotal(this.data.modifiedDamage.ap);
     }
 
-    get canSucceed() {
+    override get canSucceed() {
         return true;
     }
 
     /**
      * Resist Test success means ALL damage has been soaked.
      */
-    get success() {
+    override get success() {
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
-    get successLabel() {
+    override get successLabel() {
         return 'SR5.ResistedAllDamage';
     }
 
-    get failureLabel() {
+    override get failureLabel() {
         return 'SR5.ResistedSomeDamage';
     }
 
-    async processResults() {
+    override async processResults() {
         await super.processResults();
 
         if (!this.actor) return;

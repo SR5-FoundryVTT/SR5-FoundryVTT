@@ -15,12 +15,12 @@ export interface AttributeOnlyTestData extends SuccessTestData {
  * Main difference is the user ability to change attributes before rolling dice.
  */
 export class AttributeOnlyTest extends SuccessTest {
-    data: AttributeOnlyTestData
+    override data: AttributeOnlyTestData
 
-    get _dialogTemplate() {
+    override get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/attribute-only-test-dialog.html';
     }
-    _prepareData(data, options): any {
+    override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
         // Preset attribute selection with action attributes.
@@ -30,7 +30,7 @@ export class AttributeOnlyTest extends SuccessTest {
         return data;
     }
 
-    prepareBaseValues() {
+    override prepareBaseValues() {
         this.prepareAttributeSelection();
 
         super.prepareBaseValues();

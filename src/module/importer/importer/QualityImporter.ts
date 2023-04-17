@@ -5,8 +5,8 @@ import QualityItemData = Shadowrun.QualityItemData;
 import {Helpers} from "../../helpers";
 
 export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.QualityData> {
-    public categoryTranslations: any;
-    public itemTranslations: any;
+    public override categoryTranslations: any;
+    public override itemTranslations: any;
     public files = ['qualities.xml'];
 
     CanParse(jsonObject: object): boolean {

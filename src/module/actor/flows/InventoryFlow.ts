@@ -8,27 +8,27 @@ import {SR5Item} from "../../item/SR5Item";
 /**
  * Handle all inventory related actions on an SR5Actor'.
  *
- * An inventory can store a set of items on a document, without actually altering the
+ * An inventory can store a set of items on an actor, without actually altering the
  * itemData directly, only going through the documentData and indirectly referencing the item.
  *
- * It expects the document to define a defaultInventory field of type InventoryData, which
+ * It expects the actor to define a defaultInventory field of type InventoryData, which
  * is where all items without an inventory will be placed. This default inventory won't be
- * stored on the document. This allows for the inventory system to be drop in, without any
+ * stored on the actor. This allows for the inventory system to be drop in, without any
  * migration needed.
  * 
- * Furthermore a default Inventory (document.allInventories) exists on all inventory actors
+ * Furthermore a default Inventory (actor.allInventories) exists on all inventory actors
  * that has showAll set to true. An item can either be on no inventory, one custom inventory
  * or this allInventories, which will let it appear on all inventories.
  */
 export class InventoryFlow {
-    document: SR5Actor;
+    actor: SR5Actor;
 
-    constructor(document: SR5Actor) {
+    constructor(actor: SR5Actor) {
         //@ts-ignore // TODO: foundry-vtt-types v10
-        if (document.system.inventories === undefined)
+        if (actor.system.inventories === undefined)
             console.error('Shawdorun 5e | Actor given does not have a inventory data structure. You will experience bugs.');
 
-        this.document = document;
+        this.actor = actor;
     }
 
     /**
@@ -44,7 +44,7 @@ export class InventoryFlow {
 
         if (name.length === 0) return console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
         if (this.exists(name)) return ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
-        if (this.document.defaultInventory.name === name) return;
+        if (this.actor.defaultInventory.name === name) return;
 
         const updateData = {
             'system.inventories': {
@@ -58,7 +58,7 @@ export class InventoryFlow {
 
         console.log(`Shadowrun 5e | Executing update to create inventory`, updateData)
         // Don't render to allow sheets to manage switching inventories.
-        await this.document.update(updateData, {render: false});
+        await this.actor.update(updateData, {render: false});
 
         return name;
     }
@@ -69,7 +69,7 @@ export class InventoryFlow {
      * @param name The inventory name to be removed.
      * @param moveTo The inventory name items need to moved over to, otherwise the default inventory.
      */
-    async remove(name: string, moveTo: string = this.document.defaultInventory.name) {
+    async remove(name: string, moveTo: string = this.actor.defaultInventory.name) {
         console.log(`Shadowrun 5e | Removing inventory ${name}. Moving items over to ${moveTo}`);
 
         if (this.disallowRemove(name))
@@ -80,25 +80,25 @@ export class InventoryFlow {
 
         // Move items over to default in case of missing target inventory.
         if (!this.exists(moveTo))
-            moveTo = this.document.defaultInventory.name;
+            moveTo = this.actor.defaultInventory.name;
 
         // Prepare deletion of inventory.
         const updateData = Helpers.getDeleteKeyUpdateData('system.inventories', name);
 
         // Default inventory is virtual, so only none default inventories need to have their items merged.
-        if (this.document.defaultInventory.name !== moveTo) {
+        if (this.actor.defaultInventory.name !== moveTo) {
             // @ts-ignore
             updateData[`system.inventories.${moveTo}.itemIds`] = [
                 //@ts-ignore // TODO: foundry-vtt-types v10
-                ...this.document.system.inventories[name].itemIds,
+                ...this.actor.system.inventories[name].itemIds,
                 //@ts-ignore // TODO: foundry-vtt-types v10
-                ...this.document.system.inventories[moveTo].itemIds
+                ...this.actor.system.inventories[moveTo].itemIds
             ];
         }
 
         console.log(`Shadowrun 5e | Executing update to remove inventory`, updateData);
         // Don't render to allow sheets to manage switching inventories.
-        await this.document.update(updateData, {render: false});
+        await this.actor.update(updateData, {render: false});
     }
 
         /**
@@ -110,7 +110,7 @@ export class InventoryFlow {
      */
     exists(name): boolean {
         //@ts-ignore // TODO: foundry-vtt-types v10
-        return name === Object.keys(this.document.system.inventories)
+        return name === Object.keys(this.actor.system.inventories)
                             .find(inventory => inventory.toLowerCase() === name.toLowerCase());
     }
 
@@ -121,7 +121,7 @@ export class InventoryFlow {
      */
     getOne(name): InventoryData | undefined {
         //@ts-ignore // TODO: foundry-vtt-types v10
-        return this.document.system.inventories[name];
+        return this.actor.system.inventories[name];
     }
 
     /**
@@ -129,7 +129,7 @@ export class InventoryFlow {
      */
     getAll(): InventoriesData {
         //@ts-ignore // TODO: foundry-vtt-types v10
-        return this.document.system.inventories;
+        return this.actor.system.inventories;
     }
 
     /**
@@ -148,7 +148,7 @@ export class InventoryFlow {
         newName = InventoryFlow._sanitzeName(newName);
 
         if (newName.length === 0) return console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
-        if (this.document.defaultInventory.name === current) return;
+        if (this.actor.defaultInventory.name === current) return;
         if (current === newName) return;
 
         const inventory = this.getOne(current);
@@ -167,7 +167,7 @@ export class InventoryFlow {
 
         console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
         // Don't render to allow sheets to manage switching inventories.
-        await this.document.update(updateData, {render: false});
+        await this.actor.update(updateData, {render: false});
 
         return newName;
     }
@@ -175,15 +175,15 @@ export class InventoryFlow {
     /**
      * Add an array of items to the given inventory.
      *
-     * @param name The inventory to add the items to.
+     * @param inventoryName The inventory to add the items to.
      * @param items The items in question. A single item can be given.
      * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
      */
-    async addItems(name: string, items: SR5Item[] | SR5Item, removeFromCurrent: boolean = true) {
-        console.log(`Shadowrun 5e | Adding items to to inventory ${name}`, items);
+    async addItems(inventoryName: string, items: SR5Item[] | SR5Item, removeFromCurrent: boolean = true) {
+        console.log(`Shadowrun 5e | Adding items to to inventory ${inventoryName}`, items);
 
         // Default inventory is valid target here.
-        if (this.document.defaultInventory.name !== name && !this.exists(name)) return;
+        if (this.actor.defaultInventory.name !== inventoryName && !this.exists(inventoryName)) return;
         if (items instanceof SR5Item) items = [items];
         if (items.length === 0) return;
 
@@ -193,18 +193,18 @@ export class InventoryFlow {
         }
 
         // Default inventory is no actual inventory that needs to be added to.
-        if (this.document.defaultInventory.name === name) return;
+        if (this.actor.defaultInventory.name === inventoryName) return;
 
         for (const item of items) {
             //@ts-ignore // TODO: foundry-vtt-types v10
-            if (item.id) this.document.system.inventories[name].itemIds.push(item.id);
+            if (item.id) this.actor.system.inventories[inventoryName].itemIds.push(item.id);
         }
 
         //@ts-ignore // TODO: foundry-vtt-types v10
-        const updateData = {[`system.inventories.${name}.itemIds`]: this.document.system.inventories[name].itemIds};
+        const updateData = {[`system.inventories.${inventoryName}.itemIds`]: this.actor.system.inventories[inventoryName].itemIds};
 
         console.log(`Shadowrun 5e | Executing adding items to inventory`, updateData);
-        await this.document.update(updateData);
+        await this.actor.update(updateData);
     }
 
      /**
@@ -214,18 +214,18 @@ export class InventoryFlow {
      * @param name The one inventory to remove it from. If empty, will search for inventory the item is in.
      */
     async removeItem(item: SR5Item, name?: string) {
-        console.log(`Shadowrun 5e | Removing item from inventory (${name || this.document.defaultInventory.name})`, item);
+        console.log(`Shadowrun 5e | Removing item from inventory (${name || this.actor.defaultInventory.name})`, item);
 
         // The default inventory is not actual inventory.
-        if (this.document.defaultInventory.name === name) return;
+        if (this.actor.defaultInventory.name === name) return;
 
         // Collect affected inventories.
         //@ts-ignore // TODO: foundry-vtt-types v10
         const inventories: InventoryData[] = name ?
             //@ts-ignore // TODO: foundry-vtt-types v10
-            [this.document.system.inventories[name]] :
+            [this.actor.system.inventories[name]] :
             //@ts-ignore // TODO: foundry-vtt-types v10
-            Object.values(this.document.system.inventories).filter(({itemIds}) => itemIds.includes(item.id as string));
+            Object.values(this.actor.system.inventories).filter(({itemIds}) => itemIds.includes(item.id as string));
 
         // No inventory found means, it's in the default inventory and no removal is needed.
         if (inventories.length === 0) return;
@@ -238,7 +238,7 @@ export class InventoryFlow {
         }
 
         console.log(`Shadowrun 5e | Executing update to remove item`, updateData);
-        if (updateData) await this.document.update(updateData);
+        if (updateData) await this.actor.update(updateData);
     }
 
     /**
@@ -258,7 +258,7 @@ export class InventoryFlow {
     disallowRename(name: string): boolean {
         // Sanitize falsy by disallowing
         if (!name) return true;
-        return [this.document.defaultInventory.name, this.document.allInventories.name].includes(name);
+        return [this.actor.defaultInventory.name, this.actor.allInventories.name].includes(name);
     }
 
     /**
@@ -270,6 +270,6 @@ export class InventoryFlow {
     disallowRemove(name: string): boolean {
         // Sanitize falsy by disallowing
         if (!name) return true;
-        return [this.document.defaultInventory.name, this.document.allInventories.name].includes(name);
+        return [this.actor.defaultInventory.name, this.actor.allInventories.name].includes(name);
     }
 }

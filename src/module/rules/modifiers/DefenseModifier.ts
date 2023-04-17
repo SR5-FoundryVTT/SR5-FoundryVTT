@@ -11,7 +11,7 @@ export class DefenseModifier extends SituationModifier {
     /**
      * Defense modifier is a legacy modifier but can differ based set actor modifiers
      */
-    static get hasSourceData() {
+    static override get hasSourceData() {
         return false;
     }
 
@@ -19,7 +19,7 @@ export class DefenseModifier extends SituationModifier {
      * Depending on the test context additional defense modifiers might apply
      * 
      */
-    _calcActiveTotal(options:SituationalModifierApplyOptions): number {
+    override _calcActiveTotal(options:SituationalModifierApplyOptions): number {
         if (!this.modifiers || !this.modifiers.documentIsActor) return 0;
         
         const actor = this.modifiers.document as SR5Actor;

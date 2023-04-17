@@ -29,7 +29,7 @@ export class Import extends Application {
         this.collectDataImporterFileSupport();
     }
 
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'chummer-data-import';
         options.classes = ['app', 'window-app', 'filepicker'];
@@ -40,7 +40,7 @@ export class Import extends Application {
         return options;
     }
 
-    getData(options?: any) {
+    override getData(options?: any) {
         const data = super.getData(options) as any;
 
         data.dataFiles = {};
@@ -126,7 +126,7 @@ export class Import extends Application {
         return file.name.match(pattern) !== null;
     };
 
-    activateListeners(html) {
+    override activateListeners(html) {
         html.find("button[type='submit']").on('click', async (event) => {
             event.preventDefault();
 

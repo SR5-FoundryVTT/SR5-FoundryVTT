@@ -4,7 +4,7 @@ import { ItemParserBase } from '../item/ItemParserBase';
 import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 
 export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData> {
-    public Parse(jsonData: object, item: CritterPowerItemData, jsonTranslation?: object): CritterPowerItemData {
+    public override Parse(jsonData: object, item: CritterPowerItemData, jsonTranslation?: object): CritterPowerItemData {
         // @ts-ignore // TODO: Foundry Where is my foundry base data?
         item.name = ImportHelper.StringValue(jsonData, 'name');
 

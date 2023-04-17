@@ -17,7 +17,7 @@ export interface SkillTestData extends SuccessTestData {
  * Rule wise a skill test doesn't alter a default success test.
  */
 export class SkillTest extends SuccessTest {
-    data: SkillTestData
+    override data: SkillTestData
     lastUsedAttribute: string;
 
     constructor(data, documents, options) {
@@ -26,19 +26,19 @@ export class SkillTest extends SuccessTest {
         this.lastUsedAttribute = this.data.attribute;
     }
 
-    get _dialogTemplate() {
+    override get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.html';
     }
 
     /**
      * Show skill label as title instead of the generic success test label.
      */
-    get title() {
+    override get title() {
         if (!this.actor) return super.title;
         return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill))} ${game.i18n.localize('SR5.Test')}`;
     }
 
-    _prepareData(data: any, options: TestOptions) {
+    override _prepareData(data: any, options: TestOptions) {
         data = super._prepareData(data, options);
 
         // Preselect attribute based on action.
@@ -48,7 +48,7 @@ export class SkillTest extends SuccessTest {
         return data;
     }
 
-    prepareBaseValues() {
+    override prepareBaseValues() {
         this.prepareAttributeSelection();
         this.prepareLimitSelection();
 

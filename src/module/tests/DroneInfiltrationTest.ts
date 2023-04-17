@@ -1,7 +1,7 @@
 import {SuccessTest} from "./SuccessTest";
 
 export class DroneInfiltrationTest extends SuccessTest {
-    static async _getDocumentTestAction(item, actor) {
+    static override async _getDocumentTestAction(item, actor) {
         // Both item and actor are needed to determine what to roll.
         if (!item || !actor) return {};
 

@@ -17,9 +17,9 @@ export interface ComplexFormTestData extends SuccessTestData {
  * Handles threading complex forms as described on SR5#251.
  */
 export class ComplexFormTest extends SuccessTest {
-    data: ComplexFormTestData
+    override data: ComplexFormTestData
 
-    _prepareData(data, options): any {
+    override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
         data.level =  data.level || 0;
@@ -29,22 +29,22 @@ export class ComplexFormTest extends SuccessTest {
         return data;
     }
 
-    get _dialogTemplate()  {
+    override get _dialogTemplate()  {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/complexform-test-dialog.html';
     }
 
-    get _chatMessageTemplate(): string {
+    override get _chatMessageTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/rolls/complexform-test-message.html';
     }
 
     /**
      * This test type can't be extended.
      */
-    get canBeExtended() {
+    override get canBeExtended() {
         return false;
     }
 
-    static _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
             skill: 'software',
             attribute: 'resonance'
@@ -52,11 +52,11 @@ export class ComplexFormTest extends SuccessTest {
     }
 
     // TODO: Add missing modifiers (gitter) // SR5#251
-    get testModifiers(): ModifierTypes[] {
+    override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'noise'];
     }
 
-    async prepareDocumentData() {
+    override async prepareDocumentData() {
         this.prepareInitialLevelValue();
         await super.prepareDocumentData();
     }
@@ -72,7 +72,7 @@ export class ComplexFormTest extends SuccessTest {
         this.data.level = lastUsedLevel.value || suggestedLevel;
     }
 
-    prepareBaseValues() {
+    override prepareBaseValues() {
         super.prepareBaseValues();
         this.prepareLevelValue();
         this.prepareLimitValue();
@@ -97,7 +97,7 @@ export class ComplexFormTest extends SuccessTest {
         )
     }
 
-    calculateBaseValues() {
+    override calculateBaseValues() {
         super.calculateBaseValues();
         this.calculateFadeValue();
     }
@@ -117,13 +117,13 @@ export class ComplexFormTest extends SuccessTest {
         this.data.fadeDamage = FadeRules.calcFadeDamage(fade, this.hits.value, resonance);
     }
 
-    async processResults() {
+    override async processResults() {
         this.calculateFadeDamage();
 
         await super.processResults();
     }
 
-    async afterTestComplete() {
+    override async afterTestComplete() {
         await this.saveLastUsedLevel();
 
         await super.afterTestComplete();

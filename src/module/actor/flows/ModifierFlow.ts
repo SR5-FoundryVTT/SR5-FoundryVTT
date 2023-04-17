@@ -23,10 +23,10 @@ export interface ModifierFlowOptions {
  */
 export class ModifierFlow {
     // The actor document to retrieve modifiers for.
-    document: SR5Actor;
+    actor: SR5Actor;
 
-    constructor(document: SR5Actor) {
-        this.document = document;
+    constructor(actor: SR5Actor) {
+        this.actor = actor;
     }
 
     /**
@@ -41,18 +41,18 @@ export class ModifierFlow {
         if (this[name] !== undefined) return this[name];
 
         // Get global modifiers that can come from the general modifier system.
-        const modifiers = this.document.getSituationModifiers(options);
+        const modifiers = this.actor.getSituationModifiers(options);
         //@ts-ignore
         if (modifiers.handlesTotalFor(name)) return modifiers.getTotalFor(name, options);
 
         // Get global modifiers that come from the legacy actor modifier system.
-        return Number(this.document.system.modifiers[name] ?? 0);
+        return Number(this.actor.system.modifiers[name] ?? 0);
     }
 
     /**
      * Translate simple modifier type string to the differently named actor / document method.
      */
     get wounds(): number {
-        return this.document.getWoundModifier();
+        return this.actor.getWoundModifier();
     }
 }
