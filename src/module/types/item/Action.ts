@@ -78,9 +78,7 @@ declare namespace Shadowrun {
     export interface DamageData extends ModifiableValueLinked {
         type: BaseValuePair<DamageType>;
         element: BaseValuePair<DamageElement>;
-        ap: ModifiableValue;
-        // See config.actionDamageFormulaOperators for operator mapping.
-        base_formula_operator: FormulaOperator;
+        ap: ModifiableValueLinked;
         source?: DamageSource;
     }
 

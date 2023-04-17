@@ -35,7 +35,7 @@ export class PhysicalResistTest extends SuccessTest {
 
         // Get incoming damage from test before or default.
         data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.damageData());
-        data.modifiedDamage = duplicate(data.incomingDamage);
+        data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
 
         return data;
     }
