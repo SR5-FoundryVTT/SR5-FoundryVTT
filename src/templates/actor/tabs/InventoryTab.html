@@ -32,29 +32,38 @@
                         <i class="item-icon fas fa-plus"></i>
                         {{localize "SR5.Add"}}
                     </a>
+                    <a class="inventory-collapse" title="{{localize 'SR5.CollapseAll'}}">
+                        <i class="item-icon fas fa-chevrons-up"></i>
+                    </a>
+                    <a class="inventory-expand" title="{{localize 'SR5.ExpandAll'}}">
+                        <i class="item-icon fas fa-chevrons-down"></i>
+                    </a>
                 </div>
             </div>
         </div>
         <div class="scroll-area">
             {{#each inventory.types as |section type|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                        itemCssClass=(ift (not section.isOpen) 'faded')
                         name=(localize section.label)
                         itemId=section.type
-                        icons=(ItemHeaderIcons section.type)
+                        icons=(InventoryHeaderIcons section)
                         rightSide=(ItemHeaderRightSide section.type)
                 }}
-                {{#each section.items}}
-                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                            img=this.img
-                            name=this.name
-                            itemId=this._id
-                            icons=(InventoryItemIcons this)
-                            rightSide=(ItemRightSide this)
-                            hasDesc="true"
-                            hasRoll="true"
-                            description=this.description.value
-                    }}
-                {{/each}}
+                {{#if section.isOpen }}
+                    {{#each section.items}}
+                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                                img=this.img
+                                name=this.name
+                                itemId=this._id
+                                icons=(InventoryItemIcons this)
+                                rightSide=(ItemRightSide this)
+                                hasDesc="true"
+                                hasRoll="true"
+                                description=this.description.value
+                        }}
+                    {{/each}}
+                {{/if}}
             {{/each}}
         </div>
     </div>
