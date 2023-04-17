@@ -67,8 +67,8 @@ export const ChatData = {
                 const { damage } = system.action;
                 let damageString = '';
                 let elementString = '';
-                const operator = SR5.actionDamageFormulaOperators[damage.base_formula_operator] ?? '';
-                const attribute = damage.attribute ? `${game.i18n.localize(SR5.attributes[damage.attribute])} ${operator} ` : '';
+                let operator = SR5.actionDamageFormulaOperators[damage.base_formula_operator] ?? '';
+                let attribute = damage.attribute ? `${game.i18n.localize(SR5.attributes[damage.attribute])} ${operator} ` : '';
                 if (damage.value || attribute) {
                     const type = damage.type.value ? damage.type.value.toUpperCase().charAt(0) : '';
                     damageString = `DV ${attribute}${damage.value}${type}`;
@@ -87,7 +87,13 @@ export const ChatData = {
                 }
                 if (damageString) props.push(damageString);
                 if (elementString) props.push(elementString);
-                if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
+
+                const ap = damage.ap;
+                operator = SR5.actionDamageFormulaOperators[ap.base_formula_operator] ?? '';
+                attribute = ap.attribute ? `${game.i18n.localize(SR5.attributes[ap.attribute])} ${operator} ` : '';
+                if (ap.value || attribute) {
+                    props.push(`AP ${attribute}${damage.ap.value}`);
+                }
             }
         }
     },
@@ -180,6 +186,7 @@ export const ChatData = {
     },
 
     equipment: (system, labels, props) => {
+        ChatData.action(system, labels, props);
         if (system.technology && system.technology.rating) props.push(`Rating ${system.technology.rating}`);
     },
 

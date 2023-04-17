@@ -125,6 +125,8 @@
         }
     },
     "SR5.Close": "Fermé",
+    "SR5.Collapse": "Réduire",
+    "SR5.CollapseAll": "Réduire Tout",
     "SR5.CommonProgram": "Programme courant",
     "SR5.ComplexForm": "Forme complexe",
     "SR5.ComplexForms": "Formes complexes",
@@ -349,6 +351,8 @@
         "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné"
     },
     "SR5.EssenceCost": "Essence",
+    "SR5.Expand": "Etendre",
+    "SR5.ExpandAll": "Etendre Tout",
     "SR5.Extended": "Etendu",
     "SR5.ExtendedTest": "Test étendu",
     "SR5.Fade": "Disparition",

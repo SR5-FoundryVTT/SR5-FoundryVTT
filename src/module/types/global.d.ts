@@ -31,4 +31,8 @@ declare global {
     interface DocumentClassConfig {
         sheet: FormApplication;
     }
+
+    type RecursivePartial<T> = { 
+        [P in keyof T]?: RecursivePartial<T[P]>; 
+    };
 }

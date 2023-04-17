@@ -1146,7 +1146,8 @@ export class SR5Actor extends Actor {
             attribute: skill.attribute,
             limit: {
                 base: 0, value: 0, mod: [],
-                attribute: limit
+                attribute: limit,
+                base_formula_operator: 'add',
             },
 
             test: 'SkillTest'

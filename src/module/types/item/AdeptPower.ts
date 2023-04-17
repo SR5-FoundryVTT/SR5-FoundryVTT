@@ -1,5 +1,9 @@
 declare namespace Shadowrun {
-    export interface AdeptPowerData extends AdeptPowerPartData, DescriptionPartData, ActionPartData, ArmorPartData {
+    export interface AdeptPowerData extends
+        AdeptPowerPartData,
+        DescriptionPartData,
+        ActionPartData,
+        ArmorPartData {
 
     }
 

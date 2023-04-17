@@ -102,6 +102,11 @@ export const registerBasicHelpers = () => {
         if (v1 === v2) return options.fn(this);
         else return options.inverse(this);
     });
+    // if then
+    Handlebars.registerHelper('ift', function (v1, v2) {
+        if (v1) return v2;
+    });
+
     // if empty (object, array, string)
     Handlebars.registerHelper('empty', function (value) {
         if (foundry.utils.getType(value) === 'Array') return value.length === 0;
