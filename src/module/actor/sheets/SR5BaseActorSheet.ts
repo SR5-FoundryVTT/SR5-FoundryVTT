@@ -1170,8 +1170,8 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onOpenSourceSkill(event) {
         event.preventDefault();
-        
-        const skillId = Helpers.listItemId(event);
+        const [skillId, ] = Helpers.listItemId(event).split('.');
+
         const skill = this.actor.getSkill(skillId);
         if (!skill) {
             return console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`);
