@@ -180,6 +180,7 @@ export const ChatData = {
     },
 
     equipment: (system, labels, props) => {
+        ChatData.action(system, labels, props);
         if (system.technology && system.technology.rating) props.push(`Rating ${system.technology.rating}`);
     },
 

@@ -1450,7 +1450,7 @@
             "type": "common_program"
         },
         "equipment": {
-            "templates": ["description", "technology"]
+            "templates": ["description", "action", "technology"]
         },
         "host": {
             "templates": ["description", "matrix"],
