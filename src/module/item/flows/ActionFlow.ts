@@ -19,9 +19,9 @@ export class ActionFlow {
      * @param actor The actor to use should a dynamic calculation be needed.
      * @param item
      */
-    static calcDamage(damage: DamageData, actor?: SR5Actor, item?: SR5Item): DamageData {
+    static calcDamageData(damage: DamageData, actor?: SR5Actor, item?: SR5Item): DamageData {
         // Avoid manipulation on original data, which might come from database values.
-        damage = duplicate(damage);
+        damage = foundry.utils.duplicate(damage);
 
         if (!actor) return damage;
 
@@ -29,37 +29,43 @@ export class ActionFlow {
             damage.source = ActionFlow._damageSource(actor, item);
         }
 
-        const attribute = actor.findAttribute(damage.attribute);
-        if (!attribute) return damage;
+        this._applyModifiableValue(damage, actor);
+        damage.value = Helpers.calcTotal(damage, {min: 0});
 
-        if (!damage.base_formula_operator) {
-            console.error(`Unsupported base damage formula operator: '${damage.base_formula_operator}' used. Falling back to 'add'.`);
-            damage.base_formula_operator = 'add';
+        this._applyModifiableValue(damage.ap, actor);
+        damage.ap.value = Helpers.calcTotal(damage.ap, {min: 0});
+
+        return damage;
+    }
+
+    static _applyModifiableValue(value: Shadowrun.ModifiableValueLinked, actor: SR5Actor) {
+        const attribute = actor.findAttribute(value.attribute);
+        if (!attribute) return;
+
+        if (!value.base_formula_operator) {
+            console.error(`Unsupported formula operator: '${value.base_formula_operator}' used. Falling back to 'add'.`);
+            value.base_formula_operator = 'add';
         }
 
         // Avoid altering base OR value fields and raising the resulting damage on multiple function calls.
-        switch (damage.base_formula_operator) {
+        switch (value.base_formula_operator) {
             case "add":
-                PartsList.AddUniquePart(damage.mod, attribute.label, attribute.value);
+                PartsList.AddUniquePart(value.mod, attribute.label, attribute.value);
                 break;
             case "subtract":
-                PartsList.AddUniquePart(damage.mod, attribute.label, -attribute.value);
+                PartsList.AddUniquePart(value.mod, attribute.label, -attribute.value);
                 break;
             case "multiply":
-                PartsList.AddUniquePart(damage.mod, 'SR5.Value', (damage.base * attribute.value) - damage.base);
+                PartsList.AddUniquePart(value.mod, 'SR5.Value', (value.base * attribute.value) - value.base);
                 break;
             case "divide":
                 // Remove base from value by modifying.
-                PartsList.AddUniquePart(damage.mod, 'SR5.BaseValue', damage.base * -1);
+                PartsList.AddUniquePart(value.mod, 'SR5.BaseValue', value.base * -1);
                 // Add division result as modifier on zero.
                 const denominator = attribute.value === 0 ? 1 : attribute.value;
-                PartsList.AddUniquePart(damage.mod, 'SR5.Value', Math.floor(damage.base / denominator));
+                PartsList.AddUniquePart(value.mod, 'SR5.Value', Math.floor(value.base / denominator));
                 break;
         }
-
-        damage.value = Helpers.calcTotal(damage, {min: 0});
-
-        return damage;
     }
 
     /**
