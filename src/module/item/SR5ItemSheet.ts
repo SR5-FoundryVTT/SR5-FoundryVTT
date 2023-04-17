@@ -313,11 +313,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
-        // Prepare listeners only applied to item type action
-        if (this.document.isAction()) {
-            this._createActionModifierTagify(html);
-            
-        }
+        this._activateTagifyListeners(html);        
     }
 
     async _onDrop(event) {
@@ -666,5 +662,17 @@ export class SR5ItemSheet extends ItemSheet {
         event.preventDefault();
 
         await this.item.disconnectFromNetwork();
+    }
+
+    /**
+     * Activate listeners for tagify elements for item types that allow changing action
+     * modifiers.
+     * 
+     * @param html The JQuery HTML as given by the activateListeners method.
+     */
+    _activateTagifyListeners(html) {        
+        if (!['action', 'equipment'].includes(this.document.type)) return;
+
+        this._createActionModifierTagify(html);
     }
 }
