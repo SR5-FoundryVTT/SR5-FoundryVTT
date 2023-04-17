@@ -1,6 +1,8 @@
 import SkillEditFormData = Shadowrun.SkillEditFormData;
 import {SR5Actor} from "../../actor/SR5Actor";
 import {SR5} from "../../config";
+import { SR5Item } from "../../item/SR5Item";
+import { LinksHelpers } from "../../utils/links";
 
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
@@ -43,6 +45,8 @@ export class SkillEditSheet extends DocumentSheet {
         // get skill name.
         // NOTE: This differs from the skill id, which is used to identify the skill internally.
         const name = formData['skill.name'];
+
+        const link = formData['skill.link'];
 
         // get attribute name
         const attribute = formData['skill.attribute'];
@@ -87,7 +91,8 @@ export class SkillEditSheet extends DocumentSheet {
             bonus,
             name,
             attribute,
-            canDefault
+            canDefault,
+            link
         };
 
         // Avoid re-applying active effects without actual base level changes.
@@ -110,6 +115,7 @@ export class SkillEditSheet extends DocumentSheet {
 
     activateListeners(html) {
         super.activateListeners(html);
+        $(html).find('.open-source').on('click', this._onOpenSource.bind(this));
         $(html).find('.add-spec').on('click', this._addNewSpec.bind(this));
         $(html).find('.remove-spec').on('click', this._removeSpec.bind(this));
         $(html).find('.add-bonus').on('click', this._addNewBonus.bind(this));
@@ -140,6 +146,12 @@ export class SkillEditSheet extends DocumentSheet {
                 await this.document.update(updateData);
             }
         }
+    }
+
+    async _onOpenSource(event) {
+        event.preventDefault();
+        const link = this.getData().skill.link;
+        LinksHelpers.openSource(link);
     }
 
     async _addNewSpec(event) {
