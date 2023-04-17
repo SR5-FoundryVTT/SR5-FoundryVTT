@@ -171,12 +171,13 @@ export class VehiclePrep {
 
         let speedTotal = Helpers.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
 
-        // algorithm to determine speed, CRB pg 202 table
+        // algorithm to determine speed, CRB pg 202 table.
+        // Allow ActiveEffects to apply to movement directly.
         movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
-        movement.walk.value = movement.walk.base;
+        movement.walk.value = Helpers.calcTotal(movement.walk, {min: 0});
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = movement.run.base;
+        movement.run.value = Helpers.calcTotal(movement.run, {min: 0});;
     }
 
     static prepareMeatspaceInit(system: Shadowrun.VehicleData) {

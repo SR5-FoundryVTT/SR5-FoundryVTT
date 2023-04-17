@@ -122,9 +122,12 @@ async function linkUserData() {
             throw Error('No User Data path defined in foundryconfig.json');
         }
 
-        if (!fs.existsSync(linkDir)) {
+        if (fs.existsSync(linkDir)) {
+            if (!fs.statSync(linkDir).isSymbolicLink())
+                throw Error(`${chalk.blueBright(linkDir)} is not a link. Please delete or rename folder then run ${chalk.greenBright('link')} command again`);
+        } else {
             console.log(
-                chalk.green(`Copying build to ${chalk.blueBright(linkDir)}`)
+                chalk.green(`Linking build to ${chalk.blueBright(linkDir)}`)
             );
             await fs.symlink(path.resolve('./'), linkDir);
         }
