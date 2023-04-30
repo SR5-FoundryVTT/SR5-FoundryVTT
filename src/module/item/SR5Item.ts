@@ -67,6 +67,7 @@ import { RangedWeaponRules } from "../rules/RangedWeaponRules";
  * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
+import { LinksHelpers } from '../utils/links';
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -1022,51 +1023,11 @@ export class SR5Item extends Item {
     }
 
     /**
-     * Use the items source field to open it as another browser tab.
-     * 
-     * This is meant to allow for wikis to be used as sources.
-     */
-    openSourceURL() {
-        const source = this.getSource();
-        if (source === '') {
-            ui.notifications?.error('SR5.SourceFieldEmptyError', {localize: true});
-        }
-
-        window.open(source);
-    }
-
-    /**
-     * Use the items source field to try matching it against a PDF document and display that within FoundryVTT.
-     */
-    openSourcePDF() {
-        // Check for pdfpager module hook: https://github.com/farling42/fvtt-pdf-pager
-        if (!ui['pdfpager']) {
-            ui.notifications?.warn('SR5.DIALOG.MissingModuleContent', {localize: true});
-            return;
-        }
-
-        const source = this.getSource();
-        if (source === '') {
-            ui.notifications?.error('SR5.SourceFieldEmptyError', {localize: true});
-        }
-
-        const [code, page] = source.split(' ');
-
-        //@ts-ignore
-        ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
-    }
-
-    /**
      * Use the items source field and try different means of opening it.
      */
     openSource() {
         const source = this.getSource();
-
-        if (Helpers.isURL(source)) {
-            return this.openSourceURL();
-        }
-
-        return this.openSourcePDF();
+        LinksHelpers.openSource(source);
     }
 
     _canDealDamage(): boolean {

@@ -90,6 +90,11 @@ export const registerSkillLineHelpers = () => {
             title: game.i18n.localize('SR5.EditSkill'),
             cssClass: '',
         };
+        const openSourceIcon = { 
+            icon: 'fas fa-file',
+            title: game.i18n.localize('SR5.OpenSource'),
+            cssClass: '',
+        }
         const removeIcon = {
             icon: 'fas fa-trash',
             title: game.i18n.localize('SR5.DeleteSkill'),
@@ -99,15 +104,18 @@ export const registerSkillLineHelpers = () => {
             case 'active':
                 editIcon.cssClass = 'skill-edit';
                 removeIcon.cssClass = 'remove-active'
-                return [editIcon, removeIcon];
+                openSourceIcon.cssClass = 'skill-opensource'
+                return [openSourceIcon, editIcon, removeIcon];
             case 'language':
                 editIcon.cssClass = 'language-skill-edit';
                 removeIcon.cssClass = 'remove-language';
-                return [editIcon, removeIcon];
+                openSourceIcon.cssClass = 'language-skill-opensource'
+                return [openSourceIcon, editIcon, removeIcon];
             case 'knowledge':
                 editIcon.cssClass = 'knowledge-skill-edit';
                 removeIcon.cssClass = 'remove-knowledge';
-                return [editIcon, removeIcon];
+                openSourceIcon.cssClass = 'knowledge-skill-opensource'
+                return [openSourceIcon, editIcon, removeIcon];
             default:
                 return [editIcon];
         }

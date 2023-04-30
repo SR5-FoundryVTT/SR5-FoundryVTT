@@ -17,6 +17,7 @@ import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
+import { LinksHelpers } from '../../utils/links';
 
 
 /**
@@ -317,6 +318,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
 
         // Skill CRUD handling...
+        html.find('.skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
+        html.find('.knowledge-skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
+        html.find('.language-skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
         html.find('.skill-edit').on('click', this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').on('click', this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').on('click', this._onShowEditLanguageSkill.bind(this));
@@ -1224,6 +1228,18 @@ export class SR5BaseActorSheet extends ActorSheet {
         // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
         const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
         return this.actor.rollSkill(skillId, {event, specialization: true});
+    }
+
+    async _onOpenSourceSkill(event) {
+        event.preventDefault();
+        const [skillId, ] = Helpers.listItemId(event).split('.');
+
+        const skill = this.actor.getSkill(skillId);
+        if (!skill) {
+            return console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`);
+        }
+
+        LinksHelpers.openSource(skill.link);
     }
 
     async _onShowEditSkill(event) {
