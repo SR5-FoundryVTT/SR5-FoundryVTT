@@ -19,6 +19,7 @@ declare namespace Shadowrun {
             // Optional id field not defined within template.json
             // Use to identify a skill when fetched by its label.
             id?: string
+            link: string
         };
 
     export type HasAttribute = {

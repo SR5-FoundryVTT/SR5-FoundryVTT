@@ -461,7 +461,7 @@ export const registerItemLineHelpers = () => {
         };
         const pdfIcon = {
             icon: 'fas fa-file open-source',
-            title: game.i18n.localize('SR5.OpenSourcePdf'),
+            title: game.i18n.localize('SR5.OpenSource'),
         };
 
         const icons = [pdfIcon, editIcon, removeIcon];
