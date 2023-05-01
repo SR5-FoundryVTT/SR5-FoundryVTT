@@ -9,7 +9,8 @@ export class LinksHelpers {
      * @param candidate The string that might contain a url
      * @returns true, when candidate contains a url pattern
      */
-    static isURL(candidate: string): boolean {
+    static isURL(candidate: string|undefined): boolean {
+        if (!candidate) return false;
         var urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)?(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
         var url = new RegExp(urlRegex, 'i');
         return url.test(candidate);
@@ -20,7 +21,7 @@ export class LinksHelpers {
      * 
      * This is meant to allow for wikis to be used as sources.
      */
-    static openSourceURL(source: string) {
+    static openSourceURL(source: string|undefined) {
         if (source === '') {
             ui.notifications?.error('SR5.SourceFieldEmptyError', {localize: true});
         }
@@ -31,15 +32,16 @@ export class LinksHelpers {
     /**
      * Use the items source field to try matching it against a PDF document and display that within FoundryVTT.
      */
-    static openSourcePDF(source: string) {
+    static openSourcePDF(source: string|undefined) {
         // Check for pdfpager module hook: https://github.com/farling42/fvtt-pdf-pager
         if (!ui['pdfpager']) {
             ui.notifications?.warn('SR5.DIALOG.MissingModuleContent', {localize: true});
             return;
         }
 
-        if (source === '') {
+        if (!source) {
             ui.notifications?.error('SR5.SourceFieldEmptyError', {localize: true});
+            return;
         }
 
         const [code, page] = source.split(' ');
@@ -52,8 +54,6 @@ export class LinksHelpers {
      * Use the items source field and try different means of opening it.
      */
     static openSource(source: string|undefined) {
-        if (!source) return;
-        
         if (LinksHelpers.isURL(source)) {
             LinksHelpers.openSourceURL(source);
         } else {
