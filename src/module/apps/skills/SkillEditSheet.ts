@@ -148,10 +148,12 @@ export class SkillEditSheet extends DocumentSheet {
         }
     }
 
+    /**
+     * Open a source document connected to this skill.
+     */
     async _onOpenSource(event) {
         event.preventDefault();
-        const link = this.getData().skill.link;
-        LinksHelpers.openSource(link);
+        LinksHelpers.openSource(this.getData().skill.link);
     }
 
     async _addNewSpec(event) {

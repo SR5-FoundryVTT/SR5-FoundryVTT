@@ -304,8 +304,7 @@ export class SR5ItemSheet extends ItemSheet {
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
         html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) =>
-         this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
 
@@ -313,11 +312,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
-        // Prepare listeners only applied to item type action
-        if (this.item.isAction()) {
-            this._createActionModifierTagify(html);
-            
-        }
+        this._activateTagifyListeners(html);        
     }
 
     override async _onDrop(event) {
@@ -666,5 +661,17 @@ export class SR5ItemSheet extends ItemSheet {
         event.preventDefault();
 
         await this.item.disconnectFromNetwork();
+    }
+
+    /**
+     * Activate listeners for tagify elements for item types that allow changing action
+     * modifiers.
+     * 
+     * @param html The JQuery HTML as given by the activateListeners method.
+     */
+    _activateTagifyListeners(html) {        
+        if (!['action', 'equipment'].includes(this.document.type)) return;
+
+        this._createActionModifierTagify(html);
     }
 }

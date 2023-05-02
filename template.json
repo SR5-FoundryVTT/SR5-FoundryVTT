@@ -1222,7 +1222,7 @@
                     },
                     "opposed": {
                         "type": "",
-                        "test": "OpposedTest",
+                        "test": "",
                         "attribute": "",
                         "attribute2": "",
                         "skill": "",

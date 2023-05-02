@@ -10,6 +10,7 @@ import { PartsList } from '../../parts/PartsList';
 import {SR5} from "../../config";
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import { RangedWeaponRules } from '../../rules/RangedWeaponRules';
+import { SR } from '../../constants';
 
 
 export class VehiclePrep {
@@ -28,6 +29,7 @@ export class VehiclePrep {
         AttributesPrep.prepareAttributes(system);
         VehiclePrep.prepareAttributesWithPilot(system);
         VehiclePrep.prepareAttributesWithBody(system);
+        VehiclePrep.prepareAttributeRanges(system);
         
         SkillsPrep.prepareSkills(system);
 
@@ -99,10 +101,13 @@ export class VehiclePrep {
         ];
 
         attributeIds.forEach((attId) => {
-            if (attributes[attId] !== undefined) {
-                attributes[attId].base = vehicle_stats.pilot.value;
-                AttributesPrep.calculateAttribute(attId, attributes[attId]);
-            }
+            const attribute = attributes[attId];
+            if (!attribute) return;
+
+            // Allow value to be understandable when displayed.
+            attribute.base = 0;
+            PartsList.AddUniquePart(attribute.mod, vehicle_stats.pilot.label, vehicle_stats.pilot.value);
+            AttributesPrep.calculateAttribute(attId, attribute);
         });
     }
 
@@ -113,10 +118,13 @@ export class VehiclePrep {
         const attributeIds = ['strength']
 
         attributeIds.forEach((attId) => {
-            if (attributes[attId] !== undefined) {
-                attributes[attId].base = attributes.body.value;
-                AttributesPrep.calculateAttribute(attId, attributes[attId]);
-            }
+            const attribute = attributes[attId];
+            if (!attribute) return;
+
+            // Allow value to be understandable when displayed.
+            attribute.base = 0;
+            PartsList.AddUniquePart(attribute.mod, attributes.body.label, attributes.body.value);
+            AttributesPrep.calculateAttribute(attId, attribute);
         });
     }
 
@@ -204,5 +212,19 @@ export class VehiclePrep {
         PartsList.AddUniquePart(system.values.recoil_compensation.mod, 'SR5.RecoilCompensation', recoilCompensation);
 
         Helpers.calcTotal(system.values.recoil_compensation, {min: 0});
+    }
+
+    /**
+     * Some attributes don't exist on vehicle actors.
+     * 
+     * Instead of default character range, use vehicle specific ranges.
+     * 
+     * NOTE: This is a hack around the actor type character centric preparation design still present in the system.
+     *       Times is short, perfect solutions are costly.
+     */
+    static prepareAttributeRanges(system: Shadowrun.VehicleData) {
+        const ranges = SR.actorTypeAttributes['vehicle'];
+        Helpers.calcTotal(system.attributes.strength, ranges.strength);
+        Helpers.calcTotal(system.attributes.agility, ranges.agility);
     }
 }

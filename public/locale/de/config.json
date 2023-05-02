@@ -280,6 +280,7 @@
                 "Titel": "Eintrag löschen"
         },
         "SR5.DeleteItem": "Gegenstand löschen",
+        "SR5.DeleteSkill": "Fertigkeiten löschen",
         "SR5.Description": "Beschreibung",
         "SR5.Details": "Details",
         "SR5.DetectionSpellExtended": "Erweitert",

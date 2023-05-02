@@ -24,43 +24,6 @@ import {ModifierFlow} from "./flows/ModifierFlow";
 import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
-import ActorRollOptions = Shadowrun.ActorRollOptions;
-import AttributeField = Shadowrun.AttributeField;
-import SkillRollOptions = Shadowrun.SkillRollOptions;
-import SkillField = Shadowrun.SkillField;
-import LimitField = Shadowrun.LimitField;
-import EdgeAttributeField = Shadowrun.EdgeAttributeField;
-import VehicleStat = Shadowrun.VehicleStat;
-import Attributes = Shadowrun.Attributes;
-import Limits = Shadowrun.Limits;
-import DamageData = Shadowrun.DamageData;
-import TrackType = Shadowrun.TrackType;
-import OverflowTrackType = Shadowrun.OverflowTrackType;
-import NumberOrEmpty = Shadowrun.NumberOrEmpty;
-import VehicleStats = Shadowrun.VehicleStats;
-import ActorArmorData = Shadowrun.ActorArmorData;
-import ConditionData = Shadowrun.ConditionData;
-import Skills = Shadowrun.Skills;
-import CharacterSkills = Shadowrun.CharacterSkills;
-import SpiritActorData = Shadowrun.SpiritActorData;
-import CharacterActorData = Shadowrun.CharacterActorData;
-import SpriteActorData = Shadowrun.SpriteActorData;
-import VehicleActorData = Shadowrun.VehicleActorData;
-import CritterActorData = Shadowrun.CritterActorData;
-import ICActorData = Shadowrun.ICActorData;
-import MatrixData = Shadowrun.MatrixData;
-import HostItemData = Shadowrun.HostItemData;
-import MarkedDocument = Shadowrun.MarkedDocument;
-import MatrixMarks = Shadowrun.MatrixMarks;
-import InventoryData = Shadowrun.InventoryData;
-import DamageType = Shadowrun.DamageType;
-import PackActionName = Shadowrun.PackActionName;
-import PackName = Shadowrun.PackName;
-import ActionRollData = Shadowrun.ActionRollData;
-import ActorAttribute = Shadowrun.ActorAttribute;
-import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
-import KnowledgeSkills = Shadowrun.KnowledgeSkills;
-import ShadowrunItemData= Shadowrun.ShadowrunItemData
 import { CombatRules } from '../rules/CombatRules';
 
 
@@ -80,16 +43,14 @@ import { CombatRules } from '../rules/CombatRules';
  *
  */
 export class SR5Actor extends Actor {
-    // Default inventory name and label for when no other inventory has been created.
-    defaultInventory: InventoryData = {
+    // This is the default inventory name and label for when no other inventory has been created.
+    defaultInventory: Shadowrun.InventoryData = {
         name: 'Carried',
         label: 'SR5.Labels.Inventory.Carried',
         itemIds: []
     }
-    // Catch all inventory for these use cases:
-    // - When selected show all items across all inventories.
-    // - When item is added to it, will show that item on all inventories.
-    allInventories: InventoryData = {
+    // This is a dummy inventory
+    allInventories: Shadowrun.InventoryData = {
         name: 'All',
         label: 'SR5.Labels.Inventory.All',
         itemIds: [],
@@ -100,7 +61,7 @@ export class SR5Actor extends Actor {
     tests: typeof TestCreator = TestCreator;
 
     // Add v10 type helper
-    system: ShadowrunActorDataData; // TODO: foundry-vtt-types v10
+    system: Shadowrun.ShadowrunActorDataData; // TODO: foundry-vtt-types v10
 
     // Holds all operations related to this actors inventory.
     inventory: InventoryFlow;
@@ -214,7 +175,7 @@ export class SR5Actor extends Actor {
         super.prepareDerivedData();
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
-        const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item as unknown as ShadowrunItemData));
+        const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item as unknown as Shadowrun.ShadowrunItemData));
         switch (this.type) {
             case 'character':
                 //@ts-ignore // TODO: foundry-vtt-types v10
@@ -331,7 +292,7 @@ export class SR5Actor extends Actor {
     /**
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */
-    findActiveSkill(skillName?: string): SkillField | undefined {
+    findActiveSkill(skillName?: string): Shadowrun.SkillField | undefined {
         // Check for faulty to catch empty names as well as missing parameters.
         if (!skillName) return;
 
@@ -344,14 +305,14 @@ export class SR5Actor extends Actor {
         return Object.values(skills).find(skill => skill.name === skillName);
     }
 
-    findAttribute(id?: string): AttributeField | undefined {
+    findAttribute(id?: string): Shadowrun.AttributeField | undefined {
         if (id === undefined) return;
         const attributes = this.getAttributes();
         if (!attributes) return;
         return attributes[id];
     }
 
-    findVehicleStat(statName?: string): VehicleStat | undefined {
+    findVehicleStat(statName?: string): Shadowrun.VehicleStat | undefined {
         if (statName === undefined) return;
 
         const vehicleStats = this.getVehicleStats();
@@ -359,14 +320,14 @@ export class SR5Actor extends Actor {
             return vehicleStats[statName];
     }
 
-    findLimitFromAttribute(attributeName?: string): LimitField | undefined {
+    findLimitFromAttribute(attributeName?: string): Shadowrun.LimitField | undefined {
         if (attributeName === undefined) return undefined;
         const attribute = this.findAttribute(attributeName);
         if (!attribute?.limit) return undefined;
         return this.findLimit(attribute.limit);
     }
 
-    findLimit(limitName?: string): LimitField | undefined {
+    findLimit(limitName?: string): Shadowrun.LimitField | undefined {
         if (!limitName) return undefined;
         //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.limits[limitName];
@@ -395,7 +356,7 @@ export class SR5Actor extends Actor {
         await this.update({'data.attributes.edge.uses': uses});
     }
 
-    getEdge(): EdgeAttributeField {
+    getEdge(): Shadowrun.EdgeAttributeField {
         //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.attributes.edge;
     }
@@ -410,7 +371,7 @@ export class SR5Actor extends Actor {
      * @param damage 
      * @returns 
      */
-    getArmor(damage?:DamageData): ActorArmorData {
+    getArmor(damage?:Shadowrun.DamageData): Shadowrun.ActorArmorData {
         // Prepare base armor data.
         //@ts-ignore // TODO: foundry-vtt-types v10
         const armor = "armor" in this.system ? 
@@ -447,7 +408,7 @@ export class SR5Actor extends Actor {
         if (matrix.device) return this.items.get(matrix.device);
     }
 
-    getFullDefenseAttribute(): AttributeField | undefined {
+    getFullDefenseAttribute(): Shadowrun.AttributeField | undefined {
         if (this.isVehicle()) {
             return this.findVehicleStat('pilot');
         } else if (this.isCharacter()) {
@@ -500,7 +461,7 @@ export class SR5Actor extends Actor {
         return parseInt(this.system.matrix.rating);
     }
 
-    getAttributes(): Attributes {
+    getAttributes(): Shadowrun.Attributes {
         //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.attributes;
     }
@@ -514,7 +475,7 @@ export class SR5Actor extends Actor {
      * @param name An attribute or other stats name.
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
-    getAttribute(name: string): AttributeField {
+    getAttribute(name: string): Shadowrun.AttributeField {
         // First check vehicle stats, as they don't always exist.
         const stats = this.getVehicleStats();
         if (stats && stats[name]) return stats[name];
@@ -524,12 +485,12 @@ export class SR5Actor extends Actor {
         return attributes[name];
     }
 
-    getLimits(): Limits {
+    getLimits(): Shadowrun.Limits {
         //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.limits;
     }
 
-    getLimit(name: string): LimitField {
+    getLimit(name: string): Shadowrun.LimitField {
         const limits = this.getLimits();
         return limits[name];
     }
@@ -604,7 +565,7 @@ export class SR5Actor extends Actor {
         }
     }
 
-    getVehicleTypeSkill(): SkillField | undefined {
+    getVehicleTypeSkill(): Shadowrun.SkillField | undefined {
         if (!this.isVehicle()) return;
 
         const name = this.getVehicleTypeSkillName();
@@ -615,12 +576,12 @@ export class SR5Actor extends Actor {
         return this.getSkills() !== undefined;
     }
 
-    getSkills(): CharacterSkills {
+    getSkills(): Shadowrun.CharacterSkills {
         //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.skills;
     }
 
-    getActiveSkills(): Skills {
+    getActiveSkills(): Shadowrun.Skills {
         //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.skills.active;
     }
@@ -699,7 +660,7 @@ export class SR5Actor extends Actor {
      * @param id Either the searched id, name or translated label of a skill
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
-    getSkill(id: string, options = {byLabel: false}): SkillField | undefined {
+    getSkill(id: string, options = {byLabel: false}): Shadowrun.SkillField | undefined {
         if (options.byLabel)
             return this.getSkillByLabel(id);
 
@@ -731,10 +692,10 @@ export class SR5Actor extends Actor {
      * @param searchedFor The translated output of either the skill label (after localize) or name of the skill in question.
      * @return The first skill found with a matching translation or name.
      */
-    getSkillByLabel(searchedFor: string): SkillField | undefined {
+    getSkillByLabel(searchedFor: string): Shadowrun.SkillField | undefined {
         if (!searchedFor) return;
 
-        const possibleMatch = (skill: SkillField): string => skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label) : skill.name;
 
         const skills = this.getSkills();
 
@@ -752,7 +713,7 @@ export class SR5Actor extends Actor {
         for (const categoryKey in skills.knowledge) {
             if (!skills.knowledge.hasOwnProperty(categoryKey)) continue;
             // Typescript can't follow the flow here...
-            const categorySkills = skills.knowledge[categoryKey].value as SkillField[];
+            const categorySkills = skills.knowledge[categoryKey].value as Shadowrun.SkillField[];
             for (const [id, skill] of Object.entries(categorySkills)) {
                 if (searchedFor === possibleMatch(skill))
                     return {...skill, id};
@@ -786,7 +747,7 @@ export class SR5Actor extends Actor {
      * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The id of the created knowledege skill.
      */
-    async addKnowledgeSkill(category: keyof KnowledgeSkills, skill: Partial<SkillField>={name: SKILL_DEFAULT_NAME}): Promise<string|undefined> {
+    async addKnowledgeSkill(category: keyof Shadowrun.KnowledgeSkills, skill: Partial<Shadowrun.SkillField>={name: SKILL_DEFAULT_NAME}): Promise<string|undefined> {
         //@ts-ignore // prevent accidental creation for wrong categories TODO: foundry-vtt-types v10
         if (!this.system.skills.knowledge.hasOwnProperty(category)) {
             console.error(`Shadowrun5e | Tried creating knowledge skill with unkown category ${category}`);
@@ -812,7 +773,7 @@ export class SR5Actor extends Actor {
      * @param skillData Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The new active skill id.
      */
-    async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
+    async addActiveSkill(skillData: Partial<Shadowrun.SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
         const skill = DataDefaults.skillData(skillData);
 
         const activeSkillsPath = 'system.skills.active';
@@ -873,7 +834,7 @@ export class SR5Actor extends Actor {
      * @param skillId What skill id to delete.
      * @param category The matching knowledege skill category for skillId
      */
-    async removeKnowledgeSkill(skillId: string, category: keyof KnowledgeSkills) {
+    async removeKnowledgeSkill(skillId: string, category: keyof Shadowrun.KnowledgeSkills) {
         const updateData = Helpers.getDeleteKeyUpdateData(`system.skills.knowledge.${category}.value`, skillId);
         await this.update(updateData);
     }
@@ -975,7 +936,7 @@ export class SR5Actor extends Actor {
      *
      * @param options
      */
-    async rollDeviceRating(options?: ActorRollOptions) {
+    async rollDeviceRating(options?: Shadowrun.ActorRollOptions) {
         const rating = this.getDeviceRating();
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
@@ -1003,7 +964,7 @@ export class SR5Actor extends Actor {
      * @param options Success Test options
      * @returns the test instance after configuration and before it's execution.
      */
-    async packActionTest(packName: PackName, actionName: PackActionName, options?: ActorRollOptions) {
+    async packActionTest(packName: Shadowrun.PackName, actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         const showDialog = this.tests.shouldShowDialog(options?.event);
         return await this.tests.fromPackAction(packName, actionName, this, {showDialog});
     }
@@ -1016,7 +977,7 @@ export class SR5Actor extends Actor {
      * @param options Success Test options
      * @returns the test instance after it's been executed
      */
-    async rollPackAction(packName: PackName, actionName: PackActionName, options?: ActorRollOptions) {
+    async rollPackAction(packName: Shadowrun.PackName, actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         const test = await this.packActionTest(packName, actionName, options);
 
         if (!test) return console.error('Shadowrun 5e | Rolling pack action failed');
@@ -1030,8 +991,8 @@ export class SR5Actor extends Actor {
      * @param actionName The action with in the general pack.
      * @param options Success Test options 
      */
-    async generalActionTest(actionName: PackActionName, options?: ActorRollOptions) {
-        return await this.packActionTest(SR5.packNames.generalActions as PackName, actionName, options);
+    async generalActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
+        return await this.packActionTest(SR5.packNames.generalActions as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1040,8 +1001,8 @@ export class SR5Actor extends Actor {
      * @param actionName The action with in the general pack.
      * @param options Success Test options
      */
-    async rollGeneralAction(actionName: PackActionName, options?: ActorRollOptions) {
-        return await this.rollPackAction(SR5.packNames.generalActions as PackName, actionName, options);
+    async rollGeneralAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
+        return await this.rollPackAction(SR5.packNames.generalActions as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1051,7 +1012,7 @@ export class SR5Actor extends Actor {
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async rollSkill(skillId: string, options: SkillRollOptions={}) {
+    async rollSkill(skillId: string, options: Shadowrun.SkillRollOptions={}) {
         console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
 
         const action = this.skillActionData(skillId, options);
@@ -1070,7 +1031,7 @@ export class SR5Actor extends Actor {
      * @param name The attributes name as defined within data
      * @param options Change general roll options.
      */
-    async rollAttribute(name, options?: ActorRollOptions) {
+    async rollAttribute(name, options?: Shadowrun.ActorRollOptions) {
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
@@ -1122,7 +1083,7 @@ export class SR5Actor extends Actor {
      * @param skillId Any skill, no matter if active, knowledge or language
      * @param options
      */
-    skillActionData(skillId: string, options: SkillRollOptions = {}): ActionRollData|undefined {
+    skillActionData(skillId: string, options: Shadowrun.SkillRollOptions = {}): Shadowrun.ActionRollData|undefined {
         const byLabel = options.byLabel || false;
         const skill = this.getSkill(skillId, {byLabel});
         if (!skill) {
@@ -1136,7 +1097,7 @@ export class SR5Actor extends Actor {
         // Derive limit from skill attribute.
         const attribute = this.getAttribute(skill.attribute);
         // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
-        const limit = attribute.limit as ActorAttribute|| '';
+        const limit = attribute.limit as Shadowrun.ActorAttribute || '';
         // Should a specialization be used?
         const spec = options.specialization || false;
 
@@ -1235,7 +1196,7 @@ export class SR5Actor extends Actor {
         return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
-    __addDamageToTrackValue(damage: DamageData, track: TrackType | OverflowTrackType | ConditionData): TrackType | OverflowTrackType | ConditionData {
+    __addDamageToTrackValue(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData): Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData {
         if (damage.value === 0) return track;
         if (track.value === track.max) return track;
 
@@ -1253,7 +1214,7 @@ export class SR5Actor extends Actor {
         return track;
     }
 
-    async _addDamageToDeviceTrack(damage: DamageData, device: SR5Item) {
+    async _addDamageToDeviceTrack(damage: Shadowrun.DamageData, device: SR5Item) {
         if (!device) return;
 
         let condition = device.getCondition();
@@ -1268,7 +1229,7 @@ export class SR5Actor extends Actor {
         await device.update(updateData);
     }
 
-    async _addDamageToTrack(damage: DamageData, track: TrackType | OverflowTrackType | ConditionData) {
+    async _addDamageToTrack(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData) {
         if (damage.value === 0) return;
         if (track.value === track.max) return;
 
@@ -1277,7 +1238,7 @@ export class SR5Actor extends Actor {
         await this.update(updateData);
     }
 
-    async _addDamageToOverflow(damage: DamageData, track: OverflowTrackType) {
+    async _addDamageToOverflow(damage: Shadowrun.DamageData, track: Shadowrun.OverflowTrackType) {
         if (damage.value === 0) return;
         if (track.overflow.value === track.overflow.max) return;
 
@@ -1299,7 +1260,7 @@ export class SR5Actor extends Actor {
      * @param track What track should be healed?
      * @param healing How many boxes of healing should be done?
      */
-    async healDamage(track: DamageType, healing: number) {
+    async healDamage(track: Shadowrun.DamageType, healing: number) {
         console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
 
         // @ts-ignore
@@ -1327,7 +1288,7 @@ export class SR5Actor extends Actor {
 
     /** Apply damage to the stun track and get overflow damage for the physical track.
      */
-    async addStunDamage(damage: DamageData): Promise<DamageData> {
+    async addStunDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData> {
         if (damage.type.value !== 'stun') return damage;
 
         const track = this.getStunTrack();
@@ -1347,7 +1308,7 @@ export class SR5Actor extends Actor {
         return overflow;
     }
 
-    async addPhysicalDamage(damage: DamageData) {
+    async addPhysicalDamage(damage: Shadowrun.DamageData) {
         if (damage.type.value !== 'physical') return damage;
 
         const track = this.getPhysicalTrack();
@@ -1365,7 +1326,7 @@ export class SR5Actor extends Actor {
      * - IC has a local matrix.condition_monitor
      * - Characters have matrix devices (items) with their local track
      */
-    async addMatrixDamage(damage: DamageData): Promise<DamageData> {
+    async addMatrixDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData> {
         if (damage.type.value !== 'matrix') return damage;
 
 
@@ -1393,7 +1354,7 @@ export class SR5Actor extends Actor {
      * @param damage Damage to be applied
      * @returns overflow damage.
      */
-    async addDamage(damage: DamageData): Promise<DamageData|undefined> {
+    async addDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData|undefined> {
         switch(damage.type.value) {
             case 'matrix':
                 return await this.addMatrixDamage(damage);
@@ -1456,7 +1417,7 @@ export class SR5Actor extends Actor {
 
     /** Calculate damage overflow only based on max and current track values.
      */
-    _calcDamageOverflow(damage: DamageData, track: TrackType | ConditionData): { overflow: DamageData, rest: DamageData } {
+    _calcDamageOverflow(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.ConditionData): { overflow: Shadowrun.DamageData, rest: Shadowrun.DamageData } {
         const freeTrackDamage = track.max - track.value;
         const overflowDamage = damage.value > freeTrackDamage ?
             damage.value - freeTrackDamage :
@@ -1474,14 +1435,14 @@ export class SR5Actor extends Actor {
         return {overflow, rest};
     }
 
-    getStunTrack(): TrackType | undefined {
+    getStunTrack(): Shadowrun.TrackType | undefined {
         //@ts-ignore // TODO: foundry-vtt-types v10
         if ("track" in this.system && "stun" in this.system.track)
             //@ts-ignore // TODO: foundry-vtt-types v10
             return this.system.track.stun;
     }
 
-    getPhysicalTrack(): OverflowTrackType | undefined {
+    getPhysicalTrack(): Shadowrun.OverflowTrackType | undefined {
         //@ts-ignore // TODO: foundry-vtt-types v10
         if ("track" in this.system && "physical" in this.system.track)
             //@ts-ignore // TODO: foundry-vtt-types v10
@@ -1493,7 +1454,7 @@ export class SR5Actor extends Actor {
      *
      * Use this method for whenever you need to access this actors matrix damage track as it's source might differ.
      */
-    getMatrixTrack(): ConditionData | undefined {
+    getMatrixTrack(): Shadowrun.ConditionData | undefined {
         // Some actors will have a direct matrix track.
         //@ts-ignore // TODO: foundry-vtt-types v10
         if ("track" in this.system && "matrix" in this.system.track) {
@@ -1514,7 +1475,7 @@ export class SR5Actor extends Actor {
         return device.getCondition();
     }
 
-    getModifiedArmor(damage: DamageData): ActorArmorData {
+    getModifiedArmor(damage: Shadowrun.DamageData): Shadowrun.ActorArmorData {
         if (!damage.ap?.value) {
             return this.getArmor();
         }
@@ -1583,6 +1544,7 @@ export class SR5Actor extends Actor {
      * @returns The score or zero.
      */
     get combatInitiativeScore(): number {
+        if (!game.combat) return 0;
         const combatant = (game.combat as SR5Combat).getActorCombatant(this);
         if (!combatant || !combatant.initiative) return 0;
         return combatant.initiative;
@@ -1594,46 +1556,46 @@ export class SR5Actor extends Actor {
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
-    asVehicle(): VehicleActorData | undefined {
+    asVehicle(): Shadowrun.VehicleActorData | undefined {
         if (this.isVehicle())
-            return this.data as VehicleActorData;
+            return this as unknown as Shadowrun.VehicleActorData;
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
-    asCharacter(): CharacterActorData | undefined {
+    asCharacter(): Shadowrun.CharacterActorData | undefined {
         if (this.isCharacter())
-            return this.data as CharacterActorData;
+            return this as unknown as Shadowrun.CharacterActorData;
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
-    asSpirit(): SpiritActorData | undefined {
+    asSpirit(): Shadowrun.SpiritActorData | undefined {
         if (this.isSpirit()) {
-            return this.data as SpiritActorData;
+            return this as unknown as Shadowrun.SpiritActorData;
         }
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
-    asSprite(): SpriteActorData | undefined {
+    asSprite(): Shadowrun.SpriteActorData | undefined {
         if (this.isSprite()) {
-            return this.data as SpriteActorData;
+            return this as unknown as Shadowrun.SpriteActorData;
         }
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
-    asCritter(): CritterActorData | undefined {
+    asCritter(): Shadowrun.CritterActorData | undefined {
         if (this.isCritter()) {
-            return this.data as CritterActorData;
+            return this as unknown as Shadowrun.CritterActorData;
         }
     }
 
     //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
-    asIC(): ICActorData | undefined {
+    asIC(): Shadowrun.ICActorData | undefined {
         if (this.isIC()) {
-            return this.data as ICActorData;
+            return this as unknown as Shadowrun.ICActorData;
         }
     }
 
-    getVehicleStats(): VehicleStats | undefined {
+    getVehicleStats(): Shadowrun.VehicleStats | undefined {
         //@ts-ignore // TODO: foundry-vtt-types v10
         if (this.isVehicle() && "vehicle_stats" in this.system) {
             //@ts-ignore // TODO: foundry-vtt-types v10
@@ -1664,8 +1626,8 @@ export class SR5Actor extends Actor {
     }
 
     hasDriver(): boolean {
-        const data = this.asVehicle();
-        if (!data) return false;
+        const vehicle = this.asVehicle();
+        if (!vehicle) return false;
 
         //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.driver.length > 0;
@@ -1673,8 +1635,8 @@ export class SR5Actor extends Actor {
 
     getVehicleDriver(): SR5Actor | undefined {
         if (!this.hasDriver()) return;
-        const data = this.asVehicle();
-        if (!data) return;
+        const vehicle = this.asVehicle();
+        if (!vehicle) return;
 
         //@ts-ignore // TODO: foundry-vtt-types v10
         const driver = game.actors?.get(this.system.driver) as SR5Actor;
@@ -1703,7 +1665,7 @@ export class SR5Actor extends Actor {
         await this._updateICHostData(host);
     }
 
-    async _updateICHostData(hostData: HostItemData) {
+    async _updateICHostData(hostData: Shadowrun.HostItemData) {
         const updateData = {
             // @ts-ignore _id is missing on internal typing...
             id: hostData._id,
@@ -1786,10 +1748,10 @@ export class SR5Actor extends Actor {
         return 'matrix' in this.system;
     }
 
-    get matrixData(): MatrixData | undefined {
+    get matrixData(): Shadowrun.MatrixData | undefined {
         if (!this.isMatrixActor) return;
         // @ts-ignore // isMatrixActor handles it, TypeScript doesn't know.
-        return this.system.matrix as MatrixData;
+        return this.system.matrix as Shadowrun.MatrixData;
     }
 
     /**
@@ -1871,7 +1833,7 @@ export class SR5Actor extends Actor {
         await this.update({'system.matrix.marks': updateData});
     }
 
-    getAllMarks(): MatrixMarks | undefined {
+    getAllMarks(): Shadowrun.MatrixMarks | undefined {
         const matrixData = this.matrixData;
         if (!matrixData) return;
         return matrixData.marks;
@@ -1927,7 +1889,7 @@ export class SR5Actor extends Actor {
         return this;
     }
 
-    getAllMarkedDocuments(): MarkedDocument[] {
+    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
         const marks = this.matrixController.getAllMarks();
         if (!marks) return [];
 
