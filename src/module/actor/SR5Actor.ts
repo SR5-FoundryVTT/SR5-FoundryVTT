@@ -1544,6 +1544,7 @@ export class SR5Actor extends Actor {
      * @returns The score or zero.
      */
     get combatInitiativeScore(): number {
+        if (!game.combat) return 0;
         const combatant = (game.combat as SR5Combat).getActorCombatant(this);
         if (!combatant || !combatant.initiative) return 0;
         return combatant.initiative;
