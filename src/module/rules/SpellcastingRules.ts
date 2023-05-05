@@ -45,11 +45,23 @@ export class SpellcastingRules {
      * Calculate spell casting limit based on the force chosen.
      *
      * As defined in SR5#281 - Step 3 Choose Spell Force
+     * As defined in SR5#316-317 'Reagents'
      *
      * @param force The spell force chosen by test configuration.
+     * @param reagents The amount of reagents / drams used for the spell.
      * @returns The limit value to be applied.
      */
-    static calculateLimit(force: number): number {
-        return force;
+    static calculateLimit(force: number, reagents: number=0): number {
+        return SpellcastingRules.limitIsReagentInsteadOfForce(reagents) ? 
+            reagents : force;
+    }
+
+    /**
+     * As defined in SR5#316-317 'Reagents'
+     * @param reagents The amount of drams used from reagents
+     * @returns True if reagents should be used 
+     */
+    static limitIsReagentInsteadOfForce(reagents: number=0): boolean {
+        return reagents > 0;
     }
 }

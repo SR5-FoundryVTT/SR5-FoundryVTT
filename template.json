@@ -960,6 +960,7 @@
         },
         "spirit": {
             "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values"],
+            "summonerUuid": "",
             "services": 0,
             "bound": false,
             "force": 0,
@@ -1087,6 +1088,7 @@
             "sin",
             "spell",
             "sprite_power",
+            "summoning",
             "weapon",
             "host"
         ],
@@ -1355,6 +1357,24 @@
                 "followed": {
                     "test": "DrainTest"
                 }
+            }
+        },
+        "summoning": {
+            "templates": ["description", "action"],
+            "action": {
+                "type": "complex",
+                "test": "SummonSpiritTest",
+                "opposed": {
+                    "test": "OpposedSummonSpiritTest"
+                },
+                "followed": {
+                    "test": "DrainTest"
+                }
+            },
+            "spirit": {
+                "force": 1,
+                "type": "",
+                "uuid": ""
             }
         },
         "critter_power": {

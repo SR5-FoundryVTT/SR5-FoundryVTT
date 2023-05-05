@@ -4,6 +4,37 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
 
+
+/**
+ * Typing around the legacy item list helper.
+ */
+interface ItemListRightSide {
+    // Provide a simple text, main use for column headers.
+    text?: {
+        text: string|number|undefined
+        title?: string // TODO: This doesn't seem to be doing anything in ListItem.html
+        cssClass?: string
+    }
+    // Provide a button element, main use for column values.
+    button?: {
+        text: string|number
+        cssClass?: string
+        // Shorten the button visually...
+        short?: boolean
+    }
+    // Provide a input element, main use for column values.
+    input?: {
+        type: string
+        value: any
+        cssClass?: string
+    }
+    // Provide html as string.
+    html? :{
+        text: string
+        cssClass?: string
+    }
+}
+
 export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('InventoryHeaderIcons', function (section: InventorySheetDataByType) {
         var icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
@@ -103,6 +134,9 @@ export const registerItemLineHelpers = () => {
             case 'sprite_power':
                 addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
                 return [addIcon];
+            case 'summoning':
+                addIcon.title = game.i18n.localize('SR5.CreateItemSummoning');
+                return [addIcon];
             case 'effect':
                 addIcon.title = game.i18n.localize('SR5.CreateEffect');
                 addIcon.cssClass = 'effect-control';
@@ -126,7 +160,11 @@ export const registerItemLineHelpers = () => {
         return [addItemIcon];
     });
 
-    Handlebars.registerHelper('ItemHeaderRightSide', function (id: string) {
+    /**
+     * The legacy ItemList helper to provide a generic way of defining headers and columns 
+     * on the 'right side' of an item list across all document sheets.
+     */
+    Handlebars.registerHelper('ItemHeaderRightSide', function (id: string): ItemListRightSide[] {
         switch (id) {
             case 'action':
                 return [
@@ -251,12 +289,25 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'summoning':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Summoning.SpiritType')
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Force')
+                        }
+                    }
+                ]
             default:
                 return [];
         }
     });
 
-    Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData) {
+    Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData): ItemListRightSide[] {
         const wrapper = new SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -439,6 +490,22 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'summoning':
+                const summoningData = item.system as Shadowrun.SummoningData;
+                const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
+
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(spiritTypeLabel)
+                        }
+                    },
+                    {
+                        text: {
+                            text: summoningData.spirit.force
+                        }
+                    }
+                ]
             default:
                 return [];
         }

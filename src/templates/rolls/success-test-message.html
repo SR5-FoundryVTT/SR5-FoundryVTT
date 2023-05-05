@@ -128,6 +128,15 @@
         </div>
     </div>
     {{/if}}
+    {{#if followupActions}}
+    <div class="card-buttons">
+        {{#each followupActions}}
+        <div class="button followup-action">
+            {{localize this.label}}
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
     {{#if test.opposed}}
     <div class="card-buttons">
         {{#each opposedActions}}
