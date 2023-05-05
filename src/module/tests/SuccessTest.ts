@@ -509,15 +509,17 @@ export class SuccessTest {
      * Instead Shadowrun 5e rules expect all individual values to be rounded before use.
      * We use the 'Note on Rounding' on SR5#48 as a guideline.
      */
-    roundBaseValueModifiers() {
-        const roundAllMods = (mods: Shadowrun.ModList<number>) => {
-            mods.forEach(mod => mod.value = Math.ceil(mod.value));
+    roundBaseValueParts() {
+        const roundAllMods = (value: Shadowrun.ValueField) => {
+            value.base = Math.ceil(value.base);
+            if (value.override) value.override.value = Math.ceil(value.override.value);
+            value.mod.forEach(mod => mod.value = Math.ceil(mod.value));
         }
         
-        roundAllMods(this.data.modifiers.mod);
-        roundAllMods(this.data.pool.mod);
-        roundAllMods(this.data.threshold.mod);
-        roundAllMods(this.data.limit.mod);
+        roundAllMods(this.data.modifiers);
+        roundAllMods(this.data.pool);
+        roundAllMods(this.data.threshold);
+        roundAllMods(this.data.limit);
     }
 
     /**
@@ -526,7 +528,7 @@ export class SuccessTest {
      * NOTE: make sure to calculate test related values to integers. 
      */
     calculateBaseValues() {
-        this.roundBaseValueModifiers();
+        this.roundBaseValueParts();
 
         this.data.modifiers.value = Helpers.calcTotal(this.data.modifiers);
 
