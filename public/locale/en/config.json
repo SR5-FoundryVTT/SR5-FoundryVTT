@@ -27,6 +27,7 @@
     "ITEM.TypeSin": "SIN",
     "ITEM.TypeSpell": "Spell",
     "ITEM.TypeSprite_power": "Sprite Power",
+    "ITEM.TypeSummoning": "Summoning",
     "ITEM.TypeWeapon": "Weapon",
     "SETTINGS": {
         "ApplyLimitsDescription": "Should Limits be applied to rolls",
@@ -211,6 +212,7 @@
     "SR5.CreateItemQuality": "Create Quality",
     "SR5.CreateItemSIN": "Create SIN",
     "SR5.CreateItemSpell": "Create Spell",
+    "SR5.CreateItemSummoning": "Create Summoning",
     "SR5.CreateItemWeapon": "Create Weapon",
     "SR5.CritterPower": {
         "Categories": {
@@ -505,7 +507,8 @@
             "DamageResistanceTest": "Damage Resistance Test",
             "Modifier": "Modifier",
             "Modifiers": "Modifiers",
-            "OpposedTest": "Opposed Test"
+            "OpposedTest": "Opposed Test",
+            "SpiritType": "Spirit Type"
         },
         "ActorSheet": {
             "CreateInventory": "Create inventory place",
@@ -720,6 +723,7 @@
     "SR5.RangeWeaponAttack": "Range Weapon Attack",
     "SR5.Rating": "Rating",
     "SR5.Reach": "Reach",
+    "SR5.Reagent": "Reagent",
     "SR5.RecklessSpellButton": "Reckless",
     "SR5.Recoil": "Recoil",
     "SR5.RecoilCompensation": "Recoil Comp.",
@@ -898,7 +902,9 @@
     "SR5.Spirit": {
         "Bound": "Bound",
         "Force": "Force",
+        "MissingSummoner": "No active summoner",
         "Services": "Services",
+        "Summoner": "Summoner",
         "Type": "Type",
         "Types": {
             "Air": "Air",
@@ -962,6 +968,11 @@
     "SR5.StunTrack": "Stun Track",
     "SR5.Success": "Success!",
     "SR5.Successes": "Successes",
+    "SR5.Summoning": {
+        "DropSpirit": "Drop Spirit",
+        "FixedSpirit": "Prep. Spirit",
+        "SpiritType": "Spirit Type"
+    },
     "SR5.Suppressing": "Suppressing",
     "SR5.Target": "Target",
     "SR5.TargetDevice": "Device",
@@ -974,6 +985,10 @@
     "SR5.Temporary": "Temporary",
     "SR5.TemporaryModifiers": "Temporary Modifiers",
     "SR5.Test": "Test",
+    "SR5.TestResults": {
+        "SpiritSummonFailure": "Spirit fled!",
+        "SpiritSummonSuccess": "Spirit summoned!"
+    },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attribute-Only Test",
         "CombatSpellDefenseTest": "Combat Spell Defense",
@@ -986,6 +1001,7 @@
         "MeleeAttackTest": "Melee Weapon Attack",
         "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
         "NaturalRecoveryStunTest": "Natural Recovery Stun",
+        "OpposedSummonSpiritTest": "Oppose Summoning",
         "OpposedTest": "Opposed Test",
         "PhysicalDefenseTest": "Physical Defense",
         "PhysicalResistTest": "Physical Damage Resist",
@@ -994,6 +1010,7 @@
         "SkillTest": "Skill Test",
         "SpellCastingTest": "Spellcasting",
         "SuccessTest": "Success Test",
+        "SummonSpiritTest": "Summon Spirit",
         "SuppressionDefenseTest": "Suppression Defense",
         "ThrownAttackTest": "Thrown Weapon Attack"
     },
@@ -1002,6 +1019,7 @@
     "SR5.ToggleEquip": "Toggle Equipped",
     "SR5.Tooltips": {
         "Actor": {
+            "MissingSummoner": "Drag&Drop Character or use summoning action",
             "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
         },
         "Effect": {
@@ -1059,6 +1077,13 @@
         },
         "SituationalModifier": {
             "Recoil": "Amount of bullets fired"
+        },
+        "SummoningTest": {
+            "DragOnCanvas": "Drag spirit on canvas",
+            "Force": "Force of the summoned spirit",
+            "PreparedSpirit": "Use a prepared spirit actor instead of creating a generic one",
+            "ReagentDrams": "Drams of reagents used for altering summoning limit",
+            "SpiritType": "Type of the summoned spirit"
         }
     },
     "SR5.Top": "Top",
@@ -1119,10 +1144,12 @@
         "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",
         "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
         "InvalidMarksCount": "You've trying to place a strange number of marks",
+        "InvalidSummoningForce": "Force value chosen doesn't adhere to the rules",
         "NegativeLimitValue": "Limit values must positive numbers",
         "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
         "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
-        "TokenSelectionNeeded": "One ore more tokens need to be selected"
+        "TokenSelectionNeeded": "One ore more tokens need to be selected",
+        "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain."
     },
     "SR5.Weapon": "Weapon",
     "SR5.WeaponAmmoCount": "Ammo Count",

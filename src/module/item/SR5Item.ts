@@ -1179,6 +1179,16 @@ export class SR5Item extends Item {
         }
     }
 
+    get isSummoning(): boolean {
+        return this.type === 'summoning';
+    }
+
+    get asSummoning(): Shadowrun.SummoningItemData | undefined {
+        if (this.isSummoning)
+            //@ts-ignore // TODO: foundry-vtt-types v10
+            return this as Shadowrun.SummoningItemData;
+    }
+
     get isSpritePower(): boolean {
         return this.wrapper.isSpritePower();
     }

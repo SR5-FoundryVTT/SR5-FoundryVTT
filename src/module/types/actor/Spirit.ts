@@ -10,9 +10,14 @@ declare namespace Shadowrun {
         ArmorActorData,
         WoundsActorData,
         MovementActorData {
+            // FoundryVTT uuid of the summoning actors spirit.
+            // If no summoner is set, uuid will be empty.
+            summonerUuid: string
+
             values: PhysicalCombatValues
             spiritType: SpiritType
             force: number
             limits: AwakendLimits
+            services: number
     }
 }

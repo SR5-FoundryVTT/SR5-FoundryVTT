@@ -565,15 +565,15 @@ export const SR5 = {
 
     critterPower: {
         categories: {
-          mundane: 'SR5.CritterPower.Categories.Mundane',
-          paranormal: 'SR5.CritterPower.Categories.Paranormal',
-          free_spirit: 'SR5.CritterPower.Categories.FreeSpirit',
-          emergent: 'SR5.CritterPower.Categories.Emergent',
-          shapeshifter: 'SR5.CritterPower.Categories.Shapeshifter',
-          drake: 'SR5.CritterPower.Categories.Drake',
-          echoes: 'SR5.CritterPower.Categories.Echoes',
-          weakness: 'SR5.CritterPower.Categories.Weakness',
-          paranormal_infected: 'SR5.CritterPower.Categories.ParanormalInfected',
+            mundane: 'SR5.CritterPower.Categories.Mundane',
+            paranormal: 'SR5.CritterPower.Categories.Paranormal',
+            free_spirit: 'SR5.CritterPower.Categories.FreeSpirit',
+            emergent: 'SR5.CritterPower.Categories.Emergent',
+            shapeshifter: 'SR5.CritterPower.Categories.Shapeshifter',
+            drake: 'SR5.CritterPower.Categories.Drake',
+            echoes: 'SR5.CritterPower.Categories.Echoes',
+            weakness: 'SR5.CritterPower.Categories.Weakness',
+            paranormal_infected: 'SR5.CritterPower.Categories.ParanormalInfected',
         },
         types: {
             mana: 'SR5.CritterPower.Types.Mana',

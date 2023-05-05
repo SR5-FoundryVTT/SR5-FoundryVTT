@@ -34,7 +34,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'adept_power',
             'complex_form',
             'quality',
-            'critter_power'
+            'critter_power',
+            'summoning'
         ];
     }
 
