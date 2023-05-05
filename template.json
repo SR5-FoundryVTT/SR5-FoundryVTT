@@ -965,7 +965,16 @@
             "bound": false,
             "force": 0,
             "spiritType": "",
-            "special": "magic"
+            "special": "magic",
+            "attributes": {
+                "force": {
+                    "value": 0,
+                    "min": 0,
+                    "temp": 0,
+                    "mod": [],
+                    "hidden": true
+                }
+            }
         },
         "critter": {
             "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values"]
@@ -1033,6 +1042,15 @@
                         "value": 0,
                         "max": 0
                     }
+                }
+            },
+            "attributes": {
+                "pilot": {
+                    "value": 0,
+                    "min": 0,
+                    "temp": 0,
+                    "mod": [],
+                    "hidden": true
                 }
             }
         },

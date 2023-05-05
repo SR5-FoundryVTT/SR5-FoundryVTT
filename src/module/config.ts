@@ -28,7 +28,7 @@ export const SR5 = {
         weapon: 'SR5.ItemTypes.Weapon'
     },
 
-    // All available character attributes. Sorted alphabetically. :-)
+    // All available attributes. These are available as testable attributes across all actor types.
     attributes: {
         agility: 'SR5.AttrAgility',
         attack: 'SR5.MatrixAttrAttack',
@@ -46,6 +46,8 @@ export const SR5 = {
         sleaze: 'SR5.MatrixAttrSleaze',
         strength: 'SR5.AttrStrength',
         willpower: 'SR5.AttrWillpower',
+        pilot: 'SR5.Vehicle.Stats.Pilot',
+        force: 'SR5.Force'
     },
 
     /**

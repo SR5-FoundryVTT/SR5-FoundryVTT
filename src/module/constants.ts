@@ -126,7 +126,9 @@ export const SR = {
             sleaze: {min: 0},
             data_processing: {min: 0},
             firewall: {min: 0},
-            host_rating: {min: 0, max: 12}
+            host_rating: {min: 0, max: 12},
+            pilot: {min: 1},
+            force: {min: 1}
         },
         // Use for initial default values that aren't simply range.<>.min values.
         defaults: {

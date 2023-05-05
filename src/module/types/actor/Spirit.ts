@@ -3,6 +3,10 @@
 declare namespace Shadowrun {
     export type SpiritType = keyof typeof SR5CONFIG.spiritTypes
 
+    type SpiritAttributes = Attributes & {
+        force: AttributeField
+    }
+    
     export interface SpiritData extends
         CommonData,
         MagicActorData,
@@ -19,5 +23,6 @@ declare namespace Shadowrun {
             force: number
             limits: AwakendLimits
             services: number
+            attributes: SpiritAttributes
     }
 }

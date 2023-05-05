@@ -1,7 +1,7 @@
 /// <reference path="../Shadowrun.ts" />
 
 declare namespace Shadowrun {
-     export type VehicleTypes = 'air' | 'aerospace' | 'ground' | 'water' | 'walker' | 'exotic'
+    export type VehicleTypes = 'air' | 'aerospace' | 'ground' | 'water' | 'walker' | 'exotic'
 
     export type VehicleControlModeTypes = 'manual' | 'remote' | 'rigger' | 'autopilot'
 
@@ -12,6 +12,10 @@ declare namespace Shadowrun {
         CanHideFiled
 
     export type VehicleEnvironment = 'speed' | 'handling'
+
+    type VehicleAttributes = Attributes & {
+        pilot: AttributeField
+    }
 
     export interface VehicleData extends
         CommonData,
@@ -27,6 +31,7 @@ declare namespace Shadowrun {
             driver: string
             environment: VehicleEnvironment
             vehicle_stats: VehicleStats
+            attributes: VehicleAttributes
         }
 
     export interface VehicleStats {

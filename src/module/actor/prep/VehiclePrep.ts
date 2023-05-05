@@ -97,7 +97,9 @@ export class VehiclePrep {
             'reaction', 'willpower', 'logic', 'intuition', 'charisma',
             // No actual rule, a typical skill check would be 'Autosoft Rating + Pilot'
             // Setting agility to pilot, helps the current unpolished way vehicles use character skills.
-            'agility'
+            'agility',
+            // The actual pilot attribute will also equal the vehicle stat pilot
+            'pilot'
         ];
 
         attributeIds.forEach((attId) => {
