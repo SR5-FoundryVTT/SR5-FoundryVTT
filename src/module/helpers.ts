@@ -24,8 +24,11 @@ import WeaponItemData = Shadowrun.WeaponItemData;
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 
 interface CalcTotalOptions {
+    // Min/Max value range
     min?: number,
-    max?: number
+    max?: number,
+    // Round total to a given decimal, 0 rounds to the next integer.
+    roundDecimals?: number
 }
 
 export class Helpers {
@@ -56,9 +59,9 @@ export class Helpers {
         }
 
         // Base on type change calculation behaviour.
-        switch (getType(value.base)) {
+        switch (foundry.utils.getType(value.base)) {
             case 'number':
-                value.value = Helpers.roundTo(parts.total + value.base, 3);
+                value.value = Helpers.roundTo(parts.total + value.base, options?.roundDecimals);
                 value.value = Helpers.applyValueRange(value.value, options);
                 break;
             // boolean / string values should be applied
@@ -91,7 +94,7 @@ export class Helpers {
      * @param value Number to round with.
      * @param decimals Amount of decimals after the decimal point.
      */
-    static roundTo(value: number, decimals): number {
+    static roundTo(value: number, decimals: number=3): number {
         const multiplier = Math.pow(10, decimals);
         return Math.round(value * multiplier) / multiplier;
     }

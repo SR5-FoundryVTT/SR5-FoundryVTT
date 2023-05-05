@@ -309,7 +309,7 @@ export class SuccessTest {
      *
      * FoundryVTT documentation:
      * Shadowrun5e: SR5#44
-     *
+     * 
      */
     get formula(): string {
         const pool = Helpers.calcTotal(this.data.pool, {min: 0});
@@ -502,9 +502,32 @@ export class SuccessTest {
     }
 
     /**
+     * To assure all test values are full integers, round all value parts.
+     * Don't round the total as this will lead to some values shown as decimals and some as 
+     * integers.
+     * 
+     * Instead Shadowrun 5e rules expect all individual values to be rounded before use.
+     * We use the 'Note on Rounding' on SR5#48 as a guideline.
+     */
+    roundBaseValueModifiers() {
+        const roundAllMods = (mods: Shadowrun.ModList<number>) => {
+            mods.forEach(mod => mod.value = Math.ceil(mod.value));
+        }
+        
+        roundAllMods(this.data.modifiers.mod);
+        roundAllMods(this.data.pool.mod);
+        roundAllMods(this.data.threshold.mod);
+        roundAllMods(this.data.limit.mod);
+    }
+
+    /**
      * Calculate only the base test that can be calculated before the test has been evaluated.
+     * 
+     * NOTE: make sure to calculate test related values to integers. 
      */
     calculateBaseValues() {
+        this.roundBaseValueModifiers();
+
         this.data.modifiers.value = Helpers.calcTotal(this.data.modifiers);
 
         this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
