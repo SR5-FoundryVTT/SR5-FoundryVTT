@@ -83,7 +83,7 @@
             <select name="system.action.attribute2">
                 {{#select system.action.attribute2}}
                 <option value=""></option>
-                {{#each config.attributes as |name type|}}
+                {{#each attributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
