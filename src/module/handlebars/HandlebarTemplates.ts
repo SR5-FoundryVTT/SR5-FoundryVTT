@@ -13,6 +13,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/NetworkTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/DescriptionTab.html',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
 
