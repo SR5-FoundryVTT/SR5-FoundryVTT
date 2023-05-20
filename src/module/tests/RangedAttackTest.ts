@@ -10,21 +10,16 @@ import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
-import DamageData = Shadowrun.DamageData;
-import FireModeData = Shadowrun.FireModeData;
-import RangesTemplateData = Shadowrun.RangesTemplateData;
-import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
-import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface RangedAttackTestData extends SuccessTestData {
-    damage: DamageData
-    fireModes: FireModeData[]
-    fireMode: FireModeData
+    damage: Shadowrun.DamageData
+    fireModes: Shadowrun.FireModeData[]
+    fireMode: Shadowrun.FireModeData
     // index of selceted fireMode in fireModes
     fireModeSelected: number
-    ranges: RangesTemplateData
+    ranges: Shadowrun.RangesTemplateData
     range: number
-    targetRanges: TargetRangeTemplateData[]
+    targetRanges: Shadowrun.TargetRangeTemplateData[]
     // index of selected target range in targetRanges
     targetRangesSelected: number
 }
@@ -97,7 +92,7 @@ export class RangedAttackTest extends SuccessTest {
         // Transform weapon ranges to something usable
         const {ranges} = weapon.system.range;
         const {range_modifiers} = SR.combat.environmental;
-        const newRanges = {} as RangesTemplateData;
+        const newRanges = {} as Shadowrun.RangesTemplateData;
         for (const [key, value] of Object.entries(ranges)) {
             const distance = value as number;
             newRanges[key] = Helpers.createRangeDescription(SR5.weaponRanges[key], distance, range_modifiers[key]);
@@ -184,7 +179,7 @@ export class RangedAttackTest extends SuccessTest {
         this._selectFireMode(this.data.fireModeSelected);
     }
 
-    override get testModifiers(): ModifierTypes[] {
+    override get testModifiers(): Shadowrun.ModifierTypes[] {
         return ['global', 'wounds', 'environmental', 'recoil'];
     }
 
