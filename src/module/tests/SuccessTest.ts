@@ -526,6 +526,11 @@ export class SuccessTest {
      * The general base value preparation. This will be re applied at multiple points before execution.
      */
     prepareBaseValues() {
+        // Re-apply document modifiers first, as those might have changed in between calculations.
+        this.prepareDocumentModifiers();
+        this.prepareTestModifiers();
+
+        // Only then apply values and collected modifiers.
         this.applyPushTheLimit();
         this.applyPoolModifiers();
     }
@@ -537,8 +542,6 @@ export class SuccessTest {
      *       a modifier. Rather set it to zero, causing it to not be shown.
      */
     applyPoolModifiers() {
-        this.prepareDocumentModifiers();
-        
         const pool = new PartsList(this.pool.mod);
 
         // Remove override modifier from pool.
@@ -685,6 +688,12 @@ export class SuccessTest {
         this.prepareActorModifiers();
         this.prepareItemModifiers();
     }
+
+    /**
+     * Allow implementations to overwrite default modifiers after document modifiers have been applied to influence
+     * pool calculation.
+     */
+    prepareTestModifiers() {}
 
     /**
      * Prepare general modifiers based on the actor, as defined within the action or test implementation.
