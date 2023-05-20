@@ -204,7 +204,7 @@ export class RangedAttackTest extends SuccessTest {
      * If a suppression fire mode is used, ignore action opposed test configuration.
      */
     override get _opposedTestClass() {
-        if (this.data.fireMode.suppression) return TestCreator._getTestClass(SR5.supressionDefenseTest);
+        if (this.data.fireMode.suppression) return TestCreator._getTestClass(SR5.suppressionDefenseTest);
         return super._opposedTestClass;
     }
 

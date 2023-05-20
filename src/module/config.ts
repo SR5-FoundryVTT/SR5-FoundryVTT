@@ -497,7 +497,7 @@ export const SR5 = {
     },
 
     // When a firemode with suppression is used, this test should defend against it.
-    supressionDefenseTest: 'SupressionDefenseTest',
+    suppressionDefenseTest: 'SuppressionDefenseTest',
 
     /**
      * Names of FoundryVTT packs supplied by the system to be used as action sources.
