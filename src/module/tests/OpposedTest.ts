@@ -68,7 +68,7 @@ export class OpposedTest extends SuccessTest {
         }
 
         // Prepare testing data.
-        const data = {
+        const data: SuccessTestData = {
             // While not visible, when there is a description set, use it.
             title: againstData.opposed.description || undefined,
 
@@ -77,6 +77,7 @@ export class OpposedTest extends SuccessTest {
             pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
             limit: DataDefaults.valueData({label: 'SR5.Limit'}),
             threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
+            //@ts-ignore
             values: {},
 
             sourceItemUuid: againstData.sourceItemUuid,
@@ -109,6 +110,7 @@ export class OpposedTest extends SuccessTest {
             }
         }
 
+        //@ts-ignore
         return await this._prepareActionTestData(action, actor, data);
     }
 

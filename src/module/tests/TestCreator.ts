@@ -4,6 +4,7 @@ import {
     SuccessTest,
     SuccessTestMessageData,
     TestData,
+    SuccessTestData,
     TestDocuments,
     TestOptions
 } from "./SuccessTest";
@@ -410,7 +411,7 @@ export const TestCreator = {
      * @param actor Actor to use for retrieving source values and execute test with.
      * @param data Any test implementations resulting basic test data.
      */
-    _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data) {
+    _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData) {
         // Action values might be needed later to redo the same test.
         data.action = action;
 
@@ -448,11 +449,9 @@ export const TestCreator = {
             if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
         }
         
-        // A general pool modifier will be used as a base value.
-        // NOTE: This might not be transparent to users, instead a normal .mod entry might better?
-        //       That might clash with general pool modifier compilation though.
+        // TODO: Test and check if this still works.
         if (action.mod) {
-            data.pool.base = Number(action.mod);
+            data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, 'SR5.DicePoolModifier', action.mod);
         }
         
         // Include pool modifiers that have been collected on the action item.
