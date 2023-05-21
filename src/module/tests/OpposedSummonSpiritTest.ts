@@ -5,7 +5,6 @@ import { ConjuringRules } from '../rules/ConjuringRules';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
 import { TestDocuments, TestOptions } from './SuccessTest';
 import { SummonSpiritTest } from './SummonSpiritTest';
-import { TestCreator } from './TestCreator';
 
 
 interface OpposedSummonSpiritTestData extends OpposedTestData {
@@ -44,7 +43,6 @@ export class OpposedSummonSpiritTest extends OpposedTest {
         data = super._prepareData(data, options);
 
         data.summonedSpiritUuid = data.summonedSpiritUuid || '';
-        data.services = data.services || 0;
 
         return data;
     }
@@ -55,20 +53,11 @@ export class OpposedSummonSpiritTest extends OpposedTest {
 
     /**
      * When summoning the opposing spirit test triggers the DrainTest from summoning.
-     * Since we can expect this test be within the GM context, we can't auto cast DrainTest.
+     * Since we can expect this test to be within GM context, we can't auto cast DrainTest.
      */
     override get autoExecuteFollowupTest() {
         return false;
     }
-
-    // /**
-    //  * Calculate drain and execute the actives test followup (should be drain test)
-    //  */
-    // override async executeFollowUpTest() {
-    //     this.against.calcDrain(this.hits.value);
-    //     await this.against.saveToMessage();
-    //     this.against.executeFollowUpTest();
-    // }
 
     /**
      * To have an opposing actor, that's not on the map already, create the spirit actor.

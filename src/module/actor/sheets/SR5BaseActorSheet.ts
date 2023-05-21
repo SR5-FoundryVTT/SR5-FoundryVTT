@@ -957,8 +957,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * Enhance an SR5Item by sheet data.
-     *
+     * Enhance SR5Item data for display on actors sheets.
+     * 
+     * @param item: The item to transform into a 'sheet item'
      */
     _prepareSheetItem(item: SR5Item): SheetItemData {
         const sheetItem = item.toObject() as unknown as SheetItemData;
@@ -972,25 +973,41 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * Prepare Actor Sheet data with item data.
+     * Prepare items for easy type by type display on actors sheets with lists per item type.
+     * 
+     * NOTE: This method uses sheet item types, instead of item types. A sheet item type allows
+     * to sub-group items of one type into separate lists as needed.
+     * 
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
+     * @returns Sorted item lists per sheet item type.
      */
-    _prepareItemTypes(data) {
-        const itemType: Record<string, SheetItemData[]> = {};
+    _prepareItemTypes(data): Record<string, SheetItemData[]> {
+        const itemsByType: Record<string, SheetItemData[]> = {};
 
+        // Most sheet items are raw item types, some are sub types.
+        // These are just for display purposes and has been done for call_in_action items.
+        const sheetItemTypes = [
+            ...Object.keys(CONFIG.Item.typeLabels), 
+            'summoning', 
+            'compilation'
+        ];
+        
         // Add all item types in system.
-        Object.keys(CONFIG.Item.typeLabels).forEach(type => {
-            itemType[type] = [];
+        sheetItemTypes.forEach(type => {
+            itemsByType[type] = [];
         });
 
-        // Add existing items to their types as sheet items
+        // Add existing items to their sheet types as sheet items
         this.actor.items.forEach((item: SR5Item) => {
             const sheetItem = this._prepareSheetItem(item);
-            itemType[sheetItem.type].push(sheetItem);
+            itemsByType[sheetItem.type].push(sheetItem);
+
+            if (item.isSummoning) itemsByType['summoning'].push(sheetItem);
+            if (item.isCompilation) itemsByType['compilation'].push(sheetItem);
         });
 
-        // Sort items for each type.
-        Object.entries(itemType).forEach(([type, items]) => {
+        // Sort items for each sheet type.
+        Object.entries(itemsByType).forEach(([type, items]) => {
             switch (type) {
                 case 'quality':
                     items.sort(sortyByQuality);
@@ -1004,7 +1021,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             }
         });
 
-        return itemType
+        return itemsByType
     }
 
     /**

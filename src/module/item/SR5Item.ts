@@ -1179,14 +1179,25 @@ export class SR5Item extends Item {
         }
     }
 
-    get isSummoning(): boolean {
-        return this.type === 'summoning';
+    get isCallInAction(): boolean {
+        return this.type === 'call_in_action';
     }
 
-    get asSummoning(): Shadowrun.SummoningItemData | undefined {
-        if (this.isSummoning)
+    get asCallInAction(): Shadowrun.CallInActionItemData | undefined { 
+        if (this.isCallInAction) {
             //@ts-ignore // TODO: foundry-vtt-types v10
-            return this as Shadowrun.SummoningItemData;
+            return this as Shadowrun.CallInActionItemData;
+        }
+    }
+
+    get isSummoning(): boolean {
+        //@ts-ignore
+        return this.type === 'call_in_action' && this.system.actor_type === 'spirit';
+    }
+
+    get isCompilation(): boolean {
+        //@ts-ignore
+        return this.type === 'call_in_action' && this.system.actor_type === 'sprite';
     }
 
     get isSpritePower(): boolean {
@@ -1692,7 +1703,7 @@ export class SR5Item extends Item {
     override async _onCreate(changed, options, user) {
         const applyData = {};
         //@ts-ignore
-        Helpers.injectActionTestsIntoChangeData(this.type, changed, applyData);
+        Helpers.injectActionTestsIntoChangeData(this.type, changed, applyData, this);
         await super._preCreate(changed, options, user);
 
         // Don't kill DocumentData by applying empty objects. Also performance.
@@ -1710,7 +1721,7 @@ export class SR5Item extends Item {
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff !== false && options.recursive !== false) {
             // Change used action test implementation when necessary.
-            Helpers.injectActionTestsIntoChangeData(this.type, changed, changed);
+            Helpers.injectActionTestsIntoChangeData(this.type, changed, changed, this);
         }
         
         await super._preUpdate(changed, options, user);

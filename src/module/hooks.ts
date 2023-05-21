@@ -1,3 +1,4 @@
+import { CompileSpriteTest } from './tests/CompileSpriteTest';
 import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
 import {SR5} from './config';
 import {Migrator} from './migrator/Migrator';
@@ -6,7 +7,6 @@ import {FLAGS, SYSTEM_NAME, SYSTEM_SOCKET} from './constants';
 import {SR5Actor} from './actor/SR5Actor';
 import {SR5Item} from './item/SR5Item';
 import {SR5ItemSheet} from './item/SR5ItemSheet';
-import {SR5SummoningItemSheet} from './item/SR5SummoningItemSheet';
 import {SR5Token} from './token/SR5Token';
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
 import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
@@ -55,6 +55,8 @@ import { SkillTest } from './tests/SkillTest';
 
 import {canvasInit} from './canvas';
 import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
+import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
+import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -149,7 +151,9 @@ ___________________
                 DronePerceptionTest,
                 DroneInfiltrationTest,
                 SummonSpiritTest,
-                OpposedSummonSpiritTest
+                OpposedSummonSpiritTest,
+                CompileSpriteTest,
+                OpposedCompileSpriteTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -173,7 +177,8 @@ ___________________
                 PilotVehicleTest,
                 DronePerceptionTest,
                 DroneInfiltrationTest,
-                SummonSpiritTest
+                SummonSpiritTest,
+                CompileSpriteTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -185,7 +190,8 @@ ___________________
                 PhysicalDefenseTest,
                 SuppressionDefenseTest,
                 CombatSpellDefenseTest,
-                OpposedSummonSpiritTest
+                OpposedSummonSpiritTest,
+                OpposedCompileSpriteTest
             },
             /**
              * Subset of tests meant to be used as resist tests.
@@ -273,11 +279,18 @@ ___________________
             label: "SR5.SheetItem",
             makeDefault: true
         });
-        Items.registerSheet(SYSTEM_NAME, SR5SummoningItemSheet, {
+        Items.registerSheet(SYSTEM_NAME, SR5CallInActionSheet, {
             label: "SR5.SheetItem",
             makeDefault: true,
-            types: ['summoning']
-        })
+            types: ['call_in_action']
+        });
+        
+        console.error('Remove this sheet');
+        // Items.registerSheet(SYSTEM_NAME, SR5SummoningItemSheet, {
+        //     label: "SR5.SheetItem",
+        //     makeDefault: true,
+        //     types: ['summoning']
+        // });
 
         // Register configs for embedded documents.
         DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', ActiveEffectConfig);

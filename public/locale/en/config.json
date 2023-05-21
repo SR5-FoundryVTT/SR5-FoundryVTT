@@ -13,6 +13,7 @@
     "ITEM.TypeAmmo": "Ammunition",
     "ITEM.TypeArmor": "Armor",
     "ITEM.TypeBioware": "Bioware",
+    "ITEM.TypeCall_in_action": "Summon/Compile",
     "ITEM.TypeComplex_form": "Complex Form",
     "ITEM.TypeContact": "Contact",
     "ITEM.TypeCritter_power": "Critter Power",
@@ -27,7 +28,6 @@
     "ITEM.TypeSin": "SIN",
     "ITEM.TypeSpell": "Spell",
     "ITEM.TypeSprite_power": "Sprite Power",
-    "ITEM.TypeSummoning": "Summoning",
     "ITEM.TypeWeapon": "Weapon",
     "SETTINGS": {
         "ApplyLimitsDescription": "Should Limits be applied to rolls",
@@ -152,6 +152,13 @@
         "ReduceInitByOne": "Initiative -1",
         "ReduceInitByTen": "Initiative -10"
     },
+    "SR5.CallInAction": {
+        "ActorType": "Actor Type",
+        "Summoning": "Summoning",
+        "Compilation": "Compilation",
+        "CreateSummoning": "Create summoning action",
+        "CreateCompilation": "Create compilation action"
+    },
     "SR5.CanDefault": "Can Default",
     "SR5.Capacity": "Capacity",
     "SR5.CareerKarma": "Career Karma",
@@ -181,6 +188,11 @@
     "SR5.Collapse": "Collapse",
     "SR5.CollapseAll": "Collapse All",
     "SR5.CommonProgram": "Common Program",
+    "SR5.Compilation": {
+        "DropSprite": "Drop Sprite",
+        "FixedSprite": "Prep. Sprite",
+        "SpriteType": "Sprite Type"
+    },
     "SR5.ComplexForm": "Complex Form",
     "SR5.ComplexForms": "Complex Forms",
     "SR5.Conceal": "Conceal",
@@ -198,6 +210,7 @@
     "SR5.CreateItemAmmo": "Create Ammunition",
     "SR5.CreateItemArmor": "Create Armor",
     "SR5.CreateItemBioware": "Create Bioware",
+    "SR5.CreateItemCallInAction": "Create Call In Action",
     "SR5.CreateItemComplexForm": "Create Complex Form",
     "SR5.CreateItemContact": "Create Contact",
     "SR5.CreateItemCritterPower": "Create Critter Power",
@@ -212,7 +225,6 @@
     "SR5.CreateItemQuality": "Create Quality",
     "SR5.CreateItemSIN": "Create SIN",
     "SR5.CreateItemSpell": "Create Spell",
-    "SR5.CreateItemSummoning": "Create Summoning",
     "SR5.CreateItemWeapon": "Create Weapon",
     "SR5.CritterPower": {
         "Categories": {
@@ -508,7 +520,8 @@
             "Modifier": "Modifier",
             "Modifiers": "Modifiers",
             "OpposedTest": "Opposed Test",
-            "SpiritType": "Spirit Type"
+            "SpiritType": "Spirit Type",
+            "SpriteType": "Sprite Type"
         },
         "ActorSheet": {
             "CreateInventory": "Create inventory place",
@@ -992,6 +1005,7 @@
     "SR5.Tests": {
         "AttributeOnlyTest": "Attribute-Only Test",
         "CombatSpellDefenseTest": "Combat Spell Defense",
+        "CompileSpriteTest": "Compile Sprite",
         "ComplexFormTest": "Threading Complex Form",
         "DrainTest": "Drain Test",
         "DroneInfiltrationTest": "Drone Infiltration Test",
@@ -1001,6 +1015,7 @@
         "MeleeAttackTest": "Melee Weapon Attack",
         "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
         "NaturalRecoveryStunTest": "Natural Recovery Stun",
+        "OpposedCompileSpriteTest": "Oppose Compilation",
         "OpposedSummonSpiritTest": "Oppose Summoning",
         "OpposedTest": "Opposed Test",
         "PhysicalDefenseTest": "Physical Defense",
@@ -1021,6 +1036,14 @@
         "Actor": {
             "MissingSummoner": "Drag&Drop Character or use summoning action",
             "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
+        },
+        "CallInAction": {
+            "ActorType": "Type of actor to call in"
+        },
+        "CompilationTest": {
+            "Level": "Level of the compiled sprite",
+            "PreparedSprite": "Use a prepared sprite actor instead of creating a generic one",
+            "SpriteType": "Type of the compiled sprite"
         },
         "Effect": {
             "Inactive": "Inactive effects don't apply their changes until they are enabled",
@@ -1148,8 +1171,8 @@
         "NegativeLimitValue": "Limit values must positive numbers",
         "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
         "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
-        "TokenSelectionNeeded": "One ore more tokens need to be selected",
-        "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain."
+        "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
+        "TokenSelectionNeeded": "One ore more tokens need to be selected"
     },
     "SR5.Weapon": "Weapon",
     "SR5.WeaponAmmoCount": "Ammo Count",

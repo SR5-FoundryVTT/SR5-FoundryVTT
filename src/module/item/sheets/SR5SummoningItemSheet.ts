@@ -1,5 +1,5 @@
-import { SR5Actor } from "../actor/SR5Actor";
-import { SR5BaseItemSheetData, SR5ItemSheet } from "./SR5ItemSheet";
+import { SR5Actor } from "../../actor/SR5Actor";
+import { SR5BaseItemSheetData, SR5ItemSheet } from "../SR5ItemSheet";
 
 
 interface SR5SummoningItemSheetData extends SR5BaseItemSheetData {
