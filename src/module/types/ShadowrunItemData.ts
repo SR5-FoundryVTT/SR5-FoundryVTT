@@ -33,7 +33,7 @@ declare namespace Shadowrun {
         | QualityItemData
         | SinItemData
         | SpellItemData
-        | SummoningItemData
+        | CallInActionItemData
         | SpritePowerItemData
         | WeaponItemData;
 
@@ -188,11 +188,11 @@ declare namespace Shadowrun {
         data: SpellData;
         system: SpellData;
     }
-    export interface SummoningItemData {
-        type: 'summoning'
-        name: string
-        data: SummoningData
-        system: SummoningData
+    export interface CallInActionItemData {
+        type: 'call_in_action',
+        name: string,
+        data: CallInActionData,
+        system: CallInActionData 
     }
     export interface SpritePowerItemData {
         type: 'sprite_power';

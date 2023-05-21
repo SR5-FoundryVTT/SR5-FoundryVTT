@@ -39,12 +39,12 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SummoningList.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellAndAdeptPowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpiritOptions.html',
 
         // matrix
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html',
@@ -106,6 +106,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
         'systems/shadowrun5e/dist/templates/item/parts/critter_power.html',
         'systems/shadowrun5e/dist/templates/item/parts/summoning.html',
+        'systems/shadowrun5e/dist/templates/item/parts/compilation.html',
 
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html',

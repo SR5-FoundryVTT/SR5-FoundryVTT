@@ -1106,9 +1106,9 @@
             "sin",
             "spell",
             "sprite_power",
-            "summoning",
             "weapon",
-            "host"
+            "host",
+            "call_in_action"
         ],
         "templates": {
             "description": {
@@ -1388,6 +1388,24 @@
                 "followed": {
                     "test": "DrainTest"
                 }
+            },
+            "spirit": {
+                "force": 1,
+                "type": "",
+                "uuid": ""
+            }
+        },
+        "call_in_action": {
+            "templates": ["description", "action"],
+            "action": {
+                "test": "",
+                "type": "complex"
+            },
+            "actor_type": "",
+            "sprite": {
+                "level": 1,
+                "type": "",
+                "uuid": ""
             },
             "spirit": {
                 "force": 1,

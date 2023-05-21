@@ -1,7 +1,5 @@
 declare namespace Shadowrun {
-    interface SummoningData extends
-        DescriptionPartData,
-        ActionPartData 
+    interface SummoningData
         {
             spirit: {
                 // What type of spirit should be created.

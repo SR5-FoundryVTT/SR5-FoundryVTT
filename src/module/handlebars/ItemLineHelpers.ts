@@ -135,7 +135,12 @@ export const registerItemLineHelpers = () => {
                 addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
                 return [addIcon];
             case 'summoning':
-                addIcon.title = game.i18n.localize('SR5.CreateItemSummoning');
+                // NOTE: summoning is not an actual item type. It's an call_in_action sub type
+                addIcon.title = game.i18n.localize('SR5.CallInAction.CreateSummoning');
+                return [addIcon];
+            case 'compilation':
+                // NOTE: compilation is not an actual item type. It's an call_in_action sub type
+                addIcon.title = game.i18n.localize('SR5.CallInAction.CreateCompilation');
                 return [addIcon];
             case 'effect':
                 addIcon.title = game.i18n.localize('SR5.CreateEffect');
@@ -299,6 +304,19 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             text: game.i18n.localize('SR5.Force')
+                        }
+                    }
+                ]
+            case 'compilation': 
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Compilation.SpriteType')
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Level')
                         }
                     }
                 ]
@@ -490,8 +508,8 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
-            case 'summoning':
-                const summoningData = item.system as Shadowrun.SummoningData;
+            case 'call_in_action':
+                const summoningData = item.system as Shadowrun.CallInActionData;
                 const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
 
                 return [
