@@ -29,9 +29,11 @@ interface SummonSpiritTestData extends SuccessTestData {
  * Summoning a spirit is described in SR5#300.
  * 
  * NOTE: While we need spell casting data, we don't need general spell casting flow.
- *       This is due to spell casting operating on spell items, while summoning is an action item.
+ *       This is due to spell casting operating on spell items, while summoning is a call_in_action item.
  * 
  * Summoning uses the default Success Test, Opposed Test and Followup Flow.
+ * 
+ * #TODO: Check for modifiers application
  */
 export class SummonSpiritTest extends SuccessTest {
     override data: SummonSpiritTestData
