@@ -29,9 +29,11 @@ interface SummonSpiritTestData extends SuccessTestData {
  * Summoning a spirit is described in SR5#300.
  * 
  * NOTE: While we need spell casting data, we don't need general spell casting flow.
- *       This is due to spell casting operating on spell items, while summoning is an action item.
+ *       This is due to spell casting operating on spell items, while summoning is a call_in_action item.
  * 
  * Summoning uses the default Success Test, Opposed Test and Followup Flow.
+ * 
+ * #TODO: Check for modifiers application
  */
 export class SummonSpiritTest extends SuccessTest {
     override data: SummonSpiritTestData
@@ -75,6 +77,15 @@ export class SummonSpiritTest extends SuccessTest {
             skill: 'summoning',
             attribute: 'magic'
         }
+    }
+
+    /**
+     * Summoning actions are magic actions and get their modifiers.
+     */
+    override get testModifiers(): Shadowrun.ModifierTypes[] {
+        const modifiers = super.testModifiers;
+        modifiers.push('background_count');
+        return modifiers;
     }
 
     /**
@@ -147,8 +158,8 @@ export class SummonSpiritTest extends SuccessTest {
      */
     _prepareSummoningData(data: SummonSpiritTestData) {
         if (!this.item) return;
-        const summoning = this.item.asSummoning;
-        if (!summoning) return;
+        const summoning = this.item.asCallInAction;
+        if (!summoning || !this.item.isSummoning) return;
 
         data.spiritTypes = this._prepareSpiritTypes();
 

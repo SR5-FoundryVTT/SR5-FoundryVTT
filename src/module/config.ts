@@ -25,7 +25,8 @@ export const SR5 = {
         sin: 'SR5.ItemTypes.Sin',
         spell: 'SR5.ItemTypes.Spell',
         sprite_power: 'SR5.ItemTypes.SpritePower',
-        weapon: 'SR5.ItemTypes.Weapon'
+        weapon: 'SR5.ItemTypes.Weapon',
+        call_in_action: 'ITEM.TypeCall_in_action'
     },
 
     // All available attributes. These are available as testable attributes across all actor types.
@@ -563,6 +564,15 @@ export const SR5 = {
         soldier: 'SR5.Spirit.Types.Soldier',
         worker: 'SR5.Spirit.Types.Worker',
         queen: 'SR5.Spirit.Types.Queen',
+    },
+
+    /**
+     * Actor types that can be called in using the call in action type and be
+     * set in it's system.action_type property.
+     */
+    callInActorTypes: {
+        'spirit': 'ACTOR.TypeSpirit',
+        'sprite': 'ACTOR.TypeSprite'
     },
 
     critterPower: {
