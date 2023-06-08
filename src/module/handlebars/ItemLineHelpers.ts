@@ -325,6 +325,20 @@ export const registerItemLineHelpers = () => {
         }
     });
 
+    /**
+     * Helper for ListItem parts do define segments on the right hand sight per list row.
+     * 
+     * These must match in order and quantity to the ItemHeadersRightSide helper.
+     * Example of a matching list header by ItemHeader:
+     * <header name>                          <ItemHeaderRightSide>['First Header', 'Second Header']
+     * Example of a list item row:
+     * <list name>                            <ItemRightSide>      ['First Value',  'Second Value']
+     * 
+     * @param item The item to render the right side for.
+     *             NOTE: ItemHeaderRightSide doesn't use the whole item to determine what to show, while
+     *                   ItemRightSide does. This is due to ItemRightSide showing content, while ItemHeaderRightSide
+     *                   showing dscriptors for that content.
+     */
     Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData): ItemListRightSide[] {
         const wrapper = new SR5ItemDataWrapper(item);
         const qtyInput = {
@@ -334,6 +348,7 @@ export const registerItemLineHelpers = () => {
                 cssClass: 'item-qty',
             },
         };
+        
         switch (item.type) {
             case 'action':
 
@@ -508,22 +523,46 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            /**
+             * Call In Actions differ depending on called in actor type.
+             */
             case 'call_in_action':
-                const summoningData = item.system as Shadowrun.CallInActionData;
-                const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
+                if (item.system.actor_type === 'spirit') {
+                    const summoningData = item.system as Shadowrun.CallInActionData;
+                    const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
+    
+                    return [
+                        {
+                            text: {
+                                text: game.i18n.localize(spiritTypeLabel)
+                            }
+                        },
+                        {
+                            text: {
+                                text: summoningData.spirit.force
+                            }
+                        }
+                    ]
+                }
 
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize(spiritTypeLabel)
+                if (item.system.actor_type === 'sprite') {
+                    const compilationData = item.system as Shadowrun.CallInActionData;
+                    const spriteTypeLabel = SR5.spriteTypes[compilationData.sprite.type] ?? '';
+
+                    return [
+                        {
+                            text: {
+                                text: game.i18n.localize(spriteTypeLabel)
+                            }
+                        },
+                        {
+                            text: {
+                                text: compilationData.sprite.level
+                            }
                         }
-                    },
-                    {
-                        text: {
-                            text: summoningData.spirit.force
-                        }
-                    }
-                ]
+                    ]
+                }
+
             default:
                 return [];
         }
