@@ -88,6 +88,15 @@ export class CompileSpriteTest extends SuccessTest {
     }
 
     /**
+     * Compilation actions are matrix/threading actions and get their modifiers.
+     */
+    override get testModifiers() {
+        const modifiers = super.testModifiers;
+        modifiers.push('noise');
+        return modifiers;
+    }
+
+    /**
      * Inject level as limit value into test.
      */
     override prepareBaseValues() {

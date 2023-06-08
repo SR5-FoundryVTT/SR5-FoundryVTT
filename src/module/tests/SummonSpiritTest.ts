@@ -80,6 +80,15 @@ export class SummonSpiritTest extends SuccessTest {
     }
 
     /**
+     * Summoning actions are magic actions and get their modifiers.
+     */
+    override get testModifiers(): Shadowrun.ModifierTypes[] {
+        const modifiers = super.testModifiers;
+        modifiers.push('background_count');
+        return modifiers;
+    }
+
+    /**
      * Summoning uses Force as limit, which needs to be injected into the normal test flow.
      */
     override prepareBaseValues() {
