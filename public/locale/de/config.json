@@ -177,6 +177,8 @@
     },
     "SR5.ClearMarks": "Entferne alle Marken",
     "SR5.Close": "Schließen",
+    "SR5.Collapse": "Einklappen",
+    "SR5.CollapseAll": "Alles einklappen",
     "SR5.CommonProgram": "Standardprogramm",
     "SR5.ComplexForm": "Komplexe Form",
     "SR5.ComplexForms": "Komplexe Formen",
@@ -382,6 +384,8 @@
         "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug Akteur geworfen werden"
     },
     "SR5.EssenceCost": "Essenz",
+    "SR5.Expand": "Erweitern",
+    "SR5.ExpandAll": "Erweitere alles",
     "SR5.Extend": "Ausdehnen",
     "SR5.Extended": "Ausgedehnt",
     "SR5.ExtendedHits": "Ausged. Erfolge",
@@ -1000,7 +1004,7 @@
         "FadeTest": "Schwundwiderstand",
         "MeleeAttackTest": "Nahkampf Angriff",
         "NaturalRecoveryPhysicalTest": "Natürliche Genesung Körperlich",
-        "NaturalRecoveryStunTest": "Natürliche Genesung Geistig",        
+        "NaturalRecoveryStunTest": "Natürliche Genesung Geistig",
         "OpposedSummonSpiritTest": "Widerstehe Herbeirufung",
         "OpposedTest": "Vergleichsprobe",
         "PhysicalDefenseTest": "Physische Verteidigung",
@@ -1078,11 +1082,11 @@
             "Recoil": "Anzahl abgefeuerter Kugeln"
         },
         "SummoningTest": {
-                "DragOnCanvas": "Ziehe Geist auf Karte",
-                "Force": "Kraft des herbeizurufenden Geistes",
-                "ReagentDrams": "Dram aus Reagenzien für das Herbeirufen Limit",
-                "SpiritType": "Art des herbeizurufenden Geistes",
-                "PreparedSpirit": "Nutze einen vorbereiteten Geist Akteur anstelle eines generisch erstellten"
+            "DragOnCanvas": "Ziehe Geist auf Karte",
+            "Force": "Kraft des herbeizurufenden Geistes",
+            "PreparedSpirit": "Nutze einen vorbereiteten Geist Akteur anstelle eines generisch erstellten",
+            "ReagentDrams": "Dram aus Reagenzien für das Herbeirufen Limit",
+            "SpiritType": "Art des herbeizurufenden Geistes"
         }
     },
     "SR5.Top": "Oberseite",
@@ -1147,8 +1151,8 @@
         "NegativeLimitValue": "Limit Werte müssen über Null liegen",
         "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer.",
         "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
-        "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
-        "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen."
+        "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
+        "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
     },
     "SR5.Weapon": "Waffen",
     "SR5.WeaponAmmoCount": "Munition",
@@ -1177,9 +1181,5 @@
     "SR5.WeaponReach": "Reichweite",
     "SR5.WeaponReload": "Nachladen",
     "SR5.WeaponType": "Typ",
-    "SR5.Wireless": "Wireless",
-    "SR5.Collapse": "Einklappen",
-    "SR5.CollapseAll": "Alles einklappen",
-    "SR5.Expand": "Erweitern",
-    "SR5.ExpandAll": "Erweitere alles"
+    "SR5.Wireless": "Wireless"
 }
