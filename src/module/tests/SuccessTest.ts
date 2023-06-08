@@ -56,6 +56,10 @@ export interface TestData {
     threshold: ValueField
     limit: ValueField
 
+    // Hits as reported by an external dice roll.
+    manualHits: ValueField
+    manualGlitches: ValueField
+
     // Internal test values.
     values: TestValues
 
@@ -222,6 +226,10 @@ export class SuccessTest {
         data.values.extendedHits = data.values.extendedHits || DataDefaults.valueData({label: "SR5.ExtendedHits"});
         data.values.netHits = data.values.netHits || DataDefaults.valueData({label: "SR5.NetHits"});
         data.values.glitches = data.values.glitches || DataDefaults.valueData({label: "SR5.Glitches"});
+
+        // User reported manual hits.
+        data.manualHits = data.manualHits || DataDefaults.valueData({label: "SR5.ManualHits"});
+        data.manualGlitches = data.manualGlitches || DataDefaults.valueData({label: "SR5.ManualGlitches"});
 
         data.opposed = data.opposed || undefined;
         data.modifiers = this._prepareModifiersData(data.modifiers);
@@ -600,6 +608,9 @@ export class SuccessTest {
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
 
+        this.data.manualHits.value = Helpers.calcTotal(this.data.manualHits, {min: 0});
+        this.data.manualGlitches.value = Helpers.calcTotal(this.data.manualGlitches, {min: 0});
+        
         console.debug(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
 
@@ -612,11 +623,13 @@ export class SuccessTest {
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
      */
     async evaluate(): Promise<this> {
-        // Evaluate all rolls.
-        for (const roll of this.rolls) {
-            // @ts-ignore // foundry-vtt-types is missing evaluated.
-            if (!roll._evaluated)
-                await roll.evaluate({async: true});
+        if (!this.useManualRoll) {
+            // Evaluate all rolls.
+            for (const roll of this.rolls) {
+                // @ts-ignore // foundry-vtt-types is missing evaluated.
+                if (!roll._evaluated)
+                    await roll.evaluate({async: true});
+            }
         }
 
         this.data.evaluated = true;
@@ -825,7 +838,11 @@ export class SuccessTest {
      * Helper to get the hits value for this success test with a possible limit.
      */
     calculateHits(): ValueField {
-        const rollHits = this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
+        // Use manual or automated roll for hits.
+        const rollHits = this.useManualRoll ? 
+            this.manualHits.value :
+            this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
+
         const hits = DataDefaults.valueData({
             label: "SR5.Hits",
             base: this.hasLimit ?
@@ -846,11 +863,37 @@ export class SuccessTest {
         return this.data.values.extendedHits || DataDefaults.valueData({label: 'SR5.ExtendedHits'});
     }
 
+    get manualHits(): ValueField {
+        return this.data.manualHits;
+    }
+
+    get manualGlitches(): ValueField {
+        return this.data.manualGlitches;
+    }
+
+    /**
+     * Depending on system settings allow manual hits to skip automated roll.
+     */
+    get allowManualHits(): boolean {
+        return game.settings.get(SYSTEM_NAME, FLAGS.ManualRollOnSuccessTest) as boolean;
+    }
+
+    /**
+     * Determine if this success test must automated roll or can use a manual roll given by user.
+     */
+    get useManualRoll(): boolean {
+        return this.allowManualHits && (Boolean(this.data.manualHits.override) || Boolean(this.data.manualGlitches.override)) 
+    }
+
     /**
      * Helper to get the glitches values for this success test.
      */
     calculateGlitches(): ValueField {
-        const rollGlitches = this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
+        // When using a manual roll, don't derive glitches from automated rolls.
+        const rollGlitches = this.useManualRoll ?
+            this.manualGlitches.value :
+            this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
+
         const glitches = DataDefaults.valueData({
             label: "SR5.Glitches",
             base: rollGlitches

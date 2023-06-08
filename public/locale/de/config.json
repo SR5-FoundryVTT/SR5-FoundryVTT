@@ -44,6 +44,8 @@
         "HideGMOnlyChatContent": "Verstecke GM Informationen in Proben Chat Nachrichten",
         "HideGMOnlyChatContentDescription": "Nachrichten durch GM Proben zeigen kritische Informationen nur Spielern mit Besitzer Rechten für den genutzten Akteur",
         "IgnoreDiagonal": "Ignoriere diagonale Bewegung (1-1-1)",
+        "ManualRollOnSuccessTest": "Manuelles Würfeln bei Proben",
+        "ManualRollOnSuccessTestDescription": "Erlaubt Benutzern manuelle Würfelwürfe bei Proben und Rückmeldungen von Erfolgen",
         "MustHaveRessourcesOnTest": "Proben nur mit außreichenden Ressourcen",
         "MustHaveRessourcesOnTestDescription": "Eine Probe kann nur durchgeführt werden wenn alle Ressourcen dafür vorhadnen sind",
         "OnlyAllowRollOnDefaultableSkills": "Nur improvisierbare unbekannte Fertigkeitsproben",
@@ -57,9 +59,7 @@
         "ShowTokenNameForChatOutputDescription": "Soll der Namen des Tokens für die Würfelkarte angezeigt werden anstelle dem Namen des Actors, wenn ein Token verfügbar ist",
         "ShowTokenNameForChatOutputName": "Token Namen für Würfelkarte",
         "TokenHealthBars": "Token Lebensbalken",
-        "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige",
-        "WhisperOpposedTestsToTargetedPlayers": "Flüstere VS Anteil an anvisierte Spieler",
-        "WhisperOpposedTestsToTargetedPlayersDescription": "Bei Proben mit VS Proben wird eine geflüsterte Nachricht an anvisierte Spieler (online) versendet"
+        "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige"
     },
     "SR5.AP": "DK",
     "SR5.Accessory": "Zubehör",
@@ -589,6 +589,8 @@
     "SR5.MIGRATION.WarningRequired": "Das Shadowrun 5E System muss eine notwendige Aktualisierung ausführen.",
     "SR5.MIGRATION.WarningTitle": "Alarm",
     "SR5.Magic": "Magie",
+    "SR5.ManualHits": "Man. Erfolge",
+    "SR5.ManualGlitches": "Man. Glitches",
     "SR5.ManualOverride": "Manuelle Eingabe",
     "SR5.Marks": "Marken",
     "SR5.MatrixAttrAttack": "Attacke",
@@ -1087,6 +1089,17 @@
             "PreparedSpirit": "Nutze einen vorbereiteten Geist Akteur anstelle eines generisch erstellten",
             "ReagentDrams": "Dram aus Reagenzien für das Herbeirufen Limit",
             "SpiritType": "Art des herbeizurufenden Geistes"
+        },
+        "Test": {
+            "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
+            "Pool": "Anzahl zu werfender Würfel",
+            "Threshold": "Vollständiger Schwellenwert",
+            "Limit": "Vollständiger Limitwert",
+            "PushTheLimit": "Verwende Edge Regel Grenzen Sprenngen",
+            "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
+            "RollMode": "FoundryVTT chat message roll visibility",
+            "ManualHits": "Anzahl Erfolge von manuell geworfenen Würfeln. Überspringt FoundryVTT Würfelwurf.",
+            "ManualGlitches": "Anzahl Glitches von manuell geworfenen Würfeln. Muss zusammen mit manuellen Erfolgen verwendet werden.",
         }
     },
     "SR5.Top": "Oberseite",

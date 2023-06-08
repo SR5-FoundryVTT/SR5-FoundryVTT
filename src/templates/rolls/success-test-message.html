@@ -65,8 +65,11 @@
         <div class="card-test-content">
             {{! Some tests will not determine an outcome, but a failure will always be a failure }}
             {{#unless test.showSuccessLabel}}{{#unless test.failure}}
-            <div class="glitch-content clickable show-roll"><div class="glitch">Results</div></div>
+            <div class="glitch-content clickable show-roll">
+                <div class="glitch">Results</div>
+            </div>
             {{/unless}}{{/unless}}
+            
 
             {{! Some tests will determine an outcome and success state }}
             {{#if test.canSucceed}} {{#if test.showSuccessLabel}}
@@ -75,13 +78,7 @@
                     {{localize test.successLabel}}
                 </div>
             </div>
-            {{#if test.glitched}}
-            <div class="glitch-content">
-                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
-                    {{localize "SR5.Glitch"}}
-                </div>
-            </div>
-            {{/if}} {{/if}} {{/if}}
+            {{/if}} {{/if}}
             
             {{! Some tests will determine a failure state }}
             {{#if test.canFail}}{{#if test.failure}}
@@ -91,21 +88,35 @@
                 </div>
             </div>
             {{/if}}
+            {{/if}}
+
+            {{! In any case inform about glitched state }}
             {{#if test.criticalGlitched}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>
                     {{localize "SR5.GlitchCritical"}}
                 </div>
             </div>
-            {{/if}}{{/if}}
+            {{else}}
+            {{#if test.glitched}}
+            <div class="glitch-content">
+                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
+                    {{localize "SR5.Glitch"}}
+                </div>
+            </div>
+            {{/if}}
+            {{/if}}
+            
         </div>
     </div>
     <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
+        {{#ife test.useManualRoll false}}
         {{#each test.rolls}}
             {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'
                 roll=this
             }}
         {{/each}}
+        {{/ife}}
     </div>
     {{#if test.targets}}
     <div class="test-line">

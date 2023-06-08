@@ -45,6 +45,8 @@
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
+        "ManualRollOnSuccessTest": "Manual dice roll on any test",
+        "ManualRollOnSuccessTestDescription": "Allow user to manually roll dice on tests and report back hits",
         "MustHaveRessourcesOnTest": "Stop Tests with missing ressouces",
         "MustHaveRessourcesOnTestDescription": "Only allow actors with all necessary resources to roll a test",
         "OnlyAllowRollOnDefaultableSkills": "Only defaultable unknown skill rolls",
@@ -58,9 +60,7 @@
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
         "TokenHealthBars": "Token health bars",
-        "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
-        "WhisperOpposedTestsToTargetedPlayers": "Whisper tests to targeted players",
-        "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to an online player target"
+        "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring"
     },
     "SR5.AP": "AP",
     "SR5.Accessory": "Accessory",
@@ -154,10 +154,10 @@
     },
     "SR5.CallInAction": {
         "ActorType": "Actor Type",
-        "Summoning": "Summoning",
         "Compilation": "Compilation",
+        "CreateCompilation": "Create compilation action",
         "CreateSummoning": "Create summoning action",
-        "CreateCompilation": "Create compilation action"
+        "Summoning": "Summoning"
     },
     "SR5.CanDefault": "Can Default",
     "SR5.Capacity": "Capacity",
@@ -601,6 +601,8 @@
     "SR5.MIGRATION.WarningRequired": "The Shadowrun 5E system must begin a required update.",
     "SR5.MIGRATION.WarningTitle": "Alert",
     "SR5.Magic": "Magic",
+    "SR5.ManualHits": "Man. Hits",
+    "SR5.ManualGlitches": "Man. Glitches",
     "SR5.ManualOverride": "Manual Override",
     "SR5.Marks": "Marks",
     "SR5.MatrixAttrAttack": "Attack",
@@ -1107,6 +1109,17 @@
             "PreparedSpirit": "Use a prepared spirit actor instead of creating a generic one",
             "ReagentDrams": "Drams of reagents used for altering summoning limit",
             "SpiritType": "Type of the summoned spirit"
+        },
+        "Test": {
+            "Modifier": "Sum of all modifiers applied to dice pool",
+            "Pool": "Amount of dice to roll",
+            "Threshold": "Calculated threshold value",
+            "Limit": "Calculated limit value",
+            "PushTheLimit": "Apply push the limit edge rules",
+            "Extended": "Test will be thrown as an extended test until threshold is reached",
+            "RollMode": "FoundryVTT chat message roll visibility",
+            "ManualHits": "Amount of hits from manually thrown dice pool. Will skip FoundryVTT dice throw.",
+            "ManualGlitches": "Amount of glitches from manually thrown dice pool. Must be used together with manual hits."
         }
     },
     "SR5.Top": "Top",

@@ -16,7 +16,6 @@ export const FLAGS = {
     DiagonalMovement: 'diagonalMovement',
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
-    WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
     ShowSkillsWithDetails: 'showSkillsWithDetails',
     OnlyAutoRollNPCInCombat: 'onlyAutoRollNPCInCombat',
@@ -46,7 +45,8 @@ export const FLAGS = {
     MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest',
     AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier',
     AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
-    TurnsSinceLastAttack: 'turnsSinceLastAttack'
+    TurnsSinceLastAttack: 'turnsSinceLastAttack',
+    ManualRollOnSuccessTest: 'ManualRollOnSuccessTest',
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
