@@ -40,7 +40,7 @@
             </div>
             <div class="right-side">
                 <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span class="value-result">{{test.pool.value}}</span></div>
-                <div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span class="value-result">{{test.hits.value}}</span></div>
+                <div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span class="value-result">{{test.hits.value}}{{#if test.usingManualRoll}}*{{/if}}</span></div>
                 {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span class="value-result">{{test.extendedHits.value}}</span></div>{{/if}}
                 {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span class="value-result">{{test.netHits.value}}</span></div>{{/if}}
                 {{#if previewTemplate}}
@@ -109,14 +109,19 @@
             
         </div>
     </div>
+    {{#if test.usingManualRoll}}
+    <div class="card-main-content">
+        <div class="card-content">* {{localize "SR5.ManualHits"}}</div>
+    </disv>
+    {{/if}}
     <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
-        {{#ife test.useManualRoll false}}
+        {{#if (not test.usingManualRoll)}}
         {{#each test.rolls}}
             {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'
                 roll=this
             }}
         {{/each}}
-        {{/ife}}
+        {{/if}}
     </div>
     {{#if test.targets}}
     <div class="test-line">

@@ -623,7 +623,7 @@ export class SuccessTest {
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
      */
     async evaluate(): Promise<this> {
-        if (!this.useManualRoll) {
+        if (!this.usingManualRoll) {
             // Evaluate all rolls.
             for (const roll of this.rolls) {
                 // @ts-ignore // foundry-vtt-types is missing evaluated.
@@ -839,7 +839,7 @@ export class SuccessTest {
      */
     calculateHits(): ValueField {
         // Use manual or automated roll for hits.
-        const rollHits = this.useManualRoll ? 
+        const rollHits = this.usingManualRoll ? 
             this.manualHits.value :
             this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
 
@@ -881,7 +881,7 @@ export class SuccessTest {
     /**
      * Determine if this success test must automated roll or can use a manual roll given by user.
      */
-    get useManualRoll(): boolean {
+    get usingManualRoll(): boolean {
         return this.allowManualHits && (Boolean(this.data.manualHits.override) || Boolean(this.data.manualGlitches.override)) 
     }
 
@@ -890,7 +890,7 @@ export class SuccessTest {
      */
     calculateGlitches(): ValueField {
         // When using a manual roll, don't derive glitches from automated rolls.
-        const rollGlitches = this.useManualRoll ?
+        const rollGlitches = this.usingManualRoll ?
             this.manualGlitches.value :
             this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
 
