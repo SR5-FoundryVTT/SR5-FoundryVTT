@@ -151,6 +151,13 @@
         "ReduceInitByOne": "Initiative -1",
         "ReduceInitByTen": "Initiative -10"
     },
+    "SR5.CallInAction": {
+        "ActorType": "Akteur",
+        "Compilation": "Kompilierung",
+        "CreateCompilation": "Erstelle Kompilierungs Aktion",
+        "CreateSummoning": "Erstelle Beschwörungs Aktion",
+        "Summoning": "Beschwörung"
+    },
     "SR5.CanDefault": "Improvisierbar",
     "SR5.Capacity": "Kapazität",
     "SR5.CareerKarma": "Gesamtkarma",
@@ -589,8 +596,8 @@
     "SR5.MIGRATION.WarningRequired": "Das Shadowrun 5E System muss eine notwendige Aktualisierung ausführen.",
     "SR5.MIGRATION.WarningTitle": "Alarm",
     "SR5.Magic": "Magie",
-    "SR5.ManualHits": "Man. Erfolge",
     "SR5.ManualGlitches": "Man. Glitches",
+    "SR5.ManualHits": "Man. Erfolge",
     "SR5.ManualOverride": "Manuelle Eingabe",
     "SR5.Marks": "Marken",
     "SR5.MatrixAttrAttack": "Attacke",
@@ -1091,15 +1098,18 @@
             "SpiritType": "Art des herbeizurufenden Geistes"
         },
         "Test": {
+            "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
+            "Limit": "Vollständiger Limitwert",
+            "ManualGlitches": "Anzahl Glitches von manuell geworfenen Würfeln. Muss zusammen mit manuellen Erfolgen verwendet werden.",
+            "ManualHits": "Anzahl Erfolge von manuell geworfenen Würfeln. Überspringt FoundryVTT Würfelwurf.",
             "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
             "Pool": "Anzahl zu werfender Würfel",
-            "Threshold": "Vollständiger Schwellenwert",
-            "Limit": "Vollständiger Limitwert",
             "PushTheLimit": "Verwende Edge Regel Grenzen Sprenngen",
-            "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
             "RollMode": "FoundryVTT chat message roll visibility",
-            "ManualHits": "Anzahl Erfolge von manuell geworfenen Würfeln. Überspringt FoundryVTT Würfelwurf.",
-            "ManualGlitches": "Anzahl Glitches von manuell geworfenen Würfeln. Muss zusammen mit manuellen Erfolgen verwendet werden."
+            "Threshold": "Vollständiger Schwellenwert"
+        },
+        "CallInAction": {
+            "ActorType": "Herbeizurufender Akteurtyp"
         }
     },
     "SR5.Top": "Oberseite",
