@@ -284,13 +284,6 @@ ___________________
             makeDefault: true,
             types: ['call_in_action']
         });
-        
-        console.error('Remove this sheet');
-        // Items.registerSheet(SYSTEM_NAME, SR5SummoningItemSheet, {
-        //     label: "SR5.SheetItem",
-        //     makeDefault: true,
-        //     types: ['summoning']
-        // });
 
         // Register configs for embedded documents.
         DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', ActiveEffectConfig);
