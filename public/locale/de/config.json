@@ -1099,7 +1099,7 @@
             "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
             "RollMode": "FoundryVTT chat message roll visibility",
             "ManualHits": "Anzahl Erfolge von manuell geworfenen Würfeln. Überspringt FoundryVTT Würfelwurf.",
-            "ManualGlitches": "Anzahl Glitches von manuell geworfenen Würfeln. Muss zusammen mit manuellen Erfolgen verwendet werden.",
+            "ManualGlitches": "Anzahl Glitches von manuell geworfenen Würfeln. Muss zusammen mit manuellen Erfolgen verwendet werden."
         }
     },
     "SR5.Top": "Oberseite",
