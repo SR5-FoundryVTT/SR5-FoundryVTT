@@ -44,6 +44,9 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
             item.name = ImportHelper.StringValue(program, 'name');
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name);
+
             item.system.technology.rating = ImportHelper.IntValue(program, 'rating', 0);
             item.system.description.source = `${ImportHelper.StringValue(program, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(program, 'name'), ImportHelper.StringValue(program, 'page'))}`;
             item.system.technology.availability = ImportHelper.StringValue(program, 'avail');

@@ -1,0 +1,27 @@
+Icons in this folder are sourced from game-icons.net
+The icons and their authors are listed below as required by CC by Attribution 3.0, which can be found here https://creativecommons.org/licenses/by/3.0/.
+
+Icon - Author - Source
+
+action.svg - Lorc - https://game-icons.net/1x1/lorc/slap.html
+adept_power.svg - Lorc - https://game-icons.net/1x1/lorc/burning-passion.html
+ammo.svg - Lorc - https://game-icons.net/1x1/lorc/bullets.html
+armor.svg - Skoll - https://game-icons.net/1x1/skoll/kevlar-vest.html
+bioware.svg - Lorc - https://game-icons.net/1x1/lorc/beast-eye.html
+complex_form.svg - Lorc - https://game-icons.net/1x1/lorc/cogsplosion.html
+contact.svg - Delapouite - https://game-icons.net/1x1/delapouite/discussion.html
+critter_power.svg - Lorc - https://game-icons.net/1x1/lorc/moon-claws.html
+cyberware.svg - Delapouite - https://game-icons.net/1x1/delapouite/cyborg-face.html
+device.svg - Skoll - https://game-icons.net/1x1/skoll/smartphone.html
+equipment.svg - Delapouite - https://game-icons.net/1x1/delapouite/briefcase.html
+host.svg - Delapouite - https://game-icons.net/1x1/delapouite/server-rack.html
+lifestyle.svg - Delapouite - https://game-icons.net/1x1/delapouite/family-house.html
+modification.svg - Skoll - https://game-icons.net/1x1/skoll/bayonet.html
+program.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
+quality.svg - Lorc - https://game-icons.net/1x1/lorc/anatomy.html
+sin.svg - Lord Berandas - https://game-icons.net/1x1/lord-berandas/computing.html
+spell.svg - Delapouite - https://game-icons.net/1x1/delapouite/spell-book.html
+sprite_power.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
+weapon.svg - John Colburn - https://game-icons.net/1x1/john-colburn/pistol-gun.html
+
+deck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html

@@ -55,6 +55,10 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             }
 
             let item = parser.Parse(jsonData, this.GetDefaultData({type: 'spell'}), this.itemTranslations);
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name);
+            
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.category].id;
 

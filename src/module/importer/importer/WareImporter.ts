@@ -61,6 +61,11 @@ export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
 
             const defaultData = key === 'cyberware' ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
             let item = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
+            
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name);
+            
             const category = ImportHelper.StringValue(jsonData, 'category');
 
             // TODO: Does this type mixture cause later issues? Will it carry over?

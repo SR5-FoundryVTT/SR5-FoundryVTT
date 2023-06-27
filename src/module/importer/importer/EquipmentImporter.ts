@@ -46,6 +46,9 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
             item.name = ImportHelper.StringValue(equipment, 'name');
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name);
+
             item.system.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(equipment, 'rating', 0);
             item.system.technology.availability = ImportHelper.StringValue(equipment, 'avail');

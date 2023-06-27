@@ -766,5 +766,28 @@ export const SR5 = {
         action: 'complex',
         mode: 'full_auto'
     }
-    ] as Shadowrun.FireModeData[]
+    ] as Shadowrun.FireModeData[],
+
+    itemSubTypes: {
+        action: [],
+        adept_power: [],
+        ammo: [],
+        armor: [],
+        bioware: [],
+        complex_form: [],
+        contact: [],
+        critter_power: [],
+        cyberware: [],
+        device: [],
+        equipment: [],
+        host: [],
+        lifestyle: [],
+        modification: [],
+        program: [],
+        quality: [],
+        sin: [],
+        spell: [],
+        sprite_power: [],
+        weapon: []
+    }
 };

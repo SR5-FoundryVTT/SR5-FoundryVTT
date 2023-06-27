@@ -1,5 +1,6 @@
 import { DataDefaults } from './../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
+import * as IconAssign from '../iconAssigner/iconAssign';
 
 const xml2js = require('xml2js');
 
@@ -65,6 +66,13 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * @returns An array of created objects.
      */
     public abstract Parse(chummerData: object): Promise<Item>;
+
+    /**
+     * Get the appropriate default icon
+     */
+    public iconAssign(itemType: string, name: string): string {
+        return IconAssign.iconAssign(itemType, name);
+    }
 
     /**
      * Parse an XML string into a JSON object.

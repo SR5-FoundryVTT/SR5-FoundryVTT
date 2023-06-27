@@ -10,8 +10,8 @@ import { ComplexFormImporter } from '../importer/ComplexFormImporter';
 import { WareImporter } from '../importer/WareImporter';
 import { CritterPowerImporter } from '../importer/CritterPowerImporter';
 import { ImportHelper, ImportMode } from '../helper/ImportHelper';
-import {DeviceImporter} from "../importer/DeviceImporter";
-import {EquipmentImporter} from "../importer/EquipmentImporter";
+import { DeviceImporter } from "../importer/DeviceImporter";
+import { EquipmentImporter } from "../importer/EquipmentImporter";
 import { SpritePowerImporter } from '../importer/SpritePowerImporter';
 
 

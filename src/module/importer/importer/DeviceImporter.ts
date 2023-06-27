@@ -33,6 +33,9 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             item.name = ImportHelper.StringValue(commlink, 'name');
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name);
+
             item.system.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(commlink, 'devicerating', 0);
             item.system.technology.availability = ImportHelper.StringValue(commlink, 'avail');
@@ -65,6 +68,9 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             item.system.category = 'cyberdeck';
             item.name = ImportHelper.StringValue(cyberdeck, 'name');
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign('deck', item.name);
 
             item.system.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(cyberdeck, 'devicerating', 0);
