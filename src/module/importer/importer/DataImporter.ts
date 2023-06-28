@@ -1,6 +1,6 @@
 import { DataDefaults } from './../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
-import * as IconAssign from '../iconAssigner/iconAssign';
+import * as IconAssign from '../../apps/iconAssigner/iconAssign';
 
 const xml2js = require('xml2js');
 
@@ -70,8 +70,8 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
     /**
      * Get the appropriate default icon
      */
-    public iconAssign(itemType: string, name: string): string {
-        return IconAssign.iconAssign(itemType, name);
+    public iconAssign(itemType: string, name: string, system: Object): string {
+        return IconAssign.iconAssign(itemType, name, system);
     }
 
     /**

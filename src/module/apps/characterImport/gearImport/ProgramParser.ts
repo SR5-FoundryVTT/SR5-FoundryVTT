@@ -1,4 +1,5 @@
 import { BaseGearParser } from "./BaseGearParser"
+import { iconAssign } from '../../iconAssigner/iconAssign';
 
 /**
  * Parses common, hacking and agent programs.
@@ -20,6 +21,8 @@ export class ProgramParser extends BaseGearParser {
         {
             parsedGear.system.type = 'agent'
         }
+        
+        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
 
         return parsedGear;
     }

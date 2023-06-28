@@ -56,14 +56,14 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
             }
 
             let item = parser.Parse(jsonData, this.GetDefaultData({type: 'weapon'}), this.itemTranslations);
-
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name);
             
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.subcategory].id;
 
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name, item.system);
 
             items.push(item);
         }

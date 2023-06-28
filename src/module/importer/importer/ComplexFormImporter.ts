@@ -49,10 +49,10 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             // TODO: Follow ComplexFormParserBase approach.
             item.name = ImportHelper.MapNameToTranslation(this.nameTranslations, item.name);
 
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name);
-
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name, item.system);
 
             items.push(item);
         }

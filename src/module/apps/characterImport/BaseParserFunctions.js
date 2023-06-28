@@ -1,4 +1,5 @@
 import { DataDefaults } from "../../data/DataDefaults";
+import { iconAssign } from '../iconAssigner/iconAssign';
 
 export const getValues = (val) => {
     const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
@@ -72,7 +73,7 @@ export const createItemData = (name, type, system) => {
         _id: '',
         folder: '',
         flags: {},
-        img: 'icons/svg/mystery-man.svg',
+        img: iconAssign(type, name, system),
         type: type,
         system,
         permission: {

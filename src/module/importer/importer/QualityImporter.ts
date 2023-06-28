@@ -45,10 +45,10 @@ export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.Qua
             item.folder = folders[category.toLowerCase()].id;
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name);
-
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name, item.system);
 
             items.push(item);
         }

@@ -1,6 +1,7 @@
 import { parseDescription, parseTechnology } from "../BaseParserFunctions.js"
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import {DataDefaults} from "../../../data/DataDefaults";
+import { iconAssign } from '../../iconAssigner/iconAssign';
 
 
 /**
@@ -28,6 +29,8 @@ export class BaseGearParser implements GearParser {
 
         parsedGear.system.technology = parseTechnology(chummerGear);
         parsedGear.system.description = parseDescription(chummerGear);
+        
+        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
 
         return parsedGear;
     }

@@ -39,9 +39,6 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
             let item = parser.Parse(jsonData, this.GetDefaultData({type: 'modification'}));
             item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
 
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name);
-
             let folderName = item.system.mount_point !== undefined ? item.system.mount_point : 'Other';
             if (folderName.includes('/')) {
                 let splitName = folderName.split('/');
@@ -53,6 +50,9 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
             item.folder = folder.id;
 
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name, item.system);
 
             datas.push(item);
         }

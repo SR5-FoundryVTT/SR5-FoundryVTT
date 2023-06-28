@@ -1,4 +1,5 @@
 import { BaseGearParser } from "./BaseGearParser"
+import { iconAssign } from '../../iconAssigner/iconAssign';
 
 /**
  * Parses devices (commlinks and decks)
@@ -51,6 +52,9 @@ export class DeviceParser extends BaseGearParser {
             // We are handling rccs as commlinks for the moment since we have no support for rigger command consoles yet.
             parsedGear.system.category = 'commlink'; 
         }
+
+        
+        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
 
         return parsedGear;
     }

@@ -39,14 +39,14 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
             let item = parser.Parse(jsonData, this.GetDefaultData({type: 'armor'}));
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
-
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name);
             
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folders[category].id;
 
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name, item.system);
 
             datas.push(item);
         }

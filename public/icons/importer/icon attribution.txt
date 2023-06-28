@@ -24,4 +24,4 @@ spell.svg - Delapouite - https://game-icons.net/1x1/delapouite/spell-book.html
 sprite_power.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
 weapon.svg - John Colburn - https://game-icons.net/1x1/john-colburn/pistol-gun.html
 
-deck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
+cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html

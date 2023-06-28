@@ -1,4 +1,5 @@
 import { BaseGearParser } from "./BaseGearParser"
+import { iconAssign } from '../../iconAssigner/iconAssign';
 
 /**
  * Parses SINs and the attached licenses.
@@ -23,6 +24,9 @@ export class SinParser extends BaseGearParser {
 
             parsedGear.system.licenses = this.parseLicenses(chummerLicenses);
         }
+        
+        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
+
         return parsedGear;
     }
 

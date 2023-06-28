@@ -1,4 +1,5 @@
 import { BaseGearParser } from "./BaseGearParser"
+import { iconAssign } from '../../iconAssigner/iconAssign';
 
 /**
  * Parses ammunition
@@ -27,6 +28,8 @@ export class AmmoParser extends BaseGearParser {
                 parsedGear.system.damageType = 'physical';
             }
         }
+        
+        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
 
         return parsedGear;
     }

@@ -40,9 +40,6 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             item.name = ImportHelper.StringValue(jsonData, 'name');
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name);
-
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
             item.system.technology.rating = 2;
             item.system.technology.availability = ImportHelper.StringValue(jsonData, 'avail');
@@ -90,6 +87,9 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             item.system.technology.conceal.base = 0;
 
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name, item.system);
 
             ammoDatas.push(item);
         }

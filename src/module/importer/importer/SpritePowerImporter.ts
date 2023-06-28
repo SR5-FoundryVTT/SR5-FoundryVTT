@@ -60,10 +60,10 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
             item.folder = folder.id;
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name);
-
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            // TODO: Move this to a more general base class
+            item.img = this.iconAssign(item.type, item.name, item.system);
 
             items.push(item);
         }
