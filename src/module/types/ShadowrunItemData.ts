@@ -54,6 +54,7 @@ declare namespace Shadowrun {
      * The whole item data data as an inclusive union.
      *
      * At the moment this is only used for ShadowrunItemDataWrapper.getData to work a type narrowing rework.
+     * Also used for the iconAssign function. Will be needed until character and item importers are unified.
      */
     export type ShadowrunItemDataData =
         Partial<ActionData> &
