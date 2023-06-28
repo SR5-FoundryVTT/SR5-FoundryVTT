@@ -22,6 +22,11 @@ quality.svg - Lorc - https://game-icons.net/1x1/lorc/anatomy.html
 sin.svg - Lord Berandas - https://game-icons.net/1x1/lord-berandas/computing.html
 spell.svg - Delapouite - https://game-icons.net/1x1/delapouite/spell-book.html
 sprite_power.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
-weapon.svg - John Colburn - https://game-icons.net/1x1/john-colburn/pistol-gun.html
+weapon.svg - Delapouite - https://game-icons.net/1x1/delapouite/saber-and-pistol.html
 
 cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
+quality-positive.svg - Lorc - https://game-icons.net/1x1/lorc/strong.html
+quality-negative.svg - Lorc - https://game-icons.net/1x1/lorc/oppression.html
+weapon-melee.svg - Skoll - https://game-icons.net/1x1/skoll/spiked-bat.html
+weapon-range.svg - John Colburn - https://game-icons.net/1x1/john-colburn/pistol-gun.html
+weapon-thrown.svg - DarkZaitzev - https://game-icons.net/1x1/darkzaitzev/shuriken.html
