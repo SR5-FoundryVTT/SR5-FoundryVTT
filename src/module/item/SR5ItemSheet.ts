@@ -183,6 +183,7 @@ export class SR5ItemSheet extends ItemSheet {
         data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
 
         data.rollModes = CONFIG.Dice.rollModes
+        console.log(this.object)
 
         return data;
     }
