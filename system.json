@@ -22,7 +22,7 @@
   "compatibility": {
     "minimum": "10",
     "maximum": "11",
-    "verified": "11.302"
+    "verified": "11.304"
   },
   "minimumCoreVersion": "10",
   "scripts": [],
