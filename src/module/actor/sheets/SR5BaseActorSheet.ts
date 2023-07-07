@@ -177,7 +177,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     static override get defaultOptions() {
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
-            width: 905,
+            width: 930,
             height: 690,
             tabs: [
                 {
