@@ -29,6 +29,7 @@ export class SpiritPrep {
         SpiritPrep.prepareSpiritBaseData(system);
 
         AttributesPrep.prepareAttributes(system);
+        SpiritPrep.prepareAttributesWithForce(system);
         SkillsPrep.prepareSkills(system);
 
         LimitsPrep.prepareLimitBaseFromAttributes(system);
@@ -431,5 +432,22 @@ export class SpiritPrep {
                 break;
         }
         return overrides;
+    }
+
+    /**
+     * The spirits force value is used for the force attribute value.
+     * 
+     * NOTE: This separation is mainly a legacy concern. Attributes are available as testable (and modifiable values)
+     *       flat values like force aren't. For this reason the flat value is transformed to an attribute.
+     * 
+     * @param system The spirit system data to prepare
+     */
+    static prepareAttributesWithForce(system: Shadowrun.SpiritData) {
+        const {attributes, force} = system;
+
+        // Allow value to be understandable when displayed.
+        attributes.force.base = 0;
+        PartsList.AddUniquePart(attributes.force.mod, 'SR5.Force', force);
+        AttributesPrep.calculateAttribute('force', attributes.force);
     }
 }

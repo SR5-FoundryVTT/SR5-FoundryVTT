@@ -960,11 +960,21 @@
         },
         "spirit": {
             "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values"],
+            "summonerUuid": "",
             "services": 0,
             "bound": false,
             "force": 0,
             "spiritType": "",
-            "special": "magic"
+            "special": "magic",
+            "attributes": {
+                "force": {
+                    "value": 0,
+                    "min": 0,
+                    "temp": 0,
+                    "mod": [],
+                    "hidden": true
+                }
+            }
         },
         "critter": {
             "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values"]
@@ -1033,6 +1043,15 @@
                         "max": 0
                     }
                 }
+            },
+            "attributes": {
+                "pilot": {
+                    "value": 0,
+                    "min": 0,
+                    "temp": 0,
+                    "mod": [],
+                    "hidden": true
+                }
             }
         },
         "ic": {
@@ -1088,7 +1107,8 @@
             "spell",
             "sprite_power",
             "weapon",
-            "host"
+            "host",
+            "call_in_action"
         ],
         "templates": {
             "description": {
@@ -1355,6 +1375,42 @@
                 "followed": {
                     "test": "DrainTest"
                 }
+            }
+        },
+        "summoning": {
+            "templates": ["description", "action"],
+            "action": {
+                "type": "complex",
+                "test": "SummonSpiritTest",
+                "opposed": {
+                    "test": "OpposedSummonSpiritTest"
+                },
+                "followed": {
+                    "test": "DrainTest"
+                }
+            },
+            "spirit": {
+                "force": 1,
+                "type": "",
+                "uuid": ""
+            }
+        },
+        "call_in_action": {
+            "templates": ["description", "action"],
+            "action": {
+                "test": "",
+                "type": "complex"
+            },
+            "actor_type": "",
+            "sprite": {
+                "level": 1,
+                "type": "",
+                "uuid": ""
+            },
+            "spirit": {
+                "force": 1,
+                "type": "",
+                "uuid": ""
             }
         },
         "critter_power": {

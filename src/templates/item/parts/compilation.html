@@ -1,0 +1,32 @@
+
+<div class="flexrow nowrap">
+    <label data-tooltip="SR5.Tooltips.CompilationTest.Level">{{localize "SR5.Level"}}</label>
+    <input
+        class="display attribute-input"
+        type="text"
+        size="2"
+        name="system.sprite.level"
+        value="{{system.sprite.level}}"
+        data-dtype="Number"
+        min="0"
+        placeholder="1">
+</div>
+<div class="flexrow nowrap">
+    <label data-tooltip="SR5.Tooltips.CompilationTest.SpriteType">{{localize "SR5.Compilation.SpriteType"}}</label>
+    <select name="system.sprite.type" class="display">
+        {{#select system.sprite.type}} {{#each config.spriteTypes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
+        {{/each}} {{/select}}
+    </select>
+</div>
+<div class="flexrow nowrap">
+    <label data-tooltip="SR5.Tooltips.CompilationTest.PreparedSprite">{{localize "SR5.Summoning.FixedSpirit"}}</label>
+    {{#if sprite}}
+    <span>
+        <a class="origin-link" draggable="false" data-origin-link="{{sprite.uuid}}">{{sprite.name}}</a>
+        <a class="close sprite-remove"><i class="fas fa-times"></i></a>
+    </span>
+    {{else}}
+    <span>{{localize "SR5.Compilation.DropSprite"}}</span>
+    {{/if}}
+</div>

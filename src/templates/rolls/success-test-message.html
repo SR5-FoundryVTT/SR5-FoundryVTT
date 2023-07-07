@@ -40,7 +40,7 @@
             </div>
             <div class="right-side">
                 <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span class="value-result">{{test.pool.value}}</span></div>
-                <div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span class="value-result">{{test.hits.value}}</span></div>
+                <div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span class="value-result">{{test.hits.value}}{{#if test.usingManualRoll}}*{{/if}}</span></div>
                 {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span class="value-result">{{test.extendedHits.value}}</span></div>{{/if}}
                 {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span class="value-result">{{test.netHits.value}}</span></div>{{/if}}
                 {{#if previewTemplate}}
@@ -65,8 +65,11 @@
         <div class="card-test-content">
             {{! Some tests will not determine an outcome, but a failure will always be a failure }}
             {{#unless test.showSuccessLabel}}{{#unless test.failure}}
-            <div class="glitch-content clickable show-roll"><div class="glitch">Results</div></div>
+            <div class="glitch-content clickable show-roll">
+                <div class="glitch">Results</div>
+            </div>
             {{/unless}}{{/unless}}
+            
 
             {{! Some tests will determine an outcome and success state }}
             {{#if test.canSucceed}} {{#if test.showSuccessLabel}}
@@ -75,13 +78,7 @@
                     {{localize test.successLabel}}
                 </div>
             </div>
-            {{#if test.glitched}}
-            <div class="glitch-content">
-                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
-                    {{localize "SR5.Glitch"}}
-                </div>
-            </div>
-            {{/if}} {{/if}} {{/if}}
+            {{/if}} {{/if}}
             
             {{! Some tests will determine a failure state }}
             {{#if test.canFail}}{{#if test.failure}}
@@ -91,21 +88,40 @@
                 </div>
             </div>
             {{/if}}
+            {{/if}}
+
+            {{! In any case inform about glitched state }}
             {{#if test.criticalGlitched}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>
                     {{localize "SR5.GlitchCritical"}}
                 </div>
             </div>
-            {{/if}}{{/if}}
+            {{else}}
+            {{#if test.glitched}}
+            <div class="glitch-content">
+                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
+                    {{localize "SR5.Glitch"}}
+                </div>
+            </div>
+            {{/if}}
+            {{/if}}
+            
         </div>
     </div>
+    {{#if test.usingManualRoll}}
+    <div class="card-main-content">
+        <div class="card-content">* {{localize "SR5.ManualHits"}}</div>
+    </disv>
+    {{/if}}
     <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
+        {{#if (not test.usingManualRoll)}}
         {{#each test.rolls}}
             {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'
                 roll=this
             }}
         {{/each}}
+        {{/if}}
     </div>
     {{#if test.targets}}
     <div class="test-line">
@@ -126,6 +142,15 @@
             </div>
             {{/each}}
         </div>
+    </div>
+    {{/if}}
+    {{#if followupActions}}
+    <div class="card-buttons">
+        {{#each followupActions}}
+        <div class="button followup-action">
+            {{localize this.label}}
+        </div>
+        {{/each}}
     </div>
     {{/if}}
     {{#if test.opposed}}

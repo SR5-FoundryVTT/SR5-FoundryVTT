@@ -160,5 +160,6 @@ export class TestDialog extends FormDialog {
         // Give tests opportunity to change resulting values on the fly.
         this.data.test.prepareBaseValues();
         this.data.test.calculateBaseValues();
+        this.data.test.validateBaseValues();
     }
 }

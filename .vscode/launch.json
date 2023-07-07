@@ -6,10 +6,9 @@
     "configurations": [
         {
             "type": "msedge",
-            "version": "stable",
             "request": "launch",
             "name": "Launch in Edge",
-            "url": "http://localhost:30000/game"
+            "url": "http://localhost:30000"
         },
     ],
 }

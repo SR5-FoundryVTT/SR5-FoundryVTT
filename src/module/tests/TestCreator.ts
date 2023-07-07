@@ -1,14 +1,10 @@
-import { ModifierFlowOptions } from './../actor/flows/ModifierFlow';
-/**
- * All things around helping with Test creation.
- *
- */
 import {SR5Item} from "../item/SR5Item";
 import {SR5Actor} from "../actor/SR5Actor";
 import {
     SuccessTest,
     SuccessTestMessageData,
     TestData,
+    SuccessTestData,
     TestDocuments,
     TestOptions
 } from "./SuccessTest";
@@ -23,15 +19,17 @@ import {SR5} from "../config";
 import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
 
-import MinimalActionData = Shadowrun.MinimalActionData;
-import ActionRollData = Shadowrun.ActionRollData;
-import RollEvent = Shadowrun.RollEvent;
-import ModifierTypes = Shadowrun.ModifierTypes;
-
 /**
- * Function collection to help create any kind of test implementation for different test cases (active, followup, opposed)
- *
- * see from* functions for different
+ * Any test implementation can either be created by calling it's constructor directly or by using the TestCreator.
+ * 
+ * TestCreator provides a set of helper functions to create a test from different sources, as well as test data
+ * based either on an items (or generic) action data or specific input (like from numerical values for pool, threshold,
+ * and limit).
+ * 
+ * Usage:
+ * See the different from* functions for entry points.
+ * 
+ * To retrieve a test implementation class, use the _getTestClass function.
  */
 export const TestCreator = {
     /**
@@ -39,9 +37,8 @@ export const TestCreator = {
      * actor / item involvement.
      *
      * TODO: fromPool as a name for 'from values' doesn't quite describe the method anymore, since a pool doesn't need to be given.
-     * @param values
-     * @param actor
-     * @param options
+     * @param values The values to use for the test.
+     * @param options See TestOptions documentation.
      */
     fromPool: function(values: { pool: number, limit?: number, threshold?: number }={pool: 0, limit: 0, threshold: 0}, options?: TestOptions): SuccessTest {
         const data = TestCreator._minimalTestData();
@@ -95,13 +92,13 @@ export const TestCreator = {
     },
 
     /**
-     * Create a test from action data only.
+     * Create a test from action data only, when not having an item.
      *
-     * @param action
-     * @param actor
-     * @param options
+     * @param action The action data to use for the test.
+     * @param actor The actor to use for retrieving source values defined within the action.
+     * @param options See TestOptions documentation.
      */
-    fromAction: async function(action: ActionRollData, actor: SR5Actor, options?: TestOptions): Promise<SuccessTest | undefined> {
+    fromAction: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, options?: TestOptions): Promise<SuccessTest | undefined> {
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
@@ -141,7 +138,8 @@ export const TestCreator = {
 
     /**
      * Create a test implementation from a past test included within a message
-     * @param id
+     * 
+     * @param id The message id to retrieve test data from.
      */
     fromMessage: async function(id: string): Promise<SuccessTest | undefined> {
         const message = game.messages?.get(id);
@@ -173,7 +171,7 @@ export const TestCreator = {
      *
      * @param id The id of the to be used message.
      * @param testClsName The test class name to be used with the message test data.
-     * @param options
+     * @param options See TestOptions documentation.
      */
     fromMessageAction: async function(id: string, testClsName: string, options?: TestOptions): Promise<SuccessTest | undefined> {
         if (!game.user) return;
@@ -227,27 +225,35 @@ export const TestCreator = {
     },
 
     /**
-     * Helper method to create a SuccessTest from given data.
+     * Helper method to create a test implementation from given test data directly.
+     * 
+     * Test values will be taken from data and not refreshed from the source actor.
      *
-     * TODO: Rework this method to restore test based on test type.
-     *
-     * @param data The TestData of some test implementation
-     * @param documents Documents to create test with. These don't have to match the ones originally used.
+     * @param data The TestData of some test implementation within test registry.
+     * @param documents Documents to connect test to. These don't have to match the ones originally used and 
+     *                  won't be used for retrieving source values.
      * @param options Optional test options.
      */
     fromTestData: function(data: TestData, documents?: TestDocuments, options?: TestOptions): SuccessTest {
         const type = data.type || 'SuccessTest';
         // @ts-ignore
         const cls = TestCreator._getTestClass(type);
-        // Before used documents would be fetched during evaluation.
         return new cls(data, documents, options);
     },
 
     /**
-     * Use any kind of opposed test to create a resist test based on that
+     * Use any kind of opposed test to create a resist test based on that.
+     * 
+     * This can be used for damage resistance tests.
+     * 
+     * Within a typical success test, opposed test and resist test flow, this will
+     * happen after both main and opposed test have finished. The resiting test will be 
+     * executed in context of both with the actor of the opposed test as source.
+     * 
+     * The original action provides both the opposing and resiting test.
      *
-     * @param opposed
-     * @param options
+     * @param opposed The opposed test to create a resist test with.
+     * @param options See TestOptions documentation.
      */
     fromOpposedTestResistTest: async function(opposed: OpposedTest, options?: TestOptions): Promise<SuccessTest | void> {
         // Don't change the data's source.
@@ -258,20 +264,21 @@ export const TestCreator = {
 
         const resistTestCls = TestCreator._getTestClass(opposedData.against.opposed.resist.test);
 
-        // Prepare the resist test.
         const data = await TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.actor, opposed.data.messageUuid);
         const documents = {actor: opposed.actor};
 
-        // Initialize a new test of the current testing class.
         return new resistTestCls(data, documents, options);
     },
 
     /**
-     * Create a followup test using a test.
-     * This can be used for drain tests on spellcasting tests or for resist tests on defense tests
+     * Use any kind of test to create a followup test based on that.
+     * 
+     * This can be used for drain tests.
+     * 
+     * TODO: Describe a clear separation between resist and follow up test use cases.
      *
-     * @param test Any SuccessTest implementation with a followup.
-     * @param options Optional test options.
+     * @param test Any test implementation with an action providing a follow up test.
+     * @param options See TestOptions documentation.
      */
     fromFollowupTest: async function(test: SuccessTest, options?: TestOptions): Promise<SuccessTest  | void> {
         if (!test?.data?.action?.followed?.test) return;
@@ -279,7 +286,7 @@ export const TestCreator = {
         if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
 
         // @ts-ignore // TODO: Type merging
-        const testCls = TestCreator._getTestClass( test.data.action.followed.test);
+        const testCls = TestCreator._getTestClass(test.data.action.followed.test);
         if (!testCls) return console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
 
         const data = TestCreator._minimalTestData();
@@ -287,6 +294,7 @@ export const TestCreator = {
         data.previousMessageId = test.data.messageUuid;
         data.against = test.data;
 
+        // Allow different elements of this to override action data.
         const action = TestCreator._mergeMinimalActionDataInOrder(
             DataDefaults.actionRollData({test: testCls.name}),
             await testCls._getDocumentTestAction(test.item, test.actor),
@@ -295,13 +303,13 @@ export const TestCreator = {
         const testData = await testCls._prepareActionTestData(action, test.actor, data);
         testData.following = test.data;
 
-        // Create the followup test based on tests documents and options.
         const documents = {item: test.item, actor: test.actor};
+
         return new testCls(testData, documents, options);
     },
 
     /*
-     * Prompt the user for a default SuccessTest
+     * Prompt the user for a default SuccessTest.
      */
     promptSuccessTest: async function() {
         // Get the last used pool size for simple SuccessTestDialogs
@@ -316,14 +324,13 @@ export const TestCreator = {
         }
     },
 
-    /** Internal helpers */
-
     /**
      * Return a test class from the global registry.
      *
      * @param testName A Test class constructor name registered as a test.
      */
     _getTestClass: function(testName: string): any | undefined {
+        if (!testName) return;
         //@ts-ignore
         if (!game.shadowrun5e.tests.hasOwnProperty(testName)) { //@ts-ignore
             console.error(`Shadowrun 5e | Tried getting a Test Class ${testName}, which isn't registered in: `, game.shadowrun5e.tests);
@@ -335,7 +342,7 @@ export const TestCreator = {
     /**
      * Return test data based on an items action.
      *
-     * @param testCls
+     * @param testCls A test class implementation to use for retrieving action data.
      * @param item
      * @param actor
      */
@@ -356,14 +363,55 @@ export const TestCreator = {
     },
 
     /**
-     * Prepare values as configured in an actions roll data using the given actor for dynamic parts and
-     * modifying the given data to create a valid SuccessTestData.
+     * An opposed resist test is related to the result of an opposed test.
      *
-     * @param action An action configuration.
-     * @param actor Any type of actor.
-     * @param data A SuccessTestData or any subclass implementing
+     * This can be a physical damage resist test and will be derived from configuration
+     * of the original test that's being opposed.
+     *
+     * @param resistTestCls The resist test class to be used.
+     * @param opposedData The opposing test, including the original test being opposed.
+     * @param actor The actor doing the testing.
+     * @param previousMessageId The Message id of the originating opposing test.
      */
-    _prepareTestDataWithAction: async function(action: ActionRollData, actor: SR5Actor, data) {
+    _getOpposedResistTestData: async function(resistTestCls, opposedData: OpposedTestData, actor: SR5Actor, previousMessageId?: string) {
+        if (!opposedData.against.opposed.resist.test) {
+            console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, opposedData, this);
+            return;
+        }
+        if (!actor) {
+            console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, resistTestCls);
+        }
+
+        // Prepare general data structure with labeling.
+        const data = TestCreator._minimalTestData();
+        data.previousMessageId = previousMessageId;
+        data.following = opposedData;
+        // Make sure to give NO target actors. Otherwise, user selection will be used.
+        data.targetActorsUuid = [];
+
+        // Setup the original item actions minimal action resist configuration as a complete item action.
+        let action = DataDefaults.actionRollData({
+            ...opposedData.against.opposed.resist
+        });
+        // Provide default action information.
+        action = TestCreator._mergeMinimalActionDataInOrder(
+            action,
+            resistTestCls._getDocumentTestAction(),
+            resistTestCls._getDefaultTestAction()
+        );
+
+        // Alter default action information with user defined information.
+        return await TestCreator._prepareTestDataWithAction(action, actor, data);
+    },
+
+    /**
+     * Prepare test data with source values based on action data.
+     *
+     * @param action Action data to prepare test data with.
+     * @param actor Actor to use for retrieving source values and execute test with.
+     * @param data Any test implementations resulting basic test data.
+     */
+    _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData) {
         // Action values might be needed later to redo the same test.
         data.action = action;
 
@@ -401,11 +449,9 @@ export const TestCreator = {
             if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
         }
         
-        // A general pool modifier will be used as a base value.
-        // NOTE: This might not be transparent to users, instead a normal .mod entry might better?
-        //       That might clash with general pool modifier compilation though.
+        // TODO: Test and check if this still works.
         if (action.mod) {
-            data.pool.base = Number(action.mod);
+            data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, 'SR5.DicePoolModifier', action.mod);
         }
         
         // Include pool modifiers that have been collected on the action item.
@@ -457,7 +503,7 @@ export const TestCreator = {
 
         
         // Prepare action modifiers and possible applicable selections
-        const modifiers: {[key in ModifierTypes]?: string[]} = {};
+        const modifiers: {[key in Shadowrun.ModifierTypes]?: string[]} = {};
         for (const modifier of data.action.modifiers) {
             // A modifier with an applicable selection is found.
             if (modifier.includes('.')) {
@@ -484,7 +530,6 @@ export const TestCreator = {
             const value = actor.modifiers.totalFor(modifier, options);
             data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
         }
-        
 
         // Mark test as extended.
         data.extended = action.extended;
@@ -493,49 +538,7 @@ export const TestCreator = {
     },
 
     /**
-     * An opposed resist test is related to the result of an opposed test.
-     *
-     * This can be a physical damage resist test and will be derived from configuration
-     * of the original test that's being opposed.
-     *
-     * @param resistTestCls
-     * @param opposedData The opposing test, including the original test being opposed.
-     * @param actor The actor doing the testing.
-     * @param previousMessageId The Message id of the originating opposing test.
-     */
-    _getOpposedResistTestData: async function(resistTestCls, opposedData: OpposedTestData, actor: SR5Actor, previousMessageId?: string) {
-        if (!opposedData.against.opposed.resist.test) {
-            console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, opposedData, this);
-            return;
-        }
-        if (!actor) {
-            console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, resistTestCls);
-        }
-
-        // Prepare general data structure with labeling.
-        const data = TestCreator._minimalTestData();
-        data.previousMessageId = previousMessageId;
-        data.following = opposedData;
-        // Make sure to give NO target actors. Otherwise, user selection will be used.
-        data.targetActorsUuid = [];
-
-        // Setup the original item actions minimal action resist configuration as a complete item action.
-        let action = DataDefaults.actionRollData({
-            ...opposedData.against.opposed.resist
-        });
-        // Provide default action information.
-        action = TestCreator._mergeMinimalActionDataInOrder(
-            action,
-            resistTestCls._getDocumentTestAction(),
-            resistTestCls._getDefaultTestAction()
-        );
-
-        // Alter default action information with user defined information.
-        return await TestCreator._prepareTestDataWithAction(action, actor, data);
-    },
-
-    /**
-     * Return the minimal viable test data without test specific customization.
+     * Return minimal viable test data without test specific customization.
      */
     _minimalTestData: function(): any {
         return {
@@ -565,7 +568,7 @@ export const TestCreator = {
      * @param defaultActions List of partial actions, as defined by test implementions.
      * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
      */
-    _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: Partial<MinimalActionData>[]): ActionRollData {
+    _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: Partial<Shadowrun.MinimalActionData>[]): Shadowrun.ActionRollData {
         // This action might be taken from ItemData, causing changes to be reflected upstream.
         const resultAction = foundry.utils.duplicate(sourceAction);
 
@@ -596,7 +599,7 @@ export const TestCreator = {
      * @param key The action key to take the value from
      * @returns true for when the orgiginal action value should be kept, false if it's to be overwritten.
      */
-    _keepItemActionValue(action: ActionRollData, defaultAction: Partial<MinimalActionData>, key: string): boolean {
+    _keepItemActionValue(action: Shadowrun.ActionRollData, defaultAction: Partial<Shadowrun.MinimalActionData>, key: string): boolean {
         if (!defaultAction.hasOwnProperty(key)) return true;
 
         // Avoid user confusion. A user might change one value of a logical value grouping (skill+attribute)
@@ -622,7 +625,7 @@ export const TestCreator = {
      * @param key A key of action configuration within action parameter
      * @returns false, when the value behind key is a default value. true, when it's a custom value.
      */
-    _actionHasNoneDefaultValue(action: ActionRollData, key: string): boolean {
+    _actionHasNoneDefaultValue(action: Shadowrun.ActionRollData, key: string): boolean {
         if (!action.hasOwnProperty(key)) return false;
 
         // NOTE: A more complete comparison would take a default ActionRollData object and compare the sub-key against it.
@@ -642,27 +645,30 @@ export const TestCreator = {
     },
 
     /**
-     * A helper to define the modifier key for all sheet test interactions to cause a test to not show its dialog.
+     * Determine if a test's dialog should NOT be shown, when executing a test.
+     * 
      * @param event A PointerEvent by user interaction
      */
-    shouldHideDialog(event: RollEvent|undefined): boolean {
+    shouldHideDialog(event: Shadowrun.RollEvent|undefined): boolean {
         if (!event) return false;
         return event[SR5.kbmod.HIDE_DIALOG] === true;
     },
 
     /**
-     * A helper to define the modifier key for all sheet test interactions to cause a test to show its dialog.
+     * Determine if a test's dialog should be shown, when executing a test.
+     * 
      * @param event A PointerEvent by user interaction
      */
-    shouldShowDialog(event: RollEvent|undefined): boolean {
+    shouldShowDialog(event: Shadowrun.RollEvent|undefined): boolean {
         return !TestCreator.shouldHideDialog(event);
     },
 
     /**
-     * A helper to define the modifier key for all sheet test interactions to cause a test to not show its dialog.
+     * Determine if instead of rolling an item based test, only the item's description should be posted as a chat message.
+     * 
      * @param event A PointerEvent by user interaction
      */
-    shouldPostItemDescription(event: RollEvent|undefined): boolean {
+    shouldPostItemDescription(event: Shadowrun.RollEvent|undefined): boolean {
         if (!event) return false;
         return event[SR5.kbmod.ITEM_DESCR] === true;
     }

@@ -50,9 +50,7 @@
     "ShowTokenNameForChatOutputDescription": "이용이 가능할 때 액터의 이름 대신 토큰의 이름이 사용됨",
     "ShowTokenNameForChatOutputName": "롤 카드에 토큰 이름 사용",
     "TokenHealthBars": "토큰 체력 바",
-    "TokenHealthBarsDescription": "전체 피해 트랙이 미러링 대신 토큰의 빈 상태 표시줄로 표시됩니다.",
-    "WhisperOpposedTestsToTargetedPlayers": "선택한 플레이어에게만 보이게 테스트",
-    "WhisperOpposedTestsToTargetedPlayersDescription": "대항 테스트 굴리기가 선택된 온라인 플레이어게만 보임"
+    "TokenHealthBarsDescription": "전체 피해 트랙이 미러링 대신 토큰의 빈 상태 표시줄로 표시됩니다."
   },
   "SR5.Accessory": "부착물",
   "SR5.Accuracy": "정확도",

@@ -1,3 +1,5 @@
+import { CompileSpriteTest } from './tests/CompileSpriteTest';
+import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
 import {SR5} from './config';
 import {Migrator} from './migrator/Migrator';
 import {registerSystemSettings} from './settings';
@@ -42,6 +44,8 @@ import {PilotVehicleTest} from "./tests/PilotVehicleTest";
 import {DronePerceptionTest} from "./tests/DronePerceptionTest";
 import {DroneInfiltrationTest} from "./tests/DroneInfiltrationTest";
 import { SuppressionDefenseTest } from './tests/SuppressionDefenseTest';
+import { SummonSpiritTest } from './tests/SummonSpiritTest';
+
 import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
@@ -50,6 +54,9 @@ import { registerSystemKeybindings } from './keybindings';
 import { SkillTest } from './tests/SkillTest';
 
 import {canvasInit} from './canvas';
+import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
+import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
+import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -119,7 +126,7 @@ ___________________
 
             /**
              * .tests define what test implementation to use for each test type (key).
-             * Should you want to override default behaviour for SuccessTest types, overwrite
+             * Should you want to override default behavior for SuccessTest types, overwrite
              * the SuccessTest class reference here
              */
             tests: {
@@ -142,7 +149,11 @@ ___________________
                 NaturalRecoveryPhysicalTest,
                 PilotVehicleTest,
                 DronePerceptionTest,
-                DroneInfiltrationTest
+                DroneInfiltrationTest,
+                SummonSpiritTest,
+                OpposedSummonSpiritTest,
+                CompileSpriteTest,
+                OpposedCompileSpriteTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -165,7 +176,9 @@ ___________________
                 FadeTest,
                 PilotVehicleTest,
                 DronePerceptionTest,
-                DroneInfiltrationTest
+                DroneInfiltrationTest,
+                SummonSpiritTest,
+                CompileSpriteTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -176,7 +189,9 @@ ___________________
                 OpposedTest,
                 PhysicalDefenseTest,
                 SuppressionDefenseTest,
-                CombatSpellDefenseTest
+                CombatSpellDefenseTest,
+                OpposedSummonSpiritTest,
+                OpposedCompileSpriteTest
             },
             /**
              * Subset of tests meant to be used as resist tests.
@@ -197,7 +212,7 @@ ___________________
             /**
              * Amount of delay used on user filter inputs.
              * This came out of an unclear user issue regarding multi-char UTF symbol inputs, to allow
-             * 'interactive' changing of the delay on the user side until a sweetspot could be found.
+             * 'interactive' changing of the delay on the user side until a sweet spot could be found.
              */
             inputDelay: 300
         };
@@ -264,6 +279,11 @@ ___________________
             label: "SR5.SheetItem",
             makeDefault: true
         });
+        Items.registerSheet(SYSTEM_NAME, SR5CallInActionSheet, {
+            label: "SR5.SheetItem",
+            makeDefault: true,
+            types: ['call_in_action']
+        });
 
         // Register configs for embedded documents.
         DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', ActiveEffectConfig);
@@ -302,7 +322,7 @@ ___________________
     }
 
     /**
-     * Hanlde drop events on the hotbar creating different macros.
+     * Handle drop events on the hotbar creating different macros.
      * 
      * NOTE: FoundryVTT Hook callbacks won't be resolved when returning a promise.
      *       While this function calls async methods, it's order of operations isn't important.
@@ -465,11 +485,13 @@ ___________________
     static async chatMessageListeners(message: ChatMessage, html, data) {
         await SuccessTest.chatMessageListeners(message, html, data);
         await OpposedTest.chatMessageListeners(message, html, data);
+        await ActionFollowupFlow.chatMessageListeners(message, html, data);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
         await SuccessTest.chatLogListeners(chatLog, html, data);
         await OpposedTest.chatLogListeners(chatLog, html, data);
+        await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
     }
 
 }

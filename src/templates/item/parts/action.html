@@ -1,6 +1,6 @@
 <div class="item-form">
     <div class="header">
-        {{header}}
+        {{localize header}}
     </div>
     <div class="form-line">
         <div class="label">
@@ -83,7 +83,7 @@
             <select name="system.action.attribute2">
                 {{#select system.action.attribute2}}
                 <option value=""></option>
-                {{#each config.attributes as |name type|}}
+                {{#each attributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>

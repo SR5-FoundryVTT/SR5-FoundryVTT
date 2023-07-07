@@ -64,10 +64,10 @@ export const TestRules = {
     /**
      * Has a Success Test glitched critically?
      *
-     * @param success Has a test been a success?
+     * @param hits Amount of hits achieved
      * @param glitched Has a test been glitched?
      */
-    criticalGlitched: (success: boolean, glitched: boolean): boolean => {
-        return !success && glitched;
+    criticalGlitched: (hits: number, glitched: boolean): boolean => {
+        return hits === 0 && glitched;
     }
 }

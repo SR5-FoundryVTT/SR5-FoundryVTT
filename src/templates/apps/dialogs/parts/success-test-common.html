@@ -32,48 +32,64 @@
     <hr/>
     <div>
         <div class="form-group">
-            <label>{{localize test.data.modifiers.label}}</label>
+            <label data-tooltip="SR5.Tooltips.Test.Modifier">{{localize test.data.modifiers.label}}</label>
             <input type="number" name="test.data.modifiers" data-dtype="Number" value="{{test.data.modifiers.value}}"/>
         </div>
     </div>
     <div>
         <div class="form-group">
-            <label>{{localize "SR5.DicePool"}}</label>
+            <label data-tooltip="SR5.Tooltips.Test.Pool">{{localize "SR5.DicePool"}}</label>
             <input type='number' name='test.data.pool' size='3' maxlength='3' value='{{test.pool.value}}'
                    data-dtype="Number"/>
         </div>
         <div class="form-group">
-            <label>{{localize "SR5.Limit"}}</label>
+            <label data-tooltip="SR5.Tooltips.Test.Limit">{{localize "SR5.Limit"}}</label>
             <input type='number' name='test.data.limit' size='3' maxlength='3' value='{{test.limit.value}}'
                    data-dtype="Number"/>
         </div>
         <div class="form-group">
-            <label>{{localize "SR5.Threshold"}}</label>
+            <label data-tooltip="SR5.Tooltips.Test.Threshold">{{localize "SR5.Threshold"}}</label>
             <input type='number' name='test.data.threshold' size='3' maxlength='3'
                    value='{{test.threshold.value}}'
                    data-dtype="Number"/>
         </div>
     </div>
+
     {{#if test.actor}}
     <hr/>
     <div>
         <div class="form-group">
-            <label>{{localize "SR5.PushTheLimit"}}
+            <label data-tooltip="SR5.Tooltips.Test.PushTheLimit">{{localize "SR5.PushTheLimit"}}
                 ({{test.actor.system.attributes.edge.uses}}/{{test.actor.system.attributes.edge.value}})</label>
             <input type="checkbox" name="test.data.pushTheLimit" {{#if test.hasPushTheLimit}}checked{{/if}}/>
         </div>
     </div>
     {{/if}}
+    
+    {{#if test.allowManualHits}}
     <hr/>
+    <div>
+        <div class="form-group">
+            <label data-tooltip="SR5.Tooltips.Test.ManualHits">{{localize "SR5.ManualHits"}}</label>
+            <input type='number' name='test.data.manualHits' size='3' maxlength='3' value='{{#if test.data.manualHits.override}}{{test.data.manualHits.value}}{{/if}}' data-dtype="Number" placeholder=""/>
+        </div>
+        <div class="form-group">
+            <label data-tooltip="SR5.Tooltips.Test.ManualGlitches">{{localize "SR5.ManualGlitches"}}</label>
+            <input type='number' name='test.data.manualGlitches' size='3' maxlength='3' value='{{#if test.data.manualGlitches.override}}{{test.data.manualGlitches.value}}{{/if}}' data-dtype="Number" placeholder=""/>
+        </div>
+    </div>
+    <hr/>
+    {{/if}}
+
     <div>
         {{#if test.canBeExtended}}
         <div class="form-group">
-            <label>{{localize "SR5.Extended"}}</label>
+            <label data-tooltip="SR5.Tooltips.Test.Extended">{{localize "SR5.Extended"}}</label>
             <input type="checkbox" name="test.data.extended" {{#if test.extended}}checked{{/if}} />
         </div>
         {{/if}}
         <div class="form-group">
-            <label>{{ localize "SR5.RollMode" }}</label>
+            <label data-tooltip="SR5.Tooltips.Test.RollMode">{{ localize "SR5.RollMode" }}</label>
             <select style="color: white" name="test.data.options.rollMode">
                 {{#select rollMode}} {{#each rollModes as |label mode|}}
                 <option value="{{mode}}">{{localize label}}</option>
