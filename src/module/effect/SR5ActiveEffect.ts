@@ -5,6 +5,15 @@ import {EffectChangeData} from "@league-of-foundry-developers/foundry-vtt-types/
 
 
 
+/**
+ * Shadowrun Active Effects implement additional ways of alterting document data.
+ * 
+ * The main difference to the base implementation is the ability to modify Value structures without the need to define
+ * sub-keys. Instead of active effects adding on top of a numerical they'll be included in the mod array of the Value.
+ * 
+ * Overriding a value is also altered for Values to allow for a more dynamic approach. The original values are still available 
+ * but during calculation the override value will be used instead.
+ */
 export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Can be used to determine if the origin of the effect is an document that is owned by another document.
@@ -46,7 +55,6 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     async disable(disabled) {
-        // @ts-ignore
         return this.update({disabled});
     }
 
