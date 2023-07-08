@@ -9,8 +9,8 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
     }
 
-    override getData(options?: Application.RenderOptions): Promise<ActiveEffectConfig.Data> | ActiveEffectConfig.Data {
-        const data = super.getData(options) as any;
+    override async getData(options?: Application.RenderOptions): Promise<ActiveEffectConfig.Data> {
+        const data = await super.getData(options) as any;
         
         data.modes = this.injectModifyLabelOverCustomMode(data.modes);
 
