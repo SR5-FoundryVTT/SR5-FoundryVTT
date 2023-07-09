@@ -62,6 +62,15 @@
             </div>
         </div>
         {{/if}}
+
+        <div class="form-group">
+            <label>{{ localize "SR5.ActiveEffect.ApplyTo" }}</label>
+            <div class="form-fields">
+                <select name="flags.shadowrun5e.applyTo" data-dtype="Text">
+                    {{selectOptions applyToOptions selected=applyTo localize=true}}
+                </select>
+            </div>
+        </div>
     </section>
 
     <!-- Duration Tab -->

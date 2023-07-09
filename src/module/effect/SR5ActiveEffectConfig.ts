@@ -1,3 +1,6 @@
+import { SR5 } from "../config";
+import { SR5ActiveEffect } from "./SR5ActiveEffect";
+
 /**
  * Shadowrun system alteres some behaviours of Active Effects, making a custom ActiveEffectConfig necessary.
  * 
@@ -12,7 +15,10 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     override async getData(options?: Application.RenderOptions): Promise<ActiveEffectConfig.Data> {
         const data = await super.getData(options) as any;
         
-        data.modes = this.injectModifyLabelOverCustomMode(data.modes);
+        data.modes = this.applyModifyLabelToCustomMode(data.modes);
+        
+        data.applyToOptions = this.prepareApplyToOptions();
+        data.applyTo = this.document.applyTo;
 
         return data;
     }
@@ -26,7 +32,14 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * @param modes A object prepared for display using Foundry select handlebarjs helper.
      * @returns Copy of the original modes and labels.
      */
-    injectModifyLabelOverCustomMode(modes: Record<number, string>): Record<number, string> {
+    applyModifyLabelToCustomMode(modes: Record<number, string>): Record<number, string> {
         return {...modes, 0: game.i18n.localize('SR5.ActiveEffect.Modes.Modify')};
+    }
+
+    /**
+     * Prepare apply to select options.
+     */
+    prepareApplyToOptions(): Record<string, string> {
+        return SR5.effectApplyTo;
     }
 }

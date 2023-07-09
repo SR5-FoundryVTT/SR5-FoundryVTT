@@ -778,5 +778,16 @@ export const SR5 = {
         action: 'complex',
         mode: 'full_auto'
     }
-    ] as Shadowrun.FireModeData[]
+    ] as Shadowrun.FireModeData[],
+
+    /**
+     * Active/AdvancedEffect apply To types and their labels.
+     * 
+     * actor is the default Foundry apply to type of ActiveEffects and will be affect actor data.
+     */
+    effectApplyTo: {
+        'actor': 'SR5.FOUNDRY.Actor',
+        'test': 'SR5.Test',
+        'modifier': 'SR5.Modifier'
+    }
 };

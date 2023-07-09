@@ -155,12 +155,12 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * What target to apply this effect to.
+     * Apply to target configured for this effect.
      * 
-     * TODO: Implement typing.
+     * @returns Either the configured value or 'actor' as a default.
      */
     get applyTo(): string | null {
-        return this.getFlag(SYSTEM_NAME, 'applyTo') as string || null;
+        return this.getFlag(SYSTEM_NAME, 'applyTo') as string || 'actor';
     }
 
     /**
