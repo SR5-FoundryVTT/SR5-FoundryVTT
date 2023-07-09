@@ -75,6 +75,7 @@
     "SR5.Active": "Aktiv",
     "SR5.ActiveDefense": "Unterbrechungsh.",
     "SR5.ActiveEffect": {
+        "ApplyTo": "Anw. Auf",
         "Modes": {
             "Modify": "Modifizieren"
         },

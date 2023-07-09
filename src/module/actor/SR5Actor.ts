@@ -166,6 +166,17 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * TODO: Don't transfer effects that are not applicable to the actor at all.
+     */
+    //@ts-ignore TODO: foundry-vtt-types v10
+    override *allApplicableEffects() {
+        //@ts-ignore TODO: foundry-vtt-types v10
+        for (const effect of super.allApplicableEffects()) {
+            if (!effect.applyTo) yield effect;
+        }
+    }
+
+    /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
      *
      * At the moment general actor data preparation has been moved to derived data preparation, due it's dependence

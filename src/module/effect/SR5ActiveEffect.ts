@@ -1,7 +1,8 @@
-import {SR5Actor} from "../actor/SR5Actor";
-import {Helpers} from "../helpers";
+import { SR5Actor } from "../actor/SR5Actor";
+import { Helpers } from "../helpers";
 import ModifiableValue = Shadowrun.ModifiableValue;
-import {EffectChangeData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
+import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
+import { SYSTEM_NAME } from "../constants";
 
 
 
@@ -51,11 +52,11 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     async toggleDisabled() {
         // @ts-ignore
-        return this.update({disabled: !this.disabled});
+        return this.update({ disabled: !this.disabled });
     }
 
     async disable(disabled) {
-        return this.update({disabled});
+        return this.update({ disabled });
     }
 
     //@ts-ignore // TODO: foundry-vtt-types
@@ -75,7 +76,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor, change.key) as ModifiableValue;
             //@ts-ignore // TODO: foundry-vtt-types v10
-            value.mod.push({name: this.label, value: Number(change.value)});
+            value.mod.push({ name: this.label, value: Number(change.value) });
 
             return null;
         }
@@ -89,7 +90,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey) as ModifiableValue;
             //@ts-ignore // TODO: foundry-vtt-types v10
-            value.mod.push({name: this.label, value: Number(change.value)});
+            value.mod.push({ name: this.label, value: Number(change.value) });
 
             return null;
         }
@@ -113,7 +114,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor, change.key);
             //@ts-ignore // TODO: foundry-vtt-types v10
-            value.override = {name: this.label, value: Number(change.value)};
+            value.override = { name: this.label, value: Number(change.value) };
             value.value = change.value;
 
             return null;
@@ -127,7 +128,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey);
             //@ts-ignore // TODO: foundry-vtt-types v10
-            value.override = {name: this.label, value: Number(change.value)};
+            value.override = { name: this.label, value: Number(change.value) };
 
             return null;
         }
@@ -147,5 +148,99 @@ export class SR5ActiveEffect extends ActiveEffect {
     get minValueKeys(): string[] {
         // Match against these keys, as the exact ModifiableValue layout might be different from time to time.
         return ['value', 'mod'];
+    }
+
+    get advancedChanges() {
+        return this.getFlag(SYSTEM_NAME, 'advancedChanges') || {};
+    }
+
+    /**
+     * What target to apply this effect to.
+     * 
+     * TODO: Implement typing.
+     */
+    get applyTo(): string | null {
+        return this.getFlag(SYSTEM_NAME, 'applyTo') as string || null;
+    }
+
+    /**
+     * 
+     * @param object 
+     * @param change 
+     * @returns 
+     */
+    override apply(object: any, change) {
+        // Foundry can be used to apply to actors.
+        if (object instanceof SR5Actor) {
+            return super.apply(object, change);
+        }
+
+        // Custom handling to apply to other object types.
+        this._applyToObject(object, change);
+    }
+
+    /**
+     * Handle application for none-Document objects
+     * @param object 
+     * @param change 
+     * @returns 
+     */
+    _applyToObject(object, change) {
+        // Determine the data type of the target field
+        const current = foundry.utils.getProperty(object, change.key) ?? null;
+        // let target = current;
+        // if ( current === null ) {
+        //   const model = game.model.Actor[test.type] || {};
+        //   target = foundry.utils.getProperty(model, change.key) ?? null;
+        // }
+
+        const target = foundry.utils.getProperty(object, change.key) ?? null;
+        let targetType = foundry.utils.getType(target);
+
+        // Cast the effect change value to the correct type
+        let delta;
+        try {
+            if (targetType === "Array") {
+                const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
+                //@ts-ignore
+                delta = this._castArray(change.value, innerType);
+            }
+            //@ts-ignore
+            else delta = this._castDelta(change.value, targetType);
+        } catch (err) {
+            console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
+            return;
+        }
+
+        // Apply the change depending on the application mode
+        const modes = CONST.ACTIVE_EFFECT_MODES;
+        const changes = {};
+        switch (change.mode) {
+            case modes.ADD:
+                //@ts-ignore
+                this._applyAdd(object, change, current, delta, changes);
+                break;
+            case modes.MULTIPLY:
+                //@ts-ignore
+                this._applyMultiply(object, change, current, delta, changes);
+                break;
+            case modes.OVERRIDE:
+                //@ts-ignore
+                this._applyOverride(object, change, current, delta, changes);
+                break;
+            case modes.UPGRADE:
+            case modes.DOWNGRADE:
+                //@ts-ignore
+                this._applyUpgrade(object, change, current, delta, changes);
+                break;
+            default:
+                this._applyCustom(object, change, current, delta, changes);
+                break;
+        }
+
+        // Apply all changes to the Actor data
+        foundry.utils.mergeObject(object, changes);
+
+        return changes;
     }
 }

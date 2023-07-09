@@ -76,6 +76,7 @@
     "SR5.Active": "Active",
     "SR5.ActiveDefense": "Active Defense",
     "SR5.ActiveEffect": {
+        "ApplyTo": "Apply-To",
         "Modes": {
             "Modify": "Modify"
         },
