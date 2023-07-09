@@ -20,6 +20,8 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         data.applyToOptions = this.prepareApplyToOptions();
         data.applyTo = this.document.applyTo;
 
+        data.testKeyOptions = this.prepareTestKeyOptions();
+
         return data;
     }
 
@@ -41,5 +43,16 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      */
     prepareApplyToOptions(): Record<string, string> {
         return SR5.effectApplyTo;
+    }
+
+    prepareTestKeyOptions(): Record<string, string> {
+        return {
+            'data.pool': 'Pool',
+            'data.threshold': 'Threshold',
+            'data.limit': 'Limit',
+            'data.hits': 'Hits',
+            'data.glitches': 'Glitches',
+            'data.netHits': 'Net Hits'
+        }
     }
 }
