@@ -1034,6 +1034,9 @@
         "Actor": {
             "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück"
         },
+        "CallInAction": {
+            "ActorType": "Herbeizurufender Akteurtyp"
+        },
         "Effect": {
             "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden",
             "Persistent": "Effekte ohne zeitliche Begrenzung",
@@ -1107,9 +1110,6 @@
             "PushTheLimit": "Verwende Edge Regel Grenzen Sprenngen",
             "RollMode": "FoundryVTT chat message roll visibility",
             "Threshold": "Vollständiger Schwellenwert"
-        },
-        "CallInAction": {
-            "ActorType": "Herbeizurufender Akteurtyp"
         }
     },
     "SR5.Top": "Oberseite",
@@ -1169,6 +1169,7 @@
         "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
         "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge Punkte können nicht auf Proben ohne Actor angewendet werden.",
         "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
+        "InvalidCompilationLevel": "Resonanz Attribute zu niedrig für Sprite Stufe",
         "InvalidMarksCount": "You've trying to place a strange number of marks",
         "InvalidSummoningForce": "Gewählte Kraft hält sich nicht an die Regeln",
         "NegativeLimitValue": "Limit Werte müssen über Null liegen",
