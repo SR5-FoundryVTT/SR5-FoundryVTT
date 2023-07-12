@@ -1160,6 +1160,7 @@
     "SR5.Warnings": {
         "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
         "CantConsumeEquippedAmmo": "Ausgerüstete Munition hat nicht genug Kugeln",
+        "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
         "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
         "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",
         "CantExtendTestFurther": "Probe kann nicht weiter ausgedehnt werden. Zu wenige Würfel übrig oder Schwellenwert erreicht",
