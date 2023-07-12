@@ -1002,7 +1002,9 @@
     "SR5.Test": "Test",
     "SR5.TestResults": {
         "SpiritSummonFailure": "Spirit fled!",
-        "SpiritSummonSuccess": "Spirit summoned!"
+        "SpiritSummonSuccess": "Spirit summoned!",
+        "SpriteCompilationSuccess": "Sprite compiled!",
+        "SpriteCompilationFailure": "Sprite fled!"
     },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attribute-Only Test",
