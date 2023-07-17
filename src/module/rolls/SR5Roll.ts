@@ -106,7 +106,9 @@ export class SR5Roll extends Roll {
      * The amount of dice actually thrown after all dice explosions have been resolved.
      */
     get poolThrown(): number {
-        return this.dice[0].results.length;
+        //@ts-ignore TODO: foundry-vtt-types v10
+        // TODO: Check with v10 and with v11
+        return this.dice[0].numbers;
     }
 
     get glitched(): boolean {
