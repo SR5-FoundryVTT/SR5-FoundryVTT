@@ -1,3 +1,4 @@
+import { shadowrunRolling } from './sr5.SR5Roll.spec';
 import { shadowrunSR5RangedWeaponRules } from './sr5.RangedWeapon.spec';
 import { shadowrunAttackTesting } from './sr5.AttackTests.spec';
 import {shadowrunRulesModifiers} from "./sr5.Modifiers.spec";
@@ -38,4 +39,5 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch("shadowrun5e.flow.inventory", shadowrunInventoryFlow, {displayName: "SHADOWRUN5e: InventoryFlow Test"});
     quench.registerBatch("shadowrun5e.flow.tests", shadowrunTesting, {displayName: "SHADOWRUN5e: SuccessTest Test"});
     quench.registerBatch("shadowrun5e.flow.tests_attack", shadowrunAttackTesting, {displayName: "SHADOWRUN5e: Attack Test"});
+    quench.registerBatch("shadowrun5e.flow.sr5roll", shadowrunRolling, {displayName: "SHADOWRUN5e: SR5Roll"});
 };
