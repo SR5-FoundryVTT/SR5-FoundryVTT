@@ -1,3 +1,4 @@
+import { shadowrunRolling } from './sr5.SR5Roll.spec';
 import { shadowrunSR5RangedWeaponRules } from './sr5.RangedWeapon.spec';
 import { shadowrunAttackTesting } from './sr5.AttackTests.spec';
 import {shadowrunRulesModifiers} from "./sr5.Modifiers.spec";
