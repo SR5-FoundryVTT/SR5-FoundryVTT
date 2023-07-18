@@ -20,7 +20,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         data.applyToOptions = this.prepareApplyToOptions();
         data.applyTo = this.document.applyTo;
 
-        data.testKeyOptions = this.prepareTestKeyOptions();
+        data.testKeyOptions = this.prepareKeyOptions();
 
         return data;
     }
@@ -45,7 +45,28 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         return SR5.effectApplyTo;
     }
 
-    prepareTestKeyOptions(): Record<string, string> {
+    /**
+     * Provide the Configh Sheet with a list of keys to choose from.
+     * 
+     * The list provided depends on the systems apply-to effect type.
+     * 
+     * @returns A object with a Foundry poroperty string as key and a i18n label as value.
+     */
+    prepareKeyOptions(): Record<string, string> {
+        switch (this.document.applyTo) {
+            case 'actor':
+            case 'targeted_actor':
+                return this._prepareActorKeyOptions();
+            case 'test':
+                return this._prepareTestKeyOptions();
+            case 'modifier':
+                return this._prepareModifierKeyOptions();
+            default:
+                return {};
+        }
+    }
+
+    _prepareTestKeyOptions() {
         return {
             'data.pool': 'Pool',
             'data.threshold': 'Threshold',
@@ -54,5 +75,15 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
             'data.glitches': 'Glitches',
             'data.netHits': 'Net Hits'
         }
+    }
+
+    _prepareActorKeyOptions() {
+        return {
+            'system.attributes.body': 'SR5.AttrBody'
+        }
+    }
+
+    _prepareModifierKeyOptions() {
+        return {}
     }
 }

@@ -76,6 +76,9 @@
     "SR5.ActiveDefense": "Unterbrechungsh.",
     "SR5.ActiveEffect": {
         "ApplyTo": "Anwenden auf",
+        "ApplyTos": {
+            "TargetedActor": "Anvisierten Akteur"
+        },
         "Modes": {
             "Modify": "Modifizieren"
         },
@@ -1035,6 +1038,9 @@
         "Actor": {
             "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück"
         },
+        "CallInAction": {
+            "ActorType": "Herbeizurufender Akteurtyp"
+        },
         "Effect": {
             "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden",
             "Persistent": "Effekte ohne zeitliche Begrenzung",
@@ -1108,9 +1114,6 @@
             "PushTheLimit": "Verwende Edge Regel Grenzen Sprenngen",
             "RollMode": "FoundryVTT chat message roll visibility",
             "Threshold": "Vollständiger Schwellenwert"
-        },
-        "CallInAction": {
-            "ActorType": "Herbeizurufender Akteurtyp"
         }
     },
     "SR5.Top": "Oberseite",

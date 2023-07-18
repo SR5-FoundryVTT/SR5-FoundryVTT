@@ -128,18 +128,14 @@
         <ol class="changes-list">
             {{#each data.changes as |change i|}}
             <li class="effect-change flexrow" data-index="{{i}}">
-                {{#ife ../applyTo 'test'}}
                 <div class="key">
-                    <select name="changes.{{i}}.key" data-dtype="String">
-                        {{log ../testKeyOptions}}
-                        {{selectOptions ../testKeyOptions selected=change.key}}
-                    </select>
+                    <input type="text" name="changes.{{i}}.key" value="{{change.key}}" list="keys"/>
+                    <datalist id="keys">
+                        {{#each ../testKeyOptions}}
+                        <option value="{{@key}}">{{localize this}}</option>
+                        {{/each}}
+                    </datalist>                    
                 </div>
-                {{else}}
-                <div class="key">
-                    <input type="text" name="changes.{{i}}.key" value="{{change.key}}"/>
-                </div>
-                {{/ife}}                
                 <div class="mode">
                     <select name="changes.{{i}}.mode" data-dtype="Number">
                         {{selectOptions ../modes selected=change.mode}}
