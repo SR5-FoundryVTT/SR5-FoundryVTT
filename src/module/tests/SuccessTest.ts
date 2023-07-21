@@ -24,6 +24,7 @@ import { TestRules } from "../rules/TestRules";
 
 import { ActionResultFlow } from "../item/flows/ActionResultFlow";
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { SuccessTestEffectsFlow } from './flows/SuccessTestEffects';
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -160,6 +161,9 @@ export class SuccessTest {
 
     public targets: TokenDocument[];
 
+    // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
+    private effects: SuccessTestEffectsFlow<this>;
+
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
@@ -172,6 +176,8 @@ export class SuccessTest {
         options = options || {}
 
         this.data = this._prepareData(data, options);
+
+        this.effects = new SuccessTestEffectsFlow(this);
 
         this.calculateBaseValues();
 
@@ -543,7 +549,7 @@ export class SuccessTest {
         this.applyPushTheLimit();
         this.applyPoolModifiers();
 
-        this.applyAdvancedEffects();
+        this.effects.apply();
     }
 
     /**
@@ -762,39 +768,6 @@ export class SuccessTest {
         this.data.values.glitches = this.calculateGlitches();
 
         console.debug(`Shadowrun 5e | Calculated derived values for ${this.constructor.name}`, this.data);
-    }
-
-    applyAdvancedEffects() {
-        const changes = [];
-        for (const effect of this.allApplicableEffects()) {
-            // Organize non-disabled effects by their application priority            
-                //@ts-ignore
-                if (!effect.active) continue;
-                //@ts-ignore
-                changes.push(...effect.changes.map(change => {
-                    const c = foundry.utils.deepClone(change);
-                    c.key = c.key.replace('system', 'data');
-                    c.effect = effect;
-                    c.priority = c.priority ?? (c.mode * 10);
-                    return c;
-                }));
-                //@ts-ignore
-                // for (const statusId of effect.statuses) this.statuses.add(statusId);
-        }
-
-        //@ts-ignore
-        changes.sort((a, b) => a.priority - b.priority);
-
-        // Apply all changes
-        for (const change of changes) {
-            //@ts-ignore
-            if (!change.key) continue;
-            //@ts-ignore
-            // const changes = change.effect.apply(this, change);
-            change.effect.apply(this, change);
-            //@ts-ignore
-            // Object.assign(overrides, changes);
-        }
     }
 
     /**
@@ -2022,23 +1995,5 @@ export class SuccessTest {
 
         await test.populateDocuments();
         await ActionResultFlow.executeResult(resultAction, test);
-    }
-
-    /**
-     * Collect
-     * @returns 
-     */
-    *allApplicableEffects(): Generator<SR5ActiveEffect> {
-        if (this.actor) {
-            for (const effect of this.actor.effects as unknown as SR5ActiveEffect[]) {
-                if (effect.applyTo === 'test') yield effect;
-            }
-        }
-
-        if (this.item) {
-            for (const effect of this.item.effects as unknown as SR5ActiveEffect[]) {
-                if (effect.applyTo === 'test') yield effect;
-            }
-        }
     }
 }
