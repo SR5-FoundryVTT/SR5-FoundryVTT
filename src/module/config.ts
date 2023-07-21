@@ -787,7 +787,9 @@ export const SR5 = {
      */
     effectApplyTo: {
         'actor': 'SR5.FOUNDRY.Actor',
-        'test': 'SR5.Test',
+        'targeted_actor': 'SR5.ActiveEffect.ApplyTos.TargetedActor',
+        'test_all': 'SR5.Test',
+        'test_item': 'SR5.ActiveEffect.ApplyTos.TestItem',
         'modifier': 'SR5.Modifier'
     }
 };

@@ -77,7 +77,8 @@
     "SR5.ActiveEffect": {
         "ApplyTo": "Anwenden auf",
         "ApplyTos": {
-            "TargetedActor": "Anvisierten Akteur"
+            "TargetedActor": "Anvisierten Akteur",
+            "TestItem": "Test aus Gegenstand"
         },
         "Modes": {
             "Modify": "Modifizieren"
