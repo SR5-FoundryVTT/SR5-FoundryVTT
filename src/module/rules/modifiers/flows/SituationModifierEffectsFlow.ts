@@ -2,7 +2,7 @@ import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-type
 import { SR5Actor } from "../../../actor/SR5Actor";
 import { SR5ActiveEffect } from "../../../effect/SR5ActiveEffect";
 import { SituationModifier } from "../SituationModifier";
-import { imageMagnification, lowLight } from "./EnvironmentalChangeFlow";
+import { imageMagnification, lowLightVision, tracerRounds } from "./EnvironmentalChangeFlow";
 
 /**
  * TODO: Documentation.
@@ -17,8 +17,9 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
 
         // Configure handlers for effect change values.
         this.applyHandlers = {
-            'low_light': lowLight,
-            'image_magnification': imageMagnification
+            'low_light_vision': lowLightVision,
+            'image_magnification': imageMagnification,
+            'tracer_rounds': tracerRounds
         }
     }
 
