@@ -70,6 +70,18 @@ export const tracerRounds = (modifier: EnvironmentalModifier) => {
 }
 
 /**
+ * Apply Smartlink to wind modifiers. See SR5#175
+ * @param modifier 
+ */
+export const smartlink = (modifier: EnvironmentalModifier) => {
+    console.debug('Shadowrun 5e | Applying Smartlink Effect', modifier);
+
+    if (!modifier.applied.active.wind) return;
+
+    modifier.applied.active.wind = _shiftUpByOneRow(modifier.applied.active.wind);
+}
+
+/**
  * Local helper method to shift environmental modifiers up by one row.
  * 
  * Row relates to the Environmental modifiers table. See SR5#175
