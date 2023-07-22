@@ -82,6 +82,15 @@ export const smartlink = (modifier: EnvironmentalModifier) => {
 }
 
 /**
+ * Apply Sunglasses to light modifiers. See SR5#175
+ * @param modifier 
+ */
+export const sunglasses = (modifier: EnvironmentalModifier) => {
+    console.error('Shadowrun 5e | Sunglasses not implemented yet', modifier);
+    // NOTE: I refuse to implement sunglasses, due to them differntiating between light and glare...
+}
+
+/**
  * Local helper method to shift environmental modifiers up by one row.
  * 
  * Row relates to the Environmental modifiers table. See SR5#175
