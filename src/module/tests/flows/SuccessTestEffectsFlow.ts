@@ -32,17 +32,17 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         for (const effect of this.allApplicable()) {
             // Organize non-disabled effects by their application priority            
-                if (!effect.active) continue;
-                changes.push(...effect.changes.map(change => {
-                    const c = foundry.utils.deepClone(change) as any;
-                    // TODO: Remove this crap... Clear the issue of submitting the SR5ActiveEffectConfig changing all data. to system.
-                    c.key = c.key.replace('system.', 'data.');
-                    c.effect = effect;
-                    c.priority = c.priority ?? (c.mode * 10);
-                    return c;
-                }));
-                // TODO: What's with the statuses?
-                // for (const statusId of effect.statuses) this.statuses.add(statusId);
+            if (!effect.active) continue;
+            changes.push(...effect.changes.map(change => {
+                const c = foundry.utils.deepClone(change) as any;
+                // TODO: Remove this crap... Clear the issue of submitting the SR5ActiveEffectConfig changing all data. to system.
+                c.key = c.key.replace('system.', 'data.');
+                c.effect = effect;
+                c.priority = c.priority ?? (c.mode * 10);
+                return c;
+            }));
+            // TODO: What's with the statuses?
+            // for (const statusId of effect.statuses) this.statuses.add(statusId);
         }
 
         changes.sort((a, b) => a.priority - b.priority);
