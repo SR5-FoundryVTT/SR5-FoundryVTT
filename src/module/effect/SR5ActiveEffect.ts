@@ -16,6 +16,9 @@ import { SYSTEM_NAME } from "../constants";
  * but during calculation the override value will be used instead.
  */
 export class SR5ActiveEffect extends ActiveEffect {
+    // Foundry Core typing for the origin Document uuid.
+    public origin: string;
+
     /**
      * Can be used to determine if the origin of the effect is an document that is owned by another document.
      *
@@ -25,9 +28,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * items, this would need change.
      */
     public get isOriginOwned(): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (!this.origin) return false;
-        //@ts-ignore // TODO: foundry-vtt-types v10
         const path = this.origin.split('.');
 
         if (path[0] === 'Scene' && path.length === 6) return true;
@@ -37,7 +38,6 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     public get source() {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.origin ? fromUuid(this.origin) : null;
     }
 
