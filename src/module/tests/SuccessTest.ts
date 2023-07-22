@@ -176,7 +176,7 @@ export class SuccessTest {
 
         this.data = this._prepareData(data, options);
 
-        this.effects = new SuccessTestEffectsFlow(this);
+        this.effects = new SuccessTestEffectsFlow<this>(this);
 
         this.calculateBaseValues();
 
@@ -241,6 +241,8 @@ export class SuccessTest {
         data.modifiers = this._prepareModifiersData(data.modifiers);
 
         data.damage = data.damage || DataDefaults.damageData();
+
+        console.debug('Shadowrun 5e | Prepared test data', data);
 
         return data;
     }

@@ -4,6 +4,7 @@ import { DocumentSituationModifiers, ModifiableDocumentTypes } from '../Document
 import Modifier = Shadowrun.ModifierData;
 import SourceModifierData = Shadowrun.SourceModifierData;
 import ActiveModifierValue = Shadowrun.ActiveModifierValue;
+import { SituationModifierEffectsFlow } from './flows/SituationModifierEffectsFlow';
 
 
 export interface SituationalModifierApplyOptions {
@@ -20,9 +21,9 @@ export interface SituationalModifierApplyOptions {
 }
 
 /**
- * Base class for handling a single modifier of situational modifiers applied to a document. The 
+ * Base class for handling a single modifier type that's applied to a document.
  * 
- * Each situational modifier allows for a generic handling of it's active selections, totals and manual
+ * Each situational modifier allows for generic handling of it's active selections, totals and manual
  * override values, while also allowing to apply custom rules to each.
  * 
  * A modifier category would be: environmental, matrix, magic/astral, social, ...
@@ -32,12 +33,13 @@ export interface SituationalModifierApplyOptions {
  * 
  * A user/GM can select specific modifier values (so called active modifiers) via GUI.
  * 
- * It's allowed to have user selections for their character, while the gm has selections made
- * globally for the scene or local token position. These selections override each other and can
- * be modified by an ActiveEffect.
+ * This allows users to have active selections for their character, while the GM has active selections 
+ * for a more global document (scene, token position, ...). All active selections will be merged
+ * to an applied selection, which is used to calculate the total modifier value. The more specific
+ * a document is, the higher it's priority in the merge order.
  * 
- * A SituationModifier 
- * 
+ * Each SituationModifier only handles its own type, while the DocumentSituationModifiers handles
+ * all types for a document.
  */
 export class SituationModifier {
     type: Shadowrun.SituationModifierType;
@@ -50,6 +52,9 @@ export class SituationModifier {
 
     globalActivesApplied: boolean;
 
+    // The effects flow for this modifier.
+    effects: SituationModifierEffectsFlow<this>;
+
     /**
      * 
      * @param data The low level modifier data for this handler to work on.
@@ -58,6 +63,8 @@ export class SituationModifier {
     constructor(data?: Partial<SourceModifierData>, modifiers?: DocumentSituationModifiers) {
         this.source = this._prepareSourceData(data);
         this.modifiers = modifiers;
+
+        this.effects = new SituationModifierEffectsFlow<typeof this>(this);
     }
 
     /**
@@ -244,6 +251,9 @@ export class SituationModifier {
                 if (!applicable.includes(selection)) delete this.applied.active[selection];
             });
         }
+        
+        // Apply effect changes for this modifier type.
+        this.effects.apply();
 
         // If a fixed value selection has been made, use that.
         if (!this.hasFixed && this.hasFixedSelection) this.applied.fixed = this.applied.active.value;
