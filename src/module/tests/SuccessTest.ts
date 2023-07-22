@@ -548,8 +548,6 @@ export class SuccessTest {
         // Only then apply values and collected modifiers.
         this.applyPushTheLimit();
         this.applyPoolModifiers();
-
-        this.effects.apply();
     }
 
     /**
@@ -1270,6 +1268,9 @@ export class SuccessTest {
         await this.populateTests();
         await this.populateDocuments();
         await this.prepareDocumentData();
+
+        // Apply effects before value prep to apply them only once.
+        this.effects.apply();
 
         // Initial base value preparation will show default result without any user input.
         this.prepareBaseValues();

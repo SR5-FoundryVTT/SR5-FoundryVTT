@@ -57,7 +57,8 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
             case 'actor':
             case 'targeted_actor':
                 return this._prepareActorKeyOptions();
-            case 'test':
+            case 'test_all':
+            case 'test_item':
                 return this._prepareTestKeyOptions();
             case 'modifier':
                 return this._prepareModifierKeyOptions();
@@ -68,12 +69,12 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
     _prepareTestKeyOptions() {
         return {
-            'data.pool': 'Pool',
-            'data.threshold': 'Threshold',
-            'data.limit': 'Limit',
-            'data.hits': 'Hits',
-            'data.glitches': 'Glitches',
-            'data.netHits': 'Net Hits'
+            'system.modifiers': 'Pool Modifiers',
+            'system.threshold': 'Threshold',
+            'system.limit': 'Limit',
+            'system.hits': 'Hits',
+            'system.glitches': 'Glitches',
+            'system.netHits': 'Net Hits'
         }
     }
 
