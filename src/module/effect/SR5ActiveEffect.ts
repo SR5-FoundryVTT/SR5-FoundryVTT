@@ -3,6 +3,7 @@ import { Helpers } from "../helpers";
 import ModifiableValue = Shadowrun.ModifiableValue;
 import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import { SYSTEM_NAME } from "../constants";
+import { SR5Item } from "../item/SR5Item";
 
 
 
@@ -39,17 +40,16 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
-    public get source() {
-        return this.origin ? fromUuid(this.origin) : null;
+    public get source(): SR5Actor | SR5Item | null {
+        //@ts-ignore
+        return this.origin ? fromUuidSync(this.origin) : null;
     }
 
     /**
      * Render the sheet of the active effect source
      */
-    public async renderSourceSheet() {
-        const document = await this.source;
-        // @ts-ignore
-        return document?.sheet?.render(true);
+    public renderSourceSheet() {        
+        return this.source?.sheet?.render(true);
     }
 
     async toggleDisabled() {
@@ -166,12 +166,17 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
+     * Inject features into default FoundryVTT ActiveEffect implementation.
+     * 
+     * - dynamic source properties as change values
+     * - apply to non-Actor objects
      * 
      * @param object 
      * @param change 
-     * @returns 
      */
     override apply(object: any, change) {
+        this._transformDynamicChangeValue(change);
+
         // Foundry can be used to apply to actors.
         if (object instanceof SR5Actor) {
             return super.apply(object, change);
@@ -179,6 +184,37 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Custom handling to apply to other object types.
         this._applyToObject(object, change);
+    }
+
+    /**
+     * Transform a dynamic change value to the actual value.
+     * 
+     * A dynamic change value must always start with @ followed by the Foundry porperty path relative
+     * to the source object.
+     * 
+     * TODO: Allow for foundry rolls? Or use foundry tokenizer for calculations...
+     * 
+     * @param change A singular EffectChangeData object
+     */
+    _transformDynamicChangeValue(change: EffectChangeData) {
+        // Dynamic value present?
+        if (foundry.utils.getType(change.value) !== 'string') return;                
+        if (change.value.length === 0) return;
+        if (change.value[0] !== '@') return;
+
+        // Retrieve origin document.
+        if (!this.origin) return;
+        const source = this.source;
+        if (!source) return;
+        
+        // Retrieve dynamic value.
+        const dynamicValueKey = change.value.slice(1);        
+        const value = foundry.utils.getProperty(source, dynamicValueKey);
+
+        // Overwrite change value with graceful default, to avoid NaN errors.
+        if (value === undefined) change.value = '0';
+        // Adhere to FoundryVTT expecation of recieving string values.
+        else change.value = value.toString();
     }
 
     /**
@@ -197,7 +233,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // }
 
         const target = foundry.utils.getProperty(object, change.key) ?? null;
-        let targetType = foundry.utils.getType(target);
+        let targetType = foundry.utils.getType(target);        
 
         // Cast the effect change value to the correct type
         let delta;

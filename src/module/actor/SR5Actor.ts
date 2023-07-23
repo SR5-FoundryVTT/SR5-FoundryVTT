@@ -172,7 +172,7 @@ export class SR5Actor extends Actor {
     override *allApplicableEffects() {
         //@ts-ignore TODO: foundry-vtt-types v10
         for (const effect of super.allApplicableEffects()) {
-            if (!effect.applyTo) yield effect;
+            if (!effect.applyTo || effect.applyTo === 'actor') yield effect;            
         }
     }
 
