@@ -4,7 +4,7 @@ import { DocumentSituationModifiers, ModifiableDocumentTypes } from '../Document
 import Modifier = Shadowrun.ModifierData;
 import SourceModifierData = Shadowrun.SourceModifierData;
 import ActiveModifierValue = Shadowrun.ActiveModifierValue;
-import { SituationModifierEffectsFlow } from './flows/SituationModifierEffectsFlow';
+import { SituationModifierEffectsFlow } from '../../effect/flows/SituationModifierEffectsFlow';
 
 
 export interface SituationalModifierApplyOptions {
@@ -253,7 +253,7 @@ export class SituationModifier {
         }
         
         // Apply effect changes for this modifier type.
-        this.effects.apply();
+        this.effects.apply({test: options.test});
 
         // If a fixed value selection has been made, use that.
         if (!this.hasFixed && this.hasFixedSelection) this.applied.fixed = this.applied.active.value;
