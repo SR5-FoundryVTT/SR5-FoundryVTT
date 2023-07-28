@@ -66,7 +66,7 @@
         <div class="form-group">
             <label>{{ localize "SR5.ActiveEffect.ApplyTo" }}</label>
             <div class="form-fields">
-                <select name="flags.shadowrun5e.applyTo" data-dtype="Text">
+                <select name="flags.shadowrun5e.applyTo" data-dtype="Text" {{#if hasChanges}}disabled{{/if}}>
                     {{selectOptions applyToOptions selected=applyTo localize=true}}
                 </select>
             </div>

@@ -6,8 +6,26 @@ import { SR5ActiveEffect } from "./SR5ActiveEffect";
  * 
  * NOTE: A ActiveEffectConfig class is comparable to a DocumentSheet class, but Foundry differentiates between
  * 'Config' and 'Sheet'.
+ * 
+ * The ActiveEffectConfig differs from other sheets in updating / submitting behaviour due to changes needing a
+ * multi step configuration process. If a change is partially configured it might break the underlying data structure 
+ * and sheet rendering. To prevent this, the config sheet is rendered with a manually triggered 'submit' button.
+ * 
+ * The Shadowrun5e system uses ActiveEffects for more than only altering actor data.
+ * Besides the default 'actor' apply-to type others are also supported, with all changes of an effect applying to that target only.
+ * 
+ * Some apply-to types follow the default key-value change structure of altering data, while others (modifiers) allow defining 
+ * custom handlers to apply complex bevhaiour to targets.
+ * 
+ * Each apply-to target defines what effects are applicable to it and how changes are to be applied. These differing behaviours
+ * are defined in <>EffectsFlow.ts or <>ChangeFlow.ts and follow the Foundry interface of 'apply' and 'allApplicableEffects' methods.
+ * 
+ * While actors apply effects as part of their prepareData flow the modifier apply-to target applies effects as part of the calculation of their
+ * situational modifiers and others still can behave differently.
  */
 export class SR5ActiveEffectConfig extends ActiveEffectConfig {
+    override object: SR5ActiveEffect;
+
     override get template(): string {
         return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
     }
@@ -18,11 +36,37 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         data.modes = this.applyModifyLabelToCustomMode(data.modes);
         
         data.applyToOptions = this.prepareApplyToOptions();
-        data.applyTo = this.document.applyTo;
-
+        data.applyTo = this.object.applyTo;
         data.testKeyOptions = this.prepareKeyOptions();
+        data.hasChanges = this._prepareEffectHasChanges();
 
         return data;
+    }
+
+    override activateListeners(html: JQuery<HTMLElement>): void {
+        super.activateListeners(html);
+
+        html.find('select[name="flags.shadowrun5e.applyTo"]').on('change', this._onApplyToChange.bind(this));
+    }
+
+    /**
+     * Assure both no changes are present before changing the applyTo type
+     * and re-render the sheet to refresh prepared change value options.
+     */
+    async _onApplyToChange(event: JQuery.ClickEvent) {
+        event.preventDefault();
+
+        const select = event.currentTarget as HTMLSelectElement;
+
+        if (this.object.getFlag('shadowrun5e', 'applyTo') === select.value) return;
+
+        if (this.object.changes.length) {
+            ui.notifications?.error('You must delete changes before changing the apply-to type.');
+        } else {
+            await this.object.update({'flags.shadowrun5e.applyTo': select.value});
+        }
+        
+        this.render();
     }
 
     /**
@@ -86,5 +130,9 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
     _prepareModifierKeyOptions() {
         return {}
+    }
+
+    _prepareEffectHasChanges(): boolean {
+        return this.object.changes.length > 0;
     }
 }
