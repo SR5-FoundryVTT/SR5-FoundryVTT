@@ -240,6 +240,10 @@ ___________________
         // @ts-ignore // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
+        //@ts-ignore TODO: foundry-vtt-types v11
+        // Setting to false, will NOT create item effects on actors but traverse effects on items during data prep.
+        CONFIG.ActiveEffect.legacyTransferral = false; // TODO: this is v11 only, might need a v10 workaround
+
 
         registerSystemSettings();
         registerSystemKeybindings();

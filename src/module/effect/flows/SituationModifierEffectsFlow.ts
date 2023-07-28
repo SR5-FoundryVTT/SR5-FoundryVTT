@@ -58,9 +58,19 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
     *allApplicable(): Generator<SR5ActiveEffect> {
         if (this.modifier.sourceDocumentIsActor && this.modifier.modifiers?.document) {
             const actor = this.modifier.modifiers.document as SR5Actor;
+
+            // Apply all effects directly on actor.
             for (const effect of actor.effects as unknown as SR5ActiveEffect[]) {
                 if (!effect.active) continue;
                 if (effect.applyTo === 'modifier') yield effect;
+            }
+            
+            // Apply all effects across all items.
+            for (const items of actor.items) {
+                for (const effect of items.effects) {
+                    if (!effect.active) continue;
+                    if (effect.applyTo === 'modifier') yield effect;
+                }
             }
         }
     }

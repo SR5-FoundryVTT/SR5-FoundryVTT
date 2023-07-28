@@ -17,8 +17,8 @@ import EffectsSheetData = Shadowrun.EffectsSheetData;
  */
 export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
     // NOTE: This here is temporary until FoundryVTT has built-in support for nested item updates.
-    if ( owner.isOwned )
-        return ui.notifications.warn("Managing Active Effects within an Owned Item is not currently supported and will be added in a subsequent update.");
+    // if ( owner.isOwned )
+    //     return ui.notifications.warn("Managing Active Effects within an Owned Item is not currently supported and will be added in a subsequent update.");
 
     event.preventDefault();
     // These element grabs rely heavily on HTML structure within the templates.
