@@ -1,8 +1,8 @@
 import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
-import { SR5Actor } from "../../../actor/SR5Actor";
-import { SR5ActiveEffect } from "../../../effect/SR5ActiveEffect";
-import { SituationModifier } from "../SituationModifier";
-import { imageMagnification, lowLightVision, smartlink, tracerRounds } from "./EnvironmentalChangeFlow";
+import { SR5Actor } from "../../actor/SR5Actor";
+import { SR5ActiveEffect } from "../SR5ActiveEffect";
+import { SituationModifier, SituationalModifierApplyOptions } from "../../rules/modifiers/SituationModifier";
+import { imageMagnification, lowLightVision, smartlink, tracerRounds, ultrasound } from "./EnvironmentalChangeFlow";
 
 /**
  * TODO: Documentation.
@@ -20,11 +20,12 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             'low_light_vision': lowLightVision,
             'image_magnification': imageMagnification,
             'tracer_rounds': tracerRounds,
-            'smartlink': smartlink
+            'smartlink': smartlink,
+            'ultrasound': ultrasound
         }
     }
 
-    apply() {
+    apply(options: SituationalModifierApplyOptions = {}) {
         console.debug('Shadowrun 5e | Applying Situation Modifier Effects', this);
         const changes: any[] = [];
         for (const effect of this.allApplicable()) {
@@ -45,7 +46,7 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             const handler = this.applyHandlers[change.value];
             if (!handler) continue;
 
-            handler(this.modifier);
+            handler(this.modifier, options.test);
         }
     }
 

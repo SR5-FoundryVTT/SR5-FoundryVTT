@@ -202,9 +202,10 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (change.value.length === 0) return;
         if (change.value[0] !== '@') return;
 
-        // Retrieve origin document.
-        if (!this.origin) return;
-        const source = this.source;
+        // @ts-ignore
+        // legacyTransferal has item effects created with their items as owner/source.
+        // modern transferal has item effects directly on owned items.
+        const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;        
         if (!source) return;
         
         // Retrieve dynamic value.

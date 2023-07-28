@@ -7,14 +7,15 @@
  * 
  * TODO: Check rules on stacking of multiple environmental modifier compensations.
  */
-import { SR } from "../../../constants";
-import { EnvironmentalModifier } from "../EnvironmentalModifier";
+import { SR } from "../../constants";
+import { SuccessTest } from "../../tests/SuccessTest";
+import { EnvironmentalModifier } from "../../rules/modifiers/EnvironmentalModifier";
 
 /**
  * Apply Low Light Rules to light modifiers. See SR5#175
  * @param modifier 
  */
-export const lowLightVision = (modifier: EnvironmentalModifier) => {
+export const lowLightVision = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Low Light Effect', modifier);
 
     if (!modifier.applied.active.light) return;
@@ -27,7 +28,7 @@ export const lowLightVision = (modifier: EnvironmentalModifier) => {
  * Apply Image Manification to range modifiers. See SR5#175
  * @param modifier 
  */
-export const imageMagnification = (modifier: EnvironmentalModifier) => {
+export const imageMagnification = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Image Magnification Effect', modifier);
 
     if (!modifier.applied.active.range) return;    
@@ -41,7 +42,7 @@ export const imageMagnification = (modifier: EnvironmentalModifier) => {
  * Apply Thermographic Vision to light modifiers. See SR5#175
  * @param modifier 
  */
-export const thermographicVision = (modifier: EnvironmentalModifier) => {
+export const thermographicVision = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Thermographic Vision Effect', modifier);
 
     if (!modifier.applied.active.light) return;
@@ -55,7 +56,7 @@ export const thermographicVision = (modifier: EnvironmentalModifier) => {
  * Apply Tracer Rounds to wind and range modifiers. See SR5#175
  * @param modifier 
  */
-export const tracerRounds = (modifier: EnvironmentalModifier) => {
+export const tracerRounds = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Tracer Rounds Effect', modifier);
 
     if (modifier.applied.active.wind && modifier.applied.active.wind < SR.combat.environmental.levels.light) {
@@ -73,7 +74,7 @@ export const tracerRounds = (modifier: EnvironmentalModifier) => {
  * Apply Smartlink to wind modifiers. See SR5#175
  * @param modifier 
  */
-export const smartlink = (modifier: EnvironmentalModifier) => {
+export const smartlink = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Smartlink Effect', modifier);
 
     if (!modifier.applied.active.wind) return;
@@ -85,9 +86,26 @@ export const smartlink = (modifier: EnvironmentalModifier) => {
  * Apply Sunglasses to light modifiers. See SR5#175
  * @param modifier 
  */
-export const sunglasses = (modifier: EnvironmentalModifier) => {
+export const sunglasses = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.error('Shadowrun 5e | Sunglasses not implemented yet', modifier);
     // NOTE: I refuse to implement sunglasses, due to them differntiating between light and glare...
+}
+
+export const ultrasound = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
+    console.debug('Shadowrun 5e | Applying Ultrasound Effect', modifier);
+
+    if (modifier.applied.active.visibility) {
+        modifier.applied.active.visibility = _shiftUpByOneRow(modifier.applied.active.visibility);
+    }
+
+    // NOTE: This only uses distance, which at the moment is only set for targeted actor distances.
+    // When only the weapon range selection is used, no range distance is set.
+    // TODO: This seems to work BUT RangeAttackTest does seem to overwrite it again.
+    if (!test) return;
+    const distance = test.data['distance'];
+    if (!distance) return;
+
+    if (Number(distance) <= 50) modifier.applied.active.light = 0;
 }
 
 /**

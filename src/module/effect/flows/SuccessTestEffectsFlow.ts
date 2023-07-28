@@ -1,6 +1,5 @@
-import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
-import { SR5ActiveEffect } from "../../effect/SR5ActiveEffect";
-import { SuccessTest } from "../SuccessTest";
+import { SR5ActiveEffect } from "../SR5ActiveEffect";
+import { SuccessTest } from "../../tests/SuccessTest";
 
 /**
  * Handle the SR5ActiveEffects flow for a SuccessTest.
