@@ -22,6 +22,8 @@ export interface RangedAttackTestData extends SuccessTestData {
     targetRanges: Shadowrun.TargetRangeTemplateData[]
     // index of selected target range in targetRanges
     targetRangesSelected: number
+    // Distance to target in meters.
+    distance: number
 }
 
 
@@ -39,6 +41,7 @@ export class RangedAttackTest extends SuccessTest {
         data.targetRanges = [];
         data.targetRangesSelected = 0;
         data.damage = data.damage || DataDefaults.damageData();
+        data.distance = data.distance || 0;
 
         return data;
     }
@@ -103,9 +106,9 @@ export class RangedAttackTest extends SuccessTest {
         const actor = this.actor;
         if (!actor) return;
 
+        // Check user range selection or set to first.
         const modifiers = actor.getSituationModifiers();
-        // If no range is active, set to zero.
-        this.data.range = modifiers.environmental.applied.active.range || 0;
+        this.data.range = modifiers.environmental.source.active.range || 0;
     }
 
     /**
@@ -146,9 +149,13 @@ export class RangedAttackTest extends SuccessTest {
             return 0;
         });
 
-        // if no range is active, set to first target selected.
+        // Check user range selection or set to first.
         const modifiers = this.actor.getSituationModifiers();
-        this.data.range = modifiers.environmental.applied.active.range || this.data.targetRanges[0].range.modifier;
+        this.data.range = modifiers.environmental.source.active.range || this.data.targetRanges[0].range.modifier;
+
+        // Store distance for other calculations.
+        // NOTE: See EnvironmentalChangeFlow for likely the only usage.
+        this.data.distance = this.data.targetRanges.length > 0 ? this.data.targetRanges[0].distance : 0;
     }
 
     /**
@@ -269,7 +276,7 @@ export class RangedAttackTest extends SuccessTest {
         
         // Locally set env modifier temporarily.
         modifiers.environmental.setActive('range', Number(range));
-        modifiers.environmental.apply({reapply: true});
+        modifiers.environmental.apply({reapply: true, test: this});
 
         poolMods.addUniquePart(SR5.modifierTypes.environmental, modifiers.environmental.total);
     }

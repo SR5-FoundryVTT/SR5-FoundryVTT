@@ -99,8 +99,7 @@ export const ultrasound = (modifier: EnvironmentalModifier, test?: SuccessTest) 
     }
 
     // NOTE: This only uses distance, which at the moment is only set for targeted actor distances.
-    // When only the weapon range selection is used, no range distance is set.
-    // TODO: This seems to work BUT RangeAttackTest does seem to overwrite it again.
+    // TODO: When only the weapon range selection is used, no range distance is set.
     if (!test) return;
     const distance = test.data['distance'];
     if (!distance) return;
