@@ -252,7 +252,7 @@ export class SituationModifier {
             });
         }
         
-        // Apply effect changes for this modifier type.
+        // Apply effects applicable to situational modifiers.
         this.effects.apply({test: options.test});
 
         // If a fixed value selection has been made, use that.

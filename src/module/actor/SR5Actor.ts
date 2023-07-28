@@ -1734,11 +1734,11 @@ export class SR5Actor extends Actor {
 
     /** 
      * Get all situaitional modifiers from this actor.
+     * NOTE: These will return selections only without higher level selections applied.
+     *       You'll have to manually trigger .applyAll or apply what's needed.
      */
-    getSituationModifiers(options?): DocumentSituationModifiers {
-        const modifiers = DocumentSituationModifiers.getDocumentModifiers(this);
-        modifiers.applyAll(options);
-        return modifiers;
+    getSituationModifiers(): DocumentSituationModifiers {
+        return DocumentSituationModifiers.getDocumentModifiers(this);
     }
 
     /**

@@ -739,8 +739,7 @@ export class SuccessTest {
      * @param type The modifier type to be prepared.
      */
     prepareActorModifier(actor: SR5Actor, type: ModifierTypes): { name: string, value: number } {
-        const options = { test: this };
-        // TODO: ModifierFlow ALWAYS recalculates a total for ALL it's modifiers, even if not necessary... fix that
+        const options = { test: this, reapply: true };
         const value = actor.modifiers.totalFor(type, options);
         const name = this._getModifierTypeLabel(type);
 
@@ -1270,7 +1269,7 @@ export class SuccessTest {
         await this.populateDocuments();
         await this.prepareDocumentData();
 
-        // Apply effects before value prep to apply them only once.
+        // Apply effectes applicable to test values.
         this.effects.apply();
 
         // Initial base value preparation will show default result without any user input.

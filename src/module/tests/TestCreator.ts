@@ -523,11 +523,11 @@ export const TestCreator = {
         }
 
         // Apply applicable selections and collect modifiers.
-        for (const [modifier, applicable] of Object.entries(modifiers)) {
+        for (const [name, applicable] of Object.entries(modifiers)) {
             // Setup the resulting modifier value.
-            const label = SR5.modifierTypes[modifier];
+            const label = SR5.modifierTypes[name];
             const options = {applicable};
-            const value = actor.modifiers.totalFor(modifier, options);
+            const value = actor.modifiers.totalFor(name, options);
             data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
         }
 
