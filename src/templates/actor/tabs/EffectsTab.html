@@ -12,7 +12,7 @@
             {{#each section.effects as |effect|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                     img=effect.icon
-                    name=effect.label
+                    name=effect.name
                     itemId=effect.id
                     icons=(EffectIcons effect)
                     rightSide=[]
