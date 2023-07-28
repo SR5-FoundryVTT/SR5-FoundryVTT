@@ -23,7 +23,7 @@ import Template from "../template";
 import { TestRules } from "../rules/TestRules";
 
 import { ActionResultFlow } from "../item/flows/ActionResultFlow";
-import { SuccessTestEffectsFlow } from './flows/SuccessTestEffectsFlow';
+import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 
 export interface TestDocuments {
     actor?: SR5Actor
