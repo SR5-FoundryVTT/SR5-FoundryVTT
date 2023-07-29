@@ -24,6 +24,7 @@ import { TestRules } from "../rules/TestRules";
 
 import { ActionResultFlow } from "../item/flows/ActionResultFlow";
 import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -161,7 +162,7 @@ export class SuccessTest {
     public targets: TokenDocument[];
 
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
-    private effects: SuccessTestEffectsFlow<this>;
+    public effects: SuccessTestEffectsFlow<this>;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Store given documents to avoid later fetching.
@@ -1607,7 +1608,10 @@ export class SuccessTest {
             description: this.item?.getChatData() || '',
             // Some message segments are only meant for the gm, when the gm is the one creating the message.
             // When this test doesn't use an actor, don't worry about hiding anything.
-            applyGmOnlyContent: this._applyGmOnlyContent
+            applyGmOnlyContent: this._applyGmOnlyContent,
+            
+            // Effects that should be shown in this tests message for manual drag & drop application.
+            effects: [] as SR5ActiveEffect[]
         }
     }
 

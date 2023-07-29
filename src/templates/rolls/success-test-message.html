@@ -193,3 +193,18 @@
     </div>
 </div>
 {{/ifgt}}{{/if}}
+
+{{#if test.success}}{{#if effects}}
+<div class="sr5 chat-card roll-card">
+    {{#each effects}}
+    <div class="card-content">
+        <div class="left-side">
+           <p><a class="content-link" draggable="true" data-type="ActiveEffect" data-id="{{this.id}}" data-uuid="{{this.uuid}}" data-tooltip="TODO: EFFECTS">
+                <i class="fas fa-user">{{this.name}}</i>
+            </a></p>
+        </div>
+        <div class="right-side"></div>
+    </div>
+    {{/each}}
+</div>
+{{/if}}{{/if}}

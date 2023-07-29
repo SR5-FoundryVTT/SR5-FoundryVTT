@@ -71,6 +71,17 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     }
 
     /**
+     * Reduce all item effects to those applicable to target actors as part of a success vs opposed test flow.
+     */
+    *allApplicableToTargetActor(): Generator<SR5ActiveEffect> {
+        if (!this.test.item) return;
+
+        for (const effect of this.test.item.effects as unknown as SR5ActiveEffect[]) {
+            if (effect.applyTo === 'targeted_actor') yield effect;            
+        }
+    }
+
+    /**
      * Does the effect originate from item used within the SuccessTest?
      * 
      * @param effect Any SR5ActiveEffect

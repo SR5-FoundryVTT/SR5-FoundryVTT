@@ -166,13 +166,15 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * TODO: Don't transfer effects that are not applicable to the actor at all.
+     * Extend default FoundryVTT applicable effects to:
+     * - effects that don't follow the shadowrun5e systems applyTo settings
+     * - effects that apply To actor or targeted actors
      */
     //@ts-ignore TODO: foundry-vtt-types v10
     override *allApplicableEffects() {
         //@ts-ignore TODO: foundry-vtt-types v10
         for (const effect of super.allApplicableEffects()) {
-            if (!effect.applyTo || effect.applyTo === 'actor') yield effect;            
+            if (!effect.applyTo || effect.applyTo === 'actor' || effect.applyTo === 'targeted_actor') yield effect;
         }
     }
 
