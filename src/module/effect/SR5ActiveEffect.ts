@@ -175,7 +175,12 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param change 
      */
     override apply(object: any, change) {
-        this._transformDynamicChangeValue(change);
+        // @ts-ignore
+        // legacyTransferal has item effects created with their items as owner/source.
+        // modern transferal has item effects directly on owned items.
+        const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;        
+
+        SR5ActiveEffect.resolveDynamicChangeValue(source, change);
 
         // Foundry can be used to apply to actors.
         if (object instanceof SR5Actor) {
@@ -187,34 +192,30 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Transform a dynamic change value to the actual value.
+     * Resolve a dynamic change value to the actual numerical value.
      * 
-     * A dynamic change value must always start with @ followed by the Foundry porperty path relative
-     * to the source object.
+     * A dynamic change value follows the same rules as a Foundry roll formula (including dice pools).
      * 
-     * TODO: Allow for foundry rolls? Or use foundry tokenizer for calculations...
+     * So a change could have the key of 'system.attributes.body' with the mode Modify and a dynamic value of
+     * '@system.technology.rating * 3'. The dynamic property path would be taken from either the source or parent 
+     * document of the effect before the resolved value would be applied onto the target document / object.
      * 
+     * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular EffectChangeData object
      */
-    _transformDynamicChangeValue(change: EffectChangeData) {
+    static resolveDynamicChangeValue(source: any, change: EffectChangeData) {        
         // Dynamic value present?
         if (foundry.utils.getType(change.value) !== 'string') return;                
-        if (change.value.length === 0) return;
-        if (change.value[0] !== '@') return;
-
-        // @ts-ignore
-        // legacyTransferal has item effects created with their items as owner/source.
-        // modern transferal has item effects directly on owned items.
-        const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;        
-        if (!source) return;
+        if (change.value.length === 0) return;        
         
-        // Retrieve dynamic value.
-        const dynamicValueKey = change.value.slice(1);        
-        const value = foundry.utils.getProperty(source, dynamicValueKey);
+        // Use Foundry Roll Term parser to both resolve dynamic values and resolve calculations.
+        const terms = Roll.parse(change.value, source);
+        const expression = terms.map(term => term.total).join(' ');
+        const value = Roll.safeEval(expression);
 
-        // Overwrite change value with graceful default, to avoid NaN errors.
-        if (value === undefined) change.value = '0';
+        // Overwrite change value with graceful default, to avoid NaN errors during change application.
         // Adhere to FoundryVTT expecation of recieving string values.
+        if (value === undefined) change.value = '0';
         else change.value = value.toString();
     }
 

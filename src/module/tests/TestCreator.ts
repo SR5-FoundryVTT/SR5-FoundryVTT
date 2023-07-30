@@ -150,14 +150,20 @@ export const TestCreator = {
 
         // Check if message contains any test data.
         const flagData = message.getFlag(SYSTEM_NAME, FLAGS.Test);
-        if (!flagData) return;
+        if (!flagData) {console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`); return;}
 
+        return this._fromMessageTestData(flagData);
+    },
+
+    /**
+     * Create a test implemenation directly from a message flags test data.
+     * @param testData 
+     * @returns 
+     */
+    _fromMessageTestData: function(testData) {
         // Use test data to create the original test from it.
-        const testData = foundry.utils.duplicate(flagData) as SuccessTestMessageData;
-        if (!testData) {
-            console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
-            return;
-        }
+        testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
+        if (!testData) return;
 
         const rolls = testData.rolls.map(roll => SR5Roll.fromData(roll as any));
         const documents = {rolls};

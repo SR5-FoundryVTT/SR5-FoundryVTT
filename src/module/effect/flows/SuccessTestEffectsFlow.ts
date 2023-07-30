@@ -1,5 +1,8 @@
 import { SR5ActiveEffect } from "../SR5ActiveEffect";
 import { SuccessTest } from "../../tests/SuccessTest";
+import { ActiveEffectData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
+import { SR5Actor } from "../../actor/SR5Actor";
+import { OpposedTest } from "../../tests/OpposedTest";
 
 /**
  * Handle the SR5ActiveEffects flow for a SuccessTest.
@@ -54,6 +57,47 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     }
 
     /**
+     * Create Effectes of applyTo 'targeted_actor' after an opposed test has finished.
+     * 
+     * Before creating effects onto the target actor, resolve the dynamic values from the source context
+     * of the opposed test causing the effects. When created on the target actor, the values can't be resolved
+     * as there is no good reference to the causing test anymore.
+     * 
+     * Therefore effects on the original item can have dynamic values, while the created effects are copies with
+     * static values.
+     */
+    async createTargetActorEffectsAfterOpposedTest() {
+        //@ts-ignore Assure test is an opposed test.
+        const against = this.test.against;
+        const actor = this.test.actor;
+
+        if (!against && !this.test.opposing) return;
+        if (!actor) return;
+
+        console.debug('Shadowrun5e | Creating effects on target actor after opposed test.', this.test);
+
+        const effects: ActiveEffectData[] = [];
+        for (const effect of this.allApplicableToTargetActor()) {
+            const effectData = effect.toObject() as ActiveEffectData;
+
+            // Transform all dynamic values to static values.
+            effectData.changes = effectData.changes.map(change => {
+                // TODO: Would a value of @hits.value be better than @test.hits.value?
+                SR5ActiveEffect.resolveDynamicChangeValue({test: this.test}, change);
+                return change;
+            });
+            
+            // TODO: Check if id should be deleted or if it's recreated by creating a new effect.
+            
+            effects.push(effectData);
+        }
+
+        console.debug(`Shadowrun5e | To be created effects on target actor ${actor.name}`, effects);
+        //@ts-ignore
+        return actor.createEmbeddedDocuments('ActiveEffect', effects);
+    }
+
+    /**
      * Reduce all actor effects to those applicable to SuccessTests.
      * 
      * These can either be for ALL tests, or for those only trigger by the effects origin / source item.
@@ -77,7 +121,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (!this.test.item) return;
 
         for (const effect of this.test.item.effects as unknown as SR5ActiveEffect[]) {
-            if (effect.applyTo === 'targeted_actor') yield effect;            
+            if (effect.applyTo === 'targeted_actor') yield effect;
         }
     }
 

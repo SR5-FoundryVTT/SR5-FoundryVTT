@@ -57,6 +57,7 @@ import {canvasInit} from './canvas';
 import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
 import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
+import { SR5ChatMessage } from './chatMessage/SR5ChatMessage';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -221,8 +222,12 @@ ___________________
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
         CONFIG.Combat.documentClass = SR5Combat;
+        CONFIG.ChatMessage.documentClass = SR5ChatMessage;
         //@ts-ignore // TODO: foundry-vtt-types v10
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
+        //@ts-ignore TODO: foundry-vtt-types v11
+        // Setting to false, will NOT create item effects on actors but traverse effects on items during data prep.
+        CONFIG.ActiveEffect.legacyTransferral = false; // TODO: this is v11 only, might need a v10 workaround        
         // Register object classes
         CONFIG.Token.objectClass = SR5Token;
 
@@ -239,10 +244,6 @@ ___________________
         // Add Shadowrun configuration onto general Foundry config for module access.
         // @ts-ignore // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
-
-        //@ts-ignore TODO: foundry-vtt-types v11
-        // Setting to false, will NOT create item effects on actors but traverse effects on items during data prep.
-        CONFIG.ActiveEffect.legacyTransferral = false; // TODO: this is v11 only, might need a v10 workaround
 
 
         registerSystemSettings();
