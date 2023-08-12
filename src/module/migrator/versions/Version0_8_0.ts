@@ -4,11 +4,13 @@
  *
  * What class is to be used is defined within each action (active, followed, opposed, resist). Migration needs to map
  * these classes to their item types.
+ * 
+ * 
  */
 import {VersionMigration} from "../VersionMigration";
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import {Helpers} from "../../helpers";
+import { SR5Item } from "../../item/SR5Item";
+import { SR5Actor } from "../../actor/SR5Actor";
 
 export class Version0_8_0 extends VersionMigration {
     get SourceVersion(): string {
@@ -23,34 +25,34 @@ export class Version0_8_0 extends VersionMigration {
         return "0.8.0";
     }
 
-    protected override async ShouldMigrateItemData(data: ShadowrunItemData) {
-        return this._ShouldMigrateItemData(data);
+    protected override async ShouldMigrateItemData(item: SR5Item) {
+        return this._ShouldMigrateItemData(item);
     }
 
-    protected _ShouldMigrateItemData(data: ShadowrunItemData): boolean {
-        return ['weapon', 'spell'].includes(data.type);
+    protected _ShouldMigrateItemData(item: SR5Item): boolean {
+        return ['weapon', 'spell'].includes(item.type);
     }
 
     protected override async ShouldMigrateSceneData(scene: Scene) {
         return scene.tokens.size > 0;
     }
 
-    protected override async ShouldMigrateActorData(data: ShadowrunActorData) {
+    protected override async ShouldMigrateActorData(actor: SR5Actor) {
         // @ts-ignore
-        return data.items.contents.filter(i => this._ShouldMigrateItemData(i.data)).length > 0;
+        return actor.items.contents.filter(item => this._ShouldMigrateItemData(item)).length > 0;
     }
 
-    protected override async MigrateItemData(data: ShadowrunItemData) {
+    protected override async MigrateItemData(item: SR5Item) {
         const updateData: {
             data?: object
         } = {};
 
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+        Helpers.injectActionTestsIntoChangeData(item.type, item.data, item.data);
 
         return updateData;
     }
 
-    protected override async MigrateActorData(data: ShadowrunActorData) {
+    protected override async MigrateActorData(actor: SR5Actor) {
         let updateData: {
             data?: object,
             items?: object[]
@@ -58,7 +60,7 @@ export class Version0_8_0 extends VersionMigration {
             items: []
         };
 
-        updateData = await this.IterateActorItems(data, updateData);
+        updateData = await this.IterateActorItems(actor, updateData);
 
         // @ts-ignore//@ts-ignore // TODO: foundry-vtt-types v10
         if (updateData.data && foundry.utils.isEmpty(updateData.data)) delete updateData.data;

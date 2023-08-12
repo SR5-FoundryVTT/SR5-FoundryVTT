@@ -1,4 +1,5 @@
 import { VersionMigration } from './VersionMigration';
+import { Version0_12_0 } from './versions/Version0_12_0';
 import {Version0_8_0} from "./versions/Version0_8_0";
 
 type VersionDefinition = {
@@ -9,6 +10,7 @@ export class Migrator {
     // Map of all version migrations to their target version numbers.
     private static readonly s_Versions: VersionDefinition[] = [
         { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
+        { versionNumber: Version0_12_0.TargetVersion, migration: new Version0_12_0() }
     ];
 
     /**
@@ -124,7 +126,8 @@ export class Migrator {
      */
     private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
         // Migrate World Compendium Packs
-        const packs = game.packs?.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
+        // @ts-ignore TODO: foundry-vtt-types v10
+        const packs = game.packs?.filter((pack) => pack.metadata.packageType === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
 
         if (!packs) return;
 
