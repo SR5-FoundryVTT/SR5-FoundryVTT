@@ -111,27 +111,78 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         }
     }
 
+    /**
+     * Key options for test related applyTo selections.
+     * 
+     * @returns key - label object
+     */
     _prepareTestKeyOptions() {
         return {
-            'system.modifiers': 'Pool Modifiers',
-            'system.threshold': 'Threshold',
-            'system.limit': 'Limit',
-            'system.hits': 'Hits',
-            'system.glitches': 'Glitches',
-            'system.netHits': 'Net Hits'
+            'system.modifiers': 'SR5.DicePool',
+            'system.threshold': 'SR5.Threshold',
+            'system.limit': 'SR5.Limit',
+            'system.hits': 'SR5.Hits',
+            'system.glitches': 'SR5.Glitches',
+            'system.netHits': 'SR5.NetHits'
         }
     }
 
+    /**
+     * TODO: These could be fetched using the data model FoundryVtt provides.
+     */
     _prepareActorKeyOptions() {
         return {
-            'system.attributes.body': 'SR5.AttrBody'
+            // Attributes
+            'system.attributes.body': 'SR5.AttrAgility',
+            'system.attributes.agility': 'SR5.AttrAgility',
+            'system.attributes.attack': 'SR5.MatrixAttrAttack',
+            'system.attributes.charisma': 'SR5.AttrCharisma',
+            'system.attributes.data_processing': 'SR5.MatrixAttrDataProc',
+            'system.attributes.edge': 'SR5.AttrEdge',
+            'system.attributes.essence': 'SR5.AttrEssence',
+            'system.attributes.firewall': 'SR5.MatrixAttrFirewall',
+            'system.attributes.intuition': 'SR5.AttrIntuition',
+            'system.attributes.logic': 'SR5.AttrLogic',
+            'system.attributes.magic': 'SR5.AttrMagic',
+            'system.attributes.reaction': 'SR5.AttrReaction',
+            'system.attributes.resonance': 'SR5.AttrResonance',
+            'system.attributes.sleaze': 'SR5.MatrixAttrSleaze',
+            'system.attributes.strength': 'SR5.AttrStrength',
+            'system.attributes.willpower': 'SR5.AttrWillpower',
+            'system.attributes.pilot': 'SR5.Vehicle.Stats.Pilot',
+            'system.attributes.force': 'SR5.Force',
+
+            // Limits
+            'system.limits.physical': 'SR5.LimitPhysical',
+            'system.limits.social': 'SR5.LimitSocial',
+            'system.limits.mental': 'SR5.LimitMental',
+            'system.limits.astral': 'SR5.LimitAstral',
+
+            // 
         }
     }
 
+    /**
+     * All key options related to the effect applyTo type 'modifier'.
+     * 
+     * @returns key : label object
+     */
     _prepareModifierKeyOptions() {
-        return {}
+        return {
+            'environmental.low_light_vision': '',
+            'environmental.image_magnification': '',
+            'environmental.tracer_rounds': '',
+            'environmental.smartlink': '',
+            'environmental.ultrasound': ''
+        }
     }
 
+    /**
+     * Determine if the effect has changes applied already.
+     * 
+     * This should be used to prohibit changing of applyTo selections.
+     * @returns true if changes are present, false otherwise.
+     */
     _prepareEffectHasChanges(): boolean {
         return this.object.changes.length > 0;
     }
