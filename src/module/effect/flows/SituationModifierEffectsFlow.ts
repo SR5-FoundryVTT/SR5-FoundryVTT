@@ -38,12 +38,18 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
 
         changes.sort((a, b) => a.priority - b.priority);
 
-        console.debug('Shadowrun 5e | Applying Sitation Modifier Effect changes', changes);
+        console.debug('Shadowrun 5e | Applying Situation Modifier Effect changes', changes);
         for (const change of changes) {
             if (!change.key) continue;
-            if (!this._changeKeyMatchesModifierType(change)) continue;
+            
+            // expect keys in format of <modifierType>.<modifierHandler>
+            const changeKeySplit = change.key.split('.') as [string, string];
+            if (changeKeySplit.length !== 2) return false;
+            const [modifierType, modifierHandler] = changeKeySplit;
 
-            const handler = this.applyHandlers[change.value];
+            if (modifierType !== this.modifier.type) continue;
+
+            const handler = this.applyHandlers[modifierHandler];
             if (!handler) continue;
 
             handler(this.modifier, options.test);
@@ -73,9 +79,5 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
                 }
             }
         }
-    }
-
-    _changeKeyMatchesModifierType(change: EffectChangeData): boolean {
-        return change.key === this.modifier.type;
     }
 }
