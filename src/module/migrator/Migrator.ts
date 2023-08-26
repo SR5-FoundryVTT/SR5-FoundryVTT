@@ -81,6 +81,16 @@ export class Migrator {
         migrations.sort((a, b) => {
             return this.compareVersion(a.versionNumber, b.versionNumber);
         });
+        
+        // Before starting, configure each migration
+        for (const {migration} of migrations) {
+            // Show a configuration or information dialog and abort if necessary.
+            const consent = await migration.AskForUserConsentAndConfiguration();
+            if (!consent) return;
+        }
+
+        console.error('User consented');
+        
 
         await this.migrateWorld(game, migrations);
         await this.migrateCompendium(game, migrations);
@@ -115,6 +125,7 @@ export class Migrator {
     private static async migrateWorld(game: Game, migrations: VersionDefinition[]) {
         // Run the migrations in order
         for (const { migration } of migrations) {
+            // Migrate after user accepted.
             await migration.Migrate(game);
         }
     }

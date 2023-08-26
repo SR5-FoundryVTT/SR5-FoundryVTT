@@ -1192,6 +1192,13 @@
         "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
         "TokenSelectionNeeded": "One ore more tokens need to be selected"
     },
+    "SR5.Migrator": {
+        "Version12_0_0": {
+            "Warning": "NOTE!",
+            "Content": "From version 0.12.0 onwards effects on owned items will directly apply without them being copied onto the actor first. Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects copied from owned items will be deleted. Effects created directly on actors aren't affected. Should you want to only disable those effects, check the box below. Disabled effects will be marked as such.",
+            "OnlyDisable": "Disable Effects only"
+        }
+    },
     "SR5.Weapon": "Weapon",
     "SR5.WeaponAmmoCount": "Ammo Count",
     "SR5.WeaponCatMelee": "Melee",

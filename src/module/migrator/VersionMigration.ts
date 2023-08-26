@@ -45,6 +45,13 @@ export abstract class VersionMigration {
     }
 
     /**
+     * Show a version specific dialog to the user to inform or confirm about certain migration aspects.
+     */
+    public async AskForUserConsentAndConfiguration(): Promise<boolean> {
+        return true;
+    }
+
+    /**
      * Begin migration for the specified game.
      * @param game The world that should be migrated.
      */
