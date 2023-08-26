@@ -20,9 +20,9 @@
   },
   "version": "0.12.0",
   "compatibility": {
-    "minimum": "10",
+    "minimum": "11",
     "maximum": "11",
-    "verified": "11.305"
+    "verified": "11"
   },
   "minimumCoreVersion": "10",
   "scripts": [],
