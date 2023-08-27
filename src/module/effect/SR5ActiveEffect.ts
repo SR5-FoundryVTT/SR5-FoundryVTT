@@ -8,13 +8,16 @@ import { SR5Item } from "../item/SR5Item";
 
 
 /**
- * Shadowrun Active Effects implement additional ways of alterting document data.
+ * Shadowrun Active Effects implement additional ways of altering document data.
  * 
  * The main difference to the base implementation is the ability to modify Value structures without the need to define
  * sub-keys. Instead of active effects adding on top of a numerical they'll be included in the mod array of the Value.
  * 
  * Overriding a value is also altered for Values to allow for a more dynamic approach. The original values are still available 
  * but during calculation the override value will be used instead.
+ * 
+ * Effects can also define the type of target data to be applied to. Default effects only apply to actor data, system effects
+ * can apply to actors, tests and also only to actors targeted by tests.
  */
 export class SR5ActiveEffect extends ActiveEffect {
     // Foundry Core typing missing... TODO: foundry-vtt-types v10
@@ -23,7 +26,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     public changes: EffectChangeData[];
 
     /**
-     * Can be used to determine if the origin of the effect is an document that is owned by another document.
+     * Can be used to determine if the origin of the effect is a document owned by another document.
      *
      * A use case would be to check if the effect is applied by an actor owned item.
      *

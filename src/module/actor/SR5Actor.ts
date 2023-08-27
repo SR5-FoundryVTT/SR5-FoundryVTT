@@ -166,15 +166,24 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Extend default FoundryVTT applicable effects to:
-     * - effects that don't follow the shadowrun5e systems applyTo settings
-     * - effects that apply To actor or targeted actors
+     * Default FoundryVTT will return all effects that are to be transferred onto the actor.
+     * 
+     * The system provides additional support for:
+     * - Parent item equipped state affecting applicable effects
+     * - Only apply effects targeting actor data
+     * 
+     * NOTE: FoundryVTT applyActiveEffects will check for disabled effects.
      */
     //@ts-ignore TODO: foundry-vtt-types v10
     override *allApplicableEffects() {
-        //@ts-ignore TODO: foundry-vtt-types v10
+        // @ts-ignore TODO: foundry-vtt-types v10
         for (const effect of super.allApplicableEffects()) {
-            if (!effect.applyTo || effect.applyTo === 'actor' || effect.applyTo === 'targeted_actor') yield effect;
+            // Item owned effects should only apply when the item is equipped.
+            if (effect.parent instanceof SR5Item && !effect.parent.isEquipped()) continue;
+            // Only apply effects targeting actor data.
+            if (!['actor', 'targeted_actor'].includes(effect.applyTo)) continue;
+
+            yield effect;
         }
     }
 
@@ -215,91 +224,6 @@ export class SR5Actor extends Actor {
                 ICPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
         }
-    }
-
-    /**
-     * NOTE: This method is unused at the moment, keep it for future inspiration.
-     */
-    applyOverrideActiveEffects() {
-        const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
-            if (effect.data.disabled) return changes;
-
-            // include changes partially matching given keys.
-            return changes.concat(effect.data.changes
-                .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
-                .map(change => {
-                    // @ts-ignore // Foundry internal code, duplicate doesn't like EffectChangeData
-                    change = foundry.utils.duplicate(change);
-                    // @ts-ignore
-                    change.effect = effect;
-                    change.priority = change.priority ?? (change.mode * 10);
-
-                    return change;
-                }));
-        }, []);
-        // Sort changes according to priority, in case it's ever needed.
-        // @ts-ignore // a / b can't be null here...
-        changes.sort((a, b) => a.priority - b.priority);
-
-        for (const change of changes) {
-            // @ts-ignore
-            change.effect.apply(this, change);
-        }
-    }
-
-    /**
-     * A helper method to only apply a subset of keys instead of all.
-     * @param partialKeys Can either be complete keys or partial keys
-     */
-    _applySomeActiveEffects(partialKeys: string[]) {
-        const changes = this._reduceEffectChangesByKeys(partialKeys);
-        this._applyActiveEffectChanges(changes);
-    }
-
-
-    /**
-     * A helper method to apply a active effect changes collection (which might come from multiple active effects)
-     * @param changes
-     */
-    _applyActiveEffectChanges(changes: EffectChangeData[]) {
-        const overrides = {};
-
-        for (const change of changes) {
-            // @ts-ignore
-            const result = change.effect.apply(this, change);
-            if (result !== null) overrides[change.key] = result;
-        }
-
-        this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
-    }
-
-    /**
-     * Reduce all changes across multiple active effects that match the given set of partial keys
-     * @param partialKeys Can either be complete keys or partial keys
-     */
-    _reduceEffectChangesByKeys(partialKeys: string[]): EffectChangeData[] {
-        // Collect only those changes matching the given partial keys.
-        const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
-            if (effect.data.disabled) return changes;
-
-            // include changes partially matching given keys.
-            return changes.concat(effect.data.changes
-                .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
-                .map(change => {
-                    // @ts-ignore // Foundry internal code, duplicate doesn't like EffectChangeData
-                    change = foundry.utils.duplicate(change);
-                    // @ts-ignore
-                    change.effect = effect;
-                    change.priority = change.priority ?? (change.mode * 10);
-
-                    return change;
-                }));
-        }, []);
-        // Sort changes according to priority, in case it's ever needed.
-        // @ts-ignore // TODO: foundry-vtt-types v10
-        changes.sort((a, b) => a.priority - b.priority);
-
-        return changes;
     }
 
     /**
