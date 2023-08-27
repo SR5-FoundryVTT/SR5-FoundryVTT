@@ -150,13 +150,11 @@ export class SR5ActiveEffect extends ActiveEffect {
         return possibleValue && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, this.minValueKeys);
     }
 
+    /**
+     * Match against these keys, as the exact ModifiableValue layout might be different from time to time.
+     */
     get minValueKeys(): string[] {
-        // Match against these keys, as the exact ModifiableValue layout might be different from time to time.
         return ['value', 'mod'];
-    }
-
-    get advancedChanges() {
-        return this.getFlag(SYSTEM_NAME, 'advancedChanges') || {};
     }
 
     /**
@@ -166,6 +164,22 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     get applyTo(): string | null {
         return this.getFlag(SYSTEM_NAME, 'applyTo') as string || 'actor';
+    }
+
+    /**
+     * Some effects should only be applied depending on their parent items wireless status.
+     * 
+     * When this flag is set the parent item wireless status is taken into account.
+     */
+    get onlyForWireless(): boolean {
+        return this.getFlag(SYSTEM_NAME, 'onlyForWireless') as boolean || false;
+    }
+
+    /**
+     * Some effects should only be applied when their parent item is in active wireless mode.
+     */
+    get isWirelessActive(): boolean {
+        return this.onlyForWireless && this.parent instanceof SR5Item && this.parent.isWireless();
     }
 
     /**

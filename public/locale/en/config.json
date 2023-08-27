@@ -85,6 +85,7 @@
             "Modify": "Modify"
         },
         "New": "New Effect",
+        "OnlyForWireless": "Only when wireless is active",
         "Types": {
             "Inactive": "Inactive Effects",
             "Persistent": "Persistent Effects",
@@ -621,6 +622,13 @@
     "SR5.MigrationComplete": "Migration Complete",
     "SR5.MigrationUpdateCompendiumNoUpdateActor": "Due to technical limitations within FoundryVTT, actor compendium packs are unable to be updated at this time. You will have to manually update these packs.",
     "SR5.MigrationUpdateCompendiumUpdateMessage": "Any world compendium packs that exist in the world were also updated",
+    "SR5.Migrator": {
+        "Version12_0_0": {
+            "Content": "From version 0.12.0 onwards effects on owned items will directly apply without them being copied onto the actor first. Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects copied from owned items will be deleted. Effects created directly on actors aren't affected. Should you want to only disable those effects, check the box below. Disabled effects will be marked as such.",
+            "OnlyDisable": "Disable Effects only",
+            "Warning": "NOTE!"
+        }
+    },
     "SR5.Miscellaneous": "Misc",
     "SR5.MissingItemForOpposedTest": "Opposed Test can't be rolled due to the acting item now missing",
     "SR5.MissingRessource": {
@@ -1191,13 +1199,6 @@
         "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
         "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
         "TokenSelectionNeeded": "One ore more tokens need to be selected"
-    },
-    "SR5.Migrator": {
-        "Version12_0_0": {
-            "Warning": "NOTE!",
-            "Content": "From version 0.12.0 onwards effects on owned items will directly apply without them being copied onto the actor first. Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects copied from owned items will be deleted. Effects created directly on actors aren't affected. Should you want to only disable those effects, check the box below. Disabled effects will be marked as such.",
-            "OnlyDisable": "Disable Effects only"
-        }
     },
     "SR5.Weapon": "Weapon",
     "SR5.WeaponAmmoCount": "Ammo Count",

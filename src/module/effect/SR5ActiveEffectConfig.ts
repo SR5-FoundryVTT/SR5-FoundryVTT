@@ -34,11 +34,13 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         const data = await super.getData(options) as any;
         
         data.modes = this.applyModifyLabelToCustomMode(data.modes);
-        
-        data.applyToOptions = this.prepareApplyToOptions();
+                
         data.applyTo = this.object.applyTo;
+        data.onlyForWireless = this.object.onlyForWireless;
+
+        data.applyToOptions = this.prepareApplyToOptions();
         data.testKeyOptions = this.prepareKeyOptions();
-        data.hasChanges = this._prepareEffectHasChanges();
+        data.hasChanges = this.prepareEffectHasChanges();
 
         return data;
     }
@@ -52,6 +54,9 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     /**
      * Assure both no changes are present before changing the applyTo type
      * and re-render the sheet to refresh prepared change value options.
+     * 
+     * This is to avoid configured changes breaking when changing to other applyTo types
+     * that do not support the same change keys.
      */
     async _onApplyToChange(event: JQuery.ClickEvent) {
         event.preventDefault();
@@ -70,9 +75,9 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     }
 
     /**
-     * Foundry provides a custom mode for systems to implement behaviour with.
+     * Foundry provides a custom mode for systems to implement behavior with.
      * 
-     * Shadowrun uses this mode to implement 'modify' mode, with complex behaviour.
+     * Shadowrun uses this mode to implement 'modify' mode, with complex behavior.
      * To give users better information about the mode, inject a 'modify' label.
      * 
      * @param modes A object prepared for display using Foundry select handlebarjs helper.
@@ -90,11 +95,11 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     }
 
     /**
-     * Provide the Configh Sheet with a list of keys to choose from.
+     * Provide the config sheet with a list of change keys to choose from.
      * 
      * The list provided depends on the systems apply-to effect type.
      * 
-     * @returns A object with a Foundry poroperty string as key and a i18n label as value.
+     * @returns A object with a Foundry property string as key and a i18n label as value.
      */
     prepareKeyOptions(): Record<string, string> {
         switch (this.document.applyTo) {
@@ -183,7 +188,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * This should be used to prohibit changing of applyTo selections.
      * @returns true if changes are present, false otherwise.
      */
-    _prepareEffectHasChanges(): boolean {
+    prepareEffectHasChanges(): boolean {
         return this.object.changes.length > 0;
     }
 }

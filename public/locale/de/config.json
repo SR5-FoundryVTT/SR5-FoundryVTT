@@ -84,6 +84,7 @@
             "Modify": "Modifizieren"
         },
         "New": "New Effect",
+        "OnlyForWireless": "Nur bei aktivem wireless",
         "Types": {
             "Inactive": "Inaktive Effekte",
             "Persistent": "Anhaltende Effekte",
