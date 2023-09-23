@@ -6,4 +6,6 @@ foundryconfig.json
 shadowrun5e.lock
 *.code-workspace
 dist
-packs
+
+# NOTE: v11 packs must be ignored until system goes v11 only and drops v10 support. Until then use v11 migration path for v11 support.
+packs/*/*

@@ -1,5 +1,5 @@
 {
-    "ACTOR.TypeCharacter": "HORST",
+    "ACTOR.TypeCharacter": "Charakter",
     "ACTOR.TypeCritter": "Critter",
     "ACTOR.TypeIc": "IC",
     "ACTOR.TypeSpirit": "Geist",
@@ -44,6 +44,8 @@
         "HideGMOnlyChatContent": "Verstecke GM Informationen in Proben Chat Nachrichten",
         "HideGMOnlyChatContentDescription": "Nachrichten durch GM Proben zeigen kritische Informationen nur Spielern mit Besitzer Rechten für den genutzten Akteur",
         "IgnoreDiagonal": "Ignoriere diagonale Bewegung (1-1-1)",
+        "ManualRollOnSuccessTest": "Manuelles Würfeln bei Proben",
+        "ManualRollOnSuccessTestDescription": "Erlaubt Benutzern manuelle Würfelwürfe bei Proben und Rückmeldungen von Erfolgen",
         "MustHaveRessourcesOnTest": "Proben nur mit außreichenden Ressourcen",
         "MustHaveRessourcesOnTestDescription": "Eine Probe kann nur durchgeführt werden wenn alle Ressourcen dafür vorhadnen sind",
         "OnlyAllowRollOnDefaultableSkills": "Nur improvisierbare unbekannte Fertigkeitsproben",
@@ -57,9 +59,7 @@
         "ShowTokenNameForChatOutputDescription": "Soll der Namen des Tokens für die Würfelkarte angezeigt werden anstelle dem Namen des Actors, wenn ein Token verfügbar ist",
         "ShowTokenNameForChatOutputName": "Token Namen für Würfelkarte",
         "TokenHealthBars": "Token Lebensbalken",
-        "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige",
-        "WhisperOpposedTestsToTargetedPlayers": "Flüstere VS Anteil an anvisierte Spieler",
-        "WhisperOpposedTestsToTargetedPlayersDescription": "Bei Proben mit VS Proben wird eine geflüsterte Nachricht an anvisierte Spieler (online) versendet"
+        "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige"
     },
     "SR5.AP": "DK",
     "SR5.Accessory": "Zubehör",
@@ -151,6 +151,13 @@
         "ReduceInitByOne": "Initiative -1",
         "ReduceInitByTen": "Initiative -10"
     },
+    "SR5.CallInAction": {
+        "ActorType": "Akteur",
+        "Compilation": "Kompilierung",
+        "CreateCompilation": "Erstelle Kompilierungs Aktion",
+        "CreateSummoning": "Erstelle Beschwörungs Aktion",
+        "Summoning": "Beschwörung"
+    },
     "SR5.CanDefault": "Improvisierbar",
     "SR5.Capacity": "Kapazität",
     "SR5.CareerKarma": "Gesamtkarma",
@@ -177,6 +184,8 @@
     },
     "SR5.ClearMarks": "Entferne alle Marken",
     "SR5.Close": "Schließen",
+    "SR5.Collapse": "Einklappen",
+    "SR5.CollapseAll": "Alles einklappen",
     "SR5.CommonProgram": "Standardprogramm",
     "SR5.ComplexForm": "Komplexe Form",
     "SR5.ComplexForms": "Komplexe Formen",
@@ -277,8 +286,7 @@
         "Consent": "Bist du sicher?",
         "Delete": "Ja",
         "Description": "Das Löschen eines Eintrags kann nicht rückgängig gemacht werden!",
-        "Titel": "Eintrag löschen",
-        "Title": "Eintrag löschen   "
+        "Titel": "Eintrag löschen"
     },
     "SR5.DeleteItem": "Gegenstand löschen",
     "SR5.DeleteSkill": "Fertigkeiten löschen",
@@ -383,6 +391,8 @@
         "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug Akteur geworfen werden"
     },
     "SR5.EssenceCost": "Essenz",
+    "SR5.Expand": "Erweitern",
+    "SR5.ExpandAll": "Erweitere alles",
     "SR5.Extend": "Ausdehnen",
     "SR5.Extended": "Ausgedehnt",
     "SR5.ExtendedHits": "Ausged. Erfolge",
@@ -505,7 +515,8 @@
             "DamageResistanceTest": "Schadenswiderstandsprobe",
             "Modifier": "Modifikator",
             "Modifiers": "Modifikatoren",
-            "OpposedTest": "Vergleichsprobe"
+            "OpposedTest": "Vergleichsprobe",
+            "SpiritType": "Art"
         },
         "ActorSheet": {
             "CreateInventory": "Erstelle Inventar Ort",
@@ -585,6 +596,8 @@
     "SR5.MIGRATION.WarningRequired": "Das Shadowrun 5E System muss eine notwendige Aktualisierung ausführen.",
     "SR5.MIGRATION.WarningTitle": "Alarm",
     "SR5.Magic": "Magie",
+    "SR5.ManualGlitches": "Man. Glitches",
+    "SR5.ManualHits": "Man. Erfolge",
     "SR5.ManualOverride": "Manuelle Eingabe",
     "SR5.Marks": "Marken",
     "SR5.MatrixAttrAttack": "Attacke",
@@ -902,7 +915,9 @@
     "SR5.Spirit": {
         "Bound": "Gebunden",
         "Force": "Kraft",
+        "MissingSummoner": "Kein aktiver Beschwörer",
         "Services": "Dienste",
+        "Summoner": "Beschwörer",
         "Type": "Typ",
         "Types": {
             "Air": "Luft",
@@ -966,6 +981,11 @@
     "SR5.StunTrack": "Geistiger Monitor",
     "SR5.Success": "Erfolg!",
     "SR5.Successes": "Erfolge",
+    "SR5.Summoning": {
+        "DropSpirit": "Geist ablegen",
+        "FixedSpirit": "Vorber. Geist",
+        "SpiritType": "Geistart"
+    },
     "SR5.Suppressing": "Sperrfeuer",
     "SR5.Target": "Ziel",
     "SR5.TargetDevice": "Gerät",
@@ -978,6 +998,10 @@
     "SR5.Temporary": "Temporär",
     "SR5.TemporaryModifiers": "Temporäre Modifikatoren",
     "SR5.Test": "Probe",
+    "SR5.TestResults": {
+        "SpiritSummonFailure": "Geist geflohen!",
+        "SpiritSummonSuccess": "Geist beschworen!"
+    },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attributsprobe",
         "CombatSpellDefenseTest": "Kampfzauber Verteidigung",
@@ -990,6 +1014,7 @@
         "MeleeAttackTest": "Nahkampf Angriff",
         "NaturalRecoveryPhysicalTest": "Natürliche Genesung Körperlich",
         "NaturalRecoveryStunTest": "Natürliche Genesung Geistig",
+        "OpposedSummonSpiritTest": "Widerstehe Herbeirufung",
         "OpposedTest": "Vergleichsprobe",
         "PhysicalDefenseTest": "Physische Verteidigung",
         "PhysicalResistTest": "Physischer Schadenswiderstand",
@@ -998,9 +1023,9 @@
         "SkillTest": "Fertigkeitenprobe",
         "SpellcastingTest": "Spruchzauberei",
         "SuccessTest": "Erfolgsprobe",
+        "SummonSpiritTest": "Geist Herbeirufen",
         "SupressionDefenseTest": "Unterdrückungsfeuer Verteidigung",
-        "ThrownAttackTest": "Wurfwaffen Angriff",
-        "SpellCastingTest": "Zauber anwenden"
+        "ThrownAttackTest": "Wurfwaffen Angriff"
     },
     "SR5.Threshold": "Schwellenwert",
     "SR5.ToggleActive": "De/aktivieren",
@@ -1008,6 +1033,9 @@
     "SR5.Tooltips": {
         "Actor": {
             "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück"
+        },
+        "CallInAction": {
+            "ActorType": "Herbeizurufender Akteurtyp"
         },
         "Effect": {
             "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden",
@@ -1023,14 +1051,14 @@
             "armor": "Modifiziert den Panzerungswert",
             "astral_initiative": "Modifiziert die Basis der Astralen Initiative",
             "astral_initiative_dice": "Modifiziert die Würfel der Astralen Initiative",
-            "astral_limit": "Modifiziert das astrale Limit:",
-            "composure": "Modifiziert den Pool von Selbstherrschungsproben:",
-            "defense": "Modifiziert den Pool von Verteidigungsproben:",
-            "defense_block": "Erhöht den Verteidungsmodifikator, wenn aktiv geblockt wird",
-            "defense_dodge": "Erhöht den Verteidungsmodifikator wenn aktiv ausgewichen wird",
-            "defense_parry": "Erhöht den Verteidungsmodifikator wenn aktiv parriert wird",
-            "drain": "Modifiziert den Pool von Entzugsproben:",
-            "essence": "Modifiziert das Essenz Attribut:",
+            "astral_limit": "Modifiziert das astrale Limit",
+            "composure": "Modifiziert den Pool von Selbstherrschungsproben",
+            "defense": "Modifiziert den Pool von Verteidigungsproben",
+            "defense_block": "Modifiziert den Verteidungsmodifikator wenn aktiv geblockt wird",
+            "defense_dodge": "Modifiziert den Verteidungsmodifikator wenn aktiv ausgewichen wird",
+            "defense_parry": "Modifiziert den Verteidungsmodifikator wenn aktiv parriert wird",
+            "drain": "Modifiziert den Pool von Entzugsproben",
+            "essence": "Modifiziert das Essenz Attribut",
             "fade": "Modifiziert den Pool von Schwundproben",
             "global": "Modifiziert den Pool aller Proben, außer Schaden reduzierender Proben",
             "judge_intentions": "Modifiziert den Pool von Menschenkenntnisproben",
@@ -1045,9 +1073,9 @@
             "multi_defense": "Modifiziert physische Verteidigungsproben nach mehreren Angriffen pro Kampfrunde",
             "pain_tolerance_physical": "Modifiziert ignorierbaren Schaden bevor der erste Wundenmodi. entsteht",
             "pain_tolerance_stun": "Modifiziert ignorierbaren Schaden bevor der erste Wundenmodi. entsteht",
-            "physical_limit": "Modifiziert das Physische Limit:",
-            "physical_overflow_track": "Modifiziert den Physischen Überschuss Monitor:",
-            "physical_track": "Modifiziert den Physischen Monitor:",
+            "physical_limit": "Modifiziert das Physische Limit",
+            "physical_overflow_track": "Modifiziert den Physischen Überschuss Monitor",
+            "physical_track": "Modifiziert den Physischen Monitor",
             "run": "Modifiziert die Laufreichweite um das Vielfache des Geschicklichkeit Attributs",
             "soak": "Modifiziert den Pool von Schadenswiderstandsproben",
             "social_limit": "Modifiziert das Soziale Limit",
@@ -1058,12 +1086,30 @@
         "RangedAttack": {
             "Recoil": "Kummulativer Rückstoß",
             "RecoilAfterAttack": "Kummulativer Rückstoß nach der diesem Angriff",
-            "RecoilBeforeAttack": "Kummulativer Rückstoß jetzt, vor dem Angriff:",
+            "RecoilBeforeAttack": "Kummulativer Rückstoß jetzt, vor dem Angriff",
             "RecoilCompensation": "Gesamter RK, inklus. RK der Waffe",
             "ResetRecoil": "Setzte kumulativen Rückstoß zurück"
         },
         "SituationalModifier": {
             "Recoil": "Anzahl abgefeuerter Kugeln"
+        },
+        "SummoningTest": {
+            "DragOnCanvas": "Ziehe Geist auf Karte",
+            "Force": "Kraft des herbeizurufenden Geistes",
+            "PreparedSpirit": "Nutze einen vorbereiteten Geist Akteur anstelle eines generisch erstellten",
+            "ReagentDrams": "Dram aus Reagenzien für das Herbeirufen Limit",
+            "SpiritType": "Art des herbeizurufenden Geistes"
+        },
+        "Test": {
+            "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
+            "Limit": "Vollständiger Limitwert",
+            "ManualGlitches": "Anzahl Glitches von manuell geworfenen Würfeln. Muss zusammen mit manuellen Erfolgen verwendet werden.",
+            "ManualHits": "Anzahl Erfolge von manuell geworfenen Würfeln. Überspringt FoundryVTT Würfelwurf.",
+            "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
+            "Pool": "Anzahl zu werfender Würfel",
+            "PushTheLimit": "Verwende Edge Regel Grenzen Sprenngen",
+            "RollMode": "FoundryVTT chat message roll visibility",
+            "Threshold": "Vollständiger Schwellenwert"
         }
     },
     "SR5.Top": "Oberseite",
@@ -1114,6 +1160,7 @@
     "SR5.Warnings": {
         "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
         "CantConsumeEquippedAmmo": "Ausgerüstete Munition hat nicht genug Kugeln",
+        "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
         "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
         "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",
         "CantExtendTestFurther": "Probe kann nicht weiter ausgedehnt werden. Zu wenige Würfel übrig oder Schwellenwert erreicht",
@@ -1123,10 +1170,13 @@
         "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
         "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge Punkte können nicht auf Proben ohne Actor angewendet werden.",
         "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
+        "InvalidCompilationLevel": "Resonanz Attribute zu niedrig für Sprite Stufe",
         "InvalidMarksCount": "You've trying to place a strange number of marks",
+        "InvalidSummoningForce": "Gewählte Kraft hält sich nicht an die Regeln",
         "NegativeLimitValue": "Limit Werte müssen über Null liegen",
         "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer.",
         "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
+        "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
         "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
     },
     "SR5.Weapon": "Waffen",
@@ -1156,9 +1206,5 @@
     "SR5.WeaponReach": "Reichweite",
     "SR5.WeaponReload": "Nachladen",
     "SR5.WeaponType": "Typ",
-    "SR5.Wireless": "Wireless",
-    "SR5.Collapse": "Einklappen",
-    "SR5.CollapseAll": "Alles einklappen",
-    "SR5.Expand": "Erweitern",
-    "SR5.ExpandAll": "Erweitere alles"
+    "SR5.Wireless": "Wireless"
 }

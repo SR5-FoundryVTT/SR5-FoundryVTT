@@ -1,6 +1,7 @@
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import MarkedDocument = Shadowrun.MarkedDocument;
+import { Helpers } from "../../helpers";
 
 
 export interface CharacterSheetData extends SR5ActorSheetData {
@@ -34,7 +35,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'adept_power',
             'complex_form',
             'quality',
-            'critter_power'
+            'critter_power',
+            'call_in_action'
         ];
     }
 
@@ -69,5 +71,40 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         data['markedDocuments'] = this.actor.getAllMarkedDocuments();
 
         return data;
+    }
+
+    /**
+     * Inject special case handling for call in action items, only usable by character actors.
+     */
+    override async _onItemCreate(event) {
+        event.preventDefault();
+        const type = Helpers.listItemId(event);
+
+        if (type !== 'summoning' && type !== 'compilation') return await super._onItemCreate(event);
+        await this._onCallInActionCreate(type);
+    }
+
+    /**
+     * Create a call in action item with pre configured actor type.
+     * 
+     * @param type The call in action sub type.
+     */
+    async _onCallInActionCreate(type: 'summoning'|'compilation') {
+        // Determine actor type from sub item type.
+        const typeToActorType = {
+            'summoning': 'spirit',
+            'compilation': 'sprite'
+        }
+        const actor_type = typeToActorType[type];
+        if (!actor_type) return console.error('Shadowrun 5e | Call In Action Unknown actor type during creation');
+
+        // TODO: Add translation for item names...
+        const itemData = {
+            name: `New ${type}`,
+            type: 'call_in_action',
+            'system.actor_type': actor_type
+        };
+
+        await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});        
     }
 }

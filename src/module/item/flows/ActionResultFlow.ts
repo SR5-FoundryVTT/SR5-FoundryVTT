@@ -11,7 +11,7 @@ import ResultActions = Shadowrun.ResultActions;
  */
 export class ActionResultFlow {
     /**
-         * The handleres registered for specific result action.
+         * The handlers registered for specific result action.
          * 
          * @returns A Map mapping action name to function handler
          */
@@ -56,9 +56,9 @@ export class ActionResultFlow {
     /**
      * Modify the actors combatant according the test defined initiative modifier.
      * 
-     * @param test The test instance causing the initiave modification
+     * @param test The test instance causing the initiative modification
      */
-     static async _castInitModifierAction(test: PhysicalDefenseTest) {
+    static async _castInitModifierAction(test: PhysicalDefenseTest) {
         if (!(test instanceof PhysicalDefenseTest)) return;
         
         if (!test.data.iniMod) return;

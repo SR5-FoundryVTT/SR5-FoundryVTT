@@ -91,18 +91,6 @@ export class SpellCastingTest extends SuccessTest {
             SpellcastingRules.calculateLimit(force));
     }
 
-    // /**
-    //  * Overwrite range from environmental modifiers for indirect combat spells.
-    //  * 
-    //  * @param actor 
-    //  * @param type 
-    //  */
-    // async prepareActorModifier(actor: SR5Actor, type: ModifierTypes): Promise<{ name: string; value: number; }> {
-    //     if (type !== 'environmental' && !this.item?.isIndirectCombatSpell()) return await super.prepareActorModifier(actor, type);
-
-    //     const modifiers = actor.getSituationModifiers();
-    // }
-
     override calculateBaseValues() {
         super.calculateBaseValues();
         this.calculateDrainValue();

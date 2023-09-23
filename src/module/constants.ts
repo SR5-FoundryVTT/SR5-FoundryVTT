@@ -16,7 +16,6 @@ export const FLAGS = {
     DiagonalMovement: 'diagonalMovement',
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
-    WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
     ShowSkillsWithDetails: 'showSkillsWithDetails',
     OnlyAutoRollNPCInCombat: 'onlyAutoRollNPCInCombat',
@@ -46,7 +45,8 @@ export const FLAGS = {
     MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest',
     AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier',
     AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
-    TurnsSinceLastAttack: 'turnsSinceLastAttack'
+    TurnsSinceLastAttack: 'turnsSinceLastAttack',
+    ManualRollOnSuccessTest: 'ManualRollOnSuccessTest',
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -126,7 +126,9 @@ export const SR = {
             sleaze: {min: 0},
             data_processing: {min: 0},
             firewall: {min: 0},
-            host_rating: {min: 0, max: 12}
+            host_rating: {min: 0, max: 12},
+            pilot: {min: 1},
+            force: {min: 1}
         },
         // Use for initial default values that aren't simply range.<>.min values.
         defaults: {

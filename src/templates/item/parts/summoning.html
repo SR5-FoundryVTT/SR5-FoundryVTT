@@ -1,0 +1,32 @@
+
+<div class="flexrow nowrap">
+    <label data-tooltip="SR5.Tooltips.SummoningTest.Force">{{localize "SR5.Force"}}</label>
+    <input
+        class="display attribute-input"
+        type="text"
+        size="2"
+        name="system.spirit.force"
+        value="{{system.spirit.force}}"
+        data-dtype="Number"
+        min="0"
+        placeholder="1">
+</div>
+<div class="flexrow nowrap">
+    <label data-tooltip="SR5.Tooltips.SummoningTest.SpiritType">{{localize "SR5.Summoning.SpiritType"}}</label>
+    <select name="system.spirit.type" class="display">
+        {{#select system.spirit.type}} {{#each config.spiritTypes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
+        {{/each}} {{/select}}
+    </select>
+</div>
+<div class="flexrow nowrap">
+    <label data-tooltip="SR5.Tooltips.SummoningTest.PreparedSpirit">{{localize "SR5.Summoning.FixedSpirit"}}</label>
+    {{#if spirit}}
+    <span>
+        <a class="origin-link" draggable="false" data-origin-link="{{spirit.uuid}}">{{spirit.name}}</a>
+        <a class="close spirit-remove"><i class="fas fa-times"></i></a>
+    </span>
+    {{else}}
+    <span>{{localize "SR5.Summoning.DropSpirit"}}</span>
+    {{/if}}
+</div>

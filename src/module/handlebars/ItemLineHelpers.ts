@@ -4,6 +4,37 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
 
+
+/**
+ * Typing around the legacy item list helper.
+ */
+interface ItemListRightSide {
+    // Provide a simple text, main use for column headers.
+    text?: {
+        text: string|number|undefined
+        title?: string // TODO: This doesn't seem to be doing anything in ListItem.html
+        cssClass?: string
+    }
+    // Provide a button element, main use for column values.
+    button?: {
+        text: string|number
+        cssClass?: string
+        // Shorten the button visually...
+        short?: boolean
+    }
+    // Provide a input element, main use for column values.
+    input?: {
+        type: string
+        value: any
+        cssClass?: string
+    }
+    // Provide html as string.
+    html? :{
+        text: string
+        cssClass?: string
+    }
+}
+
 export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('InventoryHeaderIcons', function (section: InventorySheetDataByType) {
         var icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
@@ -103,6 +134,14 @@ export const registerItemLineHelpers = () => {
             case 'sprite_power':
                 addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
                 return [addIcon];
+            case 'summoning':
+                // NOTE: summoning is not an actual item type. It's an call_in_action sub type
+                addIcon.title = game.i18n.localize('SR5.CallInAction.CreateSummoning');
+                return [addIcon];
+            case 'compilation':
+                // NOTE: compilation is not an actual item type. It's an call_in_action sub type
+                addIcon.title = game.i18n.localize('SR5.CallInAction.CreateCompilation');
+                return [addIcon];
             case 'effect':
                 addIcon.title = game.i18n.localize('SR5.CreateEffect');
                 addIcon.cssClass = 'effect-control';
@@ -126,7 +165,11 @@ export const registerItemLineHelpers = () => {
         return [addItemIcon];
     });
 
-    Handlebars.registerHelper('ItemHeaderRightSide', function (id: string) {
+    /**
+     * The legacy ItemList helper to provide a generic way of defining headers and columns 
+     * on the 'right side' of an item list across all document sheets.
+     */
+    Handlebars.registerHelper('ItemHeaderRightSide', function (id: string): ItemListRightSide[] {
         switch (id) {
             case 'action':
                 return [
@@ -251,12 +294,52 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'summoning':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Summoning.SpiritType')
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Force')
+                        }
+                    }
+                ]
+            case 'compilation': 
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Compilation.SpriteType')
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Level')
+                        }
+                    }
+                ]
             default:
                 return [];
         }
     });
 
-    Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData) {
+    /**
+     * Helper for ListItem parts do define segments on the right hand sight per list row.
+     * 
+     * These must match in order and quantity to the ItemHeadersRightSide helper.
+     * Example of a matching list header by ItemHeader:
+     * <header name>                          <ItemHeaderRightSide>['First Header', 'Second Header']
+     * Example of a list item row:
+     * <list name>                            <ItemRightSide>      ['First Value',  'Second Value']
+     * 
+     * @param item The item to render the right side for.
+     *             NOTE: ItemHeaderRightSide doesn't use the whole item to determine what to show, while
+     *                   ItemRightSide does. This is due to ItemRightSide showing content, while ItemHeaderRightSide
+     *                   showing dscriptors for that content.
+     */
+    Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData): ItemListRightSide[] {
         const wrapper = new SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -265,6 +348,7 @@ export const registerItemLineHelpers = () => {
                 cssClass: 'item-qty',
             },
         };
+        
         switch (item.type) {
             case 'action':
 
@@ -439,6 +523,46 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            /**
+             * Call In Actions differ depending on called in actor type.
+             */
+            case 'call_in_action':
+                if (item.system.actor_type === 'spirit') {
+                    const summoningData = item.system as Shadowrun.CallInActionData;
+                    const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
+    
+                    return [
+                        {
+                            text: {
+                                text: game.i18n.localize(spiritTypeLabel)
+                            }
+                        },
+                        {
+                            text: {
+                                text: summoningData.spirit.force
+                            }
+                        }
+                    ]
+                }
+
+                if (item.system.actor_type === 'sprite') {
+                    const compilationData = item.system as Shadowrun.CallInActionData;
+                    const spriteTypeLabel = SR5.spriteTypes[compilationData.sprite.type] ?? '';
+
+                    return [
+                        {
+                            text: {
+                                text: game.i18n.localize(spriteTypeLabel)
+                            }
+                        },
+                        {
+                            text: {
+                                text: compilationData.sprite.level
+                            }
+                        }
+                    ]
+                }
+
             default:
                 return [];
         }

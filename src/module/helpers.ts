@@ -1059,6 +1059,33 @@ export class Helpers {
     }
 
     /**
+     * See injectActionTestsIntoChangeData for documentation.
+     */
+    static injectCallInActionTestIntoChangeData(type: string, changeData: DeepPartial<Shadowrun.CallInActionItemData>, applyData) {
+        if (changeData.system?.actor_type === undefined) return;
+
+        if (changeData.system.actor_type === 'spirit') {
+            // Reconfigure to summoning tests workflow.
+            foundry.utils.setProperty(applyData, 'system.action.test', 'SummonSpiritTest');
+            foundry.utils.setProperty(applyData, 'system.action.opposed.test', 'OpposedSummonSpiritTest');
+            foundry.utils.setProperty(applyData, 'system.action.followed.test', 'DrainTest');
+        }
+        if (changeData.system.actor_type === 'sprite') {
+            // Reconfigure to compilation tests workflow.
+            foundry.utils.setProperty(applyData, 'system.action.test', 'CompileSpriteTest');
+            foundry.utils.setProperty(applyData, 'system.action.opposed.test', 'OpposedCompileSpriteTest');
+            foundry.utils.setProperty(applyData, 'system.action.followed.test', 'FadeTest');
+        }
+        if (changeData.system.actor_type.length === 0) {
+            // Reset to prohibit testing.
+            foundry.utils.setProperty(applyData, 'system.action.test', '');
+            foundry.utils.setProperty(applyData, 'system.action.opposed.test', '');
+            foundry.utils.setProperty(applyData, 'system.action.followed.test', '');
+        }
+
+    }
+
+    /**
      * Inject action test data into any item 
      * 
      * This method is designed to be called on _preCreate/_preUpdate/_preCreateEmbeddedDocuments
@@ -1071,22 +1098,24 @@ export class Helpers {
      * When called before any DocumentData as been created, it can be applied directly to the source object before Document#create
      * 
      * @param type The item type where operating on
-     * @param changeData The changeData (partial or complet) that's been transmitted.
+     * @param changeData The changeData (partial or complete) that's been transmitted.
      * @param applyData An object to carry the altering data changes
+     * @param item Optional item reference. This can't be given during the Chummer Item Import flow.
      */
-    static injectActionTestsIntoChangeData(type: string, changeData: Partial<ShadowrunItemData>, applyData) {
+    static injectActionTestsIntoChangeData(type: string, changeData: Partial<ShadowrunItemData>, applyData, item?: SR5Item) {
         if (!changeData) return;
 
         const typeHandler = {
             'weapon': Helpers.injectWeaponTestIntoChangeData,
             'spell': Helpers.injectSpellTestIntoChangeData,
-            'complex_form': Helpers.injectComplexFormTestIntoChangeData
+            'complex_form': Helpers.injectComplexFormTestIntoChangeData,
+            'call_in_action': Helpers.injectCallInActionTestIntoChangeData
         };
 
         const handler = typeHandler[type];
         if (!handler) return;
 
-        handler(type, changeData, applyData);
+        handler(type, changeData, applyData, item);
     }
 
     /**

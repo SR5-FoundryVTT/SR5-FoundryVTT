@@ -19,4 +19,23 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
             'quality'
         ];
     }
+
+    /**
+     * Spirit actors sheets deviate from base actors around the summoning workflows.
+     * 
+     * @param options 
+     * @returns 
+     */
+    override async getData(options: any) {
+        const data = await super.getData(options);
+        
+        const spirit = this.document.asSpirit();
+        if (spirit) {
+            if (spirit.system.summonerUuid) {
+                data['summoner'] = await fromUuid((this.document.system as Shadowrun.SpiritData).summonerUuid);
+            }
+        }
+
+        return data;
+    }
 }

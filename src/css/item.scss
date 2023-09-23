@@ -72,6 +72,15 @@
             }
         }
     }
+    .item-sidebar {
+        > * {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+        }        
+        min-width: fit-content;
+        padding: 0.5em 0.5em 0.5em 0.5em;
+    }
     .technology {
         @include nodesto;
         > * {

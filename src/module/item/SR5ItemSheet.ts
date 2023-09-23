@@ -5,19 +5,41 @@ import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import { createTagify } from '../utils/sheets';
 
 /**
- * Template fields for item sheet
+ * FoundryVTT ItemSheetData typing
  */
-interface SR5ItemSheetData {
-    // Item Type
+interface FoundryItemSheetData {
+    // Item type
     type: string
     // Legacy Item Document Data
-    data: Shadowrun.ShadowrunItemDataData
+    data: Shadowrun.ShadowrunItemData
     // Item Document System Data
     system: Shadowrun.ShadowrunItemDataData
+    // A descriptive document  reference
+    item: SR5Item
+    document: SR5Item
+    
+    cssClass: string
+    editable: boolean
+    limited: boolean
+    owner: boolean
+    title: string
+}
 
+/**
+ * Shadowrun 5e ItemSheetData typing shared across all item types
+ */
+export interface SR5BaseItemSheetData extends FoundryItemSheetData {
     // SR5-FoundryVTT configuration
     config: typeof SR5
+    effects: Shadowrun.EffectsSheetData
+    // FoundryVTT rollmodes
+    rollModes: CONFIG.Dice.RollModes
+}
 
+/**
+ * Template fields for item sheet
+ */
+interface SR5ItemSheetData extends SR5BaseItemSheetData {
     // Nested item typing for different sheets
     ammunition: Shadowrun.AmmoItemData[]
     weaponMods: Shadowrun.ModificationItemData[]
@@ -27,8 +49,6 @@ interface SR5ItemSheetData {
     activeSkills: Record<string, string> // skill id: label
     attributes: Record<string, string>  // key: label
     limits: Record<string, string> // key: label
-    
-    effects: Shadowrun.EffectsSheetData
 
     // Host Item.
     markedDocuments: Shadowrun.MarkedDocument[]
@@ -47,9 +67,6 @@ interface SR5ItemSheetData {
 
     // Rendered description field
     descriptionHTML: string
-
-    // FoundryVTT rollmodes
-    rollModes: CONFIG.Dice.RollModes
 }
 
 /**
@@ -74,8 +91,7 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     override get template() {
-        const path = 'systems/shadowrun5e/dist/templates/item/';
-        return `${path}${this.item.type}.html`;
+        return `systems/shadowrun5e/dist/templates/item/${this.item.type}.html`;
     }
 
     /* -------------------------------------------- */
@@ -323,12 +339,7 @@ export class SR5ItemSheet extends ItemSheet {
         event.stopPropagation();
 
         // Parse drop data.
-        let data;
-        try {
-            data = JSON.parse(event.dataTransfer.getData('text/plain'));
-        } catch (err) {
-            return console.log('Shadowrun 5e | drop error');
-        }
+        const data = this.parseDropData(event);
 
         if (!data) return;
 
@@ -470,7 +481,7 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onOwnedItemRemove(event) {
-         event.preventDefault();1
+        event.preventDefault();1
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -674,5 +685,22 @@ export class SR5ItemSheet extends ItemSheet {
         if (!['action', 'equipment'].includes(this.document.type)) return;
 
         this._createActionModifierTagify(html);
+    }
+
+    /**
+     * Helper to parse FoundryVTT DropData directly from it's source event
+     * 
+     * This is a legacy handler for earlier FoundryVTT versions, however it's good
+     * practice to not trust faulty input and inform about.
+     * 
+     * @param event 
+     * @returns undefined when an DropData couldn't be parsed from it's JSON.
+     */
+    parseDropData(event): any|undefined {
+        try {
+            return JSON.parse(event.dataTransfer.getData('text/plain'));
+        } catch (error) {
+            return console.log('Shadowrun 5e | Dropping a document onto an item sheet caused this error', error);
+        }
     }
 }

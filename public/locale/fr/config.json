@@ -20,9 +20,7 @@
         "ShowSkillsWithDetails": "Afficher plus de détails sur la liste des compétences",
         "ShowSkillsWithDetailsDescription": "L'écriture des compétences va copier celle du livre de règles (italique, noms d'attributs raccourcis)",
         "ShowTokenNameForChatOutputDescription": "Utiliser le nom de jetons pour les messages de lancés de dés au lieu du nom du personnage",
-        "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat",
-        "WhisperOpposedTestsToTargetedPlayers": "Murmurer les tests aux joueurs ciblés",
-        "WhisperOpposedTestsToTargetedPlayersDescription": "Lancés de dés avec jets opposés seront murmurés seulement aux joueurs en ligne ciblés"
+        "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat"
     },
     "SR5.AP": "PA",
     "SR5.Accessory": "Accessoire",

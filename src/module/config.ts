@@ -25,10 +25,11 @@ export const SR5 = {
         sin: 'SR5.ItemTypes.Sin',
         spell: 'SR5.ItemTypes.Spell',
         sprite_power: 'SR5.ItemTypes.SpritePower',
-        weapon: 'SR5.ItemTypes.Weapon'
+        weapon: 'SR5.ItemTypes.Weapon',
+        call_in_action: 'ITEM.TypeCall_in_action'
     },
 
-    // All available character attributes. Sorted alphabetically. :-)
+    // All available attributes. These are available as testable attributes across all actor types.
     attributes: {
         agility: 'SR5.AttrAgility',
         attack: 'SR5.MatrixAttrAttack',
@@ -46,6 +47,8 @@ export const SR5 = {
         sleaze: 'SR5.MatrixAttrSleaze',
         strength: 'SR5.AttrStrength',
         willpower: 'SR5.AttrWillpower',
+        pilot: 'SR5.Vehicle.Stats.Pilot',
+        force: 'SR5.Force'
     },
 
     /**
@@ -495,7 +498,7 @@ export const SR5 = {
     },
 
     // When a firemode with suppression is used, this test should defend against it.
-    supressionDefenseTest: 'SupressionDefenseTest',
+    suppressionDefenseTest: 'SuppressionDefenseTest',
 
     /**
      * Names of FoundryVTT packs supplied by the system to be used as action sources.
@@ -563,17 +566,26 @@ export const SR5 = {
         queen: 'SR5.Spirit.Types.Queen',
     },
 
+    /**
+     * Actor types that can be called in using the call in action type and be
+     * set in it's system.action_type property.
+     */
+    callInActorTypes: {
+        'spirit': 'ACTOR.TypeSpirit',
+        'sprite': 'ACTOR.TypeSprite'
+    },
+
     critterPower: {
         categories: {
-          mundane: 'SR5.CritterPower.Categories.Mundane',
-          paranormal: 'SR5.CritterPower.Categories.Paranormal',
-          free_spirit: 'SR5.CritterPower.Categories.FreeSpirit',
-          emergent: 'SR5.CritterPower.Categories.Emergent',
-          shapeshifter: 'SR5.CritterPower.Categories.Shapeshifter',
-          drake: 'SR5.CritterPower.Categories.Drake',
-          echoes: 'SR5.CritterPower.Categories.Echoes',
-          weakness: 'SR5.CritterPower.Categories.Weakness',
-          paranormal_infected: 'SR5.CritterPower.Categories.ParanormalInfected',
+            mundane: 'SR5.CritterPower.Categories.Mundane',
+            paranormal: 'SR5.CritterPower.Categories.Paranormal',
+            free_spirit: 'SR5.CritterPower.Categories.FreeSpirit',
+            emergent: 'SR5.CritterPower.Categories.Emergent',
+            shapeshifter: 'SR5.CritterPower.Categories.Shapeshifter',
+            drake: 'SR5.CritterPower.Categories.Drake',
+            echoes: 'SR5.CritterPower.Categories.Echoes',
+            weakness: 'SR5.CritterPower.Categories.Weakness',
+            paranormal_infected: 'SR5.CritterPower.Categories.ParanormalInfected',
         },
         types: {
             mana: 'SR5.CritterPower.Types.Mana',

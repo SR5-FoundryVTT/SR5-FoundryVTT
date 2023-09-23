@@ -10,29 +10,21 @@ import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
-import DamageData = Shadowrun.DamageData;
-import FireModeData = Shadowrun.FireModeData;
-import RangesTemplateData = Shadowrun.RangesTemplateData;
-import TargetRangeTemplateData = Shadowrun.TargetRangeTemplateData;
-import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface RangedAttackTestData extends SuccessTestData {
-    damage: DamageData
-    fireModes: FireModeData[]
-    fireMode: FireModeData
+    damage: Shadowrun.DamageData
+    fireModes: Shadowrun.FireModeData[]
+    fireMode: Shadowrun.FireModeData
     // index of selceted fireMode in fireModes
     fireModeSelected: number
-    ranges: RangesTemplateData
+    ranges: Shadowrun.RangesTemplateData
     range: number
-    targetRanges: TargetRangeTemplateData[]
+    targetRanges: Shadowrun.TargetRangeTemplateData[]
     // index of selected target range in targetRanges
     targetRangesSelected: number
 }
 
-/**
- * TODO: Handle near misses (3 hits attacker, 3 hits defender) => No hit, but also no failure.
- * TODO: Move rules into CombatRules
- */
+
 export class RangedAttackTest extends SuccessTest {
     public override data: RangedAttackTestData;
     public override item: SR5Item;
@@ -74,9 +66,6 @@ export class RangedAttackTest extends SuccessTest {
         test.render();
     }
 
-    /**
-     * This test type can't be extended.
-     */
     override get canBeExtended() {
         return false;
     }
@@ -85,33 +74,17 @@ export class RangedAttackTest extends SuccessTest {
         return this.success;
     }
 
-    _prepareFireMode() {        
-        // No firemodes selectable on dialog for invalid item provided.
-        const weapon = this.item.asWeapon;
-        if (!weapon) return;
-
-        //@ts-ignore // TODO: foundry-vtt-types v10 
-        this.data.fireModes = FireModeRules.availableFireModes(weapon.system.range.modes);
-
-        // To avoid problems when no firemode is configured on the weapon, add at least one to what's available
-        if (this.data.fireModes.length === 0) {
-            this.data.fireModes.push(SR5.fireModes[0]);
-            ui.notifications?.warn('SR5.Warnings.NoFireModeConfigured', {localize: true});
-        }
-
-        // Current firemode selected
-        const lastFireMode = this.item.getLastFireMode() || DataDefaults.fireModeData();
-        // Try pre-selection based on last fire mode.
-        this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
-        if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;
-        this._selectFireMode(this.data.fireModeSelected);
-    }
-
     _selectFireMode(index: number) {
         this.data.fireMode = this.data.fireModes[index];
     }
 
-    async _prepareWeaponRanges() {
+    /**
+     * Weapon range selection depends on the weapon alone.
+     * 
+     * In case of selected targets, this will be overwritten.
+     * 
+     */
+    _prepareWeaponRanges() {
         // Don't let missing weapon ranges break test.
         const weapon = this.item?.asWeapon;
         if (!weapon) return;
@@ -119,7 +92,7 @@ export class RangedAttackTest extends SuccessTest {
         // Transform weapon ranges to something usable
         const {ranges} = weapon.system.range;
         const {range_modifiers} = SR.combat.environmental;
-        const newRanges = {} as RangesTemplateData;
+        const newRanges = {} as Shadowrun.RangesTemplateData;
         for (const [key, value] of Object.entries(ranges)) {
             const distance = value as number;
             newRanges[key] = Helpers.createRangeDescription(SR5.weaponRanges[key], distance, range_modifiers[key]);
@@ -136,9 +109,11 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     /**
-     * Prepare distances between attacker and targeted tokens.
+     * Actual target range between attack and target.
+     * 
+     * This will overwrite the default weapon range selection.
      */
-    async _prepareTargetRanges() {
+    _prepareTargetRanges() {
         //@ts-ignore // TODO: foundry-vtt-types v10
         if (foundry.utils.isEmpty(this.data.ranges)) return;
         if (!this.actor) return;
@@ -176,13 +151,41 @@ export class RangedAttackTest extends SuccessTest {
         this.data.range = modifiers.environmental.applied.active.range || this.data.targetRanges[0].range.modifier;
     }
 
-    override get testModifiers(): ModifierTypes[] {
+    /**
+     * Weapon fire modes will affect recoil during test.
+     * 
+     * To show the user the effect of recoil, it's applied during selection but progressive recoil is only ever fully applied
+     * after the test is executed.
+     */
+    _prepareFireMode() {        
+        // No fire modes selectable on dialog for invalid item provided.
+        const weapon = this.item.asWeapon;
+        if (!weapon) return;
+
+        //@ts-ignore // TODO: foundry-vtt-types v10 
+        this.data.fireModes = FireModeRules.availableFireModes(weapon.system.range.modes);
+
+        // To avoid problems when no firemode is configured on the weapon, add at least one to what's available
+        if (this.data.fireModes.length === 0) {
+            this.data.fireModes.push(SR5.fireModes[0]);
+            ui.notifications?.warn('SR5.Warnings.NoFireModeConfigured', {localize: true});
+        }
+
+        // Current firemode selected
+        const lastFireMode = this.item.getLastFireMode() || DataDefaults.fireModeData();
+        // Try pre-selection based on last fire mode.
+        this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
+        if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;
+        this._selectFireMode(this.data.fireModeSelected);
+    }
+
+    override get testModifiers(): Shadowrun.ModifierTypes[] {
         return ['global', 'wounds', 'environmental', 'recoil'];
     }
 
     override async prepareDocumentData(){
-        await this._prepareWeaponRanges();
-        await this._prepareTargetRanges();
+        this._prepareWeaponRanges();
+        this._prepareTargetRanges();
         this._prepareFireMode();
 
         await super.prepareDocumentData();
@@ -193,40 +196,41 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     /**
-     * If a supression fire mode is used, ignore action opposed test configuration.
+     * If a suppression fire mode is used, ignore action opposed test configuration.
      */
     override get _opposedTestClass() {
-        if (this.data.fireMode.suppression) return TestCreator._getTestClass(SR5.supressionDefenseTest);
+        if (this.data.fireMode.suppression) return TestCreator._getTestClass(SR5.suppressionDefenseTest);
         return super._opposedTestClass;
     }
 
+    /**
+     * Save selections made back to documents.
+     * @returns 
+     */
     override async saveUserSelectionAfterDialog() {
+        if (!this.actor) return;
         if (!this.item) return;
 
-        // Store for next usage.
+        // Save fire mode selection
         await this.item.setLastFireMode(this.data.fireMode);
 
-        /**
-         * RANGE
-         */
-
-        if (!this.actor) return;
-
-        const modifiers = await this.actor.getSituationModifiers();
+        // Save range selection
+        const modifiers = this.actor.getSituationModifiers();
         modifiers.environmental.setActive('range', this.data.range);
         await this.actor.setSituationModifiers(modifiers);
     }
 
+    /**
+     * Apply test selections made by user in dialog.
+     * @returns 
+     */
     override prepareBaseValues() {
         if (!this.actor) return;
         if (!this.item) return;
 
-        const poolMods = new PartsList(this.data.modifiers.mod);
-
-        // Apply recoil modification to general modifiers before calculating base values.
         // Use selection for actual fireMode, overwriting possible previous selection for item.
         this._selectFireMode(this.data.fireModeSelected);
-
+        
         // Alter fire mode by ammunition constraints.
         this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft);
 
@@ -243,6 +247,22 @@ export class RangedAttackTest extends SuccessTest {
         // Alter test data for range.
         this.data.range = Number(this.data.range);
 
+        super.prepareBaseValues();
+    }
+
+    /**
+     * Ranged attack tests allow for temporarily changing of modifiers without altering the document.
+     */
+    override prepareTestModifiers() {
+        
+        this.prepareEnvironmentalModifier();
+    }
+
+    prepareEnvironmentalModifier() {
+        if (!this.actor) return;
+        
+        const poolMods = new PartsList(this.data.modifiers.mod);
+
         // Apply altered environmental modifiers
         const range = this.hasTargets ? this.data.targetRanges[this.data.targetRangesSelected].range.modifier : this.data.range;
         const modifiers = DocumentSituationModifiers.getDocumentModifiers(this.actor);
@@ -252,12 +272,10 @@ export class RangedAttackTest extends SuccessTest {
         modifiers.environmental.apply({reapply: true});
 
         poolMods.addUniquePart(SR5.modifierTypes.environmental, modifiers.environmental.total);
-
-        super.prepareBaseValues();
     }
 
     /**
-     * Ennough ressources according to test configuration?
+     * Enough resources according to test configuration?
      * 
      * Ranged weapons need ammunition in enough quantity.
      * 

@@ -13,6 +13,7 @@
     "ITEM.TypeAmmo": "Ammunition",
     "ITEM.TypeArmor": "Armor",
     "ITEM.TypeBioware": "Bioware",
+    "ITEM.TypeCall_in_action": "Summon/Compile",
     "ITEM.TypeComplex_form": "Complex Form",
     "ITEM.TypeContact": "Contact",
     "ITEM.TypeCritter_power": "Critter Power",
@@ -44,6 +45,8 @@
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
+        "ManualRollOnSuccessTest": "Manual dice roll on any test",
+        "ManualRollOnSuccessTestDescription": "Allow user to manually roll dice on tests and report back hits",
         "MustHaveRessourcesOnTest": "Stop Tests with missing ressouces",
         "MustHaveRessourcesOnTestDescription": "Only allow actors with all necessary resources to roll a test",
         "OnlyAllowRollOnDefaultableSkills": "Only defaultable unknown skill rolls",
@@ -57,9 +60,7 @@
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
         "TokenHealthBars": "Token health bars",
-        "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
-        "WhisperOpposedTestsToTargetedPlayers": "Whisper tests to targeted players",
-        "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to an online player target"
+        "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring"
     },
     "SR5.AP": "AP",
     "SR5.Accessory": "Accessory",
@@ -151,6 +152,13 @@
         "ReduceInitByOne": "Initiative -1",
         "ReduceInitByTen": "Initiative -10"
     },
+    "SR5.CallInAction": {
+        "ActorType": "Actor Type",
+        "Compilation": "Compilation",
+        "CreateCompilation": "Create compilation action",
+        "CreateSummoning": "Create summoning action",
+        "Summoning": "Summoning"
+    },
     "SR5.CanDefault": "Can Default",
     "SR5.Capacity": "Capacity",
     "SR5.CareerKarma": "Career Karma",
@@ -180,6 +188,11 @@
     "SR5.Collapse": "Collapse",
     "SR5.CollapseAll": "Collapse All",
     "SR5.CommonProgram": "Common Program",
+    "SR5.Compilation": {
+        "DropSprite": "Drop Sprite",
+        "FixedSprite": "Prep. Sprite",
+        "SpriteType": "Sprite Type"
+    },
     "SR5.ComplexForm": "Complex Form",
     "SR5.ComplexForms": "Complex Forms",
     "SR5.Conceal": "Conceal",
@@ -197,6 +210,7 @@
     "SR5.CreateItemAmmo": "Create Ammunition",
     "SR5.CreateItemArmor": "Create Armor",
     "SR5.CreateItemBioware": "Create Bioware",
+    "SR5.CreateItemCallInAction": "Create Call In Action",
     "SR5.CreateItemComplexForm": "Create Complex Form",
     "SR5.CreateItemContact": "Create Contact",
     "SR5.CreateItemCritterPower": "Create Critter Power",
@@ -505,7 +519,9 @@
             "DamageResistanceTest": "Damage Resistance Test",
             "Modifier": "Modifier",
             "Modifiers": "Modifiers",
-            "OpposedTest": "Opposed Test"
+            "OpposedTest": "Opposed Test",
+            "SpiritType": "Spirit Type",
+            "SpriteType": "Sprite Type"
         },
         "ActorSheet": {
             "CreateInventory": "Create inventory place",
@@ -585,6 +601,8 @@
     "SR5.MIGRATION.WarningRequired": "The Shadowrun 5E system must begin a required update.",
     "SR5.MIGRATION.WarningTitle": "Alert",
     "SR5.Magic": "Magic",
+    "SR5.ManualGlitches": "Man. Glitches",
+    "SR5.ManualHits": "Man. Hits",
     "SR5.ManualOverride": "Manual Override",
     "SR5.Marks": "Marks",
     "SR5.MatrixAttrAttack": "Attack",
@@ -720,6 +738,7 @@
     "SR5.RangeWeaponAttack": "Range Weapon Attack",
     "SR5.Rating": "Rating",
     "SR5.Reach": "Reach",
+    "SR5.Reagent": "Reagent",
     "SR5.RecklessSpellButton": "Reckless",
     "SR5.Recoil": "Recoil",
     "SR5.RecoilCompensation": "Recoil Comp.",
@@ -898,7 +917,9 @@
     "SR5.Spirit": {
         "Bound": "Bound",
         "Force": "Force",
+        "MissingSummoner": "No active summoner",
         "Services": "Services",
+        "Summoner": "Summoner",
         "Type": "Type",
         "Types": {
             "Air": "Air",
@@ -962,6 +983,11 @@
     "SR5.StunTrack": "Stun Track",
     "SR5.Success": "Success!",
     "SR5.Successes": "Successes",
+    "SR5.Summoning": {
+        "DropSpirit": "Drop Spirit",
+        "FixedSpirit": "Prep. Spirit",
+        "SpiritType": "Spirit Type"
+    },
     "SR5.Suppressing": "Suppressing",
     "SR5.Target": "Target",
     "SR5.TargetDevice": "Device",
@@ -974,9 +1000,16 @@
     "SR5.Temporary": "Temporary",
     "SR5.TemporaryModifiers": "Temporary Modifiers",
     "SR5.Test": "Test",
+    "SR5.TestResults": {
+        "SpiritSummonFailure": "Spirit fled!",
+        "SpiritSummonSuccess": "Spirit summoned!",
+        "SpriteCompilationSuccess": "Sprite compiled!",
+        "SpriteCompilationFailure": "Sprite fled!"
+    },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attribute-Only Test",
         "CombatSpellDefenseTest": "Combat Spell Defense",
+        "CompileSpriteTest": "Compile Sprite",
         "ComplexFormTest": "Threading Complex Form",
         "DrainTest": "Drain Test",
         "DroneInfiltrationTest": "Drone Infiltration Test",
@@ -986,6 +1019,8 @@
         "MeleeAttackTest": "Melee Weapon Attack",
         "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
         "NaturalRecoveryStunTest": "Natural Recovery Stun",
+        "OpposedCompileSpriteTest": "Oppose Compilation",
+        "OpposedSummonSpiritTest": "Oppose Summoning",
         "OpposedTest": "Opposed Test",
         "PhysicalDefenseTest": "Physical Defense",
         "PhysicalResistTest": "Physical Damage Resist",
@@ -994,6 +1029,7 @@
         "SkillTest": "Skill Test",
         "SpellCastingTest": "Spellcasting",
         "SuccessTest": "Success Test",
+        "SummonSpiritTest": "Summon Spirit",
         "SuppressionDefenseTest": "Suppression Defense",
         "ThrownAttackTest": "Thrown Weapon Attack"
     },
@@ -1002,7 +1038,16 @@
     "SR5.ToggleEquip": "Toggle Equipped",
     "SR5.Tooltips": {
         "Actor": {
+            "MissingSummoner": "Drag&Drop Character or use summoning action",
             "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
+        },
+        "CallInAction": {
+            "ActorType": "Type of actor to call in"
+        },
+        "CompilationTest": {
+            "Level": "Level of the compiled sprite",
+            "PreparedSprite": "Use a prepared sprite actor instead of creating a generic one",
+            "SpriteType": "Type of the compiled sprite"
         },
         "Effect": {
             "Inactive": "Inactive effects don't apply their changes until they are enabled",
@@ -1059,6 +1104,24 @@
         },
         "SituationalModifier": {
             "Recoil": "Amount of bullets fired"
+        },
+        "SummoningTest": {
+            "DragOnCanvas": "Drag spirit on canvas",
+            "Force": "Force of the summoned spirit",
+            "PreparedSpirit": "Use a prepared spirit actor instead of creating a generic one",
+            "ReagentDrams": "Drams of reagents used for altering summoning limit",
+            "SpiritType": "Type of the summoned spirit"
+        },
+        "Test": {
+            "Extended": "Test will be thrown as an extended test until threshold is reached",
+            "Limit": "Calculated limit value",
+            "ManualGlitches": "Amount of glitches from manually thrown dice pool. Must be used together with manual hits.",
+            "ManualHits": "Amount of hits from manually thrown dice pool. Will skip FoundryVTT dice throw.",
+            "Modifier": "Sum of all modifiers applied to dice pool",
+            "Pool": "Amount of dice to roll",
+            "PushTheLimit": "Apply push the limit edge rules",
+            "RollMode": "FoundryVTT chat message roll visibility",
+            "Threshold": "Calculated threshold value"
         }
     },
     "SR5.Top": "Top",
@@ -1118,11 +1181,15 @@
         "CantSpendMulitplePointsOfEdge": "Can't spend mulitple points of edge on one test or action",
         "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",
         "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
+        "InvalidCompilationLevel": "Resonance attribute to low for this sprite level",
         "InvalidMarksCount": "You've trying to place a strange number of marks",
+        "InvalidSummoningForce": "Force value chosen doesn't adhere to the rules",
         "NegativeLimitValue": "Limit values must positive numbers",
         "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
         "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
-        "TokenSelectionNeeded": "One ore more tokens need to be selected"
+        "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
+        "TokenSelectionNeeded": "One ore more tokens need to be selected",
+        "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade."
     },
     "SR5.Weapon": "Weapon",
     "SR5.WeaponAmmoCount": "Ammo Count",

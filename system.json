@@ -18,11 +18,11 @@
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.10.2",
+  "version": "0.11.2",
   "compatibility": {
     "minimum": "10",
     "maximum": "11",
-    "verified": "10.291"
+    "verified": "11.305"
   },
   "minimumCoreVersion": "10",
   "scripts": [],
@@ -64,7 +64,11 @@
       "name": "Matrix Actions",
       "label": "SR5e Matrix Actions",
       "path": "./packs/sr5e-matrix-actions.db",
-      "private": false,
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "TRUSTED": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "type": "Item",
       "system": "shadowrun5e"
     },
@@ -72,7 +76,11 @@
       "name": "General Actions",
       "label": "SR5e General Actions",
       "path": "./packs/sr5e-general-actions.db",
-      "private": false,
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "TRUSTED": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "type": "Item",
       "system": "shadowrun5e"
     },
@@ -80,7 +88,11 @@
       "name": "System Macros",
       "label": "SR5e System Macros",
       "path": "./packs/sr5e-system-macros.db",
-      "private": true,
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "TRUSTED": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
       "type": "Macro",
       "system": "shadowrun5e"
     }
