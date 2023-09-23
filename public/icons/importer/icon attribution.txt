@@ -3,6 +3,7 @@ The icons and their authors are listed below as required by CC by Attribution 3.
 
 Icon - Author - Source
 
+Default
 action.svg - Lorc - https://game-icons.net/1x1/lorc/slap.html
 adept_power.svg - Lorc - https://game-icons.net/1x1/lorc/burning-passion.html
 ammo.svg - Lorc - https://game-icons.net/1x1/lorc/bullets.html
@@ -23,6 +24,19 @@ sin.svg - Lord Berandas - https://game-icons.net/1x1/lord-berandas/computing.htm
 spell.svg - Delapouite - https://game-icons.net/1x1/delapouite/spell-book.html
 sprite_power.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
 weapon.svg - Delapouite - https://game-icons.net/1x1/delapouite/saber-and-pistol.html
+
+Ammo
+ammo-ammo.svg - Lorc - https://game-icons.net/1x1/lorc/bullets.html
+ammo-arrow.svg - Lorc - https://game-icons.net/1x1/lorc/arrow-cluster.html
+ammo-bola.svg - Lorc - https://game-icons.net/1x1/lorc/bolas.html
+ammo-bolt.svg - Lorc - https://game-icons.net/1x1/lorc/spears.html
+ammo-grenade.svg - Lorc - https://game-icons.net/1x1/lorc/grenade.html
+ammo-micro-torpedo.svg - Lorc - https://game-icons.net/1x1/lorc/missile-swarm.html
+ammo-minigrenade.svg - Lorc - https://game-icons.net/1x1/lorc/flash-grenade.html
+ammo-missile - Lorc - https://game-icons.net/1x1/lorc/missile-pod.html
+ammo-rocket - Lorc - https://game-icons.net/1x1/lorc/rocket.html
+ammo-torpedo grenade - Delapouite - https://game-icons.net/1x1/delapouite/torpedo.html
+
 
 cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
 quality-positive.svg - Lorc - https://game-icons.net/1x1/lorc/strong.html
