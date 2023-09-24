@@ -9,7 +9,7 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
     const imgType = importFlags.type;
     const imgSubType = importFlags.subType;
 
-    console.log(imgName, imgType, imgSubType, system);
+    // console.log(imgName, imgType, imgSubType, system);
 
     switch (imgType) {
         case 'action':
