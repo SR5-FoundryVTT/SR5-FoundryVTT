@@ -32,27 +32,38 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
     async Parse(jsonObject: object): Promise<Item> {
         const parser = new ComplexFormParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
-
         let items: Shadowrun.ComplexFormItemData[] = [];
         let jsonDatas = jsonObject['complexforms']['complexform'];
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+
+            // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
+            // Create the item
             let item = parser.Parse(jsonData, this.GetDefaultData({type: 'complex_form'}), this.nameTranslations);
 
+            // Get the item's folder information
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 
+            // Import Flags
+            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
+            item.system.importFlags.type = item.type;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
+
+            // Default icon
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
+
             // TODO: Follow ComplexFormParserBase approach.
+            // Item name translation
             item.name = ImportHelper.MapNameToTranslation(this.nameTranslations, item.name);
 
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
-
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name, item.system);
 
             items.push(item);
         }
