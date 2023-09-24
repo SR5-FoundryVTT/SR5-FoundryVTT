@@ -3,6 +3,7 @@ import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
 import DeviceItemData = Shadowrun.DeviceItemData;
 import {Helpers} from "../../helpers";
+import { SR5 } from "../../config";
 
 export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.DeviceData> {
     public files = ['gear.xml'];
@@ -21,18 +22,34 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
-    ParseCommlinkDevices(commlinks, folder) {
+    async ParseCommlinkDevices(commlinks, folder) {
         const entries = [];
 
         for (const commlink of commlinks) {
+
+            // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(commlink)) {
                 continue;
             }
-            const item = this.GetDefaultData({type: 'device'});
-            
-            item.name = ImportHelper.StringValue(commlink, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Create the item
+            const item = this.GetDefaultData({type: 'device'});
+            item.name = ImportHelper.StringValue(commlink, 'name');
+
+            // Get the item's folder information
+            //@ts-ignore
+            item.folder = folder.id;
+
+            // Import Flags
+            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
+            item.system.importFlags.type = item.system.category;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
+
+            // Default icon
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
+
+            // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(commlink, 'devicerating', 0);
             item.system.technology.availability = ImportHelper.StringValue(commlink, 'avail');
@@ -40,13 +57,11 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             item.system.atts.att3.value = ImportHelper.IntValue(commlink, 'dataprocessing', 0);
             item.system.atts.att4.value = ImportHelper.IntValue(commlink, 'firewall', 0);
 
-            //@ts-ignore
-            item.folder = folder.id;
+            // Translate name if needed
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
-
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name, item.system);
 
             //@ts-ignore
             entries.push(item);
@@ -55,20 +70,35 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
         return entries;
     }
 
-    ParseCyberdeckDevices(cyberdecks, folder) {
+    async ParseCyberdeckDevices(cyberdecks, folder) {
         const items = [];
 
         for (const cyberdeck of cyberdecks) {
+
+            // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(cyberdeck)) {
                 continue;
             }
 
+            // Create the item
             const item = this.GetDefaultData({type: 'device'});
-
             item.system.category = 'cyberdeck';
             item.name = ImportHelper.StringValue(cyberdeck, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Get the item's folder information
+            //@ts-ignore
+            item.folder = folder.id;
+
+            // Import Flags
+            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
+            item.system.importFlags.type = item.system.category;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
+
+            // Default icon
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
+
+            // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(cyberdeck, 'devicerating', 0);
             item.system.technology.availability = ImportHelper.StringValue(cyberdeck, 'avail');
@@ -95,13 +125,11 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
                 item.system.atts.att4.value = ImportHelper.IntValue(cyberdeck, 'firewall', 0);
             }
 
-            //@ts-ignore
-            item.folder = folder.id;
+            // Translate name if needed
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
-
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign('cyberdeck', item.name, item.system);
 
             //@ts-ignore
             items.push(item);
@@ -118,8 +146,8 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
         let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
         let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
 
-        entries = entries.concat(this.ParseCommlinkDevices(commlinks, commlinksFolder));
-        entries = entries.concat(this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder));
+        entries = entries.concat(await this.ParseCommlinkDevices(commlinks, commlinksFolder));
+        entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder));
 
         // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(entries)

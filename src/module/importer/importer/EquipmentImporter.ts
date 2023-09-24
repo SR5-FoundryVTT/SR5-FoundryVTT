@@ -63,7 +63,7 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
 
             // Add the subtype so the importer can add the correct icon
             let subType = categoryEN.trim().toLowerCase().replace('/', ' ').split(' ').join('-');
-            if (SR5.itemSubTypes.modification.includes(subType)) {
+            if (SR5.itemSubTypes.equipment.includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 
@@ -79,6 +79,7 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             //@ts-ignore

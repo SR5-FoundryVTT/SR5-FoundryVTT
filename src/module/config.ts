@@ -810,7 +810,7 @@ export const SR5 = {
         host:           [],
         lifestyle:      [],
         modification:   ['barrel', 'other', 'side', 'stock', 'top', 'under'],
-        program:        ['common-programs', 'hacking-programs'],
+        program:        ['common_programs', 'hacking_programs'],
         quality:        ['negative', 'positive'],
         sin:            [],
         spell:          ['combat', 'detection', 'enchantments', 'health', 'illusion', 'manipulation', 'rituals'],

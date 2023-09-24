@@ -45,6 +45,7 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
             // Create the item
             const item = this.GetDefaultData({type: 'program'});
             item.name = ImportHelper.StringValue(program, 'name');
+            item.system.type = Constants.MAP_CHUMMER_PROGRAMM_CATEGORY[ImportHelper.StringValue(program, 'category')]
 
             // Get the program category
             const categoryEN = ImportHelper.StringValue(program, 'category')
@@ -62,8 +63,8 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
             item.system.importFlags.isFreshImport = true;
 
             // Add the subtype so the importer can add the correct icon
-            let subType = categoryEN.trim().toLowerCase().replace('/', ' ').split(' ').join('-');
-            if (SR5.itemSubTypes.modification.includes(subType)) {
+            let subType = item.system.type;
+            if (SR5.itemSubTypes.program.includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 
@@ -75,7 +76,6 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
             item.system.description.source = `${ImportHelper.StringValue(program, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(program, 'name'), ImportHelper.StringValue(program, 'page'))}`;
             item.system.technology.availability = ImportHelper.StringValue(program, 'avail');
             item.system.technology.cost = ImportHelper.IntValue(program, 'cost', 0);
-            item.system.type = Constants.MAP_CHUMMER_PROGRAMM_CATEGORY[ImportHelper.StringValue(program, 'category')]
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
