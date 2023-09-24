@@ -6,7 +6,7 @@ const xml2js = require('xml2js');
 
 /**
  * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
- * 
+ *
  * Generic type ItemDataType is the items data type DataImporter creates per entry in that Chummer5a data .xml file.
  */
 export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
@@ -23,7 +23,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
 
     /**
      * Get complete item data.
-     * 
+     *
      * NOTE: We use temporary items to have a full set of item data instead of just
      *       system model data that game.model.Item would give us.
      */
@@ -70,8 +70,8 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
     /**
      * Get the appropriate default icon
      */
-    public iconAssign(itemType: string, name: string, system: Object): string {
-        return IconAssign.iconAssign(itemType, name, system);
+    public iconAssign(importFlags: Shadowrun.ImportFlagData, system: Object): string {
+        return IconAssign.iconAssign(importFlags, system);
     }
 
     /**
@@ -105,10 +105,10 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
 
     /**
      * Filter down objects to those actaully imported.
-     * 
+     *
      * Sometimes a single Chummer xml file contains mulitple 'categories' that don't mix with system types
-     * 
-     * @param objects 
+     *
+     * @param objects
      * @returns A subset of objects
      */
     filterObjects(objects: any[]) {

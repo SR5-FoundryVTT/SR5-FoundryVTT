@@ -4,6 +4,7 @@ import { Constants } from './Constants';
 import WeaponData = Shadowrun.WeaponData;
 import AmmoItemData = Shadowrun.AmmoItemData;
 import {Helpers} from "../../helpers";
+import { SR5 } from "../../config";
 
 export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData> {
     public files = ['gear.xml'];
@@ -38,6 +39,19 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
 
             let item = this.GetDefaultData({type: 'ammo'});
             item.name = ImportHelper.StringValue(jsonData, 'name');
+
+            // Save the item's original english name for matching to icons
+            item.system.importFlags.name = foundry.utils.deepClone(item.name);
+            item.system.importFlags.type = item.type;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
+
+            let subType = item.system.importFlags.name.split(':')[0].trim().toLowerCase().split(' ').join('-');
+            if (SR5.itemSubTypes.ammo.includes(subType)) {
+                item.system.importFlags.subType = subType;
+            }
+
+            // Translate Item Name
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
@@ -89,7 +103,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name, item.system);
+            item.img = this.iconAssign(item.system.importFlags, item.system);
 
             ammoDatas.push(item);
         }

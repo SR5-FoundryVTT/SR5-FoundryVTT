@@ -336,7 +336,7 @@ export const SR5 = {
 
     /**
      * Labels for ALL actor types actor based local modifiers.
-     * 
+     *
      * All modifiers across all actor types must be included here, this is only used for display.
      */
     actorModifiers: {
@@ -422,7 +422,7 @@ export const SR5 = {
      * These are meant to be used with the Modifiers and SituationModifier classes and SR5Actor.modifiers.totalFor('wounds').
      *
      * There are additional item based modifiers that aren't present here.
-     * 
+     *
      * NOTE: Adding a modifier type here will directly affect modifiers shown on item actions for user selection.
      */
     modifierTypes: {
@@ -467,7 +467,7 @@ export const SR5 = {
 
     /**
      * Using different active test details should result in these opposed tests
-     * 
+     *
      * Structure: {
      *  [item.type]: {[item.system.type]}: 'OpposedTest'
      * }
@@ -676,11 +676,11 @@ export const SR5 = {
 
     /**
      * The available range weapon modes for to SR5#424
-     * 
-     * These are the mode selectors on the weapon. The term 'fire mode' 
+     *
+     * These are the mode selectors on the weapon. The term 'fire mode'
      * is only used to describe as the combination of weapon mode and action
      * used, causing a specific fire mode.
-     * 
+     *
      * NOTE: This list is also used for sorting order of ranged weapon mode.
      *       Alter it with care.
      */
@@ -700,8 +700,8 @@ export const SR5 = {
 
     /**
      * The preconfigured default Shadowrun firemodes according to SR5#180
-     * 
-     * These are separate from ranged weapon modes but depend on the selected 
+     *
+     * These are separate from ranged weapon modes but depend on the selected
      * ranged weapon mode.
      */
     fireModes: [
@@ -732,7 +732,7 @@ export const SR5 = {
         action: 'complex',
         mode: 'semi_auto'
     },
-    
+
     {
         label: "SR5.WeaponModeBurstFire",
         value: 3,
@@ -783,7 +783,7 @@ export const SR5 = {
     itemSubTypes: {
         action: [],
         adept_power: [],
-        ammo: [],
+        ammo: ['ammo', 'arrow', 'bola', 'bolt', 'grenade', 'micro-torpedo', 'minigrenade', 'missile', 'rocket', 'torpedo-grenade'],
         armor: [],
         bioware: [],
         complex_form: [],
@@ -791,10 +791,14 @@ export const SR5 = {
         critter_power: [],
         cyberware: [],
         device: [],
-        equipment: [],
+        equipment: ['alchemical-tools', 'appearance-modification', 'armor-enhancements', 'audio-devices',
+                    'audio-enhancements', 'autosofts', 'biotech', 'booster-chips', 'breaking-and-entering-gear',
+                    'btls', 'chemicals', 'commlink-accessories', 'commlink-apps', 'commlink-cyberdeck-form-factors',
+                    'communications-and-countermeasures', 'contracts-upkeep', 'critter-gear', 'currency',
+                    'custom-cyberdeck-attributes', 'cyberdeck-modules', 'cyberterminals', 'disguises'],
         host: [],
         lifestyle: [],
-        modification: [],
+        modification: ['barrel', 'other', 'side', 'stock', 'top', 'under'],
         program: [],
         quality: [],
         sin: [],

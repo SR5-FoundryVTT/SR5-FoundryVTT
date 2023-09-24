@@ -4,6 +4,7 @@ import { Constants } from './Constants';
 import { ModParserBase } from '../parser/mod/ModParserBase';
 import ModificationItemData = Shadowrun.ModificationItemData;
 import {Helpers} from "../../helpers";
+import { SR5 } from "../../config";
 
 export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.ModificationData> {
     public override categoryTranslations: any;
@@ -37,6 +38,13 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
             }
 
             let item = parser.Parse(jsonData, this.GetDefaultData({type: 'modification'}));
+
+            // Save the item's original english name for matching to icons
+            item.system.importFlags.name = foundry.utils.deepClone(item.name);
+            item.system.importFlags.type = item.type;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
+
             item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
 
             let folderName = item.system.mount_point !== undefined ? item.system.mount_point : 'Other';
@@ -49,10 +57,20 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 
+            // Add the subtype so the importer can add the correct icon
+            let subType = folderName.trim().toLowerCase();
+            if (subType.includes(' ')) {
+                subType = folderName.trim().split(' ').join('-');
+            }
+            if (SR5.itemSubTypes.modification.includes(subType)) {
+                item.system.importFlags.subType = subType;
+            }
+
+
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name, item.system);
+            item.img = this.iconAssign(item.system.importFlags, item.system);
 
             datas.push(item);
         }

@@ -1,20 +1,17 @@
 // import { SR5 } from "../../config";
 
-// List of recognized subcategories. This probably belongs somewhere else more appropriate.
-const ammoCategories = ['ammo', 'arrow', 'bola', 'bolt', 'grenade', 'micro-torpedo',
-                        'minigrenade', 'missile', 'rocket', 'torpedo grenade'];
+export function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadowrun.ShadowrunItemDataData): string {
 
-export function iconAssign(itemType: string, name: string, system: Shadowrun.ShadowrunItemDataData): string {
-    // const itemTypes = SR5.itemTypes;
     const defaultImg = "icons/svg/item-bag.svg";
     const imgFolder = "systems/shadowrun5e/dist/icons/importer/";
     const imgExtension = '.svg';
-    const imgType = itemType;
-    let imgSubtype: string | undefined = '';
+    const imgName = importFlags.name;
+    const imgType = importFlags.type;
+    const imgSubType = importFlags.subType;
 
-    console.log(itemType, name, system);
+    console.log(imgName, imgType, imgSubType, system);
 
-    switch (itemType) {
+    switch (imgType) {
         case 'action':
 
             break;
@@ -24,10 +21,7 @@ export function iconAssign(itemType: string, name: string, system: Shadowrun.Sha
             break;
 
         case 'ammo':
-            imgSubtype = name.split(':')[0].trim().toLowerCase();
-            if (!ammoCategories.includes(imgSubtype)) {
-                return defaultImg;
-            }
+
             break;
 
         case 'armor':
@@ -107,5 +101,5 @@ export function iconAssign(itemType: string, name: string, system: Shadowrun.Sha
             break;
     }
 
-    return imgFolder + imgType + (imgSubtype ? '-' : '') + imgSubtype + imgExtension;
+    return imgFolder + imgType + (imgSubType ? '-' : '') + imgSubType + imgExtension;
 }
