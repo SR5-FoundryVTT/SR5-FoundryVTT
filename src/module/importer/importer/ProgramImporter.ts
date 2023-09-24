@@ -3,6 +3,7 @@ import { DataImporter } from "./DataImporter";
 
 import ProgramItemData = Shadowrun.ProgramItemData;
 import { Constants } from './Constants';
+import { SR5 } from "../../config";
 
 /**
  * Programs are part of the Chummer5 gear.xml
@@ -37,33 +38,53 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
         const items: ProgramItemData[] = [];
 
         for (const program of programs) {
+
+            // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(program)) continue;
 
+            // Create the item
             const item = this.GetDefaultData({type: 'program'});
-
             item.name = ImportHelper.StringValue(program, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Get the program category
+            const categoryEN = ImportHelper.StringValue(program, 'category')
+
+            // Get the item's folder information
+            const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
+            let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Programs')}/${category}`, true);
+            //@ts-ignore TODO: foundry-vtt-types v10
+            item.folder = categoryFolder.id;
+
+            // Import Flags
+            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
+            item.system.importFlags.type = item.type;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
+
+            // Add the subtype so the importer can add the correct icon
+            let subType = categoryEN.trim().toLowerCase().replace('/', ' ').split(' ').join('-');
+            if (SR5.itemSubTypes.modification.includes(subType)) {
+                item.system.importFlags.subType = subType;
+            }
+
+            // Default icon
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
+
+            // Finish the importing
             item.system.technology.rating = ImportHelper.IntValue(program, 'rating', 0);
             item.system.description.source = `${ImportHelper.StringValue(program, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(program, 'name'), ImportHelper.StringValue(program, 'page'))}`;
             item.system.technology.availability = ImportHelper.StringValue(program, 'avail');
             item.system.technology.cost = ImportHelper.IntValue(program, 'cost', 0);
             item.system.type = Constants.MAP_CHUMMER_PROGRAMM_CATEGORY[ImportHelper.StringValue(program, 'category')]
 
-            const category = ImportHelper.TranslateCategory(ImportHelper.StringValue(program, 'category'), this.categoryTranslations).replace('/', ' ');
-            let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Programs')}/${category}`, true);
-            
-            //@ts-ignore TODO: foundry-vtt-types v10
-            item.folder = categoryFolder.id;
+            // Translate name if needed
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name, item.system);
-            
             items.push(item);
         }
 
         return items;
-    } 
+    }
 
 
     async Parse(jsonObject: object): Promise<Item> {

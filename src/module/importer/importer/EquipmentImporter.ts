@@ -52,6 +52,8 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
             // Replace / as it's used as a separator in GetFolderAtPath.
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
             let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
+            //@ts-ignore
+            item.folder = categoryFolder.id;
 
             // Import Flags
             item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
@@ -68,14 +70,11 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
             // Default icon
             item.img = await this.iconAssign(item.system.importFlags, item.system);
 
-            // Do some leftover cleanup and conversion
+            // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(equipment, 'rating', 0);
             item.system.technology.availability = ImportHelper.StringValue(equipment, 'avail');
             item.system.technology.cost = ImportHelper.IntValue(equipment, 'cost', 0);
-
-            //@ts-ignore
-            item.folder = categoryFolder.id;
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
