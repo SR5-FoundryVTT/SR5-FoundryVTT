@@ -64,7 +64,7 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
             }
 
             // Default icon
-            item.img = this.iconAssign(item.system.importFlags, item.system);
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);

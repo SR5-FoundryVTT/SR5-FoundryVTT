@@ -56,7 +56,7 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
             }
 
             // Default icon
-            item.img = this.iconAssign(item.system.importFlags, item.system);
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate the name
             item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);

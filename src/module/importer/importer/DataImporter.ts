@@ -70,7 +70,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
     /**
      * Get the appropriate default icon
      */
-    public iconAssign(importFlags: Shadowrun.ImportFlagData, system: Object): string {
+    public iconAssign(importFlags: Shadowrun.ImportFlagData, system: Object): Promise<string> {
         return IconAssign.iconAssign(importFlags, system);
     }
 

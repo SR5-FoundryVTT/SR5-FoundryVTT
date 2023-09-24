@@ -1,8 +1,8 @@
-// import { SR5 } from "../../config";
+import { SR5 } from "../../config";
 
-export function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadowrun.ShadowrunItemDataData): string {
+export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadowrun.ShadowrunItemDataData): Promise<string> {
 
-    let defaultImg = "icons/svg/item-bag.svg";
+    const defaultImg = "icons/svg/item-bag.svg";
     const imgFolder = "systems/shadowrun5e/dist/icons/importer/";
     const imgExtension = '.svg';
     const imgName = importFlags.name;
@@ -74,7 +74,7 @@ export function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadow
             break;
 
         case 'quality':
-            imgSubtype = system.type;
+            // imgSubType = system.type;
             break;
 
         case 'sin':
@@ -90,10 +90,10 @@ export function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadow
             break;
 
         case 'weapon':
-            if (system.category) {
-                imgSubtype = system.category;
+            /* if (system.category) {
+                imgSubType = system.category;
             }
-            /* if (system.subcategory) {
+            if (system.subcategory) {
                 imgSubtype = system.subcategory;
             } */
             break;
@@ -102,5 +102,18 @@ export function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadow
             break;
     }
 
-    return imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension;
+    // Priority of file names to check
+    const fileNamePriority = [
+        imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension,
+        imgFolder + imgType + '/' + imgType + imgExtension
+    ]
+
+    // Run through potential file names, taking the first one that has an icon that exists
+    for (const iconFileName of fileNamePriority) {
+        if (await srcExists(iconFileName)) {
+            return iconFileName
+        }
+    }
+
+    return defaultImg
 }

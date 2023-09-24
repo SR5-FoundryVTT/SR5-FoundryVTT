@@ -54,7 +54,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             }
 
             // Default icon
-            item.img = this.iconAssign(item.system.importFlags, item.system);
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate Item Name
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
