@@ -3,6 +3,7 @@ import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import {Helpers} from "../../helpers";
+import { SR5 } from "../../config";
 
 export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun.EquipmentData> {
     files = ['gear.xml'];
@@ -34,18 +35,40 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
         const items = [];
 
         for (const equipment of equipments) {
+
+            // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(equipment)) {
                 continue;
             }
 
-            // Replace / as it's used as a separator in GetFolderAtPath.
-            const category = ImportHelper.TranslateCategory(ImportHelper.StringValue(equipment, 'category'), this.categoryTranslations).replace('/', ' ');
-            let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
-
+            // Create the item
             const item = this.GetDefaultData({type: 'equipment'});
             item.name = ImportHelper.StringValue(equipment, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Get the equipment category
+            const categoryEN = ImportHelper.StringValue(equipment, 'category')
+
+            // Get the item's folder information
+            // Replace / as it's used as a separator in GetFolderAtPath.
+            const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
+            let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
+
+            // Import Flags
+            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
+            item.system.importFlags.type = item.type;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
+
+            // Add the subtype so the importer can add the correct icon
+            let subType = categoryEN.trim().toLowerCase().replace('/', ' ').split(' ').join('-');
+            if (SR5.itemSubTypes.modification.includes(subType)) {
+                item.system.importFlags.subType = subType;
+            }
+
+            // Default icon
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
+
+            // Do some leftover cleanup and conversion
             item.system.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(equipment, 'rating', 0);
             item.system.technology.availability = ImportHelper.StringValue(equipment, 'avail');
@@ -54,10 +77,10 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
             //@ts-ignore
             item.folder = categoryFolder.id;
 
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            // Translate name if needed
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name, item.system);
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             //@ts-ignore
             items.push(item);
