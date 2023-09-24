@@ -25,6 +25,7 @@ export function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadow
             break;
 
         case 'armor':
+            // Add separation by if it's an accessory
 
             break;
 

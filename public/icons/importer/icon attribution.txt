@@ -37,6 +37,15 @@ ammo-missile - Lorc - https://game-icons.net/1x1/lorc/missile-pod.html
 ammo-rocket - Lorc - https://game-icons.net/1x1/lorc/rocket.html
 ammo-torpedo grenade - Delapouite - https://game-icons.net/1x1/delapouite/torpedo.html
 
+Armor
+armor-armor - Skoll - https://game-icons.net/1x1/skoll/kevlar-vest.html
+armor-cloaks - Lucas - https://game-icons.net/1x1/lucasms/cloak.html
+armor-clothing - Delapouite - https://game-icons.net/1x1/delapouite/clothes.html
+armor-high-fashion-armor-clothing - Delapouite - https://game-icons.net/1x1/delapouite/travel-dress.html
+armor-specialty-armor - Delapouite - https://game-icons.net/1x1/delapouite/shoulder-armor.html
+
+Modifications
+
 
 cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
 quality-positive.svg - Lorc - https://game-icons.net/1x1/lorc/strong.html
