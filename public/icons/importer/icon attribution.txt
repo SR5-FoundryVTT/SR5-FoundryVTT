@@ -26,23 +26,23 @@ sprite_power.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
 weapon.svg - Delapouite - https://game-icons.net/1x1/delapouite/saber-and-pistol.html
 
 Ammo
-ammo-ammo.svg - Lorc - https://game-icons.net/1x1/lorc/bullets.html
-ammo-arrow.svg - Lorc - https://game-icons.net/1x1/lorc/arrow-cluster.html
-ammo-bola.svg - Lorc - https://game-icons.net/1x1/lorc/bolas.html
-ammo-bolt.svg - Lorc - https://game-icons.net/1x1/lorc/spears.html
-ammo-grenade.svg - Lorc - https://game-icons.net/1x1/lorc/grenade.html
-ammo-micro-torpedo.svg - Lorc - https://game-icons.net/1x1/lorc/missile-swarm.html
-ammo-minigrenade.svg - Lorc - https://game-icons.net/1x1/lorc/flash-grenade.html
-ammo-missile - Lorc - https://game-icons.net/1x1/lorc/missile-pod.html
-ammo-rocket - Lorc - https://game-icons.net/1x1/lorc/rocket.html
-ammo-torpedo grenade - Delapouite - https://game-icons.net/1x1/delapouite/torpedo.html
+ammo/ammo.svg - Lorc - https://game-icons.net/1x1/lorc/bullets.html
+ammo/arrow.svg - Lorc - https://game-icons.net/1x1/lorc/arrow-cluster.html
+ammo/bola.svg - Lorc - https://game-icons.net/1x1/lorc/bolas.html
+ammo/bolt.svg - Lorc - https://game-icons.net/1x1/lorc/spears.html
+ammo/grenade.svg - Lorc - https://game-icons.net/1x1/lorc/grenade.html
+ammo/micro-torpedo.svg - Lorc - https://game-icons.net/1x1/lorc/missile-swarm.html
+ammo/minigrenade.svg - Lorc - https://game-icons.net/1x1/lorc/flash-grenade.html
+ammo/missile.svg - Lorc - https://game-icons.net/1x1/lorc/missile-pod.html
+ammo/rocket.svg - Lorc - https://game-icons.net/1x1/lorc/rocket.html
+ammo/torpedo-grenade.svg - Delapouite - https://game-icons.net/1x1/delapouite/torpedo.html
 
 Armor
-armor-armor - Skoll - https://game-icons.net/1x1/skoll/kevlar-vest.html
-armor-cloaks - Lucas - https://game-icons.net/1x1/lucasms/cloak.html
-armor-clothing - Delapouite - https://game-icons.net/1x1/delapouite/clothes.html
-armor-high-fashion-armor-clothing - Delapouite - https://game-icons.net/1x1/delapouite/travel-dress.html
-armor-specialty-armor - Delapouite - https://game-icons.net/1x1/delapouite/shoulder-armor.html
+armor/armor.svg - Skoll - https://game-icons.net/1x1/skoll/kevlar-vest.html
+armor/cloaks.svg - Lucas - https://game-icons.net/1x1/lucasms/cloak.html
+armor/clothing.svg - Delapouite - https://game-icons.net/1x1/delapouite/clothes.html
+armor/high-fashion-armor-clothing.svg - Delapouite - https://game-icons.net/1x1/delapouite/travel-dress.html
+armor/specialty-armor.svg - Delapouite - https://game-icons.net/1x1/delapouite/shoulder-armor.html
 
 Modifications
 

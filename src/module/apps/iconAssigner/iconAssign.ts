@@ -2,7 +2,7 @@
 
 export function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadowrun.ShadowrunItemDataData): string {
 
-    const defaultImg = "icons/svg/item-bag.svg";
+    let defaultImg = "icons/svg/item-bag.svg";
     const imgFolder = "systems/shadowrun5e/dist/icons/importer/";
     const imgExtension = '.svg';
     const imgName = importFlags.name;
@@ -102,5 +102,5 @@ export function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadow
             break;
     }
 
-    return imgFolder + imgType + (imgSubType ? '-' : '') + imgSubType + imgExtension;
+    return imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension;
 }
