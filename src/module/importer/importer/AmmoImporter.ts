@@ -29,19 +29,21 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
 
         for (let i = 0; i < jsonAmmos.length; i++) {
             let jsonData = jsonAmmos[i];
+
+            // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
-
             if (ImportHelper.StringValue(jsonData, 'category', '') !== 'Ammunition') {
                 continue;
             }
 
+            // Create the item
             let item = this.GetDefaultData({type: 'ammo'});
             item.name = ImportHelper.StringValue(jsonData, 'name');
 
-            // Save the item's original english name for matching to icons
-            item.system.importFlags.name = foundry.utils.deepClone(item.name);
+            // Import Flags
+            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
             item.system.importFlags.type = item.type;
             item.system.importFlags.subType = '';
             item.system.importFlags.isFreshImport = true;
@@ -51,9 +53,13 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
                 item.system.importFlags.subType = subType;
             }
 
+            // Default icon
+            item.img = this.iconAssign(item.system.importFlags, item.system);
+
             // Translate Item Name
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Parse the item information from the xml
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
             item.system.technology.rating = 2;
             item.system.technology.availability = ImportHelper.StringValue(jsonData, 'avail');
@@ -101,9 +107,6 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             item.system.technology.conceal.base = 0;
 
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
-
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.system.importFlags, item.system);
 
             ammoDatas.push(item);
         }

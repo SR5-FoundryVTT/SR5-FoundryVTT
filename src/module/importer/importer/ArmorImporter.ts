@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
 import ArmorItemData = Shadowrun.ArmorItemData;
 import {Helpers} from "../../helpers";
+import { SR5 } from "../../config";
 
 export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorData> {
     public armorTranslations: any;
@@ -25,28 +26,42 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
 
     async Parse(jsonObject: object): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Armor', this.categoryTranslations);
-
         const parser = new ArmorParserBase();
-
         let datas: ArmorItemData[] = [];
         let jsonDatas = jsonObject['armors']['armor'];
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+
+            // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
+            // Create the item
             let item = parser.Parse(jsonData, this.GetDefaultData({type: 'armor'}));
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
-            item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
-            
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folders[category].id;
 
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            // Import Flags
+            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
+            item.system.importFlags.type = item.type;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
 
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name, item.system);
+            let subType = category.trim().split(' ').join('-');
+            if (SR5.itemSubTypes.armor.includes(subType)) {
+                item.system.importFlags.subType = subType;
+            }
+
+            // Default icon
+            item.img = this.iconAssign(item.system.importFlags, item.system);
+
+            // Translate the name
+            item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
+
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             datas.push(item);
         }

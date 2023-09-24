@@ -784,7 +784,7 @@ export const SR5 = {
         action: [],
         adept_power: [],
         ammo: ['ammo', 'arrow', 'bola', 'bolt', 'grenade', 'micro-torpedo', 'minigrenade', 'missile', 'rocket', 'torpedo-grenade'],
-        armor: [],
+        armor: ['armor', 'cloaks', 'clothing', 'high-fashion-armor-clothing', 'specialty-armor'],
         bioware: [],
         complex_form: [],
         contact: [],
