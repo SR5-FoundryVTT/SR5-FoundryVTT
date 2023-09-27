@@ -815,6 +815,10 @@ export const SR5 = {
         sin:            [],
         spell:          ['combat', 'detection', 'enchantments', 'health', 'illusion', 'manipulation', 'rituals'],
         sprite_power:   [],
-        weapon:         []
+        weapon:         ['melee', 'ranged', 'thrown', 'assault-cannons', 'assault-rifles', 'bio-weapon', 'blades', 'bows', 'carbines', 'clubs',
+                        'crossbows', 'cyberweapon', 'exotic-melee-weapons', 'exotic-ranged-weapons', 'flamethrowers', 'gear', 'grenade-launchers',
+                        'heavy-machine-guns', 'heavy-pistols', 'holdouts', 'improvised-weapons', 'laser-weapons', 'light-machine-guns',
+                        'light-pistols', 'machine-pistols', 'medium-machine-guns', 'micro-drone-weapons', 'missile-launchers', 'quality',
+                        'shotguns', 'sniper-rifles', 'sporting-rifles', 'submachine-guns', 'tasers', 'unarmed', 'underbarrel-weapons']
     }
 };
