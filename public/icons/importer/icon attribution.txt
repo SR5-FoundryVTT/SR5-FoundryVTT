@@ -83,6 +83,72 @@ device/cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musica
 
 Equipment
 equipment.svg - Delapouite - https://game-icons.net/1x1/delapouite/briefcase.html
+equipment/alchemical-tools.svg -
+equipment/appearance-modification.svg -
+equipment/armor-enhancements.svg -
+equipment/audio-devices.svg -
+equipment/audio-enhancements.svg -
+equipment/autosofts.svg -
+equipment/biotech.svg -
+equipment/booster-chips.svg -
+equipment/breaking-and-entering-gear.svg -
+equipment/btls.svg -
+equipment/chemicals.svg -
+equipment/commlink-accessories.svg -
+equipment/commlink-apps.svg -
+equipment/commlink-cyberdeck-form-factors.svg -
+equipment/communications-and-countermeasures.svg -
+equipment/contracts-upkeep.svg -
+equipment/critter-gear.svg -
+equipment/currency.svg -
+equipment/custom-cyberdeck-attributes.svg -
+equipment/cyberdeck-modules.svg -
+equipment/cyberterminals.svg -
+equipment/disguises.svg -
+equipment/drug-grades.svg -
+equipment/drugs.svg -
+equipment/electronic-accessories.svg -
+equipment/electronic-modification.svg -
+equipment/electronic-parts.svg -
+equipment/electronics-accessories.svg -
+equipment/entertainment.svg -
+equipment/explosives.svg -
+equipment/extraction-devices.svg -
+equipment/foci.svg -
+equipment/food.svg -
+equipment/formulae.svg -
+equipment/grapple-gun.svg -
+equipment/hard-nanoware.svg -
+equipment/housewares.svg -
+equipment/id-credsticks.svg -
+equipment/magical-compounds.svg -
+equipment/magical-supplies.svg -
+equipment/matrix-accessories.svg -
+equipment/metatype-specific.svg -
+equipment/miscellany.svg -
+equipment/musical-instruments.svg -
+equipment/nanogear.svg -
+equipment/paydata.svg -
+equipment/pi-tac.svg -
+equipment/pi-tac-programs.svg -
+equipment/printing.svg -
+equipment/reporter-gear.svg -
+equipment/rfid-tags.svg -
+equipment/security-devices.svg -
+equipment/sensor-functions.svg -
+equipment/sensor-housings.svg -
+equipment/sensors.svg -
+equipment/services.svg -
+equipment/skillsofts.svg -
+equipment/software.svg -
+equipment/software-tweaks.svg -
+equipment/survival-gear.svg -
+equipment/tailored-perfume-cologne.svg -
+equipment/tools.svg -
+equipment/tools-of-the-trade.svg -
+equipment/toxins.svg -
+equipment/vision-devices.svg -
+equipment/vision-enhancements.svg -
 
 Host
 host.svg - Delapouite - https://game-icons.net/1x1/delapouite/server-rack.html
@@ -130,3 +196,36 @@ weapon/weapon.svg - Delapouite - https://game-icons.net/1x1/delapouite/saber-and
 weapon/melee.svg - Skoll - https://game-icons.net/1x1/skoll/spiked-bat.html
 weapon/range.svg - John Colburn - https://game-icons.net/1x1/john-colburn/pistol-gun.html
 weapon/thrown.svg - DarkZaitzev - https://game-icons.net/1x1/darkzaitzev/shuriken.html
+weapon/assault-cannons.svg -
+weapon/assault-rifles.svg -
+weapon/bio-weapon.svg -
+weapon/blades.svg -
+weapon/bows.svg -
+weapon/carbines.svg -
+weapon/clubs.svg -
+weapon/crossbows.svg -
+weapon/cyberweapon.svg -
+weapon/exotic-melee-weapons.svg -
+weapon/exotic-ranged-weapons.svg -
+weapon/flamethrowers.svg -
+weapon/gear.svg -
+weapon/grenade-launchers.svg -
+weapon/heavy-machine-guns.svg -
+weapon/heavy-pistols.svg -
+weapon/holdouts.svg -
+weapon/improvised-weapons.svg -
+weapon/laser-weapons.svg -
+weapon/light-machine-guns.svg -
+weapon/light-pistols.svg -
+weapon/machine-pistols.svg -
+weapon/medium-machine-guns.svg -
+weapon/micro-drone-weapons.svg -
+weapon/missile-launchers.svg -
+weapon/quality.svg -
+weapon/shotguns.svg -
+weapon/sniper-rifles.svg -
+weapon/sporting-rifles.svg -
+weapon/submachine-guns.svg -
+weapon/tasers.svg -
+weapon/unarmed.svg -
+weapon/underbarrel-weapons'
