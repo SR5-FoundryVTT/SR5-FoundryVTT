@@ -29,7 +29,6 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
                 imgFolder + imgType + '/' + system.category + imgExtension,
                 imgFolder + imgType + '/' + imgType + imgExtension
             ]
-            console.log(imgFolder + imgType + '/' + system.category + imgExtension);
             break;
 
         default:
@@ -41,7 +40,6 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
     // Run through potential file names, taking the first one that has an icon that exists
     for (const iconFileName of fileNamePriority) {
         if (await srcExists(iconFileName)) {
-            console.log(iconFileName);
             return iconFileName
         }
     }

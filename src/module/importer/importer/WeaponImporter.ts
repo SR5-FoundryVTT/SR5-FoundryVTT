@@ -70,12 +70,10 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
 
             let subType = '';
             if (item.system.category) {
-                let subType = item.system.category.trim().split(' ').join('-');
-                console.log('category', item.system.category)
+                subType = item.system.category.trim().split(' ').join('-');
             }
             if (item.system.subcategory) {
-                let subType = item.system.subcategory.trim().split(' ').join('-');
-                console.log('subcategory', item.system.subcategory)
+                subType = item.system.subcategory.trim().split(' ').join('-');
             }
 
             if (SR5.itemSubTypes.weapon.includes(subType)) {
