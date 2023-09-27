@@ -31,13 +31,13 @@ armor/specialty-armor.svg - Delapouite - https://game-icons.net/1x1/delapouite/s
 
 Bioware
 bioware/bioware.svg - Lorc - https://game-icons.net/1x1/lorc/beast-eye.html
-bioware/basic.svg -
-bioware/bio-weapons.svg -
+bioware/basic.svg - Delapouite - https://game-icons.net/1x1/delapouite/cryo-chamber.html
+bioware/bio-weapons.svg - Lorc - https://game-icons.net/1x1/lorc/biohazard.html
 bioware/biosculpting.svg -
 bioware/chemical-gland-modifications.svg -
 bioware/complimentary-genetics.svg -
 bioware/cosmetic-bioware.svg -
-bioware/cultured.svg -
+bioware/cultured.svg - Lorc - https://game-icons.net/1x1/lorc/internal-organ.html
 bioware/environmental-microadaptation.svg -
 bioware/exotic-metaglands.svg -
 bioware/genetic-restoration.svg -
