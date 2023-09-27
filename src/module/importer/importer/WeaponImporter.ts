@@ -9,6 +9,7 @@ import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import WeaponItemData = Shadowrun.WeaponItemData;
 import {Helpers} from "../../helpers";
 import { DataDefaults } from '../../data/DataDefaults';
+import { SR5 } from "../../config";
 
 export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.WeaponData> {
     public override categoryTranslations: any;
@@ -51,19 +52,40 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
+            // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
+            // Create the item
             let item = parser.Parse(jsonData, this.GetDefaultData({type: 'weapon'}), this.itemTranslations);
-            
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.subcategory].id;
 
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            // Import Flags
+            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
+            item.system.importFlags.type = item.type;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
 
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name, item.system);
+            let subType = '';
+            if (item.system.category) {
+                let subType = item.system.category.trim().split(' ').join('-');
+                console.log('category', item.system.category)
+            }
+            if (item.system.subcategory) {
+                let subType = item.system.subcategory.trim().split(' ').join('-');
+                console.log('subcategory', item.system.subcategory)
+            }
+
+            if (SR5.itemSubTypes.weapon.includes(subType)) {
+                item.system.importFlags.subType = subType;
+            }
+
+            // Default icon
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
+
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);
         }
