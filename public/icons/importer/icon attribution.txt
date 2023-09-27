@@ -3,27 +3,12 @@ The icons and their authors are listed below as required by CC by Attribution 3.
 
 Icon - Author - Source
 
-Default
+
+Action
 action.svg - Lorc - https://game-icons.net/1x1/lorc/slap.html
+
+Adept Power
 adept_power.svg - Lorc - https://game-icons.net/1x1/lorc/burning-passion.html
-ammo.svg - Lorc - https://game-icons.net/1x1/lorc/bullets.html
-armor.svg - Skoll - https://game-icons.net/1x1/skoll/kevlar-vest.html
-bioware.svg - Lorc - https://game-icons.net/1x1/lorc/beast-eye.html
-complex_form.svg - Lorc - https://game-icons.net/1x1/lorc/cogsplosion.html
-contact.svg - Delapouite - https://game-icons.net/1x1/delapouite/discussion.html
-critter_power.svg - Lorc - https://game-icons.net/1x1/lorc/moon-claws.html
-cyberware.svg - Delapouite - https://game-icons.net/1x1/delapouite/cyborg-face.html
-device.svg - Skoll - https://game-icons.net/1x1/skoll/smartphone.html
-equipment.svg - Delapouite - https://game-icons.net/1x1/delapouite/briefcase.html
-host.svg - Delapouite - https://game-icons.net/1x1/delapouite/server-rack.html
-lifestyle.svg - Delapouite - https://game-icons.net/1x1/delapouite/family-house.html
-modification.svg - Skoll - https://game-icons.net/1x1/skoll/bayonet.html
-program.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
-quality.svg - Lorc - https://game-icons.net/1x1/lorc/anatomy.html
-sin.svg - Lord Berandas - https://game-icons.net/1x1/lord-berandas/computing.html
-spell.svg - Delapouite - https://game-icons.net/1x1/delapouite/spell-book.html
-sprite_power.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
-weapon.svg - Delapouite - https://game-icons.net/1x1/delapouite/saber-and-pistol.html
 
 Ammo
 ammo/ammo.svg - Lorc - https://game-icons.net/1x1/lorc/bullets.html
@@ -44,12 +29,104 @@ armor/clothing.svg - Delapouite - https://game-icons.net/1x1/delapouite/clothes.
 armor/high-fashion-armor-clothing.svg - Delapouite - https://game-icons.net/1x1/delapouite/travel-dress.html
 armor/specialty-armor.svg - Delapouite - https://game-icons.net/1x1/delapouite/shoulder-armor.html
 
-Modifications
+Bioware
+bioware/bioware.svg - Lorc - https://game-icons.net/1x1/lorc/beast-eye.html
+bioware/basic.svg -
+bioware/bio-weapons.svg -
+bioware/biosculpting.svg -
+bioware/chemical-gland-modifications.svg -
+bioware/complimentary-genetics.svg -
+bioware/cosmetic-bioware.svg -
+bioware/cultured.svg -
+bioware/environmental-microadaptation.svg -
+bioware/exotic-metaglands.svg -
+bioware/genetic-restoration.svg -
+bioware/immunization.svg -
+bioware/orthoskin-upgrades.svg -
+bioware/phenotype-adjustment.svg -
+bioware/symbionts.svg -
+bioware/transgenic-alteration.svg -
+bioware/transgenics.svg -
 
+Complex Form
+complex_form.svg - Lorc - https://game-icons.net/1x1/lorc/cogsplosion.html
 
-cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
-quality-positive.svg - Lorc - https://game-icons.net/1x1/lorc/strong.html
-quality-negative.svg - Lorc - https://game-icons.net/1x1/lorc/oppression.html
-weapon-melee.svg - Skoll - https://game-icons.net/1x1/skoll/spiked-bat.html
-weapon-range.svg - John Colburn - https://game-icons.net/1x1/john-colburn/pistol-gun.html
-weapon-thrown.svg - DarkZaitzev - https://game-icons.net/1x1/darkzaitzev/shuriken.html
+Contact
+contact.svg - Delapouite - https://game-icons.net/1x1/delapouite/discussion.html
+
+Critter Power
+critter_power.svg - Lorc - https://game-icons.net/1x1/lorc/moon-claws.html
+
+Cyberware
+cyberware/cyberware.svg - Delapouite - https://game-icons.net/1x1/delapouite/cyborg-face.html
+cyberware/auto-injector-mods.svg -
+cyberware/bodyware.svg -
+cyberware/cosmetic-enhancement.svg -
+cyberware/cyber-implant-weapon.svg -
+cyberware/cyber-implant-weapon-accessory.svg -
+cyberware/cyberlimb.svg -
+cyberware/cyberlimb-accessory.svg -
+cyberware/cyberlimb-enhancement.svg -
+cyberware/cybersuite.svg -
+cyberware/earware.svg -
+cyberware/eyeware.svg -
+cyberware/hard-nanoware.svg -
+cyberware/headware.svg -
+cyberware/nanocybernetics.svg -
+cyberware/soft-nanoware.svg -
+cyberware/special-biodrone-cyberware.svg -
+
+Device
+device/device.svg - Skoll - https://game-icons.net/1x1/skoll/smartphone.html
+device/commlink.svg - Skoll - https://game-icons.net/1x1/skoll/smartphone.html
+device/cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
+
+Equipment
+equipment.svg - Delapouite - https://game-icons.net/1x1/delapouite/briefcase.html
+
+Host
+host.svg - Delapouite - https://game-icons.net/1x1/delapouite/server-rack.html
+
+Lifestyle
+lifestyle.svg - Delapouite - https://game-icons.net/1x1/delapouite/family-house.html
+
+Modification
+modification/modification.svg - Skoll - https://game-icons.net/1x1/skoll/bayonet.html
+modification/barrel.svg -
+modification/other.svg -
+modification/side.svg -
+modification/stock.svg -
+modification/top.svg -
+modification/under.svg -
+
+Program
+program/program.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
+program/common_programs.svg -
+program/hacking_programs.svg -
+
+Quality
+quality/quality.svg - Lorc - https://game-icons.net/1x1/lorc/anatomy.html
+quality/positive.svg - Lorc - https://game-icons.net/1x1/lorc/strong.html
+quality/negative.svg - Lorc - https://game-icons.net/1x1/lorc/oppression.html
+
+SIN
+sin.svg - Lord Berandas - https://game-icons.net/1x1/lord-berandas/computing.html
+
+Spell
+spell/spell.svg - Delapouite - https://game-icons.net/1x1/delapouite/spell-book.html
+spell/combat.svg -
+spell/detection.svg -
+spell/enchantments.svg -
+spell/health.svg -
+spell/illusion.svg -
+spell/manipulation.svg -
+spell/rituals.svg -
+
+Sprite Power
+sprite_power.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
+
+Weapon
+weapon/weapon.svg - Delapouite - https://game-icons.net/1x1/delapouite/saber-and-pistol.html
+weapon/melee.svg - Skoll - https://game-icons.net/1x1/skoll/spiked-bat.html
+weapon/range.svg - John Colburn - https://game-icons.net/1x1/john-colburn/pistol-gun.html
+weapon/thrown.svg - DarkZaitzev - https://game-icons.net/1x1/darkzaitzev/shuriken.html
