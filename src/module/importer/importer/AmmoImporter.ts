@@ -82,6 +82,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
                 }
             }
 
+            // TODO: This can be improved by using the stored english name in item.system.importFlags.name
             let shouldLookForWeapons = false;
             let nameLower = item.name.toLowerCase();
             ['grenade', 'rocket', 'missile'].forEach((compare) => {
