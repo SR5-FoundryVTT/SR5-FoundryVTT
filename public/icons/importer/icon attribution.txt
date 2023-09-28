@@ -48,6 +48,9 @@ bioware/symbionts.svg -
 bioware/transgenic-alteration.svg -
 bioware/transgenics.svg -
 
+Commlink
+commlink.svg - Skoll - https://game-icons.net/1x1/skoll/smartphone.html
+
 Complex Form
 complex_form.svg - Lorc - https://game-icons.net/1x1/lorc/cogsplosion.html
 
@@ -56,6 +59,9 @@ contact.svg - Delapouite - https://game-icons.net/1x1/delapouite/discussion.html
 
 Critter Power
 critter_power.svg - Lorc - https://game-icons.net/1x1/lorc/moon-claws.html
+
+Cyberdeck
+cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
 
 Cyberware
 cyberware/cyberware.svg - Delapouite - https://game-icons.net/1x1/delapouite/cyborg-face.html
@@ -78,8 +84,6 @@ cyberware/special-biodrone-cyberware.svg -
 
 Device
 device/device.svg - Skoll - https://game-icons.net/1x1/skoll/smartphone.html
-device/commlink.svg - Skoll - https://game-icons.net/1x1/skoll/smartphone.html
-device/cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
 
 Equipment
 equipment.svg - Delapouite - https://game-icons.net/1x1/delapouite/briefcase.html

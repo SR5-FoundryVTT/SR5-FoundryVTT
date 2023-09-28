@@ -47,7 +47,6 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
 
             // Get the equipment category
             const categoryEN = ImportHelper.StringValue(equipment, 'category');
-            console.log(categoryEN, categoryEN.trim().toLowerCase().replace('/', ' ').split(' ').join('-'), item.type)
 
             // Get the item's folder information
             // Replace / as it's used as a separator in GetFolderAtPath.
