@@ -44,9 +44,9 @@ bioware/genetic-restoration.svg -
 bioware/immunization.svg -
 bioware/orthoskin-upgrades.svg -
 bioware/phenotype-adjustment.svg -
-bioware/symbionts.svg -
-bioware/transgenic-alteration.svg -
-bioware/transgenics.svg -
+bioware/symbionts.svg - Lorc - https://game-icons.net/1x1/lorc/internal-organ.html
+bioware/transgenic-alteration.svg - Lorc - https://game-icons.net/1x1/lorc/dna1.html
+bioware/transgenics.svg - Shadows-eye - 
 
 Complex Form
 complex_form.svg - Lorc - https://game-icons.net/1x1/lorc/cogsplosion.html
