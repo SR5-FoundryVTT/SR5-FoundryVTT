@@ -3,6 +3,7 @@ import {ImportHelper} from '../helper/ImportHelper';
 import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParserBase';
 import {Constants} from './Constants';
 import {Helpers} from "../../helpers";
+import { SR5 } from "../../config";
 
 export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
     public files = ['critterpowers.xml'];
@@ -10,7 +11,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
     public override unsupportedCategories = [
         'Emergent',
     ];
-    
+
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
     }
@@ -34,16 +35,37 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
         const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
 
         for (const chummerCritterPower of chummerCritterPowers) {
-            let item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: 'critter_power'}), this.itemTranslations);
 
+            // Check to ensure the data entry is supported
+            if (DataImporter.unsupportedEntry(chummerCritterPower)) {
+                continue;
+            }
+
+            // Create the item
+            const item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: 'critter_power'}), this.itemTranslations);
             // @ts-ignore TODO: foundry-vtt-type v10
             item.folder = folder.id;
+
+            // Import Flags
+            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
+            item.system.importFlags.type = item.type;
+            item.system.importFlags.subType = '';
+            item.system.importFlags.isFreshImport = true;
+
+            // Add the subtype so the importer can add the correct icon
+            let subType = item.system.powerType;
+            if (SR5.itemSubTypes.critter_power.includes(subType)) {
+                item.system.importFlags.subType = subType;
+            }
+
+            // Default icon
+            item.img = await this.iconAssign(item.system.importFlags, item.system);
+
+            // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
-
-            // TODO: Move this to a more general base class
-            item.img = this.iconAssign(item.type, item.name, item.system);
 
             items.push(item);
         }

@@ -790,7 +790,7 @@ export const SR5 = {
                         'phenotype-adjustment', 'symbionts', 'transgenic-alteration', 'transgenics'],
         complex_form:   [],
         contact:        [],
-        critter_power:  [],
+        critter_power:  ['mana', 'physical'],
         cyberware:      ['auto-injector-mods', 'bodyware', 'cosmetic-enhancement', 'cyber-implant-weapon', 'cyber-implant-weapon-accessory',
                         'cyberlimb', 'cyberlimb-accessory', 'cyberlimb-enhancement', 'cybersuite', 'earware', 'eyeware', 'hard-nanoware',
                         'headware', 'nanocybernetics', 'soft-nanoware', 'special-biodrone-cyberware'],
