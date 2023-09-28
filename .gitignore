@@ -2,7 +2,7 @@
 .idea
 node_modules
 foundryconfig.json
-.vscode
+.vscode/*
 shadowrun5e.lock
 *.code-workspace
 dist
