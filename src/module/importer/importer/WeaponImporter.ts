@@ -35,7 +35,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponi18n, 'weapons', 'weapon');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Weapons', this.categoryTranslations);
 
         folders['gear'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Gear`, true);
@@ -75,14 +75,14 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
             if (item.system.subcategory) {
                 subType = item.system.subcategory.trim().split(' ').join('-');
             }
-
             if (SR5.itemSubTypes.weapon.includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);

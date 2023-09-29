@@ -31,7 +31,7 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
-    async ParseEquipments(equipments) {
+    async ParseEquipment(equipments, setIcons) {
         const items = [];
 
         for (const equipment of equipments) {
@@ -68,7 +68,7 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;
@@ -89,9 +89,9 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
         return items;
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
-        const equipments = this.filterObjects(jsonObject['gears']['gear']);
-        const items = await this.ParseEquipments(equipments);
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
+        const equipment = this.filterObjects(jsonObject['gears']['gear']);
+        const items = await this.ParseEquipment(equipment, setIcons);
 
         // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(items);

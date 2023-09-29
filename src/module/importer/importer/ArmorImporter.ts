@@ -24,7 +24,7 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
         this.armorTranslations = ImportHelper.ExtractItemTranslation(jsonArmori18n, 'armors', 'armor');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Armor', this.categoryTranslations);
         const parser = new ArmorParserBase();
         let datas: ArmorItemData[] = [];
@@ -56,11 +56,12 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate the name
             item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             datas.push(item);

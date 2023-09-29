@@ -65,7 +65,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * @param chummerData The JSON data to parse.
      * @returns An array of created objects.
      */
-    public abstract Parse(chummerData: object): Promise<Item>;
+    public abstract Parse(chummerData: object, setIcons: boolean): Promise<Item>;
 
     /**
      * Get the appropriate default icon

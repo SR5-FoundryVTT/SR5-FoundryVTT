@@ -47,7 +47,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
     }
 
-    public async Parse(chummerData: object): Promise<Item> {
+    public async Parse(chummerData: object, setIcons: boolean): Promise<Item> {
         const parser = new SpritePowerParser();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('ITEM.TypeSprite_power')}`, true);
 
@@ -73,7 +73,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
             item.system.importFlags.isFreshImport = true;
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

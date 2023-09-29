@@ -34,7 +34,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonSpelli18n, 'spells', 'spell');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Spells', this.categoryTranslations);
 
         const parser = new ParserMap<Shadowrun.SpellItemData>('category', [
@@ -75,7 +75,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

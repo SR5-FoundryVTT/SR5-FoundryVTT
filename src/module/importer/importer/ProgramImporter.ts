@@ -34,7 +34,7 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
         return jsonObject['gears']['gear'].filter(gear => categories.includes(ImportHelper.StringValue(gear, 'category', '')));
     }
 
-    async parsePrograms(programs: object[]) {
+    async parsePrograms(programs: object[], setIcons: boolean) {
         const items: ProgramItemData[] = [];
 
         for (const program of programs) {
@@ -69,7 +69,7 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Finish the importing
             item.system.technology.rating = ImportHelper.IntValue(program, 'rating', 0);
@@ -87,9 +87,9 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
     }
 
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const programs = this.filterGearToPrograms(jsonObject);
-        const items = await this.parsePrograms(programs);
+        const items = await this.parsePrograms(programs, setIcons);
         // @ts-ignore I have bigger issues than fully typing this.
         return await Item.create(items);
     }

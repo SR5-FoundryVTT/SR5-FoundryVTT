@@ -27,7 +27,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
     }
 
 
-    async Parse(chummerPowers: object): Promise<Item> {
+    async Parse(chummerPowers: object, setIcons: boolean): Promise<Item> {
         const parser = new CritterPowerParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('ITEM.TypeCritter_power')}`, true);
 
@@ -59,7 +59,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

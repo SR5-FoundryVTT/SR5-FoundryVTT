@@ -24,7 +24,7 @@ export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.Qua
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonQualityi18n, 'qualities', 'quality');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const jsonNameTranslations = {};
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
 
@@ -58,11 +58,12 @@ export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.Qua
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate the name
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);

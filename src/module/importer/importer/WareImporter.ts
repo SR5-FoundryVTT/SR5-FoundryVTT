@@ -44,7 +44,7 @@ export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, typeKey, listKey);
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const cyberParser = new CyberwareParser();
 
         let key = jsonObject.hasOwnProperty('cyberwares') ? 'Cyberware' : 'Bioware';
@@ -82,7 +82,7 @@ export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

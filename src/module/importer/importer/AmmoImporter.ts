@@ -23,7 +23,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         let ammoDatas: AmmoItemData[] = [];
         let jsonAmmos = jsonObject['gears']['gear'];
 
@@ -54,10 +54,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
-
-            // Translate Item Name
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Parse the item information from the xml
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
@@ -107,6 +104,10 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             // data.data.technology.conceal.base = ImportHelper.intValue(jsonData, "conceal");
             item.system.technology.conceal.base = 0;
 
+            // Translate Item Name
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             ammoDatas.push(item);

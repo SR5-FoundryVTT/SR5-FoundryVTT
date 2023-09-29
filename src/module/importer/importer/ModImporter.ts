@@ -25,7 +25,7 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
         this.accessoryTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponsi18n, 'accessories', 'accessory');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const parser = new ModParserBase();
         let datas: ModificationItemData[] = [];
         let jsonDatas = jsonObject['accessories']['accessory'];
@@ -64,11 +64,12 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
             }
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             datas.push(item);

@@ -29,7 +29,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
         this.nameTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, 'complexforms', 'complexform');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const parser = new ComplexFormParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
         let items: Shadowrun.ComplexFormItemData[] = [];
@@ -57,12 +57,13 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             item.system.importFlags.isFreshImport = true;
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // TODO: Follow ComplexFormParserBase approach.
             // Item name translation
             item.name = ImportHelper.MapNameToTranslation(this.nameTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);

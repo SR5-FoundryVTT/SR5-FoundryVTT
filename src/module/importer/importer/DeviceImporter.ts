@@ -22,7 +22,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
-    async ParseCommlinkDevices(commlinks, folder) {
+    async ParseCommlinkDevices(commlinks, folder, setIcons) {
         const entries = [];
 
         for (const commlink of commlinks) {
@@ -47,7 +47,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             item.system.importFlags.isFreshImport = true;
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
@@ -70,7 +70,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
         return entries;
     }
 
-    async ParseCyberdeckDevices(cyberdecks, folder) {
+    async ParseCyberdeckDevices(cyberdecks, folder, setIcons) {
         const items = [];
 
         for (const cyberdeck of cyberdecks) {
@@ -96,7 +96,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             item.system.importFlags.isFreshImport = true;
 
             // Default icon
-            item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
 
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;
@@ -138,7 +138,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
         return items;
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         let entries = [];
         const commlinks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Commlinks');
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
@@ -146,8 +146,8 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
         let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
         let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
 
-        entries = entries.concat(await this.ParseCommlinkDevices(commlinks, commlinksFolder));
-        entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder));
+        entries = entries.concat(await this.ParseCommlinkDevices(commlinks, commlinksFolder, setIcons));
+        entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder, setIcons));
 
         // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(entries)
