@@ -301,6 +301,7 @@
     "SR5.Device": "Device",
     "SR5.DeviceCatCommlink": "Commlink",
     "SR5.DeviceCatCyberdeck": "Cyberdeck",
+    "SR5.DeviceCatRCC": "Rigger Command Console",
     "SR5.DeviceType": "Type",
     "SR5.Dialogs": {
         "Common": {

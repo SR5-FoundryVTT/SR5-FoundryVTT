@@ -48,8 +48,7 @@ export class DeviceParser extends BaseGearParser {
 
         if (chummerGear.category === 'Rigger Command Consoles')
         {
-            // We are handling rccs as commlinks for the moment since we have no support for rigger command consoles yet.
-            parsedGear.system.category = 'commlink'; 
+            parsedGear.system.category = 'rcc';
         }
 
         return parsedGear;

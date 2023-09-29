@@ -179,6 +179,7 @@ export const SR5 = {
     deviceCategories: {
         commlink: 'SR5.DeviceCatCommlink',
         cyberdeck: 'SR5.DeviceCatCyberdeck',
+        rcc: 'SR5.DeviceCatRCC',
     },
 
     cyberwareGrades: {

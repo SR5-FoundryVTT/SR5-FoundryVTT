@@ -199,6 +199,12 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return deviceData.category === 'cyberdeck';
     }
 
+    isRCC(): boolean {
+        if (!this.isDevice()) return false;
+        const deviceData = this.getData() as DeviceData;
+        return deviceData.category === 'rcc';
+    }
+
     isCommlink(): boolean {
         if (!this.isDevice()) return false;
         const deviceData = this.getData() as DeviceData;
