@@ -73,9 +73,6 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             if (SR5.itemSubTypes.spell.includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
-            else {
-                let x = 0;
-            }
 
             // Default icon
             item.img = await this.iconAssign(item.system.importFlags, item.system);
