@@ -34,8 +34,8 @@ bioware/bioware.svg - Lorc - https://game-icons.net/1x1/lorc/beast-eye.html
 bioware/basic.svg - Delapouite - https://game-icons.net/1x1/delapouite/cryo-chamber.html
 bioware/bio-weapons.svg - Lorc - https://game-icons.net/1x1/lorc/biohazard.html
 bioware/biosculpting.svg - Lorc - https://game-icons.net/1x1/lorc/dna2.html
-bioware/chemical-gland-modifications.svg -
-bioware/complimentary-genetics.svg -
+bioware/chemical-gland-modifications.svg - lorc - https://game-icons.net/1x1/lorc/chemical-tank.html
+bioware/complimentary-genetics.svg - Lorc - https://game-icons.net/1x1/lorc/dna1.html
 bioware/cosmetic-bioware.svg -
 bioware/cultured.svg - Lorc - https://game-icons.net/1x1/lorc/internal-organ.html
 bioware/environmental-microadaptation.svg -
