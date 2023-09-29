@@ -111,14 +111,14 @@ equipment/electronic-accessories.svg -
 equipment/electronic-modification.svg -
 equipment/electronic-parts.svg -
 equipment/electronics-accessories.svg -
-equipment/entertainment.svg -
-equipment/explosives.svg -
+equipment/entertainment.svg - delapouite - https://game-icons.net/1x1/delapouite/joystick.html
+equipment/explosives.svg - lorc - https://game-icons.net/1x1/lorc/explosive-materials.html
 equipment/extraction-devices.svg -
 equipment/foci.svg -
-equipment/food.svg -
+equipment/food.svg - delapouite - https://game-icons.net/1x1/delapouite/pizza-slice.html
 equipment/formulae.svg -
 equipment/grapple-gun.svg -
-equipment/hard-nanoware.svg -
+equipment/hard-nanoware.svg - delapouite - https://game-icons.net/1x1/delapouite/nano-bot.html
 equipment/housewares.svg -
 equipment/id-credsticks.svg -
 equipment/magical-compounds.svg -
@@ -144,10 +144,10 @@ equipment/software.svg - shadows-eye - illustration
 equipment/software-tweaks.svg -
 equipment/survival-gear.svg -
 equipment/tailored-perfume-cologne.svg -
-equipment/tools.svg -
+equipment/tools.svg - delapouite - https://game-icons.net/1x1/delapouite/toolbox.html
 equipment/tools-of-the-trade.svg -
 equipment/toxins.svg -
-equipment/vision-devices.svg -
+equipment/vision-devices.svg - delapouite - https://game-icons.net/1x1/delapouite/binoculars.html
 equipment/vision-enhancements.svg -
 
 Host
@@ -197,35 +197,35 @@ weapon/melee.svg - Skoll - https://game-icons.net/1x1/skoll/spiked-bat.html
 weapon/range.svg - John Colburn - https://game-icons.net/1x1/john-colburn/pistol-gun.html
 weapon/thrown.svg - DarkZaitzev - https://game-icons.net/1x1/darkzaitzev/shuriken.html
 weapon/assault-cannons.svg -
-weapon/assault-rifles.svg -
+weapon/assault-rifles.svg - skoll - https://game-icons.net/1x1/skoll/thompson-m1928.html
 weapon/bio-weapon.svg -
-weapon/blades.svg -
-weapon/bows.svg -
+weapon/blades.svg - lorc - https://game-icons.net/1x1/lorc/sword-array.html
+weapon/bows.svg - delapouite - https://game-icons.net/1x1/delapouite/bow-arrow.html
 weapon/carbines.svg -
-weapon/clubs.svg -
-weapon/crossbows.svg -
+weapon/clubs.svg - delapouite - https://game-icons.net/1x1/delapouite/wood-club.html
+weapon/crossbows.svg - carl olsen - https://game-icons.net/1x1/carl-olsen/crossbow.html
 weapon/cyberweapon.svg -
 weapon/exotic-melee-weapons.svg -
 weapon/exotic-ranged-weapons.svg -
-weapon/flamethrowers.svg -
+weapon/flamethrowers.svg - delapouite - https://game-icons.net/1x1/delapouite/flamethrower.html
 weapon/gear.svg -
 weapon/grenade-launchers.svg -
 weapon/heavy-machine-guns.svg -
 weapon/heavy-pistols.svg -
 weapon/holdouts.svg -
 weapon/improvised-weapons.svg -
-weapon/laser-weapons.svg -
+weapon/laser-weapons.svg - 
 weapon/light-machine-guns.svg -
 weapon/light-pistols.svg -
-weapon/machine-pistols.svg -
+weapon/machine-pistols.svg - skoll - https://game-icons.net/1x1/skoll/tec-9.html
 weapon/medium-machine-guns.svg -
 weapon/micro-drone-weapons.svg -
 weapon/missile-launchers.svg -
 weapon/quality.svg -
 weapon/shotguns.svg -
-weapon/sniper-rifles.svg -
-weapon/sporting-rifles.svg -
-weapon/submachine-guns.svg -
+weapon/sniper-rifles.svg - skoll - https://game-icons.net/1x1/skoll/steyr-aug.html
+weapon/sporting-rifles.svg - skoll - https://game-icons.net/1x1/skoll/steyr-aug.html
+weapon/submachine-guns.svg - delapouite - https://game-icons.net/1x1/delapouite/mp5.html
 weapon/tasers.svg -
-weapon/unarmed.svg -
+weapon/unarmed.svg - delapouite - https://game-icons.net/1x1/delapouite/high-punch.html
 weapon/underbarrel-weapons'
