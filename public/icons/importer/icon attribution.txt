@@ -58,7 +58,9 @@ Contact
 contact.svg - Delapouite - https://game-icons.net/1x1/delapouite/discussion.html
 
 Critter Power
-critter_power.svg - Lorc - https://game-icons.net/1x1/lorc/moon-claws.html
+critter_power/critter_power.svg - Lorc - https://game-icons.net/1x1/lorc/moon-claws.html
+critter_power/mana.svg - Lorc - https://game-icons.net/1x1/lorc/kindle.html
+critter_power/physical.svg - Lorc - https://game-icons.net/1x1/lorc/moon-claws.html
 
 Cyberdeck
 cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
