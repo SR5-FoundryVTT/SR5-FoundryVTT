@@ -16,13 +16,12 @@
         1px 1px 0 $rollcolor;
 }
 
-@mixin nodesto {
-    font-family: $nodesto;
+@mixin systemFonts {
+    font-family: $systemFonts;
 }
 
 @mixin title {
-    font-size: 120%;
-    font-family: $nodesto;
+    font-family: $systemFonts;
     color: $color;
     @include textOutline;
 }

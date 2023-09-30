@@ -49,7 +49,7 @@
             }
         }
         .item-type {
-            @include nodesto;
+            @include systemFonts;
             flex: 0;
             padding: 0 0.5em;
             color: $color;
@@ -72,17 +72,8 @@
             }
         }
     }
-    .item-sidebar {
-        > * {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: space-between;
-        }        
-        min-width: fit-content;
-        padding: 0.5em 0.5em 0.5em 0.5em;
-    }
     .technology {
-        @include nodesto;
+        @include systemFonts;
         > * {
             display: flex;
             flex-flow: row nowrap;
@@ -126,7 +117,7 @@
             .label {
                 color: $light;
                 font-size: 1.15em;
-                @include nodesto;
+                @include systemFonts;
             }
             .inputs {
                 display: flex;

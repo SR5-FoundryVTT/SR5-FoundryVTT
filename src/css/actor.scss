@@ -23,7 +23,7 @@
     .name {
         margin-bottom: 0;
         font-size: 200%;
-        @include nodesto;
+        @include systemFonts;
     }
     .sheetbody {
         overflow: hidden;
@@ -177,7 +177,7 @@
         }
     }
     .limit {
-        @include nodesto;
+        @include systemFonts;
         padding: 0 0.1em;
         margin-top: -2px;
         text-align: center;
