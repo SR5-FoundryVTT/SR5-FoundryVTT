@@ -69,9 +69,34 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
 
     /**
      * Get the appropriate default icon
+     * @param importFlags The importFlags data of an item
+     * @param system The item's system data
      */
     public iconAssign(importFlags: Shadowrun.ImportFlagData, system: Object): Promise<string> {
         return IconAssign.iconAssign(importFlags, system);
+    }
+
+    /**
+     * Reformat the subtype's name so it matches the categories in config.ts
+     * @param name The item's subtype name
+     */
+    public formatSubtypeName(name: string): string {
+        return name.trim().toLowerCase().split((/-| |\//)).join('-');
+    }
+
+    /**
+     * Generate default import flags
+     * @param name The item's English name
+     * @param type The item's type
+     */
+    public genImportFlags(name: string, type: string): Shadowrun.ImportFlagData {
+        const flags = {
+            name: foundry.utils.deepClone(name), // original english name for matching to icons
+            type: type,
+            subType: '',
+            isFreshImport: true
+        }
+        return flags;
     }
 
     /**

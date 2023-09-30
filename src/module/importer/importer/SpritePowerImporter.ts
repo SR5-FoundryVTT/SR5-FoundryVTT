@@ -53,6 +53,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
 
         const items: Shadowrun.SpritePowerItemData[] = [];
         const chummerSpritePowers = this.filterObjects(chummerData['powers']['power']);
+        const parserType = 'sprite_power';
 
         for (const chummerSpritePower of chummerSpritePowers) {
 
@@ -62,15 +63,12 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
             }
 
             // Create the item
-            let item = parser.Parse(chummerSpritePower, this.GetDefaultData({type: 'sprite_power'}), this.itemTranslations);
+            let item = parser.Parse(chummerSpritePower, this.GetDefaultData({type: parserType}), this.itemTranslations);
             // @ts-ignore TODO: foundry-vtt-type v10
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Default icon
             if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);

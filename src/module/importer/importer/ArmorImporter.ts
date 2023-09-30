@@ -29,6 +29,7 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
         const parser = new ArmorParserBase();
         let datas: ArmorItemData[] = [];
         let jsonDatas = jsonObject['armors']['armor'];
+        const parserType = 'armor';
 
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
@@ -39,19 +40,16 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'armor'}));
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}));
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folders[category].id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
-            let subType = category.trim().split(' ').join('-');
-            if (SR5.itemSubTypes.armor.includes(subType)) {
+            let subType = this.formatSubtypeName(category);
+            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 

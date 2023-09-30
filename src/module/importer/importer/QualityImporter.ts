@@ -27,11 +27,11 @@ export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.Qua
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const jsonNameTranslations = {};
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
-
         const parser = new QualityParserBase();
-
         let items: QualityItemData[] = [];
         let jsonDatas = jsonObject['qualities']['quality'];
+        const parserType = 'quality';
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
@@ -41,19 +41,16 @@ export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.Qua
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'quality'}), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
             let category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folders[category].id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
-            let subType = category.trim().split(' ').join('-');
-            if (SR5.itemSubTypes.quality.includes(subType)) {
+            let subType = this.formatSubtypeName(category);
+            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 

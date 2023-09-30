@@ -33,6 +33,7 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
 
     async ParseEquipment(equipments, setIcons) {
         const items = [];
+        const parserType = 'equipment';
 
         for (const equipment of equipments) {
 
@@ -42,7 +43,7 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
             }
 
             // Create the item
-            const item = this.GetDefaultData({type: 'equipment'});
+            const item = this.GetDefaultData({type: parserType});
             item.name = ImportHelper.StringValue(equipment, 'name');
 
             // Get the equipment category
@@ -56,14 +57,11 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
             item.folder = categoryFolder.id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Add the subtype so the importer can add the correct icon
-            let subType = categoryEN.trim().toLowerCase().replace('/', ' ').split(' ').join('-');
-            if (SR5.itemSubTypes.equipment.includes(subType)) {
+            let subType = this.formatSubtypeName(categoryEN);
+            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 

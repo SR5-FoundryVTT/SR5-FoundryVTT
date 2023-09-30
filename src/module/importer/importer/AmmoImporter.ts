@@ -26,6 +26,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         let ammoDatas: AmmoItemData[] = [];
         let jsonAmmos = jsonObject['gears']['gear'];
+        const parserType = 'ammo';
 
         for (let i = 0; i < jsonAmmos.length; i++) {
             let jsonData = jsonAmmos[i];
@@ -39,17 +40,14 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             }
 
             // Create the item
-            let item = this.GetDefaultData({type: 'ammo'});
+            let item = this.GetDefaultData({type: parserType});
             item.name = ImportHelper.StringValue(jsonData, 'name');
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
-            let subType = item.system.importFlags.name.split(':')[0].trim().toLowerCase().split(' ').join('-');
-            if (SR5.itemSubTypes.ammo.includes(subType)) {
+            let subType = this.formatSubtypeName(item.system.importFlags.name.split(':')[0]);
+            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 

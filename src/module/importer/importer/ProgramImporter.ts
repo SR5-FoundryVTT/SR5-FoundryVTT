@@ -36,6 +36,7 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
 
     async parsePrograms(programs: object[], setIcons: boolean) {
         const items: ProgramItemData[] = [];
+        const parserType = 'program';
 
         for (const program of programs) {
 
@@ -43,7 +44,7 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
             if (DataImporter.unsupportedEntry(program)) continue;
 
             // Create the item
-            const item = this.GetDefaultData({type: 'program'});
+            const item = this.GetDefaultData({type: parserType});
             item.name = ImportHelper.StringValue(program, 'name');
             item.system.type = Constants.MAP_CHUMMER_PROGRAMM_CATEGORY[ImportHelper.StringValue(program, 'category')]
 
@@ -57,14 +58,11 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
             item.folder = categoryFolder.id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Add the subtype so the importer can add the correct icon
             let subType = item.system.type;
-            if (SR5.itemSubTypes.program.includes(subType)) {
+            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 

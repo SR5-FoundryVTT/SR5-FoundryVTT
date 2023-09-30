@@ -53,6 +53,7 @@ export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
         key = key.toLowerCase();
         let items: Ware[] = [];
         let jsonDatas = jsonObject[key + 's'][key];
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
@@ -70,14 +71,11 @@ export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
             item.folder = folders[category].id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Add the subtype so the importer can add the correct icon
-            let subType = category.trim().replace('/', ' ').split(' ').join('-');
-            if (SR5.itemSubTypes.cyberware.includes(subType) || SR5.itemSubTypes.bioware.includes(subType)) {
+            let subType = this.formatSubtypeName(category);
+            if (Object.keys(SR5.itemSubTypeIconOverrides.cyberware).includes(subType) || Object.keys(SR5.itemSubTypeIconOverrides.bioware).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 

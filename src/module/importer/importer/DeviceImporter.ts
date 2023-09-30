@@ -24,6 +24,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
 
     async ParseCommlinkDevices(commlinks, folder, setIcons) {
         const entries = [];
+        const parserType = 'device';
 
         for (const commlink of commlinks) {
 
@@ -33,7 +34,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             }
 
             // Create the item
-            const item = this.GetDefaultData({type: 'device'});
+            const item = this.GetDefaultData({type: parserType});
             item.name = ImportHelper.StringValue(commlink, 'name');
 
             // Get the item's folder information
@@ -41,10 +42,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.system.category;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.system.category);
 
             // Default icon
             if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
@@ -72,6 +70,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
 
     async ParseCyberdeckDevices(cyberdecks, folder, setIcons) {
         const items = [];
+        const parserType = 'device';
 
         for (const cyberdeck of cyberdecks) {
 
@@ -81,7 +80,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             }
 
             // Create the item
-            const item = this.GetDefaultData({type: 'device'});
+            const item = this.GetDefaultData({type: parserType});
             item.system.category = 'cyberdeck';
             item.name = ImportHelper.StringValue(cyberdeck, 'name');
 
@@ -90,10 +89,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.system.category;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.system.category);
 
             // Default icon
             if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);

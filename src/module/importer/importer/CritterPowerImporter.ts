@@ -30,9 +30,9 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
     async Parse(chummerPowers: object, setIcons: boolean): Promise<Item> {
         const parser = new CritterPowerParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('ITEM.TypeCritter_power')}`, true);
-
         const items: Shadowrun.CritterPowerItemData[] = [];
         const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
+        const parserType = 'critter_power';
 
         for (const chummerCritterPower of chummerCritterPowers) {
 
@@ -42,19 +42,16 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
             }
 
             // Create the item
-            const item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: 'critter_power'}), this.itemTranslations);
+            const item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: parserType}), this.itemTranslations);
             // @ts-ignore TODO: foundry-vtt-type v10
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Add the subtype so the importer can add the correct icon
             let subType = item.system.powerType;
-            if (SR5.itemSubTypes.critter_power.includes(subType)) {
+            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 

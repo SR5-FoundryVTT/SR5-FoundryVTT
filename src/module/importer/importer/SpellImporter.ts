@@ -49,6 +49,8 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
 
         let items: Shadowrun.SpellItemData[] = [];
         let jsonDatas = jsonObject['spells']['spell'];
+        const parserType = 'spell';
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
@@ -58,19 +60,16 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'spell'}), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.category].id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Add the subtype so the importer can add the correct icon
             let subType = item.system.category;
-            if (SR5.itemSubTypes.spell.includes(subType)) {
+            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 

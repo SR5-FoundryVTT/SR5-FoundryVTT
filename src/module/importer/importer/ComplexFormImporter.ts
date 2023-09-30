@@ -34,6 +34,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
         let items: Shadowrun.ComplexFormItemData[] = [];
         let jsonDatas = jsonObject['complexforms']['complexform'];
+        const parserType = 'complex_form';
 
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
@@ -44,17 +45,14 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'complex_form'}), this.nameTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.nameTranslations);
 
             // Get the item's folder information
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Default icon
             if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);

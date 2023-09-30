@@ -49,6 +49,8 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
 
         let items: WeaponItemData[] = [];
         let jsonDatas = jsonObject['weapons']['weapon'];
+        const parserType = 'weapon';
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
@@ -58,24 +60,21 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'weapon'}), this.itemTranslations);
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.subcategory].id;
 
             // Import Flags
-            item.system.importFlags.name = foundry.utils.deepClone(item.name); // original english name for matching to icons
-            item.system.importFlags.type = item.type;
-            item.system.importFlags.subType = '';
-            item.system.importFlags.isFreshImport = true;
+            item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             let subType = '';
             if (item.system.category) {
-                subType = item.system.category.trim().split(' ').join('-');
+                subType = this.formatSubtypeName(item.system.category);
             }
             if (item.system.subcategory) {
-                subType = item.system.subcategory.trim().split(' ').join('-');
+                subType = this.formatSubtypeName(item.system.subcategory);
             }
-            if (SR5.itemSubTypes.weapon.includes(subType)) {
+            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
 
