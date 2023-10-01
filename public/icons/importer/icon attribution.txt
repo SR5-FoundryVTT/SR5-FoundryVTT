@@ -31,25 +31,25 @@ armor/specialty-armor.svg - Delapouite - https://game-icons.net/1x1/delapouite/s
 
 Bioware
 bioware/bioware.svg - Lorc - https://game-icons.net/1x1/lorc/beast-eye.html
-bioware/basic.svg - Delapouite - https://game-icons.net/1x1/delapouite/cryo-chamber.html
+bioware/basic.svg -
 bioware/bio-weapons.svg - Lorc - https://game-icons.net/1x1/lorc/biohazard.html
 bioware/biosculpting.svg - Lorc - https://game-icons.net/1x1/lorc/dna2.html
-bioware/chemical-gland-modifications.svg - lorc - https://game-icons.net/1x1/lorc/chemical-tank.html
+bioware/chemical-gland-modifications.svg - Lorc - https://game-icons.net/1x1/lorc/chemical-tank.html
 bioware/complimentary-genetics.svg - Lorc - https://game-icons.net/1x1/lorc/dna1.html
-bioware/cosmetic-bioware.svg -
+bioware/cosmetic-bioware.svg - Delapouite - https://game-icons.net/1x1/delapouite/nose-side.html
 bioware/cultured.svg - Lorc - https://game-icons.net/1x1/lorc/internal-organ.html
-bioware/environmental-microadaptation.svg -
-bioware/exotic-metaglands.svg -
+bioware/environmental-microadaptation.svg - Delapouite - https://game-icons.net/1x1/delapouite/fish-monster.html
+bioware/exotic-metaglands.svg - Delapouite - https://game-icons.net/1x1/delapouite/kidneys.html
 bioware/genetic-restoration.svg - Delapouite - https://game-icons.net/1x1/delapouite/remedy.html
 bioware/immunization.svg - Delapouite - https://game-icons.net/1x1/delapouite/eternal-love.html
 bioware/orthoskin-upgrades.svg - Lorc - https://game-icons.net/1x1/lorc/scale-mail.html
 bioware/phenotype-adjustment.svg -
-bioware/symbionts.svg - Lorc - https://game-icons.net/1x1/lorc/internal-organ.html
-bioware/transgenic-alteration.svg - Lorc - https://game-icons.net/1x1/lorc/dna1.html
-bioware/transgenics.svg - 
+bioware/symbionts.svg -
+bioware/transgenic-alteration.svg -
+bioware/transgenics.svg - Lorc - https://game-icons.net/1x1/lorc/dna1.html
 
 Commlink
-commlink.svg - Skoll - https://game-icons.net/1x1/skoll/smartphone.html
+commlink.svg -
 
 Complex Form
 complex_form.svg - Lorc - https://game-icons.net/1x1/lorc/cogsplosion.html
@@ -60,28 +60,28 @@ contact.svg - Delapouite - https://game-icons.net/1x1/delapouite/discussion.html
 Critter Power
 critter_power/critter_power.svg - Lorc - https://game-icons.net/1x1/lorc/moon-claws.html
 critter_power/mana.svg - Lorc - https://game-icons.net/1x1/lorc/kindle.html
-critter_power/physical.svg - Lorc - https://game-icons.net/1x1/lorc/moon-claws.html
+critter_power/physical.svg -
 
 Cyberdeck
 cyberdeck.svg - Delapouite - https://game-icons.net/1x1/delapouite/musical-keyboard.html
 
 Cyberware
 cyberware/cyberware.svg - Delapouite - https://game-icons.net/1x1/delapouite/cyborg-face.html
-cyberware/auto-injector-mods.svg -
-cyberware/bodyware.svg - 
+cyberware/auto-injector-mods.svg - Lorc - https://game-icons.net/1x1/lorc/triple-needle.html
+cyberware/bodyware.svg - Lorc - https://game-icons.net/1x1/lorc/techno-heart.html
 cyberware/cosmetic-enhancement.svg -
-cyberware/cyber-implant-weapon.svg -
-cyberware/cyber-implant-weapon-accessory.svg -
-cyberware/cyberlimb.svg -
-cyberware/cyberlimb-accessory.svg -
-cyberware/cyberlimb-enhancement.svg -
-cyberware/cybersuite.svg -
-cyberware/earware.svg - delapouite - https://game-icons.net/1x1/delapouite/human-ear.html
-cyberware/eyeware.svg - delapouite - https://game-icons.net/1x1/delapouite/cyber-eye.html
-cyberware/hard-nanoware.svg - delapouite - https://game-icons.net/1x1/delapouite/nano-bot.html
-cyberware/headware.svg - Delapouite - https://game-icons.net/1x1/delapouite/cyborg-face.html
+cyberware/cyber-implant-weapon.svg - Delapouite - https://game-icons.net/1x1/delapouite/wolverine-claws.html
+cyberware/cyber-implant-weapon-accessory.svg - Delapouite - https://game-icons.net/1x1/delapouite/wolverine-claws.html
+cyberware/cyberlimb.svg - Delapouite - https://game-icons.net/1x1/delapouite/robot-leg.html
+cyberware/cyberlimb-accessory.svg - Delapouite - https://game-icons.net/1x1/delapouite/robot-leg.html
+cyberware/cyberlimb-enhancement.svg - Delapouite - https://game-icons.net/1x1/delapouite/robot-leg.html
+cyberware/cybersuite.svg - Delapouite - https://game-icons.net/1x1/delapouite/battle-mech.html
+cyberware/earware.svg - Delapouite - https://game-icons.net/1x1/delapouite/human-ear.html
+cyberware/eyeware.svg - Delapouite - https://game-icons.net/1x1/delapouite/cyber-eye.html
+cyberware/hard-nanoware.svg - Delapouite - https://game-icons.net/1x1/delapouite/nano-bot.html
+cyberware/headware.svg -
 cyberware/nanocybernetics.svg -
-cyberware/soft-nanoware.svg - delapouite - https://game-icons.net/1x1/delapouite/nano-bot.html
+cyberware/soft-nanoware.svg -
 cyberware/special-biodrone-cyberware.svg -
 
 Device
@@ -89,72 +89,72 @@ device/device.svg - Skoll - https://game-icons.net/1x1/skoll/smartphone.html
 
 Equipment
 equipment.svg - Delapouite - https://game-icons.net/1x1/delapouite/briefcase.html
-equipment/alchemical-tools.svg -
-equipment/appearance-modification.svg -
-equipment/armor-enhancements.svg -
-equipment/audio-devices.svg - delapouite - https://game-icons.net/1x1/delapouite/boombox.html
-equipment/audio-enhancements.svg - delapouite - https://game-icons.net/1x1/delapouite/old-microphone.html
+equipment/alchemical-tools.svg - Lorc - https://game-icons.net/1x1/lorc/test-tubes.html
+equipment/appearance-modification.svg - Caro Asercion - https://game-icons.net/1x1/caro-asercion/prank-glasses.html
+equipment/armor-enhancements.svg - Skoll - https://game-icons.net/1x1/skoll/kevlar-vest.html
+equipment/audio-devices.svg - Delapouite - https://game-icons.net/1x1/delapouite/boombox.html
+equipment/audio-enhancements.svg - Delapouite - https://game-icons.net/1x1/delapouite/old-microphone.html
 equipment/autosofts.svg -
-equipment/biotech.svg - delapouite - https://game-icons.net/1x1/delapouite/cryo-chamber.html
-equipment/booster-chips.svg -
-equipment/breaking-and-entering-gear.svg - delapouite - https://game-icons.net/1x1/delapouite/lock-picking.html
-equipment/btls.svg - lorc - https://game-icons.net/1x1/lorc/microchip.html
-equipment/chemicals.svg - lorc - https://game-icons.net/1x1/lorc/dripping-tube.html
-equipment/commlink-accessories.svg -
+equipment/biotech.svg - Delapouite - https://game-icons.net/1x1/delapouite/cryo-chamber.html
+ equipment/booster-chips.svg -
+equipment/breaking-and-entering-gear.svg - Delapouite - https://game-icons.net/1x1/delapouite/lock-picking.html
+equipment/btls.svg - Lorc - https://game-icons.net/1x1/lorc/microchip.html
+equipment/chemicals.svg - Lorc - https://game-icons.net/1x1/lorc/dripping-tube.html
+ equipment/commlink-accessories.svg -
 equipment/commlink-apps.svg -
-equipment/commlink-cyberdeck-form-factors.svg -
+ equipment/commlink-cyberdeck-form-factors.svg -
 equipment/communications-and-countermeasures.svg -
-equipment/contracts-upkeep.svg -
-equipment/critter-gear.svg -
-equipment/currency.svg -
-equipment/custom-cyberdeck-attributes.svg -
-equipment/cyberdeck-modules.svg -
+ equipment/contracts-upkeep.svg -
+ equipment/critter-gear.svg -
+equipment/currency.svg - Delapouite - https://game-icons.net/1x1/delapouite/banknote.html
+ equipment/custom-cyberdeck-attributes.svg -
+ equipment/cyberdeck-modules.svg -
 equipment/cyberterminals.svg -
 equipment/disguises.svg -
-equipment/drug-grades.svg -
-equipment/drugs.svg -
-equipment/electronic-accessories.svg -
-equipment/electronic-modification.svg -
-equipment/electronic-parts.svg -
-equipment/electronics-accessories.svg -
-equipment/entertainment.svg - delapouite - https://game-icons.net/1x1/delapouite/joystick.html
-equipment/explosives.svg - lorc - https://game-icons.net/1x1/lorc/explosive-materials.html
-equipment/extraction-devices.svg -
-equipment/foci.svg -
-equipment/food.svg - delapouite - https://game-icons.net/1x1/delapouite/pizza-slice.html
-equipment/formulae.svg -
-equipment/grapple-gun.svg -
-equipment/hard-nanoware.svg - delapouite - https://game-icons.net/1x1/delapouite/nano-bot.html
-equipment/housewares.svg -
-equipment/id-credsticks.svg -
-equipment/magical-compounds.svg -
-equipment/magical-supplies.svg -
-equipment/matrix-accessories.svg -
-equipment/metatype-specific.svg -
+equipment/drug-grades.svg - Lorc - https://game-icons.net/1x1/lorc/overdose.html
+equipment/drugs.svg - Lorc - https://game-icons.net/1x1/lorc/overdose.html
+ equipment/electronic-accessories.svg -
+ equipment/electronic-modification.svg -
+ equipment/electronic-parts.svg -
+ equipment/electronics-accessories.svg -
+equipment/entertainment.svg - Delapouite - https://game-icons.net/1x1/delapouite/joystick.html
+equipment/explosives.svg - Lorc - https://game-icons.net/1x1/lorc/explosive-materials.html
+ equipment/extraction-devices.svg -
+equipment/foci.svg - Willdabeast - https://game-icons.net/1x1/willdabeast/orb-wand.html
+equipment/food.svg - Delapouite - https://game-icons.net/1x1/delapouite/pizza-slice.html
+ equipment/formulae.svg -
+equipment/grapple-gun.svg - Lorc - https://game-icons.net/1x1/lorc/grapple.html
+equipment/hard-nanoware.svg -
+ equipment/housewares.svg -
+ equipment/id-credsticks.svg -
+ equipment/magical-compounds.svg -
+ equipment/magical-supplies.svg -
+ equipment/matrix-accessories.svg -
+ equipment/metatype-specific.svg -
 equipment/miscellany.svg -
-equipment/musical-instruments.svg -
+ equipment/musical-instruments.svg -
 equipment/nanogear.svg -
 equipment/paydata.svg - shadows-eye - cc
-equipment/pi-tac.svg -
+equipment/pi-tac.svg - Delapouite - https://game-icons.net/1x1/delapouite/wifi-router.html
 equipment/pi-tac-programs.svg -
-equipment/printing.svg -
-equipment/reporter-gear.svg -
+ equipment/printing.svg -
+ equipment/reporter-gear.svg -
 equipment/rfid-tags.svg -
-equipment/security-devices.svg -
-equipment/sensor-functions.svg -
-equipment/sensor-housings.svg -
+ equipment/security-devices.svg -
+ equipment/sensor-functions.svg -
+ equipment/sensor-housings.svg -
 equipment/sensors.svg -
 equipment/services.svg -
 equipment/skillsofts.svg -
 equipment/software.svg - shadows-eye - illustration
 equipment/software-tweaks.svg -
-equipment/survival-gear.svg -
-equipment/tailored-perfume-cologne.svg -
-equipment/tools.svg - delapouite - https://game-icons.net/1x1/delapouite/toolbox.html
-equipment/tools-of-the-trade.svg -
-equipment/toxins.svg -
-equipment/vision-devices.svg - delapouite - https://game-icons.net/1x1/delapouite/binoculars.html
-equipment/vision-enhancements.svg -
+equipment/survival-gear.svg - Delapouite - https://game-icons.net/1x1/delapouite/swiss-army-knife.html
+equipment/tailored-perfume-cologne.svg - Lorc - https://game-icons.net/1x1/lorc/perfume-bottle.html
+equipment/tools.svg - Delapouite - https://game-icons.net/1x1/delapouite/toolbox.html
+equipment/tools-of-the-trade.svg - Delapouite - https://game-icons.net/1x1/delapouite/lockpicks.html
+equipment/toxins.svg - Lorc - https://game-icons.net/1x1/lorc/poison-bottle.html
+equipment/vision-devices.svg - Delapouite - https://game-icons.net/1x1/delapouite/binoculars.html
+equipment/vision-enhancements.svg - Delapouite - https://game-icons.net/1x1/delapouite/vr-headset.html
 
 Host
 host.svg - Delapouite - https://game-icons.net/1x1/delapouite/server-rack.html
@@ -164,17 +164,17 @@ lifestyle.svg - Delapouite - https://game-icons.net/1x1/delapouite/family-house.
 
 Modification
 modification/modification.svg - Skoll - https://game-icons.net/1x1/skoll/bayonet.html
-modification/barrel.svg -
-modification/other.svg -
-modification/side.svg -
-modification/stock.svg -
-modification/top.svg -
+modification/barrel.svg - Lorc - https://game-icons.net/1x1/lorc/gunshot.html
+ modification/other.svg -
+ modification/side.svg -
+modification/stock.svg - Delapouite - https://game-icons.net/1x1/delapouite/gun-stock.html
+ modification/top.svg -
 modification/under.svg -
 
 Program
 program/program.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
-program/common_programs.svg -
-program/hacking_programs.svg -
+ program/common_programs.svg -
+ program/hacking_programs.svg -
 
 Quality
 quality/quality.svg - Lorc - https://game-icons.net/1x1/lorc/anatomy.html
@@ -186,13 +186,13 @@ sin.svg - Lord Berandas - https://game-icons.net/1x1/lord-berandas/computing.htm
 
 Spell
 spell/spell.svg - Delapouite - https://game-icons.net/1x1/delapouite/spell-book.html
-spell/combat.svg -
-spell/detection.svg -
-spell/enchantments.svg -
-spell/health.svg -
-spell/illusion.svg -
-spell/manipulation.svg -
-spell/rituals.svg -
+ spell/combat.svg -
+ spell/detection.svg -
+ spell/enchantments.svg -
+ spell/health.svg -
+ spell/illusion.svg -
+ spell/manipulation.svg -
+ spell/rituals.svg -
 
 Sprite Power
 sprite_power.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
@@ -202,36 +202,36 @@ weapon/weapon.svg - Delapouite - https://game-icons.net/1x1/delapouite/saber-and
 weapon/melee.svg - Skoll - https://game-icons.net/1x1/skoll/spiked-bat.html
 weapon/range.svg - John Colburn - https://game-icons.net/1x1/john-colburn/pistol-gun.html
 weapon/thrown.svg - DarkZaitzev - https://game-icons.net/1x1/darkzaitzev/shuriken.html
-weapon/assault-cannons.svg -
-weapon/assault-rifles.svg - skoll - https://game-icons.net/1x1/skoll/thompson-m1928.html
+weapon/assault-cannons.svg - Lorc - https://game-icons.net/1x1/lorc/minigun.html
+weapon/assault-rifles.svg - Skoll - https://game-icons.net/1x1/skoll/thompson-m1928.html
 weapon/bio-weapon.svg -
-weapon/blades.svg - lorc - https://game-icons.net/1x1/lorc/sword-array.html
-weapon/bows.svg - delapouite - https://game-icons.net/1x1/delapouite/bow-arrow.html
-weapon/carbines.svg -
-weapon/clubs.svg - delapouite - https://game-icons.net/1x1/delapouite/wood-club.html
-weapon/crossbows.svg - carl olsen - https://game-icons.net/1x1/carl-olsen/crossbow.html
+weapon/blades.svg - Lorc - https://game-icons.net/1x1/lorc/sword-array.html
+weapon/bows.svg - Delapouite - https://game-icons.net/1x1/delapouite/bow-arrow.html
+weapon/carbines.svg - Skoll - https://game-icons.net/1x1/skoll/winchester-rifle.html
+weapon/clubs.svg - Delapouite - https://game-icons.net/1x1/delapouite/wood-club.html
+weapon/crossbows.svg - Carl Olsen - https://game-icons.net/1x1/carl-olsen/crossbow.html
 weapon/cyberweapon.svg -
-weapon/exotic-melee-weapons.svg -
-weapon/exotic-ranged-weapons.svg -
-weapon/flamethrowers.svg - delapouite - https://game-icons.net/1x1/delapouite/flamethrower.html
+weapon/exotic-melee-weapons.svg - Delapouite - https://game-icons.net/1x1/delapouite/glaive.html
+weapon/exotic-ranged-weapons.svg - Delapouite - https://game-icons.net/1x1/delapouite/zat-gun.html
+weapon/flamethrowers.svg - Delapouite - https://game-icons.net/1x1/delapouite/flamethrower.html
 weapon/gear.svg -
-weapon/grenade-launchers.svg -
+weapon/grenade-launchers.svg - Delapouite - https://game-icons.net/1x1/delapouite/mortar.html
 weapon/heavy-machine-guns.svg -
-weapon/heavy-pistols.svg -
-weapon/holdouts.svg -
-weapon/improvised-weapons.svg -
-weapon/laser-weapons.svg - 
+weapon/heavy-pistols.svg - Skoll - https://game-icons.net/1x1/skoll/desert-eagle.html
+weapon/holdouts.svg - Skoll - https://game-icons.net/1x1/skoll/walther-ppk.html
+weapon/improvised-weapons.svg - Lorc - https://game-icons.net/1x1/lorc/broken-bottle.html
+weapon/laser-weapons.svg - Lorc - https://game-icons.net/1x1/lorc/laser-blast.html
 weapon/light-machine-guns.svg -
-weapon/light-pistols.svg -
-weapon/machine-pistols.svg - skoll - https://game-icons.net/1x1/skoll/tec-9.html
+weapon/light-pistols.svg - Skoll - https://game-icons.net/1x1/skoll/glock.html
+weapon/machine-pistols.svg - Skoll - https://game-icons.net/1x1/skoll/tec-9.html
 weapon/medium-machine-guns.svg -
-weapon/micro-drone-weapons.svg -
-weapon/missile-launchers.svg -
+weapon/micro-drone-weapons.svg - Delapouite - https://game-icons.net/1x1/delapouite/delivery-drone.html
+weapon/missile-launchers.svg - Delapouite - https://game-icons.net/1x1/delapouite/missile-launcher.html
 weapon/quality.svg -
-weapon/shotguns.svg -
-weapon/sniper-rifles.svg - skoll - https://game-icons.net/1x1/skoll/steyr-aug.html
-weapon/sporting-rifles.svg - skoll - https://game-icons.net/1x1/skoll/steyr-aug.html
-weapon/submachine-guns.svg - delapouite - https://game-icons.net/1x1/delapouite/mp5.html
-weapon/tasers.svg -
-weapon/unarmed.svg - delapouite - https://game-icons.net/1x1/delapouite/high-punch.html
-weapon/underbarrel-weapons'
+weapon/shotguns.svg - Delapouite - https://game-icons.net/1x1/delapouite/sawed-off-shotgun.html
+weapon/sniper-rifles.svg - Skoll - https://game-icons.net/1x1/skoll/steyr-aug.html
+weapon/sporting-rifles.svg -
+weapon/submachine-guns.svg - Delapouite - https://game-icons.net/1x1/delapouite/mp5.html
+weapon/tasers.svg - Lorc - https://game-icons.net/1x1/lorc/bolter-gun.html
+weapon/unarmed.svg - Delapouite - https://game-icons.net/1x1/delapouite/high-punch.html
+weapon/underbarrel-weapons -
