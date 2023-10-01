@@ -1,14 +1,12 @@
 import { ImportHelper } from "../helper/ImportHelper";
 import { DataImporter } from "./DataImporter";
-
-import ProgramItemData = Shadowrun.ProgramItemData;
 import { Constants } from './Constants';
 import { SR5 } from "../../config";
 
 /**
  * Programs are part of the Chummer5 gear.xml
  */
-export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.ProgramData> {
+export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Shadowrun.ProgramData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
@@ -35,7 +33,8 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
     }
 
     async parsePrograms(programs: object[], setIcons: boolean) {
-        const items: ProgramItemData[] = [];
+        const items: Shadowrun.ProgramItemData[] = [];
+        this.iconList = await this.getIconFiles();
         const parserType = 'program';
 
         for (const program of programs) {
@@ -67,7 +66,7 @@ export class ProgramImporter extends DataImporter<ProgramItemData, Shadowrun.Pro
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Finish the importing
             item.system.technology.rating = ImportHelper.IntValue(program, 'rating', 0);

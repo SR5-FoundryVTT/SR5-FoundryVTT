@@ -2,11 +2,10 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ModParserBase } from '../parser/mod/ModParserBase';
-import ModificationItemData = Shadowrun.ModificationItemData;
-import {Helpers} from "../../helpers";
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
 
-export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.ModificationData> {
+export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Shadowrun.ModificationData> {
     public override categoryTranslations: any;
     public accessoryTranslations: any;
     public files = ['weapons.xml'];
@@ -27,9 +26,9 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const parser = new ModParserBase();
-        let datas: ModificationItemData[] = [];
+        let datas: Shadowrun.ModificationItemData[] = [];
         let jsonDatas = jsonObject['accessories']['accessory'];
-        this.iconList = await this.getIconFiles()
+        this.iconList = await this.getIconFiles();
         const parserType = 'modification';
 
         for (let i = 0; i < jsonDatas.length; i++) {

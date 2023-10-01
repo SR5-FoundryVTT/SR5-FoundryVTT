@@ -1,8 +1,8 @@
-import {DataImporter} from './DataImporter';
-import {ImportHelper} from '../helper/ImportHelper';
-import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParserBase';
-import {Constants} from './Constants';
-import {Helpers} from "../../helpers";
+import { DataImporter } from './DataImporter';
+import { ImportHelper } from '../helper/ImportHelper';
+import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
+import { Constants } from './Constants';
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
 
 export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
@@ -32,6 +32,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('ITEM.TypeCritter_power')}`, true);
         const items: Shadowrun.CritterPowerItemData[] = [];
         const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
+        this.iconList = await this.getIconFiles();
         const parserType = 'critter_power';
 
         for (const chummerCritterPower of chummerCritterPowers) {
@@ -56,7 +57,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

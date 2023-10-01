@@ -1,8 +1,8 @@
 import { SpritePowerParser } from './../parser/critter-power/SpritePowerParser';
-import { Helpers } from "../../helpers";
 import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { DataImporter } from "./DataImporter";
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
 
 
@@ -53,6 +53,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
 
         const items: Shadowrun.SpritePowerItemData[] = [];
         const chummerSpritePowers = this.filterObjects(chummerData['powers']['power']);
+        this.iconList = await this.getIconFiles();
         const parserType = 'sprite_power';
 
         for (const chummerSpritePower of chummerSpritePowers) {
@@ -71,7 +72,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
             item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

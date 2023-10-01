@@ -1,13 +1,14 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { CyberwareParser } from '../parser/ware/CyberwareParser';
-import {Helpers} from "../../helpers";
-import Ware = Shadowrun.WareItemData;
+import { Helpers } from "../../helpers";
+import { SR5 } from "../../config";
+import WareData = Shadowrun.WareData
+import WareItemData = Shadowrun.WareItemData;
 import CyberwareItemData = Shadowrun.CyberwareItemData;
 import BiowareItemData = Shadowrun.BiowareItemData;
-import { SR5 } from "../../config";
 
-export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
+export class WareImporter extends DataImporter<WareItemData, WareData> {
     public override categoryTranslations: any;
     public override itemTranslations: any;
     public files = ['cyberware.xml', 'bioware.xml'];
@@ -51,8 +52,10 @@ export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, key);
 
         key = key.toLowerCase();
-        let items: Ware[] = [];
+        let items: WareItemData[] = [];
         let jsonDatas = jsonObject[key + 's'][key];
+
+        this.iconList = await this.getIconFiles();
 
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
@@ -80,7 +83,7 @@ export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

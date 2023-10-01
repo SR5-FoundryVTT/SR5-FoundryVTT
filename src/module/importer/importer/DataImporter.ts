@@ -1,6 +1,7 @@
 import { DataDefaults } from './../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
 import * as IconAssign from '../../apps/iconAssigner/iconAssign';
+import { SR5 } from "../../config";
 
 const xml2js = require('xml2js');
 
@@ -16,6 +17,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
     public itemTranslations: any;
     public static unsupportedBooks: string[] = ['2050'];
     public iconList: string[];
+    public static SR5: object = SR5;
 
     // Used to filter down a files entries based on category.
     // See filterObjects for use.

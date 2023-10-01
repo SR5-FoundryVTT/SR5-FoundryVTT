@@ -6,8 +6,8 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
-import {Helpers} from "../../helpers";
 import { DataDefaults } from '../../data/DataDefaults';
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
 
 export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowrun.SpellData> {
@@ -49,6 +49,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
 
         let items: Shadowrun.SpellItemData[] = [];
         let jsonDatas = jsonObject['spells']['spell'];
+        this.iconList = await this.getIconFiles();
         const parserType = 'spell';
 
         for (let i = 0; i < jsonDatas.length; i++) {
@@ -74,7 +75,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

@@ -1,11 +1,10 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
-import QualityItemData = Shadowrun.QualityItemData;
-import {Helpers} from "../../helpers";
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
 
-export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.QualityData> {
+export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Shadowrun.QualityData> {
     public override categoryTranslations: any;
     public override itemTranslations: any;
     public files = ['qualities.xml'];
@@ -28,8 +27,9 @@ export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.Qua
         const jsonNameTranslations = {};
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
         const parser = new QualityParserBase();
-        let items: QualityItemData[] = [];
+        let items: Shadowrun.QualityItemData[] = [];
         let jsonDatas = jsonObject['qualities']['quality'];
+        this.iconList = await this.getIconFiles();
         const parserType = 'quality';
 
         for (let i = 0; i < jsonDatas.length; i++) {
@@ -55,7 +55,7 @@ export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.Qua
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Translate the name
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

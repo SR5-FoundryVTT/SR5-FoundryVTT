@@ -2,8 +2,9 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
-import {Helpers} from "../../helpers";
 import { DataDefaults } from '../../data/DataDefaults';
+import { Helpers } from "../../helpers";
+import { SR5 } from "../../config";
 
 export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData> {
     public override categoryTranslations: any;
@@ -34,6 +35,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
         let items: Shadowrun.ComplexFormItemData[] = [];
         let jsonDatas = jsonObject['complexforms']['complexform'];
+        this.iconList = await this.getIconFiles();
         const parserType = 'complex_form';
 
         for (let i = 0; i < jsonDatas.length; i++) {
@@ -55,7 +57,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // TODO: Follow ComplexFormParserBase approach.
             // Item name translation

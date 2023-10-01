@@ -1,12 +1,10 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
-import WeaponData = Shadowrun.WeaponData;
-import AmmoItemData = Shadowrun.AmmoItemData;
-import {Helpers} from "../../helpers";
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
 
-export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData> {
+export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun.AmmoData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
@@ -24,8 +22,9 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        let ammoDatas: AmmoItemData[] = [];
+        let ammoDatas: Shadowrun.AmmoItemData[] = [];
         let jsonAmmos = jsonObject['gears']['gear'];
+        this.iconList = await this.getIconFiles();
         const parserType = 'ammo';
 
         for (let i = 0; i < jsonAmmos.length; i++) {
@@ -52,7 +51,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Parse the item information from the xml
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
@@ -92,7 +91,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
                 });
 
                 if (foundWeapon != null && "action" in foundWeapon.data.data) {
-                    const weaponData = foundWeapon.data.data as WeaponData;
+                    const weaponData = foundWeapon.data.data as Shadowrun.WeaponData;
                     item.system.damage = weaponData.action.damage.value;
                     item.system.ap =weaponData.action.damage.ap.value;
                 }

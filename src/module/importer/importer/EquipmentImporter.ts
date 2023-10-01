@@ -1,11 +1,10 @@
-import {DataImporter} from "./DataImporter";
-import {ImportHelper} from "../helper/ImportHelper";
-import {Constants} from "./Constants";
-import EquipmentItemData = Shadowrun.EquipmentItemData;
-import {Helpers} from "../../helpers";
+import { DataImporter } from "./DataImporter";
+import { ImportHelper } from "../helper/ImportHelper";
+import { Constants } from "./Constants";
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
 
-export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun.EquipmentData> {
+export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData, Shadowrun.EquipmentData> {
     files = ['gear.xml'];
     override unsupportedCategories = [
         'Ammunition',
@@ -33,6 +32,7 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
 
     async ParseEquipment(equipments, setIcons) {
         const items = [];
+        this.iconList = await this.getIconFiles();
         const parserType = 'equipment';
 
         for (const equipment of equipments) {
@@ -66,7 +66,7 @@ export class EquipmentImporter extends DataImporter<EquipmentItemData, Shadowrun
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;

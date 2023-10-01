@@ -1,11 +1,10 @@
-import {DataImporter} from "./DataImporter";
-import {ImportHelper} from "../helper/ImportHelper";
-import {Constants} from "./Constants";
-import DeviceItemData = Shadowrun.DeviceItemData;
-import {Helpers} from "../../helpers";
+import { DataImporter } from "./DataImporter";
+import { ImportHelper } from "../helper/ImportHelper";
+import { Constants } from "./Constants";
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
 
-export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.DeviceData> {
+export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shadowrun.DeviceData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
@@ -24,6 +23,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
 
     async ParseCommlinkDevices(commlinks, folder, setIcons) {
         const entries = [];
+        this.iconList = await this.getIconFiles();
         const parserType = 'device';
 
         for (const commlink of commlinks) {
@@ -45,7 +45,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             item.system.importFlags = this.genImportFlags(item.name, item.system.category);
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
@@ -70,6 +70,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
 
     async ParseCyberdeckDevices(cyberdecks, folder, setIcons) {
         const items = [];
+        this.iconList = await this.getIconFiles();
         const parserType = 'device';
 
         for (const cyberdeck of cyberdecks) {
@@ -92,7 +93,7 @@ export class DeviceImporter extends DataImporter<DeviceItemData, Shadowrun.Devic
             item.system.importFlags = this.genImportFlags(item.name, item.system.category);
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;

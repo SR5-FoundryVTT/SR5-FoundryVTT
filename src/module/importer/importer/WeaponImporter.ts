@@ -6,12 +6,13 @@ import { MeleeParser } from '../parser/weapon/MeleeParser';
 import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { ParserMap } from '../parser/ParserMap';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
-import WeaponItemData = Shadowrun.WeaponItemData;
-import {Helpers} from "../../helpers";
 import { DataDefaults } from '../../data/DataDefaults';
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
+import WeaponItemData = Shadowrun.WeaponItemData;
+import WeaponData = Shadowrun.WeaponData;
 
-export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.WeaponData> {
+export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
     public override categoryTranslations: any;
     public override itemTranslations: any;
     public files = ['weapons.xml'];
@@ -21,8 +22,8 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
     }
 
     public override GetDefaultData({ type }: { type: any; }): WeaponItemData {
-        const systemData = {action: {type: 'varies', attribute: 'agility'}} as Shadowrun.WeaponData;
-        return DataDefaults.baseItemData<Shadowrun.WeaponItemData, Shadowrun.WeaponData>({type}, systemData);
+        const systemData = {action: {type: 'varies', attribute: 'agility'}} as WeaponData;
+        return DataDefaults.baseItemData<WeaponItemData, WeaponData>({type}, systemData);
     }
 
     ExtractTranslation() {
@@ -49,6 +50,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
 
         let items: WeaponItemData[] = [];
         let jsonDatas = jsonObject['weapons']['weapon'];
+        this.iconList = await this.getIconFiles();
         const parserType = 'weapon';
 
         for (let i = 0; i < jsonDatas.length; i++) {
@@ -79,7 +81,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);

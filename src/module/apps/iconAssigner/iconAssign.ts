@@ -24,8 +24,13 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
     const imgType = importFlags.type;
     const imgSubType = importFlags.subType;
 
+    // Get the override, if any
+    let override = ''
+    if (imgSubType) override = SR5.itemSubTypeIconOverrides[imgType][imgSubType];
+
     // Priority of file names to check
     let fileNamePriority = [
+        override,
         imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension,
         imgFolder + imgType + '/' + imgType + imgExtension
     ]
@@ -37,6 +42,7 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
 
         case 'weapon':
             fileNamePriority = [
+                override,
                 imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension,
                 imgFolder + imgType + '/' + system.category + imgExtension,
                 imgFolder + imgType + '/' + imgType + imgExtension

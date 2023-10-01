@@ -1,11 +1,10 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
-import ArmorItemData = Shadowrun.ArmorItemData;
-import {Helpers} from "../../helpers";
+import { Helpers } from "../../helpers";
 import { SR5 } from "../../config";
 
-export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorData> {
+export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowrun.ArmorData> {
     public armorTranslations: any;
     public override categoryTranslations: any;
     public files = ['armor.xml'];
@@ -27,8 +26,9 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Armor', this.categoryTranslations);
         const parser = new ArmorParserBase();
-        let datas: ArmorItemData[] = [];
+        let datas: Shadowrun.ArmorItemData[] = [];
         let jsonDatas = jsonObject['armors']['armor'];
+        this.iconList = await this.getIconFiles();
         const parserType = 'armor';
 
         for (let i = 0; i < jsonDatas.length; i++) {
@@ -54,7 +54,7 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Translate the name
             item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
