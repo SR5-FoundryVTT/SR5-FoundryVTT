@@ -15,7 +15,7 @@ function mockXmlData(data: object): object {
             [key, { '_TEXT': value }]));
 }
 
-function getData(damageString: string, apString?: string): object {
+function getData(damageString: string): object {
     return mockXmlData({
         damage: damageString,
     });
@@ -41,6 +41,7 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
                 },
             }));
         });
+
         it("Parses elemental damage", () => {
             const output = mut.GetDamage(getData("8S(e)"));
             assert.deepEqual(output, DataDefaults.damageData({
@@ -56,6 +57,7 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
                 },
             }));
         });
+
         it("Parses strength-based damage", () => {
             const output = mut.GetDamage(getData("({STR}+3)P"));
             assert.deepEqual(output, DataDefaults.damageData({
@@ -68,6 +70,43 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
                 attribute: 'strength',
             }));
         });
+
+        it("Parses damage without type as physical", () => {
+            const output = mut.GetDamage(getData("11"));
+            assert.deepEqual(output, DataDefaults.damageData({
+                base: 11,
+                value: 11,
+                type: {
+                    base: 'physical',
+                    value: 'physical',
+                },
+            }));
+        });
+
+        it("Parses 0 damage", () => {
+            const output = mut.GetDamage(getData("0"));
+            assert.deepEqual(output, DataDefaults.damageData({
+                base: 0,
+                value: 0,
+                type: {
+                    base: 'physical',
+                    value: 'physical',
+                },
+            }));
+        });
+
+        it("Parses basic matrix damage", () => {
+            const output = mut.GetDamage(getData("7M"));
+            assert.deepEqual(output, DataDefaults.damageData({
+                base: 7,
+                value: 7,
+                type: {
+                    base: 'matrix',
+                    value: 'matrix',
+                },
+            }));
+        });
+
         it("Parses strength-based damage without modifier", () => {
             const output = mut.GetDamage(getData("({STR})P"));
             assert.deepEqual(output, DataDefaults.damageData({

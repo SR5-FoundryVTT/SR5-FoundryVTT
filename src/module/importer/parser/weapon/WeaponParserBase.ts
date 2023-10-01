@@ -76,9 +76,9 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
     protected GetDamage(jsonData: object): DamageData {
         const jsonDamage = ImportHelper.StringValue(jsonData, 'damage');
         // ex. 15S(e)
-        const simpleDamage = /^([0-9]+)([PS])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
+        const simpleDamage = /^([0-9]+)([PSM])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
         // ex. ({STR}+1)P(fire)
-        const strengthDamage = /^\({STR}([+-]?[0-9]*)\)([PS])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
+        const strengthDamage = /^\({STR}([+-]?[0-9]*)\)([PSM])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
 
         let damageType: DamageType = '';
         let damageAttribute: PhysicalAttribute | '' = '';
@@ -101,8 +101,8 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
 
         const partialDamageData: RecursivePartial<DamageData> = {
             type: {
-                base: damageType,
-                value: damageType,
+                base: damageType || 'physical',
+                value: damageType || 'physical',
             },
             base: damageBase,
             value: damageBase,
