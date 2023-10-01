@@ -1,15 +1,17 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { Constants } from '../../importer/Constants';
-import DamageData = Shadowrun.DamageData;
 import WeaponCategory = Shadowrun.WeaponCategory;
 import SkillName = Shadowrun.SkillName;
 import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
 import WeaponItemData = Shadowrun.WeaponItemData;
+import DamageElement = Shadowrun.DamageElement;
+import DamageType = Shadowrun.DamageType;
+import { DataDefaults } from '../../../data/DataDefaults';
+import PhysicalAttribute = Shadowrun.PhysicalAttribute;
+import DamageData = Shadowrun.DamageData;
 
-export abstract class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
-    public abstract GetDamage(jsonData: object): DamageData;
-
-    protected GetSkill(weaponJson: object): SkillName {
+export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
+    private GetSkill(weaponJson: object): SkillName {
         if (weaponJson.hasOwnProperty('useskill')) {
             let jsonSkill = ImportHelper.StringValue(weaponJson, 'useskill');
             if (Constants.MAP_CATEGORY_TO_SKILL.hasOwnProperty(jsonSkill)) {
@@ -69,5 +71,76 @@ export abstract class WeaponParserBase extends TechnologyItemParserBase<WeaponIt
         item.system.technology.conceal.base = ImportHelper.IntValue(jsonData, 'conceal');
 
         return item;
+    }
+
+    protected GetDamage(jsonData: object): DamageData {
+        const jsonDamage = ImportHelper.StringValue(jsonData, 'damage');
+        // ex. 15S(e)
+        const simpleDamage = /^([0-9]+)([PS])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
+        // ex. ({STR}+1)P(fire)
+        const strengthDamage = /^\({STR}([+-]?[0-9]*)\)([PS])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
+
+        let damageType: DamageType = '';
+        let damageAttribute: PhysicalAttribute | '' = '';
+        let damageBase: number = 0;
+        let damageElement: DamageElement = '';
+
+        if(simpleDamage !== null) {
+            damageAttribute = '';
+            damageBase = parseInt(simpleDamage[1], 10);
+            damageType = this.parseDamageType(simpleDamage[2]);
+            damageElement = this.parseDamageElement(simpleDamage[3])
+        } else if (strengthDamage !== null) {
+            damageAttribute = 'strength';
+            damageBase = parseInt(strengthDamage[1], 10) || 0;
+            damageType = this.parseDamageType(strengthDamage[2]);
+            damageElement = this.parseDamageElement(strengthDamage[3]);
+        }
+
+        const damageAp = ImportHelper.IntValue(jsonData, 'ap', 0);
+
+        const partialDamageData: RecursivePartial<DamageData> = {
+            type: {
+                base: damageType,
+                value: damageType,
+            },
+            base: damageBase,
+            value: damageBase,
+            ap: {
+                base: damageAp,
+                value: damageAp,
+                mod: [],
+            },
+            attribute: damageAttribute,
+            element: {
+                base: damageElement,
+                value: damageElement,
+            }
+        }
+        return DataDefaults.damageData(partialDamageData);
+    }
+
+    protected parseDamageType(parsedType: string | undefined): DamageType {
+        switch(parsedType) {
+            case 'S':
+                return 'stun';
+            case 'M':
+                return 'matrix';
+            case 'P':
+                return 'physical';
+            default:
+                return '';
+        }
+    }
+
+    protected parseDamageElement(parsedElement: string | undefined): DamageElement {
+        switch(parsedElement?.toLowerCase()) {
+            case '(e)':
+                return 'electricity';
+            case '(fire)':
+                return 'fire';
+            default:
+                return '';
+        }
     }
 }
