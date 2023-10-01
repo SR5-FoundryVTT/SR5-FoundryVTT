@@ -15,6 +15,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public static unsupportedBooks: string[] = ['2050'];
+    public iconList: string[];
 
     // Used to filter down a files entries based on category.
     // See filterObjects for use.
@@ -72,8 +73,16 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * @param importFlags The importFlags data of an item
      * @param system The item's system data
      */
-    public iconAssign(importFlags: Shadowrun.ImportFlagData, system: Object): Promise<string> {
-        return IconAssign.iconAssign(importFlags, system);
+    public iconAssign(importFlags: Shadowrun.ImportFlagData, system: Object, iconList: string[]): Promise<string> {
+        // if (!this.iconList) this.getIconFiles();
+        return IconAssign.iconAssign(importFlags, system, iconList);
+    }
+
+    /**
+     * Gets a list of icons available in the importer's folder
+     */
+    public async getIconFiles(): Promise<string[]> {
+        return IconAssign.getIconFiles();
     }
 
     /**

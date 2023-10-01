@@ -29,6 +29,7 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
         const parser = new ModParserBase();
         let datas: ModificationItemData[] = [];
         let jsonDatas = jsonObject['accessories']['accessory'];
+        this.iconList = await this.getIconFiles()
         const parserType = 'modification';
 
         for (let i = 0; i < jsonDatas.length; i++) {
@@ -62,7 +63,7 @@ export class ModImporter extends DataImporter<ModificationItemData, Shadowrun.Mo
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system);
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
