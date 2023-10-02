@@ -321,7 +321,9 @@ select.display {
      */
     .entity-link,
     .content-link {
-        color: $black;
+        border: 0;
+        background: none;
+        color: white;
     }
 
     // An origin link is a uuid based entity link, without drag support.
@@ -422,6 +424,7 @@ select.display {
     }
 
     .window-content {
+        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
         color: $color;
         overflow: hidden;
     }
@@ -431,10 +434,6 @@ select.display {
         min-height: 15em;
         width: 100%;
         color: $color;
-    }
-
-    .border-right {
-        border-right: $groove;
     }
 
     .scroll-area {
@@ -485,7 +484,7 @@ select.display {
 
     .tab {
         border-radius: $radius;
-        margin-top: 0.25em;
+        margin-top: 10px;
         height: 100%;
 
         .tabbody {
@@ -579,10 +578,6 @@ select.display {
         flex-flow: column;
         padding: 2px 4px;
         justify-content: space-around;
-
-        &:not(:last-child) {
-            border-right: $groove;
-        }
 
         .block-line {
             display: flex;
@@ -712,12 +707,17 @@ select.display {
         }
 
         &.item-section {
-            border: $groove-width solid $black;
+            background: black;
+            color: #ebb531;
             margin-right: 0;
             margin-left: 0;
-            background: rgba($grey, 0.2);
-            padding: 0.25em;
+            // background: rgba($grey, 0.2);
+            // padding: 0.25em;
+            // border-radius: 0.2em;
+            border-top: 1px solid #ebb531;
+            border-bottom: 1px solid #ebb531;
             border-radius: 0.2em;
+            padding-top: 5px;
 
             &.faded {
                 color: $grey;
@@ -890,17 +890,6 @@ select.display {
         }
     }
 
-    .sunken {
-        box-shadow: $dark-sunken-box-shadow;
-        padding: $medium-distance;
-        background-color: $dark-sunken;
-    }
-
-    .card-sunken {
-        @extend .sunken;
-        margin-bottom: $large-distance;
-    }
-
     .modified-target-damage {
         margin-top: $large-distance;
         margin-bottom: $large-distance;
@@ -976,7 +965,7 @@ select.display {
     }
 
     .document-name {
-        font-family: $signika;
+        @include systemFonts;
         font-size: var(--font-size-18);
         font-weight: bold;
     }
@@ -1083,294 +1072,49 @@ select.display {
     }
 }
 
-/** Shadows additive styling */
-
-.sheet.journal-entry .journal-entry-content {
-    background: url("assets/light-page.webp") repeat;
-    width: 60%
-}
-
-.journal-sheet .journal-header .title {
-    background: url("assets/journal-banner.webp") repeat;
-    font-family: 'klavika-medium';
-    text-align: left !important;
-    text-indent: 5px;
-    color: white;
-    border-width: 0;
-    height: 80px;
-}
-
-h1 {
-    font-family: 'klavika-medium';
-    color: #55101e;
-    font-size: 25px;
-}
-
-h2 {
-    font-family: 'klavika-medium';
-    color: #55101e;
-}
-
-.journal-sheet h3 {
-    font-family: 'klavika-medium';
-    color: #55101e;
-}
-
-.sr5 .window-content {
-    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
-}
-
-.sr5 .value .value-modifiers {
-    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
-}
-
-blockquote {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    background: linear-gradient(to right, rgba(85, 16, 30, 0.304) 0%, rgba(255, 255, 255, 0.2) 100%);
-}
+@import 'foundry';
 
 /* character sheet */
 
-.sr5 .border-right {
-    border-right: 0;
-}
-
-.sr5 .block:not(:last-child) {
-    border-right: 0;
-}
-
-.sr5.actor .attributes {
-    border-top: 0;
-}
-
-.sr5.actor .attributes .attribute.no-grow {
-    flex-grow: 1;
-}
-
-.sr5.actor .attributes .attribute:not(:last-child) {
-    border-right: 0;
-}
-
-.display.text.left.document-name {
-    font-size: 25px;
-    border: 0;
-}
-
-.sr5 .list-item.item-section {
-    margin-right: 0;
-    margin-left: 0;
-    background: black;
-    color: #ebb531;
-    border-top: 1px solid #ebb531;
-    border-bottom: 1px solid #ebb531;
-    border-radius: 0.2em;
-    padding-top: 5px
-}
-
-.sr5.actor .attributes .attribute {
-    font-size: 100%;
-    color: #ebb531;
-    padding-top: 4px;
-    align-items: center;
-}
-
-.sr5.actor .attributes .attribute>.attribute-value>.attribute-value-total {
-    color: white;
-}
-
-.sr5.actor .name {
-    background: url("assets/name-banner.webp") repeat;
-    padding-left: 5px;
-}
-
-.display.text.left.document.name {
-    font-size: 25px;
-    background: 0;
-}
-
-input[type='text'].display {
-    border: 1;
-}
-
-#filter-skills.display.text.left {
-    font-size: 15px;
-}
-
-.sr5 .entity-link,
-.sr5 .content-link {
-    border: 0;
-    background: none;
-    color: white;
-}
-
-.entity-link.content-link {
-    color: white;
-}
-
-.sr5.form-dialog .dialog-title {
-    height: revert;
-}
+// TODO: TestDialog entity links. This can be solved by changing html.
+//       Should be done anyway, since the vertical order clashes with.
+// .sr5.form-dialog .dialog-title {
+//     height: revert;
+// }
 
 /* items */
 
-.sr5.item .item-header .item-name .display {
-    font-family: 'klavika-medium';
-    text-align: left;
-    padding-left: 7px;
-    height: 60px;
-    background: url("assets/item-banner.webp") repeat;
-}
+// TODO: Couldn't find a visible result by this, but added it in.
+// .sr5.item .item-header .item-name .display {
+//     font-family: 'klavika-medium';
+//     text-align: left;
+//     padding-left: 7px;
+//     height: 60px;
+//     background: url("assets/item-banner.webp") repeat;
+// }
 
-.sr5.item .description {
-    padding-left: 10px;
-    border: 0;
-}
+// TODO: This seems a rather large gap and not consistent with .technoligy
+// .sr5.item .item-form .form-line {
+//     padding-top: 10px;
+// }
 
-.sr5.item .item-header .item-name {
-    border: 0;
-    height: 60px;
-}
+// .sr5.item .item-form .header {
+    // border: 0
+// }
 
-.sr5.item .item-header .source .source-button {
-    padding: 2px;
-    top: 0.3px;
-}
+// .sr5.item .technology label {
+//     color: #ebb531;
+// }
 
-.sr5.item .item-header .source .display {
-    padding-top: 2px;
-    padding-bottom: 0px;
-}
-
-.sr5.item .technology {
-    padding-top: 10px;
-    padding-left: 10px;
-    border-right: 0;
-    border-bottom: 0;
-    border-top: 0;
-    min-width: 12em;
-}
-
-.sr5.item .item-form .form-line {
-    padding-top: 10px;
-}
-
-.sr5.item .item-form .header {
-    border: 0
-}
-
-.sr5 .tab {
-    margin-top: 10px;
-}
-
-.sr5.item .technology label {
-    color: #ebb531;
-}
-
-.sr5.item .content-link {
-    color: white;
-}
+// TODO: Doesn't seem to have an effect?
+// .sr5.item .content-link {
+//     color: white;
+// }
 
 /* Rolls */
 
-.sr5.form-dialog .dialog-content-common h2 {
-    color: white;
-}
-
-.sr5 .sunken,
-.sr5 .card-sunken {
-    background-color: revert;
-}
-
-hr {
-    border-color: #ebb531;
-}
-
-/* chat message */
-
-.chat-message {
-    color: white;
-    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
-}
-
-.chat-message.whisper {
-    color: white;
-    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
-}
-
-.sr5.chat-card .card-header:first-of-type {
-    color: #ebb531;
-    border-color: #ebb531;
-}
-
-.sr5 .container__col-half {
-    flex-basis: 100%;
-}
-
-/* Clean up */
-
-.settings-sidebar h2 {
-    color: white;
-}
-
-/* pictures */
-
-.ProseMirror-selectednode {
-    outline: 0;
-}
-
-/* table */
-
-table {
-    background: linear-gradient(to bottom, #3d3c3f, #000000);
-    font-size: 90%;
-}
-
-th {
-    padding: 9px;
-    background: black;
-    color: #ebb531;
-    text-align: left;
-}
-
-tr {
-    color: white;
-}
-
-tr:nth-child(even) {
-    background-color: #59595b;
-}
-
-table td:first-child {
-    text-align: left;
-}
-
-td:not(.column-1) {
-    text-align: center;
-}
-
-table th:first-child {
-    text-align: left;
-}
-
-th:not(.column-1) {
-    text-align: center;
-}
-
-tr:first-child th {
-    border-top: 1px solid #ebb531;
-}
-
-tr:first-child th {
-    border-bottom: 1px solid #ebb531;
-}
-
-tr:last-child td {
-    border-bottom: 1px solid #ebb531;
-}
-
-table .content-link {
-    background: none;
-    padding: 0px;
-    border: 0px;
-}
+// Removed html class usage
+// .sr5 .sunken,
+// .sr5 .card-sunken {
+    // background-color: revert;
+// }

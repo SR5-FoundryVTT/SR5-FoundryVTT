@@ -22,6 +22,7 @@
         .card-header {
             padding: 0.25em 0;
             border-bottom: $groove;
+            
 
             img {
                 flex: 0 0;
@@ -33,15 +34,16 @@
             }
 
             h3 {
-                font-size: var(--font-size-16);
                 font-weight: bold;
                 align-self: center;
                 flex: 1;
                 margin: 0;
+                font-size: var(--font-size-12);
             }
         }
         .card-header:first-of-type {
-            border-top: $groove;
+            color: #ebb531;
+            border-color: #ebb531;
         }
         .card-buttons {
             .button {
@@ -264,7 +266,7 @@
                 }
             }
             .test-code {
-                font-family: $signika;
+                @include systemFonts;
                 font-size: var(--font-size-12);
             }
         }

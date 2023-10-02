@@ -4,28 +4,20 @@
     </div>
     {{#if actor}}
     <div class="card-title card-header">
-        <div class="container container--fluid">
-            <div class="container__row">
-                <div class="container__col-half">
-                    <div class="document">
-                        <a class="chat-select-link" data-token-id="{{token.id}}"><img
-                                src="{{speakerImg actor}}" class="entity-selectable"
-                                title="{{speakerName actor}}"/></a>
-                        <h3 class="header-name"><a class="chat-document-link" data-uuid="{{actor.uuid}}">{{speakerName
-                            actor}}</a></h3>
-                    </div>
-                </div>
-                {{#if item}}
-                <div class="container__col-half">
-                    <div class="document">
-                        <img src="{{item.data.img}}" title="{{item.data.name}}"/>
-                        <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}"
-                                                   data-uuid="{{item.uuid}}">{{item.data.name}}</a></h3>
-                    </div>
-                </div>
-                {{/if}}
-            </div>
+        <div class="document">
+            <a class="chat-select-link" data-token-id="{{token.id}}"><img
+                    src="{{speakerImg actor}}" class="entity-selectable"
+                    title="{{speakerName actor}}"/></a>
+            <h3 class="header-name"><a class="chat-document-link" data-uuid="{{actor.uuid}}">{{speakerName
+                actor}}</a></h3>
         </div>
+        {{#if item}}
+        <div class="document">
+            <img src="{{item.data.img}}" title="{{item.data.name}}"/>
+            <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}"
+                                        data-uuid="{{item.uuid}}">{{item.data.name}}</a></h3>
+        </div>
+        {{/if}}
     </div>
     {{/if}}
     <div class="card-main-content">

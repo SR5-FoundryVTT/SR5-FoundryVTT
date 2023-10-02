@@ -1,0 +1,135 @@
+/**
+ * Rules related to FoundryVTT styling meant to not be limited to the system id.
+ *
+ */
+
+h1 {
+    font-family: 'klavika-medium';
+    color: #55101e;
+    font-size: 25px;
+}
+
+h2 {
+    font-family: 'klavika-medium';
+    color: #55101e;
+}
+
+hr {
+    border-color: #ebb531;
+}
+
+table {
+    background: linear-gradient(to bottom, #3d3c3f, #000000);
+    font-size: 90%;
+}
+
+th {
+    padding: 9px;
+    background: black;
+    color: #ebb531;
+    text-align: left;
+}
+
+tr {
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #59595b;
+}
+
+table td:first-child {
+    text-align: left;
+}
+
+td:not(.column-1) {
+    text-align: center;
+}
+
+table th:first-child {
+    text-align: left;
+}
+
+th:not(.column-1) {
+    text-align: center;
+}
+
+tr:first-child th {
+    border-top: 1px solid #ebb531;
+}
+
+tr:first-child th {
+    border-bottom: 1px solid #ebb531;
+}
+
+tr:last-child td {
+    border-bottom: 1px solid #ebb531;
+}
+
+table .content-link {
+    background: none;
+    padding: 0px;
+    border: 0px;
+}
+
+blockquote {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: linear-gradient(to right, rgba(85, 16, 30, 0.304) 0%, rgba(255, 255, 255, 0.2) 100%);
+}
+
+input[type='text'].display {
+    border: 1;
+}
+
+.sheet.journal-entry .journal-entry-content {
+    background: url("assets/light-page.webp") repeat;
+    width: 60%
+}
+
+.journal-sheet .journal-header .title {
+    background: url("assets/journal-banner.webp") repeat;
+    font-family: 'klavika-medium';
+    text-align: left !important;
+    text-indent: 5px;
+    color: white;
+    border-width: 0;
+    height: 80px;
+}
+
+.journal-sheet h3 {
+    font-family: 'klavika-medium';
+    color: #55101e;
+}
+
+.chat-message {
+    color: white;
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
+}
+
+.chat-message.whisper {
+    color: white;
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
+}
+
+.settings-sidebar h2 {
+    color: white;
+}
+
+.display.text.left.document-name {
+    font-size: 25px;
+    border: 0;
+}
+
+.ProseMirror-selectednode {
+    outline: 0;
+}
+
+.display.text.left.document.name {
+    font-size: 25px;
+    background: 0;
+}
+
+.entity-link.content-link {
+    color: white;
+}

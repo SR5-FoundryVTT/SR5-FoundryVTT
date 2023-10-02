@@ -6,7 +6,7 @@
 .sr5.form-dialog {
   .dialog-title {
     font-weight: bold;
-    height: 30px;
+    height: revert;
   }
 
   .form-group {
@@ -21,6 +21,7 @@
     // Avoid overlong selects breaking flow acrooss rows.
     select {
       width: 100%;
+      color: $white;
     }
 
     /**
@@ -30,6 +31,7 @@
     .form-group-element-2 {
       flex: 2
     }
+
     .form-group-element-1-right {
       flex: 1;
       text-align: right;
@@ -39,16 +41,11 @@
 
   .dialog-content-common {
     h2 {
-      text-underline: none;
       border: none;
+      color: white;
       margin: 0;
+      text-underline: none;
     }
-
-    .sunken {
-      padding: 0.5em;
-    }
-
-
   }
 
   .dialog-content-column {
