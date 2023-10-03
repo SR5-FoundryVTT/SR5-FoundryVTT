@@ -574,7 +574,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onItemCreate(event) {
         event.preventDefault();
-        const type = Helpers.listItemId(event);
+        const type = event.currentTarget.closest('.list-header').dataset.itemId;
         
         // Unhide section it it was
         this._setInventoryTypeVisibility(type, true);
