@@ -675,13 +675,10 @@ input[type='text'].display {
         flex-flow: column nowrap;
     }
 
+    .list-header,
     .list-item {
         font-size: 85%;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        align-items: center;
-        align-content: center;
+        
         padding: 0.1em 0.25em;
         min-height: 26px;
         margin: 0.1em;
@@ -724,56 +721,147 @@ input[type='text'].display {
             // }
         }
 
-        .item-center {
+        .list-item-content {
             display: flex;
             flex-flow: row nowrap;
+            justify-content: space-between;
             align-items: center;
-            align-self: center;
-        }
+            align-content: center;
 
-        .item-left {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: flex-start;
-            align-items: center;
-        }
-
-        .item-right {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .item-img {
-            padding-right: 0.25em;
-            max-width: 50px;
-
-            &.item-roll {
-                @include rollable;
-
-                &:hover {
-                    >img {
-                        content: url('assets/dice-solid.svg');
-                        filter: invert(1);
+            .item-center {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                align-self: center;
+            }
+    
+            .item-left {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: flex-start;
+                align-items: center;
+            }
+    
+            .item-right {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: flex-end;
+                align-items: center;
+            }
+    
+            .item-img {
+                padding-right: 0.25em;
+                max-width: 50px;
+    
+                &.item-roll {
+                    @include rollable;
+    
+                    &:hover {
+                        >img {
+                            content: url('assets/dice-solid.svg');
+                            filter: invert(1);
+                        }
                     }
                 }
+    
+                >img {
+                    margin: 0;
+                    transform: translateY(10%);
+                }
+    
+                &+.item-name {
+                    border-left: none !important;
+                }
             }
-
-            >img {
-                margin: 0;
-                transform: translateY(10%);
+    
+            .item-input {
+                width: 9.5em;
             }
-
-            &+.item-name {
-                border-left: none !important;
+    
+            .item-icons {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: space-evenly;
+                align-items: center;
+                color: $grey;
+                font-size: 12px;
+                height: 100%;
+            }
+    
+            .item-text {
+                width: 6em; // Long enough to avoid most line breaks / test wrapping...
+                margin: 0 0.1rem;
+                flex: 1 0 auto;
+                text-align: center;
+                height: 100%;
+                border: $light;
+    
+                &.faded {
+                    color: $grey;
+                }
+    
+                &.center {
+                    display: flex;
+                    flex-flow: row;
+                    justify-content: space-around;
+                    align-items: center;
+                    align-content: center;
+                }
+    
+                &.item-name {
+                    text-align: left;
+                    width: auto;
+                }
+    
+                &.element {
+                    width: 7em;
+                }
+    
+                &.radius {
+                    width: 4em;
+                }
+    
+                &.dropoff {
+                    width: 4em;
+                }
+    
+                &.rtg {
+                    width: 3em;
+    
+                    &.active-skills-rating {
+                        padding-right: 1em;
+                    }
+                }
+    
+                &.input {
+                    text-align: right;
+                    width: 9.5em;
+                }
+    
+                &.desc {
+                    width: 16em;
+                }
+            }
+    
+            .skill-item {
+                width: 8em;
+            }
+    
+            .skill-spec-item {
+                width: 15em;
+            }
+    
+            &.skill-header {
+                @include rollable;
             }
         }
+    }
 
-        .item-input {
-            width: 9.5em;
-        }
+    .list-item:nth-of-type(even) {
+        background: rgba($white, 0.03);
+    }
 
+    .list-item-description {
         .item-desc {
             padding: 0.25em;
             font-size: 1em;
@@ -803,92 +891,8 @@ input[type='text'].display {
                 //padding-right: 0.5em;
             }
         }
-
-        .item-icons {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: space-evenly;
-            align-items: center;
-            color: $grey;
-            font-size: 12px;
-            height: 100%;
-        }
-
-        .item-text {
-            width: 6em; // Long enough to avoid most line breaks / test wrapping...
-            margin: 0 0.1rem;
-            flex: 1 0 auto;
-            text-align: center;
-            height: 100%;
-            border: $light;
-
-            &.faded {
-                color: $grey;
-            }
-
-            &.center {
-                display: flex;
-                flex-flow: row;
-                justify-content: space-around;
-                align-items: center;
-                align-content: center;
-            }
-
-            &.item-name {
-                text-align: left;
-                width: auto;
-            }
-
-            &.element {
-                width: 7em;
-            }
-
-            &.radius {
-                width: 4em;
-            }
-
-            &.dropoff {
-                width: 4em;
-            }
-
-            &.rtg {
-                width: 3em;
-
-                &.active-skills-rating {
-                    padding-right: 1em;
-                }
-            }
-
-            &.input {
-                text-align: right;
-                width: 9.5em;
-            }
-
-            &.desc {
-                width: 16em;
-            }
-        }
-
-        // .item-create,
-        // .item-toggle,
-        // .add-new-ammo,
-        // .add-new-mod,
-        // .add-new-license {
-        //     color: $color;
-        // }
-
-        .skill-item {
-            width: 8em;
-        }
-
-        .skill-spec-item {
-            width: 15em;
-        }
-
-        &.skill-header {
-            @include rollable;
-        }
     }
+
 
     .modified-target-damage {
         margin-top: $large-distance;

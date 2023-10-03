@@ -1522,7 +1522,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const item = $(event.currentTarget).parents('.list-item');
         const iid = $(item).data().item;
-        const field = item.next();
+        const field = item.find('.list-item-description');
         field.toggle();
         if (iid) {
             if (field.is(':visible')) this._shownDesc.push(iid);
