@@ -1,8 +1,11 @@
 /**
  * Rules related to FoundryVTT styling meant to not be limited to the system id.
- *
+ * Everything here will overwrite default Foundry Styling.
  */
 
+/**
+  * GENERAL ELEMENT STYLING
+  */
 h1 {
     font-family: 'klavika-medium';
     color: #55101e;
@@ -82,9 +85,31 @@ input[type='text'].display {
     border: 1;
 }
 
-.sheet.journal-entry .journal-entry-content {
+.settings-sidebar h2 {
+    color: white;
+}
+
+.display.text.left.document-name {
+    font-size: 25px;
+    border: 0;
+}
+
+.ProseMirror-selectednode {
+    outline: 0;
+}
+
+.entity-link.content-link {
+    color: white;
+}
+
+/**
+ * JOURNAL ENTRY STYLING
+ */
+// Journal Entry
+.sheet.journal-entry .journal-entry-content,
+// Journal Entry Page Editor 
+.journal-sheet.journal-entry-page .window-content {
     background: url("assets/light-page.webp") repeat;
-    width: 60%
 }
 
 .journal-sheet .journal-header .title {
@@ -102,6 +127,17 @@ input[type='text'].display {
     color: #55101e;
 }
 
+.journal-sheet select {
+    color: $dark;
+}
+
+.journal-sheet option {
+    color: $white;
+}
+
+/**
+ * CHAT MESSAGE STYLING
+ */
 .chat-message {
     color: white;
     background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
@@ -110,26 +146,4 @@ input[type='text'].display {
 .chat-message.whisper {
     color: white;
     background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
-}
-
-.settings-sidebar h2 {
-    color: white;
-}
-
-.display.text.left.document-name {
-    font-size: 25px;
-    border: 0;
-}
-
-.ProseMirror-selectednode {
-    outline: 0;
-}
-
-.display.text.left.document.name {
-    font-size: 25px;
-    background: 0;
-}
-
-.entity-link.content-link {
-    color: white;
 }
