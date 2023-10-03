@@ -7,6 +7,7 @@
 @import 'test';
 @import 'tagify';
 @import 'modifiers';
+@import 'foundry';
 
 @font-face {
     font-family: 'klavika-medium';
@@ -989,5 +990,3 @@ select.display, select {
     justify-content: center;
     right: -150px;
 }
-
-@import 'foundry';
