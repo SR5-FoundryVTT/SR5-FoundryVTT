@@ -6,6 +6,7 @@
 @import 'chat';
 @import 'test';
 @import 'tagify';
+@import 'modifiers';
 
 @font-face {
     font-family: 'klavika-medium';
@@ -708,14 +709,14 @@ select.display, select {
 
         &.item-section {
             background: black;
-            color: #ebb531;
+            color: $yellow;
             margin-right: 0;
             margin-left: 0;
             // background: rgba($grey, 0.2);
             // padding: 0.25em;
             // border-radius: 0.2em;
-            border-top: 1px solid #ebb531;
-            border-bottom: 1px solid #ebb531;
+            border-top: 1px solid $yellow;
+            border-bottom: 1px solid $yellow;
             border-radius: 0.2em;
             padding-top: 5px;
 
@@ -989,132 +990,4 @@ select.display, select {
     right: -150px;
 }
 
-/**
-  * Is used on TokenHUDs to display a additional segment per situational modifer.
-  */
-.sr-modifier-container {
-
-    // The column to hold all modifiers besides the FoundryVTT token HUD.
-    .modifier-column {
-        padding-top: 66px;
-        // Stop flexing.
-        display: block;
-        font-weight: bold;
-        font-size: 18px;
-        // Render below the open/closable token hud actions.
-        z-index: -1;
-    }
-
-    // The row containing a single situation modifier.
-    .modifier-row {
-        position: relative;
-        display: grid;
-        flex-wrap: wrap;
-        align-items: stretch;
-        width: 160px;
-        background: rgba(0, 0, 0, 0.6);
-        box-shadow: 0 0 15px #000;
-        border: 1px solid #333;
-        color: #DDD;
-        height: 40px;
-        line-height: 40px;
-        margin-bottom: 18px;
-        border-radius: 8px;
-        pointer-events: all;
-        grid-template-columns: 36px auto;
-        overflow: hidden;
-
-        // The numerical modifier total 
-        .modifier-value {}
-
-        // The corresponding modifier description per .modifier-value
-        .modifier-description {
-            // Handle big labels without breaking layout.
-            text-overflow: clip;
-            white-space: nowrap;
-
-            // Show interactability.
-            cursor: pointer;
-
-            &:hover {
-                box-shadow: 0 0 0.25em 0.15em $white;
-                border-radius: 8px;
-            }
-        }
-    }
-}
-
-/**
- * All stylings necessary for situation modifiers
- */
-.sr5#situational-modifiers-application {
-
-    // Remove other sr5 window styles.
-    * {
-        font-size: var(--font-size-14);
-        font-weight: normal;
-    }
-
-    h1 {
-        font-weight: bold;
-    }
-
-    // Add back in stylings as necessary
-    h2,
-    h3 {
-        border-bottom: none;
-        font-weight: normal;
-    }
-
-    .modifier-total {
-        display: flex;
-        flex-direction: column;
-    }
-}
-
 @import 'foundry';
-
-/* character sheet */
-
-// TODO: TestDialog entity links. This can be solved by changing html.
-//       Should be done anyway, since the vertical order clashes with.
-// .sr5.form-dialog .dialog-title {
-//     height: revert;
-// }
-
-/* items */
-
-// TODO: Couldn't find a visible result by this, but added it in.
-// .sr5.item .item-header .item-name .display {
-//     font-family: 'klavika-medium';
-//     text-align: left;
-//     padding-left: 7px;
-//     height: 60px;
-//     background: url("assets/item-banner.webp") repeat;
-// }
-
-// TODO: This seems a rather large gap and not consistent with .technoligy
-// .sr5.item .item-form .form-line {
-//     padding-top: 10px;
-// }
-
-// .sr5.item .item-form .header {
-    // border: 0
-// }
-
-// .sr5.item .technology label {
-//     color: #ebb531;
-// }
-
-// TODO: Doesn't seem to have an effect?
-// .sr5.item .content-link {
-//     color: white;
-// }
-
-/* Rolls */
-
-// Removed html class usage
-// .sr5 .sunken,
-// .sr5 .card-sunken {
-    // background-color: revert;
-// }

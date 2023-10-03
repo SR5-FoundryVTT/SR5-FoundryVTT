@@ -18,7 +18,7 @@ h2 {
 }
 
 hr {
-    border-color: #ebb531;
+    border-color: $yellow;
 }
 
 table {
@@ -29,7 +29,7 @@ table {
 th {
     padding: 9px;
     background: black;
-    color: #ebb531;
+    color: $yellow;
     text-align: left;
 }
 
@@ -58,15 +58,15 @@ th:not(.column-1) {
 }
 
 tr:first-child th {
-    border-top: 1px solid #ebb531;
+    border-top: 1px solid $yellow;
 }
 
 tr:first-child th {
-    border-bottom: 1px solid #ebb531;
+    border-bottom: 1px solid $yellow;
 }
 
 tr:last-child td {
-    border-bottom: 1px solid #ebb531;
+    border-bottom: 1px solid $yellow;
 }
 
 table .content-link {
