@@ -425,7 +425,7 @@ select.display, select {
     }
 
     .window-content {
-        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
+        background: linear-gradient(rgba(0, 0, 0, 0.60), rgba(0, 0, 0, 0.60)), url("assets/page.webp") repeat;
         color: $color;
         overflow: hidden;
     }
@@ -456,7 +456,7 @@ select.display, select {
         align-items: stretch; // Make tabs stretch instead of space horizontally.
 
         >a {
-            margin: 0.25em;
+        margin: 0.25em;
             padding: 0.25em;
             margin-bottom: 0;
             position: relative;
@@ -963,6 +963,10 @@ select.display, select {
         @include systemFonts;
         font-size: var(--font-size-18);
         font-weight: bold;
+    }
+
+    .cell-input-roll {
+        color: $yellow;
     }
 }
 
