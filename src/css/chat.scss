@@ -47,20 +47,26 @@
         }
         .card-buttons {
             .button {
-                box-shadow: 0 0 0.25em 0.15em $dark;
                 &:hover {
-                    box-shadow: 0 0 0.25em 0.15em $black;
+                    cursor: pointer;
+                    // box-shadow: 0 0 0.25em 0.15em $black;
+                    outline: none;
+                    box-shadow: 0 0 5px var(--color-shadow-primary);
                 }
-                cursor: pointer;
-                border: $groove;
-                background: $grey;
+                
+                color: $color;
+                border-color: $black;
+                background: rgba($light, 0.1);
+                border-radius: 0.3em;
+                text-align: center;
                 margin-top: 0.5em;
                 margin-left: auto;
                 margin-right: auto;
                 text-align: center;
-                font-size: 16px;
-                font-style: italic;
-                font-weight: bold;
+
+                // font-size: 16px;
+                // font-style: italic;
+                // font-weight: bold;
             }
         }
         .card-description {

@@ -52,9 +52,6 @@
         &.wrap {
             flex-wrap: wrap;
         }
-        & + :not(.attributes) {
-            border-top: $groove;
-        }
         &:last-child {
             border-bottom: $groove;
         }

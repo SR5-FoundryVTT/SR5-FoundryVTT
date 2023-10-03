@@ -453,9 +453,6 @@ select.display, select {
 
     .tabs {
         flex: 0;
-        margin: 0.25em;
-        margin-bottom: -5px;
-        border-bottom: 1px solid $light-border;
         align-items: stretch; // Make tabs stretch instead of space horizontally.
 
         >a {
@@ -464,15 +461,14 @@ select.display, select {
             margin-bottom: 0;
             position: relative;
             font-size: 1.15em;
-            border: 1px solid $light-border;
-            border-top-left-radius: 0.25em;
-            border-top-right-radius: 0.25em;
-            border-bottom: none;
             @include rollable;
 
             &.active {
                 @include rolloutline;
-                background-color: rgba($black, 0.4);
+                color: $color;
+                // border-color: $black;
+                // border-bottom: 0px;
+                background: rgba($light, 0.1);
             }
         }
 
@@ -484,8 +480,6 @@ select.display, select {
     }
 
     .tab {
-        border-radius: $radius;
-        margin-top: 10px;
         height: 100%;
 
         .tabbody {
