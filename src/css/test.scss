@@ -1,29 +1,14 @@
 /**
- * CSS for Test Dialog styling.
+ * CSS for Success Test Dialog styling.
  */
 @import 'config';
 
 .sr5.form-dialog {
   .dialog-title {
     font-weight: bold;
-    height: revert;
   }
 
   .form-group {
-    label {
-      font-weight: normal;
-    }
-
-    input {
-      color: $white;
-    }
-
-    // Avoid overlong selects breaking flow acrooss rows.
-    select {
-      width: 100%;
-      color: $white;
-    }
-
     /**
      * Lazy hack to allow for a two segment elemnt style, with the right ones text 
      * being flush to the end.
@@ -50,13 +35,5 @@
 
   .dialog-content-column {
     width: 300px;
-  }
-
-  .sunken select {
-    color: white;
-  }
-
-  .sunken select option {
-    background-color: $dark-sunken;
   }
 }
