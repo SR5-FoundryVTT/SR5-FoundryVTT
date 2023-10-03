@@ -266,18 +266,18 @@ input[type='text'].display {
     }
 }
 
-select.display, select {
-    color: $color;
-    background: rgba($black, 0.05);
-    border-radius: 0.3em;
-    border-color: $dark;
-
-    >option {
-        background-color: $dark;
-    }
-}
-
 .sr5 {
+
+    select.display, select {
+        color: $color;
+        background: rgba($black, 0.05);
+        border-radius: 0.3em;
+        border-color: $dark;
+    
+        >option {
+            background-color: $dark;
+        }
+    }
 
     /**
      * Overwrite FoundryVTT default styling within sheets.
