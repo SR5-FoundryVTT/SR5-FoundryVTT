@@ -2,9 +2,9 @@
 
 .sr5 {
     &.chat-card {
+        @include sheet;
         font-style: normal;
         font-size: 1rem;
-        background: linear-gradient(rgba(0, 0, 0, 0.60), rgba(0, 0, 0, 0.60)), url("assets/page.webp") repeat;
 
         /**
          * Content with this class should be hidden from players eyes

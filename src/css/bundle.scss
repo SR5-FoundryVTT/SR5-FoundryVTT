@@ -268,6 +268,10 @@ input[type='text'].display {
 
 .sr5 {
 
+    hr {
+        border-color: $yellow;
+    }
+
     select.display, select {
         color: $color;
         background: rgba($black, 0.05);
@@ -425,8 +429,7 @@ input[type='text'].display {
     }
 
     .window-content {
-        background: linear-gradient(rgba(0, 0, 0, 0.60), rgba(0, 0, 0, 0.60)), url("assets/page.webp") repeat;
-        color: $color;
+        @include sheet;
         overflow: hidden;
     }
 
@@ -454,6 +457,7 @@ input[type='text'].display {
     .tabs {
         flex: 0;
         align-items: stretch; // Make tabs stretch instead of space horizontally.
+        border-bottom: 1px solid $yellow;
 
         >a {
         margin: 0.25em;
@@ -464,7 +468,7 @@ input[type='text'].display {
             @include rollable;
 
             &.active {
-                @include rolloutline;
+                @include linkHovered;
                 color: $color;
                 // border-color: $black;
                 // border-bottom: 0px;
@@ -683,7 +687,6 @@ input[type='text'].display {
         margin: 0.1em;
         margin-right: $groove-width;
         margin-left: $groove-width;
-        border-bottom: 1px solid $grey;
 
         .has-desc {
             @include rollable;
@@ -708,8 +711,7 @@ input[type='text'].display {
             margin-left: 0;
             // background: rgba($grey, 0.2);
             // padding: 0.25em;
-            // border-radius: 0.2em;
-            border-top: 1px solid $yellow;
+            // border-radius: 0.2em;            
             border-bottom: 1px solid $yellow;
             border-radius: 0.2em;
             padding-top: 5px;
@@ -717,6 +719,9 @@ input[type='text'].display {
             &.faded {
                 color: $grey;
             }
+            // &:first-child {
+            //     border-top: 1px solid $yellow;
+            // }
         }
 
         .item-center {
@@ -864,13 +869,13 @@ input[type='text'].display {
             }
         }
 
-        .item-create,
-        .item-toggle,
-        .add-new-ammo,
-        .add-new-mod,
-        .add-new-license {
-            color: $color;
-        }
+        // .item-create,
+        // .item-toggle,
+        // .add-new-ammo,
+        // .add-new-mod,
+        // .add-new-license {
+        //     color: $color;
+        // }
 
         .skill-item {
             width: 8em;
