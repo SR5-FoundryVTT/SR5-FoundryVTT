@@ -28,7 +28,7 @@ export class ItemsParser {
         }
 
         if (importOptions.weapons && chummerChar.weapons != null && chummerChar.weapons.weapon != null) {
-            const parsedWeapons = new WeaponParser().parseWeapons(chummerChar);
+            const parsedWeapons = await new WeaponParser().parseWeapons(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedWeapons);
         }
 

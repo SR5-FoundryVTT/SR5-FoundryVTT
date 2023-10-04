@@ -12,8 +12,12 @@ export class QualityParser {
 
         await qualities.forEach(async (chummerQuality) => {
             try {
-                const itemData = await this.parseQuality(chummerQuality, assignIcons, iconList);
-                await parsedQualities.push(itemData);
+                const itemData = this.parseQuality(chummerQuality);
+
+                // Assign the icon if enabled
+                if (assignIcons) itemData.img = await IconAssign.iconAssign(itemData.system.system.importFlags, itemData.system.system, iconList);
+
+                parsedQualities.push(itemData);
             } catch (e) {
                 console.error(e);
             }
@@ -22,7 +26,7 @@ export class QualityParser {
         return parsedQualities;
     }
 
-    async parseQuality(chummerQuality, assignIcons, iconList) {
+    parseQuality(chummerQuality) {
         const parserType = 'quality';
         const system = DataDefaults.baseItemData({type: parserType});
         system.type = chummerQuality.qualitytype.toLowerCase();
@@ -39,9 +43,6 @@ export class QualityParser {
 
         // Create the item
         let quality = createItemData(chummerQuality.name, parserType, system);
-
-        // Assign the icon if enabled
-        if (assignIcons) quality.img = await IconAssign.iconAssign(quality.system.system.importFlags, quality.system.system, iconList);
 
         return quality;
     }

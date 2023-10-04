@@ -1,4 +1,6 @@
-import { parseDescription, getArray, getValues, parseTechnology, createItemData } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, getValues, parseTechnology, createItemData, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import * as IconAssign from '../../apps/iconAssigner/iconAssign';
+import { SR5 } from "../../config";
 
 export class WeaponParser {
     parseDamage = (val) => {
@@ -24,13 +26,18 @@ export class WeaponParser {
         return damage;
     };
 
-    parseWeapons(chummerChar) {
+    async parseWeapons(chummerChar, assignIcons) {
         const weapons = getArray(chummerChar.weapons.weapon);
         const parsedWeapons = [];
+        const iconList = await IconAssign.getIconFiles();
 
-        weapons.forEach((chummerWeapon) => {
+        weapons.forEach(async (chummerWeapon) => {
             try {
                 const itemData = this.parseWeapon(chummerWeapon);
+
+                // Assign the icon if enabled
+                if (assignIcons) itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList);
+
                 parsedWeapons.push(itemData);
             } catch (e) {
                 console.error(e);
@@ -41,6 +48,7 @@ export class WeaponParser {
     }
 
     parseWeapon(chummerWeapon) {
+        const parserType = 'weapon';
         const system = {};
         const action = {};
         const damage = {};
@@ -146,7 +154,26 @@ export class WeaponParser {
             }
         }
 
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(chummerWeapon.name_english), parserType);
+
+        // Assign item subtype
+        let subType = '';
+        // range/melee/thrown
+        if (system.category) {
+            subType = formatAsSlug(system.category);
+        }
+        // weapon subtype
+        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(formatAsSlug(chummerWeapon.category_english))) {
+            subType = formatAsSlug(chummerWeapon.category_english);
+        }
+        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
+            system.importFlags.subType = subType;
+        }
+
+        // Create the item
         const itemData = createItemData(chummerWeapon.name, 'weapon', system);
+
         return itemData;
     }
 }
