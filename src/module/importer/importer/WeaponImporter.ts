@@ -71,10 +71,10 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
 
             let subType = '';
             if (item.system.category) {
-                subType = this.formatSubtypeName(item.system.category);
+                subType = this.formatAsSlug(item.system.category);
             }
             if (item.system.subcategory) {
-                subType = this.formatSubtypeName(item.system.subcategory);
+                subType = this.formatAsSlug(item.system.subcategory);
             }
             if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;

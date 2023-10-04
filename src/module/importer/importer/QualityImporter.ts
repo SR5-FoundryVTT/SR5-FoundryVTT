@@ -49,7 +49,7 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
             // Import Flags
             item.system.importFlags = this.genImportFlags(item.name, item.type);
 
-            let subType = this.formatSubtypeName(category);
+            let subType = this.formatAsSlug(category);
             if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }

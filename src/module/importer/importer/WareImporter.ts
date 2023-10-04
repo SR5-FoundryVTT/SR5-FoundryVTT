@@ -77,7 +77,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
             item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Add the subtype so the importer can add the correct icon
-            let subType = this.formatSubtypeName(category);
+            let subType = this.formatAsSlug(category);
             if (Object.keys(SR5.itemSubTypeIconOverrides.cyberware).includes(subType) || Object.keys(SR5.itemSubTypeIconOverrides.bioware).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }

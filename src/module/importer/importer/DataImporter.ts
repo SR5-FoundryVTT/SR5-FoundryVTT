@@ -88,11 +88,11 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
     }
 
     /**
-     * Reformat the subtype's name so it matches the categories in config.ts
-     * @param name The item's subtype name
+     * Reformat the name or subtype name so it matches the categories in config.ts
+     * @param name The item's name or subtype name to reformat
      */
-    public formatSubtypeName(name: string): string {
-        return name.trim().toLowerCase().split((/-| |\//)).join('-');
+    public formatAsSlug(name: string): string {
+        return name.trim().toLowerCase().replace((/'/), '').split((/-| |\//)).join('-');
     }
 
     /**
@@ -102,7 +102,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      */
     public genImportFlags(name: string, type: string): Shadowrun.ImportFlagData {
         const flags = {
-            name: foundry.utils.deepClone(name), // original english name for matching to icons
+            name: this.formatAsSlug(name), // original english name for matching to icons
             type: type,
             subType: '',
             isFreshImport: true

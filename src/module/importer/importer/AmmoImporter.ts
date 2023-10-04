@@ -45,7 +45,7 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
             // Import Flags
             item.system.importFlags = this.genImportFlags(item.name, item.type);
 
-            let subType = this.formatSubtypeName(item.system.importFlags.name.split(':')[0]);
+            let subType = this.formatAsSlug(item.system.importFlags.name.split(':')[0]);
             if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }

@@ -60,7 +60,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             item.system.importFlags = this.genImportFlags(item.name, item.type);
 
             // Add the subtype so the importer can add the correct icon
-            let subType = this.formatSubtypeName(categoryEN);
+            let subType = this.formatAsSlug(categoryEN);
             if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
                 item.system.importFlags.subType = subType;
             }
