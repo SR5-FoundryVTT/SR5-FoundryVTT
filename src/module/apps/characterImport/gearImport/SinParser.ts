@@ -24,14 +24,12 @@ export class SinParser extends BaseGearParser {
 
             parsedGear.system.licenses = this.parseLicenses(chummerLicenses);
         }
-        
-        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
 
         return parsedGear;
     }
 
     private parseLicenses(chummerLicenses : any) : any[] {
-        const parsedLicenses : any[] = []; 
+        const parsedLicenses : any[] = [];
 
         chummerLicenses.forEach(chummerLicense => {
             if (chummerLicense.category === 'ID/Credsticks')

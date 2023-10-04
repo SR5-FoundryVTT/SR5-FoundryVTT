@@ -19,11 +19,11 @@ export class ItemsParser {
      * @param {*} chummerChar The chummer char holding the items
      * @param {*} importOptions Additional import option that specify what items will be imported.
      */
-    parse(chummerChar, importOptions) {
+    async parse(chummerChar, importOptions) {
         const parsedItems = [];
 
         if (importOptions.qualities && chummerChar.qualities && chummerChar.qualities.quality) {
-            const parsedQualities = new QualityParser().parseQualities(chummerChar);
+            const parsedQualities = await new QualityParser().parseQualities(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedQualities);
         }
 

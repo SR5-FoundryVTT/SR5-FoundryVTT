@@ -32,6 +32,7 @@ export class ChummerImportForm extends FormApplication {
                 spells: $('.spells').is(':checked'),
                 contacts: $('.contacts').is(':checked'),
                 lifestyles: $('.lifestyles').is(':checked'),
+                assignIcons: $('.assignIcons').is(':checked'),
             }
 
             const importer = new CharacterImporter();

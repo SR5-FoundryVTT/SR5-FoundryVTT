@@ -102,7 +102,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      */
     public genImportFlags(name: string, type: string): Shadowrun.ImportFlagData {
         const flags = {
-            name: this.formatAsSlug(name), // original english name for matching to icons
+            name: this.formatAsSlug(name), // original english name
             type: type,
             subType: '',
             isFreshImport: true

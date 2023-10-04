@@ -16,13 +16,11 @@ export class ProgramParser extends BaseGearParser {
         else if (chummerGear.category === 'Hacking Programs')
         {
             parsedGear.system.type = 'hacking_program'
-        } 
+        }
         else if (chummerGear.category === 'Software')
         {
             parsedGear.system.type = 'agent'
         }
-        
-        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
 
         return parsedGear;
     }

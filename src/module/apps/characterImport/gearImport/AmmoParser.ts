@@ -5,7 +5,7 @@ import { iconAssign } from '../../iconAssigner/iconAssign';
  * Parses ammunition
  */
 export class AmmoParser extends BaseGearParser {
-   
+
     override parse(chummerGear : any) : any {
         const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'ammo';
@@ -28,8 +28,6 @@ export class AmmoParser extends BaseGearParser {
                 parsedGear.system.damageType = 'physical';
             }
         }
-        
-        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
 
         return parsedGear;
     }

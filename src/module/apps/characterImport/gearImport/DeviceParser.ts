@@ -5,7 +5,7 @@ import { iconAssign } from '../../iconAssigner/iconAssign';
  * Parses devices (commlinks and decks)
  */
 export class DeviceParser extends BaseGearParser {
-   
+
     override parse(chummerGear : any) : any {
         const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'device';
@@ -34,7 +34,7 @@ export class DeviceParser extends BaseGearParser {
             {
                 value: chummerGear.firewall,
                 att: 'firewall'
-            } 
+            }
         };
 
         if (chummerGear.category === 'Cyberdecks')
@@ -50,11 +50,8 @@ export class DeviceParser extends BaseGearParser {
         if (chummerGear.category === 'Rigger Command Consoles')
         {
             // We are handling rccs as commlinks for the moment since we have no support for rigger command consoles yet.
-            parsedGear.system.category = 'commlink'; 
+            parsedGear.system.category = 'commlink';
         }
-
-        
-        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
 
         return parsedGear;
     }

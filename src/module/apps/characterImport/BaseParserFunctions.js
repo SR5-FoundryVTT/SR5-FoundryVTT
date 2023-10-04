@@ -1,5 +1,4 @@
 import { DataDefaults } from "../../data/DataDefaults";
-import { iconAssign } from '../iconAssigner/iconAssign';
 
 export const getValues = (val) => {
     const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
@@ -73,7 +72,6 @@ export const createItemData = (name, type, system) => {
         _id: '',
         folder: '',
         flags: {},
-        img: iconAssign(type, name, system),
         type: type,
         system,
         permission: {
@@ -82,4 +80,26 @@ export const createItemData = (name, type, system) => {
     };
 }
 
+// formatAsSlug and genImportFlags copied from original implementation in bulk importer DataImporter.ts
+/**
+* Reformat the name or subtype name so it matches the categories in config.ts
+* @param name The item's name or subtype name to reformat
+*/
+export const formatAsSlug = (name) => {
+    return name.trim().toLowerCase().replace((/'/), '').split((/-| |\//)).join('-');
+ }
 
+ /**
+ * Generate default import flags
+ * @param name The item's English name, formatted as a slug using formatAsSlug
+ * @param type The item's type
+ */
+ export const genImportFlags = (name, type) => {
+    const flags = {
+        name: name, // original english name
+        type: type,
+        subType: '',
+        isFreshImport: true
+    }
+    return flags;
+ }

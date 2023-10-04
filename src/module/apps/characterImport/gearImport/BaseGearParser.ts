@@ -29,8 +29,6 @@ export class BaseGearParser implements GearParser {
 
         parsedGear.system.technology = parseTechnology(chummerGear);
         parsedGear.system.description = parseDescription(chummerGear);
-        
-        parsedGear.img = iconAssign(parsedGear.type, parsedGear.name, parsedGear.system);
 
         return parsedGear;
     }
@@ -39,4 +37,3 @@ export class BaseGearParser implements GearParser {
         return DataDefaults.baseItemData<EquipmentItemData, Shadowrun.EquipmentData>({type: 'equipment'});
     }
 }
-
