@@ -10,6 +10,7 @@ import {shadowrunSR5ActiveEffect} from "./sr5.ActiveEffect.spec";
 import {shadowrunNetworkDevices} from "./sr5.NetworkDevices.spec";
 import {shadowrunTesting} from "./sr5.Testing.spec";
 import {shadowrunInventoryFlow} from "./sr5.Inventory.spec";
+import {weaponParserTesting} from "./sr5.WeaponParser.spec";
 import { Quench } from "@ethaks/fvtt-quench";
 
 
@@ -40,4 +41,6 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch("shadowrun5e.flow.tests", shadowrunTesting, {displayName: "SHADOWRUN5e: SuccessTest Test"});
     quench.registerBatch("shadowrun5e.flow.tests_attack", shadowrunAttackTesting, {displayName: "SHADOWRUN5e: Attack Test"});
     quench.registerBatch("shadowrun5e.flow.sr5roll", shadowrunRolling, {displayName: "SHADOWRUN5e: SR5Roll"});
+
+    quench.registerBatch("shadowrun5e.parser.weapon", weaponParserTesting, {displayName: "SHADOWRUN5e: Data Importer Weapon Parsing"});
 };
