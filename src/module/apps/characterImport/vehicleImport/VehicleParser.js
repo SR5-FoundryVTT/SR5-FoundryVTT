@@ -1,9 +1,11 @@
 import { getArray } from "../BaseParserFunctions.js"
+import { WeaponParser } from "../WeaponParser";
+import { GearsParser } from "../gearImport/GearsParser"
 
 export default class VehicleParser {
 
     async parseVehicles(actor, chummerChar, importOptions) {
-        console.log(importOptions.vehicles)
+
         if(!game.user.can("ACTOR_CREATE")) {
             ui.notifications.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
             return;
@@ -20,6 +22,8 @@ export default class VehicleParser {
                 name: vehicle.name,
                 type: "vehicle"
             });
+
+            const parsedItems = [];
 
 
             let handling;
@@ -42,6 +46,8 @@ export default class VehicleParser {
                 off_road_speed =  vehicle.speed
             }
 
+            Array.prototype.push.apply(parsedItems, new WeaponParser().parseWeapons(vehicle));
+            Array.prototype.push.apply(parsedItems, new GearsParser().parseGears(getArray(vehicle.gears.gear)));
 
             vehicleActor.update({
                 'system.driver': actor.id,
@@ -57,6 +63,8 @@ export default class VehicleParser {
                 'system.armor.base': vehicle.armor,
                 'system.isDrone': vehicle.isdrone
             });
+
+            await vehicleActor.createEmbeddedDocuments('Item', parsedItems);
         }
     }
 }
