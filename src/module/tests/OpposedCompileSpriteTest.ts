@@ -89,6 +89,14 @@ export class OpposedCompileSpriteTest extends OpposedTest {
         await this.cleanupAfterExecutionCancel();
     }
 
+    override get successLabel(): string {
+        return 'SR5.TestResults.SpriteCompilationFailure';
+    }
+
+    override get failureLabel(): string {
+        return 'SR5.TestResults.SpriteCompilationSuccess';
+    }
+
     /**
      * Cleanup created actors that aren't needed anymore.
      * 

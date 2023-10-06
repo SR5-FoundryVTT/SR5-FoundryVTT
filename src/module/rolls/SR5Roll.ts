@@ -106,7 +106,7 @@ export class SR5Roll extends Roll {
      * The amount of dice actually thrown after all dice explosions have been resolved.
      */
     get poolThrown(): number {
-        return this.dice[0].results.length;
+        return this.sides.length;
     }
 
     get glitched(): boolean {
