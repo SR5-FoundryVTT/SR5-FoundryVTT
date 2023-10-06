@@ -178,7 +178,7 @@ export const ChatData = {
 
     device: (system: DeviceData, labels, props) => {
         if (system.technology && system.technology.rating) props.push(`Rating ${system.technology.rating}`);
-        if (system.category === 'cyberdeck') {
+        if (system.category === 'cyberdeck' || system.category === 'rcc') {
             for (const attN of Object.values(system.atts)) {
                 props.push(`${Helpers.label(attN.att)} ${attN.value}`);
             }
