@@ -1,36 +1,37 @@
 {
-  "authors": [
-    {
-      "discord": "n3rf_herder#9026",
-      "name": "Shawn Milligan"
-    },
-    {
-      "discord": "DJ#1982",
-      "name": "Andrew Cuccinello"
-    },
-    {
-      "discord": "taM#9507",
-      "name": "Jan Schoska"
-    }
-  ],
-  "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues",
-  "compatibility": {
-    "maximum": "11",
-    "minimum": "10",
-    "verified": "11"
-  },
+  "id": "shadowrun5e",
+  "name": "shadowrun5e",
+  "title": "Shadowrun 5th Edition",
   "description": "Shadowrun 5th Edition game",
-  "download": null,
-  "esmodules": [
-    "dist/bundle.js"
-  ],
+  "authors": [{
+      "name": "Shawn Milligan",
+      "discord": "n3rf_herder#9026"
+    },{
+      "name": "Andrew Cuccinello",
+      "discord": "DJ#1982"
+    },{
+      "name": "Jan Schoska",
+      "discord": "taM#9507"
+  }],
+  "url": "https://github.com/smilligan93/SR5-FoundryVTT",
+  "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues",
   "flags": {
     "allowBugReporter": true
   },
-  "gridDistance": 1,
-  "gridUnits": "m",
-  "id": "shadowrun5e",
-  "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
+  "version": "0.12.0",
+  "compatibility": {
+    "minimum": "10",
+    "maximum": "11",
+    "verified": "11"
+  },
+  "minimumCoreVersion": "10",
+  "scripts": [],
+  "esmodules": [
+    "dist/bundle.js"
+  ],
+  "styles": [
+    "dist/bundle.css"
+  ],
   "languages": [
     {
       "lang": "en",
@@ -58,56 +59,51 @@
       "path": "dist/locale/ko/config.json"
     }
   ],
-  "manifest": null,
-  "minimumCoreVersion": "10",
-  "name": "shadowrun5e",
   "packs": [
     {
-      "label": "SR5e Matrix Actions",
       "name": "Matrix Actions",
-      "ownership": {
-        "ASSISTANT": "OWNER",
-        "PLAYER": "OBSERVER",
-        "TRUSTED": "OBSERVER"
-      },
+      "label": "SR5e Matrix Actions",
       "path": "./packs/sr5e-matrix-actions.db",
-      "system": "shadowrun5e",
-      "type": "Item"
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "TRUSTED": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "system": "shadowrun5e"
     },
     {
-      "label": "SR5e General Actions",
       "name": "General Actions",
-      "ownership": {
-        "ASSISTANT": "OWNER",
-        "PLAYER": "OBSERVER",
-        "TRUSTED": "OBSERVER"
-      },
+      "label": "SR5e General Actions",
       "path": "./packs/sr5e-general-actions.db",
-      "system": "shadowrun5e",
-      "type": "Item"
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "TRUSTED": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "system": "shadowrun5e"
     },
     {
-      "label": "SR5e System Macros",
       "name": "System Macros",
-      "ownership": {
-        "ASSISTANT": "OWNER",
-        "PLAYER": "OBSERVER",
-        "TRUSTED": "OBSERVER"
-      },
+      "label": "SR5e System Macros",
       "path": "./packs/sr5e-system-macros.db",
-      "system": "shadowrun5e",
-      "type": "Macro"
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "TRUSTED": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Macro",
+      "system": "shadowrun5e"
     }
   ],
-  "primaryTokenAttribute": "track.physical",
-  "protected": false,
-  "scripts": [],
-  "secondaryTokenAttribute": "track.stun",
   "socket": true,
-  "styles": [
-    "dist/bundle.css"
-  ],
-  "title": "Shadowrun 5th Edition",
-  "url": "https://github.com/smilligan93/SR5-FoundryVTT",
-  "version": "0.12.0"
+  "manifest": null,
+  "download": null,
+  "protected": false,
+  "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
+  "gridDistance": 1,
+  "gridUnits": "m",
+  "primaryTokenAttribute": "track.physical",
+  "secondaryTokenAttribute": "track.stun"
 }
