@@ -419,6 +419,7 @@
     }
   },
   "SR5.ImportCharacter": "캐릭터 불러오기",
+  "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
   "SR5.Incoming": "기본",
   "SR5.IncomingDamage": "받은 피해량",
   "SR5.IncomingDrain": "받은 드레인",

@@ -454,6 +454,7 @@
         }
     },
     "SR5.ImportCharacter": "Import Character",
+    "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Incoming": "Incoming",
     "SR5.IncomingDamage": "Incoming Damage",
     "SR5.IncomingDrain": "Incoming Drain",
