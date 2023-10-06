@@ -33,7 +33,7 @@ export class ItemsParser {
         }
 
         if (importOptions.armor && chummerChar.armors && chummerChar.armors.armor) {
-            const parsedArmors = new ArmorParser().parseArmors(chummerChar);
+            const parsedArmors = await new ArmorParser().parseArmors(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedArmors);
         }
 
