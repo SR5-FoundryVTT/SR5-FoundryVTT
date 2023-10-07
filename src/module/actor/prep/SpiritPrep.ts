@@ -430,6 +430,50 @@ export class SpiritPrep {
                     'unarmed_combat',
                 );
                 break;
+            case "carcass":
+                overrides.attributes.body = 3;
+                overrides.attributes.strength = 2;
+                overrides.attributes.charisma = -1;
+                overrides.skills.push("assensing", "astral_combat", "perception", "unarmed_combat");
+                break;
+            case "corpse":
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = -1;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = -1;
+                overrides.init = 2;
+                overrides.skills.push("assensing", "astral_combat", "perception", "unarmed_combat");
+                break;
+            case "rot":
+                overrides.attributes.body = 3;
+                overrides.attributes.agility = -2;
+                overrides.attributes.strength = 1;
+                overrides.attributes.logic = -1;
+                overrides.attributes.charisma = -1;
+                overrides.skills.push("assensing", "astral_combat", "counterspelling", "exotic_range", "perception", "unarmed_combat");
+                break;
+            case "palefile":
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = -1;
+                overrides.init = 3;
+                overrides.skills.push("assensing", "astral_combat", "exotic_range", "flight", "perception", "unarmed_combat");
+                break;
+            case "detritus":
+                overrides.attributes.body = 5;
+                overrides.attributes.agility = -3;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 4;
+                overrides.attributes.logic = -1;
+                overrides.attributes.charisma = -1;
+                overrides.init = -1;
+                overrides.skills.push("assensing", "astral_combat", "exotic_range", "perception", "unarmed_combat");
+                break;
         }
         return overrides;
     }

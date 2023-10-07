@@ -961,7 +961,12 @@
             "Train": "Train",
             "Water": "Water",
             "Worker": "Insect Worker",
-            "Wraith": "Wraith"
+            "Wraith": "Wraith",
+            "Carcass": "Carcass",
+            "Corpse": "Corpse",
+            "Rot": "Rot",
+            "Palefire": "Palefire",
+            "Detritus": "Detritus"
         }
     },
     "SR5.Sprite": {
