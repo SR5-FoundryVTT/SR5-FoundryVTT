@@ -8,7 +8,7 @@ declare namespace Shadowrun {
     }
 
     // This category is used for both Device and Host item types to differentiate attribute handling.
-    export type DeviceCategory = 'commlink' | 'cyberdeck' | 'host' | '';
+    export type DeviceCategory = 'commlink' | 'cyberdeck' | 'rcc' | 'host' | '';
 
     export interface DevicePartData {
         category: DeviceCategory

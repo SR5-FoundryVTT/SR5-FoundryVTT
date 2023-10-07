@@ -199,6 +199,12 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return deviceData.category === 'cyberdeck';
     }
 
+    isRCC(): boolean {
+        if (!this.isDevice()) return false;
+        const deviceData = this.getData() as DeviceData;
+        return deviceData.category === 'rcc';
+    }
+
     isCommlink(): boolean {
         if (!this.isDevice()) return false;
         const deviceData = this.getData() as DeviceData;
@@ -296,7 +302,8 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
             },
         };
 
-        if (this.isCyberdeck()) {
+        // This if statement should cover all types of devices, meaning the "getRating" calls above are always overwritten
+        if (this.isCyberdeck() || this.isRCC() || this.isCommlink()) {
             const atts = this.getData().atts;
             if (atts) {
                 for (let [key, att] of Object.entries(atts)) {

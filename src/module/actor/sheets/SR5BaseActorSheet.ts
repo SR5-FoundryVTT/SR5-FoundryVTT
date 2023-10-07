@@ -1705,7 +1705,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Sync matrix attribute changes (order) made on the actor sheet into item data of the selected cyberdeck.
      *
      * This is done whenever a user changes matrix attribute order directly from the actor sheet matrix section.
-     * It's intent is to also order matrix attribute order on the selected matrix device of that actor.
+     * Its intent is to also order matrix attribute order on the selected matrix device of that actor.
      * 
      * @param event A mouse/pointer event
      */

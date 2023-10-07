@@ -25,6 +25,9 @@ export class WeaponParser {
     };
 
     parseWeapons(chummerChar) {
+        if(chummerChar.weapons == null) {
+            return;
+        }
         const weapons = getArray(chummerChar.weapons.weapon);
         const parsedWeapons = [];
 

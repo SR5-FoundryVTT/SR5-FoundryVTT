@@ -13,6 +13,7 @@ declare namespace Shadowrun {
         range: CritterPowerRange;
         duration: keyof typeof SR5CONFIG.critterPower.durations;
         karma: number;
+        rating: number;
     }
 
     export type CritterPowerCategory = 'mundane' | 'paranormal' | 'weakness' | 'emergent' | 'drake' | 'shapeshifter' | 'free_spirit' | 'paranormal_infected' | 'echoes' | '';

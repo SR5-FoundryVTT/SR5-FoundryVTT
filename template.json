@@ -1415,6 +1415,7 @@
         },
         "critter_power": {
             "templates": ["description", "action", "armor"],
+            "rating": 0,
             "powerType": "",
             "range": "",
             "duration": ""
@@ -1467,6 +1468,7 @@
         },
         "quality": {
             "templates": ["description", "action"],
+            "rating": 0,
             "type": "positive"
         },
         "action": {

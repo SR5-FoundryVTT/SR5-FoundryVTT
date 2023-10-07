@@ -214,96 +214,121 @@ export class CharacterInfoUpdater {
 
     importSkills(system, chummerChar) {
         const chummerSkills = chummerChar.skills.skill;
-        for (let i = 0; i < chummerSkills.length; i++) {
-            try {
-                const chummerSkill = chummerSkills[i];
-                // NOTE: taMiF here: I have no idea what the general islanguage check has been added for.
-                //                   it MIGHT be in order to exclude skill groups or some such, but I haven't found a reason
-                //                   for it. Since it's working with it, I'll leave it to the pile. Warm your hands.
-                if ((chummerSkill.rating > 0 ||chummerSkill.isnativelanguage === 'True') && chummerSkill.islanguage) {
-                    let determinedGroup = 'active';
-                    let parsedSkill = null;
 
-                    // Either find an active skill are prepare knowledge skills.
-                    if (chummerSkill.islanguage && chummerSkill.islanguage.toLowerCase() === 'true') {
-                        const id = randomID(16);
-                        parsedSkill = {};
-                        system.skills.language.value[id] = parsedSkill;
-                        determinedGroup = 'language';
-
-                        // Transform native rating into max rating.
-                        if (chummerSkill.isnativelanguage === 'True') {
-                            chummerSkill.rating = 6;
-                        }
-                    }
-                    else if (chummerSkill.knowledge && chummerSkill.knowledge.toLowerCase() === 'true') {
-                        const id = randomID(16);
-                        const category = chummerSkill.skillcategory_english;
-                        parsedSkill = {};
-
-                        // Determine the correct knowledge skill category and assign the skill to it
-                        let skillCategory;
-                        if (category) {
-                            const cat = category.toLowerCase();
-                            if (cat === 'street')
-                                skillCategory = system.skills.knowledge.street.value;
-                            if (cat === 'academic')
-                                skillCategory = system.skills.knowledge.academic.value;
-                            if (cat === 'professional')
-                                skillCategory = system.skills.knowledge.professional.value;
-                            if (cat === 'interest')
-                                skillCategory = system.skills.knowledge.interests.value;
-                            if (skillCategory)
-                                skillCategory[id] = parsedSkill;
-                        }
-                        else {
-                            if (chummerSkill.attribute.toLowerCase() === 'int') {
-                                system.skills.knowledge.street.value[id] = parsedSkill;
-                            }
-                            if (chummerSkill.attribute.toLowerCase() === 'log') {
-                                system.skills.knowledge.professional.value[id] = parsedSkill;
-                            }
-                        }
-                        determinedGroup = 'knowledge';
-                    }
-                    else {
-                        let name = chummerSkill.name
-                            .toLowerCase()
-                            .trim()
-                            .replace(/\s/g, '_')
-                            .replace(/-/g, '_');
-                        if (name.includes('exotic') && name.includes('_weapon'))
-                            name = name.replace('_weapon', '');
-                        if (name === 'pilot_watercraft')
-                            name = 'pilot_water_craft';
-                        parsedSkill = system.skills.active[name];
-                    }
-
-                    // Fill the found skill with a base rating.
-                    if (!parsedSkill) {
-                        console.error(`Couldn't parse skill ${chummerSkill.name}`);
-
-                    } else {
-                        if (determinedGroup !== 'active')
-                            parsedSkill.name = chummerSkill.name;
-                        parsedSkill.base = parseInt(chummerSkill.rating);
-
-                        if (chummerSkill.skillspecializations) {
-                            parsedSkill.specs = this.getArray(
-                                chummerSkill.skillspecializations.skillspecialization.name
-                            );
-                        }
-
-                        // Precaution to later only deal with complete SkillField data models.
-                        _mergeWithMissingSkillFields(parsedSkill);
-                    }
-                }
-            } catch (e) {
-                console.error(e);
-            }
+        try {
+            let languageSkills = chummerSkills.filter(skill => skill.islanguage && skill.islanguage.toLowerCase() === 'true')
+            this.handleLanguageSkills(system, languageSkills)
+    
+            let knowledgeSkills = chummerSkills.filter(skill => skill.rating > 0 && skill.knowledge && skill.knowledge.toLowerCase() === 'true')
+            this.handleKnowledgeSkills(system, knowledgeSkills)
+    
+            let activeSkills = chummerSkills.filter( skill => skill.rating > 0 && !languageSkills.includes(skill) && !knowledgeSkills.includes(skill) );
+            this.handleActiveSkills(system, activeSkills)
+        } catch (e) {
+            console.error(e);
         }
     }
 
+    handleActiveSkills(system, activeSkills) {
 
+        for (let skill of activeSkills) {
+            let name = skill.name_english
+                .toLowerCase()
+                .trim()
+                .replace(/\s/g, '_')
+                .replace(/-/g, '_');
+
+            if (name.includes('exotic') && name.includes('_weapon')) {
+                name = name.replace('_weapon', '');
+            }
+               
+            if (name === 'pilot_watercraft') {
+                name = 'pilot_water_craft';
+            }
+                
+            let parsedSkill = system.skills.active[name];
+
+            parsedSkill.base = parseInt(skill.rating);
+
+            if (skill.skillspecializations) {
+                parsedSkill.specs = this.getArray(
+                    skill.skillspecializations.skillspecialization.name
+                );
+            }
+
+            // Precaution to later only deal with complete SkillField data models.
+            _mergeWithMissingSkillFields(parsedSkill);
+        }
+    }
+
+    handleLanguageSkills(system, languageSkills) {
+
+        for (let skill of languageSkills) {
+            let parsedSkill = {};
+            const id = randomID(16);
+            system.skills.language.value[id] = parsedSkill;
+
+            // Transform native rating into max rating.
+            if (skill.isnativelanguage.toLowerCase() === 'true') {
+                skill.rating = 6;
+            }
+
+            parsedSkill.name = skill.name;
+            parsedSkill.base = parseInt(skill.rating);
+    
+            if (skill.skillspecializations) {
+                parsedSkill.specs = this.getArray(
+                 skill.skillspecializations.skillspecialization.name
+                );
+            }
+    
+            // Precaution to later only deal with complete SkillField data models.
+            _mergeWithMissingSkillFields(parsedSkill);
+        }
+    }
+
+    handleKnowledgeSkills(system, knowledgeSkills) {
+        for (let skill of knowledgeSkills) {
+            const id = randomID(16);
+            let parsedSkill = {};
+    
+            
+            // Determine the correct knowledge skill category and assign the skill to it
+            let skillCategory;
+            if (skill.skillcategory_english) {
+                const cat = skill.skillcategory_english.toLowerCase();
+                if (cat === 'street')
+                    skillCategory = system.skills.knowledge.street.value;
+                if (cat === 'academic')
+                    skillCategory = system.skills.knowledge.academic.value;
+                if (cat === 'professional')
+                    skillCategory = system.skills.knowledge.professional.value;
+                if (cat === 'interest')
+                    skillCategory = system.skills.knowledge.interests.value;
+                if (skillCategory)
+                    skillCategory[id] = parsedSkill;
+            }
+            else {
+                if (skill.attribute.toLowerCase() === 'int') {
+                    system.skills.knowledge.street.value[id] = parsedSkill;
+                }
+                if (skill.attribute.toLowerCase() === 'log') {
+                    system.skills.knowledge.professional.value[id] = parsedSkill;
+                }
+            }
+
+            parsedSkill.name = skill.name;
+            parsedSkill.base = parseInt(skill.rating);
+
+            if (skill.skillspecializations) {
+                parsedSkill.specs = this.getArray(
+                    skill.skillspecializations.skillspecialization.name
+                );
+            }
+
+            // Precaution to later only deal with complete SkillField data models.
+            _mergeWithMissingSkillFields(parsedSkill);
+        }
+    }
 }
 
