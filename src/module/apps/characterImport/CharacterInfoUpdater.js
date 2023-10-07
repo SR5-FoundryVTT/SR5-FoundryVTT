@@ -154,7 +154,7 @@ export class CharacterInfoUpdater {
                 system.attributes.essence.value = chummerChar.totaless;
             }
             if (chummerChar.nuyen) {
-                system.nuyen = parseInt(chummerChar.nuyen.replace(',', ''));
+                system.nuyen = parseInt(chummerChar.nuyen.replace(',', '').replace('.', ''));
             }
         } catch (e) {
             console.error(`Error while parsing character information ${e}`);
@@ -189,7 +189,7 @@ export class CharacterInfoUpdater {
         const atts = chummerChar.attributes[1].attribute;
         atts.forEach((att) => {
             try {
-                const attName = this.parseAttName(att.name);
+                const attName = this.parseAttName(att.name_english);
                 if (attName) {
                     system.attributes[attName].base = this.parseAttBaseValue(att);
                 }
