@@ -22,8 +22,9 @@ export class SpellParser {
     parseSpell(chummerSpell) {
         const action = {};
         const system = {};
+        let category = chummerSpell.category_english;
         system.action = action;
-        system.category = chummerSpell.category.toLowerCase().replace(/\s/g, '_');
+        system.category = category.toLowerCase().replace(/\s/g, '_');
         system.name = chummerSpell.name;
         system.type = chummerSpell.type === 'M' ? 'mana' : 'physical';
         system.range =
@@ -57,7 +58,7 @@ export class SpellParser {
 
         if (chummerSpell.descriptors) {
             const desc = chummerSpell.descriptors.toLowerCase();
-            if (chummerSpell.category.toLowerCase() === 'combat') {
+            if (category.toLowerCase() === 'combat') {
                 system.combat = {};
                 if (desc.includes('indirect')) {
                     system.combat.type = 'indirect';
@@ -83,7 +84,7 @@ export class SpellParser {
                     }
                 }
             }
-            if (chummerSpell.category.toLowerCase() === 'detection') {
+            if (category.toLowerCase() === 'detection') {
                 system.detection = {};
                 const split = desc.split(',');
                 split.forEach((token) => {
@@ -107,7 +108,7 @@ export class SpellParser {
                     };
                 }
             }
-            if (chummerSpell.category.toLowerCase() === 'illusion') {
+            if (category.toLowerCase() === 'illusion') {
                 system.illusion = {};
                 const split = desc.split(',');
                 split.forEach((token) => {
@@ -135,7 +136,7 @@ export class SpellParser {
                     };
                 }
             }
-            if (chummerSpell.category.toLowerCase() === 'manipulation') {
+            if (category.toLowerCase() === 'manipulation') {
                 system.manipulation = {};
                 if (desc.includes('environmental'))
                     system.manipulation.environmental = true;

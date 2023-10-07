@@ -228,6 +228,7 @@
   "SR5.Hits": "Acertos",
   "SR5.HotSim": "Hot Sim",
   "SR5.ImportCharacter": "Importar Personagem",
+  "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
   "SR5.Incoming": "Recebido",
   "SR5.IncomingDamage": "Dano Recebido",
   "SR5.Information": "Info",

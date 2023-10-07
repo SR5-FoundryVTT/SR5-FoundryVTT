@@ -199,8 +199,8 @@ export class VehiclePrep {
     static prepareArmor(system: Shadowrun.VehicleData) {
         const { armor, modifiers } = system;
 
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp']));
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', Number(modifiers['armor']));
+        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp'] || 0));
+        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', Number(modifiers['armor'] || 0));
 
         Helpers.calcTotal(armor);
     }
