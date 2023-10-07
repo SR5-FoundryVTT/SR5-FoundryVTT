@@ -38,7 +38,7 @@ export class ItemsParser {
         }
 
         if (importOptions.cyberware && chummerChar.cyberwares && chummerChar.cyberwares.cyberware) {
-            const parsedCyberware = new CyberwareParser().parseCyberwares(chummerChar);
+            const parsedCyberware = await new CyberwareParser().parseCyberwares(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedCyberware);
         }
 

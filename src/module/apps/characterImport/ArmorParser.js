@@ -75,6 +75,11 @@ export class ArmorParser {
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerArmor.name_english), parserType);
 
-        return createItemData(chummerArmor.name, 'armor', system);
+        let subType = formatAsSlug(chummerArmor.category_english);
+        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
+            system.importFlags.subType = subType;
+        }
+
+        return createItemData(chummerArmor.name, parserType, system);
     }
 }
