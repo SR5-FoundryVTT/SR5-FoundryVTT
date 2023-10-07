@@ -43,7 +43,7 @@ export class SpellParser {
                         .replace(/\s/g, '_')
                         .replace('(', '')
                         .replace(')', '');
-        system.drain = parseInt(chummerSpell.dv.replace('F', ''));
+        system.drain = parseInt(chummerSpell.dv.replace(/[A-Z]*/g, ''));
         system.description = parseDescription(chummerSpell);
 
         let description = '';
