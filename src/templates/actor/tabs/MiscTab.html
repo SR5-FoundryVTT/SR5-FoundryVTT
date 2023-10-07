@@ -4,238 +4,274 @@
             <div>
                 {{#if isCharacter}}
                     <div class="list-item">
-                        <button type="button" class="display import-character">
-                            {{localize "SR5.ImportCharacter"}}
-                        </button>
-                    </div>
-                    <div class="list-item">
-                        <div class="item-left">
-                            <div class="item-text item-name">
-                                {{localize "SR5.Nuyen"}}
-                            </div>
-                        </div>
-                        <div class="item-right">
-                            <div class="item-text input">
-                                <input class="display" type="text" name="system.nuyen" value="{{system.nuyen}}" data-dtype="Number" />
-                                <span class="unit">
-                                <i class="fas fa-yen-sign"></i>
-                            </span>
-                            </div>
+                        <div class="list-item-content">
+                            <button type="button" class="display import-character">
+                                {{localize "SR5.ImportCharacter"}}
+                            </button>
                         </div>
                     </div>
                     <div class="list-item">
-                        <div class="item-left">
-                            <div class="item-text item-name">
-                                {{localize "SR5.Karma"}}
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.Nuyen"}}
+                                </div>
                             </div>
-                        </div>
-                        <div class="item-right">
-                            <div class="item-text">
-                                <input class="display" type="text" size="10" name="system.karma.value" value="{{system.karma.value}}" data-dtype="Number" />
+                            <div class="item-right">
+                                <div class="item-text input">
+                                    <input class="display" type="text" name="system.nuyen" value="{{system.nuyen}}" data-dtype="Number" />
+                                    <span class="unit">
+                                    <i class="fas fa-yen-sign"></i>
+                                </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="list-item">
-                        <div class="item-left">
-                            <div class="item-text item-name">
-                                {{localize "SR5.CareerKarma"}}
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.Karma"}}
+                                </div>
                             </div>
-                        </div>
-                        <div class="item-right">
-                            <div class="item-text">
-                                <input class="display" type="text" size="10" name="system.karma.max" value="{{system.karma.max}}" data-dtype="Number" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-item">
-                        <div class="item-left">
-                            <div class="item-text item-name">
-                                {{localize "SR5.Notoriety"}}
-                            </div>
-                        </div>
-                        <div class="item-right">
-                            <div class="item-text">
-                                <input class="display" type="text" size="10" name="system.notoriety" value="{{system.notoriety}}" data-dtype="Number" />
+                            <div class="item-right">
+                                <div class="item-text">
+                                    <input class="display" type="text" size="10" name="system.karma.value" value="{{system.karma.value}}" data-dtype="Number" />
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="list-item">
-                        <div class="item-left">
-                            <div class="item-text item-name">
-                                {{localize "SR5.PublicAwareness"}}
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.CareerKarma"}}
+                                </div>
                             </div>
-                        </div>
-                        <div class="item-right">
-                            <div class="item-text">
-                                <input class="display" type="text" size="10" name="system.public_awareness" value="{{system.public_awareness}}" data-dtype="Number" />
+                            <div class="item-right">
+                                <div class="item-text">
+                                    <input class="display" type="text" size="10" name="system.karma.max" value="{{system.karma.max}}" data-dtype="Number" />
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="list-item">
-                        <div class="item-left">
-                            <div class="item-text item-name">
-                                {{localize "SR5.StreetCred"}}
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.Notoriety"}}
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="item-text">
+                                    <input class="display" type="text" size="10" name="system.notoriety" value="{{system.notoriety}}" data-dtype="Number" />
+                                </div>
                             </div>
                         </div>
-                        <div class="item-right">
-                            <div class="item-text">
-                                <input class="display" type="text" size="10" name="system.street_cred" value="{{system.street_cred}}" data-dtype="Number" />
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.PublicAwareness"}}
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="item-text">
+                                    <input class="display" type="text" size="10" name="system.public_awareness" value="{{system.public_awareness}}" data-dtype="Number" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.StreetCred"}}
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="item-text">
+                                    <input class="display" type="text" size="10" name="system.street_cred" value="{{system.street_cred}}" data-dtype="Number" />
+                                </div>
                             </div>
                         </div>
                     </div>
                 {{/if}}
                 {{#if hasSpecial }}
                 <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.AwakenedEmerged"}}
-                        </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text input">
-                            <select class="display" name="system.special">
-                                {{#select system.special}} {{#each config.specialTypes as |name type|}}
-                                    <option value="{{type}}">{{localize name}}</option>
-                                {{/each}} {{/select}}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                {{/if}}
-                {{#if awakened}}
-                    <div class="list-item">
+                    <div class="list-item-content">
                         <div class="item-left">
                             <div class="item-text item-name">
-                                {{localize "SR5.DrainResist"}}
+                                {{localize "SR5.AwakenedEmerged"}}
                             </div>
                         </div>
                         <div class="item-right">
                             <div class="item-text input">
-                                <select name="system.magic.attribute" class="display">
-                                    {{#select system.magic.attribute}} {{#each config.attributes as |name type|}}
+                                <select class="display" name="system.special">
+                                    {{#select system.special}} {{#each config.specialTypes as |name type|}}
                                         <option value="{{type}}">{{localize name}}</option>
                                     {{/each}} {{/select}}
                                 </select>
                             </div>
                         </div>
                     </div>
+                </div>
+                {{/if}}
+                {{#if awakened}}
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.DrainResist"}}
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="item-text input">
+                                    <select name="system.magic.attribute" class="display">
+                                        {{#select system.magic.attribute}} {{#each config.attributes as |name type|}}
+                                            <option value="{{type}}">{{localize name}}</option>
+                                        {{/each}} {{/select}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 {{/if}}
                 {{#if hasFullDefense }}
                 <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.FullDefenseAttribute"}}
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.FullDefenseAttribute"}}
+                            </div>
                         </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text input">
-                            <select name="system.full_defense_attribute" class="display">
-                                {{#select system.full_defense_attribute}} {{#each config.attributes as |name type|}}
-                                    <option value="{{type}}">{{localize name}}</option>
-                                {{/each}} {{/select}}
-                            </select>
+                        <div class="item-right">
+                            <div class="item-text input">
+                                <select name="system.full_defense_attribute" class="display">
+                                    {{#select system.full_defense_attribute}} {{#each config.attributes as |name type|}}
+                                        <option value="{{type}}">{{localize name}}</option>
+                                    {{/each}} {{/select}}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {{/if}}
                 {{#if isCharacter}}
                 <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.IsCritter"}}
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.IsCritter"}}
+                            </div>
                         </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text input">
-                            <input type="checkbox" class="checkbox" name="system.is_critter" {{checked system.is_critter}}/>
+                        <div class="item-right">
+                            <div class="item-text input">
+                                <input type="checkbox" class="checkbox" name="system.is_critter" {{checked system.is_critter}}/>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.IsNPC"}}
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.IsNPC"}}
+                            </div>
                         </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text input">
-                            <input type="checkbox" class="checkbox" name="system.is_npc" {{checked system.is_npc}}/>
+                        <div class="item-right">
+                            <div class="item-text input">
+                                <input type="checkbox" class="checkbox" name="system.is_npc" {{checked system.is_npc}}/>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {{#if system.is_npc }}
                 <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.IsGrunt"}}
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.IsGrunt"}}
+                            </div>
                         </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text input">
+                        <div class="item-right">
                             <div class="item-text input">
-                            <input type="checkbox" class="checkbox" name="system.npc.is_grunt" {{checked system.npc.is_grunt}}/>
-                        </div>
+                                <div class="item-text input">
+                                <input type="checkbox" class="checkbox" name="system.npc.is_grunt" {{checked system.npc.is_grunt}}/>
+                            </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {{/if}}
                 <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.Metatype"}}
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Metatype"}}
+                            </div>
                         </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text input">
-                            <select name="system.metatype" class="display">
-                                {{#select system.metatype}} {{#each config.character.types as |name type|}}
-                                    <option value="{{type}}">{{localize name}}</option>
-                                {{/each}} {{/select}}
-                            </select>
+                        <div class="item-right">
+                            <div class="item-text input">
+                                <select name="system.metatype" class="display">
+                                    {{#select system.metatype}} {{#each config.character.types as |name type|}}
+                                        <option value="{{type}}">{{localize name}}</option>
+                                    {{/each}} {{/select}}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {{/if}}
                 {{#if hasSkills}}
                 <div class="list-item">
-                    <button type="button" class="display show-hidden-skills">
-                        {{localize "SR5.RestoreDefaultSkills"}}
-                    </button>
+                    <div class="list-item-content">
+                        <button type="button" class="display show-hidden-skills">
+                            {{localize "SR5.RestoreDefaultSkills"}}
+                        </button>
+                    </div>
                 </div>
                 {{/if}}
                 <div class="list-item">
-                    <button type="button" class="display reset-actor-run-data" data-tooltip="SR5.Tooltips.Actor.ResetActorForNewRun">
-                        {{localize "SR5.Labels.ActorSheet.ResetActorForNewRun"}}
-                    </button>
+                    <div class="list-item-content">
+                        <button type="button" class="display reset-actor-run-data" data-tooltip="SR5.Tooltips.Actor.ResetActorForNewRun">
+                            {{localize "SR5.Labels.ActorSheet.ResetActorForNewRun"}}
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="flexcol">
                 <div class="scroll-area mods">
                     {{#if situationModifiers}}
-                    <div class="list-item item-section">
-                        <div class="item-left">
-                            <div class="item-text item-name">
-                                {{localize "SR5.SituationalModifiersApplication.Title"}}
+                    <div class="list-item item-section">                        
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.SituationalModifiersApplication.Title"}}
+                                </div>
                             </div>
-                        </div>
-                        <div class="item-right">
-                            <div class="item-text rtg">
-                                {{localize "SR5.Value"}}
+                            <div class="item-right">
+                                <div class="item-text rtg">
+                                    {{localize "SR5.Value"}}
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="mods">
                         {{#each situationModifiers}}
                             {{#if (not this.hidden)}}
-                            <div class="list-item">
-                                <div class="item-left">
-                                    <div class="item-text item-name show-situation-modifiers-application">
-                                        {{localize this.label}}
+                            <div class="list-item">                                
+                                <div class="list-item-content">
+                                    <div class="item-left">
+                                        <div class="item-text item-name show-situation-modifiers-application">
+                                            {{localize this.label}}
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="item-right">
-                                    <div class="item-text rtg">
-                                        {{this.value}}
+                                    <div class="item-right">
+                                        <div class="item-text rtg">
+                                            {{this.value}}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -243,37 +279,41 @@
                         {{/each}}
                     </div>
                     {{/if}}
-                    <div class="list-item item-section">
-                        <div class="item-left">
-                            <div class="item-text item-name">
-                                {{localize "SR5.Modifier"}}
-                            </div>
-                        </div>
-                        <div class="item-right">
-                            <div class="item-text rtg">
-                                {{localize "SR5.Value"}}
-                            </div>
-                        </div>
-                    </div>
-                    {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
-                        <div class="list-item">
+                    <div class="list-item item-section">                        
+                        <div class="list-item-content">
                             <div class="item-left">
-                                <div class="item-text item-name" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
-                                    {{localizeOb id ../config.actorModifiers}}
+                                <div class="item-text item-name">
+                                    {{localize "SR5.Modifier"}}
                                 </div>
                             </div>
                             <div class="item-right">
                                 <div class="item-text rtg">
-                                    <input
-                                            class="display attribute-input"
-                                            size="4"
-                                            maxlength="3"
-                                            type="text"
-                                            name="system.modifiers.{{id}}"
-                                            value="{{value}}"
-                                            placeholder="None"
-                                            data-dtype="Number"
-                                    />
+                                    {{localize "SR5.Value"}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
+                        <div class="list-item">                            
+                            <div class="list-item-content">
+                                <div class="item-left">
+                                    <div class="item-text item-name" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
+                                        {{localizeOb id ../config.actorModifiers}}
+                                    </div>
+                                </div>
+                                <div class="item-right">
+                                    <div class="item-text rtg">
+                                        <input
+                                                class="display attribute-input"
+                                                size="4"
+                                                maxlength="3"
+                                                type="text"
+                                                name="system.modifiers.{{id}}"
+                                                value="{{value}}"
+                                                placeholder="None"
+                                                data-dtype="Number"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -1,119 +1,123 @@
 <div class="inventory">
     <div class="scroll-area">
         <div class="list-item item-section">
-            <div class="item-left">
-                <div class="item-text rtg"></div>
-                <div class="item-text item-name">
-                    {{localize "SR5.WeaponMod"}}
+            <div class="list-item-content">
+                <div class="item-left">
+                    <div class="item-text rtg"></div>
+                    <div class="item-text item-name">
+                        {{localize "SR5.WeaponMod"}}
+                    </div>
                 </div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{localize "SR5.MountPoint"}}
-                </div>
-                <div class="item-text">
-                    {{localize "SR5.DP"}}
-                </div>
-                <div class="item-text">
-                    {{localize "SR5.Accuracy"}}
-                </div>
-                <div class="item-text">
-                    {{localize "SR5.RecoilCompensation"}}
-                </div>
-                <div class="item-text">
-                    {{localize "SR5.Conceal"}}
-                </div>
-                <div class="item-text item-icons">
-                    <a class="add-new-mod roll" title="Add Ammo" >
-                        <i class="fas fa-plus"></i>
-                        {{localize "SR5.Add"}}
-                    </a>
+                <div class="item-right">
+                    <div class="item-text">
+                        {{localize "SR5.MountPoint"}}
+                    </div>
+                    <div class="item-text">
+                        {{localize "SR5.DP"}}
+                    </div>
+                    <div class="item-text">
+                        {{localize "SR5.Accuracy"}}
+                    </div>
+                    <div class="item-text">
+                        {{localize "SR5.RecoilCompensation"}}
+                    </div>
+                    <div class="item-text">
+                        {{localize "SR5.Conceal"}}
+                    </div>
+                    <div class="item-text item-icons">
+                        <a class="add-new-mod roll" title="Add Ammo" >
+                            <i class="fas fa-plus"></i>
+                            {{localize "SR5.Add"}}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
         {{#each weaponMods as |mod id|}}
         <div class="list-item" data-item-id="{{mod._id}}">
-            <div class="item-left">
-                <div class="item-text rtg">
-                    <i
-                        title="{{localize 'SR5.ToggleEquip'}}"
-                        class="mod-equip roll
-                             {{#if mod.system.technology.equipped}}
-                              fas fa-check-circle
-                             {{else}}
-                              far fa-circle
-                             {{/if}}"
-                    >
-                    </i>
+            <div class="list-item-content">
+                <div class="item-left">
+                    <div class="item-text rtg">
+                        <i
+                            title="{{localize 'SR5.ToggleEquip'}}"
+                            class="mod-equip roll
+                                {{#if mod.system.technology.equipped}}
+                                fas fa-check-circle
+                                {{else}}
+                                far fa-circle
+                                {{/if}}"
+                        >
+                        </i>
+                    </div>
+                    <div class="item-text item-name has-desc roll">
+                        {{mod.name}}
+                    </div>
                 </div>
-                <div class="item-text item-name has-desc roll">
-                    {{mod.name}}
+                <div class="item-right">
+                    <div class="item-text">
+                        <input
+                            class="display left"
+                            type="text"
+                            value="{{localizeOb mod.system.mount_point ../config.mountPoints}}"
+                            disabled
+                        />
+                    </div>
+                    <div class="item-text">
+                        <input
+                            class="display"
+                            size="3"
+                            type="text"
+                            disabled
+                            value="{{mod.system.dice_pool}}"
+                            placeholder="0"
+                        />
+                    </div>
+                    <div class="item-text">
+                        <input
+                            class="display"
+                            size="3"
+                            type="text"
+                            disabled
+                            value="{{mod.system.accuracy}}"
+                            placeholder="0"
+                        />
+                    </div>
+                    <div class="item-text">
+                        <input
+                            class="display"
+                            size="3"
+                            type="text"
+                            disabled
+                            value="{{mod.system.rc}}"
+                            placeholder="0"
+                        />
+                    </div>
+                    <div class="item-text">
+                        <input
+                            class="display"
+                            size="3"
+                            type="text"
+                            disabled
+                            value="{{mod.system.conceal}}"
+                            placeholder="0"
+                        />
+                    </div>
+                    <div class="item-text item-icons">
+                        <i class="roll fas fa-edit edit-item" title="Edit Mod"></i>
+                        <i class="roll fas fa-trash mod-delete" title="Delete Mod"></i>
+                    </div>
                 </div>
             </div>
-            <div class="item-right">
-                <div class="item-text">
-                    <input
-                        class="display left"
-                        type="text"
-                        value="{{localizeOb mod.system.mount_point ../config.mountPoints}}"
-                        disabled
-                    />
-                </div>
-                <div class="item-text">
-                    <input
-                        class="display"
-                        size="3"
-                        type="text"
-                        disabled
-                        value="{{mod.system.dice_pool}}"
-                        placeholder="0"
-                    />
-                </div>
-                <div class="item-text">
-                    <input
-                        class="display"
-                        size="3"
-                        type="text"
-                        disabled
-                        value="{{mod.system.accuracy}}"
-                        placeholder="0"
-                    />
-                </div>
-                <div class="item-text">
-                    <input
-                        class="display"
-                        size="3"
-                        type="text"
-                        disabled
-                        value="{{mod.system.rc}}"
-                        placeholder="0"
-                    />
-                </div>
-                <div class="item-text">
-                    <input
-                        class="display"
-                        size="3"
-                        type="text"
-                        disabled
-                        value="{{mod.system.conceal}}"
-                        placeholder="0"
-                    />
-                </div>
-                <div class="item-text item-icons">
-                    <i class="roll fas fa-edit edit-item" title="Edit Mod"></i>
-                    <i class="roll fas fa-trash mod-delete" title="Delete Mod"></i>
-                </div>
-            </div>
-        </div>
-        <div class="list-item hidden">
-            <div class="item-desc">
-                <div class="props">
-                    {{#each item.properties}}
-                    <span>{{this}}</span>
-                    {{/each}}
-                </div>
-                <div class="description">
-                    {{{mod.descriptionHTML}}}
+            <div class="list-item-description hidden">
+                <div class="item-desc">
+                    <div class="props">
+                        {{#each item.properties}}
+                        <span>{{this}}</span>
+                        {{/each}}
+                    </div>
+                    <div class="description">
+                        {{{mod.descriptionHTML}}}
+                    </div>
                 </div>
             </div>
         </div>

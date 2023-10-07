@@ -78,7 +78,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      */
     override async _onItemCreate(event) {
         event.preventDefault();
-        const type = Helpers.listItemId(event);
+        const type = event.currentTarget.closest('.list-header').dataset.itemId;
 
         if (type !== 'summoning' && type !== 'compilation') return await super._onItemCreate(event);
         await this._onCallInActionCreate(type);

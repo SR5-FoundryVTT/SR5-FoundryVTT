@@ -1,5 +1,5 @@
-$nodesto: 'Nodesto', 'Signika', 'Palatino Linotype', serif;
-$signika: 'Signika', 'Palatino Linotype', serif;
+$systemFonts: 'klavika-medium', 'Signika', 'Palatino Linotype', serif;
+// $signika: 'Signika', 'Palatino Linotype', serif;
 
 $black: black;
 $blue: blue;
@@ -18,6 +18,7 @@ $dark: darken($grey, 20%);
 $dark-sunken: #414040;
 $matrix-green: rgb(7, 145, 35);
 $mce-background: #939393;
+$yellow: #ebb531;
 
 $stun: $blue;
 $physical: $red;

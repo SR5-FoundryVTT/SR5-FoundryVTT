@@ -1,64 +1,60 @@
 <form>
-    <div class="container container--fluid dialog-content-common">
-        <div class="container__row">
-            <div class="container__col-half dialog-content-column sunken">
-                <h2>{{localize test.title}}</h2>
-                <hr/>
-                <div>
-                    <div class="form-group">
-                        <label>{{localize "ITEM.TypeAmmo"}}</label>
-                        <input type="text" class="disabled-for-display" disabled
-                            value="{{test.item.system.ammo.current.value}}/{{test.item.system.ammo.current.max}}"/>
-                    </div>
-                    <div class="form-group">
-                        <label data-tooltip="SR5.Tooltips.RangedAttack.RecoilCompensation">{{localize 'SR5.RecoilCompensation'}}</label>
-                        <input type="text" class="disabled-for-display" disabled
-                            value="{{test.item.totalRecoilCompensation}}"/>
-                    </div>
-                    <div class="form-group">
-                        <label data-tooltip="SR5.Tooltips.RangedAttack.Recoil">{{localize 'SR5.Recoil'}}</label>
-                        <div class="form-group-element-2">
-                            <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilBeforeAttack">{{test.recoilBeforeAttack}}</span><span data-tooltip="SR5.Tooltips.RangedAttack.RecoilAfterAttack"> => {{test.recoilAfterAttack}}</span></div>
-                        <div id="reset-progressive-recoil" class="form-group-element-1-right roll" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil">Reset</div>
-                    </div>
-                    <div class="form-group">
-                        <label>{{localize 'SR5.FireMode'}}</label>
-                        <select name="test.data.fireModeSelected">
-                            {{#select test.data.fireModeSelected}}
-                            {{#each test.data.fireModes}}
-                            <option value="{{@index}}">
-                                {{localize this.label}} ({{this.value}}) ({{localize (objValue ../config.actionTypes this.action)}})
-                            </option>
-                            {{/each}}
-                            {{/select}}
-                        </select>
-                    </div>
-                    {{#if test.hasTargets}}
-                    <div class="form-group">
-                        <label>{{localize 'SR5.SelectedTargets'}}</label>
-                        <select name="test.data.targetRangesSelected">
-                            {{#select test.data.targetRangesSelected}}
-                            {{#each test.data.targetRanges as |target|}}
-                                <option value="{{@index}}">{{target.name}} [{{localize target.range.label}} ({{target.range.distance}}/{{target.distance}}{{target.unit}})]</option>
-                            {{/each}}
-                            {{/select}}
-                        </select>
-                    </div>
-                    {{else}}
-                    <div class="form-group">
-                        <label>{{localize 'SR5.Range'}}</label>
-                        <select name="test.data.range">
-                            {{#select test.data.range}} {{#each test.data.ranges as |range key|}}
-                            <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
-                            {{/each}} {{/select}}
-                        </select>
-                    </div>
-                    {{/if}}
-                </div>
+    <div class="dialog-content-common">
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.html'}}
+        <hr/>
+        <div>
+            <div class="form-group">
+                <label>{{localize "ITEM.TypeAmmo"}}</label>
+                <input type="text" class="disabled-for-display" disabled
+                    value="{{test.item.system.ammo.current.value}}/{{test.item.system.ammo.current.max}}"/>
             </div>
-            <div class="container__col-half dialog-content-column sunken">
-                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.RangedAttack.RecoilCompensation">{{localize 'SR5.RecoilCompensation'}}</label>
+                <input type="text" class="disabled-for-display" disabled
+                    value="{{test.item.totalRecoilCompensation}}"/>
             </div>
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.RangedAttack.Recoil">{{localize 'SR5.Recoil'}}</label>
+                <div class="form-group-element-2">
+                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilBeforeAttack">{{test.recoilBeforeAttack}}</span><span data-tooltip="SR5.Tooltips.RangedAttack.RecoilAfterAttack"> => {{test.recoilAfterAttack}}</span></div>
+                <div id="reset-progressive-recoil" class="form-group-element-1-right roll" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil">Reset</div>
+            </div>
+            <div class="form-group">
+                <label>{{localize 'SR5.FireMode'}}</label>
+                <select name="test.data.fireModeSelected">
+                    {{#select test.data.fireModeSelected}}
+                    {{#each test.data.fireModes}}
+                    <option value="{{@index}}">
+                        {{localize this.label}} ({{this.value}}) ({{localize (objValue ../config.actionTypes this.action)}})
+                    </option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            </div>
+            {{#if test.hasTargets}}
+            <div class="form-group">
+                <label>{{localize 'SR5.SelectedTargets'}}</label>
+                <select name="test.data.targetRangesSelected">
+                    {{#select test.data.targetRangesSelected}}
+                    {{#each test.data.targetRanges as |target|}}
+                        <option value="{{@index}}">{{target.name}} [{{localize target.range.label}} ({{target.range.distance}}/{{target.distance}}{{target.unit}})]</option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            </div>
+            {{else}}
+            <div class="form-group">
+                <label>{{localize 'SR5.Range'}}</label>
+                <select name="test.data.range">
+                    {{#select test.data.range}} {{#each test.data.ranges as |range key|}}
+                    <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
+                    {{/each}} {{/select}}
+                </select>
+            </div>
+            {{/if}}
+        </div>
+        <div>
+            {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
         </div>
     </div>
 </form>

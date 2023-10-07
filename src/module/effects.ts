@@ -22,8 +22,8 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
 
     event.preventDefault();
     // These element grabs rely heavily on HTML structure within the templates.
-    const icon = event.currentTarget;
-    const item = event.currentTarget.closest('.list-item');
+    const icon = event.currentTarget;    
+    const item = event.currentTarget.closest('.list-item-effect');
     const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId) : null;
     // The HTML dataset must be defined
     switch (icon.dataset.action) {
@@ -49,9 +49,7 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
             return effect.toggleDisabled();
         case "open-origin":
             return effect.renderSourceSheet();
-
         default:
-            console.error(`An active effect with the id '${effect}' couldn't be managed as no action has been defined within the template.`);
             return;
     }
 }

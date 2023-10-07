@@ -1,35 +1,31 @@
 <form>
-    <div class="container container--fluid dialog-content-common">
-        <div class="container__row">
-            <div class="container__col-half dialog-content-column sunken">
-                <h2>{{localize test.title}}</h2>
-                <hr />
-                <div>
-                    <div class="form-group">
-                        <label data-tooltip="SR5.Tooltips.SummoningTest.SpiritType">{{localize 'SR5.Labels.Action.SpiritType'}}</label>
-                        <select name="test.data.spiritTypeSelected">
-                            {{#select test.data.spiritTypeSelected}}
-                            {{#each config.spiritTypes as |name type|}}
-                            <option value="{{type}}">
-                                {{localize name}}
-                            </option>
-                            {{/each}}
-                            {{/select}}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label data-tooltip="SR5.Tooltips.SummoningTest.Force">{{localize "SR5.Force"}}</label>
-                        <input name="test.data.force" type="number" class="disabled-for-display" value="{{test.data.force}}" />
-                    </div>
-                    <div class="form-group">
-                        <label data-tooltip="SR5.Tooltips.SummoningTest.ReagentDrams">{{localize "SR5.Reagent"}}</label>
-                        <input name="test.data.reagent" type="number" class="disabled-for-display" value="{{test.data.reagent}}" />
-                    </div>
-                </div>
+    <div class="dialog-content-common">
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.html'}}
+        <hr />
+        <div>
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.SummoningTest.SpiritType">{{localize 'SR5.Labels.Action.SpiritType'}}</label>
+                <select name="test.data.spiritTypeSelected">
+                    {{#select test.data.spiritTypeSelected}}
+                    {{#each config.spiritTypes as |name type|}}
+                    <option value="{{type}}">
+                        {{localize name}}
+                    </option>
+                    {{/each}}
+                    {{/select}}
+                </select>
             </div>
-            <div class="container__col-half dialog-content-column sunken">
-                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.SummoningTest.Force">{{localize "SR5.Force"}}</label>
+                <input name="test.data.force" type="number" class="disabled-for-display" value="{{test.data.force}}" />
+            </div>
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.SummoningTest.ReagentDrams">{{localize "SR5.Reagent"}}</label>
+                <input name="test.data.reagent" type="number" class="disabled-for-display" value="{{test.data.reagent}}" />
             </div>
         </div>
+    </div>
+    <div>
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
     </div>
 </form>

@@ -16,15 +16,23 @@
         display: flex;
         flex-flow: row nowrap;
         align-items: stretch;
-        border: $groove;
+        // border: $groove;
         .item-name {
+            @include systemFonts;
+            border: 0px;
             flex: 1;
-            font-family: $signika;
+            height: 60px;
             font-size: var(--font-size-18);
+
             .display {
-                padding-top: 1em;
-                padding-bottom: 1em;
+                background: url("assets/item-banner.webp") repeat;
                 border: none;
+                font-family: 'klavika-medium';
+                height: 60px;
+                padding-bottom: 1em;
+                padding-left: 7px;
+                padding-top: 1em;
+                text-align: left;
             }
         }
         .source {
@@ -32,24 +40,30 @@
             display: flex;
             flex-flow: row nowrap;
             position: relative;
+            height: 2em;
+
             .source-button {
-                position: absolute;
-                left: .5em;
-                top: .5em;
-                font-size: 16px;
                 color: $light;
-                width: 2em;
+                font-size: 16px;
                 height: 2em;
+                left: .5em;
+                padding: 2px;
+                position: absolute;
+                top: .2em;
+                width: 2em;
             }
+
             .display {
-                padding-top: 1em;
-                padding-bottom: 1em;
+                // padding-top: 1em;
+                // padding-bottom: 1em;
+                // padding-top: 2px;
+                // padding-bottom: 0px;
                 height: auto;
                 border: none;
             }
         }
         .item-type {
-            @include nodesto;
+            @include systemFonts;
             flex: 0;
             padding: 0 0.5em;
             color: $color;
@@ -72,17 +86,13 @@
             }
         }
     }
-    .item-sidebar {
-        > * {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: space-between;
-        }        
-        min-width: fit-content;
-        padding: 0.5em 0.5em 0.5em 0.5em;
-    }
     .technology {
-        @include nodesto;
+        @include systemFonts;
+
+        min-width: 12em;
+        padding-top: 10px;
+        padding-left: 10px;
+
         > * {
             display: flex;
             flex-flow: row nowrap;
@@ -93,17 +103,17 @@
             top: 5px;
             left: 2px;
         }
-        min-width: 7em;
-        border-top: $groove;
-        border-right: $groove;
-        border-bottom: $groove;
+
+        label {
+            color: $yellow;
+        }
+        
     }
     .description {
         padding: 2px;
+        padding-left: 10px;
         height: 100%;
         min-height: 16em;
-        border: $groove;
-        margin-left: -$groove-width;
         overflow-y: auto;
     }
     .item-form {
@@ -111,8 +121,6 @@
         .header {
             @include title;
             font-size: 1.75em;
-            border-top: $groove;
-            border-bottom: $groove;
         }
         .form-line {
             display: flex;
@@ -126,7 +134,7 @@
             .label {
                 color: $light;
                 font-size: 1.15em;
-                @include nodesto;
+                @include systemFonts;
             }
             .inputs {
                 display: flex;
