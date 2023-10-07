@@ -431,6 +431,8 @@ input[type='text'].display {
     .window-content {
         @include sheet;
         overflow: hidden;
+        border: 1px solid $dark2;
+        border-top: 0px;
     }
 
     .description>.editor {
