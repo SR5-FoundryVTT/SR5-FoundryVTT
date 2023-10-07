@@ -147,7 +147,9 @@ export class CharacterInfoUpdater {
                 }
                 attr.forEach((att) => {
                     const attName = this.parseAttName(att);
-                    if (attName !== 'willpower') system.magic.attribute = att;
+                    if (attName !== 'willpower') {
+                        system.magic.attribute = attName;
+                    }
                 });
             }
             if (chummerChar.totaless) {
