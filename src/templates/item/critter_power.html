@@ -8,6 +8,23 @@
     <section class="sheetbody">
         <div class="tab" data-group="primary" data-tab="description">
             <div class="flexrow align-start nowrap full-height">
+                <div class="flexcol flex0">
+                    <div class="technology">
+                        <div class="flexrow nowrap">
+                            <label>{{localize "SR5.Rating"}}</label>
+                            <input
+                                class="display"
+                                type="text"
+                                size="2"
+                                maxlength="2"
+                                name="system.rating"
+                                value="{{system.rating}}"
+                                data-dtype="Number"
+                                placeholder="0"
+                            />
+                        </div>
+                    </div>
+                </div>
                 {{> "systems/shadowrun5e/dist/templates/item/parts/description.html"}}
             </div>
         </div>
