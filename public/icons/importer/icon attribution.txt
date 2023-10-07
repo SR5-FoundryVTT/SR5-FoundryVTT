@@ -9,6 +9,7 @@ action.svg - Lorc - https://game-icons.net/1x1/lorc/slap.html
 
 Adept Power
 adept_power.svg - Lorc - https://game-icons.net/1x1/lorc/burning-passion.html
+adept_power/adept-spell.svg -
 
 Ammo
 ammo/ammo.svg - Lorc - https://game-icons.net/1x1/lorc/bullets.html

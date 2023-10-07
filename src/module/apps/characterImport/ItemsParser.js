@@ -43,7 +43,7 @@ export class ItemsParser {
         }
 
         if (importOptions.powers && chummerChar.powers && chummerChar.powers.power) {
-            const parsedPowers = new PowerParser().parsePowers(chummerChar);
+            const parsedPowers = await new PowerParser().parsePowers(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedPowers);
         }
 

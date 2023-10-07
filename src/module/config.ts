@@ -782,7 +782,9 @@ export const SR5 = {
 
     itemSubTypeIconOverrides: {
         action: {},
-        adept_power: {},
+        adept_power: {
+            'adept-spell': 'systems/shadowrun5e/dist/icons/importer/spell/spell.svg'
+        },
         ammo: {
             'ammo': '',
             'arrow': '',
