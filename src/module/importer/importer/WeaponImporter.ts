@@ -61,6 +61,9 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
                 continue;
             }
 
+            // It might be advantageous to not double import rockets, grenades, or mini-torpedos, which also show up as weapons
+            // They should probably be removed from one category or the other
+
             // Create the item
             let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
             // @ts-ignore // TODO: Foundry Where is my foundry base data?

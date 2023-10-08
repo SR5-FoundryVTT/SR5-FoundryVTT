@@ -42,6 +42,9 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
                 continue;
             }
 
+            // It might be advantageous to not double import rockets, grenades, or mini-torpedos, which also show up as weapons
+            // They should probably be removed from one category or the other
+
             // Create the item
             const item = this.GetDefaultData({type: parserType});
             item.name = ImportHelper.StringValue(equipment, 'name');
