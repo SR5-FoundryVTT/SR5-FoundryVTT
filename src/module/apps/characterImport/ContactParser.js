@@ -1,14 +1,22 @@
-import { parseDescription, getArray, createItemData } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import * as IconAssign from '../../apps/iconAssigner/iconAssign';
+import { SR5 } from "../../config";
 
 export class ContactParser {
-    parseContacts(chummerChar) {
-        
+
+    async parseContacts(chummerChar, assignIcons) {
+
         const chummerContacts = getArray(chummerChar.contacts.contact);
         const parsedContacts = [];
+        const iconList = await IconAssign.getIconFiles();
 
-        chummerContacts.forEach((chummerContact) => {
+        chummerContacts.forEach(async (chummerContact) => {
             try {
                 const itemData = this.parseContact(chummerContact);
+
+                // Assign the icon if enabled
+                if (assignIcons) itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList);
+
                 parsedContacts.push(itemData);
             } catch (e) {
                 console.error(e);
@@ -19,6 +27,7 @@ export class ContactParser {
     }
 
     parseContact(chummerContact) {
+        const parserType = 'contact';
         const system = {};
         system.type = chummerContact.role;
 
@@ -40,6 +49,10 @@ export class ContactParser {
         system.description = parseDescription(chummerContact);
 
         const itemName = chummerContact.name ? chummerContact.name : '[Unnamed connection]';
+
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(itemName), parserType);
+
         const itemData = createItemData(itemName, 'contact', system);
         return itemData;
     }

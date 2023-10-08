@@ -59,7 +59,7 @@ export class ItemsParser {
         }
 
         if (importOptions.contacts && chummerChar.contacts && chummerChar.contacts.contact) {
-            const parsedContacts = new ContactParser().parseContacts(chummerChar);
+            const parsedContacts = await new ContactParser().parseContacts(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedContacts);
         }
 
