@@ -49,7 +49,7 @@ export class ItemsParser {
 
         if (importOptions.equipment && chummerChar.gears && chummerChar.gears.gear) {
             const gears = getArray(chummerChar.gears.gear);
-            const allGearData = new GearsParser().parseGears(gears);
+            const allGearData = await new GearsParser().parseGears(gears, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, allGearData);
         }
 
