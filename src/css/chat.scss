@@ -46,29 +46,27 @@
             color: $yellow;
             border-color: $yellow;
         }
-        .card-buttons {
-            .button {
-                &:hover {
-                    cursor: pointer;
-                    // box-shadow: 0 0 0.25em 0.15em $black;
-                    outline: none;
-                    box-shadow: 0 0 5px var(--color-shadow-primary);
-                }
-                
-                color: $color;
-                border-color: $black;
-                background: rgba($light, 0.1);
-                border-radius: 0.3em;
-                text-align: center;
-                margin-top: 0.5em;
-                margin-left: auto;
-                margin-right: auto;
-                text-align: center;
-
-                // font-size: 16px;
-                // font-style: italic;
-                // font-weight: bold;
+        .button {
+            &:hover {
+                cursor: pointer;
+                // box-shadow: 0 0 0.25em 0.15em $black;
+                outline: none;
+                box-shadow: 0 0 5px var(--color-shadow-primary);
             }
+            
+            color: $color;
+            border-color: $black;
+            background: rgba($light, 0.2);
+            border-radius: 0.3em;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            padding-left: 1em;
+            padding-right: 1em;
+            text-align: center;
         }
         .card-description {
             span {
@@ -85,22 +83,7 @@
             .card-description-content {
                 border-bottom: $groove;
             }
-        }
-
-        /** 
-         * Provide a button look-alike for interaction.
-         */
-        .button {
-            &:hover {
-                box-shadow: 0 0 0.25em 0.15em $black;
-            }
-            cursor: pointer;
-            border: $groove;
-            background: $grey;
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-        }
+        }        
 
         .damage-line {
             margin-top: 0.25em;
