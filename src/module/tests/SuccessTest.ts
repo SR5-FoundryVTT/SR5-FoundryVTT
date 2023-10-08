@@ -1787,9 +1787,13 @@ export class SuccessTest {
         // SuccessTest doesn't NEED an actor, if one is cast that way: show gm-only-content
         if (!test.actor || !game.user) {
             html.find('.gm-only-content').removeClass('gm-only-content');
+            // @ts-ignore
+            ui.chat.scrollBottom();
         }
         else if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
             html.find('.gm-only-content').removeClass('gm-only-content');
+            // @ts-ignore
+            ui.chat.scrollBottom();
         }
     }
 
