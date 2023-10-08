@@ -10,16 +10,30 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Substitute Manifest and Download Links
-      id: sub_manifest_link_version
-      uses: microsoft/variable-substitution@v1
+    - name: Update settings.json url
+      uses: jossef/action-set-json-field@v2.1
       with:
-        files: 'system.json'
-      env:
-        version: ${{github.event.release.tag_name}}
-        url: https://github.com/${{github.repository}}
-        manifest: https://github.com/${{github.repository}}/releases/latest/download/system.json
-        download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/shadowrun5e.zip
+        file: system.json
+        field: url
+        value: https://github.com/${{github.repository}}        
+    - name: Update settings.json manifest
+      uses: jossef/action-set-json-field@v2.1
+      with:
+        file: system.json
+        field: manifest
+        value: https://github.com/${{github.repository}}/releases/latest/download/system.json
+    - name: Update settings.json version
+      uses: jossef/action-set-json-field@v2.1
+      with:
+        file: system.json
+        field: version
+        value: ${{github.event.release.tag_name}}
+    - name: Update settings.json download
+      uses: jossef/action-set-json-field@v2.1
+      with:
+        file: system.json
+        field: download
+        value: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/shadowrun5e.zip
 
     - run: |
           npm ci
