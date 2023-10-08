@@ -64,7 +64,7 @@ export class ItemsParser {
         }
 
         if (importOptions.lifestyles && chummerChar.lifestyles && chummerChar.lifestyles.lifestyle) {
-            const parsedLifestyles = new LifestyleParser().parseLifestyles(chummerChar);
+            const parsedLifestyles = await new LifestyleParser().parseLifestyles(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedLifestyles);
         }
 
