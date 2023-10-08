@@ -92,7 +92,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * @param name The item's name or subtype name to reformat
      */
     public formatAsSlug(name: string): string {
-        return name.trim().toLowerCase().replace((/'/), '').split((/-| |\//)).join('-');
+        return name.trim().toLowerCase().replace((/'|,|\[|\]|\(|\)/g), '').split((/-|\s|\//g)).join('-');
     }
 
     /**
