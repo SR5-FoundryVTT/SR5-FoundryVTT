@@ -451,6 +451,14 @@ input[type='text'].display {
         overflow-y: auto;
     }
 
+    img {
+        box-sizing: border-box;
+        border: 1px solid var(--color-border-dark);
+        border-radius: 2px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
     .profile-img {
         padding: 0.25em;
         max-width: 100px;
