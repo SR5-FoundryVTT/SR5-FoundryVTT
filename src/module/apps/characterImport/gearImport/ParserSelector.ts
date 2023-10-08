@@ -30,9 +30,9 @@ export class ParserSelector {
             return new AmmoParser();
         }
 
-        if (chummerGear.category === 'Common Programs' || 
-            chummerGear.category === 'Hacking Programs' || 
-            chummerGear.category === 'Software')
+        if (chummerGear.category_english === 'Common Programs' || 
+            chummerGear.category_english === 'Hacking Programs' || 
+            chummerGear.category_english === 'Software')
         {
             return new ProgramParser();
         }
