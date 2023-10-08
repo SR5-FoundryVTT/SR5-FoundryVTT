@@ -42,8 +42,12 @@
         flex-flow: row;
         flex-wrap: nowrap;
         justify-content: space-between;
+
+        // Used to center special attributes.
+        // Therefore we can't have growing gap, but must have a fixed one.
         &.center {
             justify-content: center;
+            gap: 20px;
         }
         &.no-border {
             border-top: none;
