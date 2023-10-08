@@ -2,6 +2,7 @@
 
 .sr5 {
     &.chat-card {
+        @include sheet;
         font-style: normal;
         font-size: 1rem;
 
@@ -22,6 +23,7 @@
         .card-header {
             padding: 0.25em 0;
             border-bottom: $groove;
+            
 
             img {
                 flex: 0 0;
@@ -33,33 +35,38 @@
             }
 
             h3 {
-                font-size: var(--font-size-16);
                 font-weight: bold;
                 align-self: center;
                 flex: 1;
                 margin: 0;
+                font-size: var(--font-size-12);
             }
         }
         .card-header:first-of-type {
-            border-top: $groove;
+            color: $yellow;
+            border-color: $yellow;
         }
-        .card-buttons {
-            .button {
-                box-shadow: 0 0 0.25em 0.15em $dark;
-                &:hover {
-                    box-shadow: 0 0 0.25em 0.15em $black;
-                }
+        .button {
+            &:hover {
                 cursor: pointer;
-                border: $groove;
-                background: $grey;
-                margin-top: 0.5em;
-                margin-left: auto;
-                margin-right: auto;
-                text-align: center;
-                font-size: 16px;
-                font-style: italic;
-                font-weight: bold;
+                // box-shadow: 0 0 0.25em 0.15em $black;
+                outline: none;
+                box-shadow: 0 0 5px var(--color-shadow-primary);
             }
+            
+            color: $color;
+            border-color: $black;
+            background: rgba($light, 0.2);
+            border-radius: 0.3em;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            padding-left: 1em;
+            padding-right: 1em;
+            text-align: center;
         }
         .card-description {
             span {
@@ -76,22 +83,7 @@
             .card-description-content {
                 border-bottom: $groove;
             }
-        }
-
-        /** 
-         * Provide a button look-alike for interaction.
-         */
-        .button {
-            &:hover {
-                box-shadow: 0 0 0.25em 0.15em $black;
-            }
-            cursor: pointer;
-            border: $groove;
-            background: $grey;
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-        }
+        }        
 
         .damage-line {
             margin-top: 0.25em;
@@ -264,7 +256,7 @@
                 }
             }
             .test-code {
-                font-family: $signika;
+                @include systemFonts;
                 font-size: var(--font-size-12);
             }
         }

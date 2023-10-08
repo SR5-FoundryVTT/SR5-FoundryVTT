@@ -1,5 +1,7 @@
 import {CharacterInfoUpdater} from "./CharacterInfoUpdater"
 import {ItemsParser} from "./ItemsParser"
+import VehicleParser from "./vehicleImport/VehicleParser.js";
+
 
 /**
  * Imports characters from other tools into an existing foundry actor.
@@ -29,6 +31,7 @@ export class CharacterImporter {
         const updatedActorData = await characterInfoUpdater.update(actor._source, chummerCharacter);
         const items = new ItemsParser().parse(chummerCharacter, importOptions);
 
+        new VehicleParser().parseVehicles(actor, chummerCharacter, importOptions)
 
         await actor.update(updatedActorData);
         await actor.createEmbeddedDocuments('Item', items);

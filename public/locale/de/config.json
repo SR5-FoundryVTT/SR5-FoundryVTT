@@ -456,6 +456,7 @@
         }
     },
     "SR5.ImportCharacter": "Charakter importieren",
+    "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Incoming": "Kommend",
     "SR5.IncomingDamage": "Schaden",
     "SR5.IncomingDrain": "Entzug",
@@ -1166,6 +1167,7 @@
     "SR5.Warnings": {
         "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
         "CantConsumeEquippedAmmo": "Ausgerüstete Munition hat nicht genug Kugeln",
+        "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
         "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
         "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",
         "CantExtendTestFurther": "Probe kann nicht weiter ausgedehnt werden. Zu wenige Würfel übrig oder Schwellenwert erreicht",
@@ -1175,6 +1177,7 @@
         "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
         "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge Punkte können nicht auf Proben ohne Actor angewendet werden.",
         "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
+        "InvalidCompilationLevel": "Resonanz Attribute zu niedrig für Sprite Stufe",
         "InvalidMarksCount": "You've trying to place a strange number of marks",
         "InvalidSummoningForce": "Gewählte Kraft hält sich nicht an die Regeln",
         "NegativeLimitValue": "Limit Werte müssen über Null liegen",

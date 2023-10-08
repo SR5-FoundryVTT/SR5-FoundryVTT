@@ -6,10 +6,18 @@
 @import 'chat';
 @import 'test';
 @import 'tagify';
+@import 'modifiers';
+@import 'modifiers-container';
+@import 'foundry';
 
 @font-face {
-    font-family: 'Nodesto';
-    src: url('assets/fonts/NodestoCapsCondensed.otf');
+    font-family: 'klavika-medium';
+    src: url('assets/fonts/klavika-medium.otf');
+}
+
+@font-face {
+    font-family: 'IwaOGoPro-Md';
+    src: url("assets/fonts/IwaOGoPro-Md.otf");
 }
 
 // .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
@@ -27,7 +35,7 @@
         flex-direction: column;
         flex-wrap: nowrap;
 
-        > * {
+        >* {
             flex: 0;
         }
     }
@@ -37,7 +45,7 @@
         flex-direction: column-reverse;
         flex-wrap: nowrap;
 
-        > * {
+        >* {
             flex: 0;
         }
     }
@@ -86,27 +94,34 @@
 .align-items-center {
     align-items: center;
 }
+
 .align-content-center {
     align-content: center;
 }
+
 .flex0 {
     flex: 0;
 }
+
 .flex1 {
     flex: 1;
 }
+
 .flex2 {
     flex: 2;
 }
+
 .flex3 {
     flex: 3;
 }
+
 .flex4 {
     flex: 4;
 }
 
 .input {
     position: relative;
+
     .unit {
         @include textOutline;
         position: absolute;
@@ -128,9 +143,11 @@ label.checkbox {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    &:hover input ~ .checkmark {
+
+    &:hover input~.checkmark {
         text-shadow: 0 0 0.2em $rollcolor;
     }
+
     &.init-edge-label {
         margin-right: 1.75em;
         font-size: 0.75em;
@@ -165,6 +182,7 @@ button.plus1_button {
     background: rgba($light, 0.1);
     border-radius: 0.3em;
     text-align: center;
+
     &:hover {
         cursor: pointer;
     }
@@ -180,6 +198,7 @@ input[type='checkbox'].display {
     border: none;
     text-align: center;
     font-size: 1em;
+
     &:hover {
         background: transparent;
         border: $groove;
@@ -199,23 +218,28 @@ input[type='text'].display {
     border-color: $black;
     text-align: center;
     min-height: 1em;
+
     &::placeholder {
         color: $light-2;
     }
+
     &.short {
-        font-size: 0.75em;
-        background: rgba($dark, 0.1);
+        font-size: 0.75em;        
     }
+
     &.text {
         background: rgba($dark, 0.1);
         border-radius: 0;
     }
+
     &.right {
         text-align: right;
     }
+
     &.left {
         text-align: left;
     }
+
     &:disabled {
         color: $color;
         background: transparent;
@@ -235,6 +259,7 @@ input[type='text'].display {
     .child-on-hover {
         visibility: hidden;
     }
+
     &:hover {
         .child-on-hover {
             visibility: visible;
@@ -242,17 +267,23 @@ input[type='text'].display {
     }
 }
 
-select.display {
-    color: $color;
-    background: rgba($black, 0.05);
-    border-radius: 0.3em;
-    border-color: $dark;
-    > option {
-        background-color: $dark;
-    }
-}
-
 .sr5 {
+
+    hr {
+        border-color: $yellow;
+    }
+
+    select.display, select {
+        color: $color;
+        background: rgba($black, 0.05);
+        border-radius: 0.3em;
+        border-color: $dark;
+    
+        >option {
+            background-color: $dark;
+        }
+    }
+
     /**
      * Overwrite FoundryVTT default styling within sheets.
      */
@@ -260,6 +291,7 @@ select.display {
         label {
             font-weight: bold;
         }
+
         input {
             color: $white;
         }
@@ -272,7 +304,8 @@ select.display {
                 border-color: $grey;
             }
 
-            button, input {
+            button,
+            input {
                 width: 25px;
                 height: 25px;
                 line-height: inherit;
@@ -281,6 +314,7 @@ select.display {
             }
         }
     }
+
     /**
      * Elements used for inline editing
      */
@@ -291,8 +325,12 @@ select.display {
     /**
      * Elements used for linkable documents / entities.
      */
-    .entity-link, .content-link {
-        color: $black;
+    .entity-link,
+    .content-link,
+    .inline-roll {
+        border: 0;
+        background: none;
+        color: white;
     }
 
     // An origin link is a uuid based entity link, without drag support.
@@ -309,16 +347,19 @@ select.display {
     .roll {
         @include rollable;
     }
+
     .editor {
         height: 95%;
         width: 100%;
     }
+
     .editor .tox-edit-area {
         background: $mce-background;
     }
 
     // Styling for any prosemirror editors within shadowrun applications.
     .editor.prosemirror {
+
         // handles dropdown menus, not select based.
         .pm-dropdown {
             color: $color;
@@ -327,7 +368,8 @@ select.display {
             border-color: $dark;
 
             // Icons like chevron and ticks.
-            i, i:hover {
+            i,
+            i:hover {
                 color: $color;
             }
 
@@ -335,8 +377,9 @@ select.display {
             ul {
                 background-color: $dark;
             }
+
             // li represents each menu entry in both menus and sub-menus
-            ul > li:hover {
+            ul>li:hover {
                 color: $color;
                 border-color: rgba($white, 0.1);
                 background: rgba($black, 0.05);
@@ -359,43 +402,48 @@ select.display {
         flex-flow: row wrap;
         justify-content: center;
         align-items: center;
+
         &.vertical {
             flex-flow: column nowrap;
             justify-content: flex-end;
             align-items: flex-end;
         }
+
         .part {
             white-space: nowrap;
+
             .value {
                 font-weight: bold;
             }
+
             &.underline {
                 text-decoration: underline;
             }
         }
-        > * {
+
+        >* {
             margin: 0 0.5em;
         }
     }
+
     .no-break {
         white-space: nowrap;
     }
+
     .window-content {
-        background: $sheetbackground;
-        color: $color;
+        @include sheet;
         overflow: hidden;
-        font-size: 115%;
+        border: 1px solid $dark2;
+        border-top: 0px;
     }
 
-    .description > .editor {
+    .description>.editor {
         height: 100%;
         min-height: 15em;
         width: 100%;
         color: $color;
     }
-    .border-right {
-        border-right: $groove;
-    }
+
     .scroll-area {
         height: 100%;
         margin-bottom: 0.5em;
@@ -409,51 +457,54 @@ select.display {
         //border-right: $groove;
         //border-bottom: $groove;
     }
+
     .tabs {
         flex: 0;
-        margin: 0.25em;
-        margin-bottom: -5px;
-        border-bottom: 1px solid $light-border;
         align-items: stretch; // Make tabs stretch instead of space horizontally.
+        border-bottom: 1px solid $yellow;
 
-        > a {
-            margin: 0.25em;
+        >a {
+        margin: 0.25em;
             padding: 0.25em;
             margin-bottom: 0;
             position: relative;
             font-size: 1.15em;
-            border: 1px solid $light-border;
-            border-top-left-radius: 0.25em;
-            border-top-right-radius: 0.25em;
-            border-bottom: none;
             @include rollable;
+
             &.active {
-                @include rolloutline;
-                background-color: rgba($black, 0.4);
+                @include linkHovered;
+                color: $color;
+                // border-color: $black;
+                // border-bottom: 0px;
+                background: rgba($light, 0.1);
             }
         }
-        > .item { // Make tabs stretch across horizontally.
+
+        >.item {
+            // Make tabs stretch across horizontally.
             flex: 1;
             text-align: center;
         }
     }
+
     .tab {
-        border-radius: $radius;
-        margin-top: 0.25em;
         height: 100%;
+
         .tabbody {
             height: 100%;
             display: flex;
             flex-flow: column nowrap;
 
-            > * {
+            >* {
                 flex: 0;
             }
-            > .inventory {
+
+            >.inventory {
                 flex: 1;
             }
         }
     }
+
     .split-container {
         display: flex;
         flex-flow: row nowrap;
@@ -461,14 +512,17 @@ select.display {
         align-items: stretch;
         align-content: stretch;
         height: 100%;
-        > * {
+
+        >* {
             flex: 1;
             width: 100%;
         }
-        > *:not(:first-child) {
+
+        >*:not(:first-child) {
             margin-left: 0.25em;
         }
-        > *:not(:last-child) {
+
+        >*:not(:last-child) {
             border-right: $groove;
             padding-right: 0.25em;
         }
@@ -477,10 +531,12 @@ select.display {
     .container {
         max-width: $sheet-max-width;
         margin: 0 auto;
+
         &--fluid {
             margin: 0;
             max-width: 100%;
         }
+
         &__row {
             display: flex;
             flex-wrap: wrap;
@@ -490,7 +546,7 @@ select.display {
         // Auto create grid style classes for a fixed max column grid
         @for $i from 1 through $grid__cols {
             &__col-#{$i} {
-                flex-basis: (100 / ($grid__cols / $i) ) * 1%;
+                flex-basis: (100 / ($grid__cols / $i)) * 1%;
                 overflow: hidden;
             }
         }
@@ -525,54 +581,64 @@ select.display {
         flex-flow: column;
         padding: 2px 4px;
         justify-content: space-around;
-        &:not(:last-child) {
-            border-right: $groove;
-        }
+
         .block-line {
             display: flex;
             flex-flow: row nowrap;
             padding: 4px;
+
             &.center {
                 justify-content: center;
             }
+
             &.border-bottom {
                 border-bottom: $groove;
             }
+
             &.gap-4 {
                 > :not(:first-child) {
                     margin-left: 4px;
                 }
+
                 > :not(:last-child) {
                     margin-right: 4px;
                 }
             }
         }
     }
+
     .horizontal-cell-input {
         display: flex;
         flex-flow: row nowrap;
         justify-content: start;
         padding: 4px;
+
         &.stun .cell {
             box-shadow: 0 0 5px 1px rgba($stun, 0.5);
         }
+
         &.physical .cell {
             box-shadow: 0 0 5px 1px rgba($physical, 0.5);
         }
+
         &.edge .cell {
             box-shadow: 0 0 5px 1px rgba($edge, 0.5);
         }
+
         &.matrix .cell {
             box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
         }
+
         .roll {
             width: 60px;
             margin-right: 8px;
         }
+
         .cell-container {
             display: flex;
             flex-flow: row;
             justify-content: stretch;
+
             .cell {
                 cursor: pointer;
                 text-align: center;
@@ -583,23 +649,28 @@ select.display {
                 background: $black;
                 min-width: 26px;
                 height: 18px;
+
                 &:not(:first-child) {
                     margin-left: 2px;
                 }
+
                 &:not(:last-child) {
                     margin-right: 2px;
                 }
+
                 &.filled {
                     background: $light-2;
                     border-color: $black;
                     color: $black;
                 }
+
                 &:hover {
                     border-color: $light;
                 }
             }
         }
     }
+
     .inventory {
         overflow-y: hidden;
         height: 100%;
@@ -607,92 +678,205 @@ select.display {
         display: flex;
         flex-flow: column nowrap;
     }
+
+    .list-header,
     .list-item {
         font-size: 85%;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        align-items: center;
-        align-content: center;
+        
         padding: 0.1em 0.25em;
         min-height: 26px;
         margin: 0.1em;
         margin-right: $groove-width;
         margin-left: $groove-width;
-        border-bottom: 1px solid $grey;
+
         .has-desc {
             @include rollable;
         }
+
         &.no-border {
             border-bottom: none;
         }
+
         &.center {
             justify-content: center;
         }
+
         &.space-evenly {
             justify-content: space-evenly;
         }
+
         &.item-section {
-            border: $groove-width solid $black;
+            background: black;
+            color: $yellow;
             margin-right: 0;
             margin-left: 0;
-            background: rgba($grey, 0.2);
-            padding: 0.25em;
+            // background: rgba($grey, 0.2);
+            // padding: 0.25em;
+            // border-radius: 0.2em;            
+            border-bottom: 1px solid $yellow;
             border-radius: 0.2em;
+            padding-top: 5px;
+
             &.faded {
                 color: $grey;
             }
+            // &:first-child {
+            //     border-top: 1px solid $yellow;
+            // }
         }
-        .item-center {
+
+        .list-item-content {
             display: flex;
             flex-flow: row nowrap;
+            justify-content: space-between;
             align-items: center;
-            align-self: center;
-        }
-        .item-left {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: flex-start;
-            align-items: center;
-        }
-        .item-right {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: flex-end;
-            align-items: center;
-        }
-        .item-img {
-            padding-right: 0.25em;
-            max-width: 50px;
-            &.item-roll {
-                @include rollable;
-                &:hover {
-                    > img {
-                        content: url('assets/dice-solid.svg');
-                        filter: invert(1);
+            align-content: center;
+
+            .item-center {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                align-self: center;
+            }
+    
+            .item-left {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: flex-start;
+                align-items: center;
+            }
+    
+            .item-right {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: flex-end;
+                align-items: center;
+            }
+    
+            .item-img {
+                padding-right: 0.25em;
+                max-width: 50px;
+    
+                &.item-roll {
+                    @include rollable;
+    
+                    &:hover {
+                        >img {
+                            content: url('assets/dice-solid.svg');
+                            filter: invert(1);
+                        }
                     }
                 }
+    
+                >img {
+                    margin: 0;
+                    transform: translateY(10%);
+                }
+    
+                &+.item-name {
+                    border-left: none !important;
+                }
             }
-            > img {
-                margin: 0;
-                transform: translateY(10%);
+    
+            .item-input {
+                width: 9.5em;
             }
-            & + .item-name {
-                border-left: none !important;
+    
+            .item-icons {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: space-evenly;
+                align-items: center;
+                color: $grey;
+                font-size: 12px;
+                height: 100%;
+            }
+    
+            .item-text {
+                width: 6em; // Long enough to avoid most line breaks / test wrapping...
+                margin: 0 0.1rem;
+                flex: 1 0 auto;
+                text-align: center;
+                height: 100%;
+                border: $light;
+    
+                &.faded {
+                    color: $grey;
+                }
+    
+                &.center {
+                    display: flex;
+                    flex-flow: row;
+                    justify-content: space-around;
+                    align-items: center;
+                    align-content: center;
+                }
+    
+                &.item-name {
+                    text-align: left;
+                    width: auto;
+                }
+    
+                &.element {
+                    width: 7em;
+                }
+    
+                &.radius {
+                    width: 4em;
+                }
+    
+                &.dropoff {
+                    width: 4em;
+                }
+    
+                &.rtg {
+                    width: 3em;
+    
+                    &.active-skills-rating {
+                        padding-right: 1em;
+                    }
+                }
+    
+                &.input {
+                    text-align: right;
+                    width: 9.5em;
+                }
+    
+                &.desc {
+                    width: 16em;
+                }
+            }
+    
+            .skill-item {
+                width: 8em;
+            }
+    
+            .skill-spec-item {
+                width: 15em;
+            }
+    
+            &.skill-header {
+                @include rollable;
             }
         }
-        .item-input {
-            width: 9.5em;
-        }
+    }
+
+    .list-item:nth-of-type(even) {
+        background: rgba($white, 0.03);
+    }
+
+    .list-item-description {
         .item-desc {
             padding: 0.25em;
             font-size: 1em;
             width: 100%;
+
             .props {
                 display: flex;
                 flex-flow: wrap row;
                 padding: 0.25em 0;
-                > * {
+
+                >* {
                     flex-shrink: 0;
                     border-right: $groove;
                     border-bottom: $groove;
@@ -701,6 +885,7 @@ select.display {
                     box-shadow: 0.2em 0.2em 0.3em $black;
                 }
             }
+
             .description {
                 //border-right: $light 2px solid;
                 // border-top: $light 2px solid;
@@ -710,87 +895,8 @@ select.display {
                 //padding-right: 0.5em;
             }
         }
-        .item-icons {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: space-evenly;
-            align-items: center;
-            color: $grey;
-            font-size: 12px;
-            height: 100%;
-        }
-        .item-text {
-            width: 6em; // Long enough to avoid most line breaks / test wrapping...
-            margin: 0 0.1rem;
-            flex: 1 0 auto;
-            text-align: center;
-            height: 100%;
-            border: $light;
-            &.faded {
-                color: $grey;
-            }
-            &.center {
-                display: flex;
-                flex-flow: row;
-                justify-content: space-around;
-                align-items: center;
-                align-content: center;
-            }
-            &.item-name {
-                text-align: left;
-                width: auto;
-            }
-            &.element {
-                width: 7em;
-            }
-            &.radius {
-                width: 4em;
-            }
-            &.dropoff {
-                width: 4em;
-            }
-            &.rtg {
-                width: 3em;
-                &.active-skills-rating {
-                    padding-right: 1em;
-                }
-            }
-            &.input {
-                text-align: right;
-                width: 9.5em;
-            }
-            &.desc {
-                width: 16em;
-            }
-        }
-        .item-create,
-        .item-toggle,
-        .add-new-ammo,
-        .add-new-mod,
-        .add-new-license {
-            color: $color;
-        }
-        .skill-item {
-            width: 8em;
-        }
-        .skill-spec-item {
-            width: 15em;
-        }
-        &.skill-header {
-            @include rollable;
-        }
     }
 
-    .sunken {
-        box-shadow: $dark-sunken-box-shadow;
-        padding: $medium-distance;
-        background-color: $dark-sunken;
-    }
-
-    .card-sunken {
-        @extend .sunken;
-        margin-bottom: $large-distance;
-    }
 
     .modified-target-damage {
         margin-top: $large-distance;
@@ -799,8 +905,8 @@ select.display {
         grid-template-columns: 40px auto auto;
 
         .modified-target-damage-cell {
-            display:flex;
-            align-items:center;
+            display: flex;
+            align-items: center;
             margin-bottom: $small-distance;
         }
     }
@@ -816,12 +922,15 @@ select.display {
         background: rgba($light, 0.1);
         border-radius: 0.3em;
         text-align: center;
+
         &:hover {
             cursor: pointer;
         }
+
         &.short {
             line-height: 1.3em;
         }
+
         &.light {
             color: $black;
             background: $light;
@@ -838,14 +947,17 @@ select.display {
         padding-top: 5px;
         padding-bottom: 5px;
     }
+
     .env-modifier-active {
         border-radius: 8px;
         box-shadow: $dark-sunken-box-shadow;
         background-color: $dark-sunken;
     }
+
     .env-modifier-total {
         font-weight: bold;
     }
+
     td.env-modifier-level {
         padding-right: 6px;
     }
@@ -861,9 +973,13 @@ select.display {
     }
 
     .document-name {
-        font-family: $signika;
+        @include systemFonts;
         font-size: var(--font-size-18);
         font-weight: bold;
+    }
+
+    .cell-input-roll {
+        color: $yellow;
     }
 }
 
@@ -875,88 +991,12 @@ select.display {
     flex-direction: row;
     flex-wrap: wrap;
 }
-.form-dialog .window-content .dialog-buttons > * {
+
+.form-dialog .window-content .dialog-buttons>* {
     flex: 1;
 }
 
 .far-right {
     justify-content: center;
     right: -150px;
-}
-
-/**
-  * Is used on TokenHUDs to display a additional segment per situational modifer.
-  */
-.sr-modifier-container {
-    // The column to hold all modifiers besides the FoundryVTT token HUD.
-    .modifier-column {
-        padding-top: 66px;
-        // Stop flexing.
-        display: block;
-        font-weight: bold;
-        font-size: 18px;
-        // Render below the open/closable token hud actions.
-        z-index: -1;
-    }
-    // The row containing a single situation modifier.
-    .modifier-row {
-        position: relative;
-        display: grid;
-        flex-wrap: wrap;
-        align-items: stretch;
-        width: 160px;
-        background: rgba(0, 0, 0, 0.6);
-        box-shadow: 0 0 15px #000;
-        border: 1px solid #333;
-        color: #DDD;
-        height: 40px;
-        line-height: 40px;
-        margin-bottom: 18px;
-        border-radius: 8px;
-        pointer-events: all;
-        grid-template-columns: 36px auto;
-        overflow: hidden;
-
-        // The numerical modifier total 
-        .modifier-value {}
-        // The corresponding modifier description per .modifier-value
-        .modifier-description {
-            // Handle big labels without breaking layout.
-            text-overflow: clip;
-            white-space: nowrap;
-
-            // Show interactability.
-            cursor: pointer;
-            &:hover {
-                box-shadow: 0 0 0.25em 0.15em $white;
-                border-radius: 8px;
-            }
-        }
-    }
-}
-
-/**
- * All stylings necessary for situation modifiers
- */
-.sr5#situational-modifiers-application {
-    // Remove other sr5 window styles.
-    * {
-        font-size: var(--font-size-14);
-        font-weight: normal;
-    }
-
-    h1 {
-        font-weight: bold;
-    }
-
-    // Add back in stylings as necessary
-    h2, h3 {
-        border-bottom: none;
-        font-weight: normal;
-    }
-
-    .modifier-total {
-        display: flex;
-        flex-direction: column;
-    }
 }

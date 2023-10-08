@@ -1287,6 +1287,10 @@ export class SR5Item extends Item {
         return this.wrapper.isCyberdeck();
     }
 
+    isRCC(): boolean {
+        return this.wrapper.isRCC();
+    }
+
     isCommlink(): boolean {
         return this.wrapper.isCommlink();
     }

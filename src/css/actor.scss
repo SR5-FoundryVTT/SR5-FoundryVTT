@@ -1,4 +1,5 @@
 @import 'config';
+
 .sr5.skill-edit-window {
     min-height: 200px;
     min-width: 200px;
@@ -11,6 +12,7 @@
         overflow: hidden;
     }
 }
+
 .sr5.actor {
     min-height: 690px;
     min-width: 800px;
@@ -21,9 +23,11 @@
         overflow: hidden;
     }
     .name {
-        margin-bottom: 0;
+        @include systemFonts;
+        background: url("assets/name-banner.webp") repeat;
         font-size: 200%;
-        @include nodesto;
+        margin-bottom: 0;
+        padding-left: 5px;
     }
     .sheetbody {
         overflow: hidden;
@@ -33,7 +37,7 @@
         font-size: 115%;
     }
     .attributes {
-        border-top: $groove;
+        // border-top: $;
         display: flex;
         flex-flow: row;
         flex-wrap: nowrap;
@@ -48,22 +52,20 @@
         &.wrap {
             flex-wrap: wrap;
         }
-        & + :not(.attributes) {
-            border-top: $groove;
-        }
-        &:last-child {
-            border-bottom: $groove;
-        }
         .attribute {
             @include title;
-            display: flex;
-            text-align: center;
-            flex-flow: column nowrap;
+            
             align-items: center;
-            justify-content: space-evenly;
-            padding: 0 0.25em;
+            color: $yellow;
+            display: flex;
+            flex-flow: column nowrap;
             flex: 1 0 auto;
+            font-size: 100%;
+            justify-content: space-evenly;
             min-width: 4em;
+            padding-top: 4px;
+            text-align: center;
+
             &.no-border {
                 border-right: none;
             }
@@ -94,11 +96,9 @@
                     transform: translateY(20%);
                 }
             }
-            &:not(:last-child) {
-                border-right: $groove;
-            }
             > .attribute-value {
                 > .attribute-value-total {
+                    color: white;
                     font-size: 125%;
                     width: 100%;
                     text-align: center;
@@ -177,7 +177,7 @@
         }
     }
     .limit {
-        @include nodesto;
+        @include systemFonts;
         padding: 0 0.1em;
         margin-top: -2px;
         text-align: center;
@@ -189,49 +189,7 @@
         align-content: center;
     }
 }
-.sr5 .value {
-    > .value-modifiers-container {
-        display: none;
-        visibility: hidden;
 
-        position: absolute;
-        /* We WILL be on top! */
-        z-index: 2147483647;
-
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-
-    &:hover .value-modifiers-container {
-        display: block;
-        visibility: visible;
-        opacity: 1;
-    }
-
-    .value-modifiers {
-        display: grid;
-        grid-template-columns: 200px 50px;
-        background: $popupbackground;
-        border: 1px solid $light;
-        padding: 0.5em 0.5em 0.5em 0.5em;
-        text-align: left;
-        font-weight: normal;
-
-        > .value-modifier-name {
-            font-weight: bold;
-        }
-
-        > .value-modifiers-base {
-            border-bottom: 1px solid $light;
-        }
-
-        > .value-modifiers-total {
-            font-weight: bold;
-            border-top: 1px double $light;
-        }
-
-        > .value-modifiers-invalid-total {
-            text-decoration: line-through;
-        }
-    }
+.sr5 #filter-skills.display.text.left {
+    font-size: 15px;
 }

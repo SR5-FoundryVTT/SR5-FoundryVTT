@@ -1,27 +1,4 @@
-{{#if test.actor}}
 <div class="dialog-content-common">
-    <div class="container container--fluid">
-        <div class="container__row dialog-title">
-            <div class="container__col-half">
-                <div class="document">
-                    <img src="{{speakerImg test.actor}}"/>
-                    <a class="entity-link content-link" data-type="Actor"
-                       data-id="{{test.actor.id}}" data-uuid="{{test.actor.uuid}}">{{speakerName test.actor}}</a>
-                </div>
-            </div>
-            {{#if test.item}}
-            <div class="container__col-half">
-                <div class="document">
-                    <img src="{{test.item.img}}"/>
-                    <a class="entity-link content-link" data-type="Item"
-                       data-id="{{test.item.id}}" data-uuid="{{test.item.uuid}}">{{test.item.name}}</a>
-                </div>
-            </div>
-            {{/if}}
-        </div>
-    </div>
-    {{/if}}
-
     {{#if test.hasCode}}
     <hr/>
     <div style="margin-bottom: 4px; margin-top: 4px;">

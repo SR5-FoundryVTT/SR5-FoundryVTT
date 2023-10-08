@@ -7,6 +7,7 @@
                 tooltip=section.tooltip
                 icons=(ItemHeaderIcons 'effect')
                 itemData=(EffectData section.type)
+                itemCssClass='list-item-effect'
             }}
 
             {{#each section.effects as |effect|}}
@@ -18,6 +19,7 @@
                     rightSide=[]
                     hasDesc=false
                     hasRoll=false
+                    itemCssClass='list-item-effect'
                 }}
             {{/each}}
         {{/each}}

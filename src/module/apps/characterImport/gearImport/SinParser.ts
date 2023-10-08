@@ -30,7 +30,7 @@ export class SinParser extends BaseGearParser {
         const parsedLicenses : any[] = []; 
 
         chummerLicenses.forEach(chummerLicense => {
-            if (chummerLicense.category === 'ID/Credsticks')
+            if (chummerLicense.category_english === 'ID/Credsticks')
             {
                 parsedLicenses.push(
                     {

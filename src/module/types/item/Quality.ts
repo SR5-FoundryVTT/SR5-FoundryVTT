@@ -9,5 +9,6 @@ declare namespace Shadowrun {
 
     export interface QualityPartData {
         type: 'positive' | 'negative' | '';
+        rating: number;
     }
 }

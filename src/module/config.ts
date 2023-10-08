@@ -179,6 +179,7 @@ export const SR5 = {
     deviceCategories: {
         commlink: 'SR5.DeviceCatCommlink',
         cyberdeck: 'SR5.DeviceCatCyberdeck',
+        rcc: 'SR5.DeviceCatRCC',
     },
 
     cyberwareGrades: {
@@ -564,6 +565,13 @@ export const SR5 = {
         soldier: 'SR5.Spirit.Types.Soldier',
         worker: 'SR5.Spirit.Types.Worker',
         queen: 'SR5.Spirit.Types.Queen',
+
+        // Necro types
+        carcass: "SR5.Spirit.Types.Carcass",
+        corpse: "SR5.Spirit.Types.Corpse",
+        rot: "SR5.Spirit.Types.Rot",
+        palefire: "SR5.Spirit.Types.Palefire",
+        detritus: "SR5.Spirit.Types.Detritus"
     },
 
     /**

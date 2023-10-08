@@ -307,6 +307,7 @@
     "SR5.Device": "Device",
     "SR5.DeviceCatCommlink": "Commlink",
     "SR5.DeviceCatCyberdeck": "Cyberdeck",
+    "SR5.DeviceCatRCC": "Rigger Command Console",
     "SR5.DeviceType": "Type",
     "SR5.Dialogs": {
         "Common": {
@@ -460,6 +461,7 @@
         }
     },
     "SR5.ImportCharacter": "Import Character",
+    "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Incoming": "Incoming",
     "SR5.IncomingDamage": "Incoming Damage",
     "SR5.IncomingDrain": "Incoming Drain",
@@ -972,7 +974,12 @@
             "Train": "Train",
             "Water": "Water",
             "Worker": "Insect Worker",
-            "Wraith": "Wraith"
+            "Wraith": "Wraith",
+            "Carcass": "Carcass",
+            "Corpse": "Corpse",
+            "Rot": "Rot",
+            "Palefire": "Palefire",
+            "Detritus": "Detritus"
         }
     },
     "SR5.Sprite": {
@@ -1015,7 +1022,9 @@
     "SR5.Test": "Test",
     "SR5.TestResults": {
         "SpiritSummonFailure": "Spirit fled!",
-        "SpiritSummonSuccess": "Spirit summoned!"
+        "SpiritSummonSuccess": "Spirit summoned!",
+        "SpriteCompilationSuccess": "Sprite compiled!",
+        "SpriteCompilationFailure": "Sprite fled!"
     },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attribute-Only Test",
@@ -1192,13 +1201,15 @@
         "CantSpendMulitplePointsOfEdge": "Can't spend mulitple points of edge on one test or action",
         "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",
         "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
+        "InvalidCompilationLevel": "Resonance attribute to low for this sprite level",
         "InvalidMarksCount": "You've trying to place a strange number of marks",
         "InvalidSummoningForce": "Force value chosen doesn't adhere to the rules",
         "NegativeLimitValue": "Limit values must positive numbers",
         "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
         "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
         "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
-        "TokenSelectionNeeded": "One ore more tokens need to be selected"
+        "TokenSelectionNeeded": "One ore more tokens need to be selected",
+        "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade."
     },
     "SR5.Weapon": "Weapon",
     "SR5.WeaponAmmoCount": "Ammo Count",

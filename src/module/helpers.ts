@@ -1074,13 +1074,13 @@ export class Helpers {
             // Reconfigure to compilation tests workflow.
             foundry.utils.setProperty(applyData, 'system.action.test', 'CompileSpriteTest');
             foundry.utils.setProperty(applyData, 'system.action.opposed.test', 'OpposedCompileSpriteTest');
-            foundry.utils.setProperty(applyData, 'system.action.followed.test', 'DrainTest');
+            foundry.utils.setProperty(applyData, 'system.action.followed.test', 'FadeTest');
         }
         if (changeData.system.actor_type.length === 0) {
-            // Reset to prohibit
+            // Reset to prohibit testing.
             foundry.utils.setProperty(applyData, 'system.action.test', '');
-            foundry.utils.setProperty(applyData, 'system.action.opposed.test', 'OpposedCompileSpriteTest');
-            foundry.utils.setProperty(applyData, 'system.action.followed.test', 'DrainTest');
+            foundry.utils.setProperty(applyData, 'system.action.opposed.test', '');
+            foundry.utils.setProperty(applyData, 'system.action.followed.test', '');
         }
 
     }

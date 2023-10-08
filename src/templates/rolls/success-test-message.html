@@ -6,21 +6,23 @@
     <div class="card-title card-header">
         <div class="container container--fluid">
             <div class="container__row">
-                <div class="container__col-half">
+                <div class="container__col">
                     <div class="document">
                         <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speakerImg speaker.actor}}" class="entity-selectable" title="{{speakerName speaker.actor}}"/></a>
-                         <h3 class="header-name"><a class="chat-document-link" data-uuid="{{speaker.actor.uuid}}">{{speakerName speaker.actor}}</a></h3>
+                            <h3 class="header-name"><a class="chat-document-link" data-uuid="{{speaker.actor.uuid}}">{{speakerName speaker.actor}}</a></h3>
                     </div>
                 </div>
-                {{#if item}}
-                <div class="container__col-half">
+            </div>
+            {{#if item}}
+            <div class="container__row">
+                <div class="container__col">
                     <div class="document">
                         <img src="{{item.img}}" title="{{item.name}}"/>
                         <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{item.name}}</a></h3>
                     </div>
                 </div>
-                {{/if}}
             </div>
+            {{/if}}
         </div>
     </div>
     {{/if}}
