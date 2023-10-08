@@ -54,7 +54,7 @@ export class ItemsParser {
         }
 
         if (importOptions.spells && chummerChar.spells && chummerChar.spells.spell) {
-            const parsedSpells = new SpellParser().parseSpells(chummerChar);
+            const parsedSpells = await new SpellParser().parseSpells(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedSpells);
         }
 
