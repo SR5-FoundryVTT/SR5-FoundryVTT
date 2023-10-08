@@ -1,5 +1,6 @@
-$nodesto: 'Nodesto', 'Signika', 'Palatino Linotype', serif;
-$signika: 'Signika', 'Palatino Linotype', serif;
+// $systemFonts: 'Klavika-Medium', 'Signika', 'Palatino Linotype', serif;
+// $systemFonts: 'IwaOGoPro-Md', 'Signika', 'Palatino Linotype', serif;
+$systemFonts: 'Signika', 'Palatino Linotype', serif;
 
 $black: black;
 $blue: blue;
@@ -15,9 +16,11 @@ $light: darken($white, 10%);
 $light-1: darken($light, 10%);
 $light-2: darken($light-1, 10%);
 $dark: darken($grey, 20%);
+$dark2: #222;
 $dark-sunken: #414040;
 $matrix-green: rgb(7, 145, 35);
 $mce-background: #939393;
+$yellow: #ebb531;
 
 $stun: $blue;
 $physical: $red;

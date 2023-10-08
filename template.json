@@ -475,7 +475,7 @@
                             "value": 0,
                             "attribute": "magic",
                             "canDefault": false,
-                            "group": "Conjuring",
+                            "group": "Sorcery",
                             "mod": [],
                             "specs": []
                         },

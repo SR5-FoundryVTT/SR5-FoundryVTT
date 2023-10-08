@@ -177,7 +177,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     static override get defaultOptions() {
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
-            width: 905,
+            width: 930,
             height: 690,
             tabs: [
                 {
@@ -574,7 +574,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onItemCreate(event) {
         event.preventDefault();
-        const type = Helpers.listItemId(event);
+        const type = event.currentTarget.closest('.list-header').dataset.itemId;
         
         // Unhide section it it was
         this._setInventoryTypeVisibility(type, true);
@@ -1522,7 +1522,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const item = $(event.currentTarget).parents('.list-item');
         const iid = $(item).data().item;
-        const field = item.next();
+        const field = item.find('.list-item-description');
         field.toggle();
         if (iid) {
             if (field.is(':visible')) this._shownDesc.push(iid);
