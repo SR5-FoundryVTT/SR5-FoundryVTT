@@ -4,7 +4,7 @@ import { ArmorParser } from "./ArmorParser";
 import { WareParser } from "./WareParser";
 import { QualityParser } from "./QualityParser";
 import { PowerParser } from "./PowerParser";
-import { SpellParser } from "./SpellParser";
+import { SpellParser } from "./magicImport/SpellParser";
 import { WeaponParser } from "./WeaponParser";
 import { LifestyleParser } from "./LifestyleParser";
 import { ContactParser } from "./ContactParser";
