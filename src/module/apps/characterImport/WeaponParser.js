@@ -158,6 +158,7 @@ export class WeaponParser {
         system.importFlags = genImportFlags(formatAsSlug(chummerWeapon.name_english), parserType);
 
         // Assign item subtype
+        // TODO: Figure out how to handle grenades and rockets better
         let subType = '';
         // range/melee/thrown
         if (system.category) {
