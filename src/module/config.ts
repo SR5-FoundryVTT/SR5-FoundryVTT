@@ -856,7 +856,8 @@ export const SR5 = {
         },
         device: {
             'commlink': 'systems/shadowrun5e/dist/icons/importer/device.svg',
-            'cyberdeck': ''
+            'cyberdeck': '',
+            'rcc': ''
         },
         equipment: {
             'alchemical-tools': '',

@@ -74,15 +74,28 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
         const parserType = 'device';
 
         for (const rcc of rccs) {
+
+            // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(rcc)) {
                 continue;
             }
-            const item = this.GetDefaultData({type: parserType});
 
+            // Create the item
+            const item = this.GetDefaultData({type: parserType});
             item.system.category = 'rcc';
             item.name = ImportHelper.StringValue(rcc, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Get the item's folder information
+            //@ts-ignore
+            item.folder = folder.id;
+
+            // Import Flags
+            item.system.importFlags = this.genImportFlags(item.name, item.system.category);
+
+            // Default icon
+            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
+
+            // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(rcc, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(rcc, 'name'), ImportHelper.StringValue(rcc, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(rcc, 'devicerating', 0);
             item.system.technology.availability = ImportHelper.StringValue(rcc, 'avail');
@@ -94,38 +107,6 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
-
-            //@ts-ignore
-            entries.push(item);
-        }
-
-        return entries;
-    }
-
-    ParseRCCDevices(rccs, folder) {
-        const entries = [];
-
-        for (const rcc of rccs) {
-            if (DataImporter.unsupportedEntry(rcc)) {
-                continue;
-            }
-            const item = this.GetDefaultData({type: 'device'});
-
-            item.system.category = 'rcc';
-            item.name = ImportHelper.StringValue(rcc, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
-
-            item.system.description.source = `${ImportHelper.StringValue(rcc, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(rcc, 'name'), ImportHelper.StringValue(rcc, 'page'))}`;
-            item.system.technology.rating = ImportHelper.IntValue(rcc, 'devicerating', 0);
-            item.system.technology.availability = ImportHelper.StringValue(rcc, 'avail');
-            item.system.technology.cost = ImportHelper.IntValue(rcc, 'cost', 0);
-            item.system.atts.att3.value = ImportHelper.IntValue(rcc, 'dataprocessing', 0);
-            item.system.atts.att4.value = ImportHelper.IntValue(rcc, 'firewall', 0);
-
-            //@ts-ignore
-            item.folder = folder.id;
-
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             //@ts-ignore
@@ -214,7 +195,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
 
         entries = entries.concat(await this.ParseCommlinkDevices(commlinks, commlinksFolder, setIcons));
         entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder, setIcons));
-        entries = entries.concat(this.ParseRCCDevices(rccs, rccsFolder));
+        entries = entries.concat(await this.ParseRCCDevices(rccs, rccsFolder, setIcons));
 
         // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(entries)

@@ -182,6 +182,9 @@ quality/quality.svg - Lorc - https://game-icons.net/1x1/lorc/anatomy.html
 quality/positive.svg - Lorc - https://game-icons.net/1x1/lorc/strong.html
 quality/negative.svg - Lorc - https://game-icons.net/1x1/lorc/oppression.html
 
+Rigger Command Console
+rcc.svg - Delapouite - https://game-icons.net/1x1/delapouite/gps.html
+
 SIN
 sin.svg - Lord Berandas - https://game-icons.net/1x1/lord-berandas/computing.html
 
