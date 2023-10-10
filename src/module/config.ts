@@ -929,8 +929,8 @@ export const SR5 = {
             'under': 'systems/shadowrun5e/dist/icons/importer/modification/modification.svg'
         },
         program:        {
-            'common_programs': '',
-            'hacking_programs': ''
+            'common_program': '',
+            'hacking_program': ''
         },
         quality: {
             'negative': '',
