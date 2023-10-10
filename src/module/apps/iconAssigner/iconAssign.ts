@@ -32,7 +32,9 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
     let fileNamePriority = [
         override,
         imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension,
-        imgFolder + imgType + '/' + imgType + imgExtension
+        imgFolder + imgType + '/' + imgType + imgExtension,
+        imgFolder + imgSubType + imgExtension,
+        imgFolder + imgType + imgExtension
     ]
     switch (imgType) {
         case 'armor':
@@ -45,7 +47,9 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
                 override,
                 imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension,
                 imgFolder + imgType + '/' + system.category + imgExtension,
-                imgFolder + imgType + '/' + imgType + imgExtension
+                imgFolder + imgType + '/' + imgType + imgExtension,
+                imgFolder + imgSubType + imgExtension,
+                imgFolder + imgType + imgExtension
             ]
             break;
 

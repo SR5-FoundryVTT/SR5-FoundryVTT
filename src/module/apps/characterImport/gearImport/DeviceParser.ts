@@ -1,5 +1,6 @@
 import { BaseGearParser } from "./BaseGearParser"
-import { iconAssign } from '../../iconAssigner/iconAssign';
+import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
+import { SR5 } from "../../../config";
 
 /**
  * Parses devices (commlinks and decks)
@@ -7,8 +8,9 @@ import { iconAssign } from '../../iconAssigner/iconAssign';
 export class DeviceParser extends BaseGearParser {
 
     override parse(chummerGear : any) : any {
+        const parserType = 'device';
         const parsedGear =  super.parse(chummerGear);
-        parsedGear.type = 'device';
+        parsedGear.type = parserType;
         parsedGear.system.technology.rating = chummerGear.devicerating;
 
         parsedGear.system.atts = {
@@ -37,20 +39,33 @@ export class DeviceParser extends BaseGearParser {
             }
         };
 
-        if (chummerGear.category === 'Cyberdecks')
+        if (chummerGear.category_english === 'Cyberdecks')
         {
             parsedGear.system.category = 'cyberdeck';
         }
 
-        if (chummerGear.category === 'Commlinks')
+        if (chummerGear.category_english === 'Commlinks')
         {
             parsedGear.system.category = 'commlink';
         }
 
-        if (chummerGear.category === 'Rigger Command Consoles')
+        if (chummerGear.category_english === 'Rigger Command Consoles')
         {
             // We are handling rccs as commlinks for the moment since we have no support for rigger command consoles yet.
             parsedGear.system.category = 'commlink';
+        }
+        if (chummerGear.category_english === 'Entertainment')
+        {
+            // Chummer has prepaid commlinks set up as Entertainment category
+            parsedGear.system.category = 'commlink';
+        }
+
+        // Assign import flags
+        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
+
+        let subType = parsedGear.system.category;
+        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
+            parsedGear.system.importFlags.subType = formatAsSlug(subType);
         }
 
         return parsedGear;
