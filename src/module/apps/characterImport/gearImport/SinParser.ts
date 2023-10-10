@@ -1,5 +1,6 @@
 import { BaseGearParser } from "./BaseGearParser"
-import { iconAssign } from '../../iconAssigner/iconAssign';
+import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
+import { SR5 } from "../../../config";
 
 /**
  * Parses SINs and the attached licenses.
@@ -7,8 +8,9 @@ import { iconAssign } from '../../iconAssigner/iconAssign';
  */
 export class SinParser extends BaseGearParser {
     override parse(chummerGear : any) : any {
+        const parserType = 'sin';
         const parsedGear =  super.parse(chummerGear);
-        parsedGear.type = 'sin';
+        parsedGear.type = parserType;
 
         // Create licenses if there are any
         if (chummerGear.children) {
@@ -24,6 +26,9 @@ export class SinParser extends BaseGearParser {
 
             parsedGear.system.licenses = this.parseLicenses(chummerLicenses);
         }
+
+        // Assign import flags
+        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
 
         return parsedGear;
     }
