@@ -164,8 +164,11 @@ export class WeaponParser {
             subType = formatAsSlug(system.category);
         }
         // weapon subtype
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(formatAsSlug(chummerWeapon.category_english))) {
-            subType = formatAsSlug(chummerWeapon.category_english);
+        const category = formatAsSlug(chummerWeapon.category_english);
+        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(category)) {
+            if (!(subType && (category == 'gear'))) {
+                subType = category;
+            }
         }
         if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
             system.importFlags.subType = subType;

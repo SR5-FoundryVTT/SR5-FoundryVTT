@@ -1,5 +1,6 @@
 import { BaseGearParser } from "./BaseGearParser"
-import { iconAssign } from '../../iconAssigner/iconAssign';
+import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
+import { SR5 } from "../../../config";
 
 /**
  * Parses ammunition
@@ -7,8 +8,9 @@ import { iconAssign } from '../../iconAssigner/iconAssign';
 export class AmmoParser extends BaseGearParser {
 
     override parse(chummerGear : any) : any {
+        const parserType = 'ammo';
         const parsedGear =  super.parse(chummerGear);
-        parsedGear.type = 'ammo';
+        parsedGear.type = parserType;
 
         if (chummerGear.weaponbonusap) {
             parsedGear.system.ap = parseInt(chummerGear.weaponbonusap);
@@ -27,6 +29,14 @@ export class AmmoParser extends BaseGearParser {
             else {
                 parsedGear.system.damageType = 'physical';
             }
+        }
+
+        // Assign import flags
+        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
+
+        let subType = formatAsSlug(chummerGear.name_english.split(':')[0]);
+        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
+            parsedGear.system.importFlags.subType = formatAsSlug(subType);
         }
 
         return parsedGear;

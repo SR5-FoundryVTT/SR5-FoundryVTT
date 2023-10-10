@@ -86,7 +86,7 @@ export const createItemData = (name, type, system) => {
 * @param name The item's name or subtype name to reformat
 */
 export const formatAsSlug = (name) => {
-    return name.trim().toLowerCase().replace((/'|,|\[|\]|\(|\)/g), '').split((/-|\s|\//g)).join('-');
+    return name.trim().toLowerCase().replace((/'|,|\[|\]|\(|\)|:/g), '').split((/-|\s|\//g)).join('-');
  }
 
  /**
