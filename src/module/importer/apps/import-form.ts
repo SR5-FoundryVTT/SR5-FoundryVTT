@@ -171,6 +171,10 @@ export class Import extends Application {
             this.disableImportButton = false;
 
             await this.render();
+
+            ui.notifications?.warn(
+                'If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now.'
+            );
         });
 
         html.find("input[type='file'].langDataFileDrop").on('change', async (event) => {
