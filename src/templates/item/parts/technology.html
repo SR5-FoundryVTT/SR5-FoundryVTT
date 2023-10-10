@@ -128,16 +128,17 @@
         </div>
         {{/unless}}
         <div class="flexrow nowrap">
-            {{localize "SR5.Equipped"}}<input
+            <label>{{localize "SR5.Equipped"}}</label>
+                <input
                 class="checkbox"
                 type="checkbox"
                 name="system.technology.equipped"
                 {{checked
-                system.technology.equipped}}
-            />
+                system.technology.equipped}}/>
         </div>
         <div class="flexrow nowrap">
-            {{localize "SR5.Wireless"}}<input
+            <label>{{localize "SR5.Wireless"}}</label>
+            <input
                 class="checkbox"
                 type="checkbox"
                 name="system.technology.wireless"
@@ -146,7 +147,7 @@
             />
         </div>
         <div class="flexrow nowrap">
-            <span>PAN</span>
+            <label>PAN</label>
             {{#if networkController}}
             <span>
                 <a class="origin-link" draggable="false" data-origin-link="{{networkController.uuid}}">{{networkController.name}}</a>

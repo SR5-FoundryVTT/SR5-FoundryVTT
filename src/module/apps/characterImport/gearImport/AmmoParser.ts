@@ -17,7 +17,7 @@ export class AmmoParser extends BaseGearParser {
         }
 
         if (chummerGear.weaponbonusdamage) {
-            parsedGear.system.damage = parseInt(chummerGear.weaponbonusdamage);
+            parsedGear.system.damage = parseInt(chummerGear.weaponbonusdamage_english);
 
             if (chummerGear.weaponbonusdamage.includes('P')) {
                 parsedGear.system.damageType = 'physical';

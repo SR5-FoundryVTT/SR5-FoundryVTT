@@ -3,7 +3,7 @@ import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
 import { SR5 } from "../../../config";
 
 /**
- * Parses devices (commlinks and decks)
+ * Parses devices (commlinks, decks, and RCCs)
  */
 export class DeviceParser extends BaseGearParser {
 
@@ -16,25 +16,25 @@ export class DeviceParser extends BaseGearParser {
         parsedGear.system.atts = {
             att1:
             {
-                value: chummerGear.attack,
+                value: parseInt(chummerGear.attack),
                 att: 'attack'
             },
 
             att2:
             {
-                value: chummerGear.sleaze,
+                value: parseInt(chummerGear.sleaze),
                 att: 'sleaze'
             },
 
             att3:
             {
-                value: chummerGear.systemprocessing,
+                value: parseInt(chummerGear.dataprocessing),
                 att: 'data_processing'
             },
 
             att4:
             {
-                value: chummerGear.firewall,
+                value: parseInt(chummerGear.firewall),
                 att: 'firewall'
             }
         };
@@ -51,8 +51,7 @@ export class DeviceParser extends BaseGearParser {
 
         if (chummerGear.category_english === 'Rigger Command Consoles')
         {
-            // We are handling rccs as commlinks for the moment since we have no support for rigger command consoles yet.
-            parsedGear.system.category = 'commlink';
+            parsedGear.system.category = 'rcc';
         }
         if (chummerGear.category_english === 'Entertainment')
         {

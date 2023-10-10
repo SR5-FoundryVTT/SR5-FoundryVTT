@@ -1,52 +1,31 @@
 {{> 'systems/shadowrun5e/dist/templates/common/HeaderBlock.html' name=(localize "SR5.Labels.ActorSheet.SpiritConfiguration") }}
-<div class="list-item">
-    <div class="item-left">
-        <div class="item-text item-name">{{localize "SR5.Spirit.Summoner"}}</div>
-    </div>
-    <div class="item-right">
-        <div>
-            {{#if summoner}}
-            <a class="entity-link content-link" draggable="true" data-type="Actor" data-id="{{summoner.id}}" data-uuid="{{summoner.uuid}}">
-                <i class="fas fa-user"></i>{{summoner.name}}
-            </a>
-            <a class="close summoner-remove"><i class="fas fa-times"></i></a>
-            {{else}}<span data-tooltip="SR5.Tooltips.Actor.MissingSummoner">{{localize "SR5.Spirit.MissingSummoner"}}</span>{{/if}}
-        </div>
-    </div>
+{{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Spirit.Summoner") }}
+<div>
+    {{#if summoner}}
+    <a class="entity-link content-link" draggable="true" data-type="Actor" data-id="{{summoner.id}}" data-uuid="{{summoner.uuid}}">
+        <i class="fas fa-user"></i>{{summoner.name}}
+    </a>
+    <a class="close summoner-remove"><i class="fas fa-times"></i></a>
+    {{else}}<span data-tooltip="SR5.Tooltips.Actor.MissingSummoner">{{localize "SR5.Spirit.MissingSummoner"}}</span>{{/if}}
 </div>
-
-<div class="list-item">
-    <div class="item-left">
-        <div class="item-text item-name">{{localize "SR5.Spirit.Type"}}</div>
-    </div>
-    <div class="item-right">
-        <div>
-            <select name="system.spiritType" class="display">
-                {{#select system.spiritType}} {{#each config.spiritTypes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-        </div>
-    </div>
+{{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+{{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Spirit.Type") }}
+<div>
+    <select name="system.spiritType" class="display">
+        {{#select system.spiritType}} {{#each config.spiritTypes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
+        {{/each}} {{/select}}
+    </select>
 </div>
-<div class="list-item">
-    <div class="item-left">
-        <div class="item-text item-name">{{localize "SR5.Spirit.Force"}}</div>
-    </div>
-    <div class="item-right">
-        <div class="item-text">
-            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html' cssClass="attribute-input" size="2" maxLength="2" value=system.force
-            name="system.force" }}
-        </div>
-    </div>
+{{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+{{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Spirit.Force") }}
+<div class="item-text">
+    {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html' cssClass="attribute-input" size="2" maxLength="2" value=system.force
+    name="system.force" }}
 </div>
-<div class="list-item">
-    <div class="item-left">
-        <div class="item-text item-name">{{localize "SR5.Spirit.Bound"}}</div>
-    </div>
-    <div class="item-right">
-        <div class="item-text">
-            <input type="checkbox" class="checkbox" name="system.bound" {{checked system.bound}} />
-        </div>
-    </div>
+{{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+{{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Spirit.Bound") }}
+<div class="item-text">
+    <input type="checkbox" class="checkbox" name="system.bound" {{checked system.bound}} />
 </div>
+{{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}

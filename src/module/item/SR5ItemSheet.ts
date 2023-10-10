@@ -84,7 +84,7 @@ export class SR5ItemSheet extends ItemSheet {
         // @ts-ignore // mergeObject breaks TypeScript typing. Should be fine.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'item'],
-            width: 720,
+            width: 735,
             height: 450,
             tabs: [{ navSelector: '.tabs', contentSelector: '.sheetbody' }],
         });
@@ -284,17 +284,18 @@ export class SR5ItemSheet extends ItemSheet {
          */
         html.find('.edit-item').click(this._onEditItem.bind(this));
         html.find('.open-source').on('click', this._onOpenSource.bind(this));
-        html.find('.has-desc').click((event) => {
-            event.preventDefault();
-            const item = $(event.currentTarget).parents('.list-item');
-            const iid = $(item).data().item;
-            const field = item.next();
-            field.toggle();
-            if (iid) {
-                if (field.is(':visible')) this._shownDesc.push(iid);
-                else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
-            }
-        });
+        // html.find('.has-desc').click((event) => {
+        //     event.preventDefault();
+        //     const item = $(event.currentTarget).parents('.list-item');
+        //     const iid = $(item).data().item;
+        //     const field = item.next();
+        //     field.toggle();
+        //     if (iid) {
+        //         if (field.is(':visible')) this._shownDesc.push(iid);
+        //         else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
+        //     }
+        // });
+        html.find('.has-desc').click(this._onListItemToggleDescriptionVisibility.bind(this));
         html.find('.hidden').hide();
         html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
 
@@ -701,6 +702,21 @@ export class SR5ItemSheet extends ItemSheet {
             return JSON.parse(event.dataTransfer.getData('text/plain'));
         } catch (error) {
             return console.log('Shadowrun 5e | Dropping a document onto an item sheet caused this error', error);
+        }
+    }
+
+    /**
+     * Show / hide the items description within a sheet item l ist.
+     */
+    async _onListItemToggleDescriptionVisibility(event) {
+        event.preventDefault();
+        const item = $(event.currentTarget).parents('.list-item');
+        const iid = $(item).data().item;
+        const field = item.find('.list-item-description');
+        field.toggle();
+        if (iid) {
+            if (field.is(':visible')) this._shownDesc.push(iid);
+            else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
         }
     }
 }

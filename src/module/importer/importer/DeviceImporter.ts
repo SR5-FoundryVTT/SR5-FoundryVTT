@@ -68,6 +68,73 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
         return entries;
     }
 
+    async ParseRCCDevices(rccs, folder, setIcons) {
+        const entries = [];
+        this.iconList = await this.getIconFiles();
+        const parserType = 'device';
+
+        for (const rcc of rccs) {
+            if (DataImporter.unsupportedEntry(rcc)) {
+                continue;
+            }
+            const item = this.GetDefaultData({type: parserType});
+
+            item.system.category = 'rcc';
+            item.name = ImportHelper.StringValue(rcc, 'name');
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+
+            item.system.description.source = `${ImportHelper.StringValue(rcc, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(rcc, 'name'), ImportHelper.StringValue(rcc, 'page'))}`;
+            item.system.technology.rating = ImportHelper.IntValue(rcc, 'devicerating', 0);
+            item.system.technology.availability = ImportHelper.StringValue(rcc, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(rcc, 'cost', 0);
+            item.system.atts.att3.value = ImportHelper.IntValue(rcc, 'dataprocessing', 0);
+            item.system.atts.att4.value = ImportHelper.IntValue(rcc, 'firewall', 0);
+
+            // Translate name if needed
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+
+            // Add relevant action tests
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            //@ts-ignore
+            entries.push(item);
+        }
+
+        return entries;
+    }
+
+    ParseRCCDevices(rccs, folder) {
+        const entries = [];
+
+        for (const rcc of rccs) {
+            if (DataImporter.unsupportedEntry(rcc)) {
+                continue;
+            }
+            const item = this.GetDefaultData({type: 'device'});
+
+            item.system.category = 'rcc';
+            item.name = ImportHelper.StringValue(rcc, 'name');
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+
+            item.system.description.source = `${ImportHelper.StringValue(rcc, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(rcc, 'name'), ImportHelper.StringValue(rcc, 'page'))}`;
+            item.system.technology.rating = ImportHelper.IntValue(rcc, 'devicerating', 0);
+            item.system.technology.availability = ImportHelper.StringValue(rcc, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(rcc, 'cost', 0);
+            item.system.atts.att3.value = ImportHelper.IntValue(rcc, 'dataprocessing', 0);
+            item.system.atts.att4.value = ImportHelper.IntValue(rcc, 'firewall', 0);
+
+            //@ts-ignore
+            item.folder = folder.id;
+
+            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+
+            //@ts-ignore
+            entries.push(item);
+        }
+
+        return entries;
+    }
+
     async ParseCyberdeckDevices(cyberdecks, folder, setIcons) {
         const items = [];
         this.iconList = await this.getIconFiles();
@@ -139,12 +206,15 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
         let entries = [];
         const commlinks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Commlinks');
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
+        const rccs = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Rigger Command Consoles');
 
         let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
         let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
+        let rccsFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatRCC')}`, true);
 
         entries = entries.concat(await this.ParseCommlinkDevices(commlinks, commlinksFolder, setIcons));
         entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder, setIcons));
+        entries = entries.concat(this.ParseRCCDevices(rccs, rccsFolder));
 
         // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(entries)

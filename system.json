@@ -18,11 +18,11 @@
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.11.2",
+  "version": "0.12.0",
   "compatibility": {
     "minimum": "10",
     "maximum": "11",
-    "verified": "11.305"
+    "verified": "11"
   },
   "minimumCoreVersion": "10",
   "scripts": [],

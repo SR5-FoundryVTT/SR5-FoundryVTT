@@ -27,6 +27,9 @@ export class WeaponParser {
     };
 
     async parseWeapons(chummerChar, assignIcons) {
+        if(chummerChar.weapons == null) {
+            return;
+        }
         const weapons = getArray(chummerChar.weapons.weapon);
         const parsedWeapons = [];
         const iconList = await IconAssign.getIconFiles();

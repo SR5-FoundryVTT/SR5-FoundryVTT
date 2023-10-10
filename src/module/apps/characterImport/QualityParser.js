@@ -29,7 +29,7 @@ export class QualityParser {
     parseQuality(chummerQuality) {
         const parserType = 'quality';
         const system = DataDefaults.baseItemData({type: parserType});
-        system.type = chummerQuality.qualitytype.toLowerCase();
+        system.type = chummerQuality.qualitytype_english.toLowerCase();
         system.description = parseDescription(chummerQuality);
 
         // Assign import flags

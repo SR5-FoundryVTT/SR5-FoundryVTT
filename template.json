@@ -475,7 +475,7 @@
                             "value": 0,
                             "attribute": "magic",
                             "canDefault": false,
-                            "group": "Conjuring",
+                            "group": "Sorcery",
                             "mod": [],
                             "specs": []
                         },
@@ -1423,6 +1423,7 @@
         },
         "critter_power": {
             "templates": ["description", "action", "armor", "importFlags"],
+            "rating": 0,
             "powerType": "",
             "range": "",
             "duration": ""
@@ -1474,7 +1475,7 @@
             "level": 0
         },
         "quality": {
-            "templates": ["description", "action", "importFlags"],
+            "templates": ["description", "action"],
             "type": "positive"
         },
         "action": {

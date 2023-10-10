@@ -369,6 +369,7 @@
     "SR5.Hits": "Succès",
     "SR5.HotSim": "Hot Sim",
     "SR5.ImportCharacter": "Importer personnage via Chummer5a",
+    "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Incoming": "En approche",
     "SR5.IncomingDamage": "Dégâts en approche",
     "SR5.Information": "Info",

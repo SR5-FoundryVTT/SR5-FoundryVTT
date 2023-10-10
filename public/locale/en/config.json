@@ -301,6 +301,7 @@
     "SR5.Device": "Device",
     "SR5.DeviceCatCommlink": "Commlink",
     "SR5.DeviceCatCyberdeck": "Cyberdeck",
+    "SR5.DeviceCatRCC": "Rigger Command Console",
     "SR5.DeviceType": "Type",
     "SR5.Dialogs": {
         "Common": {
@@ -454,6 +455,7 @@
         }
     },
     "SR5.ImportCharacter": "Import Character",
+    "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Incoming": "Incoming",
     "SR5.IncomingDamage": "Incoming Damage",
     "SR5.IncomingDrain": "Incoming Drain",
@@ -959,7 +961,12 @@
             "Train": "Train",
             "Water": "Water",
             "Worker": "Insect Worker",
-            "Wraith": "Wraith"
+            "Wraith": "Wraith",
+            "Carcass": "Carcass",
+            "Corpse": "Corpse",
+            "Rot": "Rot",
+            "Palefire": "Palefire",
+            "Detritus": "Detritus"
         }
     },
     "SR5.Sprite": {
