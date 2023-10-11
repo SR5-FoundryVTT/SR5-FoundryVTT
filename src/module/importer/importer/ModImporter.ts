@@ -53,13 +53,7 @@ export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Sh
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type);
-
-            // Add the subtype so the importer can add the correct icon
-            let subType = this.formatAsSlug(folderName);
-            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-                item.system.importFlags.subType = subType;
-            }
+            item.system.importFlags = this.genImportFlags2(item.name, item.type, this.formatAsSlug(folderName));
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

@@ -41,7 +41,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.system.category);
+            item.system.importFlags = this.genImportFlags2(item.name, parserType, item.system.category);
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
@@ -89,7 +89,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.system.category);
+            item.system.importFlags = this.genImportFlags2(item.name, parserType, item.system.category);
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
@@ -137,7 +137,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.system.category);
+            item.system.importFlags = this.genImportFlags2(item.name, parserType, item.system.category);
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

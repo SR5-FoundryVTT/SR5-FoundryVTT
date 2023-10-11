@@ -43,12 +43,7 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
             item.name = ImportHelper.StringValue(jsonData, 'name');
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type);
-
-            let subType = this.formatAsSlug(item.system.importFlags.name.split(':')[0]);
-            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-                item.system.importFlags.subType = subType;
-            }
+            item.system.importFlags = this.genImportFlags2(item.name, item.type, this.formatAsSlug(item.name.split(':')[0]));
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

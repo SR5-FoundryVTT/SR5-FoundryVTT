@@ -61,27 +61,29 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
                 continue;
             }
 
-            // It might be advantageous to not double import rockets, grenades, or mini-torpedos, which also show up as weapons
-            // They should probably be removed from one category or the other
-
             // Create the item
             let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.subcategory].id;
 
-            // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type);
-
+            // Figure out item subtype
             let subType = '';
+            // range/melee/thrown
             if (item.system.category) {
                 subType = this.formatAsSlug(item.system.category);
             }
-            if (item.system.subcategory) {
-                subType = this.formatAsSlug(item.system.subcategory);
+            // exception for thrown weapons and explosives
+            const weaponCategory = this.formatAsSlug(item.system.subcategory);
+            if (!(subType && ( weaponCategory == 'gear'))) {
+                subType = weaponCategory;
             }
-            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-                item.system.importFlags.subType = subType;
+            // deal with explosives and their weird formatting
+            if (weaponCategory == 'gear' && item.name.includes(':')) {
+                subType = this.formatAsSlug(item.name.split(':')[0]);
             }
+
+            // Set Import Flags
+            item.system.importFlags = this.genImportFlags2(item.name, item.type, subType);
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

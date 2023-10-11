@@ -46,12 +46,7 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
             item.folder = folders[category].id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type);
-
-            let subType = this.formatAsSlug(category);
-            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-                item.system.importFlags.subType = subType;
-            }
+            item.system.importFlags = this.genImportFlags2(item.name, item.type, this.formatAsSlug(category));
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

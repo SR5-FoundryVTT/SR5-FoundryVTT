@@ -99,6 +99,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * Generate default import flags
      * @param name The item's English name
      * @param type The item's type
+     *
      */
     public genImportFlags(name: string, type: string): Shadowrun.ImportFlagData {
         const flags = {
@@ -106,6 +107,25 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
             type: type,
             subType: '',
             isFreshImport: true
+        }
+        return flags;
+    }
+
+    /**
+     * Set the subtype
+     * @param name The item's English name
+     * @param type The item's type
+     * @param subType The item's subtype
+     */
+    public genImportFlags2(name: string, type: string, subType: string): Shadowrun.ImportFlagData {
+        const flags = {
+            name: this.formatAsSlug(name), // original english name
+            type: type,
+            subType: '',
+            isFreshImport: true
+        }
+        if (subType && Object.keys(SR5.itemSubTypeIconOverrides[type]).includes(subType)) {
+            flags.subType = subType;
         }
         return flags;
     }
