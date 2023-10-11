@@ -1332,7 +1332,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!skillId) return;
 
         // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
+        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
@@ -1347,12 +1347,12 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = Helpers.listItemId(event) as keyof KnowledgeSkills;
+        const category = Helpers.listHeaderId(event) as keyof KnowledgeSkills;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
         // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
+        await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveKnowledgeSkill(event) {
