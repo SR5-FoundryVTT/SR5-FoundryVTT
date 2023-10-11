@@ -17,7 +17,7 @@ interface FoundryItemSheetData {
     // A descriptive document  reference
     item: SR5Item
     document: SR5Item
-    
+
     cssClass: string
     editable: boolean
     limited: boolean
@@ -44,7 +44,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     ammunition: Shadowrun.AmmoItemData[]
     weaponMods: Shadowrun.ModificationItemData[]
     armorMods: Shadowrun.ModificationItemData[]
-    
+
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
     attributes: Record<string, string>  // key: label
@@ -158,7 +158,7 @@ export class SR5ItemSheet extends ItemSheet {
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
                 //@ts-ignore TODO: foundry-vtt-types v10
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
-                
+
                 return sheetItemData;
             },
             [[], [], []],
@@ -206,7 +206,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     /**
      * Help enriching editor field values to HTML used to display editor values as read-only HTML in sheets.
-     * 
+     *
      * @param editorValue A editor field value like Item.system.description.value
      * @param options TextEditor, enrichHTML.options passed through
      * @returns Enriched HTML result
@@ -330,7 +330,39 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
-        this._activateTagifyListeners(html);        
+        this._activateTagifyListeners(html);
+    }
+
+    /**
+     * Override the close function to allow a recently imported item to be marked as reviewed
+     * @param options - close options
+     */
+    override async close(options={}) {
+        if (this.item.system.importFlags?.isFreshImport) {
+            let d = await new Dialog({
+                title: "Mark as Reviewed",
+                content: `<p><b>${this.item.name}</b> was recently imported.<br />Would you like to mark it as reviewed?</p>`,
+                buttons: {
+                 one: {
+                  icon: '<i class="fas fa-check"></i>',
+                  label: "Mark As Reviewed",
+                  callback: () => {
+                    this.document.update({'system.importFlags.isFreshImport': false});
+                    console.log(this);
+                  }
+                 },
+                 two: {
+                  icon: '<i class="fas fa-times"></i>',
+                  label: "Ignore",
+                  callback: () => {}
+                 }
+                },
+                default: "two",
+                render: html => {},
+                close: html => {}
+               }).render(true);
+        }
+        await super.close(options);
     }
 
     override async _onDrop(event) {
@@ -379,7 +411,7 @@ export class SR5ItemSheet extends ItemSheet {
             const item = await fromUuid(data.uuid) as SR5Item;
 
             if (!item || !item.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
-            
+
             return await this.item.addNetworkDevice(item);
         }
     }
@@ -519,9 +551,9 @@ export class SR5ItemSheet extends ItemSheet {
 
     /**
      * Add a tagify element for an action-modifier dom element.
-     * 
+     *
      * Usage: Call method after render with a singular item's html sub-dom-tree.
-     * 
+     *
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
@@ -533,11 +565,11 @@ export class SR5ItemSheet extends ItemSheet {
             id: modifier
         }));
 
-        // Tagify dropdown should show all whitelist tags. 
+        // Tagify dropdown should show all whitelist tags.
         const maxItems = Object.keys(SR5.modifierTypes).length;
 
-        // Use localized label as value, and modifier as the later to be extracted value 
-        const modifiers = this.item.system.action?.modifiers ?? []; 
+        // Use localized label as value, and modifier as the later to be extracted value
+        const modifiers = this.item.system.action?.modifiers ?? [];
         const tags = modifiers.map(modifier => ({
             value: game.i18n.localize(SR5.modifierTypes[modifier]),
             id: modifier
@@ -679,10 +711,10 @@ export class SR5ItemSheet extends ItemSheet {
     /**
      * Activate listeners for tagify elements for item types that allow changing action
      * modifiers.
-     * 
+     *
      * @param html The JQuery HTML as given by the activateListeners method.
      */
-    _activateTagifyListeners(html) {        
+    _activateTagifyListeners(html) {
         if (!['action', 'equipment'].includes(this.document.type)) return;
 
         this._createActionModifierTagify(html);
@@ -690,11 +722,11 @@ export class SR5ItemSheet extends ItemSheet {
 
     /**
      * Helper to parse FoundryVTT DropData directly from it's source event
-     * 
+     *
      * This is a legacy handler for earlier FoundryVTT versions, however it's good
      * practice to not trust faulty input and inform about.
-     * 
-     * @param event 
+     *
+     * @param event
      * @returns undefined when an DropData couldn't be parsed from it's JSON.
      */
     parseDropData(event): any|undefined {
