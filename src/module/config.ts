@@ -957,6 +957,7 @@ export const SR5 = {
         },
         sprite_power: {},
         weapon: {
+            // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'
             'melee': '',
             'ranged': '',
             'thrown': '',
@@ -974,6 +975,7 @@ export const SR5 = {
             'flamethrowers': '',
             'gear': 'systems/shadowrun5e/dist/icons/importer/equipment/equipment.svg',
             'grenade-launchers': '',
+            'grenade': 'systems/shadowrun5e/dist/icons/importer/ammo/grenade.svg',
             'heavy-machine-guns': 'systems/shadowrun5e/dist/icons/importer/weapon/assault-cannons.svg',
             'heavy-pistols': '',
             'holdouts': '',
@@ -984,13 +986,18 @@ export const SR5 = {
             'machine-pistols': '',
             'medium-machine-guns': 'systems/shadowrun5e/dist/icons/importer/weapon/assault-cannons.svg',
             'micro-drone-weapons': '',
-            'missile-launchers': 'systems/shadowrun5e/dist/icons/importer/ammo/missile.svg',
+            'micro-torpedo': 'systems/shadowrun5e/dist/icons/importer/ammo/micro-torpedo.svg',
+            'minigrenade': 'systems/shadowrun5e/dist/icons/importer/ammo/minigrenade.svg',
+            'missile': 'systems/shadowrun5e/dist/icons/importer/ammo/missile.svg',
+            'missile-launchers': '',
             'quality': 'systems/shadowrun5e/dist/icons/importer/quality/quality.svg',
+            'rocket': 'systems/shadowrun5e/dist/icons/importer/ammo/rocket.svg',
             'shotguns': '',
             'sniper-rifles': '',
             'sporting-rifles': 'systems/shadowrun5e/dist/icons/importer/weapon/carbines.svg',
             'submachine-guns': '',
             'tasers': '',
+            'torpedo-grenade': 'systems/shadowrun5e/dist/icons/importer/ammo/torpedo-grenade.svg',
             'unarmed': '',
             'underbarrel-weapons': 'systems/shadowrun5e/dist/icons/importer/modification/modification.svg'
         }

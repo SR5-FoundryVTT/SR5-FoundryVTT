@@ -1,4 +1,4 @@
-import { parseDescription, getArray, getValues, parseTechnology, createItemData, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, getValues, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
 import * as IconAssign from '../../apps/iconAssigner/iconAssign';
 import { SR5 } from "../../config";
 
@@ -161,23 +161,21 @@ export class WeaponParser {
         system.importFlags = genImportFlags(formatAsSlug(chummerWeapon.name_english), parserType);
 
         // Assign item subtype
-        // TODO: Figure out how to handle grenades, rockets, and mini-torpedos better
-        // Should they be weapons or gear?
         let subType = '';
         // range/melee/thrown
         if (system.category) {
             subType = formatAsSlug(system.category);
         }
-        // weapon subtype
-        const category = formatAsSlug(chummerWeapon.category_english);
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(category)) {
-            if (!(subType && (category == 'gear'))) {
-                subType = category;
-            }
+        // exception for thrown weapons and explosives
+        const weaponCategory = formatAsSlug(chummerWeapon.category_english);
+        if (!(subType && ( weaponCategory == 'gear'))) {
+            subType = weaponCategory;
         }
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-            system.importFlags.subType = subType;
+        // deal with explosives
+        if (weaponCategory == 'gear' && chummerWeapon.name_english.includes(':')) {
+            subType = chummerWeapon.name_english.toLowerCase().split(':')[0];
         }
+        setSubType(system, parserType, subType);
 
         // Create the item
         const itemData = createItemData(chummerWeapon.name, 'weapon', system);
