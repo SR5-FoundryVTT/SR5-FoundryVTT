@@ -173,7 +173,7 @@ export class WeaponParser {
         }
         // deal with explosives
         if (weaponCategory == 'gear' && chummerWeapon.name_english.includes(':')) {
-            subType = chummerWeapon.name_english.toLowerCase().split(':')[0];
+            subType = formatAsSlug(chummerWeapon.name_english.split(':')[0]);
         }
         setSubType(system, parserType, subType);
 
