@@ -3,6 +3,7 @@ declare namespace Shadowrun {
         CritterPowerPartData,
         ActionPartData,
         DescriptionPartData,
+        ImportFlags,
         ArmorPartData {
 
     }

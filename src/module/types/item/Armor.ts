@@ -3,6 +3,7 @@ declare namespace Shadowrun {
     export interface ArmorData extends
         ArmorPartData,
         DescriptionPartData,
+        ImportFlags,
         TechnologyPartData {
 
     }

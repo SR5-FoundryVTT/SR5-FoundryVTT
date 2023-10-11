@@ -1,8 +1,9 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export interface AmmoData extends 
+    export interface AmmoData extends
         AmmoPartData,
         DescriptionPartData,
+        ImportFlags,
         TechnologyPartData {
 
     }

@@ -2,6 +2,7 @@ declare namespace Shadowrun {
     export interface SpellData extends
         SpellPartData,
         DescriptionPartData,
+        ImportFlags,
         ActionPartData {
 
     }

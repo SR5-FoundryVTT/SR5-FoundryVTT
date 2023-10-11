@@ -85,7 +85,7 @@ declare namespace Shadowrun {
         name: string;
         img: string;
         data: ActionData;
-        system: ActionData & ImportFlags;
+        system: ActionData;
     }
 
     export interface AdeptPowerItemData {
@@ -93,138 +93,138 @@ declare namespace Shadowrun {
         name: string;
         img: string;
         data: AdeptPowerData;
-        system: AdeptPowerData & ImportFlags;
+        system: AdeptPowerData;
     }
     export interface AmmoItemData {
         type: 'ammo';
         name: string;
         img: string;
         data: AmmoData;
-        system: AmmoData & ImportFlags;
+        system: AmmoData;
     }
     export interface ArmorItemData {
         type: 'armor';
         name: string;
         img: string;
         data: ArmorData;
-        system: ArmorData & ImportFlags;
+        system: ArmorData;
     }
     export interface BiowareItemData {
         type: 'bioware';
         name: string;
         img: string;
         data:  BiowareData;
-        system: BiowareData & ImportFlags;
+        system: BiowareData;
     }
     export interface ComplexFormItemData {
         type: 'complex_form';
         name: string;
         img: string;
         data: ComplexFormData;
-        system: ComplexFormData & ImportFlags;
+        system: ComplexFormData;
     }
     export interface ContactItemData {
         type: 'contact';
         name: string;
         img: string;
         data: ContactData;
-        system: ContactData & ImportFlags;
+        system: ContactData;
     }
     export interface CritterPowerItemData {
         type: 'critter_power';
         name: string;
         img: string;
         data: CritterPowerData;
-        system: CritterPowerData & ImportFlags;
+        system: CritterPowerData;
     }
     export interface CyberwareItemData {
         type: 'cyberware';
         name: string;
         img: string;
         data: CyberwareData;
-        system: CyberwareData & ImportFlags;
+        system: CyberwareData;
     }
     export interface DeviceItemData {
         type: 'device';
         name: string;
         img: string;
         data: DeviceData;
-        system: DeviceData & ImportFlags;
+        system: DeviceData;
     }
     export interface EquipmentItemData {
         type: 'equipment';
         name: string;
         img: string;
         data: EquipmentData;
-        system: EquipmentData & ImportFlags;
+        system: EquipmentData;
     }
     export interface HostItemData {
         type: 'host';
         name: string;
         img: string;
         data: HostData;
-        system: HostData & ImportFlags;
+        system: HostData;
     }
     export interface LifestyleItemData {
         type: 'lifestyle';
         name: string;
         img: string;
         data: LifestyleData;
-        system: LifestyleData & ImportFlags;
+        system: LifestyleData;
     }
     export interface ModificationItemData {
         type: 'modification';
         name: string;
         img: string;
         data: ModificationData;
-        system: ModificationData & ImportFlags;
+        system: ModificationData;
     }
     export interface ProgramItemData {
         type: 'program';
         name: string;
         img: string;
         data: ProgramData;
-        system: ProgramData & ImportFlags;
+        system: ProgramData;
     }
     export interface QualityItemData {
         type: 'quality';
         name: string;
         img: string;
         data: QualityData;
-        system: QualityData & ImportFlags;
+        system: QualityData;
     }
     export interface SinItemData {
         type: 'sin';
         name: string;
         img: string;
         data: SinData;
-        system: SinData & ImportFlags;
+        system: SinData;
     }
     export interface SpellItemData {
         type: 'spell';
         name: string;
         img: string;
         data: SpellData;
-        system: SpellData & ImportFlags;
+        system: SpellData;
     }
     export interface CallInActionItemData {
         type: 'call_in_action';
         name: string;
         data: CallInActionData;
-        system: CallInActionData & ImportFlags;
+        system: CallInActionData;
     }
     export interface SpritePowerItemData {
         type: 'sprite_power';
         name: string;
         img: string;
         data: SpritePowerData;
-        system: SpritePowerData & ImportFlags;
+        system: SpritePowerData;
     }
     export interface WeaponItemData {
         type: 'weapon';
         name: string;
         img: string;
         data: WeaponData;
-        system: WeaponData & ImportFlags;
+        system: WeaponData;
     }
 }

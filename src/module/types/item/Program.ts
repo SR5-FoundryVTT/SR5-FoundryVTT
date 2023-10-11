@@ -2,6 +2,7 @@ declare namespace Shadowrun {
     export interface ProgramData extends
         ProgramPartData,
         DescriptionPartData,
+        ImportFlags,
         TechnologyPartData {
 
     }

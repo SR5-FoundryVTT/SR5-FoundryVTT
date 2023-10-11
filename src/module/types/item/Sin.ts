@@ -2,6 +2,7 @@ declare namespace Shadowrun {
     export interface SinData extends
         SinPartData,
         DescriptionPartData,
+        ImportFlags,
         TechnologyPartData {
 
     }
