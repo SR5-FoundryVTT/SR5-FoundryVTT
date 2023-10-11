@@ -3,7 +3,6 @@ import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { DataImporter } from "./DataImporter";
 import { Helpers } from "../../helpers";
-import { SR5 } from "../../config";
 
 
 /**

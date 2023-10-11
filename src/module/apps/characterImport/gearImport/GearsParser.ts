@@ -1,7 +1,5 @@
 import { ParserSelector } from "./ParserSelector";
-import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
 import * as IconAssign from '../../../apps/iconAssigner/iconAssign';
-import { SR5 } from "../../../config";
 
 /**
  * Parses all gear from a chummer character file and turns them into foundry sr item data objects

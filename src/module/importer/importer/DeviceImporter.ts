@@ -2,7 +2,6 @@ import { DataImporter } from "./DataImporter";
 import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { Helpers } from "../../helpers";
-import { SR5 } from "../../config";
 
 export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shadowrun.DeviceData> {
     public files = ['gear.xml'];

@@ -1,8 +1,5 @@
 import { parseDescription, parseTechnology } from "../BaseParserFunctions.js"
-import EquipmentItemData = Shadowrun.EquipmentItemData;
 import {DataDefaults} from "../../../data/DataDefaults";
-import { iconAssign } from '../../iconAssigner/iconAssign';
-
 
 /**
  * Parses a certain class of gear (depending on the implementation).
@@ -34,6 +31,6 @@ export class BaseGearParser implements GearParser {
     }
 
     private getDefaultData() {
-        return DataDefaults.baseItemData<EquipmentItemData, Shadowrun.EquipmentData>({type: 'equipment'});
+        return DataDefaults.baseItemData<Shadowrun.EquipmentItemData, Shadowrun.EquipmentData>({type: 'equipment'});
     }
 }

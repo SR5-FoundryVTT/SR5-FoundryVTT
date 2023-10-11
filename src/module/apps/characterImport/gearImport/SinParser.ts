@@ -1,6 +1,5 @@
 import { BaseGearParser } from "./BaseGearParser"
 import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
-import { SR5 } from "../../../config";
 
 /**
  * Parses SINs and the attached licenses.

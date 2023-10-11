@@ -4,7 +4,6 @@ import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
 import { DataDefaults } from '../../data/DataDefaults';
 import { Helpers } from "../../helpers";
-import { SR5 } from "../../config";
 
 export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData> {
     public override categoryTranslations: any;
