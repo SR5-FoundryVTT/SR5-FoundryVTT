@@ -1331,7 +1331,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skillId = await this.actor.addLanguageSkill({ name: '' });
         if (!skillId) return;
 
-        // NOTE: Causes issues with adding knowledge skills (category undefined)
         await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
     }
 
@@ -1351,7 +1350,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
-        // NOTE: Causes issues with adding knowledge skills (category undefined)
         await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
     }
 
