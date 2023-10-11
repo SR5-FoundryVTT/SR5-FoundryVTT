@@ -60,7 +60,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             item.folder = categoryFolder.id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags2(item.name, item.type, this.formatAsSlug(categoryEN));
+            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(categoryEN));
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

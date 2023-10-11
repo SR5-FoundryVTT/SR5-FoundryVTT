@@ -48,7 +48,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
             item.folder = folder.id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags2(item.name, item.type, item.system.powerType);
+            item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.powerType);
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

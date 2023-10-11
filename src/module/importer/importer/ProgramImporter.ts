@@ -57,7 +57,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
             item.folder = categoryFolder.id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags2(item.name, item.type, item.system.type);
+            item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.type);
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

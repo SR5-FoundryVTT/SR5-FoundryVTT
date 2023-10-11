@@ -66,7 +66,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             item.folder = folders[item.system.category].id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags2(item.name, item.type, item.system.category);
+            item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.category);
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

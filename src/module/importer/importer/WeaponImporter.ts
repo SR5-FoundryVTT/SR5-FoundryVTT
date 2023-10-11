@@ -83,7 +83,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
             }
 
             // Set Import Flags
-            item.system.importFlags = this.genImportFlags2(item.name, item.type, subType);
+            item.system.importFlags = this.genImportFlags(item.name, item.type, subType);
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

@@ -47,7 +47,7 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
             item.folder = folders[category].id;
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags2(item.name, item.type, this.formatAsSlug(category));
+            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};

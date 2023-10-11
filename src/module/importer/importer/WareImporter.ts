@@ -79,7 +79,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
             }
 
             // Import Flags
-            item.system.importFlags = this.genImportFlags2(item.name, item.type, this.formatAsSlug(category));
+            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
 
             // Default icon
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
