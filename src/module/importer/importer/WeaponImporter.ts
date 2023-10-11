@@ -84,7 +84,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
             // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);

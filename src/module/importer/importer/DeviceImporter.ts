@@ -45,7 +45,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.system.importFlags = this.genImportFlags(item.name, item.system.category);
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
@@ -93,7 +93,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.system.importFlags = this.genImportFlags(item.name, item.system.category);
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(rcc, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(rcc, 'name'), ImportHelper.StringValue(rcc, 'page'))}`;
@@ -141,7 +141,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.system.importFlags = this.genImportFlags(item.name, item.system.category);
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;

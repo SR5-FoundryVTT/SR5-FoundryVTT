@@ -51,7 +51,7 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
             // Parse the item information from the xml
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;

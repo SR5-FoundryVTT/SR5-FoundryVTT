@@ -57,7 +57,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

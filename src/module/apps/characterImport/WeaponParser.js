@@ -39,7 +39,7 @@ export class WeaponParser {
                 const itemData = this.parseWeapon(chummerWeapon);
 
                 // Assign the icon if enabled
-                if (assignIcons) itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList);
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
 
                 parsedWeapons.push(itemData);
             } catch (e) {

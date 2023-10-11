@@ -15,7 +15,7 @@ export class LifestyleParser {
                 const itemData = this.parseLifestyle(chummerLifestyle);
 
                 // Assign the icon if enabled
-                if (assignIcons) itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList);
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
 
                 parsedLifestyle.push(itemData);
             }

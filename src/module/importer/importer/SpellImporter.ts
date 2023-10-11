@@ -75,7 +75,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

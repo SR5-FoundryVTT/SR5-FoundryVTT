@@ -26,7 +26,7 @@ export class GearsParser {
                 const itemData = this.parseGearEntry(chummerGear);
 
                 // Assign the icon if enabled
-                if (assignIcons) itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList);
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
 
                 items.push(itemData);
             }

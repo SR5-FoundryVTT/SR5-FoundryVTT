@@ -66,7 +66,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
             }
 
             // Default icon
-            if (setIcons) item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList);
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
             // Finish the importing
             item.system.technology.rating = ImportHelper.IntValue(program, 'rating', 0);

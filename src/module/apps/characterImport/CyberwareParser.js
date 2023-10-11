@@ -13,7 +13,7 @@ export class CyberwareParser {
                 const itemData = this.parseCyberware(chummerCyber);
 
                 // Assign the icon if enabled
-                if (assignIcons) itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList);
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
 
                 parsedCyberware.push(itemData);
             } catch (e) {

@@ -15,7 +15,7 @@ export class SpellParser {
                     const itemData = this.parseSpell(chummerSpell);
 
                     // Assign the icon if enabled
-                    if (assignIcons) itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList);
+                    if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
 
                     parsedSpells.push(itemData);
                 }
