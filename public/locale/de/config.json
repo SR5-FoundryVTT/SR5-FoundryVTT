@@ -1209,5 +1209,9 @@
     "SR5.WeaponReach": "Reichweite",
     "SR5.WeaponReload": "Nachladen",
     "SR5.WeaponType": "Typ",
-    "SR5.Wireless": "Wireless"
+    "SR5.Wireless": "Wireless",
+
+    "SR5.Vision": {
+        "AstralPerception": "Astral Perception"
+    }
 }

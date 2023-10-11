@@ -1225,5 +1225,9 @@
     "SR5.WeaponReach": "길이",
     "SR5.WeaponReload": "재장전",
     "SR5.WeaponType": "종류",
-    "SR5.Wireless": "무선"
+    "SR5.Wireless": "무선",
+
+    "SR5.Vision": {
+      "AstralPerception": "Astral Perception"
+    }
 }

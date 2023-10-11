@@ -846,5 +846,9 @@
     "SR5.Wireless": "Sans fil",
     "SR5.WoundModifier": "Mod. de blessures",
     "SR5.WoundTolerance": "Tolérance blessures",
-    "SR5.Wounds": "Blessures"
+    "SR5.Wounds": "Blessures",
+
+    "SR5.Vision": {
+        "AstralPerception": "Astral Perception"
+    }
 }
