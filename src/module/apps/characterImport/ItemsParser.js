@@ -1,7 +1,7 @@
 import { getArray } from "./BaseParserFunctions.js"
 import { GearsParser } from "./gearImport/GearsParser"
 import { ArmorParser } from "./ArmorParser";
-import { CyberwareParser } from "./CyberwareParser";
+import { WareParser } from "./WareParser";
 import { QualityParser } from "./QualityParser";
 import { PowerParser } from "./PowerParser";
 import { SpellParser } from "./SpellParser";
@@ -38,8 +38,8 @@ export class ItemsParser {
         }
 
         if (importOptions.cyberware && chummerChar.cyberwares && chummerChar.cyberwares.cyberware) {
-            const parsedCyberware = await new CyberwareParser().parseCyberwares(chummerChar, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, parsedCyberware);
+            const parsedWare = await new WareParser().parseWares(chummerChar, importOptions.assignIcons);
+            Array.prototype.push.apply(parsedItems, parsedWare);
         }
 
         if (importOptions.powers && chummerChar.powers && chummerChar.powers.power) {
