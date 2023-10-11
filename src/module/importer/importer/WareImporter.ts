@@ -73,6 +73,11 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
             //@ts-ignore
             item.folder = folders[category].id;
 
+            // Bioware has no wireless feature, so disable it by default
+            if (key === 'bioware') {
+                item.system.technology.wireless = false;
+            }
+
             // Import Flags
             item.system.importFlags = this.genImportFlags(item.name, item.type);
 
