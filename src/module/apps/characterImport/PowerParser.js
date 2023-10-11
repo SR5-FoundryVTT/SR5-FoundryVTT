@@ -1,6 +1,5 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
 import * as IconAssign from '../../apps/iconAssigner/iconAssign';
-import { SR5 } from "../../config";
 
 export class PowerParser {
 
@@ -35,11 +34,9 @@ export class PowerParser {
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerPower.fullname), parserType);
-
         if (chummerPower.name != chummerPower.fullname) {
-            let subType = formatAsSlug(chummerPower.name);
-            if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-                system.importFlags.subType = subType;
+            setSubType(system, parserType, formatAsSlug(chummerPower.name));
+            if (system.importFlags.subType) {
                 system.importFlags.name = formatAsSlug(chummerPower.extra);
             }
         }

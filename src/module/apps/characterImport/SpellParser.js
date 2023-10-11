@@ -1,4 +1,4 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
 import { DataDefaults } from "../../data/DataDefaults";
 import * as IconAssign from '../../apps/iconAssigner/iconAssign';
 import { SR5 } from "../../config";
@@ -174,11 +174,7 @@ export class SpellParser {
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerSpell.name_english), parserType);
-
-        let subType = formatAsSlug(chummerSpell.category_english);
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-            system.importFlags.subType = formatAsSlug(subType);
-        }
+        setSubType(system, parserType, formatAsSlug(chummerSpell.category_english));
 
         return createItemData(chummerSpell.name, parserType, system);
     }

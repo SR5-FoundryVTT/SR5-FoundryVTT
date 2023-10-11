@@ -1,7 +1,6 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
 import { DataDefaults } from "../../data/DataDefaults";
 import * as IconAssign from '../../apps/iconAssigner/iconAssign';
-import { SR5 } from "../../config";
 
 export class QualityParser {
 
@@ -34,12 +33,7 @@ export class QualityParser {
 
         // Assign import flags
         system.system.importFlags = genImportFlags(formatAsSlug(chummerQuality.name_english), parserType);
-
-        // Assign item subtype
-        let subType = formatAsSlug(system.type); // positive or negative
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-            system.system.importFlags.subType = subType;
-        }
+        setSubType(system.system, parserType, formatAsSlug(system.type)); // positive or negative
 
         // Create the item
         let quality = createItemData(chummerQuality.name, parserType, system);

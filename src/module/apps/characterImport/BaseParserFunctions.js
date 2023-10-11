@@ -1,4 +1,5 @@
 import { DataDefaults } from "../../data/DataDefaults";
+import { SR5 } from "../../config";
 
 export const getValues = (val) => {
     const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
@@ -64,6 +65,12 @@ export const parseTechnology = (chummerEntry) => {
     }
 
     return parsedTechnology
+}
+
+export const setSubType = (parsedItem, parserType, subType) => {
+    if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
+        parsedItem.importFlags.subType = formatAsSlug(subType);
+    }
 }
 
 export const createItemData = (name, type, system) => {

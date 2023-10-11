@@ -1,6 +1,5 @@
-import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
 import * as IconAssign from '../../apps/iconAssigner/iconAssign';
-import { SR5 } from "../../config";
 
 export class ArmorParser {
 
@@ -74,11 +73,7 @@ export class ArmorParser {
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerArmor.name_english), parserType);
-
-        let subType = formatAsSlug(chummerArmor.category_english);
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-            system.importFlags.subType = subType;
-        }
+        setSubType(system, parserType, formatAsSlug(chummerArmor.category_english));
 
         return createItemData(chummerArmor.name, parserType, system);
     }

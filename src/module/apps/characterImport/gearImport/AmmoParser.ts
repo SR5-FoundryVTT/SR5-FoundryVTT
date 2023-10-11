@@ -1,6 +1,5 @@
 import { BaseGearParser } from "./BaseGearParser"
 import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
-import { SR5 } from "../../../config";
 
 /**
  * Parses ammunition
@@ -33,11 +32,7 @@ export class AmmoParser extends BaseGearParser {
 
         // Assign import flags
         parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
-
-        let subType = formatAsSlug(chummerGear.name_english.split(':')[0]);
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-            parsedGear.system.importFlags.subType = formatAsSlug(subType);
-        }
+        this.setSubType(parsedGear, parserType, formatAsSlug(chummerGear.name_english.split(':')[0]));
 
         return parsedGear;
     }

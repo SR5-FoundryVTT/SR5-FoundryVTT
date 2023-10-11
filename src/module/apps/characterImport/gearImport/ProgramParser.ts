@@ -1,6 +1,5 @@
 import { BaseGearParser } from "./BaseGearParser"
 import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
-import { SR5 } from "../../../config";
 
 /**
  * Parses common, hacking and agent programs.
@@ -26,11 +25,7 @@ export class ProgramParser extends BaseGearParser {
 
         // Assign import flags
         parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
-
-        let subType = parsedGear.system.type;
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-            parsedGear.system.importFlags.subType = formatAsSlug(subType);
-        }
+        this.setSubType(parsedGear, parserType, parsedGear.system.type);
 
         return parsedGear;
     }

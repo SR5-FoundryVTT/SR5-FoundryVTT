@@ -1,6 +1,6 @@
-import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
 import * as IconAssign from '../../apps/iconAssigner/iconAssign';
-import { SR5 } from "../../config";
+
 export class CyberwareParser {
 
     async parseCyberwares(chummerChar, assignIcons) {
@@ -37,11 +37,7 @@ export class CyberwareParser {
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerCyber.name_english), parserType);
-
-        let subType = formatAsSlug(chummerCyber.category_english);
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-            system.importFlags.subType = subType;
-        }
+        setSubType(system, parserType, formatAsSlug(chummerCyber.category_english));
 
         return createItemData(chummerCyber.name, parserType, system);
     }

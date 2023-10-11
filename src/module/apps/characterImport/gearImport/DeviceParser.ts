@@ -1,6 +1,5 @@
 import { BaseGearParser } from "./BaseGearParser"
 import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
-import { SR5 } from "../../../config";
 
 /**
  * Parses devices (commlinks, decks, and RCCs)
@@ -61,11 +60,7 @@ export class DeviceParser extends BaseGearParser {
 
         // Assign import flags
         parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
-
-        let subType = parsedGear.system.category;
-        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
-            parsedGear.system.importFlags.subType = formatAsSlug(subType);
-        }
+        this.setSubType(parsedGear, parserType, parsedGear.system.category);
 
         return parsedGear;
     }

@@ -1,5 +1,6 @@
-import { parseDescription, parseTechnology } from "../BaseParserFunctions.js"
+import { parseDescription, parseTechnology, formatAsSlug } from "../BaseParserFunctions.js"
 import {DataDefaults} from "../../../data/DataDefaults";
+import { SR5 } from "../../../config";
 
 /**
  * Parses a certain class of gear (depending on the implementation).
@@ -28,6 +29,12 @@ export class BaseGearParser implements GearParser {
         parsedGear.system.description = parseDescription(chummerGear);
 
         return parsedGear;
+    }
+
+    setSubType(parsedGear: any, parserType: string, subType: string) {
+        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
+            parsedGear.system.importFlags.subType = formatAsSlug(subType);
+        }
     }
 
     private getDefaultData() {
