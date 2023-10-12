@@ -138,7 +138,8 @@ input[type='text'].display {
  * CHAT MESSAGE STYLING
  */
 // Public Roll
-.chat-message {
+.chat-message,
+.chat-message.emote {
     color: $white;
     background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)), url("assets/page.webp") repeat;
     border: 1px solid $dark;
