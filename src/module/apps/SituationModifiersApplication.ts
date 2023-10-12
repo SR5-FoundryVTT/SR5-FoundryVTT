@@ -211,6 +211,20 @@ class RecoilModifiersHandler extends ModifiersHandler {
         this.app.modifiers.applyAll();
         this.app.render();
     }
+
+    static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+        console.log(`${SYSTEM_NAME} | Recoil modifier HUD on renderTokenHUD`);
+
+        // Setup and connect tokenHUD elements.
+        const modifier = $('<div class="modifier-row"></div>');
+        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied.total}</div>`);
+        const modifierDescription = $(`<div class="modifier-description open-recoil-modifier">${game.i18n.localize("SR5.ModifierTypes.Recoil")}</div>`);
+        modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'recoil'));
+
+        modifierColumn.append(modifier);
+        modifier.append(modifierValue);
+        modifier.append(modifierDescription);
+    }
 }
 
 /**

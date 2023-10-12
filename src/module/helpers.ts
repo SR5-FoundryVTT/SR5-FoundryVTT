@@ -119,6 +119,10 @@ export class Helpers {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
+    static listHeaderId(event): string {
+        return event.currentTarget.closest('.list-header').dataset.itemId;
+    }
+
     // replace 'SR5.'s on keys with 'SR5_DOT_'
     //@ts-ignore TODO: foundry-vtt-types v10
     static onSetFlag(data) {
