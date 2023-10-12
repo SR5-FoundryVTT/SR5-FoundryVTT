@@ -1,5 +1,5 @@
-import { SituationModifier } from './../../rules/modifiers/SituationModifier';
-import { SituationModifiersApplication } from './../../apps/SituationModifiersApplication';
+import { SituationModifier } from '../../rules/modifiers/SituationModifier';
+import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../../effects";
@@ -1350,7 +1350,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
-        await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
+        await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId, category);
     }
 
     async _onRemoveKnowledgeSkill(event) {
