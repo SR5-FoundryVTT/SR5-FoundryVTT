@@ -979,7 +979,9 @@
             "Crack": "Crack",
             "Data": "Data",
             "Fault": "Fault",
-            "Machine": "Machine"
+            "Machine": "Machine",
+            "Companion": "Companion",
+            "Generalist": "Generalist"
         }
     },
     "SR5.SpritePower": {
