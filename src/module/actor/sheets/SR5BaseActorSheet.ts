@@ -1,5 +1,5 @@
-import { SituationModifier } from './../../rules/modifiers/SituationModifier';
-import { SituationModifiersApplication } from './../../apps/SituationModifiersApplication';
+import { SituationModifier } from '../../rules/modifiers/SituationModifier';
+import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../../effects";
@@ -1331,8 +1331,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skillId = await this.actor.addLanguageSkill({ name: '' });
         if (!skillId) return;
 
-        // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
+        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
@@ -1347,12 +1346,11 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = Helpers.listItemId(event) as keyof KnowledgeSkills;
+        const category = Helpers.listHeaderId(event) as keyof KnowledgeSkills;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
-        // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
+        await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId, category);
     }
 
     async _onRemoveKnowledgeSkill(event) {
