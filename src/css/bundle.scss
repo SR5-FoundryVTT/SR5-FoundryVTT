@@ -57,7 +57,6 @@
         justify-content: flex-start;
     }
 
-
     .nowrap {
         flex-wrap: nowrap;
     }
@@ -324,13 +323,21 @@ input[type='text'].display {
 
     /**
      * Elements used for linkable documents / entities.
+     *
+     * This is also present in foundry.scss, but is overwritten by Monks Enhanced Journals module.
+     * Let's force it within the SR5 context, while leaving it everywhere else.
      */
     .entity-link,
     .content-link,
     .inline-roll {
         border: 0;
         background: none;
-        color: white;
+        color: white !important;
+    }
+
+    
+    .entity-link.content-link {
+        color: white !important;
     }
 
     // An origin link is a uuid based entity link, without drag support.

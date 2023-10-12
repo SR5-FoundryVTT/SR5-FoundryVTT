@@ -6,16 +6,6 @@
 /**
   * GENERAL ELEMENT STYLING
   */
-h1 {
-    font-family: 'klavika-medium';
-    color: #55101e;
-    font-size: 25px;
-}
-
-h2 {
-    font-family: 'klavika-medium';
-    color: #55101e;
-}
 
 table {
     background: linear-gradient(to bottom, #3d3c3f, #000000);
@@ -106,6 +96,19 @@ input[type='text'].display {
 // Journal Entry Page Editor 
 .journal-sheet.journal-entry-page .window-content {
     background: url("assets/light-page.webp") repeat;
+    
+    // As we only change headers in journal-entires, avoid cross styling outside of it.
+    // This clashed with Weather Control module and others.
+    h1 {
+        font-family: 'klavika-medium';
+        color: $darkred;
+        font-size: 25px;
+    }
+
+    h2 {
+        font-family: 'klavika-medium';
+        color: $darkred;
+    }
 }
 
 .journal-sheet .journal-header .title {
@@ -120,7 +123,7 @@ input[type='text'].display {
 
 .journal-sheet h3 {
     font-family: 'klavika-medium';
-    color: #55101e;
+    color: $darkred;
 }
 
 .journal-sheet select {
@@ -135,7 +138,8 @@ input[type='text'].display {
  * CHAT MESSAGE STYLING
  */
 // Public Roll
-.chat-message {
+.chat-message,
+.chat-message.emote {
     color: $white;
     background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)), url("assets/page.webp") repeat;
     border: 1px solid $dark;
