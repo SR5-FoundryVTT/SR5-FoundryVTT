@@ -57,9 +57,9 @@ import {canvasInit} from './canvas';
 import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
 import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
+import VisionConfigurator from './vision/visionConfigurator';
 
-import AstralPerceptionDetectionMode from './vision/astralPerception/astralPerceptionDetectionMode';
-import AstralPerceptionBackgroundVisionShader  from './vision/astralPerception/astralPerceptionBackgroundShader';
+
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -501,46 +501,8 @@ ___________________
 
     static configureVision() {
         //register detection modes
-          //todo: v10 foundry-vtt-types 
-        //@ts-ignore
-        CONFIG.Canvas.detectionModes.astralPerception = new AstralPerceptionDetectionMode({
-            id: 'astralPerception',
-            label: 'SR5.Vision.AstralPerception',
-            //@ts-ignore
-            type: DetectionMode.DETECTION_TYPES.SIGHT,
-          });
-  
-        //@ts-ignore
-        CONFIG.Canvas.visionModes.astralPerception = new VisionMode({
-            id: 'astralPerception',
-            label: 'SR5.Vision.AstralPerception',
-            canvas: {
-            //@ts-ignore
-            shader: ColorAdjustmentsSamplerShader,
-            uniforms: {
-                saturation: 1,
-                tint: AstralPerceptionBackgroundVisionShader.COLOR_TINT,
-            },
-            },
-            lighting: {
-            //@ts-ignore
-            background: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
-            //@ts-ignore
-            illumination: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
-            //@ts-ignore
-            coloration: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
-            },
-            vision: {
-            darkness: { adaptive: false },
-            defaults: {
-                attenuation: 1,
-                brightness: 0.5,
-                saturation: -0.5,
-                contrast: 1,
-            },
-            background: { shader: AstralPerceptionBackgroundVisionShader },
-            },
-        });
+        VisionConfigurator.configureAstralPerception()
+        VisionConfigurator.configureThermographicVision()
+        VisionConfigurator.configureLowlight()
     }
-
 }

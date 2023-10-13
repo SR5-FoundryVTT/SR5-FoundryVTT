@@ -1231,6 +1231,8 @@
     "SR5.Wireless": "Wireless",
 
     "SR5.Vision": {
-        "AstralPerception": "Astral Perception"
+        "AstralPerception": "Astral Perception",
+        "ThermographicVision": "Thermographic Vision",
+        "LowLight": "Low-Light Vision"
     }
 }

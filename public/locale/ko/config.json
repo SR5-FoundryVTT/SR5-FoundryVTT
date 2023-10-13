@@ -1227,7 +1227,9 @@
     "SR5.WeaponType": "종류",
     "SR5.Wireless": "무선",
 
-    "SR5.Vision": {
-      "AstralPerception": "Astral Perception"
-    }
+  "SR5.Vision": {
+    "AstralPerception": "Astral Perception",
+    "ThermographicVision": "Thermographic Vision",
+    "LowLight": "Low-Light Vision"
+  }
 }

@@ -677,6 +677,8 @@
   "SR5.Wounds": "Ferimentos",
 
   "SR5.Vision": {
-    "AstralPerception": "Astral Perception"
+    "AstralPerception": "Astral Perception",
+    "ThermographicVision": "Thermographic Vision",
+    "LowLight": "Low-Light Vision"
   }
 }
