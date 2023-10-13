@@ -851,6 +851,7 @@
     "SR5.Vision": {
         "AstralPerception": "Astral Perception",
         "ThermographicVision": "Thermographic Vision",
-        "LowLight": "Low-Light Vision"
+        "LowLight": "Low-Light Vision",
+        "AugmentedReality": "Augmented Reality"
     }
 }

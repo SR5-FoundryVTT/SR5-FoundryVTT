@@ -504,5 +504,6 @@ ___________________
         VisionConfigurator.configureAstralPerception()
         VisionConfigurator.configureThermographicVision()
         VisionConfigurator.configureLowlight()
+        VisionConfigurator.configureAR()
     }
 }
