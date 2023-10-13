@@ -1,7 +1,6 @@
 import { ImportHelper } from "../helper/ImportHelper";
 import { DataImporter } from "./DataImporter";
 import { Constants } from './Constants';
-import { SR5 } from "../../config";
 
 /**
  * Programs are part of the Chummer5 gear.xml

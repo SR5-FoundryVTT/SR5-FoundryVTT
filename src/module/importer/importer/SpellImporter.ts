@@ -8,7 +8,6 @@ import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
 import { DataDefaults } from '../../data/DataDefaults';
 import { Helpers } from "../../helpers";
-import { SR5 } from "../../config";
 
 export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowrun.SpellData> {
     public override categoryTranslations: any;

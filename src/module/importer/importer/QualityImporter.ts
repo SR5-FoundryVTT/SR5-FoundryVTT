@@ -2,7 +2,6 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
 import { Helpers } from "../../helpers";
-import { SR5 } from "../../config";
 
 export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Shadowrun.QualityData> {
     public override categoryTranslations: any;

@@ -8,7 +8,6 @@ import { ParserMap } from '../parser/ParserMap';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import { DataDefaults } from '../../data/DataDefaults';
 import { Helpers } from "../../helpers";
-import { SR5 } from "../../config";
 import WeaponItemData = Shadowrun.WeaponItemData;
 import WeaponData = Shadowrun.WeaponData;
 
