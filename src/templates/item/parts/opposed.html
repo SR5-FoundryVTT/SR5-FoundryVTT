@@ -26,7 +26,7 @@
             <select name="system.action.opposed.skill">
                 {{#select system.action.opposed.skill}}
                 <option value=""></option>
-                {{#each config.activeSkills as |name type|}}
+                {{#each activeSkills as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
@@ -98,7 +98,7 @@
             <select name="system.action.opposed.resist.skill">
                 {{#select system.action.opposed.resist.skill}}
                 <option value=""></option>
-                {{#each config.activeSkills as |name type|}}
+                {{#each activeSkills as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
