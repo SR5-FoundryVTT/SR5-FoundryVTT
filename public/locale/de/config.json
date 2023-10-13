@@ -977,7 +977,9 @@
             "Crack": "Infiltrator",
             "Data": "Daten",
             "Fault": "Stör",
-            "Machine": "Maschinen"
+            "Machine": "Maschinen",
+            "Companion": "Begleiter",
+            "Generalist": "Generalist"
         }
     },
     "SR5.SpritePower": {

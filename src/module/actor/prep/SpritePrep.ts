@@ -161,6 +161,20 @@ export class SpritePrep {
                 overrides.init = 3;
                 overrides.skills.push('electronic_warfare', 'hardware');
                 break;
+            case 'companion':
+                overrides.attack = -1;
+                overrides.sleaze = 1;
+                overrides.firewall = 4;
+                overrides.skills.push('electronic_warfare');
+                break;
+            case 'generalist':
+                overrides.attack = 1;
+                overrides.sleaze = 1;
+                overrides.data_processing = 1;
+                overrides.firewall = 1;
+                overrides.init = 1;
+                overrides.skills.push('hacking','electronic_warfare');
+                break;
         }
         return overrides;
     }

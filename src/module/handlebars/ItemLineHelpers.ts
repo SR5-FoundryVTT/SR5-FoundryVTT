@@ -272,18 +272,23 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.CritterPower.Type'),
-                        },
+                            text: game.i18n.localize('SR5.CritterPower.Type')
+                        }
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.CritterPower.Range'),
-                        },
+                            text: game.i18n.localize('SR5.CritterPower.Range')
+                        }
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.CritterPower.Duration'),
-                        },
+                            text: game.i18n.localize('SR5.CritterPower.Duration')
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Rating')
+                        }
                     },
                 ];
             case 'quality':
@@ -291,7 +296,12 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             text: game.i18n.localize('SR5.QualityType'),
-                        },
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Rating'),
+                        },                        
                     },
                 ];
             case 'summoning':
@@ -441,8 +451,13 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             text: game.i18n.localize(SR5.qualityTypes[item.system.type ?? '']),
-                        },
+                        }
                     },
+                    {
+                        text: {
+                            text: item.system.rating ?? '',
+                        },
+                    }
                 ];
 
             case 'adept_power':
@@ -480,19 +495,24 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(SR5.critterPower.types[item.system.powerType ?? '']),
-                        },
+                            text: game.i18n.localize(SR5.critterPower.types[item.system.powerType ?? ''])
+                        }
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.critterPower.ranges[item.system.range ?? '']),
-                        },
+                            text: game.i18n.localize(SR5.critterPower.ranges[item.system.range ?? ''])
+                        }
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.critterPower.durations[item.system.duration ?? '']),
-                        },
+                            text: game.i18n.localize(SR5.critterPower.durations[item.system.duration ?? ''])
+                        }
                     },
+                    {
+                        text: {
+                            text: item.system.rating ?? ''
+                        }
+                    }
                 ];
 
             case 'complex_form':

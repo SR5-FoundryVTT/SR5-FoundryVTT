@@ -1744,7 +1744,8 @@ export class SuccessTest {
             // Manually build flag data to give renderChatMessage hook flag access.
             // This test data is needed for all subsequent testing based on this chat messages.
             flags: {
-                // [SYSTEM_NAME]: {[FLAGS.Test]: this.toJSON()},
+                // Add test data to message to allow ChatMessage hooks to access it.
+                [SYSTEM_NAME]: {[FLAGS.Test]: this.toJSON()},
                 'core.canPopout': true
             },
             sound: CONFIG.sounds.dice,
@@ -1800,9 +1801,13 @@ export class SuccessTest {
         // SuccessTest doesn't NEED an actor, if one is cast that way: show gm-only-content
         if (!test.actor || !game.user) {
             html.find('.gm-only-content').removeClass('gm-only-content');
+            // @ts-ignore
+            ui.chat.scrollBottom();
         }
         else if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
             html.find('.gm-only-content').removeClass('gm-only-content');
+            // @ts-ignore
+            ui.chat.scrollBottom();
         }
     }
 

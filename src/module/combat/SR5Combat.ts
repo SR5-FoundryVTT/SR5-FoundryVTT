@@ -345,8 +345,17 @@ export class SR5Combat extends Combat {
         return this.nextRound();
     }
 
-    override async startCombat() {
-        // By default, no actor starts. Pre-selet top.
+    override async startCombat() {        
+        // Roll initiative for all combatants.
+        // Disable Foundry behavior of keeping the 'current' combatants turn.
+        // Shadowrun 5 starts at the top of the ini order, this avoids an .update
+        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {            
+            await this.rollNPC({updateTurn: false});
+        } else {
+            await this.rollAll({updateTurn: false});
+        }
+
+        // Start at top of the ini order.
         const turn = 0;
         const round = SR.combat.INITIAL_INI_ROUND;
         const initiativePass = SR.combat.INITIAL_INI_PASS;
@@ -356,12 +365,6 @@ export class SR5Combat extends Combat {
             round,
             [`flags.${SYSTEM_NAME}.${FLAGS.CombatInitiativePass}`]: initiativePass
         });
-
-        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
-            await this.rollNPC();
-        } else {
-            await this.rollAll();
-        }
 
         await this.handleActionPhase();
 
