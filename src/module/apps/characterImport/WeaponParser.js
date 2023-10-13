@@ -1,6 +1,5 @@
 import { parseDescription, getArray, getValues, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
 import * as IconAssign from '../../apps/iconAssigner/iconAssign';
-import { SR5 } from "../../config";
 
 export class WeaponParser {
     parseDamage = (val) => {
