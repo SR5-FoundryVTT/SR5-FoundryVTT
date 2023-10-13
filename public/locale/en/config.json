@@ -455,7 +455,6 @@
         }
     },
     "SR5.ImportCharacter": "Import Character",
-    "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Incoming": "Incoming",
     "SR5.IncomingDamage": "Incoming Damage",
     "SR5.IncomingDrain": "Incoming Drain",
@@ -930,8 +929,11 @@
             "Automotive": "Automotive",
             "Beasts": "Beasts",
             "Blood": "Blood",
+            "Carcass": "Carcass",
             "Caretaker": "Insect Caretaker",
             "Ceramic": "Ceramic",
+            "Corpse": "Corpse",
+            "Detritus": "Detritus",
             "Earth": "Earth",
             "Energy": "Energy",
             "Fire": "Fire",
@@ -943,8 +945,10 @@
             "Muse": "Muse",
             "Nightmare": "Nightmare",
             "Nymph": "Insect Nymph",
+            "Palefire": "Palefire",
             "Plant": "Plant",
             "Queen": "Insect Queen",
+            "Rot": "Rot",
             "Scout": "Insect Scout",
             "Shade": "Shade",
             "Shedim": "Shedim",
@@ -961,12 +965,7 @@
             "Train": "Train",
             "Water": "Water",
             "Worker": "Insect Worker",
-            "Wraith": "Wraith",
-            "Carcass": "Carcass",
-            "Corpse": "Corpse",
-            "Rot": "Rot",
-            "Palefire": "Palefire",
-            "Detritus": "Detritus"
+            "Wraith": "Wraith"
         }
     },
     "SR5.Sprite": {
@@ -1010,8 +1009,8 @@
     "SR5.TestResults": {
         "SpiritSummonFailure": "Spirit fled!",
         "SpiritSummonSuccess": "Spirit summoned!",
-        "SpriteCompilationSuccess": "Sprite compiled!",
-        "SpriteCompilationFailure": "Sprite fled!"
+        "SpriteCompilationFailure": "Sprite fled!",
+        "SpriteCompilationSuccess": "Sprite compiled!"
     },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attribute-Only Test",
@@ -1174,10 +1173,12 @@
             "Water": "Water Craft"
         }
     },
+    "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Walk": "Walk",
     "SR5.WalkingSpeed": "Walking",
     "SR5.Warnings": {
         "AlreadyExistingInventory": "An inventory with this name alreayd exists",
+        "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now.",
         "CantConsumeEquippedAmmo": "Equipped ammunition has not enouth rounds",
         "CantEditDefaultInventory": "The default inventory can't be renamed",
         "CantExtendTest": "Test type can't be extended.",
@@ -1186,6 +1187,7 @@
         "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
         "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
         "CantSpendMulitplePointsOfEdge": "Can't spend mulitple points of edge on one test or action",
+        "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade.",
         "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",
         "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
         "InvalidCompilationLevel": "Resonance attribute to low for this sprite level",
@@ -1195,9 +1197,7 @@
         "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
         "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
         "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
-        "TokenSelectionNeeded": "One ore more tokens need to be selected",
-        "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade.",
-        "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now."
+        "TokenSelectionNeeded": "One ore more tokens need to be selected"
     },
     "SR5.Weapon": "Weapon",
     "SR5.WeaponAmmoCount": "Ammo Count",
