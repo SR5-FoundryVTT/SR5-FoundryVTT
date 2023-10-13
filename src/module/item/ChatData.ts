@@ -6,6 +6,11 @@ import {SR5} from "../config";
 
 /**
  * ChatData returns little info boxes for each item type.
+ * These are shown for items in actor item lists when looking at their description and within 
+ * chat description messages of items.
+ * 
+ * NOTE: This here is hard to read, requires per item type handling and is not very flexible.
+ *       This should be refactored into are more readable approach.
  * 
  * These info boxes will be shown in a few places, most notibly the chat message but also
  * - actor sheets
@@ -192,7 +197,9 @@ export const ChatData = {
 
     quality: (system, labels, props) => {
         ChatData.action(system, labels, props);
+
         props.push(Helpers.label(system.type));
+        props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
     },
 
     sprite_power: (system, labels, props) => {
@@ -201,12 +208,10 @@ export const ChatData = {
     },
 
     critter_power: (system, labels, props) => {
-        // power type
         props.push(game.i18n.localize(SR5.critterPower.types[system.powerType]));
-        // duration
         props.push(game.i18n.localize(SR5.critterPower.durations[system.duration]));
-        // range
         props.push(game.i18n.localize(SR5.critterPower.ranges[system.range]));
+        props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
 
         // add action data
         ChatData.action(system, labels, props);

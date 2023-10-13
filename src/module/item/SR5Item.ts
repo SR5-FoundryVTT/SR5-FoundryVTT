@@ -438,7 +438,7 @@ export class SR5Item extends Item {
         // Add additional chat data fields depending on item type.
         //@ts-ignore // TODO: foundry-vtt-types v10 
         const chatDataForItemType = ChatData[this.type];
-        if (chatDataForItemType) chatDataForItemType(duplicate(system), labels, props, this);
+        if (chatDataForItemType) chatDataForItemType(system, labels, props, this);
 
         //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
         //              that's not actually defined in any SR5Item typing.
