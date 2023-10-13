@@ -1196,7 +1196,8 @@
         "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
         "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
         "TokenSelectionNeeded": "One ore more tokens need to be selected",
-        "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade."
+        "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade.",
+        "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now."
     },
     "SR5.Weapon": "Weapon",
     "SR5.WeaponAmmoCount": "Ammo Count",
