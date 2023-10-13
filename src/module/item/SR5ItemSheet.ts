@@ -198,8 +198,7 @@ export class SR5ItemSheet extends ItemSheet {
         // @ts-ignore TODO: foundry-vtt-types v10
         data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
 
-        data.rollModes = CONFIG.Dice.rollModes
-        console.log(this.object)
+        data.rollModes = CONFIG.Dice.rollModes;
 
         return data;
     }
