@@ -1,4 +1,6 @@
 import {_mergeWithMissingSkillFields} from "../../actor/prep/functions/SkillsPrep";
+import { InitiationParser } from "./magicImport/InitiationParser";
+import { MetamagicParser } from "./magicImport/MetamagicParser";
 
 /**
  * Parses all non-item character information from a chummer character object.
@@ -129,18 +131,14 @@ export class CharacterInfoUpdater {
                 system.special = 'resonance';
             }
             if (
-                (chummerChar.magician && chummerChar.magician.toLowerCase() === 'true') ||
-                (chummerChar.adept && chummerChar.adept.toLowerCase() === 'true')
+                chummerChar.magician?.toLowerCase() === 'true' ||
+                chummerChar.adept?.toLowerCase() === 'true'
             ) {
                 system.special = 'magic';
                 let attr = [];
-                if (
-                    chummerChar.tradition &&
-                    chummerChar.tradition.drainattribute &&
-                    chummerChar.tradition.drainattribute.attr
-                ) {
+                if (chummerChar.tradition?.drainattribute?.attr) {
                     attr = chummerChar.tradition.drainattribute.attr;
-                } else if (chummerChar.tradition && chummerChar.tradition.drainattributes) {
+                } else if (chummerChar.tradition?.drainattributes) {
                     attr = chummerChar.tradition.drainattributes
                         .split('+')
                         .map((item) => item.trim());
@@ -151,6 +149,16 @@ export class CharacterInfoUpdater {
                         system.magic.attribute = attName;
                     }
                 });
+
+                if(chummerChar.initiationgrade) {
+                    new InitiationParser().parseInitiation(chummerChar, system)
+                }
+
+                if(chummerChar.metamagics) {
+                    new MetamagicParser().parseMetamagic(chummerChar, system)
+                }
+
+
             }
             if (chummerChar.totaless) {
                 system.attributes.essence.value = chummerChar.totaless;

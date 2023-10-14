@@ -812,7 +812,9 @@
                         "value": 0,
                         "base": 0,
                         "mod": []
-                    }
+                    },
+                    "initiation": {},
+                    "metamagic": []
                 }
             },
             "movement": {

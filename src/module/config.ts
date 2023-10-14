@@ -48,7 +48,8 @@ export const SR5 = {
         strength: 'SR5.AttrStrength',
         willpower: 'SR5.AttrWillpower',
         pilot: 'SR5.Vehicle.Stats.Pilot',
-        force: 'SR5.Force'
+        force: 'SR5.Force',
+        initiation: 'SR5.Initiation'
     },
 
     /**
@@ -66,7 +67,8 @@ export const SR5 = {
         speed: 'SR5.Vehicle.Stats.Speed',
         sensor: 'SR5.Vehicle.Stats.Sensor',
         handling: 'SR5.Vehicle.Stats.Handling',
-        magic: 'SR5.AttrMagic'
+        magic: 'SR5.AttrMagic',
+        initiation: 'SR5.Initiation'
     },
 
     specialTypes: {

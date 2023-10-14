@@ -6,12 +6,12 @@ export default class VehicleParser {
 
     async parseVehicles(actor, chummerChar, importOptions) {
 
-        if(!game.user.can("ACTOR_CREATE")) {
-            ui.notifications.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
+        if(!importOptions.vehicles) {
             return;
         }
 
-        if(!importOptions.vehicles) {
+        if(!game.user.can("ACTOR_CREATE")) {
+            ui.notifications.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
             return;
         }
 
