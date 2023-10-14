@@ -1376,6 +1376,9 @@
                 "environmental": false,
                 "physical": false
             },
+            "ritual": {
+                "type": ""
+            },
             "action": {
                 "test": "SpellCastingTest",
                 "opposed": {

@@ -97,6 +97,7 @@ export const SR5 = {
         health: 'SR5.SpellCatHealth',
         illusion: 'SR5.SpellCatIllusion',
         manipulation: 'SR5.SpellCatManipulation',
+        rituals: 'SR5.SpellCatRitual'
     },
 
     spellTypes: {
