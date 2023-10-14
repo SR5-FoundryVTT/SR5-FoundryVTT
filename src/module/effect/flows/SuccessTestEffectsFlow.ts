@@ -107,20 +107,27 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     *allApplicable(): Generator<SR5ActiveEffect> {
         // Actor effects apply only for all tests.
         for (const effect of this.test.actor?.effects as unknown as SR5ActiveEffect[]) {
-            if (effect.applyTo === 'test_all') yield effect;                
+            if (effect.applyTo === 'test_all') yield effect;
         }
 
         // Item effects can also apply to this test only.
         for (const effect of this.test.item?.effects as unknown as SR5ActiveEffect[]) {
+            if (!effect.applyForWirelessActiveOnly(effect.parent as SR5Item)) continue;
+
             if (effect.applyTo === 'test_all') yield effect;
-            if (effect.applyTo === 'test_item') yield effect;                
+            if (effect.applyTo === 'test_item') yield effect;            
         }
 
         // NestedItem effects can also apply to this test only.
         for (const item of this.test.item?.items as unknown as SR5Item[]) {
+            // Allow users to have nested items that don't affect tests by having them unequipped.
+            if (!item.isEquipped()) continue;
+
             for (const effect of item.effects as unknown as SR5ActiveEffect[]) {
+                if (!effect.applyForWirelessActiveOnly(item)) continue;
+
                 if (effect.applyTo === 'test_all') yield effect;
-                if (effect.applyTo === 'test_item') yield effect;                
+                if (effect.applyTo === 'test_item') yield effect;
             }
         }
     }

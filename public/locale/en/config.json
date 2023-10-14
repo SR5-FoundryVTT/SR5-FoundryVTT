@@ -85,7 +85,7 @@
             "Modify": "Modify"
         },
         "New": "New Effect",
-        "OnlyForWireless": "Only when wireless is active",
+        "OnlyForWireless": "Apply only for wireless active",
         "Types": {
             "Inactive": "Inactive Effects",
             "Persistent": "Persistent Effects",
@@ -1077,7 +1077,8 @@
             "Persistent": "Effects with an unlimited life span",
             "Temporary": "Effects with a limited life span",
             "ApplyTo": "Changes of this effect will apply to this target only",
-            "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to."
+            "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
+            "OnlyForWireless": "This effect will apply only for items that have wireless enabled"
         },
         "Item": {
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",

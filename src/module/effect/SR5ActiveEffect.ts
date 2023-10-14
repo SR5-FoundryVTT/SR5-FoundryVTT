@@ -177,8 +177,11 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Some effects should only be applied when their parent item is in active wireless mode.
      */
-    get isWirelessActive(): boolean {
-        return this.onlyForWireless && this.parent instanceof SR5Item && this.parent.isWireless();
+    applyForWirelessActiveOnly(item: SR5Item|undefined): boolean {
+        if (!item) return false;
+        if (!this.onlyForWireless) return true;
+
+        return item.isWireless();
     }
 
     /**
