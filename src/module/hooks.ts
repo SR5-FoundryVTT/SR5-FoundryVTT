@@ -228,8 +228,10 @@ ___________________
         CONFIG.ChatMessage.documentClass = SR5ChatMessage;
         //@ts-ignore // TODO: foundry-vtt-types v10
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
+        
         //@ts-ignore TODO: foundry-vtt-types v11
-        // Setting to false, will NOT create item effects on actors but traverse effects on items during data prep.
+        // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
+        // Setting to true, will duplicate item effects on actors. Only effects on actors will be traversed.
         CONFIG.ActiveEffect.legacyTransferral = false;
         // Register object classes
         CONFIG.Token.objectClass = SR5Token;

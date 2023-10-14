@@ -35,8 +35,8 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
         data.modes = this.applyModifyLabelToCustomMode(data.modes);
 
-        data.applyTo = this.object.applyTo;
-        data.onlyForWireless = this.object.onlyForWireless;
+        data.applyTo = this.document.applyTo;
+        data.onlyForWireless = this.document.onlyForWireless;
 
         data.applyToOptions = this.prepareApplyToOptions();
         data.testKeyOptions = this.prepareKeyOptions();

@@ -3,6 +3,7 @@ import { SuccessTest } from "../../tests/SuccessTest";
 import { ActiveEffectData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { OpposedTest } from "../../tests/OpposedTest";
+import { SR5Item } from "../../item/SR5Item";
 
 /**
  * Handle the SR5ActiveEffects flow for a SuccessTest.
@@ -98,18 +99,28 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     }
 
     /**
-     * Reduce all actor effects to those applicable to SuccessTests.
-     * 
-     * These can either be for ALL tests, or for those only trigger by the effects origin / source item.
-     * 
+     * Reduce effects on test actor and item to those applicable to this test.
+     *      
      * Since Foundry Core uses a generator, keep this pattern for consistency.
      * 
      */
     *allApplicable(): Generator<SR5ActiveEffect> {
-        if (this.test.actor) {
-            for (const effect of this.test.actor.effects as unknown as SR5ActiveEffect[]) {
+        // Actor effects apply only for all tests.
+        for (const effect of this.test.actor?.effects as unknown as SR5ActiveEffect[]) {
+            if (effect.applyTo === 'test_all') yield effect;                
+        }
+
+        // Item effects can also apply to this test only.
+        for (const effect of this.test.item?.effects as unknown as SR5ActiveEffect[]) {
+            if (effect.applyTo === 'test_all') yield effect;
+            if (effect.applyTo === 'test_item') yield effect;                
+        }
+
+        // NestedItem effects can also apply to this test only.
+        for (const item of this.test.item?.items as unknown as SR5Item[]) {
+            for (const effect of item.effects as unknown as SR5ActiveEffect[]) {
                 if (effect.applyTo === 'test_all') yield effect;
-                if (effect.applyTo === 'test_item' && this._effectOriginatesFromTestItem(effect)) yield effect;
+                if (effect.applyTo === 'test_item') yield effect;                
             }
         }
     }
@@ -123,15 +134,5 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         for (const effect of this.test.item.effects as unknown as SR5ActiveEffect[]) {
             if (effect.applyTo === 'targeted_actor') yield effect;
         }
-    }
-
-    /**
-     * Does the effect originate from item used within the SuccessTest?
-     * 
-     * @param effect Any SR5ActiveEffect
-     * @returns true, if the effect originates from the test item.
-     */
-    _effectOriginatesFromTestItem(effect: SR5ActiveEffect): boolean {
-        return this.test.item?.uuid == effect.origin;
     }
 }

@@ -71,9 +71,12 @@
         {{/if}}
 
         <div class="form-group">
-            <label>{{ localize "SR5.ActiveEffect.ApplyTo" }}</label>
+            <label data-tooltip="{{localize 'SR5.Tooltips.Effect.ApplyTo'}}">{{ localize "SR5.ActiveEffect.ApplyTo" }}</label>
             <div class="form-fields">
-                <select name="flags.shadowrun5e.applyTo" data-dtype="Text" {{#if hasChanges}}disabled{{/if}}>
+                <select name="flags.shadowrun5e.applyTo" data-dtype="Text" 
+                    {{#if hasChanges}}disabled{{/if}}
+                    {{#if hasChanges}}data-tooltip="{{localize 'SR5.Tooltips.Effect.AlterApplyToWithChanges'}}"{{/if}}
+                >
                     {{selectOptions applyToOptions selected=applyTo localize=true}}
                 </select>
             </div>

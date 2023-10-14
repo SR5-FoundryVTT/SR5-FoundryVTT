@@ -1270,7 +1270,7 @@ export class SuccessTest {
         await this.populateDocuments();
         await this.prepareDocumentData();
 
-        // Apply effectes applicable to test values.
+        // Apply effects applicable to test values.
         this.effects.apply();
 
         // Initial base value preparation will show default result without any user input.
