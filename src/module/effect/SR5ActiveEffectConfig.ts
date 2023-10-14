@@ -9,10 +9,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         return data;
     }
 
-    override activateListeners(html: JQuery<HTMLElement>): void {
-        super.activateListeners(html);
-    }
-
     /**
    * Handle adding a new change to the changes array.
    * 
