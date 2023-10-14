@@ -25,7 +25,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     /**
      * Duplicate Foundry apply logic, but with custom handling for SR5ActiveEffects within a SuccessTest context.
      * 
-     * NOTE: Since effects are applied as none unique modifiers, applying them mulitple times is possible.
+     * NOTE: Since effects are applied as none unique modifiers, applying them multiple times is possible.
      *       Changes can't be applied as unique modifiers as they're names are not unique.
      */
     apply() {
@@ -57,7 +57,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     }
 
     /**
-     * Create Effectes of applyTo 'targeted_actor' after an opposed test has finished.
+     * Create Effects of applyTo 'targeted_actor' after an opposed test has finished.
      * 
      * Before creating effects onto the target actor, resolve the dynamic values from the source context
      * of the opposed test causing the effects. When created on the target actor, the values can't be resolved
