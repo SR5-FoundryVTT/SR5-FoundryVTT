@@ -246,7 +246,9 @@ export class SituationModifier {
         }
 
         // If a fixed value selection has been made, use that.
-        if (!this.hasFixed && this.hasFixedSelection) this.applied.fixed = this.applied.active.value;
+        // NOTE: When a fixed selection is removed, the input will return null.
+        //       Make sure to always return a number.
+        if (!this.hasFixed && this.hasFixedSelection) this.applied.fixed = this.applied.active.value || 0;
 
         // After merging active and fixed value, derive total.
         if (this.hasFixed) this.applied.total = this.applied.fixed as number;
