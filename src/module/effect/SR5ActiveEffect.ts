@@ -1,6 +1,5 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
-import ModifiableValue = Shadowrun.ModifiableValue;
 import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import { SYSTEM_NAME } from "../constants";
 import { SR5Item } from "../item/SR5Item";
@@ -79,7 +78,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     protected _applyModify(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
-            const value = foundry.utils.getProperty(actor, change.key) as ModifiableValue;
+            const value = foundry.utils.getProperty(actor, change.key) as Shadowrun.ModifiableValue;
             //@ts-ignore // TODO: foundry-vtt-types v10
             value.mod.push({ name: this.name, value: Number(change.value) });
 
@@ -93,14 +92,14 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Don't apply any changes if it's also not a indirect match.
         if (this._isKeyModifiableValue(actor, indirectKey)) {
-            const value = foundry.utils.getProperty(actor, indirectKey) as ModifiableValue;
+            const value = foundry.utils.getProperty(actor, indirectKey) as Shadowrun.ModifiableValue;
             //@ts-ignore // TODO: foundry-vtt-types v10
             value.mod.push({ name: this.name, value: Number(change.value) });
 
             return null;
         }
 
-        // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value choosen
+        // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
         //@ts-ignore // TODO: foundry-vtt-types
         return super._applyAdd(actor, change, current, delta, changes);
     }
@@ -162,8 +161,8 @@ export class SR5ActiveEffect extends ActiveEffect {
      * 
      * @returns Either the configured value or 'actor' as a default.
      */
-    get applyTo(): string | null {
-        return this.getFlag(SYSTEM_NAME, 'applyTo') as string || 'actor';
+    get applyTo() {
+        return this.getFlag(SYSTEM_NAME, 'applyTo') as Shadowrun.EffectApplyTo || 'actor';
     }
 
     /**
@@ -231,7 +230,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         const value = Roll.safeEval(expression);
 
         // Overwrite change value with graceful default, to avoid NaN errors during change application.
-        // Adhere to FoundryVTT expecation of recieving string values.
+        // Adhere to FoundryVTT expectation of receiving string values.
         if (value === undefined) change.value = '0';
         else change.value = value.toString();
     }
