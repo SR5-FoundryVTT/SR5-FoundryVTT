@@ -228,7 +228,6 @@
   "SR5.Hits": "Acertos",
   "SR5.HotSim": "Hot Sim",
   "SR5.ImportCharacter": "Importar Personagem",
-  "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
   "SR5.Incoming": "Recebido",
   "SR5.IncomingDamage": "Dano Recebido",
   "SR5.Information": "Info",
@@ -645,6 +644,13 @@
       "Water": "Nautico"
     }
   },
+  "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
+  "SR5.Vision": {
+    "AstralPerception": "Astral Perception",
+    "AugmentedReality": "Augmented Reality",
+    "LowLight": "Low-Light Vision",
+    "ThermographicVision": "Thermographic Vision"
+  },
   "SR5.Walk": "Caminhar",
   "SR5.Weapon": "Arma",
   "SR5.WeaponAmmoCount": "Qtd Municao",
@@ -674,12 +680,5 @@
   "SR5.WeaponType": "Tipo",
   "SR5.WoundModifier": "Mod Ferim",
   "SR5.WoundTolerance": "Tolerancia a Ferimentos",
-  "SR5.Wounds": "Ferimentos",
-
-  "SR5.Vision": {
-    "AstralPerception": "Astral Perception",
-    "ThermographicVision": "Thermographic Vision",
-    "LowLight": "Low-Light Vision",
-    "AugmentedReality": "Augmented Reality"
-  }
+  "SR5.Wounds": "Ferimentos"
 }
