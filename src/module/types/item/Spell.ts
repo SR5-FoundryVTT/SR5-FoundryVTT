@@ -26,9 +26,10 @@ declare namespace Shadowrun {
         physical: boolean;
     }
     export interface RitualSpellData {
-
+        ritual: {
+            type: string;
+        }
     }
-
     export interface SpellPartData {
         type: SpellType;
         category: SpellCateogry;
@@ -52,4 +53,5 @@ declare namespace Shadowrun {
     export type SpellType = 'physical' | 'mana' | '';
     export type SpellRange = 'touch' | 'los' | 'los_a' | '';
     export type SpellDuration = 'instant' | 'sustained' | 'permanent' | '';
+    export type RitualType = 'anchored' | 'material_link' | 'minion' | 'spell' | 'spotter' | '';
 }
