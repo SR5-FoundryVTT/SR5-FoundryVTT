@@ -455,7 +455,6 @@
         }
     },
     "SR5.ImportCharacter": "캐릭터 불러오기",
-    "SR5.VehicleImport.MissingPermission": "액터 생성에 대한 권한 없음",
     "SR5.Incoming": "기본",
     "SR5.IncomingDamage": "기본 피해",
     "SR5.IncomingDrain": "기본 드레인",
@@ -930,8 +929,11 @@
             "Automotive": "차량",
             "Beasts": "야수",
             "Blood": "혈액",
+            "Carcass": "날고기",
             "Caretaker": "곤충 경비병",
             "Ceramic": "도자기",
+            "Corpse": "시체",
+            "Detritus": "쓰레기",
             "Earth": "대지",
             "Energy": "기운",
             "Fire": "화염",
@@ -943,8 +945,10 @@
             "Muse": "뮤즈",
             "Nightmare": "악몽",
             "Nymph": "곤충 유충",
+            "Palefire": "창백한 불꽃",
             "Plant": "식물",
             "Queen": "곤충 여왕",
+            "Rot": "부패",
             "Scout": "곤충 정찰병",
             "Shade": "섀이드",
             "Shedim": "쉐딤",
@@ -961,12 +965,7 @@
             "Train": "기차",
             "Water": "물",
             "Worker": "곤충 일꾼",
-            "Wraith": "레이스",
-            "Carcass": "날고기",
-            "Corpse": "시체",
-            "Rot": "부패",
-            "Palefire": "창백한 불꽃",
-            "Detritus": "쓰레기"
+            "Wraith": "레이스"
         }
     },
     "SR5.Sprite": {
@@ -1010,8 +1009,8 @@
     "SR5.TestResults": {
         "SpiritSummonFailure": "영혼 사라짐!",
         "SpiritSummonSuccess": "영혼 소환 됨!",
-        "SpriteCompilationSuccess": "요정 컴파일 됨!",
-        "SpriteCompilationFailure": "요정 사라짐!"
+        "SpriteCompilationFailure": "요정 사라짐!",
+        "SpriteCompilationSuccess": "요정 컴파일 됨!"
     },
     "SR5.Tests": {
         "AttributeOnlyTest": "특성치 테스트",
@@ -1174,6 +1173,7 @@
             "Water": "선박"
         }
     },
+    "SR5.VehicleImport.MissingPermission": "액터 생성에 대한 권한 없음",
     "SR5.Walk": "걷기",
     "SR5.WalkingSpeed": "걷는 중",
     "SR5.Warnings": {
@@ -1186,6 +1186,7 @@
         "CantSecondChanceAGlitch": "해당 테스트에서는 두 번째 기회가 없음. 테스트 결과 글리치 발생.",
         "CantSecondChanceWithoutNoneHits": "해당 테스트에서는 두 번째 기회가 없음. 성공한 주사위만 남음.",
         "CantSpendMulitplePointsOfEdge": "한 번의 테스트 또는 행동에서 다수의 엣지를 소비할 수 없음",
+        "CompilationNotConcluded": "컴파일이 완료되지 못함. 페이드 수치를 결정하기 위해 컴파일 굴림에 경쟁할 요정을 기다려야 함.",
         "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "액터가 없다면 테스트에서 엣지 포인트 소비 불가",
         "HostItemOnlyAcceptIC": "IC 액터만 호스트에 추가 가능",
         "InvalidCompilationLevel": "해당 요정 단계에 대한 공명 특성치가 낮음",
@@ -1195,8 +1196,7 @@
         "NoFireModeConfigured": "원거리 무기에 사격방식 설정이 없음. 단발로 사용될 것임",
         "SkillCantBeDefault": "해당 기술은 기본값으로 설정할 수 없으므로 주사위를 굴릴 수 없음",
         "SummoningNotConcluded": "소환이 완료되지 못함. 드레인 수치를 결정하기 위해 소환 굴림에 경쟁할 영혼을 기다려야 함.",
-        "TokenSelectionNeeded": "하나 이상의 토큰이 선택되야 함",
-        "CompilationNotConcluded": "컴파일이 완료되지 못함. 페이드 수치를 결정하기 위해 컴파일 굴림에 경쟁할 요정을 기다려야 함."
+        "TokenSelectionNeeded": "하나 이상의 토큰이 선택되야 함"
     },
     "SR5.Weapon": "무기",
     "SR5.WeaponAmmoCount": "탄약 수",
