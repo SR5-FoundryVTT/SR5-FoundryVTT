@@ -3,7 +3,7 @@
  * 
  * Each function is a handler for a specific change key and value, defined by the caller of these methods.
  * 
- * Each function handles rules from the SR5#165 Environmental Modifier Compenstation table.
+ * Each function handles rules from the SR5#165 Environmental Modifier Compensation table.
  * 
  * TODO: Check rules on stacking of multiple environmental modifier compensations.
  */
@@ -25,7 +25,7 @@ export const lowLightVision = (modifier: EnvironmentalModifier, test?: SuccessTe
 }
 
 /**
- * Apply Image Manification to range modifiers. See SR5#175
+ * Apply Image Magnification to range modifiers. See SR5#175
  * @param modifier 
  */
 export const imageMagnification = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
@@ -88,7 +88,7 @@ export const smartlink = (modifier: EnvironmentalModifier, test?: SuccessTest) =
  */
 export const sunglasses = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.error('Shadowrun 5e | Sunglasses not implemented yet', modifier);
-    // NOTE: I refuse to implement sunglasses, due to them differntiating between light and glare...
+    // NOTE: I refuse to implement sunglasses, due to them differentiating between light and glare...
 }
 
 export const ultrasound = (modifier: EnvironmentalModifier, test?: SuccessTest) => {

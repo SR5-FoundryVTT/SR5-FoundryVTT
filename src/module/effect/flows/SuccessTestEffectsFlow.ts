@@ -29,7 +29,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      *       Changes can't be applied as unique modifiers as they're names are not unique.
      */
     apply() {
-        // Sice we're extending EffectChangeData by a effect field only locally, I don't care enough to resolve the typing issue.
+        // Since we're extending EffectChangeData by a effect field only locally, I don't care enough to resolve the typing issue.
         const changes: any[] = [];
 
         for (const effect of this.allApplicable()) {
