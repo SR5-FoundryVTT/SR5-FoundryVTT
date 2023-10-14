@@ -1,7 +1,6 @@
-import { parseDescription, parseTechnology } from "../BaseParserFunctions.js"
-import EquipmentItemData = Shadowrun.EquipmentItemData;
+import { parseDescription, parseTechnology, formatAsSlug } from "../BaseParserFunctions.js"
 import {DataDefaults} from "../../../data/DataDefaults";
-
+import { SR5 } from "../../../config";
 
 /**
  * Parses a certain class of gear (depending on the implementation).
@@ -32,8 +31,13 @@ export class BaseGearParser implements GearParser {
         return parsedGear;
     }
 
+    setSubType(parsedGear: any, parserType: string, subType: string) {
+        if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
+            parsedGear.system.importFlags.subType = formatAsSlug(subType);
+        }
+    }
+
     private getDefaultData() {
-        return DataDefaults.baseItemData<EquipmentItemData, Shadowrun.EquipmentData>({type: 'equipment'});
+        return DataDefaults.baseItemData<Shadowrun.EquipmentItemData, Shadowrun.EquipmentData>({type: 'equipment'});
     }
 }
-

@@ -1,14 +1,21 @@
-import { parseDescription, getArray, createItemData } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
 import { DataDefaults } from "../../data/DataDefaults";
+import * as IconAssign from '../../apps/iconAssigner/iconAssign';
 
 export class SpellParser {
-    parseSpells(chummerChar) {
+    async parseSpells(chummerChar, assignIcons) {
         const spells = getArray(chummerChar.spells.spell);
         const parsedSpells = [];
-        spells.forEach((chummerSpell) => {
+        const iconList = await IconAssign.getIconFiles();
+
+        spells.forEach(async (chummerSpell) => {
             try {
                 if (chummerSpell.alchemy.toLowerCase() !== 'true') {
                     const itemData = this.parseSpell(chummerSpell);
+
+                    // Assign the icon if enabled
+                    if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
+
                     parsedSpells.push(itemData);
                 }
             } catch (e) {
@@ -20,6 +27,7 @@ export class SpellParser {
     }
 
     parseSpell(chummerSpell) {
+        const parserType = 'spell';
         const action = {};
         const system = {};
         let category = chummerSpell.category_english;
@@ -163,6 +171,10 @@ export class SpellParser {
             }
         }
 
-        return createItemData(chummerSpell.name, 'spell', system);
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(chummerSpell.name_english), parserType);
+        setSubType(system, parserType, formatAsSlug(chummerSpell.category_english));
+
+        return createItemData(chummerSpell.name, parserType, system);
     }
 }

@@ -4,18 +4,19 @@ declare namespace Shadowrun {
 
     export interface ActionData extends
         ActionPartData,
+        ImportFlags,
         DescriptionPartData {
         result: ActionResultData
     }
-    /** 
-     * Action information for testing and throwing dice, including all the necessesary values 
+    /**
+     * Action information for testing and throwing dice, including all the necessesary values
      * that need to be collected from both the action item and the actor using it.
-     * 
-     * The main component being the test implementation string, defining what test to use. 
+     *
+     * The main component being the test implementation string, defining what test to use.
      * See TestCreator helper for more information. By default SuccessTest should be used.
-     * 
+     *
      * An action always describes an active test (i.e. a SuccessTest) and might include these other test types:
-     * - followed (a test following the main active test, i.e. Drain/Fade) 
+     * - followed (a test following the main active test, i.e. Drain/Fade)
      * - opposed (a test opposing the main active test, i.e. Opposed / Defense)
      * - resist (a test to resist damage after an opposed test, i.e. Soak)
      */

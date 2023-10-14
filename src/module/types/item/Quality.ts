@@ -3,6 +3,7 @@ declare namespace Shadowrun {
       export interface QualityData extends
           QualityPartData,
           DescriptionPartData,
+          ImportFlags,
           ActionPartData {
 
       }

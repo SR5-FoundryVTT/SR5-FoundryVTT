@@ -1,4 +1,5 @@
 import { BaseGearParser } from "./BaseGearParser"
+import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
 
 /**
  * Parses SINs and the attached licenses.
@@ -6,8 +7,9 @@ import { BaseGearParser } from "./BaseGearParser"
  */
 export class SinParser extends BaseGearParser {
     override parse(chummerGear : any) : any {
+        const parserType = 'sin';
         const parsedGear =  super.parse(chummerGear);
-        parsedGear.type = 'sin';
+        parsedGear.type = parserType;
 
         // Create licenses if there are any
         if (chummerGear.children) {
@@ -23,11 +25,15 @@ export class SinParser extends BaseGearParser {
 
             parsedGear.system.licenses = this.parseLicenses(chummerLicenses);
         }
+
+        // Assign import flags
+        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
+
         return parsedGear;
     }
 
     private parseLicenses(chummerLicenses : any) : any[] {
-        const parsedLicenses : any[] = []; 
+        const parsedLicenses : any[] = [];
 
         chummerLicenses.forEach(chummerLicense => {
             if (chummerLicense.category_english === 'ID/Credsticks')

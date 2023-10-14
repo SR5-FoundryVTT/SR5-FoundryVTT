@@ -1,15 +1,21 @@
-import { parseDescription, getArray, createItemData } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
 import { DataDefaults } from "../../data/DataDefaults";
+import * as IconAssign from '../../apps/iconAssigner/iconAssign';
 
 export class QualityParser {
 
-    parseQualities(chummerChar) {
+    async parseQualities(chummerChar, assignIcons) {
         const qualities = getArray(chummerChar.qualities.quality);
         const parsedQualities = [];
+        const iconList = await IconAssign.getIconFiles();
 
-        qualities.forEach((chummerQuality) => {
+        await qualities.forEach(async (chummerQuality) => {
             try {
                 const itemData = this.parseQuality(chummerQuality);
+
+                // Assign the icon if enabled
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.system.importFlags, itemData.system.system, iconList)};
+
                 parsedQualities.push(itemData);
             } catch (e) {
                 console.error(e);
@@ -20,10 +26,18 @@ export class QualityParser {
     }
 
     parseQuality(chummerQuality) {
-        const system = DataDefaults.baseItemData({type: 'quality'});
+        const parserType = 'quality';
+        const system = DataDefaults.baseItemData({type: parserType});
         system.type = chummerQuality.qualitytype_english.toLowerCase();
         system.description = parseDescription(chummerQuality);
 
-        return createItemData(chummerQuality.name, 'quality', system);
+        // Assign import flags
+        system.system.importFlags = genImportFlags(formatAsSlug(chummerQuality.name_english), parserType);
+        setSubType(system.system, parserType, formatAsSlug(system.type)); // positive or negative
+
+        // Create the item
+        let quality = createItemData(chummerQuality.name, parserType, system);
+
+        return quality;
     }
 }

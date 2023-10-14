@@ -1,13 +1,20 @@
-import { parseDescription, getArray, parseTechnology, createItemData } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
+import * as IconAssign from '../../apps/iconAssigner/iconAssign';
 
 export class ArmorParser {
-   
-    parseArmors(chummerChar) {
+
+    async parseArmors(chummerChar, assignIcons) {
         const armors = getArray(chummerChar.armors.armor);
         const parsedArmors = [];
-        armors.forEach((chummerArmor) => {
+        const iconList = await IconAssign.getIconFiles();
+
+        await armors.forEach(async (chummerArmor) => {
             try {
                 const itemData = this.parseArmor(chummerArmor);
+
+                // Assign the icon if enabled
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
+
                 parsedArmors.push(itemData);
             } catch (e) {
                 console.error(e);
@@ -18,6 +25,7 @@ export class ArmorParser {
     }
 
     parseArmor(chummerArmor) {
+        const parserType = 'armor';
         const system = {};
         const armor = {};
         system.armor = armor;
@@ -62,7 +70,11 @@ export class ArmorParser {
 
         system.technology = parseTechnology(chummerArmor);
         system.description = parseDescription(chummerArmor);
-        
-        return createItemData(chummerArmor.name, 'armor', system);
+
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(chummerArmor.name_english), parserType);
+        setSubType(system, parserType, formatAsSlug(chummerArmor.category_english));
+
+        return createItemData(chummerArmor.name, parserType, system);
     }
 }

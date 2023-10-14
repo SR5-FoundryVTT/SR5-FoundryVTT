@@ -1,10 +1,9 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
-import QualityItemData = Shadowrun.QualityItemData;
-import {Helpers} from "../../helpers";
+import { Helpers } from "../../helpers";
 
-export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.QualityData> {
+export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Shadowrun.QualityData> {
     public override categoryTranslations: any;
     public override itemTranslations: any;
     public files = ['qualities.xml'];
@@ -23,28 +22,39 @@ export class QualityImporter extends DataImporter<QualityItemData, Shadowrun.Qua
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonQualityi18n, 'qualities', 'quality');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const jsonNameTranslations = {};
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
-
         const parser = new QualityParserBase();
-
-        let items: QualityItemData[] = [];
+        let items: Shadowrun.QualityItemData[] = [];
         let jsonDatas = jsonObject['qualities']['quality'];
+        this.iconList = await this.getIconFiles();
+        const parserType = 'quality';
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
+            // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'quality'}), this.itemTranslations);
-
-            let category = ImportHelper.StringValue(jsonData, 'category');
+            // Create the item
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
+            let category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             //@ts-ignore TODO: Foundry Where is my foundry base data?
-            item.folder = folders[category.toLowerCase()].id;
+            item.folder = folders[category].id;
+
+            // Import Flags
+            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
+
+            // Default icon
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+
+            // Translate the name
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);

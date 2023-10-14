@@ -2,6 +2,7 @@ declare namespace Shadowrun {
     export interface ComplexFormData extends
         ComplexFormPartData,
         DescriptionPartData,
+        ImportFlags,
         ActionPartData {
 
     }

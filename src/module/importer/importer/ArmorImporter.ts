@@ -1,10 +1,9 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
-import ArmorItemData = Shadowrun.ArmorItemData;
-import {Helpers} from "../../helpers";
+import { Helpers } from "../../helpers";
 
-export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorData> {
+export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowrun.ArmorData> {
     public armorTranslations: any;
     public override categoryTranslations: any;
     public files = ['armor.xml'];
@@ -23,25 +22,38 @@ export class ArmorImporter extends DataImporter<ArmorItemData, Shadowrun.ArmorDa
         this.armorTranslations = ImportHelper.ExtractItemTranslation(jsonArmori18n, 'armors', 'armor');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Armor', this.categoryTranslations);
-
         const parser = new ArmorParserBase();
-
-        let datas: ArmorItemData[] = [];
+        let datas: Shadowrun.ArmorItemData[] = [];
         let jsonDatas = jsonObject['armors']['armor'];
+        this.iconList = await this.getIconFiles();
+        const parserType = 'armor';
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+
+            // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'armor'}));
+            // Create the item
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}));
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
-            item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folders[category].id;
 
+            // Import Flags
+            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
+
+            // Default icon
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+
+            // Translate the name
+            item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
+
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             datas.push(item);

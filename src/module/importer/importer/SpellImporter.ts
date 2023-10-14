@@ -6,8 +6,8 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
-import {Helpers} from "../../helpers";
 import { DataDefaults } from '../../data/DataDefaults';
+import { Helpers } from "../../helpers";
 
 export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowrun.SpellData> {
     public override categoryTranslations: any;
@@ -33,7 +33,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonSpelli18n, 'spells', 'spell');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Spells', this.categoryTranslations);
 
         const parser = new ParserMap<Shadowrun.SpellItemData>('category', [
@@ -48,16 +48,32 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
 
         let items: Shadowrun.SpellItemData[] = [];
         let jsonDatas = jsonObject['spells']['spell'];
+        this.iconList = await this.getIconFiles();
+        const parserType = 'spell';
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+
+            // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'spell'}), this.itemTranslations);
+            // Create the item
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
             //@ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.category].id;
 
+            // Import Flags
+            item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.category);
+
+            // Default icon
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+
+            // Translate name if needed
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);

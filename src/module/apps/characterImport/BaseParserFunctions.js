@@ -1,4 +1,5 @@
 import { DataDefaults } from "../../data/DataDefaults";
+import { SR5 } from "../../config";
 
 export const getValues = (val) => {
     const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
@@ -66,13 +67,18 @@ export const parseTechnology = (chummerEntry) => {
     return parsedTechnology
 }
 
+export const setSubType = (parsedItem, parserType, subType) => {
+    if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
+        parsedItem.importFlags.subType = formatAsSlug(subType);
+    }
+}
+
 export const createItemData = (name, type, system) => {
     return {
         name: name,
         _id: '',
         folder: '',
         flags: {},
-        img: 'icons/svg/mystery-man.svg',
         type: type,
         system,
         permission: {
@@ -81,4 +87,26 @@ export const createItemData = (name, type, system) => {
     };
 }
 
+// formatAsSlug and genImportFlags copied from original implementation in bulk importer DataImporter.ts
+/**
+* Reformat the name or subtype name so it matches the categories in config.ts
+* @param name The item's name or subtype name to reformat
+*/
+export const formatAsSlug = (name) => {
+    return name.trim().toLowerCase().replace((/'|,|\[|\]|\(|\)|:/g), '').split((/-|\s|\//g)).join('-');
+ }
 
+ /**
+ * Generate default import flags
+ * @param name The item's English name, formatted as a slug using formatAsSlug
+ * @param type The item's type
+ */
+ export const genImportFlags = (name, type) => {
+    const flags = {
+        name: name, // original english name
+        type: type,
+        subType: '',
+        isFreshImport: true
+    }
+    return flags;
+ }

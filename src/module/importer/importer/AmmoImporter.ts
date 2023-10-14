@@ -1,11 +1,9 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
-import WeaponData = Shadowrun.WeaponData;
-import AmmoItemData = Shadowrun.AmmoItemData;
-import {Helpers} from "../../helpers";
+import { Helpers } from "../../helpers";
 
-export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData> {
+export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun.AmmoData> {
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
@@ -22,23 +20,34 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
-        let ammoDatas: AmmoItemData[] = [];
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
+        let ammoDatas: Shadowrun.AmmoItemData[] = [];
         let jsonAmmos = jsonObject['gears']['gear'];
+        this.iconList = await this.getIconFiles();
+        const parserType = 'ammo';
+
         for (let i = 0; i < jsonAmmos.length; i++) {
             let jsonData = jsonAmmos[i];
+
+            // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
-
             if (ImportHelper.StringValue(jsonData, 'category', '') !== 'Ammunition') {
                 continue;
             }
 
-            let item = this.GetDefaultData({type: 'ammo'});
+            // Create the item
+            let item = this.GetDefaultData({type: parserType});
             item.name = ImportHelper.StringValue(jsonData, 'name');
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Import Flags
+            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(item.name.split(':')[0]));
+
+            // Default icon
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+
+            // Parse the item information from the xml
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
             item.system.technology.rating = 2;
             item.system.technology.availability = ImportHelper.StringValue(jsonData, 'avail');
@@ -61,6 +70,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
                 }
             }
 
+            // TODO: This can be improved by using the stored english name in item.system.importFlags.name
             let shouldLookForWeapons = false;
             let nameLower = item.name.toLowerCase();
             ['grenade', 'rocket', 'missile'].forEach((compare) => {
@@ -75,7 +85,7 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
                 });
 
                 if (foundWeapon != null && "action" in foundWeapon.data.data) {
-                    const weaponData = foundWeapon.data.data as WeaponData;
+                    const weaponData = foundWeapon.data.data as Shadowrun.WeaponData;
                     item.system.damage = weaponData.action.damage.value;
                     item.system.ap =weaponData.action.damage.ap.value;
                 }
@@ -85,6 +95,10 @@ export class AmmoImporter extends DataImporter<AmmoItemData, Shadowrun.AmmoData>
             // data.data.technology.conceal.base = ImportHelper.intValue(jsonData, "conceal");
             item.system.technology.conceal.base = 0;
 
+            // Translate Item Name
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             ammoDatas.push(item);

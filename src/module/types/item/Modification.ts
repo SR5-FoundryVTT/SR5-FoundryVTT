@@ -3,6 +3,7 @@ declare namespace Shadowrun {
     export interface ModificationData extends
         ModificationPartType,
         DescriptionPartData,
+        ImportFlags,
         TechnologyPartData {
 
     }

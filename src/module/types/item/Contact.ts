@@ -1,6 +1,7 @@
 declare namespace Shadowrun {
     export interface ContactData extends
         ContactPartData,
+        ImportFlags,
         DescriptionPartData {
 
     }
