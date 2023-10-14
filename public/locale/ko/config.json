@@ -1174,6 +1174,12 @@
         }
     },
     "SR5.VehicleImport.MissingPermission": "액터 생성에 대한 권한 없음",
+    "SR5.Vision": {
+      "AstralPerception": "Astral Perception",
+      "ThermographicVision": "Thermographic Vision",
+      "LowLight": "Low-Light Vision",
+      "AugmentedReality": "Augmented Reality"
+    },
     "SR5.Walk": "걷기",
     "SR5.WalkingSpeed": "걷는 중",
     "SR5.Warnings": {

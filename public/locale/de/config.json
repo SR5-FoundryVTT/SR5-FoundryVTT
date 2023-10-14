@@ -1159,6 +1159,12 @@
         }
     },
     "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
+    "SR5.Vision": {
+        "AstralPerception": "Astral Perception",
+        "AugmentedReality": "Augmented Reality",
+        "LowLight": "Low-Light Vision",
+        "ThermographicVision": "Thermographic Vision"
+    },
     "SR5.Walk": "Gehen",
     "SR5.WalkingSpeed": "Gehen",
     "SR5.Warnings": {

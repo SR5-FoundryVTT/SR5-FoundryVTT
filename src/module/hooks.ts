@@ -57,6 +57,9 @@ import {canvasInit} from './canvas';
 import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
 import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
+import VisionConfigurator from './vision/visionConfigurator';
+
+
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -291,6 +294,8 @@ ___________________
             makeDefault: true
         })
 
+        HooksManager.configureVision()
+
         // Preload might reduce loading time during play.
         HandlebarManager.loadTemplates();
     }
@@ -494,4 +499,11 @@ ___________________
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
     }
 
+    static configureVision() {
+        //register detection modes
+        VisionConfigurator.configureAstralPerception()
+        VisionConfigurator.configureThermographicVision()
+        VisionConfigurator.configureLowlight()
+        VisionConfigurator.configureAR()
+    }
 }
