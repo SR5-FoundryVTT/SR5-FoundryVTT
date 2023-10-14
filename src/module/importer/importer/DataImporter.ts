@@ -1,11 +1,13 @@
 import { DataDefaults } from './../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
+import * as IconAssign from '../../apps/iconAssigner/iconAssign';
+import { SR5 } from "../../config";
 
 const xml2js = require('xml2js');
 
 /**
  * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
- * 
+ *
  * Generic type ItemDataType is the items data type DataImporter creates per entry in that Chummer5a data .xml file.
  */
 export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
@@ -14,6 +16,8 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
     public categoryTranslations: any;
     public itemTranslations: any;
     public static unsupportedBooks: string[] = ['2050'];
+    public iconList: string[];
+    public static SR5: object = SR5;
 
     // Used to filter down a files entries based on category.
     // See filterObjects for use.
@@ -22,7 +26,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
 
     /**
      * Get complete item data.
-     * 
+     *
      * NOTE: We use temporary items to have a full set of item data instead of just
      *       system model data that game.model.Item would give us.
      */
@@ -64,7 +68,51 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * @param chummerData The JSON data to parse.
      * @returns An array of created objects.
      */
-    public abstract Parse(chummerData: object): Promise<Item>;
+    public abstract Parse(chummerData: object, setIcons: boolean): Promise<Item>;
+
+    /**
+     * Get the appropriate default icon
+     * @param importFlags The importFlags data of an item
+     * @param system The item's system data
+     */
+    public iconAssign(importFlags: Shadowrun.ImportFlagData, system: Object, iconList: string[]): Promise<string> {
+        // if (!this.iconList) this.getIconFiles();
+        return IconAssign.iconAssign(importFlags, system, iconList);
+    }
+
+    /**
+     * Gets a list of icons available in the importer's folder
+     */
+    public async getIconFiles(): Promise<string[]> {
+        return IconAssign.getIconFiles();
+    }
+
+    /**
+     * Reformat the name or subtype name so it matches the categories in config.ts
+     * @param name The item's name or subtype name to reformat
+     */
+    public formatAsSlug(name: string): string {
+        return name.trim().toLowerCase().replace((/'|,|\[|\]|\(|\)/g), '').split((/-|\s|\//g)).join('-');
+    }
+
+    /**
+     * Set the subtype
+     * @param name The item's English name
+     * @param type The item's type
+     * @param subType The item's subtype
+     */
+    public genImportFlags(name: string, type: string, subType: string): Shadowrun.ImportFlagData {
+        const flags = {
+            name: this.formatAsSlug(name), // original english name
+            type: type,
+            subType: '',
+            isFreshImport: true
+        }
+        if (subType && Object.keys(SR5.itemSubTypeIconOverrides[type]).includes(subType)) {
+            flags.subType = subType;
+        }
+        return flags;
+    }
 
     /**
      * Parse an XML string into a JSON object.
@@ -97,10 +145,10 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
 
     /**
      * Filter down objects to those actaully imported.
-     * 
+     *
      * Sometimes a single Chummer xml file contains mulitple 'categories' that don't mix with system types
-     * 
-     * @param objects 
+     *
+     * @param objects
      * @returns A subset of objects
      */
     filterObjects(objects: any[]) {

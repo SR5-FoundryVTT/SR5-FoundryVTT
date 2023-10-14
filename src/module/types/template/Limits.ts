@@ -16,6 +16,7 @@ declare namespace Shadowrun {
     export interface AwakendLimits extends Limits {
         astral: LimitField
         magic: LimitField
+        initiation: LimitField
     }
 
     export interface MatrixLimits extends Limits {

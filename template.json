@@ -812,7 +812,9 @@
                         "value": 0,
                         "base": 0,
                         "mod": []
-                    }
+                    },
+                    "initiation": {},
+                    "metamagic": []
                 }
             },
             "movement": {
@@ -1315,13 +1317,21 @@
                     }
                 },
                 "networkDevices": []
+            },
+            "importFlags": {
+                "importFlags": {
+                    "name": "",
+                    "type": "",
+                    "subType": "",
+                    "isFreshImport": false
+                }
             }
         },
         "armor": {
-            "templates": ["description", "armor", "technology"]
+            "templates": ["description", "armor", "technology", "importFlags"]
         },
         "ammo": {
-            "templates": ["description", "technology"],
+            "templates": ["description", "technology", "importFlags"],
             "element": "",
             "ap": 0,
             "damage": 0,
@@ -1333,7 +1343,7 @@
             }
         },
         "modification": {
-            "templates": ["description", "technology"],
+            "templates": ["description", "technology", "importFlags"],
             "type": "",
             "mount_point": "",
             "dice_pool": 0,
@@ -1342,7 +1352,7 @@
             "conceal": 0
         },
         "spell": {
-            "templates": ["description", "action"],
+            "templates": ["description", "action", "importFlags"],
             "drain": 0,
             "category": "",
             "type": "",
@@ -1366,6 +1376,9 @@
                 "environmental": false,
                 "physical": false
             },
+            "ritual": {
+                "type": ""
+            },
             "action": {
                 "test": "SpellCastingTest",
                 "opposed": {
@@ -1378,7 +1391,7 @@
             }
         },
         "summoning": {
-            "templates": ["description", "action"],
+            "templates": ["description", "action", "importFlags"],
             "action": {
                 "type": "complex",
                 "test": "SummonSpiritTest",
@@ -1396,7 +1409,7 @@
             }
         },
         "call_in_action": {
-            "templates": ["description", "action"],
+            "templates": ["description", "action", "importFlags"],
             "action": {
                 "test": "",
                 "type": "complex"
@@ -1414,14 +1427,14 @@
             }
         },
         "critter_power": {
-            "templates": ["description", "action", "armor"],
+            "templates": ["description", "action", "armor", "importFlags"],
             "rating": 0,
             "powerType": "",
             "range": "",
             "duration": ""
         },
         "complex_form": {
-            "templates": ["description", "action"],
+            "templates": ["description", "action", "importFlags"],
             "target": "",
             "duration": "",
             "fade": 0,
@@ -1436,7 +1449,7 @@
             }
         },
         "weapon": {
-            "templates": ["description", "action", "technology", "weapon"],
+            "templates": ["description", "action", "technology", "weapon", "importFlags"],
             "action": {
                 "test": "",
                 "opposed": {
@@ -1448,19 +1461,19 @@
             }
         },
         "bioware": {
-            "templates": ["description", "technology", "action", "armor"],
+            "templates": ["description", "technology", "action", "armor", "importFlags"],
             "essence": 0,
             "grade": "standard",
             "capacity": 0
         },
         "cyberware": {
-            "templates": ["description", "technology", "action", "armor"],
+            "templates": ["description", "technology", "action", "armor", "importFlags"],
             "essence": 0,
             "grade": "standard",
             "capacity": 0
         },
         "adept_power": {
-            "templates": ["description", "action", "armor"],
+            "templates": ["description", "action", "armor", "importFlags"],
             "pp": 0,
             "type": "",
             "drain": false,
@@ -1468,17 +1481,16 @@
         },
         "quality": {
             "templates": ["description", "action"],
-            "rating": 0,
             "type": "positive"
         },
         "action": {
-            "templates": ["description", "action", "action_result"]
+            "templates": ["description", "action", "action_result", "importFlags"]
         },
         "sprite_power": {
-            "templates": ["description", "action"]
+            "templates": ["description", "action", "importFlags"]
         },
         "contact": {
-            "templates": ["description"],
+            "templates": ["description", "importFlags"],
             "type": "",
             "connection": 0,
             "loyalty": 0,
@@ -1486,11 +1498,11 @@
             "blackmail": false
         },
         "sin": {
-            "templates": ["description", "technology"],
+            "templates": ["description", "technology", "importFlags"],
             "licenses": []
         },
         "lifestyle": {
-            "templates": ["description"],
+            "templates": ["description", "importFlags"],
             "type": "",
             "comforts": 0,
             "security": 0,
@@ -1501,17 +1513,17 @@
             "mods": []
         },
         "device": {
-            "templates": ["description", "technology", "matrix"]
+            "templates": ["description", "technology", "matrix", "importFlags"]
         },
         "program": {
-            "templates": ["description", "technology"],
+            "templates": ["description", "technology", "importFlags"],
             "type": "common_program"
         },
         "equipment": {
-            "templates": ["description", "action", "technology"]
+            "templates": ["description", "action", "technology", "importFlags"]
         },
         "host": {
-            "templates": ["description", "matrix"],
+            "templates": ["description", "matrix", "importFlags"],
             "marks": {},
             "rating": 0,
             "ic": []

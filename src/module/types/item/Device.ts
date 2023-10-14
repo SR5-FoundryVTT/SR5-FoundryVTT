@@ -3,6 +3,7 @@ declare namespace Shadowrun {
     export interface DeviceData extends
         DevicePartData,
         DescriptionPartData,
+        ImportFlags,
         TechnologyPartData {
 
     }

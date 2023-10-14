@@ -1,15 +1,22 @@
-import { parseDescription, getArray, createItemData } from "./BaseParserFunctions.js"
-import {SR5} from "../../config"
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import * as IconAssign from '../../apps/iconAssigner/iconAssign';
+import { SR5 } from "../../config";
+
 
 export class LifestyleParser {
-    parseLifestyles(chummerChar) {
-        
+    async parseLifestyles(chummerChar, assignIcons) {
+
         const chummerLifestyle = getArray(chummerChar.lifestyles.lifestyle);
         const parsedLifestyle = [];
+        const iconList = await IconAssign.getIconFiles();
 
-        chummerLifestyle.forEach((chummerLifestyle) => {
+        chummerLifestyle.forEach(async (chummerLifestyle) => {
             try {
                 const itemData = this.parseLifestyle(chummerLifestyle);
+
+                // Assign the icon if enabled
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
+
                 parsedLifestyle.push(itemData);
             }
              catch (e) {
@@ -21,10 +28,11 @@ export class LifestyleParser {
     }
 
     parseLifestyle(chummerLifestyle) {
+        const parserType = 'lifestyle';
         const system = {};
 
         // Advanced lifestyles and lifestyle qualities are not supported at the moment
-        // Map the chummer lifestyle type to our sr5 foundry type. 
+        // Map the chummer lifestyle type to our sr5 foundry type.
         const chummerLifestyleType = chummerLifestyle.baselifestyle.toLowerCase();
         if ((chummerLifestyleType in SR5.lifestyleTypes)) {
             system.type = chummerLifestyleType;
@@ -45,7 +53,11 @@ export class LifestyleParser {
 
         // The name of the lifestyle is optional, so we use a fallback here.
         const itemName = chummerLifestyle.name ? chummerLifestyle.name : chummerLifestyle.baselifestyle;
-        const itemData = createItemData(itemName, 'lifestyle', system);
+
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(itemName), parserType);
+
+        const itemData = createItemData(itemName, parserType, system);
         return itemData;
     }
 }

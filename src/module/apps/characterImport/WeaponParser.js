@@ -1,4 +1,5 @@
-import { parseDescription, getArray, getValues, parseTechnology, createItemData } from "./BaseParserFunctions.js"
+import { parseDescription, getArray, getValues, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
+import * as IconAssign from '../../apps/iconAssigner/iconAssign';
 
 export class WeaponParser {
     parseDamage = (val) => {
@@ -24,16 +25,21 @@ export class WeaponParser {
         return damage;
     };
 
-    parseWeapons(chummerChar) {
+    async parseWeapons(chummerChar, assignIcons) {
         if(chummerChar.weapons == null) {
             return;
         }
         const weapons = getArray(chummerChar.weapons.weapon);
         const parsedWeapons = [];
+        const iconList = await IconAssign.getIconFiles();
 
-        weapons.forEach((chummerWeapon) => {
+        weapons.forEach(async (chummerWeapon) => {
             try {
                 const itemData = this.parseWeapon(chummerWeapon);
+
+                // Assign the icon if enabled
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
+
                 parsedWeapons.push(itemData);
             } catch (e) {
                 console.error(e);
@@ -44,6 +50,7 @@ export class WeaponParser {
     }
 
     parseWeapon(chummerWeapon) {
+        const parserType = 'weapon';
         const system = {};
         const action = {};
         const damage = {};
@@ -149,7 +156,29 @@ export class WeaponParser {
             }
         }
 
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(chummerWeapon.name_english), parserType);
+
+        // Assign item subtype
+        let subType = '';
+        // range/melee/thrown
+        if (system.category) {
+            subType = formatAsSlug(system.category);
+        }
+        // exception for thrown weapons and explosives
+        const weaponCategory = formatAsSlug(chummerWeapon.category_english);
+        if (!(subType && ( weaponCategory == 'gear'))) {
+            subType = weaponCategory;
+        }
+        // deal with explosives
+        if (weaponCategory == 'gear' && chummerWeapon.name_english.includes(':')) {
+            subType = formatAsSlug(chummerWeapon.name_english.split(':')[0]);
+        }
+        setSubType(system, parserType, subType);
+
+        // Create the item
         const itemData = createItemData(chummerWeapon.name, 'weapon', system);
+
         return itemData;
     }
 }

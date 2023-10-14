@@ -10,8 +10,8 @@ import { ComplexFormImporter } from '../importer/ComplexFormImporter';
 import { WareImporter } from '../importer/WareImporter';
 import { CritterPowerImporter } from '../importer/CritterPowerImporter';
 import { ImportHelper, ImportMode } from '../helper/ImportHelper';
-import {DeviceImporter} from "../importer/DeviceImporter";
-import {EquipmentImporter} from "../importer/EquipmentImporter";
+import { DeviceImporter } from "../importer/DeviceImporter";
+import { EquipmentImporter } from "../importer/EquipmentImporter";
 import { SpritePowerImporter } from '../importer/SpritePowerImporter';
 
 
@@ -22,6 +22,7 @@ export class Import extends Application {
     private parsedFiles: string[] = [];
     private disableImportButton: boolean = true;
     private currentParsedFile: string;
+    private icons: boolean;
 
     constructor() {
         super();
@@ -94,14 +95,14 @@ export class Import extends Application {
         new ProgramImporter()
     ];
 
-    async parseXML(xmlSource, fileName) {
+    async parseXML(xmlSource, fileName, setIcons) {
         let jsonSource = await DataImporter.xml2json(xmlSource);
         ImportHelper.SetMode(ImportMode.XML);
 
         for (const di of Import.Importers) {
             if (di.CanParse(jsonSource)) {
                 di.ExtractTranslation(fileName);
-                await di.Parse(jsonSource);
+                await di.Parse(jsonSource, setIcons);
             }
         }
     }
@@ -140,6 +141,8 @@ export class Import extends Application {
                 await this.parseXmli18n(text);
             }
 
+            const setIcons = $('.setIcons').is(':checked');
+
             // Use 'for of'-loop to allow await to actually pause.
             // don't use .forEach as it won't await for async callbacks.
             // iterate over supportedDataFiles to adhere to Importer order
@@ -154,7 +157,7 @@ export class Import extends Application {
                     await this.render();
 
 
-                    await this.parseXML(text, dataFile.name);
+                    await this.parseXML(text, dataFile.name, setIcons);
 
                     // Store status to show parsing progression.
                     if (!this.parsedFiles.some((parsedFileName) => parsedFileName === dataFile.name)) {
@@ -168,6 +171,8 @@ export class Import extends Application {
             this.disableImportButton = false;
 
             await this.render();
+
+            ui.notifications?.warn('SR5.Warnings.BulkImportPerformanceWarning', {localize: true});
         });
 
         html.find("input[type='file'].langDataFileDrop").on('change', async (event) => {

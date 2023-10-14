@@ -5,6 +5,7 @@ declare namespace Shadowrun {
         DescriptionPartData,
         TechnologyPartData,
         ActionPartData,
+        ImportFlags,
         ArmorPartData {
 
     }

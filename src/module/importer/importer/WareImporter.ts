@@ -1,12 +1,13 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { CyberwareParser } from '../parser/ware/CyberwareParser';
-import {Helpers} from "../../helpers";
-import Ware = Shadowrun.WareItemData;
+import { Helpers } from "../../helpers";
+import WareData = Shadowrun.WareData
+import WareItemData = Shadowrun.WareItemData;
 import CyberwareItemData = Shadowrun.CyberwareItemData;
 import BiowareItemData = Shadowrun.BiowareItemData;
 
-export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
+export class WareImporter extends DataImporter<WareItemData, WareData> {
     public override categoryTranslations: any;
     public override itemTranslations: any;
     public files = ['cyberware.xml', 'bioware.xml'];
@@ -22,7 +23,7 @@ export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
 
     GetDefaultBiowareData(): BiowareItemData {
         return this.GetDefaultData({type: 'bioware'}) as BiowareItemData;
-    
+
     }
 
     ExtractTranslation(fileName) {
@@ -43,32 +44,49 @@ export class WareImporter extends DataImporter<Ware, Shadowrun.WareData> {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, typeKey, listKey);
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const cyberParser = new CyberwareParser();
 
         let key = jsonObject.hasOwnProperty('cyberwares') ? 'Cyberware' : 'Bioware';
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, key);
 
         key = key.toLowerCase();
-        let items: Ware[] = [];
+        let items: WareItemData[] = [];
         let jsonDatas = jsonObject[key + 's'][key];
+
+        this.iconList = await this.getIconFiles();
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
+            // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
+            // Create the item
             const defaultData = key === 'cyberware' ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
             let item = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
-            const category = ImportHelper.StringValue(jsonData, 'category');
-
+            const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             // TODO: Does this type mixture cause later issues? Will it carry over?
             //@ts-ignore
-            item.folder = folders[category.toLowerCase()].id;
+            item.folder = folders[category].id;
 
-            // // TODO: Follow ComplexFormParserBase approach.
-            // data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+            // Bioware has no wireless feature, so disable it by default
+            if (key === 'bioware') {
+                item.system.technology.wireless = false;
+            }
+
+            // Import Flags
+            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
+
+            // Default icon
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+
+            // Translate name if needed
+            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);

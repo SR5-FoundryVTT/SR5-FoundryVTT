@@ -8,6 +8,7 @@ declare namespace Shadowrun {
         WeaponPartData,
         ActionPartData,
         TechnologyPartData,
+        ImportFlags,
         DescriptionPartData {
 
     }
@@ -62,7 +63,7 @@ declare namespace Shadowrun {
         burst_fire: boolean;
         full_auto: boolean;
     }
-    
+
     /**
      * Possible firing modes for a ranged weapon.
      */

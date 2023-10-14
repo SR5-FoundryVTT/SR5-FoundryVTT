@@ -2,8 +2,8 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
-import {Helpers} from "../../helpers";
 import { DataDefaults } from '../../data/DataDefaults';
+import { Helpers } from "../../helpers";
 
 export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData> {
     public override categoryTranslations: any;
@@ -29,26 +29,40 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
         this.nameTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, 'complexforms', 'complexform');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const parser = new ComplexFormParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
-
         let items: Shadowrun.ComplexFormItemData[] = [];
         let jsonDatas = jsonObject['complexforms']['complexform'];
+        this.iconList = await this.getIconFiles();
+        const parserType = 'complex_form';
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+
+            // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'complex_form'}), this.nameTranslations);
+            // Create the item
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.nameTranslations);
 
+            // Get the item's folder information
             // @ts-ignore TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 
+            // Import Flags
+            item.system.importFlags = this.genImportFlags(item.name, item.type, '');
+
+            // Default icon
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+
             // TODO: Follow ComplexFormParserBase approach.
+            // Item name translation
             item.name = ImportHelper.MapNameToTranslation(this.nameTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);

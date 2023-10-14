@@ -1,10 +1,10 @@
 import { getArray } from "./BaseParserFunctions.js"
 import { GearsParser } from "./gearImport/GearsParser"
 import { ArmorParser } from "./ArmorParser";
-import { CyberwareParser } from "./CyberwareParser";
+import { WareParser } from "./WareParser";
 import { QualityParser } from "./QualityParser";
 import { PowerParser } from "./PowerParser";
-import { SpellParser } from "./SpellParser";
+import { SpellParser } from "./magicImport/SpellParser";
 import { WeaponParser } from "./WeaponParser";
 import { LifestyleParser } from "./LifestyleParser";
 import { ContactParser } from "./ContactParser";
@@ -19,52 +19,52 @@ export class ItemsParser {
      * @param {*} chummerChar The chummer char holding the items
      * @param {*} importOptions Additional import option that specify what items will be imported.
      */
-    parse(chummerChar, importOptions) {
+    async parse(chummerChar, importOptions) {
         const parsedItems = [];
 
         if (importOptions.qualities && chummerChar.qualities && chummerChar.qualities.quality) {
-            const parsedQualities = new QualityParser().parseQualities(chummerChar);
+            const parsedQualities = await new QualityParser().parseQualities(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedQualities);
         }
 
         if (importOptions.weapons && chummerChar.weapons != null && chummerChar.weapons.weapon != null) {
-            const parsedWeapons = new WeaponParser().parseWeapons(chummerChar);
+            const parsedWeapons = await new WeaponParser().parseWeapons(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedWeapons);
         }
 
         if (importOptions.armor && chummerChar.armors && chummerChar.armors.armor) {
-            const parsedArmors = new ArmorParser().parseArmors(chummerChar);
+            const parsedArmors = await new ArmorParser().parseArmors(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedArmors);
         }
 
         if (importOptions.cyberware && chummerChar.cyberwares && chummerChar.cyberwares.cyberware) {
-            const parsedCyberware = new CyberwareParser().parseCyberwares(chummerChar);
-            Array.prototype.push.apply(parsedItems, parsedCyberware);
+            const parsedWare = await new WareParser().parseWares(chummerChar, importOptions.assignIcons);
+            Array.prototype.push.apply(parsedItems, parsedWare);
         }
 
         if (importOptions.powers && chummerChar.powers && chummerChar.powers.power) {
-            const parsedPowers = new PowerParser().parsePowers(chummerChar);
+            const parsedPowers = await new PowerParser().parsePowers(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedPowers);
         }
 
         if (importOptions.equipment && chummerChar.gears && chummerChar.gears.gear) {
             const gears = getArray(chummerChar.gears.gear);
-            const allGearData = new GearsParser().parseGears(gears);
+            const allGearData = await new GearsParser().parseGears(gears, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, allGearData);
         }
 
         if (importOptions.spells && chummerChar.spells && chummerChar.spells.spell) {
-            const parsedSpells = new SpellParser().parseSpells(chummerChar);
+            const parsedSpells = await new SpellParser().parseSpells(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedSpells);
         }
 
         if (importOptions.contacts && chummerChar.contacts && chummerChar.contacts.contact) {
-            const parsedContacts = new ContactParser().parseContacts(chummerChar);
+            const parsedContacts = await new ContactParser().parseContacts(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedContacts);
         }
 
         if (importOptions.lifestyles && chummerChar.lifestyles && chummerChar.lifestyles.lifestyle) {
-            const parsedLifestyles = new LifestyleParser().parseLifestyles(chummerChar);
+            const parsedLifestyles = await new LifestyleParser().parseLifestyles(chummerChar, importOptions.assignIcons);
             Array.prototype.push.apply(parsedItems, parsedLifestyles);
         }
 

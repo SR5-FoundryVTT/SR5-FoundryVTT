@@ -228,7 +228,6 @@
   "SR5.Hits": "Acertos",
   "SR5.HotSim": "Hot Sim",
   "SR5.ImportCharacter": "Importar Personagem",
-  "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
   "SR5.Incoming": "Recebido",
   "SR5.IncomingDamage": "Dano Recebido",
   "SR5.Information": "Info",
@@ -505,6 +504,7 @@
   "SR5.SpellCatHealth": "Saude",
   "SR5.SpellCatIllusion": "Ilusao",
   "SR5.SpellCatManipulation": "Manipulacao",
+  "SR5.SpellCatRitual": "Ritual",
   "SR5.SpellCategory": "Categoria",
   "SR5.SpellCombatDirect": "Direto",
   "SR5.SpellCombatIndirect": "Indireto",
@@ -644,6 +644,13 @@
       "Walker": "Andarilho",
       "Water": "Nautico"
     }
+  },
+  "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
+  "SR5.Vision": {
+    "AstralPerception": "Astral Perception",
+    "AugmentedReality": "Augmented Reality",
+    "LowLight": "Low-Light Vision",
+    "ThermographicVision": "Thermographic Vision"
   },
   "SR5.Walk": "Caminhar",
   "SR5.Weapon": "Arma",

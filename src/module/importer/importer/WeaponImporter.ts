@@ -6,11 +6,12 @@ import { MeleeParser } from '../parser/weapon/MeleeParser';
 import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { ParserMap } from '../parser/ParserMap';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
-import WeaponItemData = Shadowrun.WeaponItemData;
-import {Helpers} from "../../helpers";
 import { DataDefaults } from '../../data/DataDefaults';
+import { Helpers } from "../../helpers";
+import WeaponItemData = Shadowrun.WeaponItemData;
+import WeaponData = Shadowrun.WeaponData;
 
-export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.WeaponData> {
+export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
     public override categoryTranslations: any;
     public override itemTranslations: any;
     public files = ['weapons.xml'];
@@ -20,8 +21,8 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
     }
 
     public override GetDefaultData({ type }: { type: any; }): WeaponItemData {
-        const systemData = {action: {type: 'varies', attribute: 'agility'}} as Shadowrun.WeaponData;
-        return DataDefaults.baseItemData<Shadowrun.WeaponItemData, Shadowrun.WeaponData>({type}, systemData);
+        const systemData = {action: {type: 'varies', attribute: 'agility'}} as WeaponData;
+        return DataDefaults.baseItemData<WeaponItemData, WeaponData>({type}, systemData);
     }
 
     ExtractTranslation() {
@@ -34,7 +35,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponi18n, 'weapons', 'weapon');
     }
 
-    async Parse(jsonObject: object): Promise<Item> {
+    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Weapons', this.categoryTranslations);
 
         folders['gear'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Gear`, true);
@@ -48,17 +49,45 @@ export class WeaponImporter extends DataImporter<WeaponItemData, Shadowrun.Weapo
 
         let items: WeaponItemData[] = [];
         let jsonDatas = jsonObject['weapons']['weapon'];
+        this.iconList = await this.getIconFiles();
+        const parserType = 'weapon';
+
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
+            // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: 'weapon'}), this.itemTranslations);
+            // Create the item
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
             // @ts-ignore // TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.subcategory].id;
 
+            // Figure out item subtype
+            let subType = '';
+            // range/melee/thrown
+            if (item.system.category) {
+                subType = this.formatAsSlug(item.system.category);
+            }
+            // exception for thrown weapons and explosives
+            const weaponCategory = this.formatAsSlug(item.system.subcategory);
+            if (!(subType && ( weaponCategory == 'gear'))) {
+                subType = weaponCategory;
+            }
+            // deal with explosives and their weird formatting
+            if (weaponCategory == 'gear' && item.name.includes(':')) {
+                subType = this.formatAsSlug(item.name.split(':')[0]);
+            }
+
+            // Set Import Flags
+            item.system.importFlags = this.genImportFlags(item.name, item.type, subType);
+
+            // Default icon
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);

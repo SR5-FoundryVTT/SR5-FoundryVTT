@@ -18,8 +18,19 @@ declare namespace Shadowrun {
 
     export interface MagicData {
         attribute: ActorAttribute,
-        projecting: boolean
-        drain: BaseValuePair<number> & ModifiableValue
+        projecting: boolean,
+        drain: BaseValuePair<number> & ModifiableValue,
+        initiation: InitiationData,
+        metamagic: MetamagicData[]
+    }
+
+    export interface InitiationData {
+        grade: number
+    }
+
+    export interface MetamagicData {
+        name: string,
+        notes: string,
     }
 
     export interface MatrixData {

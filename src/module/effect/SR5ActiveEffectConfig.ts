@@ -32,9 +32,9 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
     override async getData(options?: Application.RenderOptions): Promise<ActiveEffectConfig.Data> {
         const data = await super.getData(options) as any;
-        
+
         data.modes = this.applyModifyLabelToCustomMode(data.modes);
-                
+
         data.applyTo = this.object.applyTo;
         data.onlyForWireless = this.object.onlyForWireless;
 
@@ -49,6 +49,24 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         super.activateListeners(html);
 
         html.find('select[name="flags.shadowrun5e.applyTo"]').on('change', this._onApplyToChange.bind(this));
+    }
+
+    /**
+     * Handle adding a new change to the changes array.
+     * 
+     * This overrides the Foundry default behavior of using ADD as default.
+     * Shadowrun mostly uses MODIFY, so we use that as default.
+     * 
+     * @private
+     */
+    override async _addEffectChange(): Promise<this> {
+        //@ts-ignore TODO: foundry-vtt-types v10
+        const idx = this.document.changes.length;
+        return this.submit({
+            preventClose: true, updateData: {
+                [`changes.${idx}`]: { key: "", mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, value: "" }
+            }
+        }) as unknown as this;
     }
 
     /**
@@ -68,9 +86,9 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         if (this.object.changes.length) {
             ui.notifications?.error('You must delete changes before changing the apply-to type.');
         } else {
-            await this.object.update({'flags.shadowrun5e.applyTo': select.value});
+            await this.object.update({ 'flags.shadowrun5e.applyTo': select.value });
         }
-        
+
         this.render();
     }
 
@@ -84,7 +102,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * @returns Copy of the original modes and labels.
      */
     applyModifyLabelToCustomMode(modes: Record<number, string>): Record<number, string> {
-        return {...modes, 0: game.i18n.localize('SR5.ActiveEffect.Modes.Modify')};
+        return { ...modes, 0: game.i18n.localize('SR5.ActiveEffect.Modes.Modify') };
     }
 
     /**
@@ -191,4 +209,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     prepareEffectHasChanges(): boolean {
         return this.object.changes.length > 0;
     }
+
+
+
 }

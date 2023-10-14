@@ -1,13 +1,15 @@
 import { BaseGearParser } from "./BaseGearParser"
+import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
 
 /**
  * Parses ammunition
  */
 export class AmmoParser extends BaseGearParser {
-   
+
     override parse(chummerGear : any) : any {
+        const parserType = 'ammo';
         const parsedGear =  super.parse(chummerGear);
-        parsedGear.type = 'ammo';
+        parsedGear.type = parserType;
 
         if (chummerGear.weaponbonusap) {
             parsedGear.system.ap = parseInt(chummerGear.weaponbonusap);
@@ -27,6 +29,10 @@ export class AmmoParser extends BaseGearParser {
                 parsedGear.system.damageType = 'physical';
             }
         }
+
+        // Assign import flags
+        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
+        this.setSubType(parsedGear, parserType, formatAsSlug(chummerGear.name_english.split(':')[0]));
 
         return parsedGear;
     }

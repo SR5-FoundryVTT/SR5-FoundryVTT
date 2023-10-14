@@ -1,8 +1,8 @@
-import {DataImporter} from './DataImporter';
-import {ImportHelper} from '../helper/ImportHelper';
-import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParserBase';
-import {Constants} from './Constants';
-import {Helpers} from "../../helpers";
+import { DataImporter } from './DataImporter';
+import { ImportHelper } from '../helper/ImportHelper';
+import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
+import { Constants } from './Constants';
+import { Helpers } from "../../helpers";
 
 export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
     public files = ['critterpowers.xml'];
@@ -10,7 +10,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
     public override unsupportedCategories = [
         'Emergent',
     ];
-    
+
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
     }
@@ -26,20 +26,36 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
     }
 
 
-    async Parse(chummerPowers: object): Promise<Item> {
+    async Parse(chummerPowers: object, setIcons: boolean): Promise<Item> {
         const parser = new CritterPowerParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('ITEM.TypeCritter_power')}`, true);
-
         const items: Shadowrun.CritterPowerItemData[] = [];
         const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
+        this.iconList = await this.getIconFiles();
+        const parserType = 'critter_power';
 
         for (const chummerCritterPower of chummerCritterPowers) {
-            let item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: 'critter_power'}), this.itemTranslations);
 
+            // Check to ensure the data entry is supported
+            if (DataImporter.unsupportedEntry(chummerCritterPower)) {
+                continue;
+            }
+
+            // Create the item
+            const item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: parserType}), this.itemTranslations);
             // @ts-ignore TODO: foundry-vtt-type v10
             item.folder = folder.id;
+
+            // Import Flags
+            item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.powerType);
+
+            // Default icon
+            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+
+            // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
+            // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);
