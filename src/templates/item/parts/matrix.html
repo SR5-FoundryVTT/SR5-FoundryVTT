@@ -16,10 +16,9 @@
         </div>
     </div>
     {{/ife}}
-    {{#ifne system.category "commlink"}}
     <div class="form-line">
         <div class="label">
-            <select name="system.atts.att1.att">
+            <select name="system.atts.att1.att" {{#ifne system.category "cyberdeck"}}disabled{{/ifne}}>
                 {{#select system.atts.att1.att}} {{#each config.matrixAttributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
@@ -40,7 +39,7 @@
     </div>
     <div class="form-line">
         <div class="label">
-            <select name="system.atts.att2.att">
+            <select name="system.atts.att2.att" {{#ifne system.category "cyberdeck"}}disabled{{/ifne}}>
                 {{#select system.atts.att2.att}} {{#each config.matrixAttributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
@@ -61,7 +60,7 @@
     </div>
     <div class="form-line">
         <div class="label">
-            <select name="system.atts.att3.att">
+            <select name="system.atts.att3.att" {{#ifne system.category "cyberdeck"}}disabled{{/ifne}}>
                 {{#select system.atts.att3.att}} {{#each config.matrixAttributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
@@ -82,7 +81,7 @@
     </div>
     <div class="form-line">
         <div class="label">
-            <select name="system.atts.att4.att">
+            <select name="system.atts.att4.att" {{#ifne system.category "cyberdeck"}}disabled{{/ifne}}>
                 {{#select system.atts.att4.att}} {{#each config.matrixAttributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
@@ -101,5 +100,4 @@
             />
         </div>
     </div>
-    {{/ifne}}
 </div>
