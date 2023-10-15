@@ -53,15 +53,14 @@ export class NetworkDeviceFlow {
         return doc || null;
     }
 
-    static async emitAddNetworkControllerSocketMessage(controller: SR5Item, networkDevice: SR5Item) {
+    static async emitAddNetworkControllerSocketMessage(controller: SR5Item, networkDeviceLink: string) {
         const controllerLink = NetworkDeviceFlow.buildLink(controller);
-        const networkDeviceLink = NetworkDeviceFlow.buildLink(networkDevice);
 
         await SocketMessage.emitForGM(FLAGS.addNetworkController, {controllerLink, networkDeviceLink});
     }
 
     /**
-     * Handle socket messages adding a device to the device list of netowrk
+     * Handle socket messages adding a device to the device list of network
      * @param message
      */
     static async _handleAddNetworkControllerSocketMessage(message: SocketAddNetworkControllerMessageData) {
@@ -95,7 +94,20 @@ export class NetworkDeviceFlow {
         if (NetworkDeviceFlow._currentUserCanModifyDevice(controller) && NetworkDeviceFlow._currentUserCanModifyDevice(device))
             await NetworkDeviceFlow._handleAddDeviceToNetwork(controller, device);
         else
-            await NetworkDeviceFlow.emitAddNetworkControllerSocketMessage(controller, device);
+            await NetworkDeviceFlow.emitAddNetworkControllerSocketMessage(controller, device.uuid);
+    }
+
+    static async addVehicleToNetwork(controller: SR5Item, vehicle: SR5Actor) {
+        console.log(`Shadowrun5e | Adding an the vehicle ${vehicle.name} to the controller ${controller.name}`, controller, vehicle);
+        if (controller.id === vehicle.id) return console.warn('Shadowrun 5e | A device cant be its own network controller');
+        const technologyData = vehicle.matrixData;
+        if (!technologyData) return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
+        if (!controller.canBeNetworkController) return;
+
+        if (NetworkDeviceFlow._currentUserCanModifyDevice(controller) && NetworkDeviceFlow._currentUserCanModifyVehicle(vehicle))
+            await NetworkDeviceFlow._handleAddVehicleToNetwork(controller, vehicle);
+        else
+            await NetworkDeviceFlow.emitAddNetworkControllerSocketMessage(controller, vehicle.uuid);
     }
 
     /**
@@ -123,6 +135,43 @@ export class NetworkDeviceFlow {
 
         // Add the device to the list of devices of the controller.
         const networkDeviceLink = NetworkDeviceFlow.buildLink(device);
+        const networkDevices = controllerData.system.networkDevices;
+        if (networkDevices.includes(networkDeviceLink)) return;
+
+        return NetworkDeviceFlow._setDevicesOnController(controller, [...networkDevices, networkDeviceLink]);
+    }
+
+    /**
+     * Handle everything around adding a device to a controller, including removing it from already connected networks.
+     *
+     * Note: This method needs GM access
+     *
+     * @param controller
+     * @param vehicle
+     */
+    private static async _handleAddVehicleToNetwork(controller: SR5Item, actor: SR5Actor): Promise<any> {
+        if (!actor.isVehicle()) return console.error(`Device isn't capable of accepting network devices`, controller);
+
+        const vehicle = actor.asVehicle();
+
+        if (!vehicle) return console.error(`Device isn't capable of accepting network devices`, controller);
+
+        if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller) && !NetworkDeviceFlow._currentUserCanModifyVehicle(actor)) return console.error(`User isn't owner or GM of this vehicle`, controller);
+
+        const controllerData = controller.asDevice || controller.asHost;
+        if (!controllerData) return console.error(`Device isn't capable of accepting network devices`, controller);
+        const technologyData = vehicle.system.matrix;
+        if (!technologyData) return console.error(`'Device can't be added to a network`);
+
+        // Remove device from a network it's already connected to.
+        if (vehicle.data.networkController) await NetworkDeviceFlow._removeVehicleFromController(actor);
+
+        // Add the device to a new controller
+        const controllerLink = NetworkDeviceFlow.buildLink(controller);
+        await NetworkDeviceFlow._setControllerFromLinkForVehicle(actor, controllerLink);
+
+        // Add the device to the list of devices of the controller.
+        const networkDeviceLink = NetworkDeviceFlow.buildLink(actor);
         const networkDevices = controllerData.system.networkDevices;
         if (networkDevices.includes(networkDeviceLink)) return;
 
@@ -185,6 +234,12 @@ export class NetworkDeviceFlow {
         await device.update({'data.technology.networkController': controllerLink});
     }
 
+    private static async _setControllerFromLinkForVehicle(actor: SR5Actor, controllerLink: string) {
+
+        if (!actor.isVehicle()) return console.error('Shadowrun 5e | Given actor cant be part of a network', actor);
+        await actor.update({'data.networkController': controllerLink});
+    }
+
     /**
      * As part of the deleteItem FoundryVTT event this method will called by all active users, even if they lack permission.
      * @param device The device to remove a connected controller from.
@@ -226,6 +281,33 @@ export class NetworkDeviceFlow {
 
         // Remove device from it's controller.
         const deviceLink = NetworkDeviceFlow.buildLink(device);
+        const deviceLinks = controllerData.system.networkDevices.filter(existingLink => existingLink !== deviceLink);
+        await NetworkDeviceFlow._setDevicesOnController(controller, deviceLinks);
+    }
+
+    /**
+     * As part of the deleteItem FoundryVTT event this method will called by all active users, even if they lack permission.
+     * @param device The device that is to removed from the network controller.
+     * @private
+     */
+    private static async _removeVehicleFromController(actor: SR5Actor){
+        if (!actor.isVehicle()) return console.error('Shadowrun 5e | Given actor cant be part of a network', actor);
+        const vehicle = actor.asVehicle();
+        if (!vehicle) return console.error('Shadowrun 5e | Given actor cant be part of a network', actor);
+
+        const technologyData = vehicle.system.matrix;
+        if (!technologyData) return;
+
+        // Controller might not exist anymore.
+        const controller = NetworkDeviceFlow.resolveLink(vehicle.data.networkController);
+        if (!controller) return;
+        if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller)) return;
+
+        const controllerData = controller.asController();
+        if (!controllerData) return;
+
+        // Remove device from it's controller.
+        const deviceLink = NetworkDeviceFlow.buildLink(actor);
         const deviceLinks = controllerData.system.networkDevices.filter(existingLink => existingLink !== deviceLink);
         await NetworkDeviceFlow._setDevicesOnController(controller, deviceLinks);
     }
@@ -285,5 +367,9 @@ export class NetworkDeviceFlow {
 
     static _currentUserCanModifyDevice(device: SR5Item): boolean {
         return game.user?.isGM || device.isOwner;
+    }
+
+    static _currentUserCanModifyVehicle(vehicle: SR5Actor): boolean {
+        return game.user?.isGM || vehicle.isOwner;
     }
 }

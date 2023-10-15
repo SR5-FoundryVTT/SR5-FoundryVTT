@@ -1618,6 +1618,17 @@ export class SR5Item extends Item {
     }
 
     /**
+     * Configure the given vehicle to be controlled by this item in a PAN/WAN.
+     * @param target The matrix item to be connected.
+     */
+    async addNetworkVehicle(target: SR5Actor) {
+        // TODO: Add device to WAN network
+        // TODO: Add IC actor to WAN network
+        // TODO: setup networkController link on networked devices.
+        await NetworkDeviceFlow.addVehicleToNetwork(this, target);
+    }
+
+    /**
      * Alias method for addNetworkDevice, both do the same.
      * @param target
      */

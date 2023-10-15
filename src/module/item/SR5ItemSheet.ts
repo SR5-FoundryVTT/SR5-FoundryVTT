@@ -3,6 +3,7 @@ import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import { createTagify } from '../utils/sheets';
+import { SR5Actor } from '../actor/SR5Actor';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -340,7 +341,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         // Parse drop data.
         const data = this.parseDropData(event);
-
+        console.log("_onDrop", data);
         if (!data) return;
 
         // Add items to a weapons modification / ammo
@@ -380,6 +381,18 @@ export class SR5ItemSheet extends ItemSheet {
             if (!item || !item.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
             
             return await this.item.addNetworkDevice(item);
+        }
+
+        // Add vehicles to a network (PAN/WAN).
+        if (this.item.canBeNetworkController && data.type === 'Actor') {
+            const actor = await fromUuid(data.uuid) as SR5Actor;
+
+            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+
+            if(actor.isVehicle()) {
+                return await this.item.addNetworkVehicle(actor);
+            }
+
         }
     }
 
