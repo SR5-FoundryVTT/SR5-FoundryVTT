@@ -1055,7 +1055,7 @@ export class SR5Item extends Item {
         return this.getTechnologyData()?.networkController;
     }
 
-    async setNetworkController(networkController: string): Promise<void> {
+    async setNetworkController(networkController: string|undefined): Promise<void> {
         await this.update({ 'system.technology.networkController': networkController });
     }
 

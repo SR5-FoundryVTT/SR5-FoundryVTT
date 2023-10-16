@@ -592,10 +592,15 @@ export class SR5Actor extends Actor {
         return this.asVehicle()?.system?.networkController;
     }
 
-    async setNetworkController(networkController: string): Promise<void> {
+    async setNetworkController(networkController: string|undefined): Promise<void> {
         if(!this.isVehicle()) return;
 
-        await this.update({ 'system.networkController': networkController });
+        if(networkController === undefined) {
+            const update = Helpers.getDeleteKeyUpdateData('system', 'networkController');
+            await this.update(update)
+        } else {
+            await this.update({ 'system.networkController': networkController });
+        }
     }
 
     get canBeNetworkDevice(): boolean {

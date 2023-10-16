@@ -136,10 +136,10 @@ export class NetworkDeviceFlow {
 
      * @param device A network device that's connected to a controller.
      */
-    static async removeDeviceFromController(device: SR5Item|undefined) {
+    static async removeDeviceFromController(device: SR5Item|SR5Actor|undefined) {
         if (!device) return;
 
-        console.log(`Shadowrun 5e | Removing device ${device.name} from it's controller`);
+        console.log(`Shadowrun 5e | Removing device ${device.name} from its controller`);
 
         await NetworkDeviceFlow._removeDeviceFromController(device);
         await NetworkDeviceFlow._removeControllerFromDevice(device);
@@ -156,7 +156,6 @@ export class NetworkDeviceFlow {
         const controllerData = controller.asController();
         const device = NetworkDeviceFlow.resolveLink(deviceLink);
 
-        console.log("removeDeviceLinkFromNetwork", device);
         // Remove an existing item from the network.
         if (device) {
             const networkController = device.getNetworkController();
@@ -196,7 +195,7 @@ export class NetworkDeviceFlow {
     private static async _removeControllerFromDevice(device: SR5Item|SR5Actor) {
         if (!device.canBeNetworkDevice) return console.error('Shadowrun 5e | Given device cant be part of a network', device);
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(device)) return;
-        await device.update({'data.technology.networkController': ''})
+        await device.setNetworkController(undefined);
     }
 
     private static async _setDevicesOnController(controller: SR5Item, deviceLinks: string[]) {
@@ -210,8 +209,8 @@ export class NetworkDeviceFlow {
     }
 
     /**
-     * As part of the deleteItem FoundryVTT event this method will called by all active users, even if they lack permission.
-     * @param device The device that is to removed from the network controller.
+     * As part of the deleteItem FoundryVTT event this method will be called by all active users, even if they lack permission.
+     * @param device The device that is to be removed from the network controller.
      * @private
      */
     private static async _removeDeviceFromController(device: SR5Item|SR5Actor){

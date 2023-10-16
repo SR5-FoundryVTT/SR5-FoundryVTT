@@ -341,7 +341,6 @@ export class SR5ItemSheet extends ItemSheet {
 
         // Parse drop data.
         const data = this.parseDropData(event);
-        console.log("_onDrop", data);
         if (!data) return;
 
         // Add items to a weapons modification / ammo
@@ -389,9 +388,11 @@ export class SR5ItemSheet extends ItemSheet {
 
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
-            if(actor.isVehicle()) {
-                return await this.item.addNetworkDevice(actor);
+            if(!actor.isVehicle()) {
+                return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
             }
+
+            return await this.item.addNetworkDevice(actor);
         }
     }
 
