@@ -586,6 +586,22 @@ export class SR5Actor extends Actor {
         return this.system.skills.active;
     }
 
+    getNetworkController(): string|undefined {
+        if(!this.isVehicle()) return;
+
+        return this.asVehicle()?.system?.networkController;
+    }
+
+    async setNetworkController(networkController: string): Promise<void> {
+        if(!this.isVehicle()) return;
+
+        await this.update({ 'system.networkController': networkController });
+    }
+
+    get canBeNetworkDevice(): boolean {
+        return this.isVehicle();
+    }
+
     /**
      * Determine if an actor can choose a special trait using the special field.
      */

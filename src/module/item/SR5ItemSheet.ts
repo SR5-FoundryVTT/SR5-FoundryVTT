@@ -53,7 +53,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Host Item.
     markedDocuments: Shadowrun.MarkedDocument[]
-    networkDevices: SR5Item[]
+    networkDevices: (SR5Item|SR5Actor)[]
     networkController: SR5Item | undefined
 
     // Action Items. (not only type = action)
@@ -390,9 +390,8 @@ export class SR5ItemSheet extends ItemSheet {
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
             if(actor.isVehicle()) {
-                return await this.item.addNetworkVehicle(actor);
+                return await this.item.addNetworkDevice(actor);
             }
-
         }
     }
 
