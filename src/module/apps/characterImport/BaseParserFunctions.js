@@ -8,7 +8,10 @@ export const getValues = (val) => {
 };
 
 export const getArray = (value) => {
-    return Array.isArray(value) ? value : [value];
+    if(value) {
+        return Array.isArray(value) ? value : [value];
+    }
+    return []
 };
 
 /**
