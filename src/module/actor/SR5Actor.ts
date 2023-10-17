@@ -595,12 +595,7 @@ export class SR5Actor extends Actor {
     async setNetworkController(networkController: string|undefined): Promise<void> {
         if(!this.isVehicle()) return;
 
-        if(networkController === undefined) {
-            const update = Helpers.getDeleteKeyUpdateData('system', 'networkController');
-            await this.update(update)
-        } else {
-            await this.update({ 'system.networkController': networkController });
-        }
+        await this.update({ 'system.networkController': networkController });
     }
 
     get canBeNetworkDevice(): boolean {

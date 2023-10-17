@@ -195,7 +195,7 @@ export class NetworkDeviceFlow {
     private static async _removeControllerFromDevice(device: SR5Item|SR5Actor) {
         if (!device.canBeNetworkDevice) return console.error('Shadowrun 5e | Given device cant be part of a network', device);
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(device)) return;
-        await device.setNetworkController(undefined);
+        await device.setNetworkController("");
     }
 
     private static async _setDevicesOnController(controller: SR5Item, deviceLinks: string[]) {
