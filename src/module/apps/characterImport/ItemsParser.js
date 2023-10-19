@@ -21,6 +21,7 @@ export class ItemsParser {
      */
     async parse(chummerChar, importOptions) {
         const promises = [];
+        Object.freeze(chummerChar)
 
         if (importOptions.qualities && chummerChar.qualities && chummerChar.qualities.quality) {
             promises.push(new QualityParser().parseQualities(chummerChar, importOptions.assignIcons));
