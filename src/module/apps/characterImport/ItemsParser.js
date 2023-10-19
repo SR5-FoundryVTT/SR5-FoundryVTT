@@ -20,54 +20,46 @@ export class ItemsParser {
      * @param {*} importOptions Additional import option that specify what items will be imported.
      */
     async parse(chummerChar, importOptions) {
-        const parsedItems = [];
+        const promises = [];
+        Object.freeze(chummerChar)
 
         if (importOptions.qualities && chummerChar.qualities && chummerChar.qualities.quality) {
-            const parsedQualities = await new QualityParser().parseQualities(chummerChar, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, parsedQualities);
+            promises.push(new QualityParser().parseQualities(chummerChar, importOptions.assignIcons));
         }
 
         if (importOptions.weapons && chummerChar.weapons != null && chummerChar.weapons.weapon != null) {
-            const parsedWeapons = await new WeaponParser().parseWeapons(chummerChar, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, parsedWeapons);
+            promises.push(new WeaponParser().parseWeapons(chummerChar, importOptions.assignIcons));
         }
 
         if (importOptions.armor && chummerChar.armors && chummerChar.armors.armor) {
-            const parsedArmors = await new ArmorParser().parseArmors(chummerChar, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, parsedArmors);
+            promises.push(new ArmorParser().parseArmors(chummerChar, importOptions.assignIcons));
         }
 
         if (importOptions.cyberware && chummerChar.cyberwares && chummerChar.cyberwares.cyberware) {
-            const parsedWare = await new WareParser().parseWares(chummerChar, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, parsedWare);
+            promises.push(new WareParser().parseWares(chummerChar, importOptions.assignIcons));
         }
 
         if (importOptions.powers && chummerChar.powers && chummerChar.powers.power) {
-            const parsedPowers = await new PowerParser().parsePowers(chummerChar, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, parsedPowers);
+            promises.push(new PowerParser().parsePowers(chummerChar, importOptions.assignIcons));
         }
 
         if (importOptions.equipment && chummerChar.gears && chummerChar.gears.gear) {
             const gears = getArray(chummerChar.gears.gear);
-            const allGearData = await new GearsParser().parseGears(gears, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, allGearData);
+            promises.push(new GearsParser().parseGears(gears, importOptions.assignIcons));
         }
 
         if (importOptions.spells && chummerChar.spells && chummerChar.spells.spell) {
-            const parsedSpells = await new SpellParser().parseSpells(chummerChar, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, parsedSpells);
+            promises.push(new SpellParser().parseSpells(chummerChar, importOptions.assignIcons));
         }
 
         if (importOptions.contacts && chummerChar.contacts && chummerChar.contacts.contact) {
-            const parsedContacts = await new ContactParser().parseContacts(chummerChar, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, parsedContacts);
+            promises.push(new ContactParser().parseContacts(chummerChar, importOptions.assignIcons));
         }
 
         if (importOptions.lifestyles && chummerChar.lifestyles && chummerChar.lifestyles.lifestyle) {
-            const parsedLifestyles = await new LifestyleParser().parseLifestyles(chummerChar, importOptions.assignIcons);
-            Array.prototype.push.apply(parsedItems, parsedLifestyles);
+            promises.push( new LifestyleParser().parseLifestyles(chummerChar, importOptions.assignIcons));
         }
 
-        return parsedItems;
+        return  (await Promise.all(promises)).flat();
     }
 }

@@ -270,6 +270,7 @@ export class CharacterInfoUpdater {
     }
 
     handleLanguageSkills(system, languageSkills) {
+        system.skills.language.value = {}
 
         for (let skill of languageSkills) {
             let parsedSkill = {};
@@ -294,6 +295,11 @@ export class CharacterInfoUpdater {
     }
 
     handleKnowledgeSkills(system, knowledgeSkills) {
+        system.skills.knowledge.academic.value = {}
+        system.skills.knowledge.interests.value = {}
+        system.skills.knowledge.professional.value = {}
+        system.skills.knowledge.street.value = {}
+
         for (let skill of knowledgeSkills) {
             const id = randomID(16);
             let parsedSkill = {};

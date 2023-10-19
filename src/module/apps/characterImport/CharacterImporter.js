@@ -26,14 +26,33 @@ export class CharacterImporter {
             return;
         }
 
+        await this.resetCharacter(actor)
+
         const chummerCharacter = chummerFile.characters.character;
         const characterInfoUpdater = new CharacterInfoUpdater();
-        const updatedActorData = await characterInfoUpdater.update(actor._source, chummerCharacter);
-        const items = await new ItemsParser().parse(chummerCharacter, importOptions);
+        const updatedActorData = characterInfoUpdater.update(actor._source, chummerCharacter);
+        const items = new ItemsParser().parse(chummerCharacter, importOptions);
 
         new VehicleParser().parseVehicles(actor, chummerCharacter, importOptions)
 
-        await actor.update(updatedActorData);
-        await actor.createEmbeddedDocuments('Item', items);
+        await actor.update(await updatedActorData);
+        await actor.createEmbeddedDocuments('Item', await items);
+    }
+
+    async resetCharacter(actor) {
+        let deletedItems = actor.deleteEmbeddedDocuments("Item", [], { deleteAll: true });
+
+        let removed = {
+            'system.skills.language.-=value' : null,
+            'system.skills.knowledge.academic.-=value' : null,
+            'system.skills.knowledge.interests.-=value' : null,
+            'system.skills.knowledge.professional.-=value' : null,
+            'system.skills.knowledge.street.-=value' : null
+        }
+        let removeSkills = actor.update(removed)
+
+        //await as late as possible to save time
+        await deletedItems
+        await removeSkills
     }
 }
