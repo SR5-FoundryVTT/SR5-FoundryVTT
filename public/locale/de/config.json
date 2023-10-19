@@ -24,6 +24,7 @@
     "ITEM.TypeModification": "Modifikation",
     "ITEM.TypeProgram": "Programm",
     "ITEM.TypeQuality": "Qualität",
+    "ITEM.TypeRitual": "Ritual",
     "ITEM.TypeSin": "SIN",
     "ITEM.TypeSpell": "Zauberspruch",
     "ITEM.TypeSprite_power": "Spritekraft",
@@ -216,6 +217,7 @@
     "SR5.CreateItemModification": "Erstelle Modifikation",
     "SR5.CreateItemProgram": "Erstelle Programm",
     "SR5.CreateItemQuality": "Erstelle Qualität",
+    "SR5.CreateItemRitual": "Erstelle Ritual",
     "SR5.CreateItemSIN": "Erstelle SIN",
     "SR5.CreateItemSpell": "Erstelle Zauberspruch",
     "SR5.CreateItemWeapon": "Erstelle Waffe",
@@ -293,6 +295,7 @@
     "SR5.Description": "Beschreibung",
     "SR5.Details": "Details",
     "SR5.DetectionSpellExtended": "Erweitert",
+    "SR5.Descriptors": "Descriptors",
     "SR5.Device": "Gerät",
     "SR5.DeviceCatCommlink": "Commlink",
     "SR5.DeviceCatCyberdeck": "Cyberdeck",
@@ -526,6 +529,7 @@
             "Matrix": "Matrix",
             "PersonalInventory": "Am Körper",
             "ResetActorForNewRun": "Neuer Run Reset",
+            "Rituals": "Rituals",
             "RollDroneInfiltration": "Drohne infiltrieren",
             "RollDronePerception": "Drohnenwahrnehmung",
             "RollPilotVehicleTest": "Fahrzeug steuern",
@@ -887,7 +891,6 @@
     "SR5.SpellCatHealth": "Heilung",
     "SR5.SpellCatIllusion": "Illusion",
     "SR5.SpellCatManipulation": "Manipulation",
-    "SR5.SpellCatRitual": "Ritual",
     "SR5.SpellCategory": "Kategorie",
     "SR5.SpellCombatDirect": "Direkt",
     "SR5.SpellCombatIndirect": "Indirekt",
@@ -967,13 +970,13 @@
         "Services": "Aufgabe",
         "Type": "Typ",
         "Types": {
+            "Companion": "Begleiter",
             "Courier": "Kurier",
             "Crack": "Infiltrator",
             "Data": "Daten",
             "Fault": "Stör",
-            "Machine": "Maschinen",
-            "Companion": "Begleiter",
-            "Generalist": "Generalist"
+            "Generalist": "Generalist",
+            "Machine": "Maschinen"
         }
     },
     "SR5.SpritePower": {
@@ -1002,6 +1005,8 @@
     "SR5.TemporaryModifiers": "Temporäre Modifikatoren",
     "SR5.Test": "Probe",
     "SR5.TestResults": {
+        "RitualFailure" : "The ritual was to strong for you",
+        "RitualSuccess" : "The ritual is sealed",
         "SpiritSummonFailure": "Geist geflohen!",
         "SpiritSummonSuccess": "Geist beschworen!"
     },
@@ -1018,11 +1023,13 @@
         "NaturalRecoveryPhysicalTest": "Natürliche Genesung Körperlich",
         "NaturalRecoveryStunTest": "Natürliche Genesung Geistig",
         "OpposedSummonSpiritTest": "Widerstehe Herbeirufung",
+        "OpposedRitualTest": "Seal the ritual",
         "OpposedTest": "Vergleichsprobe",
         "PhysicalDefenseTest": "Physische Verteidigung",
         "PhysicalResistTest": "Physischer Schadenswiderstand",
         "PilotVehicleTest": "Fahrzeug Manövrieren",
         "RangedAttackTest": "Fernkampf Angriff",
+        "RitualSpellcastingTest": "Ritual Spellcasting",
         "SkillTest": "Fertigkeitenprobe",
         "SpellcastingTest": "Spruchzauberei",
         "SuccessTest": "Erfolgsprobe",
@@ -1185,6 +1192,8 @@
         "InvalidSummoningForce": "Gewählte Kraft hält sich nicht an die Regeln",
         "NegativeLimitValue": "Limit Werte müssen über Null liegen",
         "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer.",
+        "RitualNotConcluded": "Ritual incomplete. Wait for ritual to oppose spellcasting to determine drain.",
+        "RitualNotEnoughReagents": "Not enough reagents offered.",
         "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
         "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
         "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"

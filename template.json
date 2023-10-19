@@ -1122,6 +1122,7 @@
             "quality",
             "sin",
             "spell",
+            "ritual",
             "sprite_power",
             "weapon",
             "host",
@@ -1391,14 +1392,26 @@
                 "environmental": false,
                 "physical": false
             },
-            "ritual": {
-                "type": ""
-            },
             "action": {
                 "test": "SpellCastingTest",
                 "opposed": {
                     "test": "",
                     "resist": {"test": ""}
+                },
+                "followed": {
+                    "test": "DrainTest"
+                }
+            }
+        },
+        "ritual": {
+            "templates": ["description", "action", "importFlags"],
+            "type": "",
+            "descriptors": "",
+            "action": {
+                "type": "complex",
+                "test": "RitualSpellcastingTest",
+                "opposed": {
+                    "test": "OpposedRitualTest"
                 },
                 "followed": {
                     "test": "DrainTest"

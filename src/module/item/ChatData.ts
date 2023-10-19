@@ -265,6 +265,10 @@ export const ChatData = {
         labels.roll = 'Cast';
     },
 
+    ritual: (system, labels, props) => {
+        // TODO: add info boxes for rituals. These will show on sheets underneath the item description and on item chat cards
+    },
+
     weapon: (system, labels, props, item: SR5Item) => {
         ChatData.action(system, labels, props);
         for (let i = 0; i < props.length; i++) {
