@@ -261,9 +261,7 @@ export class CharacterInfoUpdater {
             parsedSkill.base = parseInt(skill.rating);
 
             if (skill.skillspecializations) {
-                parsedSkill.specs = this.getArray(
-                    skill.skillspecializations.skillspecialization.name
-                );
+                parsedSkill.specs = this.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
             }
 
             // Precaution to later only deal with complete SkillField data models.
@@ -287,9 +285,7 @@ export class CharacterInfoUpdater {
             parsedSkill.base = parseInt(skill.rating);
     
             if (skill.skillspecializations) {
-                parsedSkill.specs = this.getArray(
-                 skill.skillspecializations.skillspecialization.name
-                );
+                parsedSkill.specs = this.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
             }
     
             // Precaution to later only deal with complete SkillField data models.
@@ -331,9 +327,7 @@ export class CharacterInfoUpdater {
             parsedSkill.base = parseInt(skill.rating);
 
             if (skill.skillspecializations) {
-                parsedSkill.specs = this.getArray(
-                    skill.skillspecializations.skillspecialization.name
-                );
+                parsedSkill.specs = this.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
             }
 
             // Precaution to later only deal with complete SkillField data models.
