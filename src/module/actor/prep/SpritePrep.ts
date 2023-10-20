@@ -9,6 +9,7 @@ import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
 import SpriteData = Shadowrun.SpriteData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
+import VisibilityChecksPrep from './functions/VisibilityChecksPrep'
 
 
 /**
@@ -21,6 +22,8 @@ export class SpritePrep {
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
         ModifiersPrep.clearLimitMods(data);
+
+        VisibilityChecksPrep.preparVisibilityChecks(data, 'sprite')
     }
 
     static prepareDerivedData(data: SpriteData, items: SR5ItemDataWrapper[]) {

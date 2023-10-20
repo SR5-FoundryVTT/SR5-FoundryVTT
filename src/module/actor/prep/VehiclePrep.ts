@@ -11,6 +11,7 @@ import {SR5} from "../../config";
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import { RangedWeaponRules } from '../../rules/RangedWeaponRules';
 import { SR } from '../../constants';
+import VisibilityChecksPrep from './functions/VisibilityChecksPrep'
 
 
 export class VehiclePrep {
@@ -48,6 +49,8 @@ export class VehiclePrep {
         VehiclePrep.prepareArmor(system);
         CharacterPrep.prepareRecoil(system);
         VehiclePrep.prepareRecoilCompensation(system);
+
+        VisibilityChecksPrep.preparVisibilityChecks(system, 'vehicle')
     }
 
     static prepareVehicleStats(system: Shadowrun.VehicleData) {
