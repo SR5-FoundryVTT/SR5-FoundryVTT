@@ -933,10 +933,24 @@
                         "mod": []
                     }
                 }
+            },
+            "visibilityChecks": {
+                "astral": {
+                    "astralActive" : false,
+                    "affectedBySpell": false
+                },
+                "meat": {
+                    "hidden": false,
+                    "hasHeat": true
+                },
+                "matrix": {
+                    "hasIcon": false,
+                    "runningSilent": false
+                }
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values"],
+            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "visibilityChecks"],
             "ethnicity": "",
             "age": "",
             "sex": "",
@@ -961,7 +975,7 @@
             }
         },
         "spirit": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "visibilityChecks"],
             "summonerUuid": "",
             "services": 0,
             "bound": false,
@@ -979,10 +993,10 @@
             }
         },
         "critter": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values"]
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "visibilityChecks"]
         },
         "sprite": {
-            "templates": ["common", "skills", "attributes", "limits", "matrix"],
+            "templates": ["common", "skills", "attributes", "limits", "matrix", "visibilityChecks"],
             "services": 0,
             "registered": false,
             "level": 0,
@@ -990,7 +1004,7 @@
             "special": "resonance"
         },
         "vehicle": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values", "visibilityChecks"],
             "vehicleType": "ground",
             "controlMode": "autopilot",
             "environment": "speed",
@@ -1057,7 +1071,7 @@
             }
         },
         "ic": {
-            "templates": ["common",  "skills", "attributes", "limits", "matrix"],
+            "templates": ["common",  "skills", "attributes", "limits", "matrix", "visibilityChecks"],
             "track": {},
             "icType": "",
             "host": {

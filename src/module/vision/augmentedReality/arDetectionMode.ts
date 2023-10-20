@@ -16,11 +16,11 @@ export default class AugmentedRealityVisionDetectionMode extends DetectionMode {
       const tgt = target?.document;
       const targetHasIcon =
         tgt instanceof TokenDocument
-        && tgt.actor;
+        && tgt.actor?.system.visibilityChecks.matrix.hasIcon;
 
+      const targetIsNotRunningSilent = !tgt.actor?.system.visibilityChecks.matrix.runningSilent
 
-      return targetHasIcon || true
-
+      return targetHasIcon || targetIsNotRunningSilent
     }
   }
   

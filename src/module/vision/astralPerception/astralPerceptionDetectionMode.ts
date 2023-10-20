@@ -17,10 +17,10 @@ export default class AstralPerceptionDetectionMode extends DetectionMode {
       const tgt = target?.document;
       const targetAstralActive =
         tgt instanceof TokenDocument
-        && tgt.actor;
+        && tgt.actor?.system.visibilityChecks.astral.astralActive;
 
 
-      const targetAffectedBySpell = false;
+      const targetAffectedBySpell = tgt.actor?.system.visibilityChecks.astral.affectedBySpell;
 
       const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 

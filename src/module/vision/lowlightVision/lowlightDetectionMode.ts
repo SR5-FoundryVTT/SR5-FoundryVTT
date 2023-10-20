@@ -17,7 +17,7 @@ export default class LowlightVisionDetectionMode extends DetectionMode {
       const tgt = target?.document;
       const targetIsVisible =
         tgt instanceof TokenDocument
-        && tgt.actor;
+        && !tgt.actor?.system.visibilityChecks.meat.hidden;
 
 
       return targetIsVisible

@@ -17,10 +17,14 @@ export default class ThermographicVisionDetectionMode extends DetectionMode {
       const tgt = target?.document;
       const targetHasHeat =
         tgt instanceof TokenDocument
-        && tgt.actor;
+        && !tgt.actor?.system.visibilityChecks.meat.hasHeat;
+
+      const targetIsVisible =
+        tgt instanceof TokenDocument
+        && !tgt.actor?.system.visibilityChecks.meat.hidden;
 
 
-      return targetHasHeat || true
+      return targetHasHeat && targetIsVisible
 
     }
   }
