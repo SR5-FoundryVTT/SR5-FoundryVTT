@@ -129,7 +129,6 @@ export class WeaponParser {
 
         {
             const chummerDamage = this.parseDamage(chummerWeapon.damage_noammo_english);
-            console.log(chummerDamage)
             damage.base = chummerDamage.damage;
             damage.type = {
                 base: chummerDamage.type
@@ -168,7 +167,7 @@ export class WeaponParser {
         const itemData = createItemData(chummerWeapon.name, 'weapon', system);
 
         //currently does not work
-        // this.handleClips(itemData, chummerWeapon)
+        this.handleClips(itemData, chummerWeapon)
         return itemData;
     }
 
@@ -208,18 +207,18 @@ export class WeaponParser {
             
             // HeroLab export doesn't have clips
             const chummerClips = getArray(chummerWeapon.clips.clip);
-            let clips = chummerClips.filter(clip => clip.name !== "Intern")
+            let clips = chummerClips.filter(clip => !clip.name.toLowerCase().includes("inter"))
 
             ammo.spare_clips = {
-                value: clips.length -1,
-                max: clips.length -1
+                value: clips?.length -1 || 0,
+                max: clips?.length -1 || 0
             }
 
             let loadedClip = clips.filter(clip => clip.location === "loaded")[0]
             
             ammo.current = {
-                max: loadedClip.count,
-                value: loadedClip.count
+                max: loadedClip?.count || 0,
+                value: loadedClip?.count || 0
             }
         }
 
@@ -240,31 +239,34 @@ export class WeaponParser {
             
             // HeroLab export doesn't have clips
             const chummerClips = getArray(chummerWeapon.clips.clip);
-            let clips = chummerClips.filter(clip => clip.name !== "Intern")
+            let clips = chummerClips.filter(clip => !clip.name.toLowerCase().includes("inter"))
 
             let ammo = []
             clips.forEach((clip) => {
+                let ammobonus = clip.ammotype
                 let systemAmmo = {
-                    accuracy: 0,
-                    ap: 0,
+                    accuracy: ammobonus.weaponbonusacc.match(/(\d+)/).pop(),
+                    ap: ammobonus.weaponbonusap.match(/(\d+)/).pop(),
                     blast: {
                         radius: 0,
                         dropoff: 0
                     },
-                    damage: 0,
-                    damageType: '',
-                    element: '',
+                    damage: ammobonus.weaponbonusdamage_english.match(/(\d+)/).pop(),
+                    damageType: ammobonus.weaponbonusdamage_english.match(/S/)?.pop() === 'S' ? 'stun' : 'physical' ,
+                    element: ammobonus.weaponbonusdamage_english.match(/\(e\)/)?.pop() == '(e)' ? 'electricity' : '',
                     importFlags: {
                         isFreshImport: true
                     },
                     replaceDamage: false,
                     technology: {
-                        equipped: clip.location === 'loaded'
+                        equipped: clip.name === chummerWeapon.currentammo
                     }
                 }
-                ammo.push(createItemData(clip.name, 'ammo', systemAmmo));
+                let currentAmmo = createItemData(clip.name, 'ammo', systemAmmo);
+                currentAmmo._id = randomID(16)
+                ammo.push(currentAmmo);
             });
-            item.items = ammo;
+            // item.items = ammo;
             item.flags = {
                 shadowrun5e: {
                     embeddedItems: ammo
