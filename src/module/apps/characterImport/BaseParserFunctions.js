@@ -55,7 +55,7 @@ export const parseTechnology = (chummerEntry) => {
         parsedTechnology.cost = parseFloat(chummerEntry.cost.replace(/[^\d\.\-]/g, ""));
     }
 
-    if (chummerEntry.equipped && chummerEntry.equipped.toLowerCase() === 'true') {
+    if (chummerEntry.equipped?.toLowerCase() === 'true') {
         parsedTechnology.equipped = true;
     }
 

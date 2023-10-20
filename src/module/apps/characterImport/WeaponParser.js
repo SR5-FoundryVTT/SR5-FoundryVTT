@@ -5,23 +5,38 @@ export class WeaponParser {
     parseDamage = (val) => {
         const damage = {
             damage: 0,
-            type: 'physical',
+            type: '',
             radius: 0,
             dropoff: 0,
         };
-        const split = val.split(',');
+
+        const split = val.split(' ');
+
         if (split.length > 0) {
             const l = split[0].match(/(\d+)(\w+)/);
-            if (l && l[1]) damage.damage = parseInt(l[1]);
-            if (l && l[2]) damage.type = l[2] === 'P' ? 'physical' : 'stun';
+            
+            if (l && l[1]) {
+                damage.damage = parseInt(l[1]);
+            }
+
+            if (l && l[2]) {
+                damage.type = l[2] === 'P' ? 'physical' : 'stun';
+            }
         }
+
         for (let i = 1; i < split.length; i++) {
             const l = split[i].match(/(-?\d+)(.*)/);
             if (l && l[2]) {
-                if (l[2].toLowerCase().includes('/m')) damage.dropoff = parseInt(l[1]);
-                else damage.radius = parseInt(l[1]);
+                if (l[2].toLowerCase().includes('/m')) { 
+                    damage.dropoff = parseInt(l[1]);
+                    damage.radius = damage.damage / Math.abs(damage.dropoff)
+                }
+                else {
+                    damage.radius = parseInt(l[1]);
+                }
             }
         }
+
         return damage;
     };
 
@@ -51,17 +66,22 @@ export class WeaponParser {
 
     parseWeapon(chummerWeapon) {
         const parserType = 'weapon';
-        const system = {};
-        const action = {};
-        const damage = {};
-        action.damage = damage;
-        system.action = action;
+        const system = {
+            action: {
+                damage: {
+
+                }
+            }
+        };
+
+        const action = system.action;
+        const damage = system.action.damage;
 
         system.description = parseDescription(chummerWeapon);
         system.technology = parseTechnology(chummerWeapon);
 
         damage.ap = {
-            base: parseInt(getValues(chummerWeapon.ap)[0])
+            base: parseInt(getValues(chummerWeapon.ap_noammo)[0])
         };
         action.type = 'varies';
 
@@ -85,73 +105,41 @@ export class WeaponParser {
 
         action.attribute = 'agility';
         action.limit = {
-            base: parseInt(getValues(chummerWeapon.accuracy)[0])
+            base: parseInt(getValues(chummerWeapon.accuracy_noammo)[0])
         };
 
         if (chummerWeapon.type.toLowerCase() === 'melee') {
-            action.type = 'complex';
-            system.category = 'melee';
-            const melee = {};
-            system.melee = melee;
-            melee.reach = parseInt(chummerWeapon.reach);
-        } else if (chummerWeapon.type.toLowerCase() === 'ranged') {
-            system.category = 'range';
-            if (action.skill.toLowerCase().includes('throw')) {
-                system.category = 'thrown';
-            }
-            const range = {};
-            system.range = range;
-            range.rc = {
-                base: parseInt(getValues(chummerWeapon.rc)[0]),
-            };
-            if (chummerWeapon.mode) {
-                // HeroLab export doesn't have mode
-                const lower = chummerWeapon.mode.toLowerCase();
-                range.modes = {
-                    single_shot: lower.includes('ss'),
-                    semi_auto: lower.includes('sa'),
-                    burst_fire: lower.includes('bf'),
-                    full_auto: lower.includes('fa'),
-                };
-            }
-            if (chummerWeapon.clips != null && chummerWeapon.clips.clip != null) {
-                // HeroLab export doesn't have clips
-                const clips = Array.isArray(chummerWeapon.clips.clip)
-                    ? chummerWeapon.clips.clip
-                    : [chummerWeapon.clips.clip];
-                clips.forEach((clip) => {
-                    console.log(clip);
-                });
-            }
-            if (chummerWeapon.ranges &&
-                chummerWeapon.ranges.short &&
-                chummerWeapon.ranges.medium &&
-                chummerWeapon.ranges.long &&
-                chummerWeapon.ranges.extreme) {
-                console.log(chummerWeapon.ranges);
-                range.ranges = {
-                    short: parseInt(chummerWeapon.ranges.short.split('-')[1]),
-                    medium: parseInt(chummerWeapon.ranges.medium.split('-')[1]),
-                    long: parseInt(chummerWeapon.ranges.long.split('-')[1]),
-                    extreme: parseInt(chummerWeapon.ranges.extreme.split('-')[1]),
-                };
-            }
+            this.handleMeleeWeapon(chummerWeapon, system)
+        } 
 
+        if (chummerWeapon.type.toLowerCase() === 'ranged') {
+            this.handledRangedWeapon(chummerWeapon, system)
         } else if (chummerWeapon.type.toLowerCase() === 'thrown') {
             system.category = 'thrown';
+            const ranges = chummerWeapon.ranges[0]
+            if (ranges && ranges.short && ranges.medium && ranges.long && ranges.extreme) {
+                range.ranges = {
+                    short: parseInt(ranges.short.split('-')[1]),
+                    medium: parseInt(ranges.medium.split('-')[1]),
+                    long: parseInt(ranges.long.split('-')[1]),
+                    extreme: parseInt(ranges.extreme.split('-')[1]),
+                };
+            }
         }
+
         {
-            // TODO handle raw damage if present
-            const d = this.parseDamage(chummerWeapon.damage_english);
-            damage.base = d.damage;
-            damage.type = {};
-            damage.type.base = d.type;
-            if (d.dropoff || d.radius) {
+            const chummerDamage = this.parseDamage(chummerWeapon.damage_noammo_english);
+            console.log(chummerDamage)
+            damage.base = chummerDamage.damage;
+            damage.type = {
+                base: chummerDamage.type
+            };
+            if (chummerDamage.dropoff || chummerDamage.radius) {
                 const thrown = {};
                 system.thrown = thrown;
                 thrown.blast = {
-                    radius: d.radius,
-                    dropoff: d.dropoff,
+                    radius: chummerDamage.radius,
+                    dropoff: chummerDamage.dropoff,
                 };
             }
         }
@@ -179,6 +167,110 @@ export class WeaponParser {
         // Create the item
         const itemData = createItemData(chummerWeapon.name, 'weapon', system);
 
+        //currently does not work
+        // this.handleClips(itemData, chummerWeapon)
         return itemData;
+    }
+
+    handleMeleeWeapon(chummerWeapon, system) {
+        system.action.type = 'complex';
+        system.category = 'melee';
+        system.melee = {
+            reach:  parseInt(chummerWeapon.reach)
+        };
+    }
+
+    handledRangedWeapon(chummerWeapon, system) {
+        system.category = 'range';
+
+        if (system.action.skill.toLowerCase().includes('throw')) {
+            system.category = 'thrown';
+        }
+
+        const range = {};
+        system.range = range;
+        range.rc = { base: parseInt(getValues(chummerWeapon.rc_noammo)[0]) };
+
+        if (chummerWeapon.mode) {
+            // HeroLab export doesn't have mode
+            const modes = chummerWeapon.mode_noammo.toLowerCase();
+            range.modes = {
+                single_shot: modes.includes('ss'),
+                semi_auto: modes.includes('sa'),
+                burst_fire: modes.includes('bf'),
+                full_auto: modes.includes('fa'),
+            };
+        }
+
+        if (chummerWeapon.clips?.clip != null) {
+            system.ammo = {}
+            let ammo = system.ammo
+            
+            // HeroLab export doesn't have clips
+            const chummerClips = getArray(chummerWeapon.clips.clip);
+            let clips = chummerClips.filter(clip => clip.name !== "Intern")
+
+            ammo.spare_clips = {
+                value: clips.length -1,
+                max: clips.length -1
+            }
+
+            let loadedClip = clips.filter(clip => clip.location === "loaded")[0]
+            
+            ammo.current = {
+                max: loadedClip.count,
+                value: loadedClip.count
+            }
+        }
+
+        const ranges = chummerWeapon.ranges[0]
+        if (ranges && ranges.short && ranges.medium && ranges.long && ranges.extreme) {
+            range.ranges = {
+                short: parseInt(ranges.short.split('-')[1]),
+                medium: parseInt(ranges.medium.split('-')[1]),
+                long: parseInt(ranges.long.split('-')[1]),
+                extreme: parseInt(ranges.extreme.split('-')[1]),
+            };
+        }
+
+    }
+
+    handleClips(item, chummerWeapon) {
+        if (chummerWeapon.clips?.clip != null) {
+            
+            // HeroLab export doesn't have clips
+            const chummerClips = getArray(chummerWeapon.clips.clip);
+            let clips = chummerClips.filter(clip => clip.name !== "Intern")
+
+            let ammo = []
+            clips.forEach((clip) => {
+                let systemAmmo = {
+                    accuracy: 0,
+                    ap: 0,
+                    blast: {
+                        radius: 0,
+                        dropoff: 0
+                    },
+                    damage: 0,
+                    damageType: '',
+                    element: '',
+                    importFlags: {
+                        isFreshImport: true
+                    },
+                    replaceDamage: false,
+                    technology: {
+                        equipped: clip.location === 'loaded'
+                    }
+                }
+                ammo.push(createItemData(clip.name, 'ammo', systemAmmo));
+            });
+            item.items = ammo;
+            item.flags = {
+                shadowrun5e: {
+                    embeddedItems: ammo
+                }
+            }
+            
+        }
     }
 }
