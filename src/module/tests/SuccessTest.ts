@@ -302,7 +302,8 @@ export class SuccessTest {
     toJSON() {
         return {
             data: this.data,
-            rolls: this.rolls
+            // Use Roll.toJSON() to inject 'class' property. Foundry relies on this to build it's classes.
+            rolls: this.rolls.map(roll => roll.toJSON())
         };
     }
 

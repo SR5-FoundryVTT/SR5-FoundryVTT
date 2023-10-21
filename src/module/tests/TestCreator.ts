@@ -159,7 +159,7 @@ export const TestCreator = {
             return;
         }
 
-        const rolls = testData.rolls.map(roll => SR5Roll.fromData(roll as any));
+        const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll as any));
         const documents = {rolls};
         return TestCreator.fromTestData(testData.data, documents, testData.data.options);
     },
