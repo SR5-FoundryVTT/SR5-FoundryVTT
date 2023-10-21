@@ -81,7 +81,7 @@ export class WeaponParser {
         system.technology = parseTechnology(chummerWeapon);
 
         damage.ap = {
-            base: parseInt(getValues(chummerWeapon.ap_noammo)[0])
+            base: parseInt(getValues(chummerWeapon.rawap)[0])
         };
         action.type = 'varies';
 
@@ -105,7 +105,7 @@ export class WeaponParser {
 
         action.attribute = 'agility';
         action.limit = {
-            base: parseInt(getValues(chummerWeapon.accuracy_noammo)[0])
+            base: parseInt(getValues(chummerWeapon.rawaccuracy)[0])
         };
 
         if (chummerWeapon.type.toLowerCase() === 'melee') {
@@ -128,6 +128,7 @@ export class WeaponParser {
         }
 
         {
+            //TODO change this to 'rawdamage' when mods can have damage value 
             const chummerDamage = this.parseDamage(chummerWeapon.damage_noammo_english);
             damage.base = chummerDamage.damage;
             damage.type = {
@@ -168,6 +169,7 @@ export class WeaponParser {
 
         //currently does not work
         this.handleClips(itemData, chummerWeapon)
+        this.handleAccessories(itemData, chummerWeapon) 
         return itemData;
     }
 
@@ -188,7 +190,7 @@ export class WeaponParser {
 
         const range = {};
         system.range = range;
-        range.rc = { base: parseInt(getValues(chummerWeapon.rc_noammo)[0]) };
+        range.rc = { base: parseInt(getValues(chummerWeapon.rawrc)[0]) };
 
         if (chummerWeapon.mode) {
             // HeroLab export doesn't have mode
@@ -266,13 +268,53 @@ export class WeaponParser {
                 currentAmmo._id = randomID(16)
                 ammo.push(currentAmmo);
             });
-            // item.items = ammo;
-            item.flags = {
-                shadowrun5e: {
-                    embeddedItems: ammo
+
+            if(!item.flags?.shadowrun5e?.embeddedItems) {
+                item.flags = {
+                    shadowrun5e: {
+                        embeddedItems: ammo
+                    }
                 }
             }
+            else {
+                item.flags.shadowrun5e.embeddedItems.push(...ammo)
+            }            
+        }
+    }
+
+    handleAccessories(item, chummerWeapon) {
+        if (chummerWeapon.clips?.clip != null) {
             
+            let chummerAccessories = getArray(chummerWeapon.accessories.accessory);
+
+            let accessories = []
+            chummerAccessories.forEach((item) => {
+                let system = {
+                    type: "weapon",
+                    mount_point: item.mount.toLowerCase(),
+                    dice_pool: 0,
+                    accuracy: parseInt(item.accuracy),
+                    rc: parseInt(item.rc) || 0,
+                    conceal: parseInt(item.conceal),
+                    technology: {
+                        equipped: true
+                    }
+                }
+                let current = createItemData(item.name, 'modification', system);
+                current._id = randomID(16)
+                accessories.push(current);
+            });
+
+            if(!item.flags?.shadowrun5e?.embeddedItems) {
+                item.flags = {
+                    shadowrun5e: {
+                        embeddedItems: accessories
+                    }
+                }
+            }
+            else {
+                item.flags.shadowrun5e.embeddedItems.push(...accessories)
+            }            
         }
     }
 }
