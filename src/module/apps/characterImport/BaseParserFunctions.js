@@ -29,6 +29,10 @@ export const parseDescription = (chummerEntry) => {
         parsedDescription.value = TextEditor.enrichHTML(chummerEntry.description);
     }
 
+    if (chummerEntry.notes) {
+        parsedDescription.value = TextEditor.enrichHTML(chummerEntry.notes);
+    }
+
     return parsedDescription
 }
 

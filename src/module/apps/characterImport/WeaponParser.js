@@ -282,7 +282,7 @@ export class WeaponParser {
         }
     }
 
-    handleAccessories(item, chummerWeapon) {
+    handleAccessories(itemData, chummerWeapon) {
         if (chummerWeapon.clips?.clip != null) {
             
             let chummerAccessories = getArray(chummerWeapon.accessories.accessory);
@@ -305,15 +305,15 @@ export class WeaponParser {
                 accessories.push(current);
             });
 
-            if(!item.flags?.shadowrun5e?.embeddedItems) {
-                item.flags = {
+            if(!itemData.flags?.shadowrun5e?.embeddedItems) {
+                itemData.flags = {
                     shadowrun5e: {
                         embeddedItems: accessories
                     }
                 }
             }
             else {
-                item.flags.shadowrun5e.embeddedItems.push(...accessories)
+                itemData.flags.shadowrun5e.embeddedItems.push(...accessories)
             }            
         }
     }
