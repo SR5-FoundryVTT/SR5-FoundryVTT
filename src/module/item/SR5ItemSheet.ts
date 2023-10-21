@@ -3,6 +3,7 @@ import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import { createTagify } from '../utils/sheets';
+import { SR5Actor } from '../actor/SR5Actor';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -52,7 +53,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Host Item.
     markedDocuments: Shadowrun.MarkedDocument[]
-    networkDevices: SR5Item[]
+    networkDevices: (SR5Item|SR5Actor)[]
     networkController: SR5Item | undefined
 
     // Action Items. (not only type = action)
@@ -340,7 +341,6 @@ export class SR5ItemSheet extends ItemSheet {
 
         // Parse drop data.
         const data = this.parseDropData(event);
-
         if (!data) return;
 
         // Add items to a weapons modification / ammo
@@ -380,6 +380,19 @@ export class SR5ItemSheet extends ItemSheet {
             if (!item || !item.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
             
             return await this.item.addNetworkDevice(item);
+        }
+
+        // Add vehicles to a network (PAN/WAN).
+        if (this.item.canBeNetworkController && data.type === 'Actor') {
+            const actor = await fromUuid(data.uuid) as SR5Actor;
+
+            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+
+            if(!actor.isVehicle()) {
+                return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
+            }
+
+            return await this.item.addNetworkDevice(actor);
         }
     }
 

@@ -169,6 +169,9 @@
                 border-radius: 0.3em;
                 border-color: $dark;
             }
+            label {
+                color: $yellow;
+            }
         }
     }
 }
