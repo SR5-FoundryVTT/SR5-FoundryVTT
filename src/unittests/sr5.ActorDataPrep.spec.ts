@@ -40,13 +40,24 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 assert.strictEqual(character.system.attributes.intuition.value, SR.attributes.ranges['intuition'].min);
                 assert.strictEqual(character.system.attributes.charisma.value, SR.attributes.ranges['charisma'].min);
 
-                console.log('Comon special attributes');
+                console.log('Common special attributes');
                 assert.strictEqual(character.system.attributes.edge.value, SR.attributes.ranges['edge'].min);
                 assert.strictEqual(character.system.attributes.essence.value, SR.attributes.defaults['essence']);
 
                 console.log('Special special attributes');
                 assert.strictEqual(character.system.attributes.resonance.value, SR.attributes.ranges['resonance'].min);
                 assert.strictEqual(character.system.attributes.magic.value, SR.attributes.ranges['magic'].min);
+            });
+
+            
+            it('visibility checks', async() => {
+                const actor = await testActor.create({type: 'character', 'system.metatype': 'human'});
+                assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, true);
+                assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, true);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, true);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
             });
 
             it('monitor calculation', async () => {
@@ -261,6 +272,17 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 assert.strictEqual(character.system.special, 'magic');
             });
 
+            it('visibility checks', async() => {
+                const actor = await testActor.create({type: 'spirit'}) as SR5Actor;
+                assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, true);
+                assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, false);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, false);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
+            });
+
+
             it('Spirit default/overrides by example type', async () => {
                 const actor = await testActor.create({type: 'spirit', 'system.spiritType': 'air'}) as SR5Actor;
                 let spirit = actor.asSpirit() as SpiritActorData;
@@ -306,6 +328,16 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
             it('Sprites are always resonat', async () => {
                 const sprite = await testActor.create({type: 'sprite'});
                 assert.strictEqual(sprite.system.special, 'resonance');
+            });
+
+            it('visibility checks', async() => {
+                const actor = await testActor.create({type: 'sprite'});
+                assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
+                assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, false);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, true);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
             });
 
             it('Sprites default/override values by example type', async () => {
@@ -363,6 +395,19 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 await actor.update({'system.modifiers.matrix_track': 1});
                 vehicle = actor.asVehicle() as VehicleActorData;
                 assert.equal(vehicle.system.matrix.condition_monitor.max, 9);
+
+                console.log('visibility checks');
+
+            });
+
+            it('visibility checks', () => {
+                let actor = new SR5Actor({name: 'Testing', type: 'vehicle', system: {attributes: {body: {base: 5}}}});
+                assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
+                assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, true);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, true);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
             });
 
             it('Recoil compensation', () => {
@@ -409,6 +454,18 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 ic = actor.asIC() as ICActorData;
                 assert.equal(ic.system.matrix.condition_monitor.max, 9);
             });
+
+            
+            it('visibility checks', async() => {
+                const actor = await testActor.create({type: 'ic'}) as SR5Actor;
+                assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
+                assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, false);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, true);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
+            });
+
         });
 
         describe('CritterDataPrep', () => {
@@ -425,5 +482,16 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
                 
                 assert.strictEqual(critter.system.values.recoil_compensation.value, 2); // SR5#175: 1 / 3 = 0,3 (rounded up) = 1 => 1 + 1
             });
+
+            it('visibility checks', async() => {
+                let actor = new SR5Actor({name: 'Testing', type: 'critter', system: {attributes: {strength: {base: 5}}}});
+                assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, true);
+                assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, true);
+                assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, false);
+                assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
+            });
+    
         });
 }
