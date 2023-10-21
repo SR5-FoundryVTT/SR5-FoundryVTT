@@ -1481,7 +1481,8 @@
         },
         "quality": {
             "templates": ["description", "action"],
-            "type": "positive"
+            "type": "positive",
+            "rating": 0
         },
         "action": {
             "templates": ["description", "action", "action_result", "importFlags"]

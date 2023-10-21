@@ -455,7 +455,7 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: item.system.rating ?? '',
+                            text: item.system.rating || '',
                         },
                     }
                 ];

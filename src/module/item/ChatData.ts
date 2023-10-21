@@ -199,7 +199,7 @@ export const ChatData = {
         ChatData.action(system, labels, props);
 
         props.push(Helpers.label(system.type));
-        props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
+        if (system.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
     },
 
     sprite_power: (system, labels, props) => {
