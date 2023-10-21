@@ -1,8 +1,8 @@
 import { GearParser, BaseGearParser } from "./BaseGearParser";
-import { SinParser } from "./SinParser";
-import { DeviceParser } from "./DeviceParser";
-import { ProgramParser } from "./ProgramParser";
-import { AmmoParser } from "./AmmoParser";
+import { SinParser } from "../bioImport/SinParser";
+import { DeviceParser } from "../matrixImport/DeviceParser";
+import { ProgramParser } from "../matrixImport/ProgramParser";
+import { AmmoParser } from "../weaponImport/AmmoParser";
 
 /**
  * Responsible for selecting the correct GearParser depending on the gear.

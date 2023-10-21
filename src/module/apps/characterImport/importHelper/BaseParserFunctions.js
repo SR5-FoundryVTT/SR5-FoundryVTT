@@ -1,5 +1,5 @@
-import { DataDefaults } from "../../data/DataDefaults";
-import { SR5 } from "../../config";
+import { DataDefaults } from "../../../data/DataDefaults";
+import { SR5 } from "../../../config";
 
 export const getValues = (val) => {
     const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
@@ -29,6 +29,10 @@ export const parseDescription = (chummerEntry) => {
         parsedDescription.value = TextEditor.enrichHTML(chummerEntry.description);
     }
 
+    if (chummerEntry.notes) {
+        parsedDescription.value = TextEditor.enrichHTML(chummerEntry.notes);
+    }
+
     return parsedDescription
 }
 
@@ -55,7 +59,7 @@ export const parseTechnology = (chummerEntry) => {
         parsedTechnology.cost = parseFloat(chummerEntry.cost.replace(/[^\d\.\-]/g, ""));
     }
 
-    if (chummerEntry.equipped && chummerEntry.equipped.toLowerCase() === 'true') {
+    if (chummerEntry.equipped?.toLowerCase() === 'true') {
         parsedTechnology.equipped = true;
     }
 

@@ -1,5 +1,5 @@
-import { BaseGearParser } from "./BaseGearParser"
-import { formatAsSlug, genImportFlags } from "../BaseParserFunctions.js"
+import { BaseGearParser } from "../importHelper/BaseGearParser"
+import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
 
 /**
  * Parses devices (commlinks, decks, and RCCs)

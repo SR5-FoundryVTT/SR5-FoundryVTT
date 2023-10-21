@@ -1,6 +1,6 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
-import { DataDefaults } from "../../data/DataDefaults";
-import * as IconAssign from '../../apps/iconAssigner/iconAssign';
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
+import { DataDefaults } from "../../../data/DataDefaults.js";
+import * as IconAssign from '../../iconAssigner/iconAssign.js';
 
 export class QualityParser {
 

@@ -1,5 +1,5 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "./BaseParserFunctions.js"
-import * as IconAssign from '../../apps/iconAssigner/iconAssign';
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
+import * as IconAssign from '../../iconAssigner/iconAssign.js';
 
 export class PowerParser {
 
