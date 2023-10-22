@@ -1,5 +1,5 @@
 import {CharacterInfoUpdater} from "./CharacterInfoUpdater"
-import {ItemsParser} from "./ItemsParser"
+import {ItemsParser} from "./importHelper/ItemsParser";
 import VehicleParser from "./vehicleImport/VehicleParser.js";
 
 

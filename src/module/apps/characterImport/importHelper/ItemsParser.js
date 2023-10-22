@@ -1,13 +1,13 @@
 import { getArray } from "./BaseParserFunctions.js"
 import { GearsParser } from "./GearsParser.js"
-import { ArmorParser } from "./ArmorParser";
+import { ArmorParser } from "../armorImport/ArmorParser";
 import { WareParser } from "../wareImport/WareParser.js";
-import { QualityParser } from "./QualityParser";
-import { PowerParser } from "./PowerParser";
+import { QualityParser } from "../bioImport/QualityParser";
+import { PowerParser } from "../magicImport/PowerParser";
 import { SpellParser } from "../magicImport/SpellParser.js";
 import { WeaponParser } from "../weaponImport/WeaponParser.js";
-import { LifestyleParser } from "./LifestyleParser";
-import { ContactParser } from "./ContactParser";
+import { LifestyleParser } from "../bioImport/LifestyleParser";
+import { ContactParser } from "../bioImport/ContactParser";
 
 /**
  * Parses all items (qualities, weapons, gear, ...) from a chummer character.
