@@ -330,6 +330,16 @@ export const registerItemLineHelpers = () => {
                         }
                     }
                 ]
+
+            // General use case item lines
+            case 'modifiers':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Value')
+                        }
+                    }
+                ]
             default:
                 return [];
         }
@@ -455,7 +465,7 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: item.system.rating ?? '',
+                            text: item.system.rating || '',
                         },
                     }
                 ];

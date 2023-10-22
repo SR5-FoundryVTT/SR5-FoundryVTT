@@ -1,4 +1,4 @@
-import { getArray } from "../BaseParserFunctions.js"
+import { getArray } from "../importHelper/BaseParserFunctions";
 
 export class MetamagicParser {
     parseMetamagic(chummerChar, system) {

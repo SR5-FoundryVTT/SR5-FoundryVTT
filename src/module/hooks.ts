@@ -59,6 +59,7 @@ import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
 import { SR5ChatMessage } from './chatMessage/SR5ChatMessage';
 import VisionConfigurator from './vision/visionConfigurator';
+import { DataDefaults } from './data/DataDefaults';
 
 
 
@@ -127,6 +128,7 @@ ___________________
              * Use this.
              */
             test: TestCreator,
+            data: DataDefaults,
 
             /**
              * .tests define what test implementation to use for each test type (key).

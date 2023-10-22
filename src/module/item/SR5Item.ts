@@ -1051,6 +1051,14 @@ export class SR5Item extends Item {
         return this.wrapper.getTechnology();
     }
 
+    getNetworkController(): string|undefined {
+        return this.getTechnologyData()?.networkController;
+    }
+
+    async setNetworkController(networkController: string|undefined): Promise<void> {
+        await this.update({ 'system.technology.networkController': networkController });
+    }
+
     getRange(): CritterPowerRange|SpellRange|RangeWeaponData|undefined {
         return this.wrapper.getRange();
     }
@@ -1614,7 +1622,7 @@ export class SR5Item extends Item {
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
      * @param target The matrix item to be connected.
      */
-    async addNetworkDevice(target: SR5Item) {
+    async addNetworkDevice(target: SR5Item|SR5Actor) {
         // TODO: Add device to WAN network
         // TODO: Add IC actor to WAN network
         // TODO: setup networkController link on networked devices.
@@ -1678,7 +1686,7 @@ export class SR5Item extends Item {
     /**
      * Return all network device items within a possible PAN or WAN.
      */
-    get networkDevices(): SR5Item[] {
+    get networkDevices(): (SR5Item|SR5Actor)[] {
         const controller = this.asDevice || this.asHost;
         if (!controller) return [];
 

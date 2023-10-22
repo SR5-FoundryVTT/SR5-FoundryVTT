@@ -1108,7 +1108,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._filterLanguageSkills(data);
     }
 
-    _filterSkills(data: SR5ActorSheetData, skills: Skills) {
+    _filterSkills(data: SR5ActorSheetData, skills: Skills = {}) {
         const filteredSkills = {};
         for (let [key, skill] of Object.entries(skills)) {
             // Don't show hidden skills.

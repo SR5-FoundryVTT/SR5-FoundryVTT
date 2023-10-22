@@ -56,7 +56,12 @@ export class SkillsPrep {
 
         // setup knowledge skills
         for (let [, group] of Object.entries(knowledge)) {
-            const entries = Object.entries(group.value);
+
+            if(!group?.value) {
+                continue;
+            }
+            
+            const entries = Object.entries(group.value);    
             // remove entries which are deleted TODO figure out how to delete these from the data
             group.value = entries
                 .filter(([, val]) => !val._delete)

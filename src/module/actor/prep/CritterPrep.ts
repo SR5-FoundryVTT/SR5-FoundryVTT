@@ -11,6 +11,7 @@ import {WoundsPrep} from './functions/WoundsPrep';
 import {AttributesPrep} from './functions/AttributesPrep';
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import CritterData = Shadowrun.CritterData;
+import VisibilityChecksPrep from './functions/VisibilityChecksPrep'
 
 
 export class CritterPrep {
@@ -19,6 +20,8 @@ export class CritterPrep {
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
+
+        VisibilityChecksPrep.preparVisibilityChecks(system, 'critter')
     }
 
     static prepareDerivedData(system: CritterData, items: SR5ItemDataWrapper[]) {
