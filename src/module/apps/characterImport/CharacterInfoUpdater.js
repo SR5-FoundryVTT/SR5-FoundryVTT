@@ -1,6 +1,5 @@
 import {_mergeWithMissingSkillFields} from "../../actor/prep/functions/SkillsPrep";
 import { InitiationParser } from "./magicImport/InitiationParser";
-import { MetamagicParser } from "./magicImport/MetamagicParser";
 
 /**
  * Parses all non-item character information from a chummer character object.
@@ -151,13 +150,8 @@ export class CharacterInfoUpdater {
                 });
 
                 if(chummerChar.initiationgrade) {
-                    new InitiationParser().parseInitiation(chummerChar, system)
+                     new InitiationParser().parseInitiation(chummerChar, system)
                 }
-
-                if(chummerChar.metamagics) {
-                    new MetamagicParser().parseMetamagic(chummerChar, system)
-                }
-
 
             }
             if (chummerChar.totaless) {

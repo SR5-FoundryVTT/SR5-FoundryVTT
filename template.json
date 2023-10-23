@@ -813,8 +813,7 @@
                         "base": 0,
                         "mod": []
                     },
-                    "initiation": {},
-                    "metamagic": []
+                    "initiation": {}
                 }
             },
             "movement": {
@@ -1124,7 +1123,9 @@
             "sprite_power",
             "weapon",
             "host",
-            "call_in_action"
+            "call_in_action",
+            "metamagic",
+            "echo"
         ],
         "templates": {
             "description": {
@@ -1542,6 +1543,12 @@
             "marks": {},
             "rating": 0,
             "ic": []
+        },
+        "metamagic": {
+            "templates": ["description"]
+        },
+        "echo" : {
+            "templates": ["description"]
         }
     }
 }
