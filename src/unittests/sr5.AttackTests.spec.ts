@@ -192,22 +192,34 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 assert.isTrue(result);
             });
 
-            // TODO: Figure out why this test passes even with the block on CombatRules:126 commented out
             it("doesn't block damage for non-vehicle actors", async () => {
-                const armor = DataDefaults.actorArmorData({
+                const vehicleArmor = DataDefaults.actorArmorData({
                     value: 50,
                     base: 50,
                 });
                 const vehicleActor = await testActor.create({
                     type: 'vehicle', system: {
-                        armor,
+                        armor: vehicleArmor,
                     },
                 }) as SR5Actor;
+
                 const characterActor = await testActor.create({
-                    type: 'character', system: {
-                        armor,
-                    },
+                    type: 'character',
                 }) as SR5Actor;
+                await characterActor.createEmbeddedDocuments('Item',  [{
+                    type: 'armor',
+                    name: 'Test Armor',
+                    system: {
+                        armor: {
+                            base: 50,
+                            value: 50,
+                        },
+                        technology: DataDefaults.technologyData({
+                            equipped: true,
+                        })
+                    }
+                }]);
+
                 const damage = DataDefaults.damageData({
                     type: {
                         value: 'physical',
