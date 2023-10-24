@@ -8,7 +8,7 @@ import { SR5Combat } from "../combat/SR5Combat";
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { FLAGS, SYSTEM_NAME } from "../constants";
-
+import { Translation } from '../utils/strings';
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
@@ -21,6 +21,11 @@ export interface PhysicalDefenseTestData extends DefenseTestData {
     defenseReach: number
 }
 
+export type PhysicalDefenseTestSuccessCondition = {
+    test: () => boolean,
+    label: Translation,
+}
+export type PhysicalDefenseTestSuccessConditions = PhysicalDefenseTestSuccessCondition[];
 
 export class PhysicalDefenseTest extends DefenseTest {
     public override data: PhysicalDefenseTestData;
@@ -169,25 +174,27 @@ export class PhysicalDefenseTest extends DefenseTest {
         PartsList.AddUniquePart(this.data.modifiers.mod, fireMode.label, Number(fireMode.defense));
     }
 
+    private successConditions: PhysicalDefenseTestSuccessConditions = [
+        {
+            test: () => CombatRules.attackMisses(this.against.hits.value, this.hits.value),
+            label: "SR5.AttackDodged",
+        },
+        {
+            test: () => this.actor !== undefined && CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor),
+            label: "SR5.AttackDoesNoPhysicalDamageToVehicle"
+        },
+        {
+            test: () => this.actor !== undefined && CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
+            label: "SR5.AttackBlockedByVehicleArmor",
+        }
+    ]
+
     override get success() {
-        return CombatRules.attackMisses(this.against.hits.value, this.hits.value) || (this.actor !== undefined &&
-            (CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor) ||
-            CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor)));
+        return this.successConditions.some(({ test }) => test());
     }
+
     override get successLabel() {
-        if (!this.actor) return "SR5.AttackDodged";
-
-        if (CombatRules.attackMisses(this.against.hits.value, this.hits.value)) return "SR5.AttackDodged";
-
-        if(CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor)) {
-            return "SR5.AttackDoesNoPhysicalDamageToVehicle";
-        }
-
-        if(CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor)) {
-            return "SR5.AttackBlockedByVehicleArmor";
-        }
-
-        return "SR5.AttackDodged";
+        return this.successConditions.find(({ test }) => test())?.label || "SR5.AttackDodged";
     }
 
     override get failure() {
