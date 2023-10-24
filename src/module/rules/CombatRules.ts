@@ -122,6 +122,11 @@ export class CombatRules {
     }
 
     static isBlockedByVehicleArmor(incomingDamage: DamageData, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
+        // TODO: Figure out why commenting out this block doesn't fail a test
+        if(!actor.isVehicle()) {
+            return false;
+        }
+
         const modifiedDamage = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage);
 
         const modifiedAv = actor.getArmor(incomingDamage).value;
