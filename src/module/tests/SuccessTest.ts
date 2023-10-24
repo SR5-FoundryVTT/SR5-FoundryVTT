@@ -1,5 +1,5 @@
-import { TestDialogListener } from './../apps/dialogs/TestDialog';
-import { DamageApplicationFlow } from './../actor/flows/DamageApplicationFlow';
+import { TestDialogListener } from '../apps/dialogs/TestDialog';
+import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
 import {SR5Actor} from "../actor/SR5Actor";
 import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from "../constants";
 import {DataDefaults} from "../data/DataDefaults";
@@ -505,7 +505,7 @@ export class SuccessTest {
         if (dialog.canceled) {
             await this.cleanupAfterExecutionCancel();
             return false
-        };
+        }
 
         // Overwrite current test state with whatever the dialog gives.
         this.data = data;
@@ -610,7 +610,10 @@ export class SuccessTest {
 
         this.data.manualHits.value = Helpers.calcTotal(this.data.manualHits, {min: 0});
         this.data.manualGlitches.value = Helpers.calcTotal(this.data.manualGlitches, {min: 0});
-        
+
+        // Shows AP on incoming attacks
+        this.data.damage.ap.value = Helpers.calcTotal(this.data.damage.ap);
+
         console.debug(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
 
@@ -1198,7 +1201,7 @@ export class SuccessTest {
      * 
      * @returns true when enough ressources are available to consume
      */
-    canConsumeDocumentRessources(): boolean {
+    canConsumeDocumentResources(): boolean {
         // No actor present? Nothing to consume...
         if (!this.actor) return true;
         
@@ -1237,7 +1240,7 @@ export class SuccessTest {
         const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
         // Make sure to nest canConsume to avoid unneccessary warnings.
         if (mustHaveRessouces) {
-            if (!this.canConsumeDocumentRessources()) return false;
+            if (!this.canConsumeDocumentResources()) return false;
         }
 
         return await this.consumeDocumentRessources();
@@ -1297,7 +1300,7 @@ export class SuccessTest {
         if (!this.data.sourceActorUuid) {
             ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
             return this;
-        };
+        }
         if (!this.canSecondChance)  return this;
 
         // Fetch documents.
@@ -1334,7 +1337,7 @@ export class SuccessTest {
         if (!this.data.sourceActorUuid) {
             ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
             return this;
-        };
+        }
         if (!this.canPushTheLimit) return this;
 
         // Fetch documents.

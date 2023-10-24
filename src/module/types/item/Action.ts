@@ -26,7 +26,7 @@ declare namespace Shadowrun {
         test: string
         // The type of combat action to be performed.
         type: string
-        // An additional action category. This field is unused as of v.0.8.0 but inteded for
+        // An additional action category. This field is unused as of v.0.8.0 but intended for
         // a test category (social, matrix, magic, physical, ...)
         category: string
         // When set to true, the skill specialization modifier must be applied.

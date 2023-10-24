@@ -170,11 +170,28 @@ export class PhysicalDefenseTest extends DefenseTest {
     }
 
     override get success() {
-        return CombatRules.attackMisses(this.against.hits.value, this.hits.value);
+        return CombatRules.attackMisses(this.against.hits.value, this.hits.value) || (this.actor !== undefined &&
+            (CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor) ||
+            CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor)));
+    }
+    override get successLabel() {
+        if (!this.actor) return "SR5.AttackDodged";
+
+        if (CombatRules.attackMisses(this.against.hits.value, this.hits.value)) return "SR5.AttackDodged";
+
+        if(CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor)) {
+            return "SR5.AttackDoesNoPhysicalDamageToVehicle";
+        }
+
+        if(CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor)) {
+            return "SR5.AttackBlockedByVehicleArmor";
+        }
+
+        return "SR5.AttackDodged";
     }
 
     override get failure() {
-        return CombatRules.attackHits(this.against.hits.value, this.hits.value)
+        return !this.success;
     }
 
     override async processResults() {
@@ -203,7 +220,7 @@ export class PhysicalDefenseTest extends DefenseTest {
         await test.execute();
     }
 
-    override canConsumeDocumentRessources() {
+    override canConsumeDocumentResources() {
         // Check if the actor is in active combat situation and has enough initiative score left.
         if (this.actor && this.data.iniMod && game.combat) {
             const combat: SR5Combat = game.combat as unknown as SR5Combat;
@@ -216,7 +233,7 @@ export class PhysicalDefenseTest extends DefenseTest {
             }
         }
 
-        return super.canConsumeDocumentRessources();
+        return super.canConsumeDocumentResources();
     }
 
     /**
