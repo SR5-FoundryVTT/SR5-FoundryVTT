@@ -14,6 +14,6 @@ export class SuppressionDefenseTest extends PhysicalDefenseTest {
     }
 
     override async processFailure() {
-        this.data.modifiedDamage = CombatRules.modifyDamageAfterSupressionHit(this.data.incomingDamage);
+        this.data.modifiedDamage = CombatRules.modifyDamageAfterSuppressionHit(this.data.incomingDamage);
     }
 }

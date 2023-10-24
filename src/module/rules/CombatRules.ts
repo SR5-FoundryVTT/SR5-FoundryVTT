@@ -1,9 +1,7 @@
-import { SR5Item } from './../item/SR5Item';
 import {SR} from "../constants";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import DamageData = Shadowrun.DamageData;
-import ArmorData = Shadowrun.ArmorData;
 import ValueField = Shadowrun.ValueField;
 import {SoakRules} from "./SoakRules";
 import {SR5Actor} from "../actor/SR5Actor";
@@ -97,7 +95,7 @@ export class CombatRules {
     }
 
     /**
-     * Modify Damage according to combat sequence (SR5#173) part defend. Successfull attack.
+     * Modify Damage according to combat sequence (SR5#173) part defend. Successful attack.
      *
      * @param defender The active defender
      * @param attackerHits The attackers hits. Should be a positive number.
@@ -123,6 +121,21 @@ export class CombatRules {
         return modified;
     }
 
+    static isBlockedByVehicleArmor(incomingDamage: DamageData, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
+        const modifiedDamage = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage);
+
+        const modifiedAv = actor.getArmor(incomingDamage).value;
+        const modifiedDv = modifiedDamage.value;
+
+        console.log(`Checking vehicle armor - Modified AV: ${modifiedAv}, Modified DV: ${modifiedDv}`);
+
+        return modifiedDv < modifiedAv;
+    }
+
+    static doesNoPhysicalDamageToVehicle(incomingDamage: DamageData, actor: SR5Actor): boolean {
+        return actor.isVehicle() && incomingDamage.type.value === 'stun' && incomingDamage.element.value !== "electricity";
+    }
+
     /**
      * Modify damage according to suppression defense (SR5#179). Successfull attack.
      * 
@@ -130,7 +143,7 @@ export class CombatRules {
      * 
      * @param damage The incoming weapon damage of the attack, unaltered.
      */
-    static modifyDamageAfterSupressionHit(damage: DamageData): DamageData {
+    static modifyDamageAfterSuppressionHit(damage: DamageData): DamageData {
         return foundry.utils.duplicate(damage);
     }
 
@@ -145,6 +158,10 @@ export class CombatRules {
         // Keep base and modification intact, only overwriting the result.
         modifiedDamage.override = {name: 'SR5.Success', value: 0};
         Helpers.calcTotal(modifiedDamage, {min: 0});
+        modifiedDamage.ap.override = {name: 'SR5.Success', value: 0};
+        Helpers.calcTotal(modifiedDamage.ap);
+        modifiedDamage.type.value = '';
+        modifiedDamage.element.value = '';
 
         return modifiedDamage;
     }
