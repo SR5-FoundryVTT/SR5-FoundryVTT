@@ -127,7 +127,7 @@ export class CharacterInfoUpdater {
             if (chummerChar.totalkarma) {
                 system.karma.max = chummerChar.totalkarma;
             }
-            if (chummerChar.technomancer && chummerChar.technomancer.toLowerCase() === 'true') {
+            if (chummerChar.technomancer?.toLowerCase() === 'true') {
                 system.special = 'resonance';
             }
             if (

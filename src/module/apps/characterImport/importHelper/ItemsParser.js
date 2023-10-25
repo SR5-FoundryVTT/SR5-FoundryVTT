@@ -31,7 +31,7 @@ export class ItemsParser {
             promises.push(new WeaponParser().parseWeapons(chummerChar, importOptions.assignIcons));
         }
 
-        if (importOptions.armor && chummerChar.armors && chummerChar.armors.armor) {
+        if (importOptions.armor && (chummerChar.armors?.armor || chummerChar.otherarmors?.otherarmor)) {
             promises.push(new ArmorParser().parseArmors(chummerChar, importOptions.assignIcons));
         }
 
