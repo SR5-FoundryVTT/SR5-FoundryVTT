@@ -179,8 +179,10 @@ export class SR5Actor extends Actor {
         // @ts-ignore TODO: foundry-vtt-types v10
         for (const effect of super.allApplicableEffects()) {
             // Item owned effects should only apply when the item is equipped.
+            // TODO: implement effect.isEquippedOnly and allow for effects of unequipped items to also apply...
             if (effect.parent instanceof SR5Item && !effect.parent.isEquipped()) continue;
             // Item owned effects with only on wireless mode should only apply when the item is wireless.
+            // TODO: Check for effect.applyForWirelessActiveOnly
             if (effect.parent instanceof SR5Item && !effect.isWirelessActive) continue;
             // Only apply effects targeting actor data.
             if (!['actor', 'targeted_actor'].includes(effect.applyTo)) continue;

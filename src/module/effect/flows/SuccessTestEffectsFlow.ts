@@ -105,10 +105,18 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * 
      */
     *allApplicable(): Generator<SR5ActiveEffect> {
+        // Pool only tests will don't have actors attached.
+        if (!this.test.actor) return;
+
         // Actor effects apply only for all tests.
-        for (const effect of this.test.actor?.effects as unknown as SR5ActiveEffect[]) {
+        // TODO: CHeck if these include actor.items (and actor.items.items) effects.
+        //       If so, use this general actor effects collection bellow as well for test_all 
+        for (const effect of this.test.actor.effects as unknown as SR5ActiveEffect[]) {
             if (effect.applyTo === 'test_all') yield effect;
         }
+
+        // Tests like SkillTest don't have items attached.
+        if (!this.test.item) return;
 
         // Item effects can also apply to this test only.
         for (const effect of this.test.item?.effects as unknown as SR5ActiveEffect[]) {
@@ -117,7 +125,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             if (effect.applyTo === 'test_all') yield effect;
             if (effect.applyTo === 'test_item') yield effect;            
         }
-
+        
         // NestedItem effects can also apply to this test only.
         for (const item of this.test.item?.items as unknown as SR5Item[]) {
             // Allow users to have nested items that don't affect tests by having them unequipped.
