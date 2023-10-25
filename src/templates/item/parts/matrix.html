@@ -20,16 +20,15 @@
     {{/ife}}
     <div class="form-line">
         <div class="label">
-            {{#ife system.category "cyberdeck"}}
-            <select name="system.atts.att1.att">
+            {{#ifin system.category (toArray "cyberdeck" "host")}}
+            <select class="matrix-att-selector" name="system.atts.att1.att" data-att="att1">
                 {{#select system.atts.att1.att}} {{#each config.matrixAttributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
-            {{/ife}}
-            {{#ifne system.category "cyberdeck"}}
+            {{else}}
             <label>{{localize (lookup config.matrixAttributes system.atts.att1.att)}}</label>
-            {{/ifne}}
+            {{/ifin}}
         </div>
         <div class="inputs">
             <input
@@ -46,16 +45,15 @@
     </div>
     <div class="form-line">
         <div class="label">
-            {{#ife system.category "cyberdeck"}}
-            <select name="system.atts.att2.att">
+            {{#ifin system.category (toArray "cyberdeck" "host")}}
+            <select class="matrix-att-selector" name="system.atts.att2.att" data-att="att2">
                 {{#select system.atts.att2.att}} {{#each config.matrixAttributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
-            {{/ife}}
-            {{#ifne system.category "cyberdeck"}}
+            {{else}}
             <label>{{localize (lookup config.matrixAttributes system.atts.att2.att)}}</label>
-            {{/ifne}}
+            {{/ifin}}
         </div>
         <div class="inputs">
             <input
@@ -72,16 +70,15 @@
     </div>
     <div class="form-line">
         <div class="label">
-            {{#ife system.category "cyberdeck"}}
-            <select name="system.atts.att3.att">
+            {{#ifin system.category (toArray "cyberdeck" "host")}}
+            <select class="matrix-att-selector" name="system.atts.att3.att" data-att="att3">
                 {{#select system.atts.att3.att}} {{#each config.matrixAttributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
-            {{/ife}}
-            {{#ifne system.category "cyberdeck"}}
+            {{else}}
             <label>{{localize (lookup config.matrixAttributes system.atts.att3.att)}}</label>
-            {{/ifne}}
+            {{/ifin}}
         </div>
         <div class="inputs">
             <input
@@ -98,16 +95,15 @@
     </div>
     <div class="form-line">
         <div class="label">
-            {{#ife system.category "cyberdeck"}}
-            <select name="system.atts.att4.att">
+            {{#ifin system.category (toArray "cyberdeck" "host")}}
+            <select class="matrix-att-selector" name="system.atts.att4.att" data-att="att4">
                 {{#select system.atts.att4.att}} {{#each config.matrixAttributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
-            {{/ife}}
-            {{#ifne system.category "cyberdeck"}}
+            {{else}}
             <label>{{localize (lookup config.matrixAttributes system.atts.att4.att)}}</label>
-            {{/ifne}}
+            {{/ifin}}
         </div>
         <div class="inputs">
             <input
