@@ -8,6 +8,7 @@ import { SpellParser } from "../magicImport/SpellParser.js";
 import { WeaponParser } from "../weaponImport/WeaponParser.js";
 import { LifestyleParser } from "../bioImport/LifestyleParser";
 import { ContactParser } from "../bioImport/ContactParser";
+import { CritterPowerParser } from "../magicImport/CritterPowerParser.js";
 
 /**
  * Parses all items (qualities, weapons, gear, ...) from a chummer character.
@@ -59,6 +60,8 @@ export class ItemsParser {
         if (importOptions.lifestyles && chummerChar.lifestyles && chummerChar.lifestyles.lifestyle) {
             promises.push( new LifestyleParser().parseLifestyles(chummerChar, importOptions.assignIcons));
         }
+
+        promises.push(new CritterPowerParser().parseCritterPowers(chummerChar, importOptions.assignIcons))
 
         return  (await Promise.all(promises)).flat();
     }

@@ -90,6 +90,10 @@ export class CharacterInfoUpdater {
         this.importInitiative(clonedActorSource.system, chummerChar);
         this.importSkills(clonedActorSource.system, chummerChar);
 
+        if(chummerChar.critterpowers?.critterpower) {
+            clonedActorSource.system.is_critter = true;
+        }
+
         return clonedActorSource;
     }
 
