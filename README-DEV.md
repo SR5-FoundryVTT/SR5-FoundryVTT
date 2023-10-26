@@ -5,8 +5,8 @@ The main development workflow uses a build system using npm and gulp with Github
 
 Shadowrun5e uses Typescript (with esbuild), npm with gulp and git.
 
-You'll have to install node.js (npm) and git:
-* [https://nodejs.org/en/download](https://nodejs.org/en/download)
+You'll have to install node.js (npm) (Use node v18! v20 seems to cause issues) and git: 
+* Node v18: [https://nodejs.org/download/release/v18.18.2/node-v18.18.2-x64.msi](https://nodejs.org/download/release/v18.18.2/node-v18.18.2-x64.msi)
 * [https://git-scm.com/download/](https://git-scm.com/download/)
 
 Follow these steps using your terminal (cmd.exe on Windows):
