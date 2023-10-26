@@ -16,7 +16,7 @@ Follow these steps using your terminal (cmd.exe on Windows):
 * `cd <the_cloned_fork_directory>`
 * `npm install` (this will take a while)
 * `gulp watch`
-* Start developing
+* Start developing (you might want to link your dev and local systems folder)
 
 There are multiple gulp tasks available to help development:
 * watch => rebuild the system after a change is detected (code and `/public` data)
@@ -24,6 +24,23 @@ There are multiple gulp tasks available to help development:
 * link => See section below
 
 The resulting application used for FoundryVTT will only use contents in `/dist`.
+
+## Linking the dev and system folder
+It's helpful, but not strictly necessary, to place your development folder separate from the FoundryVTT system folder as a system update will overwrite your development folder otherwise. This can be done with linking the two. For both options to work, the shadowrun5e system can't be installed in your local Foundry.
+
+### Option A: gulp link 
+For the `gulp link` command to work, you need to include the following file as _foundryconfig.json_ directly underneath your development shadowrun5e system directory.
+`{
+  "dataPath": "C:\\Users\\<addYourUserHere>\\AppData\\Local\\FoundryVTT\\",
+  "linkTargetDirName": "shadowrun5e"
+}
+`
+
+### Option B: (Windows) mklink
+Instead of using the built in `gulp link` command, you can also execute this from within your `cmd` or `Windows Terminal`:
+`mklink /D "C:\Users\<yourUser>\AppData\Local\FoundryVTT\Data\systems\shadowrun5e" "<yourClonedRepoPath>"`
+
+<yourClonedRepoPath> must be the cloned repositiry that includes the `dist` folder within it.
 
 # System Architecture
 A broad overview of the different areas of the shadowrun5e system. For more explanations around system specific concepts see `System Concepts`.
@@ -65,16 +82,6 @@ The system branch workflow is simple:
 
 ## Unittesting
 There is unit testing support using the FVTT Quench module. It's encouraged to do some unit testing where possible but it's not mandatory. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules. 
-
-## Linking the dev and system folder
-It's helpful, but not strictly necessary, to place your development folder separate from the FoundryVTT system folder as a system update will overwrite your development folder otherwise. This can be done with linking the two.
-
-For the `gulp link` command to work, you need to include the following file as _foundryconfig.json_ directly underneath your development shadowrun5e system directory.
-`{
-  "dataPath": "C:\\Users\\<addYourUserHere>\\AppData\\Local\\FoundryVTT\\",
-  "linkTargetDirName": "shadowrun5e"
-}
-`
 
 Afterwards open a terminal (cmd.exe on Windows) with administrative permissions ([see here for help](https://www.howtogeek.com/194041/how-to-open-the-command-prompt-as-administrator-in-windows-8.1/)):
 * `cd <the_cloned_fork_directory>`
