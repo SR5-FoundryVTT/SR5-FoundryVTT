@@ -1,7 +1,7 @@
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import DamageData = Shadowrun.DamageData;
 import {DataDefaults} from "../data/DataDefaults";
-import {SoakFlow} from "../actor/flows/SoakFlow";
+import { Translation } from '../utils/strings';
 
 
 export interface DefenseTestData extends OpposedTestData {
@@ -39,12 +39,12 @@ export class DefenseTest extends OpposedTest {
         return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html'
     }
 
-    override get successLabel() {
-        return 'SR5.AttackDodged';
+    override get successLabel(): Translation {
+        return 'SR5.TestResults.AttackDodged';
     }
 
-    override get failureLabel() {
-        return 'SR5.AttackHits';
+    override get failureLabel(): Translation {
+        return 'SR5.TestResults.AttackHits';
     }
 
     /**

@@ -15,7 +15,7 @@ export interface PhysicalDefenseTestData extends DefenseTestData {
     cover: number
     // Dialog input for active defense modifier
     activeDefense: string
-    activeDefenses: Record<string, { label: string, value: number|undefined, initMod: number, weapon?: string, disabled?: boolean }>
+    activeDefenses: Record<string, { label: Translation, value: number|undefined, initMod: number, weapon?: string, disabled?: boolean }>
     // Melee weapon reach modification.
     isMeleeAttack: boolean
     defenseReach: number
@@ -177,15 +177,15 @@ export class PhysicalDefenseTest extends DefenseTest {
     private successConditions: PhysicalDefenseTestSuccessConditions = [
         {
             test: () => CombatRules.attackMisses(this.against.hits.value, this.hits.value),
-            label: "SR5.AttackDodged",
+            label: "SR5.TestResults.AttackDodged",
         },
         {
             test: () => this.actor !== undefined && CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor),
-            label: "SR5.AttackDoesNoPhysicalDamageToVehicle"
+            label: "SR5.TestResults.AttackDoesNoPhysicalDamageToVehicle",
         },
         {
             test: () => this.actor !== undefined && CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
-            label: "SR5.AttackBlockedByVehicleArmor",
+            label: "SR5.TestResults.AttackBlockedByVehicleArmor",
         }
     ]
 
@@ -193,8 +193,8 @@ export class PhysicalDefenseTest extends DefenseTest {
         return this.successConditions.some(({ test }) => test());
     }
 
-    override get successLabel() {
-        return this.successConditions.find(({ test }) => test())?.label || "SR5.AttackDodged";
+    override get successLabel(): Translation {
+        return this.successConditions.find(({ test }) => test())?.label || "SR5.TestResults.AttackDodged";
     }
 
     override get failure() {
