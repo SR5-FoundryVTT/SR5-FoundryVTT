@@ -6,6 +6,7 @@ import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import GenericValueField = Shadowrun.GenericValueField;
+import { Translation } from '../utils/strings';
 
 export interface DrainTestData extends SuccessTestData {
     incomingDrain: DamageData
@@ -97,12 +98,12 @@ export class DrainTest extends SuccessTest {
         return this.data.modifiedDrain.value <= 0;
     }
 
-    override get successLabel(): string {
-        return 'SR5.ResistedAllDamage';
+    override get successLabel(): Translation {
+        return 'SR5.TestResults.ResistedAllDamage';
     }
 
-    override get failureLabel(): string {
-        return 'SR5.ResistedSomeDamage'
+    override get failureLabel(): Translation {
+        return 'SR5.TestResults.ResistedSomeDamage'
     }
 
     override async processResults() {

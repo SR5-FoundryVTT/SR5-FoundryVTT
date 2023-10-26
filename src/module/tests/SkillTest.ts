@@ -1,5 +1,4 @@
 import { PartsList } from '../parts/PartsList';
-import { SR5Actor } from './../actor/SR5Actor';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 
 

@@ -112,8 +112,6 @@
     "SR5.ApplyWounds": "Anwenden",
     "SR5.Armor": "Armor",
     "SR5.ArmorValue": "Panzerungswert",
-    "SR5.AttackDodged": "Ausgewichen",
-    "SR5.AttackHits": "Treffer",
     "SR5.Attacker": "Angreifer",
     "SR5.AttackerHits": "Angreifer Erfolge",
     "SR5.AttackerNetHits": "Angreifer Netto-Erfolge",
@@ -405,7 +403,6 @@
     },
     "SR5.Fade": "Schwund",
     "SR5.FadeValue": "Schwundwert",
-    "SR5.Failure": "Misserfolg!",
     "SR5.Family": "Familie",
     "SR5.Filter": "Filter",
     "SR5.FireMode": "Feuermodus",
@@ -742,10 +739,7 @@
     "SR5.RecoilCompensation": "Rückstoßkomp.",
     "SR5.ResetOverwatchScore": "Nulle Overwatch Wert",
     "SR5.Resist": "Widerstehen",
-    "SR5.ResistedAllDamage": "Kein Schaden!",
-    "SR5.ResistedSomeDamage": "Schaden!",
     "SR5.RestoreDefaultSkills": "Standardfertigkeiten zurückholen",
-    "SR5.Results": "Ergebnis",
     "SR5.RightClickToClear": "Rechtsklick zum Leeren",
     "SR5.Roll": "Werfen",
     "SR5.RollArmor": "Panzerung",
@@ -982,7 +976,6 @@
     "SR5.Stock": "Schulterstürze",
     "SR5.StreetCred": "Straßenruf",
     "SR5.StunTrack": "Geistiger Monitor",
-    "SR5.Success": "Erfolg!",
     "SR5.Successes": "Erfolge",
     "SR5.Summoning": {
         "DropSpirit": "Geist ablegen",
@@ -1002,8 +995,15 @@
     "SR5.TemporaryModifiers": "Temporäre Modifikatoren",
     "SR5.Test": "Probe",
     "SR5.TestResults": {
+        "AttackDodged": "Ausgewichen",
+        "AttackHits": "Treffer",
+        "Failure": "Misserfolg!",
+        "Results": "Ergebnis",
+        "ResistedAllDamage": "Kein Schaden!",
+        "ResistedSomeDamage": "Schaden!",
         "SpiritSummonFailure": "Geist geflohen!",
-        "SpiritSummonSuccess": "Geist beschworen!"
+        "SpiritSummonSuccess": "Geist beschworen!",
+        "Success": "Erfolg!"
     },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attributsprobe",

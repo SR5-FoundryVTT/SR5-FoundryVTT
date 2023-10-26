@@ -603,6 +603,8 @@
   "SR5.TargetSprite": "Sprite",
   "SR5.Temporary": "Temporario",
   "SR5.TemporaryModifiers": "Modificadores Temporarios",
+  "SR5.TestResults": {
+  },
   "SR5.ToggleEquip": "Trava Equipada",
   "SR5.Top": "Acima",
   "SR5.Total": "Total",

@@ -23,6 +23,7 @@ import Template from "../template";
 import {TestRules} from "../rules/TestRules";
 
 import {ActionResultFlow} from "../item/flows/ActionResultFlow";
+import { Translation } from '../utils/strings';
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -1009,16 +1010,16 @@ export class SuccessTest {
     /**
      * How to call a successful test of this type.
      */
-    get successLabel(): string {
-        return 'SR5.Success';
+    get successLabel(): Translation {
+        return 'SR5.TestResults.Success';
     }
 
     /**
      * How to call a failed test of this type.
      */
-    get failureLabel(): string {
-        if (this.extended) return 'SR5.Results';
-        return 'SR5.Failure';
+    get failureLabel(): Translation {
+        if (this.extended) return 'SR5.TestResults.Results';
+        return 'SR5.TestResults.Failure';
     }
 
     /**
