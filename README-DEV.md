@@ -3,13 +3,16 @@
 ## General development
 The main development workflow uses a build system using npm and gulp with Github pull requests required for changes made. Should you have issues while setting it up, please web search first.
 
-Shadowrun5e uses Typescript (with esbuild), npm with gulp and git. Follow these installation manuals: 
-* [https://www.npmjs.com/get-npm](https://www.npmjs.com/get-npm)
-* [https://github.com/git-guides/install-git#:~:text=To%20install%20Git%2C%20navigate%20to,installation%20by%20typing%3A%20git%20version%20.](https://github.com/git-guides/install-git#:~:text=To%20install%20Git%2C%20navigate%20to,installation%20by%20typing%3A%20git%20version%20.)
+Shadowrun5e uses Typescript (with esbuild), npm with gulp and git.
+
+You'll have to install node.js (npm) and git:
+* [https://nodejs.org/en/download](https://nodejs.org/en/download)
+* [https://git-scm.com/download/](https://git-scm.com/download/)
 
 Follow these steps using your terminal (cmd.exe on Windows):
 * `npm install --global gulp-cli`
 * Follow this manual on how to work with a Github forking and cloning, git branches and Github pull requests ([https://opensource.com/article/19/7/create-pull-request-github](https://opensource.com/article/19/7/create-pull-request-github))
+* `git clone <the_fork_url_on_your_github`
 * `cd <the_cloned_fork_directory>`
 * `npm install` (this will take a while)
 * `gulp watch`
