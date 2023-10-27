@@ -63,12 +63,12 @@ export class ItemsParser {
 
         if(chummerChar.metamagics?.metamagic) {
             let metamagics = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("metamagic"))
-            promises.push(new SimpleParser().parseCollection(metamagics, "metamagic")); 
+            promises.push(new SimpleParser().parseCollection(metamagics, "metamagic", importOptions.assignIcons));
         }
 
         if(chummerChar.metamagics?.metamagic) {
-            let echos = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("echo"))
-            promises.push(new SimpleParser().parseCollection(echos, "echo")); 
+            let echoes = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("echo"))
+            promises.push(new SimpleParser().parseCollection(echoes, "echo", importOptions.assignIcons));
         }
 
         return  (await Promise.all(promises)).flat();

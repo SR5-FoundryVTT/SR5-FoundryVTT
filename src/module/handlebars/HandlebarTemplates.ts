@@ -37,6 +37,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         // magic
         'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/MetamagicList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SummoningList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpiritOptions.html',
@@ -45,6 +46,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/EchoList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html',
