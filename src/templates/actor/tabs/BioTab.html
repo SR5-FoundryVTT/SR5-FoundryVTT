@@ -29,6 +29,12 @@
                             description=item.description.value
                     }}
                 {{/each}}
+                {{#if awakened}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/MetamagicList.html' }}
+                {{/if}}
+                {{#if emerged}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/EchoList.html' }}
+                {{/if}}
             </div>
         </div>
     </div>
