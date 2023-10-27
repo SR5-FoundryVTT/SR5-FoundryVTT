@@ -21,7 +21,7 @@ export class CharacterImporter {
         console.log('Using the following import options:')
         console.log(importOptions);
 
-        if (!chummerFile.characters || !chummerFile.characters.character) {
+        if (!chummerFile.characters?.character) {
             console.log('Did not find a valid character to import  - aborting import');
             return;
         }
@@ -40,7 +40,8 @@ export class CharacterImporter {
     }
 
     async resetCharacter(actor) {
-        let deletedItems = actor.deleteEmbeddedDocuments("Item", [], { deleteAll: true });
+        let toDeleteItems = actor.items.filter(item => item.type !== "action").map(item => item.id)
+        let deletedItems = actor.deleteEmbeddedDocuments("Item", toDeleteItems );
 
         let removed = {
             'system.skills.language.-=value' : null,
