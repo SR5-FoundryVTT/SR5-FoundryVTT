@@ -247,8 +247,8 @@ export class WeaponParser {
             clips.forEach((clip) => {
                 let ammobonus = clip.ammotype
                 let systemAmmo = {
-                    accuracy: ammobonus.weaponbonusacc.match(/(\d+)/).pop(),
-                    ap: ammobonus.weaponbonusap.match(/(\d+)/).pop(),
+                    accuracy: parseInt(ammobonus.weaponbonusacc),
+                    ap: parseInt(ammobonus.weaponbonusap),
                     blast: {
                         radius: 0,
                         dropoff: 0

@@ -90,6 +90,10 @@ export class CharacterInfoUpdater {
         this.importInitiative(clonedActorSource.system, chummerChar);
         this.importSkills(clonedActorSource.system, chummerChar);
 
+        if(chummerChar.critterpowers?.critterpower) {
+            clonedActorSource.system.is_critter = true;
+        }
+
         return clonedActorSource;
     }
 
@@ -127,7 +131,7 @@ export class CharacterInfoUpdater {
             if (chummerChar.totalkarma) {
                 system.karma.max = chummerChar.totalkarma;
             }
-            if (chummerChar.technomancer && chummerChar.technomancer.toLowerCase() === 'true') {
+            if (chummerChar.technomancer?.toLowerCase() === 'true') {
                 system.special = 'resonance';
             }
             if (
@@ -250,6 +254,10 @@ export class CharacterInfoUpdater {
 
             if (name.includes('exotic') && name.includes('_weapon')) {
                 name = name.replace('_weapon', '');
+            }
+
+            if (name.includes('exotic') && name.includes('_ranged')) {
+                name = name.replace('_ranged', '_range');
             }
                
             if (name === 'pilot_watercraft') {

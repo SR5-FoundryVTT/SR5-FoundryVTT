@@ -4,13 +4,28 @@ import * as IconAssign from '../../iconAssigner/iconAssign.js';
 export class ArmorParser {
 
     async parseArmors(chummerChar, assignIcons) {
-        const armors = getArray(chummerChar.armors.armor);
+        const armors = getArray(chummerChar.armors?.armor);
         const parsedArmors = [];
         const iconList = await IconAssign.getIconFiles();
 
         armors.forEach(async (chummerArmor) => {
             try {
                 const itemData = this.parseArmor(chummerArmor);
+
+                // Assign the icon if enabled
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
+
+                parsedArmors.push(itemData);
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        const otherArmors = getArray(chummerChar.otherarmors?.otherarmor)
+
+        otherArmors.forEach(async (chummerArmor) => {
+            try {
+                const itemData = this.parseOtherArmor(chummerArmor);
 
                 // Assign the icon if enabled
                 if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
@@ -63,5 +78,26 @@ export class ArmorParser {
         setSubType(system, parserType, formatAsSlug(chummerArmor.category_english));
 
         return createItemData(chummerArmor.name, parserType, system);
+    }
+
+    parseOtherArmor(chummerArmor) {
+        const parserType = 'armor';
+        const system = {
+            armor: {}
+        };
+        const armor = system.armor;
+
+        armor.mod = chummerArmor.armor.includes('+');
+        armor.value = parseInt(chummerArmor.armor);
+
+        system.technology = parseTechnology(chummerArmor);
+        system.technology.equipped = true;
+        system.description = parseDescription(chummerArmor);
+
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(chummerArmor.objectname_english), parserType);
+        setSubType(system, parserType, formatAsSlug(chummerArmor.improvesource));
+
+        return createItemData(chummerArmor.objectname_english, parserType, system);
     }
 }
