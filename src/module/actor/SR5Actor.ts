@@ -1252,6 +1252,8 @@ export class SR5Actor extends Actor {
      * 
      * Applying damage will also reduce the initiative score of an active combatant.
      * 
+     * Handles rule 'Changing Initiative' on SR5#160.
+     * 
      * @param damage The damage to be taken.
      * @param track The track to apply that damage to.
      */
@@ -1260,7 +1262,7 @@ export class SR5Actor extends Actor {
         if (track.value === track.max) return;
 
         // Allow a wound modifier difference to be calculated after damage has been dealt.
-        const previousWounds = this.getWoundModifier();
+        const woundsBefore = this.getWoundModifier();
 
         // Apply damage to track and trigger derived value calculation.
         track = this.__addDamageToTrackValue(damage, track);
@@ -1268,11 +1270,11 @@ export class SR5Actor extends Actor {
         await this.update(updateData);
 
         // Apply any wounds modifier delta to an active combatant.
-        const currentWounds = this.getWoundModifier();
-        const deltaWounds = currentWounds - previousWounds;
+        const woundsAfter = this.getWoundModifier();
+        const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
 
         // Only actors that can have a wound modifier, will have a delta.
-        if (deltaWounds < 0 && game.combat) game.combat.adjustActorInitiative(this, deltaWounds);
+        if (iniAdjustment < 0 && game.combat) game.combat.adjustActorInitiative(this, iniAdjustment);
     }
 
     /**
