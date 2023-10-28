@@ -1,11 +1,11 @@
 # Shadowrun5e for Foundry Virtual Tabletop
-Manifest: https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json
+Manifest: https://raw.githubusercontent.com/SR5-FoundryVTT/SR5-FoundryVTT/master/system.json
 
 Come on the FoundryVTT discord shadowrun5e channel and have a chat. :)
 
 We will always be happy to look at a Pull Request if there are features or bugs you'd like to work on.
 
-Should you need an older version you can check https://github.com/smilligan93/SR5-FoundryVTT/releases and reference the system.json on each release instead of FoundryVTTs system marketplace.
+Should you need an older version you can check https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases and reference the system.json on each release instead of FoundryVTTs system marketplace.
 
 ## General Information (read before playing)
 It's complicated, it's a work in progress, but it is _kinda_ stable. We try to break as little as possible.
@@ -19,13 +19,13 @@ It's complicated, it's a work in progress, but it is _kinda_ stable. We try to b
 - IC
 
 ## Learn more
-To learn more about the features of the system and how to use them, please visit our wiki: https://github.com/smilligan93/SR5-FoundryVTT/wiki
+To learn more about the features of the system and how to use them, please visit our wiki: https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki
 
 ## Report issues
 Found some problem? Please report it in our issue tracker or on discord.
 
 ## Want to help out?
-Great, thanks :) Please check this page for more information: https://github.com/smilligan93/SR5-FoundryVTT/wiki/How-to-help-out
+Great, thanks :) Please check this page for more information: https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/How-to-help-out
 There is also the README-dev.md for development.
 
 ## Licences
