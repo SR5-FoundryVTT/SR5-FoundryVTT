@@ -1272,7 +1272,6 @@ export class SR5Actor extends Actor {
         const deltaWounds = currentWounds - previousWounds;
 
         // Only actors that can have a wound modifier, will have a delta.
-        // @ts-ignore TODO: Check if we can inject SR5Combat to game.combat
         if (deltaWounds < 0 && game.combat) game.combat.adjustActorInitiative(this, deltaWounds);
     }
 
