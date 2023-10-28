@@ -557,7 +557,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onInventorySectionVisiblitySwitch(event) {
         event.preventDefault();
-        const type = Helpers.listItemId(event);
+        const type = Helpers.listHeaderId(event);
 
         this._setInventoryTypeVisibility(type, !this._inventoryOpenClose[type]);
         this.render();
