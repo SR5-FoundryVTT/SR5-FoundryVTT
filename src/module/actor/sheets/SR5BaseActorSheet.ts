@@ -1729,6 +1729,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         };
 
         // go through atts on device, setup matrix attributes on it
+        // This logic swaps the two slots when a new one is selected
         for (let i = 1; i <= 4; i++) {
             let tmp = `att${i}`;
             let key = `system.atts.att${i}.att`;

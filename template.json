@@ -917,6 +917,20 @@
                         "itemIds": [],
                         "showAll": true
                     }
+                },
+                "visibilityChecks": {
+                    "astral": {
+                        "astralActive" : false,
+                        "affectedBySpell": false
+                    },
+                    "meat": {
+                        "hidden": false,
+                        "hasHeat": true
+                    },
+                    "matrix": {
+                        "hasIcon": false,
+                        "runningSilent": false
+                    }
                 }
             },
             "physical_combat_values": {
@@ -931,20 +945,6 @@
                         "value": 0,
                         "mod": []
                     }
-                }
-            },
-            "visibilityChecks": {
-                "astral": {
-                    "astralActive" : false,
-                    "affectedBySpell": false
-                },
-                "meat": {
-                    "hidden": false,
-                    "hasHeat": true
-                },
-                "matrix": {
-                    "hasIcon": false,
-                    "runningSilent": false
                 }
             }
         },

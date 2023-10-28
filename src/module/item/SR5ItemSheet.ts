@@ -330,6 +330,8 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
+        html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
+
         this._activateTagifyListeners(html);        
     }
 
@@ -404,6 +406,30 @@ export class SR5ItemSheet extends ItemSheet {
     _onOpenSource(event) {
         event.preventDefault();
         this.item.openSource();
+    }
+
+    //Swap slots (att1, att2, etc.) for ASDF matrix attributes
+    async _onMatrixAttributeSelected(event) {
+        if (!this.item.system.atts) return;
+
+        // sleaze, attack, etc.
+        const selectedAtt = event.currentTarget.value;
+        // att1, att2, etc..
+        const changedSlot = event.currentTarget.dataset.att;
+
+        const oldValue = this.item.system.atts[changedSlot].att;
+
+        let data = {}
+
+        Object.entries(this.item.system.atts).forEach(([slot, { att }]) => {
+            if(slot === changedSlot) {
+                data[`system.atts.${slot}.att`] = selectedAtt;
+            } else if (att === selectedAtt) {
+                data[`system.atts.${slot}.att`] = oldValue;
+            }
+        });
+
+        await this.item.update(data);
     }
 
     async _onEditItem(event) {

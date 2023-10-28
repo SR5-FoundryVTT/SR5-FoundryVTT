@@ -9,6 +9,7 @@ import { WeaponParser } from "../weaponImport/WeaponParser.js";
 import { LifestyleParser } from "../bioImport/LifestyleParser";
 import { ContactParser } from "../bioImport/ContactParser";
 import SimpleParser from "./SimpleParser.js";
+import { CritterPowerParser } from "../magicImport/CritterPowerParser.js";
 
 /**
  * Parses all items (qualities, weapons, gear, ...) from a chummer character.
@@ -32,7 +33,7 @@ export class ItemsParser {
             promises.push(new WeaponParser().parseWeapons(chummerChar, importOptions.assignIcons));
         }
 
-        if (importOptions.armor && chummerChar.armors?.armor) {
+        if (importOptions.armor && (chummerChar.armors?.armor || chummerChar.otherarmors?.otherarmor)) {
             promises.push(new ArmorParser().parseArmors(chummerChar, importOptions.assignIcons));
         }
 
@@ -70,6 +71,8 @@ export class ItemsParser {
             let echoes = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("echo"))
             promises.push(new SimpleParser().parseCollection(echoes, "echo", importOptions.assignIcons));
         }
+
+        promises.push(new CritterPowerParser().parseCritterPowers(chummerChar, importOptions.assignIcons))
 
         return  (await Promise.all(promises)).flat();
     }
