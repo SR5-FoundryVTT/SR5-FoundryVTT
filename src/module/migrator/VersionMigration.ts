@@ -395,7 +395,7 @@ export abstract class VersionMigration {
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
-                    //@ts-expect-error
+                    //@ts-expect-error TODO: foundry-vtt-types v10
                     updateData = await this.MigrateActorData(foundry.utils.duplicate(document.data));
 
                     //@ts-expect-error // TODO: foundry-vtt-types v10
