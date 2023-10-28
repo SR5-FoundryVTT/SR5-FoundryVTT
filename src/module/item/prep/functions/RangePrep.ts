@@ -1,4 +1,3 @@
-import { Helpers } from "../../../helpers";
 import { PartsList } from "../../../parts/PartsList";
 import { SR5Item } from "../../SR5Item";
 /**
@@ -12,13 +11,16 @@ export const RangePrep = {
      * @param equippedMods Those item mods that are equipped.
      */
     prepareRecoilCompensation(range: Shadowrun.RangeWeaponData, equippedMods: SR5Item[]) {
-        const rangeParts = new PartsList<number>();
-        
-        // Apply ammo recoil compensation.
-        equippedMods.forEach(mod => {
-            if (mod.system.rc) rangeParts.addUniquePart(mod.name as string, mod.system.rc);            
+        const rangeParts = new PartsList();
+        equippedMods.forEach((mod) => {
+            //@ts-ignore // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
+            //@ts-ignore // TODO: foundry-vtt-types v10 
+            if (mod.system.rc) rangeParts.addUniquePart(mod.name, mod.system.rc);
+            // handle overrides from ammo
         });
+        //@ts-ignore // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
         range.rc.mod = rangeParts.list;
-        range.rc.value = Helpers.calcTotal(range.rc);
+        //@ts-ignore // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
+        if (range.rc) range.rc.value = Helpers.calcTotal(range.rc);
     }
 }
