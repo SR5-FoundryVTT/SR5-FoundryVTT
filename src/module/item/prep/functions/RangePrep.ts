@@ -13,12 +13,12 @@ export const RangePrep = {
      */
     prepareRecoilCompensation(range: Shadowrun.RangeWeaponData, equippedMods: SR5Item[]) {
         const rangeParts = new PartsList<number>();
-        equippedMods.forEach((mod) => {
-            //@ts-expect-error // TODO: foundry-vtt-types v10 
-            if (mod.system.rc) rangeParts.addUniquePart(mod.name, mod.system.rc);
-            // handle overrides from ammo
+        
+        // Apply ammo recoil compensation.
+        equippedMods.forEach(mod => {
+            if (mod.system.rc) rangeParts.addUniquePart(mod.name as string, mod.system.rc);            
         });
         range.rc.mod = rangeParts.list;
-        if (range.rc) range.rc.value = Helpers.calcTotal(range.rc);
+        range.rc.value = Helpers.calcTotal(range.rc);
     }
 }
