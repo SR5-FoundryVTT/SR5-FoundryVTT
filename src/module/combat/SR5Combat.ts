@@ -82,6 +82,19 @@ export class SR5Combat extends Combat {
     }
 
     /**
+     * Helper method to adjust an actors combatants initiative.
+     * 
+     * @param actor The actor that should have their ini score adjusted.
+     * @param adjustment The delta to adjust the ini score with.
+     */
+    async adjustActorInitiative(actor: SR5Actor, adjustment: number) {
+        const combatant = this.getActorCombatant(actor);
+        if (!combatant) return;
+
+        await this.adjustInitiative(combatant, adjustment);
+    }
+
+    /**
      * Adjust a combatants initiative score in combat.
      * 
      * @param combatant Combatant to adjust

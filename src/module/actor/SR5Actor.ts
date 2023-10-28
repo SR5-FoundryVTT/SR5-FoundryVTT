@@ -1245,15 +1245,44 @@ export class SR5Actor extends Actor {
         await device.update(updateData);
     }
 
+    /**
+     * Apply damage to an actors main damage monitor / track.
+     * 
+     * This includes physical and stun for meaty actors and matrix for matrixy actors.
+     * 
+     * Applying damage will also reduce the initiative score of an active combatant.
+     * 
+     * @param damage The damage to be taken.
+     * @param track The track to apply that damage to.
+     */
     async _addDamageToTrack(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData) {
         if (damage.value === 0) return;
         if (track.value === track.max) return;
 
+        // Allow a wound modifier difference to be calculated after damage has been dealt.
+        const previousWounds = this.getWoundModifier();
+
+        // Apply damage to track and trigger derived value calculation.
         track = this.__addDamageToTrackValue(damage, track);
         const updateData = {[`system.track.${damage.type.value}`]: track};
         await this.update(updateData);
+
+        // Apply any wounds modifier delta to an active combatant.
+        const currentWounds = this.getWoundModifier();
+        const deltaWounds = currentWounds - previousWounds;
+
+        // Only actors that can have a wound modifier, will have a delta.
+        // @ts-ignore TODO: Check if we can inject SR5Combat to game.combat
+        if (deltaWounds < 0 && game.combat) game.combat.adjustActorInitiative(this, deltaWounds);
     }
 
+    /**
+     * Apply damage to an actors physical overflow damage monitor / track.
+     * 
+     * @param damage The damage to overflow.
+     * @param track The track to overflow the damage into.
+     * @returns 
+     */
     async _addDamageToOverflow(damage: Shadowrun.DamageData, track: Shadowrun.OverflowTrackType) {
         if (damage.value === 0) return;
         if (track.overflow.value === track.overflow.max) return;
@@ -1371,6 +1400,8 @@ export class SR5Actor extends Actor {
      * @returns overflow damage.
      */
     async addDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData|undefined> {
+        const previousWounds = this.getWoundModifier();
+
         switch(damage.type.value) {
             case 'matrix':
                 return await this.addMatrixDamage(damage);
@@ -1380,9 +1411,8 @@ export class SR5Actor extends Actor {
                 return await this.addPhysicalDamage(damage);
         }
 
-        console.error('Shadowrun 5e | Actor does not support given damage type: ', damage);
+        const currentWounds = this.getWoundModifier();
 
-        // TODO: Add automated combat ini score modifier here.
     }
 
     /**
