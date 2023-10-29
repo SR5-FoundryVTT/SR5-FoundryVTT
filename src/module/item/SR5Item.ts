@@ -248,9 +248,10 @@ export class SR5Item extends Item {
             TechnologyPrep.prepareConditionMonitor(technology);
             TechnologyPrep.prepareConceal(technology, equippedMods);
         }
-
+        
         const action = this.getAction();
         if (action) {
+            ActionPrep.prepareActionDamageSource(action, this);
             ActionPrep.prepareActionRollData(action, equippedMods, equippedAmmo);
         }
 
