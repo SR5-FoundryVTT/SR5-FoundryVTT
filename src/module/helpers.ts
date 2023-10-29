@@ -58,7 +58,7 @@ export class Helpers {
             return value.value;
         }
 
-        // Base on type change calculation behaviour.
+        // Base on type change calculation behavior.
         switch (foundry.utils.getType(value.base)) {
             case 'number':
                 value.value = Helpers.roundTo(parts.total + value.base, options?.roundDecimals);
@@ -124,7 +124,6 @@ export class Helpers {
     }
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
-    //@ts-ignore TODO: foundry-vtt-types v10
     static onSetFlag(data) {
         if (typeof data !== 'object') return data;
         if (data === undefined || data === null) return data;
@@ -137,7 +136,6 @@ export class Helpers {
     }
 
     // replace 'SR5_DOT_' with 'SR5.' on keys
-    //@ts-ignore TODO: foundry-vtt-types v10
     static onGetFlag(data) {
         if (typeof data !== 'object') return data;
         if (data === undefined || data === null) return data;
@@ -338,7 +336,6 @@ export class Helpers {
     static getSceneTokenDocument(sceneId, tokenId): TokenDocument | undefined {
         const scene = game.scenes?.get(sceneId);
         if (!scene) return;
-        // @ts-ignore
         const token = scene.tokens.get(tokenId);
         if (!token) return;
 
@@ -379,9 +376,9 @@ export class Helpers {
         if (!tokenOrigin || !tokenDest) return 0;
 
         // 2d coordinates and distance
-        // @ts-ignore TODO: foundry-vtt-types v10
+        // @ts-expect-error TODO: foundry-vtt-types v10
         const origin2D = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.x, tokenOrigin.y));
-        // @ts-ignore TODO: foundry-vtt-types v10
+        // @ts-expect-error TODO: foundry-vtt-types v10
         const dest2D = new PIXI.Point(...canvas.grid.getCenter(tokenDest.x, tokenDest.y));
 
         // Use gridSpace to measure in grids instead of distance. This will give results parity to FoundryVTTs canvas ruler.
@@ -390,14 +387,14 @@ export class Helpers {
         // 3d coordinates and distance
         const originLOSHeight = Helpers.getTokenLOSHeight(tokenOrigin);
         const destLOSHeight = Helpers.getTokenLOSHeight(tokenDest);
-        // @ts-ignore TODO: foundry-vtt-types v10
+        // @ts-expect-error TODO: foundry-vtt-types v10
         const elevationDifference = (tokenOrigin.elevation + originLOSHeight) - (tokenDest.elevation + destLOSHeight);
         const origin3D = new PIXI.Point(0, 0);
         const dest3D = new PIXI.Point(distanceInGridUnits2D, elevationDifference);
         
         const distanceInGridUnits3D = Math.round(Helpers.measurePointDistance(origin3D, dest3D));
 
-        //@ts-ignore TODO: foundry-vtt-types v10
+        //@ts-expect-error TODO: foundry-vtt-types v10
         const sceneUnit = canvas.scene.grid.units;
         return Helpers.convertLengthUnit(distanceInGridUnits3D, sceneUnit);
     }
@@ -426,12 +423,11 @@ export class Helpers {
      * @returns 
      */
     static getTokenLOSHeight(token: TokenDocument): number {
-        //@ts-ignore TODO: foundry-vtt-types v10
+        //@ts-expect-error TODO: foundry-vtt-types v10
         return token.flags['wall-height']?.tokenHeight ?? 0;
     }
 
     static convertLengthUnit(length: number, fromUnit: string): number {
-        //@ts-ignore
         fromUnit = fromUnit.toLowerCase();
 
         if (!LENGTH_UNIT_TO_METERS_MULTIPLIERS.hasOwnProperty(fromUnit)) {
@@ -576,7 +572,7 @@ export class Helpers {
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (useTokenForChatOutput && token) return token.texture.src || '';
         return actor.img || '';
     }
@@ -808,7 +804,7 @@ export class Helpers {
 
         return game.users.filter(user => {
             if (user.isGM) return false;
-            // @ts-ignore // Check for permissions. String is allowed
+            // @ts-expect-error // Check for permissions. String is allowed
             if (!document.testUserPermission(user, permission)) return false;
             // Check for active state.
             if (active && !user.active) return false;
@@ -855,7 +851,7 @@ export class Helpers {
      */
     static async getEntityFromCollection(collection: string, id: string): Promise<Document> {
         const pack = game.packs.find((p) => p.collection === collection);
-        // @ts-ignore // All Document types COULD be returned...
+        // @ts-expect-error // All Document types COULD be returned...
         return await pack.getDocument(id);
     }
 
@@ -994,7 +990,7 @@ export class Helpers {
         if (!document) return;
         if (document instanceof TokenDocument && resolveTokenToActor && document.actor)
             document = document.actor;
-        // @ts-ignore
+        // @ts-expect-error
         await document.sheet.render(true);
     }
 
@@ -1003,19 +999,16 @@ export class Helpers {
      */
     static injectWeaponTestIntoChangeData(type: string, changeData: Partial<WeaponItemData>, applyData) {
         // Abort when category isn't part of this change.
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (changeData?.system?.category === undefined) return;
         
         // Remove test when user selects empty category.
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (changeData.system.category === '') {
             foundry.utils.setProperty(applyData, 'system.action.test', '');
             return;
         }
 
-        //@ts-ignore Make sure a matching active test for the configured weapons category is used.
         const test = SR5.weaponCategoryActiveTests[changeData.system.category];
-        if (!test) { //@ts-ignore // TODO: foundry-vtt-types v10
+        if (!test) {
             console.error(`Shadowrun 5 | There is no active test configured for the weapon category ${changeData.system.category}.`, changeData);
         }
 
@@ -1029,11 +1022,9 @@ export class Helpers {
      */
     static injectSpellTestIntoChangeData(type: string, changeData: Partial<SpellItemData>, applyData) {
         // Abort when category isn't part of this change.
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (changeData?.system?.category === undefined) return;
         
         // Remove test when user selects empty category.
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (changeData.system.category === '') {
             foundry.utils.setProperty(applyData, 'system.action.test', '');
             return;
@@ -1041,9 +1032,7 @@ export class Helpers {
         
         // Based on category switch out active, opposed and resist test.
         const test = SR5.activeTests[type];
-        //@ts-ignore // TODO: foundry-vtt-types v10
         const opposedTest = SR5.opposedTests[type][changeData.system.category] || 'OpposedTest';
-        //@ts-ignore // TODO: foundry-vtt-types v10
         const resistTest = SR5.opposedResistTests[type][changeData.system.category] || '';
         const drainTest = SR5.followedTests[test] ?? '';
 
@@ -1096,7 +1085,7 @@ export class Helpers {
      * 
      * Make sure to not mix up changeData and itemData
      * 
-     * Depending on the caller whatever was applied to the applyData parameter must be handeled differently.
+     * Depending on the caller whatever was applied to the applyData parameter must be handled differently.
      * When called by _onCreate, it must be used as updateData using Document#update
      * When called by _preUpdate, it must be applied directly to changeData
      * When called before any DocumentData as been created, it can be applied directly to the source object before Document#create

@@ -57,13 +57,13 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     networkController: SR5Item | undefined
 
     // Action Items. (not only type = action)
-    //@ts-ignore
+    //@ts-expect-error
     tests: typeof game.shadowrun5e.tests
-    // @ts-ignore
+    // @ts-expect-error
     opposedTests: typeof game.shadowrun5e.opposedTests
-    // @ts-ignore
+    // @ts-expect-error
     activeTests: typeof game.shadowrun5e.activeTests
-    // @ts-ignore
+    // @ts-expect-error
     resistTests: typeof game.shadowrun5e.resistTests
 
     // Rendered description field
@@ -82,7 +82,6 @@ export class SR5ItemSheet extends ItemSheet {
      * @returns {Object}
      */
     static override get defaultOptions() {
-        // @ts-ignore // mergeObject breaks TypeScript typing. Should be fine.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'item'],
             width: 735,
@@ -105,12 +104,9 @@ export class SR5ItemSheet extends ItemSheet {
         const data = super.getData(options) as unknown as SR5ItemSheetData;
 
         // Rework v9 style data mapping to v10 style, while waiting for foundry-vtt-types to be update to v10.
-        //@ts-ignore
         data.type = data.data.type;
-        // data.data = data.system = data.data;
-        //@ts-ignore
         data.system = data.item.system;
-        //@ts-ignore // TODO: remove TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: remove TODO: foundry-vtt-types v10
         data.data = data.item.system;
         const itemData = this.item.system;
 
@@ -150,14 +146,14 @@ export class SR5ItemSheet extends ItemSheet {
         const [ammunition, weaponMods, armorMods] = this.item.items.reduce(
             (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
                 const itemData = nestedItem.toObject();
-                //@ts-ignore
+                //@ts-expect-error
                 itemData.descriptionHTML = this.enrichEditorFieldToHTML(itemData.system.description.value);
 
-                //@ts-ignore
+                //@ts-expect-error
                 if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData); // TODO: foundry-vtt-types v10
-                //@ts-ignore TODO: foundry-vtt-types v10
+                //@ts-expect-error TODO: foundry-vtt-types v10
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
-                //@ts-ignore TODO: foundry-vtt-types v10
+                //@ts-expect-error TODO: foundry-vtt-types v10
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
                 
                 return sheetItemData;
@@ -187,16 +183,16 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // Provide action parts with all test variantes.
-        // @ts-ignore // TODO: put 'opposed test types' into config (see data.config)
+        // @ts-expect-error // TODO: put 'opposed test types' into config (see data.config)
         data.tests = game.shadowrun5e.tests;
-        // @ts-ignore
+        // @ts-expect-error
         data.opposedTests = game.shadowrun5e.opposedTests;
-        // @ts-ignore
+        // @ts-expect-error
         data.activeTests = game.shadowrun5e.activeTests;
-        // @ts-ignore
+        // @ts-expect-error
         data.resistTests = game.shadowrun5e.resistTests;
 
-        // @ts-ignore TODO: foundry-vtt-types v10
+        // @ts-expect-error TODO: foundry-vtt-types v10
         data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
 
         data.rollModes = CONFIG.Dice.rollModes;
@@ -271,9 +267,9 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Drag and Drop Handling
          */
-        //@ts-ignore
+        //@ts-expect-error
         this.form.ondragover = (event) => this._onDragOver(event);
-        //@ts-ignore
+        //@ts-expect-error
         this.form.ondrop = (event) => this._onDrop(event);
 
         // Active Effect management
@@ -485,11 +481,9 @@ export class SR5ItemSheet extends ItemSheet {
             type: type,
             system: {type: 'weapon'}
         };
-        // @ts-ignore
-        // itemData.data.type = 'weapon';
-        // @ts-ignore
+        // @ts-expect-error
         const item = new SR5Item(itemData, {parent: this.item});
-        //@ts-ignore TODO: foundry-vtt-types v10
+        //@ts-expect-error TODO: foundry-vtt-types v10
         await this.item.createNestedItem(item._source);
     }
 
@@ -513,9 +507,9 @@ export class SR5ItemSheet extends ItemSheet {
             name: `New ${Helpers.label(type)}`,
             type: type
         };
-        // @ts-ignore
+        // @ts-expect-error
         const item = new SR5Item(itemData, {parent: this.item});
-        // @ts-ignore TODO: foundry-vtt-types v10
+        // @ts-expect-error TODO: foundry-vtt-types v10
         await this.item.createNestedItem(item._source);
     }
 
@@ -600,7 +594,7 @@ export class SR5ItemSheet extends ItemSheet {
     private fixStaleRenderedState() {
         if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
             console.warn(`SR5ItemSheet app for ${this.item.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
-            // Hotfixing instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
+            // Hotfix instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
             this._state = Application.RENDER_STATES.CLOSED;
         }
     }
@@ -704,7 +698,7 @@ export class SR5ItemSheet extends ItemSheet {
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        // @ts-ignore
+        // @ts-expect-error
         device.sheet.render(true);
     }
 

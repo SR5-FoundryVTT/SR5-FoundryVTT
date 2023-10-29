@@ -114,7 +114,7 @@ export class SituationModifier {
      * Determine if the source data has an active modifier set for this situational modifier.
      */
     get hasActive(): boolean {
-        //@ts-ignore TODO: foundry-vtt-types v10
+        //@ts-expect-error TODO: foundry-vtt-types v10
         return !foundry.utils.isEmpty(this.source.active);
     }
 

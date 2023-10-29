@@ -29,7 +29,7 @@ export class TestDialog extends FormDialog {
     // Listeners as given by the dialogs creator.
     listeners: TestDialogListener[]
 
-    // @ts-ignore // TODO: default option value with all the values...
+    // @ts-expect-error // TODO: default option value with all the values...
     constructor(data, options: FormDialogOptions = {}, listeners: TestDialogListener[]=[]) {
         // Allow for Sheet style form submit value handling.
         options.applyFormChangesOnSubmit = true;
@@ -45,7 +45,7 @@ export class TestDialog extends FormDialog {
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
-        // @ts-ignore
+        // @ts-expect-error
         options.width = 'auto';
         return options;
     }
@@ -64,7 +64,7 @@ export class TestDialog extends FormDialog {
      */
     _injectExternalActiveListeners(html: JQuery) {
         for (const listener of this.listeners) {
-            //@ts-ignore
+            //@ts-expect-error
             html.find(listener.query).on(listener.on, (event: JQuery<HTMLElement>) => listener.callback.bind(this.data.test)(event, this));
         }
     }
@@ -78,11 +78,11 @@ export class TestDialog extends FormDialog {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html';
     }
 
-    //@ts-ignore
+    //@ts-expect-error
     getData() {
         const data = super.getData() as unknown as TestDialogData;
 
-        //@ts-ignore //TODO: default to general roll mode user setting
+        //@ts-expect-error //TODO: default to general roll mode user setting
         data.rollMode = data.test.data.options?.rollMode;
         data.rollModes = CONFIG.Dice.rollModes;
         data.default = 'roll';
@@ -117,7 +117,7 @@ export class TestDialog extends FormDialog {
     }
 
     /**
-     * Callback for after the dialoge has closed.
+     * Callback for after the dialog has closed.
      * @param html
      */
     override onAfterClose(html: JQuery<HTMLElement>): SuccessTestData {
@@ -131,13 +131,12 @@ export class TestDialog extends FormDialog {
      * @param data An object with keys in Foundry UpdateData style {'key.key.key': value}
      */
     override _updateData(data) {
-        // The user canceled their interaction by cancenling, don't apply form changes.
+        // The user canceled their interaction by canceling, don't apply form changes.
         if (this.selectedButton === 'cancel') return;
 
         // First, apply changes to ValueField style values in a way that makes sense.
         Object.entries(data).forEach(([key, value]) => {
             // key is expected to be relative from TestDialog.data and begin with 'test'
-            // @ts-ignore
             const valueField = foundry.utils.getProperty(this.data, key);
             if (foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
 
@@ -154,7 +153,6 @@ export class TestDialog extends FormDialog {
         });
 
         // Second, apply generic values.
-        // @ts-ignore
         foundry.utils.mergeObject(this.data, data);
 
         // Give tests opportunity to change resulting values on the fly.

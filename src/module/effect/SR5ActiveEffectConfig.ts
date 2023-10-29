@@ -18,7 +18,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
    * @private
    */
   override async _addEffectChange(): Promise<this> {
-    //@ts-ignore TODO: foundry-vtt-types v10
+    //@ts-expect-error TODO: foundry-vtt-types v10
     const idx = this.document.changes.length;
     return this.submit({preventClose: true, updateData: {
       [`changes.${idx}`]: {key: "", mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, value: ""}

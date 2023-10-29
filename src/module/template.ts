@@ -28,7 +28,6 @@ export default class Template extends MeasuredTemplate {
         templateData['dropoff'] = blast?.dropoff || 0;
 
         const document = new MeasuredTemplateDocument(templateData, {parent: canvas.scene});
-        // @ts-ignore
         const template = new Template(document);
         template.item = item;
         template.onComplete = onComplete;
@@ -61,7 +60,7 @@ export default class Template extends MeasuredTemplate {
             if (now - moveTime <= 20) return;
             const mousePos = event.data.getLocalPosition(this.layer);
             const snapped = canvas.grid.getSnappedPosition(mousePos.x, mousePos.y, 2);
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             this.document.updateSource({x: snapped.x, y: snapped.y})
             // this.data.x = snapped.x;
             // this.data.y = snapped.y;
@@ -93,7 +92,7 @@ export default class Template extends MeasuredTemplate {
             // Transform mouse position into grid position
             const gridPos = canvas.grid.getSnappedPosition(this.x, this.y, 2);
             
-            // Prepare measued template data.
+            // Prepare measured template data.
             const templateData = this.document.toObject();
             templateData.x = gridPos.x;
             templateData.y = gridPos.y;
@@ -111,9 +110,9 @@ export default class Template extends MeasuredTemplate {
             let delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
             let snap = event.shiftKey ? delta : 5;
 
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             const direction = this.document.direction + snap * Math.sign(event.deltaY);
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             this.document.updateSource({direction})
             this.refresh();
         };

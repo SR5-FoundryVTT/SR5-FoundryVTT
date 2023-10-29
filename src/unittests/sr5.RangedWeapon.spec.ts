@@ -30,7 +30,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             // const actor = await testActor.create({type: 'character'});
             // const item = await testItem.create({type: 'weapon', system: {category: 'ranged'}});
             // const modification = new SR5Item({name: 'Mod', type: 'modification', system: {type: 'weapon', rc: 2}}, {parent: item});
-            // //@ts-ignore TODO: foundry-vtt-types v10
+            // //@ts-expect-error TODO: foundry-vtt-types v10
             // await item.createNestedItem(modification._source);
 
             // const character = actor.asCharacter() as Shadowrun.CharacterActorData;

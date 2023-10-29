@@ -49,7 +49,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.nameTranslations);
 
             // Get the item's folder information
-            // @ts-ignore TODO: Foundry Where is my foundry base data?
+            // @ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 
             // Import Flags
@@ -68,7 +68,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             items.push(item);
         }
 
-        // @ts-ignore
+        // @ts-expect-error
         return await Item.create(items) as Item;
     }
 }

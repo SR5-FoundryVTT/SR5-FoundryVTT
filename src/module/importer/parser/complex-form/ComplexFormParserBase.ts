@@ -5,7 +5,6 @@ import ComplexFormItemData = Shadowrun.ComplexFormItemData;
 
 export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
     override Parse(jsonData: object, item: ComplexFormItemData, jsonTranslation?: object): ComplexFormItemData {
-        // @ts-ignore // TODO: Foundry Where is my foundry base data?
         item.name = ImportHelper.StringValue(jsonData, 'name');
 
         item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
@@ -41,7 +40,6 @@ export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
 
         if (jsonTranslation) {
             const origName = ImportHelper.StringValue(jsonData, 'name');
-            // @ts-ignore // TODO: Foundry Where is my foundry base data?
             item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
         }

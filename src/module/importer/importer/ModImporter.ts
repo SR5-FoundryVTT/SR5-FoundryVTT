@@ -48,7 +48,7 @@ export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Sh
                 folderName = splitName[0];
             }
             let folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Mods/${folderName}`, true);
-            //@ts-ignore TODO: Foundry Where is my foundry base data?
+            //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 
             // Import Flags
@@ -66,7 +66,7 @@ export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Sh
             datas.push(item);
         }
 
-        // @ts-ignore // TODO: TYPE: Remove this.
+        // @ts-expect-error // TODO: TYPE: Remove this.
         return await Item.create(datas);
     }
 }
