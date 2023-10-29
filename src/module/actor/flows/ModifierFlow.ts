@@ -42,7 +42,6 @@ export class ModifierFlow {
 
         // Get global modifiers that can come from the general modifier system.
         const modifiers = this.actor.getSituationModifiers(options);
-        //@ts-ignore
         if (modifiers.handlesTotalFor(name)) return modifiers.getTotalFor(name, options);
 
         // Get global modifiers that come from the legacy actor modifier system.

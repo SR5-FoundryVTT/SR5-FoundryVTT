@@ -2,17 +2,17 @@
 import LowLightVisionFilter from './lowlightFilter';
 
 //todo: v10 foundry-vtt-types 
-//@ts-ignore
+//@ts-expect-error
 export default class LowlightVisionDetectionMode extends DetectionMode {
 
-  //@ts-ignore
+  //@ts-expect-error
   static override getDetectionFilter() {
-    //@ts-ignore
+    //@ts-expect-error
     return (this._detectionFilter ??= LowLightVisionFilter.create());
   }
 
   
-    //@ts-ignore
+    //@ts-expect-error
     override _canDetect(visionSource, target) {
       const tgt = target?.document;
       const targetIsVisible =

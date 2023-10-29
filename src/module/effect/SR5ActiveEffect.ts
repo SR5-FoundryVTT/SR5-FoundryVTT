@@ -15,9 +15,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      * items, this would need change.
      */
     public get isOriginOwned(): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (!this.origin) return false;
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const path = this.origin.split('.');
 
         if (path[0] === 'Scene' && path.length === 6) return true;
@@ -27,7 +27,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     public get source() {
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         return this.origin ? fromUuid(this.origin) : null;
     }
 
@@ -36,21 +36,20 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     public async renderSourceSheet() {
         const document = await this.source;
-        // @ts-ignore
+        // @ts-expect-error
         return document?.sheet?.render(true);
     }
 
     async toggleDisabled() {
-        // @ts-ignore
+        // @ts-expect-error
         return this.update({disabled: !this.disabled});
     }
 
     async disable(disabled) {
-        // @ts-ignore
         return this.update({disabled});
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types
+    //@ts-expect-error // TODO: foundry-vtt-types
     protected _applyCustom(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         return this._applyModify(actor, change, current, delta, changes);
     }
@@ -61,12 +60,11 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    //@ts-ignore // TODO: foundry-vtt-types
     protected _applyModify(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor, change.key) as ModifiableValue;
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             value.mod.push({name: this.label, value: Number(change.value)});
 
             return null;
@@ -80,14 +78,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Don't apply any changes if it's also not a indirect match.
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey) as ModifiableValue;
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             value.mod.push({name: this.label, value: Number(change.value)});
 
             return null;
         }
 
-        // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value choosen
-        //@ts-ignore // TODO: foundry-vtt-types
+        // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
+        //@ts-expect-error // TODO: foundry-vtt-types
         return super._applyAdd(actor, change, current, delta, changes);
     }
 
@@ -99,12 +97,12 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    //@ts-ignore // TODO: foundry-vtt-types
+    //@ts-expect-error // TODO: foundry-vtt-types
     protected _applyOverride(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor, change.key);
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             value.override = {name: this.label, value: Number(change.value)};
             value.value = change.value;
 
@@ -118,14 +116,14 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey);
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             value.override = {name: this.label, value: Number(change.value)};
 
             return null;
         }
 
         // Neither a direct nor an indirect ModifiableValue match.
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         return super._applyOverride(actor, change, current, delta, changes);
     }
 

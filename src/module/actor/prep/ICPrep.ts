@@ -52,9 +52,7 @@ export class ICPrep {
         // Newly created actors SHOULD have this by template.
         // Legacy actors MIGHT not have it, therefore make sure it's their.
         const track = data.track || {};
-        // @ts-ignore
         if (!track.matrix) track.matrix = DataDefaults.trackData();
-        // @ts-ignore
         data.track = track;
     }
 

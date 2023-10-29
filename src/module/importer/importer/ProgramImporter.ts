@@ -52,7 +52,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
             // Get the item's folder information
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
             let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Programs')}/${category}`, true);
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             item.folder = categoryFolder.id;
 
             // Import Flags
@@ -80,7 +80,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const programs = this.filterGearToPrograms(jsonObject);
         const items = await this.parsePrograms(programs, setIcons);
-        // @ts-ignore I have bigger issues than fully typing this.
+        // @ts-expect-error I have bigger issues than fully typing this.
         return await Item.create(items);
     }
 }

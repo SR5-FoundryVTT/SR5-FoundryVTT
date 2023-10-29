@@ -138,7 +138,7 @@ class MagicModifiersHandler extends ModifiersHandler {
     static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
         console.log(`${SYSTEM_NAME} | Magic modifier HUD on renderTokenHUD`);
 
-        // Don't add awakend modifiers to token hud for mundane actors.
+        // Don't add awakened modifiers to token hud for mundane actors.
         if (!actor.isAwakened) return;
 
         // Setup and connect tokenHUD elements.
@@ -264,10 +264,9 @@ export class SituationModifiersApplication extends FormApplication {
     }
 
     /**
-     * Prepare all handlers used for the different modifer categories.
+     * Prepare all handlers used for the different modifier categories.
      */
     _prepareHandlers(): ModifiersHandler[] {
-        //@ts-ignore The implementing class is used, not the abstract one.
         return SituationModifiersApplication._staticHandlers.map(staticHandler => new staticHandler(this));
     }
 
@@ -282,7 +281,7 @@ export class SituationModifiersApplication extends FormApplication {
         options.id = 'situational-modifiers-application';
         options.title = game.i18n.localize('SR5.SituationalModifiersApplication.Title');
 
-        //@ts-ignore
+        //@ts-expect-error
         options.width = 'auto';
         options.height = 'auto';
         options.resizable = false;
@@ -309,7 +308,7 @@ export class SituationModifiersApplication extends FormApplication {
             ...await super.getData(options),
             
             targetType: this._targetTypeLabel,
-            targetName: this.target.name || 'Unkown target',
+            targetName: this.target.name || 'Unknown target',
 
             modifiers: this.modifiers,
             environmentalLevels: this.modifiers.environmental.levels
@@ -452,7 +451,7 @@ export class SituationModifiersApplication extends FormApplication {
         // Connect SR-FoundryVTT tokenHUD elements to FoundryVTT tokenHUD column structure.
         html.find('.col.right').after(container);
 
-        // Hand DOM element over and let ModifierHandlers add their TokenHUDElments.
+        // Hand DOM element over and let ModifierHandlers add their TokenHUDElements.
         SituationModifiersApplication._staticHandlers.forEach(handler => handler.addTokenHUDElements(column, data._id, actor, modifiers));
     }
 
@@ -476,7 +475,6 @@ export class SituationModifiersApplication extends FormApplication {
             const app = new SituationModifiersApplication(token.actor);
             // Use async render as activateTab needs tabs to bind to rendered result.
             await app._render(true);
-            //@ts-ignore
             // if (tab) app.activateTab(tab);
         }   
     }

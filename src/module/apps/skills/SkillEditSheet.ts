@@ -22,7 +22,6 @@ export class SkillEditSheet extends DocumentSheet {
 
     static override get defaultOptions() {
         const options = super.defaultOptions;
-        // @ts-ignore
         return mergeObject(options, {
             id: 'skill-editor',
             classes: ['sr5', 'sheet', 'skill-edit-window'],
@@ -102,7 +101,7 @@ export class SkillEditSheet extends DocumentSheet {
 
 
     /** @override */
-    // @ts-ignore // SkillEditSheet vs DocumentSheet typing, I don't quite get it...
+    // @ts-expect-error // SkillEditSheet vs DocumentSheet typing, I don't quite get it...
     async _updateObject(event, formData) {
         // Without an actual input field used, avoid a unneeded update...
         // ...the update would happen due to how _onUpdateObject works.
@@ -195,11 +194,11 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
-    // @ts-ignore // Missing DocumentSheetData typing
+    // @ts-expect-error // Missing DocumentSheetData typing
     getData(): SkillEditFormData {
         const data = super.getData();
 
-        //@ts-ignore TODO: foundry-vtt-types v10'
+        //@ts-expect-error TODO: foundry-vtt-types v10'
         // skill property will hold a direct skill reference
         data['skill'] = foundry.utils.getProperty(data.data, this._updateString());
         data['editable_name'] = this._allowSkillNameEditing();

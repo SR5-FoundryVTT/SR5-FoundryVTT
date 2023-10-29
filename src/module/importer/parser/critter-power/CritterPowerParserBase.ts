@@ -5,7 +5,6 @@ import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 
 export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData> {
     public override Parse(jsonData: object, item: CritterPowerItemData, jsonTranslation?: object): CritterPowerItemData {
-        // @ts-ignore // TODO: Foundry Where is my foundry base data?
         item.name = ImportHelper.StringValue(jsonData, 'name');
 
         item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
@@ -46,7 +45,6 @@ export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData>
 
         if (jsonTranslation) {
             const origName = ImportHelper.StringValue(jsonData, 'name');
-            // @ts-ignore // TODO: Foundry Where is my foundry base data?
             item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
         }

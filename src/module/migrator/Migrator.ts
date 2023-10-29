@@ -23,13 +23,13 @@ export class Migrator {
     }
 
     public static get onlySystemPacks(): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         return game.packs.contents.filter(pack => pack.metadata.packageType !== 'system' && pack.metadata.packageName !== 'shadowrun5e').length === 0;
     }
 
     public static async InitWorldForMigration() {
         console.log('Shadowrun 5e | Initializing an empty world for future migrations');
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, game.system.version);
     }
 

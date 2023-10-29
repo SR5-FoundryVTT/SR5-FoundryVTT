@@ -2,17 +2,17 @@
 import ThermographicVisionFilter from './thermographicFilter';
 
 //todo: v10 foundry-vtt-types 
-//@ts-ignore
+//@ts-expect-error
 export default class ThermographicVisionDetectionMode extends DetectionMode {
 
-  //@ts-ignore
+  //@ts-expect-error
   static override getDetectionFilter() {
-    //@ts-ignore
+    //@ts-expect-error
     return (this._detectionFilter ??= ThermographicVisionFilter.create());
   }
 
   
-    //@ts-ignore
+    //@ts-expect-error
     override _canDetect(visionSource, target) {
       const tgt = target?.document;
       const targetHasHeat =

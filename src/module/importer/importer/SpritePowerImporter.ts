@@ -64,7 +64,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
 
             // Create the item
             let item = parser.Parse(chummerSpritePower, this.GetDefaultData({type: parserType}), this.itemTranslations);
-            // @ts-ignore TODO: foundry-vtt-type v10
+            // @ts-expect-error TODO: foundry-vtt-type v10
             item.folder = folder.id;
 
             // Import Flags
@@ -82,7 +82,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
             items.push(item);
         }
 
-        // @ts-ignore // TODO: TYPE: Remove this.
+        // @ts-expect-error // TODO: TYPE: Remove this.
         return await Item.create(items);
     }
 }

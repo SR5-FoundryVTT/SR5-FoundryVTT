@@ -62,7 +62,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
 
             // Create the item
             let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
-            // @ts-ignore // TODO: Foundry Where is my foundry base data?
+            // @ts-expect-error // TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.subcategory].id;
 
             // Figure out item subtype
@@ -93,7 +93,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
             items.push(item);
         }
 
-        // @ts-ignore // TODO: TYPE: This should be removed after typing of SR5Item
+        // @ts-expect-error // TODO: TYPE: This should be removed after typing of SR5Item
         return await Item.create(items);
     }
 }

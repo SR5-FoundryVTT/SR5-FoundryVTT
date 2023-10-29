@@ -108,7 +108,6 @@ export abstract class VersionMigration {
 
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
-                // @ts-ignore
                 await actor.updateEmbeddedDocuments('Item', embeddedItems);
             }
 
@@ -124,7 +123,7 @@ export abstract class VersionMigration {
      * @param entityUpdates
      */
     protected async IterateScenes(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        // @ts-ignore // ignore null state
+        // @ts-expect-error // ignore null state
         for (const scene of game.scenes.contents) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
@@ -146,10 +145,10 @@ export abstract class VersionMigration {
                     // Don't migrate tokens without or a linked actor.
                     if (!token.actor || token.data.actorLink) continue;
                     
-                    //@ts-ignore // TODO: foundry-vtt-types v10
+                    //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(token.actor.data)) continue;
 
-                    // @ts-ignore
+                    // @ts-expect-error
                     const updateData = await this.MigrateActorData(foundry.utils.duplicate(token.actor.data));
 
                     expandObject(updateData);
@@ -159,7 +158,7 @@ export abstract class VersionMigration {
                     });
                 }
 
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 if (foundry.utils.isEmpty(updateData)) {
                     continue;
                 }
@@ -181,7 +180,7 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateItems(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        // @ts-ignore // ignore null state
+        // @ts-expect-error // ignore null state
         for (const item of game.items.contents) {
             try {
                 if (!(await this.ShouldMigrateItemData(item.data))) {
@@ -191,13 +190,12 @@ export abstract class VersionMigration {
                 console.log(`Migrating Item: ${item.name}`);
                 const updateData = await this.MigrateItemData(item.data);
 
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 if (foundry.utils.isEmpty(updateData)) {
                     continue;
                 }
 
                 expandObject(updateData);
-                // @ts-ignore
                 entityUpdates.set(item, {
                     updateData,
                     embeddedItems: null,
@@ -214,7 +212,7 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateActors(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        // @ts-ignore // ignore null state
+        // @ts-expect-error // ignore null state
         for (const actor of game.actors.contents) {
             try {
                 if (!(await this.ShouldMigrateActorData(actor.data))) {
@@ -223,7 +221,7 @@ export abstract class VersionMigration {
 
                 console.log(`Migrating Actor ${actor.name}`);
                 console.log(actor);
-                // @ts-ignore
+                // @ts-expect-error
                 const updateData = await this.MigrateActorData(duplicate(actor.data));
                 console.log(updateData);
                 let items = [];
@@ -252,10 +250,10 @@ export abstract class VersionMigration {
      */
     protected async IterateActorItems(actorData: ShadowrunActorData, updateData) {
         let hasItemUpdates = false;
-        // @ts-ignore
+        // @ts-expect-error
         if (actorData.items !== undefined) {
             const items = await Promise.all(
-                // @ts-ignore
+                // @ts-expect-error
                 actorData.items.map(async (itemData) => {
                     if (itemData instanceof SR5Item) console.error('Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object');
                     if (!await this.ShouldMigrateItemData(itemData)) return itemData;
@@ -381,10 +379,10 @@ export abstract class VersionMigration {
             try {
                 let updateData: any = null;
                 if (pack.metadata.type === 'Item') {
-                    // @ts-ignore // TODO: vtt-types v9 document.data.type check added to type gate... but didn't work
+                    // @ts-expect-error // TODO: vtt-types v9 document.data.type check added to type gate... but didn't work
                     updateData = await this.MigrateItemData(foundry.utils.duplicate(document.data));
 
-                    //@ts-ignore // TODO: foundry-vtt-types v10
+                    //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
                         continue;
                     }
@@ -394,13 +392,10 @@ export abstract class VersionMigration {
                         document.update(updateData.data);
                     }
 
-                // TODO: Uncomment when foundry allows embeddeds to be updated in packs
-                //@ts-ignore
                 } else if (pack.metadata.type === 'Actor') {
-                    // @ts-ignore
                     updateData = await this.MigrateActorData(foundry.utils.duplicate(document.data));
 
-                    //@ts-ignore // TODO: foundry-vtt-types v10
+                    //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
                         continue;
                     }
@@ -421,7 +416,7 @@ export abstract class VersionMigration {
                 } else if (pack.metadata.type === 'Scene') {
                     updateData = await this.MigrateSceneData(foundry.utils.duplicate(document.data));
 
-                    //@ts-ignore // TODO: foundry-vtt-types v10
+                    //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
                         continue;
                     }

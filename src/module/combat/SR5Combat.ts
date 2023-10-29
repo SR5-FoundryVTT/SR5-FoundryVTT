@@ -8,9 +8,9 @@ import SocketMessageData = Shadowrun.SocketMessageData;
  * Foundry combat implementation for Shadowrun5 rules.
  *
  * TODO: Store what combatants already acted and with what initiative base and dice they did. This can be used to alter
- *       initiative score without fully rerolling and maintain propper turn order after an actor raised they ini while
+ *       initiative score without fully rerolling and maintain proper turn order after an actor raised they ini while
  *       stepping over other actors that already had their action phase in the current initiative pass.
- *       @PDF SR5#160 'Chaning Initiative'
+ *       @PDF SR5#160 'Changing Initiative'
  */
 export class SR5Combat extends Combat {
     // Overwrite foundry-vtt-types v9 combatTrackerSettings type definitions.
@@ -106,7 +106,6 @@ export class SR5Combat extends Combat {
             console.error('Could not find combatant with id ', combatant);
             return;
         }
-        // @ts-ignore
         await combatant.update({
             initiative: Number(combatant.initiative) + adjustment,
         });
@@ -242,7 +241,6 @@ export class SR5Combat extends Combat {
                 Number(actor.getEdge().value),
                 Number(actor.findAttribute('reaction')?.value),
                 Number(actor.findAttribute('intuition')?.value),
-                // @ts-ignore
                 new Roll('1d2').evaluate({async: false}).total as number,
             ];
         };
@@ -265,12 +263,12 @@ export class SR5Combat extends Combat {
         for (let [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            // @ts-ignore
+            // @ts-expect-error
             if (!combatant.defeated && combatant.initiative > 0) {
                 return turnInPass;
             }
         }
-        // The current turn is the last undefeated combatant. So go to the end and beeeeyooond.
+        // The current turn is the last undefeated combatant. So go to the end and beyond.
         return this.turns.length;
     }
 
@@ -282,17 +280,17 @@ export class SR5Combat extends Combat {
         for (let [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            // @ts-ignore
+            // @ts-expect-error
             if (combatant.initiative > 0) {
                 return turnInPass;
             }
         }
-        // The current turn is the last undefeated combatant. So go to the end and beeeeyooond.
+        // The current turn is the last undefeated combatant. So go to the end and beyond.
         return this.turns.length;
     }
 
     /**
-     * Determine wheter the current combat situation (current turn order) needs and can have an initiative pass applied.
+     * Determine whether the current combat situation (current turn order) needs and can have an initiative pass applied.
      * @return true means that an initiative pass must be applied
      */
     doIniPass(nextTurn: number): boolean {
@@ -310,7 +308,7 @@ export class SR5Combat extends Combat {
      *
      * As long as a combatant still has a positive initiative score left, go to the next pass.
      *  Raise the Foundry turn and don't raise the Foundry round.
-     * As soons as all combatants have no initiative score left, go to the next combat round.
+     * As soon as all combatants have no initiative score left, go to the next combat round.
      *  Reset the Foundry pass and don't raise the Foundry turn.
      *
      * Retrigger Initiative Rolls on each new Foundry round.
@@ -419,7 +417,7 @@ export class SR5Combat extends Combat {
      * @param combatant
      */
     _getInitiativeFormula(combatant: Combatant) {
-        if (this.initiativePass === SR.combat.INITIAL_INI_PASS) { // @ts-ignore
+        if (this.initiativePass === SR.combat.INITIAL_INI_PASS) { // @ts-expect-error
             return super._getInitiativeFormula(combatant);
         }
 
@@ -428,7 +426,6 @@ export class SR5Combat extends Combat {
     }
 
     static _getSystemInitiativeBaseFormula() {
-        // @ts-ignore
         return String(CONFIG.Combat.initiative.formula || game.system.data.initiative);
     }
 

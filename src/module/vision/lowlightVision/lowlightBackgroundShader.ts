@@ -1,5 +1,5 @@
 //todo: v10 foundry-vtt-types 
-//@ts-ignore
+//@ts-expect-error
 export default class LowLightBackgroundVisionShader extends AmplificationBackgroundVisionShader {
     static COLOR_TINT = [0.25, 1, 0.25];
   

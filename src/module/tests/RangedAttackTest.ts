@@ -15,7 +15,7 @@ export interface RangedAttackTestData extends SuccessTestData {
     damage: Shadowrun.DamageData
     fireModes: Shadowrun.FireModeData[]
     fireMode: Shadowrun.FireModeData
-    // index of selceted fireMode in fireModes
+    // index of selected fireMode in fireModes
     fireModeSelected: number
     ranges: Shadowrun.RangesTemplateData
     range: number
@@ -114,7 +114,7 @@ export class RangedAttackTest extends SuccessTest {
      * This will overwrite the default weapon range selection.
      */
     _prepareTargetRanges() {
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (foundry.utils.isEmpty(this.data.ranges)) return;
         if (!this.actor) return;
         if (!this.hasTargets) return;
@@ -162,7 +162,6 @@ export class RangedAttackTest extends SuccessTest {
         const weapon = this.item.asWeapon;
         if (!weapon) return;
 
-        //@ts-ignore // TODO: foundry-vtt-types v10 
         this.data.fireModes = FireModeRules.availableFireModes(weapon.system.range.modes);
 
         // To avoid problems when no firemode is configured on the weapon, add at least one to what's available

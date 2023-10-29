@@ -128,7 +128,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     selectedInventory: string;
 
     constructor(...args) {
-        // @ts-ignore // Since we don't need any actual data, don't define args to avoid breaking changes.
+        // @ts-expect-error // Since we don't need any actual data, don't define args to avoid breaking changes.
         super(...args);
 
         // Preselect default inventory.
@@ -217,9 +217,9 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data = {
             ...data,
-            // @ts-ignore TODO: foundry-vtt-types v10
+            // @ts-expect-error TODO: foundry-vtt-types v10
             data: actorData.system,
-            // @ts-ignore TODO: foundry-vtt-types v10
+            // @ts-expect-error TODO: foundry-vtt-types v10
             system: actorData.system
         }
 
@@ -244,11 +244,11 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.situationModifiers = this._prepareSituationModifiers();
 
-        // @ts-ignore TODO: foundry-vtt-types v10
+        // @ts-expect-error TODO: foundry-vtt-types v10
         data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
             // secrets: this.actor.isOwner,
             // rollData: this.actor.getRollData.bind(this.actor),
-            // @ts-ignore TODO: foundry-vtt-types v10
+            // @ts-expect-error TODO: foundry-vtt-types v10
             async: true,
             relativeTo: this.actor
         });
@@ -454,7 +454,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
-    // @ts-ignore
+    // @ts-expect-error
     async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
@@ -818,7 +818,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
-        //@ts-ignore Since we're field checking, we can ignore typing...
+        //@ts-expect-error Since we're field checking, we can ignore typing...
         const { matrix } = sheetData.system;
         if (matrix) {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
@@ -966,7 +966,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const chatData = item.getChatData();
         sheetItem.description = chatData.description;
-        // @ts-ignore
+        // @ts-expect-error
         sheetItem.properties = chatData.properties;
 
         return sheetItem as unknown as SheetItemData;
@@ -1226,7 +1226,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._delays.skills = setTimeout(() => {
             this._filters.skills = event.currentTarget.value;
             this.render();
-            //@ts-ignore TODO: foundry-vtt-types v10. Add to typing.
+            //@ts-expect-error TODO: foundry-vtt-types v10. Add to typing.
         }, game.shadowrun5e.inputDelay);
     }
 
@@ -1503,7 +1503,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             // this.actor.effects.forEach(effect => {
             //     if (effect.system.origin !== item.uuid) return;
             //
-            //     // @ts-ignore
+            //     // @ts-expect-error
             //     effect.disable(item.isEquipped());
             // })
 
