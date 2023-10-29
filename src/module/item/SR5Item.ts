@@ -54,6 +54,7 @@ import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
 import { RangedWeaponRules } from "../rules/RangedWeaponRules";
+import { LinksHelpers } from '../utils/links';
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
@@ -67,7 +68,6 @@ import { RangedWeaponRules } from "../rules/RangedWeaponRules";
  * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
-import { LinksHelpers } from '../utils/links';
 ActionResultFlow; // DON'T TOUCH!
 
 /**
