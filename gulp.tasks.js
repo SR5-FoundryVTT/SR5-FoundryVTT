@@ -1,8 +1,8 @@
 'use strict';
 const fs = require('fs-extra');
 const path = require('path');
-const del = require('del');
-const chalk = require('chalk');
+const del = import('del'); //es6m
+const chalk = import('chalk'); //es6m
 
 // Sass
 const gulpsass = require('gulp-sass')(require('node-sass'));
