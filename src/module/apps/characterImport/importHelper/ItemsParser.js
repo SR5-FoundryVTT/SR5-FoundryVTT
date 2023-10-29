@@ -8,6 +8,7 @@ import { SpellParser } from "../magicImport/SpellParser.js";
 import { WeaponParser } from "../weaponImport/WeaponParser.js";
 import { LifestyleParser } from "../bioImport/LifestyleParser";
 import { ContactParser } from "../bioImport/ContactParser";
+import SimpleParser from "./SimpleParser.js";
 import { CritterPowerParser } from "../magicImport/CritterPowerParser.js";
 
 /**
@@ -24,11 +25,11 @@ export class ItemsParser {
         const promises = [];
         Object.freeze(chummerChar)
 
-        if (importOptions.qualities && chummerChar.qualities && chummerChar.qualities.quality) {
+        if (importOptions.qualities && chummerChar.qualities?.quality) {
             promises.push(new QualityParser().parseQualities(chummerChar, importOptions.assignIcons));
         }
 
-        if (importOptions.weapons && chummerChar.weapons != null && chummerChar.weapons.weapon != null) {
+        if (importOptions.weapons && chummerChar.weapons?.weapon) {
             promises.push(new WeaponParser().parseWeapons(chummerChar, importOptions.assignIcons));
         }
 
@@ -36,29 +37,39 @@ export class ItemsParser {
             promises.push(new ArmorParser().parseArmors(chummerChar, importOptions.assignIcons));
         }
 
-        if (importOptions.cyberware && chummerChar.cyberwares && chummerChar.cyberwares.cyberware) {
+        if (importOptions.cyberware && chummerChar.cyberwares?.cyberware) {
             promises.push(new WareParser().parseWares(chummerChar, importOptions.assignIcons));
         }
 
-        if (importOptions.powers && chummerChar.powers && chummerChar.powers.power) {
+        if (importOptions.powers && chummerChar.powers?.power) {
             promises.push(new PowerParser().parsePowers(chummerChar, importOptions.assignIcons));
         }
 
-        if (importOptions.equipment && chummerChar.gears && chummerChar.gears.gear) {
+        if (importOptions.equipment && chummerChar.gears?.gear) {
             const gears = getArray(chummerChar.gears.gear);
             promises.push(new GearsParser().parseGears(gears, importOptions.assignIcons));
         }
 
-        if (importOptions.spells && chummerChar.spells && chummerChar.spells.spell) {
+        if (importOptions.spells && chummerChar.spells?.spell) {
             promises.push(new SpellParser().parseSpells(chummerChar, importOptions.assignIcons));
         }
 
-        if (importOptions.contacts && chummerChar.contacts && chummerChar.contacts.contact) {
+        if (importOptions.contacts && chummerChar.contacts?.contact) {
             promises.push(new ContactParser().parseContacts(chummerChar, importOptions.assignIcons));
         }
 
-        if (importOptions.lifestyles && chummerChar.lifestyles && chummerChar.lifestyles.lifestyle) {
+        if (importOptions.lifestyles && chummerChar.lifestyles?.lifestyle) {
             promises.push( new LifestyleParser().parseLifestyles(chummerChar, importOptions.assignIcons));
+        }
+
+        if(chummerChar.metamagics?.metamagic) {
+            let metamagics = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("metamagic"))
+            promises.push(new SimpleParser().parseCollection(metamagics, "metamagic", importOptions.assignIcons));
+        }
+
+        if(chummerChar.metamagics?.metamagic) {
+            let echoes = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("echo"))
+            promises.push(new SimpleParser().parseCollection(echoes, "echo", importOptions.assignIcons));
         }
 
         promises.push(new CritterPowerParser().parseCritterPowers(chummerChar, importOptions.assignIcons))

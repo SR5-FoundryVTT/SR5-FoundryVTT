@@ -813,8 +813,7 @@
                         "base": 0,
                         "mod": []
                     },
-                    "initiation": {},
-                    "metamagic": []
+                    "initiation": {}
                 }
             },
             "movement": {
@@ -1114,8 +1113,10 @@
             "bioware",
             "cyberware",
             "device",
+            "echo",
             "equipment",
             "lifestyle",
+            "metamagic",
             "modification",
             "program",
             "quality",
@@ -1542,6 +1543,12 @@
             "marks": {},
             "rating": 0,
             "ic": []
+        },
+        "metamagic": {
+            "templates": ["description", "importFlags"]
+        },
+        "echo" : {
+            "templates": ["description", "importFlags"]
         }
     }
 }
