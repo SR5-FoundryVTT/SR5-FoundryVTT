@@ -848,11 +848,12 @@ export class SuccessTest {
             this.manualHits.value :
             this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
 
+        // Sum of all rolls!
         this.hits.base = rollHits;
         
-        // First calculate hits based on roll and modifiers.
+        // First, calculate hits based on roll and modifiers.
         this.hits.value = Helpers.calcTotal(this.hits, { min: 0 });
-        // Second reduce hits by limit, if applicable.
+        // Second, reduce hits by limit.
         this.hits.value = this.hasLimit ? Math.min(this.limit.value, this.hits.value) : this.hits.value;
 
         return this.hits;
