@@ -155,7 +155,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     _prepareActorKeyOptions() {
         return {
             // Attributes
-            'system.attributes.body': 'SR5.AttrAgility',
+            'system.attributes.body': 'SR5.AttrBody',
             'system.attributes.agility': 'SR5.AttrAgility',
             'system.attributes.attack': 'SR5.MatrixAttrAttack',
             'system.attributes.charisma': 'SR5.AttrCharisma',
