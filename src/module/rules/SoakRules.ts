@@ -29,6 +29,21 @@ export class SoakRules {
             return Helpers.reduceDamageByHits(damageData, damageData.value, 'SR5.VehicleStunImmunity');
         }
 
+        let armorData = actor.getArmor(damageData)
+
+        // @ts-expect-error
+        if(armorData.hardened) {
+            let ap = armorData.mod.filter(mod => mod.name === "SR5.AP")[0].value
+            let base = armorData.base
+            let modifiedArmor = base + ap;
+
+            if(damageData.value < modifiedArmor) {
+                hits += damageData.value
+            }
+            else {
+                hits += Math.floor(modifiedArmor/2);
+            }
+        }
         return Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
     }
 

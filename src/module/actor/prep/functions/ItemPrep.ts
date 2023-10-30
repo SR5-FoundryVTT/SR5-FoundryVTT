@@ -38,6 +38,7 @@ export class ItemPrep {
                     if (armorValue > armor.base) {
                         armor.base = item.getArmorValue();
                         armor.label = item.getName();
+                        armor.hardened = item.getHardened()
                     }
                 }
             }
