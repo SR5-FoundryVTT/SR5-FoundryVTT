@@ -531,7 +531,7 @@ ___________________
                     { selector: `.tab[data-tab="effects"] .key-test_item input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: testDataGetter},
                     { selector: `.tab[data-tab="effects"] .key-modifier input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: modifiersDataGetter},
 
-                    { selector: `.tab[data-tab="effects"] .value-targeted_actor input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: false, dataMode: DATA_MODE.CUSTOM, customDataGetter: targetedActorDataGetter}
+                    { selector: `.tab[data-tab="effects"] .value-targeted_actor input[type="text"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: targetedActorDataGetter}
                 ]
             }]
         };
