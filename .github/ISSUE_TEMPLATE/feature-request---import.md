@@ -1,6 +1,6 @@
 ---
 name: Feature request - Import
-about: Suggest an idea for this project
+about: Chummer stuff
 title: "[Feature Request]"
 labels: chummer, enhancement
 assignees: ''
