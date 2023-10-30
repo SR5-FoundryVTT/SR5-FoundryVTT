@@ -112,6 +112,7 @@
     "SR5.Aoe": "AoE",
     "SR5.ApplyWounds": "부상 적용",
     "SR5.Armor": "방어구",
+    "SR5.ArmorHardened" : "Hardened",
     "SR5.ArmorValue": "방어구 수치",
     "SR5.AttackDodged": "공격 회피",
     "SR5.AttackHits": "공격 명중",

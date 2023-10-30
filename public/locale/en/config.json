@@ -114,6 +114,7 @@
     "SR5.Aoe": "AoE",
     "SR5.ApplyWounds": "Apply Wounds",
     "SR5.Armor": "Armor",
+    "SR5.ArmorHardened" : "Hardened",
     "SR5.ArmorValue": "Armor Value",
     "SR5.AttackDodged": "Attack Dodged",
     "SR5.AttackHits": "Attack Hits",
