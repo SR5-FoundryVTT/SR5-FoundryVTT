@@ -479,12 +479,59 @@ ___________________
         console.log('Shadowrun 5e | Registering support for autocomplete-inline-properties');
         const DATA_MODE = api.CONST.DATA_MODE;
 
+        const testDataGetter = (EffectConfig: SR5ActiveEffectConfig) => {
+            const effect = EffectConfig.object;
+            
+            if (effect.parent instanceof SR5Actor) {
+                const test = new SuccessTest({});
+                return test;
+            }
+            
+            if (effect.parent instanceof SR5Item) {
+                const item = effect.parent as SR5Item;
+                const test = TestCreator.fromItem(item);
+                return test;
+            }
+        };
+
+        const modifiersDataGetter = (EffectConfig: SR5ActiveEffectConfig) => {
+            return {environmental: {
+                low_light_vision: '',
+                image_magnification: '',
+                tracer_rounds: '',
+                smartlink: '',
+                ultrasound: ''
+            }}
+        }
+
+        const targetedActorDataGetter = (EffectConfig: SR5ActiveEffectConfig) => {
+            const effect = EffectConfig.object;
+
+            if (effect.parent instanceof SR5Item) {
+                const item = effect.parent as SR5Item;
+                const action = item.getAction();
+                if (!action) return {};                
+                const SuccessTestClass = TestCreator._getTestClass(action.test);
+                const OpposedTestClass = TestCreator._getTestClass(action.opposed.test);
+                const successTest = new SuccessTestClass({});
+                const opposedTest = new OpposedTestClass({against: successTest.data}, {actor: item.actor, item});
+                
+                return opposedTest;
+            }
+        }
+
         const config = {
             packageName: "shadowrun5e",
             sheetClasses: [{
                 name: "ActiveEffectConfig",
                 fieldConfigs: [
-                    { selector: `.tab[data-tab="effects"] .key input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="effects"] .key-actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="effects"] .key-targeted_actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="effects"] .key-test_all input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: testDataGetter},
+                    { selector: `.tab[data-tab="effects"] .key-test_item input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: testDataGetter},
+                    { selector: `.tab[data-tab="effects"] .key-modifier input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: modifiersDataGetter},
+
+                    { selector: `.tab[data-tab="effects"] .value-targeted_actor input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: false, dataMode: DATA_MODE.CUSTOM, customDataGetter: targetedActorDataGetter}
                 ]
             }]
         };
