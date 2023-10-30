@@ -944,7 +944,7 @@ export class SR5Actor extends Actor {
         const mods = new PartsList<number>(test.data.modifiers.mod);
         mods.addUniquePart('SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
-        await test.execute();
+        return await test.execute();
     }
 
     /**
@@ -1013,7 +1013,7 @@ export class SR5Actor extends Actor {
         const test = await this.tests.fromAction(action, this, {showDialog});
         if (!test) return;
 
-        await test.execute();
+        return await test.execute();
     }
 
     /**
@@ -1030,7 +1030,7 @@ export class SR5Actor extends Actor {
         const test = await this.tests.fromAction(action, this);
         if (!test) return;
 
-        await test.execute();
+        return await test.execute();
     }
 
     /**
