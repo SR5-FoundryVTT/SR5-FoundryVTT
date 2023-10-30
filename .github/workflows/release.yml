@@ -50,6 +50,7 @@ jobs:
       id: create_version_release
       uses: ncipollo/release-action@v1
       with:
+        makeLatest: false # Must be false, to allow test releases using this workflow.
         allowUpdates: true # Must be true, to allow updating existing releases
         name: ${{ github.event.release.name }}
         draft: false
