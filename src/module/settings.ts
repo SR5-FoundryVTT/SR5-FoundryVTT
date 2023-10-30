@@ -15,14 +15,14 @@ export const registerSystemSettings = () => {
         config: true,
         type: String,
         default: 'EUCL',
-        // @ts-ignore
+        // @ts-expect-error
         choices: {
             '1-1-1': 'SETTINGS.IgnoreDiagonal',
             '1-2-1': 'SETTINGS.EstimateDiagonal',
             'EUCL': 'SETTINGS.Euclidean',
         },
         onChange: (rule) => {
-            // @ts-ignore 
+            // @ts-expect-error 
             // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
             canvas.grid.diagonalRule = rule
         },

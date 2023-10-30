@@ -1,8 +1,10 @@
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import {SR5Item} from "../item/SR5Item";
-import {SR5Actor} from "../actor/SR5Actor";
-import {SR5ActiveEffect} from "../effect/SR5ActiveEffect";
+import { SR5Item } from "../item/SR5Item";
+import { SR5Actor } from "../actor/SR5Actor";
+import { SR5Combat } from "../combat/SR5Combat";
+import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
+import { SR5Roll } from "../rolls/SR5Roll";
 
 declare global {
     // Configuration of foundry-vtt-types
@@ -27,6 +29,8 @@ declare global {
         Item: typeof SR5Item;
         Actor: typeof SR5Actor;
         ActiveEffect: typeof SR5ActiveEffect;
+        Combat: typeof SR5Combat;
+        Roll: typeof SR5Roll;
     }
 
     // Declaration Merging
@@ -34,7 +38,7 @@ declare global {
         sheet: FormApplication;
     }
 
-    type RecursivePartial<T> = { 
-        [P in keyof T]?: RecursivePartial<T[P]>; 
+    type RecursivePartial<T> = {
+        [P in keyof T]?: RecursivePartial<T[P]>;
     };
 }

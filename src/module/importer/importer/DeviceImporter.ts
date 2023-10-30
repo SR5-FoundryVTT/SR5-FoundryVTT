@@ -37,7 +37,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(commlink, 'name');
 
             // Get the item's folder information
-            //@ts-ignore
+            //@ts-expect-error
             item.folder = folder.id;
 
             // Import Flags
@@ -60,7 +60,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-ignore
+            //@ts-expect-error
             entries.push(item);
         }
 
@@ -85,7 +85,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(rcc, 'name');
 
             // Get the item's folder information
-            //@ts-ignore
+            //@ts-expect-error
             item.folder = folder.id;
 
             // Import Flags
@@ -108,7 +108,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-ignore
+            //@ts-expect-error
             entries.push(item);
         }
 
@@ -133,7 +133,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(cyberdeck, 'name');
 
             // Get the item's folder information
-            //@ts-ignore
+            //@ts-expect-error
             item.folder = folder.id;
 
             // Import Flags
@@ -175,7 +175,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-ignore
+            //@ts-expect-error
             items.push(item);
         }
 
@@ -196,7 +196,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
         entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder, setIcons));
         entries = entries.concat(await this.ParseRCCDevices(rccs, rccsFolder, setIcons));
 
-        // @ts-ignore // TODO: TYPE: Remove this.
+        // @ts-expect-error // TODO: TYPE: Remove this.
         return await Item.create(entries)
     }
 

@@ -196,17 +196,15 @@ export class SuccessTest {
         data.type = data.type || this.type;
 
         // Store the current users targeted token ids for later use.
-        // @ts-ignore // undefined isn't allowed but excluded.
         data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
 
         // Store given document uuids to be fetched during evaluation.
         data.sourceActorUuid = data.sourceActorUuid || this.actor?.uuid;
         data.sourceItemUuid = data.sourceItemUuid || this.item?.uuid;
 
-        // @ts-ignore // Prepare general test information.
+        // @ts-expect-error // Prepare general test information.
         data.title = data.title || this.constructor.label;
 
-        // @ts-ignore // In FoundryVTT core settings we shall trust.
         options.rollMode = this._prepareRollMode(data, options);
         options.showDialog = options.showDialog !== undefined ? options.showDialog : true;
         options.showMessage = options.showMessage !== undefined ? options.showMessage : true;
@@ -252,10 +250,10 @@ export class SuccessTest {
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data, options: TestOptions): Shadowrun.FoundyRollMode {
+    _prepareRollMode(data, options: TestOptions): Shadowrun.FoundryRollMode {
         if (options.rollMode !== undefined) return options.rollMode;
         if (data.action && data.action.roll_mode) return data.action.roll_mode;
-        else return game.settings.get(CORE_NAME, CORE_FLAGS.RollMode) as Shadowrun.FoundyRollMode;
+        else return game.settings.get(CORE_NAME, CORE_FLAGS.RollMode) as Shadowrun.FoundryRollMode;
     }
 
     /**
@@ -271,7 +269,7 @@ export class SuccessTest {
      * Overwrite this method to alter the title of test dialogs and messages.
      */
     get title(): string {
-        // @ts-ignore
+        // @ts-expect-error
         return `${game.i18n.localize(this.constructor.label)}`;
     }
 
@@ -305,7 +303,7 @@ export class SuccessTest {
      * FoundryVTT serializer method to embed this test into a document (ChatMessage).
      * 
      * Foundry expects Roll data to serialize into rolls.
-     * sr5-foundryvtt expects Test data to serialize into data.
+     * The system expects Test data to serialize into data.
      * @returns 
      */
     toJSON() {
@@ -456,8 +454,6 @@ export class SuccessTest {
      * Helper method to create the main SR5Roll.
      */
     createRoll(): SR5Roll {
-        // TODO: Add typing for rolls?
-        // @ts-ignore
         const roll = new SR5Roll(this.formula) as unknown as SR5Roll;
         this.rolls.push(roll);
         return roll;
@@ -636,7 +632,7 @@ export class SuccessTest {
         if (!this.usingManualRoll) {
             // Evaluate all rolls.
             for (const roll of this.rolls) {
-                // @ts-ignore // foundry-vtt-types is missing evaluated.
+                // @ts-expect-error // foundry-vtt-types is missing evaluated.
                 if (!roll._evaluated)
                     await roll.evaluate({ async: true });
             }
@@ -662,7 +658,7 @@ export class SuccessTest {
         if (!this.actor && this.data.sourceActorUuid) {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
             const document = await fromUuid(this.data.sourceActorUuid) || undefined;
-            // @ts-ignore
+            // @ts-expect-error
             this.actor = document instanceof TokenDocument ?
                 document.actor :
                 document as SR5Actor;
@@ -829,7 +825,7 @@ export class SuccessTest {
             Math.max(hits.value - this.threshold.value, 0) :
             hits.value;
 
-        // Calculate a ValueField for standardisation.
+        // Calculate a ValueField for standardization.
         const netHits = DataDefaults.valueData({
             label: "SR5.NetHits",
             base
@@ -1003,8 +999,8 @@ export class SuccessTest {
     }
 
     /**
-     * While a test might be successfull with a zero threshold, it's
-     * unclear if it's meant to be a sucsess.
+     * While a test might be successful with a zero threshold, it's
+     * unclear if it's meant to be a success.
      * 
      * Tests that don't know their threshold, either by GM secrecy or
      * following opposed tests not yet thrown, shouldn't show user
@@ -1064,7 +1060,7 @@ export class SuccessTest {
      * This can either be from an items action or a pre-configured action.
      */
     get hasAction(): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         return !foundry.utils.isEmpty(this.data.action);
     }
 
@@ -1096,7 +1092,7 @@ export class SuccessTest {
      */
     get canSecondChance(): boolean {
         if (!this.evaluated) {
-            console.error('Shadowrun5e | Second chance edge rules should not be appliable on initial cast');
+            console.error('Shadowrun5e | Second chance edge rules should not be applicable on initial cast');
             return false;
         }
         // According to rules, second chance can't be used on glitched tests.
@@ -1200,11 +1196,11 @@ export class SuccessTest {
     }
 
     /**
-     * Make sure ALL ressources needed are available.
+     * Make sure ALL resources needed are available.
      * 
-     * This is checked before any ressources are consumed.
+     * This is checked before any resources are consumed.
      * 
-     * @returns true when enough ressources are available to consume
+     * @returns true when enough resources are available to consume
      */
     canConsumeDocumentRessources(): boolean {
         // No actor present? Nothing to consume...
@@ -1224,7 +1220,7 @@ export class SuccessTest {
     /**
      * Handle resulting resource consumption caused by this test.
      * 
-     * @return true when the ressources could be consumed in appropriate ammounts.
+     * @return true when the resources could be consumed in appropriate amounts.
      */
     async consumeDocumentRessources(): Promise<boolean> {
         if (!this.actor) return true;
@@ -1238,12 +1234,12 @@ export class SuccessTest {
     }
 
     /**
-    * Consume ressources according to whats configured for this world.
+    * Consume resources according to whats configured for this world.
     * @returns true when the test can process
     */
     async consumeDocumentRessoucesWhenNeeded(): Promise<boolean> {
         const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
-        // Make sure to nest canConsume to avoid unneccessary warnings.
+        // Make sure to nest canConsume to avoid unnecessary warnings.
         if (mustHaveRessouces) {
             if (!this.canConsumeDocumentRessources()) return false;
         }
@@ -1361,7 +1357,7 @@ export class SuccessTest {
         const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
         if (!actorConsumedResources) return this;
 
-        // Keep push the limit active, to have remove limit during derived value calcution.
+        // Keep push the limit active, to have remove limit during derived value calculation.
         await this.evaluate();
         await this.processResults();
 
@@ -1476,7 +1472,7 @@ export class SuccessTest {
         const currentModifierValue = pool.getPartValue('SR5.ExtendedTest') || 0;
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
 
-        // A pool could be overriden or not.
+        // A pool could be overwritten or not.
         if (data.pool.override) {
             data.pool.override.value = Math.max(data.pool.override.value - 1, 0);
         } else {
@@ -1489,7 +1485,7 @@ export class SuccessTest {
             return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
         }
 
-        // Fetch original tests docments.
+        // Fetch original tests documents.
         await this.populateDocuments();
 
         // Create a new test instance of the same type.
@@ -1521,7 +1517,7 @@ export class SuccessTest {
      * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
     async rollDiceSoNice() {
-        // @ts-ignore
+        // @ts-expect-error
         if (!game.dice3d || !game.user || !game.users) return;
 
         console.debug('Shadowrun5e | Initiating DiceSoNice throw');
@@ -1535,7 +1531,7 @@ export class SuccessTest {
         let whisper: User[] | null = null;
         // ...for gmOnlyContent check permissions
         if (this._applyGmOnlyContent && this.actor) {
-            // @ts-ignore
+            // @ts-expect-error
             whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER'));
         }
         // ...for rollMode include GM when GM roll
@@ -1548,7 +1544,7 @@ export class SuccessTest {
         const blind = this.data.options?.rollMode === 'blindroll';
         const synchronize = this.data.options?.rollMode === 'publicroll';
 
-        // @ts-ignore
+        // @ts-expect-error
         game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
@@ -1565,7 +1561,7 @@ export class SuccessTest {
         const messageData = this._prepareMessageData(content);
         const options = { rollMode: this._rollMode };
 
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const message = await ChatMessage.create(messageData, options);
 
         if (!message) return;
@@ -1753,7 +1749,7 @@ export class SuccessTest {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        // @ts-ignore TODO: Types Provide propper SuccessTestData and SuccessTestOptions
+        // @ts-expect-error TODO: Types Provide proper SuccessTestData and SuccessTestOptions
         ChatMessage.applyRollMode(messageData, this._rollMode);
 
         return messageData;
@@ -1802,12 +1798,12 @@ export class SuccessTest {
         // SuccessTest doesn't NEED an actor, if one is cast that way: show gm-only-content
         if (!test.actor || !game.user) {
             html.find('.gm-only-content').removeClass('gm-only-content');
-            // @ts-ignore
+            // @ts-expect-error
             ui.chat.scrollBottom();
         }
         else if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
             html.find('.gm-only-content').removeClass('gm-only-content');
-            // @ts-ignore
+            // @ts-expect-error
             ui.chat.scrollBottom();
         }
     }
@@ -1846,13 +1842,13 @@ export class SuccessTest {
         const uuid = element.data('uuid') ?? '';
         const item = await fromUuid(uuid) as SR5Item;
 
-        if (!item) return console.error('Shadowrun 5e | Item doesnt exist for uuid', uuid);
+        if (!item) return console.error("Shadowrun 5e | Item doesn't exist for uuid", uuid);
 
         item.castAction(event);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
-        // setup chat listener messages for each message as some need the message context instead of chatlog context.
+        // setup chat listener messages for each message as some need the message context instead of ChatLog context.
         html.find('.chat-message').each(async (index, element) => {
             element = $(element);
             const id = element.data('messageId');
@@ -1916,7 +1912,6 @@ export class SuccessTest {
             const test = await TestCreator.fromMessage(messageId);
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 
-            // @ts-ignore
             if (!test.canBeExtended) {
                 return ui.notifications?.warn('SR5.Warnings.CantExtendTest', { localize: true });
             }

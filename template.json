@@ -813,8 +813,7 @@
                         "base": 0,
                         "mod": []
                     },
-                    "initiation": {},
-                    "metamagic": []
+                    "initiation": {}
                 }
             },
             "movement": {
@@ -918,6 +917,20 @@
                         "itemIds": [],
                         "showAll": true
                     }
+                },
+                "visibilityChecks": {
+                    "astral": {
+                        "astralActive" : false,
+                        "affectedBySpell": false
+                    },
+                    "meat": {
+                        "hidden": false,
+                        "hasHeat": true
+                    },
+                    "matrix": {
+                        "hasIcon": false,
+                        "runningSilent": false
+                    }
                 }
             },
             "physical_combat_values": {
@@ -932,20 +945,6 @@
                         "value": 0,
                         "mod": []
                     }
-                }
-            },
-            "visibilityChecks": {
-                "astral": {
-                    "astralActive" : false,
-                    "affectedBySpell": false
-                },
-                "meat": {
-                    "hidden": false,
-                    "hasHeat": true
-                },
-                "matrix": {
-                    "hasIcon": false,
-                    "runningSilent": false
                 }
             }
         },
@@ -1114,8 +1113,10 @@
             "bioware",
             "cyberware",
             "device",
+            "echo",
             "equipment",
             "lifestyle",
+            "metamagic",
             "modification",
             "program",
             "quality",
@@ -1542,6 +1543,12 @@
             "marks": {},
             "rating": 0,
             "ic": []
+        },
+        "metamagic": {
+            "templates": ["description", "importFlags"]
+        },
+        "echo" : {
+            "templates": ["description", "importFlags"]
         }
     }
 }

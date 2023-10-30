@@ -46,7 +46,7 @@ export class LinksHelpers {
 
         const [code, page] = source.split(' ');
 
-        //@ts-ignore
+        //@ts-expect-error
         ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
     }
 

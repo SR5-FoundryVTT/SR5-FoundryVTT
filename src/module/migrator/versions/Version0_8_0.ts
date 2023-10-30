@@ -38,7 +38,6 @@ export class Version0_8_0 extends VersionMigration {
     }
 
     protected override async ShouldMigrateActorData(actor: SR5Actor) {
-        // @ts-ignore
         return actor.items.contents.filter(item => this._ShouldMigrateItemData(item)).length > 0;
     }
 
@@ -62,9 +61,8 @@ export class Version0_8_0 extends VersionMigration {
 
         updateData = await this.IterateActorItems(actor, updateData);
 
-        // @ts-ignore//@ts-ignore // TODO: foundry-vtt-types v10
+        // @ts-expect-error//@ts-expect-error // TODO: foundry-vtt-types v10
         if (updateData.data && foundry.utils.isEmpty(updateData.data)) delete updateData.data;
-        // @ts-ignore
         if (updateData.items?.length === 0) delete updateData.items;
 
         return updateData;

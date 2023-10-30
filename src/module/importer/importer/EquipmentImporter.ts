@@ -55,7 +55,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             // Replace / as it's used as a separator in GetFolderAtPath.
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
             let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
-            //@ts-ignore
+            //@ts-expect-error
             item.folder = categoryFolder.id;
 
             // Import Flags
@@ -76,7 +76,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             // Add relevant action tests
             Helpers.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-ignore
+            //@ts-expect-error
             items.push(item);
         }
 
@@ -87,7 +87,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
         const equipment = this.filterObjects(jsonObject['gears']['gear']);
         const items = await this.ParseEquipment(equipment, setIcons);
 
-        // @ts-ignore // TODO: TYPE: Remove this.
+        // @ts-expect-error // TODO: TYPE: Remove this.
         return await Item.create(items);
     }
 }

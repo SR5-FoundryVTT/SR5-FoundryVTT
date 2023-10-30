@@ -43,7 +43,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     public get source(): SR5Actor | SR5Item | null {
-        //@ts-ignore
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         return this.origin ? fromUuidSync(this.origin) : null;
     }
 
@@ -55,15 +55,15 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     async toggleDisabled() {
-        // @ts-ignore
-        return this.update({ disabled: !this.disabled });
+        // @ts-expect-error
+        return this.update({disabled: !this.disabled});
     }
 
     async disable(disabled) {
-        return this.update({ disabled });
+        return this.update({disabled});
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types
+    //@ts-expect-error // TODO: foundry-vtt-types
     protected _applyCustom(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         return this._applyModify(actor, change, current, delta, changes);
     }
@@ -74,12 +74,11 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    //@ts-ignore // TODO: foundry-vtt-types
     protected _applyModify(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor, change.key) as Shadowrun.ModifiableValue;
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             value.mod.push({ name: this.name, value: Number(change.value) });
 
             return null;
@@ -93,14 +92,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Don't apply any changes if it's also not a indirect match.
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey) as Shadowrun.ModifiableValue;
-            //@ts-ignore // TODO: foundry-vtt-types v10
-            value.mod.push({ name: this.name, value: Number(change.value) });
+            //@ts-expect-error // TODO: foundry-vtt-types v10
+            value.mod.push({name: this.label, value: Number(change.value)});
 
             return null;
         }
 
         // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
-        //@ts-ignore // TODO: foundry-vtt-types
+        //@ts-expect-error // TODO: foundry-vtt-types
         return super._applyAdd(actor, change, current, delta, changes);
     }
 
@@ -112,13 +111,13 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    //@ts-ignore // TODO: foundry-vtt-types
+    //@ts-expect-error // TODO: foundry-vtt-types
     protected _applyOverride(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor, change.key);
-            //@ts-ignore // TODO: foundry-vtt-types v10
-            value.override = { name: this.name, value: Number(change.value) };
+            //@ts-expect-error // TODO: foundry-vtt-types v10
+            value.override = {name: this.label, value: Number(change.value)};
             value.value = change.value;
 
             return null;
@@ -131,14 +130,14 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey);
-            //@ts-ignore // TODO: foundry-vtt-types v10
-            value.override = { name: this.name, value: Number(change.value) };
+            //@ts-expect-error // TODO: foundry-vtt-types v10
+            value.override = {name: this.label, value: Number(change.value)};
 
             return null;
         }
 
         // Neither a direct nor an indirect ModifiableValue match.
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         return super._applyOverride(actor, change, current, delta, changes);
     }
 
@@ -194,7 +193,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param change 
      */
     override apply(object: any, change) {
-        // @ts-ignore
+        // @ts-expect-error
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;        
@@ -261,10 +260,10 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             if (targetType === "Array") {
                 const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
-                //@ts-ignore
+                //@ts-expect-error
                 delta = this._castArray(change.value, innerType);
             }
-            //@ts-ignore
+            //@ts-expect-error
             else delta = this._castDelta(change.value, targetType);
         } catch (err) {
             console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
@@ -276,20 +275,20 @@ export class SR5ActiveEffect extends ActiveEffect {
         const changes = {};
         switch (change.mode) {
             case modes.ADD:
-                //@ts-ignore
+                //@ts-expect-error
                 this._applyAdd(object, change, current, delta, changes);
                 break;
             case modes.MULTIPLY:
-                //@ts-ignore
+                //@ts-expect-error
                 this._applyMultiply(object, change, current, delta, changes);
                 break;
             case modes.OVERRIDE:
-                //@ts-ignore
+                //@ts-expect-error
                 this._applyOverride(object, change, current, delta, changes);
                 break;
             case modes.UPGRADE:
             case modes.DOWNGRADE:
-                //@ts-ignore
+                //@ts-expect-error
                 this._applyUpgrade(object, change, current, delta, changes);
                 break;
             default:

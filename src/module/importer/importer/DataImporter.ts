@@ -153,7 +153,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      */
     filterObjects(objects: any[]) {
         if (!this.unsupportedCategories) return objects;
-        //@ts-ignore
+        //@ts-expect-error
         return objects.filter(object => !this.unsupportedCategories.includes(ImportHelper.StringValue(object, 'category', '')));
     }
 }

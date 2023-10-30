@@ -24,7 +24,6 @@ export class InventoryFlow {
     actor: SR5Actor;
 
     constructor(actor: SR5Actor) {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (actor.system.inventories === undefined)
             console.error('Shawdorun 5e | Actor given does not have a inventory data structure. You will experience bugs.');
 
@@ -87,11 +86,9 @@ export class InventoryFlow {
 
         // Default inventory is virtual, so only none default inventories need to have their items merged.
         if (this.actor.defaultInventory.name !== moveTo) {
-            // @ts-ignore
+            // @ts-expect-error
             updateData[`system.inventories.${moveTo}.itemIds`] = [
-                //@ts-ignore // TODO: foundry-vtt-types v10
                 ...this.actor.system.inventories[name].itemIds,
-                //@ts-ignore // TODO: foundry-vtt-types v10
                 ...this.actor.system.inventories[moveTo].itemIds
             ];
         }
@@ -109,7 +106,6 @@ export class InventoryFlow {
      * @param name The inventory name.
      */
     exists(name): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return name === Object.keys(this.actor.system.inventories)
                             .find(inventory => inventory.toLowerCase() === name.toLowerCase());
     }
@@ -120,7 +116,6 @@ export class InventoryFlow {
      * @param name The inventory name to return.
      */
     getOne(name): InventoryData | undefined {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.actor.system.inventories[name];
     }
 
@@ -128,7 +123,6 @@ export class InventoryFlow {
      * Helper to get all inventories.
      */
     getAll(): InventoriesData {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.actor.system.inventories;
     }
 
@@ -196,11 +190,9 @@ export class InventoryFlow {
         if (this.actor.defaultInventory.name === inventoryName) return;
 
         for (const item of items) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
             if (item.id) this.actor.system.inventories[inventoryName].itemIds.push(item.id);
         }
 
-        //@ts-ignore // TODO: foundry-vtt-types v10
         const updateData = {[`system.inventories.${inventoryName}.itemIds`]: this.actor.system.inventories[inventoryName].itemIds};
 
         console.log(`Shadowrun 5e | Executing adding items to inventory`, updateData);
@@ -220,11 +212,8 @@ export class InventoryFlow {
         if (this.actor.defaultInventory.name === name) return;
 
         // Collect affected inventories.
-        //@ts-ignore // TODO: foundry-vtt-types v10
         const inventories: InventoryData[] = name ?
-            //@ts-ignore // TODO: foundry-vtt-types v10
             [this.actor.system.inventories[name]] :
-            //@ts-ignore // TODO: foundry-vtt-types v10
             Object.values(this.actor.system.inventories).filter(({itemIds}) => itemIds.includes(item.id as string));
 
         // No inventory found means, it's in the default inventory and no removal is needed.

@@ -61,7 +61,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
 
             // Create the item
             let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
-            //@ts-ignore TODO: Foundry Where is my foundry base data?
+            //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.category].id;
 
             // Import Flags
@@ -79,7 +79,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             items.push(item);
         }
 
-        // @ts-ignore // TODO: TYPE: Remove this.
+        // @ts-expect-error // TODO: TYPE: Remove this.
         return await Item.create(items);
     }
 }

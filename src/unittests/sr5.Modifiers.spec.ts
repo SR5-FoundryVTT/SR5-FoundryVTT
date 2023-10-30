@@ -106,12 +106,12 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 assert.equal(sitMod.source.active['a'], 1);
             })
 
-            it('correctly deactive a modifier selection', () => {
+            it('correctly deactivate a modifier selection', () => {
                 const sitMod = new SituationModifier({active: {a: 1, b: 2}});
                 assert.equal(sitMod.isActive('a'), true)
 
                 sitMod.setInactive('a');
-                assert.equal(sitMod.isActive('a'), false); // Makre sure it's not active anymore.
+                assert.equal(sitMod.isActive('a'), false); // Make sure it's not active anymore.
                 assert.equal(sitMod.isActive('b'), true); // Make sure only a is touched.
             });
 
@@ -142,14 +142,14 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 assert.equal(sitMod.hasActive, false);
             });
 
-            it('use a fixed user selection instead of suming up', () => {
+            it('use a fixed user selection instead of summing up', () => {
                 const sitMod = new SituationModifier({active: {value: 3, a: 1, b: 3}});
                 sitMod.apply();
 
                 assert.equal(sitMod.total, 3);
             });
 
-            it('use a fixed programmating value before a fixed user selection', () => {
+            it('use a fixed value before a fixed user selection', () => {
                 const sitMod = new SituationModifier({active: {value: 3, a: 1, b: 3}, fixed: -3});
                 assert.equal(sitMod.total, -3);
             });
@@ -196,17 +196,15 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
             })
 
             it('use default modifiers for faulty constructor params', () => {
-                //@ts-ignore
+                //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers({}).source, defaultSourceModifiers);
-                //@ts-ignore
                 assert.deepEqual(new DocumentSituationModifiers(undefined).source, defaultSourceModifiers);
-                //@ts-ignore
+                //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers(null).source, defaultSourceModifiers);
-                //@ts-ignore
+                //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers(0).source, defaultSourceModifiers);
-                //@ts-ignore
+                //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers(1).source, defaultSourceModifiers);
-                //@ts-ignore
                 assert.deepEqual(new DocumentSituationModifiers().source, defaultSourceModifiers);
             })
 

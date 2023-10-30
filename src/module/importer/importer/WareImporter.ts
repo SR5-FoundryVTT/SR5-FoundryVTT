@@ -69,7 +69,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
             let item = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             // TODO: Does this type mixture cause later issues? Will it carry over?
-            //@ts-ignore
+            //@ts-expect-error
             item.folder = folders[category].id;
 
             // Bioware has no wireless feature, so disable it by default
@@ -92,7 +92,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
             items.push(item);
         }
 
-        // @ts-ignore // TODO: TYPE: Remove this.
+        // @ts-expect-error // TODO: TYPE: Remove this.
         return await Item.create(items);
     }
 }

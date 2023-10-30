@@ -109,27 +109,27 @@ export class SR5Actor extends Actor {
 
         switch (this.type) {
             case 'character':
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 CharacterPrep.prepareBaseData(this.system);
                 break;
             case "critter":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 CritterPrep.prepareBaseData(this.system);
                 break;
             case "spirit":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 SpiritPrep.prepareBaseData(this.system);
                 break;
             case "sprite":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 SpritePrep.prepareBaseData(this.system);
                 break;
             case "vehicle":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 VehiclePrep.prepareBaseData(this.system);
                 break;
             case "ic":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 ICPrep.prepareBaseData(this.system);
                 break;
         }
@@ -143,7 +143,6 @@ export class SR5Actor extends Actor {
         // overwritten.
         super.prepareEmbeddedDocuments();
 
-        // @ts-ignore
         // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
         //       look at this beautiful piece of software and shiver in it's glory.
         // ClientDocumentMixin(class {}).prototype.prepareEmbeddedDocuments.apply(this);
@@ -174,9 +173,9 @@ export class SR5Actor extends Actor {
      * 
      * NOTE: FoundryVTT applyActiveEffects will check for disabled effects.
      */
-    //@ts-ignore TODO: foundry-vtt-types v10
+    //@ts-expect-error TODO: foundry-vtt-types v10
     override *allApplicableEffects() {
-        // @ts-ignore TODO: foundry-vtt-types v10
+        // @ts-expect-error TODO: foundry-vtt-types v10
         for (const effect of super.allApplicableEffects()) {
             // Item owned effects should only apply when the item is equipped.
             // TODO: implement effect.isEquippedOnly and allow for effects of unequipped items to also apply...
@@ -204,30 +203,115 @@ export class SR5Actor extends Actor {
         const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item as unknown as Shadowrun.ShadowrunItemData));
         switch (this.type) {
             case 'character':
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 CharacterPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "critter":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 CritterPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "spirit":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 SpiritPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "sprite":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 SpritePrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "vehicle":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 VehiclePrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
             case "ic":
-                //@ts-ignore // TODO: foundry-vtt-types v10
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 ICPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
         }
+    }
+
+    /**
+     * NOTE: This method is unused at the moment, keep it for future inspiration.
+     */
+    applyOverrideActiveEffects() {
+        const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
+            if (effect.data.disabled) return changes;
+
+            // include changes partially matching given keys.
+            return changes.concat(effect.data.changes
+                .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
+                .map(change => {
+                    // @ts-expect-error // Foundry internal code, duplicate doesn't like EffectChangeData
+                    change = foundry.utils.duplicate(change);
+                    // @ts-expect-error
+                    change.effect = effect;
+                    change.priority = change.priority ?? (change.mode * 10);
+
+                    return change;
+                }));
+        }, []);
+        // Sort changes according to priority, in case it's ever needed.
+        // @ts-expect-error // a / b can't be null here...
+        changes.sort((a, b) => a.priority - b.priority);
+
+        for (const change of changes) {
+            // @ts-expect-error
+            change.effect.apply(this, change);
+        }
+    }
+
+    /**
+     * A helper method to only apply a subset of keys instead of all.
+     * @param partialKeys Can either be complete keys or partial keys
+     */
+    _applySomeActiveEffects(partialKeys: string[]) {
+        const changes = this._reduceEffectChangesByKeys(partialKeys);
+        this._applyActiveEffectChanges(changes);
+    }
+
+
+    /**
+     * A helper method to apply a active effect changes collection (which might come from multiple active effects)
+     * @param changes
+     */
+    _applyActiveEffectChanges(changes: EffectChangeData[]) {
+        const overrides = {};
+
+        for (const change of changes) {
+            // @ts-expect-error
+            const result = change.effect.apply(this, change);
+            if (result !== null) overrides[change.key] = result;
+        }
+
+        this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
+    }
+
+    /**
+     * Reduce all changes across multiple active effects that match the given set of partial keys
+     * @param partialKeys Can either be complete keys or partial keys
+     */
+    _reduceEffectChangesByKeys(partialKeys: string[]): EffectChangeData[] {
+        // Collect only those changes matching the given partial keys.
+        const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
+            if (effect.data.disabled) return changes;
+
+            // include changes partially matching given keys.
+            return changes.concat(effect.data.changes
+                .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
+                .map(change => {
+                    // @ts-expect-error // Foundry internal code, duplicate doesn't like EffectChangeData
+                    change = foundry.utils.duplicate(change);
+                    // @ts-expect-error
+                    change.effect = effect;
+                    change.priority = change.priority ?? (change.mode * 10);
+
+                    return change;
+                }));
+        }, []);
+        // Sort changes according to priority, in case it's ever needed.
+        // @ts-expect-error // TODO: foundry-vtt-types v10
+        changes.sort((a, b) => a.priority - b.priority);
+
+        return changes;
     }
 
     /**
@@ -270,14 +354,11 @@ export class SR5Actor extends Actor {
 
     findLimit(limitName?: string): Shadowrun.LimitField | undefined {
         if (!limitName) return undefined;
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.limits[limitName];
     }
 
     getWoundModifier(): number {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (!("wounds" in this.system)) return 0;
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return -1 * this.system.wounds.value || 0;
     }
 
@@ -293,17 +374,14 @@ export class SR5Actor extends Actor {
 
         const uses = Math.min(edge.value, usesLeft + by);
 
-        // @ts-ignore
         await this.update({'data.attributes.edge.uses': uses});
     }
 
     getEdge(): Shadowrun.EdgeAttributeField {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.attributes.edge;
     }
 
     hasArmor(): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return "armor" in this.system;
     }
 
@@ -314,9 +392,7 @@ export class SR5Actor extends Actor {
      */
     getArmor(damage?:Shadowrun.DamageData): Shadowrun.ActorArmorData {
         // Prepare base armor data.
-        //@ts-ignore // TODO: foundry-vtt-types v10
         const armor = "armor" in this.system ? 
-            //@ts-ignore // TODO: foundry-vtt-types v10
             foundry.utils.duplicate(this.system.armor) : 
             DataDefaults.actorArmorData();
         // Prepare damage to apply to armor.
@@ -342,9 +418,7 @@ export class SR5Actor extends Actor {
     }
 
     getMatrixDevice(): SR5Item | undefined {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (!("matrix" in this.system)) return;
-        //@ts-ignore // TODO: foundry-vtt-types v10
         const matrix = this.system.matrix;
         if (matrix.device) return this.items.get(matrix.device);
     }
@@ -355,7 +429,6 @@ export class SR5Actor extends Actor {
         } else if (this.isCharacter()) {
             const character = this.asCharacter();
             if (character) {
-                //@ts-ignore // TODO: foundry-vtt-types v10
                 let att = character.system.full_defense_attribute;
                 if (!att) att = 'willpower';
                 return this.findAttribute(att);
@@ -372,7 +445,7 @@ export class SR5Actor extends Actor {
      */
     get recoilCompensation(): number {
         if(!this.system.values.hasOwnProperty('recoil_compensation')) return 0;
-        //@ts-ignore
+        //@ts-expect-error
         return this.system.values.recoil_compensation.value;
     }
 
@@ -391,19 +464,17 @@ export class SR5Actor extends Actor {
      */
     get recoil(): number {
         if(!this.system.values.hasOwnProperty('recoil')) return 0;
-        //@ts-ignore
+        //@ts-expect-error
         return this.system.values.recoil.value;
     }
 
     getDeviceRating(): number {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (!("matrix" in this.system)) return 0;
-        // @ts-ignore // parseInt does indeed allow number types.
+        // @ts-expect-error // parseInt does indeed allow number types.
         return parseInt(this.system.matrix.rating);
     }
 
     getAttributes(): Shadowrun.Attributes {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.attributes;
     }
 
@@ -427,7 +498,6 @@ export class SR5Actor extends Actor {
     }
 
     getLimits(): Shadowrun.Limits {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.limits;
     }
 
@@ -460,10 +530,8 @@ export class SR5Actor extends Actor {
     }
 
     isGrunt() {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (!("is_npc" in this.system) || !("npc" in this.system)) return false;
 
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.is_npc && this.system.npc.is_grunt;
     }
 
@@ -484,10 +552,8 @@ export class SR5Actor extends Actor {
     }
 
     getVehicleTypeSkillName(): string | undefined {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (!("vehicleType" in this.system)) return;
 
-        //@ts-ignore // TODO: foundry-vtt-types v10
         switch (this.system.vehicleType) {
             case 'air':
                 return 'pilot_aircraft';
@@ -518,12 +584,10 @@ export class SR5Actor extends Actor {
     }
 
     getSkills(): Shadowrun.CharacterSkills {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.skills;
     }
 
     getActiveSkills(): Shadowrun.Skills {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.skills.active;
     }
 
@@ -561,7 +625,6 @@ export class SR5Actor extends Actor {
      * Determine if an actor is awakened / magical in some kind.
      */
     get isAwakened(): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return this.system.special === 'magic';
     }
 
@@ -571,7 +634,6 @@ export class SR5Actor extends Actor {
      */
     get isEmerged(): boolean {
         if (this.isSprite()) return true;
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (this.isCharacter() && this.system.special === 'resonance') return true;
 
         return false;
@@ -581,9 +643,9 @@ export class SR5Actor extends Actor {
      * Return the full pool of a skill including attribute and possible specialization bonus.
      * @param skillId The ID of the skill. Note that this can differ from what is shown in the skill list. If you're
      *                unsure about the id and want to search
-     * @param options An object to change the behaviour.
+     * @param options An object to change the behavior.
      *                The property specialization will trigger the pool value to be raised by a specialization modifier
-     *                The property byLbale will cause the param skillId to be interpreted as the shown i18n label.
+     *                The property byLabel will cause the param skillId to be interpreted as the shown i18n label.
      */
     getPool(skillId: string, options = {specialization: false, byLabel: false}): number {
         const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
@@ -621,7 +683,6 @@ export class SR5Actor extends Actor {
         if (options.byLabel)
             return this.getSkillByLabel(id);
 
-        //@ts-ignore // TODO: foundry-vtt-types v10
         const {skills} = this.system;
 
         // Find skill by direct id to key matching.
@@ -697,17 +758,16 @@ export class SR5Actor extends Actor {
     /**
      * Add a new knowledge skill for a specific category.
      * 
-     * Knowledge skills are stored separataly from active and language skills and have
+     * Knowledge skills are stored separately from active and language skills and have
      * some values pre-defined by their category (street, professional, ...)
      * 
-     * @param category Define the knowledege skill category
+     * @param category Define the knowledge skill category
      * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
-     * @returns The id of the created knowledege skill.
+     * @returns The id of the created knowledge skill.
      */
     async addKnowledgeSkill(category: keyof Shadowrun.KnowledgeSkills, skill: Partial<Shadowrun.SkillField>={name: SKILL_DEFAULT_NAME}): Promise<string|undefined> {
-        //@ts-ignore // prevent accidental creation for wrong categories TODO: foundry-vtt-types v10
         if (!this.system.skills.knowledge.hasOwnProperty(category)) {
-            console.error(`Shadowrun5e | Tried creating knowledge skill with unkown category ${category}`);
+            console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
             return;
         }
         
@@ -789,7 +849,7 @@ export class SR5Actor extends Actor {
     /**
      * Remove a knowledge skill
      * @param skillId What skill id to delete.
-     * @param category The matching knowledege skill category for skillId
+     * @param category The matching knowledge skill category for skillId
      */
     async removeKnowledgeSkill(skillId: string, category: keyof Shadowrun.KnowledgeSkills) {
         const updateData = Helpers.getDeleteKeyUpdateData(`system.skills.knowledge.${category}.value`, skillId);
@@ -812,7 +872,7 @@ export class SR5Actor extends Actor {
         if (skill.name === '' && skill.label !== undefined && skill.label !== '') {
             await this.hideSkill(skillId);
             // NOTE: For some reason unlinked token actors won't cause a render on update?
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             if (!this.prototypeToken.actorLink)
                 await this.sheet?.render();
             return;
@@ -858,7 +918,7 @@ export class SR5Actor extends Actor {
     /**
      * Show all hidden skills.
      * 
-     * For hidding/unhiding skill see SR5Actor#showSkill and SR5Actor#hideSkill.
+     * For hiding/showing skill see SR5Actor#showSkill and SR5Actor#hideSkill.
      */
     async showHiddenSkills() {
         const updateData = {};
@@ -875,7 +935,7 @@ export class SR5Actor extends Actor {
 
         await this.update(updateData);
         // NOTE: For some reason unlinked token actors won't cause a render on update?
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (!this.prototypeToken.actorLink)
             await this.sheet?.render();
     }
@@ -1078,9 +1138,8 @@ export class SR5Actor extends Actor {
      * @param key
      * @param value
      */
-    //@ts-ignore // TODO: foundry-vtt-types v10
+    //@ts-expect-error // TODO: foundry-vtt-types v10
     setFlag(scope: string, key: string, value: any): Promise<any> {
-        //@ts-ignore TODO: foundry-vtt-types v10
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
     }
@@ -1090,16 +1149,15 @@ export class SR5Actor extends Actor {
      * @param scope
      * @param key
      */
-    //@ts-ignore // TODO: foundry-vtt-types v10
+    //@ts-expect-error // TODO: foundry-vtt-types v10
     getFlag(scope: string, key: string): any {
-        //@ts-ignore TODO: foundry-vtt-types v10
         const data = super.getFlag(scope, key);
         return Helpers.onGetFlag(data);
     }
 
     /** Return either the linked token or the token of the synthetic actor.
      *
-     * @retrun Will return null should no token have been placed on scene.
+     * @return Will return null should no token have been placed on scene.
      */
     getToken(): TokenDocument | null {
         // Linked actors can only have one token, which isn't stored within actor data...
@@ -1118,7 +1176,7 @@ export class SR5Actor extends Actor {
      * There is no need for a token to placed. The prototype token is enough.
      */
     _isLinkedToToken(): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         // If an actor is linked, all it's copies also contain this linked status, even if they're not.
         return this.prototypeToken.actorLink && !this.token;
     }
@@ -1149,7 +1207,7 @@ export class SR5Actor extends Actor {
     }
 
     getActivePlayerOwners(): User[] {
-        // @ts-ignore
+        // @ts-expect-error
         return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
@@ -1158,7 +1216,6 @@ export class SR5Actor extends Actor {
         if (track.value === track.max) return track;
 
         //  Avoid cross referencing.
-        // @ts-ignore
         track = duplicate(track);
 
         track.value += damage.value;
@@ -1186,15 +1243,45 @@ export class SR5Actor extends Actor {
         await device.update(updateData);
     }
 
+    /**
+     * Apply damage to an actors main damage monitor / track.
+     * 
+     * This includes physical and stun for meaty actors and matrix for matrix actors.
+     * 
+     * Applying damage will also reduce the initiative score of an active combatant.
+     * 
+     * Handles rule 'Changing Initiative' on SR5#160.
+     * 
+     * @param damage The damage to be taken.
+     * @param track The track to apply that damage to.
+     */
     async _addDamageToTrack(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData) {
         if (damage.value === 0) return;
         if (track.value === track.max) return;
 
+        // Allow a wound modifier difference to be calculated after damage has been dealt.
+        const woundsBefore = this.getWoundModifier();
+
+        // Apply damage to track and trigger derived value calculation.
         track = this.__addDamageToTrackValue(damage, track);
         const updateData = {[`system.track.${damage.type.value}`]: track};
         await this.update(updateData);
+
+        // Apply any wounds modifier delta to an active combatant.
+        const woundsAfter = this.getWoundModifier();
+        const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
+
+        // Only actors that can have a wound modifier, will have a delta.
+        if (iniAdjustment < 0 && game.combat) game.combat.adjustActorInitiative(this, iniAdjustment);
     }
 
+    /**
+     * Apply damage to an actors physical overflow damage monitor / track.
+     * 
+     * @param damage The damage to overflow.
+     * @param track The track to overflow the damage into.
+     * @returns 
+     */
     async _addDamageToOverflow(damage: Shadowrun.DamageData, track: Shadowrun.OverflowTrackType) {
         if (damage.value === 0) return;
         if (track.overflow.value === track.overflow.max) return;
@@ -1220,10 +1307,10 @@ export class SR5Actor extends Actor {
     async healDamage(track: Shadowrun.DamageType, healing: number) {
         console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
 
-        // @ts-ignore
+        // @ts-expect-error
         if (!this.system?.track.hasOwnProperty(track)) return
 
-        // @ts-ignore
+        // @ts-expect-error
         const current = Math.max(this.system.track[track].value - healing, 0);
 
         await this.update({[`system.track.${track}.value`]: current});
@@ -1312,6 +1399,8 @@ export class SR5Actor extends Actor {
      * @returns overflow damage.
      */
     async addDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData|undefined> {
+        const previousWounds = this.getWoundModifier();
+
         switch(damage.type.value) {
             case 'matrix':
                 return await this.addMatrixDamage(damage);
@@ -1321,9 +1410,8 @@ export class SR5Actor extends Actor {
                 return await this.addPhysicalDamage(damage);
         }
 
-        console.error('Shadowrun 5e | Actor does not support given damage type: ', damage);
+        const currentWounds = this.getWoundModifier();
 
-        // TODO: Add automated combat ini score modifier here.
     }
 
     /**
@@ -1388,21 +1476,16 @@ export class SR5Actor extends Actor {
         overflow.value = overflowDamage;
         rest.value = restDamage;
 
-        // @ts-ignore
         return {overflow, rest};
     }
 
     getStunTrack(): Shadowrun.TrackType | undefined {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if ("track" in this.system && "stun" in this.system.track)
-            //@ts-ignore // TODO: foundry-vtt-types v10
             return this.system.track.stun;
     }
 
     getPhysicalTrack(): Shadowrun.OverflowTrackType | undefined {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if ("track" in this.system && "physical" in this.system.track)
-            //@ts-ignore // TODO: foundry-vtt-types v10
             return this.system.track.physical;
     }
 
@@ -1413,15 +1496,13 @@ export class SR5Actor extends Actor {
      */
     getMatrixTrack(): Shadowrun.ConditionData | undefined {
         // Some actors will have a direct matrix track.
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if ("track" in this.system && "matrix" in this.system.track) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
             return this.system.track.matrix;
         }
 
         // Some actors will have a personal matrix condition monitor, like a device condition monitor.
         if (this.isMatrixActor) {
-            // @ts-ignore isMatrixActor checks for the matrix attribute
+            // @ts-expect-error isMatrixActor checks for the matrix attribute
             return this.system.matrix.condition_monitor;
         }
 
@@ -1439,13 +1520,10 @@ export class SR5Actor extends Actor {
 
         const modified = duplicate(this.getArmor());
         if (modified) {
-            // @ts-ignore
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
-            // @ts-ignore
             modified.value = Helpers.calcTotal(modified, {min: 0});
         }
 
-        // @ts-ignore
         return modified;
     }
 
@@ -1468,7 +1546,7 @@ export class SR5Actor extends Actor {
         if (!combatant) return;
         if (!combatant.initiative) return;
 
-        // While not prohibiting, inform user about missing ressource.
+        // While not prohibiting, inform user about missing resource.
         if (combatant.initiative + modifier < 0) {
             ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
         }
@@ -1508,44 +1586,37 @@ export class SR5Actor extends Actor {
     }
 
     hasDamageTracks(): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return "track" in this.system;
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asVehicle(): Shadowrun.VehicleActorData | undefined {
         if (this.isVehicle())
             return this as unknown as Shadowrun.VehicleActorData;
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asCharacter(): Shadowrun.CharacterActorData | undefined {
         if (this.isCharacter())
             return this as unknown as Shadowrun.CharacterActorData;
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asSpirit(): Shadowrun.SpiritActorData | undefined {
         if (this.isSpirit()) {
             return this as unknown as Shadowrun.SpiritActorData;
         }
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asSprite(): Shadowrun.SpriteActorData | undefined {
         if (this.isSprite()) {
             return this as unknown as Shadowrun.SpriteActorData;
         }
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asCritter(): Shadowrun.CritterActorData | undefined {
         if (this.isCritter()) {
             return this as unknown as Shadowrun.CritterActorData;
         }
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10 - will return the item 
     asIC(): Shadowrun.ICActorData | undefined {
         if (this.isIC()) {
             return this as unknown as Shadowrun.ICActorData;
@@ -1553,9 +1624,7 @@ export class SR5Actor extends Actor {
     }
 
     getVehicleStats(): Shadowrun.VehicleStats | undefined {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (this.isVehicle() && "vehicle_stats" in this.system) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
             return this.system.vehicle_stats;
         }
     }
@@ -1586,7 +1655,7 @@ export class SR5Actor extends Actor {
         const vehicle = this.asVehicle();
         if (!vehicle) return false;
 
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         return this.system.driver.length > 0;
     }
 
@@ -1595,7 +1664,7 @@ export class SR5Actor extends Actor {
         const vehicle = this.asVehicle();
         if (!vehicle) return;
 
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const driver = game.actors?.get(this.system.driver) as SR5Actor;
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver) return;
@@ -1624,7 +1693,7 @@ export class SR5Actor extends Actor {
 
     async _updateICHostData(hostData: Shadowrun.HostItemData) {
         const updateData = {
-            // @ts-ignore _id is missing on internal typing...
+            // @ts-expect-error _id is missing on internal typing...
             id: hostData._id,
             rating: hostData.system.rating,
             atts: duplicate(hostData.system.atts)
@@ -1656,7 +1725,6 @@ export class SR5Actor extends Actor {
     hasHost(): boolean {
         const ic = this.asIC();
         if (!ic) return false;
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return ic && !!ic.system.host.id;
     }
 
@@ -1666,7 +1734,6 @@ export class SR5Actor extends Actor {
     getICHost(): SR5Item | undefined {
         const ic = this.asIC();
         if (!ic) return;
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return game.items?.get(ic?.system?.host.id);
     }
 
@@ -1701,13 +1768,12 @@ export class SR5Actor extends Actor {
      * Check if the current actor has matrix capabilities.
      */
     get isMatrixActor(): boolean {
-        //@ts-ignore // TODO: foundry-vtt-types v10
         return 'matrix' in this.system;
     }
 
     get matrixData(): Shadowrun.MatrixData | undefined {
         if (!this.isMatrixActor) return;
-        // @ts-ignore // isMatrixActor handles it, TypeScript doesn't know.
+        // @ts-expect-error // isMatrixActor handles it, TypeScript doesn't know.
         return this.system.matrix as Shadowrun.MatrixData;
     }
 
@@ -1735,7 +1801,6 @@ export class SR5Actor extends Actor {
         }
         if (target.actor && !target.actor.isMatrixActor) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
-            // @ts-ignore
             return console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
         }
         if (!target.actor) {
@@ -1851,7 +1916,7 @@ export class SR5Actor extends Actor {
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
-        // @ts-ignore
+        // @ts-expect-error
         return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => ({
@@ -1867,7 +1932,7 @@ export class SR5Actor extends Actor {
      * @returns A positive number or zero.
      */
     get previousAttacks(): number {
-        //@ts-ignore TODO: foundry-vtt-types v10
+        //@ts-expect-error TODO: foundry-vtt-types v10
         return Math.max(this.system.modifiers.multi_defense * -1, 0);
     }
     /**
@@ -1899,7 +1964,7 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Add a firemodes recoil to the progressive recoil.
+     * Add a firemode recoil to the progressive recoil.
      * 
      * @param fireMode Ranged Weapon firemode used to attack with.
      */
@@ -1932,7 +1997,7 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Determinal if the actor has a physical body
+     * Determine if the actor has a physical body
      * 
      * @returns true, if the actor can interact with the physical plane
      */

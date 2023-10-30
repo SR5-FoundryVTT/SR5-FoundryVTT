@@ -216,7 +216,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isMatrixAction(): boolean {
-        // @ts-ignore
+        // @ts-expect-error
         return this.isAction() && this.getData().result.success.matrix.placeMarks;
     }
 
@@ -229,7 +229,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getId(): string {
-        // @ts-ignore // TODO: Foundry Where is my foundry base data?
+        // @ts-expect-error // TODO: Foundry Where is my foundry base data?
         return this.data._id;
     }
 
@@ -413,7 +413,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getActionResult(): ActionResultData {
-        // @ts-ignore
+        // @ts-expect-error
         return this.getData().result;
     }
 }

@@ -13,8 +13,8 @@
       "name": "Jan Schoska",
       "discord": "taM#9507"
   }],
-  "url": "https://github.com/smilligan93/SR5-FoundryVTT",
-  "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues",
+  "url": "https://github.com/SR5-FoundryVTT/SR5-FoundryVTT",
+  "bugs": "https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/issues",
   "flags": {
     "allowBugReporter": true
   },

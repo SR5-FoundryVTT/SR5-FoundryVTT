@@ -28,7 +28,6 @@ export class FormDialog extends Dialog<FormDialogOptions> {
     _templatePath: string;
 
     constructor(data: FormDialogData, options?: FormDialogOptions) {
-        // @ts-ignore
         super(data, options);
 
         const {templateData, templatePath} = data;
@@ -68,7 +67,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         this.applyFormData();
 
         super.submit(button);
-        // @ts-ignore
+        // @ts-expect-error
         await this.afterSubmit("jQuery" in this.options ? this.element : this.element [0]);
     }
 
@@ -81,33 +80,32 @@ export class FormDialog extends Dialog<FormDialogOptions> {
     }
 
     /**
-     * Allow Foundry Sheet behaviour for dialogs with complex forms.
+     * Allow Foundry Sheet behavior for dialogs with complex forms.
      * @returns
      */
     applyFormData() {
-        //@ts-ignore // TODO: FormDialog class definition should override options,but doesn't.
         if (!this.options.applyFormChangesOnSubmit) return;
 
         if ( !this.form ) throw new Error(`The FormApplication subclass has no registered form element`);
         const fd = new FormDataExtended(this.form, {editors: {}});
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const data = fd.object;
 
         this._updateData(data);
     }
 
     _updateData(data) {
-        //@ts-ignore // TODO: FormDialog.data typing is missing
+        //@ts-expect-error // TODO: FormDialog.data typing is missing
         foundry.utils.mergeObject(this.data.templateData, data);
     }
 
-    //@ts-ignore
+    //@ts-expect-error
     getData() {
         // Dialog.getData expects buttons to be set.
         this.data.buttons = this.data.buttons || this.buttons;
         this._amendButtonsWithName(this.data.buttons);
 
-        // Call preconfigured Dialog.getData.
+        // Call pre-configured Dialog.getData.
         const data = super.getData();
 
         // Merge default Dialog data with whatever's been given.

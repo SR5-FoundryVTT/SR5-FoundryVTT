@@ -42,7 +42,7 @@ export class Version0_12_0 extends VersionMigration {
 
         console.error(this, dialog.data);
 
-        // @ts-ignore
+        // @ts-expect-error
         this.onlyDisableEffects = dialog.data.templateData.onlyDisableEffects;
 
         return true;
@@ -109,7 +109,7 @@ export class Version0_12_0 extends VersionMigration {
      */
     static async DisableLocalItemOwnedEffects(actor: SR5Actor) {
         const itemOriginEffects = actor.effects
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             .filter(effect => effect.origin.includes('.Item.') && !effect.disabled);
         
         if (itemOriginEffects.length === 0) return {};
@@ -129,7 +129,7 @@ class ConfigurationDialog extends FormDialog {
         data.templateData = {onlyDisableEffects: data.onlyDisableEffects};
         data.templatePath = 'systems/shadowrun5e/dist/templates/apps/migrator/Version12.0.0.hbs';
         data.title = 'Version 12.0.0';
-        //@ts-ignore
+        //@ts-expect-error
         super(data, {applyFormChangesOnSubmit: true});
     }
     

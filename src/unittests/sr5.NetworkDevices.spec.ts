@@ -51,7 +51,6 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
             const item = await testItem.create({type: 'weapon'});
             const embeddedItems = await actor.createEmbeddedDocuments('Item', [item.toObject()]);
             const embeddedItem = embeddedItems[0];
-            // @ts-ignore // ignore undefined
             const link = NetworkDeviceFlow.buildLink(embeddedItem);
             const resolvedItem = await NetworkDeviceFlow.resolveLink(link)
 
@@ -60,12 +59,12 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         });
 
         it('resolve a network link back to a token collection document', async () => {
-            // Test TokenDokument Actor
+            // Test TokenDocument Actor
             const scene = await testScene.create({name: 'Test'});
             const actor = await testActor.create({'type': 'character'});
             const token = await getDocumentClass('Token').create(await actor.getTokenData({x: 0, y: 0}), {parent: scene});
 
-            // @ts-ignore // ignore null
+            // @ts-expect-error // ignore null
             const link = NetworkDeviceFlow.buildLink(token);
             const resolvedToken = await NetworkDeviceFlow.resolveLink(link);
 
@@ -196,7 +195,7 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
             assert.strictEqual(device.system.networkController, newController.uuid);
         });
 
-        it('remove an item network device that doesnt exist anymore', async () => {
+        it("remove an item network device that doesn't exist anymore", async () => {
             const controller = await testItem.create({type: 'device'});
             const device = await testItem.create({type: 'weapon'});
             const deviceId = device.id;
@@ -215,7 +214,7 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
             assert.deepEqual(controller.system.networkDevices, []);
         });
 
-        it('remove a vehicle network device that doesnt exist anymore', async () => {
+        it("remove a vehicle network device that doesn't exist anymore", async () => {
             const controller = await testItem.create({type: 'device'});
             const device = await testActor.create({type: 'vehicle'});
             const deviceId = device.id;

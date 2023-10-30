@@ -31,7 +31,7 @@ export class OpposedTest extends SuccessTest {
 
         // Use the supplied original active test to create a reference.
         // If nothing was given create a default placeholder
-        // @ts-ignore // Feed original / active test data into the class originally used for ease of access.
+        // Feed original / active test data into the class originally used for ease of access.
         const AgainstCls = data.against ? TestCreator._getTestClass(data.against.type) : SuccessTest;
         this.against = new AgainstCls(data.against || {});
     }
@@ -58,7 +58,6 @@ export class OpposedTest extends SuccessTest {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;
         }
-        // @ts-ignore // TODO: Typing expects a boolean, though OpposedTestData defines it as string. Odd.
         if (againstData.opposed.type !== '') {
             console.warn(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
         }
@@ -77,7 +76,7 @@ export class OpposedTest extends SuccessTest {
             pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
             limit: DataDefaults.valueData({label: 'SR5.Limit'}),
             threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
-            //@ts-ignore
+            //@ts-expect-error
             values: {},
 
             sourceItemUuid: againstData.sourceItemUuid,
@@ -110,7 +109,7 @@ export class OpposedTest extends SuccessTest {
             }
         }
 
-        //@ts-ignore
+        //@ts-expect-error
         return await this._prepareActionTestData(action, actor, data);
     }
 

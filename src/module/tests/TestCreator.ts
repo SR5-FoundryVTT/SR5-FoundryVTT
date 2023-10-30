@@ -62,7 +62,7 @@ export const TestCreator = {
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
     fromItem: async function(item: SR5Item, actor?: SR5Actor, options?: TestOptions): Promise<any | undefined> {
-        //@ts-ignore Default to item parent actor, if none given.
+        //@ts-expect-error Default to item parent actor, if none given.
         if (!actor) actor = item.parent;
         if (!(actor instanceof SR5Actor)) {
             console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
@@ -77,14 +77,13 @@ export const TestCreator = {
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
         }
 
-        // @ts-ignore // Check for test class registration.
+        // @ts-expect-error // Check for test class registration.
         if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
             console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
             return;
         }
 
         // Any action item will return a list of values to create the test pool from.
-        // @ts-ignore // Get test class from registry to allow custom module tests.
         const cls = TestCreator._getTestClass(action.test);
         const data = await TestCreator._getTestDataFromItemAction(cls, item, actor);
         const documents = {item, actor};
@@ -104,14 +103,13 @@ export const TestCreator = {
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
         }
 
-        // @ts-ignore // Check for test class registration.
+        // @ts-expect-error // Check for test class registration.
         if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
             console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
             return;
         }
 
         // Any action item will return a list of values to create the test pool from.
-        // @ts-ignore // Get test class from registry to allow custom module tests.
         const cls = TestCreator._getTestClass(action.test);
         const data = await TestCreator._prepareTestDataWithAction(action, actor, TestCreator._minimalTestData());
         const documents = {actor};
@@ -195,7 +193,6 @@ export const TestCreator = {
             return;
         }
 
-        // @ts-ignore // TODO: Add typing by declaration merging
         const testClass = TestCreator._getTestClass(testClsName);
         if (!testClass) {
             console.error(`Shadowrun 5e | Couldn't find a registered test implementation for ${testClsName}`);
@@ -242,7 +239,6 @@ export const TestCreator = {
      */
     fromTestData: function(data: TestData, documents?: TestDocuments, options?: TestOptions): SuccessTest {
         const type = data.type || 'SuccessTest';
-        // @ts-ignore
         const cls = TestCreator._getTestClass(type);
         return new cls(data, documents, options);
     },
@@ -291,7 +287,6 @@ export const TestCreator = {
         if (!test.item) return console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
         if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
 
-        // @ts-ignore // TODO: Type merging
         const testCls = TestCreator._getTestClass(test.data.action.followed.test);
         if (!testCls) return console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
 
@@ -337,11 +332,11 @@ export const TestCreator = {
      */
     _getTestClass: function(testName: string): any | undefined {
         if (!testName) return;
-        //@ts-ignore
-        if (!game.shadowrun5e.tests.hasOwnProperty(testName)) { //@ts-ignore
+        //@ts-expect-error
+        if (!game.shadowrun5e.tests.hasOwnProperty(testName)) { //@ts-expect-error
             console.error(`Shadowrun 5e | Tried getting a Test Class ${testName}, which isn't registered in: `, game.shadowrun5e.tests);
             return;
-        } //@ts-ignore
+        } //@ts-expect-error
         return game.shadowrun5e.tests[testName];
     },
 
@@ -461,7 +456,7 @@ export const TestCreator = {
         }
         
         // Include pool modifiers that have been collected on the action item.
-        // Thes can come from nested items and more.
+        // These can come from nested items and more.
         if(action.dice_pool_mod) {
             action.dice_pool_mod.forEach(mod => PartsList.AddUniquePart(data.modifiers.mod, mod.name, mod.value));
         }
@@ -517,7 +512,7 @@ export const TestCreator = {
                 const segments = modifier.split('.') as string[];
                 if (segments.length > 2) console.error('Shadowrun 5e | Action contained a partial modifier with more than two segments', modifier, data.action);
 
-                // Record the modifier catgeory with it's single applicable.
+                // Record the modifier category with it's single applicable.
                 const [category, applicable] = segments;
                 modifiers[category] = modifiers[category] ?? [];
                 modifiers[category].push(applicable);
@@ -571,7 +566,7 @@ export const TestCreator = {
      * C: action.armor == true will be overwritten by minimalAction.armor == false
      *
      * @param sourceAction Main action, as defined by user input.
-     * @param defaultActions List of partial actions, as defined by test implementions.
+     * @param defaultActions List of partial actions, as defined by test implementations.
      * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
      */
     _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: Partial<Shadowrun.MinimalActionData>[]): Shadowrun.ActionRollData {
@@ -603,7 +598,7 @@ export const TestCreator = {
      * @param action The original action data.
      * @param defaultAction A partial action that may provide values to apply to the main action.
      * @param key The action key to take the value from
-     * @returns true for when the orgiginal action value should be kept, false if it's to be overwritten.
+     * @returns true for when the original action value should be kept, false if it's to be overwritten.
      */
     _keepItemActionValue(action: Shadowrun.ActionRollData, defaultAction: Partial<Shadowrun.MinimalActionData>, key: string): boolean {
         if (!defaultAction.hasOwnProperty(key)) return true;

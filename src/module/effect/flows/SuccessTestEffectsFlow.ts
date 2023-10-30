@@ -68,7 +68,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * static values.
      */
     async createTargetActorEffectsAfterOpposedTest() {
-        //@ts-ignore Assure test is an opposed test.
+        //@ts-expect-error Assure test is an opposed test.
         const against = this.test.against;
         const actor = this.test.actor;
 
@@ -94,7 +94,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         }
 
         console.debug(`Shadowrun5e | To be created effects on target actor ${actor.name}`, effects);
-        //@ts-ignore
+        //@ts-expect-error
         return actor.createEmbeddedDocuments('ActiveEffect', effects);
     }
 
