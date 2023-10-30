@@ -83,12 +83,9 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {
-                // TODO: Would a value of @hits.value be better than @test.hits.value?
                 SR5ActiveEffect.resolveDynamicChangeValue({test: this.test}, change);
                 return change;
             });
-            
-            // TODO: Check if id should be deleted or if it's recreated by creating a new effect.
             
             effects.push(effectData);
         }
@@ -109,8 +106,6 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (!this.test.actor) return;
 
         // Actor effects apply only for all tests.
-        // TODO: CHeck if these include actor.items (and actor.items.items) effects.
-        //       If so, use this general actor effects collection bellow as well for test_all 
         for (const effect of this.test.actor.effects as unknown as SR5ActiveEffect[]) {
             if (effect.applyTo === 'test_all') yield effect;
         }
