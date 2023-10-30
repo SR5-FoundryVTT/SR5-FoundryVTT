@@ -83,7 +83,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue({test: this.test}, change);
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change);
                 return change;
             });
             
@@ -104,6 +104,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     *allApplicable(): Generator<SR5ActiveEffect> {
         // Pool only tests will don't have actors attached.
         if (!this.test.actor) return;
+        // Opposing tests do show the item, however shouldn't use effects from it.
+        if (this.test.opposing) return;
 
         // Actor effects apply only for all tests.
         for (const effect of this.test.actor.effects as unknown as SR5ActiveEffect[]) {
