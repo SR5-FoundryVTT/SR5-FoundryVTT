@@ -30,7 +30,7 @@
                     }}
                 {{/each}}
               
-                {{#ife type 'character'}}
+                {{#ife actor.type 'character'}}
                     {{#if awakened}}
                         {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/MetamagicList.html' }}
                     {{/if}}
