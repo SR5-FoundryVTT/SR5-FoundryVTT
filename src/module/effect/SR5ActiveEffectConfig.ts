@@ -143,7 +143,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
             'system.modifiers': 'SR5.DicePool',
             'system.threshold': 'SR5.Threshold',
             'system.limit': 'SR5.Limit',
-            'system.hits': 'SR5.Hits',
+            'system.values.hits': 'SR5.Hits',
             'system.glitches': 'SR5.Glitches',
             'system.netHits': 'SR5.NetHits'
         }
