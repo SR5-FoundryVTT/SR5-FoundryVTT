@@ -154,7 +154,6 @@ export abstract class VersionMigration {
                     //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(token.actor.data)) continue;
 
-                    // @ts-expect-error
                     const updateData = await this.MigrateActorData(token.actor);
 
                     expandObject(updateData);
@@ -227,7 +226,6 @@ export abstract class VersionMigration {
 
                 console.log(`Migrating Actor ${actor.name}`);
                 console.log(actor);
-                // @ts-expect-error
                 const updateData = await this.MigrateActorData(actor);
                 console.log(updateData);
                 let items = [];
@@ -256,10 +254,8 @@ export abstract class VersionMigration {
      */
     protected async IterateActorItems(actor: SR5Actor, updateData) {
         let hasItemUpdates = false;
-        // @ts-expect-error
         if (actor.items !== undefined) {
             const items = await Promise.all(
-                // @ts-expect-error
                 actor.items.map(async (item) => {
                     if (item instanceof SR5Item) console.error('Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object');
                     if (!await this.ShouldMigrateItemData(item)) return item;

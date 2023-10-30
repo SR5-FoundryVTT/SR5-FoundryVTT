@@ -283,7 +283,6 @@ export class SR5ActiveEffect extends ActiveEffect {
                 this._applyMultiply(object, change, current, delta, changes);
                 break;
             case modes.OVERRIDE:
-                //@ts-expect-error
                 this._applyOverride(object, change, current, delta, changes);
                 break;
             case modes.UPGRADE:
