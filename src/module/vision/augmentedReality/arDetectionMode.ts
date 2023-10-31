@@ -20,7 +20,9 @@ export default class AugmentedRealityVisionDetectionMode extends DetectionMode {
 
       const targetIsNotRunningSilent = !tgt.actor?.system.visibilityChecks.matrix.runningSilent
 
-      return targetHasIcon || targetIsNotRunningSilent
+      const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
+
+      return targetHasIcon && targetIsNotRunningSilent && !isAstralPerceiving
     }
   }
   

@@ -23,8 +23,9 @@ export default class ThermographicVisionDetectionMode extends DetectionMode {
         tgt instanceof TokenDocument
         && !tgt.actor?.system.visibilityChecks.meat.hidden;
 
+        const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 
-      return targetHasHeat && targetIsVisible
+      return targetHasHeat && targetIsVisible && !isAstralPerceiving
 
     }
   }
