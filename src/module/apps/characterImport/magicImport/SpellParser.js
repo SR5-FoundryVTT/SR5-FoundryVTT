@@ -4,7 +4,7 @@ import * as IconAssign from '../../../apps/iconAssigner/iconAssign';
 
 export class SpellParser {
     async parseSpells(chummerChar, assignIcons) {
-        const spells = getArray(chummerChar.spells.spell);
+        const spells = getArray(chummerChar.spells.spell).filter(chummerSpell => !chummerSpell.category_english.includes("Rituals"));
         const parsedSpells = [];
         const iconList = await IconAssign.getIconFiles();
 
@@ -102,9 +102,6 @@ export class SpellParser {
             }
             if (category.toLowerCase() === 'manipulation') {
                 this.handleManipulationSpellSpecifics(system, desc)
-            }
-            if(category.toLowerCase() === 'rituals') {
-                this.handleRitualSpellSpecifics(system, chummerSpell.descriptors)
             }
         }
     }
@@ -214,15 +211,5 @@ export class SpellParser {
                 attribute2: 'strength',
             };
         }
-    }
-
-    handleRitualSpellSpecifics(system, desc) {
-        system.ritual = {};
-        system.ritual.type = desc
-        system.action.opposed = {
-            type: 'custom',
-            attribute: 'force',
-            attribute2: 'force',
-        };
     }
 }
