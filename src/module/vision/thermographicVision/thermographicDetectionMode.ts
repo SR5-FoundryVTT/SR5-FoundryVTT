@@ -17,7 +17,7 @@ export default class ThermographicVisionDetectionMode extends DetectionMode {
       const tgt = target?.document;
       const targetHasHeat =
         tgt instanceof TokenDocument
-        && !tgt.actor?.system.visibilityChecks.meat.hasHeat;
+        && tgt.actor?.system.visibilityChecks.meat.hasHeat;
 
       const targetIsVisible =
         tgt instanceof TokenDocument
