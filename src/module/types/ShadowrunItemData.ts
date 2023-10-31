@@ -26,8 +26,10 @@ declare namespace Shadowrun {
         | CyberwareItemData
         | DeviceItemData
         | EquipmentItemData
+        | EchoItemData
         | HostItemData
         | LifestyleItemData
+        | MetamagicItemData
         | ModificationItemData
         | ProgramItemData
         | QualityItemData
@@ -68,9 +70,11 @@ declare namespace Shadowrun {
         Partial<CritterPowerData> &
         Partial<CyberwareData> &
         Partial<DeviceData> &
+        Partial<EchoData> &
         Partial<EquipmentData> &
         Partial<HostData> &
         Partial<LifestyleData> &
+        Partial<MetamagicData> &
         Partial<ModificationData> &
         Partial<ProgramData> &
         Partial<QualityData> &
@@ -151,6 +155,13 @@ declare namespace Shadowrun {
         data: DeviceData;
         system: DeviceData;
     }
+    export interface EchoItemData {
+        type: 'echo';
+        name: string;
+        img: string;
+        data: EchoData;
+        system: EchoData;
+    }
     export interface EquipmentItemData {
         type: 'equipment';
         name: string;
@@ -171,6 +182,13 @@ declare namespace Shadowrun {
         img: string;
         data: LifestyleData;
         system: LifestyleData;
+    }
+    export interface MetamagicItemData {
+        type: 'metamagic';
+        name: string;
+        img: string;
+        data: MetamagicData;
+        system: MetamagicData;
     }
     export interface ModificationItemData {
         type: 'modification';

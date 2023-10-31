@@ -38,14 +38,13 @@ export class SR5Roll extends Roll {
     // }
 
     get sides(): number[] {
-        //@ts-ignore
         // 0.7.x foundryVTT
         if (this.terms) {
-            //@ts-ignore
+            //@ts-expect-error
             return this.terms[0].results.map(result => result.result);
         }
 
-        //@ts-ignore
+        //@ts-expect-error
         // 0.6.x foundryVTT
         return this.parts[0].rolls.map(roll => roll.roll);
     }
@@ -87,17 +86,16 @@ export class SR5Roll extends Roll {
     /**
      * The amount of dice going into the throw (the pool used).
      * 
-     * NOTE: this can be different from the amount of dice actually thown.
+     * NOTE: this can be different from the amount of dice actually thrown.
      *       Use SR5Roll#diceThrown instead
      */
     get pool(): number {
         // 0.7.x > FoundryVTT
         if (this.terms) {
-            //@ts-ignore
             return this.dice[0].number;
         }
 
-        //@ts-ignore
+        //@ts-expect-error
         // till 0.6.x FoundryVTT
         return this.parts[0].rolls.length;
     }

@@ -1,6 +1,5 @@
 import {_mergeWithMissingSkillFields} from "../../actor/prep/functions/SkillsPrep";
 import { InitiationParser } from "./magicImport/InitiationParser";
-import { MetamagicParser } from "./magicImport/MetamagicParser";
 
 /**
  * Parses all non-item character information from a chummer character object.
@@ -90,6 +89,10 @@ export class CharacterInfoUpdater {
         this.importInitiative(clonedActorSource.system, chummerChar);
         this.importSkills(clonedActorSource.system, chummerChar);
 
+        if(chummerChar.critterpowers?.critterpower) {
+            clonedActorSource.system.is_critter = true;
+        }
+
         return clonedActorSource;
     }
 
@@ -127,7 +130,7 @@ export class CharacterInfoUpdater {
             if (chummerChar.totalkarma) {
                 system.karma.max = chummerChar.totalkarma;
             }
-            if (chummerChar.technomancer && chummerChar.technomancer.toLowerCase() === 'true') {
+            if (chummerChar.technomancer?.toLowerCase() === 'true') {
                 system.special = 'resonance';
             }
             if (
@@ -151,13 +154,8 @@ export class CharacterInfoUpdater {
                 });
 
                 if(chummerChar.initiationgrade) {
-                    new InitiationParser().parseInitiation(chummerChar, system)
+                     new InitiationParser().parseInitiation(chummerChar, system)
                 }
-
-                if(chummerChar.metamagics) {
-                    new MetamagicParser().parseMetamagic(chummerChar, system)
-                }
-
 
             }
             if (chummerChar.totaless) {
@@ -251,6 +249,10 @@ export class CharacterInfoUpdater {
             if (name.includes('exotic') && name.includes('_weapon')) {
                 name = name.replace('_weapon', '');
             }
+
+            if (name.includes('exotic') && name.includes('_ranged')) {
+                name = name.replace('_ranged', '_range');
+            }
                
             if (name === 'pilot_watercraft') {
                 name = 'pilot_water_craft';
@@ -261,9 +263,7 @@ export class CharacterInfoUpdater {
             parsedSkill.base = parseInt(skill.rating);
 
             if (skill.skillspecializations) {
-                parsedSkill.specs = this.getArray(
-                    skill.skillspecializations.skillspecialization.name
-                );
+                parsedSkill.specs = this.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
             }
 
             // Precaution to later only deal with complete SkillField data models.
@@ -272,6 +272,7 @@ export class CharacterInfoUpdater {
     }
 
     handleLanguageSkills(system, languageSkills) {
+        system.skills.language.value = {}
 
         for (let skill of languageSkills) {
             let parsedSkill = {};
@@ -287,9 +288,7 @@ export class CharacterInfoUpdater {
             parsedSkill.base = parseInt(skill.rating);
     
             if (skill.skillspecializations) {
-                parsedSkill.specs = this.getArray(
-                 skill.skillspecializations.skillspecialization.name
-                );
+                parsedSkill.specs = this.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
             }
     
             // Precaution to later only deal with complete SkillField data models.
@@ -298,6 +297,11 @@ export class CharacterInfoUpdater {
     }
 
     handleKnowledgeSkills(system, knowledgeSkills) {
+        system.skills.knowledge.academic.value = {}
+        system.skills.knowledge.interests.value = {}
+        system.skills.knowledge.professional.value = {}
+        system.skills.knowledge.street.value = {}
+
         for (let skill of knowledgeSkills) {
             const id = randomID(16);
             let parsedSkill = {};
@@ -331,9 +335,7 @@ export class CharacterInfoUpdater {
             parsedSkill.base = parseInt(skill.rating);
 
             if (skill.skillspecializations) {
-                parsedSkill.specs = this.getArray(
-                    skill.skillspecializations.skillspecialization.name
-                );
+                parsedSkill.specs = this.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
             }
 
             // Precaution to later only deal with complete SkillField data models.

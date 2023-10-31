@@ -188,7 +188,7 @@ export class DocumentSituationModifiers {
      *                 The source property will be overriden.
      */
     applyAll(options: SituationalModifierApplyOptions={}) {
-        //@ts-ignore // Rebuild applied data fully for all modifiers.
+        //@ts-expect-error // Rebuild applied data fully for all modifiers.
         this.applied = {};
 
         // Let all handlers apply their modifier rules on the documents source data.

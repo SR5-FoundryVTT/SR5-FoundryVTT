@@ -1,6 +1,6 @@
-import { getArray } from "../BaseParserFunctions.js"
-import { WeaponParser } from "../WeaponParser";
-import { GearsParser } from "../gearImport/GearsParser"
+import { getArray } from "../importHelper/BaseParserFunctions.js";
+import { WeaponParser } from "../weaponImport/WeaponParser";
+import { GearsParser } from "../importHelper/GearsParser.js";
 
 export default class VehicleParser {
 

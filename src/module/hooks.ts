@@ -58,6 +58,7 @@ import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
 import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
 import VisionConfigurator from './vision/visionConfigurator';
+import { DataDefaults } from './data/DataDefaults';
 
 
 
@@ -126,6 +127,7 @@ ___________________
              * Use this.
              */
             test: TestCreator,
+            data: DataDefaults,
 
             /**
              * .tests define what test implementation to use for each test type (key).
@@ -224,23 +226,22 @@ ___________________
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
         CONFIG.Combat.documentClass = SR5Combat;
-        //@ts-ignore // TODO: foundry-vtt-types v10
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
         // Register object classes
         CONFIG.Token.objectClass = SR5Token;
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
-        // @ts-ignore
+        // @ts-expect-error
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
         // Register general SR5Roll for JSON serialization support.
         CONFIG.Dice.rolls.push(SR5Roll);
-        // @ts-ignore // Register the SR5Roll dnd5e style.
+        // @ts-expect-error // Register the SR5Roll dnd5e style.
         CONFIG.Dice.SR5oll = SR5Roll;
 
         // Add Shadowrun configuration onto general Foundry config for module access.
-        // @ts-ignore // TODO: Add declaration merging
+        // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
 
@@ -404,7 +405,7 @@ ___________________
                 // All sidebar actors should also include tokens with linked actors.
                 ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
                 // All token actors that aren't linked.
-                // @ts-ignore // TODO: foundry-vtt-types v10
+                // @ts-expect-error // TODO: foundry-vtt-types v10
                 ...canvas.scene.tokens.filter(token => !token.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
             ];
 
@@ -464,13 +465,12 @@ ___________________
         // Module might not be installed.
         const aipModule = game.modules.get("autocomplete-inline-properties");
         if (!aipModule) return;
-        // @ts-ignore
+        // @ts-expect-error
         // API might be missing.
         const api = aipModule.API;
         if (!api) return;
 
         console.log('Shadowrun 5e | Registering support for autocomplete-inline-properties');
-        // @ts-ignore
         const DATA_MODE = api.CONST.DATA_MODE;
 
         const config = {
@@ -483,7 +483,6 @@ ___________________
             }]
         };
 
-        // @ts-ignore
         api.PACKAGE_CONFIG.push(config);
     }
 

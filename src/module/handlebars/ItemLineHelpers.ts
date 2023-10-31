@@ -134,6 +134,12 @@ export const registerItemLineHelpers = () => {
             case 'sprite_power':
                 addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
                 return [addIcon];
+            case 'echo':
+                addIcon.title = game.i18n.localize('SR5.CreateItemEcho');
+                return [addIcon];
+            case 'metamagic':
+                addIcon.title = game.i18n.localize('SR5.CreateItemMetamagic');
+                return [addIcon];
             case 'summoning':
                 // NOTE: summoning is not an actual item type. It's an call_in_action sub type
                 addIcon.title = game.i18n.localize('SR5.CallInAction.CreateSummoning');
@@ -166,7 +172,7 @@ export const registerItemLineHelpers = () => {
     });
 
     /**
-     * The legacy ItemList helper to provide a generic way of defining headers and columns 
+     * The legacy ItemList helper to provide a generic way of defining headers and columns
      * on the 'right side' of an item list across all document sheets.
      */
     Handlebars.registerHelper('ItemHeaderRightSide', function (id: string): ItemListRightSide[] {
@@ -301,9 +307,12 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             text: game.i18n.localize('SR5.Rating'),
-                        },                        
+                        },
                     },
                 ];
+            case 'echo':
+            case 'metamagic':
+                return [{}];
             case 'summoning':
                 return [
                     {
@@ -317,7 +326,7 @@ export const registerItemLineHelpers = () => {
                         }
                     }
                 ]
-            case 'compilation': 
+            case 'compilation':
                 return [
                     {
                         text: {
@@ -330,6 +339,16 @@ export const registerItemLineHelpers = () => {
                         }
                     }
                 ]
+
+            // General use case item lines
+            case 'modifiers':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Value')
+                        }
+                    }
+                ]
             default:
                 return [];
         }
@@ -337,13 +356,13 @@ export const registerItemLineHelpers = () => {
 
     /**
      * Helper for ListItem parts do define segments on the right hand sight per list row.
-     * 
+     *
      * These must match in order and quantity to the ItemHeadersRightSide helper.
      * Example of a matching list header by ItemHeader:
      * <header name>                          <ItemHeaderRightSide>['First Header', 'Second Header']
      * Example of a list item row:
      * <list name>                            <ItemRightSide>      ['First Value',  'Second Value']
-     * 
+     *
      * @param item The item to render the right side for.
      *             NOTE: ItemHeaderRightSide doesn't use the whole item to determine what to show, while
      *                   ItemRightSide does. This is due to ItemRightSide showing content, while ItemHeaderRightSide
@@ -358,7 +377,7 @@ export const registerItemLineHelpers = () => {
                 cssClass: 'item-qty',
             },
         };
-        
+
         switch (item.type) {
             case 'action':
 
@@ -374,7 +393,7 @@ export const registerItemLineHelpers = () => {
                     textLimitParts.push(game.i18n.localize(SR5.limits[limitAttribute ?? '']));
                 }
                 const textLimit = textLimitParts.join(' + ');
-                
+
 
                 return [
                     {
@@ -422,8 +441,8 @@ export const registerItemLineHelpers = () => {
                     const count = wrapper.getAmmo()?.current.value ?? 0;
                     const max = wrapper.getAmmo()?.current.max ?? 0;
                     // Show reload on both no ammo configured and partially consumed clips.
-                    const text = count < max || max === 0 ? 
-                        `${game.i18n.localize('SR5.WeaponReload')} (${count}/${max})` : 
+                    const text = count < max || max === 0 ?
+                        `${game.i18n.localize('SR5.WeaponReload')} (${count}/${max})` :
                         game.i18n.localize('SR5.AmmoFull');
 
                     const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : 'faded');
@@ -455,7 +474,7 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: item.system.rating ?? '',
+                            text: item.system.rating || '',
                         },
                     }
                 ];
@@ -543,6 +562,10 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+
+            case 'echo':
+            case 'metamagic':
+                return [{}];
             /**
              * Call In Actions differ depending on called in actor type.
              */
@@ -550,7 +573,7 @@ export const registerItemLineHelpers = () => {
                 if (item.system.actor_type === 'spirit') {
                     const summoningData = item.system as Shadowrun.CallInActionData;
                     const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
-    
+
                     return [
                         {
                             text: {

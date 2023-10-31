@@ -1,5 +1,5 @@
 import {CharacterInfoUpdater} from "./CharacterInfoUpdater"
-import {ItemsParser} from "./ItemsParser"
+import {ItemsParser} from "./importHelper/ItemsParser";
 import VehicleParser from "./vehicleImport/VehicleParser.js";
 
 
@@ -21,19 +21,39 @@ export class CharacterImporter {
         console.log('Using the following import options:')
         console.log(importOptions);
 
-        if (!chummerFile.characters || !chummerFile.characters.character) {
+        if (!chummerFile.characters?.character) {
             console.log('Did not find a valid character to import  - aborting import');
             return;
         }
 
+        await this.resetCharacter(actor)
+
         const chummerCharacter = chummerFile.characters.character;
         const characterInfoUpdater = new CharacterInfoUpdater();
-        const updatedActorData = await characterInfoUpdater.update(actor._source, chummerCharacter);
-        const items = await new ItemsParser().parse(chummerCharacter, importOptions);
+        const updatedActorData = characterInfoUpdater.update(actor._source, chummerCharacter);
+        const items = new ItemsParser().parse(chummerCharacter, importOptions);
 
         new VehicleParser().parseVehicles(actor, chummerCharacter, importOptions)
 
-        await actor.update(updatedActorData);
-        await actor.createEmbeddedDocuments('Item', items);
+        await actor.update(await updatedActorData);
+        await actor.createEmbeddedDocuments('Item', await items);
+    }
+
+    async resetCharacter(actor) {
+        let toDeleteItems = actor.items.filter(item => item.type !== "action").map(item => item.id)
+        let deletedItems = actor.deleteEmbeddedDocuments("Item", toDeleteItems );
+
+        let removed = {
+            'system.skills.language.-=value' : null,
+            'system.skills.knowledge.academic.-=value' : null,
+            'system.skills.knowledge.interests.-=value' : null,
+            'system.skills.knowledge.professional.-=value' : null,
+            'system.skills.knowledge.street.-=value' : null
+        }
+        let removeSkills = actor.update(removed)
+
+        //await as late as possible to save time
+        await deletedItems
+        await removeSkills
     }
 }

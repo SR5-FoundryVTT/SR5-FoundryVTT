@@ -16,9 +16,11 @@ export const SR5 = {
         critter_power: 'SR5.ItemTypes.CritterPower',
         cyberware: 'SR5.ItemTypes.Cyberware',
         device: 'SR5.ItemTypes.Device',
+        echo: 'SR5.ItemTypes.Echo',
         equipment: 'SR5.ItemTypes.Equipment',
         host: 'SR5.ItemTypes.Host',
         lifestyle: 'SR5.ItemTypes.Lifestyle',
+        metamagic: 'SR5.ItemTypes.Metamagic',
         modification: 'SR5.ItemTypes.Modification',
         program: 'SR5.ItemTypes.Program',
         quality: 'SR5.ItemTypes.Quality',
@@ -864,6 +866,7 @@ export const SR5 = {
             'cyberdeck': '',
             'rcc': ''
         },
+        echo: {},
         equipment: {
             'alchemical-tools': '',
             'appearance-modification': '',
@@ -934,6 +937,7 @@ export const SR5 = {
         },
         host: {},
         lifestyle: {},
+        metamagic: {},
         modification: {
             'barrel': '',
             'other': '',

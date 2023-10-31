@@ -1,8 +1,6 @@
 import { Helpers } from '../helpers';
 import {SafeString} from "handlebars";
 import SkillField = Shadowrun.SkillField;
-import {SR5} from "../config";
-import {FLAGS, SR, SYSTEM_NAME} from "../constants";
 import {SR5Actor} from "../actor/SR5Actor";
 
 export const registerBasicHelpers = () => {
@@ -156,5 +154,14 @@ export const registerBasicHelpers = () => {
      */
     Handlebars.registerHelper('objValue', function(obj: Object, key: string) {
         return obj[key] ||  '';
+    });
+
+    /**
+     * Creates an array from a spread set of objects ie. (toArray "foo" "bar") => ["foo", "bar"]
+     */
+    Handlebars.registerHelper('toArray', function(...vals) {
+        const copy = [...vals];
+        copy.splice(-1); //Remove handlebars options object from last item in array
+        return copy;
     });
 };

@@ -1,18 +1,18 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='misc'}}
     <div class="inventory">
         <div class="split-container">
-            <div>
-                {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
-                        name=(localize "SR5.Description")
+            <div class="description">
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                    name=(localize 'SR5.Description')                    
                 }}
-                {{> "systems/shadowrun5e/dist/templates/item/parts/description.html"}}
+                {{editor biographyHTML target="system.description.value" button=true editable=true engine="prosemirror" collaborate=false}}
             </div>
             <div class="flexcol">
-                {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Modifier") }}
-                <div class="item-text rtg">
-                    {{localize "SR5.Value"}}
-                </div>
-                {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                    name=(localize 'SR5.Modifier')
+                    itemId='modifiers'
+                    rightSide=(ItemHeaderRightSide 'modifiers')
+                }}
                 <div class="scroll-area mods">
                     {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
                         {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localizeOb id ../config.actorModifiers) }}

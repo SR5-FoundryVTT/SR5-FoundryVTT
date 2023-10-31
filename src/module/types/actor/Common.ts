@@ -14,6 +14,7 @@ declare namespace Shadowrun {
          * Actor inventories allow to show items separated out into different places / inventories.
          */
         inventories: InventoriesData
+        visibilityChecks: VisibilityChecks
     }
 
     export interface MagicData {
@@ -105,5 +106,26 @@ declare namespace Shadowrun {
         recoil: ModifiableValue
         // The base amount of recoil compensation of an actor, without recoil reducing it.
         recoil_compensation: ModifiableValue
+    }
+
+    export interface VisibilityChecks {
+        astral : AstralVisibility
+        meat: MeatSpaceVisibility
+        matrix: MatrixVisibility
+    }
+
+    export interface MeatSpaceVisibility {
+        hidden: boolean
+        hasHeat: boolean
+    }
+
+    export interface AstralVisibility {
+        astralActive : boolean,
+        affectedBySpell: boolean
+    }
+
+    export interface MatrixVisibility {
+        hasIcon: boolean,
+        runningSilent: boolean
     }
 }

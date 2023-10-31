@@ -54,6 +54,7 @@ import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
 import { RangedWeaponRules } from "../rules/RangedWeaponRules";
+import { LinksHelpers } from '../utils/links';
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
@@ -67,7 +68,6 @@ import { RangedWeaponRules } from "../rules/RangedWeaponRules";
  * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
-import { LinksHelpers } from '../utils/links';
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -125,7 +125,7 @@ export class SR5Item extends Item {
         // An embedded item will have an item as an actor, which might have an actor owner.
         // NOTE: This is very likely wrong and should be fixed during embedded item prep / creation. this.actor will only
         //       check what is set in the items options.actor during it's construction.
-        //@ts-ignore
+        //@ts-expect-error
         return this.actor.actorOwner;
     }
 
@@ -236,11 +236,9 @@ export class SR5Item extends Item {
         this.labels = {};
 
         if (this.type === 'sin') {
-            //@ts-ignore // TODO: foundry-vtt-types v10 
             if (typeof this.system.licenses === 'object') {
-                //@ts-ignore // taMiF: This seems to be a hacky solution to some internal or Foundry issue with reading
-                //                      a object/HashMap when an array/iterable was expected
-                //@ts-ignore // TODO: foundry-vtt-types v10 
+                // taMiF: This seems to be a hacky solution to some internal or Foundry issue with reading
+                //        a object/HashMap when an array/iterable was expected
                 this.system.licenses = Object.values(this.system.licenses);
             }
         }
@@ -261,9 +259,9 @@ export class SR5Item extends Item {
             if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: []};
 
             const concealParts = new PartsList<number>();
-            equippedMods.forEach((modificiation) => {
-                if (modificiation.system.conceal  && modificiation.system.conceal > 0) {
-                    concealParts.addUniquePart(modificiation.name as string, modificiation.system.conceal);
+            equippedMods.forEach((modification) => {
+                if (modification.system.conceal  && modification.system.conceal > 0) {
+                    concealParts.addUniquePart(modification.name as string, modification.system.conceal);
                 }
             });
 
@@ -279,7 +277,7 @@ export class SR5Item extends Item {
             action.damage.ap.mod = [];
             action.dice_pool_mod = [];
 
-            // @ts-ignore
+            // @ts-expect-error
             // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
             if (action.damage.base_formula_operator === '+') {
                 action.damage.base_formula_operator = 'add';
@@ -302,15 +300,12 @@ export class SR5Item extends Item {
                 const modification = mod.asModification();
                 if (!modification) return;
 
-                //@ts-ignore // TODO: foundry-vtt-types v10 
                 if (modification.system.accuracy) limitParts.addUniquePart(mod.name as string, modification.system.accuracy);
-                //@ts-ignore // TODO: foundry-vtt-types v10 
                 if (modification.system.dice_pool) dpParts.addUniquePart(mod.name as string, modification.system.dice_pool);
                 
             });
 
             if (equippedAmmo) {
-                //@ts-ignore // TODO: foundry-vtt-types v10 
                 const ammoData = equippedAmmo.system as AmmoData;
 
                 // Some ammunition want to replace the weapons damage, others modify it.
@@ -356,21 +351,19 @@ export class SR5Item extends Item {
             if (range.rc) {
                 const rangeParts = new PartsList();
                 equippedMods.forEach((mod) => {
-                    //@ts-ignore // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
-                    //@ts-ignore // TODO: foundry-vtt-types v10 
+                    //@ts-expect-error // TODO: foundry-vtt-types v10 
+                    // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
                     if (mod.system.rc) rangeParts.addUniquePart(mod.name, mod.system.rc);
                     // handle overrides from ammo
                 });
-                //@ts-ignore // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
+                //@ts-expect-error // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
                 range.rc.mod = rangeParts.list;
-                //@ts-ignore // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
                 if (range.rc) range.rc.value = Helpers.calcTotal(range.rc);
             }
         }
 
         const adeptPower = this.asAdeptPower();
         if (adeptPower) {
-            //@ts-ignore // TODO: foundry-vtt-types v10 
             adeptPower.system.type = adeptPower.system.action.type ? 'active' : 'passive';
         }
 
@@ -378,7 +371,7 @@ export class SR5Item extends Item {
         // ... this is ongoing work to clean up SR5item.prepareData
         switch (this.type) {
             case 'host':
-                //@ts-ignore // TODO: foundry-vtt-types v10 
+                //@ts-expect-error // TODO: foundry-vtt-types v10 
                 HostDataPreparation(this.system);
         }
     }
@@ -425,22 +418,19 @@ export class SR5Item extends Item {
     getChatData(htmlOptions={}) {
         const system = duplicate(this.system);
         const { labels } = this;
-        //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
-        //              that's not actually defined in any SR5Item typing.
         if (!system.description) system.description = {chat: '', source: '', value: ''};
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
-        //@ts-ignore // TODO: foundry-vtt-types v10
         if (!system.description.value) system.description.value = '';
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         system.description.value = TextEditor.enrichHTML(system.description.value, {...htmlOptions, async: false});
 
         const props = [];
         // Add additional chat data fields depending on item type.
-        //@ts-ignore // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10 
         const chatDataForItemType = ChatData[this.type];
         if (chatDataForItemType) chatDataForItemType(system, labels, props, this);
 
-        //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
+        //@ts-expect-error // This is a hacky monkey patch solution to add a property to the item data
         //              that's not actually defined in any SR5Item typing.
         system.properties = props.filter((p) => !!p);
 
@@ -471,8 +461,7 @@ export class SR5Item extends Item {
 
     getBlastData(actionTestData?: any): BlastData | undefined {
         if (this.isSpell && this.isAreaOfEffect) {
-            //@ts-ignore // TODO: foundry-vtt-types v10 
-            const system = this.system as SpellData;
+            const system = this.system as unknown as SpellData;
 
             // By default spell distance is equal to it's Force.
             let distance = this.getLastSpellForce().value;
@@ -492,7 +481,6 @@ export class SR5Item extends Item {
             }
 
         } else if (this.isGrenade) {
-            //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as WeaponData;
 
             const distance = system.thrown.blast.radius;
@@ -509,9 +497,7 @@ export class SR5Item extends Item {
 
             if (!ammo) return {radius: 0, dropoff: 0};
 
-            //@ts-ignore // TODO: foundry-vtt-types v10 
             const distance = ammo.system.blast.radius;
-            //@ts-ignore // TODO: foundry-vtt-types v10 
             const dropoff = ammo.system.blast.dropoff;
 
             return {
@@ -539,7 +525,6 @@ export class SR5Item extends Item {
     get hasExplosiveAmmo(): boolean {
         const ammo = this.getEquippedAmmo();
         if (!ammo) return false;
-        //@ts-ignore // TODO: foundry-vtt-types v10 
         const system = ammo.system as AmmoData;
         return system.blast.radius > 0;
     }
@@ -579,7 +564,7 @@ export class SR5Item extends Item {
     async useAmmo(fired) {
         if (this.type !== 'weapon') return;
 
-        //@ts-ignore // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10 
         const value = Math.max(0, this.system.ammo.current.value - fired);
         return await this.update({'system.ammo.current.value': value});
     }
@@ -589,15 +574,15 @@ export class SR5Item extends Item {
         
         // Reload this weapons ammunition to it's max capacity.
         const updateData = {};
-        //@ts-ignore // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10 
         const diff = this.system.ammo.current.max - this.system.ammo.current.value;
-        //@ts-ignore // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10 
         updateData['system.ammo.current.value'] = this.system.ammo.current.max;
         
         // TODO: Make actual use of this spare clips system...
-        //@ts-ignore // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10 
         if (this.system.ammo.current.spare_clips) {
-            //@ts-ignore // TODO: foundry-vtt-types v10 
+            //@ts-expect-error // TODO: foundry-vtt-types v10 
             updateData['system.ammo.current.value'] = Math.max(0, this.system.ammo.spare_clips.value - 1);
         }
         
@@ -610,12 +595,11 @@ export class SR5Item extends Item {
         const newAmmunition = (this.items || [])
             .filter((i) => i.type === 'ammo')
             .reduce((acc: AmmoItemData[], item: SR5Item) => {
-                //@ts-ignore // TODO: foundry-vtt-types v10 
+                //@ts-expect-error // TODO: foundry-vtt-types v10 
                 // Not-equipped ammunition isn't expected to be consumed.
                 if (item.data && item.data.system.technology.equipped) {
 
                     const itemData = item.toObject() as AmmoItemData;
-                    //@ts-ignore // TODO: foundry-vtt-types v10 
                     const qty = typeof itemData.system.technology.quantity === 'string' ? 0 : itemData.system.technology.quantity;
 
                     // Inform user about missing rounds.
@@ -623,7 +607,6 @@ export class SR5Item extends Item {
                         ui.notifications?.warn('SR5.Warnings.CantConsumeEquippedAmmo', {localize: true})
                     }
                     
-                    //@ts-ignore // TODO: foundry-vtt-types v10 
                     itemData.system.technology.quantity = Math.max(0, qty - diff);
                     acc.push(itemData);
                 }
@@ -649,7 +632,7 @@ export class SR5Item extends Item {
             
         for (const item of ammoItems) {
             if (!unequipOthers && item.id !== id) continue;
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             const equip = toggle ? !item.system.technology.equipped : id === item.id;
 
             updateData.push({_id: item.id, 'system.technology.equipped': equip});
@@ -659,9 +642,9 @@ export class SR5Item extends Item {
     }
 
     /**
-     * Equip one ammo item exclusivley.
+     * Equip one ammo item exclusively.
      * 
-     * @param id Item id of the to be exclusivley equipped ammo item.
+     * @param id Item id of the to be exclusively equipped ammo item.
      */
     async equipAmmo(id) {
         await this.equipNestedItem(id, 'ammo', {unequipOthers: true});
@@ -671,11 +654,9 @@ export class SR5Item extends Item {
         if (this.type !== 'sin') return;
 
         // NOTE: This might be related to Foundry data serialization sometimes returning arrays as ordered HashMaps...
-        //@ts-ignore TODO: foundry-vtt-types v10
         const licenses = foundry.utils.getType(this.system.licenses) === 'Object' ? 
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             Object.values(this.system.licenses) :
-            //@ts-ignore TODO: foundry-vtt-types v10
             this.system.licenses;
 
         if (!licenses) return;
@@ -696,7 +677,7 @@ export class SR5Item extends Item {
 
     get asSin(): SinItemData | undefined {
         if (this.isSin) {
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as SinItemData;
         }
     }
@@ -707,7 +688,7 @@ export class SR5Item extends Item {
 
     get asLifestyle(): LifestyleItemData | undefined {
         if (this.isLifestyle) {
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as LifestyleItemData;
         }
     }
@@ -722,7 +703,7 @@ export class SR5Item extends Item {
 
     get asAmmo(): AmmoItemData | undefined {
         if (this.isAmmo) {
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as AmmoItemData;
         }
     }
@@ -733,7 +714,7 @@ export class SR5Item extends Item {
 
     asModification(): ModificationItemData | undefined {
         if (this.isModification) {
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as ModificationItemData;
         }
     }
@@ -752,7 +733,7 @@ export class SR5Item extends Item {
 
     get asProgram(): ProgramItemData | undefined {
         if (this.isProgram) {
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as ProgramItemData;
         }
     }
@@ -763,7 +744,7 @@ export class SR5Item extends Item {
 
     get asQuality(): QualityItemData | undefined {
         if (this.isQuality) {
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as QualityItemData;
         }
     }
@@ -774,7 +755,7 @@ export class SR5Item extends Item {
 
     asAdeptPower(): AdeptPowerItemData|undefined {
         if (this.isAdeptPower)
-        //@ts-ignore TODO: foundry-vtt-types v10
+        //@ts-expect-error TODO: foundry-vtt-types v10
             return this as AdeptPowerItemData;
     }
 
@@ -785,7 +766,7 @@ export class SR5Item extends Item {
 
     get asHost(): HostItemData|undefined {
         if (this.isHost) {
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as HostItemData;
         }
     }
@@ -798,7 +779,7 @@ export class SR5Item extends Item {
     async removeLicense(index) {
         if (this.type !== 'sin') return;
 
-        //@ts-ignore TODO: foundry-vtt-types v10
+        //@ts-expect-error TODO: foundry-vtt-types v10
         const licenses = this.system.licenses.splice(index, 1);
         await this.update({'system.licenses': licenses});
     }
@@ -809,7 +790,7 @@ export class SR5Item extends Item {
 
     asAction(): ActionItemData | undefined {
         if (this.isAction()) {
-            //@ts-ignore TODO: foundry-vtt-types v10
+            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as ActionItemData;
         }
     }
@@ -853,7 +834,7 @@ export class SR5Item extends Item {
     static getTargets() {
         if (!game.ready || !game.user) return;
         const { character } = game.user;
-        // @ts-ignore
+        // @ts-expect-error
         const { controlled } = canvas.tokens;
         const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
         if (character && controlled.length === 0) targets.push(character);
@@ -881,7 +862,7 @@ export class SR5Item extends Item {
      * @param itemData
      * @param options
      * 
-     * //@ts-ignore TODO: foundry-vtt-types v10 Rework method...
+     * //@ts-expect-error TODO: foundry-vtt-types v10 Rework method...
      */
     async createNestedItem(itemData, options = {}) {
         if (!Array.isArray(itemData)) itemData = [itemData];
@@ -995,7 +976,6 @@ export class SR5Item extends Item {
      * @param data
      * @param options
      */
-    // @ts-ignore
     async updateEmbeddedEntity(embeddedName, data, options?): Promise<any> {
         await this.updateNestedItems(data);
         return this;
@@ -1051,6 +1031,14 @@ export class SR5Item extends Item {
         return this.wrapper.getTechnology();
     }
 
+    getNetworkController(): string|undefined {
+        return this.getTechnologyData()?.networkController;
+    }
+
+    async setNetworkController(networkController: string|undefined): Promise<void> {
+        await this.update({ 'system.technology.networkController': networkController });
+    }
+
     getRange(): CritterPowerRange|SpellRange|RangeWeaponData|undefined {
         return this.wrapper.getRange();
     }
@@ -1083,7 +1071,7 @@ export class SR5Item extends Item {
     /**
      * An attack with this weapon will create an area of effect / blast.
      * 
-     * There is a mulitide of possibilties as to HOW an item can create an AoE, 
+     * There is a multitude of possibilities as to HOW an item can create an AoE, 
      * both directly connected to the item and / or some of it's nested items.
      * 
      */
@@ -1097,7 +1085,7 @@ export class SR5Item extends Item {
 
     get asArmor(): ArmorItemData | undefined {
         if (this.isArmor) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as ArmorItemData;
         }
     }
@@ -1124,7 +1112,7 @@ export class SR5Item extends Item {
 
     get asWeapon(): WeaponItemData | undefined {
         if (this.isWeapon) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as WeaponItemData;
         }
     }
@@ -1143,7 +1131,7 @@ export class SR5Item extends Item {
 
     get asCyberware(): CyberwareItemData | undefined {
         if (this.isCyberware) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as CyberwareItemData;
         }
     }
@@ -1174,7 +1162,7 @@ export class SR5Item extends Item {
 
     get asSpell(): SpellItemData | undefined {
         if (this.isSpell) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as SpellItemData;
         }
     }
@@ -1185,18 +1173,18 @@ export class SR5Item extends Item {
 
     get asCallInAction(): Shadowrun.CallInActionItemData | undefined { 
         if (this.isCallInAction) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as Shadowrun.CallInActionItemData;
         }
     }
 
     get isSummoning(): boolean {
-        //@ts-ignore
+        //@ts-expect-error
         return this.type === 'call_in_action' && this.system.actor_type === 'spirit';
     }
 
     get isCompilation(): boolean {
-        //@ts-ignore
+        //@ts-expect-error
         return this.type === 'call_in_action' && this.system.actor_type === 'sprite';
     }
 
@@ -1206,7 +1194,7 @@ export class SR5Item extends Item {
 
     get asSpritePower(): SpritePowerItemData | undefined {
         if (this.isSpritePower) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as SpritePowerItemData;
         }
     }
@@ -1221,7 +1209,7 @@ export class SR5Item extends Item {
 
     get asComplexForm(): ComplexFormItemData | undefined {
         if (this.isComplexForm) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as ComplexFormItemData;
         }
     }
@@ -1232,7 +1220,7 @@ export class SR5Item extends Item {
 
     get asContact(): ContactItemData | undefined {
         if (this.isContact) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as ContactItemData;
         }
     }
@@ -1243,7 +1231,7 @@ export class SR5Item extends Item {
 
     get asCritterPower(): CritterPowerItemData | undefined {
         if (this.isCritterPower) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as CritterPowerItemData;
         }
     }
@@ -1254,12 +1242,11 @@ export class SR5Item extends Item {
 
     get asDevice(): DeviceItemData | undefined {
         if (this.isDevice) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as DeviceItemData;
         }
     }
 
-    //@ts-ignore // TODO: foundry-vtt-types v10
     asController(): HostItemData | DeviceItemData | undefined {
         return this.asHost || this.asDevice || undefined;
     }
@@ -1270,7 +1257,7 @@ export class SR5Item extends Item {
 
     get asEquipment(): EquipmentItemData | undefined {
         if (this.isEquipment()) {
-            //@ts-ignore // TODO: foundry-vtt-types v10
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as EquipmentItemData;
         }
     }
@@ -1391,7 +1378,6 @@ export class SR5Item extends Item {
 
     getReach(): number {
         if (this.isMeleeWeapon) {
-            //@ts-ignore // TODO: foundry-vtt-types v10 
             const system = this.system as WeaponData;
             return system.melee.reach ?? 0;
         }
@@ -1476,7 +1462,7 @@ export class SR5Item extends Item {
         data._id = this.id;
 
         // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
-        // @ts-ignore
+        // @ts-expect-error
         await this.parent.updateNestedItems(data);
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
@@ -1494,7 +1480,7 @@ export class SR5Item extends Item {
         }
 
         // Actor.item => Directly owned item by an actor!
-        // @ts-ignore
+        // @ts-expect-error
         return await super.update(data, options);
     }
 
@@ -1610,7 +1596,7 @@ export class SR5Item extends Item {
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
      * @param target The matrix item to be connected.
      */
-    async addNetworkDevice(target: SR5Item) {
+    async addNetworkDevice(target: SR5Item|SR5Actor) {
         // TODO: Add device to WAN network
         // TODO: Add IC actor to WAN network
         // TODO: setup networkController link on networked devices.
@@ -1650,7 +1636,7 @@ export class SR5Item extends Item {
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
-        // @ts-ignore
+        // @ts-expect-error
         return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => ({
@@ -1674,7 +1660,7 @@ export class SR5Item extends Item {
     /**
      * Return all network device items within a possible PAN or WAN.
      */
-    get networkDevices(): SR5Item[] {
+    get networkDevices(): (SR5Item|SR5Actor)[] {
         const controller = this.asDevice || this.asHost;
         if (!controller) return [];
 
@@ -1706,12 +1692,11 @@ export class SR5Item extends Item {
 
     override async _onCreate(changed, options, user) {
         const applyData = {};
-        //@ts-ignore
         Helpers.injectActionTestsIntoChangeData(this.type, changed, applyData, this);
         await super._preCreate(changed, options, user);
 
         // Don't kill DocumentData by applying empty objects. Also performance.
-        //@ts-ignore // TODO: foundry-vtt-types v10
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (!foundry.utils.isEmpty(applyData)) await this.update(applyData);
     }
 

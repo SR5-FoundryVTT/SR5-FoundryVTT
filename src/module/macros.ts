@@ -27,7 +27,7 @@ export async function createItemMacro(dropData, slot) {
     if (!macro) {
         macro = await Macro.create(
             {
-                //@ts-ignore
+                //@ts-expect-error
                 name: item.name,
                 type: 'script',
                 img: item.img,
@@ -76,7 +76,6 @@ export async function createSkillMacro(data: {skillId: string, skill: SkillField
 
     // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
     const name = Helpers.getSkillLabelOrName(skill);
-    // @ts-ignore
     const existingMacro = game.macros.contents.find(macro => macro.name === name);
     if (existingMacro) return;
 

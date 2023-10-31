@@ -102,10 +102,12 @@ export const ChatData = {
             }
         }
     },
+    
     sin: (system, labels, props) => {
-        props.push(`Rating ${system.technology.rating}`);
+        // Avoid displaying rating null (empty input field) and rating 0.
+        if (system.technology.rating) props.push(`Rating ${system.technology.rating}`);
         system.licenses.forEach((license) => {
-            props.push(`${license.name} R${license.rtg}`);
+            if (license.rtg) props.push(`${license.name} R${license.rtg}`);
         });
     },
 
@@ -183,9 +185,17 @@ export const ChatData = {
 
     device: (system: DeviceData, labels, props) => {
         if (system.technology && system.technology.rating) props.push(`Rating ${system.technology.rating}`);
+        // Show ALL matrix ratings for these devices
         if (system.category === 'cyberdeck' || system.category === 'rcc') {
-            for (const attN of Object.values(system.atts)) {
-                props.push(`${Helpers.label(attN.att)} ${attN.value}`);
+            for (const attribute of Object.values(system.atts)) {
+                props.push(`${Helpers.label(attribute.att)} ${attribute.value}`);
+            }
+        }
+        // Commlinks CAN have all values, but tend to only have dp and fw
+        // Therefore only show non-zero values
+        if (system.category === 'commlink') {
+            for (const attribute of Object.values(system.atts)) {
+                if (attribute.value) props.push(`${Helpers.label(attribute.att)} ${attribute.value}`);
             }
         }
     },
@@ -199,7 +209,7 @@ export const ChatData = {
         ChatData.action(system, labels, props);
 
         props.push(Helpers.label(system.type));
-        props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
+        if (system.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
     },
 
     sprite_power: (system, labels, props) => {

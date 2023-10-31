@@ -43,7 +43,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
 
             // Create the item
             const item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: parserType}), this.itemTranslations);
-            // @ts-ignore TODO: foundry-vtt-type v10
+            // @ts-expect-error TODO: foundry-vtt-type v10
             item.folder = folder.id;
 
             // Import Flags
@@ -61,7 +61,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
             items.push(item);
         }
 
-        // @ts-ignore // TODO: TYPE: Remove this.
+        // @ts-expect-error // TODO: TYPE: Remove this.
         return await Item.create(items);
     }
 }

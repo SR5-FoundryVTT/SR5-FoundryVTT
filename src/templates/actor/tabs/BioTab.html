@@ -29,6 +29,16 @@
                             description=item.description.value
                     }}
                 {{/each}}
+              
+                {{#ife actor.type 'character'}}
+                    {{#if awakened}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/MetamagicList.html' }}
+                    {{/if}}
+                    {{#if emerged}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/EchoList.html' }}
+                    {{/if}}
+                {{/ife}}
+              
             </div>
         </div>
     </div>

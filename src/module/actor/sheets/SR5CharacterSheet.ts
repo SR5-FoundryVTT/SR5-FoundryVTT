@@ -35,6 +35,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'adept_power',
             'complex_form',
             'quality',
+            'echo',
+            'metamagic',
             'critter_power',
             'call_in_action'
         ];
@@ -86,7 +88,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
     /**
      * Create a call in action item with pre configured actor type.
-     * 
+     *
      * @param type The call in action sub type.
      */
     async _onCallInActionCreate(type: 'summoning'|'compilation') {
@@ -105,6 +107,6 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'system.actor_type': actor_type
         };
 
-        await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});        
+        await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
     }
 }

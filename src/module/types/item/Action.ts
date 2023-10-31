@@ -161,9 +161,9 @@ declare namespace Shadowrun {
     /**
      * Copy of FoundryVTT RollMode for messages and rolls.
      */
-    type FoundyRollMode = 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll'
+    type FoundryRollMode = 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll'
     /**
      * The actual usable values for an action.
      */
-    type ActionRollMode = FoundyRollMode | ''
+    type ActionRollMode = FoundryRollMode | ''
 }

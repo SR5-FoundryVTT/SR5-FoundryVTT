@@ -1,9 +1,12 @@
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5Actor} from "../SR5Actor";
+import { SR5Item } from '../../item/SR5Item';
+import { NetworkDeviceFlow } from '../../item/flows/NetworkDeviceFlow';
 
 interface VehicleSheetDataFields {
     driver: SR5Actor|undefined
+    networkController: SR5Item | undefined
 }
 
 interface VehicleActorSheetData extends SR5ActorSheetData {
@@ -65,6 +68,10 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
 
         // Vehicle Sheet related handlers...
         html.find('.driver-remove').on('click', this._handleRemoveVehicleDriver.bind(this));
+
+        // PAN/WAN
+        html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
+        html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
     }
 
     /**
@@ -92,13 +99,36 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     _prepareVehicleFields(): VehicleSheetDataFields {
         const driver = this.actor.getVehicleDriver();
 
+        const networkControllerLink = this.actor.getNetworkController();
+        const networkController = networkControllerLink ? NetworkDeviceFlow.resolveItemLink(networkControllerLink) : undefined;
+
         return {
-            driver
+            driver,
+            networkController,
         };
     }
 
     async _handleRemoveVehicleDriver(event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
+    }
+
+    async _onOpenOriginLink(event) {
+        event.preventDefault();
+
+        console.log('Shadowrun 5e | Opening PAN/WAN network controller');
+
+        const originLink = event.currentTarget.dataset.originLink;
+        const device = await fromUuid(originLink);
+        if (!device) return;
+
+        // @ts-expect-error
+        device.sheet.render(true);
+    }
+
+    async _onControllerRemove(event) {
+        event.preventDefault();
+
+        await NetworkDeviceFlow.removeDeviceFromController(this.actor);
     }
 }
