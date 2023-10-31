@@ -21,11 +21,10 @@ export interface PhysicalDefenseTestData extends DefenseTestData {
     defenseReach: number
 }
 
-export type PhysicalDefenseTestSuccessCondition = {
+export type PhysicalDefenseNoDamageCondition = {
     test: () => boolean,
     label: Translation,
 }
-export type PhysicalDefenseTestSuccessConditions = PhysicalDefenseTestSuccessCondition[];
 
 export class PhysicalDefenseTest extends DefenseTest {
     public override data: PhysicalDefenseTestData;
@@ -174,11 +173,17 @@ export class PhysicalDefenseTest extends DefenseTest {
         PartsList.AddUniquePart(this.data.modifiers.mod, fireMode.label, Number(fireMode.defense));
     }
 
-    private successConditions: PhysicalDefenseTestSuccessConditions = [
-        {
-            test: () => CombatRules.attackMisses(this.against.hits.value, this.hits.value),
-            label: "SR5.TestResults.AttackDodged",
-        },
+    override get success() {
+        return CombatRules.attackMisses(this.against.hits.value, this.hits.value);
+    }
+
+    override get failure() {
+        return CombatRules.attackHits(this.against.hits.value, this.hits.value);
+    }
+
+
+    // Order is important in this array to determine which label is shown, determined by the first test whose function returns a truthy value
+    private noDamageConditions: PhysicalDefenseNoDamageCondition[] = [
         {
             test: () => this.actor !== undefined && CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor),
             label: "SR5.TestResults.AttackDoesNoPhysicalDamageToVehicle",
@@ -186,19 +191,15 @@ export class PhysicalDefenseTest extends DefenseTest {
         {
             test: () => this.actor !== undefined && CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
             label: "SR5.TestResults.AttackBlockedByVehicleArmor",
-        }
-    ]
+        },
+    ];
 
-    override get success() {
-        return this.successConditions.some(({ test }) => test());
+    private getNoDamageCondition(): PhysicalDefenseNoDamageCondition|undefined {
+        return this.noDamageConditions.find(({ test }) => test());
     }
 
-    override get successLabel(): Translation {
-        return this.successConditions.find(({ test }) => test())?.label || "SR5.TestResults.AttackDodged";
-    }
-
-    override get failure() {
-        return !this.success;
+    override get failureLabel(): Translation {
+        return this.getNoDamageCondition()?.label || super.failureLabel;
     }
 
     override async processResults() {
@@ -216,12 +217,21 @@ export class PhysicalDefenseTest extends DefenseTest {
     override async processFailure() {
         if (!this.actor) return;
 
-        this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.actor, this.against.hits.value, this.hits.value, this.data.incomingDamage);
+        if(this.getNoDamageCondition()) {
+            this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage, true);
+        } else {
+            this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.actor, this.against.hits.value, this.hits.value, this.data.incomingDamage);
+        }
 
         await super.processFailure();
     }
 
     override async afterFailure() {
+        // If attack hits but does no damage, don't perform the follow-up physical resist test
+        if(this.getNoDamageCondition()) {
+            return;
+        }
+
         const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
         if (!test) return;
         await test.execute();
