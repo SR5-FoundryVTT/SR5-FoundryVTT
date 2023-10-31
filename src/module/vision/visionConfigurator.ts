@@ -20,29 +20,23 @@ export default class VisionConfigurator {
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
             canvas: {
-            //@ts-expect-error
-            shader: ColorAdjustmentsSamplerShader,
-            uniforms: {
-                saturation: 1,
-                tint: AstralPerceptionBackgroundVisionShader.COLOR_TINT,
-            },
+                //@ts-expect-error
+                shader: ColorAdjustmentsSamplerShader,
+                uniforms: {
+                    saturation: 5,
+                    tint: AstralPerceptionBackgroundVisionShader.COLOR_TINT,
+                },
             },
             lighting: {
-            //@ts-expect-error
-            background: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
-            //@ts-expect-error
-            illumination: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
-            //@ts-expect-error
-            coloration: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
+                //@ts-expect-error
+                background: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
+                //@ts-expect-error
+                illumination: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
+                //@ts-expect-error
+                coloration: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
             },
             vision: {
                 darkness: { adaptive: false },
-                defaults: {
-                    attenuation: 1,
-                    brightness: 0.5,
-                    saturation: -0.5,
-                    contrast: 1,
-                },
                 background: { shader: AstralPerceptionBackgroundVisionShader },
             },
         });
