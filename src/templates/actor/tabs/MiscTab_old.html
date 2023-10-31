@@ -245,42 +245,42 @@
                 <div class="scroll-area mods">
                     <!-- Situational Modifiers Section -->
                     {{#if situationModifiers}}
-                    <div class="list-item item-section wrap-collapsible">
+                    <div class="list-item item-section wrap-collabsible">
                         <input id="collapsible-situation-modifiers" class="toggle" type="checkbox" checked>
-                        <div class="list-item-content">
-                            <div class="item-left">
-                                <label for="collapsible-situation-modifiers" class="lbl-toggle">
+                        <label for="collapsible-situation-modifiers" class="lbl-toggle">
+                            <div class="list-item-content">
+                                <div class="item-left">
                                     <div class="item-text item-name">
                                         {{localize "SR5.SituationalModifiersApplication.Title"}}
                                     </div>
-                                </label>
-                            </div>
-                            <div class="item-right">
-                                <div class="item-text rtg">
-                                    {{localize "SR5.Value"}}
+                                </div>
+                                <div class="item-right">
+                                    <div class="item-text rtg">
+                                        {{localize "SR5.Value"}}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </label>
                         <div class="collapsible-content">
                             <div class="content-inner">
                                 <div class="mods">
                                     {{#each situationModifiers}}
-                                    {{#if (not this.hidden)}}
-                                    <div class="list-item">
-                                        <div class="list-item-content">
-                                            <div class="item-left">
-                                                <div class="item-text item-name show-situation-modifiers-application">
-                                                    {{localize this.label}}
+                                        {{#if (not this.hidden)}}
+                                        <div class="list-item">
+                                            <div class="list-item-content">
+                                                <div class="item-left">
+                                                    <div class="item-text item-name show-situation-modifiers-application">
+                                                        {{localize this.label}}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="item-right">
-                                                <div class="item-text rtg">
-                                                    {{this.value}}
+                                                <div class="item-right">
+                                                    <div class="item-text rtg">
+                                                        {{this.value}}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    {{/if}}
+                                        {{/if}}
                                     {{/each}}
                                 </div>
                             </div>
@@ -288,54 +288,54 @@
                     </div>
                     {{/if}}
                 
-                    <!-- Modifier Section -->
-                    <div class="list-item item-section wrap-collapsible">
-                        <input id="collapsible-modifiers" class="toggle" type="checkbox">
+    <!-- Modifier Section -->
+    <div class="list-item item-section wrap-collabsible">
+        <input id="collapsible-modifiers" class="toggle" type="checkbox">
+        <label for="collapsible-modifiers" class="lbl-toggle">
+            <div class="list-item-content">
+                <div class="item-left">
+                    <div class="item-text item-name">
+                        {{localize "SR5.Modifier"}}
+                    </div>
+                </div>
+                <div class="item-right">
+                    <div class="item-text rtg">
+                        {{localize "SR5.Value"}}
+                    </div>
+                </div>
+            </div>
+        </label>
+        <div class="collapsible-content">
+            <div class="content-inner">
+                {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
+                    <div class="list-item">
                         <div class="list-item-content">
                             <div class="item-left">
-                                <label for="collapsible-modifiers" class="lbl-toggle">
-                                    <div class="item-text item-name">
-                                        {{localize "SR5.Modifier"}}
-                                    </div>
-                                </label>
+                                <div class="item-text item-name" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
+                                    {{localizeOb id ../config.actorModifiers}}
+                                </div>
                             </div>
                             <div class="item-right">
                                 <div class="item-text rtg">
-                                    {{localize "SR5.Value"}}
+                                    <input
+                                            class="display attribute-input"
+                                            size="4"
+                                            maxlength="3"
+                                            type="text"
+                                            name="system.modifiers.{{id}}"
+                                            value="{{value}}"
+                                            placeholder="None"
+                                            data-dtype="Number"
+                                    />
                                 </div>
-                            </div>
-                        </div>
-                        <div class="collapsible-content">
-                            <div class="content-inner">
-                                {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
-                                <div class="list-item">
-                                    <div class="list-item-content">
-                                        <div class="item-left">
-                                            <div class="item-text item-name" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
-                                                {{localizeOb id ../config.actorModifiers}}
-                                            </div>
-                                        </div>
-                                        <div class="item-right">
-                                            <div class="item-text rtg">
-                                                <input
-                                                        class="display attribute-input"
-                                                        size="4"
-                                                        maxlength="3"
-                                                        type="text"
-                                                        name="system.modifiers.{{id}}"
-                                                        value="{{value}}"
-                                                        placeholder="None"
-                                                        data-dtype="Number"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {{/ifne}} {{/each}}
                             </div>
                         </div>
                     </div>
-                </div>                                                       
+                {{/ifne}} {{/each}}
+            </div>
+        </div>
+    </div>
+</div>               
             </div>
         </div>
     </div>
