@@ -66,7 +66,6 @@
             padding-bottom: 2px;
             padding-left: 1em;
             padding-right: 1em;
-            text-align: center;
         }
         .card-description {
             span {
@@ -258,6 +257,18 @@
             .test-code {
                 @include systemFonts;
                 font-size: var(--font-size-12);
+            }
+            &.can-wrap {
+                flex-flow: row wrap;
+                row-gap: 5px;
+                .left-side {
+                    flex: 1 0;
+                    white-space: nowrap;
+                }
+                .right-side {
+                    flex: 1 0;
+                    white-space: nowrap;
+                }
             }
         }
         .dice-rolls {
