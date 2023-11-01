@@ -1651,14 +1651,11 @@ export class SR5Actor extends Actor {
      * Currently compendium hosts aren't supported.
      * Any other actor type has no use for this method.
      *
-     * @param uuid The host item id
+     * @param item The host item
      */
-    async addICHost(uuid: string) {
+    async addICHost(item: SR5Item) {
         if (!this.isIC()) return;
-
-        // Check if the given item id is valid.
-        const item = await fromUuid(uuid) as SR5Item;
-        if (!item || !item.isHost) return;
+        if (!item.isHost) return;
 
         const host = item.asHost;
         if (!host) return;
