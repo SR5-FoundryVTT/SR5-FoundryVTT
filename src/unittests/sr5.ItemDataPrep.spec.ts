@@ -73,7 +73,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             // @ts-expect-error // test-case makes this necessary
             action.action.damage.base_formula_operator = '+';
             
-            ActionPrep.prepareActionRollData(action.action, [], undefined);
+            ActionPrep.prepareWithMods(action.action, []);
 
             assert.equal(action.action.damage.base_formula_operator, 'add');
         });
@@ -83,7 +83,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const documents = await actor.createEmbeddedDocuments('Item', [{type: 'action', name: 'TestAction'}]);
             const action = documents[0] as SR5Item;
 
-            ActionPrep.prepareActionDamageSource(action.system.action as Shadowrun.ActionRollData, action)
+            ActionPrep.prepareDamageSource(action.system.action as Shadowrun.ActionRollData, action)
 
             assert.deepEqual(action.system.action?.damage.source, {
                 actorId: actor.id as string,
@@ -99,7 +99,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             await weapon.createNestedItem({type: 'modification', name: 'TestModA', system: {type: 'weapon', accuracy: 2}});
             await weapon.createNestedItem({type: 'modification', name: 'TestModB', system: {type: 'weapon', accuracy: 4}});
 
-            ActionPrep.prepareActionRollData(weapon.system.action as Shadowrun.ActionRollData, weapon.items.filter(item => item.type === 'modification'));
+            ActionPrep.prepareWithMods(weapon.system.action as Shadowrun.ActionRollData, weapon.items.filter(item => item.type === 'modification'));
             
             assert.strictEqual(weapon.system.action?.limit.value, 6);
             assert.strictEqual(weapon.system.action?.limit.mod.length, 2);
@@ -108,10 +108,10 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         it('Check for weapon modification dice pool mod override', async () => {
             const weapon = await testItem.create({type: 'weapon'});
             // unique names are necessary
-            await weapon.createNestedItem({type: 'modification', name: 'TestModA', system: {type: 'weapon', dice_pool: 2}});
-            await weapon.createNestedItem({type: 'modification', name: 'TestModB', system: {type: 'weapon', dice_pool: 4}});
+            await weapon.createNestedItem({type: 'modification', name: 'TestModA', system: {type: 'weapon', dice_pool: 2, equipped: true}});
+            await weapon.createNestedItem({type: 'modification', name: 'TestModB', system: {type: 'weapon', dice_pool: 4, equipped: true}});
 
-            ActionPrep.prepareActionRollData(weapon.system.action as Shadowrun.ActionRollData, weapon.items.filter(item => item.type === 'modification'));
+            ActionPrep.prepareWithMods(weapon.system.action as Shadowrun.ActionRollData, weapon.items.filter(item => item.type === 'modification'));
             
             // NOTE: I expect this to fail, as this doesn't seem to work?
             assert.strictEqual(weapon.system.action?.mod, 6);
@@ -119,7 +119,14 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Check for ammo to apply its damage to the weapon', async () => {
-            assert.fail();
+            const weapon = await testItem.create({type: 'weapon'});
+
+            // unique names are necessary
+            await weapon.createNestedItem({type: 'ammo', name: 'TestAmmoA', system: {equipped: true}});
+            
+            ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, weapon.items.find(item => item.type === 'ammo' && item.isEquipped));
+
+            assert.strictEqual(weapon.system.action?.damage.value, 6);
         });
 
         it('Check for ammo to override its damage to the weapon', async () => {

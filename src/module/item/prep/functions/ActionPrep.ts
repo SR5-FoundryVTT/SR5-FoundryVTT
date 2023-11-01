@@ -11,7 +11,7 @@ export const ActionPrep = {
      * @param action The ActionRollData to alter.
      * @param item The item to use as a source.
      */
-    prepareActionDamageSource(action: Shadowrun.ActionRollData, item: SR5Item) {
+    prepareDamageSource(action: Shadowrun.ActionRollData, item: SR5Item) {
         if (!item.actor?.system) return;
 
         action.damage.source = {
@@ -21,6 +21,56 @@ export const ActionPrep = {
             itemType: item.type
         };
     },
+
+    /**
+     * Prepare weapon action data effects of the quipped ammo item.
+     * @param action The systems data action property to be altered.
+     * @param equippedAmmo The equipped ammunition item
+     */
+    prepareWithAmmo(action: Shadowrun.ActionRollData, equippedAmmo?: SR5Item) {
+        // No equipped ammo, just calculate the damage directly.
+        if (!equippedAmmo) {            
+            action.damage.element.value = action.damage.element.base;
+            action.damage.type.value = action.damage.type.base;
+
+            return;
+        }
+
+        // Collect weapon value modifications from used ammunition.
+        //@ts-expect-error // TODO: foundry-vtt-types v10 
+        const ammoData = equippedAmmo.system as AmmoData;
+        const limitParts = new PartsList(action.limit.mod);
+
+        // Some ammunition want to replace the weapons damage, others modify it.
+        if (ammoData.replaceDamage) {
+            action.damage.override = { name: equippedAmmo.name as string, value: Number(ammoData.damage) };
+        } else {
+            action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
+        }
+
+        // add mods to ap from ammo
+        action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
+
+        if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name as string, ammoData.accuracy);
+
+        // override element
+        if (ammoData.element) {
+            action.damage.element.value = ammoData.element;
+        } else {
+            action.damage.element.value = action.damage.element.base;
+        }
+
+        // override damage type
+        if (ammoData.damageType) {
+            action.damage.type.value = ammoData.damageType;
+        } else {
+            action.damage.type.value = action.damage.type.base;
+        }
+
+        // Apply collected modifications.
+        action.limit.mod = limitParts.list;
+    },
+
     /**
      * Prepare general action data.
      * 
@@ -28,9 +78,8 @@ export const ActionPrep = {
      * 
      * @param action The systems data action property to be altered.
      * @param equippedMods Those item mods that are equipped
-     * @param equippedAmmo The equipped ammunition item
      */
-    prepareActionRollData(action: Shadowrun.ActionRollData, equippedMods: SR5Item[], equippedAmmo?: SR5Item) {
+    prepareWithMods(action: Shadowrun.ActionRollData, equippedMods: SR5Item[]) {
         action.alt_mod = 0;
         action.limit.mod = [];
         action.damage.mod = [];
@@ -53,42 +102,6 @@ export const ActionPrep = {
             if (modification.system.accuracy) limitParts.addUniquePart(mod.name as string, modification.system.accuracy);
             if (modification.system.dice_pool) dpParts.addUniquePart(mod.name as string, modification.system.dice_pool);
         });
-
-        // Collect weapon value modifications from used ammunition.
-        if (equippedAmmo) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10 
-            const ammoData = equippedAmmo.system as AmmoData;
-
-            // Some ammunition want to replace the weapons damage, others modify it.
-            if (ammoData.replaceDamage) {
-                action.damage.override = { name: equippedAmmo.name as string, value: Number(ammoData.damage) };
-            } else {
-                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
-            }
-
-            // add mods to ap from ammo
-            action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
-
-            if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name as string, ammoData.accuracy);
-
-            // override element
-            if (ammoData.element) {
-                action.damage.element.value = ammoData.element;
-            } else {
-                action.damage.element.value = action.damage.element.base;
-            }
-
-            // override damage type
-            if (ammoData.damageType) {
-                action.damage.type.value = ammoData.damageType;
-            } else {
-                action.damage.type.value = action.damage.type.base;
-            }
-        } else {
-            // set value if we don't have item overrides
-            action.damage.element.value = action.damage.element.base;
-            action.damage.type.value = action.damage.type.base;
-        }
 
         // Apply collected modifications.
         action.limit.mod = limitParts.list;

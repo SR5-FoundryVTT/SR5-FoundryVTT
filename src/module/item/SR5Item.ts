@@ -251,8 +251,9 @@ export class SR5Item extends Item {
         
         const action = this.getAction();
         if (action) {
-            ActionPrep.prepareActionDamageSource(action, this);
-            ActionPrep.prepareActionRollData(action, equippedMods, equippedAmmo);
+            ActionPrep.prepareDamageSource(action, this);
+            ActionPrep.prepareWithAmmo(action, equippedAmmo);
+            ActionPrep.prepareWithMods(action, equippedMods);
         }
 
         const range = this.getWeaponRange();
