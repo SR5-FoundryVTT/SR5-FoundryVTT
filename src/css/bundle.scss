@@ -1416,6 +1416,7 @@ color: white;
     padding: 10px;               /* Padding */
     text-align: left;          /* Left text */
     border-bottom: 2px solid $edge; /* Add a border at the bottom */
+    font-size: medium;
 }
 
 .SR5 tr p:not(th p) {
@@ -1431,39 +1432,72 @@ color: white;
 
 .license-section .list-item-content,
 .license-section .list-item.item-section .list-item-content {
-    display: flex;
+    display: flex !important;
     flex-direction: row;
-    justify-content: flex-start;
-    margin: 0;
-    padding: 1px;
+    justify-content: flex-start !important;
+    margin: 0 !important;
+    padding: 1px !important;
 }
 
-.license-section .item-left,
-.license-section .item-text.rtg-rate,
-.license-section .item-text.desc {
-    flex-grow: 1;
-    flex: 1 0 auto;
+.desc {
+   margin-left: -1em !important; 
+   margin-right: 1em !important;
 }
+
+
 
 /* New or updated rules */
-.license-section .item-left .item-text.rtg.rate,
-.license-section .item-left .item-text.rtg-rate {
+.license-section .item-text.rtg.rate,
+.license-section .rtg-rate.item-text {  /* Updated */
     margin-left: 0;
     padding-left: 0;
     text-align: left;
+    width: 22px;  /* Updated */
+}
+//Header Rating
+.license-section .item-text.rtg.rate-header {
+    max-width: 2em;
+    margin-left: -1em;
+}
+//Header detail
+.detail{
+    margin-left: 1em !important;
+}
+//Rating width
+.license-section .list-item .rtg-rate.item-text {
+    max-width: 2em;
+}
+//Item Name field size
+.license-section .list-item .rtg-rate.item-text {
+    max-width: 1em;
+}
+.item-name-field {
+    max-width: 11em;  /* Set to your desired max width */
 }
 
+.display.left.name-display {
+    width: 100%;  /* Takes the maximum width of the parent */
+    max-width: 100%;  /* Optional, ensures it doesn't go beyond parent */
+}
+.display.desc-sin {
+    margin-left: 2em;
+}
 .license-section .list-item.item-section .item-left .item-text,
-.license-section .list-item .item-left .item-text.item-name {
-    flex-basis: calc(50% - 1em);
+.license-section .list-item .item-left .item-text.item-name-header {
+    flex-basis: calc(15% - 1em);
     text-align: left;
+}
+
+.item-text.item-name-header {
+    /* Set to your desired width */
+    max-width: 11em;  /* Optional, ensures it doesn't go beyond the set width */
 }
 
 .license-section .list-item.item-section .item-text.rtg.rate,
-.license-section .list-item .item-text.rtg-rate {
+.license-section .list-item .rtg-rate.item-text {  /* Updated */
     flex-basis: calc(25% - 1em);
     text-align: left;
-    width: 2em;
+    width: 22px;  /* Updated */
 }
 
 .license-section .list-item.item-section .item-text.desc.detail,
@@ -1473,8 +1507,15 @@ color: white;
 }
 
 /* Specifics for the rtg-rate input field */
-.license-section .list-item .item-text.rtg-rate input {
-    width: 2em;
+.license-section .list-item .rtg-rate.item-text input {  /* Updated */
+    width: 22px;  /* Updated */
+}
+
+// Specific em
+.license-section .sr5 .list-header .list-item-content .item-text.desc,
+.license-section .sr5 .list-item .list-item-content .item-text.desc {
+    width: 30em;
+    margin-right: 5px;
 }
 
 .license-section .item-left {
@@ -1488,7 +1529,9 @@ color: white;
 }
 
 .license-section .sr5 .list-item .list-item-content .item-text.desc {
-    width: 30em !important;  /* Changed this from 47em to 30em */
+    width: 30em !important;
+    margin-left: -1em !important;
     text-align: left;
 }
+
 
