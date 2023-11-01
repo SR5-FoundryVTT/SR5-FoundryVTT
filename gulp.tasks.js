@@ -74,23 +74,36 @@ async function watch() {
 
     gulp.watch('src/**/*.scss').on('change', async () => await buildSass());
 
-    esbuild.build({
-        entryPoints: [entryPoint],
-        bundle: true,
-        minify: false, // BEWARE: minify: true will break the system as class names are used as string references
-        sourcemap: true,
-        format: 'esm',
-        outfile: path.resolve(destFolder, jsBundle),
-        plugins: [typecheckPlugin()],
-        watch: {
-            onRebuild(error, result) {
-                if (error) console.error('watch build failed:', error)
-                else console.log('watch build succeeded:', result)
-            },
-        },
-    }).catch((err) => {
-        console.log(err)
-    })
+    // esbuild.build({
+    //     entryPoints: [entryPoint],
+    //     bundle: true,
+    //     minify: false, // BEWARE: minify: true will break the system as class names are used as string references
+    //     sourcemap: true,
+    //     format: 'esm',
+    //     outfile: path.resolve(destFolder, jsBundle),
+    //     plugins: [typecheckPlugin()],
+    //     watch: {
+    //         onRebuild(error, result) {
+    //             if (error) console.error('watch build failed:', error)
+    //             else console.log('watch build succeeded:', result)
+    //         },
+    //     },
+    // }).catch((err) => {
+    //     console.log(err)
+    // })
+
+    const context = await esbuild.context({
+            entryPoints: [entryPoint],
+            bundle: true,
+            minify: false, // BEWARE: minify: true will break the system as class names are used as string references
+            sourcemap: true,
+            format: 'esm',
+            outfile: path.resolve(destFolder, jsBundle),
+            plugins: [typecheckPlugin({watch: true})],
+      })
+      
+      // Enable watch mode
+      await context.watch();
 }
 
 /**
