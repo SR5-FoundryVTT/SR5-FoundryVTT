@@ -965,6 +965,11 @@ input[type='text'].display {
                 //padding-right: 0.5em;
             }
         }
+        .item-desc:after{
+            content: "";
+            clear: both;
+            display: table;
+        }
     }
 
 
@@ -1418,4 +1423,37 @@ color: white;
 .fas.fa-file-pdf {
     color: #e67260;
     
+}
+
+// Test new SIN Layout
+
+.list-item-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.item-left,
+.item-right {
+    display: flex;
+    align-items: center;
+}
+
+.item-text.item-name {
+    flex-grow: 1;
+    min-width: 0; /* To allow the element to shrink */
+    padding-right: 10px;
+}
+
+.item-text.rtg-rate {
+    flex-shrink: 0; /* Prevent it from shrinking */
+    padding-right: 10px;
+}
+
+.item-text.desc {
+    flex-grow: 2; /* Take up remaining space */
+    min-width: 0; /* To allow the element to shrink */
+}
+
+.item-text.item-icons.rtg {
+    flex-shrink: 0; /* Prevent it from shrinking */
 }
