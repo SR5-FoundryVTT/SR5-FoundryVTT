@@ -814,6 +814,7 @@ input[type='text'].display {
                 flex-flow: row nowrap;
                 justify-content: flex-start;
                 align-items: center;
+                flex-grow:1;
             }
     
             .item-right {
@@ -869,6 +870,7 @@ input[type='text'].display {
                 text-align: center;
                 height: 100%;
                 border: $light;
+                padding-right: 10px;
     
                 &.faded {
                     color: $grey;
@@ -1427,33 +1429,66 @@ color: white;
 
 // Test new SIN Layout
 
-.list-item-content {
+.license-section .list-item-content,
+.license-section .list-item.item-section .list-item-content {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin: 0;
+    padding: 1px;
 }
 
-.item-left,
-.item-right {
-    display: flex;
-    align-items: center;
-}
-
-.item-text.item-name {
+.license-section .item-left,
+.license-section .item-text.rtg-rate,
+.license-section .item-text.desc {
     flex-grow: 1;
-    min-width: 0; /* To allow the element to shrink */
-    padding-right: 10px;
+    flex: 1 0 auto;
 }
 
-.item-text.rtg-rate {
-    flex-shrink: 0; /* Prevent it from shrinking */
-    padding-right: 10px;
+/* New or updated rules */
+.license-section .item-left .item-text.rtg.rate,
+.license-section .item-left .item-text.rtg-rate {
+    margin-left: 0;
+    padding-left: 0;
+    text-align: left;
 }
 
-.item-text.desc {
-    flex-grow: 2; /* Take up remaining space */
-    min-width: 0; /* To allow the element to shrink */
+.license-section .list-item.item-section .item-left .item-text,
+.license-section .list-item .item-left .item-text.item-name {
+    flex-basis: calc(50% - 1em);
+    text-align: left;
 }
 
-.item-text.item-icons.rtg {
-    flex-shrink: 0; /* Prevent it from shrinking */
+.license-section .list-item.item-section .item-text.rtg.rate,
+.license-section .list-item .item-text.rtg-rate {
+    flex-basis: calc(25% - 1em);
+    text-align: left;
+    width: 2em;
 }
+
+.license-section .list-item.item-section .item-text.desc.detail,
+.license-section .list-item {
+    flex-basis: calc(25% - 1em);
+    text-align: left;
+}
+
+/* Specifics for the rtg-rate input field */
+.license-section .list-item .item-text.rtg-rate input {
+    width: 2em;
+}
+
+.license-section .item-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.license-section .item-left .item-text {
+    align-self: flex-start;
+}
+
+.license-section .sr5 .list-item .list-item-content .item-text.desc {
+    width: 30em !important;  /* Changed this from 47em to 30em */
+    text-align: left;
+}
+
