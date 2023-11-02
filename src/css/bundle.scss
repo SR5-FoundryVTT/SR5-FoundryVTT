@@ -300,7 +300,7 @@ input[type='text'].display {
      */
     .form-group {
         label {
-            color: white;
+            color: $white;
             font-weight: bold;
         }
 
@@ -484,8 +484,8 @@ input[type='text'].display {
     } 
     
     .list-item[data-item-type="skill"] {
-        /* Your CSS properties here */
-        color: #ebb531;
+        
+        color: $yellow;
     }
 
     .list-item[data-item-type="knowledgeskill"] {
@@ -532,28 +532,28 @@ input[type='text'].display {
 
         >.item {
             // Make tabs stretch across horizontally.
-            color: white;
+            color: $white;
             flex: 1;
             text-align: center;
         }
     }
     .sheet .editor-content {
-        color: white;
-        font-family: 'klavika-medium';
+        color: $white;
+        font-family: $editorFonts;
         height: 100%;
         overflow-y: auto;
         word-break: break-word;
     }
     .list-item.item-section.flexrow {
-        min-height: 36px;  /* set your desired min-height */
+        min-height: 36px;  
     }
 
     label.item-text.item-name[for="select-inventory"] {
-        color: $edge;  /* set the color to yellow */
+        color: $edge;  
     }
 
     label.item-text.item-name {
-        color: white;  /* set the color to yellow */
+        color: $white;  
     }
 
     .tab {
@@ -1139,254 +1139,7 @@ input[type='text'].display {
     justify-content: center;
     right: -150px;
 }
-/** This is intended to replace foriens Quest Log to Match its CSS to Shadowrun Styles
- */
-#forien-quest-log.window-app .window-content {
-    overflow: visible;
-}
 
-#forien-quest-log section, .window-app.forien-quest-preview section {
-    display: block;
-    flex-direction: row;
-    justify-content: flex-start;
-}
-//window background
-body #forien-quest-log .window-content, .window-app.forien-quest-preview .window-content {
-    border-radius: 0 0 5px 5px;
-    margin: 0;
-    padding: 0;
-    background: url("assets/light-page.webp") repeat;
-}
-
-.window-app .window-content {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    
-    padding: 8px;
-    //color: var(--color-text-dark-primary);
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-#forien-quest-log .actions i.fa-play, .window-app.forien-quest-preview .actions i.fa-play {
-    font-size: 14px;
-    padding-top: 2px;
-    color: $yellow;
-}
-body #forien-quest-log .quest-log .log-body header {
-    background: url(assets/journal-banner.webp) repeat;
-    font-family: 'klavika-medium';
-    text-align: left !important;
-    text-indent: 5px;
-    color: white;
-    border-width: 0;
-    height: 80px;
-    border-block-end: 2px solid var(--palette-primary,var(--default-primary-accent,#782e22));
-    border-bottom: 2px solid var(--palette-primary,var(--default-primary-accent,#782e22));
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 4px;
-    margin-top: 0;
-    padding-top: 0;
-}
-
-//table list hover
-body #forien-quest-log .quest-log .table ul li.drag-quest:hover {
-    border-color: var(--palette-primary,var(--default-primary-accent,$red));
-    box-shadow: 0 0 2px var(--palette-primary,var(--default-primary-accent,$red)) inset; //$red is the var for Red
-}
-// Quest Pause Hover
-//body #forien-quest-log .actions i:hover, .window-app.forien-quest-preview .actions i:hover {
-    //color: $green;
-//}
-
-body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .quest-giver-name h2:hover {
-    color: var(--palette-primary,var(--default-primary-accent,$darkred));
-    text-shadow: 0 0 5px #fff, 0 0 3px #fff, 0 0 4px $darkred, 0 0 5px $darkred, 0 0 5px $darkred, 0 0 4px $darkred, 0 0 4px white; /* Add this line for glow */
-}
-
-.tox .tox-tbtn svg {
-    display: block;
-    fill: white;
-}
-
-
-body #forien-quest-log .quest-log .log-body header h1 {
-    align-self: flex-end;
-    border: none;
-    font-family: 'klavika-medium';
-    font-size: medium;
-    margin: 0;
-    padding-bottom: 26px;
-    background: rgba(255, 255, 255, 0);
-}
-
-body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .quest-giver-name h2 {
-    border: none;
-    cursor: pointer;
-    display: inline-block;
-    margin: 0;
-    transition: color .3s ease;
-    background: #ffffff00;
-    color: darkred;
-}
-
-body #forien-quest-log .actions-single i, .window-app.forien-quest-preview .actions-single i {
-    cursor: pointer;
-    font-size: 18px;
-    transition: color .3s ease;
-    color: $yellow;
-}
-//h1 quest Log
-body #forien-quest-log h1, .window-app.forien-quest-preview h1 {
-    flex: 0 0 1px;
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1;
-    margin: 0 0 8px;
-    padding: 0 0 30px;
-    color: #ffffff; 
-    //border-bottom: 2px solid var(--color-underline-header);
-}
-// h1 quest log header
-body #forien-quest-log h1, .window-app.forien-quest-preview h1 {
-    //background: url(assets/journal-banner-small.webp) repeat;
-    color: white;
-}
-
-body #forien-quest-log h1, body .window-app.forien-quest-preview h1 {
-    line-height: 1;  /* or whatever line-height value you want */
-    text-indent: 10px;
-    padding-top: 2px;
-    background: url(assets/journal-banner-small.webp) repeat;
-}
-
-// h4 Quest Log
-body #quest-tracker .window-header h4 {
-    font-family: 'klavika-medium';
-    color: $yellow;
-    font-size: large;
-}
-//h2
-body #forien-quest-log .quest-log .table ul .title h2, body .window-app.forien-quest-preview h2 {
-    border-width: 2px;
-    font-size: 20px;
-    font-weight: 700;
-    margin: 4px;
-    padding: 0px;
-    color: #C7B002;
-    background: #000000b8;
-}
-
-
-body #quest-tracker .quest .title a, #quest-tracker .quest .title i {
-    filter: drop-shadow(1px 1px 1px #000);
-    font-family: 'klavika-medium';
-    font-size: medium;
-    color: $yellow;
-}
-
-body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .quest-title {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    background: url(assets/journal-banner-small.webp) repeat;
-    background-size: cover;
-}
-
-body .window-app.forien-quest-preview .quest-body .quest-info .quest-col-right .quest-tasks .toggleState:hover {
-    color: var(--palette-primary,var(--default-primary-accent,$yellow));
-}
-
-body #forien-quest-log .actions i.fa-times-circle, .window-app.forien-quest-preview .actions i.fa-times-circle {
-    color: $red;
-}
-
-body .quest-tasks ul {
-    background: #00000047;
-}
-
-body .window-app.forien-quest-preview .quest-body .quest-info .quest-col-right header {
-    border-block-end: 2px solid var(--palette-primary,var(--default-primary-accent,#782e22));
-    border-bottom: 2px solid var(--palette-primary,var(--default-primary-accent,#782e22));
-    color: $edge;
-    display: flex;
-    flex: 0 0 1px;
-    margin-bottom: 4px;
-    background: #000000b8;
-}
-//table h2
-body #forien-quest-log .quest-log .table ul li.drag-quest {
-    align-items: center;
-    background: #000000b8;
-    border: 1px solid #0000;
-    border-radius: 5px;
-    display: flex;
-    justify-content: flex-start;
-    margin: 0 4px 2px 0;
-    min-height: 42px;
-    transition: border-color .3s ease,box-shadow .3s ease;
-}
-//title h2
-body #forien-quest-log .quest-log .table ul .title h2 {
-    color: #C7B002;
-    background: #00000000;
-}
-
-body .open-quest.tasks {
-    color: #f2f2f2; /* Sets the background color */
-}
-
-//Buttons
-body .window-app.forien-quest-preview .quest-body .quest-info .quest-col-right button {
-    flex: 0 0 1px;
-    font-size: 15px;
-    height: 20px;
-    line-height: 1;
-    white-space: nowrap;
-    background: $darkred;
-    color: white;
-}
-
-#forien-quest-log button, .window-app.forien-quest-preview button {
-    border-radius: 5px;
-    cursor: pointer;
-    height: 30px;
-    margin-bottom: 2px;
-    margin-right: 4px;
-    margin-top: 2px;
-    transition: border-color .3s ease,background .3s ease,box-shadow .3s ease;
-    background: $darkred;
-    color: white;
-}
-//Play
-#forien-quest-log .actions i.move.fas.fa-play:hover, .window-app.forien-quest-preview .actions i.move.fas.fa-play:hover {
-    color: green;
-}
-//Trashbin
-body #forien-quest-log .actions i.delete.fas.fa-trash:hover, body .window-app.forien-quest-preview .actions i.delete.fas.fa-trash:hover {
-    color: #cc5e5e;
-}
-
-body #forien-quest-log .actions i.fa-trash, body .window-app.forien-quest-preview .actions i.fa-trash {
-    color: #af0505;
-}
-//Back to deactive
-body #forien-quest-log .actions i.move.fas.fa-stop-circle:hover, body .window-app.forien-quest-preview .actions i.move.fas.fa-stop-circle:hover {
-    color: $edge;
-}
-
-//Make Available
-#forien-quest-log .actions i.move.fas.fa-clipboard:hover, .window-app.forien-quest-preview .actions i.move.fas.fa-clipboard:hover {
-    color: $edge;
-}
-
-body #forien-quest-log .quest-log .table ul .title p {
-    color: white;
-}
-//End Quest Log Styles
 
 .list-header.item-section[data-item-id="weapon"][data-item-type=""] {
     color: $edge;  /* set the color to yellow */
@@ -1394,25 +1147,25 @@ body #forien-quest-log .quest-log .table ul .title p {
 
 .common-test{
 margin-bottom: 4px; margin-top: 4px;
-color: white;
+color: $white;
 }
 
 .custom-item-element {
-    color: white;               /* Text color */
+    color: $white;               /* Text color */
 }
 //lable back to white color
 .matrix-label{
-    color: white;
+    color: $white;
 }
 
 .scroll-area-matrix{
     overflow-y: auto;
-    color: white;
+    color: $white;
 }
 
 //table in any Item
 .SR5 th {
-    color: #ebb531;              
+    color: $yellow;              
     padding: 10px;               /* Padding */
     text-align: left;          /* Left text */
     border-bottom: 2px solid $edge; /* Add a border at the bottom */
@@ -1424,7 +1177,7 @@ color: white;
 }
 
 .fas.fa-file-pdf {
-    color: #e67260;
+    color: $pdfColor;
     
 }
 
