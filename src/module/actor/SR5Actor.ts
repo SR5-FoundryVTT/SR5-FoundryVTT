@@ -360,15 +360,16 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Return 
-     * @param damage 
-     * @returns 
+     * Return armor worn by this actor.
+     * 
+     * @param damage If given will be applied to the armor to get modified armor.
+     * @returns Armor or modified armor.
      */
-    getArmor(damage?:Shadowrun.DamageData): Shadowrun.ActorArmorData {
+    getArmor(damage?:Shadowrun.DamageData) {
         // Prepare base armor data.
         const armor = "armor" in this.system ? 
             foundry.utils.duplicate(this.system.armor) : 
-            DataDefaults.actorArmorData();
+            DataDefaults.actorArmor();
         // Prepare damage to apply to armor.
         damage = damage || DataDefaults.damageData();
 
