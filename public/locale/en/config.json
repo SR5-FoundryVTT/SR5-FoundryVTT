@@ -1019,6 +1019,7 @@
     "SR5.Test": "Test",
     "SR5.TestResults": {
         "AttackBlockedByVehicleArmor": "Attack Hits But Is Blocked By Vehicle Armor",
+        "AttackBlockedByHardenedArmor": "Attack Hits But Is Blocked By Hardened Armor",
         "AttackDodged": "Attack Dodged",
         "AttackDoesNoPhysicalDamageToVehicle": "Attack Hits But Does No Physical Damage To Vehicle",
         "AttackHits": "Attack Hits",
