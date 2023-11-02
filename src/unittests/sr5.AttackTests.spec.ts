@@ -169,7 +169,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         describe("isBlockedByVehicleArmor", () => {
             it('blocks damage due to vehicle armor', async () => {
-                const armor = DataDefaults.actorArmorData({
+                const armor = DataDefaults.actorArmor({
                     value: 50,
                     base: 50,
                 });
@@ -193,7 +193,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             });
 
             it("doesn't block damage for non-vehicle actors", async () => {
-                const vehicleArmor = DataDefaults.actorArmorData({
+                const vehicleArmor = DataDefaults.actorArmor({
                     value: 50,
                     base: 50,
                 });
@@ -237,7 +237,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             });
 
             it("takes net hits into account", async () => {
-                const armor = DataDefaults.actorArmorData({
+                const armor = DataDefaults.actorArmor({
                     value: 6,
                     base: 6,
                 });
@@ -263,7 +263,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             });
 
             it("takes AP into account", async () => {
-                const armor = DataDefaults.actorArmorData({
+                const armor = DataDefaults.actorArmor({
                     value: 6,
                     base: 6,
                 });
