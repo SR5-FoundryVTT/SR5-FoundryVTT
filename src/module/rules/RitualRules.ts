@@ -13,9 +13,9 @@ export const RitualRules = {
      * @param hitsCaster Hits of the ritual test.
      * @param hitsRitual Hits of the ritual opposing test.
      */
-        ritualHits: (hitsCaster: number, hitsRitual: number): number => {
-            return Math.max(hitsCaster - hitsRitual, 0);
-        },
+    ritualHits: (hitsCaster: number, hitsRitual: number): number => {
+        return Math.max(hitsCaster - hitsRitual, 0);
+    },
 
     /**
      * Determine the amount of drain value all ritual participants have to drain against.
@@ -25,7 +25,7 @@ export const RitualRules = {
      * @param hits The amount of hits of the opposing ritual
      */
     drainValue: (hits: number, reagents: number, force: number): number => {
-        let reduction = Math.max((reagents/force)-1, 0);
+        let reduction = Math.max((reagents / force) - 1, 0);
         return Math.max(hits * 2 - reduction, 2);
     },
 
@@ -47,8 +47,8 @@ export const RitualRules = {
         const damage = DataDefaults.damageData();
         damage.base = drain;
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);
-        Helpers.calcTotal(damage, {min: 0});
-        
+        Helpers.calcTotal(damage, { min: 0 });
+
         return damage;
     },
 
