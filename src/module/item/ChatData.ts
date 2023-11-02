@@ -102,10 +102,12 @@ export const ChatData = {
             }
         }
     },
+    
     sin: (system, labels, props) => {
-        props.push(`Rating ${system.technology.rating}`);
+        // Avoid displaying rating null (empty input field) and rating 0.
+        if (system.technology.rating) props.push(`Rating ${system.technology.rating}`);
         system.licenses.forEach((license) => {
-            props.push(`${license.name} R${license.rtg}`);
+            if (license.rtg) props.push(`${license.name} R${license.rtg}`);
         });
     },
 

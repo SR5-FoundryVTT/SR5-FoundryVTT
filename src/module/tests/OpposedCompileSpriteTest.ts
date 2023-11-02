@@ -4,6 +4,7 @@ import { PartsList } from "../parts/PartsList";
 import { CompileSpriteTest } from "./CompileSpriteTest";
 import { OpposedTest, OpposedTestData } from "./OpposedTest";
 import { TestDocuments, TestOptions } from "./SuccessTest";
+import { Translation } from '../utils/strings';
 
 
 interface OpposedCompileSpriteTestData extends OpposedTestData {
@@ -89,11 +90,11 @@ export class OpposedCompileSpriteTest extends OpposedTest {
         await this.cleanupAfterExecutionCancel();
     }
 
-    override get successLabel(): string {
+    override get successLabel(): Translation {
         return 'SR5.TestResults.SpriteCompilationFailure';
     }
 
-    override get failureLabel(): string {
+    override get failureLabel(): Translation {
         return 'SR5.TestResults.SpriteCompilationSuccess';
     }
 

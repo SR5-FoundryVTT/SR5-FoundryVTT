@@ -1,9 +1,7 @@
-import { EnvironmentalModifier } from './../rules/modifiers/EnvironmentalModifier';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
 import ModifierTypes = Shadowrun.ModifierTypes;
-import EnvironmentalModifiersSourceData = Shadowrun.EnvironmentalModifiersSourceData;
 
 export interface MeleeAttackData extends SuccessTestData {
     reach: number

@@ -1,9 +1,7 @@
-import { SR5Item } from './../item/SR5Item';
 import {SR} from "../constants";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import DamageData = Shadowrun.DamageData;
-import ArmorData = Shadowrun.ArmorData;
 import ValueField = Shadowrun.ValueField;
 import {SoakRules} from "./SoakRules";
 import {SR5Actor} from "../actor/SR5Actor";
@@ -97,7 +95,7 @@ export class CombatRules {
     }
 
     /**
-     * Modify Damage according to combat sequence (SR5#173) part defend. Successfull attack.
+     * Modify Damage according to combat sequence (SR5#173) part defend. Successful attack.
      *
      * @param defender The active defender
      * @param attackerHits The attackers hits. Should be a positive number.
@@ -124,27 +122,65 @@ export class CombatRules {
     }
 
     /**
+     * Check if vehicle wouldn't take any damage due to vehicle armor rules (SR5#199)
+     * @param incomingDamage The incoming damage
+     * @param attackerHits The attackers hits. Should be a positive number.
+     * @param defenderHits The attackers hits. Should be a positive number.
+     * @param actor The active defender
+     */
+    static isBlockedByVehicleArmor(incomingDamage: DamageData, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
+        if(!actor.isVehicle()) {
+            return false;
+        }
+
+        const modifiedDamage = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage);
+
+        const modifiedAv = actor.getArmor(incomingDamage).value;
+        const modifiedDv = modifiedDamage.value;
+
+        return modifiedDv < modifiedAv;
+    }
+
+    /**
+     * Check if vehicle wouldn't take any damage due to non-electric stun damage
+     * @param incomingDamage The incoming damage
+     * @param actor The active defender
+     */
+    static doesNoPhysicalDamageToVehicle(incomingDamage: DamageData, actor: SR5Actor): boolean {
+        return actor.isVehicle() && incomingDamage.type.value === 'stun' && incomingDamage.element.value !== "electricity";
+    }
+
+    /**
      * Modify damage according to suppression defense (SR5#179). Successfull attack.
      * 
      * In case of suppression a successfull attack just does weapon damage (base + ammunition)
      * 
      * @param damage The incoming weapon damage of the attack, unaltered.
      */
-    static modifyDamageAfterSupressionHit(damage: DamageData): DamageData {
+    static modifyDamageAfterSuppressionHit(damage: DamageData): DamageData {
         return foundry.utils.duplicate(damage);
     }
 
     /**
      * Modify damage according to combat sequence (SR5#173 part defend. Missing attack.
      * @param damage Incoming damage to be modified
+     * @param isHitWithNoDamage Optional parameter used for physical defense tests when attack hits but will deal no damage
      * @return A new damage object for modified damage.
      */
-    static modifyDamageAfterMiss(damage: DamageData): DamageData {
+    static modifyDamageAfterMiss(damage: DamageData, isHitWithNoDamage?: boolean): DamageData {
         const modifiedDamage = foundry.utils.duplicate(damage);
 
         // Keep base and modification intact, only overwriting the result.
-        modifiedDamage.override = {name: 'SR5.Success', value: 0};
+        modifiedDamage.override = {name: 'SR5.TestResults.Success', value: 0};
         Helpers.calcTotal(modifiedDamage, {min: 0});
+        modifiedDamage.ap.override = {name: 'SR5.TestResults.Success', value: 0};
+        Helpers.calcTotal(modifiedDamage.ap);
+        modifiedDamage.type.value = '';
+
+        // If attack hits but deals no damage, keep the element of the attack for any side effects.
+        if(!isHitWithNoDamage) {
+            modifiedDamage.element.value = '';
+        }
 
         return modifiedDamage;
     }

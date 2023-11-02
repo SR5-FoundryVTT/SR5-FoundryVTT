@@ -1,5 +1,5 @@
-import { TestDialog } from './../apps/dialogs/TestDialog';
-import { RangedWeaponRules } from './../rules/RangedWeaponRules';
+import { TestDialog } from '../apps/dialogs/TestDialog';
+import { RangedWeaponRules } from '../rules/RangedWeaponRules';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
@@ -281,7 +281,7 @@ export class RangedAttackTest extends SuccessTest {
      * NOTE: In this case it's only checked if at least ONE bullet exists.
      *       It's done this way as no matter the fire mode, you can fire it.
      */
-    override canConsumeDocumentRessources() {
+    override canConsumeDocumentResources() {
         if (!this.item.isRangedWeapon) return true;
         
         // Ammo consumption
@@ -293,7 +293,7 @@ export class RangedAttackTest extends SuccessTest {
             return false;
         }
 
-        return super.canConsumeDocumentRessources();
+        return super.canConsumeDocumentResources();
     }
 
     /**

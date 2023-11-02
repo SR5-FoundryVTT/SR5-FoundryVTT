@@ -60,6 +60,7 @@
     "SR5.Aoe": "Z",
     "SR5.ApplyWounds": "Appliquer les blessures",
     "SR5.Armor": "Blindage",
+    "SR5.ArmorHardened" : "Hardened",
     "SR5.ArmorValue": "Valeur Blindage",
     "SR5.AstralDice": "Dés init. Astral",
     "SR5.AstralInit": "Init. Astral",
@@ -767,6 +768,8 @@
     "SR5.Temporary": "Temporaire",
     "SR5.TemporaryModifiers": "Modificateurs temporaires",
     "SR5.Test": "Test",
+    "SR5.TestResults": {
+    },
     "SR5.ToggleEquip": "Basculer équipé",
     "SR5.Top": "Coté",
     "SR5.Total": "Total",

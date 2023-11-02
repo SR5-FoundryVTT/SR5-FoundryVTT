@@ -15,6 +15,7 @@
     "strictNullChecks": true,
     "skipLibCheck": true,
     "noEmitOnError": false,
-    "noImplicitOverride": true
+    "noImplicitOverride": true,
+    "resolveJsonModule": true
   }
 }

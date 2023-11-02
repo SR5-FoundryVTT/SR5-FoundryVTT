@@ -5,6 +5,7 @@ import { ConjuringRules } from '../rules/ConjuringRules';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
 import { TestDocuments, TestOptions } from './SuccessTest';
 import { SummonSpiritTest } from './SummonSpiritTest';
+import { Translation } from '../utils/strings';
 
 
 interface OpposedSummonSpiritTestData extends OpposedTestData {
@@ -94,11 +95,11 @@ export class OpposedSummonSpiritTest extends OpposedTest {
         await this.cleanupAfterExecutionCancel();
     }
 
-    override get successLabel(): string {
+    override get successLabel(): Translation {
         return 'SR5.TestResults.SpiritSummonFailure';
     }
 
-    override get failureLabel(): string {
+    override get failureLabel(): Translation {
         return 'SR5.TestResults.SpiritSummonSuccess';
     }
 

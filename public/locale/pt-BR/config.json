@@ -51,6 +51,7 @@
   "SR5.Aoe": "AdE",
   "SR5.ApplyWounds": "Aplicar Ferimentos",
   "SR5.Armor": "Armadura",
+  "SR5.ArmorHardened" : "Hardened",
   "SR5.ArmorValue": "Valor de Armadura",
   "SR5.AstralDice": "Dado Inic Astral",
   "SR5.AstralInit": "Inic Astral",
@@ -604,6 +605,8 @@
   "SR5.TargetSprite": "Sprite",
   "SR5.Temporary": "Temporario",
   "SR5.TemporaryModifiers": "Modificadores Temporarios",
+  "SR5.TestResults": {
+  },
   "SR5.ToggleEquip": "Trava Equipada",
   "SR5.Top": "Acima",
   "SR5.Total": "Total",

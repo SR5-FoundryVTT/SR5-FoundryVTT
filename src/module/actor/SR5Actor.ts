@@ -360,15 +360,16 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Return 
-     * @param damage 
-     * @returns 
+     * Return armor worn by this actor.
+     * 
+     * @param damage If given will be applied to the armor to get modified armor.
+     * @returns Armor or modified armor.
      */
-    getArmor(damage?:Shadowrun.DamageData): Shadowrun.ActorArmorData {
+    getArmor(damage?:Shadowrun.DamageData) {
         // Prepare base armor data.
         const armor = "armor" in this.system ? 
             foundry.utils.duplicate(this.system.armor) : 
-            DataDefaults.actorArmorData();
+            DataDefaults.actorArmor();
         // Prepare damage to apply to armor.
         damage = damage || DataDefaults.damageData();
 
@@ -944,7 +945,7 @@ export class SR5Actor extends Actor {
         const mods = new PartsList<number>(test.data.modifiers.mod);
         mods.addUniquePart('SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
-        await test.execute();
+        return await test.execute();
     }
 
     /**
@@ -1013,7 +1014,7 @@ export class SR5Actor extends Actor {
         const test = await this.tests.fromAction(action, this, {showDialog});
         if (!test) return;
 
-        await test.execute();
+        return await test.execute();
     }
 
     /**
@@ -1030,7 +1031,7 @@ export class SR5Actor extends Actor {
         const test = await this.tests.fromAction(action, this);
         if (!test) return;
 
-        await test.execute();
+        return await test.execute();
     }
 
     /**
@@ -1651,14 +1652,11 @@ export class SR5Actor extends Actor {
      * Currently compendium hosts aren't supported.
      * Any other actor type has no use for this method.
      *
-     * @param uuid The host item id
+     * @param item The host item
      */
-    async addICHost(uuid: string) {
+    async addICHost(item: SR5Item) {
         if (!this.isIC()) return;
-
-        // Check if the given item id is valid.
-        const item = await fromUuid(uuid) as SR5Item;
-        if (!item || !item.isHost) return;
+        if (!item.isHost) return;
 
         const host = item.asHost;
         if (!host) return;

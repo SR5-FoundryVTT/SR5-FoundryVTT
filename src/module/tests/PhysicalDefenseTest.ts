@@ -8,19 +8,23 @@ import { SR5Combat } from "../combat/SR5Combat";
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { FLAGS, SYSTEM_NAME } from "../constants";
-
+import { Translation } from '../utils/strings';
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
     cover: number
     // Dialog input for active defense modifier
     activeDefense: string
-    activeDefenses: Record<string, { label: string, value: number|undefined, initMod: number, weapon?: string, disabled?: boolean }>
+    activeDefenses: Record<string, { label: Translation, value: number|undefined, initMod: number, weapon?: string, disabled?: boolean }>
     // Melee weapon reach modification.
     isMeleeAttack: boolean
     defenseReach: number
 }
 
+export type PhysicalDefenseNoDamageCondition = {
+    test: () => boolean,
+    label: Translation,
+}
 
 export class PhysicalDefenseTest extends DefenseTest {
     public override data: PhysicalDefenseTestData;
@@ -174,7 +178,28 @@ export class PhysicalDefenseTest extends DefenseTest {
     }
 
     override get failure() {
-        return CombatRules.attackHits(this.against.hits.value, this.hits.value)
+        return CombatRules.attackHits(this.against.hits.value, this.hits.value);
+    }
+
+
+    // Order is important in this array to determine which label is shown, determined by the first test whose function returns a truthy value
+    private noDamageConditions: PhysicalDefenseNoDamageCondition[] = [
+        {
+            test: () => this.actor !== undefined && CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor),
+            label: "SR5.TestResults.AttackDoesNoPhysicalDamageToVehicle",
+        },
+        {
+            test: () => this.actor !== undefined && CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
+            label: "SR5.TestResults.AttackBlockedByVehicleArmor",
+        },
+    ];
+
+    private getNoDamageCondition(): PhysicalDefenseNoDamageCondition|undefined {
+        return this.noDamageConditions.find(({ test }) => test());
+    }
+
+    override get failureLabel(): Translation {
+        return this.getNoDamageCondition()?.label || super.failureLabel;
     }
 
     override async processResults() {
@@ -192,18 +217,27 @@ export class PhysicalDefenseTest extends DefenseTest {
     override async processFailure() {
         if (!this.actor) return;
 
-        this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.actor, this.against.hits.value, this.hits.value, this.data.incomingDamage);
+        if(this.getNoDamageCondition()) {
+            this.data.modifiedDamage = CombatRules.modifyDamageAfterMiss(this.data.incomingDamage, true);
+        } else {
+            this.data.modifiedDamage = CombatRules.modifyDamageAfterHit(this.actor, this.against.hits.value, this.hits.value, this.data.incomingDamage);
+        }
 
         await super.processFailure();
     }
 
     override async afterFailure() {
+        // If attack hits but does no damage, don't perform the follow-up physical resist test
+        if(this.getNoDamageCondition()) {
+            return;
+        }
+
         const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
         if (!test) return;
         await test.execute();
     }
 
-    override canConsumeDocumentRessources() {
+    override canConsumeDocumentResources() {
         // Check if the actor is in active combat situation and has enough initiative score left.
         if (this.actor && this.data.iniMod && game.combat) {
             const combat: SR5Combat = game.combat as unknown as SR5Combat;
@@ -216,7 +250,7 @@ export class PhysicalDefenseTest extends DefenseTest {
             }
         }
 
-        return super.canConsumeDocumentRessources();
+        return super.canConsumeDocumentResources();
     }
 
     /**
