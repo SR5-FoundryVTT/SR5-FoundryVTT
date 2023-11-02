@@ -2,6 +2,7 @@ import { PartsList } from '../parts/PartsList';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
 import { TestDocuments, TestOptions } from './SuccessTest';
 import { RitualSpellcastingTest } from './RitualSpellcastingTest';
+import { Translation } from '../utils/strings';
 
 
 interface OpposedRitualTestData extends OpposedTestData {
@@ -65,11 +66,11 @@ export class OpposedRitualTest extends OpposedTest {
         await this.cleanupAfterExecutionCancel();
     }
 
-    override get successLabel(): string {
+    override get successLabel(): Translation {
         return 'SR5.TestResults.RitualFailure';
     }
 
-    override get failureLabel(): string {
+    override get failureLabel(): Translation {
         return 'SR5.TestResults.RitualSuccess';
     }
 
