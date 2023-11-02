@@ -31,7 +31,6 @@ export class SoakRules {
 
         let armorData = actor.getArmor(damageData)
 
-        // @ts-expect-error
         if(armorData.hardened) {
             if(damageData.value < armorData.value) {
                 damageData.override = {name: 'SR5.Success', value: 0};

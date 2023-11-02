@@ -91,13 +91,18 @@ export class DataDefaults {
      * 
      * @param partialActorArmorData Inject partial armor data
      */
-    static actorArmorData(partialActorArmorData: Partial<ActorArmorData> = {}): ActorArmorData {
+    static actorArmor(partialActorArmorData: Partial<Shadowrun.ActorArmor> = {}): Shadowrun.ActorArmor {
         return mergeObject({
             value: 0,
             mod: [],
             base: 0,
             label: '',
-        }, partialActorArmorData) as ActorArmorData;
+            fire: 0,
+            electric: 0,
+            cold: 0,
+            acid: 0,
+            hardened: false
+        }, partialActorArmorData) as Shadowrun.ActorArmor;
     }
 
     /**
