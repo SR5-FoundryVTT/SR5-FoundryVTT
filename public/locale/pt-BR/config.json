@@ -173,6 +173,7 @@
   "SR5.DefenseTest": "Teste de Defesa",
   "SR5.Description": "Descricao",
   "SR5.DetectionSpellExtended": "Estendido",
+  "SR5.Descriptors": "Descriptors",
   "SR5.Device": "Dispositivo",
   "SR5.DeviceCatCommlink": "Com-link",
   "SR5.DeviceCatCyberdeck": "Ciberdeck",
@@ -269,6 +270,7 @@
     "ActorSheet": {
       "CritterPowers": "Poderes Criatura",
       "DeviceRating": "Nivel Dispositivo",
+      "Rituals": "Rituals",
       "RollDroneInfiltration": "Infiltracao de Drone",
       "RollDronePerception": "Percepcao de Drone",
       "RollPilotVehicleTest": "Pilotar Veiculo",
@@ -505,7 +507,6 @@
   "SR5.SpellCatHealth": "Saude",
   "SR5.SpellCatIllusion": "Ilusao",
   "SR5.SpellCatManipulation": "Manipulacao",
-  "SR5.SpellCatRitual": "Ritual",
   "SR5.SpellCategory": "Categoria",
   "SR5.SpellCombatDirect": "Direto",
   "SR5.SpellCombatIndirect": "Indireto",

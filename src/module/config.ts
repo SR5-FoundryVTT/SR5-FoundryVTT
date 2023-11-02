@@ -24,6 +24,7 @@ export const SR5 = {
         modification: 'SR5.ItemTypes.Modification',
         program: 'SR5.ItemTypes.Program',
         quality: 'SR5.ItemTypes.Quality',
+        ritual: 'SR5.ItemTypes.Ritual',
         sin: 'SR5.ItemTypes.Sin',
         spell: 'SR5.ItemTypes.Spell',
         sprite_power: 'SR5.ItemTypes.SpritePower',
@@ -98,8 +99,7 @@ export const SR5 = {
         detection: 'SR5.SpellCatDetection',
         health: 'SR5.SpellCatHealth',
         illusion: 'SR5.SpellCatIllusion',
-        manipulation: 'SR5.SpellCatManipulation',
-        rituals: 'SR5.SpellCatRitual'
+        manipulation: 'SR5.SpellCatManipulation'
     },
 
     spellTypes: {
@@ -468,6 +468,7 @@ export const SR5 = {
      */
     activeTests: {
         'spell': 'SpellCastingTest',
+        'ritual': 'RitualSpellcastingTest',
         'complex_form': 'ComplexFormTest'
     },
 
@@ -961,9 +962,9 @@ export const SR5 = {
             'enchantments': '',
             'health': '',
             'illusion': '',
-            'manipulation': '',
-            'rituals': ''
+            'manipulation': ''
         },
+        ritual: {},
         sprite_power: {},
         weapon: {
             // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'

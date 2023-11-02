@@ -95,6 +95,9 @@ export const registerItemLineHelpers = () => {
             case 'spell':
                 addIcon.title = game.i18n.localize('SR5.CreateItemSpell');
                 return [addIcon];
+            case 'ritual':
+                addIcon.title = game.i18n.localize('SR5.CreateItemRitual');
+                return [addIcon];
             case 'gear':
                 addIcon.title = game.i18n.localize('SR5.CreateItemGear');
                 return [addIcon];
