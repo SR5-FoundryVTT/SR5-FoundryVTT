@@ -345,12 +345,12 @@ input[type='text'].display {
     .inline-roll {
         border: 0;
         background: none;
-        color: white !important;
+        color: $white !important;
     }
 
     
     .entity-link.content-link {
-        color: white !important;
+        color: $white !important;
     }
 
     // An origin link is a uuid based entity link, without drag support.
@@ -489,8 +489,8 @@ input[type='text'].display {
     }
 
     .list-item[data-item-type="knowledgeskill"] {
-        /* Your CSS properties here */
-        color: #ebb531;
+        
+        color: $yellow;
     }
 
     img {
