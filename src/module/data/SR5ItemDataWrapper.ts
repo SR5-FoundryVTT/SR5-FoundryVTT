@@ -250,7 +250,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getHardened(): boolean {
-        return this.getData()?.armor?.hardened || false;
+        return this.getData()?.armor?.hardened ?? false;
     }
 
     getArmorElements(): { [key: string]: number } {

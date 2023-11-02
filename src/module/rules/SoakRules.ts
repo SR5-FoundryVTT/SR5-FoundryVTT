@@ -33,15 +33,11 @@ export class SoakRules {
 
         // @ts-expect-error
         if(armorData.hardened) {
-            let ap = armorData.mod.filter(mod => mod.name === "SR5.AP")[0].value
-            let base = armorData.base
-            let modifiedArmor = base + ap;
-
-            if(damageData.value < modifiedArmor) {
-                hits += damageData.value
+            if(damageData.value < armorData.value) {
+                damageData.override = {name: 'SR5.Success', value: 0};
             }
             else {
-                hits += Math.floor(modifiedArmor/2);
+                hits += Math.ceil(armorData.value/2);
             }
         }
         return Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
