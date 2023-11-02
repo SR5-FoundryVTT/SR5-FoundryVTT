@@ -101,7 +101,7 @@ export class RitualSpellcastingTest extends SuccessTest {
 
         //currently we dont check for the lodge, so we always allow it
         if (!RitualRules.validForce(force, force)) {
-            //produce a warning when implemented
+            ui.notifications?.warn('SR5.Warnings.RitualInvalidForce', {localize: true});
         }
     }
 

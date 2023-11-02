@@ -1176,6 +1176,7 @@
     "SR5.Walk": "Gehen",
     "SR5.WalkingSpeed": "Gehen",
     "SR5.Warnings": {
+        "RitualInvalidForce": "Ritual Kraft ist zu klein oder größer als die des Refugiums",
         "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
         "CantConsumeEquippedAmmo": "Ausgerüstete Munition hat nicht genug Kugeln",
         "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
