@@ -9,6 +9,7 @@
 @import 'modifiers';
 @import 'modifiers-container';
 @import 'foundry';
+@import 'module';
 
 @font-face {
     font-family: 'klavika-medium';
@@ -277,7 +278,9 @@ input[type='text'].display {
         }
     }
 }
-
+    /**
+     * Special SR5 hr and select display
+     */
 .sr5 {
 
     hr {
@@ -1017,7 +1020,7 @@ input[type='text'].display {
     button.display.import-character {
         color: $color;
         border-color: $black;
-        background: rgb(70, 7, 7);
+        background: $bgrButton;
         border-radius: 0.3em;
         text-align: center;
 
@@ -1089,8 +1092,9 @@ input[type='text'].display {
 
     .env-modifier-active {
         border-radius: 8px;
-        box-shadow: $dark-sunken-box-shadow;
-        background-color: $dark-sunken;
+        //box-shadow: $dark-sunken-box-shadow;
+        background-color: $darkred; //$dark-sunken;
+        color: $yellow;
     }
 
     .env-modifier-total {
@@ -1135,10 +1139,15 @@ input[type='text'].display {
     flex: 1;
 }
 
+.dialog-button.remove-token-modifiers-from-scene,
+.dialog-button.remove-modifiers-from-target{
+    background-color: $bgrButton;
+}
 .far-right {
     justify-content: center;
     right: -150px;
 }
+//END SR5 Style
 
 
 .list-header.item-section[data-item-id="weapon"][data-item-type=""] {
@@ -1286,5 +1295,7 @@ color: $white;
     margin-left: -1em !important;
     text-align: left;
 }
-
-
+//Issue resolve Quality Name. This Needs outside nesting of .SR5 due to specificy of CSS
+.sr5 .list-item .list-item-content .item-text.item-name{
+   width: 6em; 
+}
