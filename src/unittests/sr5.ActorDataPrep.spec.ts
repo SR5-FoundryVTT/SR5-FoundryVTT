@@ -52,7 +52,8 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', async () => {
             const actor = await testActor.create({ type: 'character', 'system.metatype': 'human' });
-            assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, true);
+            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, true);
+            assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
             assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, true);
             assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
@@ -330,6 +331,7 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
         it('visibility checks', async () => {
             const actor = await testActor.create({ type: 'spirit' }) as SR5Actor;
             assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, true);
+            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, true);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
             assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, false);
             assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
@@ -387,6 +389,7 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', async () => {
             const actor = await testActor.create({ type: 'sprite' });
+            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
             assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, false);
@@ -457,6 +460,7 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', () => {
             let actor = new SR5Actor({ name: 'Testing', type: 'vehicle', system: { attributes: { body: { base: 5 } } } });
+            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
             assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, true);
@@ -515,6 +519,7 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', async () => {
             const actor = await testActor.create({ type: 'ic' }) as SR5Actor;
+            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
             assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, false);
@@ -542,7 +547,8 @@ export const shadowrunSR5ActorDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', async () => {
             let actor = new SR5Actor({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 5 } } } });
-            assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, true);
+            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, true);
+            assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
             assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, true);
             assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);

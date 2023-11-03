@@ -120,6 +120,7 @@ declare namespace Shadowrun {
     }
 
     export interface AstralVisibility {
+        hasAura: boolean,
         astralActive : boolean,
         affectedBySpell: boolean
     }

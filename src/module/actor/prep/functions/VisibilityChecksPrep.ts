@@ -33,6 +33,7 @@ export default class ModifiersPrep {
     private static preparVisibilityChecksBase(system: ActorTypesData) {
         system.visibilityChecks = {
             astral: {
+                hasAura: false,
                 affectedBySpell: false,
                 astralActive: false
             },
@@ -52,27 +53,23 @@ export default class ModifiersPrep {
     }
 
     private static preparVisibilityChecksLiving(system: ActorTypesData) {
-        system.visibilityChecks.astral.affectedBySpell = false;
-        system.visibilityChecks.astral.astralActive = true;
+        system.visibilityChecks.astral.hasAura = true;
 
         system.visibilityChecks.meat.hasHeat = true;
-        system.visibilityChecks.meat.hidden = false;
     }
 
     private static preparVisibilityChecksSpirit(system: ActorTypesData) {
-        system.visibilityChecks.astral.affectedBySpell = false;
         system.visibilityChecks.astral.astralActive = true;
+        system.visibilityChecks.astral.hasAura = true;
     }
 
     private static preparVisibilityChecksMatrix(system: ActorTypesData) {
         system.visibilityChecks.matrix.hasIcon = true;
-        system.visibilityChecks.matrix.runningSilent = false;
     }
 
     private static preparVisibilityChecksMachine(system: ActorTypesData) {
         system.visibilityChecks.meat.hasHeat = true;
         system.visibilityChecks.matrix.hasIcon = true;
-        system.visibilityChecks.matrix.runningSilent = false;
     }
 
 }
