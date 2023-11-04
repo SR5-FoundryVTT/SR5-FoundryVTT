@@ -467,10 +467,13 @@ input[type='text'].display {
         color: $color;
     }
 
+    .mods-scroll,
     .scroll-area {
         height: 100%;
         margin-bottom: 0.5em;
         flex: 1;
+        overflow-y: auto;
+        color: $white;
     }
     .scroll-area-knowlage {
         overflow-y: auto;
