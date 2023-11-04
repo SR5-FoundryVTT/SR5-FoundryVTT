@@ -1185,9 +1185,9 @@ color: $white;
     padding-left: 10px;  /* Padding on the left */
 }
 
-.fas.fa-file-pdf {
-    color: $pdfColor;
-    
+.fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
+{
+    color: $pdfColor; 
 }
 
 // Test new SIN Layout
