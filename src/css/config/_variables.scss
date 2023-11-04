@@ -1,6 +1,7 @@
 // $systemFonts: 'Klavika-Medium', 'Signika', 'Palatino Linotype', serif;
 // $systemFonts: 'IwaOGoPro-Md', 'Signika', 'Palatino Linotype', serif;
 $systemFonts: 'Signika', 'Palatino Linotype', serif;
+$editorFonts: "klavika-medium";
 
 $black: black;
 $blue: blue;
@@ -17,10 +18,15 @@ $light-1: darken($light, 10%);
 $light-2: darken($light-1, 10%);
 $dark: darken($grey, 20%);
 $dark2: #222;
-$dark-sunken: #414040;
+$dark-sunken: #414040; //Removed as no longer needed in situational modifiers
 $matrix-green: rgb(7, 145, 35);
 $mce-background: #939393;
 $yellow: #ebb531;
+$pdfColor: #ebb531a6;//#e67260;
+$fadedBlack: #000000b8;
+$fLightRed: #cc5e5e;
+$fDarkRed: #af0505;
+$bgrButton: rgba(70, 7, 7, 0.692);
 
 $stun: $blue;
 $physical: $red;
@@ -43,7 +49,7 @@ $groove-color: $dark;
 $groove: $groove-width solid $groove-color;
 $light-border: $dark;
 
-$dark-sunken-box-shadow: inset 0 0 3px 0 #000, 0 -2px 2px -1px #000, -2px 0 2px -2px #28221f, -2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 0 3px 3px -3px #8f8c8b, 0 2px 2px -2px #8f8c8b, 0 1px 1px -1px #8f8c8b;
+$dark-sunken-box-shadow: inset 0 0 3px 0 $darkred, 0 -2px 2px -1px $darkred, -2px 0 2px -2px $fDarkRed, -2px 0 2px -2px $fDarkRed, 2px 0 2px -2px $darkred, 2px 0 2px -2px $darkred, 0 3px 3px -3px $fLightRed, 0 2px 2px -2px $fLightRed, 0 1px 1px -1px $fLightRed;
 
 $radius: 0.25em;
 $small-distance: 0.15em;
@@ -60,3 +66,4 @@ $popupbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
 
 $grid__cols: 12;
 $sheet-max-width: 690px;
+

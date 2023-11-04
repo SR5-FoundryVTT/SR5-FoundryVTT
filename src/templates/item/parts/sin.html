@@ -1,18 +1,19 @@
 <div class="inventory">
+ <section class="license-section">   
     <div class="list-item item-section">
         <div class="list-item-content">
             <div class="item-left">
-                <div class="item-text item-name">
+                <div class="item-text item-name-header">
                     {{localize "SR5.License"}}
+                </div>
+                <div class="item-text rtg rate-header">
+                    {{localize "SR5.Rtg"}}
+                </div>
+                <div class="item-text desc detail">
+                    {{localize "SR5.Description"}}
                 </div>
             </div>
             <div class="item-right">
-                <div class="item-text rtg">
-                    {{localize "SR5.Rtg"}}
-                </div>
-                <div class="item-text desc">
-                    {{localize "SR5.Description"}}
-                </div>
                 <div class="item-text item-icons rtg">
                     <a class="add-new-license" title="{{localize 'SR5.CreateItemLicense'}}">
                         <i class="fas fa-plus"></i>
@@ -24,38 +25,37 @@
     {{#each system.licenses as |license id|}}
     <div class="list-item">
         <div class="list-item-content">
-            <div class="item-left">
-                <div class="item-text item-name">
+            
+                <div class="item-name-field">
                     <input
-                        class="display left"
+                        class="display left name-display"
                         type="text"
                         name="system.licenses.{{id}}.name"
                         value="{{license.name}}"
                         placeholder=""
                     />
                 </div>
+            
+            <div class="rtg-rate item-text">
+                <input class="display rtg-rate"
+                    size="3"
+                    type="text"
+                    name="system.licenses.{{id}}.rtg"
+                    value="{{license.rtg}}"
+                    data-dtype="Number"
+                    placeholder="0"
+                />
+            </div>
+            <div class="item-text desc">
+                <input
+                    class="display desc-sin"
+                    type="text"
+                    name="system.licenses.{{id}}.description"
+                    value="{{license.description}}"
+                    placeholder='{{localize "SR5.Description"}}'
+                />
             </div>
             <div class="item-right">
-                <div class="item-text rtg">
-                    <input
-                        class="display"
-                        size="3"
-                        type="text"
-                        name="system.licenses.{{id}}.rtg"
-                        value="{{license.rtg}}"
-                        data-dtype="Number"
-                        placeholder="0"
-                    />
-                </div>
-                <div class="item-text desc">
-                    <input
-                        class="display"
-                        type="text"
-                        name="system.licenses.{{id}}.description"
-                        value="{{license.description}}"
-                        placeholder='{{localize "SR5.Description"}}'
-                    />
-                </div>
                 <div class="item-text item-icons rtg">
                     <a class="license-delete" title="Delete License" data-index="{{id}}">
                         <i class="fas fa-trash"></i>
@@ -65,4 +65,5 @@
         </div>
     </div>
     {{/each}}
+</section>
 </div>

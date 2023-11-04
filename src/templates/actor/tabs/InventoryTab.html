@@ -43,30 +43,35 @@
                 </div>
             </div>
         </div>
-        <div class="scroll-area">
+        <div class="scroll-area-inventory">
             {{#each inventory.types as |section type|}}
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                        itemCssClass=(ift (not section.isOpen) 'faded')
-                        name=(localize section.label)
-                        itemId=section.type
-                        icons=(InventoryHeaderIcons section)
-                        rightSide=(ItemHeaderRightSide section.type)
-                }}
+                <div class="custom-section-heading">
+                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                            itemCssClass=(ift (not section.isOpen) 'faded')
+                            name=(localize section.label)
+                            itemId=section.type
+                            icons=(InventoryHeaderIcons section)
+                            rightSide=(ItemHeaderRightSide section.type)
+                    }}
+                </div>
                 {{#if section.isOpen }}
                     {{#each section.items}}
-                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                                img=this.img
-                                name=this.name
-                                itemId=this._id
-                                icons=(InventoryItemIcons this)
-                                rightSide=(ItemRightSide this)
-                                hasDesc="true"
-                                hasRoll="true"
-                                description=this.description.value
-                        }}
+                        <div class="custom-item-element">
+                            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                                    img=this.img
+                                    name=this.name
+                                    itemId=this._id
+                                    icons=(InventoryItemIcons this)
+                                    rightSide=(ItemRightSide this)
+                                    hasDesc="true"
+                                    hasRoll="true"
+                                    description=this.description.value
+                            }}
+                        </div>
                     {{/each}}
                 {{/if}}
             {{/each}}
         </div>
-    </div>
-{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}
+        </div>
+        {{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}
+        
