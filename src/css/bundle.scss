@@ -1166,7 +1166,14 @@ color: $white;
 .matrix-label{
     color: $white;
 }
-
+.scroll-area-network,
+.scroll-area-mods,
+.scroll-area-magic,
+.scroll-area-sin,
+.scroll-area-contact,
+.scroll-area-effect,
+.scroll-area-action,
+.scroll-area-bio,
 .scroll-area-matrix{
     overflow-y: auto;
     color: $white;
