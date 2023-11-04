@@ -13,7 +13,7 @@
                     itemId='modifiers'
                     rightSide=(ItemHeaderRightSide 'modifiers')
                 }}
-                <div class="scroll-area mods">
+                <div class="mods-scroll">
                     {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
                         {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localizeOb id ../config.actorModifiers) }}
                         <div class="item-text rtg">

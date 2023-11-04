@@ -466,11 +466,13 @@ input[type='text'].display {
         width: 100%;
         color: $color;
     }
-
+    .mods-scroll,
     .scroll-area {
         height: 100%;
         margin-bottom: 0.5em;
         flex: 1;
+        overflow-y: auto;
+        color: $white;
     }
     .scroll-area-knowlage {
         overflow-y: auto;
@@ -1164,18 +1166,6 @@ color: $white;
 }
 //lable back to white color
 .matrix-label{
-    color: $white;
-}
-.scroll-area-network,
-.scroll-area-mods,
-.scroll-area-magic,
-.scroll-area-sin,
-.scroll-area-contact,
-.scroll-area-effect,
-.scroll-area-action,
-.scroll-area-bio,
-.scroll-area-matrix{
-    overflow-y: auto;
     color: $white;
 }
 
