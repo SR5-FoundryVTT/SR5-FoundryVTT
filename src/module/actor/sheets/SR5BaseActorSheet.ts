@@ -56,10 +56,10 @@ let globalSkillAppId: number = -1;
 
 /**
  * Sort a list of items by name in ascending alphabetical order.
- * 
+ *
  * @param a Any type of item data
  * @param b Any type of item data
- * @returns 
+ * @returns
  */
 const sortByName = (a, b) => {
     if (a.name > b.name) return 1;
@@ -69,15 +69,15 @@ const sortByName = (a, b) => {
 
 /**
  * Sort a list of items by equipped and name in ascending alphabetical order.
- * 
+ *
  * @param a Any type of item data
  * @param b Any type of item data
- * @returns 
+ * @returns
  */
 const sortByEquipped = (a, b) => {
     const leftEquipped = a.system?.technology?.equipped;
     const rightEquipped = b.system?.technology?.equipped;
-    
+
     if (leftEquipped && !rightEquipped) return -1;
     if (rightEquipped && !leftEquipped) return 1;
     if (a.name > b.name) return 1;
@@ -87,10 +87,10 @@ const sortByEquipped = (a, b) => {
 
 /**
  * Sort a list of items by quality type and name in ascending alphabetical order.
- * 
+ *
  * @param a A quality item data
  * @param b A quality item data
- * @returns 
+ * @returns
  */
 const sortyByQuality = (a: any, b: any) => {
     if (a.system.type === 'positive' && b.system.type === 'negative') return -1;
@@ -356,6 +356,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Situation modifiers application
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
+        // Freshly imported item toggle
+        html.find('.toggle-fresh-import-all-off').on('click', this._toggleAllFreshImportFlagsOff.bind(this));
+
+        // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
     }
 
@@ -575,7 +579,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onItemCreate(event) {
         event.preventDefault();
         const type = event.currentTarget.closest('.list-header').dataset.itemId;
-        
+
         // Unhide section it it was
         this._setInventoryTypeVisibility(type, true);
 
@@ -782,7 +786,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Special fields are shared across all actor types.
-     * 
+     *
      * These are used as indicators about what kind of 'special' a character might be.
      *
      * @param sheetData ActorSheetData as created within getData method
@@ -873,10 +877,10 @@ export class SR5BaseActorSheet extends ActorSheet {
                     types: {}
                 }
             }
-            
+
             // Add default inventory types for this sheet type first, so they appear on top.
             this._addInventoryTypes(inventoriesSheet[name]);
-            
+
             // Inform user about duplicate inventory mapping for a single item.
             itemIds.forEach(id => {
                 itemIdInventory[id] = inventory;
@@ -958,7 +962,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Enhance SR5Item data for display on actors sheets.
-     * 
+     *
      * @param item: The item to transform into a 'sheet item'
      */
     _prepareSheetItem(item: SR5Item): SheetItemData {
@@ -974,10 +978,10 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Prepare items for easy type by type display on actors sheets with lists per item type.
-     * 
+     *
      * NOTE: This method uses sheet item types, instead of item types. A sheet item type allows
      * to sub-group items of one type into separate lists as needed.
-     * 
+     *
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      * @returns Sorted item lists per sheet item type.
      */
@@ -987,11 +991,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Most sheet items are raw item types, some are sub types.
         // These are just for display purposes and has been done for call_in_action items.
         const sheetItemTypes = [
-            ...Object.keys(CONFIG.Item.typeLabels), 
-            'summoning', 
+            ...Object.keys(CONFIG.Item.typeLabels),
+            'summoning',
             'compilation'
         ];
-        
+
         // Add all item types in system.
         sheetItemTypes.forEach(type => {
             itemsByType[type] = [];
@@ -1212,17 +1216,17 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.render();
     }
 
-    /** 
+    /**
      * Parameterize skill filtering within getData and implement a general delay around it.
-     * 
+     *
      * NOTE: Be aware of UTF-8/16 multi character input languages, using mulitple separate input symbol to form a single alphabet character.
-     * NOTE: This is ONLY necessary as shadowrun5e filters through the render -> getData -> template chain instead of 
+     * NOTE: This is ONLY necessary as shadowrun5e filters through the render -> getData -> template chain instead of
      *       hiding HTML elements based on their text.
      */
     async _onFilterSkills(event) {
-        if (this._delays.skills) 
+        if (this._delays.skills)
             clearTimeout(this._delays.skills);
-        
+
         this._delays.skills = setTimeout(() => {
             this._filters.skills = event.currentTarget.value;
             this.render();
@@ -1262,7 +1266,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onShowEditSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
-        
+
         if (!skill) {
             return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
         }
@@ -1443,7 +1447,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Change the quantity on an item shown within a sheet item list.
-     * 
+     *
      * @param event A DOM mouse/touch event
      */
     async _onListItemChangeQuantity(event) {
@@ -1455,7 +1459,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
             return console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item);
         }
-        	
+
         await item.update({ 'system.technology.quantity': quantity });
     }
 
@@ -1676,13 +1680,13 @@ export class SR5BaseActorSheet extends ActorSheet {
      * the initial change event (by leaving the element focus, i.e. leaving or clicking on submit)
      * will cause a general form submit (Foundry FormApplication onChangeSubmit), causing a render
      * and removing the inventory input box.
-     * 
+     *
      * Note: This ONLY happens on new actors and NOT on inventory changes on old actors. The root cause
      * is unclear.
-     * 
+     *
      * As the inventory inpunt box lives outside of Foundries default form handling, prevent
      * this by stopping propagation into Foundries onChange listeners.
-     * 
+     *
      * @param event Any event
      */
     _onInventoryChangePreventSheetSubmit(event: Event) {
@@ -1706,7 +1710,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * This is done whenever a user changes matrix attribute order directly from the actor sheet matrix section.
      * Its intent is to also order matrix attribute order on the selected matrix device of that actor.
-     * 
+     *
      * @param event A mouse/pointer event
      */
     async _onMatrixAttributeSelected(event) {
@@ -1777,9 +1781,9 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Prepare applied Situation Modifiers for display (read-only) on any actor sheet.
-     * 
+     *
      * Some modifiers might be hidden, when the document doesn't fullfill criterea for it.
-     * 
+     *
      * @returns List of prepare sit. mod data
      */
     _prepareSituationModifiers(): {category: string, label: string, value: number, hidden: boolean}[] {
@@ -1796,7 +1800,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Determine if a situation modifier category should be hidden from an actor sheet.
-     * 
+     *
      * @param category Modifier category to maybe hide
      * @returns true, hide this category from the actors sheet.
      */
@@ -1818,17 +1822,31 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Show the situation modifiers application for this actor doucment
-     * 
-     * @param event 
+     *
+     * @param event
      */
     _onShowSituationModifiersApplication(event) {
         new SituationModifiersApplication(this.actor).render(true);
     }
 
     /**
+     * Toggle to isFreshImport property of importFlags for all items on the character sheet
+     *
+     * @param event
+     */
+    _toggleAllFreshImportFlagsOff(event) {
+        const allItems = this.actor.items;
+        for (const item of allItems) {
+            if (item.system.importFlags) {
+                item.system.importFlags.isFreshImport = false;
+            }
+        }
+    }
+
+    /**
      * Trigger a full reset of all run related actor data.
-     * 
-     * @param event 
+     *
+     * @param event
      */
     _onResetActorRunData(event) {
         this.actor.resetRunData()
