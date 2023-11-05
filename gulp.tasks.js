@@ -41,6 +41,7 @@ async function buildJS() {
     esbuild.build({
         entryPoints: [entryPoint],
         bundle: true,
+        keepNames: true, // esbuild doesn't guarantee names of classes, so we need to inject .name with the original cls name
         minify: false, // BEWARE: minify: true will break the system as class names are used as string references
         sourcemap: true,
         format: 'esm',
@@ -95,6 +96,7 @@ async function watch() {
     const context = await esbuild.context({
             entryPoints: [entryPoint],
             bundle: true,
+            keepNames: true, // esbuild doesn't guarantee names of classes, so we need to inject .name with the original cls name
             minify: false, // BEWARE: minify: true will break the system as class names are used as string references
             sourcemap: true,
             format: 'esm',
