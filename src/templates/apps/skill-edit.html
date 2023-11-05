@@ -1,5 +1,5 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
-    <div class="inventory">
+    <div class="inventory-edit">
         {{#if editable_name}}
         <div class="list-item item-section">
             <div class="list-item-content">
@@ -41,11 +41,13 @@
                 </div>
                 <div class="item-right">
                     <div class="item-text item-name">
+                    <section class="box">
                         {{> "systems/shadowrun5e/dist/templates/common/Select.html"
                                 options=attributes
                                 value=skill.attribute
                                 path="skill.attribute"
                         }}
+                    </section>
                     </div>
                 </div>
             </div>

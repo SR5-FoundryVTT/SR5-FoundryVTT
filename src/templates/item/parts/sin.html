@@ -1,26 +1,22 @@
- <section class="license-section">   
-    <div class="list-item item-section">
-        <div class="list-item-content">
-            <div class="item-left">
-                <div class="item-text item-name-header">
-                    {{localize "SR5.License"}}
-                </div>
-                <div class="item-text rtg rate-header">
-                    {{localize "SR5.Rtg"}}
-                </div>
-                <div class="item-text desc detail">
-                    {{localize "SR5.Description"}}
-                </div>
-            </div>
+ <section class="license-section">
+    <section class="grid-section">
+                    <div class="item-text item-name-header">
+                        {{localize "SR5.License"}}
+                    </div>
+                    <div class="item-text rtg rate-header">
+                        {{localize "SR5.Rtg"}}
+                    </div>
+                    <div class="item-text desc detail">
+                        {{localize "SR5.Description"}}
+                    </div>
             <div class="item-right">
                 <div class="item-text item-icons rtg">
-                    <a class="add-new-license" title="{{localize 'SR5.CreateItemLicense'}}">
-                        <i class="fas fa-plus"></i>
-                    </a>
+                        <a class="add-new-license" title="{{localize 'SR5.CreateItemLicense'}}">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
+    </section>
     {{#each system.licenses as |license id|}}
     <div class="list-item">
         <div class="list-item-content">

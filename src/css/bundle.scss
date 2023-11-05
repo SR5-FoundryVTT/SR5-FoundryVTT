@@ -201,7 +201,7 @@ input[type='checkbox'].toggle {
 }
 
 .toggle:checked + .list-item-content + .collapsible-content {
-    max-height: 600px;
+    max-height: 350px;
 }
 //Collapsible End
 input[type='checkbox'].display {
@@ -469,17 +469,25 @@ input[type='text'].display {
 
     .mods-scroll,
     .scroll-area {
-        height: 100%;
         margin-bottom: 0.5em;
         flex: 1;
         overflow-y: auto;
         color: $white;
     }
-    .scroll-area-knowlage {
+    .flexcontainer-skills{
+        display: flex;
+        height: 270px;
+    }
+    .scroll-area-knowledge {
         overflow-y: auto;
-        height: 100%;
+        max-height: 300px;
         margin-bottom: 0.5em;
-        flex: 1;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: auto;
+      }
+    .scroll-area-mods{
+        height: 600px;
     }
     .scroll-area-inventory {
         overflow-y: auto;
@@ -498,7 +506,9 @@ input[type='text'].display {
         
         color: $yellow;
     }
-
+    .list-item.item-section.wrap-collapsiblewrap-collapsible{
+        height: 400px;
+      }
     img {
         box-sizing: border-box;
         border: 1px solid var(--color-border-dark);
@@ -542,6 +552,9 @@ input[type='text'].display {
             flex: 1;
             text-align: center;
         }
+    }
+    .wrap-collapsible{
+        height: 600px;
     }
     .sheet .editor-content {
         color: $white;
@@ -753,6 +766,16 @@ input[type='text'].display {
         display: flex;
         flex-flow: column nowrap;
     }
+    .box{
+        display: grid;
+    }
+    .inventory-edit {
+        overflow-y: hidden;
+        height: 100%;
+        width: 280px;
+        display: flex;
+        flex-flow: column nowrap;
+    }
 
     .list-header,
     .list-item {
@@ -816,11 +839,11 @@ input[type='text'].display {
             }
     
             .item-left {
-                display: flex;
+                display: grid;
+                grid-template-columns: auto auto;
                 flex-flow: row nowrap;
-                justify-content: flex-start;
+                /* justify-content: flex-start; */
                 align-items: center;
-                flex-grow:1;
             }
     
             .item-right {
@@ -1194,6 +1217,13 @@ color: $white;
 }
 
 // Test new SIN Layout
+.grid-section{
+    display: grid;
+    margin-left: 1px;
+    margin-top: 2px;
+    grid-template-columns: 10em auto auto 2em;
+    color: #ebb531;
+}
 
 .license-section .list-item-content,
 .license-section .list-item.item-section .list-item-content {
@@ -1297,8 +1327,4 @@ color: $white;
     width: 30em !important;
     margin-left: -1em !important;
     text-align: left;
-}
-//Issue resolve Quality Name. This Needs outside nesting of .SR5 due to specificy of CSS
-.sr5 .list-item .list-item-content .item-text.item-name{
-   width: 6em; 
 }
