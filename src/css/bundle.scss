@@ -475,11 +475,19 @@ input[type='text'].display {
         overflow-y: auto;
         color: $white;
     }
+    .attributes center{
+        height: 78px;
+    }
+    .flexcol-skills{
+        height: 380px;
+    }
     .scroll-area-knowlage {
         overflow-y: auto;
-        height: 100%;
+        height: 300px;
         margin-bottom: 0.5em;
-        flex: 1;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: auto;
     }
     .scroll-area-inventory {
         overflow-y: auto;
@@ -1302,3 +1310,84 @@ color: $white;
 .sr5 .list-item .list-item-content .item-text.item-name{
    width: 6em; 
 }
+
+
+// Skill Edit Grid layout
+.skill-section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+  
+    &-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  
+    &-title,
+    &-input,
+    &-action {
+      flex-basis: 50%;
+    }
+  
+    &-title {
+      // Aligning titles to the left
+      text-align: left;
+      color: $yellow;
+    }
+  
+    &-input {
+      // Aligning inputs to the right
+      text-align: right;
+    }
+  
+    &-action {
+      // Aligning action buttons to the right
+      display: flex;
+      justify-content: flex-end;
+    }
+  
+    .skill-section-input {
+      width: 100%;
+      max-width: 140px; // Adjust the max-width as needed
+    }
+
+    .skill-section-modifiers{
+        display: none;
+    }
+  
+    .scroll-area {
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  
+    .skill-section-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center; // Align items in the vertical center
+        margin-bottom: 4px;
+      
+        .skill-item-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+      
+        .skill-item-input {
+          flex-grow: 1;
+          // Ensuring that input fields take up the maximum available width
+          margin-right: 8px; // Ensure there's some space between the input and the action button
+        }
+      
+        .item-action,
+        .skill-item-action {
+          // If both are used for delete buttons in different sections, ensure both are styled
+          display: flex;
+          // Remove margin-left if you find that the button is too far from the input
+          align-self: center;
+          // No need for flex-grow here, as we don't want this to expand
+        }
+      }      
+  }  

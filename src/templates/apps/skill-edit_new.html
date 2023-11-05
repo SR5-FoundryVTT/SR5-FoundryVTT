@@ -1,0 +1,80 @@
+<form class="{{cssClass}} sheet-form" autocomplete="off">
+    <div class="inventory-section">
+        <div class="inventory-header">Inventory Details</div>
+        
+        {{#if editable_name}}
+        <div class="section name-section">
+            <label for="skill_name">{{localize "SR5.Name"}}</label>
+            <input id="skill_name" class="display" type="text" value="{{skill.name}}" name="skill.name" />
+        </div>
+        {{/if}}
+
+        <div class="section link-section">
+            <span>{{localize 'SR5.OpenSource'}}</span>
+            <input class="display" type="text" value="{{skill.link}}" name="skill.link" />
+        </div>
+        
+        {{#if editable_attribute}}
+        <div class="section attribute-section">
+            <label for="skill_attribute">{{localize "SR5.Attribute"}}</label>
+            {{> "systems/shadowrun5e/dist/templates/common/Select.html" options=attributes value=skill.attribute path="skill.attribute"}}
+        </div>
+        {{/if}}
+        
+        {{#if editable_canDefault}}
+        <div class="section default-checkbox-section">
+            <label for="skill_canDefault">{{localize "SR5.CanDefault"}}</label>
+            <input id="skill_canDefault" type="checkbox" class="checkbox" name="skill.canDefault" {{checked skill.canDefault}}/>
+        </div>
+        {{/if}}
+        
+        <div class="section total-value-section">
+            <label for="skill_total_value">{{localize "SR5.Total"}} {{localize "SR5.Value"}}</label>
+            <input id="skill_total_value" class="display" type="text" value="{{skill.value}}" disabled data-dtype="Number" />
+        </div>
+
+        {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=skill}}
+        
+        <div class="section base-value-section">
+            <label for="skill_base_value">{{localize "SR5.Base"}} {{localize "SR5.Value"}}</label>
+            <input id="skill_base_value" class="display" type="text" value="{{skill.base}}" name="skill.base" placeholder="0" data-dtype="Number" />
+        </div>
+
+        <div class="section item-value-section">
+            <label for="skill_item_value">{{localize "SR5.Item"}} {{localize "SR5.Value"}}</label>
+            <input id="skill_item_value" class="display" type="text" value="{{skill.item}}" disabled placeholder="-" data-dtype="Number" />
+        </div>
+
+        <div class="section bonuses-section">
+            <span>{{localize "SR5.Bonuses"}}</span>
+            <div class="bonuses-controls">
+                <button type="button" class="bonus-add-button"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="bonuses-list">
+                {{#each skill.bonus as |bonus id|}}
+                <div class="bonus-entry">
+                    <input class="display" type="text" name="skill.bonus.{{id}}.key" value="{{bonus.key}}" placeholder='{{localize "SR5.Bonus"}}'/>
+                    <input class="display" type="text" name="skill.bonus.{{id}}.value" value="{{bonus.value}}" placeholder='0'/>
+                    <button type="button" class="bonus-remove-button" title="Remove Bonus" data-spec="{{id}}"><i class="fas fa-trash"></i></button>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+        <div class="section specializations-section">
+            <span>{{localize "SR5.Specializations"}}</span>
+            <div class="specialization-controls">
+                <button type="button" class="specialization-add-button"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="specialization-list">
+                {{#each skill.specs as |spec id|}}
+                <div class="specialization-entry">
+                    <input class="display" type="text" name="skill.specs.{{id}}" value="{{spec}}" placeholder='{{localize "SR5.Specialization"}}'/>
+                    <button type="button" class="specialization-remove-button" title="Remove Specialization" data-spec="{{id}}"><i class="fas fa-trash"></i></button>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+    </div>
+</form>
