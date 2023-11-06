@@ -762,10 +762,6 @@ input[type='text'].display {
     }
     .inventory-edit {
         overflow-y: hidden;
-        height: 100%;
-        width: 280px;
-        display: flex;
-        flex-flow: column nowrap;
     }
 
     .list-header,
