@@ -39,6 +39,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/MetamagicList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/RitualList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SummoningList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpiritOptions.html',
 
@@ -96,6 +97,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/damage.html',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.html',
         'systems/shadowrun5e/dist/templates/item/parts/spell.html',
+        'systems/shadowrun5e/dist/templates/item/parts/ritual.html',
         'systems/shadowrun5e/dist/templates/item/parts/complex_form.html',
         'systems/shadowrun5e/dist/templates/item/parts/weapon.html',
         'systems/shadowrun5e/dist/templates/item/parts/armor.html',

@@ -253,9 +253,13 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData()?.armor?.value ?? 0;
     }
 
+    getHardened(): boolean {
+        return this.getData()?.armor?.hardened ?? false;
+    }
+
     getArmorElements(): { [key: string]: number } {
-        const { fire, electricity, cold, acid } = this.getData().armor || {};
-        return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0 };
+        const { fire, electricity, cold, acid, radiation } = this.getData().armor || {};
+        return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0, radiation: radiation ?? 0 };
     }
 
     getName(): string {

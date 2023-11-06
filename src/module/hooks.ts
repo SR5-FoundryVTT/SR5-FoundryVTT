@@ -1,5 +1,7 @@
 import { CompileSpriteTest } from './tests/CompileSpriteTest';
 import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
+import { OpposedRitualTest } from './tests/OpposedRitualTest';
+import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
 import {SR5} from './config';
 import {Migrator} from './migrator/Migrator';
 import {registerSystemSettings} from './settings';
@@ -145,6 +147,8 @@ ___________________
                 SuppressionDefenseTest,
                 PhysicalResistTest,
                 SpellCastingTest,
+                RitualSpellcastingTest,
+                OpposedRitualTest,
                 CombatSpellDefenseTest,
                 DrainTest,
                 FadeTest,
@@ -159,7 +163,7 @@ ___________________
                 SummonSpiritTest,
                 OpposedSummonSpiritTest,
                 CompileSpriteTest,
-                OpposedCompileSpriteTest
+                OpposedCompileSpriteTest,
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -184,7 +188,8 @@ ___________________
                 DronePerceptionTest,
                 DroneInfiltrationTest,
                 SummonSpiritTest,
-                CompileSpriteTest
+                CompileSpriteTest,
+                RitualSpellcastingTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -197,7 +202,8 @@ ___________________
                 SuppressionDefenseTest,
                 CombatSpellDefenseTest,
                 OpposedSummonSpiritTest,
-                OpposedCompileSpriteTest
+                OpposedCompileSpriteTest,
+                OpposedRitualTest
             },
             /**
              * Subset of tests meant to be used as resist tests.

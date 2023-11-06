@@ -60,6 +60,7 @@
     "SR5.Aoe": "Z",
     "SR5.ApplyWounds": "Appliquer les blessures",
     "SR5.Armor": "Blindage",
+    "SR5.ArmorHardened" : "Hardened",
     "SR5.ArmorValue": "Valeur Blindage",
     "SR5.AstralDice": "Dés init. Astral",
     "SR5.AstralInit": "Init. Astral",
@@ -221,6 +222,7 @@
     },
     "SR5.Description": "Description",
     "SR5.DetectionSpellExtended": "Prolongé",
+    "SR5.Descriptors": "Descriptors",
     "SR5.Device": "Appareil",
     "SR5.DeviceCatCommlink": "Commlink",
     "SR5.DeviceCatCyberdeck": "Cyberdeck",
@@ -369,6 +371,7 @@
         "ActorSheet": {
             "CritterPowers": "Pouvoirs",
             "DeviceRating": "Indice d'appareil",
+            "Rituals": "Rituals",
             "RollDroneInfiltration": "Drone Infiltration",
             "RollDronePerception": "Perception du drone",
             "RollPilotVehicleTest": "Véhicule Autopilotage",
@@ -662,7 +665,6 @@
     "SR5.SpellCatHealth": "Santé",
     "SR5.SpellCatIllusion": "Illusion",
     "SR5.SpellCatManipulation": "Manipulation",
-    "SR5.SpellCatRitual": "Ritual",
     "SR5.SpellCategory": "Catégorie",
     "SR5.SpellCombatDirect": "Direct",
     "SR5.SpellCombatIndirect": "Indirect",
@@ -766,6 +768,8 @@
     "SR5.Temporary": "Temporaire",
     "SR5.TemporaryModifiers": "Modificateurs temporaires",
     "SR5.Test": "Test",
+    "SR5.TestResults": {
+    },
     "SR5.ToggleEquip": "Basculer équipé",
     "SR5.Top": "Coté",
     "SR5.Total": "Total",
@@ -821,6 +825,8 @@
     "SR5.Warnings": {
         "MissingSkillOnActor": "Votre personnage selectionné ne connait pas cette compétence",
         "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
+        "RitualNotConcluded": "Ritual incomplete. Wait for ritual to oppose spellcasting to determine drain.",
+        "RitualNotEnoughReagents": "Not enough reagents offered.",
         "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
         "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
     },

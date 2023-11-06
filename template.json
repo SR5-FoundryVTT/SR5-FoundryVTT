@@ -801,7 +801,8 @@
                     "cold": 0,
                     "fire": 0,
                     "electricity": 0,
-                    "radiation": 0
+                    "radiation": 0,
+                    "hardened": false
                 }
             },
             "magic": {
@@ -1122,6 +1123,7 @@
             "quality",
             "sin",
             "spell",
+            "ritual",
             "sprite_power",
             "weapon",
             "host",
@@ -1304,7 +1306,8 @@
                     "fire": 0,
                     "electricity": 0,
                     "radiation": 0,
-                    "temp": 0
+                    "temp": 0,
+                    "hardened": false
                 }
             },
             "matrix": {
@@ -1391,14 +1394,26 @@
                 "environmental": false,
                 "physical": false
             },
-            "ritual": {
-                "type": ""
-            },
             "action": {
                 "test": "SpellCastingTest",
                 "opposed": {
                     "test": "",
                     "resist": {"test": ""}
+                },
+                "followed": {
+                    "test": "DrainTest"
+                }
+            }
+        },
+        "ritual": {
+            "templates": ["description", "action", "importFlags"],
+            "type": "",
+            "descriptors": "",
+            "action": {
+                "type": "complex",
+                "test": "RitualSpellcastingTest",
+                "opposed": {
+                    "test": "OpposedRitualTest"
                 },
                 "followed": {
                     "test": "DrainTest"

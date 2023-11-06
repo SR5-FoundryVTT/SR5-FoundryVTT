@@ -1,26 +1,20 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     <header class="flexrow">
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html'
-            height='90px'
-            width='90px'
-        }}
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html' height='90px' width='90px' }}
         <div class="flexcol flex-end">
             <div class="flexrow">
-                <div class="block">
-                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
-                </div>
-                <div class="attributes smooth">
-                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
-                </div>
+                <div class="block">{{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}</div>
+                <div class="attributes smooth">{{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}</div>
             </div>
             <div class="attributes smooth">
                 <div class="block">
-                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                            name=(localize system.track.matrix.label)
-                            value=system.track.matrix.value
-                            max=system.track.matrix.max
-                            id="matrix"
-                    }}
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html' name=(localize system.track.matrix.label)
+                    value=system.track.matrix.value max=system.track.matrix.max id="matrix" }}
+                </div>
+                <div class="attributes no-border">
+                    <div class="attribute row space-around">
+                    <div title="Roll" class="attribute-name Roll fas fa-dice-six" data-roll-id="prompt-roll"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -33,10 +27,8 @@
         <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
     </nav>
     <section class="sheetbody">
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.html"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}} {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html"}} {{>
+        "systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.html"}} {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html"}} {{>
+        "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.html"}}
     </section>
 </form>

@@ -1,6 +1,11 @@
-import { FireModeRules } from './../module/rules/FireModeRules';
+import { FireModeRules } from '../module/rules/FireModeRules';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5 } from '../module/config';
+import { SR5TestingDocuments } from './utils';
+import { SR5Actor } from '../module/actor/SR5Actor';
+import { SR5Item } from '../module/item/SR5Item';
+import { DataDefaults } from '../module/data/DataDefaults';
+import { CombatRules } from '../module/rules/CombatRules';
 
 export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
     const {describe, it, assert, before, after} = context;
@@ -150,4 +155,209 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             }), 3); // per default rules only one single shot mode
         })
     })
-}
+
+    describe('CombatRules', () => {
+        let testActor;
+        let testItem;
+        let testScene;
+
+        before(async () => {
+            testActor = new SR5TestingDocuments(SR5Actor);
+            testItem = new SR5TestingDocuments(SR5Item);
+            testScene = new SR5TestingDocuments(Scene);
+        });
+
+        describe("isBlockedByVehicleArmor", () => {
+            it('blocks damage due to vehicle armor', async () => {
+                const armor = DataDefaults.actorArmor({
+                    value: 50,
+                    base: 50,
+                });
+                const vehicle = await testActor.create({
+                    type: 'vehicle', system: {
+                        armor,
+                    },
+                }) as SR5Actor;
+                const damage = DataDefaults.damageData({
+                    type: {
+                        value: 'physical',
+                        base: 'physical',
+                    },
+                    value: 4,
+                    base: 4,
+                });
+
+                const result = CombatRules.isBlockedByVehicleArmor(damage, 5, 2, vehicle);
+
+                assert.isTrue(result);
+            });
+
+            it("doesn't block damage for non-vehicle actors", async () => {
+                const vehicleArmor = DataDefaults.actorArmor({
+                    value: 50,
+                    base: 50,
+                });
+                const vehicleActor = await testActor.create({
+                    type: 'vehicle', system: {
+                        armor: vehicleArmor,
+                    },
+                }) as SR5Actor;
+
+                const characterActor = await testActor.create({
+                    type: 'character',
+                }) as SR5Actor;
+                await characterActor.createEmbeddedDocuments('Item',  [{
+                    type: 'armor',
+                    name: 'Test Armor',
+                    system: {
+                        armor: {
+                            base: 50,
+                            value: 50,
+                        },
+                        technology: DataDefaults.technologyData({
+                            equipped: true,
+                        })
+                    }
+                }]);
+
+                const damage = DataDefaults.damageData({
+                    type: {
+                        value: 'physical',
+                        base: 'physical',
+                    },
+                    value: 4,
+                    base: 4,
+                });
+
+                const characterResult = CombatRules.isBlockedByVehicleArmor(damage, 5, 2, characterActor);
+                const vehicleResult = CombatRules.isBlockedByVehicleArmor(damage, 5, 2, vehicleActor);
+
+                assert.isFalse(characterResult);
+                assert.isTrue(vehicleResult);
+            });
+
+            it("takes net hits into account", async () => {
+                const armor = DataDefaults.actorArmor({
+                    value: 6,
+                    base: 6,
+                });
+                const vehicle = await testActor.create({
+                    type: 'vehicle', system: {
+                        armor,
+                    },
+                }) as SR5Actor;
+                const damage = DataDefaults.damageData({
+                    type: {
+                        value: 'physical',
+                        base: 'physical',
+                    },
+                    value: 4,
+                    base: 4,
+                });
+
+                const blockedResult = CombatRules.isBlockedByVehicleArmor(damage, 5, 4, vehicle);
+                const notBlockedResult = CombatRules.isBlockedByVehicleArmor(damage, 5, 3, vehicle);
+
+                assert.isTrue(blockedResult);
+                assert.isFalse(notBlockedResult);
+            });
+
+            it("takes AP into account", async () => {
+                const armor = DataDefaults.actorArmor({
+                    value: 6,
+                    base: 6,
+                });
+                const vehicle = await testActor.create({
+                    type: 'vehicle', system: {
+                        armor,
+                    },
+                }) as SR5Actor;
+                // This is "high" AP but a negative number, just go with it
+                const highApDamage = DataDefaults.damageData({
+                    type: {
+                        value: 'physical',
+                        base: 'physical',
+                    },
+                    value: 4,
+                    base: 4,
+                    ap: {
+                        base: -5,
+                        value: -5,
+                    }
+                });
+                const lowApDamage = DataDefaults.damageData({
+                    type: {
+                        value: 'physical',
+                        base: 'physical',
+                    },
+                    value: 4,
+                    base: 4,
+                    ap: {
+                        base: 5,
+                        value: 5,
+                    }
+                });
+
+                const blockedResult = CombatRules.isBlockedByVehicleArmor(lowApDamage, 5, 3, vehicle);
+                const notBlockedResult = CombatRules.isBlockedByVehicleArmor(highApDamage, 5, 3, vehicle);
+
+                assert.isTrue(blockedResult);
+                assert.isFalse(notBlockedResult);
+            });
+        });
+
+        describe("doesNoPhysicalDamageToVehicle", () => {
+            it("blocks non-physical damage to vehicle", async () => {
+                const vehicle = await testActor.create({ type: 'vehicle' }) as SR5Actor;
+                const damage = DataDefaults.damageData({
+                    type: {
+                        value: 'stun',
+                        base: 'stun',
+                    },
+                    value: 4,
+                    base: 4,
+                });
+
+                const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);
+
+                assert.isTrue(result);
+            });
+
+            it("does not block physical damage to vehicle", async () => {
+                const vehicle = await testActor.create({ type: 'vehicle' }) as SR5Actor;
+                const damage = DataDefaults.damageData({
+                    type: {
+                        value: 'physical',
+                        base: 'physical',
+                    },
+                    value: 4,
+                    base: 4,
+                });
+
+                const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);
+
+                assert.isFalse(result);
+            });
+
+            it("does not block electric stun damage to vehicle", async () => {
+                const vehicle = await testActor.create({ type: 'vehicle' }) as SR5Actor;
+                const damage = DataDefaults.damageData({
+                    type: {
+                        value: 'stun',
+                        base: 'stun',
+                    },
+                    element: {
+                        base: 'electricity',
+                        value: 'electricity',
+                    },
+                    value: 4,
+                    base: 4,
+                });
+
+                const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);
+
+                assert.isFalse(result);
+            });
+        });
+    });
+};

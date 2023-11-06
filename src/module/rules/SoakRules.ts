@@ -29,6 +29,16 @@ export class SoakRules {
             return Helpers.reduceDamageByHits(damageData, damageData.value, 'SR5.VehicleStunImmunity');
         }
 
+        let armorData = actor.getArmor(damageData)
+
+        if(armorData.hardened) {
+            if(damageData.value < armorData.value) {
+                damageData.override = {name: 'SR5.Success', value: 0};
+            }
+            else {
+                hits += Math.ceil(armorData.value/2);
+            }
+        }
         return Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
     }
 

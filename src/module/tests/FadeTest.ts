@@ -5,6 +5,7 @@ import {FadeRules} from "../rules/FadeRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import { Translation } from '../utils/strings';
 
 export interface FadeTestData extends SuccessTestData {
     incomingFade: DamageData
@@ -58,12 +59,12 @@ export class FadeTest extends SuccessTest {
         return this.data.modifiedFade.value <= 0;
     }
 
-    override get successLabel(): string {
-        return 'SR5.ResistedAllDamage';
+    override get successLabel(): Translation {
+        return 'SR5.TestResults.ResistedAllDamage';
     }
 
-    override get failureLabel(): string {
-        return 'SR5.ResistedSomeDamage'
+    override get failureLabel(): Translation {
+        return 'SR5.TestResults.ResistedSomeDamage'
     }
 
     /**

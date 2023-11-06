@@ -17,6 +17,7 @@ declare namespace Shadowrun {
             fire: number;
             electricity: number;
             radiation: number;
+            hardened: boolean;
         };
     }
 }

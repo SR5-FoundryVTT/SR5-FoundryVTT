@@ -3,7 +3,7 @@
         {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html" }}
         <div class="block">
             <div class="block-line gap-4 border-bottom center">
-                <label>
+                <label class="matrix-label">
                     {{localize "SR5.HotSim"}}
                     <input
                             type="checkbox"
@@ -12,7 +12,7 @@
                         {{checked system.matrix.hot_sim}}
                     />
                 </label>
-                <label>
+                <label class="matrix-label">
                     {{localize "SR5.RunningSilent"}}
                     <input
                             type="checkbox"

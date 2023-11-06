@@ -10,6 +10,7 @@ import { LifestyleParser } from "../bioImport/LifestyleParser";
 import { ContactParser } from "../bioImport/ContactParser";
 import SimpleParser from "./SimpleParser.js";
 import { CritterPowerParser } from "../magicImport/CritterPowerParser.js";
+import { RitualParser } from "../magicImport/RitualParser.js";
 
 /**
  * Parses all items (qualities, weapons, gear, ...) from a chummer character.
@@ -52,6 +53,7 @@ export class ItemsParser {
 
         if (importOptions.spells && chummerChar.spells?.spell) {
             promises.push(new SpellParser().parseSpells(chummerChar, importOptions.assignIcons));
+            promises.push(new RitualParser().parseRituals(chummerChar, importOptions.assignIcons));
         }
 
         if (importOptions.contacts && chummerChar.contacts?.contact) {

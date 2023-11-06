@@ -6,6 +6,7 @@ declare namespace Shadowrun {
         electric: number,
         cold: number,
         acid: number,
-        label?: string;
+        label?: string,
+        hardened: boolean
     }
 }

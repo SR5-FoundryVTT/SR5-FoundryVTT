@@ -9,6 +9,7 @@
 @import 'modifiers';
 @import 'modifiers-container';
 @import 'foundry';
+@import 'module';
 
 @font-face {
     font-family: 'klavika-medium';
@@ -186,11 +187,23 @@ button.plus1_button {
         cursor: pointer;
     }
 }
-
-input[type='checkbox'].hidden {
+input[type='checkbox'].toggle {
     display: none;
 }
+//Collapsible Start
+.lbl-toggle {
+    cursor: pointer;
+}
+.collapsible-content {
+    max-height: 0;
+    overflow-y: auto;
+    transition: max-height 0.25s ease-in-out;
+}
 
+.toggle:checked + .list-item-content + .collapsible-content {
+    max-height: 600px;
+}
+//Collapsible End
 input[type='checkbox'].display {
     background: transparent;
     color: $color;
@@ -265,7 +278,9 @@ input[type='text'].display {
         }
     }
 }
-
+    /**
+     * Special SR5 hr and select display
+     */
 .sr5 {
 
     hr {
@@ -288,6 +303,7 @@ input[type='text'].display {
      */
     .form-group {
         label {
+            color: $white;
             font-weight: bold;
         }
 
@@ -332,12 +348,12 @@ input[type='text'].display {
     .inline-roll {
         border: 0;
         background: none;
-        color: white !important;
+        color: $white !important;
     }
 
     
     .entity-link.content-link {
-        color: white !important;
+        color: $white !important;
     }
 
     // An origin link is a uuid based entity link, without drag support.
@@ -451,11 +467,36 @@ input[type='text'].display {
         color: $color;
     }
 
+    .mods-scroll,
     .scroll-area {
         height: 100%;
         margin-bottom: 0.5em;
         flex: 1;
         overflow-y: auto;
+        color: $white;
+    }
+    .scroll-area-knowlage {
+        overflow-y: auto;
+        height: 100%;
+        margin-bottom: 0.5em;
+        flex: 1;
+    }
+    .scroll-area-inventory {
+        overflow-y: auto;
+    }
+
+    .scroll-area.left.light-border-right-skills {
+        overflow-y: auto;
+    } 
+    
+    .list-item[data-item-type="skill"] {
+        
+        color: $yellow;
+    }
+
+    .list-item[data-item-type="knowledgeskill"] {
+        
+        color: $yellow;
     }
 
     img {
@@ -497,9 +538,28 @@ input[type='text'].display {
 
         >.item {
             // Make tabs stretch across horizontally.
+            color: $white;
             flex: 1;
             text-align: center;
         }
+    }
+    .sheet .editor-content {
+        color: $white;
+        font-family: $editorFonts;
+        height: 100%;
+        overflow-y: auto;
+        word-break: break-word;
+    }
+    .list-item.item-section.flexrow {
+        min-height: 36px;  
+    }
+
+    label.item-text.item-name[for="select-inventory"] {
+        color: $edge;  
+    }
+
+    label.item-text.item-name {
+        color: $white;  
     }
 
     .tab {
@@ -741,6 +801,7 @@ input[type='text'].display {
         }
 
         .list-item-content {
+            //color: white;
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
@@ -759,6 +820,7 @@ input[type='text'].display {
                 flex-flow: row nowrap;
                 justify-content: flex-start;
                 align-items: center;
+                flex-grow:1;
             }
     
             .item-right {
@@ -814,6 +876,7 @@ input[type='text'].display {
                 text-align: center;
                 height: 100%;
                 border: $light;
+                padding-right: 10px;
     
                 &.faded {
                     color: $grey;
@@ -910,6 +973,11 @@ input[type='text'].display {
                 //padding-right: 0.5em;
             }
         }
+        .item-desc:after{
+            content: "";
+            clear: both;
+            display: table;
+        }
     }
 
 
@@ -952,6 +1020,68 @@ input[type='text'].display {
         }
     }
 
+    button.display.import-character {
+        color: $color;
+        border-color: $black;
+        background: $bgrButton;
+        border-radius: 0.3em;
+        text-align: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+
+        &.light {
+            color: $black;
+            background: $light;
+        }
+    }
+    button.display.show-hidden-skills {
+        color: $color;
+        border-color: $black;
+        background: rgb(70, 7, 7);
+        border-radius: 0.3em;
+        text-align: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+
+        &.light {
+            color: $black;
+            background: $light;
+        }
+    }
+
+    button.display.reset-actor-run-data {
+        color: $color;
+        border-color: $black;
+        background: rgb(70, 7, 7);
+        border-radius: 0.3em;
+        text-align: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+
+        &.light {
+            color: $black;
+            background: $light;
+        }
+    }
+
     /** CSS for the Environmental Modifier Application Window
      *
      */
@@ -965,8 +1095,9 @@ input[type='text'].display {
 
     .env-modifier-active {
         border-radius: 8px;
-        box-shadow: $dark-sunken-box-shadow;
-        background-color: $dark-sunken;
+        //box-shadow: $dark-sunken-box-shadow;
+        background-color: $darkred; //$dark-sunken;
+        color: $yellow;
     }
 
     .env-modifier-total {
@@ -1011,7 +1142,163 @@ input[type='text'].display {
     flex: 1;
 }
 
+.dialog-button.remove-token-modifiers-from-scene,
+.dialog-button.remove-modifiers-from-target{
+    background-color: $bgrButton;
+}
 .far-right {
     justify-content: center;
     right: -150px;
+}
+//END SR5 Style
+
+
+.list-header.item-section[data-item-id="weapon"][data-item-type=""] {
+    color: $edge;  /* set the color to yellow */
+}
+
+.common-test{
+margin-bottom: 4px; margin-top: 4px;
+color: $white;
+}
+
+.custom-item-element {
+    color: $white;               /* Text color */
+}
+//lable back to white color
+.matrix-label{
+    color: $white;
+}
+
+.scroll-area-matrix{
+    overflow-y: auto;
+    color: $white;
+}
+
+//table in any Item
+.SR5 th {
+    color: $yellow;              
+    padding: 10px;               /* Padding */
+    text-align: left;          /* Left text */
+    border-bottom: 2px solid $edge; /* Add a border at the bottom */
+    font-size: medium;
+}
+
+.SR5 tr p:not(th p) {
+    padding-left: 10px;  /* Padding on the left */
+}
+
+.fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
+{
+    color: $pdfColor; 
+}
+
+// Test new SIN Layout
+
+.license-section .list-item-content,
+.license-section .list-item.item-section .list-item-content {
+    display: flex !important;
+    flex-direction: row;
+    justify-content: flex-start !important;
+    margin: 0 !important;
+    padding: 1px !important;
+}
+
+.desc {
+   margin-left: -1em !important; 
+   margin-right: 1em !important;
+}
+
+
+
+/* New or updated rules */
+.license-section .item-text.rtg.rate,
+.license-section .rtg-rate.item-text {  /* Updated */
+    margin-left: 0;
+    padding-left: 0;
+    text-align: left;
+    width: 22px;  /* Updated */
+}
+//Header Rating
+.license-section .item-text.rtg.rate-header {
+    max-width: 2em;
+    margin-left: -1em;
+}
+//Header detail
+.detail{
+    margin-left: 1em !important;
+}
+//Rating width
+.license-section .list-item .rtg-rate.item-text {
+    max-width: 2em;
+}
+//Item Name field size
+.license-section .list-item .rtg-rate.item-text {
+    max-width: 1em;
+}
+.item-name-field {
+    max-width: 11em;  /* Set to your desired max width */
+}
+
+.display.left.name-display {
+    width: 100%;  /* Takes the maximum width of the parent */
+    max-width: 100%;  /* Optional, ensures it doesn't go beyond parent */
+}
+.display.desc-sin {
+    margin-left: 2em;
+}
+.license-section .list-item.item-section .item-left .item-text,
+.license-section .list-item .item-left .item-text.item-name-header {
+    flex-basis: calc(15% - 1em);
+    text-align: left;
+}
+
+.item-text.item-name-header {
+    /* Set to your desired width */
+    max-width: 11em;  /* Optional, ensures it doesn't go beyond the set width */
+}
+
+.license-section .list-item.item-section .item-text.rtg.rate,
+.license-section .list-item .rtg-rate.item-text {  /* Updated */
+    flex-basis: calc(25% - 1em);
+    text-align: left;
+    width: 22px;  /* Updated */
+}
+
+.license-section .list-item.item-section .item-text.desc.detail,
+.license-section .list-item {
+    flex-basis: calc(25% - 1em);
+    text-align: left;
+}
+
+/* Specifics for the rtg-rate input field */
+.license-section .list-item .rtg-rate.item-text input {  /* Updated */
+    width: 22px;  /* Updated */
+}
+
+// Specific em
+.license-section .sr5 .list-header .list-item-content .item-text.desc,
+.license-section .sr5 .list-item .list-item-content .item-text.desc {
+    width: 30em;
+    margin-right: 5px;
+}
+
+.license-section .item-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.license-section .item-left .item-text {
+    align-self: flex-start;
+}
+
+.license-section .sr5 .list-item .list-item-content .item-text.desc {
+    width: 30em !important;
+    margin-left: -1em !important;
+    text-align: left;
+}
+//Issue resolve Quality Name. This Needs outside nesting of .SR5 due to specificy of CSS
+.sr5 .list-item .list-item-content .item-text.item-name{
+   width: 6em; 
 }

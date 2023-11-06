@@ -8,6 +8,7 @@ import {SoakFlow} from "../actor/flows/SoakFlow";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import { Translation } from '../utils/strings';
 
 
 export interface PhysicalResistTestData extends SuccessTestData {
@@ -114,12 +115,12 @@ export class PhysicalResistTest extends SuccessTest {
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
-    override get successLabel() {
-        return 'SR5.ResistedAllDamage';
+    override get successLabel(): Translation {
+        return 'SR5.TestResults.ResistedAllDamage';
     }
 
-    override get failureLabel() {
-        return 'SR5.ResistedSomeDamage';
+    override get failureLabel(): Translation {
+        return 'SR5.TestResults.ResistedSomeDamage';
     }
 
     override async processResults() {
