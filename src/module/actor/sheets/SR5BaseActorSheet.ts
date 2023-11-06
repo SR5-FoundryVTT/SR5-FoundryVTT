@@ -1,5 +1,5 @@
-import { SituationModifier } from '../../rules/modifiers/SituationModifier';
-import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
+import { SituationModifier } from './../../rules/modifiers/SituationModifier';
+import { SituationModifiersApplication } from './../../apps/SituationModifiersApplication';
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../../effects";
@@ -128,7 +128,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     selectedInventory: string;
 
     constructor(...args) {
-        // @ts-expect-error // Since we don't need any actual data, don't define args to avoid breaking changes.
+        // @ts-ignore // Since we don't need any actual data, don't define args to avoid breaking changes.
         super(...args);
 
         // Preselect default inventory.
@@ -217,9 +217,9 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data = {
             ...data,
-            // @ts-expect-error TODO: foundry-vtt-types v10
+            // @ts-ignore TODO: foundry-vtt-types v10
             data: actorData.system,
-            // @ts-expect-error TODO: foundry-vtt-types v10
+            // @ts-ignore TODO: foundry-vtt-types v10
             system: actorData.system
         }
 
@@ -244,11 +244,11 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.situationModifiers = this._prepareSituationModifiers();
 
-        // @ts-expect-error TODO: foundry-vtt-types v10
+        // @ts-ignore TODO: foundry-vtt-types v10
         data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
             // secrets: this.actor.isOwner,
             // rollData: this.actor.getRollData.bind(this.actor),
-            // @ts-expect-error TODO: foundry-vtt-types v10
+            // @ts-ignore TODO: foundry-vtt-types v10
             async: true,
             relativeTo: this.actor
         });
@@ -356,6 +356,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Situation modifiers application
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
+        // Freshly imported item toggle
+        html.find('.toggle-fresh-import-all-off').on('click', async (event) => this._toggleAllFreshImportFlags(event, false));
+        html.find('.toggle-fresh-import-all-on').on('click', async (event) => this._toggleAllFreshImportFlags(event, true));
+
+        // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
     }
 
@@ -454,7 +459,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
-    // @ts-expect-error
+    // @ts-ignore
     async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
@@ -557,7 +562,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onInventorySectionVisiblitySwitch(event) {
         event.preventDefault();
-        const type = Helpers.listHeaderId(event);
+        const type = Helpers.listItemId(event);
 
         this._setInventoryTypeVisibility(type, !this._inventoryOpenClose[type]);
         this.render();
@@ -818,7 +823,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
-        //@ts-expect-error Since we're field checking, we can ignore typing...
+        //@ts-ignore Since we're field checking, we can ignore typing...
         const { matrix } = sheetData.system;
         if (matrix) {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
@@ -966,7 +971,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const chatData = item.getChatData();
         sheetItem.description = chatData.description;
-        // @ts-expect-error
+        // @ts-ignore
         sheetItem.properties = chatData.properties;
 
         return sheetItem as unknown as SheetItemData;
@@ -1108,7 +1113,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._filterLanguageSkills(data);
     }
 
-    _filterSkills(data: SR5ActorSheetData, skills: Skills = {}) {
+    _filterSkills(data: SR5ActorSheetData, skills: Skills) {
         const filteredSkills = {};
         for (let [key, skill] of Object.entries(skills)) {
             // Don't show hidden skills.
@@ -1226,7 +1231,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._delays.skills = setTimeout(() => {
             this._filters.skills = event.currentTarget.value;
             this.render();
-            //@ts-expect-error TODO: foundry-vtt-types v10. Add to typing.
+            //@ts-ignore TODO: foundry-vtt-types v10. Add to typing.
         }, game.shadowrun5e.inputDelay);
     }
 
@@ -1331,7 +1336,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skillId = await this.actor.addLanguageSkill({ name: '' });
         if (!skillId) return;
 
-        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
+        // NOTE: Causes issues with adding knowledge skills (category undefined)
+        // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
@@ -1346,11 +1352,12 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = Helpers.listHeaderId(event) as keyof KnowledgeSkills;
+        const category = Helpers.listItemId(event) as keyof KnowledgeSkills;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
-        await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId, category);
+        // NOTE: Causes issues with adding knowledge skills (category undefined)
+        // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveKnowledgeSkill(event) {
@@ -1503,7 +1510,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             // this.actor.effects.forEach(effect => {
             //     if (effect.system.origin !== item.uuid) return;
             //
-            //     // @ts-expect-error
+            //     // @ts-ignore
             //     effect.disable(item.isEquipped());
             // })
 
@@ -1729,7 +1736,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         };
 
         // go through atts on device, setup matrix attributes on it
-        // This logic swaps the two slots when a new one is selected
         for (let i = 1; i <= 4; i++) {
             let tmp = `att${i}`;
             let key = `system.atts.att${i}.att`;
@@ -1822,6 +1828,22 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _onShowSituationModifiersApplication(event) {
         new SituationModifiersApplication(this.actor).render(true);
+    }
+
+    /**
+     * Toggle to isFreshImport property of importFlags for all items on the character sheet
+     *
+     * @param event
+     */
+    async _toggleAllFreshImportFlags(event, onOff: boolean) {
+        const allItems = this.actor.items;
+        console.debug('Toggling all importFlags on owned items to ->', onOff, event);
+        for (const item of allItems) {
+            if (item.system.importFlags) {
+                await item.update({ 'system.importFlags.isFreshImport': onOff });
+                continue;
+            }
+        }
     }
 
     /**
