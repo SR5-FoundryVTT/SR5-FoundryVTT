@@ -6,6 +6,13 @@
                     <img src="{{img}}" title="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip='SHIFT' descr='CTRL'}}" height="24px" width="24px"/>
                 </div>
             {{/if}}
+            {{#if system.importFlags.isFreshImport}}
+                {{#if img}}
+                    <div class="item-img">
+                        <img src="systems/shadowrun5e/dist/icons/checklist.svg" title="{{localize "SR5.IsFreshImport"}}" height="24px" width="24px"/>
+                    </div>
+                {{/if}}
+            {{/if}}
             <div class="item-text item-name
                 {{#if system.importFlags.isFreshImport}}fresh-import{{/if}}
                 {{#if hasDesc}}has-desc{{/if}}

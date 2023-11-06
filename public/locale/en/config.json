@@ -479,6 +479,7 @@
     "SR5.Initiative": "Initiative",
     "SR5.Internal": "Internal",
     "SR5.IsCritter": "Critter",
+    "SR5.IsFreshImport": "This item was imported from Chummer and needs manual review.",
     "SR5.IsGrunt": "Grunt",
     "SR5.IsNPC": "NPC",
     "SR5.Item": "Item",
