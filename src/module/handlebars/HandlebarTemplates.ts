@@ -29,6 +29,7 @@ export const preloadHandlebarsTemplates = async () => {
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html',
+        'systems/shadowrun5e/dist/templates/item/parts/import_flag_button.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
         'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html',
         'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html',

@@ -85,6 +85,10 @@
             > :not(:last-child) {
                 border-bottom: $groove;
             }
+
+            .toggle-fresh-import-off {
+                flex-grow: 0;
+            }
         }
     }
     .technology {
@@ -108,7 +112,7 @@
         label {
             color: $yellow;
         }
-        
+
     }
     .description {
         padding: 2px;
