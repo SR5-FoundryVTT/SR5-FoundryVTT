@@ -13,7 +13,6 @@ import {SkillFlow} from "../flows/SkillFlow";
 import SpiritType = Shadowrun.SpiritType;
 import SpiritData = Shadowrun.SpiritData;
 import { CharacterPrep } from './CharacterPrep';
-import VisibilityChecksPrep from './functions/VisibilityChecksPrep'
 
 
 export class SpiritPrep {
@@ -24,8 +23,6 @@ export class SpiritPrep {
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
-
-        VisibilityChecksPrep.preparVisibilityChecks(system, 'spirit')
     }
 
     static prepareDerivedData(system: SpiritData, items: SR5ItemDataWrapper[]) {
