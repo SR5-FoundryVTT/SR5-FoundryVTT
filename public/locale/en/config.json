@@ -88,7 +88,8 @@
             "Modify": "Modify"
         },
         "New": "New Effect",
-        "OnlyForWireless": "Apply only for wireless active",
+        "OnlyForWireless": "Apply for wireless active only",
+        "OnlyForEquipped": "Apply for equipped item only",
         "Types": {
             "Inactive": "Inactive Effects",
             "Persistent": "Persistent Effects",

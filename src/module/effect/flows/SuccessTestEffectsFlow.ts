@@ -117,7 +117,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         // Item effects can also apply to this test only.
         for (const effect of this.test.item?.effects as unknown as SR5ActiveEffect[]) {
-            if (!effect.applyForWirelessActiveOnly(effect.parent as SR5Item)) continue;
+            if (!effect.skipApply(effect.parent as SR5Item)) continue;
 
             if (effect.applyTo === 'test_all') yield effect;
             if (effect.applyTo === 'test_item') yield effect;            
@@ -129,7 +129,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             if (!item.isEquipped()) continue;
 
             for (const effect of item.effects as unknown as SR5ActiveEffect[]) {
-                if (!effect.applyForWirelessActiveOnly(item)) continue;
+                if (!effect.skipApply(item)) continue;
 
                 if (effect.applyTo === 'test_all') yield effect;
                 if (effect.applyTo === 'test_item') yield effect;

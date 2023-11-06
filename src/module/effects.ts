@@ -147,13 +147,13 @@ export function prepareEnabledEffects(actor: SR5Actor): Shadowrun.AllEnabledEffe
 function *allEnabledItemEffects(actor: SR5Actor) {
     for (const item of actor.items) {
         for (const effect of item.effects) {
-            if (effect.disabled) continue;
+            if (effect.skipApply(item)) continue;
             yield effect;
         }
 
         for (const nestedItem of item.items) {
             for (const effect of nestedItem.effects) {
-                if (effect.disabled) continue;
+                if (effect.skipApply(item)) continue;
                 yield effect;
             }
         }

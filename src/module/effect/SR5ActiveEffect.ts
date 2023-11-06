@@ -167,20 +167,37 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Some effects should only be applied depending on their parent items wireless status.
      * 
-     * When this flag is set the parent item wireless status is taken into account.
+     * When this flag is set, the parent item wireless status is taken into account.
      */
     get onlyForWireless(): boolean {
         return this.getFlag(SYSTEM_NAME, 'onlyForWireless') as boolean || false;
     }
 
     /**
-     * Some effects should only be applied when their parent item is in active wireless mode.
+     * Some effects should only be applied depending on their parent items enabled status.
+     * 
+     * When this flag is set, the parent item enabled status is taken into account.
      */
-    applyForWirelessActiveOnly(item: SR5Item|undefined): boolean {
-        if (!item) return false;
-        if (!this.onlyForWireless) return true;
+    get onlyForEquipped(): boolean {
+        return this.getFlag(SYSTEM_NAME, 'onlyForEquipped') as boolean || false;
+    }
 
-        return item.isWireless();
+    /**
+     * Check if this effect should be applied in any context, depending on it's parent items state.
+     * 
+     * @param item The item to check against.
+     * @returns 
+     */
+    skipApply(item: SR5Item|undefined): boolean {
+        if (!item) return false;
+        if (!(item instanceof SR5Item)) return false;
+        //@ts-expect-error TODO: foundry-vtt-types v10
+        if (this.disabled) return true;
+
+        if (this.onlyForEquipped && !item.isEquipped()) return true;
+        if (this.onlyForWireless && !item.isWireless()) return true;
+
+        return false;
     }
 
     /**
