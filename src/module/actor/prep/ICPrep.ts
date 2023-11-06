@@ -10,7 +10,6 @@ import {DataDefaults} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
 import DeviceAttribute = Shadowrun.DeviceAttribute;
 import {SkillsPrep} from "./functions/SkillsPrep";
-import VisibilityChecksPrep from './functions/VisibilityChecksPrep'
 
 
 export class ICPrep {
@@ -21,8 +20,6 @@ export class ICPrep {
         ICPrep.addMissingTracks(data);
         ICPrep.prepareModifiers(data);
         ICPrep.hideMeatAttributes(data);
-
-        VisibilityChecksPrep.preparVisibilityChecks(data, 'ic')
     }
 
     static prepareDerivedData(data: ICData, items: SR5ItemDataWrapper[]) {
