@@ -1841,7 +1841,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         for (const item of allItems) {
             if (item.system.importFlags) {
                 await item.update({ 'system.importFlags.isFreshImport': onOff });
-                continue;
             }
         }
     }
