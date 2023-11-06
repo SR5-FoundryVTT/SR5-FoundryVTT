@@ -23,6 +23,24 @@
                 }}
             {{/each}}
         {{/each}}
+        {{#if enabledEffects}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+            name="TODO: All Item Effects"
+            itemCssClass='list-item-effect'
+        }}
+        {{#each enabledEffects}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+            img=this.icon
+            name=this.name
+            itemId=this.uuid
+            icons=(ItemEffectIcons this)
+            rightSide=[]
+            hasDesc=false
+            hasRoll=false
+            itemCssClass='list-item-effect'
+            }}
+        {{/each}}
+        {{/if}}
         </div>
     </div>
 {{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

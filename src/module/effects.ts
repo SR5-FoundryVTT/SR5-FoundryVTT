@@ -9,6 +9,7 @@ import {SR5Actor} from "./actor/SR5Actor";
 import {SR5Item} from "./item/SR5Item";
 import {Helpers} from "./helpers";
 import EffectsSheetData = Shadowrun.EffectsSheetData;
+import { SR5ActiveEffect } from "./effect/SR5ActiveEffect";
 
 /**
  * Manage Active Effect instances through the Actor Sheet via effect control buttons.
@@ -55,6 +56,32 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
 }
 
 /**
+ * Manage Active Effect instances of an actors item or nested item based effects.
+ * 
+ * @param event The left-click event on the list-item-effect control
+ */
+export async function onManageItemActiveEffect(event: MouseEvent) {
+    event.preventDefault();
+
+    const icon = event.currentTarget;
+    const listItem = event.currentTarget.closest('.list-item-effect');
+    const uuid = listItem.dataset.itemId;
+    const effect = await fromUuid(uuid) as SR5ActiveEffect;
+    if (!effect) return;
+
+    switch (icon.dataset.action) {
+        case "edit":
+            return effect.sheet.render(true);
+        case "toggle":
+            return effect.toggleDisabled();
+        case "open-origin":
+            return effect.parent?.sheet?.render(true);
+        default:
+            return;
+    }
+}
+
+/**
  * Prepare the data structure for Active Effects which are currently applied to an Actor or Item.
  * @param {ActiveEffect[]} effects    The array of Active Effect instances to prepare sheet data for
  * @return {object}                   Data for rendering
@@ -91,4 +118,44 @@ export function prepareActiveEffectCategories(effects): EffectsSheetData {
     }
 
     return categories;
+}
+
+/**
+ * Collect all enabled Active Effects which are present on any owned or nested Item.
+ * 
+ * TODO: Move into data preparation phase, similar to how actor.effects works.
+ * @param actor The actor collect effects from.
+ * @returns A data object containing all enabled effects with their name as key and sorted alphabetically.
+ */
+export function prepareEnabledEffects(actor: SR5Actor): Shadowrun.AllEnabledEffectsSheetData {
+    const enabledEffects: Shadowrun.AllEnabledEffectsSheetData = [];
+
+    for (const effect of allEnabledItemEffects(actor)) {
+        enabledEffects.push(effect);
+    }
+
+    // Alphabetically sort effects by label.
+    enabledEffects.sort((a, b) => a.name.localeCompare(game.i18n.localize(b.label)));
+
+    return enabledEffects;
+}
+
+/**
+ * Iterator for all enabled effects of an actors owned and nested items.
+ * @param actor 
+ */
+function *allEnabledItemEffects(actor: SR5Actor) {
+    for (const item of actor.items) {
+        for (const effect of item.effects) {
+            if (effect.disabled) continue;
+            yield effect;
+        }
+
+        for (const nestedItem of item.items) {
+            for (const effect of nestedItem.effects) {
+                if (effect.disabled) continue;
+                yield effect;
+            }
+        }
+    }
 }

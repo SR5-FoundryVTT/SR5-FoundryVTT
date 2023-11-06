@@ -29,6 +29,8 @@ declare namespace Shadowrun {
         effects: any[]
     }
 
+    type AllEnabledEffectsSheetData = any[];
+
     export interface SR5SheetFilters {
         skills: string
         showUntrainedSkills
