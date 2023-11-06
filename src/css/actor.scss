@@ -54,7 +54,7 @@
         }
         .attribute {
             @include title;
-            
+
             align-items: center;
             color: $yellow;
             display: flex;
@@ -136,6 +136,15 @@
                     margin: 2px;
                 }
             }
+
+            .toggle-fresh-import-all-off {
+                font-size: 0.75em;
+            }
+
+            .toggle-fresh-import-all-on {
+                font-size: 0.75em;
+            }
+
             .track {
                 display: flex;
                 flex-flow: row;

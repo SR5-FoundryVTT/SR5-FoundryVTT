@@ -357,7 +357,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
         // Freshly imported item toggle
-        html.find('.toggle-fresh-import-all-off').on('click', this._toggleAllFreshImportFlagsOff.bind(this));
+        html.find('.toggle-fresh-import-all-off').on('click', async (event) => this._toggleAllFreshImportFlags(event, false));
+        html.find('.toggle-fresh-import-all-on').on('click', async (event) => this._toggleAllFreshImportFlags(event, true));
 
         // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
@@ -1834,11 +1835,13 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
-    _toggleAllFreshImportFlagsOff(event) {
+    async _toggleAllFreshImportFlags(event, onOff: boolean) {
         const allItems = this.actor.items;
+        console.debug('Toggling all importFlags on owned items to ->', onOff, event);
         for (const item of allItems) {
             if (item.system.importFlags) {
-                item.system.importFlags.isFreshImport = false;
+                await item.update({ 'system.importFlags.isFreshImport': onOff });
+                continue;
             }
         }
     }
