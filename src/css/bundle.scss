@@ -496,19 +496,10 @@ input[type='text'].display {
     .scroll-area.left.light-border-right-skills {
         overflow-y: auto;
     } 
-    
-    .list-item[data-item-type="skill"] {
-        
-        color: $yellow;
-    }
-
-    .list-item[data-item-type="knowledgeskill"] {
-        
-        color: $yellow;
-    }
-    .list-item.item-section.wrap-collapsiblewrap-collapsible{
+    .list-item.item-section.wrap-collapsiblewrap-collapsible {
         height: 400px;
-      }
+    }
+    
     img {
         box-sizing: border-box;
         border: 1px solid var(--color-border-dark);
@@ -893,7 +884,7 @@ input[type='text'].display {
             }
     
             .item-text {
-                width: 6em; // Long enough to avoid most line breaks / test wrapping...
+                // width: 6em; // Long enough to avoid most line breaks / test wrapping...
                 margin: 0 0.1rem;
                 flex: 1 0 auto;
                 text-align: center;
