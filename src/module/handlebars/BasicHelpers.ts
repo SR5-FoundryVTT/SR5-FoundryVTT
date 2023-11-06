@@ -164,4 +164,20 @@ export const registerBasicHelpers = () => {
         copy.splice(-1); //Remove handlebars options object from last item in array
         return copy;
     });
+
+    /**
+     * Check whether an actor has any items that are freshly imported
+     */
+    Handlebars.registerHelper('hasAnyFreshImports', function(actor: SR5Actor) {
+        const allItems = actor.items;
+        for (const item of allItems) {
+            if (item.system.importFlags) {
+                if (item.system.importFlags.isFreshImport) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    });
 };

@@ -7,6 +7,7 @@
                 </div>
             {{/if}}
             <div class="item-text item-name
+                {{#if system.importFlags.isFreshImport}}fresh-import{{/if}}
                 {{#if hasDesc}}has-desc{{/if}}
                 {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}}
                 {{#each additionalCssClass}}{{this }}{{/each}}
@@ -68,7 +69,7 @@
             {{/if}}
         </div>
     </div>
-    
+
     {{#if hasDesc}}
     <div class="list-item-description hidden">
         <div class="item-desc">
