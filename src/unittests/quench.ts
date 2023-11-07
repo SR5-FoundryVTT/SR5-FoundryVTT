@@ -11,6 +11,8 @@ import {shadowrunNetworkDevices} from "./sr5.NetworkDevices.spec";
 import {shadowrunTesting} from "./sr5.Testing.spec";
 import {shadowrunInventoryFlow} from "./sr5.Inventory.spec";
 import {weaponParserTesting} from "./sr5.WeaponParser.spec";
+import {characterImporterTesting} from "./characterImport/sr5.CharacterImporter.spec";
+import {characterInfoUpdaterTesting} from "./characterImport/sr5.CharacterInfoUpdater.spec";
 import { Quench } from "@ethaks/fvtt-quench";
 
 
@@ -43,4 +45,7 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch("shadowrun5e.flow.sr5roll", shadowrunRolling, {displayName: "SHADOWRUN5e: SR5Roll"});
 
     quench.registerBatch("shadowrun5e.parser.weapon", weaponParserTesting, {displayName: "SHADOWRUN5e: Data Importer Weapon Parsing"});
+
+    quench.registerBatch("shadowrun5e.characterImporter", characterImporterTesting, {displayName: "SHADOWRUN5e: Chummer Character Importer"});
+    quench.registerBatch("shadowrun5e.characterInfoUpdater", characterInfoUpdaterTesting, {displayName: "SHADOWRUN5e: Chummer Character Info Updater"});
 };

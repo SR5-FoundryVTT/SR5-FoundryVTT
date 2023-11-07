@@ -167,6 +167,10 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             testScene = new SR5TestingDocuments(Scene);
         });
 
+        after(async () => {
+            await testActor.teardown();
+        })
+
         describe("isBlockedByVehicleArmor", () => {
             it('blocks damage due to vehicle armor', async () => {
                 const armor = DataDefaults.actorArmor({
