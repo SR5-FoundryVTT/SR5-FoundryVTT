@@ -97,6 +97,7 @@ export class SpiritPrep {
         const {armor, attributes} = data;
         armor.base = (attributes.essence.value ?? 0) * 2;
         armor.value = Helpers.calcTotal(armor);
+        armor.hardened = true;
     }
 
     /**
