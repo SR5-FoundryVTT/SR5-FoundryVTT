@@ -201,7 +201,7 @@ input[type='checkbox'].toggle {
 }
 
 .toggle:checked + .list-item-content + .collapsible-content {
-    max-height: 600px;
+    max-height: 310px;
 }
 //Collapsible End
 input[type='checkbox'].display {
@@ -469,7 +469,6 @@ input[type='text'].display {
 
     .mods-scroll,
     .scroll-area {
-        height: 100%;
         margin-bottom: 0.5em;
         flex: 1;
         overflow-y: auto;
@@ -481,6 +480,11 @@ input[type='text'].display {
         margin-bottom: 0.5em;
         flex: 1;
     }
+
+    .scroll-area-mods{
+        height: 600px;
+    }
+
     .scroll-area-inventory {
         overflow-y: auto;
     }
@@ -1297,8 +1301,4 @@ color: $white;
     width: 30em !important;
     margin-left: -1em !important;
     text-align: left;
-}
-//Issue resolve Quality Name. This Needs outside nesting of .SR5 due to specificy of CSS
-.sr5 .list-item .list-item-content .item-text.item-name{
-   width: 6em; 
 }
