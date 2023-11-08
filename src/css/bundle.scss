@@ -873,7 +873,7 @@ input[type='text'].display {
             }
     
             .item-text {
-                // width: 6em; // Long enough to avoid most line breaks / test wrapping...
+                width: 6em; // This will allow item header / line columns to align up.
                 margin: 0 0.1rem;
                 flex: 1 0 auto;
                 text-align: center;
