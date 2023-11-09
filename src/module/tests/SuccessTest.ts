@@ -61,6 +61,12 @@ export interface TestData {
     manualHits: ValueField
     manualGlitches: ValueField
 
+    appendedHits?: number
+    hitsIcon?: {
+        icon: string;
+        tooltip: Translation;
+    }
+
     // Internal test values.
     values: TestValues
 
@@ -609,6 +615,10 @@ export class SuccessTest {
         this.data.manualHits.value = Helpers.calcTotal(this.data.manualHits, {min: 0});
         this.data.manualGlitches.value = Helpers.calcTotal(this.data.manualGlitches, {min: 0});
 
+        // if(this.data.appendedHits) {
+        //     this.data.appendedHits.value = Helpers.calcTotal(this.data.appendedHits);
+        // }
+
         // Shows AP on incoming attacks
         this.data.damage.ap.value = Helpers.calcTotal(this.data.damage.ap);
 
@@ -870,6 +880,18 @@ export class SuccessTest {
 
     get manualGlitches(): ValueField {
         return this.data.manualGlitches;
+    }
+
+    get hitsIcon(): {
+        icon: string;
+        tooltip: Translation;
+    } | undefined {
+        return this.data.hitsIcon;
+    }
+
+    // get appendedHits(): ValueField | undefined {
+    get appendedHits(): number | undefined {
+        return this.data.appendedHits;
     }
 
     /**

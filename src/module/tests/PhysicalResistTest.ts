@@ -112,6 +112,20 @@ export class PhysicalResistTest extends SuccessTest {
      * Resist Test success means ALL damage has been soaked.
      */
     override get success() {
+        if(this.actor) {
+            const armor = this.actor.getArmor(this.data.incomingDamage);
+
+            if(armor.hardened) {
+                if(this.data.incomingDamage.value < armor.value) {
+                    //Automatic success
+                    return true;
+                }
+
+                const soaked = this.hits.value + Math.ceil(armor.value/2);
+                return this.data.incomingDamage.value <= soaked;
+            }
+        }
+
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
@@ -133,5 +147,14 @@ export class PhysicalResistTest extends SuccessTest {
 
         // Handle Knock Down Rules with legacy flow handling.
         this.data.knockedDown = new SoakFlow().knocksDown(this.data.modifiedDamage, this.actor);
+
+        const armor = this.actor.getArmor(this.data.modifiedDamage);
+        if(armor.hardened){
+            this.data.hitsIcon = {
+                icon: "systems/shadowrun5e/dist/icons/bell-shield.svg",
+                tooltip: "SR5.ArmorHardenedFull",
+            }
+            this.data.appendedHits = Math.ceil(armor.value/2);
+        }
     }
 }
