@@ -201,7 +201,7 @@ input[type='checkbox'].toggle {
 }
 
 .toggle:checked + .list-item-content + .collapsible-content {
-    max-height: 600px;
+    max-height: 310px;
 }
 //Collapsible End
 input[type='checkbox'].display {
@@ -469,24 +469,35 @@ input[type='text'].display {
 
     .mods-scroll,
     .scroll-area {
-        height: 100%;
         margin-bottom: 0.5em;
         flex: 1;
         overflow-y: auto;
         color: $white;
     }
-    .scroll-area-knowlage {
-        overflow-y: auto;
-        height: 100%;
-        margin-bottom: 0.5em;
-        flex: 1;
+    .flexcontainer-skills{
+        display: flex;
+        height: 250px;
     }
+    .scroll-area-knowledge {
+        overflow-y: auto;
+        max-height: 300px;
+        margin-bottom: 0.5em;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: auto;
+    }
+
+    .scroll-area-mods{
+        height: 600px;
+    }
+
     .scroll-area-inventory {
         overflow-y: auto;
     }
 
     .scroll-area.left.light-border-right-skills {
         overflow-y: auto;
+<<<<<<< HEAD
     }
 
     .list-item[data-item-type="skill"] {
@@ -499,6 +510,13 @@ input[type='text'].display {
         color: $yellow;
     }
 
+=======
+    }
+    .list-item.item-section.wrap-collapsiblewrap-collapsible {
+        height: 400px;
+    }
+
+>>>>>>> 353c81b998430b036595dc1420f63a75c935f9bb
     img {
         box-sizing: border-box;
         border: 1px solid var(--color-border-dark);
@@ -870,7 +888,7 @@ input[type='text'].display {
             }
 
             .item-text {
-                width: 6em; // Long enough to avoid most line breaks / test wrapping...
+                width: 6em; // This will allow item header / line columns to align up.
                 margin: 0 0.1rem;
                 flex: 1 0 auto;
                 text-align: center;
@@ -1301,8 +1319,4 @@ color: $white;
     width: 30em !important;
     margin-left: -1em !important;
     text-align: left;
-}
-//Issue resolve Quality Name. This Needs outside nesting of .SR5 due to specificy of CSS
-.sr5 .list-item .list-item-content .item-text.item-name{
-   width: 6em;
 }
