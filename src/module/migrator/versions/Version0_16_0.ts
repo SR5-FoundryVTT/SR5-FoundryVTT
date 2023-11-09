@@ -40,8 +40,6 @@ export class Version0_16_0 extends VersionMigration {
     }
 
     protected override async MigrateActorData(data: ShadowrunActorData) {
-        data.data.visibilityChecks.meat.hasHeat = false
-        
-        return data;
+        return {data: {'visibilityChecks.meat.hasHeat': false}};
     }
 }
