@@ -13,7 +13,6 @@ import { AttributesPrep } from './functions/AttributesPrep';
 import { NPCPrep } from './functions/NPCPrep';
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import { Helpers } from '../../helpers';
-import VisibilityChecksPrep from './functions/VisibilityChecksPrep'
 
 export class CharacterPrep {
     static prepareBaseData(system: Shadowrun.CharacterData) {
@@ -22,8 +21,6 @@ export class CharacterPrep {
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
         ModifiersPrep.clearValueMods(system);
-
-        VisibilityChecksPrep.preparVisibilityChecks(system, 'character')
     }
 
     /**
