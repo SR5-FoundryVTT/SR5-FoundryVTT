@@ -24,7 +24,7 @@
                     placeholder='{{localize "SR5.Source"}}'
                 />
             </div>
-            {{#if system.importFlags.isFreshImport}}{{> 'systems/shadowrun5e/dist/templates/item/parts/import_flag_button.html' }}{{/if}}
+            {{#if system.importFlags.isFreshImport}}{{#if (itemMarking "ANY")}}{{> 'systems/shadowrun5e/dist/templates/item/parts/import_flag_button.html' }}{{/if}}{{/if}}
         </div>
     </div>
 </div>
