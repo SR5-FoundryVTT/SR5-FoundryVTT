@@ -33,9 +33,9 @@
         "ApplyLimitsDescription": "Sollten Limits verwendet werden?",
         "ApplyLimitsName": "Verwende Limits bei Würfen",
         "AutomateMultiDefenseModifier": "Automatisiere Verteidigungs modi.",
-        "AutomateMultiDefenseModifierDescription": "Im Kampf erzeugen mehrere Angriffe auf einen Verteidiger automatisch Verteidungsmodi.",
+        "AutomateMultiDefenseModifierDescription": "Automatische Anwendung des Mehrfachangriffsmodifikator",
         "AutomateProgressiveRecoil": "Automatisiere Kumulativen Rückstoß",
-        "AutomateProgressiveRecoilDescription": "Summiere Rückstoß so lange auf wie attackiert wird",
+        "AutomateProgressiveRecoilDescription": "Kumulativer Rückstoß wird automatisch aufgerechnet",
         "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
         "DiagonalMovementName": "Diagonale Bewegung",
         "DisplayDefaultRollCardDescription": "Soll die standard Würfelkarte zusammen mit der Shadowrun Würfelkarte angezeigt werden",
@@ -112,7 +112,7 @@
     "SR5.Aoe": "Fläche",
     "SR5.ApplyWounds": "Anwenden",
     "SR5.Armor": "Armor",
-    "SR5.ArmorHardened" : "Hardened",
+    "SR5.ArmorHardened": "Hardened",
     "SR5.ArmorValue": "Panzerungswert",
     "SR5.Attacker": "Angreifer",
     "SR5.AttackerHits": "Angreifer Erfolge",
@@ -1005,8 +1005,8 @@
         "Results": "Ergebnis",
         "ResistedAllDamage": "Kein Schaden!",
         "ResistedSomeDamage": "Schaden!",
-        "RitualFailure" : "The ritual was to strong for you",
-        "RitualSuccess" : "The ritual is sealed",
+        "RitualFailure": "The ritual was to strong for you",
+        "RitualSuccess": "The ritual is sealed",
         "SpiritSummonFailure": "Geist geflohen!",
         "SpiritSummonSuccess": "Geist beschworen!",
         "Success": "Erfolg!"
@@ -1227,5 +1227,8 @@
     "SR5.WeaponReach": "Reichweite",
     "SR5.WeaponReload": "Nachladen",
     "SR5.WeaponType": "Typ",
-    "SR5.Wireless": "Wireless"
+    "SR5.Wireless": "Wireless",
+    "ITEM.TypeCall_in_action": "Beschwören/Kompilieren",
+    "ITEM.TypeEcho": "Echo",
+    "ITEM.TypeMetamagic": "Metamagie"
 }
