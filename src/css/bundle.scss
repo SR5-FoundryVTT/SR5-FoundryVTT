@@ -911,7 +911,8 @@ input[type='text'].display {
                 }
     
                 &.rtg {
-                    width: 3em;
+                    min-width: 3em;
+                    max-width: 4em;
     
                     &.active-skills-rating {
                         padding-right: 1em;
@@ -925,6 +926,9 @@ input[type='text'].display {
     
                 &.desc {
                     width: 16em;
+                }
+                .content-inner{
+                    color: $white;
                 }
             }
     
@@ -1011,6 +1015,7 @@ input[type='text'].display {
 
         &:hover {
             cursor: pointer;
+            background: $bgrButton;
         }
 
         &.short {
@@ -1026,7 +1031,7 @@ input[type='text'].display {
     button.display.import-character {
         color: $color;
         border-color: $black;
-        background: $bgrButton;
+        background: $dark-sunken;
         border-radius: 0.3em;
         text-align: center;
 
@@ -1158,6 +1163,7 @@ input[type='text'].display {
 
 .list-header.item-section[data-item-id="weapon"][data-item-type=""] {
     color: $edge;  /* set the color to yellow */
+    font-size: small;
 }
 
 .common-test{
