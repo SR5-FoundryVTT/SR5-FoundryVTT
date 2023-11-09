@@ -1130,6 +1130,11 @@ input[type='text'].display {
     .cell-input-roll {
         color: $yellow;
     }
+
+    // Intended to affect icons only within the url/pdf source controls.
+    .source-button i.fas {
+        color: $pdfColor;
+    }
 }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
@@ -1189,11 +1194,6 @@ color: $white;
 
 .SR5 tr p:not(th p) {
     padding-left: 10px;  /* Padding on the left */
-}
-
-.fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
-{
-    color: $pdfColor; 
 }
 
 // Test new SIN Layout
