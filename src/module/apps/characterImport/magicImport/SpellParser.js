@@ -92,7 +92,7 @@ export class SpellParser {
         if (chummerSpell.descriptors) {
             const desc = chummerSpell.descriptors.toLowerCase();
             if (category.toLowerCase() === 'combat') {
-                this.handleCombatSpellSpecifics(system, desc)
+                this.handleCombatSpellSpecifics(system, desc, chummerSpell.damage)
             }
             if (category.toLowerCase() === 'detection') {
                 this.handleDetectionSpellSpecifics(system, desc)
@@ -106,7 +106,7 @@ export class SpellParser {
         }
     }
 
-    handleCombatSpellSpecifics(system, desc) {
+    handleCombatSpellSpecifics(system, desc, damage) {
         system.combat = {};
         if (desc.includes('indire')) {
             system.combat.type = 'indirect';
@@ -116,20 +116,21 @@ export class SpellParser {
         } else {
             system.combat.type = 'direct';
             if (system.type === 'mana') {
-                system.action.damage.type.base = 'stun';
-                system.action.damage.type.value = 'stun';
                 system.action.opposed = {
                     type: 'soak',
                     attribute: 'willpower',
                 };
             } else if (system.type === 'physical') {
-                system.action.damage.type.base = 'physical';
-                system.action.damage.type.value = 'physical';
                 system.action.opposed = {
                     type: 'soak',
                     attribute: 'body',
                 };
             }
+        }
+
+        if(damage.includes("0")) {
+            system.action.damage.type.base = damage.match(/[SG]/) !== null  ? 'stun' : 'physical' ;
+            system.action.damage.type.value = system.action.damage.type.base;
         }
     }
 
