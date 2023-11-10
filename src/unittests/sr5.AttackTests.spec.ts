@@ -170,6 +170,12 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             testScene = new SR5TestingDocuments(Scene);
         });
 
+        after(async () => {
+            await testActor.teardown();
+            await testItem.teardown();
+            await testScene.teardown();
+        })
+
         const getCharacterWithArmor = async (armorValue: number, {
             hardened = false
         }: {
