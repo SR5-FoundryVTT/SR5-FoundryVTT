@@ -1716,6 +1716,23 @@ export class SR5Actor extends Actor {
         return game.items?.get(ic?.system?.host.id);
     }
 
+    /**
+     * Add an actor as this spirit actor's summoner.
+     * @param actor A character actor to be used as summoner
+     */
+    async addSummoner(actor: SR5Actor) {
+        if (!this.isSpirit() || !actor.isCharacter()) return;
+        this.update({ 'system.summonerUuid': actor.uuid });
+    }
+
+    /**
+     * Remove a summoner from this spirit actor.
+     */
+    async removeSummoner() {
+        if (!this.isSpirit()) return;
+        this.update({ 'system.summonerUuid': null });
+    }
+
     /** Check if this actor is of one or multiple given actor types
      *
      * @param types A list of actor types to check.
