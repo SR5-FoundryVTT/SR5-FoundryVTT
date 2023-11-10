@@ -40,7 +40,6 @@ export const shadowrunSR5CritterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
             assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, true);
-            assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
             assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, false);
             assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
         });

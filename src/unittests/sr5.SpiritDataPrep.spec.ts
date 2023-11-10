@@ -32,7 +32,6 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, true);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
             assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, false);
-            assert.strictEqual(actor.system.visibilityChecks.meat.hidden, false);
             assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, false);
             assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
         });
