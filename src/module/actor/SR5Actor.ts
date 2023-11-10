@@ -590,6 +590,13 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Determine if an actor can alter the special trait
+     */
+    get canAlterSpecial(): boolean {
+        return this.hasSpecial && ['character', 'critter'].includes(this.type);
+    }
+
+    /**
      * Determine if an actor can choose a full defense attribute
      */
     get hasFullDefense(): boolean {

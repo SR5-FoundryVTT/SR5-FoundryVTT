@@ -1033,7 +1033,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         sheetData.isSpirit = this.actor.isSpirit();
         sheetData.isCritter = this.actor.isCritter();
         sheetData.hasSkills = this.actor.hasSkills;
-        sheetData.hasSpecial = this.actor.hasSpecial;
+        sheetData.canAlterSpecial = this.actor.canAlterSpecial;
         sheetData.hasFullDefense = this.actor.hasFullDefense;
     }
 
