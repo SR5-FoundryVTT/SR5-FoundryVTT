@@ -5,12 +5,12 @@ import {MatrixPrep} from './functions/MatrixPrep';
 import {ItemPrep} from './functions/ItemPrep';
 import {SkillsPrep} from './functions/SkillsPrep';
 import {LimitsPrep} from './functions/LimitsPrep';
-import {ConditionMonitorsPrep} from './functions/ConditionMonitorsPrep';
 import {MovementPrep} from './functions/MovementPrep';
 import {WoundsPrep} from './functions/WoundsPrep';
 import {AttributesPrep} from './functions/AttributesPrep';
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import CritterData = Shadowrun.CritterData;
+import { GruntPrep } from './functions/GruntPrep';
 
 
 export class CritterPrep {
@@ -37,8 +37,7 @@ export class CritterPrep {
         LimitsPrep.prepareLimits(system);
         LimitsPrep.prepareDerivedLimits(system);
 
-        ConditionMonitorsPrep.preparePhysical(system);
-        ConditionMonitorsPrep.prepareStun(system);
+        GruntPrep.prepareConditionMonitors(system);
 
         MovementPrep.prepareMovement(system);
         WoundsPrep.prepareWounds(system);

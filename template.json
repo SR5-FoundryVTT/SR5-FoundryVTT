@@ -947,10 +947,17 @@
                         "mod": []
                     }
                 }
+            },
+            "grunt": {
+                "is_npc": false,
+                "npc": {
+                    "is_grunt": false,
+                    "professional_rating": 0
+                }
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values"],
+            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt"],
             "ethnicity": "",
             "age": "",
             "sex": "",
@@ -959,7 +966,6 @@
             "street_cred": 0,
             "notoriety": 0,
             "public_awareness": 0,
-            "is_npc": false,
             "is_critter": false,
             "karma": {
                 "value": 0,
@@ -968,11 +974,7 @@
             "rent": {
                 "cost": 0,
                 "locations": []
-            },
-            "npc": {
-                "is_grunt": false,
-                "professional_rating": 0
-            },
+            },            
             "visibilityChecks": {
                 "astral": {
                     "hasAura" : true
@@ -986,13 +988,14 @@
             }
         },
         "spirit": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt"],
             "summonerUuid": "",
             "services": 0,
             "bound": false,
             "force": 0,
             "spiritType": "",
             "special": "magic",
+            "is_npc": true,
             "attributes": {
                 "force": {
                     "value": 0,
@@ -1010,7 +1013,8 @@
             }
         },
         "critter": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "is_npc": true,
             "visibilityChecks": {
                 "astral": {
                     "hasAura" : true
