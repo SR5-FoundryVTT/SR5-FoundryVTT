@@ -133,6 +133,35 @@ export class CombatRules {
             return false;
         }
 
+        return CombatRules.isDamageLessThanArmor(incomingDamage, attackerHits, defenderHits, actor);
+    }
+
+    /**
+     * Check if actor wouldn't take any damage due to hardened armor rules (SR5#397)
+     * @param incomingDamage The incoming damage
+     * @param attackerHits The attackers hits. Should be a positive number.
+     * @param defenderHits The attackers hits. Should be a positive number.
+     * @param actor The active defender
+     */
+    static isBlockedByHardenedArmor(incomingDamage: DamageData, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
+        const armor = actor.getArmor(incomingDamage);
+
+        if(!armor.hardened) {
+            return false;
+        }
+
+        return CombatRules.isDamageLessThanArmor(incomingDamage, attackerHits, defenderHits, actor);
+    }
+
+    /**
+     * Check if incoming damage (modified by net hits) is less than the actor's armor (modified by AP).
+     * Used for vehicle armor, hardened armor, and physical -> stun damage logic
+     * @param incomingDamage The incoming damage
+     * @param attackerHits The attackers hits. Should be a positive number.
+     * @param defenderHits The attackers hits. Should be a positive number.
+     * @param actor The active defender
+     */
+    static isDamageLessThanArmor(incomingDamage: DamageData, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
         const modifiedDamage = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage);
 
         const modifiedAv = actor.getArmor(incomingDamage).value;

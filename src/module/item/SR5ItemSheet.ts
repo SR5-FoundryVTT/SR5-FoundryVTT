@@ -68,6 +68,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Rendered description field
     descriptionHTML: string
+
+    // Can be used to check if the source field contains a URL.
+    sourceIsURL: boolean
 }
 
 /**
@@ -194,6 +197,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         // @ts-expect-error TODO: foundry-vtt-types v10
         data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
+        data.sourceIsURL = this.item.sourceIsUrl;
 
         data.rollModes = CONFIG.Dice.rollModes;
 
@@ -280,17 +284,6 @@ export class SR5ItemSheet extends ItemSheet {
          */
         html.find('.edit-item').click(this._onEditItem.bind(this));
         html.find('.open-source').on('click', this._onOpenSource.bind(this));
-        // html.find('.has-desc').click((event) => {
-        //     event.preventDefault();
-        //     const item = $(event.currentTarget).parents('.list-item');
-        //     const iid = $(item).data().item;
-        //     const field = item.next();
-        //     field.toggle();
-        //     if (iid) {
-        //         if (field.is(':visible')) this._shownDesc.push(iid);
-        //         else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
-        //     }
-        // });
         html.find('.has-desc').click(this._onListItemToggleDescriptionVisibility.bind(this));
         html.find('.hidden').hide();
         html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));

@@ -201,7 +201,8 @@ export class SR5BaseActorSheet extends ActorSheet {
     override get template() {
         const path = 'systems/shadowrun5e/dist/templates';
 
-        if (this.actor.limited) {
+        // v10 actor.limited doesn't take GM into account, so we have to do it ourselves.
+        if (!game.user?.isGM && this.actor.limited) {
             return `${path}/actor-limited/${this.actor.type}.html`;
         }
 
@@ -1037,7 +1038,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         sheetData.isSpirit = this.actor.isSpirit();
         sheetData.isCritter = this.actor.isCritter();
         sheetData.hasSkills = this.actor.hasSkills;
-        sheetData.hasSpecial = this.actor.hasSpecial;
+        sheetData.canAlterSpecial = this.actor.canAlterSpecial;
         sheetData.hasFullDefense = this.actor.hasFullDefense;
     }
 
