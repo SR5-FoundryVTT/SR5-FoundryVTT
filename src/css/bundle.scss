@@ -236,7 +236,7 @@ input[type='text'].display {
     }
 
     &.short {
-        font-size: 0.75em;        
+        font-size: 0.75em;
     }
 
     &.text {
@@ -292,7 +292,7 @@ input[type='text'].display {
         background: rgba($black, 0.05);
         border-radius: 0.3em;
         border-color: $dark;
-    
+
         >option {
             background-color: $dark;
         }
@@ -351,7 +351,7 @@ input[type='text'].display {
         color: $white !important;
     }
 
-    
+
     .entity-link.content-link {
         color: $white !important;
     }
@@ -497,11 +497,11 @@ input[type='text'].display {
 
     .scroll-area.left.light-border-right-skills {
         overflow-y: auto;
-    } 
+    }
     .list-item.item-section.wrap-collapsiblewrap-collapsible {
         height: 400px;
     }
-    
+
     img {
         box-sizing: border-box;
         border: 1px solid var(--color-border-dark);
@@ -554,15 +554,15 @@ input[type='text'].display {
         word-break: break-word;
     }
     .list-item.item-section.flexrow {
-        min-height: 36px;  
+        min-height: 36px;
     }
 
     label.item-text.item-name[for="select-inventory"] {
-        color: $edge;  
+        color: $edge;
     }
 
     label.item-text.item-name {
-        color: $white;  
+        color: $white;
     }
 
     .tab {
@@ -760,7 +760,6 @@ input[type='text'].display {
     .list-header,
     .list-item {
         font-size: var(--font-size-12);
-        
         padding: 0.1em 0.25em;
         min-height: 26px;
         margin: 0.1em;
@@ -790,7 +789,7 @@ input[type='text'].display {
             margin-left: 0;
             // background: rgba($grey, 0.2);
             // padding: 0.25em;
-            // border-radius: 0.2em;            
+            // border-radius: 0.2em;
             border-bottom: 1px solid $yellow;
             border-radius: 0.2em;
             padding-top: 5px;
@@ -817,7 +816,7 @@ input[type='text'].display {
                 align-items: center;
                 align-self: center;
             }
-    
+
             .item-left {
                 display: flex;
                 flex-flow: row nowrap;
@@ -825,21 +824,21 @@ input[type='text'].display {
                 align-items: center;
                 flex-grow:1;
             }
-    
+
             .item-right {
                 display: flex;
                 flex-flow: row nowrap;
                 justify-content: flex-end;
                 align-items: center;
             }
-    
+
             .item-img {
                 padding-right: 0.25em;
                 max-width: 50px;
-    
+
                 &.item-roll {
                     @include rollable;
-    
+
                     &:hover {
                         >img {
                             content: url('assets/dice-solid.svg');
@@ -847,21 +846,21 @@ input[type='text'].display {
                         }
                     }
                 }
-    
+
                 >img {
                     margin: 0;
                     transform: translateY(10%);
                 }
-    
+
                 &+.item-name {
                     border-left: none !important;
                 }
             }
-    
+
             .item-input {
                 width: 9.5em;
             }
-    
+
             .item-icons {
                 display: flex;
                 flex-flow: row nowrap;
@@ -871,7 +870,7 @@ input[type='text'].display {
                 font-size: 12px;
                 height: 100%;
             }
-    
+
             .item-text {
                 width: 6em; // This will allow item header / line columns to align up.
                 margin: 0 0.1rem;
@@ -880,11 +879,11 @@ input[type='text'].display {
                 height: 100%;
                 border: $light;
                 padding-right: 10px;
-    
+
                 &.faded {
                     color: $grey;
                 }
-    
+
                 &.center {
                     display: flex;
                     flex-flow: row;
@@ -892,38 +891,41 @@ input[type='text'].display {
                     align-items: center;
                     align-content: center;
                 }
-    
+
                 &.item-name {
                     text-align: left;
                     width: auto;
+
+                    &.fresh-import {
+                        color: $freshImportColor;
+                    }
                 }
-    
+
                 &.element {
                     width: 7em;
                 }
-    
+
                 &.radius {
                     width: 4em;
                 }
-    
+
                 &.dropoff {
                     width: 4em;
                 }
-    
+
                 &.rtg {
                     min-width: 3em;
                     max-width: 4em;
-    
                     &.active-skills-rating {
                         padding-right: 1em;
                     }
                 }
-    
+
                 &.input {
                     text-align: right;
                     width: 9.5em;
                 }
-    
+
                 &.desc {
                     width: 16em;
                 }
@@ -931,13 +933,17 @@ input[type='text'].display {
                     color: $white;
                 }
             }
-    
+
             .skill-item {
                 width: 8em;
             }
-    
+
             .skill-spec-item {
                 width: 15em;
+            }
+
+            &.skill-header {
+                @include rollable;
             }
         }
     }
@@ -1131,6 +1137,11 @@ input[type='text'].display {
     .cell-input-roll {
         color: $yellow;
     }
+
+    // Intended to affect icons only within the url/pdf source controls.
+    .source-button i.fas {
+        color: $pdfColor;
+    }
 }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
@@ -1182,7 +1193,7 @@ color: $white;
 
 //table in any Item
 .SR5 th {
-    color: $yellow;              
+    color: $yellow;
     padding: 10px;               /* Padding */
     text-align: left;          /* Left text */
     border-bottom: 2px solid $edge; /* Add a border at the bottom */
@@ -1195,7 +1206,7 @@ color: $white;
 
 .fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
 {
-    color: $pdfColor; 
+    color: $pdfColor;
 }
 
 // Test new SIN Layout
@@ -1210,7 +1221,7 @@ color: $white;
 }
 
 .desc {
-   margin-left: -1em !important; 
+   margin-left: -1em !important;
    margin-right: 1em !important;
 }
 

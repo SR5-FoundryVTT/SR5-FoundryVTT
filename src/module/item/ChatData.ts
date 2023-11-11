@@ -1,3 +1,4 @@
+
 import { Helpers } from '../helpers';
 import DeviceData = Shadowrun.DeviceData;
 import { SR5Item } from './SR5Item';
@@ -16,6 +17,18 @@ import {SR5} from "../config";
  * - actor sheets
  */
 export const ChatData = {
+    call_in_action: (system: Shadowrun.CallInActionData, labels, props) => {
+        switch(system.actor_type) {
+            case 'sprite':
+                if (system.sprite.type) props.push(`${game.i18n.localize("SR5.Compilation.SpriteType")} ${game.i18n.localize(SR5.spriteTypes[system.sprite.type])}`);
+                if (system.sprite.level) props.push(`${game.i18n.localize('SR5.Level')} ${system.sprite.level}`);
+                return;
+            case 'spirit':
+                if (system.spirit.type) props.push(`${game.i18n.localize("SR5.Summoning.SpiritType")} ${game.i18n.localize(SR5.spiritTypes[system.spirit.type])}`);
+                if (system.spirit.force) props.push(`${game.i18n.localize('SR5.Force')} ${system.spirit.force}`);
+                return;
+        }
+    },
     action: (system, labels, props) => {
         if (system.action) {
             const labelStringList: string[] = [];

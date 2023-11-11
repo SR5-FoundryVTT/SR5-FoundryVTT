@@ -339,4 +339,23 @@ export class DataDefaults {
             networkController: undefined
         }, partialTechnologyData) as Shadowrun.TechnologyData;
     }
+
+    /**
+     * Build a attribute data segment.
+     * 
+     * @param partialAttributeData
+     * @returns Merged of partial and basic attribute data
+     */
+    static attributeData(partialAttributeData: Partial<Shadowrun.AttributeField> = {}) {
+        return mergeObject({
+            value: 0,
+            mod: [],
+            base: 0,
+            label: '',
+            hidden: false,
+            device_att: '',
+            temp: 0,
+            limit: ''
+        }, partialAttributeData) as Shadowrun.AttributeField;
+    }
 }

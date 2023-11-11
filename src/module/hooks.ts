@@ -61,6 +61,7 @@ import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
 import VisionConfigurator from './vision/visionConfigurator';
 import { DataDefaults } from './data/DataDefaults';
+import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 
 
 
@@ -130,6 +131,12 @@ ___________________
              */
             test: TestCreator,
             data: DataDefaults,
+
+            /**
+             * You want to access or alter situational modifiers on any document?
+             * Use this.
+             */
+            modifiers: DocumentSituationModifiers,
 
             /**
              * .tests define what test implementation to use for each test type (key).

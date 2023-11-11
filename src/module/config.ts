@@ -52,7 +52,8 @@ export const SR5 = {
         willpower: 'SR5.AttrWillpower',
         pilot: 'SR5.Vehicle.Stats.Pilot',
         force: 'SR5.Force',
-        initiation: 'SR5.Initiation'
+        initiation: 'SR5.Initiation',
+        rating: 'SR5.Rating',
     },
 
     /**
@@ -300,7 +301,7 @@ export const SR5 = {
         attack: 'SR5.MatrixAttrAttack',
         sleaze: 'SR5.MatrixAttrSleaze',
         data_processing: 'SR5.MatrixAttrDataProc',
-        firewall: 'SR5.MatrixAttrFirewall',
+        firewall: 'SR5.MatrixAttrFirewall'
     },
 
     initiativeCategories: {

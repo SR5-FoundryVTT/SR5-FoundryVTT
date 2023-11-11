@@ -569,57 +569,57 @@ export class SR5Item extends Item {
         return await this.update({'system.ammo.current.value': value});
     }
 
+    /**
+     * Reload this weapon according to information in:
+     * - its current clips
+     * - its available spare clips (when given)
+     * - its equipped ammo
+     * 
+     * This method will only reload the weapon to the max amount of ammo available.
+     * 
+     * TODO: Currently only the minimal amount of bullets is reloaded. For weapons using ejectable clips, this should be full clip capacity.
+     */
     async reloadAmmo() {
-        if (this.type !== 'weapon') return;
+        const weapon = this.asWeapon;
+        if (!weapon) return;
         
         // Reload this weapons ammunition to it's max capacity.
         const updateData = {};
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
-        const diff = this.system.ammo.current.max - this.system.ammo.current.value;
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
-        updateData['system.ammo.current.value'] = this.system.ammo.current.max;
-        
-        // TODO: Make actual use of this spare clips system...
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
-        if (this.system.ammo.current.spare_clips) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10 
-            updateData['system.ammo.current.value'] = Math.max(0, this.system.ammo.spare_clips.value - 1);
+
+        // Prepare reloading by getting ammunition information.
+        const ammo = this.getEquippedAmmo();
+        const ammoItems = this.items.filter(item => item.isAmmo).length;
+
+        const remainingBullets = Number(weapon.system.ammo.current.value);
+        // Don't adhere to clip sizes, only reload from the point of capacity left.
+        const missingBullets = Math.max(0, weapon.system.ammo.current.max - remainingBullets);
+        // If there aren't ANY ammo items, just use weapon max as to not enforce ammo onto users without.
+        const availableBullets = ammoItems > 0 ? Number(ammo.system.technology?.quantity) : weapon.system.ammo.current.max;
+
+        // Validate ammunition and clip availability.
+        if (weapon.system.ammo.spare_clips.value === 0 && weapon.system.ammo.spare_clips.max > 0) {
+            // Should this ever be enforced, change info to warn.
+            ui.notifications?.info("SR5.Warnings.CantReloadWithoutSpareClip", {localize: true});
         }
+        if (ammo && Number(ammo.system.technology?.quantity) === 0) {
+            return ui.notifications?.warn('SR5.Warnings.CantReloadAtAllDueToAmmo', {localize: true});
+        }
+        if (ammo && Number(ammo.system.technology?.quantity) < missingBullets) {
+            ui.notifications?.info('SR5.Warnings.CantReloadFullyDueToAmmo', {localize: true});
+        }
+
+        // Prepare what can be reloaded.
+        const reloadedBullets = Math.min(missingBullets, availableBullets);
         
+
+        if (weapon.system.ammo.spare_clips.max > 0) {
+            updateData['system.ammo.spare_clips.value'] = Math.max(0, weapon.system.ammo.spare_clips.value - 1);
+        }
+        updateData['system.ammo.current.value'] = remainingBullets + reloadedBullets;
         await this.update(updateData);
 
-
-        // Reduce capacity in whatever equipped nested ammunition item.
-        // TODO: This must be the other way around. Reduce equipped ammo first and only reload what's possible to the weapon item.
-        //       Additionally there needs to be a reload clip mechanism equipping / unequipping clips/mags
-        const newAmmunition = (this.items || [])
-            .filter((i) => i.type === 'ammo')
-            .reduce((acc: AmmoItemData[], item: SR5Item) => {
-                //@ts-expect-error // TODO: foundry-vtt-types v10 
-                // Not-equipped ammunition isn't expected to be consumed.
-                if (item.data && item.data.system.technology.equipped) {
-
-                    const itemData = item.toObject() as AmmoItemData;
-                    const qty = typeof itemData.system.technology.quantity === 'string' ? 0 : itemData.system.technology.quantity;
-
-                    // Inform user about missing rounds.
-                    if (qty - diff < 0) {
-                        ui.notifications?.warn('SR5.Warnings.CantConsumeEquippedAmmo', {localize: true})
-                    }
-                    
-                    itemData.system.technology.quantity = Math.max(0, qty - diff);
-                    acc.push(itemData);
-                }
-                
-                return acc;
-            }, []);
-
-        if (newAmmunition && newAmmunition.length) {
-            await this.updateNestedItems(newAmmunition);
-
-            // Inform user about change to equipped ammo.
-            ui.notifications?.info('SR5.Infos.ConsumedEquippedAmmo', {localize: true});
-        }
+        if (!ammo) return;
+        await ammo.update({'system.technology.quantity': Math.max(0, Number(ammo.system.technology?.quantity) - reloadedBullets)});
     }
 
     async equipNestedItem(id: string, type: string, options: {unequipOthers?: boolean, toggle?: boolean}={}) {
@@ -1008,6 +1008,15 @@ export class SR5Item extends Item {
     openSource() {
         const source = this.getSource();
         LinksHelpers.openSource(source);
+    }
+
+    /**
+     * Determine if the items source field points to a URL instead of an PDF code.
+     * @returns true if the source field is a URL.
+     */
+    get sourceIsUrl(): boolean {
+        const source = this.getSource();
+        return LinksHelpers.isURL(source);
     }
 
     _canDealDamage(): boolean {
