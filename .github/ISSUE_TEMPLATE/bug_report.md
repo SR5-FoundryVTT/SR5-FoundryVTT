@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Bugs, layout issues, unintended behavior
+about: Bugs, unintended behavior
 title: "[BUG] "
 labels: bug
 assignees: ''

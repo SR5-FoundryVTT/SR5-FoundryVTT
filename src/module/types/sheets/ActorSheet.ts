@@ -11,7 +11,7 @@ declare namespace Shadowrun {
         woundTolerance: number
         vehicle: SR5VehicleSheetData
         hasSkills: boolean
-        hasSpecial: boolean
+        canAlterSpecial: boolean
         hasFullDefense: boolean
         effects: EffectsSheetData
     }

@@ -1010,6 +1010,15 @@ export class SR5Item extends Item {
         LinksHelpers.openSource(source);
     }
 
+    /**
+     * Determine if the items source field points to a URL instead of an PDF code.
+     * @returns true if the source field is a URL.
+     */
+    get sourceIsUrl(): boolean {
+        const source = this.getSource();
+        return LinksHelpers.isURL(source);
+    }
+
     _canDealDamage(): boolean {
         // NOTE: Double negation to force boolean comparison casting.
         const action = this.getAction();

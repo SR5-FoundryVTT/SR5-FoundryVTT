@@ -153,7 +153,7 @@ export class SR5Actor extends Actor {
      * @override
      */
     override applyActiveEffects() {
-        // Shadowrun uses prepareDerivedData to calculate lot's of things that don't exist on the data model in full.
+        // Shadowrun uses prepareDerivedData to calculate lots of things that don't exist on the data model in full.
         // Errors during change application will stop that process and cause a broken sheet.
         try {
             super.applyActiveEffects();
@@ -587,6 +587,13 @@ export class SR5Actor extends Actor {
      */
     get hasSpecial(): boolean {
         return ['character', 'sprite', 'spirit', 'critter'].includes(this.type);
+    }
+
+    /**
+     * Determine if an actor can alter the special trait
+     */
+    get canAlterSpecial(): boolean {
+        return this.hasSpecial && ['character', 'critter'].includes(this.type);
     }
 
     /**
@@ -1707,6 +1714,23 @@ export class SR5Actor extends Actor {
         const ic = this.asIC();
         if (!ic) return;
         return game.items?.get(ic?.system?.host.id);
+    }
+
+    /**
+     * Add an actor as this spirit actor's summoner.
+     * @param actor A character actor to be used as summoner
+     */
+    async addSummoner(actor: SR5Actor) {
+        if (!this.isSpirit() || !actor.isCharacter()) return;
+        this.update({ 'system.summonerUuid': actor.uuid });
+    }
+
+    /**
+     * Remove a summoner from this spirit actor.
+     */
+    async removeSummoner() {
+        if (!this.isSpirit()) return;
+        this.update({ 'system.summonerUuid': null });
     }
 
     /** Check if this actor is of one or multiple given actor types

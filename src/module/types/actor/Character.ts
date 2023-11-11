@@ -150,4 +150,9 @@ declare namespace Shadowrun {
         // Meant to be applied on all defense test, for defense modifiers after multiple attacks.
         multi_defense: NumberOrEmpty
     }
+
+    /**
+     * Actor data that can be Grunts.
+     */
+    type GruntActorData = CharacterData | SpiritData | CritterData;
 }
