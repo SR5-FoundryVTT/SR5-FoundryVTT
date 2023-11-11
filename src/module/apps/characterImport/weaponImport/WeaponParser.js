@@ -41,13 +41,12 @@ export class WeaponParser {
     };
 
     async parseWeapons(chummerChar, assignIcons) {
-        if(chummerChar.weapons == null) {
-            return;
-        }
-        const weapons = getArray(chummerChar.weapons.weapon);
+        return this.parseWeaponArray(getArray(chummerChar.weapons?.weapon), assignIcons)
+    }
+
+    async parseWeaponArray(weapons, assignIcons) {
         const parsedWeapons = [];
         const iconList = await IconAssign.getIconFiles();
-
         weapons.forEach(async (chummerWeapon) => {
             try {
                 const itemData = this.parseWeapon(chummerWeapon);
