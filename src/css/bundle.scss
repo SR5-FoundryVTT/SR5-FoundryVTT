@@ -759,7 +759,7 @@ input[type='text'].display {
 
     .list-header,
     .list-item {
-        font-size: 85%;
+        font-size: var(--font-size-12);
         
         padding: 0.1em 0.25em;
         min-height: 26px;
