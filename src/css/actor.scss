@@ -179,6 +179,11 @@
         align-items: center;
         align-content: center;
     }
+
+    // Interaction Element for Skill Lists
+    .skill-header {
+        @include rollable;
+    }
 }
 
 .sr5 #filter-skills.display.text.left {

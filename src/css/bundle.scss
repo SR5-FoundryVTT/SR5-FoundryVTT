@@ -939,10 +939,6 @@ input[type='text'].display {
             .skill-spec-item {
                 width: 15em;
             }
-    
-            &.skill-header {
-                @include rollable;
-            }
         }
     }
 
