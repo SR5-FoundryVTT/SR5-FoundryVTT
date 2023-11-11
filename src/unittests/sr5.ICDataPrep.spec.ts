@@ -42,5 +42,23 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
         });
 
+        it('has meat attributes based on the host rating', async () => {
+            const ic = await testActor.create({ type: 'ic', 'system.host.rating': 5}) as SR5Actor;
+
+            assert.strictEqual(ic.system.attributes.agility.value, 5);
+            assert.strictEqual(ic.system.attributes.reaction.value, 5);
+            assert.strictEqual(ic.system.attributes.body.value, 5);
+            assert.strictEqual(ic.system.attributes.strength.value, 5);
+            assert.strictEqual(ic.system.attributes.logic.value, 5);
+            assert.strictEqual(ic.system.attributes.willpower.value, 5);
+            assert.strictEqual(ic.system.attributes.charisma.value, 5);
+            assert.strictEqual(ic.system.attributes.intuition.value, 5);
+        });
+
+        it('has rating attribute based on the host rating', async () => {
+            const ic = await testActor.create({ type: 'ic', 'system.host.rating': 5}) as SR5Actor;
+
+            assert.strictEqual(ic.system.attributes.rating.value, 5);
+        });
     });
 };
