@@ -153,7 +153,7 @@ export class SR5Actor extends Actor {
      * @override
      */
     override applyActiveEffects() {
-        // Shadowrun uses prepareDerivedData to calculate lot's of things that don't exist on the data model in full.
+        // Shadowrun uses prepareDerivedData to calculate lots of things that don't exist on the data model in full.
         // Errors during change application will stop that process and cause a broken sheet.
         try {
             super.applyActiveEffects();

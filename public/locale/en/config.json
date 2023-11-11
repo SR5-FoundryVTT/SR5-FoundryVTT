@@ -1018,6 +1018,7 @@
     "SR5.TemporaryModifiers": "Temporary Modifiers",
     "SR5.Test": "Test",
     "SR5.TestResults": {
+        "AttackBlockedByHardenedArmor": "Attack Hits But Is Blocked By Hardened Armor",
         "AttackBlockedByVehicleArmor": "Attack Hits But Is Blocked By Vehicle Armor",
         "AttackDodged": "Attack Dodged",
         "AttackDoesNoPhysicalDamageToVehicle": "Attack Hits But Does No Physical Damage To Vehicle",

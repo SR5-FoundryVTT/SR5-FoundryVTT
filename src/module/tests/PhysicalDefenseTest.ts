@@ -192,6 +192,10 @@ export class PhysicalDefenseTest extends DefenseTest {
             test: () => this.actor !== undefined && CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
             label: "SR5.TestResults.AttackBlockedByVehicleArmor",
         },
+        {
+            test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
+            label: "SR5.TestResults.AttackBlockedByHardenedArmor",
+        }
     ];
 
     private getNoDamageCondition(): PhysicalDefenseNoDamageCondition|undefined {
