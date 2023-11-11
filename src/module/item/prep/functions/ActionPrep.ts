@@ -106,8 +106,14 @@ export const ActionPrep = {
         // Apply collected modifications.
         action.limit.mod = limitParts.list;
         action.dice_pool_mod = dpParts.list;
+    },
 
-        // once all damage mods have been accounted for, sum base and mod to value
+    /**
+     * Calculate the total values of action data.
+     * 
+     * @param action To be altered action data.
+     */
+    calculateValues(action: Shadowrun.ActionRollData) {
         action.damage.value = Helpers.calcTotal(action.damage);
         action.damage.ap.value = Helpers.calcTotal(action.damage.ap);
         action.limit.value = Helpers.calcTotal(action.limit);

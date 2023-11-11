@@ -100,45 +100,62 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             await weapon.createNestedItem({type: 'modification', name: 'TestModB', system: {type: 'weapon', accuracy: 4}});
 
             ActionPrep.prepareWithMods(weapon.system.action as Shadowrun.ActionRollData, weapon.items.filter(item => item.type === 'modification'));
-            
+            ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
+
             assert.strictEqual(weapon.system.action?.limit.value, 6);
             assert.strictEqual(weapon.system.action?.limit.mod.length, 2);
         });
 
-        it('Check for weapon modification dice pool mod override', async () => {
-            const weapon = await testItem.create({type: 'weapon'});
+        it('Check for weapon modification setting dice pool modifiers', async () => {
+            const weapon = new SR5Item({type: 'weapon', name: 'Test'});
             // unique names are necessary
-            await weapon.createNestedItem({type: 'modification', name: 'TestModA', system: {type: 'weapon', dice_pool: 2, equipped: true}});
-            await weapon.createNestedItem({type: 'modification', name: 'TestModB', system: {type: 'weapon', dice_pool: 4, equipped: true}});
+            const mods: SR5Item[] = [];
+            //@ts-expect-error
+            mods.push(new SR5Item({type: 'modification', name: 'TestModA', system: {type: 'weapon', dice_pool: 2}}));
+            //@ts-expect-error
+            mods.push(new SR5Item({type: 'modification', name: 'TestModB', system: {type: 'weapon', dice_pool: 4}}));
 
-            ActionPrep.prepareWithMods(weapon.system.action as Shadowrun.ActionRollData, weapon.items.filter(item => item.type === 'modification'));
-            
-            // NOTE: I expect this to fail, as this doesn't seem to work?
-            assert.strictEqual(weapon.system.action?.mod, 6);
+            ActionPrep.prepareWithMods(weapon.system.action as Shadowrun.ActionRollData, mods);
+            ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
+
             assert.strictEqual(weapon.system.action?.dice_pool_mod.length, 2);
         });
 
-        it('Check for ammo to apply its damage to the weapon', async () => {
-            const weapon = await testItem.create({type: 'weapon'});
-
+        it('Check for weapon modification setting limit modifiers', async () => {
+            const weapon = new SR5Item({type: 'weapon', name: 'Test'});
             // unique names are necessary
-            await weapon.createNestedItem({type: 'ammo', name: 'TestAmmoA', system: {equipped: true}});
-            
-            ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, weapon.items.find(item => item.type === 'ammo' && item.isEquipped));
+            const mods: SR5Item[] = [];
+            //@ts-expect-error
+            mods.push(new SR5Item({type: 'modification', name: 'TestModA', system: {type: 'weapon', accuracy: 2}}));
+            //@ts-expect-error
+            mods.push(new SR5Item({type: 'modification', name: 'TestModB', system: {type: 'weapon', accuracy: 4}}));
 
-            assert.strictEqual(weapon.system.action?.damage.value, 6);
+            ActionPrep.prepareWithMods(weapon.system.action as Shadowrun.ActionRollData, mods);
+            ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
+
+            assert.strictEqual(weapon.system.action?.limit.mod.length, 2);
         });
 
-        it('Check for ammo to override its damage to the weapon', async () => {
-            assert.fail();
+        it('Check for ammo to apply its damage to the weapon', async () => {
+            const weapon = new SR5Item({type: 'weapon', name: 'Test'});
+            //@ts-expect-error
+            const ammo = new SR5Item({type: 'ammo', name: 'TestModA', 'system.damage': 2});
+            
+            ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
+            ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
+
+            assert.strictEqual(weapon.system.action?.damage.value, 2);
         });
 
         it('Check for ammo to modify the weapon armor piercing', async () => {
-            assert.fail();
-        });
+            const weapon = new SR5Item({type: 'weapon', name: 'Test'});
+            //@ts-expect-error
+            const ammo = new SR5Item({type: 'ammo', name: 'TestModA', 'system.ap': -2});
+            
+            ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
+            ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
 
-        it('Check for ammo to modify the weapon accuracy', async () => {
-            assert.fail();
+            assert.strictEqual(weapon.system.action?.damage.ap.value, -2);
         });
 
         it('Check for ammo to override the weapon damage element type', async () => {
