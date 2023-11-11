@@ -1,6 +1,6 @@
 //todo: v10 foundry-vtt-types 
 //@ts-expect-error
-export default class AugmentedRealityVisionFilter extends AbstractBaseFilter {
+export default class LowLightVisionFilter extends AbstractBaseFilter {
   //@ts-expect-error
   static override defaultUniforms = {
     luminanceThreshold: 0.5,
@@ -27,7 +27,7 @@ export default class AugmentedRealityVisionFilter extends AbstractBaseFilter {
     vec4 texColor = texture2D(uSampler, vTextureCoord);
     float luminance = dot(vec3(0.30, 0.59, 0.11), texColor.rgb);
     if ( texColor.a > alphaThreshold ) {
-      gl_FragColor = mix(vec4(0.1, 0.1, 0.5, 1.0), vec4(0.4, 0.4, 0.8, 1.0), (luminance - 0.5) * 2.0);;
+      gl_FragColor = mix(vec4(0.2, 0.5, 0.2, 1), vec4(1, 1, 0.4, 1), (luminance - 0.5) * 2.0);;
       gl_FragColor.rgb *= 0.1 + 0.25 + 0.75 * pow( 16.0 * vTextureCoord.x * vTextureCoord.y * (1.0 - vTextureCoord.x) * (1.0 - vTextureCoord.y), 0.15 );
       gl_FragColor.a = texColor.a;
     } else {
