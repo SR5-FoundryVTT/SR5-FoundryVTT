@@ -42,12 +42,8 @@
         flex-flow: row;
         flex-wrap: nowrap;
         justify-content: space-between;
-
-        // Used to center special attributes.
-        // Therefore we can't have growing gap, but must have a fixed one.
         &.center {
             justify-content: center;
-            gap: 20px;
         }
         &.no-border {
             border-top: none;
@@ -58,7 +54,7 @@
         }
         .attribute {
             @include title;
-            
+
             align-items: center;
             color: $yellow;
             display: flex;
@@ -140,12 +136,23 @@
                     margin: 2px;
                 }
             }
+
+            .toggle-fresh-import-all-off {
+                font-size: 0.75em;
+                background-color: $bgrButton;
+            }
+
+            .toggle-fresh-import-all-on {
+                font-size: 0.75em;
+                background-color: $bgrButton;
+            }
+
             .track {
                 display: flex;
                 flex-flow: row;
                 justify-content: space-evenly;
                 margin-bottom: 0.1em;
-                
+                width: 100%;
                 &.center {
                     justify-content: center;
                     & > *:not(:first-child) {
