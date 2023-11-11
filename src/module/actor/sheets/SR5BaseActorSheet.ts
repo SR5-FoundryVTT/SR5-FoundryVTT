@@ -1,5 +1,5 @@
-import { SituationModifier } from './../../rules/modifiers/SituationModifier';
-import { SituationModifiersApplication } from './../../apps/SituationModifiersApplication';
+import { SituationModifier } from '../../rules/modifiers/SituationModifier';
+import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../../effects";
@@ -563,7 +563,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onInventorySectionVisiblitySwitch(event) {
         event.preventDefault();
-        const type = Helpers.listItemId(event);
+        const type = Helpers.listHeaderId(event);
 
         this._setInventoryTypeVisibility(type, !this._inventoryOpenClose[type]);
         this.render();
@@ -1114,7 +1114,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._filterLanguageSkills(data);
     }
 
-    _filterSkills(data: SR5ActorSheetData, skills: Skills) {
+    _filterSkills(data: SR5ActorSheetData, skills: Skills = {}) {
         const filteredSkills = {};
         for (let [key, skill] of Object.entries(skills)) {
             // Don't show hidden skills.
@@ -1337,8 +1337,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skillId = await this.actor.addLanguageSkill({ name: '' });
         if (!skillId) return;
 
-        // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
+        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
@@ -1353,12 +1352,11 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = Helpers.listItemId(event) as keyof KnowledgeSkills;
+        const category = Helpers.listHeaderId(event) as keyof KnowledgeSkills;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
-        // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
+        await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId, category);
     }
 
     async _onRemoveKnowledgeSkill(event) {
@@ -1737,6 +1735,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         };
 
         // go through atts on device, setup matrix attributes on it
+        // This logic swaps the two slots when a new one is selected
         for (let i = 1; i <= 4; i++) {
             let tmp = `att${i}`;
             let key = `system.atts.att${i}.att`;
