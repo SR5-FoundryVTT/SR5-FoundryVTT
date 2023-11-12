@@ -62,6 +62,7 @@ import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
 import { SR5ChatMessage } from './chatMessage/SR5ChatMessage';
 import VisionConfigurator from './vision/visionConfigurator';
 import { DataDefaults } from './data/DataDefaults';
+import { AutocompleteInlineHooksFlow } from './effect/autoinline/AutocompleteInlineHooksFlow';
 
 
 
@@ -74,7 +75,7 @@ export class HooksManager {
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
         Hooks.once('init', HooksManager.init);
-        Hooks.once('setup', HooksManager.setupAutocompleteInlinePropertiesSupport);
+        Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
 
         Hooks.on('canvasInit', canvasInit);
         Hooks.on('ready', HooksManager.ready);
@@ -464,85 +465,6 @@ ___________________
                 await handler(message);
             }
         });
-    }
-
-    /**
-     * Add support for https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties module
-     * to give auto complete for active effect attribute keys.
-     *
-     * This is taken from: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/CONTRIBUTING.md
-     * It partially uses: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/package-config.mjs#L141
-     */
-    static setupAutocompleteInlinePropertiesSupport() {
-        // Module might not be installed.
-        const aipModule = game.modules.get("autocomplete-inline-properties");
-        if (!aipModule) return;
-        // @ts-expect-error
-        // API might be missing.
-        const api = aipModule.API;
-        if (!api) return;
-
-        console.log('Shadowrun 5e | Registering support for autocomplete-inline-properties');
-        const DATA_MODE = api.CONST.DATA_MODE;
-
-        const testDataGetter = (EffectConfig: SR5ActiveEffectConfig) => {
-            const effect = EffectConfig.object;
-            
-            if (effect.parent instanceof SR5Actor) {
-                const test = new SuccessTest({});
-                return test;
-            }
-            
-            if (effect.parent instanceof SR5Item) {
-                const item = effect.parent as SR5Item;
-                const test = TestCreator.fromItem(item);
-                return test;
-            }
-        };
-
-        const modifiersDataGetter = (EffectConfig: SR5ActiveEffectConfig) => {
-            return {environmental: {
-                low_light_vision: '',
-                image_magnification: '',
-                tracer_rounds: '',
-                smartlink: '',
-                ultrasound: ''
-            }}
-        }
-
-        const targetedActorDataGetter = (EffectConfig: SR5ActiveEffectConfig) => {
-            const effect = EffectConfig.object;
-
-            if (effect.parent instanceof SR5Item) {
-                const item = effect.parent as SR5Item;
-                const action = item.getAction();
-                if (!action) return {};                
-                const SuccessTestClass = TestCreator._getTestClass(action.test);
-                const OpposedTestClass = TestCreator._getTestClass(action.opposed.test);
-                const successTest = new SuccessTestClass({});
-                const opposedTest = new OpposedTestClass({against: successTest.data}, {actor: item.actor, item});
-                
-                return opposedTest;
-            }
-        }
-
-        const config = {
-            packageName: "shadowrun5e",
-            sheetClasses: [{
-                name: "ActiveEffectConfig",
-                fieldConfigs: [
-                    { selector: `.tab[data-tab="effects"] .key-actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
-                    { selector: `.tab[data-tab="effects"] .key-targeted_actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
-                    { selector: `.tab[data-tab="effects"] .key-test_all input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: testDataGetter},
-                    { selector: `.tab[data-tab="effects"] .key-test_item input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: testDataGetter},
-                    { selector: `.tab[data-tab="effects"] .key-modifier input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: modifiersDataGetter},
-
-                    { selector: `.tab[data-tab="effects"] .value-targeted_actor input[type="text"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: targetedActorDataGetter}
-                ]
-            }]
-        };
-
-        api.PACKAGE_CONFIG.push(config);
     }
 
     static async chatMessageListeners(message: ChatMessage, html, data) {

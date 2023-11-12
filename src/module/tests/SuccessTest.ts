@@ -182,7 +182,7 @@ export class SuccessTest {
 
         this.calculateBaseValues();
 
-        console.log(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
+        console.debug(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
 
     /**
