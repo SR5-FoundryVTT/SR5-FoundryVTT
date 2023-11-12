@@ -42,7 +42,10 @@ export const AutocompleteInlineHooksFlow =  {
                     { selector: `.tab[data-tab="effects"] .autocomplete-key-test_item input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
                     { selector: `.tab[data-tab="effects"] .autocomplete-key-modifier input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterModifiersData},
 
-                    { selector: `.tab[data-tab="effects"] .autocomplete-value-targeted_actor input[type="text"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData}
+                    { selector: `.tab[data-tab="effects"] .autocomplete-value-actor input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
+                    { selector: `.tab[data-tab="effects"] .autocomplete-value-targeted_actor input[type="text"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
+                    { selector: `.tab[data-tab="effects"] .autocomplete-value-test_all input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.tab[data-tab="effects"] .autocomplete-value-test_item input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                 ]
             }]
         };
@@ -51,7 +54,19 @@ export const AutocompleteInlineHooksFlow =  {
     },
 
     /**
-     * Getter to show data for apply-to test_all and test_item
+     * Getter to show values for apply-to actor.
+     * 
+     * @param EffectConfig The effect config supplying the effect context.
+     * @returns Either a SR5Actor or SR5Item source object.
+     */
+    valueGetterActor: (EffectConfig: SR5ActiveEffectConfig) => {
+        const effect = EffectConfig.object;
+        if (!effect.parent) return {};
+        return effect.parent?.toObject();
+    },
+
+    /**
+     * Getter to show keys for apply-to test_all and test_item
      * 
      * @param EffectConfig The effect config supplying the effect context.
      * @returns A test object for the autocomplete module to use.
@@ -59,16 +74,32 @@ export const AutocompleteInlineHooksFlow =  {
     keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
         const effect = EffectConfig.object;
         
+        // For actor effects, we can't determine the test type.
         if (effect.parent instanceof SR5Actor) {
-            const test = new SuccessTest({});
-            return test;
+            return new SuccessTest({});
         }
         
+        // For item effects, we can determine the test type.
         if (effect.parent instanceof SR5Item) {
             const item = effect.parent as SR5Item;
-            const test = TestCreator.fromItem(item);
+            const action = item.getAction();
+            if (!action) return {};                
+            const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;
+            const test = new SuccessTestClass({}, {actor: item.actor, item});
             return test;
         }
+    },
+
+    /**
+     * Getter to show values for apply-to test_all and test_item
+     * 
+     * @param EffectConfig 
+     */
+    valueGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
+        const effect = EffectConfig.object;
+        if (!effect.parent) return {};
+
+        return effect.parent;
     },
 
     /**
