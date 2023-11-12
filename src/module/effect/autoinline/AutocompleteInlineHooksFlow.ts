@@ -28,7 +28,7 @@ export const AutocompleteInlineHooksFlow =  {
         const api = aipModule.API;
         if (!api) return;
 
-        console.log('Shadowrun 5e | Registering support for autocomplete-inline-properties');
+        console.debug('Shadowrun 5e | Registering support for autocomplete-inline-properties');
         const DATA_MODE = api.CONST.DATA_MODE;
 
         const config = {
