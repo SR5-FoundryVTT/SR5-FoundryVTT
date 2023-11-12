@@ -112,14 +112,30 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             if (effect.applyTo === 'test_all') yield effect;
         }
 
-        // Tests like SkillTest don't have items attached.
+        // apply-to 'test_all' effects for OwnedItems and NestedItems
+        for (const item of this.test.actor.items as unknown as SR5Item[]) {
+            for (const effect of item.effects as unknown as SR5ActiveEffect[]) {
+                if (effect.skipApply(item)) continue;
+
+                if (effect.applyTo === 'test_all') yield effect;
+            }
+
+            for (const nestedItem of item.items) {
+                for (const effect of nestedItem.effects as unknown as SR5ActiveEffect[]) {
+                    if (effect.skipApply(nestedItem)) continue;
+    
+                    if (effect.applyTo === 'test_all') yield effect;
+                }
+            }
+        }
+
+        // Skip tests without an item for apply-to test_item effects.
         if (!this.test.item) return;
 
         // Item effects can also apply to this test only.
         for (const effect of this.test.item?.effects as unknown as SR5ActiveEffect[]) {
-            if (!effect.skipApply(effect.parent as SR5Item)) continue;
+            if (effect.skipApply(effect.parent as SR5Item)) continue;
 
-            if (effect.applyTo === 'test_all') yield effect;
             if (effect.applyTo === 'test_item') yield effect;            
         }
         
@@ -129,9 +145,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             if (!item.isEquipped()) continue;
 
             for (const effect of item.effects as unknown as SR5ActiveEffect[]) {
-                if (!effect.skipApply(item)) continue;
+                if (effect.skipApply(item)) continue;
 
-                if (effect.applyTo === 'test_all') yield effect;
                 if (effect.applyTo === 'test_item') yield effect;
             }
         }

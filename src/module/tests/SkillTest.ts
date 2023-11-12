@@ -47,11 +47,13 @@ export class SkillTest extends SuccessTest {
         return data;
     }
 
-    override prepareBaseValues() {
+    override async prepareDocumentData() {
+        await super.prepareDocumentData();
+    }
+
+    override prepareTestSelectionData() {
         this.prepareAttributeSelection();
         this.prepareLimitSelection();
-
-        super.prepareBaseValues();
     }
 
     /**
