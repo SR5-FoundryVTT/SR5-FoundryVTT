@@ -26,10 +26,6 @@ export class Version0_16_0 extends VersionMigration {
         return false;
     }
 
-    protected _ShouldMigrateItemData(data: Shadowrun.ShadowrunItemData): boolean {
-        return false;
-    }
-
     protected override async ShouldMigrateSceneData(scene: Scene) {
         return false;
     }
