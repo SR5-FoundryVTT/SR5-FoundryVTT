@@ -6,9 +6,8 @@
  * these classes to their item types.
  */
 import {VersionMigration} from "../VersionMigration";
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import {Helpers} from "../../helpers";
+import { SR5Item } from "../../item/SR5Item";
+import { SR5Actor } from "../../actor/SR5Actor";
 
 export class Version0_16_0 extends VersionMigration {
     get SourceVersion(): string {
@@ -23,11 +22,11 @@ export class Version0_16_0 extends VersionMigration {
         return "0.16.0";
     }
 
-    protected override async ShouldMigrateItemData(data: ShadowrunItemData) {
+    protected override async ShouldMigrateItemData(item: SR5Item) {
         return false;
     }
 
-    protected _ShouldMigrateItemData(data: ShadowrunItemData): boolean {
+    protected _ShouldMigrateItemData(data: Shadowrun.ShadowrunItemData): boolean {
         return false;
     }
 
@@ -35,11 +34,11 @@ export class Version0_16_0 extends VersionMigration {
         return false;
     }
 
-    protected override async ShouldMigrateActorData(data: ShadowrunActorData) {
-        return data.type !== 'character' && data.type !== 'critter' && data.type !== 'vehicle';
+    protected override async ShouldMigrateActorData(actor: SR5Actor) {
+        return actor.type !== 'character' && actor.type !== 'critter' && actor.type !== 'vehicle';
     }
 
-    protected override async MigrateActorData(data: ShadowrunActorData) {
+    protected override async MigrateActorData(actor: SR5Actor) {
         return {data: {'visibilityChecks.meat.hasHeat': false}};
     }
 }
