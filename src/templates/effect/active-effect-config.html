@@ -147,13 +147,8 @@
         <ol class="changes-list">
             {{#each data.changes as |change i|}}
             <li class="effect-change flexrow" data-index="{{i}}">
-                <div class="key key-{{../applyTo}}">
-                    <input type="text" name="changes.{{i}}.key" value="{{change.key}}" list="keys"/>
-                    <datalist id="keys">
-                        {{#each ../testKeyOptions}}
-                        <option value="{{@key}}">{{localize this}}</option>
-                        {{/each}}
-                    </datalist>                    
+                <div class="key autocomplete-key-{{../applyTo}}">
+                    <input type="text" name="changes.{{i}}.key" value="{{change.key}}"/>
                 </div>
                 {{#ifne ../applyTo "modifier"}}
                 <div class="mode">
@@ -161,7 +156,7 @@
                         {{selectOptions ../modes selected=change.mode}}
                     </select>
                 </div>
-                <div class="value value-{{../applyTo}}">
+                <div class="value autocomplete-value-{{../applyTo}}">
                     <input type="text" name="changes.{{i}}.value" value="{{change.value}}"/>
                 </div>
                 {{/ifne}}
