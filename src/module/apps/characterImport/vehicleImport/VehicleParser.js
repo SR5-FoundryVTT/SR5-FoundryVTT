@@ -61,9 +61,10 @@ export default class VehicleParser {
                 'system.attributes.body.base': vehicle.body,
             
                 'system.armor.base': vehicle.armor,
-                'system.isDrone': vehicle.isdrone
+                'system.isDrone': vehicle.isdrone,
+                'folder': actor.folder.id
             });
-            
+
             await vehicleActor.createEmbeddedDocuments('Item', (await Promise.all(promises)).flat());
         }
     }
