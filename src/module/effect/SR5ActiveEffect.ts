@@ -93,7 +93,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey) as Shadowrun.ModifiableValue;
             //@ts-expect-error // TODO: foundry-vtt-types v10
-            value.mod.push({name: this.label, value: Number(change.value)});
+            value.mod.push({name: this.name, value: Number(change.value)});
 
             return null;
         }
@@ -116,8 +116,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor, change.key);
-            //@ts-expect-error // TODO: foundry-vtt-types v10
-            value.override = {name: this.label, value: Number(change.value)};
+            value.override = {name: this.name, value: Number(change.value)};
             value.value = change.value;
 
             return null;
@@ -130,8 +129,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey);
-            //@ts-expect-error // TODO: foundry-vtt-types v10
-            value.override = {name: this.label, value: Number(change.value)};
+            value.override = {name: this.name, value: Number(change.value)};
 
             return null;
         }
