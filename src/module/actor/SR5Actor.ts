@@ -25,6 +25,7 @@ import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 
 
 /**
@@ -187,6 +188,23 @@ export class SR5Actor extends Actor {
             if (!['actor', 'targeted_actor'].includes(effect.applyTo)) continue;
 
             yield effect;
+        }
+
+        // apply-to 'actor' effects for OwnedItems and NestedItems
+        for (const item of this.items) {
+            for (const effect of item.effects) {
+                if (effect.skipApply(item)) continue;
+
+                if (effect.applyTo === 'actor') yield effect;
+            }
+
+            for (const nestedItem of item.items) {
+                for (const effect of nestedItem.effects) {
+                    if (effect.skipApply(nestedItem)) continue;
+    
+                    if (effect.applyTo === 'actor') yield effect;
+                }
+            }
         }
     }
 
