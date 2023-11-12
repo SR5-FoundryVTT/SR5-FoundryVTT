@@ -20,7 +20,7 @@ import { SR5Item } from "../item/SR5Item";
  */
 export class SR5ActiveEffect extends ActiveEffect {
     // Foundry Core typing missing... TODO: foundry-vtt-types v10
-    public origin: string;
+    public origin: string|null;
     public active: boolean;
     public changes: EffectChangeData[];
 

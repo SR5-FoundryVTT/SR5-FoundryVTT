@@ -22,7 +22,7 @@ export class Version0_12_0 extends VersionMigration {
     }
 
     static get TargetVersion(): string {
-        return '0.12.0';
+        return '0.12.0'; // TODO: check the consent dialog for this version
     }
 
     // By default item effects will be deleted. should users want to keep them, they can 
@@ -39,8 +39,6 @@ export class Version0_12_0 extends VersionMigration {
         const dialog = new ConfigurationDialog({onlyDisableEffects: this.onlyDisableEffects});
         await dialog.select();
         if (dialog.canceled) return false;
-
-        console.error(this, dialog.data);
 
         // @ts-expect-error
         this.onlyDisableEffects = dialog.data.templateData.onlyDisableEffects;
@@ -86,7 +84,7 @@ export class Version0_12_0 extends VersionMigration {
      * @param actor 
      */
     static async DeleteLocalItemOwnedEffects(actor: SR5Actor) {
-        const itemOriginEffects = actor.effects.filter(effect => effect.origin.includes('.Item.'));
+        const itemOriginEffects = actor.effects.filter(effect => !!effect.origin && effect.origin.includes('.Item.'));
 
         console.log(`Actor (${actor.uuid}). Delete these effects:`, itemOriginEffects);
         const toMigrate: string[] = [];
@@ -110,7 +108,7 @@ export class Version0_12_0 extends VersionMigration {
     static async DisableLocalItemOwnedEffects(actor: SR5Actor) {
         const itemOriginEffects = actor.effects
             //@ts-expect-error TODO: foundry-vtt-types v10
-            .filter(effect => effect.origin.includes('.Item.') && !effect.disabled);
+            .filter(effect => !!effect.origin && effect.origin.includes('.Item.') && !effect.disabled);
         
         if (itemOriginEffects.length === 0) return {};
 
