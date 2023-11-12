@@ -18,7 +18,7 @@ interface FoundryItemSheetData {
     // A descriptive document  reference
     item: SR5Item
     document: SR5Item
-    
+
     cssClass: string
     editable: boolean
     limited: boolean
@@ -45,7 +45,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     ammunition: Shadowrun.AmmoItemData[]
     weaponMods: Shadowrun.ModificationItemData[]
     armorMods: Shadowrun.ModificationItemData[]
-    
+
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
     attributes: Record<string, string>  // key: label
@@ -68,6 +68,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Rendered description field
     descriptionHTML: string
+
+    // Can be used to check if the source field contains a URL.
+    sourceIsURL: boolean
 }
 
 /**
@@ -155,7 +158,7 @@ export class SR5ItemSheet extends ItemSheet {
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
                 //@ts-expect-error TODO: foundry-vtt-types v10
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
-                
+
                 return sheetItemData;
             },
             [[], [], []],
@@ -194,6 +197,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         // @ts-expect-error TODO: foundry-vtt-types v10
         data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
+        data.sourceIsURL = this.item.sourceIsUrl;
 
         data.rollModes = CONFIG.Dice.rollModes;
 
@@ -202,7 +206,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     /**
      * Help enriching editor field values to HTML used to display editor values as read-only HTML in sheets.
-     * 
+     *
      * @param editorValue A editor field value like Item.system.description.value
      * @param options TextEditor, enrichHTML.options passed through
      * @returns Enriched HTML result
@@ -280,17 +284,6 @@ export class SR5ItemSheet extends ItemSheet {
          */
         html.find('.edit-item').click(this._onEditItem.bind(this));
         html.find('.open-source').on('click', this._onOpenSource.bind(this));
-        // html.find('.has-desc').click((event) => {
-        //     event.preventDefault();
-        //     const item = $(event.currentTarget).parents('.list-item');
-        //     const iid = $(item).data().item;
-        //     const field = item.next();
-        //     field.toggle();
-        //     if (iid) {
-        //         if (field.is(':visible')) this._shownDesc.push(iid);
-        //         else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
-        //     }
-        // });
         html.find('.has-desc').click(this._onListItemToggleDescriptionVisibility.bind(this));
         html.find('.hidden').hide();
         html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
@@ -328,7 +321,10 @@ export class SR5ItemSheet extends ItemSheet {
 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
-        this._activateTagifyListeners(html);        
+        // Freshly imported item toggle
+        html.find('.toggle-fresh-import-off').on('click', async (event) => this._toggleFreshImportFlag(event, false));
+
+        this._activateTagifyListeners(html);
     }
 
     override async _onDrop(event) {
@@ -376,7 +372,7 @@ export class SR5ItemSheet extends ItemSheet {
             const item = await fromUuid(data.uuid) as SR5Item;
 
             if (!item || !item.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
-            
+
             return await this.item.addNetworkDevice(item);
         }
 
@@ -551,9 +547,9 @@ export class SR5ItemSheet extends ItemSheet {
 
     /**
      * Add a tagify element for an action-modifier dom element.
-     * 
+     *
      * Usage: Call method after render with a singular item's html sub-dom-tree.
-     * 
+     *
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
@@ -565,11 +561,11 @@ export class SR5ItemSheet extends ItemSheet {
             id: modifier
         }));
 
-        // Tagify dropdown should show all whitelist tags. 
+        // Tagify dropdown should show all whitelist tags.
         const maxItems = Object.keys(SR5.modifierTypes).length;
 
-        // Use localized label as value, and modifier as the later to be extracted value 
-        const modifiers = this.item.system.action?.modifiers ?? []; 
+        // Use localized label as value, and modifier as the later to be extracted value
+        const modifiers = this.item.system.action?.modifiers ?? [];
         const tags = modifiers.map(modifier => ({
             value: game.i18n.localize(SR5.modifierTypes[modifier]),
             id: modifier
@@ -711,10 +707,10 @@ export class SR5ItemSheet extends ItemSheet {
     /**
      * Activate listeners for tagify elements for item types that allow changing action
      * modifiers.
-     * 
+     *
      * @param html The JQuery HTML as given by the activateListeners method.
      */
-    _activateTagifyListeners(html) {        
+    _activateTagifyListeners(html) {
         if (!['action', 'equipment'].includes(this.document.type)) return;
 
         this._createActionModifierTagify(html);
@@ -722,11 +718,11 @@ export class SR5ItemSheet extends ItemSheet {
 
     /**
      * Helper to parse FoundryVTT DropData directly from it's source event
-     * 
+     *
      * This is a legacy handler for earlier FoundryVTT versions, however it's good
      * practice to not trust faulty input and inform about.
-     * 
-     * @param event 
+     *
+     * @param event
      * @returns undefined when an DropData couldn't be parsed from it's JSON.
      */
     parseDropData(event): any|undefined {
@@ -749,6 +745,19 @@ export class SR5ItemSheet extends ItemSheet {
         if (iid) {
             if (field.is(':visible')) this._shownDesc.push(iid);
             else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
+        }
+    }
+
+    /**
+     * Toggle to isFreshImport property of importFlags for an item
+     *
+     * @param event
+     */
+    async _toggleFreshImportFlag(event, onOff: boolean) {
+        console.debug('Toggling isFreshImport on item to ->', onOff, event);
+        const item = this.item;
+        if (item.system.importFlags) {
+            await item.update({ 'system.importFlags.isFreshImport': onOff });
         }
     }
 }

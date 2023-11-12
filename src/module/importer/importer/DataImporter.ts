@@ -75,7 +75,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * @param importFlags The importFlags data of an item
      * @param system The item's system data
      */
-    public iconAssign(importFlags: Shadowrun.ImportFlagData, system: Object, iconList: string[]): Promise<string> {
+    public iconAssign(importFlags: Shadowrun.ImportFlagData, system: any, iconList: string[]): Promise<string> {
         // if (!this.iconList) this.getIconFiles();
         return IconAssign.iconAssign(importFlags, system, iconList);
     }

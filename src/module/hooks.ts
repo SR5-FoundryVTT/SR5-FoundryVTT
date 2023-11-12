@@ -63,6 +63,7 @@ import { SR5ChatMessage } from './chatMessage/SR5ChatMessage';
 import VisionConfigurator from './vision/visionConfigurator';
 import { DataDefaults } from './data/DataDefaults';
 import { AutocompleteInlineHooksFlow } from './effect/autoinline/AutocompleteInlineHooksFlow';
+import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 
 
 
@@ -132,6 +133,12 @@ ___________________
              */
             test: TestCreator,
             data: DataDefaults,
+
+            /**
+             * You want to access or alter situational modifiers on any document?
+             * Use this.
+             */
+            modifiers: DocumentSituationModifiers,
 
             /**
              * .tests define what test implementation to use for each test type (key).

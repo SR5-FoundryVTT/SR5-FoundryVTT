@@ -921,12 +921,12 @@
                 },
                 "visibilityChecks": {
                     "astral": {
+                        "hasAura" : false,
                         "astralActive" : false,
                         "affectedBySpell": false
                     },
                     "meat": {
-                        "hidden": false,
-                        "hasHeat": true
+                        "hasHeat": false
                     },
                     "matrix": {
                         "hasIcon": false,
@@ -947,10 +947,17 @@
                         "mod": []
                     }
                 }
+            },
+            "grunt": {
+                "is_npc": false,
+                "npc": {
+                    "is_grunt": false,
+                    "professional_rating": 0
+                }
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "visibilityChecks"],
+            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt"],
             "ethnicity": "",
             "age": "",
             "sex": "",
@@ -959,7 +966,6 @@
             "street_cred": 0,
             "notoriety": 0,
             "public_awareness": 0,
-            "is_npc": false,
             "is_critter": false,
             "karma": {
                 "value": 0,
@@ -968,20 +974,28 @@
             "rent": {
                 "cost": 0,
                 "locations": []
-            },
-            "npc": {
-                "is_grunt": false,
-                "professional_rating": 0
+            },            
+            "visibilityChecks": {
+                "astral": {
+                    "hasAura" : true
+                },
+                "meat": {
+                    "hasHeat": true
+                },
+                "matrix": {
+                    "hasIcon": true
+                }
             }
         },
         "spirit": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "visibilityChecks"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt"],
             "summonerUuid": "",
             "services": 0,
             "bound": false,
             "force": 0,
             "spiritType": "",
             "special": "magic",
+            "is_npc": true,
             "attributes": {
                 "force": {
                     "value": 0,
@@ -990,21 +1004,41 @@
                     "mod": [],
                     "hidden": true
                 }
+            },
+            "visibilityChecks": {
+                "astral": {
+                    "hasAura" : true,
+                    "astralActive" : true
+                }
             }
         },
         "critter": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "visibilityChecks"]
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "is_npc": true,
+            "visibilityChecks": {
+                "astral": {
+                    "hasAura" : true
+                },
+                "meat": {
+                    "hasHeat": true
+                }
+            }
         },
         "sprite": {
-            "templates": ["common", "skills", "attributes", "limits", "matrix", "visibilityChecks"],
+            "templates": ["common", "skills", "attributes", "limits", "matrix"],
             "services": 0,
             "registered": false,
             "level": 0,
             "spriteType": "",
-            "special": "resonance"
+            "special": "resonance",
+            "visibilityChecks": {
+                "matrix": {
+                    "hasIcon": true
+                }
+            }
         },
         "vehicle": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values", "visibilityChecks"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values"],
             "vehicleType": "ground",
             "controlMode": "autopilot",
             "environment": "speed",
@@ -1068,10 +1102,18 @@
                     "mod": [],
                     "hidden": true
                 }
+            },
+            "visibilityChecks": {
+                "meat": {
+                    "hasHeat": true
+                },
+                "matrix": {
+                    "hasIcon": true
+                }
             }
         },
         "ic": {
-            "templates": ["common",  "skills", "attributes", "limits", "matrix", "visibilityChecks"],
+            "templates": ["common",  "skills", "attributes", "limits", "matrix"],
             "track": {},
             "icType": "",
             "host": {
@@ -1098,6 +1140,11 @@
                         "att": "firewall",
                         "editable": false
                     }
+                }
+            },
+            "visibilityChecks": {
+                "matrix": {
+                    "hasIcon": true
                 }
             }
         }

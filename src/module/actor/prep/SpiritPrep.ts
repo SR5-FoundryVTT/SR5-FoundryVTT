@@ -13,7 +13,7 @@ import {SkillFlow} from "../flows/SkillFlow";
 import SpiritType = Shadowrun.SpiritType;
 import SpiritData = Shadowrun.SpiritData;
 import { CharacterPrep } from './CharacterPrep';
-import VisibilityChecksPrep from './functions/VisibilityChecksPrep'
+import { GruntPrep } from './functions/GruntPrep';
 
 
 export class SpiritPrep {
@@ -24,8 +24,6 @@ export class SpiritPrep {
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
-
-        VisibilityChecksPrep.preparVisibilityChecks(system, 'spirit')
     }
 
     static prepareDerivedData(system: SpiritData, items: SR5ItemDataWrapper[]) {
@@ -41,9 +39,8 @@ export class SpiritPrep {
 
         SpiritPrep.prepareSpiritArmor(system);
 
-        ConditionMonitorsPrep.prepareStun(system);
-        ConditionMonitorsPrep.preparePhysical(system);
-
+        GruntPrep.prepareConditionMonitors(system);
+        
         MovementPrep.prepareMovement(system);
         WoundsPrep.prepareWounds(system);
 
@@ -97,6 +94,7 @@ export class SpiritPrep {
         const {armor, attributes} = data;
         armor.base = (attributes.essence.value ?? 0) * 2;
         armor.value = Helpers.calcTotal(armor);
+        armor.hardened = true;
     }
 
     /**

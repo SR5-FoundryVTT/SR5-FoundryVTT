@@ -6,7 +6,21 @@
                     <img src="{{img}}" title="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip='SHIFT' descr='CTRL'}}" height="24px" width="24px"/>
                 </div>
             {{/if}}
+            {{#if system.importFlags.isFreshImport}}
+            {{#if (itemMarking "ICON")}}
+                {{#if (itemMarking "COLOR")}}
+                    <div class="item-img">
+                        <img src="systems/shadowrun5e/dist/icons/checklist.svg" title="{{localize "SR5.IsFreshImport"}}" height="24px" width="24px"/>
+                    </div>
+                {{else}}
+                    <div class="item-img">
+                        <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" title="{{localize "SR5.IsFreshImport"}}" height="24px" width="24px"/>
+                    </div>
+                {{/if}}
+            {{/if}}
+            {{/if}}
             <div class="item-text item-name
+                {{#if system.importFlags.isFreshImport}}{{#if (itemMarking "COLOR")}}fresh-import{{/if}}{{/if}}
                 {{#if hasDesc}}has-desc{{/if}}
                 {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}}
                 {{#each additionalCssClass}}{{this }}{{/each}}
@@ -68,7 +82,7 @@
             {{/if}}
         </div>
     </div>
-    
+
     {{#if hasDesc}}
     <div class="list-item-description hidden">
         <div class="item-desc">

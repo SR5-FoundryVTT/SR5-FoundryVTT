@@ -37,8 +37,8 @@ export type ModifiableDocumentTypes = SR5Actor | Scene;
  * 
  * A category should be matched a top-level property to the documents source object.
  * 
- * A DocumentSitiationModifiers instance doesn't do any handling of values but delegates to
- * the respectiv handler of each category.
+ * A DocumentSituationModifiers instance doesn't do any handling of values but delegates to
+ * the respective handler of each category.
  * 
  * Documents only store source data per document, while a document might have other
  * document source data applied first. The resulting applied data is what's actually used to
@@ -47,6 +47,34 @@ export type ModifiableDocumentTypes = SR5Actor | Scene;
  * This allows for modifiers to be defined globally (scene), while also locally (actor) and, in theory,
  * add more other other modifier sources in that chain of application to reach the actual modifier.
  * 
+ * Usage Examples:
+ * 
+ * Get modifiers for the current scene:
+ * > const modifiers = DocumentSituationModifiers.fromDocument(canvas.scene);
+ * 
+ * Get modifiers for a specific actor:
+ * > const actor = game.actors.getName('John Doe');
+ * > const modifiers = DocumentSituationModifiers.fromDocument(actor);
+ * > // or
+ * > // const modifiers = actor.getSituationModifiers();
+ * > // NOTE: actor modifiers will take scene modifiers into account when it's a token actor.
+ * 
+ * Access modifier total value for any modifier category:
+ * > const modifiers = DocumentSituationModifiers.fromDocument(canvas.scene);
+ * > const total = modifiers.getTotalFor('noise');
+ * > // or
+ * > // modifiers.noise.apply();
+ * > // const total = modifiers.noise.total;
+ * 
+ * Access any modifier total:
+ * > const modifiers = DocumentSituationModifiers.fromDocument(canvas.scene);
+ * > modifiers.applyAll();
+ * > const total = modifiers.getTotalFor('background_count');
+ * 
+ * Change modifiers for a document:
+ * > const modifiers = DocumentSituationModifiers.fromDocument(canvas.scene);
+ * > modifiers.environmental.set('light', -3);
+ * > await modifiers.updateDocument();
  */
 export class DocumentSituationModifiers {
     // A reference to the original document holding modifier source data.

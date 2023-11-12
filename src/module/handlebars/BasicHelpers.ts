@@ -2,6 +2,7 @@ import { Helpers } from '../helpers';
 import {SafeString} from "handlebars";
 import SkillField = Shadowrun.SkillField;
 import {SR5Actor} from "../actor/SR5Actor";
+import {SYSTEM_NAME} from "../constants";
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
@@ -163,5 +164,38 @@ export const registerBasicHelpers = () => {
         const copy = [...vals];
         copy.splice(-1); //Remove handlebars options object from last item in array
         return copy;
+    });
+
+    /**
+     * Checks if an element should be displayed based on the value of the MarkImports Setting
+     * 'ANY' option returns true as long as the setting isn't set to 'NONE'
+     */
+    Handlebars.registerHelper('itemMarking', function(element: string) {
+        const mark = game.settings.get(SYSTEM_NAME, 'MarkImports');
+        if (element == 'ANY' && mark != 'NONE') {
+            return true;
+        }
+        if (mark == element || mark == 'BOTH') {
+            return true;
+        }
+        return false;
+    });
+
+    /**
+     * Check whether an actor has any items that are freshly imported
+     */
+    Handlebars.registerHelper('hasAnyFreshImports', function(actor: SR5Actor) {
+        if (game.settings.get(SYSTEM_NAME, 'MarkImports') != 'NONE') {
+            const allItems = actor.items;
+            for (const item of allItems) {
+                if (item.system.importFlags) {
+                    if (item.system.importFlags.isFreshImport) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     });
 };

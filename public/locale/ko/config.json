@@ -1193,7 +1193,6 @@
     "SR5.WalkingSpeed": "걷는 중",
     "SR5.Warnings": {
         "AlreadyExistingInventory": "해당 이름의 소지품 위치가 이미 존재함",
-        "CantConsumeEquippedAmmo": "장착된 탄약의 개수가 충분하지 않음",
         "CantEditDefaultInventory": "기본 소지품 위치의 이름은 재설정할 수 없음",
         "CantExtendTest": "해당 종류의 테스트는 연장 불가",
         "CantExtendTestFurther": "주사위가 남거나 성공 값을 넘겨서 테스트를 연장할 수 없음",

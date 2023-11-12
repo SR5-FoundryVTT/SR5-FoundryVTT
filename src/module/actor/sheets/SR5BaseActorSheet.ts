@@ -201,7 +201,8 @@ export class SR5BaseActorSheet extends ActorSheet {
     override get template() {
         const path = 'systems/shadowrun5e/dist/templates';
 
-        if (this.actor.limited) {
+        // v10 actor.limited doesn't take GM into account, so we have to do it ourselves.
+        if (!game.user?.isGM && this.actor.limited) {
             return `${path}/actor-limited/${this.actor.type}.html`;
         }
 
@@ -358,6 +359,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Situation modifiers application
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
+        // Freshly imported item toggle
+        html.find('.toggle-fresh-import-all-off').on('click', async (event) => this._toggleAllFreshImportFlags(event, false));
+        html.find('.toggle-fresh-import-all-on').on('click', async (event) => this._toggleAllFreshImportFlags(event, true));
+
+        // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
     }
 
@@ -1034,7 +1040,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         sheetData.isSpirit = this.actor.isSpirit();
         sheetData.isCritter = this.actor.isCritter();
         sheetData.hasSkills = this.actor.hasSkills;
-        sheetData.hasSpecial = this.actor.hasSpecial;
+        sheetData.canAlterSpecial = this.actor.canAlterSpecial;
         sheetData.hasFullDefense = this.actor.hasFullDefense;
     }
 
@@ -1824,6 +1830,21 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _onShowSituationModifiersApplication(event) {
         new SituationModifiersApplication(this.actor).render(true);
+    }
+
+    /**
+     * Toggle to isFreshImport property of importFlags for all items on the character sheet
+     *
+     * @param event
+     */
+    async _toggleAllFreshImportFlags(event, onOff: boolean) {
+        const allItems = this.actor.items;
+        console.debug('Toggling all importFlags on owned items to ->', onOff, event);
+        for (const item of allItems) {
+            if (item.system.importFlags) {
+                await item.update({ 'system.importFlags.isFreshImport': onOff });
+            }
+        }
     }
 
     /**

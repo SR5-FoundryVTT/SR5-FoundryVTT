@@ -194,6 +194,10 @@ export class CharacterInfoUpdater {
     }
 
     importAttributes(system, chummerChar) {
+        if(!chummerChar.attributes) {
+            return;
+        }
+
         const atts = chummerChar.attributes[1].attribute;
         atts.forEach((att) => {
             try {
@@ -221,16 +225,16 @@ export class CharacterInfoUpdater {
     }
 
     importSkills(system, chummerChar) {
-        const chummerSkills = chummerChar.skills.skill;
+        const chummerSkills = chummerChar.skills?.skill;
 
         try {
-            let languageSkills = chummerSkills.filter(skill => skill.islanguage && skill.islanguage.toLowerCase() === 'true')
+            let languageSkills = chummerSkills?.filter(skill => skill.islanguage && skill.islanguage.toLowerCase() === 'true') ?? []
             this.handleLanguageSkills(system, languageSkills)
     
-            let knowledgeSkills = chummerSkills.filter(skill => skill.rating > 0 && skill.knowledge && skill.knowledge.toLowerCase() === 'true')
+            let knowledgeSkills = chummerSkills?.filter(skill => skill.rating > 0 && skill.knowledge && skill.knowledge.toLowerCase() === 'true') ?? []
             this.handleKnowledgeSkills(system, knowledgeSkills)
     
-            let activeSkills = chummerSkills.filter( skill => skill.rating > 0 && !languageSkills.includes(skill) && !knowledgeSkills.includes(skill) );
+            let activeSkills = chummerSkills?.filter( skill => skill.rating > 0 && !languageSkills.includes(skill) && !knowledgeSkills.includes(skill) ) ?? [];
             this.handleActiveSkills(system, activeSkills)
         } catch (e) {
             console.error(e);
