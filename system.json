@@ -18,7 +18,7 @@
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.15.3",
+  "version": "0.16.0",
   "compatibility": {
     "minimum": "11",
     "maximum": "11",
