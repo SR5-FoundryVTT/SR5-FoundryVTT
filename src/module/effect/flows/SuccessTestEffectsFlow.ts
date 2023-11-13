@@ -37,26 +37,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             // Organize non-disabled effects by their application priority            
             if (!effect.active) continue;
 
-            // Filter effects that don't apply to this test.
-            const tests = effect.selectionTests;
-            // Opposed tests use the same item as the success test but normally don't apply effects from it.
-            // However if an effect defines a test, it should apply to it.
-            if (tests.length === 0 && this.test.opposing) continue;
-            if (tests.length > 0 && !tests.includes(this.test.type)) continue;
-
-            const skills = effect.selectionSkills;
-            const skill = this.test.data.action.skill;
-            if (skills.length > 0 && !skills.includes(skill)) continue;
-
-            const attributes = effect.selectionAttributes;
-            const attribute = this.test.data.action.attribute;
-            const attribute2 = this.test.data.action.attribute2;
-            if (attributes.length > 0 && attribute && !attributes.includes(attribute)) continue;
-            if (attributes.length > 0 && attribute2 && !attributes.includes(attribute2)) continue;
-
-            const limits = effect.selectionLimits;
-            const limit = this.test.data.action.limit.attribute;
-            if (limits.length > 0 && !limits.includes(limit)) continue;
+            if (this._skipEffectForTestLimitations(effect)) continue;
 
             // Collect all changes of effect left.
             changes.push(...effect.changes.map(change => {
@@ -78,6 +59,46 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             if (!change.key) continue;
             change.effect.apply(this.test, change);
         }
+    }
+
+    /**
+     * Should this effect be skipped for this test?
+     * 
+     * Check all limitations of the effect against the test.
+     * 
+     * There is a few special cases to consider:
+     * - effects limit a category (skill, attribute), but the test doesn't use that category.
+     *   in that case the effect shouldn't apply.
+     * - effects that don't limit the test type, shouldn't apply to opposed tests
+     *   however, if a test limitation is used, it should still apply. 
+     * 
+     * @param effect An apply-to 'test_all' effect with possible test limitations.
+     * @returns 
+     */
+    _skipEffectForTestLimitations(effect: SR5ActiveEffect) {
+        // Filter effects that don't apply to this test.
+        const tests = effect.selectionTests;
+        // Opposed tests use the same item as the success test but normally don't apply effects from it.
+        // However if an effect defines a test, it should apply to it.
+        if (tests.length === 0 && this.test.opposing) return true;
+        if (tests.length > 0 && !tests.includes(this.test.type)) return true;
+
+        const skills = effect.selectionSkills;
+        const skill = this.test.data.action.skill;
+        if (skills.length > 0 && !skills.includes(skill)) return true;
+
+        const attributes = effect.selectionAttributes;
+        const attribute = this.test.data.action.attribute;
+        const attribute2 = this.test.data.action.attribute2;
+        if (attributes.length > 0 && attribute && !attributes.includes(attribute)) return true;
+        if (attributes.length > 0 && attribute2 && !attributes.includes(attribute2)) return true;
+        if (attributes.length > 0 && !attribute && !attribute2) return true;
+
+        const limits = effect.selectionLimits;
+        const limit = this.test.data.action.limit.attribute;
+        if (limits.length > 0 && !limits.includes(limit)) return true;
+
+        return false;
     }
 
     /**
