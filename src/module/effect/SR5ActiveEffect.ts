@@ -189,6 +189,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         return tagifyFlagsToIds(this, 'selection_skills');
     }
 
+    get selectionAttributes(): string[] {
+        return tagifyFlagsToIds(this, 'selection_attributes');
+    }
+
+    get selectionLimits(): string[] {
+        return tagifyFlagsToIds(this, 'selection_limits');
+    }
+
     /**
      * Check if this effect should be applied in any context, depending on it's parent items state.
      * 

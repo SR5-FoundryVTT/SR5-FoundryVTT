@@ -131,6 +131,8 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
             case 'test_all':
                 this._prepareTestSelectionTagify(html);
                 this._prepareSkillSelectionTagify(html);
+                this._prepareAttributesSelectionTagify(html);
+                this._prepareLimitsSelectionTagify(html);
                 break;
         }
     }
@@ -171,6 +173,28 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         const options = Object.entries(actor.getActiveSkills()).map(([id, skill]) => ({label: skill.label ?? skill.name, id}));
         const maxItems = options.length;
         const value = this.object.getFlag('shadowrun5e', 'selection_skills') as string;
+        const selected = value ? JSON.parse(value) : [];
+
+        createTagifyOnInput(inputElement, options, maxItems, selected);
+    }
+
+    _prepareAttributesSelectionTagify(html: JQuery) {
+        const inputElement = html.find('input#attribute-selection').get(0) as HTMLInputElement;
+
+        const options = Object.entries(SR5.attributes).map(([attribute, label]) => ({label, id: attribute}));
+        const maxItems = options.length;
+        const value = this.object.getFlag('shadowrun5e', 'selection_attributes') as string;
+        const selected = value ? JSON.parse(value) : [];
+
+        createTagifyOnInput(inputElement, options, maxItems, selected);
+    }
+
+    _prepareLimitsSelectionTagify(html: JQuery) {
+        const inputElement = html.find('input#limit-selection').get(0) as HTMLInputElement;
+
+        const options = Object.entries(SR5.limits).map(([limit, label]) => ({label, id: limit}));
+        const maxItems = options.length;
+        const value = this.object.getFlag('shadowrun5e', 'selection_limits') as string;
         const selected = value ? JSON.parse(value) : [];
 
         createTagifyOnInput(inputElement, options, maxItems, selected);

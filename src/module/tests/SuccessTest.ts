@@ -1273,6 +1273,7 @@ export class SuccessTest {
      * NOTE: Currently none of these methods trigger Foundry hooks.
      */
     async execute(): Promise<this> {
+        console.error(this);
         await this.populateTests();
         await this.populateDocuments();
         await this.prepareDocumentData();

@@ -43,8 +43,20 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
             const skills = effect.selectionSkills;
             const skill = this.test.data.action.skill;
-            if (skills.length > 0 && skill && !skills.includes(skill)) continue;
+            if (skills.length > 0 && !skills.includes(skill)) continue;
 
+            const selectedAttributes = [];
+            const attributes = effect.selectionAttributes;
+            const attribute = this.test.data.action.attribute;
+            const attribute2 = this.test.data.action.attribute2;
+            if (attributes.length > 0 && attribute && !attributes.includes(attribute)) continue;
+            if (attributes.length > 0 && attribute2 && !attributes.includes(attribute2)) continue;
+
+            const limits = effect.selectionLimits;
+            const limit = this.test.data.action.limit.attribute;
+            if (limits.length > 0 && !limits.includes(limit)) continue;
+
+            // Collect all changes of effect left.
             changes.push(...effect.changes.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
                 // TODO: Remove this crap... Clear the issue of submitting the SR5ActiveEffectConfig changing all data. to system.
@@ -114,7 +126,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Pool only tests will don't have actors attached.
         if (!this.test.actor) return;
         // Opposing tests do show the item, however shouldn't use effects from it.
-        if (this.test.opposing) return;
+        if (this.test.opposing) return console.error('Effects don\'t apply to opposing tests.');
 
         // Actor effects apply only for all tests.
         for (const effect of this.test.actor.effects as unknown as SR5ActiveEffect[]) {
