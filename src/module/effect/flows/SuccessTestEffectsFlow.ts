@@ -36,6 +36,15 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         for (const effect of this.allApplicable()) {
             // Organize non-disabled effects by their application priority            
             if (!effect.active) continue;
+
+            // Filter effects that don't apply to this test.
+            const tests = effect.selectionTests;
+            if (tests.length > 0 && !tests.includes(this.test.type)) continue;
+
+            const skills = effect.selectionSkills;
+            const skill = this.test.data.action.skill;
+            if (skills.length > 0 && skill && !skills.includes(skill)) continue;
+
             changes.push(...effect.changes.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
                 // TODO: Remove this crap... Clear the issue of submitting the SR5ActiveEffectConfig changing all data. to system.

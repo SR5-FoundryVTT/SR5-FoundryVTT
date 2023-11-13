@@ -88,6 +88,21 @@
                 </select>
             </div>
         </div>
+
+        {{#ife applyTo "test_all"}}
+        <div class="form-group">
+            <label>{{ localize "SR5.ActiveEffect.Test.Test" }}</label>
+            <div class="form-fields">
+                <input name="flags.shadowrun5e.selection_tests" id="test-selection" class="tagify-selection" data-dtype="Text"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>{{ localize "SR5.ActiveEffect.Test.Skill" }}</label>
+            <div class="form-fields">
+                <input name="flags.shadowrun5e.selection_skills" id="skill-selection" class="tagify-selection" data-dtype="Text"/>
+            </div>
+        </div>
+        {{/ife}}
     </section>
 
     <!-- Duration Tab -->

@@ -3,6 +3,7 @@ import { Helpers } from "../helpers";
 import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import { SYSTEM_NAME } from "../constants";
 import { SR5Item } from "../item/SR5Item";
+import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
 
 
 
@@ -178,6 +179,14 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     get onlyForEquipped(): boolean {
         return this.getFlag(SYSTEM_NAME, 'onlyForEquipped') as boolean || false;
+    }
+
+    get selectionTests(): string[] {
+        return tagifyFlagsToIds(this, 'selection_tests');
+    }
+
+    get selectionSkills(): string[] {
+        return tagifyFlagsToIds(this, 'selection_skills');
     }
 
     /**

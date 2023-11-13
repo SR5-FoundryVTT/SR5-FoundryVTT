@@ -1,4 +1,7 @@
+import { SR5Actor } from "../actor/SR5Actor";
 import { SR5 } from "../config";
+import { SuccessTest } from "../tests/SuccessTest";
+import { createTagify, createTagifyOnInput } from "../utils/sheets";
 import { SR5ActiveEffect } from "./SR5ActiveEffect";
 
 /**
@@ -49,6 +52,8 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         super.activateListeners(html);
 
         html.find('select[name="flags.shadowrun5e.applyTo"]').on('change', this._onApplyToChange.bind(this));
+
+        this._activateTagifyListeners(html);
     }
 
     /**
@@ -119,5 +124,55 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      */
     prepareEffectHasChanges(): boolean {
         return this.object.changes.length > 0;
+    }
+
+    _activateTagifyListeners(html: JQuery) {
+        switch (this.object.applyTo) {
+            case 'test_all':
+                this._prepareTestSelectionTagify(html);
+                this._prepareSkillSelectionTagify(html);
+                break;
+        }
+    }
+
+    _prepareTestSelectionTagify(html: JQuery) {
+        const inputElement = html.find('input#test-selection').get(0) as HTMLInputElement;
+
+        // Tagify expects this format for localized tags.
+        // @ts-expect-error TODO: I've been lazy and need proper typing of class SuccessTest
+        const options = Object.values(game.shadowrun5e.tests).map(((test: any) => ({
+            label: test.label, id: test.name
+        })));
+
+        // Tagify dropdown should show all whitelist tags.
+        const maxItems = options.length;
+
+        // Fetch current selections.
+        const value = this.object.getFlag('shadowrun5e', 'selection_tests') as string;
+        const selected = value ? JSON.parse(value) : [];
+        
+        createTagifyOnInput(inputElement, options, maxItems, selected);
+    }
+
+    _prepareSkillSelectionTagify(html: JQuery) {
+        const inputElement = html.find('input#skill-selection').get(0) as HTMLInputElement;
+
+        // Grab the top most actor in the document chain.
+        // This handles NestedItems and OwnedItems.
+        const getActor = (document) => {
+            if (!document) return;
+            if (document instanceof Actor) return document;
+            return getActor(document.parent);
+        }
+        const actor = getActor(this.object.parent) as SR5Actor;
+        // TODO: implement basic active skill list. see actions prep. _getSortedActiveSkillsForSelect
+        if (!actor) return;
+
+        const options = Object.entries(actor.getActiveSkills()).map(([id, skill]) => ({label: skill.label ?? skill.name, id}));
+        const maxItems = options.length;
+        const value = this.object.getFlag('shadowrun5e', 'selection_skills') as string;
+        const selected = value ? JSON.parse(value) : [];
+
+        createTagifyOnInput(inputElement, options, maxItems, selected);
     }
 }
