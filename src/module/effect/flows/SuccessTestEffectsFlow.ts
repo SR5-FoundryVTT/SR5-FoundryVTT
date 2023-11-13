@@ -39,13 +39,15 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
             // Filter effects that don't apply to this test.
             const tests = effect.selectionTests;
+            // Opposed tests use the same item as the success test but normally don't apply effects from it.
+            // However if an effect defines a test, it should apply to it.
+            if (tests.length === 0 && this.test.opposing) continue;
             if (tests.length > 0 && !tests.includes(this.test.type)) continue;
 
             const skills = effect.selectionSkills;
             const skill = this.test.data.action.skill;
             if (skills.length > 0 && !skills.includes(skill)) continue;
 
-            const selectedAttributes = [];
             const attributes = effect.selectionAttributes;
             const attribute = this.test.data.action.attribute;
             const attribute2 = this.test.data.action.attribute2;
@@ -125,9 +127,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     *allApplicable(): Generator<SR5ActiveEffect> {
         // Pool only tests will don't have actors attached.
         if (!this.test.actor) return;
-        // Opposing tests do show the item, however shouldn't use effects from it.
-        if (this.test.opposing) return console.error('Effects don\'t apply to opposing tests.');
-
+        
         // Actor effects apply only for all tests.
         for (const effect of this.test.actor.effects as unknown as SR5ActiveEffect[]) {
             if (effect.applyTo === 'test_all') yield effect;
