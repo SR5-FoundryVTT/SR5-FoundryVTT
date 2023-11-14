@@ -1,16 +1,15 @@
 
 //todo: v10 foundry-vtt-types 
+
+import LowLightVisionFilter from "./lowlightFilter";
+
 //@ts-expect-error
 export default class LowlightVisionDetectionMode extends DetectionMode {
 
   //@ts-expect-error
   static override getDetectionFilter() {
     //@ts-expect-error
-    return this._detectionFilter ??= OutlineOverlayFilter.create({
-      outlineColor: [0, 1, 0, 1],
-      knockout: true,
-      wave: true
-    })
+    return this._detectionFilter ??= LowLightVisionFilter.create();
   }
 
   
