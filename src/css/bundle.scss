@@ -35,7 +35,6 @@
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
-
         >* {
             flex: 0;
         }
@@ -512,6 +511,7 @@ input[type='text'].display {
 
     .profile-img {
         padding: 0.25em;
+        min-width: 80px; // should also have a min width
         max-width: 100px;
         //border-right: $groove;
         //border-bottom: $groove;
@@ -834,6 +834,7 @@ input[type='text'].display {
 
             .item-img {
                 padding-right: 0.25em;
+                min-width: 28px; //needed for quality fix
                 max-width: 50px;
 
                 &.item-roll {
@@ -894,6 +895,7 @@ input[type='text'].display {
 
                 &.item-name {
                     text-align: left;
+                    display: flex;
                     width: auto;
 
                     &.fresh-import {
@@ -989,7 +991,11 @@ input[type='text'].display {
         }
     }
 
-
+    .quality .list-item-content .item-text.item-name {
+        min-width: 5em;
+        max-width: 15em;
+        display: contents;
+    }
     .modified-target-damage {
         margin-top: $large-distance;
         margin-bottom: $large-distance;
