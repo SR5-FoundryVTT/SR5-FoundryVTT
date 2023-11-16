@@ -1573,7 +1573,8 @@
             "connection": 0,
             "loyalty": 0,
             "family": false,
-            "blackmail": false
+            "blackmail": false,
+            "group": false
         },
         "sin": {
             "templates": ["description", "technology", "importFlags"],

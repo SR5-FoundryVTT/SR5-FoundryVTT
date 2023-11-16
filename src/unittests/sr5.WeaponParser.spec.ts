@@ -21,7 +21,7 @@ function getData(damageString: string): object {
     });
 }
 
-export const weaponParserTesting = (context: QuenchBatchContext) => {
+export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
 
     let mut = new TestWeaponParser();

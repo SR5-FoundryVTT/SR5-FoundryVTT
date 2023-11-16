@@ -1,14 +1,19 @@
 
-import AugmentedRealityVisionFilter from './arFilter';
-
 //todo: v10 foundry-vtt-types 
+
+import AugmentedRealityVisionFilter from "./arFilter";
+
 //@ts-expect-error
 export default class AugmentedRealityVisionDetectionMode extends DetectionMode {
 
   //@ts-expect-error
   static override getDetectionFilter() {
     //@ts-expect-error
-    return (this._detectionFilter ??= AugmentedRealityVisionFilter.create());
+    return this._detectionFilter ??= AugmentedRealityVisionFilter.create();
+
+    // return this._detectionFilter ??= GlowOverlayFilter.create({
+    //   glowColor: [0, 0.25, 0.75, 1]
+    // });
   }
   
     //@ts-expect-error
