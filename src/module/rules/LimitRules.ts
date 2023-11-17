@@ -40,5 +40,13 @@ export const LimitRules = {
             base: magic.value,
             label: magic.label
         });
+     },
+
+     calculateInitiationSubmersionLimit(initiation: number): LimitField {
+        return DataDefaults.limitField({
+            base: initiation,
+            value: initiation,
+            label: SR5.limits.initiation
+        })
      }
 }
