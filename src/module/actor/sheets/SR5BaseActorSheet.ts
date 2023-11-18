@@ -1110,10 +1110,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.actor.clearMarks();
     }
 
-    _prepareSkillsWithFilters(data: SR5ActorSheetData) {
-        this._filterActiveSkills(data);
-        this._filterKnowledgeSkills(data);
-        this._filterLanguageSkills(data);
+    /**
+     * Prepare skills with sorting and filtering given by this sheet.
+     * 
+     * @param sheetData What is to be displayed on sheet.
+     */
+    _prepareSkillsWithFilters(sheetData: SR5ActorSheetData) {
+        this._filterActiveSkills(sheetData);
     }
 
     _filterSkills(data: SR5ActorSheetData, skills: Skills = {}) {
@@ -1182,22 +1185,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         let searchString = `${searchKey} ${name} ${specs}`;
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
-    }
-
-    _filterKnowledgeSkills(sheetData: SR5ActorSheetData) {
-        // Knowledge skill have separate sub-categories.
-        Object.keys(SR5.knowledgeSkillCategories).forEach((category) => {
-            if (!sheetData.system.skills.knowledge.hasOwnProperty(category)) {
-                console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
-                return;
-            }
-            sheetData.system.skills.knowledge[category].value = this._filterSkills(sheetData, sheetData.system.skills.knowledge[category].value);
-        });
-    }
-
-    _filterLanguageSkills(sheetData: SR5ActorSheetData) {
-        // Language Skills have no sub-categories.
-        sheetData.system.skills.language.value = this._filterSkills(sheetData, sheetData.system.skills.language.value);
     }
 
     _filterActiveSkills(sheetData: SR5ActorSheetData) {

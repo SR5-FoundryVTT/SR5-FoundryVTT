@@ -31,10 +31,22 @@ export class Version0_16_0 extends VersionMigration {
     }
 
     protected override async ShouldMigrateActorData(actor: SR5Actor) {
-        return actor.type !== 'character' && actor.type !== 'critter' && actor.type !== 'vehicle';
+        return true;
     }
 
     protected override async MigrateActorData(actor: SR5Actor) {
-        return {data: {'visibilityChecks.meat.hasHeat': false}};
+        const updateData = {data: {}};       
+
+        // Some actors did have heat, when they shouldn't.
+        if (actor.type !== 'character' && actor.type !== 'critter' && actor.type !== 'vehicle') {
+            updateData.data['visibilityChecks.meat.hasHeat'] = false;
+        }
+
+        // Migrate magic character actors with wrong templates for initiation (initiation = {})
+        // @ts-expect-error
+        if (actor.system.magic && actor.system.magic.hasOwnProperty('initiation') && isNaN(actor.system.magic.initiation)) {
+            updateData.data['magic.initiation'] = 0;
+        }
+        return updateData;
     }
 }

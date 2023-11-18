@@ -9,7 +9,7 @@ declare namespace Shadowrun {
         cost: NumberOrEmpty
         equipped: boolean
         conceal: ModifiableValue
-        condition_monitor?: ConditionData
+        condition_monitor: ConditionData
         wireless: boolean
         networkController: string
     };

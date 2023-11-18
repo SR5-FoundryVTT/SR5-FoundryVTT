@@ -39,7 +39,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'echo',
             'metamagic',
             'critter_power',
-            'call_in_action'
+            'call_in_action',
+            'ritual'
         ];
     }
 

@@ -139,7 +139,7 @@ export class Migrator {
      */
     private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
         // Migrate World Compendium Packs
-        // @ts-expect-error TODO: foundry-vtt-types v10
+        // @ts-expect-error // v11 onwards uses packageType
         const packs = game.packs?.filter((pack) => pack.metadata.packageType === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
 
         if (!packs) return;

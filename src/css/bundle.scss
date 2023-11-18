@@ -35,7 +35,6 @@
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
-
         >* {
             flex: 0;
         }
@@ -512,6 +511,7 @@ input[type='text'].display {
 
     .profile-img {
         padding: 0.25em;
+        min-width: 80px; // should also have a min width
         max-width: 100px;
         //border-right: $groove;
         //border-bottom: $groove;
@@ -759,8 +759,7 @@ input[type='text'].display {
 
     .list-header,
     .list-item {
-        font-size: 85%;
-
+        font-size: var(--font-size-12);
         padding: 0.1em 0.25em;
         min-height: 26px;
         margin: 0.1em;
@@ -835,6 +834,7 @@ input[type='text'].display {
 
             .item-img {
                 padding-right: 0.25em;
+                min-width: 28px; //needed for quality fix
                 max-width: 50px;
 
                 &.item-roll {
@@ -895,6 +895,7 @@ input[type='text'].display {
 
                 &.item-name {
                     text-align: left;
+                    display: flex;
                     width: auto;
 
                     &.fresh-import {
@@ -915,8 +916,8 @@ input[type='text'].display {
                 }
 
                 &.rtg {
-                    width: 3em;
-
+                    min-width: 3em;
+                    max-width: 4em;
                     &.active-skills-rating {
                         padding-right: 1em;
                     }
@@ -929,6 +930,9 @@ input[type='text'].display {
 
                 &.desc {
                     width: 16em;
+                }
+                .content-inner{
+                    color: $white;
                 }
             }
 
@@ -987,7 +991,11 @@ input[type='text'].display {
         }
     }
 
-
+    .quality .list-item-content .item-text.item-name {
+        min-width: 5em;
+        max-width: 15em;
+        display: contents;
+    }
     .modified-target-damage {
         margin-top: $large-distance;
         margin-bottom: $large-distance;
@@ -1015,6 +1023,7 @@ input[type='text'].display {
 
         &:hover {
             cursor: pointer;
+            background: $bgrButton;
         }
 
         &.short {
@@ -1030,7 +1039,7 @@ input[type='text'].display {
     button.display.import-character {
         color: $color;
         border-color: $black;
-        background: $bgrButton;
+        background: $dark-sunken;
         border-radius: 0.3em;
         text-align: center;
 
@@ -1167,6 +1176,7 @@ input[type='text'].display {
 
 .list-header.item-section[data-item-id="weapon"][data-item-type=""] {
     color: $edge;  /* set the color to yellow */
+    font-size: small;
 }
 
 .common-test{

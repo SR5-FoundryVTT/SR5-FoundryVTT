@@ -1,18 +1,5 @@
 @import 'config';
 
-.sr5.skill-edit-window {
-    min-height: 200px;
-    min-width: 200px;
-    display: inline-block;
-
-    .wholesheet {
-        height: auto;
-        display: flex;
-        flex-flow: column nowrap;
-        overflow: hidden;
-    }
-}
-
 .sr5.actor {
     min-height: 690px;
     min-width: 800px;
@@ -24,7 +11,7 @@
     }
     .name {
         @include systemFonts;
-        background: url("assets/name-banner.webp") repeat;
+        background: url('assets/name-banner.webp') repeat;
         font-size: 200%;
         margin-bottom: 0;
         padding-left: 5px;
@@ -159,7 +146,7 @@
                         margin-left: 4px;
                     }
                     & > *:not(:last-child) {
-                            margin-right: 4px;
+                        margin-right: 4px;
                     }
                 }
                 &.between {
@@ -199,8 +186,29 @@
         align-items: center;
         align-content: center;
     }
+
+    // Interaction Element for Skill Lists
+    .skill-header {
+        @include rollable;
+    }
 }
 
 .sr5 #filter-skills.display.text.left {
     font-size: 15px;
+}
+
+/**
+ * Skill Editing Application
+ */
+.sr5.skill-edit-window {
+    min-height: 200px;
+    min-width: 370px;
+    display: inline-block;
+
+    .wholesheet {
+        height: auto;
+        display: flex;
+        flex-flow: column nowrap;
+        overflow: hidden;
+    }
 }

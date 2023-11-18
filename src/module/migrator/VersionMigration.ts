@@ -111,6 +111,8 @@ export abstract class VersionMigration {
      */
     protected async Apply(documentUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of documentUpdates) {
+            
+            const updateSystem = updateData.data ? {system: updateData.data} : updateData;
 
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
@@ -118,7 +120,7 @@ export abstract class VersionMigration {
             }
 
             if (updateData !== null ) {
-                await entity.update(updateData, { enforceTypes: false });
+                await entity.update(updateSystem, { enforceTypes: false });
             }
         }
     }
@@ -391,7 +393,7 @@ export abstract class VersionMigration {
 
                     if (updateData.data) {
                         expandObject(updateData.data);
-                        document.update(updateData.data);
+                        document.update({system: updateData.data});
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
@@ -413,7 +415,7 @@ export abstract class VersionMigration {
 
                     if (updateData.data) {
                         expandObject(updateData.data);
-                        await document.update(updateData.data);
+                        await document.update({system: updateData.data});
                     }
 
                 } else if (pack.metadata.type === 'Scene') {
