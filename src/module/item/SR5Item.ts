@@ -267,10 +267,13 @@ export class SR5Item extends Item {
         switch (this.type) {
             case 'host':
                 HostDataPreparation(this.system as Shadowrun.HostData);
+                break;
             case 'adept_power':
                 AdeptPowerPrep.prepareBaseData(this.system as unknown as Shadowrun.AdeptPowerData);
+                break;
             case 'sin':
                 SinPrep.prepareBaseData(this.system as unknown as Shadowrun.SinData);
+                break;
         }
     }
 
