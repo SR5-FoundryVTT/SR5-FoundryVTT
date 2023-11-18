@@ -9,6 +9,7 @@
     <!-- Effect Configuration Tabs -->
     <nav class="sheet-tabs tabs">
         <a class="item" data-tab="details"><i class="fas fa-book"></i> {{localize "EFFECT.TabDetails"}}</a>
+        <a class="item" data-tab="applyTo"><i class="fas fa-filter"></i> {{localize "SR5.ActiveEffect.ApplyTo"}}</a>
         <a class="item" data-tab="duration"><i class="fas fa-clock"></i> {{localize "EFFECT.TabDuration"}}</a>
         <a class="item" data-tab="effects"><i class="fas fa-cogs"></i> {{localize "EFFECT.TabEffects"}}</a>
         <a class="item" data-tab="help"><i class="fas fa-book"></i> {{localize "SR5.Help"}}</a>
@@ -61,7 +62,11 @@
                 <input type="checkbox" name="transfer" {{checked data.transfer}}/>
             </div>
         </div>
+        {{/if}}
+    </section>
 
+    <section class="tab" data-tab="applyTo">
+        {{#if isItemEffect}}
         <div class="form-group">
             <label>{{ localize "SR5.ActiveEffect.OnlyForWireless" }}</label>
             <div class="form-fields">
