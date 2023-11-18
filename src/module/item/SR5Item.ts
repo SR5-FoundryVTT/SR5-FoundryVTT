@@ -71,6 +71,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
  * 
  * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
+ * NOTE: still not fixed with esbuild@0.19.5
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 ActionResultFlow; // DON'T TOUCH!

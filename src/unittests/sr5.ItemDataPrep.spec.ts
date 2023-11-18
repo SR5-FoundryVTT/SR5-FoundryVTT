@@ -139,7 +139,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         it('Check for ammo to apply its damage to the weapon', async () => {
             const weapon = new SR5Item({type: 'weapon', name: 'Test'});
             //@ts-expect-error
-            const ammo = new SR5Item({type: 'ammo', name: 'TestModA', 'system.damage': 2});
+            const ammo = new SR5Item({type: 'ammo', name: 'TestModA',system: {damage: 2}});
             
             ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
             ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
