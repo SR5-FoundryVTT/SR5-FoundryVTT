@@ -1,7 +1,7 @@
 import {Helpers} from '../helpers';
 import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
-import {onManageActiveEffect, prepareActiveEffectCategories, prepareItemEffects} from "../effects";
+import {onManageActiveEffect, prepareItemEffects} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';

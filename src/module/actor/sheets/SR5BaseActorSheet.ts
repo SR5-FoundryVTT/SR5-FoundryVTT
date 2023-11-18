@@ -2,7 +2,7 @@ import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
-import {onManageActiveEffect, onManageItemActiveEffect, prepareActiveEffectCategories, prepareItemEffects} from "../../effects";
+import {onManageActiveEffect, onManageItemActiveEffect, prepareItemEffects} from "../../effects";
 import {SR5} from "../../config";
 import {SkillEditSheet} from "../../apps/skills/SkillEditSheet";
 import {SR5Actor} from "../SR5Actor";

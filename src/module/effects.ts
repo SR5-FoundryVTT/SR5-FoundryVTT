@@ -66,6 +66,10 @@ export async function onManageItemActiveEffect(event: MouseEvent) {
     const icon = event.currentTarget;
     const listItem = event.currentTarget.closest('.list-item-effect');
     const uuid = listItem.dataset.itemId;
+    // Foundry doesn't support direct update on nested item effects.
+    // Instead of implementing a custom solution, we just show an error message.
+    // In the future NestedItems should be replaced by a linked items approach.
+    if (effectUuidIsNestedItem(uuid)) return ui.notifications.error("Effects on nested items can't be managed. Move the item to the sidebar to manage.");
     const effect = await fromUuid(uuid) as SR5ActiveEffect;
     if (!effect) return;
 
@@ -82,42 +86,14 @@ export async function onManageItemActiveEffect(event: MouseEvent) {
 }
 
 /**
- * Prepare the data structure for Active Effects which are currently applied to an Actor or Item.
- * @param {ActiveEffect[]} effects    The array of Active Effect instances to prepare sheet data for
- * @return {object}                   Data for rendering
+ * Determine if a uuid points to a effect within a nested item.
+ * 
+ * These can't be managed with Foundry v11.
+ * @param uuid 
+ * @returns true, when the uuid points to a nested item effect.
  */
-export function prepareActiveEffectCategories(effects): EffectsSheetData {
-
-    // Define effect header categories
-    const categories = {
-        temporary: {
-            type: "temporary",
-            label: game.i18n.localize("SR5.ActiveEffect.Types.Temporary"),
-            tooltip: game.i18n.localize("SR5.Tooltips.Effect.Temporary"),
-            effects: []
-        },
-        persistent: {
-            type: "persistent",
-            label: game.i18n.localize("SR5.ActiveEffect.Types.Persistent"),
-            tooltip: game.i18n.localize("SR5.Tooltips.Effect.Persistent"),
-            effects: []
-        },
-        inactive: {
-            type: "inactive",
-            label: game.i18n.localize("SR5.ActiveEffect.Types.Inactive"),
-            tooltip: game.i18n.localize("SR5.Tooltips.Effect.Inactive"),
-            effects: []
-        }
-    };
-
-    // Iterate over active effects, classifying them into categories
-    for (const effect of effects) {
-        if (effect.disabled) categories.inactive.effects.push(effect);
-        else if (effect.isTemporary) categories.temporary.effects.push(effect);
-        else categories.persistent.effects.push(effect);
-    }
-
-    return categories;
+export function effectUuidIsNestedItem(uuid: string) {
+    return (uuid.match(/Item./g) || []).length >= 2;
 }
 
 /**
