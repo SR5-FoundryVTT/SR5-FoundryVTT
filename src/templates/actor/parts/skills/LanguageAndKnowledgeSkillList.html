@@ -2,7 +2,7 @@
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
             name=(localize 'SR5.Languages')
             icons=(SkillHeaderIcons 'language')
-            rightSide=(SkillHeaderRightSide 'language' filters)
+            rightSide=(SkillHeaderRightSide 'language')
     }}
     {{#each system.skills.language.value as |skill sid|}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
@@ -20,7 +20,7 @@
             name=(localizeOb cid ../config.knowledgeSkillCategories)
             itemId=cid
             icons=(SkillHeaderIcons 'knowledge')
-            rightSide=(SkillHeaderRightSide 'knowledge' ../filters)
+            rightSide=(SkillHeaderRightSide 'knowledge')
     }}
         {{#each cat.value as |skill sid|}}
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
