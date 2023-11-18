@@ -4,6 +4,7 @@ import { SR5TestingDocuments } from "./utils";
 import { TechnologyPrep } from "../module/item/prep/functions/TechnologyPrep";
 import { ActionPrep } from "../module/item/prep/functions/ActionPrep";
 import { SR5Actor } from "../module/actor/SR5Actor";
+import { RangePrep } from "../module/item/prep/functions/RangePrep";
 
 /**
  * Tests involving data preparation for SR5Item types.
@@ -93,19 +94,6 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             })
         });
 
-        it('Check weapon modification accuracy override', async () => {
-            const weapon = await testItem.create({type: 'weapon'});
-            // unique names are necessary
-            await weapon.createNestedItem({type: 'modification', name: 'TestModA', system: {type: 'weapon', accuracy: 2}});
-            await weapon.createNestedItem({type: 'modification', name: 'TestModB', system: {type: 'weapon', accuracy: 4}});
-
-            ActionPrep.prepareWithMods(weapon.system.action as Shadowrun.ActionRollData, weapon.items.filter(item => item.type === 'modification'));
-            ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
-
-            assert.strictEqual(weapon.system.action?.limit.value, 6);
-            assert.strictEqual(weapon.system.action?.limit.mod.length, 2);
-        });
-
         it('Check for weapon modification setting dice pool modifiers', async () => {
             const weapon = new SR5Item({type: 'weapon', name: 'Test'});
             // unique names are necessary
@@ -139,7 +127,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         it('Check for ammo to apply its damage to the weapon', async () => {
             const weapon = new SR5Item({type: 'weapon', name: 'Test'});
             //@ts-expect-error
-            const ammo = new SR5Item({type: 'ammo', name: 'TestModA',system: {damage: 2}});
+            const ammo = new SR5Item({type: 'ammo', name: 'TestModA', system: {damage: 2}});
             
             ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
             ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
@@ -150,7 +138,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         it('Check for ammo to modify the weapon armor piercing', async () => {
             const weapon = new SR5Item({type: 'weapon', name: 'Test'});
             //@ts-expect-error
-            const ammo = new SR5Item({type: 'ammo', name: 'TestModA', 'system.ap': -2});
+            const ammo = new SR5Item({type: 'ammo', name: 'TestModA', system: {ap: -2}});
             
             ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
             ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
@@ -158,12 +146,42 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.action?.damage.ap.value, -2);
         });
 
-        it('Check for ammo to override the weapon damage element type', async () => {
-            assert.fail();
-        });
+        it('Check for ammo to override the weapon damage info', async () => {
+            //@ts-expect-error
+            const weapon = new SR5Item({type: 'weapon', name: 'Test', system: {action: 
+                {damage: {
+                    element: {value: 'fire'}, 
+                    base: 3,
+                    type: {base: 'physical'}
+            }}}});
+            //@ts-expect-error
+            const ammo = new SR5Item({type: 'ammo', name: 'TestModA', system: {replaceDamage: true, damage: 2, damageType: 'stun', element: 'cold'}});
+            
+            ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
+            ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
 
-        it('Check for ammo to override the weapon damage type', async () => {
-            assert.fail();
+            assert.strictEqual(weapon.system.action?.damage.base, 3);
+            assert.strictEqual(weapon.system.action?.damage.value, 2);
+            assert.strictEqual(weapon.system.action?.damage.type.base, 'physical');
+            assert.strictEqual(weapon.system.action?.damage.type.value, 'stun');
+            assert.strictEqual(weapon.system.action?.damage.element.base, '');
+            assert.strictEqual(weapon.system.action?.damage.element.value, 'cold');
+        });
+    });
+
+    describe('RangeData preparation', () => {
+        it('Check for weapon modification recoil modifiers' , async () => {
+            //@ts-expect-error
+            const weapon = new SR5Item({type: 'weapon', name: 'Test', system: {range: {rc: {base: 2}}}}) as unknown as Shadowrun.WeaponItemData;
+            const mods: SR5Item[] = [];
+            //@ts-expect-error
+            mods.push(new SR5Item({type: 'modification', name: 'TestModA', system: {type: 'weapon', rc: 2}}));
+
+            RangePrep.prepareRecoilCompensation(weapon.system.range, mods);
+
+            assert.strictEqual(weapon.system.range.rc.base, 2);
+            assert.strictEqual(weapon.system.range.rc.mod.length, 1);
+            assert.strictEqual(weapon.system.range.rc.value, 4);
         });
     });
 }

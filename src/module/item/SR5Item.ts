@@ -241,6 +241,7 @@ export class SR5Item extends Item {
         // Description labels might have changed since last data prep.
         this.labels = {};
         
+        // Collect the equipped modifying nested items.
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
 
@@ -252,10 +253,7 @@ export class SR5Item extends Item {
         
         const action = this.getAction();
         if (action) {
-            ActionPrep.prepareDamageSource(action, this);
-            ActionPrep.prepareWithAmmo(action, equippedAmmo);
-            ActionPrep.prepareWithMods(action, equippedMods);
-            ActionPrep.calculateValues(action);
+            ActionPrep.prepareData(action, this, equippedMods, equippedAmmo);
         }
 
         const range = this.getWeaponRange();

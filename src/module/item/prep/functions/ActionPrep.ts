@@ -6,6 +6,33 @@ import { SR5Item } from './../../SR5Item';
  */
 export const ActionPrep = {
     /**
+     * Main preparation method for actions prep.
+     * @param action The ActionRollData to alter.
+     * @param item The item to use as a source.
+     * @param equippedMods Equipped modifications on that item.
+     * @param equippedAmmo Equipped ammunition on that item.
+     */
+    prepareData(action: Shadowrun.ActionRollData, item: SR5Item, equippedMods: SR5Item[], equippedAmmo?: SR5Item) {
+        ActionPrep.clearMods(action);
+        ActionPrep.prepareDamageSource(action, item);
+        ActionPrep.prepareWithMods(action, equippedMods);
+        ActionPrep.prepareWithAmmo(action, equippedAmmo);
+        ActionPrep.calculateValues(action);
+    },
+    /**
+     * remove any possible previous mods that might have been introduced by preparation or alteration in system data.
+     * 
+     * @param action The ActionRollData to alter.
+     */
+    clearMods(action: Shadowrun.ActionRollData) {
+        action.alt_mod = 0;
+        action.limit.mod = [];
+        action.damage.mod = [];
+        action.damage.ap.mod = [];
+        action.dice_pool_mod = [];
+    },
+
+    /**
      * Provide the action damage a source for the damage calculation.
      * 
      * @param action The ActionRollData to alter.
@@ -80,12 +107,6 @@ export const ActionPrep = {
      * @param equippedMods Those item mods that are equipped
      */
     prepareWithMods(action: Shadowrun.ActionRollData, equippedMods: SR5Item[]) {
-        action.alt_mod = 0;
-        action.limit.mod = [];
-        action.damage.mod = [];
-        action.damage.ap.mod = [];
-        action.dice_pool_mod = [];
-
         // @ts-expect-error
         // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
         if (action.damage.base_formula_operator === '+') {
