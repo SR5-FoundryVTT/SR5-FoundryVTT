@@ -1335,11 +1335,15 @@ export class SR5Actor extends Actor {
     }
 
     async addPhysicalDamage(damage: Shadowrun.DamageData) {
-        if (damage.type.value !== 'physical') return damage;
+        if (damage.type.value !== 'physical') {
+            return damage;
+        }
+        
 
         const track = this.getPhysicalTrack();
-        if (!track)
+        if (!track) {
             return damage;
+        }  
 
         const {overflow, rest} = this._calcDamageOverflow(damage, track);
 

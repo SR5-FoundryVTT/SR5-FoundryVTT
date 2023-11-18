@@ -35,10 +35,24 @@ export const LimitRules = {
      * @params magic The magic attribute to use.
      * @returns A magic limit field based on the magic attribute
      */
-     calculateMagicLimit(magic: AttributeField): LimitField {
+    calculateMagicLimit(magic: AttributeField): LimitField {
         return DataDefaults.limitField({
             base: magic.value,
             label: magic.label
         });
-     }
+    },
+
+    /**
+     * Derive the initiation limit of a character from its initiation rank.
+     * @param initiation The rank of initiation.
+     * @returns A hidden limit as to not show it on the sheet limits.
+     */
+    calculateInitiationSubmersionLimit(initiation: number): LimitField {
+        return DataDefaults.limitField({
+            base: initiation,
+            value: initiation,
+            label: SR5.limits.initiation,
+            hidden: true
+        })
+    }
 }
