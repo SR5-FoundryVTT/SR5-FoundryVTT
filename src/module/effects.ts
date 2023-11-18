@@ -124,14 +124,13 @@ export function prepareActiveEffectCategories(effects): EffectsSheetData {
  * Collect all enabled Active Effects which are present on any owned or nested Item.
  * 
  * TODO: Move into data preparation phase, similar to how actor.effects works.
- * @param actor The actor collect effects from.
+ * @param document The document to collect item effects from.
  * @returns A data object containing all enabled effects with their name as key and sorted alphabetically.
  */
-export function prepareEnabledItemEffectsApplyingToActor(actor: SR5Actor): Shadowrun.AllEnabledEffectsSheetData {
+export function prepareItemEffects(document: SR5Actor|SR5Item): Shadowrun.AllEnabledEffectsSheetData {
     const enabledEffects: Shadowrun.AllEnabledEffectsSheetData = [];
 
-    for (const effect of allEnabledItemEffects(actor)) {
-        if (effect.applyTo !== 'actor') continue;
+    for (const effect of allEnabledItemEffects(document)) {
         enabledEffects.push(effect);
     }
 
@@ -143,14 +142,16 @@ export function prepareEnabledItemEffectsApplyingToActor(actor: SR5Actor): Shado
 
 /**
  * Iterator for all enabled effects of an actors owned and nested items.
- * @param actor 
+ * @param document 
  */
-function *allEnabledItemEffects(actor: SR5Actor) {
-    for (const item of actor.items) {
+function *allEnabledItemEffects(document: SR5Actor|SR5Item) {
+    for (const item of document.items) {
         for (const effect of item.effects) {
             if (effect.skipApply(item)) continue;
             yield effect;
         }
+
+        if (document instanceof SR5Item) continue;
 
         for (const nestedItem of item.items) {
             for (const effect of nestedItem.effects) {

@@ -353,7 +353,7 @@ export const registerItemLineHelpers = () => {
                         }
                     }
                 ]
-            case 'enabledEffects':
+            case 'itemEffects':
                 return [
                     {
                         text: {
@@ -371,6 +371,19 @@ export const registerItemLineHelpers = () => {
                             // This way the header column is empty (as no +Add makes sense)
                             // However the line column contains the normal interaction icons.
                             text: ''
+                        }
+                    }
+                ]
+            case 'effects':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.ActiveEffect.ApplyTo')
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Duration')
                         }
                     }
                 ]
@@ -675,14 +688,12 @@ export const registerItemLineHelpers = () => {
     /**
      * Used for the actor sheets display of active effects.
      */
-    Handlebars.registerHelper('ItemEffectRightSide', function (effect: SR5ActiveEffect) {
-        console.error(effect);
-
+    Handlebars.registerHelper('EffectRightSide', function (effect: SR5ActiveEffect) {
         const getDurationLabel = () => {
             // @ts-expect-error
             if (effect.duration.seconds) return `${effect.duration.seconds}s`;
             // @ts-expect-error
-            if (effect.duration.rounds) return `${effect.duration.rounds}R`;
+            if (effect.duration.rounds) return `${effect.duration.rounds}r`;
 
             return '';
         }

@@ -1,9 +1,10 @@
 import {Helpers} from '../helpers';
 import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
-import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
+import {onManageActiveEffect, prepareActiveEffectCategories, prepareItemEffects} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -32,7 +33,8 @@ interface FoundryItemSheetData {
 export interface SR5BaseItemSheetData extends FoundryItemSheetData {
     // SR5-FoundryVTT configuration
     config: typeof SR5
-    effects: Shadowrun.EffectsSheetData
+    effects: SR5ActiveEffect[]
+    itemEffects: SR5ActiveEffect[]
     // FoundryVTT rollmodes
     rollModes: CONFIG.Dice.RollModes
 }
@@ -170,8 +172,8 @@ export class SR5ItemSheet extends ItemSheet {
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
 
-        // Active Effects data.
-        data['effects'] = prepareActiveEffectCategories(this.item.effects);
+        data['effects'] = this.item.effects.contents;
+        data['itemEffects'] = prepareItemEffects(this.object);
 
         if (this.item.isHost) {
             data['markedDocuments'] = this.item.getAllMarkedDocuments();

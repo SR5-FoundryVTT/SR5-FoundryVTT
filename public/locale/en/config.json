@@ -590,7 +590,7 @@
             "PAN": "PAN",
             "SubtractOne": "Subtract One",
             "WAN": "WAN",
-            "ActiveItemEffect": "Active Item Effects"
+            "ItemEffects": "Item Effects"
         }
     },
     "SR5.Languages": "Languages",
@@ -1121,7 +1121,9 @@
             "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
             "OnlyForWireless": "This effect will apply only for items that have wireless enabled",
             "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
-            "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections"
+            "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
+            "ItemEffects": "Effects collected from items on this document",
+            "DocumentEffects": "Effects directly on this document"
         },
         "Item": {
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",

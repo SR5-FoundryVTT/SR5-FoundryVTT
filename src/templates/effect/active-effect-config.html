@@ -56,16 +56,14 @@
         {{/if}}
 
         {{#if isItemEffect}}
-        <div class="form-group">
+        <!-- <div class="form-group">
             <label>{{ localize "EFFECT.Transfer" }}</label>
             <div class="form-fields">
                 <input type="checkbox" name="transfer" {{checked data.transfer}}/>
             </div>
-        </div>
+        </div> -->
         {{/if}}
-    </section>
 
-    <section class="tab" data-tab="applyTo">
         {{#if isItemEffect}}
         <div class="form-group">
             <label>{{ localize "SR5.ActiveEffect.OnlyForWireless" }}</label>
@@ -81,7 +79,9 @@
             </div>
         </div>
         {{/if}}
+    </section>
 
+    <section class="tab" data-tab="applyTo">
         <div class="form-group">
             <label data-tooltip="{{localize 'SR5.Tooltips.Effect.ApplyTo'}}">{{ localize "SR5.ActiveEffect.ApplyTo" }}</label>
             <div class="form-fields">

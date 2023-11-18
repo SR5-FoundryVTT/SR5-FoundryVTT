@@ -13,13 +13,7 @@ declare namespace Shadowrun {
         hasSkills: boolean
         canAlterSpecial: boolean
         hasFullDefense: boolean
-        effects: EffectsSheetData
-    }
-
-    interface EffectsSheetData {
-        temporary: EffectsCategoryData
-        persistant: EffectsCategoryData
-        inactive: EffectsCategoryData
+        effects: any[]
     }
 
     interface EffectsCategoryData {
