@@ -391,7 +391,7 @@ export abstract class VersionMigration {
 
                     if (updateData.data) {
                         expandObject(updateData.data);
-                        document.update(updateData.data);
+                        document.update({system: updateData.data});
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
@@ -413,7 +413,7 @@ export abstract class VersionMigration {
 
                     if (updateData.data) {
                         expandObject(updateData.data);
-                        await document.update(updateData.data);
+                        await document.update({system: updateData.data});
                     }
 
                 } else if (pack.metadata.type === 'Scene') {

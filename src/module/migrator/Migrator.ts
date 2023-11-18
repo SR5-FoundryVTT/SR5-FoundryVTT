@@ -126,7 +126,8 @@ export class Migrator {
      */
     private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
         // Migrate World Compendium Packs
-        const packs = game.packs?.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
+        // @ts-expect-error // v11 onwards uses packageType
+        const packs = game.packs?.filter((pack) => pack.metadata.packageType === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
 
         if (!packs) return;
 
