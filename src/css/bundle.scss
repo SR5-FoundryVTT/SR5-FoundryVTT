@@ -197,6 +197,7 @@ input[type='checkbox'].toggle {
     max-height: 0;
     overflow-y: auto;
     transition: max-height 0.25s ease-in-out;
+    color: $white;
 }
 
 .toggle:checked + .list-item-content + .collapsible-content {
@@ -558,7 +559,7 @@ input[type='text'].display {
     }
 
     label.item-text.item-name[for="select-inventory"] {
-        color: $edge;
+        color: $yellow;
     }
 
     label.item-text.item-name {
@@ -1175,7 +1176,7 @@ input[type='text'].display {
 
 
 .list-header.item-section[data-item-id="weapon"][data-item-type=""] {
-    color: $edge;  /* set the color to yellow */
+    color: $yellow;  /* set the color to yellow */
     font-size: small;
 }
 
