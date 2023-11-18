@@ -45,4 +45,5 @@
 
 @mixin linkHovered {
     text-shadow: 0 0 8px var(--color-shadow-primary);
+    color: $fLightRed;
 }
