@@ -28,7 +28,15 @@ export const registerSkillLineHelpers = () => {
         }
     });
 
-    Handlebars.registerHelper('SkillHeaderRightSide', function (id, filters: SR5SheetFilters) {
+    /**
+     * Handle the right side of the skill header.
+     * 
+     * Main feature necessary is to indicate the list being filtered or not.
+     * 
+     * @param id The skill category of this skill header.
+     * @param filters As soon as the sheet uses some kind of filter this will provide an object that is 'truey'.
+     */
+    Handlebars.registerHelper('SkillHeaderRightSide', function (id: string, filters: SR5SheetFilters) {
         const specs = {
             text: {
                 text: game.i18n.localize('SR5.Specialization'),
