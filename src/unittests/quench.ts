@@ -20,6 +20,7 @@ import { characterImporterTesting } from "./characterImport/sr5.CharacterImporte
 import { characterInfoUpdaterTesting } from "./characterImport/sr5.CharacterInfoUpdater.spec";
 import { weaponParserTesting } from "./characterImport/sr5.CharacterImporterWeapon.spec";
 import { mountedWeaponParserTesting } from "./characterImport/sr5.VehicleImporterMountedWeapon.spec";
+import { shadowrunSR5ItemDataPrep } from "./sr5.ItemDataPrep.spec";
 
 import { Quench } from "@ethaks/fvtt-quench";
 
@@ -55,6 +56,8 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch("shadowrun5e.data_prep.spirit", shadowrunSR5SpiritDataPrep, { displayName: "SHADOWRUN5e: SR5SpiritDataPreparation Test" });
     quench.registerBatch("shadowrun5e.data_prep.ic", shadowrunSR5ICDataPrep, { displayName: "SHADOWRUN5e: SR5ICDataPreparation Test" });
     quench.registerBatch("shadowrun5e.data_prep.vehicle", shadowrunSR5VehicleDataPrep, { displayName: "SHADOWRUN5e: SR5VehicleDataPreparation Test" });
+
+    quench.registerBatch("shadowrun5e.data_prep.item", shadowrunSR5ItemDataPrep, { displayName: "SHADOWRUN5e: SR5ItemDataPreparation Test" });
 
     quench.registerBatch("shadowrun5e.flow.networkDevices", shadowrunNetworkDevices, { displayName: "SHADOWRUN5e: Matrix Network Devices Test" });
     quench.registerBatch("shadowrun5e.flow.inventory", shadowrunInventoryFlow, { displayName: "SHADOWRUN5e: InventoryFlow Test" });

@@ -391,11 +391,11 @@ export abstract class VersionMigration {
 
                     if (updateData.data) {
                         expandObject(updateData.data);
-                        document.update(updateData.data);
+                        document.update({system: updateData.data});
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
-                    //@ts-expect-error
+                    //@ts-expect-error TODO: foundry-vtt-types v10
                     updateData = await this.MigrateActorData(foundry.utils.duplicate(document.data));
 
                     //@ts-expect-error // TODO: foundry-vtt-types v10
@@ -413,7 +413,7 @@ export abstract class VersionMigration {
 
                     if (updateData.data) {
                         expandObject(updateData.data);
-                        await document.update(updateData.data);
+                        await document.update({system: updateData.data});
                     }
 
                 } else if (pack.metadata.type === 'Scene') {

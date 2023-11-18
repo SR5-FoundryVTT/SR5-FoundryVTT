@@ -55,6 +55,11 @@ import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
 import { RangedWeaponRules } from "../rules/RangedWeaponRules";
 import { LinksHelpers } from '../utils/links';
+import { TechnologyPrep } from './prep/functions/TechnologyPrep';
+import { SinPrep } from './prep/SinPrep';
+import { ActionPrep } from './prep/functions/ActionPrep';
+import { RangePrep } from './prep/functions/RangePrep';
+import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
@@ -66,6 +71,7 @@ import { LinksHelpers } from '../utils/links';
  * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
  * 
  * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
+ * NOTE: still not fixed with esbuild@0.19.5
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 ActionResultFlow; // DON'T TOUCH!
@@ -233,146 +239,38 @@ export class SR5Item extends Item {
         this.prepareNestedItems();
 
         // Description labels might have changed since last data prep.
+        // NOTE: this here is likely unused and heavily legacy.
         this.labels = {};
-
-        if (this.type === 'sin') {
-            if (typeof this.system.licenses === 'object') {
-                // taMiF: This seems to be a hacky solution to some internal or Foundry issue with reading
-                //        a object/HashMap when an array/iterable was expected
-                this.system.licenses = Object.values(this.system.licenses);
-            }
-        }
+        
+        // Collect the equipped modifying nested items.
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
 
         const technology = this.getTechnologyData();
         if (technology) {
-            // taMiF: This migration code could be needed for items imported from an older compendium?
-            if (technology.condition_monitor === undefined) {
-                technology.condition_monitor = { value: 0, max: 0, label: '' };
-            }
-            // Rating might be a string.
-            const rating = typeof technology.rating === 'string' ? 0 : technology.rating;
-            technology.condition_monitor.max = 8 + Math.ceil(rating / 2);
-
-            // Calculate conceal data.
-            if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: []};
-
-            const concealParts = new PartsList<number>();
-            equippedMods.forEach((modification) => {
-                if (modification.system.conceal  && modification.system.conceal > 0) {
-                    concealParts.addUniquePart(modification.name as string, modification.system.conceal);
-                }
-            });
-
-            technology.conceal.mod = concealParts.list;
-            technology.conceal.value = Helpers.calcTotal(technology.conceal);
+            TechnologyPrep.prepareConditionMonitor(technology);
+            TechnologyPrep.prepareConceal(technology, equippedMods);
         }
-
+        
         const action = this.getAction();
         if (action) {
-            action.alt_mod = 0;
-            action.limit.mod = [];
-            action.damage.mod = [];
-            action.damage.ap.mod = [];
-            action.dice_pool_mod = [];
-
-            // @ts-expect-error
-            // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
-            if (action.damage.base_formula_operator === '+') {
-                action.damage.base_formula_operator = 'add';
-            }
-
-            // Item.prepareData is called once (first) with an empty SR5Actor instance without .data and once (second) with .data.
-            if (this.actor?.system) {
-                action.damage.source = {
-                    actorId: this.actor.id as string,
-                    itemId: this.id as string,
-                    itemName: this.name as string,
-                    itemType: this.type
-                };
-            }
-
-            // handle overrides from mods
-            const limitParts = new PartsList(action.limit.mod);
-            const dpParts = new PartsList(action.dice_pool_mod);
-            equippedMods.forEach((mod) => {
-                const modification = mod.asModification();
-                if (!modification) return;
-
-                if (modification.system.accuracy) limitParts.addUniquePart(mod.name as string, modification.system.accuracy);
-                if (modification.system.dice_pool) dpParts.addUniquePart(mod.name as string, modification.system.dice_pool);
-                
-            });
-
-            if (equippedAmmo) {
-                const ammoData = equippedAmmo.system as AmmoData;
-
-                // Some ammunition want to replace the weapons damage, others modify it.
-                if (ammoData.replaceDamage) {
-                    action.damage.override = {name: equippedAmmo.name as string, value: Number(ammoData.damage)};
-                } else {
-                    action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);    
-                }
-                
-                // add mods to ap from ammo
-                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
-
-                if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name as string, ammoData.accuracy);
-
-                // override element
-                if (ammoData.element) {
-                    action.damage.element.value = ammoData.element;
-                } else {
-                    action.damage.element.value = action.damage.element.base;
-                }
-
-                // override damage type
-                if (ammoData.damageType) {
-                    action.damage.type.value = ammoData.damageType;
-                } else {
-                    action.damage.type.value = action.damage.type.base;
-                }
-            } else {
-                // set value if we don't have item overrides
-                action.damage.element.value = action.damage.element.base;
-                action.damage.type.value = action.damage.type.base;
-            }
-
-            // once all damage mods have been accounted for, sum base and mod to value
-            action.damage.value = Helpers.calcTotal(action.damage);
-            action.damage.ap.value = Helpers.calcTotal(action.damage.ap);
-
-            action.limit.value = Helpers.calcTotal(action.limit);
+            ActionPrep.prepareData(action, this, equippedMods, equippedAmmo);
         }
 
         const range = this.getWeaponRange();
-        if (range) {
-            if (range.rc) {
-                const rangeParts = new PartsList();
-                equippedMods.forEach((mod) => {
-                    //@ts-expect-error // TODO: foundry-vtt-types v10 
-                    // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
-                    if (mod.system.rc) rangeParts.addUniquePart(mod.name, mod.system.rc);
-                    // handle overrides from ammo
-                });
-                //@ts-expect-error // TypeScript doesn't like this.system Item.Data<DataType> possibly being all the things.
-                range.rc.mod = rangeParts.list;
-                if (range.rc) range.rc.value = Helpers.calcTotal(range.rc);
-            }
-        }
-
-        const adeptPower = this.asAdeptPower();
-        if (adeptPower) {
-            adeptPower.system.type = adeptPower.system.action.type ? 'active' : 'passive';
+        if (range && range.rc) {
+            RangePrep.prepareData(range, equippedMods);
         }
 
         // Switch item data preparation between types...
         // ... this is ongoing work to clean up SR5item.prepareData
         switch (this.type) {
             case 'host':
-                //@ts-expect-error // TODO: foundry-vtt-types v10 
-                HostDataPreparation(this.system);
+                HostDataPreparation(this.system as Shadowrun.HostData);
+            case 'adept_power':
+                AdeptPowerPrep.prepareBaseData(this.system as unknown as Shadowrun.AdeptPowerData);
+            case 'sin':
+                SinPrep.prepareBaseData(this.system as unknown as Shadowrun.SinData);
         }
     }
 
