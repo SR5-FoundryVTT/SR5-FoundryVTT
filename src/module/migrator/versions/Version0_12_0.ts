@@ -1,5 +1,6 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { FormDialog } from "../../apps/dialogs/FormDialog";
+import { SR5ActiveEffect } from "../../effect/SR5ActiveEffect";
 import { VersionMigration } from "../VersionMigration";
 
 /**
@@ -84,15 +85,13 @@ export class Version0_12_0 extends VersionMigration {
      * @param actor 
      */
     static async DeleteLocalItemOwnedEffects(actor: SR5Actor) {
-        const itemOriginEffects = actor.effects.filter(effect => !!effect.origin && effect.origin.includes('.Item.'));
+        const itemOriginEffects = migrateEffects(actor);
 
-        console.log(`Actor (${actor.uuid}). Delete these effects:`, itemOriginEffects);
-        const toMigrate: string[] = [];
-        for (const effect of itemOriginEffects) {            
-            toMigrate.push(effect.id as string);
-        }
+        if (itemOriginEffects.length === 0) return;
         
-        await actor.deleteEmbeddedDocuments('ActiveEffect', toMigrate);
+        console.log(`Actor (${actor.uuid}). Delete these effects:`, itemOriginEffects);
+        const toDelete = itemOriginEffects.map(effect => effect.id as string);
+        await actor.deleteEmbeddedDocuments('ActiveEffect', toDelete);
     }
 
 
@@ -106,12 +105,11 @@ export class Version0_12_0 extends VersionMigration {
      * @returns updateData{effects}
      */
     static async DisableLocalItemOwnedEffects(actor: SR5Actor) {
-        const itemOriginEffects = actor.effects
-            //@ts-expect-error TODO: foundry-vtt-types v10
-            .filter(effect => !!effect.origin && effect.origin.includes('.Item.') && !effect.disabled);
+        const itemOriginEffects = migrateEffects(actor);
         
         if (itemOriginEffects.length === 0) return {};
 
+        console.log('Actor (${actor.uuid}). Disable these effects:', itemOriginEffects);
         const updateData = {effects: itemOriginEffects.map(effect => {
             return {_id: effect.id, disabled: true, name: `DISABLED: ${effect.name}`};
         })};
@@ -119,7 +117,6 @@ export class Version0_12_0 extends VersionMigration {
         return updateData;
     }
 }
-
 
 
 class ConfigurationDialog extends FormDialog {
@@ -142,4 +139,23 @@ class ConfigurationDialog extends FormDialog {
             }
         };
     } 
+}
+
+/**
+ * Filter down all effects to only those to be migrated.
+ * @param effects 
+ * @param actor 
+ * @returns 
+ */
+const migrateEffects = (actor: SR5Actor) => {
+    return actor.effects
+    //@ts-expect-error TODO: foundry-vtt-types v10
+    .filter(effect => !!effect.origin && effect.origin.includes('.Item.') && !effect.disabled)
+    .filter(effect => {
+        // @ts-expect-error
+        // origin is always an owned item, therefore parent must always be an actor.
+        // nested items didn't apply their effects onto actors.
+        let origin = fromUuidSync(effect.origin);
+        return origin.parent && origin.parent.id === actor.id;
+    });
 }
