@@ -239,6 +239,7 @@ export class SR5Item extends Item {
         this.prepareNestedItems();
 
         // Description labels might have changed since last data prep.
+        // NOTE: this here is likely unused and heavily legacy.
         this.labels = {};
         
         // Collect the equipped modifying nested items.
@@ -258,7 +259,7 @@ export class SR5Item extends Item {
 
         const range = this.getWeaponRange();
         if (range && range.rc) {
-            RangePrep.prepareRecoilCompensation(range, equippedMods);
+            RangePrep.prepareData(range, equippedMods);
         }
 
         // Switch item data preparation between types...
