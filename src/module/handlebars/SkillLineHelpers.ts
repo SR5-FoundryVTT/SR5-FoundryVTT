@@ -36,7 +36,7 @@ export const registerSkillLineHelpers = () => {
      * @param id The skill category of this skill header.
      * @param filters As soon as the sheet uses some kind of filter this will provide an object that is 'truey'.
      */
-    Handlebars.registerHelper('SkillHeaderRightSide', function (id: string, filters: SR5SheetFilters) {
+    Handlebars.registerHelper('SkillHeaderRightSide', function (id: string, filters?: SR5SheetFilters) {
         const specs = {
             text: {
                 text: game.i18n.localize('SR5.Specialization'),
@@ -44,12 +44,17 @@ export const registerSkillLineHelpers = () => {
             },
         };
 
+        // Display filters for active skills. See issue #871.
+        // when not given, filters won't be undefined, but will contain a handlebar object.
+        const activeSkillFilter = id === 'active' &&
+            filters && filters.hasOwnProperty('showUntrainedSkills') &&
+            !filters.showUntrainedSkills;
+
         const rtg = {
-            // Change Rating header to show active filtering.
             text: {
-                text: !filters || filters.showUntrainedSkills ?
-                    game.i18n.localize('SR5.Rtg') :
-                    game.i18n.localize('SR5.RtgAboveZero'),
+                text: activeSkillFilter ?
+                    game.i18n.localize('SR5.RtgAboveZero') :
+                    game.i18n.localize('SR5.Rtg'),
                 cssClass: 'rtg',
             },
         };
