@@ -589,7 +589,8 @@
             "NetworkDevices": "Networked Devices",
             "PAN": "PAN",
             "SubtractOne": "Subtract One",
-            "WAN": "WAN"
+            "WAN": "WAN",
+            "ActiveItemEffect": "Active Item Effects"
         }
     },
     "SR5.Languages": "Languages",

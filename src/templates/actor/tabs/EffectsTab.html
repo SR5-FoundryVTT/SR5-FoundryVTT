@@ -1,6 +1,7 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='effects'}}
     <div class="inventory">
         <div class="scroll-area">
+        <!-- Actor Effects -->
         {{#each effects as |section sid|}}
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=section.label
@@ -25,16 +26,18 @@
         {{/each}}
         {{#if enabledEffects}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-            name="TODO: All Item Effects"
+            name=(localize 'SR5.Labels.Sheet.ActiveItemEffect')
             itemCssClass='list-item-effect'
+            rightSide=(ItemHeaderRightSide 'enabledEffects')
         }}
+        <!-- Collected Item Effects -->
         {{#each enabledEffects}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
             img=this.icon
             name=this.name
             itemId=this.uuid
             icons=(ItemEffectIcons this)
-            rightSide=[]
+            rightSide=(ItemEffectRightSide this)
             hasDesc=false
             hasRoll=false
             itemCssClass='list-item-effect'

@@ -3,6 +3,7 @@ import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 
 
 /**
@@ -352,6 +353,27 @@ export const registerItemLineHelpers = () => {
                         }
                     }
                 ]
+            case 'enabledEffects':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.ActiveEffect.ApplyTo')
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Duration')
+                        }
+                    },
+                    {
+                        text: {
+                            // Used as a placeholder for effect line icons.
+                            // This way the header column is empty (as no +Add makes sense)
+                            // However the line column contains the normal interaction icons.
+                            text: ''
+                        }
+                    }
+                ]
             default:
                 return [];
         }
@@ -648,6 +670,39 @@ export const registerItemLineHelpers = () => {
         }
 
         return icons;
+    });
+
+    /**
+     * Used for the actor sheets display of active effects.
+     */
+    Handlebars.registerHelper('ItemEffectRightSide', function (effect: SR5ActiveEffect) {
+        console.error(effect);
+
+        const getDurationLabel = () => {
+            // @ts-expect-error
+            if (effect.duration.seconds) return `${effect.duration.seconds}s`;
+            // @ts-expect-error
+            if (effect.duration.rounds) return `${effect.duration.rounds}R`;
+
+            return '';
+        }
+
+        return [
+            {
+                // Apply To Column
+                text: {
+                    text: game.i18n.localize(SR5.effectApplyTo[effect.applyTo]),
+                    cssClass: 'six',
+                }
+            },
+            {
+                // Duration Column
+                text: {
+                    text: getDurationLabel(),
+                    cssClass: 'six',
+                }
+            }
+        ];
     });
 
     Handlebars.registerHelper('InventoryItemIcons', function (item: ShadowrunItemData) {
