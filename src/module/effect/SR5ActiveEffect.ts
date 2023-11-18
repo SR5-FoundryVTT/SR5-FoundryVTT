@@ -1,6 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
-import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
+import { EffectChangeData, EffectChangeDataSource } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import { SYSTEM_NAME } from "../constants";
 import { SR5Item } from "../item/SR5Item";
 import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
@@ -21,7 +21,7 @@ import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
  */
 export class SR5ActiveEffect extends ActiveEffect {
     // Foundry Core typing missing... TODO: foundry-vtt-types v10
-    public origin: string|null;
+    public origin: string | null;
     public active: boolean;
     public changes: EffectChangeData[];
 
@@ -51,17 +51,17 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Render the sheet of the active effect source
      */
-    public renderSourceSheet() {        
+    public renderSourceSheet() {
         return this.source?.sheet?.render(true);
     }
 
     async toggleDisabled() {
         // @ts-expect-error
-        return this.update({disabled: !this.disabled});
+        return this.update({ disabled: !this.disabled });
     }
 
     async disable(disabled) {
-        return this.update({disabled});
+        return this.update({ disabled });
     }
 
     //@ts-expect-error // TODO: foundry-vtt-types
@@ -94,7 +94,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey) as Shadowrun.ModifiableValue;
             //@ts-expect-error // TODO: foundry-vtt-types v10
-            value.mod.push({name: this.name, value: Number(change.value)});
+            value.mod.push({ name: this.name, value: Number(change.value) });
 
             return null;
         }
@@ -117,7 +117,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor, change.key);
-            value.override = {name: this.name, value: Number(change.value)};
+            value.override = { name: this.name, value: Number(change.value) };
             value.value = change.value;
 
             return null;
@@ -130,7 +130,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (this._isKeyModifiableValue(actor, indirectKey)) {
             const value = foundry.utils.getProperty(actor, indirectKey);
-            value.override = {name: this.name, value: Number(change.value)};
+            value.override = { name: this.name, value: Number(change.value) };
 
             return null;
         }
@@ -203,7 +203,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param item The item to check against.
      * @returns 
      */
-    skipApply(item: SR5Item|undefined): boolean {
+    skipApply(item: SR5Item | undefined): boolean {
         if (!item) return false;
         if (!(item instanceof SR5Item)) return false;
         //@ts-expect-error TODO: foundry-vtt-types v10
@@ -228,7 +228,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // @ts-expect-error
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
-        const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;        
+        const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
 
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
 
@@ -253,11 +253,11 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular EffectChangeData object
      */
-    static resolveDynamicChangeValue(source: any, change: EffectChangeData) {        
+    static resolveDynamicChangeValue(source: any, change: EffectChangeData) {
         // Dynamic value present?
-        if (foundry.utils.getType(change.value) !== 'string') return;                
-        if (change.value.length === 0) return;        
-        
+        if (foundry.utils.getType(change.value) !== 'string') return;
+        if (change.value.length === 0) return;
+
         // Use Foundry Roll Term parser to both resolve dynamic values and resolve calculations.
         const terms = Roll.parse(change.value, source);
         const expression = terms.map(term => term.total).join(' ');
@@ -285,7 +285,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // }
 
         const target = foundry.utils.getProperty(object, change.key) ?? null;
-        let targetType = foundry.utils.getType(target);        
+        let targetType = foundry.utils.getType(target);
 
         // Cast the effect change value to the correct type
         let delta;
@@ -331,5 +331,27 @@ export class SR5ActiveEffect extends ActiveEffect {
         foundry.utils.mergeObject(object, changes);
 
         return changes;
+    }
+
+    /**
+     * Override Foundry effect data migration to avoid data => system migration.
+     * 
+     * Since the system provides autocomplete-inline-properties as a relationship and
+     * has it configured to provide system as the default key, the Foundry migration
+     * shouldn't be necessary. The migration hinders effects with apply-to test.
+     * 
+     * All migrations here are taken from FoundryVtt common.js BaseActiveEffect#migrateData
+     * for v11.315
+     */
+    // @ts-expect-error foundry-vtt-types v10
+    static override migrateData(data: any) {
+        /**
+         * label -> name
+         * @deprecated since v11
+         */
+        // @ts-expect-error
+        this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
+
+        return data;
     }
 }
