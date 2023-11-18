@@ -91,25 +91,25 @@
 
         {{#ife applyTo "test_all"}}
         <div class="form-group">
-            <label>{{ localize "SR5.ActiveEffect.Test.Tests" }}</label>
+            <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Tests" }}</label>
             <div class="form-fields">
                 <input name="flags.shadowrun5e.selection_tests" id="test-selection" class="tagify-selection" data-dtype="Text"/>
             </div>
         </div>
         <div class="form-group">
-            <label>{{ localize "SR5.ActiveEffect.Test.Skills" }}</label>
+            <label  data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Skills" }}</label>
             <div class="form-fields">
                 <input name="flags.shadowrun5e.selection_skills" id="skill-selection" class="tagify-selection" data-dtype="Text"/>
             </div>
         </div>
         <div class="form-group">
-            <label>{{ localize "SR5.ActiveEffect.Test.Attributes" }}</label>
+            <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyAllFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Attributes" }}</label>
             <div class="form-fields">
                 <input name="flags.shadowrun5e.selection_attributes" id="attribute-selection" class="tagify-selection" data-dtype="Text"/>
             </div>
         </div>
         <div class="form-group">
-            <label>{{ localize "SR5.ActiveEffect.Test.Limits" }}</label>
+            <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Limits" }}</label>
             <div class="form-fields">
                 <input name="flags.shadowrun5e.selection_limits" id="limit-selection" class="tagify-selection" data-dtype="Text"/>
             </div>

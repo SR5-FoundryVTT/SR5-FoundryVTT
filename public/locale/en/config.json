@@ -100,6 +100,12 @@
             "Inactive": "Inactive Effects",
             "Persistent": "Persistent Effects",
             "Temporary": "Temporary Effects"
+        },
+        "Test": {
+            "Tests": "Tests Filter",
+            "Skills": "Skills Filter",
+            "Attributes": "Attributes Filter",
+            "Limits": "Limits Filter"
         }
     },
     "SR5.ActiveSkills": "Active Skills",
@@ -1112,7 +1118,9 @@
             "Temporary": "Effects with a limited life span",
             "ApplyTo": "Changes of this effect will apply to this target only",
             "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
-            "OnlyForWireless": "This effect will apply only for items that have wireless enabled"
+            "OnlyForWireless": "This effect will apply only for items that have wireless enabled",
+            "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
+            "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections"
         },
         "Item": {
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",
