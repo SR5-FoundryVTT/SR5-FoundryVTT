@@ -97,6 +97,10 @@
       "system": "shadowrun5e"
     }
   ],
+  "relationships": [{
+    "id": "autocomplete-inline-properties",
+    "type": "module"
+  }],
   "socket": true,
   "manifest": null,
   "download": null,
