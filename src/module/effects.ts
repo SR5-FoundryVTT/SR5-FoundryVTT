@@ -127,10 +127,11 @@ export function prepareActiveEffectCategories(effects): EffectsSheetData {
  * @param actor The actor collect effects from.
  * @returns A data object containing all enabled effects with their name as key and sorted alphabetically.
  */
-export function prepareEnabledEffects(actor: SR5Actor): Shadowrun.AllEnabledEffectsSheetData {
+export function prepareEnabledItemEffectsApplyingToActor(actor: SR5Actor): Shadowrun.AllEnabledEffectsSheetData {
     const enabledEffects: Shadowrun.AllEnabledEffectsSheetData = [];
 
     for (const effect of allEnabledItemEffects(actor)) {
+        if (effect.applyTo !== 'actor') continue;
         enabledEffects.push(effect);
     }
 
