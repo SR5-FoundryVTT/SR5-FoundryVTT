@@ -8,7 +8,6 @@
 import {VersionMigration} from "../VersionMigration";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import {Helpers} from "../../helpers";
 
 export class Version0_16_0 extends VersionMigration {
     get SourceVersion(): string {
@@ -36,10 +35,22 @@ export class Version0_16_0 extends VersionMigration {
     }
 
     protected override async ShouldMigrateActorData(data: ShadowrunActorData) {
-        return data.type !== 'character' && data.type !== 'critter' && data.type !== 'vehicle';
+        return true;
     }
 
     protected override async MigrateActorData(data: ShadowrunActorData) {
-        return {data: {'visibilityChecks.meat.hasHeat': false}};
+        const updateData = {data: {}};       
+
+        // Some actors did have heat, when they shouldn't.
+        if (data.type !== 'character' && data.type !== 'critter' && data.type !== 'vehicle') {
+            updateData.data['visibilityChecks.meat.hasHeat'] = false;
+        }
+
+        // Migrate magic character actors with wrong templates for initiation (initiation = {})
+        // @ts-expect-error magic is not on all actor types.
+        if (data.system.magic && data.system.magic.hasOwnProperty('initiation') && isNaN(data.system.magic.initiation)) {
+            updateData.data['magic.initiation'] = 0;
+        }
+        return updateData;
     }
 }
