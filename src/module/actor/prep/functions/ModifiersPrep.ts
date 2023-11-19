@@ -14,16 +14,17 @@ export class ModifiersPrep {
      *       Therefore adding a modifier to an actor DataModel happens here and during Actor#prepareData
      */
     static prepareModifiers(system: ActorTypesData) {
-        let modifiers = ModifiersPrep.commonModifiers;
+        let modifiers = ModifiersPrep.commonModifiers as string[];
         modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
         modifiers = modifiers.concat(ModifiersPrep.characterModifiers);
+
         ModifiersPrep.setupModifiers(system, modifiers);
     }
 
     /**
      * Modifiers that appear on all actor types.
      */
-    static get commonModifiers() {
+    static get commonModifiers(): (keyof Shadowrun.CommonModifiers)[] {
         return [
             'defense', 
             'defense_dodge',
@@ -36,7 +37,7 @@ export class ModifiersPrep {
     /**
      * Modifiers that appear on all character actors.
      */
-    static get characterModifiers() {
+    static get characterModifiers(): (keyof Shadowrun.CharacterModifiers)[] {
         return [
             'drain',
             'armor',
@@ -62,14 +63,15 @@ export class ModifiersPrep {
             'pain_tolerance_physical',
             'essence',
             'fade',
-            'multi_defense'
+            'multi_defense',
+            'reach'
         ];
     }
 
     /**
      * Modifiers that appear on all matrix actor types.
      */
-    static get matrixModifiers() {
+    static get matrixModifiers(): (keyof Shadowrun.MatrixModifiers)[] {
         return [
             'matrix_initiative',
             'matrix_initiative_dice',
@@ -77,12 +79,11 @@ export class ModifiersPrep {
         ]
     }
 
-    static setupModifiers(system: ShadowrunActorDataData, modifiers) {
+    static setupModifiers(system: ShadowrunActorDataData, modifiers: string[]) {
         if (!system.modifiers) {
             system.modifiers = {};
         }
 
-        // TODO: localize sorting of modifiers.
         modifiers.sort();
         // add and force global to the top
         modifiers.unshift('global');

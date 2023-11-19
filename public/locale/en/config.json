@@ -671,6 +671,7 @@
     "SR5.ModifiedFade": "Mod. Fade",
     "SR5.Modifier": "Modifier",
     "SR5.ModifierTypes": {
+        "Reach": "Reach",
         "Armor": "Armor",
         "AstralDice": "Astral Init Dice",
         "AstralInit": "Astral Init",
@@ -1116,6 +1117,7 @@
             "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it"
         },
         "Modifiers": {
+            "reach": "Modifies reach of melee attacks",
             "armor": "Modifies total armor value",
             "astral_initiative": "Modifies astral initiative base",
             "astral_initiative_dice": "Modifies astral initiative dice",

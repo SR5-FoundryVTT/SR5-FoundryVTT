@@ -4,6 +4,7 @@ import { DocumentSituationModifiers, ModifiableDocumentTypes } from '../Document
 import Modifier = Shadowrun.ModifierData;
 import SourceModifierData = Shadowrun.SourceModifierData;
 import ActiveModifierValue = Shadowrun.ActiveModifierValue;
+import { SR5 } from '../../config';
 
 
 export interface SituationalModifierApplyOptions {
@@ -18,6 +19,8 @@ export interface SituationalModifierApplyOptions {
     // Apply modifier within this tests context.
     test?: SuccessTest
 }
+
+export type ModifierTypes = Partial<keyof typeof SR5['modifierTypes']>;
 
 /**
  * Base class for handling a single modifier of situational modifiers applied to a document. The 

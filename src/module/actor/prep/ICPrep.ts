@@ -59,8 +59,8 @@ export class ICPrep {
      * @param system
      */
     static prepareModifiers(system: ICData) {
-        let modifiers = ModifiersPrep.commonModifiers;
-        modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
+        let modifiers = ModifiersPrep.commonModifiers as string[];
+        modifiers = modifiers.concat(ModifiersPrep.matrixModifiers as string[]);
         ModifiersPrep.setupModifiers(system, modifiers);
     }
 

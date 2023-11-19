@@ -25,5 +25,6 @@ declare namespace Shadowrun {
             limits: AwakendLimits
             services: number
             attributes: SpiritAttributes
+            modifiers: Modifiers & CommonModifiers
     }
 }

@@ -21,8 +21,9 @@ declare namespace Shadowrun {
             full_defense_attribute: string;
             // Can a character have critter powers?
             is_critter: boolean;
-            modifiers: CharacterModifiers
+            // modifiers: CharacterModifiers;
             limits: CharacterLimits
+            modifiers: Modifiers & CharacterModifiers
     }
 
     export interface CharacterLimits extends AwakendLimits, MatrixLimits {}
@@ -103,7 +104,7 @@ declare namespace Shadowrun {
         attributes: object
     };
 
-    export interface CommonModifiers extends Modifiers {
+    export interface CommonModifiers {
         // Meant to be applied on all defense tests.
         defense: NumberOrEmpty
         // Meant to be applied on some defense tests that apply the defense modifier.
@@ -117,15 +118,22 @@ declare namespace Shadowrun {
         recoil: NumberOrEmpty
     }
 
+    interface MatrixModifiers {
+        matrix_initiative: NumberOrEmpty
+        matrix_initiative_dice: NumberOrEmpty
+        matrix_track: NumberOrEmpty
+    }
+
     /**
      * These modifiers are available for Character type actors.
      * 
      * This interface must correspond with modifiers inject during character data prep.
      */
-    export interface CharacterModifiers extends CommonModifiers {
+    export interface CharacterModifiers extends CommonModifiers, MatrixModifiers {
         drain: NumberOrEmpty
         armor: NumberOrEmpty
         physical_limit: NumberOrEmpty
+        astral_limit: NumberOrEmpty
         social_limit: NumberOrEmpty
         mental_limit: NumberOrEmpty
         stun_track: NumberOrEmpty
@@ -146,9 +154,9 @@ declare namespace Shadowrun {
         pain_tolerance_physical: NumberOrEmpty
         essence: NumberOrEmpty
         fade: NumberOrEmpty
-
         // Meant to be applied on all defense test, for defense modifiers after multiple attacks.
         multi_defense: NumberOrEmpty
+        reach: NumberOrEmpty
     }
 
     /**
