@@ -1,7 +1,7 @@
 import {Helpers} from '../helpers';
 import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
-import {onManageActiveEffect, prepareItemEffects} from "../effects";
+import {onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
@@ -173,8 +173,8 @@ export class SR5ItemSheet extends ItemSheet {
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
 
-        data['effects'] = this.item.effects.contents;
-        data['itemEffects'] = prepareItemEffects(this.object);
+        data['effects'] = prepareSortedEffects(this.item.effects.contents);
+        data['itemEffects'] = prepareSortedItemEffects(this.object);
 
         if (this.item.isHost) {
             data['markedDocuments'] = this.item.getAllMarkedDocuments();
@@ -188,7 +188,7 @@ export class SR5ItemSheet extends ItemSheet {
             data['networkController'] = this.item.networkController;
         }
 
-        // Provide action parts with all test variantes.
+        // Provide action parts with all test variants.
         // @ts-expect-error // TODO: put 'opposed test types' into config (see data.config)
         data.tests = game.shadowrun5e.tests;
         // @ts-expect-error
@@ -331,7 +331,7 @@ export class SR5ItemSheet extends ItemSheet {
             // Case 1 - Data explicitly provided
             if (data.data) {
                 if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
-                    return console.warn('Shadowrun 5e | Cant drop items onto themself');
+                    return console.warn('Shadowrun 5e | Cant drop items onto them self');
                 }
                 item = data;
             // Case 2 - From a Compendium Pack

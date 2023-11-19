@@ -2,7 +2,7 @@ import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
-import {onManageActiveEffect, onManageItemActiveEffect, prepareItemEffects} from "../../effects";
+import {onManageActiveEffect, onManageItemActiveEffect, prepareSortedItemEffects, prepareSortedEffects} from "../../effects";
 import {SR5} from "../../config";
 import {SkillEditSheet} from "../../apps/skills/SkillEditSheet";
 import {SR5Actor} from "../SR5Actor";
@@ -237,8 +237,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareSkillsWithFilters(data);
 
         data.itemType = this._prepareItemTypes(data);
-        data.effects = this.actor.effects;
-        data.itemEffects = prepareItemEffects(this.actor);
+        data.effects = prepareSortedEffects(this.actor.effects.contents);
+        data.itemEffects = prepareSortedItemEffects(this.actor);
         data.inventories = this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);

@@ -97,23 +97,28 @@ export function effectUuidIsNestedItem(uuid: string) {
 }
 
 /**
+ * Sort effects by their name.
+ * @param effects 
+ */
+export function prepareSortedEffects(effects: SR5ActiveEffect[]) {
+    return effects.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
  * Collect all enabled Active Effects which are present on any owned or nested Item.
  * 
  * TODO: Move into data preparation phase, similar to how actor.effects works.
  * @param document The document to collect item effects from.
  * @returns A data object containing all enabled effects with their name as key and sorted alphabetically.
  */
-export function prepareItemEffects(document: SR5Actor|SR5Item): Shadowrun.AllEnabledEffectsSheetData {
+export function prepareSortedItemEffects(document: SR5Actor|SR5Item): Shadowrun.AllEnabledEffectsSheetData {
     const enabledEffects: Shadowrun.AllEnabledEffectsSheetData = [];
 
     for (const effect of allEnabledItemEffects(document)) {
         enabledEffects.push(effect);
     }
 
-    // Alphabetically sort effects by label.
-    enabledEffects.sort((a, b) => a.name.localeCompare(game.i18n.localize(b.label)));
-
-    return enabledEffects;
+    return prepareSortedEffects(enabledEffects);
 }
 
 /**
