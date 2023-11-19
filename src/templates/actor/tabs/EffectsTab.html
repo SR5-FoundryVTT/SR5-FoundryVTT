@@ -32,7 +32,7 @@
         {{#each itemEffects}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
             img=this.icon
-            name=this.name
+            name=this.sheetName
             itemId=this.uuid
             icons=(ItemEffectIcons this)
             rightSide=(EffectRightSide this)

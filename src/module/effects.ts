@@ -98,10 +98,11 @@ export function effectUuidIsNestedItem(uuid: string) {
 
 /**
  * Sort effects by their name.
- * @param effects 
+ * @param effects The effects to be sorted by name
+ * @returns Instance of the given effects, not a copy.
  */
-export function prepareSortedEffects(effects: SR5ActiveEffect[]) {
-    return effects.sort((a, b) => a.name.localeCompare(b.name));
+export function prepareSortedEffects(effects: SR5ActiveEffect[], byKey: string = "name") {
+    return effects.sort((a, b) => a[byKey].localeCompare(b[byKey]));
 }
 
 /**
@@ -118,7 +119,7 @@ export function prepareSortedItemEffects(document: SR5Actor|SR5Item): Shadowrun.
         enabledEffects.push(effect);
     }
 
-    return prepareSortedEffects(enabledEffects);
+    return prepareSortedEffects(enabledEffects, 'sheetName');
 }
 
 /**
@@ -128,7 +129,7 @@ export function prepareSortedItemEffects(document: SR5Actor|SR5Item): Shadowrun.
 function *allEnabledItemEffects(document: SR5Actor|SR5Item) {
     for (const item of document.items) {
         for (const effect of item.effects) {
-            if (effect.skipApply(item)) continue;
+            if (effect.skipApply(item, false)) continue;
             yield effect;
         }
 
@@ -136,7 +137,7 @@ function *allEnabledItemEffects(document: SR5Actor|SR5Item) {
 
         for (const nestedItem of item.items) {
             for (const effect of nestedItem.effects) {
-                if (effect.skipApply(item)) continue;
+                if (effect.skipApply(item, false)) continue;
                 yield effect;
             }
         }

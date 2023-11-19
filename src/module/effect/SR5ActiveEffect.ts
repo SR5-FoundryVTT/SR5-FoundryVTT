@@ -49,6 +49,13 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
+     * Use to display this effect on sheet, including a possible parent item structure.
+     */
+    public get sheetName(): string | null {
+        if (this.parent instanceof SR5Actor) return this.name;
+        return `${this.parent?.name} » ${this.name}`;
+    }
+    /**
      * Render the sheet of the active effect source
      */
     public renderSourceSheet() {
@@ -201,13 +208,14 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Check if this effect should be applied in any context, depending on it's parent items state.
      * 
      * @param item The item to check against.
-     * @returns 
+     * @param onlyEnabled Should the active status of an effect be taken into account?
+     * @returns true, if this effect should be skipped according to it's configuration.
      */
-    skipApply(item: SR5Item | undefined): boolean {
+    skipApply(item: SR5Item | undefined, onlyEnabled: boolean = true): boolean {
         if (!item) return false;
         if (!(item instanceof SR5Item)) return false;
         //@ts-expect-error TODO: foundry-vtt-types v10
-        if (this.disabled) return true;
+        if (onlyEnabled && this.disabled) return true;
 
         if (this.onlyForEquipped && !item.isEquipped()) return true;
         if (this.onlyForWireless && !item.isWireless()) return true;
