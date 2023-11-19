@@ -335,12 +335,6 @@ export const SR5 = {
         other: 'SR5.LifestyleOther',
     },
 
-    kbmod: {
-        ITEM_DESCR: 'ctrlKey',
-        EDGE: 'altKey',
-        HIDE_DIALOG: 'shiftKey',
-    },
-
     /**
      * Labels for ALL actor types actor based local modifiers.
      *

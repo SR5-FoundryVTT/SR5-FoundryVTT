@@ -499,9 +499,17 @@
     },
     "SR5.Karma": "Karma",
     "SR5.Keybinding": {
+        "HideTestDialog": {
+            "Hint": "Testdialoge werden einmalig übersprungen",
+            "Label": "Testdialog überspringen"
+        },
         "OverwatchScoreTracker": {
             "Hint": "Öffne den Overwatchwert Monitor",
             "Label": "Overwatchwert Monitor"
+        },
+        "ShowItemCard": {
+            "Hint": "Anstelle eines Tests zeige die Gegenstandskarte im Chat",
+            "Label": "Zeige nur Chatkarte"
         },
         "ShowSituationModifiers": {
             "Hint": "Öffne Situationsmodifikatoren für aktuelle Auswahl",

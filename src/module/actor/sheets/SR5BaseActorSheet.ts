@@ -254,6 +254,8 @@ export class SR5BaseActorSheet extends ActorSheet {
             relativeTo: this.actor
         });
 
+        data.bindings = this._prepareKeybindings();
+
         return data;
     }
 
@@ -1839,5 +1841,16 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _onResetActorRunData(event) {
         this.actor.resetRunData()
+    }
+
+    /**
+     * Prepare keybindings to be shown when hovering over a rolling icon 
+     * in any list item view that has rolls.
+     */
+    _prepareKeybindings() {
+        return {
+            skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => `${binding.key.replace('Key', '')}`).join(', '),
+            card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => `${binding.key.replace('Key', '')}`).join(', '),
+        }
     }
 }

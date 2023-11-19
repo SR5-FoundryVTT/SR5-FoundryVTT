@@ -518,9 +518,17 @@
     },
     "SR5.Karma": "Karma",
     "SR5.Keybinding": {
+        "HideTestDialog": {
+            "Hint": "Skip dialog when rolling tests from any button",
+            "Label": "Hide Test Dialog"
+        },
         "OverwatchScoreTracker": {
             "Hint": "Open overwatch score tracker",
             "Label": "Overwatch Score Tracker"
+        },
+        "ShowItemCard": {
+            "Hint": "Only show item card in chat instead of rolling test",
+            "Label": "Show Item Card"
         },
         "ShowSituationModifiers": {
             "Hint": "Open situation modifiers for selection",
@@ -533,11 +541,6 @@
     "SR5.KnowledgeSkillProfessional": "Professional",
     "SR5.KnowledgeSkillStreet": "Street",
     "SR5.Labels": {
-        "Sidebar": {
-            "Changelog": "Changelog",
-            "Issues": "Issues",
-            "Wiki": "Wiki"
-        },
         "Action": {
             "ActiveTest": "Test",
             "DamageResistanceTest": "Damage Resistance Test",
@@ -582,6 +585,11 @@
             "PAN": "PAN",
             "SubtractOne": "Subtract One",
             "WAN": "WAN"
+        },
+        "Sidebar": {
+            "Changelog": "Changelog",
+            "Issues": "Issues",
+            "Wiki": "Wiki"
         }
     },
     "SR5.Languages": "Languages",
@@ -1279,5 +1287,5 @@
     "SR5.WeaponReach": "Reach",
     "SR5.WeaponReload": "Reload",
     "SR5.WeaponType": "Type",
-    "SR5.Wireless": "Wireless"    
+    "SR5.Wireless": "Wireless"
 }

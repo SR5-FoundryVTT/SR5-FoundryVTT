@@ -2,8 +2,8 @@
     <div class="list-item-content">
         <div class="item-left">
             {{#if img}}
-                <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">
-                    <img src="{{img}}" title="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip='SHIFT' descr='CTRL'}}" height="24px" width="24px"/>
+                <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">                    
+                    <img src="{{img}}" data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}" data-tooltip-direction="LEFT" height="24px" width="24px"/>
                 </div>
             {{/if}}
             {{#if system.importFlags.isFreshImport}}
@@ -25,7 +25,7 @@
                 {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}}
                 {{#each additionalCssClass}}{{this }}{{/each}}
                 {{#unless img}}{{#if hasRoll}}roll{{/if}}{{/unless}}"
-                {{#unless img}}{{#if hasRoll}}title="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip='SHIFT' descr='CTRL'}}"{{/if}}{{/unless}}
+                {{#unless img}}{{#if hasRoll}}title="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=bindings.skip descr=bindings.card}}"{{/if}}{{/unless}}
                 {{#if tooltip}}data-tooltip="{{tooltip}}"{{/if}}
             >
                 {{name}}
