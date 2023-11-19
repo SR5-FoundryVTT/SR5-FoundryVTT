@@ -1,5 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5 } from "../config";
+import { ActionFlow } from "../item/flows/ActionFlow";
 import { SuccessTest } from "../tests/SuccessTest";
 import { createTagify, createTagifyOnInput } from "../utils/sheets";
 import { SR5ActiveEffect } from "./SR5ActiveEffect";
@@ -159,18 +160,16 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     _prepareSkillSelectionTagify(html: JQuery) {
         const inputElement = html.find('input#skill-selection').get(0) as HTMLInputElement;
 
-        // Grab the top most actor in the document chain.
-        // This handles NestedItems and OwnedItems.
-        const getActor = (document) => {
-            if (!document) return;
-            if (document instanceof Actor) return document;
-            return getActor(document.parent);
-        }
-        const actor = getActor(this.object.parent) as SR5Actor;
-        // TODO: implement basic active skill list. see actions prep. _getSortedActiveSkillsForSelect
-        if (!actor) return;
+        if (!this.object.parent) return console.error('Shadowrun 5e | SR5ActiveEffect unexpecedtly has no parent document', this.object, this);
 
-        const options = Object.entries(actor.getActiveSkills()).map(([id, skill]) => ({label: skill.label ?? skill.name, id}));
+        // Discard token effects
+        // Create a SR5ActiveEffect.actorOwner similar to SR5Item.actorOwner
+        const actor = this.object.isOriginOwned ? this.object.parent.parent : this.object.parent;
+        const actorOrNothing = !(actor instanceof SR5Actor) ? undefined : actor;
+
+        // Use ActionFlow to assure either custom skills or global skills to be included.
+        const skills = ActionFlow.sortedActiveSkills(actorOrNothing);
+        const options = Object.entries(skills).map(([id, label]) => ({label, id}));
         const maxItems = options.length;
         const value = this.object.getFlag('shadowrun5e', 'selection_skills') as string;
         const selected = value ? JSON.parse(value) : [];

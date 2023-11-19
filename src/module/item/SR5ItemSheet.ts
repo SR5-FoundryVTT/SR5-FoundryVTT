@@ -5,6 +5,7 @@ import {onManageActiveEffect, prepareItemEffects} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { ActionFlow } from './flows/ActionFlow';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -235,23 +236,8 @@ export class SR5ItemSheet extends ItemSheet {
      * Sorted (by translation) active skills either from the owning actor or general configuration.
      */
     _getSortedActiveSkillsForSelect() {
-        // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
-        const actor = this.item.actorOwner;
-        // Fallback for actors without skills.
-        if (!actor || actor.isIC()) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
-
-        const activeSkills = Helpers.sortSkills(actor.getActiveSkills());
-
-        const activeSkillsForSelect: Record<string, string> = {};
-        for (const [id, skill] of Object.entries(activeSkills)) {
-            // Legacy skills have no name, but their name is their id!
-            // Custom skills have a name and their id is random.
-            const key = skill.name || id;
-            const label = skill.label || skill.name;
-            activeSkillsForSelect[key] = label;
-        }
-
-        return activeSkillsForSelect;
+        // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
+        return ActionFlow.sortedActiveSkills(this.item.actorOwner);
     }
 
     _getNetworkDevices(): SR5Item[] {
