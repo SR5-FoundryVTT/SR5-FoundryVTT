@@ -150,12 +150,5 @@ class ConfigurationDialog extends FormDialog {
 const migrateEffects = (actor: SR5Actor) => {
     return actor.effects
     //@ts-expect-error TODO: foundry-vtt-types v10
-    .filter(effect => !!effect.origin && effect.origin.includes('.Item.') && !effect.disabled)
-    .filter(effect => {
-        // @ts-expect-error
-        // origin is always an owned item, therefore parent must always be an actor.
-        // nested items didn't apply their effects onto actors.
-        let origin = fromUuidSync(effect.origin);
-        return origin.parent && origin.parent.id === actor.id;
-    });
+    .filter(effect => !!effect.origin && effect.origin.includes('.Item.') && !effect.disabled);
 }
