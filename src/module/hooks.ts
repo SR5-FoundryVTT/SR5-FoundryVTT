@@ -62,6 +62,7 @@ import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
 import VisionConfigurator from './vision/visionConfigurator';
 import { DataDefaults } from './data/DataDefaults';
 import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
+import { RenderSettings } from './systemLinks';
 
 
 
@@ -93,6 +94,8 @@ export class HooksManager {
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
 
         Hooks.on('quenchReady', quenchRegister);
+
+        RenderSettings.listen();
     }
 
     static init() {

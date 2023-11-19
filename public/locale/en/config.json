@@ -148,7 +148,6 @@
     "SR5.BaseValue": "Base Value",
     "SR5.Biography": "Bio",
     "SR5.Blackmail": "Blackmail",
-    "SR5.GroupContact": "Group",
     "SR5.BlastRadius": "Blast Radius",
     "SR5.Block": "Block",
     "SR5.Bonus": "Bonus",
@@ -437,6 +436,7 @@
     "SR5.GlitchCritical": "Critical Glitch!",
     "SR5.Glitches": "Glitches:",
     "SR5.GoodCover": "Good Cover",
+    "SR5.GroupContact": "Group",
     "SR5.HackingProgram": "Hacking Program",
     "SR5.Help": "Help",
     "SR5.Hits": "Hits",
@@ -533,6 +533,11 @@
     "SR5.KnowledgeSkillProfessional": "Professional",
     "SR5.KnowledgeSkillStreet": "Street",
     "SR5.Labels": {
+        "Sidebar": {
+            "Changelog": "Changelog",
+            "Issues": "Issues",
+            "Wiki": "Wiki"
+        },
         "Action": {
             "ActiveTest": "Test",
             "DamageResistanceTest": "Damage Resistance Test",
@@ -1274,5 +1279,5 @@
     "SR5.WeaponReach": "Reach",
     "SR5.WeaponReload": "Reload",
     "SR5.WeaponType": "Type",
-    "SR5.Wireless": "Wireless"
+    "SR5.Wireless": "Wireless"    
 }
