@@ -810,10 +810,6 @@ export const registerItemLineHelpers = () => {
         return [openOriginIcon, disableIcon, editIcon];
     });
 
-    Handlebars.registerHelper('EffectData', function(effectType: string) {
-        return {'effect-type': effectType};
-    });
-
     // Allow Matrix Marks to be changed on the spot on a Sheet.
     Handlebars.registerHelper('MarksRightSide', (marked: MarkedDocument) => {
         const quantityInput = {

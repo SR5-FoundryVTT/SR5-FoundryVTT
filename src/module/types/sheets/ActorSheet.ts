@@ -16,13 +16,6 @@ declare namespace Shadowrun {
         effects: any[]
     }
 
-    interface EffectsCategoryData {
-        type: "temporary"|"persistent"|"inactive"
-        label: string
-        tooltip: string
-        effects: any[]
-    }
-
     type AllEnabledEffectsSheetData = any[];
 
     export interface SR5SheetFilters {

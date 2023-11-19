@@ -88,12 +88,7 @@
             "Modify": "Modifizieren"
         },
         "New": "New Effect",
-        "OnlyForWireless": "Nur bei aktivem wireless",
-        "Types": {
-            "Inactive": "Inaktive Effekte",
-            "Persistent": "Anhaltende Effekte",
-            "Temporary": "Temporäre Effekte"
-        }
+        "OnlyForWireless": "Nur bei aktivem wireless"
     },
     "SR5.ActiveSkills": "Aktive Fertigkeiten",
     "SR5.ActorTypes": {
@@ -1056,11 +1051,6 @@
         },
         "CallInAction": {
             "ActorType": "Herbeizurufender Akteurtyp"
-        },
-        "Effect": {
-            "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden",
-            "Persistent": "Effekte ohne zeitliche Begrenzung",
-            "Temporary": "Effekte mit zeitlicher Begrenzung"
         },
         "Item": {
             "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",

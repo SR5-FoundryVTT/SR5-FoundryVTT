@@ -96,11 +96,6 @@
         "New": "New Effect",
         "OnlyForWireless": "Apply for wireless active only",
         "OnlyForEquipped": "Apply for equipped item only",
-        "Types": {
-            "Inactive": "Inactive Effects",
-            "Persistent": "Persistent Effects",
-            "Temporary": "Temporary Effects"
-        },
         "Test": {
             "Tests": "Tests Filter",
             "Skills": "Skills Filter",
@@ -1114,9 +1109,6 @@
             "SpriteType": "Type of the compiled sprite"
         },
         "Effect": {
-            "Inactive": "Inactive effects don't apply their changes until they are enabled",
-            "Persistent": "Effects with an unlimited life span",
-            "Temporary": "Effects with a limited life span",
             "ApplyTo": "Changes of this effect will apply to this target only",
             "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
             "OnlyForWireless": "This effect will apply only for items that have wireless enabled",

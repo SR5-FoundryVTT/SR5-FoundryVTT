@@ -21,6 +21,7 @@
             itemCssClass='list-item-effect'
             }}
         {{/each}}
+        <!-- Owned Item Effects. Actor only. -->
         {{#if itemEffects}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
             name=(localize 'SR5.Labels.Sheet.ItemEffects')
@@ -28,7 +29,6 @@
             itemCssClass='list-item-effect'
             rightSide=(ItemHeaderRightSide 'itemEffects')
         }}
-        <!-- Owned Item Effects. Actor only. -->
         {{#each itemEffects}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
             img=this.icon
