@@ -901,6 +901,9 @@ input[type='text'].display {
                     &.fresh-import {
                         color: $freshImportColor;
                     }
+                    &.mods-label{
+                        color: $white;
+                    }
                 }
 
                 &.element {
@@ -927,7 +930,7 @@ input[type='text'].display {
                     text-align: right;
                     width: 9.5em;
                     &.defense{ //Moves the selector Box for defense to the left to align
-                        width: 10.5em;
+                        width: 13.5em;
                     }
                 }
 
@@ -1323,6 +1326,7 @@ color: $white;
     margin-left: -1em !important;
     text-align: left;
 }
+
 a.inventory-remove.action-icon.roll {
     padding: 0.5em;
     padding-left: 0.1em;
