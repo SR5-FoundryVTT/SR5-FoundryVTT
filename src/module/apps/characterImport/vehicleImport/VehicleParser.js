@@ -18,7 +18,7 @@ export default class VehicleParser {
 
         const vehicles = getArray(chummerChar.vehicles?.vehicle);
 
-        for(let vehicle of vehicles) {
+        vehicles.forEach(async vehicle => {
             let vehicleActor = await Actor.create({
                 name: vehicle.name,
                 type: "vehicle"
@@ -62,10 +62,10 @@ export default class VehicleParser {
             
                 'system.armor.base': vehicle.armor,
                 'system.isDrone': vehicle.isdrone,
-                'folder': actor.folder.id
+                'folder': actor.folder?.id
             });
 
             await vehicleActor.createEmbeddedDocuments('Item', (await Promise.all(promises)).flat());
-        }
+        })
     }
 }
