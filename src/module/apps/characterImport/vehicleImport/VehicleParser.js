@@ -24,6 +24,11 @@ export default class VehicleParser {
                 type: "vehicle"
             });
 
+            const promises = [];
+            promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));
+            promises.push(new GearsParser().parseGears(getArray(vehicle.gears?.gear),  importOptions.assignIcons));
+            promises.push(new MountedWeaponParser().parseWeapons(vehicle, importOptions.assignIcons))
+
             let handling;
             let off_road_handling;
             if(vehicle.handling.includes("/")) {
@@ -43,11 +48,6 @@ export default class VehicleParser {
                 speed = vehicle.speed
                 off_road_speed =  vehicle.speed
             }
-
-            const promises = [];
-            promises.push(new WeaponParser().parseWeapons(vehicle));
-            promises.push(new GearsParser().parseGears(getArray(vehicle.gears?.gear)));
-            promises.push(new MountedWeaponParser().parseWeapons(vehicle))
 
             vehicleActor.update({
                 'system.driver': actor.id,
