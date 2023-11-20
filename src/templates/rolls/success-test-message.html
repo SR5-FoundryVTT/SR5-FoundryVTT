@@ -30,10 +30,8 @@
         {{#if test.hasAction}}
         <div class="card-content {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <div class="test-line">
-                <div>
-                    <span class="test-code">{{test.code}}</span>
-                    {{#if test.hitsIcon}}<img src="{{test.hitsIcon.icon}}" title="{{localize test.hitsIcon.tooltip}}" style="width:15px;height:15px;margin-left:5px;margin-bottom:0;border:0" tooltip="{{localize test.hitsIcon.tooltip}}" />{{/if}}
-                </div>
+                <span class="test-code">{{test.code}}</span>
+                {{#if test.hitsIcon}}<img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />{{/if}}
             </div>
         </div>
         {{/if}}
@@ -48,7 +46,7 @@
                 <div class="test-value">
                     <span class="value">{{localize test.hits.label}}:</span>
                     <span class="value-result">{{test.hits.value}}{{#if test.usingManualRoll}}*{{/if}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}</span>
-                    {{#if test.hitsIcon}}<img src="{{test.hitsIcon.icon}}" title="{{localize test.hitsIcon.tooltip}}" style="width:15px;height:15px;margin-left:0;margin-bottom:0;border:0" tooltip="{{localize test.hitsIcon.tooltip}}" />{{/if}}
+                    {{#if test.hitsIcon}}<img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />{{/if}}
                 </div>
                 {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span class="value-result">{{test.extendedHits.value}}</span></div>{{/if}}
                 {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span class="value-result">{{test.netHits.value}}</span></div>{{/if}}

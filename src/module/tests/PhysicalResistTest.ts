@@ -38,6 +38,14 @@ export class PhysicalResistTest extends SuccessTest {
         data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.damageData());
         data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
 
+        const armor = this.actor?.getArmor();
+        if(armor?.hardened){
+            data.hitsIcon = {
+                icon: "systems/shadowrun5e/dist/icons/bell-shield.svg",
+                tooltip: "SR5.ArmorHardenedFull",
+            };
+        }
+
         return data;
     }
 
@@ -150,10 +158,6 @@ export class PhysicalResistTest extends SuccessTest {
 
         const armor = this.actor.getArmor(this.data.modifiedDamage);
         if(armor.hardened){
-            this.data.hitsIcon = {
-                icon: "systems/shadowrun5e/dist/icons/bell-shield.svg",
-                tooltip: "SR5.ArmorHardenedFull",
-            }
             this.data.appendedHits = Math.ceil(armor.value/2);
         }
     }

@@ -165,6 +165,13 @@
                 margin-right: 1em;
                 flex: 0;
             }
+            .test-icon {
+                width: 15px;
+                height: 15px;
+                margin-left: 5px;
+                margin-bottom: 0;
+                border: 0;
+            }
         }
         .card-description {
             padding: 0.25em;
@@ -252,6 +259,13 @@
                     text-align: right;
                     padding-right: 8px;
                     white-space: nowrap;
+                }
+                .test-icon {
+                    width: 15px;
+                    height: 15px;
+                    margin-left: 0;
+                    margin-bottom: 0;
+                    border: 0;
                 }
             }
             .test-code {
