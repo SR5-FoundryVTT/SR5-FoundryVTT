@@ -20,6 +20,7 @@ export interface PhysicalResistTestData extends SuccessTestData {
     modifiedDamage: DamageData
     // Determine if an actor should be knockedDown after a defense.
     knockedDown: boolean
+    overrideSuccessMessage: Translation
 }
 
 
@@ -126,6 +127,7 @@ export class PhysicalResistTest extends SuccessTest {
             if(armor.hardened) {
                 if(this.data.incomingDamage.value < armor.value) {
                     //Automatic success
+                    this.data.overrideSuccessMessage = "SR5.TestResults.SoakBlockedByHardenedArmor";
                     return true;
                 }
 
@@ -142,7 +144,7 @@ export class PhysicalResistTest extends SuccessTest {
     }
 
     override get successLabel(): Translation {
-        return 'SR5.TestResults.ResistedAllDamage';
+        return this.data.overrideSuccessMessage || 'SR5.TestResults.ResistedAllDamage';
     }
     override get failureLabel(): Translation {
         return 'SR5.TestResults.ResistedSomeDamage';

@@ -42,6 +42,10 @@ export interface SuccessTestValues extends TestValues {
     extendedHits: ValueField
 }
 
+export interface IconWithTooltip {
+    icon: string;
+    tooltip: Translation;
+}
 
 /**
  * Contain all data necessary to handle an action based test.
@@ -62,10 +66,7 @@ export interface TestData {
     manualGlitches: ValueField
 
     appendedHits?: number
-    hitsIcon?: {
-        icon: string;
-        tooltip: Translation;
-    }
+    hitsIcon?: IconWithTooltip
 
     // Internal test values.
     values: TestValues
@@ -615,10 +616,6 @@ export class SuccessTest {
         this.data.manualHits.value = Helpers.calcTotal(this.data.manualHits, {min: 0});
         this.data.manualGlitches.value = Helpers.calcTotal(this.data.manualGlitches, {min: 0});
 
-        // if(this.data.appendedHits) {
-        //     this.data.appendedHits.value = Helpers.calcTotal(this.data.appendedHits);
-        // }
-
         // Shows AP on incoming attacks
         this.data.damage.ap.value = Helpers.calcTotal(this.data.damage.ap);
 
@@ -882,14 +879,10 @@ export class SuccessTest {
         return this.data.manualGlitches;
     }
 
-    get hitsIcon(): {
-        icon: string;
-        tooltip: Translation;
-    } | undefined {
+    get hitsIcon(): IconWithTooltip | undefined {
         return this.data.hitsIcon;
     }
 
-    // get appendedHits(): ValueField | undefined {
     get appendedHits(): number | undefined {
         return this.data.appendedHits;
     }
