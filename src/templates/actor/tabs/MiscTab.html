@@ -147,7 +147,7 @@
                             </div>
                         </div>
                         <div class="item-right">
-                            <div class="item-text input">
+                            <div class="item-text input defense">
                                 <select name="system.full_defense_attribute" class="display">
                                     {{#select system.full_defense_attribute}} {{#each config.attributes as |name type|}}
                                         <option value="{{type}}">{{localize name}}</option>
@@ -272,7 +272,7 @@
                                     <div class="list-item">
                                         <div class="list-item-content">
                                             <div class="item-left">
-                                                <div class="item-text item-name show-situation-modifiers-application">
+                                                <div class="item-text item-name mods-label show-situation-modifiers-application">
                                                     {{localize this.label}}
                                                 </div>
                                             </div>
@@ -314,7 +314,7 @@
                                 <div class="list-item">
                                     <div class="list-item-content">
                                         <div class="item-left">
-                                            <div class="item-text item-name" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
+                                            <div class="item-text item-name mods-label" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
                                                 {{localizeOb id ../config.actorModifiers}}
                                             </div>
                                         </div>

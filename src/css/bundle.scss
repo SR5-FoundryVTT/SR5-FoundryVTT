@@ -896,11 +896,14 @@ input[type='text'].display {
 
                 &.item-name {
                     text-align: left;
-                    display: flex;
+                    display: grid;
                     width: auto;
 
                     &.fresh-import {
                         color: $freshImportColor;
+                    }
+                    &.mods-label{
+                        color: $white;
                     }
                 }
 
@@ -927,6 +930,9 @@ input[type='text'].display {
                 &.input {
                     text-align: right;
                     width: 9.5em;
+                    &.defense{ //Moves the selector Box for defense to the left to align
+                        width: 13.5em;
+                    }
                 }
 
                 &.desc {
@@ -1320,4 +1326,16 @@ color: $white;
     width: 30em !important;
     margin-left: -1em !important;
     text-align: left;
+}
+
+a.inventory-remove.action-icon.roll {
+    padding: 0.5em;
+    padding-left: 0.1em;
+}
+a.inventory-edit.action-icon.roll {
+    padding: 0.5em;
+}
+span.selection-inventory {
+    display: flex;
+    margin: 0.2em;
 }
