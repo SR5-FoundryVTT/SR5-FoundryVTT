@@ -137,10 +137,13 @@ export class PhysicalResistTest extends SuccessTest {
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
+    override get showSuccessLabel(): boolean {
+        return this.success;
+    }
+
     override get successLabel(): Translation {
         return 'SR5.TestResults.ResistedAllDamage';
     }
-
     override get failureLabel(): Translation {
         return 'SR5.TestResults.ResistedSomeDamage';
     }

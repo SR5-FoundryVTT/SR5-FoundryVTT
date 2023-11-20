@@ -70,11 +70,10 @@
         </div>
         {{/if}}
         <div class="card-test-content">
-            {{! TODO: Why is this a thing, and why is it happening to my soak roles}}
             {{! Some tests will not determine an outcome, but a failure will always be a failure }}
             {{#unless test.showSuccessLabel}}{{#unless test.failure}}
             <div class="glitch-content clickable show-roll">
-                <div class="glitch">{{localize SR5.TestResults.Results}}</div>
+                <div class="glitch">{{localize "SR5.TestResults.Results"}}</div>
             </div>
             {{/unless}}{{/unless}}
             
