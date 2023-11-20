@@ -1,18 +1,5 @@
 @import 'config';
 
-.sr5.skill-edit-window {
-    min-height: 200px;
-    min-width: 200px;
-    display: inline-block;
-
-    .wholesheet {
-        height: auto;
-        display: flex;
-        flex-flow: column nowrap;
-        overflow: hidden;
-    }
-}
-
 .sr5.actor {
     min-height: 690px;
     min-width: 800px;
@@ -24,7 +11,7 @@
     }
     .name {
         @include systemFonts;
-        background: url("assets/name-banner.webp") repeat;
+        background: url('assets/name-banner.webp') repeat;
         font-size: 200%;
         margin-bottom: 0;
         padding-left: 5px;
@@ -42,12 +29,8 @@
         flex-flow: row;
         flex-wrap: nowrap;
         justify-content: space-between;
-
-        // Used to center special attributes.
-        // Therefore we can't have growing gap, but must have a fixed one.
         &.center {
             justify-content: center;
-            gap: 20px;
         }
         &.no-border {
             border-top: none;
@@ -58,7 +41,7 @@
         }
         .attribute {
             @include title;
-            
+
             align-items: center;
             color: $yellow;
             display: flex;
@@ -140,19 +123,30 @@
                     margin: 2px;
                 }
             }
+
+            .toggle-fresh-import-all-off {
+                font-size: 0.75em;
+                background-color: $bgrButton;
+            }
+
+            .toggle-fresh-import-all-on {
+                font-size: 0.75em;
+                background-color: $bgrButton;
+            }
+
             .track {
                 display: flex;
                 flex-flow: row;
                 justify-content: space-evenly;
                 margin-bottom: 0.1em;
-                
+                width: 100%;
                 &.center {
                     justify-content: center;
                     & > *:not(:first-child) {
                         margin-left: 4px;
                     }
                     & > *:not(:last-child) {
-                            margin-right: 4px;
+                        margin-right: 4px;
                     }
                 }
                 &.between {
@@ -192,8 +186,29 @@
         align-items: center;
         align-content: center;
     }
+
+    // Interaction Element for Skill Lists
+    .skill-header {
+        @include rollable;
+    }
 }
 
 .sr5 #filter-skills.display.text.left {
     font-size: 15px;
+}
+
+/**
+ * Skill Editing Application
+ */
+.sr5.skill-edit-window {
+    min-height: 200px;
+    min-width: 370px;
+    display: inline-block;
+
+    .wholesheet {
+        height: auto;
+        display: flex;
+        flex-flow: column nowrap;
+        overflow: hidden;
+    }
 }

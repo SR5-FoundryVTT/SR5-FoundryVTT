@@ -38,6 +38,17 @@ declare global {
         sheet: FormApplication;
     }
 
+    // Inject model basic structure into foundry-vtt-types
+    interface Game {
+        model: {
+            Item: any;
+            Actor: any;
+            Card: any;
+            Cards: any;
+            JournalEntryPage: any;
+        };
+    }
+
     type RecursivePartial<T> = { 
         [P in keyof T]?: RecursivePartial<T[P]>; 
     };

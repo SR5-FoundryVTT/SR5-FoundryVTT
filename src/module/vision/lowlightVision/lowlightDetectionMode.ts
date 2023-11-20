@@ -1,16 +1,15 @@
 
 //todo: v10 foundry-vtt-types 
+
+import LowLightVisionFilter from "./lowlightFilter";
+
 //@ts-expect-error
 export default class LowlightVisionDetectionMode extends DetectionMode {
 
   //@ts-expect-error
   static override getDetectionFilter() {
     //@ts-expect-error
-    return this._detectionFilter ??= OutlineOverlayFilter.create({
-      outlineColor: [0, 1, 0, 1],
-      knockout: true,
-      wave: true
-    })
+    return this._detectionFilter ??= LowLightVisionFilter.create();
   }
 
   
@@ -19,7 +18,8 @@ export default class LowlightVisionDetectionMode extends DetectionMode {
       const tgt = target?.document;
       const targetIsVisible =
         tgt instanceof TokenDocument
-        && !tgt.actor?.system.visibilityChecks.meat.hidden;
+        //@ts-expect-error
+        && !tgt.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
 
         const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 

@@ -14,7 +14,11 @@
         <div class="flexrow">
             <div class="source">
                 <div class="source-button roll open-source" title="{{localize 'SR5.OpenSource'}}">
+                    {{#if sourceIsURL}}
+                    <i class="fas fa-link"></i> 
+                    {{else}}
                     <i class="fas fa-file-pdf"></i> 
+                    {{/if}}
                 </div>
                 <input
                     class="display text"
@@ -24,6 +28,7 @@
                     placeholder='{{localize "SR5.Source"}}'
                 />
             </div>
+            {{#if system.importFlags.isFreshImport}}{{#if (itemMarking "ANY")}}{{> 'systems/shadowrun5e/dist/templates/item/parts/import_flag_button.html' }}{{/if}}{{/if}}
         </div>
     </div>
 </div>

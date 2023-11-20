@@ -12,5 +12,6 @@ declare namespace Shadowrun {
         loyalty: number;
         family: boolean;
         blackmail: boolean;
+        group: boolean;
     }
 }

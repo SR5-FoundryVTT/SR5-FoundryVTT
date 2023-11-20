@@ -590,6 +590,13 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Determine if an actor can alter the special trait
+     */
+    get canAlterSpecial(): boolean {
+        return this.hasSpecial && ['character', 'critter'].includes(this.type);
+    }
+
+    /**
      * Determine if an actor can choose a full defense attribute
      */
     get hasFullDefense(): boolean {
@@ -1328,11 +1335,15 @@ export class SR5Actor extends Actor {
     }
 
     async addPhysicalDamage(damage: Shadowrun.DamageData) {
-        if (damage.type.value !== 'physical') return damage;
+        if (damage.type.value !== 'physical') {
+            return damage;
+        }
+        
 
         const track = this.getPhysicalTrack();
-        if (!track)
+        if (!track) {
             return damage;
+        }  
 
         const {overflow, rest} = this._calcDamageOverflow(damage, track);
 
@@ -1707,6 +1718,23 @@ export class SR5Actor extends Actor {
         const ic = this.asIC();
         if (!ic) return;
         return game.items?.get(ic?.system?.host.id);
+    }
+
+    /**
+     * Add an actor as this spirit actor's summoner.
+     * @param actor A character actor to be used as summoner
+     */
+    async addSummoner(actor: SR5Actor) {
+        if (!this.isSpirit() || !actor.isCharacter()) return;
+        this.update({ 'system.summonerUuid': actor.uuid });
+    }
+
+    /**
+     * Remove a summoner from this spirit actor.
+     */
+    async removeSummoner() {
+        if (!this.isSpirit()) return;
+        this.update({ 'system.summonerUuid': null });
     }
 
     /** Check if this actor is of one or multiple given actor types

@@ -1,5 +1,6 @@
 import { VersionMigration } from './VersionMigration';
-import {Version0_8_0} from "./versions/Version0_8_0";
+import { Version0_16_0 } from './versions/Version0_16_0';
+import { Version0_8_0 } from "./versions/Version0_8_0";
 
 type VersionDefinition = {
     versionNumber: string;
@@ -9,6 +10,7 @@ export class Migrator {
     // Map of all version migrations to their target version numbers.
     private static readonly s_Versions: VersionDefinition[] = [
         { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
+        { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() },
     ];
 
     /**
@@ -17,9 +19,9 @@ export class Migrator {
      */
     public static get isEmptyWorld(): boolean {
         return game.actors?.contents.length === 0 &&
-               game.items?.contents.length === 0 &&
-               game.scenes?.contents.length === 0 &&
-               Migrator.onlySystemPacks
+            game.items?.contents.length === 0 &&
+            game.scenes?.contents.length === 0 &&
+            Migrator.onlySystemPacks
     }
 
     public static get onlySystemPacks(): boolean {
@@ -124,7 +126,8 @@ export class Migrator {
      */
     private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
         // Migrate World Compendium Packs
-        const packs = game.packs?.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
+        // @ts-expect-error // v11 onwards uses packageType
+        const packs = game.packs?.filter((pack) => pack.metadata.packageType === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
 
         if (!packs) return;
 

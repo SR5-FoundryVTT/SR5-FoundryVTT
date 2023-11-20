@@ -52,7 +52,8 @@ export const SR5 = {
         willpower: 'SR5.AttrWillpower',
         pilot: 'SR5.Vehicle.Stats.Pilot',
         force: 'SR5.Force',
-        initiation: 'SR5.Initiation'
+        initiation: 'SR5.Initiation',
+        rating: 'SR5.Rating',
     },
 
     /**
@@ -300,7 +301,7 @@ export const SR5 = {
         attack: 'SR5.MatrixAttrAttack',
         sleaze: 'SR5.MatrixAttrSleaze',
         data_processing: 'SR5.MatrixAttrDataProc',
-        firewall: 'SR5.MatrixAttrFirewall',
+        firewall: 'SR5.MatrixAttrFirewall'
     },
 
     initiativeCategories: {
@@ -334,12 +335,6 @@ export const SR5 = {
         other: 'SR5.LifestyleOther',
     },
 
-    kbmod: {
-        ITEM_DESCR: 'ctrlKey',
-        EDGE: 'altKey',
-        HIDE_DIALOG: 'shiftKey',
-    },
-
     /**
      * Labels for ALL actor types actor based local modifiers.
      *
@@ -351,10 +346,10 @@ export const SR5 = {
         astral_initiative: 'SR5.ModifierTypes.AstralInit',
         astral_limit: 'SR5.ModifierTypes.AstralLimit',
         composure: 'SR5.ModifierTypes.Composure',
-        defense: 'SR5.ModifierTypes.Defense',
-        defense_dodge: 'SR5.ModifierTypes.DefenseDodge',
         defense_block: 'SR5.ModifierTypes.DefenseBlock',
+        defense_dodge: 'SR5.ModifierTypes.DefenseDodge',
         defense_parry: 'SR5.ModifierTypes.DefenseParry',
+        defense: 'SR5.ModifierTypes.Defense',
         drain: 'SR5.ModifierTypes.Drain',
         essence: 'SR5.ModifierTypes.Essence',
         fade: 'SR5.ModifierTypes.Fade',
@@ -374,6 +369,7 @@ export const SR5 = {
         physical_limit: 'SR5.ModifierTypes.PhysicalLimit',
         physical_overflow_track: 'SR5.ModifierTypes.PhysicalOverflowTrack',
         physical_track: 'SR5.ModifierTypes.PhysicalTrack',
+        reach: 'SR5.ModifierTypes.Reach',
         run: 'SR5.ModifierTypes.Run',
         soak: 'SR5.ModifierTypes.Soak',
         social_limit: 'SR5.ModifierTypes.SocialLimit',
@@ -391,10 +387,10 @@ export const SR5 = {
         astral_initiative: 'SR5.Tooltips.Modifiers.astral_initiative',
         astral_limit: 'SR5.Tooltips.Modifiers.astral_limit',
         composure: 'SR5.Tooltips.Modifiers.composure',
-        defense: 'SR5.Tooltips.Modifiers.defense',
         defense_block: 'SR5.Tooltips.Modifiers.defense_block',
         defense_dodge: 'SR5.Tooltips.Modifiers.defense_dodge',
         defense_parry: 'SR5.Tooltips.Modifiers.defense_parry',
+        defense: 'SR5.Tooltips.Modifiers.defense',
         drain: 'SR5.Tooltips.Modifiers.drain',
         essence: 'SR5.Tooltips.Modifiers.essence',
         fade: 'SR5.Tooltips.Modifiers.fade',
@@ -414,6 +410,7 @@ export const SR5 = {
         physical_limit: 'SR5.Tooltips.Modifiers.physical_limit',
         physical_overflow_track: 'SR5.Tooltips.Modifiers.physical_overflow_track',
         physical_track: 'SR5.Tooltips.Modifiers.physical_track',
+        reach: 'SR5.Tooltips.Modifiers.reach',
         run: 'SR5.Tooltips.Modifiers.run',
         soak: 'SR5.Tooltips.Modifiers.soak',
         social_limit: 'SR5.Tooltips.Modifiers.social_limit',
@@ -451,7 +448,7 @@ export const SR5 = {
         memory: 'SR5.ModifierTypes.Memory',
         soak: 'SR5.ModifierTypes.Soak',
         wounds: 'SR5.ModifierTypes.Wounds',
-        recoil: 'SR5.ModifierTypes.Recoil'
+        recoil: 'SR5.ModifierTypes.Recoil',
     },
 
     /**

@@ -246,3 +246,40 @@ body #forien-quest-log .quest-log .table ul .title p {
     color: $white;
 }
 //End Quest Log Styles
+
+//Start Simple Calendar
+/**
+ * CHAT MESSAGE STYLING
+ */
+// Public Roll
+.chat-message,
+.chat-message.emote {
+    color: $white;
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)), url("assets/page.webp") repeat;
+    border: 1px solid $dark;
+    .message-content.h2{
+        color: $yellow;
+    }
+    a.content-link{
+        background: none;
+    }
+}
+
+//Icons
+span.fa.fa-calendar{
+    color: $yellow;
+}
+
+//headers
+.message-content{
+h2{
+    color: $yellow;
+    font-size: 1.5em;
+    border-bottom: 1px solid $edge;
+}}
+h4.message-sender{
+    font-family: 'klavika-medium' ;
+    font-size: small;
+    color: $white;
+}
+//End Simple Calendar

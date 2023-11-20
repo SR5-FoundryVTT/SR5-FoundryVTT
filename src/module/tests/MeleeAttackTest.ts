@@ -1,5 +1,5 @@
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DataDefaults} from "../data/DataDefaults";
+import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { DataDefaults } from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
 import ModifierTypes = Shadowrun.ModifierTypes;
 
@@ -25,11 +25,11 @@ export class MeleeAttackTest extends SuccessTest {
         return false;
     }
 
-     override get testModifiers(): ModifierTypes[] {
+    override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'environmental'];
     }
 
-     override get _dialogTemplate(): string {
+    override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.html';
     }
 
@@ -41,6 +41,7 @@ export class MeleeAttackTest extends SuccessTest {
         if (!this.item || !this.item.isMeleeWeapon) return;
 
         this.data.reach = this.item.getReach();
+        this.data.reach += this.actor?.system.modifiers.reach || 0;
 
         await super.prepareDocumentData();
     }
@@ -58,11 +59,11 @@ export class MeleeAttackTest extends SuccessTest {
 
         // Only light and visibility apply.
         const modifiers = actor.getSituationModifiers();
-        modifiers.environmental.apply({applicable: ['light', 'visibility']});
+        modifiers.environmental.apply({ applicable: ['light', 'visibility'] });
 
         const name = this._getModifierTypeLabel(type);
         const value = modifiers.environmental.total;
 
-        return {name, value};
+        return { name, value };
     }
 }

@@ -22,7 +22,7 @@ export const registerSystemSettings = () => {
             'EUCL': 'SETTINGS.Euclidean',
         },
         onChange: (rule) => {
-            // @ts-expect-error 
+            // @ts-expect-error
             // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
             canvas.grid.diagonalRule = rule
         },
@@ -122,9 +122,9 @@ export const registerSystemSettings = () => {
 
     /**
      * Control Test behaviour and consumption of necessary ressources for it.
-     * 
+     *
      * When set to true tests will NOT roll should one ressource be missing.
-     * 
+     *
      * This can be used to prevent edge rules to be used, when an actor doesn't have edge
      * and other ressources.
      */
@@ -138,9 +138,9 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Control automation of creating the defense modification after mulitple attacks 
+     * Control automation of creating the defense modification after mulitple attacks
      * on an actor unti their next action phase.
-     * 
+     *
      * See SR5.189 'Defender has defended against previous attacks'
      */
     game.settings.register(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier, {
@@ -154,7 +154,7 @@ export const registerSystemSettings = () => {
 
     /**
      * Control automation of progressive recoil when continuously firing
-     * 
+     *
      * See SR5.175 'Progressive Recoil'
      */
     game.settings.register(SYSTEM_NAME, FLAGS.AutomateProgressiveRecoil, {
@@ -176,5 +176,24 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: false
+    });
+
+    /**
+     * Register diagonal movement rule setting
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.MarkImports, {
+        name: 'SETTINGS.MarkImportsName',
+        hint: 'SETTINGS.MarkImportsDescription',
+        scope: 'client',
+        config: true,
+        type: String,
+        default: 'BOTH',
+        // @ts-expect-error
+        choices: {
+            'BOTH': 'SETTINGS.FreshColorAndIcon',
+            'COLOR': 'SETTINGS.FreshColor',
+            'ICON': 'SETTINGS.FreshIcon',
+            'NONE': 'SETTINGS.NoMarking'
+        }
     });
 };

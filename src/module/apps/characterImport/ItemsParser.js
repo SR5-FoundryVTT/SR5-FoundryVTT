@@ -1,16 +1,16 @@
-import { getArray } from "./BaseParserFunctions.js"
-import { GearsParser } from "./GearsParser.js"
-import { ArmorParser } from "../armorImport/ArmorParser";
-import { WareParser } from "../wareImport/WareParser.js";
-import { QualityParser } from "../bioImport/QualityParser";
-import { PowerParser } from "../magicImport/PowerParser";
-import { SpellParser } from "../magicImport/SpellParser.js";
-import { WeaponParser } from "../weaponImport/WeaponParser.js";
-import { LifestyleParser } from "../bioImport/LifestyleParser";
-import { ContactParser } from "../bioImport/ContactParser";
-import SimpleParser from "./SimpleParser.js";
-import { CritterPowerParser } from "../magicImport/CritterPowerParser.js";
-import { RitualParser } from "../magicImport/RitualParser.js";
+import { getArray } from "./importHelper/BaseParserFunctions.js"
+import { GearsParser } from "./importHelper/GearsParser.js"
+import { ArmorParser } from "./armorImport/ArmorParser.js";
+import { WareParser } from "./wareImport/WareParser.js";
+import { QualityParser } from "./bioImport/QualityParser.js";
+import { PowerParser } from "./magicImport/PowerParser.js";
+import { SpellParser } from "./magicImport/SpellParser.js";
+import { WeaponParser } from "./weaponImport/WeaponParser.js";
+import { LifestyleParser } from "./bioImport/LifestyleParser.js";
+import { ContactParser } from "./bioImport/ContactParser.js";
+import SimpleParser from "./importHelper/SimpleParser.js";
+import { CritterPowerParser } from "./magicImport/CritterPowerParser.js";
+import { RitualParser } from "./magicImport/RitualParser.js";
 
 /**
  * Parses all items (qualities, weapons, gear, ...) from a chummer character.

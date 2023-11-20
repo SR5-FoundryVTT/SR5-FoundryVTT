@@ -201,7 +201,8 @@ export class SR5BaseActorSheet extends ActorSheet {
     override get template() {
         const path = 'systems/shadowrun5e/dist/templates';
 
-        if (this.actor.limited) {
+        // v10 actor.limited doesn't take GM into account, so we have to do it ourselves.
+        if (!game.user?.isGM && this.actor.limited) {
             return `${path}/actor-limited/${this.actor.type}.html`;
         }
 
@@ -252,6 +253,8 @@ export class SR5BaseActorSheet extends ActorSheet {
             async: true,
             relativeTo: this.actor
         });
+
+        data.bindings = this._prepareKeybindings();
 
         return data;
     }
@@ -356,6 +359,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Situation modifiers application
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
+        // Freshly imported item toggle
+        html.find('.toggle-fresh-import-all-off').on('click', async (event) => this._toggleAllFreshImportFlags(event, false));
+        html.find('.toggle-fresh-import-all-on').on('click', async (event) => this._toggleAllFreshImportFlags(event, true));
+
+        // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
     }
 
@@ -1032,7 +1040,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         sheetData.isSpirit = this.actor.isSpirit();
         sheetData.isCritter = this.actor.isCritter();
         sheetData.hasSkills = this.actor.hasSkills;
-        sheetData.hasSpecial = this.actor.hasSpecial;
+        sheetData.canAlterSpecial = this.actor.canAlterSpecial;
         sheetData.hasFullDefense = this.actor.hasFullDefense;
     }
 
@@ -1102,10 +1110,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.actor.clearMarks();
     }
 
-    _prepareSkillsWithFilters(data: SR5ActorSheetData) {
-        this._filterActiveSkills(data);
-        this._filterKnowledgeSkills(data);
-        this._filterLanguageSkills(data);
+    /**
+     * Prepare skills with sorting and filtering given by this sheet.
+     * 
+     * @param sheetData What is to be displayed on sheet.
+     */
+    _prepareSkillsWithFilters(sheetData: SR5ActorSheetData) {
+        this._filterActiveSkills(sheetData);
     }
 
     _filterSkills(data: SR5ActorSheetData, skills: Skills = {}) {
@@ -1174,22 +1185,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         let searchString = `${searchKey} ${name} ${specs}`;
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
-    }
-
-    _filterKnowledgeSkills(sheetData: SR5ActorSheetData) {
-        // Knowledge skill have separate sub-categories.
-        Object.keys(SR5.knowledgeSkillCategories).forEach((category) => {
-            if (!sheetData.system.skills.knowledge.hasOwnProperty(category)) {
-                console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
-                return;
-            }
-            sheetData.system.skills.knowledge[category].value = this._filterSkills(sheetData, sheetData.system.skills.knowledge[category].value);
-        });
-    }
-
-    _filterLanguageSkills(sheetData: SR5ActorSheetData) {
-        // Language Skills have no sub-categories.
-        sheetData.system.skills.language.value = this._filterSkills(sheetData, sheetData.system.skills.language.value);
     }
 
     _filterActiveSkills(sheetData: SR5ActorSheetData) {
@@ -1825,11 +1820,37 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
+     * Toggle to isFreshImport property of importFlags for all items on the character sheet
+     *
+     * @param event
+     */
+    async _toggleAllFreshImportFlags(event, onOff: boolean) {
+        const allItems = this.actor.items;
+        console.debug('Toggling all importFlags on owned items to ->', onOff, event);
+        for (const item of allItems) {
+            if (item.system.importFlags) {
+                await item.update({ 'system.importFlags.isFreshImport': onOff });
+            }
+        }
+    }
+
+    /**
      * Trigger a full reset of all run related actor data.
      *
      * @param event
      */
     _onResetActorRunData(event) {
         this.actor.resetRunData()
+    }
+
+    /**
+     * Prepare keybindings to be shown when hovering over a rolling icon 
+     * in any list item view that has rolls.
+     */
+    _prepareKeybindings() {
+        return {
+            skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => `${binding.key.replace('Key', '')}`).join(', '),
+            card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => `${binding.key.replace('Key', '')}`).join(', '),
+        }
     }
 }

@@ -49,5 +49,11 @@ export class LimitsPrep {
             limits.magic.hidden = true;
             Helpers.calcTotal(limits.magic);
         }
+
+        if("magic" in system) {
+            limits.initiation = LimitRules.calculateInitiationSubmersionLimit(system.magic.initiation)
+            Helpers.calcTotal(limits.initiation, {min: 0} );
+        }
+        
     }
 }

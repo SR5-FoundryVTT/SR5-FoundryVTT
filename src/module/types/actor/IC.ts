@@ -15,6 +15,16 @@ declare namespace Shadowrun {
                 id: string,
                 // The hosts matrix attribute selection.
                 atts: MatrixAttributes
-            }
+            },
+            attributes: ICAttributes
+            modifiers: Modifiers & CommonModifiers & MatrixModifiers
+    }    
+
+    interface ICAttributes extends Attributes {
+        rating: AttributeField
+        attack: AttributeField
+        sleaze: AttributeField
+        data_processing: AttributeField
+        firewall: AttributeField
     }
 }

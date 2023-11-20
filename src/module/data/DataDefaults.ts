@@ -41,8 +41,7 @@ export class DataDefaults {
         const type = itemData.type;
 
         // Duplicate source to avoid keeping reference to model data.
-        //@ts-expect-error foundry-vtt-type v10
-        const modelSystemData = duplicate(game.model['Item'][type]);
+        const modelSystemData = duplicate(game.model.Item[type]);
         if (!modelSystemData) throw new Error(`FoundryVTT doesn't have item type: ${type} registered`);
         return {
             name, type,
@@ -338,5 +337,24 @@ export class DataDefaults {
             wireless: true,
             networkController: undefined
         }, partialTechnologyData) as Shadowrun.TechnologyData;
+    }
+
+    /**
+     * Build a attribute data segment.
+     * 
+     * @param partialAttributeData
+     * @returns Merged of partial and basic attribute data
+     */
+    static attributeData(partialAttributeData: Partial<Shadowrun.AttributeField> = {}) {
+        return mergeObject({
+            value: 0,
+            mod: [],
+            base: 0,
+            label: '',
+            hidden: false,
+            device_att: '',
+            temp: 0,
+            limit: ''
+        }, partialAttributeData) as Shadowrun.AttributeField;
     }
 }

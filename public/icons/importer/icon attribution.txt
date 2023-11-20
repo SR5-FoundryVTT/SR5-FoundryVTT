@@ -245,3 +245,6 @@ weapon/submachine-guns.svg - Delapouite - https://game-icons.net/1x1/delapouite/
 weapon/tasers.svg - Lorc - https://game-icons.net/1x1/lorc/bolter-gun.html
 weapon/unarmed.svg - Delapouite - https://game-icons.net/1x1/delapouite/high-punch.html
 weapon/underbarrel-weapons -
+
+Other
+checklist.svg - Delapouite - https://game-icons.net/1x1/delapouite/checklist.html

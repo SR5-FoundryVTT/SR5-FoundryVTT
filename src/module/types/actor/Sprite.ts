@@ -10,5 +10,6 @@ declare namespace Shadowrun {
             services: number;
             registered: boolean;
             spriteType: SpriteType;
+            modifiers: Modifiers & CommonModifiers;
     }
 }

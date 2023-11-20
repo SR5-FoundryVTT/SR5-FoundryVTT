@@ -13,7 +13,8 @@ declare namespace Shadowrun {
         TwoTrackActorData,
         ArmorActorData,
         WoundsActorData,
-        MovementActorData {
+        MovementActorData,
+        NPCActorData {
             // FoundryVTT uuid of the summoning actors spirit.
             // If no summoner is set, uuid will be empty.
             summonerUuid: string
@@ -24,5 +25,6 @@ declare namespace Shadowrun {
             limits: AwakendLimits
             services: number
             attributes: SpiritAttributes
+            modifiers: Modifiers & CommonModifiers
     }
 }

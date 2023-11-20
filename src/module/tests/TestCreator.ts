@@ -646,7 +646,11 @@ export const TestCreator = {
      */
     shouldHideDialog(event: Shadowrun.RollEvent|undefined): boolean {
         if (!event) return false;
-        return event[SR5.kbmod.HIDE_DIALOG] === true;
+        const bindings = game.keybindings.get("shadowrun5e", "hide-test-dialog");
+        for (const binding of bindings) {
+            return event[binding.key] === true;
+        }
+        return false;
     },
 
     /**
@@ -665,6 +669,10 @@ export const TestCreator = {
      */
     shouldPostItemDescription(event: Shadowrun.RollEvent|undefined): boolean {
         if (!event) return false;
-        return event[SR5.kbmod.ITEM_DESCR] === true;
+        const bindings = game.keybindings.get("shadowrun5e", "show-item-card");
+        for (const binding of bindings) {
+            return event[binding.key] === true;
+        }
+        return false;
     }
 };

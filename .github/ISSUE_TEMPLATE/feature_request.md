@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Missing stuff, changes to stuff, removal of stuff
-title: "[Feature Request]"
+title: "[FEATURE]"
 labels: enhancement
 assignees: ''
 

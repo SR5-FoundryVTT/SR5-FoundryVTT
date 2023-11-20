@@ -1,6 +1,7 @@
 import { getArray } from "../importHelper/BaseParserFunctions.js";
 import { WeaponParser } from "../weaponImport/WeaponParser";
 import { GearsParser } from "../importHelper/GearsParser.js";
+import { MountedWeaponParser } from "./MountedWeaponParser.js";
 
 export default class VehicleParser {
 
@@ -23,9 +24,6 @@ export default class VehicleParser {
                 type: "vehicle"
             });
 
-            const parsedItems = [];
-
-
             let handling;
             let off_road_handling;
             if(vehicle.handling.includes("/")) {
@@ -46,8 +44,10 @@ export default class VehicleParser {
                 off_road_speed =  vehicle.speed
             }
 
-            Array.prototype.push.apply(parsedItems, new WeaponParser().parseWeapons(vehicle));
-            Array.prototype.push.apply(parsedItems, new GearsParser().parseGears(getArray(vehicle.gears.gear)));
+            const promises = [];
+            promises.push(new WeaponParser().parseWeapons(vehicle));
+            promises.push(new GearsParser().parseGears(getArray(vehicle.gears?.gear)));
+            promises.push(new MountedWeaponParser().parseWeapons(vehicle))
 
             vehicleActor.update({
                 'system.driver': actor.id,
@@ -61,10 +61,11 @@ export default class VehicleParser {
                 'system.attributes.body.base': vehicle.body,
             
                 'system.armor.base': vehicle.armor,
-                'system.isDrone': vehicle.isdrone
+                'system.isDrone': vehicle.isdrone,
+                'folder': actor.folder.id
             });
 
-            await vehicleActor.createEmbeddedDocuments('Item', parsedItems);
+            await vehicleActor.createEmbeddedDocuments('Item', (await Promise.all(promises)).flat());
         }
     }
 }

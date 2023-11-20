@@ -1,7 +1,7 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='misc'}}
     <div class="inventory">
         <div class="split-container">
-            <div>
+            <div class="scroll-area">
                 {{#if isCharacter}}
                     <div class="list-item">
                         <div class="list-item-content">
@@ -98,7 +98,7 @@
                         </div>
                     </div>
                 {{/if}}
-                {{#if hasSpecial }}
+                {{#if canAlterSpecial }}
                 <div class="list-item">
                     <div class="list-item-content">
                         <div class="item-left">
@@ -147,7 +147,7 @@
                             </div>
                         </div>
                         <div class="item-right">
-                            <div class="item-text input">
+                            <div class="item-text input defense">
                                 <select name="system.full_defense_attribute" class="display">
                                     {{#select system.full_defense_attribute}} {{#each config.attributes as |name type|}}
                                         <option value="{{type}}">{{localize name}}</option>
@@ -187,6 +187,7 @@
                         </div>
                     </div>
                 </div>
+                {{/if}}
                 {{#if system.is_npc }}
                 <div class="list-item">
                     <div class="list-item-content">
@@ -205,6 +206,7 @@
                     </div>
                 </div>
                 {{/if}}
+                {{#if isCharacter}}
                 <div class="list-item">
                     <div class="list-item-content">
                         <div class="item-left">
@@ -233,6 +235,7 @@
                     </div>
                 </div>
                 {{/if}}
+                {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html' }}{{/if}}
                 <div class="list-item">
                     <div class="list-item-content">
                         <button type="button" class="display reset-actor-run-data" data-tooltip="SR5.Tooltips.Actor.ResetActorForNewRun">
@@ -242,7 +245,7 @@
                 </div>
             </div>
             <div class="flexcol">
-                <div class="scroll-area-mods">
+                <div class="scroll-area scroll-area-mods">
                     <!-- Situational Modifiers Section -->
                     {{#if situationModifiers}}
                     <div class="list-item item-section wrap-collapsible">
@@ -269,7 +272,7 @@
                                     <div class="list-item">
                                         <div class="list-item-content">
                                             <div class="item-left">
-                                                <div class="item-text item-name show-situation-modifiers-application">
+                                                <div class="item-text item-name mods-label show-situation-modifiers-application">
                                                     {{localize this.label}}
                                                 </div>
                                             </div>
@@ -311,7 +314,7 @@
                                 <div class="list-item">
                                     <div class="list-item-content">
                                         <div class="item-left">
-                                            <div class="item-text item-name" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
+                                            <div class="item-text item-name mods-label" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
                                                 {{localizeOb id ../config.actorModifiers}}
                                             </div>
                                         </div>

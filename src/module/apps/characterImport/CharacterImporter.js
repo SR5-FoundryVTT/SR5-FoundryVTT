@@ -1,5 +1,5 @@
 import {CharacterInfoUpdater} from "./CharacterInfoUpdater"
-import {ItemsParser} from "./importHelper/ItemsParser";
+import {ItemsParser} from "./ItemsParser";
 import VehicleParser from "./vehicleImport/VehicleParser.js";
 
 
@@ -40,7 +40,7 @@ export class CharacterImporter {
     }
 
     async resetCharacter(actor) {
-        let toDeleteItems = actor.items.filter(item => item.type !== "action").map(item => item.id)
+        let toDeleteItems = actor.items?.filter(item => item.type !== "action").map(item => item.id)
         let deletedItems = actor.deleteEmbeddedDocuments("Item", toDeleteItems );
 
         let removed = {
