@@ -127,6 +127,7 @@ export class PhysicalResistTest extends SuccessTest {
             if(armor.hardened) {
                 if(this.data.incomingDamage.value < armor.value) {
                     //Automatic success
+                    this.data.autoSuccess = true;
                     this.data.overrideSuccessMessage = "SR5.TestResults.SoakBlockedByHardenedArmor";
                     return true;
                 }

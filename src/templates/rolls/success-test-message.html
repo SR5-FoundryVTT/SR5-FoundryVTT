@@ -35,44 +35,46 @@
             </div>
         </div>
         {{/if}}
-        <div class="card-content {{#if showDescription}}clickable show-description{{/if}}  {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
-            <div class="left-side">
-                {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.OpposingHits"}}:</span> <span class="value-result">{{test.against.netHits.value}}</span></div>{{/if}}
-                {{#if test.hasLimit}}<div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span class="value-result">{{test.limit.value}}</span></div>{{/if}}
-                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.threshold.label}}:</span> <span class="value-result">{{test.threshold.value}}</span></span></div>{{/if}}
-            </div>
-            <div class="right-side">
-                <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span class="value-result">{{test.pool.value}}</span></div>
-                <div class="test-value">
-                    <span class="value">{{localize test.hits.label}}:</span>
-                    <span class="value-result">{{test.hits.value}}{{#if test.usingManualRoll}}*{{/if}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}</span>
-                    {{#if test.hitsIcon}}<img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />{{/if}}
+        {{#unless test.autoSuccess}}
+            <div class="card-content {{#if showDescription}}clickable show-description{{/if}}  {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
+                <div class="left-side">
+                    {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.OpposingHits"}}:</span> <span class="value-result">{{test.against.netHits.value}}</span></div>{{/if}}
+                    {{#if test.hasLimit}}<div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span class="value-result">{{test.limit.value}}</span></div>{{/if}}
+                    {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.threshold.label}}:</span> <span class="value-result">{{test.threshold.value}}</span></span></div>{{/if}}
                 </div>
-                {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span class="value-result">{{test.extendedHits.value}}</span></div>{{/if}}
-                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span class="value-result">{{test.netHits.value}}</span></div>{{/if}}
-                {{#if previewTemplate}}
-                <div class="test-value">
-                    <span class="value" title="{{localize 'SR5.PlaceTemplate'}}">{{localize "SR5.PlaceTemplate"}}:</span> <span class="value-result"><i class="fas fa-bullseye roll place-template"></i></span>
+                <div class="right-side">
+                    <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span class="value-result">{{test.pool.value}}</span></div>
+                    <div class="test-value">
+                        <span class="value">{{localize test.hits.label}}:</span>
+                        <span class="value-result">{{test.hits.value}}{{#if test.usingManualRoll}}*{{/if}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}</span>
+                        {{#if test.hitsIcon}}<img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />{{/if}}
+                    </div>
+                    {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span class="value-result">{{test.extendedHits.value}}</span></div>{{/if}}
+                    {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span class="value-result">{{test.netHits.value}}</span></div>{{/if}}
+                    {{#if previewTemplate}}
+                    <div class="test-value">
+                        <span class="value" title="{{localize 'SR5.PlaceTemplate'}}">{{localize "SR5.PlaceTemplate"}}:</span> <span class="value-result"><i class="fas fa-bullseye roll place-template"></i></span>
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+            {{#if showDescription}}
+             <div class="card-description">
+                {{#if description.description.value}}
+                <div class="card-description-content">
+                    {{{description.description.value}}}
                 </div>
                 {{/if}}
-            </div>
-        </div>
-        {{#if showDescription}}
-         <div class="card-description">
-            {{#if description.description.value}}
-            <div class="card-description-content">
-                {{{description.description.value}}}
+                {{#each description.properties}}
+                <span style="white-space: nowrap;">{{this}}</span>
+                {{/each}}
             </div>
             {{/if}}
-            {{#each description.properties}}
-            <span style="white-space: nowrap;">{{this}}</span>
-            {{/each}}
-        </div>
-        {{/if}}
+        {{/unless}}
         <div class="card-test-content">
             {{! Some tests will not determine an outcome, but a failure will always be a failure }}
             {{#unless test.showSuccessLabel}}{{#unless test.failure}}
-            <div class="glitch-content clickable show-roll">
+            <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
                 <div class="glitch">{{localize "SR5.TestResults.Results"}}</div>
             </div>
             {{/unless}}{{/unless}}
@@ -81,7 +83,7 @@
             {{! Some tests will determine an outcome and success state }}
             {{#if test.canSucceed}} {{#if test.showSuccessLabel}}
             <div class="glitch-content">
-                <div class="glitch clickable show-roll">
+                <div class="glitch {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
                     {{localize test.successLabel}}
                 </div>
             </div>
@@ -90,7 +92,7 @@
             {{! Some tests will determine a failure state }}
             {{#if test.canFail}}{{#if test.failure}}
             <div class="glitch-content">
-                <div class="glitch clickable show-roll">
+                <div class="glitch {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
                     {{localize test.failureLabel}}
                 </div>
             </div>

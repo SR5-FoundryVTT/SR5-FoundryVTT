@@ -67,6 +67,7 @@ export interface TestData {
 
     appendedHits?: number
     hitsIcon?: IconWithTooltip
+    autoSuccess?: boolean
 
     // Internal test values.
     values: TestValues
@@ -885,6 +886,11 @@ export class SuccessTest {
 
     get appendedHits(): number | undefined {
         return this.data.appendedHits;
+    }
+
+    // Hide dice pool and roll results as they are not relevant to the success of the test
+    get autoSuccess(): boolean {
+        return !!this.data.autoSuccess;
     }
 
     /**
