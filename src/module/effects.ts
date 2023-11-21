@@ -113,29 +113,65 @@ export function prepareSortedEffects(effects: SR5ActiveEffect[], byKey: string =
 export function prepareSortedItemEffects(document: SR5Actor|SR5Item): Shadowrun.AllEnabledEffectsSheetData {
     const enabledEffects: Shadowrun.AllEnabledEffectsSheetData = [];
 
-    for (const effect of allEnabledItemEffects(document)) {
+    for (const effect of allApplicableItemEffects(document)) {
+        if (!effect.active) continue;
+
         enabledEffects.push(effect);
     }
 
     return prepareSortedEffects(enabledEffects, 'sheetName');
 }
 
+interface ApplicableItemEffectOptions {
+    applyTo?: string[]
+    nestedItems?: boolean
+}
+
+interface ApplicableDocumentEffectOptions {
+    applyTo?: string[]
+}
+
 /**
- * Iterator for all enabled effects of an actors owned and nested items.
- * @param document 
+ * Collect all local effects from a given document.
+ * 
+ * To collect effects of embedded items, use allApplicableItemEffects.
+ * 
+ * @param document Either an actor or item document.
+ * @param options.applyTo A iterable of apply-to target values
  */
-function *allEnabledItemEffects(document: SR5Actor|SR5Item) {
+export function *allApplicableDocumentEffects(document: SR5Actor|SR5Item, options: ApplicableDocumentEffectOptions = {}) {
+    const applyTo = options.applyTo ?? [];
+
+    for (const effect of document.effects) {
+        if (applyTo.length > 0 && !applyTo.includes(effect.applyTo)) continue;
+        yield effect;
+    }
+}
+
+/**
+ * Collect all effects from a documents items and nested items.
+ * 
+ * @param document Either a actor or item document.
+ * @param options.applyTo A iterable of apply-to target values
+ * @param options.nestedItems Whether to include nested items
+ * @returns An iterator effect
+ */
+export function *allApplicableItemEffects(document: SR5Actor|SR5Item, options: ApplicableItemEffectOptions = {}) {
+    const applyTo = options.applyTo ?? [];
+    const nestedItems = options.nestedItems ?? true;
+
     for (const item of document.items) {
         for (const effect of item.effects) {
-            if (effect.skipApply(item, false)) continue;
+            if (applyTo.length > 0 && !applyTo.includes(effect.applyTo)) continue ;
             yield effect;
         }
 
+        if (!nestedItems) continue;
         if (document instanceof SR5Item) continue;
 
         for (const nestedItem of item.items) {
             for (const effect of nestedItem.effects) {
-                if (effect.skipApply(item, false)) continue;
+                if (applyTo.length > 0 && !applyTo.includes(effect.applyTo)) continue;
                 yield effect;
             }
         }

@@ -1279,8 +1279,7 @@ export class SuccessTest {
 
         this.prepareTestSelectionData();
 
-        // Apply effects applicable to test values.
-        this.effects.apply();
+        this.effects.applyAllEffects();
 
         // Initial base value preparation will show default result without any user input.
         this.prepareBaseValues();

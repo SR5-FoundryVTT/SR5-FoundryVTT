@@ -4,6 +4,7 @@ import { ActiveEffectData } from "@league-of-foundry-developers/foundry-vtt-type
 import { SR5Actor } from "../../actor/SR5Actor";
 import { OpposedTest } from "../../tests/OpposedTest";
 import { SR5Item } from "../../item/SR5Item";
+import { allApplicableDocumentEffects, allApplicableItemEffects } from "../../effects";
 
 /**
  * Handle the SR5ActiveEffects flow for a SuccessTest.
@@ -29,11 +30,11 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * NOTE: Since effects are applied as none unique modifiers, applying them multiple times is possible.
      *       Changes can't be applied as unique modifiers as they're names are not unique.
      */
-    apply() {
+    applyAllEffects() {
         // Since we're extending EffectChangeData by a effect field only locally, I don't care enough to resolve the typing issue.
         const changes: any[] = [];
 
-        for (const effect of this.allApplicable()) {
+        for (const effect of this.allApplicableEffects()) {
             // Organize non-disabled effects by their application priority            
             if (!effect.active) continue;
 
@@ -42,7 +43,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             // Collect all changes of effect left.
             changes.push(...effect.changes.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
-                // TODO: Remove this crap... Clear the issue of submitting the SR5ActiveEffectConfig changing all data. to system.
+                // Make sure FoundryVTT key migration doesn't affect us here.
                 c.key = c.key.replace('system.', 'data.');
                 c.effect = effect;
                 c.priority = c.priority ?? (c.mode * 10);
@@ -118,11 +119,12 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         if (!against && !this.test.opposing) return;
         if (!actor) return;
+        if (!this.test.item) return;
 
         console.debug('Shadowrun5e | Creating effects on target actor after opposed test.', this.test);
 
         const effects: ActiveEffectData[] = [];
-        for (const effect of this.allApplicableToTargetActor()) {
+        for (const effect of allApplicableItemEffects(this.test.item, {applyTo: ['targeted_actor']})) {
             const effectData = effect.toObject() as ActiveEffectData;
 
             // Transform all dynamic values to static values.
@@ -145,59 +147,34 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * Since Foundry Core uses a generator, keep this pattern for consistency.
      * 
      */
-    *allApplicable(): Generator<SR5ActiveEffect> {
+    *allApplicableEffects(): Generator<SR5ActiveEffect> {
         // Pool only tests will don't have actors attached.
         if (!this.test.actor) return;
         
-        // Actor effects apply only for all tests.
-        for (const effect of this.test.actor.effects as unknown as SR5ActiveEffect[]) {
-            if (effect.applyTo === 'test_all') yield effect;
+        for (const effect of allApplicableDocumentEffects(this.test.actor, {applyTo: ['test_all']})) {
+            yield effect;
         }
 
-        // apply-to 'test_all' effects for OwnedItems and NestedItems
-        for (const item of this.test.actor.items as unknown as SR5Item[]) {
-            for (const effect of item.effects as unknown as SR5ActiveEffect[]) {
-                if (effect.skipApply(item)) continue;
-
-                if (effect.applyTo === 'test_all') yield effect;
-            }
-
-            for (const nestedItem of item.items) {
-                for (const effect of nestedItem.effects as unknown as SR5ActiveEffect[]) {
-                    if (effect.skipApply(nestedItem)) continue;
-    
-                    if (effect.applyTo === 'test_all') yield effect;
-                }
-            }
+        for (const effect of allApplicableItemEffects(this.test.actor, {applyTo: ['test_all']})) {
+            yield effect;
         }
 
         // Skip tests without an item for apply-to test_item effects.
         if (!this.test.item) return;
 
-        // Item effects can also apply to this test only.
-        for (const effect of this.test.item?.effects as unknown as SR5ActiveEffect[]) {
-            if (effect.skipApply(effect.parent as SR5Item)) continue;
-
-            if (effect.applyTo === 'test_item') yield effect;            
+        for (const effect of allApplicableDocumentEffects(this.test.item, {applyTo: ['test_item']})) {
+            yield effect;
         }
         
-        // NestedItem effects can also apply to this test only.
-        for (const item of this.test.item?.items as unknown as SR5Item[]) {
-            // Allow users to have nested items that don't affect tests by having them unequipped.
-            if (!item.isEquipped()) continue;
-
-            for (const effect of item.effects as unknown as SR5ActiveEffect[]) {
-                if (effect.skipApply(item)) continue;
-
-                if (effect.applyTo === 'test_item') yield effect;
-            }
+        for (const effect of allApplicableItemEffects(this.test.item, {applyTo: ['test_item']})) {
+            yield effect;
         }
     }
 
     /**
      * Reduce all item effects to those applicable to target actors as part of a success vs opposed test flow.
      */
-    *allApplicableToTargetActor(): Generator<SR5ActiveEffect> {
+    *allApplicableEffectsToTargetActor(): Generator<SR5ActiveEffect> {
         if (!this.test.item) return;
 
         for (const effect of this.test.item.effects as unknown as SR5ActiveEffect[]) {

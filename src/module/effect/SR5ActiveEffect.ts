@@ -21,8 +21,8 @@ import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
  */
 export class SR5ActiveEffect extends ActiveEffect {
     // Foundry Core typing missing... TODO: foundry-vtt-types v10
-    public origin: string | null;
     public active: boolean;
+    public origin: string | null;
     public changes: EffectChangeData[];
 
     /**
@@ -55,6 +55,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this.parent instanceof SR5Actor) return this.name;
         return `${this.parent?.name} » ${this.name}`;
     }
+
     /**
      * Render the sheet of the active effect source
      */
@@ -208,19 +209,22 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Check if this effect should be applied in any context, depending on it's parent items state.
      * 
      * @param item The item to check against.
-     * @param onlyEnabled Should the active status of an effect be taken into account?
      * @returns true, if this effect should be skipped according to it's configuration.
      */
-    skipApply(item: SR5Item | undefined, onlyEnabled: boolean = true): boolean {
-        if (!item) return false;
-        if (!(item instanceof SR5Item)) return false;
-        //@ts-expect-error TODO: foundry-vtt-types v10
-        if (onlyEnabled && this.disabled) return true;
-
+    activeWithItem(item: SR5Item): boolean {
         if (this.onlyForEquipped && !item.isEquipped()) return true;
         if (this.onlyForWireless && !item.isWireless()) return true;
 
         return false;
+    }
+
+    override get isSuppressed(): boolean {
+        if (!(this.parent instanceof SR5Item)) return false;
+
+        if (this.onlyForEquipped && !this.parent.isEquipped()) return true;
+        if (this.onlyForWireless && !this.parent.isWireless()) return true;
+
+        return false; 
     }
 
     /**

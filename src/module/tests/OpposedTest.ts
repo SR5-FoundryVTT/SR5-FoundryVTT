@@ -194,7 +194,7 @@ export class OpposedTest extends SuccessTest {
 
         if (!this.against) return templateData;
 
-        for (const effect of this.against.effects.allApplicableToTargetActor()) {
+        for (const effect of this.against.effects.allApplicableEffectsToTargetActor()) {
             templateData.effects.push(effect);
         }
 

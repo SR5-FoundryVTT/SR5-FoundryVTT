@@ -253,7 +253,7 @@ export class SituationModifier {
         }
         
         // Apply effects applicable to situational modifiers.
-        this.effects.apply({test: options.test});
+        this.effects.applyAllEffects(options.test);
 
         // If a fixed value selection has been made, use that.
         // NOTE: When a fixed selection is removed, the input will return null.

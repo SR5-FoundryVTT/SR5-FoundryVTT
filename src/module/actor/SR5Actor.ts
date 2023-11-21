@@ -26,6 +26,7 @@ import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { allApplicableDocumentEffects, allApplicableItemEffects } from '../effects';
 
 
 /**
@@ -166,45 +167,25 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Default FoundryVTT will return all effects that are to be transferred onto the actor.
+     * Get all ActiveEffects applicable to this actor.
      * 
-     * The system provides additional support for:
-     * - Parent item equipped state affecting applicable effects
-     * - Only apply effects targeting actor data
+     * The system uses a custom method of determining what ActiveEffect is applicable that doesn't 
+     * use default FoundryVTT allApplicableEffect.
+     * 
+     * The system has additional support for:
+     * - taking actor effects from items (apply-To actor)
+     * - having effects apply that are part of a targeted action against this actor (apply-To targeted_actor)
      * 
      * NOTE: FoundryVTT applyActiveEffects will check for disabled effects.
      */
     //@ts-expect-error TODO: foundry-vtt-types v10
     override *allApplicableEffects() {
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        for (const effect of super.allApplicableEffects()) {
-            // Item owned effects should only apply when the item is equipped.
-            // TODO: implement effect.isEquippedOnly and allow for effects of unequipped items to also apply...
-            if (effect.parent instanceof SR5Item && !effect.parent.isEquipped()) continue;
-            // Item owned effects with only on wireless mode should only apply when the item is wireless.
-            // TODO: Check for effect.applyForWirelessActiveOnly
-            if (effect.parent instanceof SR5Item && !effect.isWirelessActive) continue;
-            // Only apply effects targeting actor data.
-            if (!['actor', 'targeted_actor'].includes(effect.applyTo)) continue;
-
+        for (const effect of allApplicableDocumentEffects(this, {applyTo: ['actor', 'targeted_actor']})) {
             yield effect;
         }
 
-        // apply-to 'actor' effects for OwnedItems and NestedItems
-        for (const item of this.items) {
-            for (const effect of item.effects) {
-                if (effect.skipApply(item)) continue;
-
-                if (effect.applyTo === 'actor') yield effect;
-            }
-
-            for (const nestedItem of item.items) {
-                for (const effect of nestedItem.effects) {
-                    if (effect.skipApply(nestedItem)) continue;
-    
-                    if (effect.applyTo === 'actor') yield effect;
-                }
-            }
+        for (const effect of allApplicableItemEffects(this, {applyTo: ['actor']})) {
+            yield effect;
         }
     }
 
