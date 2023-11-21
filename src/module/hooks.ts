@@ -63,6 +63,7 @@ import VisionConfigurator from './vision/visionConfigurator';
 import { DataDefaults } from './data/DataDefaults';
 import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 import { RenderSettings } from './systemLinks';
+import registerSR5Tours from './tours/tours';
 
 
 
@@ -315,6 +316,10 @@ ___________________
 
         // Preload might reduce loading time during play.
         HandlebarManager.loadTemplates();
+
+        // Register Tours
+        registerSR5Tours();
+
     }
 
     static async ready() {

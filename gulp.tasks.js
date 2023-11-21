@@ -59,6 +59,7 @@ async function buildJS() {
 async function copyAssets() {
     gulp.src('public/**/*').pipe(gulp.dest(destFolder));
     gulp.src('src/templates/**/*').pipe(gulp.dest(path.resolve(destFolder, 'templates')));
+    gulp.src('src/module/tours/jsons/**/*').pipe(gulp.dest(path.resolve(destFolder, 'tours')));
 }
 
 /**
@@ -72,6 +73,7 @@ async function watch() {
 
     gulp.watch('public/**/*').on('change', () => gulp.src('public/**/*').pipe(gulp.dest(destFolder)));
     watch('src/templates/**/*', 'templates');
+    watch('src/module/tours/jsons/**/*', 'tours');
 
     gulp.watch('src/**/*.scss').on('change', async () => await buildSass());
 

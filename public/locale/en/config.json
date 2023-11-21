@@ -1289,5 +1289,20 @@
     "SR5.WeaponReach": "Reach",
     "SR5.WeaponReload": "Reload",
     "SR5.WeaponType": "Type",
-    "SR5.Wireless": "Wireless"
+    "SR5.Wireless": "Wireless",
+
+    "SR5.Tours": {
+            "Tracks": {
+                "Title": "Tracks Tour",
+                "Description": "This Tour will give you an overview how tracks work. It requires a character actor to work",
+                "GeneralTitle": "Tracks",
+                "GeneralContent": "These are your tracks. They consist of several cells. In certain cells you can see a written number. If these cells are filled your wound modifier is increased to this number. The wound modifiers of all tracks are added",
+                "WoundModifierTitle": "Wound Modifier",
+                "WoundModifierContent": "This cell denotes that filling it increases your wound modifier by the number written in the cell",
+                "ApplyDamageTitle":"Applying and removing Damage",
+                "ApplyDamageContent":"To apply damage left click a cell. All cells up to this cell including will be filled. If more cells where filled all cells to the right will not be filled anymore. Right clicking any cell will remove all damage from the track.",
+                "RecoveryTitle": "Recovery Checks",
+                "RecoveryContent": "Clicking on the label of a track will prompt a recovery check. The result of the recovery check will be automatically applied to the track."
+            }
+        }
 }
