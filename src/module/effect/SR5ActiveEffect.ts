@@ -117,6 +117,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * To keep the ActiveEffect workflow simple and still allow to override values that aren't a ModifiableValue,
      * check for such values and give the ActorDataPreparation flow some hints.
+     * 
+     * To complicate things, there are some use cases when overwriting an actual property of a ValueField
+     * is needed. The SR5 uneducated quality needs to override the canDefault field of a skill.
      *
      * @protected
      */
@@ -131,19 +134,6 @@ export class SR5ActiveEffect extends ActiveEffect {
             return null;
         }
 
-        // Check indirect key.
-        const nodes = change.key.split('.');
-        nodes.pop();
-        const indirectKey = nodes.join('.');
-
-        if (this._isKeyModifiableValue(actor, indirectKey)) {
-            const value = foundry.utils.getProperty(actor, indirectKey);
-            value.override = { name: this.name, value: Number(change.value) };
-
-            return null;
-        }
-
-        // Neither a direct nor an indirect ModifiableValue match.
         //@ts-expect-error // TODO: foundry-vtt-types v10
         return super._applyOverride(actor, change, current, delta, changes);
     }
