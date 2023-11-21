@@ -791,21 +791,21 @@ export const registerItemLineHelpers = () => {
      * Helper specifically for active effect icons sourced from an actors items to display in list form.
      */
     Handlebars.registerHelper('ItemEffectIcons', function (effect) {
-        const editIcon = {
-            icon: 'fas fa-edit item-effect-control',
-            title: game.i18n.localize('SR5.EditItem'),
-            data: {action: 'edit'}
-        };        
-        const disableIcon = {
-            icon: `${effect.disabled ? 'far fa-circle' : 'fas fa-check-circle'} item-effect-control`,
-            title: game.i18n.localize('SR5.ToggleActive'),
-            data: {action: "toggle"}
-        };
         const openOriginIcon = {
             icon: 'fas fa-file item-effect-control',
             title: game.i18n.localize('SR5.OpenOrigin'),
             data: {action: "open-origin"}
         }
+        const disableIcon = {
+            icon: `${effect.disabled ? 'far fa-circle' : 'fas fa-check-circle'} item-effect-control`,
+            title: game.i18n.localize('SR5.ToggleActive'),
+            data: {action: "toggle"}
+        };
+        const editIcon = {
+            icon: 'fas fa-edit item-effect-control',
+            title: game.i18n.localize('SR5.EditItem'),
+            data: {action: 'edit'}
+        };        
 
         return [openOriginIcon, disableIcon, editIcon];
     });
