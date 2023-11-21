@@ -143,7 +143,7 @@ export class CombatRules {
      * @param defenderHits The attackers hits. Should be a positive number.
      * @param actor The active defender
      */
-    static isBlockedByHardenedArmor(incomingDamage: DamageData, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
+    static isBlockedByHardenedArmor(incomingDamage: DamageData, attackerHits: number = 0, defenderHits: number = 0, actor: SR5Actor): boolean {
         const armor = actor.getArmor(incomingDamage);
 
         if(!armor.hardened) {

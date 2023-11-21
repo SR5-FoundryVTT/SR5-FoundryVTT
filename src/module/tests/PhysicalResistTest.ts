@@ -20,9 +20,13 @@ export interface PhysicalResistTestData extends SuccessTestData {
     modifiedDamage: DamageData
     // Determine if an actor should be knockedDown after a defense.
     knockedDown: boolean
-    overrideSuccessMessage: Translation
 }
 
+export type PhysicalResistOverrideSuccessCondition = {
+    test: () => boolean,
+    label: Translation,
+    effect: () => void,
+}
 
 /**
  * A physical resist test handles SR5#173 Defend B
@@ -125,13 +129,6 @@ export class PhysicalResistTest extends SuccessTest {
             const armor = this.actor.getArmor(this.data.incomingDamage);
 
             if(armor.hardened) {
-                if(this.data.incomingDamage.value < armor.value) {
-                    //Automatic success
-                    this.data.autoSuccess = true;
-                    this.data.overrideSuccessMessage = "SR5.TestResults.SoakBlockedByHardenedArmor";
-                    return true;
-                }
-
                 const soaked = this.hits.value + Math.ceil(armor.value/2);
                 return this.data.incomingDamage.value <= soaked;
             }
@@ -140,15 +137,35 @@ export class PhysicalResistTest extends SuccessTest {
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
+    private overrideSuccessConditions: PhysicalResistOverrideSuccessCondition[] = [
+        {
+            test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
+            label: "SR5.TestResults.SoakBlockedByHardenedArmor",
+            effect: () => {
+                this.data.autoSuccess = true;
+            }
+        }
+    ]
+
+    private getOverrideSuccessCondition(): PhysicalResistOverrideSuccessCondition|undefined {
+        return this.overrideSuccessConditions.find(({ test }) => test());
+    }
+
     override get showSuccessLabel(): boolean {
         return this.success;
     }
 
     override get successLabel(): Translation {
-        return this.data.overrideSuccessMessage || 'SR5.TestResults.ResistedAllDamage';
+        return this.getOverrideSuccessCondition()?.label || 'SR5.TestResults.ResistedAllDamage';
     }
     override get failureLabel(): Translation {
         return 'SR5.TestResults.ResistedSomeDamage';
+    }
+
+    override async processSuccess() {
+        await super.processSuccess();
+
+        this.getOverrideSuccessCondition()?.effect();
     }
 
     override async processResults() {
