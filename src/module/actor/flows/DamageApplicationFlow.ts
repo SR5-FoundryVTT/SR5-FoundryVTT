@@ -41,13 +41,13 @@ export class DamageApplicationFlow {
         // We are not doing this earlier in the soak flow to avoid confusing the user
         damage = this.changeStunToPhysicalForGrunts(actor, damage);
 
+        //TODO convert overflow
         const overflow = actor.addDamage(damage);
         
 
         // NOTE: For stuff like healing the last wound by magic, it might also be interesting to store and give
         //       an overview of each damage/wound applied to select from.
         // await this.update({'data.track': this.data.data.track});
-        // TODO: Handle changes in actor status (death and such)
     }
 
     private changeStunToPhysicalForGrunts(actor : SR5Actor, damage: DamageData): DamageData {

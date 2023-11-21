@@ -1331,6 +1331,18 @@ export class SR5Actor extends Actor {
         }
 
         await this._addDamageToTrack(rest, track);
+
+        
+        if(this.getStunTrack()?.value == this.getStunTrack()?.max) {
+            await this.update({defeated:true});
+            // @ts-expect-error
+            const status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED);
+
+            const effect = status ? status : CONFIG.controlIcons.defeated;
+            // @ts-expect-error
+            await this.getToken().object.toggleEffect(effect, {overlay: true, active: true});
+        }
+
         return overflow;
     }
 
@@ -1349,6 +1361,16 @@ export class SR5Actor extends Actor {
 
         await this._addDamageToTrack(rest, track);
         await this._addDamageToOverflow(overflow, track);
+
+        if(this.getPhysicalTrack()?.value == this.getPhysicalTrack()?.max) {
+            await this.update({defeated:true});
+            // @ts-expect-error
+            const status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED);
+
+            const effect = status ? status : CONFIG.controlIcons.defeated;
+            // @ts-expect-error
+            await this.getToken().object.toggleEffect(effect, {overlay: true, active: true});
+        }
     }
 
     /**
@@ -1371,6 +1393,16 @@ export class SR5Actor extends Actor {
         }
         if (this.isIC() || this.isSprite()) {
             await this._addDamageToTrack(rest, track);
+
+            if(this.getMatrixTrack()?.value == this.getMatrixTrack()?.max) {
+                await this.update({defeated:true});
+                // @ts-expect-error
+                const status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED);
+    
+                const effect = status ? status : CONFIG.controlIcons.defeated;
+                // @ts-expect-error
+                await this.getToken().object.toggleEffect(effect, {overlay: true, active: true});
+            }
         }
 
 
