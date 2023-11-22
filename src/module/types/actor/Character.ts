@@ -15,6 +15,7 @@ declare namespace Shadowrun {
         MagicActorData,
         WoundsActorData,
         MovementActorData,
+        TechnomancerActorData,
         NPCActorData {
             values: PhysicalCombatValues
             metatype: string | keyof typeof SR5CONFIG.character.types;
