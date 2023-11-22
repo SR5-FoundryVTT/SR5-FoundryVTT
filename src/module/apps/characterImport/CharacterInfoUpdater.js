@@ -1,5 +1,6 @@
 import {_mergeWithMissingSkillFields} from "../../actor/prep/functions/SkillsPrep";
 import { InitiationParser } from "./magicImport/InitiationParser";
+import { SubmersionParser } from "./technoImport/SubmersionParser";
 
 /**
  * Parses all non-item character information from a chummer character object.
@@ -132,6 +133,10 @@ export class CharacterInfoUpdater {
             }
             if (chummerChar.technomancer?.toLowerCase() === 'true') {
                 system.special = 'resonance';
+                
+                if(chummerChar.initiationgrade) {
+                    new SubmersionParser().parseSubmersions(chummerChar, system)
+               }
             }
             if (
                 chummerChar.magician?.toLowerCase() === 'true' ||

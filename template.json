@@ -817,6 +817,17 @@
                     "initiation": 0
                 }
             },
+            "technomancer": {
+                "technomancer": {
+                    "attribute": "willpower",
+                    "fade": {
+                        "value": 0,
+                        "base": 0,
+                        "mod": []
+                    },
+                    "submersion": 0
+                }
+            },
             "movement": {
                 "movement": {
                     "walk": {
@@ -957,7 +968,7 @@
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "technomancer", "movement", "condition_monitors", "physical_combat_values", "grunt"],
             "ethnicity": "",
             "age": "",
             "sex": "",
