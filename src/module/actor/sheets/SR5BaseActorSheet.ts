@@ -740,22 +740,25 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
 
         const value = Number(event.currentTarget.dataset.value);
-        const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
         const data = {};
-        if (cmId === 'stun' || cmId === 'physical') {
-            const property = `system.track.${cmId}.value`;
+
+        if (track === 'stun' || track === 'physical') {
+            const property = `system.track.${track}.value`;
             data[property] = value;
-        } else if (cmId === 'edge') {
+        } else if (track === 'edge') {
             const property = `system.attributes.edge.uses`;
             data[property] = value;
-        } else if (cmId === 'overflow') {
+        } else if (track === 'overflow') {
             const property = 'system.track.physical.overflow.value';
             data[property] = value;
-        } else if (cmId === 'matrix') {
-            // Sprites don't have a matrix device, but still use the matrix condition monitor, not matrix track.
-            return await this.actor.setMatrixDamage(value);
+        } else if (track === 'matrix') {
+            await this.actor.setMatrixDamage(value);
         }
-        await this.actor.update(data);
+
+        if (data) await this.actor.update(data);
+        
+        await this.document.applyDefeatedStatus();
     }
 
     /**
@@ -765,27 +768,28 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onClearConditionTrack(event) {
         event.preventDefault();
 
-        const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
         const data = {};
-        if (cmId === 'stun') {
+        if (track === 'stun') {
             data[`system.track.stun.value`] = 0;
         }
         // Clearing the physical monitor should also clear the overflow.
-        else if (cmId === 'physical') {
+        else if (track === 'physical') {
             data[`system.track.physical.value`] = 0;
             data['system.track.physical.overflow.value'] = 0;
 
-        } else if (cmId === 'edge') {
+        } else if (track === 'edge') {
             data[`system.attributes.edge.uses`] = 0;
 
-        } else if (cmId === 'overflow') {
+        } else if (track === 'overflow') {
             data['system.track.physical.overflow.value'] = 0;
 
-        } else if (cmId === 'matrix') {
+        } else if (track === 'matrix') {
             await this.actor.setMatrixDamage(0);
         }
 
-        await this.actor.update(data);
+        if (data) await this.actor.update(data);
+        await this.actor.applyDefeatedStatus();
     }
 
     /**
