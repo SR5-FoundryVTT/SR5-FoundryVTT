@@ -59,6 +59,15 @@ declare namespace Shadowrun {
         magic: MagicData
     };
 
+    export type TechnomancerActorData = {
+        technomancer: {
+            // Fade test attribute
+            attribute: ActorAttribute
+            fade: ModifiableValue
+            submersion: number
+        }
+    }
+
     export type MatrixActorData = {
         matrix: MatrixData;
     };
