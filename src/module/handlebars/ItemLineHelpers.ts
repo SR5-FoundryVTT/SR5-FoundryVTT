@@ -397,7 +397,6 @@ export const registerItemLineHelpers = () => {
                 }
                 const textLimit = textLimitParts.join(' + ');
 
-
                 return [
                     {
                         text: {
@@ -414,7 +413,8 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.attributes[wrapper.getActionAttribute2() ?? '']),
+                            // Legacy actions could have both skill and attribute2 set, which would show both information, when it shouldn't.
+                            text: wrapper.getActionSkill() ? '' : game.i18n.localize(SR5.attributes[wrapper.getActionAttribute2() ?? '']),
                             cssClass: 'six',
                         },
                     },
