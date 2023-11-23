@@ -4,6 +4,7 @@ import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
 import { DataDefaults } from '../../data/DataDefaults';
 import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
 
 export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData> {
     public override categoryTranslations: any;
@@ -63,7 +64,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             item.name = ImportHelper.MapNameToTranslation(this.nameTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);
         }

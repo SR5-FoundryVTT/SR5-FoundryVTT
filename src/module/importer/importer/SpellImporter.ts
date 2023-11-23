@@ -8,6 +8,7 @@ import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
 import { DataDefaults } from '../../data/DataDefaults';
 import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
 
 export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowrun.SpellData> {
     public override categoryTranslations: any;
@@ -74,7 +75,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);
         }

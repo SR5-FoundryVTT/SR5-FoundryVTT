@@ -6,6 +6,7 @@ import WareData = Shadowrun.WareData
 import WareItemData = Shadowrun.WareItemData;
 import CyberwareItemData = Shadowrun.CyberwareItemData;
 import BiowareItemData = Shadowrun.BiowareItemData;
+import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
 
 export class WareImporter extends DataImporter<WareItemData, WareData> {
     public override categoryTranslations: any;
@@ -87,7 +88,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);
         }

@@ -2,6 +2,7 @@ import { DataImporter } from "./DataImporter";
 import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from "../../item/flows/UpdateActionFlow";
 
 export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData, Shadowrun.EquipmentData> {
     files = ['gear.xml'];
@@ -74,7 +75,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             //@ts-expect-error
             items.push(item);

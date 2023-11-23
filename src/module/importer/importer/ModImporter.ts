@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ModParserBase } from '../parser/mod/ModParserBase';
 import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
 
 export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Shadowrun.ModificationData> {
     public override categoryTranslations: any;
@@ -61,7 +62,7 @@ export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Sh
             item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             datas.push(item);
         }

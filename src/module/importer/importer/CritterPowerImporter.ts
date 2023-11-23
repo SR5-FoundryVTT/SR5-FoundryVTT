@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
 import { Constants } from './Constants';
 import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
 
 export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
     public files = ['critterpowers.xml'];
@@ -56,7 +57,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);
         }

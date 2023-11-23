@@ -9,6 +9,7 @@ import {VersionMigration} from "../VersionMigration";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import {Helpers} from "../../helpers";
+import { UpdateActionFlow } from "../../item/flows/UpdateActionFlow";
 
 export class Version0_8_0 extends VersionMigration {
     get SourceVersion(): string {
@@ -45,7 +46,7 @@ export class Version0_8_0 extends VersionMigration {
             data?: object
         } = {};
 
-        Helpers.injectActionTestsIntoChangeData(data.type, data, data);
+        UpdateActionFlow.injectActionTestsIntoChangeData(data.type, data, data);
 
         return updateData;
     }

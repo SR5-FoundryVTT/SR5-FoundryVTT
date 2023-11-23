@@ -3,6 +3,7 @@ import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { DataImporter } from "./DataImporter";
 import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
 
 
 /**
@@ -77,7 +78,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);
         }
