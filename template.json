@@ -820,11 +820,6 @@
             "technomancer": {
                 "technomancer": {
                     "attribute": "willpower",
-                    "fade": {
-                        "value": 0,
-                        "base": 0,
-                        "mod": []
-                    },
                     "submersion": 0
                 }
             },

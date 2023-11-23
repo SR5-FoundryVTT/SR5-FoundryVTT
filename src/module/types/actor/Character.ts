@@ -64,7 +64,6 @@ declare namespace Shadowrun {
         technomancer: {
             // Fade test attribute
             attribute: ActorAttribute
-            fade: ModifiableValue
             submersion: number
         }
     }
