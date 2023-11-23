@@ -127,12 +127,12 @@ export class RangedAttackTest extends SuccessTest {
         }
 
         // Build target ranges for template display.
-        this.data.targetRanges = this.targets.map(target => {
-            const distance = Helpers.measureTokenDistance(attacker, target);
+        this.data.targetRanges = this.targets.map(token => {
+            const distance = Helpers.measureTokenDistance(attacker, token);
             const range = RangedWeaponRules.getRangeForTargetDistance(distance, this.data.ranges);
             return {
-                uuid: target.uuid,
-                name: target.name || '',
+                tokenUuid: token.uuid,
+                name: token.name || '',
                 unit: LENGTH_UNIT,
                 range,
                 distance,
@@ -240,7 +240,11 @@ export class RangedAttackTest extends SuccessTest {
             const target = this.data.targetRanges[this.data.targetRangesSelected];
             this.data.range = target.range.modifier;
 
-            this.data.targetActorsUuid = this.data.targetActorsUuid.filter(uuid => uuid === target.uuid);
+            // Reduce all targets selected down to the actual target fired upon.
+            const token = fromUuidSync(target.tokenUuid) as TokenDocument;
+            if (!(token instanceof TokenDocument)) return console.error(`Shadowrun 5e | ${this.type} got a target that is no TokenDocument`, token);
+            if (!token.actor) return console.error(`Shadowrun 5e | ${this.type} got a token that has no actor`, token);
+            this.data.targetActorsUuid = this.data.targetActorsUuid.filter(uuid => uuid === token.actor?.uuid);
         }
 
         // Alter test data for range.
