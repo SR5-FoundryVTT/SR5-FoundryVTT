@@ -17,6 +17,7 @@ declare namespace Shadowrun {
         MovementActorData,
         TechnomancerActorData,
         NPCActorData {
+            attributes: CharacterAttributes
             values: PhysicalCombatValues
             metatype: string | keyof typeof SR5CONFIG.character.types;
             full_defense_attribute: string;
@@ -174,4 +175,12 @@ declare namespace Shadowrun {
      * Actor data that can be Grunts.
      */
     type GruntActorData = CharacterData | SpiritData | CritterData;
+
+    /**
+     * These attributes are always available for this actor type.
+     */
+    interface CharacterAttributes extends Attributes {
+        initiation: AttributeField
+        submersion: AttributeField
+    }
 }

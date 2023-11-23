@@ -124,7 +124,7 @@
                         <div class="list-item-content">
                             <div class="item-left">
                                 <div class="item-text item-name">
-                                    {{localize "SR5.DrainResist"}}
+                                    {{localize "SR5.DrainAttribute"}}
                                 </div>
                             </div>
                             <div class="item-right">
@@ -138,54 +138,23 @@
                             </div>
                         </div>
                     </div>
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <div class="item-left">
-                                <div class="item-text item-name">
-                                    <!--Content of the Initiat Grade Name-->
-                                    <label for='initiation'>{{localize "SR5.Initiation"}}</label>
-                                
-                                </div>
-                            </div>
-                            <div class="item-right">
-                                <div class="item-text input">
-                                    <!--Input Field for Initiat Grade-->
-                                    <input class="display" type="text" name='system.magic.initiation' value="{{system.magic.initiation}}" data-dtype="Number" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 {{/if}}
-                <!--New Submersion Resonaz Fade Selector not Integrated-->
                 {{#if emerged}}
                 <div class="list-item">
                     <div class="list-item-content">
                         <div class="item-left">
                             <div class="item-text item-name">
-                                <!--Content of the Initiat Grade Name-->
-                                <label for='initiation'>{{localize "SR5.Initiation"}}</label>
-                            
+                                <label for='Submersion'>{{localize "SR5.FadeAttribute"}}</label>
                             </div>
-                            <!-- Resonaz label for Fade Selector
-                                <div class="item-text item-name">
-                                    {{localize "SR5.DrainResist"}}
-                                </div>
-                            -->
                         </div>
                         <div class="item-right">
-                            <div class="item-text input">
-                                <!--Input Field for Initiat Grade and Submersion-->
-                                <input class="display" type="text" name='system.magic.initiation' value="{{system.smagic.initiation}}" data-dtype="Number" />
-                            </div>
-                            <!-- Resonaz selector for Fade 
                             <div class="item-text input defense">
-                                <select name="system.magic.attribute" class="display">
-                                    {{#select system.magic.attribute}} {{#each config.attributes as |name type|}}
+                                <select name="system.technomancer.attribute" class="display">
+                                    {{#select system.technomancer.attribute}} {{#each config.attributes as |name type|}}
                                         <option value="{{type}}">{{localize name}}</option>
                                     {{/each}} {{/select}}
                                 </select>
                             </div>
-                            -->
                         </div>
                     </div>
                 </div>

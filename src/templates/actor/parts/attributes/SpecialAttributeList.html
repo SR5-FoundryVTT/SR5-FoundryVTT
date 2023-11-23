@@ -16,7 +16,7 @@
                 attribute=system.attributes.essence
                 disableBase=true
         }}
-            {{#if awakened}}
+        {{#if awakened}}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                 cssClass='no-grow'
                 rollId="attribute.magic"
@@ -25,8 +25,14 @@
                 disableBase=(not awakened)
                 disableManual=(not awakened)
         }}
-            {{/if}}
-            {{#if emerged}}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/FakeAttribute.html"
+                cssClass='no-grow'
+                baseInputName="system.magic.initiation"
+                rollId="attribute.initiation"
+                attribute=system.attributes.initiation
+        }}
+        {{/if}}
+        {{#if emerged}}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
                 cssClass='no-grow'
                 rollId="attribute.resonance"
@@ -35,7 +41,12 @@
                 disableBase=(not emerged)
                 disableManual=(not emerged)
         }}
-
-            {{/if}}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/FakeAttribute.html"
+                cssClass='no-grow'
+                baseInputName="system.technomancer.submersion"
+                rollId="attribute.submersion"
+                attribute=system.attributes.submersion
+        }}
+        {{/if}}
     </div>
 </div>

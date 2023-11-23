@@ -53,6 +53,7 @@ export const SR5 = {
         pilot: 'SR5.Vehicle.Stats.Pilot',
         force: 'SR5.Force',
         initiation: 'SR5.Initiation',
+        submersion: 'SR5.Submersion',
         rating: 'SR5.Rating',
     },
 
