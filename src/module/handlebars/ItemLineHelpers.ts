@@ -184,6 +184,12 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
+                            text: game.i18n.localize('SR5.ActionType'),
+                            cssClass: 'six',
+                        },
+                    },
+                    {
+                        text: {
                             text: game.i18n.localize('SR5.Skill'),
                             cssClass: 'six',
                         },
@@ -398,6 +404,12 @@ export const registerItemLineHelpers = () => {
                 const textLimit = textLimitParts.join(' + ');
 
                 return [
+                    {
+                        text: {
+                            // Instead of 'complex' only show C. This might break in some languages. At that point, you can call me lazy.
+                            text: item.system.action.type ? game.i18n.localize(SR5.actionTypes[item.system.action.type] ?? '')[0] : ''
+                        },
+                    },
                     {
                         text: {
                             // Either use the legacy skill localization OR just the skill name/id instead.
