@@ -101,6 +101,8 @@ export class SpiritPrep {
      * get the attribute and initiative modifiers and skills
      */
     static getSpiritStatModifiers(spiritType: SpiritType) {
+        if (!spiritType) return;
+
         const overrides = {
             // value of 0 for attribute makes it equal to the Force
             attributes: {
