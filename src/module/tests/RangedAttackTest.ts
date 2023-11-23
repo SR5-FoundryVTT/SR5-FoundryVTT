@@ -244,7 +244,8 @@ export class RangedAttackTest extends SuccessTest {
             const token = fromUuidSync(target.tokenUuid) as TokenDocument;
             if (!(token instanceof TokenDocument)) return console.error(`Shadowrun 5e | ${this.type} got a target that is no TokenDocument`, token);
             if (!token.actor) return console.error(`Shadowrun 5e | ${this.type} got a token that has no actor`, token);
-            this.data.targetActorsUuid = this.data.targetActorsUuid.filter(uuid => uuid === token.actor?.uuid);
+            this.data.targetActorsUuid = [token.actor.uuid];
+            this.targets = [token];
         }
 
         // Alter test data for range.
@@ -257,7 +258,6 @@ export class RangedAttackTest extends SuccessTest {
      * Ranged attack tests allow for temporarily changing of modifiers without altering the document.
      */
     override prepareTestModifiers() {
-        
         this.prepareEnvironmentalModifier();
     }
 
