@@ -809,11 +809,6 @@
                 "magic": {
                     "attribute": "logic",
                     "projecting": false,
-                    "drain": {
-                        "value": 0,
-                        "base": 0,
-                        "mod": []
-                    },
                     "initiation": 0
                 }
             },
