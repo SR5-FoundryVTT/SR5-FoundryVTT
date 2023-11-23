@@ -8,7 +8,7 @@
             <div class="block">
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
             </div>
-            <div class="attributes smooth">
+            <div class="attributes smooth" id="tracks">
                 <div class="block">
                     {{#each system.track as |track id|}}
                         {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
