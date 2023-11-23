@@ -809,12 +809,13 @@
                 "magic": {
                     "attribute": "logic",
                     "projecting": false,
-                    "drain": {
-                        "value": 0,
-                        "base": 0,
-                        "mod": []
-                    },
                     "initiation": 0
+                }
+            },
+            "technomancer": {
+                "technomancer": {
+                    "attribute": "willpower",
+                    "submersion": 0
                 }
             },
             "movement": {
@@ -957,7 +958,7 @@
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "technomancer", "movement", "condition_monitors", "physical_combat_values", "grunt"],
             "ethnicity": "",
             "age": "",
             "sex": "",

@@ -15,6 +15,7 @@ declare namespace Shadowrun {
         MagicActorData,
         WoundsActorData,
         MovementActorData,
+        TechnomancerActorData,
         NPCActorData {
             values: PhysicalCombatValues
             metatype: string | keyof typeof SR5CONFIG.character.types;
@@ -58,6 +59,14 @@ declare namespace Shadowrun {
     export type MagicActorData = {
         magic: MagicData
     };
+
+    export type TechnomancerActorData = {
+        technomancer: {
+            // Fade test attribute
+            attribute: ActorAttribute
+            submersion: number
+        }
+    }
 
     export type MatrixActorData = {
         matrix: MatrixData;

@@ -20,7 +20,6 @@ declare namespace Shadowrun {
     export interface MagicData {
         attribute: ActorAttribute,
         projecting: boolean,
-        drain: BaseValuePair<number> & ModifiableValue,
         initiation: number
     }
 
