@@ -578,7 +578,31 @@ export const SR5 = {
         corpse: "SR5.Spirit.Types.Corpse",
         rot: "SR5.Spirit.Types.Rot",
         palefire: "SR5.Spirit.Types.Palefire",
-        detritus: "SR5.Spirit.Types.Detritus"
+        detritus: "SR5.Spirit.Types.Detritus",
+
+        // Howling Shadow spirits
+        anarch: "SR5.Spirit.Types.Anarch",
+        arboreal: "SR5.Spirit.Types.Arboreal",
+        blackjack: "SR5.Spirit.Types.Blackjack",
+        boggle: "SR5.Spirit.Types.Boggle",
+        bugul: "SR5.Spirit.Types.Bugul",
+        chindi: "SR5.Spirit.Types.Chindi",
+        croki: "SR5.Spirit.Types.Croki",
+        duende: "SR5.Spirit.Types.Duende",
+        elvar: "SR5.Spirit.Types.Elvar",
+        erinyes: "SR5.Spirit.Types.Erinyes",
+        greenman: "SR5.Spirit.Types.Greenman",
+        imp: "SR5.Spirit.Types.Imp",
+        jarl: "SR5.Spirit.Types.Jarl",
+        kappa: "SR5.Spirit.Types.Kappa",
+        kokopelli: "SR5.Spirit.Types.Kokopelli",
+        morbi: "SR5.Spirit.Types.Morbi",
+        nocnitasa: "SR5.Spirit.Types.Nocnitasa",
+        phantom: "SR5.Spirit.Types.Phantom",
+        preta: "SR5.Spirit.Types.Preta",
+        stabber: "SR5.Spirit.Types.Stabber",
+        tungak: "SR5.Spirit.Types.Tungak",
+        vucub: "SR5.Spirit.Types.Vucub",
     },
 
     /**
