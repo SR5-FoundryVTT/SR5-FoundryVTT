@@ -30,6 +30,8 @@ export class ModifiersPrep {
             'defense_dodge',
             'defense_block', 
             'defense_parry',
+            'defense_melee',
+            'defense_ranged',
             'soak'
         ];
     }

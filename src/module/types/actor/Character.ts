@@ -111,6 +111,8 @@ declare namespace Shadowrun {
         ['defense_dodge']: NumberOrEmpty
         ['defense_parry']: NumberOrEmpty
         ['defense_block']: NumberOrEmpty
+        ['defense_melee']: NumberOrEmpty
+        ['defense_ranged']: NumberOrEmpty
 
         // Meant to be applied on physical resist (soak) tests.
         soak: NumberOrEmpty
