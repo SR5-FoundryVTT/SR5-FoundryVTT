@@ -1,8 +1,8 @@
-import {SR5Actor} from "../SR5Actor";
-import {Helpers} from "../../helpers";
+import { SR5Actor } from "../SR5Actor";
+import { Helpers } from "../../helpers";
 import InventoryData = Shadowrun.InventoryData;
 import InventoriesData = Shadowrun.InventoriesData;
-import {SR5Item} from "../../item/SR5Item";
+import { SR5Item } from "../../item/SR5Item";
 
 
 /**
@@ -24,8 +24,12 @@ export class InventoryFlow {
     actor: SR5Actor;
 
     constructor(actor: SR5Actor) {
-        if (actor.system.inventories === undefined)
-            console.error('Shawdorun 5e | Actor given does not have a inventory data structure. You will experience bugs.');
+        // Some actor's might have inventories as a key with an undefined value.
+        // This will happen if there has been some tempering with inventory data.
+        // To prevent this causing issues, just set it to default data
+        if (actor.system.inventories === undefined) {
+            actor.system.inventories = foundry.utils.duplicate(game.model.Actor[actor.type].inventories);
+        }
 
         this.actor = actor;
     }
@@ -36,7 +40,7 @@ export class InventoryFlow {
      * @param name How to name the inventory, will also be its label for custom inventories.
      * @returns Created inventories name
      */
-    async create(name: string): Promise<string|void> {
+    async create(name: string): Promise<string | void> {
         console.log(`Shadowrun 5e | Creating inventory ${name}`);
 
         name = InventoryFlow._sanitzeName(name);
@@ -57,7 +61,7 @@ export class InventoryFlow {
 
         console.log(`Shadowrun 5e | Executing update to create inventory`, updateData)
         // Don't render to allow sheets to manage switching inventories.
-        await this.actor.update(updateData, {render: false});
+        await this.actor.update(updateData, { render: false });
 
         return name;
     }
@@ -95,19 +99,19 @@ export class InventoryFlow {
 
         console.log(`Shadowrun 5e | Executing update to remove inventory`, updateData);
         // Don't render to allow sheets to manage switching inventories.
-        await this.actor.update(updateData, {render: false});
+        await this.actor.update(updateData, { render: false });
     }
 
-        /**
-     * Does this actor have the given inventory already?
-     *
-     * Note: Comparisons will only be against lower case.
-     *
-     * @param name The inventory name.
-     */
+    /**
+ * Does this actor have the given inventory already?
+ *
+ * Note: Comparisons will only be against lower case.
+ *
+ * @param name The inventory name.
+ */
     exists(name): boolean {
         return name === Object.keys(this.actor.system.inventories)
-                            .find(inventory => inventory.toLowerCase() === name.toLowerCase());
+            .find(inventory => inventory.toLowerCase() === name.toLowerCase());
     }
 
     /**
@@ -132,7 +136,7 @@ export class InventoryFlow {
      * @param current The old name of the inventory.
      * @param newName The new name of the inventory.
      */
-    async rename(current: string, newName: string): Promise<string|void> {
+    async rename(current: string, newName: string): Promise<string | void> {
         console.log(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
 
         // Disallow editing of default inventory.
@@ -155,13 +159,13 @@ export class InventoryFlow {
         const updateData = {
             'system.inventories': {
                 [`-=${current}`]: null,
-                [newName]:  inventory
+                [newName]: inventory
             }
         };
 
         console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
         // Don't render to allow sheets to manage switching inventories.
-        await this.actor.update(updateData, {render: false});
+        await this.actor.update(updateData, { render: false });
 
         return newName;
     }
@@ -193,18 +197,18 @@ export class InventoryFlow {
             if (item.id) this.actor.system.inventories[inventoryName].itemIds.push(item.id);
         }
 
-        const updateData = {[`system.inventories.${inventoryName}.itemIds`]: this.actor.system.inventories[inventoryName].itemIds};
+        const updateData = { [`system.inventories.${inventoryName}.itemIds`]: this.actor.system.inventories[inventoryName].itemIds };
 
         console.log(`Shadowrun 5e | Executing adding items to inventory`, updateData);
         await this.actor.update(updateData);
     }
 
-     /**
-     * Remove the given item from one or any inventory it might be in.
-     *
-     * @param item The item to be removed.
-     * @param name The one inventory to remove it from. If empty, will search for inventory the item is in.
-     */
+    /**
+    * Remove the given item from one or any inventory it might be in.
+    *
+    * @param item The item to be removed.
+    * @param name The one inventory to remove it from. If empty, will search for inventory the item is in.
+    */
     async removeItem(item: SR5Item, name?: string) {
         console.log(`Shadowrun 5e | Removing item from inventory (${name || this.actor.defaultInventory.name})`, item);
 
@@ -214,7 +218,7 @@ export class InventoryFlow {
         // Collect affected inventories.
         const inventories: InventoryData[] = name ?
             [this.actor.system.inventories[name]] :
-            Object.values(this.actor.system.inventories).filter(({itemIds}) => itemIds.includes(item.id as string));
+            Object.values(this.actor.system.inventories).filter(({ itemIds }) => itemIds.includes(item.id as string));
 
         // No inventory found means, it's in the default inventory and no removal is needed.
         if (inventories.length === 0) return;
