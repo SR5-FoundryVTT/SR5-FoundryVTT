@@ -41,7 +41,7 @@ export class InventoryFlow {
      * @returns Created inventories name
      */
     async create(name: string): Promise<string | void> {
-        console.log(`Shadowrun 5e | Creating inventory ${name}`);
+        console.debug(`Shadowrun 5e | Creating inventory ${name}`);
 
         name = InventoryFlow._sanitzeName(name);
 
@@ -59,7 +59,7 @@ export class InventoryFlow {
             }
         };
 
-        console.log(`Shadowrun 5e | Executing update to create inventory`, updateData)
+        console.debug(`Shadowrun 5e | Executing update to create inventory`, updateData)
         // Don't render to allow sheets to manage switching inventories.
         await this.actor.update(updateData, { render: false });
 
@@ -73,7 +73,7 @@ export class InventoryFlow {
      * @param moveTo The inventory name items need to moved over to, otherwise the default inventory.
      */
     async remove(name: string, moveTo: string = this.actor.defaultInventory.name) {
-        console.log(`Shadowrun 5e | Removing inventory ${name}. Moving items over to ${moveTo}`);
+        console.debug(`Shadowrun 5e | Removing inventory ${name}. Moving items over to ${moveTo}`);
 
         if (this.disallowRemove(name))
             return ui.notifications?.error(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
@@ -97,7 +97,7 @@ export class InventoryFlow {
             ];
         }
 
-        console.log(`Shadowrun 5e | Executing update to remove inventory`, updateData);
+        console.debug(`Shadowrun 5e | Executing update to remove inventory`, updateData);
         // Don't render to allow sheets to manage switching inventories.
         await this.actor.update(updateData, { render: false });
     }
@@ -137,7 +137,7 @@ export class InventoryFlow {
      * @param newName The new name of the inventory.
      */
     async rename(current: string, newName: string): Promise<string | void> {
-        console.log(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
+        console.debug(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
 
         // Disallow editing of default inventory.
         if (this.disallowRename(current))
@@ -163,7 +163,7 @@ export class InventoryFlow {
             }
         };
 
-        console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
+        console.debug(`Shadowrun 5e | Executing update to rename inventory`, updateData);
         // Don't render to allow sheets to manage switching inventories.
         await this.actor.update(updateData, { render: false });
 
@@ -178,7 +178,7 @@ export class InventoryFlow {
      * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
      */
     async addItems(inventoryName: string, items: SR5Item[] | SR5Item, removeFromCurrent: boolean = true) {
-        console.log(`Shadowrun 5e | Adding items to to inventory ${inventoryName}`, items);
+        console.debug(`Shadowrun 5e | Adding items to to inventory ${inventoryName}`, items);
 
         // Default inventory is valid target here.
         if (this.actor.defaultInventory.name !== inventoryName && !this.exists(inventoryName)) return;
@@ -199,7 +199,7 @@ export class InventoryFlow {
 
         const updateData = { [`system.inventories.${inventoryName}.itemIds`]: this.actor.system.inventories[inventoryName].itemIds };
 
-        console.log(`Shadowrun 5e | Executing adding items to inventory`, updateData);
+        console.debug(`Shadowrun 5e | Executing adding items to inventory`, updateData);
         await this.actor.update(updateData);
     }
 
@@ -210,7 +210,7 @@ export class InventoryFlow {
     * @param name The one inventory to remove it from. If empty, will search for inventory the item is in.
     */
     async removeItem(item: SR5Item, name?: string) {
-        console.log(`Shadowrun 5e | Removing item from inventory (${name || this.actor.defaultInventory.name})`, item);
+        console.debug(`Shadowrun 5e | Removing item from inventory (${name || this.actor.defaultInventory.name})`, item);
 
         // The default inventory is not actual inventory.
         if (this.actor.defaultInventory.name === name) return;
@@ -230,7 +230,7 @@ export class InventoryFlow {
             updateData[`system.inventories.${inventory.name}.itemIds`] = itemIds;
         }
 
-        console.log(`Shadowrun 5e | Executing update to remove item`, updateData);
+        console.debug(`Shadowrun 5e | Executing update to remove item`, updateData);
         if (updateData) await this.actor.update(updateData);
     }
 
