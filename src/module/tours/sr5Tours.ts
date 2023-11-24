@@ -2,39 +2,46 @@ import { SR5Actor } from "../actor/SR5Actor";
 
 // @ts-expect-error
 export default class Sr5Tour extends Tour {
-    actorType?: String;
+    //the type of actor that should be created for the tour
+    actorType: String;
+
+    //the tab for the tour
+    tab?: String
+
+    //this field is only for internal handling
     actor?: SR5Actor;
 
     /** @override */
     async _preStep() {
         await super._preStep();
 
-         // @ts-expect-error
-        let actorType = this.config.actorType
+        //check if the tour actor already exists. This can happen when resuming the tour
+        // @ts-expect-error
+        this.actor = game.actors?.getName("Tour " + this.id);
 
-        // If we need an actor, make it and render
-        if (actorType) {
-            //get an unopened actor
+        //create actor if needed
+        if(this.actor == undefined) {
+            this.actor = await Actor.create({
+                //@ts-expect-error
+                name: "Tour " + this.id,
+                // @ts-expect-error
+                type: this.config.actorType
+            });
+        }
+
+        //@ts-expect-error Calling _render because it's async unlike render
+        await this.actor.sheet?._render(true);
+
+
+        // @ts-expect-error
+        if(this.config.tab) {
             // @ts-expect-error
-            this.actor = game.actors?.getName("Tour " + this.id);
-
-            //create actor if needed
-            if(this.actor == undefined) {
-                this.actor = await Actor.create({
-                    //@ts-expect-error
-                    name: "Tour " + this.id,
-                    type: actorType
-                });
-            }
-
-            //@ts-expect-error Calling _render because it's async unlike render
-            await this.actor.sheet?._render(true);
+            this.actor?.sheet?.activateTab(this.config.tab)
         }
     }
 
     /** @override */
     async complete() {
-         // @ts-expect-error
         await this.actor?.sheet?.close()
         // @ts-expect-error
         await Actor.deleteDocuments([this.actor?.id]);
