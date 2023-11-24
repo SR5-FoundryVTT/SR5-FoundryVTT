@@ -16,34 +16,35 @@ export default class Sr5Tour extends Tour {
         if (actorType) {
             //get an unopened actor
             // @ts-expect-error
-            let availableActors = game.actors.filter(actor => actor.type.includes(actorType) && Object.values(actor.apps).filter(app => app?.rendered).length == 0);
-            
-            this.actor = availableActors[0]
-            // @ts-expect-error
-            await availableActors[0].sheet?._render(true)
-        }
-    }
+            this.actor = game.actors?.getName("Tour " + this.id);
 
-    /** @override */
-    get canStart() {
-        // @ts-expect-error
-        let actorType = this.config.actorType
-        if (actorType) {
-            // @ts-expect-error
-            return game.actors.filter(actor => actor.type.includes(actorType) && Object.values(actor.apps).filter(app => app?.rendered).length == 0).length > 0;
-        }
+            //create actor if needed
+            if(this.actor == undefined) {
+                this.actor = await Actor.create({
+                    //@ts-expect-error
+                    name: "Tour " + this.id,
+                    type: actorType
+                });
+            }
 
-        return true;
+            //@ts-expect-error Calling _render because it's async unlike render
+            await this.actor.sheet?._render(true);
+        }
     }
 
     /** @override */
     async complete() {
          // @ts-expect-error
-        if (this.config.actorType) {
-            // for some reason the sheet does not update after the tour anymore
-            // so we open an unopend one and close it after the tour
-            this.actor?.sheet?.close()
-        }
+        await this.actor?.sheet?.close()
+        // @ts-expect-error
+        await Actor.deleteDocuments([this.actor?.id]);
+
         return super.complete()
       }
+
+    /** @override */
+    get canStart() {
+        // @ts-expect-error
+        return game.user.can("ACTOR_CREATE");
+    }
 }

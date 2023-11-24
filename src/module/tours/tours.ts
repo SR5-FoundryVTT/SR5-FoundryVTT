@@ -6,7 +6,7 @@ export default async function registerSR5Tours() {
      // @ts-expect-error
     game.tours.register(
       'shadowrun5e',
-      'tracks',
+      'Tracks',
        // @ts-expect-error
       await Sr5Tour.fromJSON('/systems/shadowrun5e/dist/tours/tracks.json'),
     );

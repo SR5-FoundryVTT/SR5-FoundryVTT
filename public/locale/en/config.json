@@ -1324,7 +1324,7 @@
     "SR5.Tours": {
             "Tracks": {
                 "Title": "Tracks Tour",
-                "Description": "This Tour will give you an overview how tracks work. It requires a character actor to work",
+                "Description": "This Tour will give you an overview how tracks work.",
                 "GeneralTitle": "Tracks",
                 "GeneralContent": "These are your tracks. They consist of several cells. In certain cells you can see a written number. If these cells are filled your wound modifier is increased to this number. The wound modifiers of all tracks are added",
                 "WoundModifierTitle": "Wound Modifier",
