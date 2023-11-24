@@ -32,7 +32,6 @@ export default class Sr5Tour extends Tour {
         //@ts-expect-error Calling _render because it's async unlike render
         await this.actor.sheet?._render(true);
 
-
         // @ts-expect-error
         if(this.config.tab) {
             // @ts-expect-error

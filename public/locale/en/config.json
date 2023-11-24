@@ -1322,17 +1322,23 @@
     "SR5.Wireless": "Wireless",
 
     "SR5.Tours": {
-            "Tracks": {
-                "Title": "Tracks Tour",
-                "Description": "This Tour will give you an overview how tracks work.",
-                "GeneralTitle": "Tracks",
-                "GeneralContent": "These are your tracks. They consist of several cells. In certain cells you can see a written number. If these cells are filled your wound modifier is increased to this number. The wound modifiers of all tracks are added",
+            "ConditionMonitor": {
+                "Title": "Condition Monitor Tour",
+                "Description": "This tour will give you an overview how the condition monitor work.",
+                "GeneralTitle": "Condition Monitor",
+                "GeneralContent": "These are your conditions monitors. They consist of several cells. In certain cells you can see a written number. If these cells are filled your wound modifier is increased to this number. The wound modifiers of all monitors are added",
                 "WoundModifierTitle": "Wound Modifier",
                 "WoundModifierContent": "This cell denotes that filling it increases your wound modifier by the number written in the cell",
                 "ApplyDamageTitle":"Applying and removing Damage",
-                "ApplyDamageContent":"To apply damage left click a cell. All cells up to this cell including will be filled. If more cells where filled all cells to the right will not be filled anymore. Right clicking any cell will remove all damage from the track.",
-                "RecoveryTitle": "Recovery Checks",
-                "RecoveryContent": "Clicking on the label of a track will prompt a recovery check. The result of the recovery check will be automatically applied to the track."
+                "ApplyDamageContent":"To apply damage left click a cell. All cells up to this cell including will be filled. If more cells where filled all cells to the right will not be filled anymore. Right clicking any cell will remove all damage from the monitor.",
+                "RecoveryTitle": "Recovery Tests",
+                "RecoveryContent": "Clicking on the label of a condition monitor will prompt an extended recovery test. The result of the recovery test will be automatically applied to the monitor."
+            },
+            "CharacterImport": {
+                "Title": "Character Import",
+                "Description": "This Tour will give you an overview how to import a chummer character. For details look into https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import",
+                "GeneralTitle": "Importing a character",
+                "GeneralContent": "To import a character you need the export json from chummer 5e."
             }
         }
 }
