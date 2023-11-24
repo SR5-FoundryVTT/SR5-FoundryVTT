@@ -11,7 +11,7 @@ export default async function registerSR5Tours() {
       await Sr5Tour.fromJSON('/systems/shadowrun5e/dist/tours/ConditionMonitor.json'),
     );
 
-     // @ts-expect-error
+
 //      game.tours.register(
 //       'shadowrun5e',
 //       'CharacterImport',
