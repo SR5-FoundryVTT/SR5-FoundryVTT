@@ -567,6 +567,7 @@
             "SetMonitor": "Monitor must be set manually.",
             "Spells": "Spells",
             "SpiritConfiguration": "Spirit Configuration",
+            "SpriteConfiguration": "Sprite Configuration",
             "SpritePowers": "Sprite Powers",
             "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
             "VehicleConfiguration": "Vehicle Configuration"

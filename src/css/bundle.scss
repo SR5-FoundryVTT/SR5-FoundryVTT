@@ -766,7 +766,9 @@ input[type='text'].display {
         margin: 0.1em;
         margin-right: $groove-width;
         margin-left: $groove-width;
-
+        &.matrix{
+            color: $white;
+        }
         .has-desc {
             @include rollable;
         }
@@ -794,7 +796,9 @@ input[type='text'].display {
             border-bottom: 1px solid $yellow;
             border-radius: 0.2em;
             padding-top: 5px;
-
+            &.sprite{
+                background: none;
+            }
             &.faded {
                 color: $grey;
             }

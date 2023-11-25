@@ -53,6 +53,25 @@
             </div>
         </div>
     </header>
+    <div>
+        {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
+                name=(localize "SR5.Labels.ActorSheet.Matrix")
+        }}
+        <div class="attributes">
+            {{#each config.matrixAttributes as |label key|}}
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html"
+                        matrixAtt=(lookup ../system.matrix key)
+                        key=key
+                        label=label
+                        matrixAttributes=../config/matrixAttributes
+                }}
+            {{/each}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                    attributeId='resonance'
+                    attribute=system.attributes.resonance
+            }}
+        </div>
+    </div>
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
         <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
