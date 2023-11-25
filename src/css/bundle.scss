@@ -1212,7 +1212,25 @@ color: $white;
     border-bottom: 2px solid $edge; /* Add a border at the bottom */
     font-size: medium;
 }
-
+.SR5 th:hover {
+    color: $pdfColor;
+}
+.SR5 caption{
+    background: none;
+    color: $yellow;
+    padding: 6px;
+    text-align: left;
+    font-size: medium;
+}
+.SR5 caption:hover{
+    color: $fDarkRed;
+}
+.SR5 tr{
+    color: $white;
+}
+.SR5 tr:hover{
+    color: $pdfColor;
+}
 .SR5 tr p:not(th p) {
     padding-left: 10px;  /* Padding on the left */
 }
