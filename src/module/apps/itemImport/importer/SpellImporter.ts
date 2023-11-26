@@ -6,9 +6,8 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
-import { DataDefaults } from '../../data/DataDefaults';
-import { Helpers } from "../../helpers";
-import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
+import { DataDefaults } from '../../../data/DataDefaults';
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowrun.SpellData> {
     public override categoryTranslations: any;

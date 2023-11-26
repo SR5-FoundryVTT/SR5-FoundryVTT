@@ -1,9 +1,6 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
 import { Constants } from '../../importer/Constants';
-import DamageData = Shadowrun.DamageData;
-import DamageType = Shadowrun.DamageType;
-import {DataDefaults} from "../../../data/DataDefaults";
 import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class RangedParser extends WeaponParserBase {

@@ -6,7 +6,7 @@ import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
 import WeaponItemData = Shadowrun.WeaponItemData;
 import DamageElement = Shadowrun.DamageElement;
 import DamageType = Shadowrun.DamageType;
-import { DataDefaults } from '../../../data/DataDefaults';
+import { DataDefaults } from '../../../../data/DataDefaults';
 import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 import DamageData = Shadowrun.DamageData;
 

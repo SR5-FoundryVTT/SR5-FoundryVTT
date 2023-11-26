@@ -1,5 +1,5 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { WeaponParserBase } from '../module/importer/parser/weapon/WeaponParserBase';
+import { WeaponParserBase } from '../module/apps/itemImport/parser/weapon/WeaponParserBase';
 import DamageData = Shadowrun.DamageData;
 import { DataDefaults } from '../module/data/DataDefaults';
 

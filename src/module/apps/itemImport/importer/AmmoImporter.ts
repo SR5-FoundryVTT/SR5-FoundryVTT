@@ -1,8 +1,7 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
-import { Helpers } from "../../helpers";
-import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun.AmmoData> {
     public files = ['gear.xml'];
