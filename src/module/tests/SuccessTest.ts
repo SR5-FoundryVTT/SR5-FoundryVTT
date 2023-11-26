@@ -157,7 +157,6 @@ export class SuccessTest {
     public actor: SR5Actor | undefined;
     public item: SR5Item | undefined;
     public rolls: SR5Roll[];
-
     public targets: TokenDocument[];
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
@@ -649,7 +648,7 @@ export class SuccessTest {
      * This can happen when a test is created from a ChatMessage.
      */
     async populateDocuments() {
-        // Fetch documents, when no reference has been made yet.
+        // Populate the actor document.
         if (!this.actor && this.data.sourceActorUuid) {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
             const document = await fromUuid(this.data.sourceActorUuid) || undefined;
@@ -658,8 +657,12 @@ export class SuccessTest {
                 document.actor :
                 document as SR5Actor;
         }
+
+        // Populate the item document.
         if (!this.item && this.data.sourceItemUuid)
             this.item = await fromUuid(this.data.sourceItemUuid) as SR5Item || undefined;
+
+        // Populate targeted token documents.
         if (this.targets.length === 0 && this.data.targetActorsUuid) {
             this.targets = [];
             for (const uuid of this.data.targetActorsUuid) {
