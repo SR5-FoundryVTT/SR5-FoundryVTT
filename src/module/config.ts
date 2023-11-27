@@ -89,25 +89,81 @@ export const SR5 = {
     },
 
     rangedWeaponTypes: {
-        manual: "SR5.Weapon.Ranged.Type.Manual",
-        taser: "SR5.Weapon.Ranged.Type.Taser",
-        holdOutPistol: "SR5.Weapon.Ranged.Type.HoldOutPistol",
-        lightPistol: "SR5.Weapon.Ranged.Type.LightPistol",
-        heavyPistol: "SR5.Weapon.Ranged.Type.HeavyPistol",
-        machinePistol: "SR5.Weapon.Ranged.Type.MachinePistol",
-        smg: "SR5.Weapon.Ranged.Type.SMG",
-        assaultRifle: "SR5.Weapon.Ranged.Type.AssaultRifle",
-        shotgunFlechette: "SR5.Weapon.Ranged.Type.ShotgunFlechette",
-        shotgunSlug: "SR5.Weapon.Ranged.Type.ShotgunSlug",
-        sniperRifle: "SR5.Weapon.Ranged.Type.SniperRifle",
-        lightMachinegun: "SR5.Weapon.Ranged.Type.LightMachinegun",
-        mediumHeavyMachinegun: "SR5.Weapon.Ranged.Type.MediumHeavyMachinegun",
-        assaultCannon: "SR5.Weapon.Ranged.Type.AssaultCannon",
-        grenadeLauncher: "SR5.Weapon.Ranged.Type.GrenadeLauncher",
-        missileLauncher: "SR5.Weapon.Ranged.Type.MissileLauncher",
-        lightCrossbow: "SR5.Weapon.Ranged.Type.LightCrossbow",
-        mediumCrossbow: "SR5.Weapon.Ranged.Type.MediumCrossbow",
-        heavyCrossbow: "SR5.Weapon.Ranged.Type.HeavyCrossbow",
+        manual: {
+            label: "SR5.Weapon.Ranged.Type.Manual"
+        },
+        taser: {
+            label: "SR5.Weapon.Ranged.Type.Taser",
+            ranges: [5, 10, 15, 20],
+        },
+        holdOutPistol: {
+            label: "SR5.Weapon.Ranged.Type.HoldOutPistol",
+            ranges: [5, 15, 30, 50],
+        },
+        lightPistol: {
+            label: "SR5.Weapon.Ranged.Type.LightPistol",
+            ranges: [5, 15, 30, 50],
+        },
+        heavyPistol: {
+            label: "SR5.Weapon.Ranged.Type.HeavyPistol",
+            ranges: [5, 20, 40, 60],
+        },
+        machinePistol: {
+            label: "SR5.Weapon.Ranged.Type.MachinePistol",
+            ranges: [5, 15, 30, 50],
+        },
+        smg: {
+            label: "SR5.Weapon.Ranged.Type.SMG",
+            ranges: [10, 40, 80, 150],
+        },
+        assaultRifle: {
+            label: "SR5.Weapon.Ranged.Type.AssaultRifle",
+            ranges: [25, 150, 350, 550],
+        },
+        shotgunFlechette: {
+            label: "SR5.Weapon.Ranged.Type.ShotgunFlechette",
+            ranges: [15, 30, 45, 60],
+        },
+        shotgunSlug: {
+            label: "SR5.Weapon.Ranged.Type.ShotgunSlug",
+            ranges: [10, 40, 80, 150],
+        },
+        sniperRifle: {
+            label: "SR5.Weapon.Ranged.Type.SniperRifle",
+            ranges: [50, 350, 800, 1500],
+        },
+        lightMachinegun: {
+            label: "SR5.Weapon.Ranged.Type.LightMachinegun",
+            ranges: [25, 200, 400, 800],
+        },
+        mediumHeavyMachinegun: {
+            label: "SR5.Weapon.Ranged.Type.MediumHeavyMachinegun",
+            ranges: [40, 250, 750, 1200],
+        },
+        assaultCannon: {
+            label: "SR5.Weapon.Ranged.Type.AssaultCannon",
+            ranges: [50, 300, 750, 1500],
+        },
+        grenadeLauncher: {
+            label: "SR5.Weapon.Ranged.Type.GrenadeLauncher",
+            ranges: [50, 100, 150, 500],
+        },
+        missileLauncher: {
+            label: "SR5.Weapon.Ranged.Type.MissileLauncher",
+            ranges: [70, 150, 450, 1500],
+        },
+        lightCrossbow: {
+            label: "SR5.Weapon.Ranged.Type.LightCrossbow",
+            ranges: [6, 24, 60, 120],
+        },
+        mediumCrossbow: {
+            label: "SR5.Weapon.Ranged.Type.MediumCrossbow",
+            ranges: [9, 36, 90, 150],
+        },
+        heavyCrossbow: {
+            label: "SR5.Weapon.Ranged.Type.HeavyCrossbow",
+            ranges: [15, 45, 120, 180],
+        },
     },
 
     elementTypes: {

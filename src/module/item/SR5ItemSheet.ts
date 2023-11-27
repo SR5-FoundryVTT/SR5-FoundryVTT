@@ -4,7 +4,6 @@ import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
-import { RANGED_WEAPON_RANGES } from './flows/RangedWeaponRangeDefaults';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -308,7 +307,6 @@ export class SR5ItemSheet extends ItemSheet {
          * SIN item specific
          */
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        html.find('.add-new-license').click(this._onAddLicense.bind(this));
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
 
         html.find('.network-clear').on('click', this._onRemoveAllNetworkDevices.bind(this));
@@ -409,10 +407,10 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onSelectRangeTemplate(event) {
-        const selectedRangeTemplate = event.currentTarget.value;
+        const selectedRangeTemplate = event.currentTarget.value as keyof typeof SR5.rangedWeaponTypes;
 
         if(selectedRangeTemplate !== "manual") {
-            const ranges = RANGED_WEAPON_RANGES[selectedRangeTemplate];
+            const ranges = SR5.rangedWeaponTypes[selectedRangeTemplate].ranges;
 
             await this.item.update({
                 'system.range.ranges.short': ranges[0],

@@ -115,7 +115,7 @@
                 class="select-range-template"
             >
                 {{#each config.rangedWeaponTypes as |val key|}}
-                <option value="{{key}}"{{#ife ../system.range.ranges.template key}}selected="selected"{{/ife}}>{{localize val}}</option>
+                <option value="{{key}}"{{#ife ../system.range.ranges.template key}}selected="selected"{{/ife}}>{{localize val.label}}</option>
                 {{/each}}
             </select>
             <input
