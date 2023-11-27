@@ -65,7 +65,6 @@ export interface TestData {
     manualHits: ValueField
     manualGlitches: ValueField
 
-    appendedHits?: number
     hitsIcon?: IconWithTooltip
     autoSuccess?: boolean
 
@@ -885,7 +884,12 @@ export class SuccessTest {
     }
 
     get appendedHits(): number | undefined {
-        return this.data.appendedHits;
+        return this.hits.mod.find((mod) => mod.name === "SR5.AppendedHits")?.value;
+    }
+
+    // In the case we've added appended hits, we want to separately display the hits value and the appended hits (ie. "7 + 5" instead of "12")
+    get displayHits(): number | undefined {
+        return this.hits.value - (this.appendedHits || 0);
     }
 
     // Hide dice pool and roll results as they are not relevant to the success of the test

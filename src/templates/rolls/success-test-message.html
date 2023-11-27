@@ -46,7 +46,7 @@
                     <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span class="value-result">{{test.pool.value}}</span></div>
                     <div class="test-value">
                         <span class="value">{{localize test.hits.label}}:</span>
-                        <span class="value-result">{{test.hits.value}}{{#if test.usingManualRoll}}*{{/if}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}</span>
+                        <span class="value-result">{{test.displayHits}}{{#if test.usingManualRoll}}*{{/if}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}</span>
                         {{#if test.hitsIcon}}<img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />{{/if}}
                     </div>
                     {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span class="value-result">{{test.extendedHits.value}}</span></div>{{/if}}

@@ -22,10 +22,10 @@ export interface PhysicalResistTestData extends SuccessTestData {
     knockedDown: boolean
 }
 
-export type PhysicalResistOverrideSuccessCondition = {
+export type PhysicalResistSuccessCondition = {
     test: () => boolean,
-    label: Translation,
-    effect: () => void,
+    label?: Translation,
+    effect?: () => void,
 }
 
 /**
@@ -36,7 +36,7 @@ export type PhysicalResistOverrideSuccessCondition = {
 export class PhysicalResistTest extends SuccessTest {
     override data: PhysicalResistTestData
 
-    override _prepareData(data, options): any {
+    override _prepareData(data: PhysicalResistTestData, options): any {
         data = super._prepareData(data, options);
 
         // Get incoming damage from test before or default.
@@ -125,30 +125,28 @@ export class PhysicalResistTest extends SuccessTest {
      * Resist Test success means ALL damage has been soaked.
      */
     override get success() {
-        if(this.actor) {
-            const armor = this.actor.getArmor(this.data.incomingDamage);
+        return !!this.getSuccessCondition();
+    }
 
-            if(armor.hardened) {
-                const soaked = this.hits.value + Math.ceil(armor.value/2);
-                return this.data.incomingDamage.value <= soaked;
-            }
-        }
-
+    private isFullySoaked(): boolean {
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
-    private overrideSuccessConditions: PhysicalResistOverrideSuccessCondition[] = [
+    private successConditions: PhysicalResistSuccessCondition[] = [
         {
             test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
             label: "SR5.TestResults.SoakBlockedByHardenedArmor",
             effect: () => {
                 this.data.autoSuccess = true;
             }
-        }
+        },
+        {
+            test: () => this.isFullySoaked(),
+        },
     ]
 
-    private getOverrideSuccessCondition(): PhysicalResistOverrideSuccessCondition|undefined {
-        return this.overrideSuccessConditions.find(({ test }) => test());
+    private getSuccessCondition(): PhysicalResistSuccessCondition|undefined {
+        return this.successConditions.find(({ test }) => test());
     }
 
     override get showSuccessLabel(): boolean {
@@ -156,7 +154,7 @@ export class PhysicalResistTest extends SuccessTest {
     }
 
     override get successLabel(): Translation {
-        return this.getOverrideSuccessCondition()?.label || 'SR5.TestResults.ResistedAllDamage';
+        return this.getSuccessCondition()?.label || 'SR5.TestResults.ResistedAllDamage';
     }
     override get failureLabel(): Translation {
         return 'SR5.TestResults.ResistedSomeDamage';
@@ -165,10 +163,18 @@ export class PhysicalResistTest extends SuccessTest {
     override async processSuccess() {
         await super.processSuccess();
 
-        this.getOverrideSuccessCondition()?.effect();
+        this.getSuccessCondition()?.effect?.();
     }
 
     override async processResults() {
+        // Automatic hits from hardened armor (SR5#397)
+        // Must be called before super.processResults to ensure that we factor in the appended hits when determining if the test was successful
+        const armor = this.actor?.getArmor(this.data.modifiedDamage);
+        if(armor?.hardened) {
+            PartsList.AddUniquePart(this.hits.mod, 'SR5.AppendedHits', Math.ceil(armor.value/2));
+            Helpers.calcTotal(this.hits);
+        }
+
         await super.processResults();
 
         if (!this.actor) return;
@@ -178,10 +184,5 @@ export class PhysicalResistTest extends SuccessTest {
 
         // Handle Knock Down Rules with legacy flow handling.
         this.data.knockedDown = new SoakFlow().knocksDown(this.data.modifiedDamage, this.actor);
-
-        const armor = this.actor.getArmor(this.data.modifiedDamage);
-        if(armor.hardened){
-            this.data.appendedHits = Math.ceil(armor.value/2);
-        }
     }
 }
