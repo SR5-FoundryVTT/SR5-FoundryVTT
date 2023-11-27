@@ -89,6 +89,7 @@ export const SR5 = {
     },
 
     rangedWeaponTypes: {
+        manual: "SR5.Weapon.Ranged.Type.Manual",
         taser: "SR5.Weapon.Ranged.Type.Taser",
         holdOutPistol: "SR5.Weapon.Ranged.Type.HoldOutPistol",
         lightPistol: "SR5.Weapon.Ranged.Type.LightPistol",
@@ -1059,4 +1060,4 @@ export const SR5 = {
             'underbarrel-weapons': 'systems/shadowrun5e/dist/icons/importer/modification/modification.svg'
         }
     }
-};
+} as const;

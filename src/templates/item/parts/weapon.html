@@ -112,23 +112,19 @@
         <div class="inputs">
             <select
                 name="system.range.ranges.template"
+                class="select-range-template"
             >
-                <option value="custom">Custom</option>
                 {{#each config.rangedWeaponTypes as |val key|}}
-                    <option value="{{key}}"{{#ife ../system.range.ranges.template key}}selected="selected"{{/ife}}>{{localize val}}</option>
+                <option value="{{key}}"{{#ife ../system.range.ranges.template key}}selected="selected"{{/ife}}>{{localize val}}</option>
                 {{/each}}
             </select>
-
-        </div>
-    </div>
-    <div class="form-line">
-        <div class="inputs">
             <input
                 size="3"
                 type="text"
                 name="system.range.ranges.short"
                 value="{{system.range.ranges.short}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeTemplate}} disabled {{/if}}
             />
             /
             <input
@@ -137,6 +133,7 @@
                 name="system.range.ranges.medium"
                 value="{{system.range.ranges.medium}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeTemplate}} disabled {{/if}}
             />
             /
             <input
@@ -145,6 +142,7 @@
                 name="system.range.ranges.long"
                 value="{{system.range.ranges.long}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeTemplate}} disabled {{/if}}
             />
             /
             <input
@@ -153,6 +151,7 @@
                 name="system.range.ranges.extreme"
                 value="{{system.range.ranges.extreme}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeTemplate}} disabled {{/if}}
             />
         </div>
     </div>

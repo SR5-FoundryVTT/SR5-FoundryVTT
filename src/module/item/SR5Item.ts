@@ -1071,6 +1071,10 @@ export class SR5Item extends Item {
         return this.wrapper.isSpell();
     }
 
+    get isUsingRangeTemplate(): boolean {
+        return this.wrapper.isUsingRangeTemplate();
+    }
+
     get asSpell(): SpellItemData | undefined {
         if (this.isSpell) {
             //@ts-expect-error // TODO: foundry-vtt-types v10

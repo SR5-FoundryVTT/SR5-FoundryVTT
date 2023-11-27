@@ -1337,7 +1337,8 @@
                 "MissileLauncher": "Missile Launcher",
                 "LightCrossbow": "Light Crossbow",
                 "MediumCrossbow": "Medium Crossbow",
-                "HeavyCrossbow": "Heavy Crossbow"
+                "HeavyCrossbow": "Heavy Crossbow",
+                "Manual": "Manual"
             }
         },
         "Weapon": "Weapon"

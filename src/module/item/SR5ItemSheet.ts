@@ -4,6 +4,7 @@ import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
+import { RANGED_WEAPON_RANGES } from './flows/RangedWeaponRangeDefaults';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -71,6 +72,8 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Can be used to check if the source field contains a URL.
     sourceIsURL: boolean
+
+    isUsingRangeTemplate: boolean
 }
 
 /**
@@ -199,6 +202,8 @@ export class SR5ItemSheet extends ItemSheet {
         data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
         data.sourceIsURL = this.item.sourceIsUrl;
 
+        data.isUsingRangeTemplate = this.item.isUsingRangeTemplate;
+
         data.rollModes = CONFIG.Dice.rollModes;
 
         return data;
@@ -303,6 +308,7 @@ export class SR5ItemSheet extends ItemSheet {
          * SIN item specific
          */
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
+        html.find('.add-new-license').click(this._onAddLicense.bind(this));
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
 
         html.find('.network-clear').on('click', this._onRemoveAllNetworkDevices.bind(this));
@@ -323,6 +329,8 @@ export class SR5ItemSheet extends ItemSheet {
 
         // Freshly imported item toggle
         html.find('.toggle-fresh-import-off').on('click', async (event) => this._toggleFreshImportFlag(event, false));
+
+        html.find('.select-range-template').on('change', this._onSelectRangeTemplate.bind(this));
 
         this._activateTagifyListeners(html);
     }
@@ -398,6 +406,21 @@ export class SR5ItemSheet extends ItemSheet {
     _onOpenSource(event) {
         event.preventDefault();
         this.item.openSource();
+    }
+
+    async _onSelectRangeTemplate(event) {
+        const selectedRangeTemplate = event.currentTarget.value;
+
+        if(selectedRangeTemplate !== "manual") {
+            const ranges = RANGED_WEAPON_RANGES[selectedRangeTemplate];
+
+            await this.item.update({
+                'system.range.ranges.short': ranges[0],
+                'system.range.ranges.medium': ranges[1],
+                'system.range.ranges.long': ranges[2],
+                'system.range.ranges.extreme': ranges[3],
+            });
+        }
     }
 
     //Swap slots (att1, att2, etc.) for ASDF matrix attributes
