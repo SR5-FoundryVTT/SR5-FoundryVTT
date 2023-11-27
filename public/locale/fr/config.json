@@ -378,6 +378,7 @@
             "SetMonitor": "Moniteur doit être installé manuellement",
             "Spells": "Sorts",
             "SpiritConfiguration": "Configuration d'esprit",
+            "SpriteConfiguration": "Configuration d'Sprite",
             "SpritePowers": "Pouvoirs de sprites",
             "VehicleConfiguration": "Configuration Véhicule"
         }

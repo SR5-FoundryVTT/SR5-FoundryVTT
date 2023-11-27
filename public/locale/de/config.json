@@ -545,6 +545,7 @@
             "SetMonitor": "Monitor muss manuell gesetzt werden",
             "Spells": "Zaubersprüche",
             "SpiritConfiguration": "Geist Konfiguration",
+            "SpriteConfiguration": "Sprite Konfiguration",
             "SpritePowers": "Sprite Kräfte",
             "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung.",
             "VehicleConfiguration": "Fahrzeug Konfiguration"
@@ -973,7 +974,7 @@
     "SR5.Sprite": {
         "Level": "Stufe",
         "Registered": "Registriert",
-        "Services": "Aufgabe",
+        "Services": "Aufgaben",
         "Type": "Typ",
         "Types": {
             "Companion": "Begleiter",

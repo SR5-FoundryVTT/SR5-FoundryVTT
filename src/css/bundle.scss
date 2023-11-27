@@ -766,7 +766,9 @@ input[type='text'].display {
         margin: 0.1em;
         margin-right: $groove-width;
         margin-left: $groove-width;
-
+        &.matrix{
+            color: $white;
+        }
         .has-desc {
             @include rollable;
         }
@@ -794,7 +796,9 @@ input[type='text'].display {
             border-bottom: 1px solid $yellow;
             border-radius: 0.2em;
             padding-top: 5px;
-
+            &.sprite{
+                background: none;
+            }
             &.faded {
                 color: $grey;
             }
@@ -1212,7 +1216,25 @@ color: $white;
     border-bottom: 2px solid $edge; /* Add a border at the bottom */
     font-size: medium;
 }
-
+.SR5 th:hover {
+    color: $pdfColor;
+}
+.SR5 caption{
+    background: none;
+    color: $yellow;
+    padding: 6px;
+    text-align: left;
+    font-size: medium;
+}
+.SR5 caption:hover{
+    color: $fDarkRed;
+}
+.SR5 tr{
+    color: $white;
+}
+.SR5 tr:hover{
+    color: $pdfColor;
+}
 .SR5 tr p:not(th p) {
     padding-left: 10px;  /* Padding on the left */
 }
