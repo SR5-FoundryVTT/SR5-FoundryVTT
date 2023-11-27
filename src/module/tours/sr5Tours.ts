@@ -2,48 +2,45 @@ import { SR5Actor } from "../actor/SR5Actor";
 
 // @ts-expect-error
 export default class Sr5Tour extends Tour {
-    actorType?: String;
+    //the type of actor that should be created for the tour
+    actorType: String;
+
+    //the tab for the tour
+    tab?: String
+
+    //this field is only for internal handling
     actor?: SR5Actor;
 
     /** @override */
     async _preStep() {
         await super._preStep();
 
-         // @ts-expect-error
-        let actorType = this.config.actorType
-
-        // If we need an actor, make it and render
-        if (actorType) {
-            //get an unopened actor
-            // @ts-expect-error
-            let availableActors = game.actors.filter(actor => actor.type.includes(actorType) && Object.values(actor.apps).filter(app => app?.rendered).length == 0);
-            
-            this.actor = availableActors[0]
-            // @ts-expect-error
-            await availableActors[0].sheet?._render(true)
+        //create actor if needed
+        if(this.actor == undefined) {
+            this.actor = new SR5Actor.implementation({
+                //@ts-expect-error
+                name: "Tour " + this.id,
+                // @ts-expect-error
+                type: this.config.actorType,
+                ownership: {
+                    default: 3
+                }
+            }) as SR5Actor;
         }
-    }
 
-    /** @override */
-    get canStart() {
         // @ts-expect-error
-        let actorType = this.config.actorType
-        if (actorType) {
-            // @ts-expect-error
-            return game.actors.filter(actor => actor.type.includes(actorType) && Object.values(actor.apps).filter(app => app?.rendered).length == 0).length > 0;
-        }
+        await this.actor.sheet?._render(true, {editable: false});
 
-        return true;
+        // @ts-expect-error
+        if(this.config.tab) {
+            // @ts-expect-error
+            this.actor?.sheet?.activateTab(this.config.tab)
+        }
     }
 
     /** @override */
     async complete() {
-         // @ts-expect-error
-        if (this.config.actorType) {
-            // for some reason the sheet does not update after the tour anymore
-            // so we open an unopend one and close it after the tour
-            this.actor?.sheet?.close()
-        }
+        await this.actor?.sheet?.close()
         return super.complete()
       }
 }

@@ -1,0 +1,34 @@
+{
+    "title": "SR5.Tours.ConditionMonitor.Title",
+    "description": "SR5.Tours.ConditionMonitor.Description",
+    "canBeResumed": true,
+    "display": true,
+    "actorType": "character",
+    "steps": [
+      {
+        "id": "General",
+        "selector": "#tracks",
+        "title": "SR5.Tours.ConditionMonitor.GeneralTitle",
+        "content": "SR5.Tours.ConditionMonitor.GeneralContent"
+      },
+      {
+        "id": "WoundModifier",
+        "selector": "#woundModifierCell-1",
+        "title": "SR5.Tours.ConditionMonitor.WoundModifierTitle",
+        "content": "SR5.Tours.ConditionMonitor.WoundModifierContent"
+      },
+      {
+        "id": "ApplyDamage",
+        "selector": "#tracks",
+        "title": "SR5.Tours.ConditionMonitor.ApplyDamageTitle",
+        "content": "SR5.Tours.ConditionMonitor.ApplyDamageContent"
+      },
+      {
+        "id": "Recovery",
+        "selector": "#stun",
+        "title": "SR5.Tours.ConditionMonitor.RecoveryTitle",
+        "content": "SR5.Tours.ConditionMonitor.RecoveryContent"
+      }
+    ]
+}
+  

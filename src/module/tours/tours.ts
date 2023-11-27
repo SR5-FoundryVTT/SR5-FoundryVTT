@@ -6,10 +6,19 @@ export default async function registerSR5Tours() {
      // @ts-expect-error
     game.tours.register(
       'shadowrun5e',
-      'tracks',
+      'ConditionMonitor',
        // @ts-expect-error
-      await Sr5Tour.fromJSON('/systems/shadowrun5e/dist/tours/tracks.json'),
+      await Sr5Tour.fromJSON('/systems/shadowrun5e/dist/tours/ConditionMonitor.json'),
     );
+
+
+//      game.tours.register(
+//       'shadowrun5e',
+//       'CharacterImport',
+//        // @ts-expect-error
+//       await Sr5Tour.fromJSON('/systems/shadowrun5e/dist/tours/character-import.json'),
+//     );
+//
 
   } catch (err) {
     console.log(err);
