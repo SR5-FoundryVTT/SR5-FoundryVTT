@@ -9,6 +9,7 @@
                                 {{localize "SR5.ImportCharacter"}}
                             </button>
                         </div>
+                        {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html' }}{{/if}}
                     </div>
                     <div class="list-item">
                         <div class="list-item-content">
@@ -22,7 +23,7 @@
                                     <input class="display" type="text" name="system.nuyen" value="{{system.nuyen}}" data-dtype="Number" />
                                     <span class="unit">
                                     <i class="fas fa-yen-sign"></i>
-                                </span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -97,6 +98,7 @@
                             </div>
                         </div>
                     </div>
+                <!--Magic/Resonaz Selector-->    
                 {{/if}}
                 {{#if canAlterSpecial }}
                 <div class="list-item">
@@ -123,11 +125,11 @@
                         <div class="list-item-content">
                             <div class="item-left">
                                 <div class="item-text item-name">
-                                    {{localize "SR5.DrainResist"}}
+                                    {{localize "SR5.DrainAttribute"}}
                                 </div>
                             </div>
                             <div class="item-right">
-                                <div class="item-text input">
+                                <div class="item-text input defense">
                                     <select name="system.magic.attribute" class="display">
                                         {{#select system.magic.attribute}} {{#each config.attributes as |name type|}}
                                             <option value="{{type}}">{{localize name}}</option>
@@ -138,6 +140,27 @@
                         </div>
                     </div>
                 {{/if}}
+                {{#if emerged}}
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                <label for='Submersion'>{{localize "SR5.FadeAttribute"}}</label>
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text input defense">
+                                <select name="system.technomancer.attribute" class="display">
+                                    {{#select system.technomancer.attribute}} {{#each config.attributes as |name type|}}
+                                        <option value="{{type}}">{{localize name}}</option>
+                                    {{/each}} {{/select}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/if}}                
+                <!--Defense Selector -->
                 {{#if hasFullDefense }}
                 <div class="list-item">
                     <div class="list-item-content">
@@ -147,7 +170,7 @@
                             </div>
                         </div>
                         <div class="item-right">
-                            <div class="item-text input">
+                            <div class="item-text input defense">
                                 <select name="system.full_defense_attribute" class="display">
                                     {{#select system.full_defense_attribute}} {{#each config.attributes as |name type|}}
                                         <option value="{{type}}">{{localize name}}</option>
@@ -162,7 +185,7 @@
                 <div class="list-item">
                     <div class="list-item-content">
                         <div class="item-left">
-                            <div class="item-text item-name">
+                            <div class="item-text item-name" data-tooltip="SR5.Tooltips.Actor.Critter">
                                 {{localize "SR5.IsCritter"}}
                             </div>
                         </div>
@@ -176,7 +199,7 @@
                 <div class="list-item">
                     <div class="list-item-content">
                         <div class="item-left">
-                            <div class="item-text item-name">
+                            <div class="item-text item-name" data-tooltip="SR5.Tooltips.Actor.NPC">
                                 {{localize "SR5.IsNPC"}}
                             </div>
                         </div>
@@ -192,7 +215,7 @@
                 <div class="list-item">
                     <div class="list-item-content">
                         <div class="item-left">
-                            <div class="item-text item-name">
+                            <div class="item-text item-name" data-tooltip="SR5.Tooltips.Actor.Grunt">
                                 {{localize "SR5.IsGrunt"}}
                             </div>
                         </div>
@@ -210,7 +233,7 @@
                 <div class="list-item">
                     <div class="list-item-content">
                         <div class="item-left">
-                            <div class="item-text item-name">
+                            <div class="item-text item-name" data-tooltip="SR5.Tooltips.Actor.Metatype">
                                 {{localize "SR5.Metatype"}}
                             </div>
                         </div>
@@ -235,7 +258,6 @@
                     </div>
                 </div>
                 {{/if}}
-                {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html' }}{{/if}}
                 <div class="list-item">
                     <div class="list-item-content">
                         <button type="button" class="display reset-actor-run-data" data-tooltip="SR5.Tooltips.Actor.ResetActorForNewRun">
@@ -244,8 +266,8 @@
                     </div>
                 </div>
             </div>
-            <div class="flexcol">
-                <div class="scroll-area-mods">
+            <div>
+                <div class="scroll-area scroll-area-mods">
                     <!-- Situational Modifiers Section -->
                     {{#if situationModifiers}}
                     <div class="list-item item-section wrap-collapsible">
@@ -272,7 +294,7 @@
                                     <div class="list-item">
                                         <div class="list-item-content">
                                             <div class="item-left">
-                                                <div class="item-text item-name show-situation-modifiers-application">
+                                                <div class="item-text item-name mods-label show-situation-modifiers-application">
                                                     {{localize this.label}}
                                                 </div>
                                             </div>
@@ -314,7 +336,7 @@
                                 <div class="list-item">
                                     <div class="list-item-content">
                                         <div class="item-left">
-                                            <div class="item-text item-name" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
+                                            <div class="item-text item-name mods-label" data-tooltip="{{localizeOb id ../config.actorModifiersTooltip}}">
                                                 {{localizeOb id ../config.actorModifiers}}
                                             </div>
                                         </div>

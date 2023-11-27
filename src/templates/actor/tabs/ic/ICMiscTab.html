@@ -1,15 +1,13 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='misc'}}
     <div class="inventory">
         <div class="split-container">
-            <div class="scroll-area">
-                <div class="description">
-                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                        name=(localize 'SR5.Description')                    
-                    }}
-                    {{editor biographyHTML target="system.description.value" button=true editable=true engine="prosemirror" collaborate=false}}
-                </div>
+            <div>
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                    name=(localize 'SR5.Description')                    
+                }}
+                {{editor biographyHTML target="system.description.value" button=true editable=true engine="prosemirror" collaborate=false}}
             </div>
-            <div class="flexcol">
+            <div>
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                     name=(localize 'SR5.Modifier')
                     itemId='modifiers'

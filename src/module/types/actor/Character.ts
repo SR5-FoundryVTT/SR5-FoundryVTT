@@ -15,14 +15,17 @@ declare namespace Shadowrun {
         MagicActorData,
         WoundsActorData,
         MovementActorData,
+        TechnomancerActorData,
         NPCActorData {
+            attributes: CharacterAttributes
             values: PhysicalCombatValues
             metatype: string | keyof typeof SR5CONFIG.character.types;
             full_defense_attribute: string;
             // Can a character have critter powers?
             is_critter: boolean;
-            modifiers: CharacterModifiers
+            // modifiers: CharacterModifiers;
             limits: CharacterLimits
+            modifiers: Modifiers & CharacterModifiers
     }
 
     export interface CharacterLimits extends AwakendLimits, MatrixLimits {}
@@ -57,6 +60,14 @@ declare namespace Shadowrun {
     export type MagicActorData = {
         magic: MagicData
     };
+
+    export type TechnomancerActorData = {
+        technomancer: {
+            // Fade test attribute
+            attribute: ActorAttribute
+            submersion: number
+        }
+    }
 
     export type MatrixActorData = {
         matrix: MatrixData;
@@ -103,13 +114,15 @@ declare namespace Shadowrun {
         attributes: object
     };
 
-    export interface CommonModifiers extends Modifiers {
+    export interface CommonModifiers {
         // Meant to be applied on all defense tests.
         defense: NumberOrEmpty
         // Meant to be applied on some defense tests that apply the defense modifier.
         ['defense_dodge']: NumberOrEmpty
         ['defense_parry']: NumberOrEmpty
         ['defense_block']: NumberOrEmpty
+        ['defense_melee']: NumberOrEmpty
+        ['defense_ranged']: NumberOrEmpty
 
         // Meant to be applied on physical resist (soak) tests.
         soak: NumberOrEmpty
@@ -117,15 +130,22 @@ declare namespace Shadowrun {
         recoil: NumberOrEmpty
     }
 
+    interface MatrixModifiers {
+        matrix_initiative: NumberOrEmpty
+        matrix_initiative_dice: NumberOrEmpty
+        matrix_track: NumberOrEmpty
+    }
+
     /**
      * These modifiers are available for Character type actors.
      * 
      * This interface must correspond with modifiers inject during character data prep.
      */
-    export interface CharacterModifiers extends CommonModifiers {
+    export interface CharacterModifiers extends CommonModifiers, MatrixModifiers {
         drain: NumberOrEmpty
         armor: NumberOrEmpty
         physical_limit: NumberOrEmpty
+        astral_limit: NumberOrEmpty
         social_limit: NumberOrEmpty
         mental_limit: NumberOrEmpty
         stun_track: NumberOrEmpty
@@ -146,13 +166,21 @@ declare namespace Shadowrun {
         pain_tolerance_physical: NumberOrEmpty
         essence: NumberOrEmpty
         fade: NumberOrEmpty
-
         // Meant to be applied on all defense test, for defense modifiers after multiple attacks.
         multi_defense: NumberOrEmpty
+        reach: NumberOrEmpty
     }
 
     /**
      * Actor data that can be Grunts.
      */
     type GruntActorData = CharacterData | SpiritData | CritterData;
+
+    /**
+     * These attributes are always available for this actor type.
+     */
+    interface CharacterAttributes extends Attributes {
+        initiation: AttributeField
+        submersion: AttributeField
+    }
 }

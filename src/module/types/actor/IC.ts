@@ -17,6 +17,7 @@ declare namespace Shadowrun {
                 atts: MatrixAttributes
             },
             attributes: ICAttributes
+            modifiers: Modifiers & CommonModifiers & MatrixModifiers
     }    
 
     interface ICAttributes extends Attributes {

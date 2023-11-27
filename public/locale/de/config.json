@@ -319,7 +319,7 @@
     "SR5.Dodge": "Ausweichen",
     "SR5.DontApplyWounds": "Nicht anwenden",
     "SR5.Drain": "Entzug",
-    "SR5.DrainResist": "Entzug widerstehen",
+    "SR5.DrainAttribute": "Entzug widerstehen",
     "SR5.DrainValue": "Entzug",
     "SR5.Dropoff": "Wirkung",
     "SR5.DuckOrCover": "Deckung oder Hinwerfen",
@@ -500,9 +500,17 @@
     },
     "SR5.Karma": "Karma",
     "SR5.Keybinding": {
+        "HideTestDialog": {
+            "Hint": "Testdialoge werden einmalig übersprungen",
+            "Label": "Testdialog überspringen"
+        },
         "OverwatchScoreTracker": {
             "Hint": "Öffne den Overwatchwert Monitor",
             "Label": "Overwatchwert Monitor"
+        },
+        "ShowItemCard": {
+            "Hint": "Anstelle eines Tests zeige die Gegenstandskarte im Chat",
+            "Label": "Zeige nur Chatkarte"
         },
         "ShowSituationModifiers": {
             "Hint": "Öffne Situationsmodifikatoren für aktuelle Auswahl",
@@ -538,6 +546,7 @@
             "SetMonitor": "Monitor muss manuell gesetzt werden",
             "Spells": "Zaubersprüche",
             "SpiritConfiguration": "Geist Konfiguration",
+            "SpriteConfiguration": "Sprite Konfiguration",
             "SpritePowers": "Sprite Kräfte",
             "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung.",
             "VehicleConfiguration": "Fahrzeug Konfiguration"
@@ -704,7 +713,8 @@
     "SR5.OpenOrigin": "Öffne Gegenstand",
     "SR5.OpenSource": "Öffne Quelle für Gegenstand als pdfpager PDF oder Website",
     "SR5.OpposedType": "Typ",
-    "SR5.OpposingHits": "Gegenüber Erfolge",
+    "SR5.OpposingHits": "Gegn. Erfolge",
+    "SR5.OpposingNetHits": "Gegn. Netto Erfolge",
     "SR5.OriginalDicePool": "Originaler Würfelpool",
     "SR5.OutOfRange": "Außer Reichweite",
     "SR5.Overflow": "Überschuss",
@@ -959,14 +969,13 @@
             "ToxicWater": "Schlamm",
             "Train": "Zug",
             "Water": "Wasser",
-            "Worker": "Insekten Arbeiter",
-            "Wraith": "Wraith"
+            "Worker": "Insekten Arbeiter"
         }
     },
     "SR5.Sprite": {
         "Level": "Stufe",
         "Registered": "Registriert",
-        "Services": "Aufgabe",
+        "Services": "Aufgaben",
         "Type": "Typ",
         "Types": {
             "Companion": "Begleiter",
@@ -1047,6 +1056,10 @@
     "SR5.ToggleEquip": "Anlegen/Ablegen",
     "SR5.Tooltips": {
         "Actor": {
+            "Critter": "Ermöglicht die Nutzung von Critterkräften",
+            "Grunt": "Nutze Grunt Regeln für Akteur",
+            "Metatype": "Ein NPC-Akteur bekommt automatische Attributemodi. abhängig vom Metatyp",
+            "NPC": "Makriere Akteur als NPC und ermöglicht weitere NPC-Funktionen",
             "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück"
         },
         "CallInAction": {

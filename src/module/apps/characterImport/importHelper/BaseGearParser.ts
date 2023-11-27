@@ -1,5 +1,5 @@
-import { parseDescription, parseTechnology, formatAsSlug } from "./BaseParserFunctions.js"
-import {DataDefaults} from "../../../data/DataDefaults.js";
+import { parseDescription, parseTechnology, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
+import { DataDefaults } from "../../../data/DataDefaults.js";
 import { SR5 } from "../../../config.js";
 
 /**
@@ -19,6 +19,7 @@ export interface GearParser {
 export class BaseGearParser implements GearParser {
     parse(chummerGear : any) : any {
         const parsedGear = this.getDefaultData();
+        const parserType = 'equipment';
         parsedGear.name = chummerGear.name;
         if (chummerGear.extra)
         {
@@ -27,6 +28,9 @@ export class BaseGearParser implements GearParser {
 
         parsedGear.system.technology = parseTechnology(chummerGear);
         parsedGear.system.description = parseDescription(chummerGear);
+
+        // Assign import flags
+        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name), parserType);
 
         return parsedGear;
     }

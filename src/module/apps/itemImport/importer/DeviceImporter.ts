@@ -1,7 +1,7 @@
 import { DataImporter } from "./DataImporter";
 import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
-import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from "../../../item/flows/UpdateActionFlow";
 
 export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shadowrun.DeviceData> {
     public files = ['gear.xml'];
@@ -37,7 +37,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(commlink, 'name');
 
             // Get the item's folder information
-            //@ts-expect-error
+            // @ts-expect-error
             item.folder = folder.id;
 
             // Import Flags
@@ -58,7 +58,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             //@ts-expect-error
             entries.push(item);
@@ -85,7 +85,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(rcc, 'name');
 
             // Get the item's folder information
-            //@ts-expect-error
+            // @ts-expect-error
             item.folder = folder.id;
 
             // Import Flags
@@ -106,7 +106,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             //@ts-expect-error
             entries.push(item);
@@ -133,7 +133,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(cyberdeck, 'name');
 
             // Get the item's folder information
-            //@ts-expect-error
+            // @ts-expect-error
             item.folder = folder.id;
 
             // Import Flags
@@ -173,7 +173,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             //@ts-expect-error
             items.push(item);

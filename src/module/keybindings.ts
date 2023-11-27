@@ -19,4 +19,16 @@ export const registerSystemKeybindings = () => {
         editable: [{ key: "KeyO", modifiers: [] }],
         onDown: () => new OverwatchScoreTracker().render(true),
     });
+
+    game.keybindings.register("shadowrun5e", "hide-test-dialog", {
+        name: game.i18n.localize("SR5.Keybinding.HideTestDialog.Label"),
+        hint: game.i18n.localize("SR5.Keybinding.HideTestDialog.Hint"),
+        editable: [{key: "shiftKey"}]
+    });
+
+    game.keybindings.register("shadowrun5e", "show-item-card", {
+        name: game.i18n.localize("SR5.Keybinding.ShowItemCard.Label"),
+        hint: game.i18n.localize("SR5.Keybinding.ShowItemCard.Hint"),
+        editable: [{key: "ctrlKey"}]
+    });
 }

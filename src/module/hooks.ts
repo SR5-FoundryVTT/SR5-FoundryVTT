@@ -15,7 +15,7 @@ import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
 import {HandlebarManager} from './handlebars/HandlebarManager';
 
 import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
-import {Import} from './importer/apps/import-form';
+import {Import} from './apps/itemImport/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
@@ -64,6 +64,8 @@ import VisionConfigurator from './vision/visionConfigurator';
 import { DataDefaults } from './data/DataDefaults';
 import { AutocompleteInlineHooksFlow } from './effect/autoinline/AutocompleteInlineHooksFlow';
 import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
+import { RenderSettings } from './systemLinks';
+import registerSR5Tours from './tours/tours';
 
 
 
@@ -95,6 +97,8 @@ export class HooksManager {
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
 
         Hooks.on('quenchReady', quenchRegister);
+
+        RenderSettings.listen();
     }
 
     static init() {
@@ -319,6 +323,10 @@ ___________________
 
         // Preload might reduce loading time during play.
         HandlebarManager.loadTemplates();
+
+        // Register Tours
+        registerSR5Tours();
+
     }
 
     static async ready() {

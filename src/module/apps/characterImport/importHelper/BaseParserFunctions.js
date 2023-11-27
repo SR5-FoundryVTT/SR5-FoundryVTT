@@ -26,11 +26,11 @@ export const parseDescription = (chummerEntry) => {
     }
 
     if (chummerEntry.description) {
-        parsedDescription.value = TextEditor.enrichHTML(chummerEntry.description);
+        parsedDescription.value = chummerEntry.description;
     }
 
     if (chummerEntry.notes) {
-        parsedDescription.value = TextEditor.enrichHTML(chummerEntry.notes);
+        parsedDescription.value = chummerEntry.notes;
     }
 
     return parsedDescription

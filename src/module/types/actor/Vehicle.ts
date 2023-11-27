@@ -33,6 +33,7 @@ declare namespace Shadowrun {
             vehicle_stats: VehicleStats
             attributes: VehicleAttributes
             networkController: string
+            modifiers: Modifiers & CommonModifiers
         }
 
     export interface VehicleStats {

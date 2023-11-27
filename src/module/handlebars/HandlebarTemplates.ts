@@ -57,6 +57,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/attributes/FakeAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/SpecialAttributeList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.html',

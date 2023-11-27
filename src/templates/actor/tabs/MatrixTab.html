@@ -44,12 +44,13 @@
         {{/each}}
     </div>
     <div class="inventory">
-        {{#if emerged}}
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html' }}
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.html' }}
-        {{else}}
+        <div class ="scroll-area scroll-area-matrix">    
+            {{#if emerged}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html' }}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.html' }}
+            {{/if}}
             {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html' }}
-        {{/if}}
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html' }}
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html' }}
+        </div>
     </div>
 {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

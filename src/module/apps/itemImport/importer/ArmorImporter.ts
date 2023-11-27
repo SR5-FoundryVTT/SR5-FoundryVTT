@@ -1,7 +1,7 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
-import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowrun.ArmorData> {
     public armorTranslations: any;
@@ -54,7 +54,7 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
             item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             datas.push(item);
         }

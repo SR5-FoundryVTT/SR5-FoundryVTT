@@ -25,8 +25,8 @@ import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
-import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { allApplicableDocumentEffects, allApplicableItemEffects } from '../effects';
+import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 
 
 /**
@@ -1337,7 +1337,11 @@ export class SR5Actor extends Actor {
         return RecoveryRules.canHealPhysicalDamage(stun.value);
     }
 
-    /** Apply damage to the stun track and get overflow damage for the physical track.
+    /** 
+     * Apply damage to the stun track and get overflow damage for the physical track.
+     * 
+     * @param damage The to be applied damage.
+     * @returns overflow damage after stun damage is full.
      */
     async addStunDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData> {
         if (damage.type.value !== 'stun') return damage;
@@ -1356,9 +1360,15 @@ export class SR5Actor extends Actor {
         }
 
         await this._addDamageToTrack(rest, track);
+
         return overflow;
     }
 
+    /**
+     * Apply damage to the physical track and get overflow damage for the physical overflow track.
+     * 
+     * @param damage The to be applied damage.
+     */
     async addPhysicalDamage(damage: Shadowrun.DamageData) {
         if (damage.type.value !== 'physical') {
             return damage;
@@ -1376,13 +1386,14 @@ export class SR5Actor extends Actor {
         await this._addDamageToOverflow(overflow, track);
     }
 
+    
     /**
      * Matrix damage can be added onto different tracks:
      * - IC has a local matrix.condition_monitor
      * - Characters have matrix devices (items) with their local track
      */
-    async addMatrixDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData> {
-        if (damage.type.value !== 'matrix') return damage;
+    async addMatrixDamage(damage: Shadowrun.DamageData) {
+        if (damage.type.value !== 'matrix') return;
 
 
         const device = this.getMatrixDevice();
@@ -1397,32 +1408,30 @@ export class SR5Actor extends Actor {
         if (this.isIC() || this.isSprite()) {
             await this._addDamageToTrack(rest, track);
         }
-
-
-        // Return overflow for consistency, yet nothing will take overflowing matrix damage.
-        return overflow;
     }
 
     /**
-     * Apply damage of any type to this actor.
+     * Apply damage of any type to this actor. This should be the main entry method to applying damage.
      * 
      * @param damage Damage to be applied
      * @returns overflow damage.
      */
-    async addDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData|undefined> {
-        const previousWounds = this.getWoundModifier();
-
+    async addDamage(damage: Shadowrun.DamageData) {
         switch(damage.type.value) {
             case 'matrix':
-                return await this.addMatrixDamage(damage);
+                await this.addMatrixDamage(damage);
+                break;
             case 'stun':
-                return await this.addStunDamage(damage);
+                // Let stun overflow to physical.
+                const overflow = await this.addStunDamage(damage);
+                await this.addPhysicalDamage(overflow);
+                break;
             case 'physical':
-                return await this.addPhysicalDamage(damage);
+                await this.addPhysicalDamage(damage);
+                break;
         }
 
-        const currentWounds = this.getWoundModifier();
-
+        await this.applyDefeatedStatus();
     }
 
     /**
@@ -1522,6 +1531,65 @@ export class SR5Actor extends Actor {
         if (!device) return undefined;
 
         return device.getCondition();
+    }
+
+    /**
+     * Depending on this actors defeated status, apply the correct effect and status.
+     * 
+     * @param defeated Optional defeated status to be used. Will be determined if not given.
+     */
+    async applyDefeatedStatus(defeated?: DefeatedStatus) {
+        defeated = defeated || ConditionRules.determineDefeatedStatus(this);
+        await this.removeDefeatedStatus(defeated);
+
+        if (!defeated.unconscious && !defeated.dying && !defeated.dead) return this.combatant?.update({defeated: false});
+        else this.combatant?.update({defeated: true});
+
+        let newStatus = 'unconscious';
+        if (defeated.dying) newStatus = 'unconscious';
+        if (defeated.dead) newStatus = 'dead';
+
+        // Find fitting status and fallback to dead if not found.
+        const status = CONFIG.statusEffects.find(e => e.id === newStatus);
+        const effect = status || CONFIG.controlIcons.defeated;
+
+        // Avoid applying defeated status multiple times.
+        const existing = this.effects.reduce((arr, e) => {
+            // @ts-expect-error TODO: foundry-vtt-types v10
+            if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) arr.push(e.id);
+            return arr;
+        }, []);
+
+        if (existing.length) return;
+
+        // @ts-expect-error
+        // Set effect as active, as we've already made sure it isn't.
+        // Otherwise Foundry would toggle on/off, even though we're still dead.
+        await this.getToken().object.toggleEffect(effect, { overlay: true, active: true });
+    }
+
+    /**
+     * Remove defeated status effects from this actor, depending on current status.
+     * 
+     * @param defeated Optional defeated status to be used. Will be determined if not given.
+     */
+    async removeDefeatedStatus(defeated?: DefeatedStatus) {
+        defeated = defeated || ConditionRules.determineDefeatedStatus(this);
+
+        const removeStatus: string[] = [];
+        if ((!defeated.unconscious && !defeated.dying) || defeated.dead) removeStatus.push('unconscious');
+        if (!defeated.dead) removeStatus.push('dead');
+        
+        // Remove out old defeated effects.
+        if (removeStatus.length) {
+            const existing = this.effects.reduce((arr, e) => {
+                // @ts-expect-error TODO: foundry-vtt-types v10
+                if ( (e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status)) ) arr.push(e.id);
+                return arr; 
+            }, []);
+
+            if (existing.length) await this.deleteEmbeddedDocuments('ActiveEffect', existing);
+        }
     }
 
     getModifiedArmor(damage: Shadowrun.DamageData): Shadowrun.ActorArmorData {

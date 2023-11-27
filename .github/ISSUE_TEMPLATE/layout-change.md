@@ -14,4 +14,5 @@ A clear and concise description of what you want to happen.
 An example of visual issues or the area of description.
 
 **Versions**
-System:
+- FoundryVTT Version
+- System Version

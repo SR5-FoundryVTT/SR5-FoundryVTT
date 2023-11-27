@@ -11,6 +11,7 @@ import {VersionMigration} from "../VersionMigration";
 import {Helpers} from "../../helpers";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../../actor/SR5Actor";
+import { UpdateActionFlow } from "../../item/flows/UpdateActionFlow";
 
 export class Version0_8_0 extends VersionMigration {
     get SourceVersion(): string {
@@ -46,7 +47,7 @@ export class Version0_8_0 extends VersionMigration {
             data?: object
         } = {};
 
-        Helpers.injectActionTestsIntoChangeData(item.type, item.data, item.data);
+        UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item.toObject(), item.toObject());
 
         return updateData;
     }

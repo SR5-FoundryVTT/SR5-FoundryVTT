@@ -155,7 +155,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                  * In that case, injecting ANYthing into systemdata will replace ALL of system data
                  * with what is meant to be injected.
                  * 
-                 * This is testing Helpers.injectActionTestsIntoChangeData which is connected to some 
+                 * This is testing UpdateActionFlow.injectActionTestsIntoChangeData which is connected to some 
                  * document lifecycle methods.
                  */
                 const item = await testItem.create({type: 'complex_form'});

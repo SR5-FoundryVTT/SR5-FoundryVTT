@@ -18,11 +18,16 @@ export default class VehicleParser {
 
         const vehicles = getArray(chummerChar.vehicles?.vehicle);
 
-        for(let vehicle of vehicles) {
+        vehicles.forEach(async vehicle => {
             let vehicleActor = await Actor.create({
                 name: vehicle.name,
                 type: "vehicle"
             });
+
+            const promises = [];
+            promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));
+            promises.push(new GearsParser().parseGears(getArray(vehicle.gears?.gear),  importOptions.assignIcons));
+            promises.push(new MountedWeaponParser().parseWeapons(vehicle, importOptions.assignIcons))
 
             let handling;
             let off_road_handling;
@@ -44,11 +49,6 @@ export default class VehicleParser {
                 off_road_speed =  vehicle.speed
             }
 
-            const promises = [];
-            promises.push(new WeaponParser().parseWeapons(vehicle));
-            promises.push(new GearsParser().parseGears(getArray(vehicle.gears?.gear)));
-            promises.push(new MountedWeaponParser().parseWeapons(vehicle))
-
             vehicleActor.update({
                 'system.driver': actor.id,
                 'system.vehicle_stats.pilot.base': vehicle.pilot,
@@ -62,10 +62,10 @@ export default class VehicleParser {
             
                 'system.armor.base': vehicle.armor,
                 'system.isDrone': vehicle.isdrone,
-                'folder': actor.folder.id
+                'folder': actor.folder?.id
             });
 
             await vehicleActor.createEmbeddedDocuments('Item', (await Promise.all(promises)).flat());
-        }
+        })
     }
 }

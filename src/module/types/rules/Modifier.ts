@@ -1,8 +1,11 @@
 declare namespace Shadowrun {
-    /**
+/**
      * The general types of modifiers supported by the system.
      * 
      * These should match config.ts#SR5.modifierTypes
+     * 
+     * NOTE: normally I'd keyof typeof SR5.modifierTypes, but it doesn't
+     * work here and I don't know why :)
      */
     export type ModifierTypes = 
         'armor' |

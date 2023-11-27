@@ -74,6 +74,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  * NOTE: still not fixed with esbuild@0.19.5
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
+import { UpdateActionFlow } from './flows/UpdateActionFlow';
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -1606,7 +1607,7 @@ export class SR5Item extends Item {
 
     override async _onCreate(changed, options, user) {
         const applyData = {};
-        Helpers.injectActionTestsIntoChangeData(this.type, changed, applyData, this);
+        UpdateActionFlow.injectActionTestsIntoChangeData(this.type, changed, applyData, this);
         await super._preCreate(changed, options, user);
 
         // Don't kill DocumentData by applying empty objects. Also performance.
@@ -1624,7 +1625,8 @@ export class SR5Item extends Item {
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff !== false && options.recursive !== false) {
             // Change used action test implementation when necessary.
-            Helpers.injectActionTestsIntoChangeData(this.type, changed, changed, this);
+            UpdateActionFlow.injectActionTestsIntoChangeData(this.type, changed, changed, this);
+            UpdateActionFlow.onUpdateAlterActionData(changed, this);
         }
         
         await super._preUpdate(changed, options, user);
