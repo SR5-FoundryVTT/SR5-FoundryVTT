@@ -166,14 +166,20 @@ export class PhysicalResistTest extends SuccessTest {
         this.getSuccessCondition()?.effect?.();
     }
 
-    override async processResults() {
+    override async evaluate(): Promise<this> {
+        await super.evaluate();
+
         // Automatic hits from hardened armor (SR5#397)
-        // Must be called before super.processResults to ensure that we factor in the appended hits when determining if the test was successful
         const armor = this.actor?.getArmor(this.data.modifiedDamage);
         if(armor?.hardened) {
             PartsList.AddUniquePart(this.hits.mod, 'SR5.AppendedHits', Math.ceil(armor.value/2));
             Helpers.calcTotal(this.hits);
         }
+
+        return this;
+    }
+
+    override async processResults() {
 
         await super.processResults();
 
