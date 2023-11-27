@@ -5,6 +5,8 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { SuccessTest } from "../module/tests/SuccessTest";
 import { DataDefaults } from "../module/data/DataDefaults";
+import { RangedAttackTest } from "../module/tests/RangedAttackTest";
+import { SkillTest } from "../module/tests/SkillTest";
 
 export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
@@ -482,23 +484,52 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('Advanced effects modify specific values', () => {
-        it('TEST modify hits on SuccessTest', async () => {
-            const actor = new SR5Actor({ type: 'character', name: 'Test Actor' });
+    /**
+     * All these tests check for cases that caused issues in the past, due to specific implementation details
+     * of some test implementations.
+     */
+    describe('Advanced effects modify proplematic test implemenations', () => {
+        it('TEST modify damage on RangedAttackTest', async () => {
+            const actor = await testActor.create({ type: 'character' });
+            const weapon = await testItem.create({ type: 'weapon', system: { category: 'ranged' } });
             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-                nam: 'Test Effect',
+                name: 'Test Effect',
                 flags: { shadowrun5e: { applyTo: 'test_all' } },
-                changes: [{ key: 'data.values.hits', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+                changes: [{ key: 'data.damage', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            const action = DataDefaults.actionRollData({ test: SuccessTest.name });
-            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            const test = await TestCreator.fromItem(weapon, actor, { showDialog: false, showMessage: false }) as SuccessTest;
 
             // Go through normal procedure but manually compare hits + effect hits
-            await test.execute();
-            const hits = test?.rolls[0].hits;
+            test.effects.applyAllEffects();
+            test.prepareBaseValues();
+            test.calculateBaseValues();
 
-            assert.equal(test.hits.value, hits + 3);
+            assert.equal(test.data.damage.value, 3);
+        });
+
+        it('TEST modify limit on SkillTest', async () => {
+            const actor = await testActor.create({ type: 'character' });
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                flags: { shadowrun5e: { applyTo: 'test_all' } },
+                changes: [
+                    { key: 'data.limit', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'data.pool', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
+                ]
+            }]);
+
+            const action = DataDefaults.actionRollData({ test: SkillTest.name });
+            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
+
+            test.effects.applyAllEffects();
+            test.prepareAttributeSelection();
+            test.prepareLimitSelection();
+            test.prepareBaseValues();
+            test.calculateBaseValues();
+
+            assert.strictEqual(test.limit.value, 3);
+            assert.strictEqual(test.pool.value, 3);
         });
     });
 };

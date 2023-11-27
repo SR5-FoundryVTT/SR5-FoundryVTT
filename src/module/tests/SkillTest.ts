@@ -10,19 +10,21 @@ export interface SkillTestData extends SuccessTestData {
 
 
 /**
- * Handle skill test allowing for alterting the attribtue used for that skill away from the
- * pre configuration.
+ * Skill tests allow users to change the connected attribute and limit.
  * 
  * Rule wise a skill test doesn't alter a default success test.
  */
 export class SkillTest extends SuccessTest {
     override data: SkillTestData
+    // temporary selection information.
     lastUsedAttribute: string;
+    lastUsedLimit: string;
 
     constructor(data, documents, options) {
         super(data, documents, options);
 
         this.lastUsedAttribute = this.data.attribute;
+        this.lastUsedLimit = this.data.limitSelection;
     }
 
     override get _dialogTemplate() {
@@ -40,7 +42,7 @@ export class SkillTest extends SuccessTest {
     override _prepareData(data: any, options: TestOptions) {
         data = super._prepareData(data, options);
 
-        // Preselect attribute based on action.
+        // Preselect based on action.
         data.attribute = data.action.attribute;
         data.limitSelection = data.action.limit.attribute;
 
@@ -63,7 +65,7 @@ export class SkillTest extends SuccessTest {
     prepareAttributeSelection() {
         if (!this.actor) return;
 
-        // Remove last used attribute and it's modifiers and replace with new selection.
+        // Remove last used attribute and its modifiers and replace with new selection.
         const useSelection = this.data.attribute !== this.data.action.attribute;
         const usedAttribute = useSelection ? this.data.attribute : this.data.action.attribute;
         const attribute = this.actor.getAttribute(usedAttribute);
@@ -92,12 +94,30 @@ export class SkillTest extends SuccessTest {
     prepareLimitSelection() {
         if (!this.actor) return;
 
-        this.data.limit.mod = [];
-        const limitMod = new PartsList(this.limit.mod);
-        const poolMod = new PartsList(this.pool.mod);
+        // Remove last used limit and its modifiers and replace with new selection.
+        const useSelection = this.data.limitSelection !== this.data.action.limit.attribute;
+        const selectedLimit = useSelection ? this.data.limitSelection : this.data.action.limit.attribute;
+        const usedLimit = this.actor.getLimit(selectedLimit);
+        const lastUsedLimit = this.actor.getLimit(this.lastUsedLimit);
 
-        const limit = this.actor.getLimit(this.data.limitSelection);
-        if (limit) limitMod.addUniquePart(limit.label, limit.value);
-        if (limit && this.actor._isMatrixAttribute(this.data.limitSelection)) this.actor._addMatrixParts(poolMod, true);
+        if (!usedLimit || !lastUsedLimit) return console.error('Shadowrun 5e | A limit was used that does not exist on', this.actor, usedLimit, lastUsedLimit);
+
+        const limit = new PartsList(this.limit.mod);
+        const pool = new PartsList(this.pool.mod);
+
+        // Replace previous limit with new one, without changing other modifiers.
+        limit.removePart(lastUsedLimit.label);
+        limit.addPart(usedLimit.label, usedLimit.value);
+        this.actor._removeMatrixParts(pool);
+
+        if (limit && this.actor._isMatrixAttribute(this.data.limitSelection)) this.actor._addMatrixParts(pool, true);
+
+        // this.data.limit.mod = [];
+        // const limitMod = new PartsList(this.limit.mod);
+        // const poolMod = new PartsList(this.pool.mod);
+
+        // const limit = this.actor.getLimit(this.data.limitSelection);
+        // if (limit) limitMod.addUniquePart(limit.label, limit.value);
+        // if (limit && this.actor._isMatrixAttribute(this.data.limitSelection)) this.actor._addMatrixParts(poolMod, true);
     }
 }
