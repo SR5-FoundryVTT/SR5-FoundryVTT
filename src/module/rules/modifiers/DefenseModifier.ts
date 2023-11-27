@@ -27,11 +27,18 @@ export class DefenseModifier extends SituationModifier {
 
         const test = options.test as PhysicalDefenseTest;
 
+        let defense = Number(actor.system.modifiers.defense);
+
         switch (test.data.activeDefense) {
-            case 'dodge': return Number(actor.system.modifiers.defense) + actor.modifiers.totalFor('defense_dodge');
-            case 'block': return Number(actor.system.modifiers.defense) + actor.modifiers.totalFor('defense_block');
-            case 'parry': return Number(actor.system.modifiers.defense) + actor.modifiers.totalFor('defense_parry');
-            default: return Number(actor.system.modifiers.defense);
+            case 'dodge': defense += actor.modifiers.totalFor('defense_dodge'); break;
+            case 'block': defense += actor.modifiers.totalFor('defense_block'); break;
+            case 'parry': defense += actor.modifiers.totalFor('defense_parry'); break;
         }
+
+        // Based on opposed weapon category, add appropriate defense modifier.
+        if (test.against.item?.isRangedWeapon) defense += actor.modifiers.totalFor('defense_ranged');
+        if (test.against.item?.isMeleeWeapon) defense += actor.modifiers.totalFor('defense_melee');
+
+        return defense;
     }
 }

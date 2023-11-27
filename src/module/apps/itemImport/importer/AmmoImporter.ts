@@ -1,7 +1,7 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
-import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun.AmmoData> {
     public files = ['gear.xml'];
@@ -99,7 +99,7 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             ammoDatas.push(item);
         }

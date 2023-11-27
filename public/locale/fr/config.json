@@ -240,7 +240,7 @@
     "SR5.Dodge": "Esquiver",
     "SR5.DontApplyWounds": "Ne pas appliquer les blessures",
     "SR5.Drain": "Drain",
-    "SR5.DrainResist": "Resister au Drain",
+    "SR5.DrainAttribute": "Resister au Drain",
     "SR5.DrainValue": "Valeur drain",
     "SR5.Dropoff": "Chute",
     "SR5.DuckOrCover": "Au sol ou à couvert",
@@ -378,6 +378,7 @@
             "SetMonitor": "Moniteur doit être installé manuellement",
             "Spells": "Sorts",
             "SpiritConfiguration": "Configuration d'esprit",
+            "SpriteConfiguration": "Configuration d'Sprite",
             "SpritePowers": "Pouvoirs de sprites",
             "VehicleConfiguration": "Configuration Véhicule"
         }

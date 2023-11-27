@@ -6,10 +6,10 @@ import { MeleeParser } from '../parser/weapon/MeleeParser';
 import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { ParserMap } from '../parser/ParserMap';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
-import { DataDefaults } from '../../data/DataDefaults';
-import { Helpers } from "../../helpers";
+import { DataDefaults } from '../../../data/DataDefaults';
 import WeaponItemData = Shadowrun.WeaponItemData;
 import WeaponData = Shadowrun.WeaponData;
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
     public override categoryTranslations: any;
@@ -88,7 +88,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
             if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);
         }

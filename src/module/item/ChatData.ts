@@ -3,7 +3,7 @@ import { Helpers } from '../helpers';
 import DeviceData = Shadowrun.DeviceData;
 import { SR5Item } from './SR5Item';
 import AmmoData = Shadowrun.AmmoData;
-import {SR5} from "../config";
+import { SR5 } from "../config";
 
 /**
  * ChatData returns little info boxes for each item type.
@@ -18,7 +18,7 @@ import {SR5} from "../config";
  */
 export const ChatData = {
     call_in_action: (system: Shadowrun.CallInActionData, labels, props) => {
-        switch(system.actor_type) {
+        switch (system.actor_type) {
             case 'sprite':
                 if (system.sprite.type) props.push(`${game.i18n.localize("SR5.Compilation.SpriteType")} ${game.i18n.localize(SR5.spriteTypes[system.sprite.type])}`);
                 if (system.sprite.level) props.push(`${game.i18n.localize('SR5.Level')} ${system.sprite.level}`);
@@ -115,7 +115,7 @@ export const ChatData = {
             }
         }
     },
-    
+
     sin: (system, labels, props) => {
         // Avoid displaying rating null (empty input field) and rating 0.
         if (system.technology.rating) props.push(`Rating ${system.technology.rating}`);
@@ -234,7 +234,7 @@ export const ChatData = {
         props.push(game.i18n.localize(SR5.critterPower.types[system.powerType]));
         props.push(game.i18n.localize(SR5.critterPower.durations[system.duration]));
         props.push(game.i18n.localize(SR5.critterPower.ranges[system.range]));
-        props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
+        if (system.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
 
         // add action data
         ChatData.action(system, labels, props);

@@ -321,7 +321,7 @@
     "SR5.Dodge": "회피",
     "SR5.DontApplyWounds": "부상 적용 안함",
     "SR5.Drain": "드레인",
-    "SR5.DrainResist": "드레인 저항",
+    "SR5.DrainAttribute": "드레인 저항",
     "SR5.DrainValue": "드레인 수치",
     "SR5.Dropoff": "감소",
     "SR5.DuckOrCover": "숙이거나 엄폐하기",

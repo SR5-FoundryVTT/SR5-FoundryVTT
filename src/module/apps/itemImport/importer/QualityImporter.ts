@@ -1,7 +1,7 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
-import { Helpers } from "../../helpers";
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Shadowrun.QualityData> {
     public override categoryTranslations: any;
@@ -55,7 +55,7 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
             // Add relevant action tests
-            Helpers.injectActionTestsIntoChangeData(item.type, item, item);
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
             items.push(item);
         }

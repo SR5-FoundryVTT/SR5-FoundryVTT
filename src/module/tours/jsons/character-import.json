@@ -1,0 +1,23 @@
+{
+    "title": "SR5.Tours.CharacterImport.Title",
+    "description": "SR5.Tours.CharacterImport.Description",
+    "canBeResumed": true,
+    "display": true,
+    "actorType": "character",
+    "tab": "misc",
+    "steps": [
+      {
+        "id": "General",
+        "selector": ".import-character",
+        "title": "SR5.Tours.CharacterImport.GeneralTitle",
+        "content": "SR5.Tours.CharacterImport.GeneralContent"
+      },
+      {
+        "id": "Import Window",
+        "selector": ".import-character",
+        "title": "SR5.Tours.CharacterImport.GeneralTitle",
+        "content": "SR5.Tours.CharacterImport.GeneralContent"
+      }
+    ]
+}
+  

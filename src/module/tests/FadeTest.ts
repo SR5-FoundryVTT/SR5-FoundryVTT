@@ -1,11 +1,13 @@
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {ComplexFormTest, ComplexFormTestData} from "./ComplexFormTest";
-import {Helpers} from "../helpers";
-import {FadeRules} from "../rules/FadeRules";
+import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { ComplexFormTest, ComplexFormTestData } from "./ComplexFormTest";
+import { Helpers } from "../helpers";
+import { FadeRules } from "../rules/FadeRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
+import { SR5Actor } from "../actor/SR5Actor";
+import { SR5Item } from "../item/SR5Item";
 
 export interface FadeTestData extends SuccessTestData {
     incomingFade: DamageData
@@ -39,16 +41,32 @@ export class FadeTest extends SuccessTest {
 
     static override _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
-            'attribute': 'resonance',
-            'attribute2': 'willpower'
+            'attribute2': 'resonance'
         };
+    }
+    
+    static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor) {
+        const documentAction = await super._getDocumentTestAction(item, actor);
+
+        const character = actor.asCharacter();
+
+        if (!character || !actor.isEmerged) {
+            console.error(`Shadowrun 5e | A ${this.name} expected an emerged actor but got this`, actor);
+            return documentAction;
+        }
+
+        // Get technomancer fade attribute
+        const attribute = character.system.technomancer.attribute;
+        foundry.utils.mergeObject(documentAction, {attribute});
+        
+        return documentAction;
     }
 
     override get testModifiers(): ModifierTypes[] {
         return ['global', 'fade']
     }
 
-     override get canBeExtended() {
+    override get canBeExtended() {
         return false;
     }
 
@@ -74,7 +92,7 @@ export class FadeTest extends SuccessTest {
         super.calculateBaseValues();
 
         // Avoid using a user defined value override.
-        this.data.modifiedFade.base = Helpers.calcTotal(this.data.incomingFade, {min: 0});
+        this.data.modifiedFade.base = Helpers.calcTotal(this.data.incomingFade, { min: 0 });
     }
 
     override async processResults() {

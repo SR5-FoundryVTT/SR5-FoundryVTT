@@ -15,7 +15,9 @@ declare namespace Shadowrun {
         MagicActorData,
         WoundsActorData,
         MovementActorData,
+        TechnomancerActorData,
         NPCActorData {
+            attributes: CharacterAttributes
             values: PhysicalCombatValues
             metatype: string | keyof typeof SR5CONFIG.character.types;
             full_defense_attribute: string;
@@ -58,6 +60,14 @@ declare namespace Shadowrun {
     export type MagicActorData = {
         magic: MagicData
     };
+
+    export type TechnomancerActorData = {
+        technomancer: {
+            // Fade test attribute
+            attribute: ActorAttribute
+            submersion: number
+        }
+    }
 
     export type MatrixActorData = {
         matrix: MatrixData;
@@ -111,6 +121,8 @@ declare namespace Shadowrun {
         ['defense_dodge']: NumberOrEmpty
         ['defense_parry']: NumberOrEmpty
         ['defense_block']: NumberOrEmpty
+        ['defense_melee']: NumberOrEmpty
+        ['defense_ranged']: NumberOrEmpty
 
         // Meant to be applied on physical resist (soak) tests.
         soak: NumberOrEmpty
@@ -163,4 +175,12 @@ declare namespace Shadowrun {
      * Actor data that can be Grunts.
      */
     type GruntActorData = CharacterData | SpiritData | CritterData;
+
+    /**
+     * These attributes are always available for this actor type.
+     */
+    interface CharacterAttributes extends Attributes {
+        initiation: AttributeField
+        submersion: AttributeField
+    }
 }

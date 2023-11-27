@@ -41,6 +41,7 @@
                     {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.OpposingHits"}}:</span> <span class="value-result">{{test.against.netHits.value}}</span></div>{{/if}}
                     {{#if test.hasLimit}}<div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span class="value-result">{{test.limit.value}}</span></div>{{/if}}
                     {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.threshold.label}}:</span> <span class="value-result">{{test.threshold.value}}</span></span></div>{{/if}}
+                    {{#if test.opposing}}<div class="test-value"><span class="value">{{localize "SR5.OpposingNetHits"}}:</span> <span class="value-result">{{test.againstNetHits.value}}</span></div>{{/if}}
                 </div>
                 <div class="right-side">
                     <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span class="value-result">{{test.pool.value}}</span></div>
@@ -50,7 +51,7 @@
                         {{#if test.hitsIcon}}<img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />{{/if}}
                     </div>
                     {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span class="value-result">{{test.extendedHits.value}}</span></div>{{/if}}
-                    {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span class="value-result">{{test.netHits.value}}</span></div>{{/if}}
+                    {{#if (and (not test.opposing) test.hasThreshold)}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span class="value-result">{{test.netHits.value}}</span></div>{{/if}}
                     {{#if previewTemplate}}
                     <div class="test-value">
                         <span class="value" title="{{localize 'SR5.PlaceTemplate'}}">{{localize "SR5.PlaceTemplate"}}:</span> <span class="value-result"><i class="fas fa-bullseye roll place-template"></i></span>

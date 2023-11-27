@@ -14,9 +14,11 @@ declare namespace Shadowrun {
 
     /**
      * Ranges of targeted TokenDocuments.
+     * NOTE: We store uuid instead of a document, as
+     *       to not store that document when calling SuccessTest.toJSON()
      */
     export interface TargetRangeTemplateData {
-        uuid: string
+        tokenUuid: string
         name: string
         distance: number
         unit: string

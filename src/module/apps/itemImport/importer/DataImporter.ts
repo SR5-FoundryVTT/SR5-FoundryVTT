@@ -1,7 +1,7 @@
-import { DataDefaults } from './../../data/DataDefaults';
+import { DataDefaults } from '.././../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
-import * as IconAssign from '../../apps/iconAssigner/iconAssign';
-import { SR5 } from "../../config";
+import * as IconAssign from '../../../apps/iconAssigner/iconAssign';
+import { SR5 } from "../../../config";
 
 const xml2js = require('xml2js');
 
