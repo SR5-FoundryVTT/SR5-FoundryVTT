@@ -73,16 +73,29 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 label: 'Test Effect',
                 changes: [
                     { key: 'system.attributes.body', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
-                    { key: 'system.attributes.agility.value', value: 4, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
+                    { key: 'system.attributes.agility.value', value: 4, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+                    { key: 'system.skills.active.automatics.canDefault', value: false, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
                 ]
             }]);
 
+            // Body should be overwritten as a Valuefield.
             assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3 });
-            assert.deepEqual(actor.system.attributes.agility.override, { name: 'Test Effect', value: 4 });
+            assert.strictEqual(actor.system.attributes.body.base, 0);
             assert.deepEqual(actor.system.attributes.body.mod, []);
             assert.strictEqual(actor.system.attributes.body.value, 3);
+
+            // Agility should be overwritten as a object property without system behavior.
+            // However total will be calculated to be 1 again due to the systems ValueField flow
             assert.deepEqual(actor.system.attributes.agility.mod, []);
-            assert.strictEqual(actor.system.attributes.agility.value, 4);
+            assert.equal(actor.system.attributes.agility.override, undefined);
+            assert.strictEqual(actor.system.attributes.agility.base, 0);
+            assert.strictEqual(actor.system.attributes.agility.value, 1);
+
+            // A ValueField value outside of value calculation should still work
+            // Skill automatics normally can default, wich we overwrite here.
+            assert.deepEqual(actor.system.skills.active.automatics.mod, []);
+            assert.strictEqual(actor.system.skills.active.automatics.override, undefined);
+            assert.strictEqual(actor.system.skills.active.automatics.canDefault, false);
         });
 
         it('OVERRIDE mode: override all existing .mod values', async () => {
@@ -456,7 +469,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
     describe('AdvancedEffects with dynamic values', () => {
         it('ACTOR apply-to: Grab dynamic actor values', async () => {
-            const actor = await testActor.create({ type: 'character', system: {modifiers: {global: 6}} });
+            const actor = await testActor.create({ type: 'character', system: { modifiers: { global: 6 } } });
             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
                 label: 'Actor Effect',
                 changes: [
@@ -466,6 +479,26 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.lengthOf(actor.effects.contents, 1);
             assert.equal(actor.system.attributes.body.value, 6);
+        });
+    });
+
+    describe('Advanced effects modify specific values', () => {
+        it('TEST modify hits on SuccessTest', async () => {
+            const actor = new SR5Actor({ type: 'character', name: 'Test Actor' });
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                nam: 'Test Effect',
+                flags: { shadowrun5e: { applyTo: 'test_all' } },
+                changes: [{ key: 'data.values.hits', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }]);
+
+            const action = DataDefaults.actionRollData({ test: SuccessTest.name });
+            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+
+            // Go through normal procedure but manually compare hits + effect hits
+            await test.execute();
+            const hits = test?.rolls[0].hits;
+
+            assert.equal(test.hits.value, hits + 3);
         });
     });
 };
