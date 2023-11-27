@@ -1055,6 +1055,10 @@
     "SR5.ToggleEquip": "Anlegen/Ablegen",
     "SR5.Tooltips": {
         "Actor": {
+            "Critter": "Ermöglicht die Nutzung von Critterkräften",
+            "Grunt": "Nutze Grunt Regeln für Akteur",
+            "Metatype": "Ein NPC-Akteur bekommt automatische Attributemodi. abhängig vom Metatyp",
+            "NPC": "Makriere Akteur als NPC und ermöglicht weitere NPC-Funktionen",
             "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück"
         },
         "CallInAction": {

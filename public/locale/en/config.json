@@ -332,7 +332,6 @@
     "SR5.DontApplyWounds": "Don't Apply Wounds",
     "SR5.Drain": "Drain",
     "SR5.DrainAttribute": "Drain Attribute",
-    "SR5.FadeAttribute": "Fade Attribute",
     "SR5.DrainValue": "Drain Value",
     "SR5.Dropoff": "Dropoff",
     "SR5.DuckOrCover": "Duck or Cover",
@@ -425,6 +424,7 @@
         "Token": "Token"
     },
     "SR5.Fade": "Fade",
+    "SR5.FadeAttribute": "Fade Attribute",
     "SR5.FadeValue": "Fade Value",
     "SR5.Family": "Family",
     "SR5.Filter": "Filter",
@@ -1124,7 +1124,11 @@
     "SR5.ToggleEquip": "Toggle Equipped",
     "SR5.Tooltips": {
         "Actor": {
+            "Critter": "Allow the use of critter powers",
+            "Grunt": "Apply grunt rules to this actor",
+            "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
             "MissingSummoner": "Drag&Drop Character or use summoning action",
+            "NPC": "Mark actor as NPC to get additional features",
             "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
         },
         "CallInAction": {
@@ -1215,6 +1219,26 @@
     },
     "SR5.Top": "Top",
     "SR5.Total": "Total",
+    "SR5.Tours": {
+        "CharacterImport": {
+            "Description": "This Tour will give you an overview how to import a chummer character. For details look into https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import",
+            "GeneralContent": "To import a character you need the export json from chummer 5e.",
+            "GeneralTitle": "Importing a character",
+            "Title": "Character Import"
+        },
+        "ConditionMonitor": {
+            "ApplyDamageContent": "To apply damage left click a cell. All cells up to this cell including will be filled. If more cells where filled all cells to the right will not be filled anymore. Right clicking any cell will remove all damage from the monitor.",
+            "ApplyDamageTitle": "Applying and removing Damage",
+            "Description": "This tour will give you an overview how the condition monitor work.",
+            "GeneralContent": "These are your conditions monitors. They consist of several cells. In certain cells you can see a written number. If these cells are filled your wound modifier is increased to this number. The wound modifiers of all monitors are added",
+            "GeneralTitle": "Condition Monitor",
+            "RecoveryContent": "Clicking on the label of a condition monitor will prompt an extended recovery test. The result of the recovery test will be automatically applied to the monitor.",
+            "RecoveryTitle": "Recovery Tests",
+            "Title": "Condition Monitor Tour",
+            "WoundModifierContent": "This cell denotes that filling it increases your wound modifier by the number written in the cell",
+            "WoundModifierTitle": "Wound Modifier"
+        }
+    },
     "SR5.UnderBarrel": "Under Barrel",
     "SR5.Value": "Value",
     "SR5.Vehicle": {
@@ -1320,26 +1344,5 @@
     "SR5.WeaponReach": "Reach",
     "SR5.WeaponReload": "Reload",
     "SR5.WeaponType": "Type",
-    "SR5.Wireless": "Wireless",
-
-    "SR5.Tours": {
-            "ConditionMonitor": {
-                "Title": "Condition Monitor Tour",
-                "Description": "This tour will give you an overview how the condition monitor work.",
-                "GeneralTitle": "Condition Monitor",
-                "GeneralContent": "These are your conditions monitors. They consist of several cells. In certain cells you can see a written number. If these cells are filled your wound modifier is increased to this number. The wound modifiers of all monitors are added",
-                "WoundModifierTitle": "Wound Modifier",
-                "WoundModifierContent": "This cell denotes that filling it increases your wound modifier by the number written in the cell",
-                "ApplyDamageTitle":"Applying and removing Damage",
-                "ApplyDamageContent":"To apply damage left click a cell. All cells up to this cell including will be filled. If more cells where filled all cells to the right will not be filled anymore. Right clicking any cell will remove all damage from the monitor.",
-                "RecoveryTitle": "Recovery Tests",
-                "RecoveryContent": "Clicking on the label of a condition monitor will prompt an extended recovery test. The result of the recovery test will be automatically applied to the monitor."
-            },
-            "CharacterImport": {
-                "Title": "Character Import",
-                "Description": "This Tour will give you an overview how to import a chummer character. For details look into https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import",
-                "GeneralTitle": "Importing a character",
-                "GeneralContent": "To import a character you need the export json from chummer 5e."
-            }
-        }
+    "SR5.Wireless": "Wireless"
 }
