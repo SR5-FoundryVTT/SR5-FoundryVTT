@@ -1071,8 +1071,8 @@ export class SR5Item extends Item {
         return this.wrapper.isSpell();
     }
 
-    get isUsingRangeTemplate(): boolean {
-        return this.wrapper.isUsingRangeTemplate();
+    get isUsingRangeCategory(): boolean {
+        return this.wrapper.isUsingRangeCategory();
     }
 
     get asSpell(): SpellItemData | undefined {

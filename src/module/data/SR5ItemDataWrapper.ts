@@ -369,10 +369,10 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData().drain || 0;
     }
 
-    isUsingRangeTemplate(): boolean {
-        const template = this.getData().range?.ranges?.template;
+    isUsingRangeCategory(): boolean {
+        const category = this.getData().range?.ranges?.category;
 
-        return !!template && template !== "manual";
+        return !!category && category !== "manual";
     }
 
     getFade(): number {

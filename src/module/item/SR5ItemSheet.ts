@@ -72,7 +72,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     // Can be used to check if the source field contains a URL.
     sourceIsURL: boolean
 
-    isUsingRangeTemplate: boolean
+    isUsingRangeCategory: boolean
 }
 
 /**
@@ -201,7 +201,7 @@ export class SR5ItemSheet extends ItemSheet {
         data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
         data.sourceIsURL = this.item.sourceIsUrl;
 
-        data.isUsingRangeTemplate = this.item.isUsingRangeTemplate;
+        data.isUsingRangeCategory = this.item.isUsingRangeCategory;
 
         data.rollModes = CONFIG.Dice.rollModes;
 
@@ -328,7 +328,7 @@ export class SR5ItemSheet extends ItemSheet {
         // Freshly imported item toggle
         html.find('.toggle-fresh-import-off').on('click', async (event) => this._toggleFreshImportFlag(event, false));
 
-        html.find('.select-range-template').on('change', this._onSelectRangeTemplate.bind(this));
+        html.find('.select-range-category').on('change', this._onSelectRangeCategory.bind(this));
 
         this._activateTagifyListeners(html);
     }
@@ -406,11 +406,11 @@ export class SR5ItemSheet extends ItemSheet {
         this.item.openSource();
     }
 
-    async _onSelectRangeTemplate(event) {
-        const selectedRangeTemplate = event.currentTarget.value as keyof typeof SR5.rangedWeaponTypes;
+    async _onSelectRangeCategory(event) {
+        const selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.rangedWeaponRanges;
 
-        if(selectedRangeTemplate !== "manual") {
-            const ranges = SR5.rangedWeaponTypes[selectedRangeTemplate].ranges;
+        if(selectedRangeCategory !== "manual") {
+            const ranges = SR5.rangedWeaponRanges[selectedRangeCategory].ranges;
 
             await this.item.update({
                 'system.range.ranges.short': ranges[0],

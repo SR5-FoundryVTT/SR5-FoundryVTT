@@ -111,11 +111,11 @@
         </div>
         <div class="inputs">
             <select
-                name="system.range.ranges.template"
-                class="select-range-template"
+                name="system.range.ranges.category"
+                class="select-range-category"
             >
-                {{#each config.rangedWeaponTypes as |val key|}}
-                <option value="{{key}}"{{#ife ../system.range.ranges.template key}}selected="selected"{{/ife}}>{{localize val.label}}</option>
+                {{#each config.rangedWeaponRanges as |val key|}}
+                <option value="{{key}}"{{#ife ../system.range.ranges.category key}}selected="selected"{{/ife}}>{{localize val.label}}</option>
                 {{/each}}
             </select>
             <input
@@ -124,7 +124,7 @@
                 name="system.range.ranges.short"
                 value="{{system.range.ranges.short}}"
                 data-dtype="Number"
-                {{#if this.isUsingRangeTemplate}} disabled {{/if}}
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             /
             <input
@@ -133,7 +133,7 @@
                 name="system.range.ranges.medium"
                 value="{{system.range.ranges.medium}}"
                 data-dtype="Number"
-                {{#if this.isUsingRangeTemplate}} disabled {{/if}}
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             /
             <input
@@ -142,7 +142,7 @@
                 name="system.range.ranges.long"
                 value="{{system.range.ranges.long}}"
                 data-dtype="Number"
-                {{#if this.isUsingRangeTemplate}} disabled {{/if}}
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             /
             <input
@@ -151,7 +151,7 @@
                 name="system.range.ranges.extreme"
                 value="{{system.range.ranges.extreme}}"
                 data-dtype="Number"
-                {{#if this.isUsingRangeTemplate}} disabled {{/if}}
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
         </div>
     </div>
