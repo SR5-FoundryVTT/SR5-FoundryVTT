@@ -2,7 +2,7 @@ import { Constants } from '../importer/Constants';
 import { XMLStrategy } from './XMLStrategy';
 import { JSONStrategy } from './JSONStrategy';
 import { ImportStrategy } from './ImportStrategy';
-import {SR5Item} from "../../item/SR5Item";
+import {SR5Item} from "../../../item/SR5Item";
 
 export enum ImportMode {
     XML = 1,

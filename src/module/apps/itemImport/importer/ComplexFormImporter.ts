@@ -2,9 +2,9 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
-import { DataDefaults } from '../../data/DataDefaults';
-import { Helpers } from "../../helpers";
-import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
+import { DataDefaults } from '../../../data/DataDefaults';
+
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData> {
     public override categoryTranslations: any;

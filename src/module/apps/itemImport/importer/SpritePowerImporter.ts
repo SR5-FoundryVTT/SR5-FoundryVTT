@@ -2,8 +2,7 @@ import { SpritePowerParser } from './../parser/critter-power/SpritePowerParser';
 import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { DataImporter } from "./DataImporter";
-import { Helpers } from "../../helpers";
-import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 
 /**

@@ -2,8 +2,7 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ModParserBase } from '../parser/mod/ModParserBase';
-import { Helpers } from "../../helpers";
-import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Shadowrun.ModificationData> {
     public override categoryTranslations: any;

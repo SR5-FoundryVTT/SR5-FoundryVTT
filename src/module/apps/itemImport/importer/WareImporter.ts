@@ -1,12 +1,11 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { CyberwareParser } from '../parser/ware/CyberwareParser';
-import { Helpers } from "../../helpers";
 import WareData = Shadowrun.WareData
 import WareItemData = Shadowrun.WareItemData;
 import CyberwareItemData = Shadowrun.CyberwareItemData;
 import BiowareItemData = Shadowrun.BiowareItemData;
-import { UpdateActionFlow } from '../../item/flows/UpdateActionFlow';
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class WareImporter extends DataImporter<WareItemData, WareData> {
     public override categoryTranslations: any;
