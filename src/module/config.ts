@@ -88,6 +88,27 @@ export const SR5 = {
         matrix: 'SR5.DmgTypeMatrix',
     },
 
+    rangedWeaponTypes: {
+        taser: "SR5.Weapon.Ranged.Type.Taser",
+        holdOutPistol: "SR5.Weapon.Ranged.Type.HoldOutPistol",
+        lightPistol: "SR5.Weapon.Ranged.Type.LightPistol",
+        heavyPistol: "SR5.Weapon.Ranged.Type.HeavyPistol",
+        machinePistol: "SR5.Weapon.Ranged.Type.MachinePistol",
+        smg: "SR5.Weapon.Ranged.Type.SMG",
+        assaultRifle: "SR5.Weapon.Ranged.Type.AssaultRifle",
+        shotgunFlechette: "SR5.Weapon.Ranged.Type.ShotgunFlechette",
+        shotgunSlug: "SR5.Weapon.Ranged.Type.ShotgunSlug",
+        sniperRifle: "SR5.Weapon.Ranged.Type.SniperRifle",
+        lightMachinegun: "SR5.Weapon.Ranged.Type.LightMachinegun",
+        mediumHeavyMachinegun: "SR5.Weapon.Ranged.Type.MediumHeavyMachinegun",
+        assaultCannon: "SR5.Weapon.Ranged.Type.AssaultCannon",
+        grenadeLauncher: "SR5.Weapon.Ranged.Type.GrenadeLauncher",
+        missileLauncher: "SR5.Weapon.Ranged.Type.MissileLauncher",
+        lightCrossbow: "SR5.Weapon.Ranged.Type.LightCrossbow",
+        mediumCrossbow: "SR5.Weapon.Ranged.Type.MediumCrossbow",
+        heavyCrossbow: "SR5.Weapon.Ranged.Type.HeavyCrossbow",
+    },
+
     elementTypes: {
         fire: 'SR5.ElementFire',
         cold: 'SR5.ElementCold',
@@ -313,7 +334,7 @@ export const SR5 = {
 
     // Gear modification types. :) Not modifiers.
     modificationTypes: {
-        weapon: 'SR5.Weapon',
+        weapon: 'SR5.Weapon.Weapon',
         armor: 'SR5.Armor',
     },
 

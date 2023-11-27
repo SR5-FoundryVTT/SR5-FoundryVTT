@@ -1218,7 +1218,9 @@
         "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
         "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
     },
-    "SR5.Weapon": "Waffen",
+    "SR5.Weapon": {
+        "Weapon": "Waffen"
+    },
     "SR5.WeaponAmmoCount": "Munition",
     "SR5.WeaponCatMelee": "Nahkampf",
     "SR5.WeaponCatRange": "Fernkampf",

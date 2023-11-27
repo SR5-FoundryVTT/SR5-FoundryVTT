@@ -110,6 +110,19 @@
             {{localize "SR5.WeaponRanges"}}
         </div>
         <div class="inputs">
+            <select
+                name="system.range.ranges.template"
+            >
+                <option value="custom">Custom</option>
+                {{#each config.rangedWeaponTypes as |val key|}}
+                    <option value="{{key}}"{{#ife ../system.range.ranges.template key}}selected="selected"{{/ife}}>{{localize val}}</option>
+                {{/each}}
+            </select>
+
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="inputs">
             <input
                 size="3"
                 type="text"

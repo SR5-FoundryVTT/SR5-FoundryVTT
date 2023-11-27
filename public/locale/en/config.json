@@ -1317,7 +1317,31 @@
         "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
         "TokenSelectionNeeded": "One ore more tokens need to be selected"
     },
-    "SR5.Weapon": "Weapon",
+    "SR5.Weapon": {
+        "Ranged": {
+            "Type": {
+                "Taser": "Taser",
+                "HoldOutPistol": "Hold-Out Pistol",
+                "LightPistol": "Light Pistol",
+                "HeavyPistol": "Heavy Pistol",
+                "MachinePistol": "Machine Pistol",
+                "SMG": "SMG",
+                "AssaultRifle": "Assault Rifle",
+                "ShotgunFlechette": "Shotgun (flechette)",
+                "ShotgunSlug": "Shotgun (slug)",
+                "SniperRifle": "Sniper Rifle",
+                "LightMachinegun": "Light Machinegun",
+                "MediumHeavyMachinegun": "Medium/Heavy Machinegun",
+                "AssaultCannon": "Assault Cannon",
+                "GrenadeLauncher": "Grenade Launcher",
+                "MissileLauncher": "Missile Launcher",
+                "LightCrossbow": "Light Crossbow",
+                "MediumCrossbow": "Medium Crossbow",
+                "HeavyCrossbow": "Heavy Crossbow"
+            }
+        },
+        "Weapon": "Weapon"
+    },
     "SR5.WeaponAmmoCount": "Ammo Count",
     "SR5.WeaponCatMelee": "Melee",
     "SR5.WeaponCatRange": "Range",

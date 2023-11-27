@@ -831,7 +831,9 @@
         "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
         "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
     },
-    "SR5.Weapon": "Arme",
+    "SR5.Weapon": {
+        "Weapon": "Arme"
+    },
     "SR5.WeaponAmmoCount": "Compteur munition",
     "SR5.WeaponCatMelee": "Melée",
     "SR5.WeaponCatRange": "Portée",
