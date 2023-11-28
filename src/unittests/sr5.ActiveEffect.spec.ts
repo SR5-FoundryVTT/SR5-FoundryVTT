@@ -508,7 +508,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(test.data.damage.value, 3);
         });
 
-        it('TEST modify limit on SkillTest', async () => {
+        it('TEST modify attribute and limit on SkillTest', async () => {
             const actor = await testActor.create({ type: 'character' });
             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
@@ -522,7 +522,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const action = DataDefaults.actionRollData({ test: SkillTest.name });
             const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
 
+            // Simulate relevant part of #execute
             test.effects.applyAllEffects();
+
             test.prepareAttributeSelection();
             test.prepareLimitSelection();
             test.prepareBaseValues();
@@ -530,6 +532,17 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.strictEqual(test.limit.value, 3);
             assert.strictEqual(test.pool.value, 3);
+
+            // Simulate change of selection
+            test.data.attribute = 'body';
+            test.data.limitSelection = 'social';
+
+            test.prepareAttributeSelection();
+            test.prepareLimitSelection();
+            test.prepareBaseValues();
+            test.calculateBaseValues();
+
+            assert.strictEqual(test.limit.value, 3);
         });
     });
 };

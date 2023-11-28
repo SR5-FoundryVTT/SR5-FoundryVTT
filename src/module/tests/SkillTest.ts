@@ -59,37 +59,34 @@ export class SkillTest extends SuccessTest {
     }
 
     /**
-     * Only add selected attribute values to the pool
-     * 
+     * Change out previous attribute with new selection.
      */
     prepareAttributeSelection() {
         if (!this.actor) return;
 
         // Remove last used attribute and its modifiers and replace with new selection.
         const useSelection = this.data.attribute !== this.data.action.attribute;
-        const usedAttribute = useSelection ? this.data.attribute : this.data.action.attribute;
-        const attribute = this.actor.getAttribute(usedAttribute);
+        const selectedAttribute = useSelection ? this.data.attribute : this.data.action.attribute;
+        const usedAttribute = this.actor.getAttribute(selectedAttribute);
         const lastUsedAttribute = this.actor.getAttribute(this.lastUsedAttribute);
 
-        if (!attribute || !lastUsedAttribute) return console.error('Shadowrun 5e | An attribute was used that does not exist on', this.actor, attribute, lastUsedAttribute);
+        if (!usedAttribute || !lastUsedAttribute) return console.error('Shadowrun 5e | An attribute was used that does not exist on', this.actor, usedAttribute, lastUsedAttribute);
 
 
         const pool = new PartsList(this.pool.mod);
 
-        // Remove both original action and .
+        // Replace previous attribute with new one, without changing other modifiers
         pool.removePart(lastUsedAttribute.label);
         this.actor._removeMatrixParts(pool);
+        pool.addPart(usedAttribute.label, usedAttribute.value);
 
-        // Add pool values related to either selected or action attribute
-        pool.addPart(attribute.label, attribute.value);
-        if (this.actor._isMatrixAttribute(usedAttribute)) this.actor._addMatrixParts(pool, true);
+        if (this.actor._isMatrixAttribute(selectedAttribute)) this.actor._addMatrixParts(pool, true);
 
-        // Save this attribtue selection as last used for next selection cycle
-        this.lastUsedAttribute = usedAttribute;
+        this.lastUsedAttribute = selectedAttribute;
     }
 
     /**
-     * Rebuild limit after limit selection.
+     * Change out previous limit with new selection.
      */
     prepareLimitSelection() {
         if (!this.actor) return;
@@ -110,14 +107,8 @@ export class SkillTest extends SuccessTest {
         limit.addPart(usedLimit.label, usedLimit.value);
         this.actor._removeMatrixParts(pool);
 
-        if (limit && this.actor._isMatrixAttribute(this.data.limitSelection)) this.actor._addMatrixParts(pool, true);
+        if (limit && this.actor._isMatrixAttribute(selectedLimit)) this.actor._addMatrixParts(pool, true);
 
-        // this.data.limit.mod = [];
-        // const limitMod = new PartsList(this.limit.mod);
-        // const poolMod = new PartsList(this.pool.mod);
-
-        // const limit = this.actor.getLimit(this.data.limitSelection);
-        // if (limit) limitMod.addUniquePart(limit.label, limit.value);
-        // if (limit && this.actor._isMatrixAttribute(this.data.limitSelection)) this.actor._addMatrixParts(poolMod, true);
+        this.lastUsedLimit = selectedLimit;
     }
 }
