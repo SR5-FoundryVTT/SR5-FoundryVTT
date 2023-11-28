@@ -5,7 +5,6 @@ import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 export interface SkillTestData extends SuccessTestData {
     attribute: string
     limitSelection: string
-    sepcialization: boolean
 }
 
 
