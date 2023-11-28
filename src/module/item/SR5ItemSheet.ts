@@ -407,16 +407,16 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onSelectRangeCategory(event) {
-        const selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.rangedWeaponRanges;
+        const selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.weaponRangeCategories;
 
         if(selectedRangeCategory !== "manual") {
-            const ranges = SR5.rangedWeaponRanges[selectedRangeCategory].ranges;
+            const ranges = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
 
             await this.item.update({
-                'system.range.ranges.short': ranges[0],
-                'system.range.ranges.medium': ranges[1],
-                'system.range.ranges.long': ranges[2],
-                'system.range.ranges.extreme': ranges[3],
+                'system.range.ranges': {
+                    ...ranges,
+                    category: selectedRangeCategory,
+                },
             });
         }
     }

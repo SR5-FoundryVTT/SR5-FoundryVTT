@@ -10,7 +10,7 @@ import SourceEntityField = Shadowrun.SourceEntityField;
 import ValueField = Shadowrun.ValueField;
 import GenericValueField = Shadowrun.GenericValueField;
 import MinimalActionData = Shadowrun.MinimalActionData;
-
+import RangeData = Shadowrun.RangeData;
 
 interface MinimalItemData {
     // Whatever name you want to give but not ''.
@@ -295,6 +295,16 @@ export class DataDefaults {
             mode: 'single_shot',
             action: 'simple'
         }, partialFireModeData);
+    }
+
+    static weaponRangeData(partialRangeData: Partial<RangeData> = {}): RangeData {
+        return mergeObject({
+            short: 0,
+            medium: 0,
+            long: 0,
+            extreme: 0,
+            category: 'manual',
+        }, partialRangeData);
     }
 
     /**

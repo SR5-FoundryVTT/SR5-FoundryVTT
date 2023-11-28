@@ -52,7 +52,7 @@ declare namespace Shadowrun {
         medium: number;
         long: number;
         extreme: number;
-        category: keyof typeof SR5CONFIG.rangedWeaponRanges;
+        category: keyof typeof SR5CONFIG.weaponRangeCategories;
         attribute?: ActorAttribute;
     }
     /**

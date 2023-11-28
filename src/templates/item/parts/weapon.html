@@ -114,7 +114,7 @@
                 name="system.range.ranges.category"
                 class="select-range-category"
             >
-                {{#each config.rangedWeaponRanges as |val key|}}
+                {{#each config.weaponRangeCategories as |val key|}}
                 <option value="{{key}}"{{#ife ../system.range.ranges.category key}}selected="selected"{{/ife}}>{{localize val.label}}</option>
                 {{/each}}
             </select>

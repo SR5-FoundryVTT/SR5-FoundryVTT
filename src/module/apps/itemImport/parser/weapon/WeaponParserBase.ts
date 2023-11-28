@@ -9,6 +9,8 @@ import DamageType = Shadowrun.DamageType;
 import { DataDefaults } from '../../../../data/DataDefaults';
 import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 import DamageData = Shadowrun.DamageData;
+import { SR5 } from '../../../../config';
+import RangeData = Shadowrun.RangeData;
 
 export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
     private GetSkill(weaponJson: object): SkillName {
@@ -142,5 +144,16 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
             default:
                 return '';
         }
+    }
+
+    protected GetRangeDataFromImportedCategory(category: string): RangeData|undefined {
+        const systemRangeCategory: Exclude<keyof typeof SR5.weaponRangeCategories, "manual"> | undefined = Constants.MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY[category];
+        if(systemRangeCategory === undefined) {
+            return undefined;
+        }
+        return {
+            ...SR5.weaponRangeCategories[systemRangeCategory].ranges,
+            category: systemRangeCategory,
+        };
     }
 }

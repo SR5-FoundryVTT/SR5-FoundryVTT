@@ -1,7 +1,7 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
-import { Constants } from '../../importer/Constants';
 import WeaponItemData = Shadowrun.WeaponItemData;
+import { DataDefaults } from '../../../../data/DataDefaults';
 
 export class RangedParser extends WeaponParserBase {
     protected GetAmmo(weaponJson: object) {
@@ -21,13 +21,9 @@ export class RangedParser extends WeaponParserBase {
             item.system.range.rc.base = 0;
             item.system.range.rc.value = 0;
         }
-        
 
-        if (jsonData.hasOwnProperty('range')) {
-            item.system.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'range')];
-        } else {
-            item.system.range.ranges = Constants.WEAPON_RANGES[ImportHelper.StringValue(jsonData, 'category')];
-        }
+        const rangeCategory = ImportHelper.StringValue(jsonData, jsonData.hasOwnProperty('range') ? 'range' : 'category');
+        item.system.range.ranges = DataDefaults.weaponRangeData(this.GetRangeDataFromImportedCategory(rangeCategory));
 
         item.system.ammo.current.value = this.GetAmmo(jsonData);
         item.system.ammo.current.max = this.GetAmmo(jsonData);
