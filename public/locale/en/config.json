@@ -586,7 +586,8 @@
             "OpenInventory": "Inventory"
         },
         "Message": {
-            "ClickToSelect": "Click to select on scene"
+            "ClickToSelect": "Click to select on scene",
+            "TestEffects": "Applied effects"
         },
         "Sheet": {
             "AddOne": "Add One",

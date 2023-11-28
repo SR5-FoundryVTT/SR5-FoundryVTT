@@ -126,7 +126,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         console.debug('Shadowrun5e | Creating effects on target actor after opposed test.', this.test);
 
         const effectsData: ActiveEffectData[] = [];
-        for (const effect of allApplicableDocumentEffects(this.test.item, {applyTo: ['targeted_actor']})) {
+        for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
             const effectData = effect.toObject() as ActiveEffectData;
 
             // Transform all dynamic values to static values.
@@ -134,11 +134,11 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
                 SR5ActiveEffect.resolveDynamicChangeValue(this.test, change);
                 return change;
             });
-            
+
             effectsData.push(effectData);
         }
 
-        for (const effect of allApplicableItemsEffects(this.test.item, {applyTo: ['targeted_actor'], nestedItems: false})) {
+        for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
             const effectData = effect.toObject() as ActiveEffectData;
 
             // Transform all dynamic values to static values.
@@ -165,8 +165,28 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param effectsData The effects data to be applied;
      */
     static async _createTargetedEffectsAsGM(actor: SR5Actor, effectsData: ActiveEffectData[]) {
+        const alias = game.user?.name;
+        const linkedTokens = actor.getActiveTokens(true) || [];
+        const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
+
         // @ts-expect-error
-        return await actor.createEmbeddedDocuments('ActiveEffect', effectsData) as SR5ActiveEffect[];
+        const effects = await actor.createEmbeddedDocuments('ActiveEffect', effectsData) as SR5ActiveEffect[];
+
+        const templateData = {
+            effects,
+            speaker: {
+                actor,
+                alias,
+                token
+            }
+        };
+        const content = await renderTemplate('systems/shadowrun5e/dist/templates/chat/test-effects-message.hbs', templateData);
+        const messageData = {
+            content
+        };
+        ChatMessage.create(messageData);
+
+        return effects;
     }
 
     /**
@@ -175,7 +195,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param effectsData The effects data to be applied;
      */
     async _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: ActiveEffectData[]) {
-        await SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, {actorUuid: actor.uuid, effectsData});
+        await SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, { actorUuid: actor.uuid, effectsData });
     }
 
     /**
@@ -206,23 +226,23 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     *allApplicableEffects(): Generator<SR5ActiveEffect> {
         // Pool only tests will don't have actors attached.
         if (!this.test.actor) return;
-        
-        for (const effect of allApplicableDocumentEffects(this.test.actor, {applyTo: ['test_all']})) {
+
+        for (const effect of allApplicableDocumentEffects(this.test.actor, { applyTo: ['test_all'] })) {
             yield effect;
         }
 
-        for (const effect of allApplicableItemsEffects(this.test.actor, {applyTo: ['test_all']})) {
+        for (const effect of allApplicableItemsEffects(this.test.actor, { applyTo: ['test_all'] })) {
             yield effect;
         }
 
         // Skip tests without an item for apply-to test_item effects.
         if (!this.test.item) return;
 
-        for (const effect of allApplicableDocumentEffects(this.test.item, {applyTo: ['test_item']})) {
+        for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['test_item'] })) {
             yield effect;
         }
-        
-        for (const effect of allApplicableItemsEffects(this.test.item, {applyTo: ['test_item']})) {
+
+        for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['test_item'] })) {
             yield effect;
         }
     }

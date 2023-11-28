@@ -196,23 +196,3 @@
     </div>
 </div>
 {{/ifgt}}{{/if}}
-
-{{#if test.failure}}{{#if effects}}
-<div class="sr5 chat-card roll-card">
-    <div class="test-line">
-        <span class="test-name {{#if roll}}test-roll{{/if}}">
-            {{localize "SR5.Effects"}}
-        </span>
-    </div>
-    {{#each effects}}
-    <div class="card-content">
-        <div class="left-side">
-           <p><a class="content-link" draggable="true" data-type="ActiveEffect" data-id="{{this.id}}" data-uuid="{{this.uuid}}" data-tooltip="TODO: EFFECTS">
-                <i class="fas fa-user">{{this.name}}</i>
-            </a></p>
-        </div>
-        <div class="right-side"></div>
-    </div>
-    {{/each}}
-</div>
-{{/if}}{{/if}}

@@ -235,8 +235,11 @@ export class OpposedTest extends SuccessTest {
         return templateData;
     }
 
-    override async afterTestComplete() {
-        await super.afterTestComplete();
+    /**
+     * Targeted Actor effects are currently disabled, as they need more time.
+     */
+    override async afterFailure() {
+        await super.afterFailure();
         await this.effects.createTargetActorEffectsAfterOpposedTest();
     }
 }
