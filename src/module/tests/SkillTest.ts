@@ -69,7 +69,7 @@ export class SkillTest extends SuccessTest {
         const usedAttribute = this.actor.getAttribute(selectedAttribute);
         const lastUsedAttribute = this.actor.getAttribute(this.lastUsedAttribute);
 
-        if (!usedAttribute || !lastUsedAttribute) return console.error('Shadowrun 5e | An attribute was used that does not exist on', this.actor, usedAttribute, lastUsedAttribute);
+        if (!usedAttribute || !lastUsedAttribute) return; 
 
 
         const pool = new PartsList(this.pool.mod);
@@ -96,7 +96,7 @@ export class SkillTest extends SuccessTest {
         const usedLimit = this.actor.getLimit(selectedLimit);
         const lastUsedLimit = this.actor.getLimit(this.lastUsedLimit);
 
-        if (!usedLimit || !lastUsedLimit) return console.error('Shadowrun 5e | A limit was used that does not exist on', this.actor, usedLimit, lastUsedLimit);
+        if (!usedLimit || !lastUsedLimit) return;
 
         const limit = new PartsList(this.limit.mod);
         const pool = new PartsList(this.pool.mod);

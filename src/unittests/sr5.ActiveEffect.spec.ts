@@ -516,7 +516,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            const action = DataDefaults.actionRollData({ test: SkillTest.name });
+            // @ts-expect-error
+            const action = DataDefaults.actionRollData({ test: SkillTest.name, limit: {attribute: 'social'} });
             const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
 
             // Simulate relevant part of #execute
@@ -527,19 +528,19 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareBaseValues();
             test.calculateBaseValues();
 
-            assert.strictEqual(test.limit.value, 3);
+            assert.strictEqual(test.limit.value, actor.getLimit('social').value + 3);
             assert.strictEqual(test.pool.value, 3);
 
             // Simulate change of selection
             test.data.attribute = 'body';
-            test.data.limitSelection = 'social';
+            test.data.limitSelection = 'physical';
 
             test.prepareAttributeSelection();
             test.prepareLimitSelection();
             test.prepareBaseValues();
             test.calculateBaseValues();
 
-            assert.strictEqual(test.limit.value, 3);
+            assert.strictEqual(test.limit.value, actor.getLimit('physical').value + 3);
         });
     });
 };
