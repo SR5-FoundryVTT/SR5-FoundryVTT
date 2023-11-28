@@ -161,6 +161,10 @@
 
                 &.ranges {
                     flex: 1 1 30%;
+
+                    :disabled {
+                        text-align: center;
+                    }
                 }
             }
             select {

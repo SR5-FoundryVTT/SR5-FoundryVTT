@@ -93,12 +93,12 @@ export class RangedAttackTest extends SuccessTest {
         const {ranges} = weapon.system.range;
         const {range_modifiers} = SR.combat.environmental;
         const newRanges = {} as Shadowrun.RangesTemplateData;
-        for (const [key, value] of Object.entries(ranges)) {
-            // TODO: Clean this up
-            if(key === "category" || key === "attribute") {
-                continue;
-            }
-            const distance = (this.actor && !!ranges.attribute) ? this.actor.getAttribute(ranges.attribute).value * value : value;
+
+        for (const key of ["short", "medium", "long", "extreme"] as const) {
+            const rangeValue = ranges[key];
+            const distance = (this.actor && !!ranges.attribute) ?
+                this.actor.getAttribute(ranges.attribute).value * rangeValue :
+                rangeValue;
             newRanges[key] = Helpers.createRangeDescription(SR5.weaponRanges[key], distance, range_modifiers[key]);
         }
         this.data.ranges = newRanges;

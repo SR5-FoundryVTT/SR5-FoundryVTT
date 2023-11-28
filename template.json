@@ -1204,7 +1204,8 @@
                         "short": 0,
                         "medium": 0,
                         "long": 0,
-                        "extreme": 0
+                        "extreme": 0,
+                        "category": "manual"
                     },
                     "rc": {
                         "value": 0
@@ -1225,7 +1226,8 @@
                         "medium": 0,
                         "long": 0,
                         "extreme": 0,
-                        "attribute": ""
+                        "attribute": "",
+                        "category": "manual"
                     },
                     "blast": {
                         "radius": 0,
