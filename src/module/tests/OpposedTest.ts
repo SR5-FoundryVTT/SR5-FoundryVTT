@@ -237,7 +237,6 @@ export class OpposedTest extends SuccessTest {
 
     override async afterTestComplete() {
         await super.afterTestComplete();
-        if (!this.actor) return;
         await this.effects.createTargetActorEffectsAfterOpposedTest();
     }
 }

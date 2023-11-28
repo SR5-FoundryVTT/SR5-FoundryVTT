@@ -4,7 +4,9 @@ import { ActiveEffectData } from "@league-of-foundry-developers/foundry-vtt-type
 import { SR5Actor } from "../../actor/SR5Actor";
 import { OpposedTest } from "../../tests/OpposedTest";
 import { SR5Item } from "../../item/SR5Item";
-import { allApplicableDocumentEffects, allApplicableItemEffects } from "../../effects";
+import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
+import { SocketMessage } from "../../sockets";
+import { FLAGS } from "../../constants";
 
 /**
  * Handle the SR5ActiveEffects flow for a SuccessTest.
@@ -123,8 +125,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         console.debug('Shadowrun5e | Creating effects on target actor after opposed test.', this.test);
 
-        const effects: ActiveEffectData[] = [];
-        for (const effect of allApplicableItemEffects(this.test.item, {applyTo: ['targeted_actor']})) {
+        const effectsData: ActiveEffectData[] = [];
+        for (const effect of allApplicableDocumentEffects(this.test.item, {applyTo: ['targeted_actor']})) {
             const effectData = effect.toObject() as ActiveEffectData;
 
             // Transform all dynamic values to static values.
@@ -133,12 +135,66 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
                 return change;
             });
             
-            effects.push(effectData);
+            effectsData.push(effectData);
         }
 
-        console.debug(`Shadowrun5e | To be created effects on target actor ${actor.name}`, effects);
-        //@ts-expect-error
-        return actor.createEmbeddedDocuments('ActiveEffect', effects);
+        for (const effect of allApplicableItemsEffects(this.test.item, {applyTo: ['targeted_actor'], nestedItems: false})) {
+            const effectData = effect.toObject() as ActiveEffectData;
+
+            // Transform all dynamic values to static values.
+            effectData.changes = effectData.changes.map(change => {
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change);
+                return change;
+            });
+
+            effectsData.push(effectData);
+        }
+
+        console.debug(`Shadowrun5e | To be created effects on target actor ${actor.name}`, effectsData);
+
+        if (!game.user?.isGM) {
+            await this._sendCreateTargetedEffectsSocketMessage(actor, effectsData);
+        } else {
+            await SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, effectsData);
+        }
+    }
+
+    /**
+     * Create a set of effects on the targeted actor, user must have permissions.
+     * @param actor The actor to create the effects on.
+     * @param effectsData The effects data to be applied;
+     */
+    static async _createTargetedEffectsAsGM(actor: SR5Actor, effectsData: ActiveEffectData[]) {
+        // @ts-expect-error
+        return await actor.createEmbeddedDocuments('ActiveEffect', effectsData) as SR5ActiveEffect[];
+    }
+
+    /**
+     * Send out a socket message to a connected GM to create actor effects.
+     * @param actor The actor to create the effects on.
+     * @param effectsData The effects data to be applied;
+     */
+    async _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: ActiveEffectData[]) {
+        await SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, {actorUuid: actor.uuid, effectsData});
+    }
+
+    /**
+     * Handle a sent socket message to create effects on a target actor.
+     * @param {string} message.actorUuid Must contain the uuid of the actor to create the effects on.
+     * @param {ActiveEffectData[]} message.effectsData Must contain a list of effects data to be applied.
+     * @returns 
+     */
+    static async _handleCreateTargetedEffectsSocketMessage(message: Shadowrun.SocketMessageData) {
+        if (!message.data.hasOwnProperty('actorUuid') && !message.data.hasOwnProperty('effectsData')) {
+            console.error(`Shadowrun 5e | ${this.name} Socket Message is missing necessary properties`, message);
+            return;
+        }
+
+        if (!message.data.effectsData.length) return;
+
+        const actor = await fromUuid(message.data.actorUuid) as SR5Actor;
+
+        return await SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, message.data.effectsData);
     }
 
     /**
@@ -155,7 +211,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             yield effect;
         }
 
-        for (const effect of allApplicableItemEffects(this.test.actor, {applyTo: ['test_all']})) {
+        for (const effect of allApplicableItemsEffects(this.test.actor, {applyTo: ['test_all']})) {
             yield effect;
         }
 
@@ -166,7 +222,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             yield effect;
         }
         
-        for (const effect of allApplicableItemEffects(this.test.item, {applyTo: ['test_item']})) {
+        for (const effect of allApplicableItemsEffects(this.test.item, {applyTo: ['test_item']})) {
             yield effect;
         }
     }

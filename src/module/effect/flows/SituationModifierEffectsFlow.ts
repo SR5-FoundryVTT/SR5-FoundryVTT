@@ -5,7 +5,7 @@ import { SR5ActiveEffect } from "../SR5ActiveEffect";
 import { SituationModifier, SituationalModifierApplyOptions } from "../../rules/modifiers/SituationModifier";
 import { imageMagnification, lowLightVision, smartlink, tracerRounds, ultrasound } from "./EnvironmentalChangeFlow";
 import { SuccessTest } from "../../tests/SuccessTest";
-import { allApplicableDocumentEffects, allApplicableItemEffects } from "../../effects";
+import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
 
 /**
  * TODO: Documentation.
@@ -81,7 +81,7 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
                 yield effect;
             }
             
-            for (const effect of allApplicableItemEffects(actor, {applyTo: ['modifier']})) {
+            for (const effect of allApplicableItemsEffects(actor, {applyTo: ['modifier']})) {
                 yield effect;
             }
         }

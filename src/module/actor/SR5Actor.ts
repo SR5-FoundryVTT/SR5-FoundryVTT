@@ -25,7 +25,7 @@ import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
-import { allApplicableDocumentEffects, allApplicableItemEffects } from '../effects';
+import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 
 
@@ -184,7 +184,7 @@ export class SR5Actor extends Actor {
             yield effect;
         }
 
-        for (const effect of allApplicableItemEffects(this, {applyTo: ['actor']})) {
+        for (const effect of allApplicableItemsEffects(this, {applyTo: ['actor']})) {
             yield effect;
         }
     }

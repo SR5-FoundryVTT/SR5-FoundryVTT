@@ -66,6 +66,7 @@ import { AutocompleteInlineHooksFlow } from './effect/autoinline/AutocompleteInl
 import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 import { RenderSettings } from './systemLinks';
 import registerSR5Tours from './tours/tours';
+import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 
 
 
@@ -454,7 +455,7 @@ ___________________
     /**
      * This method is used as a simple place to register socket hook handlers for the system.
      *
-     * You can use the SocketMessage
+     * You can use the SocketMessage for sending messages using a socket event message id and generic data object.
      */
     static registerSocketListeners() {
         if (!game.socket || !game.user) return;
@@ -463,7 +464,8 @@ ___________________
             [FLAGS.addNetworkController]: [NetworkDeviceFlow._handleAddNetworkControllerSocketMessage],
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
-            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage]
+            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage],
+            [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage]
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {

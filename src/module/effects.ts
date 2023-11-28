@@ -113,7 +113,7 @@ export function prepareSortedEffects(effects: SR5ActiveEffect[], byKey: string =
 export function prepareSortedItemEffects(document: SR5Actor|SR5Item): Shadowrun.AllEnabledEffectsSheetData {
     const enabledEffects: Shadowrun.AllEnabledEffectsSheetData = [];
 
-    for (const effect of allApplicableItemEffects(document)) {
+    for (const effect of allApplicableItemsEffects(document)) {
         if (!effect.active) continue;
 
         enabledEffects.push(effect);
@@ -156,7 +156,7 @@ export function *allApplicableDocumentEffects(document: SR5Actor|SR5Item, option
  * @param options.nestedItems Whether to include nested items
  * @returns An iterator effect
  */
-export function *allApplicableItemEffects(document: SR5Actor|SR5Item, options: ApplicableItemEffectOptions = {}) {
+export function *allApplicableItemsEffects(document: SR5Actor|SR5Item, options: ApplicableItemEffectOptions = {}) {
     const applyTo = options.applyTo ?? [];
     const nestedItems = options.nestedItems ?? true;
 

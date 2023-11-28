@@ -47,7 +47,8 @@ export const FLAGS = {
     AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
     TurnsSinceLastAttack: 'turnsSinceLastAttack',
     ManualRollOnSuccessTest: 'ManualRollOnSuccessTest',
-    MarkImports: 'MarkImports'
+    MarkImports: 'MarkImports',
+    CreateTargetedEffects: 'CreateTargetedEffects'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
