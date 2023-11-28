@@ -158,6 +158,10 @@
                     padding-left: 0.25em;
                     padding-right: 0.25em;
                 }
+
+                &.ranges {
+                    flex: 1 1 30%;
+                }
             }
             select {
                 color: $color;

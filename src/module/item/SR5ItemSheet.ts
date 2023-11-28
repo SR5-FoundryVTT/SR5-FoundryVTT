@@ -4,6 +4,7 @@ import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
+import RangeData = Shadowrun.RangeData;
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -328,7 +329,8 @@ export class SR5ItemSheet extends ItemSheet {
         // Freshly imported item toggle
         html.find('.toggle-fresh-import-off').on('click', async (event) => this._toggleFreshImportFlag(event, false));
 
-        html.find('.select-range-category').on('change', this._onSelectRangeCategory.bind(this));
+        html.find('.select-ranged-range-category').on('change', this._onSelectRangedRangeCategory.bind(this));
+        html.find('.select-thrown-range-category').on('change', this._onSelectThrownRangeCategory.bind(this));
 
         this._activateTagifyListeners(html);
     }
@@ -406,15 +408,31 @@ export class SR5ItemSheet extends ItemSheet {
         this.item.openSource();
     }
 
-    async _onSelectRangeCategory(event) {
+    async _onSelectRangedRangeCategory(event) {
+        await this._onSelectRangeCategory("system.range.ranges", event);
+    }
+
+    async _onSelectThrownRangeCategory(event) {
+        await this._onSelectRangeCategory("system.thrown.ranges", event);
+    }
+
+    async _onSelectRangeCategory(key: string, event) {
+        event.stopPropagation();
         const selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.weaponRangeCategories;
 
-        if(selectedRangeCategory !== "manual") {
-            const ranges = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
+        if(selectedRangeCategory === "manual") {
+            await this.item.update({
+                [key]: {
+                    category: selectedRangeCategory,
+                },
+            });
+        } else {
+            const ranges: Omit<RangeData, 'category'> = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
 
             await this.item.update({
-                'system.range.ranges': {
+                [key]: {
                     ...ranges,
+                    attribute: ranges.attribute || null, //Clear attribute if necessary
                     category: selectedRangeCategory,
                 },
             });
