@@ -722,11 +722,6 @@ export class SuccessTest {
     prepareTestModifiers() { }
 
     /**
-     * Allow implementations to influence test data during the test dialog selection phase.
-     */
-    prepareTestSelectionData() {}
-
-    /**
      * Prepare general modifiers based on the actor, as defined within the action or test implementation.
      */
     prepareActorModifiers() {
@@ -1283,9 +1278,6 @@ export class SuccessTest {
         this.effects.applyAllEffects();
 
         await this.prepareDocumentData();
-
-        this.prepareTestSelectionData();
-
 
         // Initial base value preparation will show default result without any user input.
         this.prepareBaseValues();

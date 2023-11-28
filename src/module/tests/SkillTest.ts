@@ -53,7 +53,7 @@ export class SkillTest extends SuccessTest {
         await super.prepareDocumentData();
     }
 
-    override prepareTestSelectionData() {
+    override prepareBaseValues() {
         this.prepareAttributeSelection();
         this.prepareLimitSelection();
     }
