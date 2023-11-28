@@ -488,7 +488,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
      * All these tests check for cases that caused issues in the past, due to specific implementation details
      * of some test implementations.
      */
-    describe('Advanced effects modify proplematic test implemenations', () => {
+    describe('Advanced effects modify problematic test implementations', () => {
         it('TEST modify damage on RangedAttackTest', async () => {
             const actor = await testActor.create({ type: 'character' });
             const weapon = await testItem.create({ type: 'weapon', system: { category: 'ranged' } });
