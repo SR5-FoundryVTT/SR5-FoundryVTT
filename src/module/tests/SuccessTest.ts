@@ -1278,11 +1278,14 @@ export class SuccessTest {
     async execute(): Promise<this> {
         await this.populateTests();
         await this.populateDocuments();
+
+        // Effects need to be applied before any values are calculated.
+        this.effects.applyAllEffects();
+
         await this.prepareDocumentData();
 
         this.prepareTestSelectionData();
 
-        this.effects.applyAllEffects();
 
         // Initial base value preparation will show default result without any user input.
         this.prepareBaseValues();

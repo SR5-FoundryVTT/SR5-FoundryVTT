@@ -500,10 +500,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             const test = await TestCreator.fromItem(weapon, actor, { showDialog: false, showMessage: false }) as SuccessTest;
 
-            // Go through normal procedure but manually compare hits + effect hits
-            test.effects.applyAllEffects();
-            test.prepareBaseValues();
-            test.calculateBaseValues();
+            await test.execute();
 
             assert.equal(test.data.damage.value, 3);
         });
