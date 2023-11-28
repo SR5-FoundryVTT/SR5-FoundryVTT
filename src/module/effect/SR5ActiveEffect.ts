@@ -48,6 +48,23 @@ export class SR5ActiveEffect extends ActiveEffect {
         return this.origin ? fromUuidSync(this.origin) : null;
     }
 
+    get isActorOwned(): boolean {
+        return this.parent instanceof SR5Actor;
+    }
+
+    get isItemOwned(): boolean {
+        return this.parent instanceof SR5Item;
+    }
+
+    /**
+     * Always returns the parent actor of the effect, even if the effect is applied to an item.
+     */
+    get actor(): SR5Actor | null {
+        if (this.parent instanceof SR5Actor) return this.parent;
+        if (this.parent instanceof SR5Item) return this.parent?.parent;
+        return null;
+    }
+
     /**
      * Use to display this effect on sheet, including a possible parent item structure.
      */

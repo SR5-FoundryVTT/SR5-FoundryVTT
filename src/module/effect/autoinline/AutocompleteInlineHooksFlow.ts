@@ -73,20 +73,33 @@ export const AutocompleteInlineHooksFlow =  {
      */
     keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
         const effect = EffectConfig.object;
+
+        // For  effects targeting specific tests, we can provide a merge of all tests data.
+        if (effect.selectionTests) {
+            const actor = effect.actor;
+            const testData = {};
+            for (const TestClassName of effect.selectionTests) {
+                if (!TestClassName) return {};
+                const TestClass = TestCreator._getTestClass(TestClassName);
+                if (!TestClass) return {};
+                const test = new TestClass({}, {actor});
+                foundry.utils.mergeObject(testData, test.data);
+            }
+            return {data: testData};
+        }
         
         // For actor effects, we can't determine the test type.
-        if (effect.parent instanceof SR5Actor) {
-            return new SuccessTest({});
+        if (effect.isActorOwned) {
+            return {data: new SuccessTest({}).data};
         }
         
         // For item effects, we can determine the test type.
-        if (effect.parent instanceof SR5Item) {
+        if (effect.isItemOwned) {
             const item = effect.parent as SR5Item;
             const action = item.getAction();
             if (!action) return {};                
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;
-            const test = new SuccessTestClass({}, {actor: item.actor, item});
-            return test;
+            return {data: new SuccessTestClass({}, {actor: item.actor, item}).data};
         }
     },
 
@@ -145,7 +158,7 @@ export const AutocompleteInlineHooksFlow =  {
             const successTest = new SuccessTestClass({});
             const opposedTest = new OpposedTestClass({against: successTest.data}, {actor: item.actor, item});
             
-            return opposedTest;
+            return {data: opposedTest.data};
         }
     }
 }
