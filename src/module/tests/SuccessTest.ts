@@ -152,8 +152,8 @@ export interface SuccessTestMessageData {
  * and it would be retrieved by the TestCreator like this:
  * > const SuccessTest = TestCreate._getTestClass('SuccessTest');
  */
-export class SuccessTest {
-    public data: SuccessTestData;
+export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
+    public data: T;
     public actor: SR5Actor | undefined;
     public item: SR5Item | undefined;
     public rolls: SR5Roll[];
