@@ -117,28 +117,32 @@ export class WeaponParser {
             system.category = 'thrown';
             const ranges = chummerWeapon.ranges[0]
             if (ranges && ranges.short && ranges.medium && ranges.long && ranges.extreme) {
-                range.ranges = {
-                    short: parseInt(ranges.short.split('-')[1]),
-                    medium: parseInt(ranges.medium.split('-')[1]),
-                    long: parseInt(ranges.long.split('-')[1]),
-                    extreme: parseInt(ranges.extreme.split('-')[1]),
+                system.thrown = {
+                    ...system.thrown,
+                    ranges: {
+                        short: parseInt(ranges.short.split('-')[1]),
+                        medium: parseInt(ranges.medium.split('-')[1]),
+                        long: parseInt(ranges.long.split('-')[1]),
+                        extreme: parseInt(ranges.extreme.split('-')[1]),
+                    }
                 };
             }
         }
 
         {
-            //TODO change this to 'rawdamage' when mods can have damage value 
+            //TODO change this to 'rawdamage' when mods can have damage value
             const chummerDamage = this.parseDamage(chummerWeapon.damage_noammo_english);
             damage.base = chummerDamage.damage;
             damage.type = {
                 base: chummerDamage.type
             };
             if (chummerDamage.dropoff || chummerDamage.radius) {
-                const thrown = {};
-                system.thrown = thrown;
-                thrown.blast = {
-                    radius: chummerDamage.radius,
-                    dropoff: chummerDamage.dropoff,
+                system.thrown = {
+                    ...system.thrown,
+                    blast: {
+                        radius: chummerDamage.radius,
+                        dropoff: chummerDamage.dropoff,
+                    },
                 };
             }
         }
@@ -225,12 +229,21 @@ export class WeaponParser {
 
         const ranges = chummerWeapon.ranges[0]
         if (ranges && ranges.short && ranges.medium && ranges.long && ranges.extreme) {
-            range.ranges = {
+            const rangeData = {
                 short: parseInt(ranges.short.split('-')[1]),
                 medium: parseInt(ranges.medium.split('-')[1]),
                 long: parseInt(ranges.long.split('-')[1]),
                 extreme: parseInt(ranges.extreme.split('-')[1]),
             };
+            if(system.category === "range") {
+                range.ranges = rangeData;
+            }
+            if(system.category === "thrown") {
+                system.thrown = {
+                    ...system.thrown,
+                    ranges: rangeData,
+                };
+            }
         }
 
     }
