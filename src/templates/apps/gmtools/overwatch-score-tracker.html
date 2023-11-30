@@ -10,7 +10,7 @@
                     </div>
                     <div class="item-right">
                         <div class="item-icons item-text">
-                            <a class="roll overwatch-score-add-actor" title="{{localize "SR5.OverwatchScoreTracker.AddSelect"}}">
+                            <a class="roll overwatch-score-add-actor" data-tooltip="SR5.OverwatchScoreTracker.AddSelect">
                                 <i class="fas fa-plus"></i>
                                 {{localize "SR5.Add"}}
                             </a>
@@ -26,7 +26,7 @@
                             <div class="item-img">
                                 <img
                                     src="{{actor.img}}"
-                                    title="{{actor.name}}"
+                                    data-tooltip="{{actor.name}}"
                                     height="24px"
                                     width="24px"
                                 />
@@ -49,11 +49,11 @@
                         </div>
                         <div class="item-text rtg"></div>
                         <div class="item-text" style="white-space: nowrap">
-                            <span class="overwatch-score-add roll" title="{{localize 'SR5.AddOneToOverwatch'}}" data-amount="1">+1</span>
+                            <span class="overwatch-score-add roll" data-tooltip="SR5.AddOneToOverwatch" data-amount="1">+1</span>
                             <span> / </span>
-                            <span class="overwatch-score-add roll" title="{{localize 'SR5.AddFiveToOverwatch'}}" data-amount="5">+5</span>
+                            <span class="overwatch-score-add roll" data-tooltip="SR5.AddFiveToOverwatch" data-amount="5">+5</span>
                             <span> / </span>
-                            <span class="roll overwatch-score-roll-15-minutes" title="{{localize 'SR5.AddFifteenMinutesToOverwatch'}}">
+                            <span class="roll overwatch-score-roll-15-minutes" data-tooltip="SR5.AddFifteenMinutesToOverwatch">
                                 {{localize "SR5.PlusFifteenMinutes"}}
                             </span>
                         </div>
@@ -61,7 +61,7 @@
                         <div class="item-text item-icons">
                             <i
                                 class="roll fas fa-power-off overwatch-score-reset"
-                                title="{{localize 'SR5.ResetOverwatchScore'}}"
+                                data-tooltip="SR5.ResetOverwatchScore"
                             ></i>
                         </div>
                     </div>

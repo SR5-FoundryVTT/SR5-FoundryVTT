@@ -25,7 +25,7 @@
             {{#if system.action.type}}
             <label>
                 {{localize "SR5.Extended"}}<input
-                    title="Specialization"
+                    data-tooltip="SR5.Specialization"
                     type="checkbox"
                     name="system.action.extended"
                     {{checked system.action.extended}}
@@ -51,7 +51,7 @@
             <label>
                 {{localize "SR5.Specialization"}}
                 <input
-                    title="Specialization"
+                    data-tooltip="SR5.Specialization"
                     type="checkbox"
                     name="system.action.spec"
                     {{checked system.action.spec}}
@@ -96,7 +96,7 @@
         </div>
         <div class="inputs">
             <input
-                    title="{{localize SR5.Armor}}"
+                    data-tooltip="SR5.Armor"
                     type="checkbox"
                     name="system.action.armor"
                     {{checked system.action.armor}}
@@ -164,7 +164,7 @@
         </div>
     </div>
     <div class="form-line">
-        <div class="label" data-tooltip="{{localize 'SR5.Tooltips.Item.ActionRollMode'}}">
+        <div class="label" data-tooltip="SR5.Tooltips.Item.ActionRollMode">
             {{localize "SR5.RollMode"}}
         </div>
         <div class="inputs">

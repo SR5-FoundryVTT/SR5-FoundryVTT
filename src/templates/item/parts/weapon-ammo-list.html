@@ -31,7 +31,7 @@
                         {{localize "SR5.Dropoff"}}
                     </div>
                     <div class="item-text item-icons">
-                        <a class="add-new-ammo roll" title="Add Ammo">
+                        <a class="add-new-ammo roll" data-tooltip="SR5.AddAmmo">
                             <i class="fas fa-plus"></i>
                             {{localize "SR5.Add"}}
                         </a>
@@ -45,7 +45,7 @@
                 <div class="item-left">
                     <div class="item-text rtg">
                         <i
-                            title="{{localize 'SR5.ToggleEquip'}}"
+                            data-tooltip="SR5.ToggleEquip"
                             class="ammo-equip roll
                                 {{#if ammo.system.technology.equipped}}
                                 fas fa-check-circle
@@ -141,8 +141,8 @@
                         <div class="track-max-value">/m</div>
                     </div>
                     <div class="item-text item-icons">
-                        <i class="edit-item roll fas fa-edit" title="Edit Ammo"></i>
-                        <i class="ammo-delete roll fas fa-trash" title="Delete Ammo"></i>
+                        <i class="edit-item roll fas fa-edit" data-tooltip="SR5.EditAmmo"></i>
+                        <i class="ammo-delete roll fas fa-trash" data-tooltip="SR5.DeleteAmmo"></i>
                     </div>
                 </div>
             </div>
