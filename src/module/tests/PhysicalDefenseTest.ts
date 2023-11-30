@@ -156,7 +156,7 @@ export class PhysicalDefenseTest extends DefenseTest {
     applyPoolMeleeReachModifier() {
         if (!this.data.isMeleeAttack) return;
 
-        PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.WeaponReach', this.data.defenseReach);
+        PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.Weapon.Reach', this.data.defenseReach);
     }
 
     /**

@@ -4,7 +4,7 @@
     </div>
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.WeaponType"}}
+            {{localize "SR5.Weapon.Type"}}
         </div>
         <div class="inputs">
             <select name="system.category">
@@ -18,7 +18,7 @@
     </div>
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.WeaponAmmoCount"}}
+            {{localize "SR5.Weapon.AmmoCount"}}
         </div>
         <div class="inputs">
             <input
@@ -67,11 +67,11 @@
     </div>
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.WeaponModes"}}
+            {{localize "SR5.Weapon.Mode.Modes"}}
         </div>
         <div class="inputs">
             <label>
-                {{localize "SR5.WeaponModeSingleShot"}}<input
+                {{localize "SR5.Weapon.Mode.SingleShot"}}<input
                     type="checkbox"
                     name="system.range.modes.single_shot"
                     {{checked
@@ -79,7 +79,7 @@
                 />
             </label>
             <label>
-                {{localize "SR5.WeaponModeSemiAuto"}}<input
+                {{localize "SR5.Weapon.Mode.SemiAuto"}}<input
                     type="checkbox"
                     name="system.range.modes.semi_auto"
                     {{checked
@@ -87,7 +87,7 @@
                 />
             </label>
             <label>
-                {{localize "SR5.WeaponModeBurstFire"}}<input
+                {{localize "SR5.Weapon.Mode.BurstFire"}}<input
                     type="checkbox"
                     name="system.range.modes.burst_fire"
                     {{checked
@@ -95,7 +95,7 @@
                 />
             </label>
             <label>
-                {{localize "SR5.WeaponModeFullAuto"}}<input
+                {{localize "SR5.Weapon.Mode.FullAuto"}}<input
                     type="checkbox"
                     name="system.range.modes.full_auto"
                     {{checked
@@ -107,7 +107,7 @@
     {{/ife}} {{#ife system.category "range"}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.WeaponRanges"}}
+            {{localize "SR5.Weapon.Range.Ranges"}}
         </div>
         <div class="inputs ranges">
             <select
@@ -184,7 +184,7 @@
     {{/ife}} {{#ife system.category "thrown"}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.WeaponRanges"}}
+            {{localize "SR5.Weapon.Range.Ranges"}}
         </div>
         <div class="inputs ranges">
             <select
@@ -246,7 +246,7 @@
     {{/ife}} {{#ife system.category "melee"}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.WeaponReach"}}
+            {{localize "SR5.Weapon.Reach"}}
         </div>
         <div class="inputs">
             <input

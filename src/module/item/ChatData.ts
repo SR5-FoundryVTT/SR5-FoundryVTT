@@ -320,10 +320,10 @@ export const ChatData = {
             if (system.range.modes) {
                 const newModes: string[] = [];
                 const { modes } = system.range;
-                if (modes.single_shot) newModes.push('SR5.WeaponModeSingleShotShort');
-                if (modes.semi_auto) newModes.push('SR5.WeaponModeSemiAutoShort');
-                if (modes.burst_fire) newModes.push('SR5.WeaponModeBurstFireShort');
-                if (modes.full_auto) newModes.push('SR5.WeaponModeFullAutoShort');
+                if (modes.single_shot) newModes.push('SR5.Weapon.Mode.SingleShotShort');
+                if (modes.semi_auto) newModes.push('SR5.Weapon.Mode.SemiAutoShort');
+                if (modes.burst_fire) newModes.push('SR5.Weapon.Mode.BurstFireShort');
+                if (modes.full_auto) newModes.push('SR5.Weapon.Mode.FullAutoShort');
                 props.push(newModes.map((m) => game.i18n.localize(m)).join('/'));
             }
             if (system.range.ranges) props.push(Array.from(Object.values(system.range.ranges)).join('/'));

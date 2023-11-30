@@ -90,10 +90,10 @@ export const SR5 = {
 
     weaponRangeCategories: {
         manual: {
-            label: 'SR5.Weapon.RangeCategory.Manual',
+            label: 'SR5.Weapon.Range.Category.Manual',
         },
         taser: {
-            label: 'SR5.Weapon.RangeCategory.Taser',
+            label: 'SR5.Weapon.Range.Category.Taser',
             ranges: {
                 short: 5,
                 medium: 10,
@@ -102,7 +102,7 @@ export const SR5 = {
             },
         },
         holdOutPistol: {
-            label: 'SR5.Weapon.RangeCategory.HoldOutPistol',
+            label: 'SR5.Weapon.Range.Category.HoldOutPistol',
             ranges: {
                 short: 5,
                 medium: 15,
@@ -111,7 +111,7 @@ export const SR5 = {
             },
         },
         lightPistol: {
-            label: 'SR5.Weapon.RangeCategory.LightPistol',
+            label: 'SR5.Weapon.Range.Category.LightPistol',
             ranges: {
                 short: 5,
                 medium: 15,
@@ -120,7 +120,7 @@ export const SR5 = {
             },
         },
         heavyPistol: {
-            label: 'SR5.Weapon.RangeCategory.HeavyPistol',
+            label: 'SR5.Weapon.Range.Category.HeavyPistol',
             ranges: {
                 short: 5,
                 medium: 20,
@@ -129,7 +129,7 @@ export const SR5 = {
             },
         },
         machinePistol: {
-            label: 'SR5.Weapon.RangeCategory.MachinePistol',
+            label: 'SR5.Weapon.Range.Category.MachinePistol',
             ranges: {
                 short: 5,
                 medium: 15,
@@ -138,7 +138,7 @@ export const SR5 = {
             },
         },
         smg: {
-            label: 'SR5.Weapon.RangeCategory.SMG',
+            label: 'SR5.Weapon.Range.Category.SMG',
             ranges: {
                 short: 10,
                 medium: 40,
@@ -147,7 +147,7 @@ export const SR5 = {
             },
         },
         assaultRifle: {
-            label: 'SR5.Weapon.RangeCategory.AssaultRifle',
+            label: 'SR5.Weapon.Range.Category.AssaultRifle',
             ranges: {
                 short: 25,
                 medium: 150,
@@ -156,7 +156,7 @@ export const SR5 = {
             },
         },
         shotgunFlechette: {
-            label: 'SR5.Weapon.RangeCategory.ShotgunFlechette',
+            label: 'SR5.Weapon.Range.Category.ShotgunFlechette',
             ranges: {
                 short: 15,
                 medium: 30,
@@ -165,7 +165,7 @@ export const SR5 = {
             },
         },
         shotgunSlug: {
-            label: 'SR5.Weapon.RangeCategory.ShotgunSlug',
+            label: 'SR5.Weapon.Range.Category.ShotgunSlug',
             ranges: {
                 short: 10,
                 medium: 40,
@@ -174,7 +174,7 @@ export const SR5 = {
             },
         },
         sniperRifle: {
-            label: 'SR5.Weapon.RangeCategory.SniperRifle',
+            label: 'SR5.Weapon.Range.Category.SniperRifle',
             ranges: {
                 short: 50,
                 medium: 350,
@@ -183,7 +183,7 @@ export const SR5 = {
             },
         },
         sportingRifle: {
-            label: 'SR5.Weapon.RangeCategory.SportingRifle',
+            label: 'SR5.Weapon.Range.Category.SportingRifle',
             ranges: {
                 short: 50,
                 medium: 250,
@@ -192,7 +192,7 @@ export const SR5 = {
             },
         },
         lightMachinegun: {
-            label: 'SR5.Weapon.RangeCategory.LightMachinegun',
+            label: 'SR5.Weapon.Range.Category.LightMachinegun',
             ranges: {
                 short: 25,
                 medium: 200,
@@ -201,7 +201,7 @@ export const SR5 = {
             },
         },
         mediumHeavyMachinegun: {
-            label: 'SR5.Weapon.RangeCategory.MediumHeavyMachinegun',
+            label: 'SR5.Weapon.Range.Category.MediumHeavyMachinegun',
             ranges: {
                 short: 40,
                 medium: 250,
@@ -210,7 +210,7 @@ export const SR5 = {
             },
         },
         assaultCannon: {
-            label: 'SR5.Weapon.RangeCategory.AssaultCannon',
+            label: 'SR5.Weapon.Range.Category.AssaultCannon',
             ranges: {
                 short: 50,
                 medium: 300,
@@ -219,7 +219,7 @@ export const SR5 = {
             },
         },
         grenadeLauncher: {
-            label: 'SR5.Weapon.RangeCategory.GrenadeLauncher',
+            label: 'SR5.Weapon.Range.Category.GrenadeLauncher',
             ranges: {
                 short: 50,
                 medium: 100,
@@ -228,7 +228,7 @@ export const SR5 = {
             },
         },
         missileLauncher: {
-            label: 'SR5.Weapon.RangeCategory.MissileLauncher',
+            label: 'SR5.Weapon.Range.Category.MissileLauncher',
             ranges: {
                 short: 70,
                 medium: 150,
@@ -237,7 +237,7 @@ export const SR5 = {
             },
         },
         bow: {
-            label: 'SR5.Weapon.RangeCategory.Bow',
+            label: 'SR5.Weapon.Range.Category.Bow',
             ranges: {
                 short: 1,
                 medium: 10,
@@ -247,7 +247,7 @@ export const SR5 = {
             },
         },
         lightCrossbow: {
-            label: 'SR5.Weapon.RangeCategory.LightCrossbow',
+            label: 'SR5.Weapon.Range.Category.LightCrossbow',
             ranges: {
                 short: 6,
                 medium: 24,
@@ -256,7 +256,7 @@ export const SR5 = {
             },
         },
         mediumCrossbow: {
-            label: 'SR5.Weapon.RangeCategory.MediumCrossbow',
+            label: 'SR5.Weapon.Range.Category.MediumCrossbow',
             ranges: {
                 short: 9,
                 medium: 36,
@@ -265,7 +265,7 @@ export const SR5 = {
             },
         },
         heavyCrossbow: {
-            label: 'SR5.Weapon.RangeCategory.HeavyCrossbow',
+            label: 'SR5.Weapon.Range.Category.HeavyCrossbow',
             ranges: {
                 short: 15,
                 medium: 45,
@@ -274,7 +274,7 @@ export const SR5 = {
             },
         },
         thrownKnife: {
-            label: 'SR5.Weapon.RangeCategory.ThrownKnife',
+            label: 'SR5.Weapon.Range.Category.ThrownKnife',
             ranges: {
                 short: 1,
                 medium: 2,
@@ -284,7 +284,7 @@ export const SR5 = {
             },
         },
         net: {
-            label: 'SR5.Weapon.RangeCategory.Net',
+            label: 'SR5.Weapon.Range.Category.Net',
             ranges: {
                 short: 0.5,
                 medium: 1,
@@ -294,7 +294,7 @@ export const SR5 = {
             },
         },
         shuriken: {
-            label: 'SR5.Weapon.RangeCategory.Shuriken',
+            label: 'SR5.Weapon.Range.Category.Shuriken',
             ranges: {
                 short: 1,
                 medium: 2,
@@ -304,7 +304,7 @@ export const SR5 = {
             },
         },
         standardThrownGrenade: {
-            label: 'SR5.Weapon.RangeCategory.StandardThrownGrenade',
+            label: 'SR5.Weapon.Range.Category.StandardThrownGrenade',
             ranges: {
                 short: 2,
                 medium: 4,
@@ -314,7 +314,7 @@ export const SR5 = {
             },
         },
         aerodynamicThrownGrenade: {
-            label: 'SR5.Weapon.RangeCategory.AerodynamicThrownGrenade',
+            label: 'SR5.Weapon.Range.Category.AerodynamicThrownGrenade',
             ranges: {
                 short: 2,
                 medium: 4,
@@ -324,7 +324,7 @@ export const SR5 = {
             },
         },
         harpoonGun: {
-            label: 'SR5.Weapon.RangeCategory.HarpoonGun',
+            label: 'SR5.Weapon.Range.Category.HarpoonGun',
             ranges: {
                 short: 5,
                 medium: 20,
@@ -333,7 +333,7 @@ export const SR5 = {
             },
         },
         harpoonGunUnderwater: {
-            label: 'SR5.Weapon.RangeCategory.HarpoonGunUnderwater',
+            label: 'SR5.Weapon.Range.Category.HarpoonGunUnderwater',
             ranges: {
                 short: 6,
                 medium: 24,
@@ -342,7 +342,7 @@ export const SR5 = {
             },
         },
         flamethrower: {
-            label: 'SR5.Weapon.RangeCategory.Flamethrower',
+            label: 'SR5.Weapon.Range.Category.Flamethrower',
             ranges: {
                 short: 15,
                 medium: 20,
@@ -424,16 +424,16 @@ export const SR5 = {
     },
 
     weaponCategories: {
-        range: 'SR5.WeaponCatRange',
-        melee: 'SR5.WeaponCatMelee',
-        thrown: 'SR5.WeaponCatThrown',
+        range: 'SR5.Weapon.Category.Range',
+        melee: 'SR5.Weapon.Category.Melee',
+        thrown: 'SR5.Weapon.Category.Thrown',
     },
 
     weaponRanges: {
-        short: 'SR5.WeaponRangeShort',
-        medium: 'SR5.WeaponRangeMedium',
-        long: 'SR5.WeaponRangeLong',
-        extreme: 'SR5.WeaponRangeExtreme',
+        short: 'SR5.Weapon.Range.Short',
+        medium: 'SR5.Weapon.Range.Medium',
+        long: 'SR5.Weapon.Range.Long',
+        extreme: 'SR5.Weapon.Range.Extreme',
     },
 
     qualityTypes: {
@@ -999,10 +999,10 @@ export const SR5 = {
     ],
 
     rangeWeaponModeLabel: {
-        'single_shot': 'SR5.WeaponModeSingleShot',
-        'semi_auto': 'SR5.WeaponModeSemiAuto',
-        'burst_file': 'SR5.WeaponModeBurstFire',
-        'full_auto': 'SR5.WeaponModeFullAuto'
+        'single_shot': 'SR5.Weapon.Mode.SingleShot',
+        'semi_auto': 'SR5.Weapon.Mode.SemiAuto',
+        'burst_file': 'SR5.Weapon.Mode.BurstFire',
+        'full_auto': 'SR5.Weapon.Mode.FullAuto'
     },
 
     /**
@@ -1013,7 +1013,7 @@ export const SR5 = {
      */
     fireModes: [
     {
-        label: "SR5.WeaponModeSingleShot",
+        label: "SR5.Weapon.Mode.SingleShot",
         value: 1,
         recoil: false,
         defense: 0,
@@ -1022,7 +1022,7 @@ export const SR5 = {
         mode: 'single_shot'
     },
     {
-        label: "SR5.WeaponModeSemiAutoShort",
+        label: "SR5.Weapon.Mode.SemiAutoShort",
         value: 1,
         recoil: true,
         defense: 0,
@@ -1031,7 +1031,7 @@ export const SR5 = {
         mode: 'semi_auto'
     },
     {
-        label: "SR5.WeaponModeSemiAutoBurst",
+        label: "SR5.Weapon.Mode.SemiAutoBurst",
         value: 3,
         recoil: true,
         defense: -2,
@@ -1041,7 +1041,7 @@ export const SR5 = {
     },
 
     {
-        label: "SR5.WeaponModeBurstFire",
+        label: "SR5.Weapon.Mode.BurstFire",
         value: 3,
         recoil: true,
         defense: -2,
@@ -1050,7 +1050,7 @@ export const SR5 = {
         mode: 'burst_fire'
     },
     {
-        label: "SR5.WeaponModeBurstFireLong",
+        label: "SR5.Weapon.Mode.BurstFireLong",
         value: 6,
         recoil: true,
         defense: -5,
@@ -1059,7 +1059,7 @@ export const SR5 = {
         mode: 'burst_fire',
     },
     {
-        label: "SR5.WeaponModeFullAutoShort",
+        label: "SR5.Weapon.Mode.FullAutoShort",
         value: 6,
         recoil: true,
         defense: -5,
@@ -1068,7 +1068,7 @@ export const SR5 = {
         mode: 'full_auto'
     },
     {
-        label: 'SR5.WeaponModeFullAutoLong',
+        label: 'SR5.Weapon.Mode.FullAutoLong',
         value: 10,
         recoil: true,
         defense: -9,
