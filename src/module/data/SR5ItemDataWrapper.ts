@@ -133,14 +133,14 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
     isManaSpell(): boolean {
         if (!this.isSpell()) return false;
-        // Cast as partial spelldata due to conflicting .type between differing item types.
+        // Cast as partial spell data due to conflicting .type between differing item types.
         const spellData = this.getData() as Partial<SpellData>;
         return spellData.type === 'mana';
     }
 
     isPhysicalSpell(): boolean {
         if (!this.isSpell()) return false;
-        // Cast as partial spelldata due to conflicting .type between differing item types.
+        // Cast as partial spell data due to conflicting .type between differing item types.
         const spellData = this.getData() as Partial<SpellData>;
         return spellData.type === 'physical';
     }
@@ -267,7 +267,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
      * 
      * Using quantity allows for two approaches:
      * - Add an item twice while still having book essence values
-     * - Add an itwm with quantity 2 while also having book essence values
+     * - Add an item with quantity 2 while also having book essence values
      * Both are valid.
      * 
      * @returns A decimal as essence modifier

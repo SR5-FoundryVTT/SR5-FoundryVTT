@@ -1,8 +1,9 @@
 <div class="dialog-content-common">
     {{#if test.hasCode}}
     <hr/>
-    <div  class="common-test">
+    <div class="common-test">
         {{test.code}}
+        {{#if test.hitsIcon}}<img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />{{/if}}
     </div>
     {{/if}}
 

@@ -1191,8 +1191,17 @@ input[type='text'].display {
 }
 
 .common-test{
-margin-bottom: 4px; margin-top: 4px;
-color: $white;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    color: $white;
+    display: flex;
+    .test-icon {
+        width: 17px;
+        height: 17px;
+        margin-left: 5px;
+        margin-bottom: 0;
+        border: 0;
+    }
 }
 
 .custom-item-element {

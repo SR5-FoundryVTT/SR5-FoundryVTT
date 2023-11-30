@@ -42,6 +42,10 @@ export interface SuccessTestValues extends TestValues {
     extendedHits: ValueField
 }
 
+export interface IconWithTooltip {
+    icon: string;
+    tooltip: Translation;
+}
 
 /**
  * Contain all data necessary to handle an action based test.
@@ -60,6 +64,9 @@ export interface TestData {
     // Hits as reported by an external dice roll.
     manualHits: ValueField
     manualGlitches: ValueField
+
+    hitsIcon?: IconWithTooltip
+    autoSuccess?: boolean
 
     // Internal test values.
     values: TestValues
@@ -873,6 +880,24 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     get manualGlitches(): ValueField {
         return this.data.manualGlitches;
+    }
+
+    get hitsIcon(): IconWithTooltip | undefined {
+        return this.data.hitsIcon;
+    }
+
+    get appendedHits(): number | undefined {
+        return this.hits.mod.find((mod) => mod.name === "SR5.AppendedHits")?.value;
+    }
+
+    // In the case we've added appended hits, we want to separately display the hits value and the appended hits (ie. "7 + 5" instead of "12")
+    get displayHits(): number | undefined {
+        return this.hits.value - (this.appendedHits || 0);
+    }
+
+    // Hide dice pool and roll results as they are not relevant to the success of the test
+    get autoSuccess(): boolean {
+        return !!this.data.autoSuccess;
     }
 
     /**

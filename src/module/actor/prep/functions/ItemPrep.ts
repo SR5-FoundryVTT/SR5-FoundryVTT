@@ -16,10 +16,7 @@ export class ItemPrep {
         const { armor } = system;
         armor.base = 0;
         armor.value = 0;
-        // if (!isNaN(armor.mod)) {
-        //     armor.mod = [armor.mod]
-        // }
-        // armor.mod = [];
+
         for (const element of Object.keys(SR5.elementTypes)) {
             armor[element] = 0;
         }
@@ -56,7 +53,7 @@ export class ItemPrep {
     /**
      * Apply all changes to an actor by their 'ware items.
      * 
-     * Modifiy essence by items essence loss
+     * Modify essence by items essence loss
      */
     static prepareWareEssenceLoss(system: ActorTypesData, items: SR5ItemDataWrapper[]) {
         const parts = new PartsList<number>(system.attributes.essence.mod);

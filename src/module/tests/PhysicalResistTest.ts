@@ -22,6 +22,11 @@ export interface PhysicalResistTestData extends SuccessTestData {
     knockedDown: boolean
 }
 
+export type PhysicalResistSuccessCondition = {
+    test: () => boolean,
+    label?: Translation,
+    effect?: () => void,
+}
 
 /**
  * A physical resist test handles SR5#173 Defend B
@@ -31,12 +36,20 @@ export interface PhysicalResistTestData extends SuccessTestData {
 export class PhysicalResistTest extends SuccessTest {
     override data: PhysicalResistTestData
 
-    override _prepareData(data, options): any {
+    override _prepareData(data: PhysicalResistTestData, options): any {
         data = super._prepareData(data, options);
 
         // Get incoming damage from test before or default.
         data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.damageData());
         data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+
+        const armor = this.actor?.getArmor();
+        if(armor?.hardened){
+            data.hitsIcon = {
+                icon: "systems/shadowrun5e/dist/icons/bell-shield.svg",
+                tooltip: "SR5.ArmorHardenedFull",
+            };
+        }
 
         return data;
     }
@@ -112,18 +125,62 @@ export class PhysicalResistTest extends SuccessTest {
      * Resist Test success means ALL damage has been soaked.
      */
     override get success() {
+        return !!this.getSuccessCondition();
+    }
+
+    private isFullySoaked(): boolean {
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
-    override get successLabel(): Translation {
-        return 'SR5.TestResults.ResistedAllDamage';
+    private successConditions: PhysicalResistSuccessCondition[] = [
+        {
+            test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
+            label: "SR5.TestResults.SoakBlockedByHardenedArmor",
+            effect: () => {
+                this.data.autoSuccess = true;
+            }
+        },
+        {
+            test: () => this.isFullySoaked(),
+        },
+    ]
+
+    private getSuccessCondition(): PhysicalResistSuccessCondition|undefined {
+        return this.successConditions.find(({ test }) => test());
     }
 
+    override get showSuccessLabel(): boolean {
+        return this.success;
+    }
+
+    override get successLabel(): Translation {
+        return this.getSuccessCondition()?.label || 'SR5.TestResults.ResistedAllDamage';
+    }
     override get failureLabel(): Translation {
         return 'SR5.TestResults.ResistedSomeDamage';
     }
 
+    override async processSuccess() {
+        await super.processSuccess();
+
+        this.getSuccessCondition()?.effect?.();
+    }
+
+    override async evaluate(): Promise<this> {
+        await super.evaluate();
+
+        // Automatic hits from hardened armor (SR5#397)
+        const armor = this.actor?.getArmor(this.data.modifiedDamage);
+        if(armor?.hardened) {
+            PartsList.AddUniquePart(this.hits.mod, 'SR5.AppendedHits', Math.ceil(armor.value/2));
+            Helpers.calcTotal(this.hits);
+        }
+
+        return this;
+    }
+
     override async processResults() {
+
         await super.processResults();
 
         if (!this.actor) return;
