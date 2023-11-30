@@ -75,12 +75,12 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             let spirit = actor.asSpirit();
             if (!spirit) return assert.fail();
 
-            assert.strictEqual(spirit.system.values.recoil_compensation.value, 2);
+            assert.strictEqual(spirit.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
         });
         it('A NPC Grunt should only have physical track', async () => {
             const actor = await testActor.create({ type: 'spirit', 'system.is_npc': true, 'system.npc.is_grunt': true }) as SR5Actor;
             const character = actor.asSpirit() as unknown as Shadowrun.CharacterActorData;
-            
+
             assert.strictEqual(character.system.track.stun.value, 0);
             assert.strictEqual(character.system.track.stun.disabled, true);
             assert.strictEqual(character.system.track.physical.disabled, false);
