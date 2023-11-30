@@ -369,6 +369,20 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData().drain || 0;
     }
 
+    isUsingRangeCategory(): boolean {
+        if(this.isRangedWeapon()) {
+            const category = this.getData().range?.ranges?.category;
+
+            return !!category && category !== "manual";
+        }
+        if(this.isThrownWeapon()) {
+            const category = this.getData().thrown?.ranges?.category;
+
+            return !!category && category !== "manual";
+        }
+        return false;
+    }
+
     getFade(): number {
         return this.getData().fade || 0;
     }

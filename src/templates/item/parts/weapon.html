@@ -109,13 +109,22 @@
         <div class="label">
             {{localize "SR5.WeaponRanges"}}
         </div>
-        <div class="inputs">
+        <div class="inputs ranges">
+            <select
+                name="system.range.ranges.category"
+                class="select-ranged-range-category"
+            >
+                {{#each config.weaponRangeCategories as |val key|}}
+                <option value="{{key}}"{{#ife ../system.range.ranges.category key}}selected="selected"{{/ife}}>{{localize val.label}}</option>
+                {{/each}}
+            </select>
             <input
                 size="3"
                 type="text"
                 name="system.range.ranges.short"
                 value="{{system.range.ranges.short}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             /
             <input
@@ -124,6 +133,7 @@
                 name="system.range.ranges.medium"
                 value="{{system.range.ranges.medium}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             /
             <input
@@ -132,6 +142,7 @@
                 name="system.range.ranges.long"
                 value="{{system.range.ranges.long}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             /
             <input
@@ -140,7 +151,19 @@
                 name="system.range.ranges.extreme"
                 value="{{system.range.ranges.extreme}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
+            <i class="fas fa-times"></i>
+            <select
+                name="system.range.ranges.attribute"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
+            >
+                {{#select system.range.ranges.attribute}}
+                <option value=""></option>
+                {{#each config.attributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
         </div>
     </div>
     <div class="form-line">
@@ -163,13 +186,22 @@
         <div class="label">
             {{localize "SR5.WeaponRanges"}}
         </div>
-        <div class="inputs">
+        <div class="inputs ranges">
+            <select
+                name="system.thrown.ranges.category"
+                class="select-thrown-range-category"
+            >
+                {{#each config.weaponRangeCategories as |val key|}}
+                <option value="{{key}}"{{#ife ../system.thrown.ranges.category key}}selected="selected"{{/ife}}>{{localize val.label}}</option>
+                {{/each}}
+            </select>
             <input
                 size="3"
                 type="text"
                 name="system.thrown.ranges.short"
                 value="{{system.thrown.ranges.short}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             /
             <input
@@ -178,6 +210,7 @@
                 name="system.thrown.ranges.medium"
                 value="{{system.thrown.ranges.medium}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             /
             <input
@@ -186,6 +219,7 @@
                 name="system.thrown.ranges.long"
                 value="{{system.thrown.ranges.long}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             /
             <input
@@ -194,9 +228,13 @@
                 name="system.thrown.ranges.extreme"
                 value="{{system.thrown.ranges.extreme}}"
                 data-dtype="Number"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
             />
             <i class="fas fa-times"></i>
-            <select name="system.thrown.ranges.attribute">
+            <select
+                name="system.thrown.ranges.attribute"
+                {{#if this.isUsingRangeCategory}} disabled {{/if}}
+            >
                 {{#select system.thrown.ranges.attribute}}
                 <option value=""></option>
                 {{#each config.attributes as |name type|}}

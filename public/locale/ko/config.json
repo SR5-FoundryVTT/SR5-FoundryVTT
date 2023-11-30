@@ -1214,7 +1214,9 @@
         "SummoningNotConcluded": "소환이 완료되지 못함. 드레인 수치를 결정하기 위해 소환 굴림에 경쟁할 영혼을 기다려야 함.",
         "TokenSelectionNeeded": "하나 이상의 토큰이 선택되야 함"
     },
-    "SR5.Weapon": "무기",
+    "SR5.Weapon": {
+        "Weapon": "무기"
+    },
     "SR5.WeaponAmmoCount": "탄약 수",
     "SR5.WeaponCatMelee": "근접",
     "SR5.WeaponCatRange": "원거리",
