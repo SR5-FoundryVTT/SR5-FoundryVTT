@@ -180,9 +180,9 @@ export class CombatRules {
     }
 
     /**
-     * Modify damage according to suppression defense (SR5#179). Successfull attack.
+     * Modify damage according to suppression defense (SR5#179). Successful attack.
      * 
-     * In case of suppression a successfull attack just does weapon damage (base + ammunition)
+     * In case of suppression a successful attack just does weapon damage (base + ammunition)
      * 
      * @param damage The incoming weapon damage of the attack, unaltered.
      */
@@ -218,7 +218,7 @@ export class CombatRules {
      * Modify damage according to combat sequence (SR5#173 part defend B). Damage resistance.
      *
      * @param actor The actor resisting the damage
-     * @param damage Incoming damage tobe modified.
+     * @param damage Incoming damage to be modified.
      * @param hits The resisting tests hits
      * @return A new damage object for modified damage.
      */
@@ -278,12 +278,12 @@ export class CombatRules {
     }
 
     /**
-     * Determine the amount of inititative score modifier change.
+     * Determine the amount of initiative score modifier change.
      * 
      * According to SR5#170 'Wound Modifiers'.
      * 
      * @param woundModBefore A negative wound modifier, before taking latest damage.
-     * @param woundModAfter A negative wound modifier, after takting latest damage.
+     * @param woundModAfter A negative wound modifier, after taking latest damage.
      * @return An to be applied initiative score modifier
      */
     static combatInitiativeScoreModifierAfterDamage(woundModBefore: number, woundModAfter: number): number {
