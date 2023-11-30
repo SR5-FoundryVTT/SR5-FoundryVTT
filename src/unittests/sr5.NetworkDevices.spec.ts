@@ -134,7 +134,7 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
                 await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
             }
 
-            const fetchedDevices = NetworkDeviceFlow.getNetworkDevices(controller);
+            const fetchedDevices = await NetworkDeviceFlow.getNetworkDevices(controller);
 
             // Check for structural equality.
             assert.strictEqual(controller.system.networkDevices.length, 2);

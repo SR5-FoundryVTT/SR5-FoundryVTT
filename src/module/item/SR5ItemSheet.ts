@@ -178,14 +178,14 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         if (this.item.canBeNetworkController) {
-            data['networkDevices'] = this.item.networkDevices;
+            data['networkDevices'] = await this.item.networkDevices();
         }
 
         if (this.item.canBeNetworkDevice) {
-            data['networkController'] = this.item.networkController;
+            data['networkController'] = await this.item.networkController();
         }
 
-        // Provide action parts with all test variantes.
+        // Provide action parts with all test variants.
         // @ts-expect-error // TODO: put 'opposed test types' into config (see data.config)
         data.tests = game.shadowrun5e.tests;
         // @ts-expect-error
@@ -343,7 +343,7 @@ export class SR5ItemSheet extends ItemSheet {
             // Case 1 - Data explicitly provided
             if (data.data) {
                 if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
-                    return console.warn('Shadowrun 5e | Cant drop items onto themself');
+                    return console.warn('Shadowrun 5e | Cant drop items onto themselves');
                 }
                 item = data;
             // Case 2 - From a Compendium Pack
