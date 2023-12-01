@@ -265,4 +265,18 @@ export class InventoryFlow {
         if (!name) return true;
         return [this.actor.defaultInventory.name, this.actor.allInventories.name].includes(name);
     }
+
+    /**
+     * Check if the given item is within the given inventory.
+     * 
+     * @param name Inventory name to check for item in
+     * @param item Item to check for in inventory
+     * @returns 
+     */
+    isItemInInventory(name: string, item: SR5Item) {
+        const inventory = this.actor.inventory.getOne(name);
+        if (!inventory) return false;
+
+        return inventory.itemIds.includes(item.id as string);
+    }
 }

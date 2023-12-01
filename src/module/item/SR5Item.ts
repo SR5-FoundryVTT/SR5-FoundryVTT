@@ -63,7 +63,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
- * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of exceution within transpiled bundle.js code, 
+ * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of execution within transpiled bundle.js code, 
  * resulting OpposedTest not finding SuccessTest (undefined) when extending it.
  * 
  * ... I'd love to remove this, or even just comment it, but tree-shaking will do it's job.
@@ -1071,6 +1071,10 @@ export class SR5Item extends Item {
         return this.wrapper.isSpell();
     }
 
+    get isUsingRangeCategory(): boolean {
+        return this.wrapper.isUsingRangeCategory();
+    }
+
     get asSpell(): SpellItemData | undefined {
         if (this.isSpell) {
             //@ts-expect-error // TODO: foundry-vtt-types v10
@@ -1564,18 +1568,18 @@ export class SR5Item extends Item {
     /**
      * Return the network controller item when connected to a PAN or WAN.
      */
-    get networkController(): SR5Item | undefined {
+    async networkController() {
         const technologyData = this.getTechnologyData();
         if (!technologyData) return;
         if (!technologyData.networkController) return;
 
-        return NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
+        return await NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
     }
 
     /**
      * Return all network device items within a possible PAN or WAN.
      */
-    get networkDevices(): (SR5Item|SR5Actor)[] {
+    async networkDevices() {
         const controller = this.asDevice || this.asHost;
         if (!controller) return [];
 

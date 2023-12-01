@@ -28,7 +28,7 @@ declare namespace Shadowrun {
     export type WeaponCategory = 'range' | 'melee' | 'thrown' | '';
 
     /**
-     * Ammunition data for an weapon.
+     * Ammunition data for a weapon.
      */
     export interface AmmunitionData {
         spare_clips: ValueMaxPair<number>;
@@ -52,10 +52,11 @@ declare namespace Shadowrun {
         medium: number;
         long: number;
         extreme: number;
+        category: keyof typeof SR5CONFIG.weaponRangeCategories;
         attribute?: ActorAttribute;
     }
     /**
-     * Selection of what reanged weapon modes are available
+     * Selection of what ranged weapon modes are available
      */
     export interface FiringModeData  {
         single_shot: boolean;

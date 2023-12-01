@@ -657,7 +657,9 @@
     "ThermographicVision": "Thermographic Vision"
   },
   "SR5.Walk": "Caminhar",
-  "SR5.Weapon": "Arma",
+  "SR5.Weapon": {
+    "Weapon": "Arma"
+  },
   "SR5.WeaponAmmoCount": "Qtd Municao",
   "SR5.WeaponCatMelee": "Corpo a Corpo",
   "SR5.WeaponCatRange": "Distancia",

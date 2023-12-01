@@ -44,6 +44,10 @@ export interface SuccessTestValues extends TestValues {
     extendedHits: ValueField
 }
 
+export interface IconWithTooltip {
+    icon: string;
+    tooltip: Translation;
+}
 
 /**
  * Contain all data necessary to handle an action based test.
@@ -62,6 +66,9 @@ export interface TestData {
     // Hits as reported by an external dice roll.
     manualHits: ValueField
     manualGlitches: ValueField
+
+    hitsIcon?: IconWithTooltip
+    autoSuccess?: boolean
 
     // Internal test values.
     values: TestValues
@@ -154,8 +161,8 @@ export interface SuccessTestMessageData {
  * and it would be retrieved by the TestCreator like this:
  * > const SuccessTest = TestCreate._getTestClass('SuccessTest');
  */
-export class SuccessTest {
-    public data: SuccessTestData;
+export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
+    public data: T;
     public actor: SR5Actor | undefined;
     public item: SR5Item | undefined;
     public rolls: SR5Roll[];
@@ -881,6 +888,24 @@ export class SuccessTest {
 
     get manualGlitches(): ValueField {
         return this.data.manualGlitches;
+    }
+
+    get hitsIcon(): IconWithTooltip | undefined {
+        return this.data.hitsIcon;
+    }
+
+    get appendedHits(): number | undefined {
+        return this.hits.mod.find((mod) => mod.name === "SR5.AppendedHits")?.value;
+    }
+
+    // In the case we've added appended hits, we want to separately display the hits value and the appended hits (ie. "7 + 5" instead of "12")
+    get displayHits(): number | undefined {
+        return this.hits.value - (this.appendedHits || 0);
+    }
+
+    // Hide dice pool and roll results as they are not relevant to the success of the test
+    get autoSuccess(): boolean {
+        return !!this.data.autoSuccess;
     }
 
     /**

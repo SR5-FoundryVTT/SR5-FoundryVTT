@@ -6,6 +6,7 @@ import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
+import RangeData = Shadowrun.RangeData;
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -74,6 +75,8 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Can be used to check if the source field contains a URL.
     sourceIsURL: boolean
+
+    isUsingRangeCategory: boolean
 }
 
 /**
@@ -181,11 +184,11 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         if (this.item.canBeNetworkController) {
-            data['networkDevices'] = this.item.networkDevices;
+            data['networkDevices'] = await this.item.networkDevices();
         }
 
         if (this.item.canBeNetworkDevice) {
-            data['networkController'] = this.item.networkController;
+            data['networkController'] = await this.item.networkController();
         }
 
         // Provide action parts with all test variants.
@@ -201,6 +204,8 @@ export class SR5ItemSheet extends ItemSheet {
         // @ts-expect-error TODO: foundry-vtt-types v10
         data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
         data.sourceIsURL = this.item.sourceIsUrl;
+
+        data.isUsingRangeCategory = this.item.isUsingRangeCategory;
 
         data.rollModes = CONFIG.Dice.rollModes;
 
@@ -312,6 +317,9 @@ export class SR5ItemSheet extends ItemSheet {
         // Freshly imported item toggle
         html.find('.toggle-fresh-import-off').on('click', async (event) => this._toggleFreshImportFlag(event, false));
 
+        html.find('.select-ranged-range-category').on('change', this._onSelectRangedRangeCategory.bind(this));
+        html.find('.select-thrown-range-category').on('change', this._onSelectThrownRangeCategory.bind(this));
+
         this._activateTagifyListeners(html);
     }
 
@@ -331,7 +339,7 @@ export class SR5ItemSheet extends ItemSheet {
             // Case 1 - Data explicitly provided
             if (data.data) {
                 if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
-                    return console.warn('Shadowrun 5e | Cant drop items onto them self');
+                    return console.warn('Shadowrun 5e | Cant drop items onto themselves');
                 }
                 item = data;
             // Case 2 - From a Compendium Pack
@@ -386,6 +394,37 @@ export class SR5ItemSheet extends ItemSheet {
     _onOpenSource(event) {
         event.preventDefault();
         this.item.openSource();
+    }
+
+    async _onSelectRangedRangeCategory(event) {
+        await this._onSelectRangeCategory("system.range.ranges", event);
+    }
+
+    async _onSelectThrownRangeCategory(event) {
+        await this._onSelectRangeCategory("system.thrown.ranges", event);
+    }
+
+    async _onSelectRangeCategory(key: string, event) {
+        event.stopPropagation();
+        const selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.weaponRangeCategories;
+
+        if(selectedRangeCategory === "manual") {
+            await this.item.update({
+                [key]: {
+                    category: selectedRangeCategory,
+                },
+            });
+        } else {
+            const ranges: Omit<RangeData, 'category'> = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
+
+            await this.item.update({
+                [key]: {
+                    ...ranges,
+                    attribute: ranges.attribute || null, //Clear attribute if necessary
+                    category: selectedRangeCategory,
+                },
+            });
+        }
     }
 
     //Swap slots (att1, att2, etc.) for ASDF matrix attributes

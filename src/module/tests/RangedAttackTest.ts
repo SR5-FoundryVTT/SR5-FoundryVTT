@@ -1,17 +1,13 @@
 import { TestDialog } from '../apps/dialogs/TestDialog';
-import { RangedWeaponRules } from '../rules/RangedWeaponRules';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
-import {PartsList} from "../parts/PartsList";
-import {Helpers} from "../helpers";
-import {LENGTH_UNIT, SR, SYSTEM_NAME} from "../constants";
 import {SR5} from "../config";
-import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
+import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 
-export interface RangedAttackTestData extends SuccessTestData {
+export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: Shadowrun.DamageData
     fireModes: Shadowrun.FireModeData[]
     fireMode: Shadowrun.FireModeData
@@ -27,8 +23,7 @@ export interface RangedAttackTestData extends SuccessTestData {
 }
 
 
-export class RangedAttackTest extends SuccessTest {
-    public override data: RangedAttackTestData;
+export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     public override item: SR5Item;
 
     override _prepareData(data, options): RangedAttackTestData {
@@ -36,12 +31,8 @@ export class RangedAttackTest extends SuccessTest {
 
         data.fireModes = [];
         data.fireMode = {value: 0, defense: 0, label: ''};
-        data.ranges = {};
-        data.range = 0;
-        data.targetRanges = [];
-        data.targetRangesSelected = 0;
-        data.damage = data.damage || DataDefaults.damageData();
-        data.distance = data.distance || 0;
+        WeaponRangeTestBehavior.prepareData(this, data);
+
 
         return data;
     }
@@ -82,83 +73,6 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     /**
-     * Weapon range selection depends on the weapon alone.
-     * 
-     * In case of selected targets, this will be overwritten.
-     * 
-     */
-    _prepareWeaponRanges() {
-        // Don't let missing weapon ranges break test.
-        const weapon = this.item?.asWeapon;
-        if (!weapon) return;
-
-        // Transform weapon ranges to something usable
-        const {ranges} = weapon.system.range;
-        const {range_modifiers} = SR.combat.environmental;
-        const newRanges = {} as Shadowrun.RangesTemplateData;
-        for (const [key, value] of Object.entries(ranges)) {
-            const distance = value as number;
-            newRanges[key] = Helpers.createRangeDescription(SR5.weaponRanges[key], distance, range_modifiers[key]);
-        }
-        this.data.ranges = newRanges;
-
-        // Get currently active range modifier.
-        const actor = this.actor;
-        if (!actor) return;
-
-        // Check user range selection or set to first.
-        const modifiers = actor.getSituationModifiers();
-        this.data.range = modifiers.environmental.source.active.range || 0;
-    }
-
-    /**
-     * Actual target range between attack and target.
-     * 
-     * This will overwrite the default weapon range selection.
-     */
-    _prepareTargetRanges() {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        if (foundry.utils.isEmpty(this.data.ranges)) return;
-        if (!this.actor) return;
-        if (!this.hasTargets) return;
-
-        const attacker = this.actor.getToken();
-
-        if (!attacker) {
-            ui.notifications?.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
-            return [];
-        }
-
-        // Build target ranges for template display.
-        this.data.targetRanges = this.targets.map(token => {
-            const distance = Helpers.measureTokenDistance(attacker, token);
-            const range = RangedWeaponRules.getRangeForTargetDistance(distance, this.data.ranges);
-            return {
-                tokenUuid: token.uuid,
-                name: token.name || '',
-                unit: LENGTH_UNIT,
-                range,
-                distance,
-            };
-        });
-
-        // Sort targets by ascending distance from attacker.
-        this.data.targetRanges = this.data.targetRanges.sort((a, b) => {
-            if (a.distance < b.distance) return -1;
-            if (a.distance > b.distance) return 1;
-            return 0;
-        });
-
-        // Check user range selection or set to first.
-        const modifiers = this.actor.getSituationModifiers();
-        this.data.range = modifiers.environmental.source.active.range || this.data.targetRanges[0].range.modifier;
-
-        // Store distance for other calculations.
-        // NOTE: See EnvironmentalChangeFlow for likely the only usage.
-        this.data.distance = this.data.targetRanges.length > 0 ? this.data.targetRanges[0].distance : 0;
-    }
-
-    /**
      * Weapon fire modes will affect recoil during test.
      * 
      * To show the user the effect of recoil, it's applied during selection but progressive recoil is only ever fully applied
@@ -190,8 +104,7 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     override async prepareDocumentData(){
-        this._prepareWeaponRanges();
-        this._prepareTargetRanges();
+        WeaponRangeTestBehavior.prepareDocumentData(this, (weapon) => weapon.system.range.ranges);
         this._prepareFireMode();
 
         await super.prepareDocumentData();
@@ -219,11 +132,7 @@ export class RangedAttackTest extends SuccessTest {
 
         // Save fire mode selection
         await this.item.setLastFireMode(this.data.fireMode);
-
-        // Save range selection
-        const modifiers = this.actor.getSituationModifiers();
-        modifiers.environmental.setActive('range', this.data.range);
-        await this.actor.setSituationModifiers(modifiers);
+        await WeaponRangeTestBehavior.saveUserSelectionAfterDialog(this);
     }
 
     /**
@@ -240,23 +149,7 @@ export class RangedAttackTest extends SuccessTest {
         // Alter fire mode by ammunition constraints.
         this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft);
 
-        // Get range modifier from selected target instead of selected range.
-        if (this.hasTargets) {
-            // Cast select options string to integer index.
-            this.data.targetRangesSelected = Number(this.data.targetRangesSelected);
-            const target = this.data.targetRanges[this.data.targetRangesSelected];
-            this.data.range = target.range.modifier;
-
-            // Reduce all targets selected down to the actual target fired upon.
-            const token = fromUuidSync(target.tokenUuid) as TokenDocument;
-            if (!(token instanceof TokenDocument)) return console.error(`Shadowrun 5e | ${this.type} got a target that is no TokenDocument`, token);
-            if (!token.actor) return console.error(`Shadowrun 5e | ${this.type} got a token that has no actor`, token);
-            this.data.targetActorsUuid = [token.actor.uuid];
-            this.targets = [token];
-        }
-
-        // Alter test data for range.
-        this.data.range = Number(this.data.range);
+        WeaponRangeTestBehavior.prepareBaseValues(this);
 
         super.prepareBaseValues();
     }
@@ -265,23 +158,7 @@ export class RangedAttackTest extends SuccessTest {
      * Ranged attack tests allow for temporarily changing of modifiers without altering the document.
      */
     override prepareTestModifiers() {
-        this.prepareEnvironmentalModifier();
-    }
-
-    prepareEnvironmentalModifier() {
-        if (!this.actor) return;
-        
-        const poolMods = new PartsList(this.data.modifiers.mod);
-
-        // Apply altered environmental modifiers
-        const range = this.hasTargets ? this.data.targetRanges[this.data.targetRangesSelected].range.modifier : this.data.range;
-        const modifiers = DocumentSituationModifiers.getDocumentModifiers(this.actor);
-        
-        // Locally set env modifier temporarily.
-        modifiers.environmental.setActive('range', Number(range));
-        modifiers.environmental.apply({reapply: true, test: this});
-
-        poolMods.addUniquePart(SR5.modifierTypes.environmental, modifiers.environmental.total);
+        WeaponRangeTestBehavior.prepareTestModifiers(this);
     }
 
     /**
@@ -340,18 +217,9 @@ export class RangedAttackTest extends SuccessTest {
     }
 
     override async processResults() {
-        super.processResults();
+        await super.processResults();
 
-        await this.markActionPhaseAsAttackUsed();
-    }
-
-    async markActionPhaseAsAttackUsed() {
-        if (!this.actor! || !this.actor.combatActive) return;
-        
-        const combatant = this.actor.combatant;
-        if (!combatant) return;
-        
-        await combatant.setFlag(SYSTEM_NAME, 'turnsSinceLastAttack', 0);
+        await WeaponRangeTestBehavior.processResults(this);
     }
 
     /**

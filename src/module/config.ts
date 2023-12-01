@@ -88,6 +88,271 @@ export const SR5 = {
         matrix: 'SR5.DmgTypeMatrix',
     },
 
+    weaponRangeCategories: {
+        manual: {
+            label: 'SR5.Weapon.RangeCategory.Manual',
+        },
+        taser: {
+            label: 'SR5.Weapon.RangeCategory.Taser',
+            ranges: {
+                short: 5,
+                medium: 10,
+                long: 15,
+                extreme: 20,
+            },
+        },
+        holdOutPistol: {
+            label: 'SR5.Weapon.RangeCategory.HoldOutPistol',
+            ranges: {
+                short: 5,
+                medium: 15,
+                long: 30,
+                extreme: 50,
+            },
+        },
+        lightPistol: {
+            label: 'SR5.Weapon.RangeCategory.LightPistol',
+            ranges: {
+                short: 5,
+                medium: 15,
+                long: 30,
+                extreme: 50,
+            },
+        },
+        heavyPistol: {
+            label: 'SR5.Weapon.RangeCategory.HeavyPistol',
+            ranges: {
+                short: 5,
+                medium: 20,
+                long: 40,
+                extreme: 60,
+            },
+        },
+        machinePistol: {
+            label: 'SR5.Weapon.RangeCategory.MachinePistol',
+            ranges: {
+                short: 5,
+                medium: 15,
+                long: 30,
+                extreme: 50,
+            },
+        },
+        smg: {
+            label: 'SR5.Weapon.RangeCategory.SMG',
+            ranges: {
+                short: 10,
+                medium: 40,
+                long: 80,
+                extreme: 150,
+            },
+        },
+        assaultRifle: {
+            label: 'SR5.Weapon.RangeCategory.AssaultRifle',
+            ranges: {
+                short: 25,
+                medium: 150,
+                long: 350,
+                extreme: 550,
+            },
+        },
+        shotgunFlechette: {
+            label: 'SR5.Weapon.RangeCategory.ShotgunFlechette',
+            ranges: {
+                short: 15,
+                medium: 30,
+                long: 45,
+                extreme: 60,
+            },
+        },
+        shotgunSlug: {
+            label: 'SR5.Weapon.RangeCategory.ShotgunSlug',
+            ranges: {
+                short: 10,
+                medium: 40,
+                long: 80,
+                extreme: 150,
+            },
+        },
+        sniperRifle: {
+            label: 'SR5.Weapon.RangeCategory.SniperRifle',
+            ranges: {
+                short: 50,
+                medium: 350,
+                long: 800,
+                extreme: 1500,
+            },
+        },
+        sportingRifle: {
+            label: 'SR5.Weapon.RangeCategory.SportingRifle',
+            ranges: {
+                short: 50,
+                medium: 250,
+                long: 500,
+                extreme: 750,
+            },
+        },
+        lightMachinegun: {
+            label: 'SR5.Weapon.RangeCategory.LightMachinegun',
+            ranges: {
+                short: 25,
+                medium: 200,
+                long: 400,
+                extreme: 800,
+            },
+        },
+        mediumHeavyMachinegun: {
+            label: 'SR5.Weapon.RangeCategory.MediumHeavyMachinegun',
+            ranges: {
+                short: 40,
+                medium: 250,
+                long: 750,
+                extreme: 1200,
+            },
+        },
+        assaultCannon: {
+            label: 'SR5.Weapon.RangeCategory.AssaultCannon',
+            ranges: {
+                short: 50,
+                medium: 300,
+                long: 750,
+                extreme: 1500,
+            },
+        },
+        grenadeLauncher: {
+            label: 'SR5.Weapon.RangeCategory.GrenadeLauncher',
+            ranges: {
+                short: 50,
+                medium: 100,
+                long: 150,
+                extreme: 500,
+            },
+        },
+        missileLauncher: {
+            label: 'SR5.Weapon.RangeCategory.MissileLauncher',
+            ranges: {
+                short: 70,
+                medium: 150,
+                long: 450,
+                extreme: 1500,
+            },
+        },
+        bow: {
+            label: 'SR5.Weapon.RangeCategory.Bow',
+            ranges: {
+                short: 1,
+                medium: 10,
+                long: 30,
+                extreme: 60,
+                attribute: 'strength',
+            },
+        },
+        lightCrossbow: {
+            label: 'SR5.Weapon.RangeCategory.LightCrossbow',
+            ranges: {
+                short: 6,
+                medium: 24,
+                long: 60,
+                extreme: 120,
+            },
+        },
+        mediumCrossbow: {
+            label: 'SR5.Weapon.RangeCategory.MediumCrossbow',
+            ranges: {
+                short: 9,
+                medium: 36,
+                long: 90,
+                extreme: 150,
+            },
+        },
+        heavyCrossbow: {
+            label: 'SR5.Weapon.RangeCategory.HeavyCrossbow',
+            ranges: {
+                short: 15,
+                medium: 45,
+                long: 120,
+                extreme: 180,
+            },
+        },
+        thrownKnife: {
+            label: 'SR5.Weapon.RangeCategory.ThrownKnife',
+            ranges: {
+                short: 1,
+                medium: 2,
+                long: 3,
+                extreme: 5,
+                attribute: 'strength',
+            },
+        },
+        net: {
+            label: 'SR5.Weapon.RangeCategory.Net',
+            ranges: {
+                short: 0.5,
+                medium: 1,
+                long: 1.5,
+                extreme: 2.5,
+                attribute: 'strength',
+            },
+        },
+        shuriken: {
+            label: 'SR5.Weapon.RangeCategory.Shuriken',
+            ranges: {
+                short: 1,
+                medium: 2,
+                long: 5,
+                extreme: 7,
+                attribute: 'strength',
+            },
+        },
+        standardThrownGrenade: {
+            label: 'SR5.Weapon.RangeCategory.StandardThrownGrenade',
+            ranges: {
+                short: 2,
+                medium: 4,
+                long: 6,
+                extreme: 10,
+                attribute: 'strength',
+            },
+        },
+        aerodynamicThrownGrenade: {
+            label: 'SR5.Weapon.RangeCategory.AerodynamicThrownGrenade',
+            ranges: {
+                short: 2,
+                medium: 4,
+                long: 8,
+                extreme: 15,
+                attribute: 'strength',
+            },
+        },
+        harpoonGun: {
+            label: 'SR5.Weapon.RangeCategory.HarpoonGun',
+            ranges: {
+                short: 5,
+                medium: 20,
+                long: 40,
+                extreme: 60,
+            },
+        },
+        harpoonGunUnderwater: {
+            label: 'SR5.Weapon.RangeCategory.HarpoonGunUnderwater',
+            ranges: {
+                short: 6,
+                medium: 24,
+                long: 60,
+                extreme: 120,
+            },
+        },
+        flamethrower: {
+            label: 'SR5.Weapon.RangeCategory.Flamethrower',
+            ranges: {
+                short: 15,
+                medium: 20,
+                long: -1,
+                extreme: -1,
+            },
+        }
+
+    },
+
     elementTypes: {
         fire: 'SR5.ElementFire',
         cold: 'SR5.ElementCold',
@@ -313,7 +578,7 @@ export const SR5 = {
 
     // Gear modification types. :) Not modifiers.
     modificationTypes: {
-        weapon: 'SR5.Weapon',
+        weapon: 'SR5.Weapon.Weapon',
         armor: 'SR5.Armor',
     },
 
@@ -1052,4 +1317,4 @@ export const SR5 = {
             'underbarrel-weapons': 'systems/shadowrun5e/dist/icons/importer/modification/modification.svg'
         }
     }
-};
+} as const;
