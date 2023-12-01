@@ -190,7 +190,7 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Skill'),
+                            text: game.i18n.localize('SR5.Skill.Skill'),
                             cssClass: 'six',
                         },
                     },

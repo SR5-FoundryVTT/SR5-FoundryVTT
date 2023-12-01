@@ -156,10 +156,10 @@ export class Helpers {
             'SR5.MatrixAttrDataProcessing',
             'SR5.MatrixAttrSleaze',
             'SR5.MatrixAttrAttack',
-            'SR5.SkillComputer',
-            'SR5.SkillHacking',
-            'SR5.SkillCybercombat',
-            'SR5.SkillElectronicWarfare',
+            'SR5.Skill.Computer',
+            'SR5.Skill.Hacking',
+            'SR5.Skill.Cybercombat',
+            'SR5.Skill.ElectronicWarfare',
             'SR5.Software',
         ];
         if (!Array.isArray(atts)) atts = [atts];
