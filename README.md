@@ -19,7 +19,7 @@ It's complicated, it's a work in progress, but it is _kinda_ stable. We try to b
 - IC
 
 ## Learn more
-To learn more about the features of the system and how to use them, please visit our wiki: https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki
+To learn more about the features of the system and how to use them, please visit our wiki: http://sr5-foundryvtt.privateworks.com/index.php/Main_Page
 
 ## Report issues
 Found some problem? Please report it in our issue tracker or on discord.
