@@ -1,6 +1,7 @@
 import { ImportHelper } from "../helper/ImportHelper";
 import { DataImporter } from "./DataImporter";
 import { Constants } from './Constants';
+import localize from '../../../utils/strings';
 
 /**
  * Programs are part of the Chummer5 gear.xml
@@ -51,7 +52,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
 
             // Get the item's folder information
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
-            let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Programs')}/${category}`, true);
+            let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${localize('SR5.Programs')}/${category}`, true);
             //@ts-expect-error TODO: foundry-vtt-types v10
             item.folder = categoryFolder.id;
 

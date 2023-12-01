@@ -3,6 +3,7 @@ import {SuccessTest} from "../../tests/SuccessTest";
 import { SuccessTestData } from './../../tests/SuccessTest';
 import {SR5} from "../../config";
 import {Helpers} from "../../helpers";
+import localize from '../../utils/strings';
 
 
 export interface TestDialogData extends FormDialogData {
@@ -107,11 +108,11 @@ export class TestDialog extends FormDialog {
     override get buttons() {
         return {
             roll: {
-                label: game.i18n.localize('SR5.Roll'),
+                label: localize('SR5.Roll'),
                 icon: '<i class="fas fa-dice-six"></i>'
             },
             cancel: {
-                label: game.i18n.localize('SR5.Dialogs.Common.Cancel')
+                label: localize('SR5.Dialogs.Common.Cancel')
             }
         };
     }

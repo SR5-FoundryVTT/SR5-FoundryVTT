@@ -75,6 +75,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+import localize from '../utils/strings';
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -341,7 +342,7 @@ export class SR5Item extends Item {
 
     getActionTestName(): string {
         const testName = this.getRollName();
-        return testName ? testName :  game.i18n.localize('SR5.Action');
+        return testName ? testName :  localize('SR5.Action');
     }
 
     /**
@@ -961,16 +962,16 @@ export class SR5Item extends Item {
 
     getRollName(): string {
         if (this.isRangedWeapon) {
-            return game.i18n.localize('SR5.RangeWeaponAttack');
+            return localize('SR5.RangeWeaponAttack');
         }
         if (this.isMeleeWeapon) {
-            return game.i18n.localize('SR5.MeleeWeaponAttack');
+            return localize('SR5.MeleeWeaponAttack');
         }
         if (this.isCombatSpell) {
-            return game.i18n.localize('SR5.SpellAttack');
+            return localize('SR5.SpellAttack');
         }
         if (this.isSpell) {
-            return game.i18n.localize('SR5.SpellCast');
+            return localize('SR5.SpellCast');
         }
         if (this.hasRoll) {
             return this.name as string;

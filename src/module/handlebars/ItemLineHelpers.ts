@@ -3,6 +3,7 @@ import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
+import localize from '../utils/strings';
 
 
 /**
@@ -42,14 +43,14 @@ export const registerItemLineHelpers = () => {
         icons.push(section.isOpen
             ? {
                 icon: 'fas fa-square-chevron-up',
-                title: game.i18n.localize('SR5.Collapse'),
+                title: localize('SR5.Collapse'),
                 cssClass: 'item-toggle',
                 // Add HTML data attributes using a key<string>:value<string> structure
                 data: {}
             }
             : {
                 icon: 'fas fa-square-chevron-down',
-                title: game.i18n.localize('SR5.Expand'),
+                title: localize('SR5.Expand'),
                 cssClass: 'item-toggle',
                 // Add HTML data attributes using a key<string>:value<string> structure
                 data: {}
@@ -61,98 +62,98 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('ItemHeaderIcons', function (type: string) {
         const PlusIcon = 'fas fa-plus';
-        const AddText = game.i18n.localize('SR5.Add');
+        const AddText = localize('SR5.Add');
         const addIcon = {
             icon: PlusIcon,
             text: AddText,
-            title: game.i18n.localize('SR5.CreateItem'),
+            title: localize('SR5.CreateItem'),
             cssClass: 'item-create',
             // Add HTML data attributes using a key<string>:value<string> structure
             data: {}
         };
         switch (type) {
             case 'lifestyle':
-                addIcon.title = game.i18n.localize('SR5.CreateItemLifestyle');
+                addIcon.title = localize('SR5.CreateItemLifestyle');
                 return [addIcon];
             case 'contact':
-                addIcon.title = game.i18n.localize('SR5.CreateItemContact');
+                addIcon.title = localize('SR5.CreateItemContact');
                 return [addIcon];
             case 'sin':
-                addIcon.title = game.i18n.localize('SR5.CreateItemSIN');
+                addIcon.title = localize('SR5.CreateItemSIN');
                 return [addIcon];
             case 'license':
-                addIcon.title = game.i18n.localize('SR5.CreateItemLicense');
+                addIcon.title = localize('SR5.CreateItemLicense');
                 return [addIcon];
             case 'quality':
-                addIcon.title = game.i18n.localize('SR5.CreateItemQuality');
+                addIcon.title = localize('SR5.CreateItemQuality');
                 return [addIcon];
             case 'adept_power':
-                addIcon.title = game.i18n.localize('SR5.CreateItemAdeptPower');
+                addIcon.title = localize('SR5.CreateItemAdeptPower');
                 return [addIcon];
             case 'action':
-                addIcon.title = game.i18n.localize('SR5.CreateItemAction');
+                addIcon.title = localize('SR5.CreateItemAction');
                 return [addIcon];
             case 'spell':
-                addIcon.title = game.i18n.localize('SR5.CreateItemSpell');
+                addIcon.title = localize('SR5.CreateItemSpell');
                 return [addIcon];
             case 'ritual':
-                addIcon.title = game.i18n.localize('SR5.CreateItemRitual');
+                addIcon.title = localize('SR5.CreateItemRitual');
                 return [addIcon];
             case 'gear':
-                addIcon.title = game.i18n.localize('SR5.CreateItemGear');
+                addIcon.title = localize('SR5.CreateItemGear');
                 return [addIcon];
             case 'complex_form':
-                addIcon.title = game.i18n.localize('SR5.CreateItemComplexForm');
+                addIcon.title = localize('SR5.CreateItemComplexForm');
                 return [addIcon];
             case 'program':
-                addIcon.title = game.i18n.localize('SR5.CreateItemProgram');
+                addIcon.title = localize('SR5.CreateItemProgram');
                 return [addIcon];
             case 'weapon':
-                addIcon.title = game.i18n.localize('SR5.CreateItemWeapon');
+                addIcon.title = localize('SR5.CreateItemWeapon');
                 return [addIcon];
             case 'armor':
-                addIcon.title = game.i18n.localize('SR5.CreateItemArmor');
+                addIcon.title = localize('SR5.CreateItemArmor');
                 return [addIcon];
             case 'ammo':
-                addIcon.title = game.i18n.localize('SR5.CreateItemAmmo');
+                addIcon.title = localize('SR5.CreateItemAmmo');
                 return [addIcon];
             case 'modification':
-                addIcon.title = game.i18n.localize('SR5.CreateItemModification');
+                addIcon.title = localize('SR5.CreateItemModification');
                 return [addIcon];
             case 'device':
-                addIcon.title = game.i18n.localize('SR5.CreateItemDevice');
+                addIcon.title = localize('SR5.CreateItemDevice');
                 return [addIcon];
             case 'equipment':
-                addIcon.title = game.i18n.localize('SR5.CreateItemEquipment');
+                addIcon.title = localize('SR5.CreateItemEquipment');
                 return [addIcon];
             case 'cyberware':
-                addIcon.title = game.i18n.localize('SR5.CreateItemCyberware');
+                addIcon.title = localize('SR5.CreateItemCyberware');
                 return [addIcon];
             case 'bioware':
-                addIcon.title = game.i18n.localize('SR5.CreateItemBioware');
+                addIcon.title = localize('SR5.CreateItemBioware');
                 return [addIcon];
             case 'critter_power':
-                addIcon.title = game.i18n.localize('SR5.CreateItemCritterPower');
+                addIcon.title = localize('SR5.CreateItemCritterPower');
                 return [addIcon];
             case 'sprite_power':
-                addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
+                addIcon.title = localize('SR5.CreateItemSpritePower');
                 return [addIcon];
             case 'echo':
-                addIcon.title = game.i18n.localize('SR5.CreateItemEcho');
+                addIcon.title = localize('SR5.CreateItemEcho');
                 return [addIcon];
             case 'metamagic':
-                addIcon.title = game.i18n.localize('SR5.CreateItemMetamagic');
+                addIcon.title = localize('SR5.CreateItemMetamagic');
                 return [addIcon];
             case 'summoning':
-                // NOTE: summoning is not an actual item type. It's an call_in_action sub type
-                addIcon.title = game.i18n.localize('SR5.CallInAction.CreateSummoning');
+                // NOTE: summoning is not an actual item type. It's a call_in_action sub type
+                addIcon.title = localize('SR5.CallInAction.CreateSummoning');
                 return [addIcon];
             case 'compilation':
-                // NOTE: compilation is not an actual item type. It's an call_in_action sub type
-                addIcon.title = game.i18n.localize('SR5.CallInAction.CreateCompilation');
+                // NOTE: compilation is not an actual item type. It's a call_in_action sub type
+                addIcon.title = localize('SR5.CallInAction.CreateCompilation');
                 return [addIcon];
             case 'effect':
-                addIcon.title = game.i18n.localize('SR5.CreateEffect');
+                addIcon.title = localize('SR5.CreateEffect');
                 addIcon.cssClass = 'effect-control';
                 addIcon.data = {action: 'create'};
                 return [addIcon];
@@ -164,8 +165,8 @@ export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('InventoryIcons', function(name: string) {
         const addItemIcon = {
             icon: 'fas fa-plus',
-            text: game.i18n.localize('SR5.Add'),
-            title: game.i18n.localize('SR5.CreateItem'),
+            text: localize('SR5.Add'),
+            title: localize('SR5.CreateItem'),
             cssClass: 'inventory-item-create',
             // Add HTML data attributes using a key<string>:value<string> structure
             data: {inventory: name}
@@ -184,37 +185,37 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.ActionType'),
+                            text: localize('SR5.ActionType'),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Skill.Skill'),
+                            text: localize('SR5.Skill.Skill'),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Attribute'),
+                            text: localize('SR5.Attribute'),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Attribute'),
+                            text: localize('SR5.Attribute'),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Limit'),
+                            text: localize('SR5.Limit'),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Modifier'),
+                            text: localize('SR5.Modifier'),
                             cssClass: 'six',
                         },
                     },
@@ -230,7 +231,7 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Qty'),
+                            text: localize('SR5.Qty'),
                         },
                     },
                 ];
@@ -238,17 +239,17 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Target'),
+                            text: localize('SR5.Target'),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Duration'),
+                            text: localize('SR5.Duration'),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Fade'),
+                            text: localize('SR5.Fade'),
                         },
                     },
                 ];
@@ -256,7 +257,7 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.PowerType'),
+                            text: localize('SR5.PowerType'),
                         },
                     },
                 ];
@@ -264,22 +265,22 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.SpellType'),
+                            text: localize('SR5.SpellType'),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.SpellRange'),
+                            text: localize('SR5.SpellRange'),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Duration'),
+                            text: localize('SR5.Duration'),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Drain'),
+                            text: localize('SR5.Drain'),
                         },
                     },
                 ];
@@ -287,22 +288,22 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.CritterPower.Type')
+                            text: localize('SR5.CritterPower.Type')
                         }
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.CritterPower.Range')
+                            text: localize('SR5.CritterPower.Range')
                         }
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.CritterPower.Duration')
+                            text: localize('SR5.CritterPower.Duration')
                         }
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Rating')
+                            text: localize('SR5.Rating')
                         }
                     },
                 ];
@@ -310,12 +311,12 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.QualityType'),
+                            text: localize('SR5.QualityType'),
                         }
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Rating'),
+                            text: localize('SR5.Rating'),
                         },
                     },
                 ];
@@ -326,12 +327,12 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Summoning.SpiritType')
+                            text: localize('SR5.Summoning.SpiritType')
                         }
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Force')
+                            text: localize('SR5.Force')
                         }
                     }
                 ]
@@ -339,12 +340,12 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Compilation.SpriteType')
+                            text: localize('SR5.Compilation.SpriteType')
                         }
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Level')
+                            text: localize('SR5.Level')
                         }
                     }
                 ]
@@ -354,7 +355,7 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Value')
+                            text: localize('SR5.Value')
                         }
                     }
                 ]
@@ -399,7 +400,7 @@ export const registerItemLineHelpers = () => {
                     textLimitParts.push(limitBase.toString());
                 }
                 if (limitAttribute) {
-                    textLimitParts.push(game.i18n.localize(SR5.limits[limitAttribute ?? '']));
+                    textLimitParts.push(localize(SR5.limits[limitAttribute ?? '']));
                 }
                 const textLimit = textLimitParts.join(' + ');
 
@@ -407,26 +408,26 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             // Instead of 'complex' only show C. This might break in some languages. At that point, you can call me lazy.
-                            text: item.system.action.type ? game.i18n.localize(SR5.actionTypes[item.system.action.type] ?? '')[0] : ''
+                            text: item.system.action.type ? localize(SR5.actionTypes[item.system.action.type] ?? '')[0] : ''
                         },
                     },
                     {
                         text: {
                             // Either use the legacy skill localization OR just the skill name/id instead.
-                            text: game.i18n.localize(SR5.activeSkills[wrapper.getActionSkill() ?? ''] ?? wrapper.getActionSkill()),
+                            text: localize(SR5.activeSkills[wrapper.getActionSkill() ?? ''] ?? wrapper.getActionSkill()),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.attributes[wrapper.getActionAttribute() ?? '']),
+                            text: localize(SR5.attributes[wrapper.getActionAttribute() ?? '']),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
                             // Legacy actions could have both skill and attribute2 set, which would show both information, when it shouldn't.
-                            text: wrapper.getActionSkill() ? '' : game.i18n.localize(SR5.attributes[wrapper.getActionAttribute2() ?? '']),
+                            text: wrapper.getActionSkill() ? '' : localize(SR5.attributes[wrapper.getActionAttribute2() ?? '']),
                             cssClass: 'six',
                         },
                     },
@@ -457,14 +458,14 @@ export const registerItemLineHelpers = () => {
                     const max = wrapper.getAmmo()?.current.max ?? 0;
                     // Show reload on both no ammo configured and partially consumed clips.
                     const text = count < max || max === 0 ?
-                        `${game.i18n.localize('SR5.Weapon.Reload')} (${count}/${max})` :
-                        game.i18n.localize('SR5.AmmoFull');
+                        `${localize('SR5.Weapon.Reload')} (${count}/${max})` :
+                        localize('SR5.AmmoFull');
 
                     const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : 'faded');
                     return [
                         {
                             text: {
-                                title: `${game.i18n.localize('SR5.Weapon.AmmoCount')}: ${count}`,
+                                title: `${localize('SR5.Weapon.AmmoCount')}: ${count}`,
                                 text,
                                 cssClass,
                             },
@@ -484,7 +485,7 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(SR5.qualityTypes[item.system.type ?? '']),
+                            text: localize(SR5.qualityTypes[item.system.type ?? '']),
                         }
                     },
                     {
@@ -498,7 +499,7 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(SR5.adeptPower.types[item.system.type ?? '']),
+                            text: localize(SR5.adeptPower.types[item.system.type ?? '']),
                         },
                     },
                 ];
@@ -506,17 +507,17 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(SR5.spellTypes[item.system.type ?? '']),
+                            text: localize(SR5.spellTypes[item.system.type ?? '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.spellRanges[item.system.range ?? '']),
+                            text: localize(SR5.spellRanges[item.system.range ?? '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.durations[item.system.duration ?? '']),
+                            text: localize(SR5.durations[item.system.duration ?? '']),
                         },
                     },
                     {
@@ -529,17 +530,17 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(SR5.critterPower.types[item.system.powerType ?? ''])
+                            text: localize(SR5.critterPower.types[item.system.powerType ?? ''])
                         }
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.critterPower.ranges[item.system.range ?? ''])
+                            text: localize(SR5.critterPower.ranges[item.system.range ?? ''])
                         }
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.critterPower.durations[item.system.duration ?? ''])
+                            text: localize(SR5.critterPower.durations[item.system.duration ?? ''])
                         }
                     },
                     {
@@ -553,12 +554,12 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(SR5.matrixTargets[item.system.target ?? '']),
+                            text: localize(SR5.matrixTargets[item.system.target ?? '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.durations[item.system.duration ?? '']),
+                            text: localize(SR5.durations[item.system.duration ?? '']),
                         },
                     },
                     {
@@ -573,7 +574,7 @@ export const registerItemLineHelpers = () => {
                         button: {
                             cssClass: `item-equip-toggle ${wrapper.isEquipped() ? 'light' : ''}`,
                             short: true,
-                            text: wrapper.isEquipped() ? game.i18n.localize('SR5.Loaded') : game.i18n.localize('SR5.Load') + ' >>',
+                            text: wrapper.isEquipped() ? localize('SR5.Loaded') : localize('SR5.Load') + ' >>',
                         },
                     },
                 ];
@@ -592,7 +593,7 @@ export const registerItemLineHelpers = () => {
                     return [
                         {
                             text: {
-                                text: game.i18n.localize(spiritTypeLabel)
+                                text: localize(spiritTypeLabel)
                             }
                         },
                         {
@@ -610,7 +611,7 @@ export const registerItemLineHelpers = () => {
                     return [
                         {
                             text: {
-                                text: game.i18n.localize(spriteTypeLabel)
+                                text: localize(spriteTypeLabel)
                             }
                         },
                         {
@@ -631,19 +632,19 @@ export const registerItemLineHelpers = () => {
 
         const editIcon = {
             icon: 'fas fa-edit item-edit',
-            title: game.i18n.localize('SR5.EditItem'),
+            title: localize('SR5.EditItem'),
         };
         const removeIcon = {
             icon: 'fas fa-trash item-delete',
-            title: game.i18n.localize('SR5.DeleteItem'),
+            title: localize('SR5.DeleteItem'),
         };
         const equipIcon = {
             icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
-            title: game.i18n.localize('SR5.ToggleEquip'),
+            title: localize('SR5.ToggleEquip'),
         };
         const pdfIcon = {
             icon: 'fas fa-file open-source',
-            title: game.i18n.localize('SR5.OpenSource'),
+            title: localize('SR5.OpenSource'),
         };
 
         const icons = [pdfIcon, editIcon, removeIcon];
@@ -666,23 +667,23 @@ export const registerItemLineHelpers = () => {
         const wrapper = new SR5ItemDataWrapper(item);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
-            title: game.i18n.localize('SR5.MoveItemInventory')
+            title: localize('SR5.MoveItemInventory')
         };
         const editIcon = {
             icon: 'fas fa-edit item-edit',
-            title: game.i18n.localize('SR5.EditItem'),
+            title: localize('SR5.EditItem'),
         };
         const removeIcon = {
             icon: 'fas fa-trash item-delete',
-            title: game.i18n.localize('SR5.DeleteItem'),
+            title: localize('SR5.DeleteItem'),
         };
         const equipIcon = {
             icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
-            title: game.i18n.localize('SR5.ToggleEquip'),
+            title: localize('SR5.ToggleEquip'),
         };
         const pdfIcon = {
             icon: 'fas fa-file open-source',
-            title: game.i18n.localize('SR5.OpenSource'),
+            title: localize('SR5.OpenSource'),
         };
 
         const icons = [pdfIcon, moveIcon, editIcon, removeIcon];
@@ -709,22 +710,22 @@ export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('EffectIcons', function (effect) {
         const editIcon = {
             icon: 'fas fa-edit effect-control',
-            title: game.i18n.localize('SR5.EditItem'),
+            title: localize('SR5.EditItem'),
             data: {action: 'edit'}
         };
         const removeIcon = {
             icon: 'fas fa-trash effect-control',
-            title: game.i18n.localize('SR5.DeleteItem'),
+            title: localize('SR5.DeleteItem'),
             data: {action: 'delete'}
         };
         const disableIcon = {
             icon: `${effect.disabled ? 'far fa-circle' : 'fas fa-check-circle'} effect-control`,
-            title: game.i18n.localize('SR5.ToggleActive'),
+            title: localize('SR5.ToggleActive'),
             data: {action: "toggle"}
         };
         const openOriginIcon = {
             icon: 'fas fa-file effect-control',
-            title: game.i18n.localize('SR5.OpenOrigin'),
+            title: localize('SR5.OpenOrigin'),
             data: {action: "open-origin"}
         }
         // Disallow changes to effects that aren't of direct origin.
@@ -753,12 +754,12 @@ export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('MarksIcons', (marked: MarkedDocument) => {
         const incrementIcon = {
             icon: 'fas fa-plus marks-add-one',
-            title: game.i18n.localize('SR5.Labels.Sheet.AddOne'),
+            title: localize('SR5.Labels.Sheet.AddOne'),
             data: {action: 'add-one'}
         };
         const decrementIcon = {
             icon: 'fas fa-minus marks-remove-one',
-            title: game.i18n.localize('SR5.Labels.Sheet.SubtractOne'),
+            title: localize('SR5.Labels.Sheet.SubtractOne'),
             data: {action: 'remove-one'}
         }
 
@@ -769,17 +770,17 @@ export const registerItemLineHelpers = () => {
         return [
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Scene'),
+                    text: localize('SR5.FOUNDRY.Scene'),
                 },
             },
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                    text: localize('SR5.FOUNDRY.Item'),
                 },
             },
             {
                 text: {
-                    text: game.i18n.localize('SR5.Qty'),
+                    text: localize('SR5.Qty'),
                 },
             }]
     });
@@ -787,8 +788,8 @@ export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('MarkListHeaderIcons', () => {
         return [{
             icon: 'fas fa-trash',
-            title: game.i18n.localize('SR5.ClearMarks'),
-            text: game.i18n.localize('SR5.Del'),
+            title: localize('SR5.ClearMarks'),
+            text: localize('SR5.Del'),
             cssClass: 'marks-clear-all'
         }];
     });
@@ -797,12 +798,12 @@ export const registerItemLineHelpers = () => {
         return [
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Actor'),
+                    text: localize('SR5.FOUNDRY.Actor'),
                 },
             },
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                    text: localize('SR5.FOUNDRY.Item'),
                 },
             }]
     })
@@ -810,8 +811,8 @@ export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('NetworkDevicesListHeaderIcons', () => {
         return [{
             icon: 'fas fa-trash',
-            title: game.i18n.localize('SR5.Labels.Sheet.ClearNetwork'),
-            text: game.i18n.localize('SR5.Del'),
+            title: localize('SR5.Labels.Sheet.ClearNetwork'),
+            text: localize('SR5.Del'),
             cssClass: 'network-clear'
         }];
     })

@@ -1,6 +1,7 @@
 import { VersionMigration } from './VersionMigration';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_8_0 } from "./versions/Version0_8_0";
+import localize from '../utils/strings';
 
 type VersionDefinition = {
     versionNumber: string;
@@ -51,12 +52,12 @@ export class Migrator {
             return;
         }
 
-        const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
-        const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
-        const localizedWarningRequired = game.i18n.localize('SR5.MIGRATION.WarningRequired');
-        const localizedWarningDescription = game.i18n.localize('SR5.MIGRATION.WarningDescription');
-        const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
-        const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
+        const localizedWarningTitle = localize('SR5.MIGRATION.WarningTitle');
+        const localizedWarningHeader = localize('SR5.MIGRATION.WarningHeader');
+        const localizedWarningRequired = localize('SR5.MIGRATION.WarningRequired');
+        const localizedWarningDescription = localize('SR5.MIGRATION.WarningDescription');
+        const localizedWarningBackup = localize('SR5.MIGRATION.WarningBackup');
+        const localizedWarningBegin = localize('SR5.MIGRATION.BeginMigration');
 
         const d = new Dialog({
             title: localizedWarningTitle,
@@ -85,11 +86,11 @@ export class Migrator {
         await this.migrateWorld(game, migrations);
         await this.migrateCompendium(game, migrations);
 
-        const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.SuccessTitle');
-        const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.SuccessHeader');
-        const localizedSuccessDescription = game.i18n.localize('SR5.MIGRATION.SuccessDescription');
-        const localizedSuccessPacksInfo = game.i18n.localize('SR5.MIGRATION.SuccessPacksInfo');
-        const localizedSuccessConfirm = game.i18n.localize('SR5.MIGRATION.SuccessConfirm');
+        const localizedWarningTitle = localize('SR5.MIGRATION.SuccessTitle');
+        const localizedWarningHeader = localize('SR5.MIGRATION.SuccessHeader');
+        const localizedSuccessDescription = localize('SR5.MIGRATION.SuccessDescription');
+        const localizedSuccessPacksInfo = localize('SR5.MIGRATION.SuccessPacksInfo');
+        const localizedSuccessConfirm = localize('SR5.MIGRATION.SuccessConfirm');
         const packsDialog = new Dialog({
             title: localizedWarningTitle,
             content:

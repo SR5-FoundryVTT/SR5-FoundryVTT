@@ -1,6 +1,7 @@
 import {FormDialog, FormDialogData} from "./FormDialog";
 import DamageData = Shadowrun.DamageData;
 import {SR5Actor} from "../../actor/SR5Actor";
+import localize from '../../utils/strings';
 
 export class DamageApplicationDialog extends FormDialog {
 
@@ -20,7 +21,7 @@ export class DamageApplicationDialog extends FormDialog {
     }
 
     static getDialogData(actors : SR5Actor[], damage: DamageData): FormDialogData {
-        const title = game.i18n.localize('SR5.DamageApplication.Title');
+        const title = localize('SR5.DamageApplication.Title');
         const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html';
 
         // Simplify / refactor this
@@ -32,7 +33,7 @@ export class DamageApplicationDialog extends FormDialog {
 
         const buttons = {
             damage: {
-                label: game.i18n.localize('SR5.DamageApplication.ApplyDamage')
+                label: localize('SR5.DamageApplication.ApplyDamage')
             }
         }
 

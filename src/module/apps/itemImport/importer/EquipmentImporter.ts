@@ -2,6 +2,7 @@ import { DataImporter } from "./DataImporter";
 import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { UpdateActionFlow } from "../../../item/flows/UpdateActionFlow";
+import localize from '../../../utils/strings';
 
 export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData, Shadowrun.EquipmentData> {
     files = ['gear.xml'];
@@ -54,7 +55,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             // Get the item's folder information
             // Replace / as it's used as a separator in GetFolderAtPath.
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
-            let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
+            let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${localize('SR5.Gear')}/${category}`, true);
             // @ts-expect-error
             item.folder = categoryFolder.id;
 

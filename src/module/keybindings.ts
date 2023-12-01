@@ -1,5 +1,6 @@
 import {SituationModifiersApplication} from './apps/SituationModifiersApplication';
 import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
+import localize from './utils/strings';
 /**
  * All systems keybindings should be registered here.
  * 
@@ -21,14 +22,14 @@ export const registerSystemKeybindings = () => {
     });
 
     game.keybindings.register("shadowrun5e", "hide-test-dialog", {
-        name: game.i18n.localize("SR5.Keybinding.HideTestDialog.Label"),
-        hint: game.i18n.localize("SR5.Keybinding.HideTestDialog.Hint"),
+        name: localize("SR5.Keybinding.HideTestDialog.Label"),
+        hint: localize("SR5.Keybinding.HideTestDialog.Hint"),
         editable: [{key: "shiftKey"}]
     });
 
     game.keybindings.register("shadowrun5e", "show-item-card", {
-        name: game.i18n.localize("SR5.Keybinding.ShowItemCard.Label"),
-        hint: game.i18n.localize("SR5.Keybinding.ShowItemCard.Hint"),
+        name: localize("SR5.Keybinding.ShowItemCard.Label"),
+        hint: localize("SR5.Keybinding.ShowItemCard.Hint"),
         editable: [{key: "ctrlKey"}]
     });
 }

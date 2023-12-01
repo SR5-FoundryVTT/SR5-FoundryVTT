@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
 import { Constants } from './Constants';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import localize from '../../../utils/strings';
 
 export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
     public files = ['critterpowers.xml'];
@@ -28,7 +29,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
 
     async Parse(chummerPowers: object, setIcons: boolean): Promise<Item> {
         const parser = new CritterPowerParserBase();
-        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('ITEM.TypeCritter_power')}`, true);
+        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${localize('ITEM.TypeCritter_power')}`, true);
         const items: Shadowrun.CritterPowerItemData[] = [];
         const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
         this.iconList = await this.getIconFiles();

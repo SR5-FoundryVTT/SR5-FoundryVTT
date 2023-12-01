@@ -119,6 +119,7 @@
     "SR5.Agent": "Agent",
     "SR5.Ammo": "Ammo",
     "SR5.AmmoFull": "Ammo Full",
+    "SR5.AmmoGelRounds": "Gel Rounds",
     "SR5.Aoe": "AoE",
     "SR5.AP": "AP",
     "SR5.ApplyWounds": "Apply Wounds",
@@ -239,6 +240,7 @@
     "SR5.CreateItemRitual": "Create Ritual",
     "SR5.CreateItemSIN": "Create SIN",
     "SR5.CreateItemSpell": "Create Spell",
+    "SR5.CreateItemSpritePower": "Create Sprite Power",
     "SR5.CreateItemWeapon": "Create Weapon",
     "SR5.CritterPower": {
         "Categories": {
@@ -295,6 +297,7 @@
     "SR5.Defaulting": "Defaulting",
     "SR5.Defender": "Defender",
     "SR5.DefenderNetHits": "Defender Net Hits",
+    "SR5.Defense": "Defense",
     "SR5.DefenseTest": "Defense Test",
     "SR5.Del": "Del",
     "SR5.DeleteAmmo": "Delete Ammo",
@@ -627,6 +630,7 @@
     "SR5.LimitMental": "Mental",
     "SR5.LimitPhysical": "Physical",
     "SR5.LimitSocial": "Social",
+    "SR5.LivingPersona": "Living Persona",
     "SR5.Load": "Load",
     "SR5.Loaded": "Loaded",
     "SR5.Loyalty": "Loyalty",

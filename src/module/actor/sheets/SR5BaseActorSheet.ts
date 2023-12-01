@@ -18,6 +18,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
+import localize from '../../utils/strings';
 
 
 /**
@@ -1052,7 +1053,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return ui.notifications?.info(localize('SR5.Infos.CantModifyHostContent'));
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1071,7 +1072,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return ui.notifications?.info(localize('SR5.Infos.CantModifyHostContent'));
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1089,7 +1090,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return ui.notifications?.info(localize('SR5.Infos.CantModifyHostContent'));
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1105,7 +1106,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return ui.notifications?.info(localize('SR5.Infos.CantModifyHostContent'));
         }
 
         const userConsented = await Helpers.confirmDeletion();
@@ -1567,7 +1568,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Disallow editing of default inventory.
         if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory))
-            return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+            return ui.notifications?.warn(localize('SR5.Warnings.CantEditDefaultInventory'));
 
 
         $('.selection-inventory').hide();

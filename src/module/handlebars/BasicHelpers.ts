@@ -3,11 +3,12 @@ import {SafeString} from "handlebars";
 import SkillField = Shadowrun.SkillField;
 import {SR5Actor} from "../actor/SR5Actor";
 import {SYSTEM_NAME} from "../constants";
+import localize from '../utils/strings';
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj) strId = obj[strId];
-        return game.i18n.localize(strId);
+        return localize(strId);
     });
 
     Handlebars.registerHelper('localizeDocumentType', function (document) {
@@ -26,7 +27,7 @@ export const registerBasicHelpers = () => {
         //     return translatedSkill;
         //
         // // Try showing the first three letters, or less.
-        // const translatedAttribute = game.i18n.localize(SR5.attributes[skill.attribute]);
+        // const translatedAttribute = localize(SR5.attributes[skill.attribute]);
         // if (!translatedAttribute) return translatedSkill;
         //
         // const cutToIndex = translatedAttribute.length < SR.attributes.SHORT_NAME_LENGTH ?

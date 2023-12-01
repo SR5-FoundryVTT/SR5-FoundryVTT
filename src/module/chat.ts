@@ -1,4 +1,5 @@
 import {CORE_FLAGS, CORE_NAME} from './constants';
+import localize from './utils/strings';
 
 
 /**
@@ -52,7 +53,7 @@ function createChatTemplateData(options) {
     let {actor, item, description, tests} = options;
 
     const token = actor?.getToken();
-    const title = game.i18n.localize("SR5.Description");
+    const title = localize("SR5.Description");
 
     return {
         title,

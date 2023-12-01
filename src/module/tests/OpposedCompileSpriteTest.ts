@@ -4,7 +4,7 @@ import { PartsList } from "../parts/PartsList";
 import { CompileSpriteTest } from "./CompileSpriteTest";
 import { OpposedTest, OpposedTestData } from "./OpposedTest";
 import { TestDocuments, TestOptions } from "./SuccessTest";
-import { Translation } from '../utils/strings';
+import localize, { Translation } from '../utils/strings';
 
 
 interface OpposedCompileSpriteTestData extends OpposedTestData {
@@ -182,8 +182,8 @@ export class OpposedCompileSpriteTest extends OpposedTest {
         } else {
             // Create a new sprite actor from scratch...
             const spriteType = this.against.data.spriteTypeSelected;
-            const spriteTypeLabel = game.i18n.localize(SR5.spriteTypes[spriteType]);
-            const name = `${technomancer.name} ${spriteTypeLabel} ${game.i18n.localize('ACTOR.TypeSprite')}`;
+            const spriteTypeLabel = localize(SR5.spriteTypes[spriteType]);
+            const name = `${technomancer.name} ${spriteTypeLabel} ${localize('ACTOR.TypeSprite')}`;
             const level = this.against.data.level;
             const system = { level, spriteType };
     

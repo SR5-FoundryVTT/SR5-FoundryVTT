@@ -1,4 +1,5 @@
 import {FormDialog, FormDialogData} from "./FormDialog";
+import localize from '../../utils/strings';
 
 export class DeleteConfirmationDialog extends FormDialog {
     constructor(options?) {
@@ -9,13 +10,13 @@ export class DeleteConfirmationDialog extends FormDialog {
 
     static getDialogData() {
         return {
-            title: game.i18n.localize("SR5.DeleteConfirmationApplication.Title"),
+            title: localize("SR5.DeleteConfirmationApplication.Title"),
             buttons: {
                 delete: {
-                    label: game.i18n.localize('SR5.DeleteConfirmationApplication.Delete')
+                    label: localize('SR5.DeleteConfirmationApplication.Delete')
                 },
                 cancel: {
-                    label: game.i18n.localize('SR5.DeleteConfirmationApplication.Cancel')
+                    label: localize('SR5.DeleteConfirmationApplication.Cancel')
                 }
             },
             default: 'cancel',

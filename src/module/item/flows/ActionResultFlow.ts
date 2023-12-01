@@ -3,6 +3,7 @@ import {SR5Actor} from "../../actor/SR5Actor";
 import {SuccessTest} from "../../tests/SuccessTest";
 import { PhysicalDefenseTest } from "../../tests/PhysicalDefenseTest";
 import ResultActions = Shadowrun.ResultActions;
+import localize from '../../utils/strings';
 
 
 /**
@@ -45,7 +46,7 @@ export class ActionResultFlow {
      */
     static async placeMatrixMarks(active: SR5Actor, targets: Token[], marks: number) {
         if (!MatrixRules.isValidMarksCount(marks)) {
-            return ui.notifications?.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
+            return ui.notifications?.warn(localize("SR5.Warnings.InvalidMarksCount"));
         }
 
         for (const target of targets) {

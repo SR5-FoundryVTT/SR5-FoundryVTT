@@ -22,6 +22,7 @@ import { SuccessTestData } from "./tests/SuccessTest";
 import SpellItemData = Shadowrun.SpellItemData;
 import WeaponItemData = Shadowrun.WeaponItemData;
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+import localize, { Translation } from './utils/strings';
 
 interface CalcTotalOptions {
     // Min/Max value range
@@ -524,9 +525,9 @@ export class Helpers {
         return actors;
     }
 
-    static createRangeDescription(label: string, distance: number, modifier: number): RangeTemplateData {
-        label = game.i18n.localize(label);
-        return {label, distance, modifier}
+    static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateData {
+        const localizedLabel = localize(label);
+        return {label: localizedLabel, distance, modifier}
     }
 
     static convertIndexedObjectToArray(indexedObject: object): object[] {

@@ -4,6 +4,7 @@ import {SocketMessage} from "../../sockets";
 import {FLAGS} from "../../constants";
 import SocketAddNetworkControllerMessageData = Shadowrun.SocketAddNetworkControllerMessageData;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
+import localize from '../../utils/strings';
 
 export class NetworkDeviceFlow {
     /**
@@ -65,7 +66,7 @@ export class NetworkDeviceFlow {
     static async addDeviceToNetwork(controller: SR5Item, device: SR5Item|SR5Actor) {
         console.log(`Shadowrun5e | Adding an the item ${device.name} to the controller ${controller.name}`, controller, device);
         if (controller.id === device.id) return console.warn('Shadowrun 5e | A device cant be its own network controller');
-        if (!device.canBeNetworkDevice) return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
+        if (!device.canBeNetworkDevice) return ui.notifications?.error(localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
         if (!controller.canBeNetworkController) return;
 
         if (NetworkDeviceFlow._currentUserCanModifyDevice(controller) && NetworkDeviceFlow._currentUserCanModifyDevice(device))

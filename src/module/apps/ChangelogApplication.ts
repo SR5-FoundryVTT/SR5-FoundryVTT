@@ -1,4 +1,5 @@
 import {FLAGS, SYSTEM_NAME} from "../constants";
+import localize from '../utils/strings';
 
 export class ChangelogApplication extends Application {
     override get template(): string {
@@ -8,7 +9,7 @@ export class ChangelogApplication extends Application {
     static override get defaultOptions() {
         const options = super.defaultOptions;
         options.classes = ['shadowrun5e'];
-        options.title = game.i18n.localize('SR5.ChangelogApplication.Title');
+        options.title = localize('SR5.ChangelogApplication.Title');
         options.width = 500;
         options.height = 'auto';
         return options;

@@ -1,5 +1,6 @@
 import { PartsList } from '../parts/PartsList';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
+import localize from '../utils/strings';
 
 
 export interface SkillTestData extends SuccessTestData {
@@ -34,7 +35,7 @@ export class SkillTest extends SuccessTest {
      */
     override get title() {
         if (!this.actor) return super.title;
-        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill))} ${game.i18n.localize('SR5.Test')}`;
+        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill))} ${localize('SR5.Test')}`;
     }
 
     override _prepareData(data: any, options: TestOptions) {

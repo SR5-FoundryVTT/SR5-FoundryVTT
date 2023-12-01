@@ -23,7 +23,7 @@ import Template from "../template";
 import {TestRules} from "../rules/TestRules";
 
 import {ActionResultFlow} from "../item/flows/ActionResultFlow";
-import { Translation } from '../utils/strings';
+import localize, { Translation } from '../utils/strings';
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -268,7 +268,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get title(): string {
         // @ts-expect-error
-        return `${game.i18n.localize(this.constructor.label)}`;
+        return `${localize(this.constructor.label)}`;
     }
 
     /**
@@ -1234,7 +1234,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Edge consumption.
         if (this.hasPushTheLimit || this.hasSecondChance) {      
             if (this.actor.getEdge().uses <= 0) {
-                ui.notifications?.error(game.i18n.localize('SR5.MissingRessource.Edge'));
+                ui.notifications?.error(localize('SR5.MissingRessource.Edge'));
                 return false;
             }
         }
@@ -1844,7 +1844,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (token && token instanceof Token) {
             token.control();
         } else {
-            ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
+            ui.notifications?.warn(localize('SR5.NoSelectableToken'))
         }
     }
 
@@ -1942,21 +1942,21 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const deleteOption = options.pop();
 
         options.push({
-            name: game.i18n.localize('SR5.PushTheLimit'),
+            name: localize('SR5.PushTheLimit'),
             callback: pushTheLimit,
             condition: true,
             icon: '<i class="fas fa-meteor"></i>'
         })
         
         options.push({
-            name: game.i18n.localize('SR5.SecondChance'),
+            name: localize('SR5.SecondChance'),
             callback: secondChance,
             condition: true,
             icon: '<i class="fas fa-meteor"></i>'
         });
 
         options.push({
-            name: game.i18n.localize('SR5.Extend'),
+            name: localize('SR5.Extend'),
             callback: extendTest,
             condition: true,
             icon: '<i class="fas fa-clock"></i>'

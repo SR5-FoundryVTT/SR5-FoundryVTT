@@ -1,6 +1,8 @@
 /**
  * Add a few system links to the settings sidebar menu for easier access and better visibility by users.
  */
+import localize from './utils/strings';
+
 export const RenderSettings = {
     listen: () => {
         Hooks.on("renderSettings", async (_app, $html) => {

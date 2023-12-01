@@ -8,6 +8,7 @@ import { DocumentSituationModifiers } from './DocumentSituationModifiers';
 import { SuccessTest, SuccessTestData } from '../tests/SuccessTest';
 import RangeData = Shadowrun.RangeData;
 import WeaponItemData = Shadowrun.WeaponItemData;
+import localize from '../utils/strings';
 
 export interface WeaponRangeTestDataFragment {
     damage: Shadowrun.DamageData
@@ -80,7 +81,7 @@ export class WeaponRangeTestBehavior {
         const attacker = test.actor.getToken();
 
         if (!attacker) {
-            ui.notifications?.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
+            ui.notifications?.warn(localize('SR5.TargetingNeedsActorWithToken'));
             return [];
         }
 

@@ -26,6 +26,7 @@ import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
+import localize from '../utils/strings';
 
 
 /**
@@ -1865,11 +1866,11 @@ export class SR5Actor extends Actor {
         }
 
         if (!this.isMatrixActor) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
+            ui.notifications?.error(localize('SR5.Errors.MarksCantBePlacedBy'));
             return console.error(`The actor type ${this.type} can't receive matrix marks!`);
         }
         if (target.actor && !target.actor.isMatrixActor) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
+            ui.notifications?.error(localize('SR5.Errors.MarksCantBePlacedOn'));
             return console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
         }
         if (!target.actor) {

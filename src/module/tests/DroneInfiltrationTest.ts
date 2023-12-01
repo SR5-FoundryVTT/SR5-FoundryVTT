@@ -1,4 +1,5 @@
 import {SuccessTest} from "./SuccessTest";
+import localize from '../utils/strings';
 
 export class DroneInfiltrationTest extends SuccessTest {
     static override async _getDocumentTestAction(item, actor) {
@@ -7,7 +8,7 @@ export class DroneInfiltrationTest extends SuccessTest {
 
         const vehicleData = actor.asVehicle();
         if (!vehicleData) {
-            await ui.notifications?.error(game.i18n.localize('SR5.ERROR.TestExpectsVehicleOnly'))
+            await ui.notifications?.error(localize('SR5.Errors.TestExpectsVehicleOnly'))
             return {};
         }
 

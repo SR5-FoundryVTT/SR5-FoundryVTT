@@ -3,6 +3,7 @@ import {SR5Actor} from "../../actor/SR5Actor";
 import {SR5} from "../../config";
 import { SR5Item } from "../../item/SR5Item";
 import { LinksHelpers } from "../../utils/links";
+import localize from '../../utils/strings';
 
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
@@ -37,7 +38,7 @@ export class SkillEditSheet extends DocumentSheet {
 
     override get title(): string {
         const label = this.document.getSkillLabel(this.skillId);
-        return `${game.i18n.localize('SR5.EditSkill')} - ${game.i18n.localize(label)}`;
+        return `${localize('SR5.EditSkill')} - ${game.i18n.localize(label)}`;
     }
 
     _onUpdateObject(event, formData, updateData) {

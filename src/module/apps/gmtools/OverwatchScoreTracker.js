@@ -9,7 +9,7 @@ export class OverwatchScoreTracker extends Application {
         const options = super.defaultOptions;
         options.id = 'overwatch-score-tracker';
         options.classes = ['sr5'];
-        options.title = game.i18n.localize('SR5.OverwatchScoreTrackerTitle');
+        options.title = localize('SR5.OverwatchScoreTrackerTitle');
         options.template = 'systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.html';
         options.width = 450;
         options.height = 'auto';
@@ -67,13 +67,13 @@ export class OverwatchScoreTracker extends Application {
 
         const tokens = Helpers.getControlledTokens();
         if (tokens.length === 0) {
-            return ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+            return ui.notifications?.warn(localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
         }
 
         // Warn user about selected unlinked token actors.
         const unlinkedActor = tokens.find(token => !token.data.actorLink);
         if (unlinkedActor !== undefined) {
-            ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported'));
+            ui.notifications.warn(localize('SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported'));
         }
 
         // Add linked token actors.
