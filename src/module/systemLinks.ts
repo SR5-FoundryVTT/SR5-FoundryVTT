@@ -28,7 +28,7 @@ export const RenderSettings = {
                     label: "SR5.Labels.Sidebar.Issues",
                 },
                 {
-                    url: "https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/",
+                    url: "http://sr5-foundryvtt.privateworks.com/index.php/Main_Page",
                     label: "SR5.Labels.Sidebar.Wiki",
                 },
             ].map((data): HTMLAnchorElement => {
