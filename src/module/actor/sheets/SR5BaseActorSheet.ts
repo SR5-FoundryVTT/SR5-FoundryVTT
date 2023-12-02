@@ -974,7 +974,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param item: The item to transform into a 'sheet item'
      */
     _prepareSheetItem(item: SR5Item): SheetItemData {
-        const sheetItem = item.toObject() as unknown as SheetItemData;
+        // Copy derived schema data instead of source data (false)
+        const sheetItem = item.toObject(false) as unknown as SheetItemData;
 
         const chatData = item.getChatData();
         sheetItem.description = chatData.description;
