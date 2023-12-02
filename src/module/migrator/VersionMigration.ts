@@ -101,7 +101,7 @@ export abstract class VersionMigration {
         // Apply the updates, this should *always* work, now that parsing is complete.
         await this.Apply(entityUpdates);
 
-        // await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
+        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
         ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
@@ -112,7 +112,8 @@ export abstract class VersionMigration {
     protected async Apply(documentUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of documentUpdates) {
             
-            const updateSystem = updateData.data ? {system: updateData.data} : updateData;
+            // v9 -> v10 workaround, should be removed when safe.
+            const updateSystem = updateData?.data ? {system: updateData.data} : updateData;
 
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
@@ -146,6 +147,7 @@ export abstract class VersionMigration {
                 entityUpdates.set(scene, {
                     updateData,
                     embeddedItems: null,
+                    embeddedEffects: null,
                 });
 
                 // Migrate embedded TokenDocument / ActorData within SceneData
@@ -161,7 +163,8 @@ export abstract class VersionMigration {
                     expandObject(updateData);
                     entityUpdates.set(token.actor, {
                         updateData: updateData.data || null,
-                        embeddedItems: updateData.items || null
+                        embeddedItems: updateData.items || null,
+                        embeddedEffects: updateData.effects || null
                     });
                 }
 
@@ -174,6 +177,7 @@ export abstract class VersionMigration {
                 entityUpdates.set(scene, {
                     updateData,
                     embeddedItems: null,
+                    embeddedEffects: null
                 });
             } catch (error) {
                 console.error(error);
@@ -206,6 +210,7 @@ export abstract class VersionMigration {
                 entityUpdates.set(item, {
                     updateData,
                     embeddedItems: null,
+                    embeddedEffects: updateData.effects || null
                 });
             } catch (error) {
                 console.error(error);
@@ -241,6 +246,7 @@ export abstract class VersionMigration {
                 entityUpdates.set(actor, {
                     updateData,
                     embeddedItems: items,
+                    embeddedEffects: updateData.effects || null
                 });
             } catch (error) {
                 console.error(error);
@@ -442,4 +448,5 @@ export abstract class VersionMigration {
 type DocumentUpdate = {
     updateData: any;
     embeddedItems: null | any[];
+    embeddedEffects: null | any[];
 };

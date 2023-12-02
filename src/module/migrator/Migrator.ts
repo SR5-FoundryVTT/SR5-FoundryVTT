@@ -1,6 +1,6 @@
 import { VersionMigration } from './VersionMigration';
 import {Version0_8_0} from "./versions/Version0_8_0";
-import { Version0_12_0 } from './versions/Version0_12_0';
+import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 
 type VersionDefinition = {
@@ -11,12 +11,12 @@ export class Migrator {
     // Map of all version migrations to their target version numbers.
     private static readonly s_Versions: VersionDefinition[] = [
         { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
-        { versionNumber: Version0_12_0.TargetVersion, migration: new Version0_12_0() },
+        { versionNumber: Version0_18_0.TargetVersion, migration: new Version0_18_0() },
         { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() }
     ];
 
     /**
-     * Check if the current world is empty of any migratable documents.
+     * Check if the current world is empty of any migrate documents.
      * 
      */
     public static get isEmptyWorld(): boolean {

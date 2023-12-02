@@ -670,8 +670,11 @@
     "SR5.MigrationUpdateCompendiumNoUpdateActor": "Due to technical limitations within FoundryVTT, actor compendium packs are unable to be updated at this time. You will have to manually update these packs.",
     "SR5.MigrationUpdateCompendiumUpdateMessage": "Any world compendium packs that exist in the world were also updated",
     "SR5.Migrator": {
-        "Version12_0_0": {
-            "Content": "From version 0.12.0 onwards effects on owned items will directly apply without them being copied onto the actor first. Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects copied from owned items will be deleted. Effects created directly on actors aren't affected. Should you want to only disable those effects, check the box below. Disabled effects will be marked as such.",
+        "Version18_0_0": {
+            "Line1": "From version 0.18.0 onwards effects on owned items will directly apply without them having to be copied to the actor.",
+            "Line2": "Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects with an item origin will be deleted.",
+            "Line3": "Effects created directly on actors aren't affected.",
+            "Line4": "Should you heavily use effects and effects modules and aren't sure about 'item owned effects', you set this migration to disable and review your disabled effects. Disabled effects will be marked as such.",
             "OnlyDisable": "Disable Effects only",
             "Warning": "NOTE!"
         }

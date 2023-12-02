@@ -7,29 +7,28 @@ import { VersionMigration } from "../VersionMigration";
  * Version 0.12.0 disables Foundry CONFIG.Active.Effect.legacyTransferal.
  * 
  * This causes effects on owned items to also be applied on actors. As these effects will have been
- * transfered onto the actor before, they're now collected and applied twice.
+ * transferred onto the actor before, they're now collected and applied twice.
  * 
- * Therfore effects with a owned item source are deleted. Effects without an
+ * Therefore effects with a owned item source are deleted. Effects without an
  * existing origin item on their parent actor will be left in place.
  */
-export class Version0_12_0 extends VersionMigration {
+export class Version0_18_0 extends VersionMigration {
     // TODO: is this the last version with a migration?
     get SourceVersion(): string {
-        return '0.8.0';
+        return '0.17.0';
     }
 
     get TargetVersion(): string {
-        return Version0_12_0.TargetVersion;
+        return Version0_18_0.TargetVersion;
     }
 
     static get TargetVersion(): string {
-        return '0.12.0'; // TODO: check the consent dialog for this version
+        return '0.18.0'; // TODO: check the consent dialog for this version
     }
 
     // By default item effects will be deleted. should users want to keep them, they can 
     // only have them disabled and manually review / remove each.
-    // TODO: During dev this will only disable. Change to false before release.
-    private onlyDisableEffects = true;
+    private onlyDisableEffects = false;
 
     /**
      * Version 12 is introducing a breaking change with deleting effects.
@@ -61,11 +60,11 @@ export class Version0_12_0 extends VersionMigration {
      */
     protected override async MigrateActorData(actor: SR5Actor) {
         if (!this.onlyDisableEffects) {
-            await Version0_12_0.DeleteLocalItemOwnedEffects(actor);
+            await Version0_18_0.DeleteLocalItemOwnedEffects(actor);
             return {};
         }
         
-        return Version0_12_0.DisableLocalItemOwnedEffects(actor);   
+        return Version0_18_0.DisableLocalItemOwnedEffects(actor);   
     }
 
     protected override async ShouldMigrateSceneData(scene) {
@@ -118,12 +117,14 @@ export class Version0_12_0 extends VersionMigration {
     }
 }
 
-
+/**
+ * Inform users about migration changes and let them consent to deleting effects or opt-in to deleting effects only.
+ */
 class ConfigurationDialog extends FormDialog {
     constructor(data = {} as any) {
         data.templateData = {onlyDisableEffects: data.onlyDisableEffects};
-        data.templatePath = 'systems/shadowrun5e/dist/templates/apps/migrator/Version12.0.0.hbs';
-        data.title = 'Version 12.0.0';
+        data.templatePath = `systems/shadowrun5e/dist/templates/apps/migrator/Version${Version0_18_0.TargetVersion}.hbs`;
+        data.title = Version0_18_0.TargetVersion;
         //@ts-expect-error
         super(data, {applyFormChangesOnSubmit: true});
     }
