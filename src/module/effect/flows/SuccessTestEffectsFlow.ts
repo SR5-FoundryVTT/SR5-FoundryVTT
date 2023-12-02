@@ -87,8 +87,9 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (tests.length > 0 && !tests.includes(this.test.type)) return true;
 
         const skills = effect.selectionSkills;
-        const skill = this.test.data.action.skill;
-        if (skills.length > 0 && !skills.includes(skill)) return true;
+        const skillId = this.test.data.action.skill;
+        const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
+        if (skills.length > 0 && !skills.includes(skillName)) return true;
 
         const attributes = effect.selectionAttributes;
         const attribute = this.test.data.action.attribute;

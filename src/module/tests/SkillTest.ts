@@ -1,3 +1,4 @@
+import { DataDefaults } from '../data/DataDefaults';
 import { PartsList } from '../parts/PartsList';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 
@@ -40,6 +41,8 @@ export class SkillTest extends SuccessTest {
 
     override _prepareData(data: any, options: TestOptions) {
         data = super._prepareData(data, options);
+
+        data.action = data.action || DataDefaults.actionRollData();
 
         // Preselect based on action.
         data.attribute = data.action.attribute;
