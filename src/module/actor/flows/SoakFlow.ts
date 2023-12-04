@@ -1,7 +1,6 @@
 import {SR5Actor} from "../SR5Actor";
 import {SR5Item} from '../../item/SR5Item';
 import DamageData = Shadowrun.DamageData;
-import localize from '../../utils/strings';
 
 export class SoakFlow {
     knocksDown(damage: DamageData, actor:SR5Actor) {
@@ -26,7 +25,7 @@ export class SoakFlow {
                 if (item) {
                     return item.items
                         .filter(mod => mod.getTechnologyData()?.equipped)
-                        .filter(tech => tech.name == localize("SR5.AmmoGelRounds")).length > 0;
+                        .filter(tech => tech.name == game.i18n.localize("SR5.AmmoGelRounds")).length > 0;
                 }
             }
         }

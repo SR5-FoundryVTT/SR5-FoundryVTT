@@ -5,6 +5,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Combat } from "../combat/SR5Combat";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
+import { Translation } from '../utils/strings';
 
 declare global {
     // Configuration of foundry-vtt-types
@@ -60,4 +61,9 @@ declare global {
      */
     declare function fromUuidSync(uuid: string): foundry.abstract.Document<any, any> | null;
 
+    declare class Localization {
+        localize(stringId: Translation): string;
+
+        format(stringId: Translation, data?: Record<string, unknown>): string;
+    }
 }

@@ -49,7 +49,6 @@ import HostItemData = Shadowrun.HostItemData;
 import ActionResultData = Shadowrun.ActionResultData;
 import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
-import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
@@ -75,7 +74,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
-import localize from '../utils/strings';
+
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -342,7 +341,7 @@ export class SR5Item extends Item {
 
     getActionTestName(): string {
         const testName = this.getRollName();
-        return testName ? testName :  localize('SR5.Action');
+        return testName ? testName :  game.i18n.localize('SR5.Action');
     }
 
     /**
@@ -962,16 +961,16 @@ export class SR5Item extends Item {
 
     getRollName(): string {
         if (this.isRangedWeapon) {
-            return localize('SR5.RangeWeaponAttack');
+            return game.i18n.localize('SR5.RangeWeaponAttack');
         }
         if (this.isMeleeWeapon) {
-            return localize('SR5.MeleeWeaponAttack');
+            return game.i18n.localize('SR5.MeleeWeaponAttack');
         }
         if (this.isCombatSpell) {
-            return localize('SR5.SpellAttack');
+            return game.i18n.localize('SR5.SpellAttack');
         }
         if (this.isSpell) {
-            return localize('SR5.SpellCast');
+            return game.i18n.localize('SR5.SpellCast');
         }
         if (this.hasRoll) {
             return this.name as string;

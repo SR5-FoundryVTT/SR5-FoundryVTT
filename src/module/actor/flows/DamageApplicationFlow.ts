@@ -5,7 +5,6 @@ import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import { Helpers } from '../../helpers';
 import { TestCreator } from '../../tests/TestCreator';
-import localize from '../../utils/strings';
 
 export class DamageApplicationFlow {
 
@@ -98,7 +97,7 @@ export class DamageApplicationFlow {
 
         // Abort if no actors could be collected.
         if (actors.length === 0) {
-            ui.notifications?.warn(localize("SR5.Warnings.TokenSelectionNeeded"));
+            ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
             return;
         }
 

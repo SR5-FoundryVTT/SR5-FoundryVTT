@@ -5,7 +5,7 @@ import { ConjuringRules } from '../rules/ConjuringRules';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
 import { TestDocuments, TestOptions } from './SuccessTest';
 import { SummonSpiritTest } from './SummonSpiritTest';
-import localize, { Translation } from '../utils/strings';
+import { Translation } from '../utils/strings';
 
 
 interface OpposedSummonSpiritTestData extends OpposedTestData {
@@ -177,8 +177,8 @@ export class OpposedSummonSpiritTest extends OpposedTest {
         } else {
             // Create a new spirit actor from scratch...
             const spiritType = this.against.data.spiritTypeSelected;
-            const spiritTypeLabel = localize(SR5.spiritTypes[spiritType]);
-            const name = `${summoner.name} ${spiritTypeLabel} ${localize('ACTOR.TypeSpirit')}`;
+            const spiritTypeLabel = game.i18n.localize(SR5.spiritTypes[spiritType]);
+            const name = `${summoner.name} ${spiritTypeLabel} ${game.i18n.localize('ACTOR.TypeSpirit')}`;
             const force = this.against.data.force;
             const system = { force, spiritType };
     

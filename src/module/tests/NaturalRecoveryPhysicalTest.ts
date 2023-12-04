@@ -1,12 +1,11 @@
 import {SuccessTest} from "./SuccessTest";
 import {PartsList} from "../parts/PartsList";
-import localize from '../utils/strings';
 
 export class NaturalRecoveryPhysicalTest extends SuccessTest {
     override async execute(): Promise<this> {
         if (!this.actor) return this;
         if (!this.actor.canRecoverPhysicalDamage) {
-            ui.notifications?.warn(localize('SR5.Warnings.CantRecoverPhysicalWithStunDamage'));
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantRecoverPhysicalWithStunDamage'));
             return this;
         }
 

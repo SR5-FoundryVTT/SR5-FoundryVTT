@@ -18,7 +18,6 @@ import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {SR5} from "../config";
 import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
-import localize from '../utils/strings';
 
 /**
  * Any test implementation can either be created by calling it's constructor directly or by using the TestCreator.
@@ -206,7 +205,7 @@ export const TestCreator = {
         if (actors.length === 0 && game.user.character) actors.push(game.user.character);
 
         if (actors.length === 0)
-            ui.notifications?.warn(localize('SR5.Warnings.TokenSelectionNeeded'));
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
         else 
             console.log('Shadowrun 5e | Casting an opposed test using these actors', actors, testData);
 

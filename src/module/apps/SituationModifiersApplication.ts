@@ -5,7 +5,6 @@ import { ModifiableDocumentTypes, DocumentSituationModifiers } from "../rules/Do
 
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
-import localize from '../utils/strings';
 
 
 interface SituationalModifiersTemplateData extends FormApplication.Data<{}> {
@@ -63,7 +62,7 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-matrix">${modifiers.environmental.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${localize("SR5.ModifierTypes.Environmental")}</div>`);
+        const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Environmental")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'environmental'));
 
         modifierColumn.append(modifier);
@@ -118,7 +117,7 @@ class MatrixModifiersHandler extends ModifiersHandler {
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-matrix">${modifiers.noise.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${localize("SR5.ModifierTypes.Noise")}</div>`);
+        const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Noise")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'matrix'));
 
         modifierColumn.append(modifier);
@@ -145,7 +144,7 @@ class MagicModifiersHandler extends ModifiersHandler {
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-magic">${modifiers.background_count.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-magic-modifier">${localize("SR5.ModifierTypes.BackgroundCount")}</div>`);
+        const modifierDescription = $(`<div class="modifier-description open-magic-modifier">${game.i18n.localize("SR5.ModifierTypes.BackgroundCount")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'magic'));
 
         modifierColumn.append(modifier);
@@ -219,7 +218,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-recoil-modifier">${localize("SR5.ModifierTypes.Recoil")}</div>`);
+        const modifierDescription = $(`<div class="modifier-description open-recoil-modifier">${game.i18n.localize("SR5.ModifierTypes.Recoil")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'recoil'));
 
         modifierColumn.append(modifier);
@@ -280,7 +279,7 @@ export class SituationModifiersApplication extends FormApplication {
 
         options.classes = ['sr5'];
         options.id = 'situational-modifiers-application';
-        options.title = localize('SR5.SituationalModifiersApplication.Title');
+        options.title = game.i18n.localize('SR5.SituationalModifiersApplication.Title');
 
         //@ts-expect-error
         options.width = 'auto';
@@ -408,10 +407,10 @@ export class SituationModifiersApplication extends FormApplication {
 
     get _targetTypeLabel(): string {
         if (this.target instanceof Scene) {
-            return localize('SR5.FOUNDRY.Scene');
+            return game.i18n.localize('SR5.FOUNDRY.Scene');
         }
         if (this.target instanceof SR5Actor) {
-            return localize('SR5.FOUNDRY.Actor');
+            return game.i18n.localize('SR5.FOUNDRY.Actor');
         }
 
         return '';

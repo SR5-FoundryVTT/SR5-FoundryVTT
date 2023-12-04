@@ -9,7 +9,6 @@ import {SR5Actor} from "./actor/SR5Actor";
 import {SR5Item} from "./item/SR5Item";
 import {Helpers} from "./helpers";
 import EffectsSheetData = Shadowrun.EffectsSheetData;
-import localize from './utils/strings';
 
 /**
  * Manage Active Effect instances through the Actor Sheet via effect control buttons.
@@ -30,7 +29,7 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
     switch (icon.dataset.action) {
         case "create":
             return owner.createEmbeddedDocuments('ActiveEffect', [{
-                label: localize("SR5.ActiveEffect.New"),
+                label: game.i18n.localize("SR5.ActiveEffect.New"),
                 // icon: "icons/svg/aura.svg",
                 origin: owner.uuid,
                 "duration.rounds": item.dataset.effectType === "temporary" ? 1 : undefined,
@@ -66,20 +65,20 @@ export function prepareActiveEffectCategories(effects): EffectsSheetData {
     const categories = {
         temporary: {
             type: "temporary",
-            label: localize("SR5.ActiveEffect.Types.Temporary"),
-            tooltip: localize("SR5.Tooltips.Effect.Temporary"),
+            label: game.i18n.localize("SR5.ActiveEffect.Types.Temporary"),
+            tooltip: game.i18n.localize("SR5.Tooltips.Effect.Temporary"),
             effects: []
         },
         persistent: {
             type: "persistent",
-            label: localize("SR5.ActiveEffect.Types.Persistent"),
-            tooltip: localize("SR5.Tooltips.Effect.Persistent"),
+            label: game.i18n.localize("SR5.ActiveEffect.Types.Persistent"),
+            tooltip: game.i18n.localize("SR5.Tooltips.Effect.Persistent"),
             effects: []
         },
         inactive: {
             type: "inactive",
-            label: localize("SR5.ActiveEffect.Types.Inactive"),
-            tooltip: localize("SR5.Tooltips.Effect.Inactive"),
+            label: game.i18n.localize("SR5.ActiveEffect.Types.Inactive"),
+            tooltip: game.i18n.localize("SR5.Tooltips.Effect.Inactive"),
             effects: []
         }
     };

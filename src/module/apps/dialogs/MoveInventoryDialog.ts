@@ -1,7 +1,6 @@
 import { FormDialog, FormDialogData } from "./FormDialog";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
-import localize from '../../utils/strings';
 
 /**
  * Show a list of the SR5Actor inventories to the user and let them choose one.
@@ -33,13 +32,13 @@ export class MoveInventoryDialog extends FormDialog {
         const inventories = MoveInventoryDialog.selectableInventories(actor, item, sourceInventory);
 
         return {
-            title: localize('SR5.MoveInventoryDialog.Title'),
+            title: game.i18n.localize('SR5.MoveInventoryDialog.Title'),
             buttons: {
                 move: {
-                    label: localize('SR5.MoveInventoryDialog.Move')
+                    label: game.i18n.localize('SR5.MoveInventoryDialog.Move')
                 },
                 cancel: {
-                    label: localize('SR5.MoveInventoryDialog.Cancel')
+                    label: game.i18n.localize('SR5.MoveInventoryDialog.Cancel')
                 }
             },
             default: 'cancel',

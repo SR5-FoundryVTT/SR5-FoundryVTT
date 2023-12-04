@@ -3,7 +3,6 @@ import {SR5Item} from "../item/SR5Item";
 import {ActorData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import localize from '../utils/strings';
 
 export type SystemMigrationDocuments = SR5Actor|SR5Item|Scene;
 /**
@@ -51,8 +50,8 @@ export abstract class VersionMigration {
      * @param game The world that should be migrated.
      */
     public async Migrate(game: Game) {
-        ui.notifications?.info(`${localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
-        ui.notifications?.warn(localize('SR5.MIGRATION.DoNotCloseNotification'), {
+        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
+        ui.notifications?.warn(game.i18n.localize('SR5.MIGRATION.DoNotCloseNotification'), {
             permanent: true,
         });
 
@@ -97,7 +96,7 @@ export abstract class VersionMigration {
         await this.Apply(entityUpdates);
 
         await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
-        ui.notifications?.info(`${localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
+        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
     /**

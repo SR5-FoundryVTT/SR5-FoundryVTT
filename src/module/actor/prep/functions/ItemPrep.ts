@@ -4,8 +4,6 @@ import { PartsList } from '../../../parts/PartsList';
 import ArmorActorData = Shadowrun.ArmorActorData;
 import {SR5} from "../../../config";
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
-import {SR} from "../../../constants";
-import localize from '../../../utils/strings';
 
 export class ItemPrep {
     /**
@@ -47,7 +45,7 @@ export class ItemPrep {
             }
         });
 
-        if (system.modifiers['armor']) armorModParts.addUniquePart(localize('SR5.Bonus'), system.modifiers['armor']);
+        if (system.modifiers['armor']) armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), system.modifiers['armor']);
         // SET ARMOR
         armor.value = Helpers.calcTotal(armor);
     }

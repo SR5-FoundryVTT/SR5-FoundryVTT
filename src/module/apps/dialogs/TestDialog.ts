@@ -1,10 +1,9 @@
 import {FormDialog, FormDialogData, FormDialogOptions} from "./FormDialog";
 import {SuccessTest} from "../../tests/SuccessTest";
-import { SuccessTestData } from './../../tests/SuccessTest';
+import { SuccessTestData } from '../../tests/SuccessTest';
 import {SR5} from "../../config";
 import {Helpers} from "../../helpers";
-import localize from '../../utils/strings';
-
+import { Translation } from '../../utils/strings';
 
 export interface TestDialogData extends FormDialogData {
     test: SuccessTest
@@ -99,7 +98,7 @@ export class TestDialog extends FormDialog {
      */
     override get title() {
         const data = this.data as unknown as TestDialogData;
-        return game.i18n.localize(data.test.title);
+        return game.i18n.localize(data.test.title as Translation);
     }
 
     /**
@@ -108,11 +107,11 @@ export class TestDialog extends FormDialog {
     override get buttons() {
         return {
             roll: {
-                label: localize('SR5.Roll'),
+                label: game.i18n.localize('SR5.Roll'),
                 icon: '<i class="fas fa-dice-six"></i>'
             },
             cancel: {
-                label: localize('SR5.Dialogs.Common.Cancel')
+                label: game.i18n.localize('SR5.Dialogs.Common.Cancel')
             }
         };
     }

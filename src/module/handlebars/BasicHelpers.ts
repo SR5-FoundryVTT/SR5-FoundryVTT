@@ -3,12 +3,20 @@ import {SafeString} from "handlebars";
 import SkillField = Shadowrun.SkillField;
 import {SR5Actor} from "../actor/SR5Actor";
 import {SYSTEM_NAME} from "../constants";
-import localize from '../utils/strings';
+import { Translation } from '../utils/strings';
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj) strId = obj[strId];
-        return localize(strId);
+        return game.i18n.localize(strId);
+    });
+
+    Handlebars.registerHelper('localize', function (str: string) {
+        const localizedString = game.i18n.localize(str as Translation);
+        if(localizedString === str) {
+            console.warn(`Handlebar helper localize was passed a non-translated string: "${str}"`);
+        }
+        return localizedString;
     });
 
     Handlebars.registerHelper('localizeDocumentType', function (document) {
@@ -16,18 +24,18 @@ export const registerBasicHelpers = () => {
         const documentClass = document instanceof SR5Actor ? 'ACTOR' : 'ITEM';
         const documentTypeLabel = document.type[0].toUpperCase() + document.type.slice(1);
         const i18nTypeLabel = `${documentClass}.Type${documentTypeLabel}`;
-        return game.i18n.localize(i18nTypeLabel);
+        return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
     Handlebars.registerHelper('localizeSkill', function (skill: SkillField): string {
-        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+        return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
         // NOTE: Below is code to append a shortened attribute name to the skill name. It's been removed for readability.
         //       But still might useful for someone.
         // if (!game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) || !translatedSkill || !skill.attribute)
         //     return translatedSkill;
         //
         // // Try showing the first three letters, or less.
-        // const translatedAttribute = localize(SR5.attributes[skill.attribute]);
+        // const translatedAttribute = game.i18n.localize(SR5.attributes[skill.attribute]);
         // if (!translatedAttribute) return translatedSkill;
         //
         // const cutToIndex = translatedAttribute.length < SR.attributes.SHORT_NAME_LENGTH ?

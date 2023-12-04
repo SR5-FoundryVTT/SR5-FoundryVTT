@@ -3,7 +3,6 @@ import {FLAGS, SR, SYSTEM_NAME} from "../constants";
 import {CombatRules} from "../rules/CombatRules";
 import {SocketMessage} from "../sockets";
 import SocketMessageData = Shadowrun.SocketMessageData;
-import localize from '../utils/strings';
 
 /**
  * Foundry combat implementation for Shadowrun5 rules.
@@ -46,7 +45,7 @@ export class SR5Combat extends Combat {
     static addCombatTrackerContextOptions(html, options: any[]) {
         options.push(
             {
-                name: localize('SR5.COMBAT.ReduceInitByOne'),
+                name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
                 icon: '<i class="fas fa-caret-down"></i>',
                 callback: async (li) => {
                     const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
@@ -57,7 +56,7 @@ export class SR5Combat extends Combat {
                 },
             },
             {
-                name: localize('SR5.COMBAT.ReduceInitByFive'),
+                name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
                 icon: '<i class="fas fa-angle-down"></i>',
                 callback: async (li) => {
                     const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
@@ -68,7 +67,7 @@ export class SR5Combat extends Combat {
                 },
             },
             {
-                name: localize('SR5.COMBAT.ReduceInitByTen'),
+                name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
                 icon: '<i class="fas fa-angle-double-down"></i>',
                 callback: async (li) => {
                     const combatant = await game.combat?.combatants.get(li.data('combatant-id'));

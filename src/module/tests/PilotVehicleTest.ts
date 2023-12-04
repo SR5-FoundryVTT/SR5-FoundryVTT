@@ -1,6 +1,4 @@
 import {SuccessTest} from "./SuccessTest";
-import localize from '../utils/strings';
-
 export class PilotVehicleTest extends SuccessTest {
     /**
      * Piloting a vehicle will alter the kind of test that needs to be made based on a few factors.
@@ -14,7 +12,7 @@ export class PilotVehicleTest extends SuccessTest {
 
         const vehicleData = actor.asVehicle();
         if (!vehicleData) {
-            await ui.notifications?.error(localize('SR5.Errors.TestExpectsVehicleOnly'))
+            await ui.notifications?.error(game.i18n.localize('SR5.Errors.TestExpectsVehicleOnly'))
             return {};
         }
 

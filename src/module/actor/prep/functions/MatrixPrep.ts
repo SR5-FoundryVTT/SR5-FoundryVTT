@@ -4,10 +4,8 @@ import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { PartsList } from '../../../parts/PartsList';
 import {SR5} from "../../../config";
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
-import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 import CommonData = Shadowrun.CommonData;
 import {AttributesPrep} from "./AttributesPrep";
-import localize from '../../../utils/strings';
 
 export class MatrixPrep {
     /**
@@ -66,7 +64,7 @@ export class MatrixPrep {
             matrix.rating = Helpers.calcTotal(attributes.resonance);
             matrix.attack.base = Helpers.calcTotal(attributes.charisma);
             matrix.sleaze.base = Helpers.calcTotal(attributes.intuition);
-            matrix.name = localize('SR5.LivingPersona');
+            matrix.name = game.i18n.localize('SR5.LivingPersona');
         }
 
         // set matrix condition monitor to max if greater than

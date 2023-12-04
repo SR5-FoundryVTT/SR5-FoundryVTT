@@ -1,6 +1,4 @@
 import {CORE_FLAGS, CORE_NAME} from './constants';
-import localize from './utils/strings';
-
 
 /**
  * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
@@ -53,7 +51,7 @@ function createChatTemplateData(options) {
     let {actor, item, description, tests} = options;
 
     const token = actor?.getToken();
-    const title = localize("SR5.Description");
+    const title = game.i18n.localize("SR5.Description");
 
     return {
         title,

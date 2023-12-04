@@ -26,7 +26,7 @@ import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
-import localize from '../utils/strings';
+import { Translation } from '../utils/strings';
 
 
 /**
@@ -697,7 +697,7 @@ export class SR5Actor extends Actor {
     getSkillByLabel(searchedFor: string): Shadowrun.SkillField | undefined {
         if (!searchedFor) return;
 
-        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
 
         const skills = this.getSkills();
 
@@ -736,7 +736,7 @@ export class SR5Actor extends Actor {
             return '';
         }
 
-        return skill.label ? skill.label : skill.name ? skill.name : '';
+        return skill.label ?? skill.name ?? '';
     }
 
     /**
@@ -1866,11 +1866,11 @@ export class SR5Actor extends Actor {
         }
 
         if (!this.isMatrixActor) {
-            ui.notifications?.error(localize('SR5.Errors.MarksCantBePlacedBy'));
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
             return console.error(`The actor type ${this.type} can't receive matrix marks!`);
         }
         if (target.actor && !target.actor.isMatrixActor) {
-            ui.notifications?.error(localize('SR5.Errors.MarksCantBePlacedOn'));
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
             return console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
         }
         if (!target.actor) {

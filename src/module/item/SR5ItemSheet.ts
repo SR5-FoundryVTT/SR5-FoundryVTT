@@ -5,7 +5,6 @@ import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import RangeData = Shadowrun.RangeData;
-import localize from '../utils/strings';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -392,7 +391,7 @@ export class SR5ItemSheet extends ItemSheet {
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
             if(!actor.isVehicle()) {
-                return ui.notifications?.error(localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
+                return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
             }
 
             return await this.item.addNetworkDevice(actor);
@@ -597,7 +596,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         // Tagify expects this format for localized tags.
         const whitelist = Object.keys(SR5.modifierTypes).map(modifier => ({
-            value: localize(SR5.modifierTypes[modifier]),
+            value: game.i18n.localize(SR5.modifierTypes[modifier]),
             id: modifier
         }));
 
@@ -607,7 +606,7 @@ export class SR5ItemSheet extends ItemSheet {
         // Use localized label as value, and modifier as the later to be extracted value
         const modifiers = this.item.system.action?.modifiers ?? [];
         const tags = modifiers.map(modifier => ({
-            value: localize(SR5.modifierTypes[modifier]),
+            value: game.i18n.localize(SR5.modifierTypes[modifier]),
             id: modifier
         }));
 

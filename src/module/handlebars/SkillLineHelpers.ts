@@ -4,14 +4,13 @@ import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SkillCategories = Shadowrun.SkillCategories;
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
-import localize from '../utils/strings';
 
 export const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('SkillHeaderIcons', function (category: SkillCategories) {
         const addIcon = {
             icon: 'fas fa-plus',
-            title: localize('SR5.AddSkill'),
-            text: localize('SR5.Add'),
+            title: game.i18n.localize('SR5.AddSkill'),
+            text: game.i18n.localize('SR5.Add'),
             cssClass: '',
         };
         switch (category) {
@@ -40,7 +39,7 @@ export const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('SkillHeaderRightSide', function (id: string, filters?: SR5SheetFilters) {
         const specs = {
             text: {
-                text: localize('SR5.Specialization'),
+                text: game.i18n.localize('SR5.Specialization'),
                 cssClass: 'skill-spec-item',
             },
         };
@@ -54,8 +53,8 @@ export const registerSkillLineHelpers = () => {
         const rtg = {
             text: {
                 text: activeSkillFilter ?
-                    localize('SR5.RtgAboveZero') :
-                    localize('SR5.Rtg'),
+                    game.i18n.localize('SR5.RtgAboveZero') :
+                    game.i18n.localize('SR5.Rtg'),
                 cssClass: 'rtg',
             },
         };
@@ -101,17 +100,17 @@ export const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('SkillIcons', function (skillType: string, skill: SkillField) {
         const editIcon = {
             icon: 'fas fa-edit',
-            title: localize('SR5.EditSkill'),
+            title: game.i18n.localize('SR5.EditSkill'),
             cssClass: '',
         };
         const openSourceIcon = { 
             icon: 'fas fa-file',
-            title: localize('SR5.OpenSource'),
+            title: game.i18n.localize('SR5.OpenSource'),
             cssClass: '',
         }
         const removeIcon = {
             icon: 'fas fa-trash',
-            title: localize('SR5.DeleteSkill'),
+            title: game.i18n.localize('SR5.DeleteSkill'),
             cssClass: '',
         };
         switch (skillType) {

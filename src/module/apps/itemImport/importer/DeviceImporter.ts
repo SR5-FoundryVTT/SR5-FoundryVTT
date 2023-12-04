@@ -2,7 +2,6 @@ import { DataImporter } from "./DataImporter";
 import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { UpdateActionFlow } from "../../../item/flows/UpdateActionFlow";
-import localize from '../../../utils/strings';
 
 export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shadowrun.DeviceData> {
     public files = ['gear.xml'];
@@ -189,9 +188,9 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
         const rccs = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Rigger Command Consoles');
 
-        let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${localize('SR5.DeviceCatCommlink')}`, true);
-        let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${localize('SR5.DeviceCatCyberdeck')}`, true);
-        let rccsFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${localize('SR5.DeviceCatRCC')}`, true);
+        let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
+        let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
+        let rccsFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatRCC')}`, true);
 
         entries = entries.concat(await this.ParseCommlinkDevices(commlinks, commlinksFolder, setIcons));
         entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder, setIcons));
