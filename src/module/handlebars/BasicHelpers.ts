@@ -11,14 +11,6 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(strId);
     });
 
-    Handlebars.registerHelper('localize', function (str: string) {
-        const localizedString = game.i18n.localize(str as Translation);
-        if(localizedString === str) {
-            console.warn(`Handlebar helper localize was passed a non-translated string: "${str}"`);
-        }
-        return localizedString;
-    });
-
     Handlebars.registerHelper('localizeDocumentType', function (document) {
         if (document.type.length < 1) return '';
         const documentClass = document instanceof SR5Actor ? 'ACTOR' : 'ITEM';
