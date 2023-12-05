@@ -254,10 +254,10 @@ export const ChatData = {
             props.push(game.i18n.localize(SR5.illusionSpellTypes[system.illusion.type]));
             props.push(game.i18n.localize(SR5.illusionSpellSenses[system.illusion.sense]));
         } else if (system.category === 'manipulation') {
-            if (system.manipulation.damaging) props.push(game.i18n.localize('SR5.SpellManipulationDamaging'));
-            if (system.manipulation.mental) props.push(game.i18n.localize('SR5.SpellManipulationMental'));
-            if (system.manipulation.environmental) props.push(game.i18n.localize('SR5.SpellManipulationEnvironmental'));
-            if (system.manipulation.physical) props.push(game.i18n.localize('SR5.SpellManipulationPhysical'));
+            if (system.manipulation.damaging) props.push(game.i18n.localize('SR5.Spell.ManipulationDamaging'));
+            if (system.manipulation.mental) props.push(game.i18n.localize('SR5.Spell.ManipulationMental'));
+            if (system.manipulation.environmental) props.push(game.i18n.localize('SR5.Spell.ManipulationEnvironmental'));
+            if (system.manipulation.physical) props.push(game.i18n.localize('SR5.Spell.ManipulationPhysical'));
         } else if (system.category === 'detection') {
             props.push(game.i18n.localize(SR5.detectionSpellTypes[system.detection.type]));
             props.push(system.detection.passive ? game.i18n.localize('SR5.Passive') :  game.i18n.localize('SR5.Active'));
