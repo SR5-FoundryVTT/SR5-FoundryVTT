@@ -30,7 +30,7 @@
         flex-wrap: nowrap;
         justify-content: space-between;
         &.center {
-            justify-content: center;
+            justify-content: space-evenly;
         }
         &.no-border {
             border-top: none;
