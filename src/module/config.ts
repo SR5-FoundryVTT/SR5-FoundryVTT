@@ -362,43 +362,43 @@ export const SR5 = {
     },
 
     spellCategories: {
-        combat: 'SR5.SpellCatCombat',
-        detection: 'SR5.SpellCatDetection',
-        health: 'SR5.SpellCatHealth',
-        illusion: 'SR5.SpellCatIllusion',
-        manipulation: 'SR5.SpellCatManipulation'
+        combat: 'SR5.Spell.CatCombat',
+        detection: 'SR5.Spell.CatDetection',
+        health: 'SR5.Spell.CatHealth',
+        illusion: 'SR5.Spell.CatIllusion',
+        manipulation: 'SR5.Spell.CatManipulation'
     },
 
     spellTypes: {
-        physical: 'SR5.SpellTypePhysical',
-        mana: 'SR5.SpellTypeMana',
+        physical: 'SR5.Spell.TypePhysical',
+        mana: 'SR5.Spell.TypeMana',
     },
 
     spellRanges: {
-        touch: 'SR5.SpellRangeTouch',
-        los: 'SR5.SpellRangeLos',
-        los_a: 'SR5.SpellRangeLosA',
+        touch: 'SR5.Spell.RangeTouch',
+        los: 'SR5.Spell.RangeLos',
+        los_a: 'SR5.Spell.RangeLosA',
     },
 
     combatSpellTypes: {
-        direct: 'SR5.SpellCombatDirect',
-        indirect: 'SR5.SpellCombatIndirect',
+        direct: 'SR5.Spell.CombatDirect',
+        indirect: 'SR5.Spell.CombatIndirect',
     },
 
     detectionSpellTypes: {
-        directional: 'SR5.SpellDetectionDirectional',
-        psychic: 'SR5.SpellDetectionPsychic',
-        area: 'SR5.SpellDetectionArea',
+        directional: 'SR5.Spell.DetectionDirectional',
+        psychic: 'SR5.Spell.DetectionPsychic',
+        area: 'SR5.Spell.DetectionArea',
     },
 
     illusionSpellTypes: {
-        obvious: 'SR5.SpellIllusionObvious',
-        realistic: 'SR5.SpellIllusionRealistic',
+        obvious: 'SR5.Spell.IllusionObvious',
+        realistic: 'SR5.Spell.IllusionRealistic',
     },
 
     illusionSpellSenses: {
-        'single-sense': 'SR5.SpellIllusionSingleSense',
-        'multi-sense': 'SR5.SpellIllusionMultiSense',
+        'single-sense': 'SR5.Spell.IllusionSingleSense',
+        'multi-sense': 'SR5.Spell.IllusionMultiSense',
     },
 
     attributeRolls: {

@@ -4,7 +4,7 @@
     </div>
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.SpellCategory"}}
+            {{localize "SR5.Spell.Category"}}
         </div>
         <div class="inputs">
             <select name="system.category">
@@ -19,7 +19,7 @@
     {{#if system.category}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.SpellType"}}
+            {{localize "SR5.Spell.Type"}}
         </div>
         <div class="inputs">
             <select name="system.type">
@@ -31,7 +31,7 @@
     </div>
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.SpellRange"}}
+            {{localize "SR5.Spell.Range"}}
         </div>
         <div class="inputs">
             <select name="system.range">
@@ -73,7 +73,7 @@
     {{#ife system.category "combat"}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.SpellCatCombat"}}
+            {{localize "SR5.Spell.CatCombat"}}
         </div>
         <div class="inputs">
             <select name="system.combat.type">
@@ -86,7 +86,7 @@
     {{/ife}} {{#ife system.category "detection"}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.SpellCatDetection"}}
+            {{localize "SR5.Spell.CatDetection"}}
         </div>
         <div class="inputs between">
             <select name="system.detection.passive" data-dtype="Boolean">
@@ -113,7 +113,7 @@
     {{/ife}} {{#ife system.category "illusion"}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.SpellCatIllusion"}}
+            {{localize "SR5.Spell.CatIllusion"}}
         </div>
         <div class="inputs between">
             <select name="system.illusion.type">
@@ -131,11 +131,11 @@
     {{/ife}} {{#ife system.category "manipulation"}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.SpellCatManipulation"}}
+            {{localize "SR5.Spell.CatManipulation"}}
         </div>
         <div class="inputs">
             <label>
-                {{localize "SR5.SpellManipulationDamaging"}}
+                {{localize "SR5.Spell.ManipulationDamaging"}}
                 <input
                     class="display"
                     type="checkbox"
@@ -144,7 +144,7 @@
                 />
             </label>
             <label>
-                {{localize "SR5.SpellManipulationMental"}}
+                {{localize "SR5.Spell.ManipulationMental"}}
                 <input
                     class="display"
                     type="checkbox"
@@ -153,7 +153,7 @@
                 />
             </label>
             <label>
-                {{localize "SR5.SpellManipulationEnvironmental"}}
+                {{localize "SR5.Spell.ManipulationEnvironmental"}}
                 <input
                     class="display"
                     type="checkbox"
@@ -162,7 +162,7 @@
                 />
             </label>
             <label>
-                {{localize "SR5.SpellManipulationPhysical"}}
+                {{localize "SR5.Spell.ManipulationPhysical"}}
                 <input
                     class="display"
                     type="checkbox"

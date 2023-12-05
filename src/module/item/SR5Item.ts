@@ -967,10 +967,10 @@ export class SR5Item extends Item {
             return game.i18n.localize('SR5.MeleeWeaponAttack');
         }
         if (this.isCombatSpell) {
-            return game.i18n.localize('SR5.SpellAttack');
+            return game.i18n.localize('SR5.Spell.Attack');
         }
         if (this.isSpell) {
-            return game.i18n.localize('SR5.SpellCast');
+            return game.i18n.localize('SR5.Spell.Cast');
         }
         if (this.hasRoll) {
             return this.name as string;
