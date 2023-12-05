@@ -973,7 +973,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param item: The item to transform into a 'sheet item'
      */
     _prepareSheetItem(item: SR5Item): SheetItemData {
-        const sheetItem = item.toObject() as unknown as SheetItemData;
+        // Copy derived schema data instead of source data (false)
+        const sheetItem = item.toObject(false) as unknown as SheetItemData;
 
         const chatData = item.getChatData();
         sheetItem.description = chatData.description;
@@ -1474,41 +1475,19 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
-        if (item) {
-            const newItems = [] as any[];
+        if (!item) return;
 
-            // Handle the equipped state.
-            if (item.isDevice) {
-                // Only allow one equipped device item. Unequip all other.
-                for (const item of this.actor.items.filter(actorItem => actorItem.isDevice)) {
-                    newItems.push({
-                        '_id': item.id,
-                        'system.technology.equipped': item.id === iid,
-                    });
-                }
-
-            } else {
-                // Toggle equip status.
-                newItems.push({
-                    '_id': iid,
-                    'system.technology.equipped': !item.isEquipped(),
-                });
-            }
-
-            // Handle active effects based on equipped status.
-            // NOTE: This is commented out for later ease of enabling effects based on equip status AND if they are
-            //       meant to enable on eqiup or not.
-            // this.actor.effects.forEach(effect => {
-            //     if (effect.system.origin !== item.uuid) return;
-            //
-            //     // @ts-expect-error
-            //     effect.disable(item.isEquipped());
-            // })
-
-            await this.actor.updateEmbeddedDocuments('Item', newItems);
-
-            this.actor.render(false);
+        // Handle the equipped state.
+        if (item.isDevice) {
+            await this.document.equipOnlyOneItemOfType(item);
+        } else {
+            await this.actor.updateEmbeddedDocuments('Item', [{
+                '_id': iid,
+                'system.technology.equipped': !item.isEquipped(),
+            }]);
         }
+
+        this.actor.render(false);
     }
 
     /**

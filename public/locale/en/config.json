@@ -767,6 +767,9 @@
     "SR5.QualityTypeNegative": "Negative",
     "SR5.QualityTypePositive": "Positive",
     "SR5.Quantity": "Quantity",
+    "SR5.QuickInfo": {
+        "DrainForce": "Drain F{sign}{drain}"
+    },
     "SR5.Radius": "Radius",
     "SR5.Range": "Range",
     "SR5.RangeWeaponAttack": "Range Weapon Attack",

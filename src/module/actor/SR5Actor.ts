@@ -2099,4 +2099,22 @@ export class SR5Actor extends Actor {
         if (this.isMatrixActor) await this.setMatrixDamage(0);
         if (updateData) await this.update(updateData);
     }
+
+    /**
+     * Will unequip all other items of the same type as the given item.
+     * 
+     * It's not necessary for the given item to be equipped.
+     * 
+     * @param item Input item that will be equipped while unequipping all others of the same type.
+     */
+    async equipOnlyOneItemOfType(item: SR5Item) {
+        const updateData = this.items
+            .filter(ownedItem => ownedItem.type === item.type)
+            .map(ownedItem => ({
+                _id: ownedItem.id,
+                'system.technology.equipped': ownedItem.id === item.id
+        }));
+
+        await this.updateEmbeddedDocuments('Item', updateData);
+    }
 }

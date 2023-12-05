@@ -729,6 +729,9 @@
     "SR5.QualityType": "Typ",
     "SR5.QualityTypeNegative": "Negativ",
     "SR5.QualityTypePositive": "Positiv",
+    "SR5.QuickInfo": {
+        "DrainForce": "Entzug K{sign}{drain}"
+    },
     "SR5.Radius": "Radius",
     "SR5.Range": "Reichweite",
     "SR5.RangeWeaponAttack": "Feuerwaffenangriff",
