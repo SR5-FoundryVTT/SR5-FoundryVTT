@@ -61,6 +61,8 @@ declare global {
      */
     declare function fromUuidSync(uuid: string): foundry.abstract.Document<any, any> | null;
 
+    // Use declaration merging to add strong typing to Foundry's game.i18n localize and format functions,
+    // sourcing valid translation strings from this system's english translations file
     declare class Localization {
         localize(stringId: Translation): string;
 
