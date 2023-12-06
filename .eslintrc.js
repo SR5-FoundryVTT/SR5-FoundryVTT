@@ -29,8 +29,6 @@ module.exports = {
     "plugins": [
         "prettier",
         "@typescript-eslint",
-        "@stylistic/ts",
-        // "import",
     ],
     parser: '@typescript-eslint/parser',
     "rules": {

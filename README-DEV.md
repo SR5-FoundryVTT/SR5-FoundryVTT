@@ -96,7 +96,7 @@ The system branch workflow is simple:
 ## Unittesting
 There is unit testing support using the FVTT Quench module. It's encouraged to do some unit testing where possible but it's not mandatory. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules. 
 
-Afterward open a terminal (cmd.exe on Windows) with administrative permissions ([see here for help](https://www.howtogeek.com/194041/how-to-open-the-command-prompt-as-administrator-in-windows-8.1/)):
+Afterwards open a terminal (cmd.exe on Windows) with administrative permissions ([see here for help](https://www.howtogeek.com/194041/how-to-open-the-command-prompt-as-administrator-in-windows-8.1/)):
 * `cd <the_cloned_fork_directory>`
 * `gulp link` (should this fail, remove the existing shadowrun5e system or check for administrative permissions)
 
