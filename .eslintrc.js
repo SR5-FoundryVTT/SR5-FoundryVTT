@@ -46,7 +46,7 @@ module.exports = {
         "@typescript-eslint/class-literal-property-style": "warn",
         "@typescript-eslint/ban-ts-comment": "warn",
         "@typescript-eslint/no-unused-vars": "warn",
-        "prefer-const": "error",
+        "prefer-const": "warn",
         "@typescript-eslint/no-confusing-void-expression": "warn",
         "@typescript-eslint/no-misused-promises": "warn",
         "@typescript-eslint/prefer-optional-chain": "warn",
