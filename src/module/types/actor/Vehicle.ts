@@ -44,5 +44,6 @@ declare namespace Shadowrun {
         off_road_speed: VehicleStat
         acceleration: VehicleStat
         sensor: VehicleStat
+        seats: VehicleStat
     }
 }

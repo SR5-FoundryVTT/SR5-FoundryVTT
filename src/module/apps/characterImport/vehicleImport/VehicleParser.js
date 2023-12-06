@@ -58,10 +58,10 @@ export default class VehicleParser {
                 'system.vehicle_stats.off_road_speed.base': off_road_speed,
                 'system.vehicle_stats.acceleration.base': vehicle.accel,
                 'system.vehicle_stats.sensor.base': vehicle.sensor,
+                'system.vehicle_stats.seats.base': vehicle.seats,
                 'system.attributes.body.base': vehicle.body,
-            
                 'system.armor.base': vehicle.armor,
-                'system.isDrone': vehicle.isdrone,
+                'system.isDrone': vehicle.isdrone === "True",
                 'folder': actor.folder?.id
             });
 

@@ -1081,6 +1081,11 @@
                     "base": 0,
                     "value": 0,
                     "mod": []
+                },
+                "seats": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
                 }
             },
             "track": {
