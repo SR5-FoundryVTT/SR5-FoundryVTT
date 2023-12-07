@@ -2,31 +2,34 @@ import { getArray } from "../importHelper/BaseParserFunctions.js";
 import { WeaponParser } from "../weaponImport/WeaponParser";
 import { GearsParser } from "../importHelper/GearsParser.js";
 import { MountedWeaponParser } from "./MountedWeaponParser.js";
+import { SR5Actor } from '../../../actor/SR5Actor';
 
 export default class VehicleParser {
 
-    async parseVehicles(actor, chummerChar, importOptions) {
-
+    async parseVehicles(actor, chummerChar, importOptions): Promise<Array<SR5Actor>|undefined> {
         if(!importOptions.vehicles) {
             return;
         }
 
-        if(!game.user.can("ACTOR_CREATE")) {
-            ui.notifications.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
+        if(!game.user?.can("ACTOR_CREATE")) {
+            ui.notifications?.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
             return;
         }
 
         const vehicles = getArray(chummerChar.vehicles?.vehicle);
 
-        vehicles.forEach(async vehicle => {
-            let vehicleActor = await Actor.create({
+        return await Promise.all<SR5Actor>(vehicles.map<Promise<SR5Actor>>(async (vehicle) => {
+            let vehicleActor = (await Actor.create({
                 name: vehicle.name,
                 type: "vehicle"
-            });
+            }))!;
 
-            const promises = [];
+            const promises : Array<Promise<any>> = [];
+            // @ts-ignore
             promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));
+            // @ts-ignore
             promises.push(new GearsParser().parseGears(getArray(vehicle.gears?.gear),  importOptions.assignIcons));
+            // @ts-ignore
             promises.push(new MountedWeaponParser().parseWeapons(vehicle, importOptions.assignIcons))
 
             let handling;
@@ -49,7 +52,7 @@ export default class VehicleParser {
                 off_road_speed =  vehicle.speed
             }
 
-            vehicleActor.update({
+            await vehicleActor.update({
                 'system.driver': actor.id,
                 'system.vehicle_stats.pilot.base': vehicle.pilot,
                 'system.vehicle_stats.handling.base': handling,
@@ -66,6 +69,8 @@ export default class VehicleParser {
             });
 
             await vehicleActor.createEmbeddedDocuments('Item', (await Promise.all(promises)).flat());
-        })
+
+            return vehicleActor;
+        }));
     }
 }

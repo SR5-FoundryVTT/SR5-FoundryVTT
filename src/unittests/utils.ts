@@ -13,6 +13,11 @@ export class SR5TestingDocuments<DocumentType> {
             return document;
         }
 
+        // Register document created outside SR5TestingDocuments to be torn down at the end of testing
+        register(document: foundry.abstract.Document<any>): void {
+          this.documents.push(document);
+        }
+
         async teardown() {
             this.documents.forEach(document => document.delete());
         }

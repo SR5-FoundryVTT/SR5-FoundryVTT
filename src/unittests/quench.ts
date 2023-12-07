@@ -21,6 +21,7 @@ import { characterInfoUpdaterTesting } from "./characterImport/sr5.CharacterInfo
 import { weaponParserTesting } from "./characterImport/sr5.CharacterImporterWeapon.spec";
 import { mountedWeaponParserTesting } from "./characterImport/sr5.VehicleImporterMountedWeapon.spec";
 import { shadowrunSR5ItemDataPrep } from "./sr5.ItemDataPrep.spec";
+import { vehicleImporterTesting } from "./characterImport/sr5.VehicleImporter.spec";
 
 import { Quench } from "@ethaks/fvtt-quench";
 
@@ -44,6 +45,7 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch("shadowrun5e.characterImporter", characterImporterTesting, { displayName: "SHADOWRUN5e: Chummer Character Importer" });
     quench.registerBatch("shadowrun5e.characterInfoUpdater", characterInfoUpdaterTesting, { displayName: "SHADOWRUN5e: Chummer Character Info Updater" });
     quench.registerBatch("shadowrun5e.characterImporterWeapons", weaponParserTesting, { displayName: "SHADOWRUN5e: Chummer Character Weapon Importer" });
+    quench.registerBatch("shadowrun5e.characterImporterVehicles", vehicleImporterTesting, { displayName: "SHADOWRUN5e: Chummer Character Vehicle Importer" });
     quench.registerBatch("shadowrun5e.characterImporterVehicleMountedWeapons", mountedWeaponParserTesting, { displayName: "SHADOWRUN5e: Chummer Character Vehicle Mounted Weapon Importer" });
 
     quench.registerBatch("shadowrun5e.entities.items", shadowrunSR5Item, { displayName: "SHADOWRUN5e: SR5Item Test" });
