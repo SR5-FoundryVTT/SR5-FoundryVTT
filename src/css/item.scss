@@ -1,7 +1,7 @@
 @import 'config';
 .sr5.item {
-    min-height: 450px;
-    min-width: 650px;
+    min-height: 484px;
+    min-width: 600px;
     .wholesheet {
         height: 100%;
         display: flex;
@@ -9,7 +9,7 @@
         overflow: hidden;
     }
     .sheetbody {
-        overflow: hidden;
+        overflow: auto;
         flex: 1;
     }
 

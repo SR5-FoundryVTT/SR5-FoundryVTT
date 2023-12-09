@@ -13,7 +13,7 @@
     <div class="track center {{#if disableBase}}{{#if disableManual}}invisible{{/if}}{{/if}}">
         <div class="attribute-input-container">
             {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
-                    cssClass="short"
+                    cssClass="attribute-input short"
                     title=(localize 'SR5.BaseValue')
                     size="2"
                     maxLength="2"
@@ -21,6 +21,7 @@
                     name=baseInputName
             }}
         </div>
+        <!--
         <div class="track-plus"></div>
         <div class="attribute-input-container">
             {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
@@ -30,6 +31,6 @@
                     maxLength="2"
                     disabled=true
             }}
-        </div>
+        </div> -->
     </div>
 {{/"systems/shadowrun5e/dist/templates/common/Attribute.html"}}

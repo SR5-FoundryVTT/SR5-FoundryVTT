@@ -2,7 +2,7 @@
 
 .sr5.actor {
     min-height: 690px;
-    min-width: 800px;
+    min-width: 870px;
     .wholesheet {
         height: 100%;
         display: flex;
@@ -30,7 +30,7 @@
         flex-wrap: nowrap;
         justify-content: space-between;
         &.center {
-            justify-content: center;
+            justify-content: space-evenly;
         }
         &.no-border {
             border-top: none;
