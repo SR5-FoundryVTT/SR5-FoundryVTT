@@ -1832,8 +1832,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _prepareKeybindings() {
         return {
-            skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => `${binding.key.replace('Key', '')}`).join(', '),
-            card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => `${binding.key.replace('Key', '')}`).join(', '),
+            skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+            card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
         }
     }
 }
