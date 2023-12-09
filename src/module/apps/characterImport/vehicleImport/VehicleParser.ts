@@ -19,17 +19,14 @@ export default class VehicleParser {
         const vehicles = getArray(chummerChar.vehicles?.vehicle);
 
         return await Promise.all<SR5Actor>(vehicles.map<Promise<SR5Actor>>(async (vehicle) => {
-            let vehicleActor = (await Actor.create({
+            const vehicleActor = (await Actor.create({
                 name: vehicle.name,
                 type: "vehicle"
             }))!;
 
             const promises : Array<Promise<any>> = [];
-            // @ts-ignore
             promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));
-            // @ts-ignore
             promises.push(new GearsParser().parseGears(getArray(vehicle.gears?.gear),  importOptions.assignIcons));
-            // @ts-ignore
             promises.push(new MountedWeaponParser().parseWeapons(vehicle, importOptions.assignIcons))
 
             let handling;
