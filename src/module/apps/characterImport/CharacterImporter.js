@@ -1,6 +1,6 @@
 import {CharacterInfoUpdater} from "./CharacterInfoUpdater"
 import {ItemsParser} from "./ItemsParser";
-import VehicleParser from "./vehicleImport/VehicleParser.js";
+import VehicleParser from "./vehicleImport/VehicleParser.ts";
 
 
 /**

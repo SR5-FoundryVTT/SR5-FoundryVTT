@@ -1,27 +1,81 @@
 <div class="flexcol">
     {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.html" }}
     <div class="attributes">
-        {{#each system.vehicle_stats as |attribute a|}}
-            {{#unless attribute.hidden}}
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
-                        rollId=(concatStrings "vehicleStat." a)
-                        attributeId=a
-                        attribute=attribute
-                        attributesPath="system.vehicle_stats"
-                }}
-            {{/unless}}
-        {{/each}}
+        {{#unless system.vehicle_stats.handling.hidden}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                rollId=(concatStrings "vehicleStat." handling)
+                attributeId=handling
+                attribute=system.vehicle_stats.handling
+                attributesPath="system.vehicle_stats"
+            }}
+        {{/unless}}
+        {{#unless system.vehicle_stats.off_road_handling.hidden}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                rollId=(concatStrings "vehicleStat." off_road_handling)
+                attributeId=off_road_handling
+                attribute=system.vehicle_stats.off_road_handling
+                attributesPath="system.vehicle_stats"
+            }}
+        {{/unless}}
+        {{#unless system.vehicle_stats.speed.hidden}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                rollId=(concatStrings "vehicleStat." speed)
+                attributeId=speed
+                attribute=system.vehicle_stats.speed
+                attributesPath="system.vehicle_stats"
+            }}
+        {{/unless}}
+        {{#unless system.vehicle_stats.off_road_speed.hidden}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                rollId=(concatStrings "vehicleStat." off_road_speed)
+                attributeId=off_road_speed
+                attribute=system.vehicle_stats.off_road_speed
+                attributesPath="system.vehicle_stats"
+            }}
+        {{/unless}}
+        {{#unless system.vehicle_stats.acceleration.hidden}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                rollId=(concatStrings "vehicleStat." acceleration)
+                attributeId=acceleration
+                attribute=system.vehicle_stats.acceleration
+                attributesPath="system.vehicle_stats"
+            }}
+        {{/unless}}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
-                rollId="attribute.body"
-                attributeId='body'
-                attribute=system.attributes.body
+            rollId="attribute.body"
+            attributeId='body'
+            attribute=system.attributes.body
         }}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
-                rollId="armor"
-                attributeId='armor'
-                attribute=system.armor
-                attributesPath='system'
-                label="SR5.Armor"
+            rollId="armor"
+            attributeId='armor'
+            attribute=system.armor
+            attributesPath='system'
+            label="SR5.Armor"
         }}
+        {{#unless system.vehicle_stats.pilot.hidden}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                rollId=(concatStrings "vehicleStat." pilot)
+                attributeId=pilot
+                attribute=system.vehicle_stats.pilot
+                attributesPath="system.vehicle_stats"
+            }}
+        {{/unless}}
+        {{#unless system.vehicle_stats.sensor.hidden}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                rollId=(concatStrings "vehicleStat." sensor)
+                attributeId=sensor
+                attribute=system.vehicle_stats.sensor
+                attributesPath="system.vehicle_stats"
+            }}
+        {{/unless}}
+        {{#unless system.vehicle_stats.seats.hidden}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                rollId=(concatStrings "vehicleStat." seats)
+                attributeId=seats
+                attribute=system.vehicle_stats.seats
+                attributesPath="system.vehicle_stats"
+            }}
+        {{/unless}}
     </div>
 </div>

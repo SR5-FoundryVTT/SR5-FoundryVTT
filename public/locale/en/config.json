@@ -1265,7 +1265,8 @@
             "OffRoadSpeed": "Speed (Off Road)",
             "Pilot": "Pilot",
             "Sensor": "Sensor",
-            "Speed": "Speed"
+            "Speed": "Speed",
+            "Seats": "Seats"
         },
         "Stealth": "Stealth",
         "Type": "Type",
