@@ -101,10 +101,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @protected
      */
     protected _applyModify(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
+        const value = foundry.utils.getProperty(actor, change.key);
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
-            const value = foundry.utils.getProperty(actor, change.key) as Shadowrun.ModifiableValue;
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             value.mod.push({ name: this.name, value: Number(change.value) });
 
             return null;
@@ -117,12 +116,14 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Don't apply any changes if it's also not a indirect match.
         if (this._isKeyModifiableValue(actor, indirectKey)) {
-            const value = foundry.utils.getProperty(actor, indirectKey) as Shadowrun.ModifiableValue;
-            //@ts-expect-error // TODO: foundry-vtt-types v10
+            const value = foundry.utils.getProperty(actor, indirectKey);
             value.mod.push({ name: this.name, value: Number(change.value) });
 
             return null;
         }
+
+        // Don't apply any changes if there is NO matching value.
+        if (value === undefined) return null;
 
         // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
         //@ts-expect-error // TODO: foundry-vtt-types
