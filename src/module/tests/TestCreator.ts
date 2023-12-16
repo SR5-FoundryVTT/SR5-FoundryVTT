@@ -194,10 +194,7 @@ export const TestCreator = {
         }
 
         // Determine actors to roll test with.
-        // First - use selection or targets.
-        let actors = testData.data.targetActorsUuid.length > 0 ? await Helpers.getTestTargetActors(testData.data) :
-            Helpers.getSelectedActorsOrCharacter();
-
+        let actors = await Helpers.getOpposedTestActors(testData.data);
         // Second - filter out actors current user shouldn't be able to test with.
         actors = actors.filter(actor => actor.isOwner);
         // Last - Fallback to player character.

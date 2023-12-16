@@ -24,6 +24,8 @@ export const ConditionRules = {
         // Some actor types die differently.
         if (actor.isIC() || actor.isSprite()) {
             dead = matrix?.value === matrix?.max;
+        } else if (actor.isVehicle()) {
+            dead = phyiscal?.value === phyiscal?.max;
         } else {
             unconscious = stun?.value === stun?.max;
             dying = phyiscal?.value === phyiscal?.max;

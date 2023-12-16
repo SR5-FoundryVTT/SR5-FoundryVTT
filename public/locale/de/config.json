@@ -39,6 +39,8 @@
         "AutomateMultiDefenseModifierDescription": "Automatische Anwendung des Mehrfachangriffsmodifikator",
         "AutomateProgressiveRecoil": "Automatisiere Kumulativen Rückstoß",
         "AutomateProgressiveRecoilDescription": "Kumulativer Rückstoß wird automatisch aufgerechnet",
+        "DefaultOpposedTestActorSelection": "Nutze immer Ziele für Vergleichsproben",
+        "DefaultOpposedTestActorSelectionDescription": "Überschreibe Tokenauswahl mit den Zielen der Probe.",
         "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
         "DiagonalMovementName": "Diagonale Bewegung",
         "DisplayDefaultRollCardDescription": "Soll die standard Würfelkarte zusammen mit der Shadowrun Würfelkarte angezeigt werden",

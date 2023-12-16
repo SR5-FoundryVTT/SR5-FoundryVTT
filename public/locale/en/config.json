@@ -39,6 +39,8 @@
         "AutomateMultiDefenseModifierDescription": "Will automatically apply defense mod for mulitple attacks",
         "AutomateProgressiveRecoil": "Automate progressive recoil",
         "AutomateProgressiveRecoilDescription": "Characters accrue progressive recoil until reset",
+        "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
+        "DefaultOpposedTestActorSelectionDescription": "Always overwrite selected tokens with targets used for testing",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
         "DiagonalMovementName": "Diagonal Movement",
         "DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the Shadowrun roll-card",
@@ -1264,9 +1266,9 @@
             "OffRoadHandling": "Handling (Off Road)",
             "OffRoadSpeed": "Speed (Off Road)",
             "Pilot": "Pilot",
+            "Seats": "Seats",
             "Sensor": "Sensor",
-            "Speed": "Speed",
-            "Seats": "Seats"
+            "Speed": "Speed"
         },
         "Stealth": "Stealth",
         "Type": "Type",

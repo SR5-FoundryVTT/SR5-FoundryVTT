@@ -519,6 +519,23 @@ export class Helpers {
         }
         return actors;
     }
+    /**
+     * Check given test for actors to use for opposed tests.
+     *
+     * @param testData The test to use for actor selection
+     * @returns A list of actors that should be used for an opposed test.
+     */
+    static async getOpposedTestActors(testData: SuccessTestData): Promise<SR5Actor[]> {
+        const overwriteSelectionWithTarget = game.settings.get(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection) as boolean;
+
+        // Honor user preference of using test targets, if any are set.
+        if (overwriteSelectionWithTarget && testData.targetActorsUuid.length > 0) {
+            return await Helpers.getTestTargetActors(testData);
+        }
+
+        // Otherwise fallback to default behavior
+        return Helpers.getSelectedActorsOrCharacter();
+    }
 
     static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateData {
         const localizedLabel = game.i18n.localize(label);
