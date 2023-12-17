@@ -1,6 +1,6 @@
 import { parseDescription, parseTechnology, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
-import { DataDefaults } from "../../../data/DataDefaults.js";
-import { SR5 } from "../../../config.js";
+import { DataDefaults } from "../../../../../data/DataDefaults.js";
+import { SR5 } from "../../../../../config.js";
 
 /**
  * Parses a certain class of gear (depending on the implementation).

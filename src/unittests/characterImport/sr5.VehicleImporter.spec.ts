@@ -1,5 +1,5 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import VehicleParser from '../../module/apps/characterImport/vehicleImport/VehicleParser';
+import VehicleParser from '../../module/apps/importer/actorImport/itemImporter/vehicleImport/VehicleParser';
 import * as chummerDrone from "./drone.json";
 import * as chummerVehicle from "./vehicle.json";
 import { SR5TestingDocuments } from '../utils';

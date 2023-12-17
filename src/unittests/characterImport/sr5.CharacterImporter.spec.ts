@@ -1,5 +1,5 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { CharacterImporter } from '../../module/apps/characterImport/CharacterImporter';
+import { CharacterImporter } from '../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
 import { SR5TestingDocuments } from "../utils";
 import { SR5Actor } from "../../module/actor/SR5Actor";
 import {SR5Item} from "../../module/item/SR5Item";

@@ -2,7 +2,7 @@ import { getArray } from "../importHelper/BaseParserFunctions.js";
 import { WeaponParser } from "../weaponImport/WeaponParser";
 import { GearsParser } from "../importHelper/GearsParser.js";
 import { MountedWeaponParser } from "./MountedWeaponParser.js";
-import { SR5Actor } from '../../../actor/SR5Actor';
+import { SR5Actor } from '../../../../../actor/SR5Actor';
 
 export default class VehicleParser {
 

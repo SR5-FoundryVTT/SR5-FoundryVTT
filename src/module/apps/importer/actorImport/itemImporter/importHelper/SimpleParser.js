@@ -1,5 +1,5 @@
 import { parseDescription, createItemData, genImportFlags, formatAsSlug } from "./BaseParserFunctions";
-import * as IconAssign from '../../iconAssigner/iconAssign.js';
+import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
 
 export default class SimpleParser {
     async parseCollection(parsingCollection, parserType, assignIcons) {

@@ -1,5 +1,5 @@
-import { DataDefaults } from "../../../data/DataDefaults";
-import { SR5 } from "../../../config";
+import { DataDefaults } from "../../../../../data/DataDefaults";
+import { SR5 } from "../../../../../config";
 
 export const getValues = (val) => {
     const regex = /(-?[0-9]+)(?:([0-9]+))*/g;

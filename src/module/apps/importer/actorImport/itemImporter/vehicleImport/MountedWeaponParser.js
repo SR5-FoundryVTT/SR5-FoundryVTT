@@ -1,6 +1,5 @@
 import { getArray } from "../importHelper/BaseParserFunctions.js"
 import { WeaponParser } from "../weaponImport/WeaponParser.js";
-import * as IconAssign from '../../iconAssigner/iconAssign.js';
 
 export class MountedWeaponParser {
 

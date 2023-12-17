@@ -1,6 +1,6 @@
-import {_mergeWithMissingSkillFields} from "../../actor/prep/functions/SkillsPrep";
-import { InitiationParser } from "./magicImport/InitiationParser";
-import { SubmersionParser } from "./technoImport/SubmersionParser";
+import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
+import { InitiationParser } from "../itemImporter/magicImport/InitiationParser";
+import { SubmersionParser } from "../itemImporter/technoImport/SubmersionParser";
 
 /**
  * Parses all non-item character information from a chummer character object.

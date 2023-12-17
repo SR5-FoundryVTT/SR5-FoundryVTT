@@ -1,6 +1,6 @@
 import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../iconAssigner/iconAssign.js';
-import { SR5 } from "../../../config.js";
+import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
+import { SR5 } from "../../../../../config.js";
 
 
 export class LifestyleParser {

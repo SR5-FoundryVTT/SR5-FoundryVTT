@@ -1,5 +1,5 @@
 import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../iconAssigner/iconAssign.js';
+import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
 
 export class ContactParser {
 

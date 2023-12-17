@@ -1,5 +1,5 @@
 import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../iconAssigner/iconAssign.js';
+import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
 
 export class RitualParser {
     async parseRituals(chummerChar, assignIcons) {

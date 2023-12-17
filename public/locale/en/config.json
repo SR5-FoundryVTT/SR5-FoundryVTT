@@ -472,6 +472,11 @@
             "Track": "Track"
         }
     },
+    "SR5.Import": {
+        "Spirit": {
+            "SpiritTypeNotFound": "The spirit type was not found. Please open a github issue with your chummer export json."
+        }
+    },
     "SR5.ImportCharacter": "Import Character",
     "SR5.Incoming": "Incoming",
     "SR5.IncomingDamage": "Incoming Damage",

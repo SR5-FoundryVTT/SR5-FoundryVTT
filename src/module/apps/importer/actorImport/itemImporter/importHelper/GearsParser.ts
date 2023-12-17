@@ -1,5 +1,5 @@
 import { ParserSelector } from "./ParserSelector";
-import * as IconAssign from '../../iconAssigner/iconAssign';
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
 
 /**
  * Parses all gear from a chummer character file and turns them into foundry sr item data objects

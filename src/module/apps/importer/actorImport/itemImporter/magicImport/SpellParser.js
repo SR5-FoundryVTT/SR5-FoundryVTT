@@ -1,6 +1,6 @@
 import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
-import { DataDefaults } from "../../../data/DataDefaults";
-import * as IconAssign from '../../../apps/iconAssigner/iconAssign';
+import { DataDefaults } from "../../../../../data/DataDefaults";
+import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
 
 export class SpellParser {
     async parseSpells(chummerChar, assignIcons) {
