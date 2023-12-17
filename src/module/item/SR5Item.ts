@@ -63,13 +63,13 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
- * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of execution within transpiled bundle.js code, 
+ * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of execution within transpiled bundle.js code,
  * resulting OpposedTest not finding SuccessTest (undefined) when extending it.
- * 
+ *
  * ... I'd love to remove this, or even just comment it, but tree-shaking will do it's job.
- * 
+ *
  * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
- * 
+ *
  * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
  * NOTE: still not fixed with esbuild@0.19.5
  */
@@ -242,7 +242,7 @@ export class SR5Item extends Item {
         // Description labels might have changed since last data prep.
         // NOTE: this here is likely unused and heavily legacy.
         this.labels = {};
-        
+
         // Collect the equipped modifying nested items.
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
@@ -252,7 +252,7 @@ export class SR5Item extends Item {
             TechnologyPrep.prepareConditionMonitor(technology);
             TechnologyPrep.prepareConceal(technology, equippedMods);
         }
-        
+
         const action = this.getAction();
         if (action) {
             ActionPrep.prepareData(action, this, equippedMods, equippedAmmo);
@@ -305,17 +305,17 @@ export class SR5Item extends Item {
         const test = await TestCreator.fromItem(this, this.actor, {showDialog});
         if (!test) return;
         await test.execute();
-}
+    }
 
     /**
      * Create display only information for this item. Used on sheets, chat messages and more.
      * Both actor and item sheets.
-     * 
+     *
      * The original naming leans on the dnd5e systems use of it for chat messages.
      * NOTE: This is very legacy, difficult to read and should be improved upon.
-     * 
-     * @param htmlOptions 
-     * @returns 
+     *
+     * @param htmlOptions
+     * @returns
      */
     getChatData(htmlOptions={}) {
         const system = duplicate(this.system);
@@ -328,7 +328,7 @@ export class SR5Item extends Item {
 
         const props = [];
         // Add additional chat data fields depending on item type.
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const chatDataForItemType = ChatData[this.type];
         if (chatDataForItemType) chatDataForItemType(system, labels, props, this);
 
@@ -466,7 +466,7 @@ export class SR5Item extends Item {
     async useAmmo(fired) {
         if (this.type !== 'weapon') return;
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const value = Math.max(0, this.system.ammo.current.value - fired);
         return await this.update({'system.ammo.current.value': value});
     }
@@ -476,15 +476,15 @@ export class SR5Item extends Item {
      * - its current clips
      * - its available spare clips (when given)
      * - its equipped ammo
-     * 
+     *
      * This method will only reload the weapon to the max amount of ammo available.
-     * 
+     *
      * TODO: Currently only the minimal amount of bullets is reloaded. For weapons using ejectable clips, this should be full clip capacity.
      */
     async reloadAmmo() {
         const weapon = this.asWeapon;
         if (!weapon) return;
-        
+
         // Reload this weapons ammunition to it's max capacity.
         const updateData = {};
 
@@ -512,7 +512,7 @@ export class SR5Item extends Item {
 
         // Prepare what can be reloaded.
         const reloadedBullets = Math.min(missingBullets, availableBullets);
-        
+
 
         if (weapon.system.ammo.spare_clips.max > 0) {
             updateData['system.ammo.spare_clips.value'] = Math.max(0, weapon.system.ammo.spare_clips.value - 1);
@@ -531,7 +531,7 @@ export class SR5Item extends Item {
         // Collect all item data and update at once.
         const updateData: Record<any, any>[] = [];
         const ammoItems = this.items.filter(item => item.type === type);
-            
+
         for (const item of ammoItems) {
             if (!unequipOthers && item.id !== id) continue;
             //@ts-expect-error TODO: foundry-vtt-types v10
@@ -545,7 +545,7 @@ export class SR5Item extends Item {
 
     /**
      * Equip one ammo item exclusively.
-     * 
+     *
      * @param id Item id of the to be exclusively equipped ammo item.
      */
     async equipAmmo(id) {
@@ -556,13 +556,13 @@ export class SR5Item extends Item {
         if (this.type !== 'sin') return;
 
         // NOTE: This might be related to Foundry data serialization sometimes returning arrays as ordered HashMaps...
-        const licenses = foundry.utils.getType(this.system.licenses) === 'Object' ? 
+        const licenses = foundry.utils.getType(this.system.licenses) === 'Object' ?
             //@ts-expect-error TODO: foundry-vtt-types v10
             Object.values(this.system.licenses) :
             this.system.licenses;
 
         if (!licenses) return;
-        
+
         // Add the new license to the list
         licenses.push({
             name: '',
@@ -675,7 +675,7 @@ export class SR5Item extends Item {
 
     /**
      * SIN Item - remove a single license within this SIN
-     * 
+     *
      * @param index The license list index
      */
     async removeLicense(index) {
@@ -763,7 +763,7 @@ export class SR5Item extends Item {
      * Create an item in this item
      * @param itemData
      * @param options
-     * 
+     *
      * //@ts-expect-error TODO: foundry-vtt-types v10 Rework method...
      */
     async createNestedItem(itemData, options = {}) {
@@ -797,7 +797,7 @@ export class SR5Item extends Item {
      */
     prepareNestedItems() {
         this.items = this.items || [];
-        
+
         const items = this.getNestedItems();
         if (!items) return;
 
@@ -817,7 +817,7 @@ export class SR5Item extends Item {
             // Case: MODIFY => Update existing item.
             if (item._id in loaded) {
                 const currentItem = loaded[item._id];
-                
+
                 // Update DocumentData directly, since we're not really having database items here.
                 currentItem.updateSource(item);
                 currentItem.prepareData();
@@ -981,10 +981,10 @@ export class SR5Item extends Item {
 
     /**
      * An attack with this weapon will create an area of effect / blast.
-     * 
-     * There is a multitude of possibilities as to HOW an item can create an AoE, 
+     *
+     * There is a multitude of possibilities as to HOW an item can create an AoE,
      * both directly connected to the item and / or some of it's nested items.
-     * 
+     *
      */
     get isAreaOfEffect(): boolean {
         return this.wrapper.isAreaOfEffect() || this.hasExplosiveAmmo;
@@ -1086,7 +1086,7 @@ export class SR5Item extends Item {
         return this.type === 'call_in_action';
     }
 
-    get asCallInAction(): Shadowrun.CallInActionItemData | undefined { 
+    get asCallInAction(): Shadowrun.CallInActionItemData | undefined {
         if (this.isCallInAction) {
             //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as Shadowrun.CallInActionItemData;
@@ -1271,7 +1271,7 @@ export class SR5Item extends Item {
 
     /**
      * Amount of recoil compensation totally available when using weapon
-     * 
+     *
      * This includes both actor and item recoil compensation.
      */
     get totalRecoilCompensation(): number {
@@ -1281,9 +1281,9 @@ export class SR5Item extends Item {
 
     /**
      * Current TOTAL recoil compensation with current recoil included.
-     * 
+     *
      * This includes both the items and it's parent actors recoil compensation and total progressive recoil.
-     * 
+     *
      * @returns A positive number or zero.
      */
     get currentRecoilCompensation(): number {
@@ -1558,7 +1558,7 @@ export class SR5Item extends Item {
                 ...Helpers.getMarkIdDocuments(markId),
                 marks,
                 markId
-            })) 
+            }))
     }
 
     /**
@@ -1628,7 +1628,7 @@ export class SR5Item extends Item {
             UpdateActionFlow.injectActionTestsIntoChangeData(this.type, changed, changed, this);
             UpdateActionFlow.onUpdateAlterActionData(changed, this);
         }
-        
+
         await super._preUpdate(changed, options, user);
     }
 }

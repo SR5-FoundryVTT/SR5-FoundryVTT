@@ -1,4 +1,5 @@
 import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
+import { SR5Item } from '../item/SR5Item';
 import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
@@ -814,5 +815,20 @@ export const registerItemLineHelpers = () => {
             text: game.i18n.localize('SR5.Del'),
             cssClass: 'network-clear'
         }];
+    })
+
+    /**
+     * Helper for checking if a weapon has any equipped ammo
+     *
+     * @param weaponItemData The weapon item to check for an equipped ammunition item
+     *
+     */
+    Handlebars.registerHelper('getEquippedAmmo', function(weaponItemData: ShadowrunItemData) {
+        const weapon = new SR5Item(weaponItemData);
+        if (weapon.hasAmmo()) {
+            const ammo = weapon.getEquippedAmmo();
+            return ammo;
+        }
+        return false;
     })
 };

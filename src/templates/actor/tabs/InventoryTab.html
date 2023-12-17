@@ -68,10 +68,14 @@
                                     description=this.description.value
                             }}
                         </div>
+                        {{#ife this.type 'weapon'}}
+                            {{#getEquippedAmmo this}}
+                                {{#log this}}{{/log}}
+                            {{/getEquippedAmmo}}
+                        {{/ife}}
                     {{/each}}
                 {{/if}}
             {{/each}}
         </div>
         </div>
         {{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}
-        
