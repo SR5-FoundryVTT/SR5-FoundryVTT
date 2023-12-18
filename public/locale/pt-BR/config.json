@@ -599,43 +599,50 @@
   "SR5.Total": "Total",
   "SR5.UnderBarrel": "Embaixo Barril",
   "SR5.Value": "Valor",
-  "SR5.Vehicle": {
-    "ChaseEnvironment": "Ambiente Perseguicao",
-    "Clearsight": "Visao Clara",
-    "ControlMode": "Modo de Controle",
-    "ControlModes": {
-      "Autopilot": "Autopiloto",
-      "Manual": "Manual",
-      "Remote": "Remoto",
-      "Rigger": "Fusor"
+    "SR5.Vehicle": {
+        "ChaseEnvironment": "Ambiente Perseguicao",
+        "Clearsight": "Visao Clara",
+        "ControlMode": "Modo de Controle",
+        "ControlModes": {
+            "Autopilot": "Autopiloto",
+            "Manual": "Manual",
+            "Remote": "Remoto",
+            "Rigger": "Fusor"
+        },
+        "Environments": {
+            "Handling": "Manejo",
+            "Speed": "Velocidade"
+        },
+        "IsDrone": "Drone",
+        "IsOffRoad": "Off Road",
+        "Maneuvering": "Manobralidade",
+        "MissingDriver": "Drag&Drop an actor as a driver",
+        "ModCategorySlots_Body": "Modification Category Slots - Body",
+        "ModCategorySlots_PowerTrain": "Modification Category Slots - Power Train",
+        "ModCategorySlots_Protection": "Modification Category Slots - Protection",
+        "ModCategorySlots_Electromagnetic": "Modification Category Slots - Electromagnetic",
+        "ModCategorySlots_Cosmetic": "Modification Category Slots - Cosmetic",
+        "ModCategorySlots_Weapons": "Modification Category Slots - Weapons",
+        "Stats": {
+            "Acceleration": "Aceleracao",
+            "Handling": "Manejo",
+            "OffRoadHandling": "Manejo (Off Road)",
+            "OffRoadSpeed": "Velocidade (Off Road)",
+            "Pilot": "Piloto",
+            "Sensor": "Sensor",
+            "Speed": "Velocidade"
+        },
+        "Stealth": "Furtividade",
+        "Type": "Tipo",
+        "Types": {
+            "Aerospace": "Espaconave",
+            "Air": "Aeronave",
+            "Exotic": "Exotico",
+            "Ground": "Terrestre",
+            "Walker": "Andarilho",
+            "Water": "Nautico"
+        }
     },
-    "Environments": {
-      "Handling": "Manejo",
-      "Speed": "Velocidade"
-    },
-    "IsDrone": "Drone",
-    "IsOffRoad": "Off Road",
-    "Maneuvering": "Manobralidade",
-    "Stats": {
-      "Acceleration": "Aceleracao",
-      "Handling": "Manejo",
-      "OffRoadHandling": "Manejo (Off Road)",
-      "OffRoadSpeed": "Velocidade (Off Road)",
-      "Pilot": "Piloto",
-      "Sensor": "Sensor",
-      "Speed": "Velocidade"
-    },
-    "Stealth": "Furtividade",
-    "Type": "Tipo",
-    "Types": {
-      "Aerospace": "Espaconave",
-      "Air": "Aeronave",
-      "Exotic": "Exotico",
-      "Ground": "Terrestre",
-      "Walker": "Andarilho",
-      "Water": "Nautico"
-    }
-  },
   "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
   "SR5.Vision": {
     "AstralPerception": "Astral Perception",

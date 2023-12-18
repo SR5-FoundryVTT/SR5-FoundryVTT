@@ -3,102 +3,102 @@
         <div class="split-container">
             <div class="scroll-area">
                 {{#if isCharacter}}
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <button type="button" class="display import-character">
-                                {{localize "SR5.ImportCharacter"}}
-                            </button>
-                        </div>
-                        {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html' }}{{/if}}
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <button type="button" class="display import-character">
+                            {{localize "SR5.ImportCharacter"}}
+                        </button>
                     </div>
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <div class="item-left">
-                                <div class="item-text item-name">
-                                    {{localize "SR5.Nuyen"}}
-                                </div>
+                    {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html' }}{{/if}}
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Nuyen"}}
                             </div>
-                            <div class="item-right">
-                                <div class="item-text input">
-                                    <input class="display" type="text" name="system.nuyen" value="{{system.nuyen}}" data-dtype="Number" />
-                                    <span class="unit">
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text input">
+                                <input class="display" type="text" name="system.nuyen" value="{{system.nuyen}}" data-dtype="Number" />
+                                <span class="unit">
                                     <i class="fas fa-yen-sign"></i>
-                                    </span>
-                                </div>
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <div class="item-left">
-                                <div class="item-text item-name">
-                                    {{localize "SR5.Karma"}}
-                                </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Karma"}}
                             </div>
-                            <div class="item-right">
-                                <div class="item-text">
-                                    <input class="display" type="text" size="10" name="system.karma.value" value="{{system.karma.value}}" data-dtype="Number" />
-                                </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.karma.value" value="{{system.karma.value}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <div class="item-left">
-                                <div class="item-text item-name">
-                                    {{localize "SR5.CareerKarma"}}
-                                </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.CareerKarma"}}
                             </div>
-                            <div class="item-right">
-                                <div class="item-text">
-                                    <input class="display" type="text" size="10" name="system.karma.max" value="{{system.karma.max}}" data-dtype="Number" />
-                                </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.karma.max" value="{{system.karma.max}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <div class="item-left">
-                                <div class="item-text item-name">
-                                    {{localize "SR5.Notoriety"}}
-                                </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Notoriety"}}
                             </div>
-                            <div class="item-right">
-                                <div class="item-text">
-                                    <input class="display" type="text" size="10" name="system.notoriety" value="{{system.notoriety}}" data-dtype="Number" />
-                                </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.notoriety" value="{{system.notoriety}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <div class="item-left">
-                                <div class="item-text item-name">
-                                    {{localize "SR5.PublicAwareness"}}
-                                </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.PublicAwareness"}}
                             </div>
-                            <div class="item-right">
-                                <div class="item-text">
-                                    <input class="display" type="text" size="10" name="system.public_awareness" value="{{system.public_awareness}}" data-dtype="Number" />
-                                </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.public_awareness" value="{{system.public_awareness}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <div class="item-left">
-                                <div class="item-text item-name">
-                                    {{localize "SR5.StreetCred"}}
-                                </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.StreetCred"}}
                             </div>
-                            <div class="item-right">
-                                <div class="item-text">
-                                    <input class="display" type="text" size="10" name="system.street_cred" value="{{system.street_cred}}" data-dtype="Number" />
-                                </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.street_cred" value="{{system.street_cred}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>
-                <!--Magic/Resonaz Selector-->    
+                </div>
+                <!--Magic/Resonaz Selector-->
                 {{/if}}
                 {{#if canAlterSpecial }}
                 <div class="list-item">
@@ -112,7 +112,7 @@
                             <div class="item-text input">
                                 <select class="display" name="system.special">
                                     {{#select system.special}} {{#each config.specialTypes as |name type|}}
-                                        <option value="{{type}}">{{localize name}}</option>
+                                    <option value="{{type}}">{{localize name}}</option>
                                     {{/each}} {{/select}}
                                 </select>
                             </div>
@@ -121,24 +121,24 @@
                 </div>
                 {{/if}}
                 {{#if awakened}}
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <div class="item-left">
-                                <div class="item-text item-name">
-                                    {{localize "SR5.DrainAttribute"}}
-                                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.DrainAttribute"}}
                             </div>
-                            <div class="item-right">
-                                <div class="item-text input defense">
-                                    <select name="system.magic.attribute" class="display">
-                                        {{#select system.magic.attribute}} {{#each config.attributes as |name type|}}
-                                            <option value="{{type}}">{{localize name}}</option>
-                                        {{/each}} {{/select}}
-                                    </select>
-                                </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text input defense">
+                                <select name="system.magic.attribute" class="display">
+                                    {{#select system.magic.attribute}} {{#each config.attributes as |name type|}}
+                                    <option value="{{type}}">{{localize name}}</option>
+                                    {{/each}} {{/select}}
+                                </select>
                             </div>
                         </div>
                     </div>
+                </div>
                 {{/if}}
                 {{#if emerged}}
                 <div class="list-item">
@@ -152,14 +152,14 @@
                             <div class="item-text input defense">
                                 <select name="system.technomancer.attribute" class="display">
                                     {{#select system.technomancer.attribute}} {{#each config.attributes as |name type|}}
-                                        <option value="{{type}}">{{localize name}}</option>
+                                    <option value="{{type}}">{{localize name}}</option>
                                     {{/each}} {{/select}}
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
-                {{/if}}                
+                {{/if}}
                 <!--Defense Selector -->
                 {{#if hasFullDefense }}
                 <div class="list-item">
@@ -173,7 +173,7 @@
                             <div class="item-text input defense">
                                 <select name="system.full_defense_attribute" class="display">
                                     {{#select system.full_defense_attribute}} {{#each config.attributes as |name type|}}
-                                        <option value="{{type}}">{{localize name}}</option>
+                                    <option value="{{type}}">{{localize name}}</option>
                                     {{/each}} {{/select}}
                                 </select>
                             </div>
@@ -191,7 +191,7 @@
                         </div>
                         <div class="item-right">
                             <div class="item-text input">
-                                <input type="checkbox" class="checkbox" name="system.is_critter" {{checked system.is_critter}}/>
+                                <input type="checkbox" class="checkbox" name="system.is_critter" {{checked system.is_critter}} />
                             </div>
                         </div>
                     </div>
@@ -205,7 +205,7 @@
                         </div>
                         <div class="item-right">
                             <div class="item-text input">
-                                <input type="checkbox" class="checkbox" name="system.is_npc" {{checked system.is_npc}}/>
+                                <input type="checkbox" class="checkbox" name="system.is_npc" {{checked system.is_npc}} />
                             </div>
                         </div>
                     </div>
@@ -222,8 +222,8 @@
                         <div class="item-right">
                             <div class="item-text input">
                                 <div class="item-text input">
-                                <input type="checkbox" class="checkbox" name="system.npc.is_grunt" {{checked system.npc.is_grunt}}/>
-                            </div>
+                                    <input type="checkbox" class="checkbox" name="system.npc.is_grunt" {{checked system.npc.is_grunt}} />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -241,9 +241,95 @@
                             <div class="item-text input">
                                 <select name="system.metatype" class="display">
                                     {{#select system.metatype}} {{#each config.character.types as |name type|}}
-                                        <option value="{{type}}">{{localize name}}</option>
+                                    <option value="{{type}}">{{localize name}}</option>
                                     {{/each}} {{/select}}
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/if}}
+                {{#if isVehicle}}
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Vehicle.ModCategorySlots_Body"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.modCategorySlots_Body" value="{{system.modCategorySlots_Body}}" data-dtype="Number" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Vehicle.ModCategorySlots_Cosmetic"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.modCategorySlots_Cosmetic" value="{{system.modCategorySlots_Cosmetic}}" data-dtype="Number" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Vehicle.ModCategorySlots_Electromagnetic"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.modCategorySlots_Electromagnetic" value="{{system.modCategorySlots_Electromagnetic}}" data-dtype="Number" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Vehicle.ModCategorySlots_PowerTrain"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.modCategorySlots_PowerTrain" value="{{system.modCategorySlots_PowerTrain}}" data-dtype="Number" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Vehicle.ModCategorySlots_Protection"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.modCategorySlots_Protection" value="{{system.modCategorySlots_Protection}}" data-dtype="Number" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Vehicle.ModCategorySlots_Weapons"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="system.modCategorySlots_Weapons" value="{{system.modCategorySlots_Weapons}}" data-dtype="Number" />
                             </div>
                         </div>
                     </div>

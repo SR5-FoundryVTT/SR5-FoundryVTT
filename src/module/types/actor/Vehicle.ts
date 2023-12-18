@@ -34,6 +34,12 @@ declare namespace Shadowrun {
             attributes: VehicleAttributes
             networkController: string
             modifiers: Modifiers & CommonModifiers
+            modCategorySlots_Body: number
+            modCategorySlots_PowerTrain: number
+            modCategorySlots_Protection: number
+            modCategorySlots_Electromagnetic: number
+            modCategorySlots_Cosmetic: number
+            modCategorySlots_Weapons: number
         }
 
     export interface VehicleStats {

@@ -1039,13 +1039,19 @@
             }
         },
         "vehicle": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values"],
+            "templates": [ "common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values" ],
             "vehicleType": "ground",
             "controlMode": "autopilot",
             "environment": "speed",
             "isDrone": false,
             "isOffRoad": false,
             "driver": "",
+            "modCategorySlots_Body": 0,
+            "modCategorySlots_PowerTrain": 0,
+            "modCategorySlots_Protection": 0,
+            "modCategorySlots_Electromagnetic": 0,
+            "modCategorySlots_Cosmetic": 0,
+            "modCategorySlots_Weapons": 0,
             "vehicle_stats": {
                 "pilot": {
                     "base": 0,
