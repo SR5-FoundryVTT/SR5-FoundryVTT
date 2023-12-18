@@ -37,6 +37,9 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/ContactList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/SinAndLifestyleList.html',
 
+        // inventory
+        'systems/shadowrun5e/dist/templates/actor/parts/inventory/InlineAmmo.html',
+
         // magic
         'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/MetamagicList.html',

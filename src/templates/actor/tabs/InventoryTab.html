@@ -69,13 +69,23 @@
                             }}
                         </div>
                         {{#ife this.type 'weapon'}}
-                        <div>
                             {{#each (getEquippedAmmo this) as |ammo|}}
                                 {{#if ammo}}
-                                {{!Gotta add in ammo display here}}
+                                <div class="custom-item-element">
+                                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/inventory/InlineAmmo.html'
+                                            itemCssClass="ammo-inline"
+                                            img=ammo.img
+                                            name=ammo.name
+                                            itemId=ammo._id
+                                            icons=(InventoryItemIcons ammo)
+                                            rightSide=(ItemRightSide ammo)
+                                            hasDesc="true"
+                                            hasRoll="true"
+                                            description=ammo.description.value
+                                    }}
+                                </div>
                                 {{/if}}
                             {{/each}}
-                        </div>
                         {{/ife}}
                     {{/each}}
                 {{/if}}

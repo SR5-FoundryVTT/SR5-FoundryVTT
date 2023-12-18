@@ -807,6 +807,12 @@ input[type='text'].display {
             // }
         }
 
+        &.ammo-inline {
+            margin-left: 12px;
+            padding-left: 6px;
+            border-left: dashed cornflowerblue;
+        }
+
         .list-item-content {
             //color: white;
             display: flex;
