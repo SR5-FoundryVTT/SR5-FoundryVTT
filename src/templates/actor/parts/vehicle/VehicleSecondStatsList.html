@@ -3,60 +3,79 @@
             name=(localize "SR5.Labels.ActorSheet.VehicleConfiguration")
     }}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.Driver") }}
-        <div>
-            {{#if vehicle.driver}}
-            <a class="entity-link content-link" draggable="true" data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
-                <i class="fas fa-user"></i>
-                {{vehicle.driver.name}}
-            </a>
-            <a class="close driver-remove"><i class="fas fa-times"></i></a>
-            {{else}}
-            {{localize "SR5.Vehicle.MissingDriver"}}
-            {{/if}}
-        </div>
+    <div>
+        {{#if vehicle.driver}}
+        <a class="entity-link content-link" draggable="true" data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
+            <i class="fas fa-user"></i>
+            {{vehicle.driver.name}}
+        </a>
+        <a class="close driver-remove"><i class="fas fa-times"></i></a>
+        {{else}}
+        {{localize "SR5.Vehicle.MissingDriver"}}
+        {{/if}}
+    </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.Type") }}
-        <div>
-            {{> "systems/shadowrun5e/dist/templates/common/Select.html"
+    <div>
+        {{> "systems/shadowrun5e/dist/templates/common/Select.html"
                     options=config.vehicle.types
                     value=system.vehicleType
                     path="system.vehicleType"
-            }}
-        </div>
+        }}
+    </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
 
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ControlMode") }}
-        <div>
-            {{> "systems/shadowrun5e/dist/templates/common/Select.html"
+    <div>
+        {{> "systems/shadowrun5e/dist/templates/common/Select.html"
                     options=config.vehicle.control_modes
                     value=system.controlMode
                     path="system.controlMode"
-            }}
-        </div>
+        }}
+    </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
 
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ChaseEnvironment") }}
-        <div>
-            {{> "systems/shadowrun5e/dist/templates/common/Select.html"
+    <div>
+        {{> "systems/shadowrun5e/dist/templates/common/Select.html"
                     options=config.vehicle.environments
                     value=system.environment
                     path="system.environment"
-            }}
-        </div>
+        }}
+    </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
 
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.IsDrone") }}
-        <input type="checkbox" class="checkbox" name="system.isDrone" {{checked system.isDrone}}/>
+        <input type="checkbox" class="checkbox" name="system.isDrone" {{checked system.isDrone}} />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.IsOffRoad") }}
-        <input type="checkbox" class="checkbox" name="system.isOffRoad" {{checked system.isOffRoad}}/>
+        <input type="checkbox" class="checkbox" name="system.isOffRoad" {{checked system.isOffRoad}} />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Labels.Sheet.PAN") }}
     {{#if vehicle.networkController}}
-    <span>
-                <a class="origin-link" draggable="false" data-origin-link="{{vehicle.networkController.uuid}}">{{vehicle.networkController.name}}</a>
-                <a class="close controller-remove"><i class="fas fa-times"></i></a>
-            </span>
+        <span>
+            <a class="origin-link" draggable="false" data-origin-link="{{vehicle.networkController.uuid}}">{{vehicle.networkController.name}}</a>
+            <a class="close controller-remove"><i class="fas fa-times"></i></a>
+        </span>
     {{/if}}
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModCategorySlots_Body") }}
+        <input class="display" type="text" size="10" name="system.modCategorySlots_Body" value="{{system.modCategorySlots_Body}}" data-dtype="Number" />
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModCategorySlots_Cosmetic") }}
+        <input class="display" type="text" size="10" name="system.modCategorySlots_Cosmetic" value="{{system.modCategorySlots_Cosmetic}}" data-dtype="Number" />
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModCategorySlots_Electromagnetic") }}
+        <input class="display" type="text" size="10" name="system.modCategorySlots_Electromagnetic" value="{{system.modCategorySlots_Electromagnetic}}" data-dtype="Number" />
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModCategorySlots_PowerTrain") }}
+        <input class="display" type="text" size="10" name="system.modCategorySlots_PowerTrain" value="{{system.modCategorySlots_PowerTrain}}" data-dtype="Number" />
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModCategorySlots_Protection") }}
+        <input class="display" type="text" size="10" name="system.modCategorySlots_Protection" value="{{system.modCategorySlots_Protection}}" data-dtype="Number" />
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModCategorySlots_Weapons") }}
+        <input class="display" type="text" size="10" name="system.modCategorySlots_Weapons" value="{{system.modCategorySlots_Weapons}}" data-dtype="Number" />
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+
 </div>
