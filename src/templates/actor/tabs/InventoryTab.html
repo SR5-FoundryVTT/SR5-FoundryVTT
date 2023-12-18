@@ -69,9 +69,13 @@
                             }}
                         </div>
                         {{#ife this.type 'weapon'}}
-                            {{#getEquippedAmmo this}}
-                                {{#log this}}{{/log}}
-                            {{/getEquippedAmmo}}
+                        <div>
+                            {{#each (getEquippedAmmo this) as |ammo|}}
+                                {{#if ammo}}
+                                {{!Gotta add in ammo display here}}
+                                {{/if}}
+                            {{/each}}
+                        </div>
                         {{/ife}}
                     {{/each}}
                 {{/if}}

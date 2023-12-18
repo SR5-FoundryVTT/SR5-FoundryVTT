@@ -827,8 +827,8 @@ export const registerItemLineHelpers = () => {
         const weapon = new SR5Item(weaponItemData);
         if (weapon.hasAmmo()) {
             const ammo = weapon.getEquippedAmmo();
-            return ammo;
+            return [ammo];
         }
-        return false;
+        return [false];
     })
 };
