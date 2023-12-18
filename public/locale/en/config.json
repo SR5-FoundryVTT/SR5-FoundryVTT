@@ -675,6 +675,7 @@
             "Line2": "Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects with an item origin will be deleted.",
             "Line3": "Effects created directly on actors aren't affected.",
             "Line4": "Should you heavily use effects and effects modules and aren't sure about 'item owned effects', you set this migration to disable and review your disabled effects. Disabled effects will be marked as such.",
+            "Line5": "Also be aware that enabled effects on actor items will now be applied. You'll be able to see all applied effects in the actors effects tab.",
             "OnlyDisable": "Disable Effects only",
             "Warning": "NOTE!"
         }
