@@ -11,7 +11,7 @@
             <div class="item-left">
                 <div class="item-img">
                     <img src="{{this.target.img}}"
-                         title="{{this.target.name}}"
+                         data-tooltip="{{this.target.name}}"
                          height="24px"
                          width="24px"/>
                 </div>
@@ -28,13 +28,13 @@
                     <input class="display marks-qty" size="1" type="text" data-dtype="Number" placeholder="1" value="{{this.marks}}" data-mark-id="{{this.markId}}"/>
                 </div>
                 <div class="item-text item-icons">
-                    <a class="" title="{{localize "SR5.Labels.Sheet.AddOne"}}">
+                    <a class="" data-tooltip="SR5.Labels.Sheet.AddOne">
                         <i class="item-icon fas fa-plus marks-add-one" data-mark-id="{{this.markId}}"></i>
                     </a>
-                    <a class="" title="{{localize "SR5.Labels.Sheet.SubtractOne"}}">
+                    <a class="" data-tooltip="SR5.Labels.Sheet.SubtractOne">
                         <i class="item-icon fas fa-minus marks-remove-one" data-mark-id="{{this.markId}}"></i>
                     </a>
-                    <a class="" title="{{localize "SR5.Del"}}">
+                    <a class="" data-tooltip="SR5.Del">
                         <i class="item-icon fas fa-trash marks-delete" data-mark-id="{{this.markId}}"></i>
                     </a>
                 </div>

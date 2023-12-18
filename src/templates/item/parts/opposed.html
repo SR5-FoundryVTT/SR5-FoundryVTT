@@ -20,7 +20,7 @@
     {{#if system.action.opposed.test}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.Skill"}}
+            {{localize "SR5.Skill.Skill"}}
         </div>
         <div class="inputs">
             <select name="system.action.opposed.skill">
@@ -63,7 +63,7 @@
         </div>
         <div class="inputs">
             <input
-                    title="{{localize SR5.Armor}}"
+                    data-tooltip="SR5.Armor"
                     type="checkbox"
                     name="system.action.opposed.armor"
                     {{checked system.action.opposed.armor}}
@@ -92,7 +92,7 @@
     {{#if system.action.opposed.resist.test}}
     <div class="form-line">
         <div class="label">
-            {{localize "SR5.Skill"}}
+            {{localize "SR5.Skill.Skill"}}
         </div>
         <div class="inputs">
             <select name="system.action.opposed.resist.skill">
@@ -135,7 +135,7 @@
         </div>
         <div class="inputs">
             <input
-                    title="{{localize SR5.Armor}}"
+                    data-tooltip="SR5.Armor"
                     type="checkbox"
                     name="system.action.opposed.resist.armor"
                     {{checked system.action.opposed.resist.armor}}

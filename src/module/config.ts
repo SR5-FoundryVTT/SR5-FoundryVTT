@@ -90,10 +90,10 @@ export const SR5 = {
 
     weaponRangeCategories: {
         manual: {
-            label: 'SR5.Weapon.RangeCategory.Manual',
+            label: 'SR5.Weapon.Range.Category.Manual',
         },
         taser: {
-            label: 'SR5.Weapon.RangeCategory.Taser',
+            label: 'SR5.Weapon.Range.Category.Taser',
             ranges: {
                 short: 5,
                 medium: 10,
@@ -102,7 +102,7 @@ export const SR5 = {
             },
         },
         holdOutPistol: {
-            label: 'SR5.Weapon.RangeCategory.HoldOutPistol',
+            label: 'SR5.Weapon.Range.Category.HoldOutPistol',
             ranges: {
                 short: 5,
                 medium: 15,
@@ -111,7 +111,7 @@ export const SR5 = {
             },
         },
         lightPistol: {
-            label: 'SR5.Weapon.RangeCategory.LightPistol',
+            label: 'SR5.Weapon.Range.Category.LightPistol',
             ranges: {
                 short: 5,
                 medium: 15,
@@ -120,7 +120,7 @@ export const SR5 = {
             },
         },
         heavyPistol: {
-            label: 'SR5.Weapon.RangeCategory.HeavyPistol',
+            label: 'SR5.Weapon.Range.Category.HeavyPistol',
             ranges: {
                 short: 5,
                 medium: 20,
@@ -129,7 +129,7 @@ export const SR5 = {
             },
         },
         machinePistol: {
-            label: 'SR5.Weapon.RangeCategory.MachinePistol',
+            label: 'SR5.Weapon.Range.Category.MachinePistol',
             ranges: {
                 short: 5,
                 medium: 15,
@@ -138,7 +138,7 @@ export const SR5 = {
             },
         },
         smg: {
-            label: 'SR5.Weapon.RangeCategory.SMG',
+            label: 'SR5.Weapon.Range.Category.SMG',
             ranges: {
                 short: 10,
                 medium: 40,
@@ -147,7 +147,7 @@ export const SR5 = {
             },
         },
         assaultRifle: {
-            label: 'SR5.Weapon.RangeCategory.AssaultRifle',
+            label: 'SR5.Weapon.Range.Category.AssaultRifle',
             ranges: {
                 short: 25,
                 medium: 150,
@@ -156,7 +156,7 @@ export const SR5 = {
             },
         },
         shotgunFlechette: {
-            label: 'SR5.Weapon.RangeCategory.ShotgunFlechette',
+            label: 'SR5.Weapon.Range.Category.ShotgunFlechette',
             ranges: {
                 short: 15,
                 medium: 30,
@@ -165,7 +165,7 @@ export const SR5 = {
             },
         },
         shotgunSlug: {
-            label: 'SR5.Weapon.RangeCategory.ShotgunSlug',
+            label: 'SR5.Weapon.Range.Category.ShotgunSlug',
             ranges: {
                 short: 10,
                 medium: 40,
@@ -174,7 +174,7 @@ export const SR5 = {
             },
         },
         sniperRifle: {
-            label: 'SR5.Weapon.RangeCategory.SniperRifle',
+            label: 'SR5.Weapon.Range.Category.SniperRifle',
             ranges: {
                 short: 50,
                 medium: 350,
@@ -183,7 +183,7 @@ export const SR5 = {
             },
         },
         sportingRifle: {
-            label: 'SR5.Weapon.RangeCategory.SportingRifle',
+            label: 'SR5.Weapon.Range.Category.SportingRifle',
             ranges: {
                 short: 50,
                 medium: 250,
@@ -192,7 +192,7 @@ export const SR5 = {
             },
         },
         lightMachinegun: {
-            label: 'SR5.Weapon.RangeCategory.LightMachinegun',
+            label: 'SR5.Weapon.Range.Category.LightMachinegun',
             ranges: {
                 short: 25,
                 medium: 200,
@@ -201,7 +201,7 @@ export const SR5 = {
             },
         },
         mediumHeavyMachinegun: {
-            label: 'SR5.Weapon.RangeCategory.MediumHeavyMachinegun',
+            label: 'SR5.Weapon.Range.Category.MediumHeavyMachinegun',
             ranges: {
                 short: 40,
                 medium: 250,
@@ -210,7 +210,7 @@ export const SR5 = {
             },
         },
         assaultCannon: {
-            label: 'SR5.Weapon.RangeCategory.AssaultCannon',
+            label: 'SR5.Weapon.Range.Category.AssaultCannon',
             ranges: {
                 short: 50,
                 medium: 300,
@@ -219,7 +219,7 @@ export const SR5 = {
             },
         },
         grenadeLauncher: {
-            label: 'SR5.Weapon.RangeCategory.GrenadeLauncher',
+            label: 'SR5.Weapon.Range.Category.GrenadeLauncher',
             ranges: {
                 short: 50,
                 medium: 100,
@@ -228,7 +228,7 @@ export const SR5 = {
             },
         },
         missileLauncher: {
-            label: 'SR5.Weapon.RangeCategory.MissileLauncher',
+            label: 'SR5.Weapon.Range.Category.MissileLauncher',
             ranges: {
                 short: 70,
                 medium: 150,
@@ -237,7 +237,7 @@ export const SR5 = {
             },
         },
         bow: {
-            label: 'SR5.Weapon.RangeCategory.Bow',
+            label: 'SR5.Weapon.Range.Category.Bow',
             ranges: {
                 short: 1,
                 medium: 10,
@@ -247,7 +247,7 @@ export const SR5 = {
             },
         },
         lightCrossbow: {
-            label: 'SR5.Weapon.RangeCategory.LightCrossbow',
+            label: 'SR5.Weapon.Range.Category.LightCrossbow',
             ranges: {
                 short: 6,
                 medium: 24,
@@ -256,7 +256,7 @@ export const SR5 = {
             },
         },
         mediumCrossbow: {
-            label: 'SR5.Weapon.RangeCategory.MediumCrossbow',
+            label: 'SR5.Weapon.Range.Category.MediumCrossbow',
             ranges: {
                 short: 9,
                 medium: 36,
@@ -265,7 +265,7 @@ export const SR5 = {
             },
         },
         heavyCrossbow: {
-            label: 'SR5.Weapon.RangeCategory.HeavyCrossbow',
+            label: 'SR5.Weapon.Range.Category.HeavyCrossbow',
             ranges: {
                 short: 15,
                 medium: 45,
@@ -274,7 +274,7 @@ export const SR5 = {
             },
         },
         thrownKnife: {
-            label: 'SR5.Weapon.RangeCategory.ThrownKnife',
+            label: 'SR5.Weapon.Range.Category.ThrownKnife',
             ranges: {
                 short: 1,
                 medium: 2,
@@ -284,7 +284,7 @@ export const SR5 = {
             },
         },
         net: {
-            label: 'SR5.Weapon.RangeCategory.Net',
+            label: 'SR5.Weapon.Range.Category.Net',
             ranges: {
                 short: 0.5,
                 medium: 1,
@@ -294,7 +294,7 @@ export const SR5 = {
             },
         },
         shuriken: {
-            label: 'SR5.Weapon.RangeCategory.Shuriken',
+            label: 'SR5.Weapon.Range.Category.Shuriken',
             ranges: {
                 short: 1,
                 medium: 2,
@@ -304,7 +304,7 @@ export const SR5 = {
             },
         },
         standardThrownGrenade: {
-            label: 'SR5.Weapon.RangeCategory.StandardThrownGrenade',
+            label: 'SR5.Weapon.Range.Category.StandardThrownGrenade',
             ranges: {
                 short: 2,
                 medium: 4,
@@ -314,7 +314,7 @@ export const SR5 = {
             },
         },
         aerodynamicThrownGrenade: {
-            label: 'SR5.Weapon.RangeCategory.AerodynamicThrownGrenade',
+            label: 'SR5.Weapon.Range.Category.AerodynamicThrownGrenade',
             ranges: {
                 short: 2,
                 medium: 4,
@@ -324,7 +324,7 @@ export const SR5 = {
             },
         },
         harpoonGun: {
-            label: 'SR5.Weapon.RangeCategory.HarpoonGun',
+            label: 'SR5.Weapon.Range.Category.HarpoonGun',
             ranges: {
                 short: 5,
                 medium: 20,
@@ -333,7 +333,7 @@ export const SR5 = {
             },
         },
         harpoonGunUnderwater: {
-            label: 'SR5.Weapon.RangeCategory.HarpoonGunUnderwater',
+            label: 'SR5.Weapon.Range.Category.HarpoonGunUnderwater',
             ranges: {
                 short: 6,
                 medium: 24,
@@ -342,7 +342,7 @@ export const SR5 = {
             },
         },
         flamethrower: {
-            label: 'SR5.Weapon.RangeCategory.Flamethrower',
+            label: 'SR5.Weapon.Range.Category.Flamethrower',
             ranges: {
                 short: 15,
                 medium: 20,
@@ -362,43 +362,43 @@ export const SR5 = {
     },
 
     spellCategories: {
-        combat: 'SR5.SpellCatCombat',
-        detection: 'SR5.SpellCatDetection',
-        health: 'SR5.SpellCatHealth',
-        illusion: 'SR5.SpellCatIllusion',
-        manipulation: 'SR5.SpellCatManipulation'
+        combat: 'SR5.Spell.CatCombat',
+        detection: 'SR5.Spell.CatDetection',
+        health: 'SR5.Spell.CatHealth',
+        illusion: 'SR5.Spell.CatIllusion',
+        manipulation: 'SR5.Spell.CatManipulation'
     },
 
     spellTypes: {
-        physical: 'SR5.SpellTypePhysical',
-        mana: 'SR5.SpellTypeMana',
+        physical: 'SR5.Spell.TypePhysical',
+        mana: 'SR5.Spell.TypeMana',
     },
 
     spellRanges: {
-        touch: 'SR5.SpellRangeTouch',
-        los: 'SR5.SpellRangeLos',
-        los_a: 'SR5.SpellRangeLosA',
+        touch: 'SR5.Spell.RangeTouch',
+        los: 'SR5.Spell.RangeLos',
+        los_a: 'SR5.Spell.RangeLosA',
     },
 
     combatSpellTypes: {
-        direct: 'SR5.SpellCombatDirect',
-        indirect: 'SR5.SpellCombatIndirect',
+        direct: 'SR5.Spell.CombatDirect',
+        indirect: 'SR5.Spell.CombatIndirect',
     },
 
     detectionSpellTypes: {
-        directional: 'SR5.SpellDetectionDirectional',
-        psychic: 'SR5.SpellDetectionPsychic',
-        area: 'SR5.SpellDetectionArea',
+        directional: 'SR5.Spell.DetectionDirectional',
+        psychic: 'SR5.Spell.DetectionPsychic',
+        area: 'SR5.Spell.DetectionArea',
     },
 
     illusionSpellTypes: {
-        obvious: 'SR5.SpellIllusionObvious',
-        realistic: 'SR5.SpellIllusionRealistic',
+        obvious: 'SR5.Spell.IllusionObvious',
+        realistic: 'SR5.Spell.IllusionRealistic',
     },
 
     illusionSpellSenses: {
-        'single-sense': 'SR5.SpellIllusionSingleSense',
-        'multi-sense': 'SR5.SpellIllusionMultiSense',
+        'single-sense': 'SR5.Spell.IllusionSingleSense',
+        'multi-sense': 'SR5.Spell.IllusionMultiSense',
     },
 
     attributeRolls: {
@@ -424,16 +424,16 @@ export const SR5 = {
     },
 
     weaponCategories: {
-        range: 'SR5.WeaponCatRange',
-        melee: 'SR5.WeaponCatMelee',
-        thrown: 'SR5.WeaponCatThrown',
+        range: 'SR5.Weapon.Category.Range',
+        melee: 'SR5.Weapon.Category.Melee',
+        thrown: 'SR5.Weapon.Category.Thrown',
     },
 
     weaponRanges: {
-        short: 'SR5.WeaponRangeShort',
-        medium: 'SR5.WeaponRangeMedium',
-        long: 'SR5.WeaponRangeLong',
-        extreme: 'SR5.WeaponRangeExtreme',
+        short: 'SR5.Weapon.Range.Short',
+        medium: 'SR5.Weapon.Range.Medium',
+        long: 'SR5.Weapon.Range.Long',
+        extreme: 'SR5.Weapon.Range.Extreme',
     },
 
     qualityTypes: {
@@ -470,81 +470,81 @@ export const SR5 = {
     },
 
     activeSkills: {
-        archery: 'SR5.SkillArchery',
-        automatics: 'SR5.SkillAutomatics',
-        blades: 'SR5.SkillBlades',
-        clubs: 'SR5.SkillClubs',
-        exotic_melee: 'SR5.SkillExoticMelee',
-        exotic_range: 'SR5.SkillExoticRange',
-        heavy_weapons: 'SR5.SkillHeavyWeapons',
-        longarms: 'SR5.SkillLongarms',
-        pistols: 'SR5.SkillPistols',
-        throwing_weapons: 'SR5.SkillThrowingWeapons',
-        unarmed_combat: 'SR5.SkillUnarmedCombat',
-        disguise: 'SR5.SkillDisguise',
-        diving: 'SR5.SkillDiving',
-        escape_artist: 'SR5.SkillEscapeArtist',
-        free_fall: 'SR5.SkillFreeFall',
-        gymnastics: 'SR5.SkillGymnastics',
-        palming: 'SR5.SkillPalming',
-        perception: 'SR5.SkillPerception',
-        running: 'SR5.SkillRunning',
-        sneaking: 'SR5.SkillSneaking',
-        survival: 'SR5.SkillSurvival',
-        swimming: 'SR5.SkillSwimming',
-        tracking: 'SR5.SkillTracking',
-        con: 'SR5.SkillCon',
-        etiquette: 'SR5.SkillEtiquette',
-        impersonation: 'SR5.SkillImpersonation',
-        instruction: 'SR5.SkillInstruction',
-        intimidation: 'SR5.SkillIntimidation',
-        leadership: 'SR5.SkillLeadership',
-        negotiation: 'SR5.SkillNegotiation',
-        performance: 'SR5.SkillPerformance',
-        alchemy: 'SR5.SkillAlchemy',
-        arcana: 'SR5.SkillArcana',
-        artificing: 'SR5.SkillArtificing',
-        assensing: 'SR5.SkillAssensing',
-        astral_combat: 'SR5.SkillAstralCombat',
-        banishing: 'SR5.SkillBanishing',
-        binding: 'SR5.SkillBinding',
-        counterspelling: 'SR5.SkillCounterspelling',
-        disenchanting: 'SR5.SkillDisenchanting',
-        ritual_spellcasting: 'SR5.SkillRitualSpellcasting',
-        spellcasting: 'SR5.SkillSpellcasting',
-        summoning: 'SR5.SkillSummoning',
-        compiling: 'SR5.SkillCompiling',
-        decompiling: 'SR5.SkillDecompiling',
-        registering: 'SR5.SkillRegistering',
-        aeronautics_mechanic: 'SR5.SkillAeronauticsMechanic',
-        automotive_mechanic: 'SR5.SkillAutomotiveMechanic',
-        industrial_mechanic: 'SR5.SkillIndustrialMechanic',
-        nautical_mechanic: 'SR5.SkillNauticalMechanic',
-        animal_handling: 'SR5.SkillAnimalHandling',
-        armorer: 'SR5.SkillArmorer',
-        artisan: 'SR5.SkillArtisan',
-        biotechnology: 'SR5.SkillBiotechnology',
-        chemistry: 'SR5.SkillChemistry',
-        computer: 'SR5.SkillComputer',
-        cybercombat: 'SR5.SkillCybercombat',
-        cybertechnology: 'SR5.SkillCybertechnology',
-        demolitions: 'SR5.SkillDemolitions',
-        electronic_warfare: 'SR5.SkillElectronicWarfare',
-        first_aid: 'SR5.SkillFirstAid',
-        forgery: 'SR5.SkillForgery',
-        hacking: 'SR5.SkillHacking',
-        hardware: 'SR5.SkillHardware',
-        locksmith: 'SR5.SkillLocksmith',
-        medicine: 'SR5.SkillMedicine',
-        navigation: 'SR5.SkillNavigation',
-        software: 'SR5.SkillSoftware',
-        gunnery: 'SR5.SkillGunnery',
-        pilot_aerospace: 'SR5.SkillPilotAerospace',
-        pilot_aircraft: 'SR5.SkillPilotAircraft',
-        pilot_walker: 'SR5.SkillPilotWalker',
-        pilot_ground_craft: 'SR5.SkillPilotGroundCraft',
-        pilot_water_craft: 'SR5.SkillPilotWaterCraft',
-        pilot_exotic_vehicle: 'SR5.SkillPilotExoticVehicle',
+        archery: 'SR5.Skill.Archery',
+        automatics: 'SR5.Skill.Automatics',
+        blades: 'SR5.Skill.Blades',
+        clubs: 'SR5.Skill.Clubs',
+        exotic_melee: 'SR5.Skill.ExoticMelee',
+        exotic_range: 'SR5.Skill.ExoticRange',
+        heavy_weapons: 'SR5.Skill.HeavyWeapons',
+        longarms: 'SR5.Skill.Longarms',
+        pistols: 'SR5.Skill.Pistols',
+        throwing_weapons: 'SR5.Skill.ThrowingWeapons',
+        unarmed_combat: 'SR5.Skill.UnarmedCombat',
+        disguise: 'SR5.Skill.Disguise',
+        diving: 'SR5.Skill.Diving',
+        escape_artist: 'SR5.Skill.EscapeArtist',
+        free_fall: 'SR5.Skill.FreeFall',
+        gymnastics: 'SR5.Skill.Gymnastics',
+        palming: 'SR5.Skill.Palming',
+        perception: 'SR5.Skill.Perception',
+        running: 'SR5.Skill.Running',
+        sneaking: 'SR5.Skill.Sneaking',
+        survival: 'SR5.Skill.Survival',
+        swimming: 'SR5.Skill.Swimming',
+        tracking: 'SR5.Skill.Tracking',
+        con: 'SR5.Skill.Con',
+        etiquette: 'SR5.Skill.Etiquette',
+        impersonation: 'SR5.Skill.Impersonation',
+        instruction: 'SR5.Skill.Instruction',
+        intimidation: 'SR5.Skill.Intimidation',
+        leadership: 'SR5.Skill.Leadership',
+        negotiation: 'SR5.Skill.Negotiation',
+        performance: 'SR5.Skill.Performance',
+        alchemy: 'SR5.Skill.Alchemy',
+        arcana: 'SR5.Skill.Arcana',
+        artificing: 'SR5.Skill.Artificing',
+        assensing: 'SR5.Skill.Assensing',
+        astral_combat: 'SR5.Skill.AstralCombat',
+        banishing: 'SR5.Skill.Banishing',
+        binding: 'SR5.Skill.Binding',
+        counterspelling: 'SR5.Skill.Counterspelling',
+        disenchanting: 'SR5.Skill.Disenchanting',
+        ritual_spellcasting: 'SR5.Skill.RitualSpellcasting',
+        spellcasting: 'SR5.Skill.Spellcasting',
+        summoning: 'SR5.Skill.Summoning',
+        compiling: 'SR5.Skill.Compiling',
+        decompiling: 'SR5.Skill.Decompiling',
+        registering: 'SR5.Skill.Registering',
+        aeronautics_mechanic: 'SR5.Skill.AeronauticsMechanic',
+        automotive_mechanic: 'SR5.Skill.AutomotiveMechanic',
+        industrial_mechanic: 'SR5.Skill.IndustrialMechanic',
+        nautical_mechanic: 'SR5.Skill.NauticalMechanic',
+        animal_handling: 'SR5.Skill.AnimalHandling',
+        armorer: 'SR5.Skill.Armorer',
+        artisan: 'SR5.Skill.Artisan',
+        biotechnology: 'SR5.Skill.Biotechnology',
+        chemistry: 'SR5.Skill.Chemistry',
+        computer: 'SR5.Skill.Computer',
+        cybercombat: 'SR5.Skill.Cybercombat',
+        cybertechnology: 'SR5.Skill.Cybertechnology',
+        demolitions: 'SR5.Skill.Demolitions',
+        electronic_warfare: 'SR5.Skill.ElectronicWarfare',
+        first_aid: 'SR5.Skill.FirstAid',
+        forgery: 'SR5.Skill.Forgery',
+        hacking: 'SR5.Skill.Hacking',
+        hardware: 'SR5.Skill.Hardware',
+        locksmith: 'SR5.Skill.Locksmith',
+        medicine: 'SR5.Skill.Medicine',
+        navigation: 'SR5.Skill.Navigation',
+        software: 'SR5.Skill.Software',
+        gunnery: 'SR5.Skill.Gunnery',
+        pilot_aerospace: 'SR5.Skill.PilotAerospace',
+        pilot_aircraft: 'SR5.Skill.PilotAircraft',
+        pilot_walker: 'SR5.Skill.PilotWalker',
+        pilot_ground_craft: 'SR5.Skill.PilotGroundCraft',
+        pilot_water_craft: 'SR5.Skill.PilotWaterCraft',
+        pilot_exotic_vehicle: 'SR5.Skill.PilotExoticVehicle',
     },
 
     actionTypes: {
@@ -1000,10 +1000,10 @@ export const SR5 = {
     ],
 
     rangeWeaponModeLabel: {
-        'single_shot': 'SR5.WeaponModeSingleShot',
-        'semi_auto': 'SR5.WeaponModeSemiAuto',
-        'burst_file': 'SR5.WeaponModeBurstFire',
-        'full_auto': 'SR5.WeaponModeFullAuto'
+        'single_shot': 'SR5.Weapon.Mode.SingleShot',
+        'semi_auto': 'SR5.Weapon.Mode.SemiAuto',
+        'burst_file': 'SR5.Weapon.Mode.BurstFire',
+        'full_auto': 'SR5.Weapon.Mode.FullAuto'
     },
 
     /**
@@ -1014,7 +1014,7 @@ export const SR5 = {
      */
     fireModes: [
     {
-        label: "SR5.WeaponModeSingleShot",
+        label: "SR5.Weapon.Mode.SingleShot",
         value: 1,
         recoil: false,
         defense: 0,
@@ -1023,7 +1023,7 @@ export const SR5 = {
         mode: 'single_shot'
     },
     {
-        label: "SR5.WeaponModeSemiAutoShort",
+        label: "SR5.Weapon.Mode.SemiAutoShort",
         value: 1,
         recoil: true,
         defense: 0,
@@ -1032,7 +1032,7 @@ export const SR5 = {
         mode: 'semi_auto'
     },
     {
-        label: "SR5.WeaponModeSemiAutoBurst",
+        label: "SR5.Weapon.Mode.SemiAutoBurst",
         value: 3,
         recoil: true,
         defense: -2,
@@ -1042,7 +1042,7 @@ export const SR5 = {
     },
 
     {
-        label: "SR5.WeaponModeBurstFire",
+        label: "SR5.Weapon.Mode.BurstFire",
         value: 3,
         recoil: true,
         defense: -2,
@@ -1051,7 +1051,7 @@ export const SR5 = {
         mode: 'burst_fire'
     },
     {
-        label: "SR5.WeaponModeBurstFireLong",
+        label: "SR5.Weapon.Mode.BurstFireLong",
         value: 6,
         recoil: true,
         defense: -5,
@@ -1060,7 +1060,7 @@ export const SR5 = {
         mode: 'burst_fire',
     },
     {
-        label: "SR5.WeaponModeFullAutoShort",
+        label: "SR5.Weapon.Mode.FullAutoShort",
         value: 6,
         recoil: true,
         defense: -5,
@@ -1069,7 +1069,7 @@ export const SR5 = {
         mode: 'full_auto'
     },
     {
-        label: 'SR5.WeaponModeFullAutoLong',
+        label: 'SR5.Weapon.Mode.FullAutoLong',
         value: 10,
         recoil: true,
         defense: -9,

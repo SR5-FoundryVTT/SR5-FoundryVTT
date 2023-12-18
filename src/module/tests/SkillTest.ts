@@ -1,6 +1,6 @@
 import { PartsList } from '../parts/PartsList';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
-
+import { Translation } from '../utils/strings';
 
 export interface SkillTestData extends SuccessTestData {
     attribute: string
@@ -34,7 +34,7 @@ export class SkillTest extends SuccessTest {
      */
     override get title() {
         if (!this.actor) return super.title;
-        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill))} ${game.i18n.localize('SR5.Test')}`;
+        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill) as Translation)} ${game.i18n.localize('SR5.Test')}`;
     }
 
     override _prepareData(data: any, options: TestOptions) {
@@ -70,7 +70,7 @@ export class SkillTest extends SuccessTest {
         if (!attribute || !lastUsedAttribute) return console.error('Shadowrun 5e | An attribute was used that does not exist on', this.actor, attribute, lastUsedAttribute);
 
 
-        const pool = new PartsList(this.pool.mod);
+        const pool: PartsList<number> = new PartsList(this.pool.mod);
 
         // Remove both original action and .
         pool.removePart(lastUsedAttribute.label);
@@ -91,8 +91,8 @@ export class SkillTest extends SuccessTest {
         if (!this.actor) return;
 
         this.data.limit.mod = [];
-        const limitMod = new PartsList(this.limit.mod);
-        const poolMod = new PartsList(this.pool.mod);
+        const limitMod: PartsList<number> = new PartsList(this.limit.mod);
+        const poolMod: PartsList<number> = new PartsList(this.pool.mod);
 
         const limit = this.actor.getLimit(this.data.limitSelection);
         if (limit) limitMod.addUniquePart(limit.label, limit.value);

@@ -20,7 +20,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
         it('apply defense modifier per fire mode', () => {
             // Check no modifier
             assert.strictEqual(FireModeRules.fireModeDefenseModifier({
-                label: "SR5.WeaponModeSingleShot",
+                label: "SR5.Weapon.Mode.SingleShot",
                 value: 1,
                 recoil: false,
                 defense: 0,
@@ -30,7 +30,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             }), 0);
             // Check positive modifiers
             assert.strictEqual(FireModeRules.fireModeDefenseModifier({
-                label: "SR5.WeaponModeSingleShot",
+                label: "SR5.Weapon.Mode.SingleShot",
                 value: 1,
                 recoil: false,
                 defense: 3,
@@ -40,7 +40,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             }), 3);
             // Check correct negative modifiers
             assert.strictEqual(FireModeRules.fireModeDefenseModifier({
-                label: "SR5.WeaponModeSingleShot",
+                label: "SR5.Weapon.Mode.SingleShot",
                 value: 1,
                 recoil: false,
                 defense: -3,
@@ -53,7 +53,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
         it('reduce defense modifier per firemode by ammo available', () => {
             // Check with enough ammo
             assert.strictEqual(FireModeRules.fireModeDefenseModifier({
-                label: "SR5.WeaponModeSingleShot",
+                label: "SR5.Weapon.Mode.SingleShot",
                 value: 3,
                 recoil: false,
                 defense: -3,
@@ -64,7 +64,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
             // Check with to little ammo
             assert.strictEqual(FireModeRules.fireModeDefenseModifier({
-                label: "SR5.WeaponModeSingleShot",
+                label: "SR5.Weapon.Mode.SingleShot",
                 value: 6,
                 recoil: false,
                 defense: -6,
@@ -77,7 +77,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
         it('apply attack modifier per fire mode', () => {
             // A mode without recoil, shouldn't cause recoil modifiers.
             assert.strictEqual(FireModeRules.recoilModifierAfterAttack({
-                label: "SR5.WeaponModeBurstFireLong",
+                label: "SR5.Weapon.Mode.BurstFireLong",
                 value: 6,
                 recoil: false,
                 defense: -5,
@@ -88,7 +88,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             
             // No compensation should cause full recoil modifier
             assert.strictEqual(FireModeRules.recoilModifierAfterAttack({
-                label: "SR5.WeaponModeBurstFireLong",
+                label: "SR5.Weapon.Mode.BurstFireLong",
                 value: 6,
                 recoil: true,
                 defense: -5,
@@ -100,7 +100,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             // recoil modifier should be reduced by compensation,
             // compensation shouldbe reduced
             assert.strictEqual(FireModeRules.recoilModifierAfterAttack({
-                label: "SR5.WeaponModeBurstFireLong",
+                label: "SR5.Weapon.Mode.BurstFireLong",
                 value: 6,
                 recoil: true,
                 defense: -5,
@@ -111,7 +111,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
             // handle faulty value input gracefully, don't fire. Keep compensation.
             assert.strictEqual(FireModeRules.recoilModifierAfterAttack({
-                label: "SR5.WeaponModeBurstFireLong",
+                label: "SR5.Weapon.Mode.BurstFireLong",
                 value: -6,
                 recoil: true,
                 defense: -5,

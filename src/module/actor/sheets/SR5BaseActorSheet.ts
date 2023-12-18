@@ -19,7 +19,6 @@ import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
 
-
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
  */

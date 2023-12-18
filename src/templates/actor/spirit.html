@@ -68,14 +68,14 @@
                 {{localize "SR5.RollMemory"}}
             </div>
             <div
-                    title="Roll"
+                    data-tooltip="SR5.Roll"
                     class="attribute-name Roll fas fa-dice-six"
                     data-roll-id="prompt-roll"
             ></div>
-            <div title="Defense" class="attribute-name Roll" data-roll-id="defense">
+            <div data-tooltip="SR5.Defense" class="attribute-name Roll" data-roll-id="defense">
                 {{localize "SR5.RollDefense"}}
             </div>
-            <div title="Soak" class="attribute-name Roll" data-roll-id="damage-resist">
+            <div data-tooltip="SR5.Soak" class="attribute-name Roll" data-roll-id="damage-resist">
                 {{localize "SR5.RollSoak"}}
             </div>
             <div class="attribute-name Roll" data-roll-id="armor">
@@ -89,7 +89,7 @@
     </div>
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
-        <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
+        <a class="item" data-tab="skills">{{localize "SR5.Skill.Skills"}}</a>
         {{#if hasInventory }}<a class="item" data-tab="inventory">{{localize "SR5.Gear"}}</a>{{/if}}
         <a class="item" data-tab="critter_powers">{{localize "SR5.Labels.ActorSheet.CritterPowers"}}</a>
         <a class="item" data-tab="spells">{{localize "SR5.Labels.ActorSheet.Spells"}}</a>

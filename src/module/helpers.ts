@@ -12,16 +12,12 @@ import Skills = Shadowrun.Skills;
 import TargetedDocument = Shadowrun.TargetedDocument;
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
-import { SR5 } from "./config";
-import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME } from "./constants";
+import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
 import { DataDefaults } from "./data/DataDefaults";
 import { SR5Item } from './item/SR5Item';
 import { PartsList } from './parts/PartsList';
 import { SuccessTestData } from "./tests/SuccessTest";
-
-import SpellItemData = Shadowrun.SpellItemData;
-import WeaponItemData = Shadowrun.WeaponItemData;
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+import { Translation } from './utils/strings';
 
 interface CalcTotalOptions {
     // Min/Max value range
@@ -156,10 +152,10 @@ export class Helpers {
             'SR5.MatrixAttrDataProcessing',
             'SR5.MatrixAttrSleaze',
             'SR5.MatrixAttrAttack',
-            'SR5.SkillComputer',
-            'SR5.SkillHacking',
-            'SR5.SkillCybercombat',
-            'SR5.SkillElectronicWarfare',
+            'SR5.Skill.Computer',
+            'SR5.Skill.Hacking',
+            'SR5.Skill.Cybercombat',
+            'SR5.Skill.ElectronicWarfare',
             'SR5.Software',
         ];
         if (!Array.isArray(atts)) atts = [atts];
@@ -293,7 +289,7 @@ export class Helpers {
 
     /* Handle Shadowrun style shortened attribute names with typical three letter shortening. */
     static shortenAttributeLocalization(label: string, length: number = 3): string {
-        const name = game.i18n.localize(label);
+        const name = game.i18n.localize(label as Translation);
 
         if (length <= 0) {
             return name;
@@ -523,10 +519,9 @@ export class Helpers {
         }
         return actors;
     }
-
     /**
      * Check given test for actors to use for opposed tests.
-     * 
+     *
      * @param testData The test to use for actor selection
      * @returns A list of actors that should be used for an opposed test.
      */
@@ -542,9 +537,9 @@ export class Helpers {
         return Helpers.getSelectedActorsOrCharacter();
     }
 
-    static createRangeDescription(label: string, distance: number, modifier: number): RangeTemplateData {
-        label = game.i18n.localize(label);
-        return {label, distance, modifier}
+    static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateData {
+        const localizedLabel = game.i18n.localize(label);
+        return {label: localizedLabel, distance, modifier}
     }
 
     static convertIndexedObjectToArray(indexedObject: object): object[] {
@@ -747,7 +742,7 @@ export class Helpers {
     }
 
     static localizeSkill(skill: SkillField): string {
-        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+        return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
     }
 
     /**
@@ -790,7 +785,7 @@ export class Helpers {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted config values given by the configValues parameter
      */
-    static sortConfigValuesByTranslation(configValues: Record<string, string>, asc: boolean = true): Record<string, string> {
+    static sortConfigValuesByTranslation(configValues: Record<string, Translation>, asc: boolean = true): Record<string, string> {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
             const comparatorA = game.i18n.localize(a);
@@ -839,7 +834,7 @@ export class Helpers {
      */
     static getSkillLabelOrName(skill: SkillField): string {
         // Custom skills don't have labels, use their name instead.
-        return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
+        return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name || '';
     }
 
     /**

@@ -1,6 +1,6 @@
 <div class="item-header">
     <div class="item-image">
-        <img src="{{item.img}}" title="{{item.name}}" data-edit="img" width="80" height="80"/>
+        <img src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" width="80" height="80"/>
     </div>
     <div class="item-info">
         <div class="flexrow">
@@ -13,7 +13,7 @@
         </div>
         <div class="flexrow">
             <div class="source">
-                <div class="source-button roll open-source" title="{{localize 'SR5.OpenSource'}}">
+                <div class="source-button roll open-source" data-tooltip="SR5.OpenSource">
                     {{#if sourceIsURL}}
                     <i class="fas fa-link"></i> 
                     {{else}}

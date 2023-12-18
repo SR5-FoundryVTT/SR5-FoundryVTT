@@ -1,3 +1,4 @@
+
 export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     override get template(): string {
         return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';

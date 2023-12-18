@@ -26,6 +26,7 @@ import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
+import { Translation } from '../utils/strings';
 
 
 /**
@@ -696,7 +697,7 @@ export class SR5Actor extends Actor {
     getSkillByLabel(searchedFor: string): Shadowrun.SkillField | undefined {
         if (!searchedFor) return;
 
-        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
 
         const skills = this.getSkills();
 
@@ -735,7 +736,7 @@ export class SR5Actor extends Actor {
             return '';
         }
 
-        return skill.label ? skill.label : skill.name ? skill.name : '';
+        return skill.label ?? skill.name ?? '';
     }
 
     /**

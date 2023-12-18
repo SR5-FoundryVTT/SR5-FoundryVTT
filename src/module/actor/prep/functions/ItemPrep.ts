@@ -4,7 +4,6 @@ import { PartsList } from '../../../parts/PartsList';
 import ArmorActorData = Shadowrun.ArmorActorData;
 import {SR5} from "../../../config";
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
-import {SR} from "../../../constants";
 
 export class ItemPrep {
     /**
