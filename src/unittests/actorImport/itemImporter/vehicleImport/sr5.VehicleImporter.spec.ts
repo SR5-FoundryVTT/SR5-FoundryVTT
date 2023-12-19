@@ -1,10 +1,10 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import VehicleParser from '../../module/apps/importer/actorImport/itemImporter/vehicleImport/VehicleParser';
+import VehicleParser from '../../../../module/apps/importer/actorImport/itemImporter/vehicleImport/VehicleParser';
 import * as chummerDrone from "./drone.json";
 import * as chummerVehicle from "./vehicle.json";
-import { SR5TestingDocuments } from '../utils';
-import { SR5Actor } from '../../module/actor/SR5Actor';
-import { SR5Item } from '../../module/item/SR5Item';
+import { SR5TestingDocuments } from '../../../utils';
+import { SR5Actor } from '../../../../module/actor/SR5Actor';
+import { SR5Item } from '../../../../module/item/SR5Item';
 
 export const vehicleImporterTesting = (context: QuenchBatchContext) => {
   const { describe, it, assert, before, after } = context;

@@ -16,12 +16,12 @@ import { shadowrunNetworkDevices } from "./sr5.NetworkDevices.spec";
 import { shadowrunTesting } from "./sr5.Testing.spec";
 import { shadowrunInventoryFlow } from "./sr5.Inventory.spec";
 import { weaponParserBaseTesting } from "./sr5.WeaponParser.spec";
-import { characterImporterTesting } from "./characterImport/sr5.CharacterImporter.spec";
-import { characterInfoUpdaterTesting } from "./characterImport/sr5.CharacterInfoUpdater.spec";
-import { weaponParserTesting } from "./characterImport/sr5.CharacterImporterWeapon.spec";
-import { mountedWeaponParserTesting } from "./characterImport/sr5.VehicleImporterMountedWeapon.spec";
+import { characterImporterTesting } from "./actorImport/characterImporter/sr5.CharacterImporter.spec";
+import { characterInfoUpdaterTesting } from "./actorImport/characterImporter/sr5.CharacterInfoUpdater.spec";
+import { weaponParserTesting } from "./actorImport/itemImporter/weaponImport/sr5.WeaponImport.spec";
+import { mountedWeaponParserTesting } from "./actorImport/itemImporter/vehicleImport/sr5.VehicleImporterMountedWeapon.spec";
 import { shadowrunSR5ItemDataPrep } from "./sr5.ItemDataPrep.spec";
-import { vehicleImporterTesting } from "./characterImport/sr5.VehicleImporter.spec";
+import { vehicleImporterTesting } from "./actorImport/itemImporter/vehicleImport/sr5.VehicleImporter.spec";
 
 import { Quench } from "@ethaks/fvtt-quench";
 

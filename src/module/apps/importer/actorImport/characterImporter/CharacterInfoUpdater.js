@@ -83,6 +83,7 @@ export class CharacterInfoUpdater {
         else {
             clonedActorSource.name = chummerChar.name ? chummerChar.name : '[Name not found]';
         }
+        clonedActorSource.prototypeToken.name = clonedActorSource.name;
 
         this.importBasicData(clonedActorSource.system, chummerChar);
         await this.importBio(clonedActorSource.system, chummerChar);

@@ -1,7 +1,7 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { CharacterImporter } from '../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
-import { SR5TestingDocuments } from "../utils";
-import { SR5Actor } from "../../module/actor/SR5Actor";
+import { CharacterImporter } from '../../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
+import { SR5TestingDocuments } from "../../utils";
+import { SR5Actor } from "../../../module/actor/SR5Actor";
 
 export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
@@ -38,6 +38,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
           await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions)
         
           assert.strictEqual(character.name, "ImportTester")
+          assert.strictEqual(character.prototypeToken.name, "ImportTester")
   
       });
 
@@ -47,6 +48,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
           await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions)
 
           assert.strictEqual(character.name, "[Name not found]")
+          assert.strictEqual(character.prototypeToken.name, "[Name not found]")
   
       });
     })

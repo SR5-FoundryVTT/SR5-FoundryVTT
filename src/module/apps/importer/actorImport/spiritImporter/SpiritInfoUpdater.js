@@ -21,6 +21,8 @@ export class SpiritInfoUpdater {
         else {
             clonedActorSource.name = chummerChar.name ? chummerChar.name : '[Name not found]';
         }
+        clonedActorSource.prototypeToken.name = clonedActorSource.name;
+
 
         clonedActorSource.system.special = 'magic';
         const magic = chummerChar.attributes[1].attribute.filter(att => att.name_english.toLowerCase() == 'mag')[0].total;
