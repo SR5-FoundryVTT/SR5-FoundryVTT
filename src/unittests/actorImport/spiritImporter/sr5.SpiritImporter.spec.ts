@@ -1,33 +1,38 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { CharacterImporter } from '../../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
+import { SpiritImporter } from '../../../module/apps/importer/actorImport/spiritImporter/SpiritImporter';
 import { SR5TestingDocuments } from '../../utils';
 import { SR5Actor } from '../../../module/actor/SR5Actor';
 import { SR5Item } from '../../../module/item/SR5Item';
+import { emptySpirit } from './spirits';
 
-export const characterImporterTesting = (context: QuenchBatchContext) => {
+
+export const spiritImporterTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
 
     let testActor;
-    let importOptions = {};
-    let chummerFile = {
-        characters: {
-            character: {},
-        },
-    };
+    const actorType = 'spirit';
+
+    const importOptions = {};
+    let chummerFile;
 
     before(async () => {
         testActor = new SR5TestingDocuments(SR5Actor);
     });
+
+    beforeEach(async () => {
+        chummerFile = structuredClone(emptySpirit);
+    });
+
     after(async () => {
         await testActor.teardown();
     });
 
-    describe('Chummer Character Importer', () => {
-        let testItem = new SR5TestingDocuments(SR5Item);
+    describe('Chummer Spirit Importer', () => {
+        const testItem = new SR5TestingDocuments(SR5Item);
 
         it('Does nothing when no character found', async () => {
             const item = await testItem.create({ type: 'weapon' });
-            const character = await testActor.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = await testActor.create({ type: actorType });
             await character.createEmbeddedDocuments('Item', [item]);
 
             assert.lengthOf(character.items, 1);
@@ -39,18 +44,18 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
 
         it('Clears all items no actions present', async () => {
             const item = await testItem.create({ type: 'weapon' });
-            const character = await testActor.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = await testActor.create({ type: actorType });
             await character.createEmbeddedDocuments('Item', [item]);
-            await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
+            await new SpiritImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.isEmpty(character.items);
         });
 
         it('Clears all items but actions', async () => {
             const item = await testItem.create({ type: 'action' });
-            const character = await testActor.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = await testActor.create({ type: actorType });
             await character.createEmbeddedDocuments('Item', [item]);
-            await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
+            await new SpiritImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.lengthOf(character.items, 1);
             // @ts-expect-error

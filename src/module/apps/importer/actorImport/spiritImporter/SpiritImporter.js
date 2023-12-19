@@ -25,7 +25,7 @@ export class SpiritImporter {
             return;
         }
 
-        if(!actor.type == "spirit") {
+        if(actor.type !== "spirit") {
             return;
         }
 

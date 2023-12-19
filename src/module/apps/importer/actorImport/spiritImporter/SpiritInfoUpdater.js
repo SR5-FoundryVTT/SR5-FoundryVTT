@@ -25,7 +25,7 @@ export class SpiritInfoUpdater {
 
 
         clonedActorSource.system.special = 'magic';
-        const magic = chummerChar.attributes[1].attribute.filter(att => att.name_english.toLowerCase() == 'mag')[0].total;
+        const magic = (Number) (chummerChar.attributes[1]?.attribute.filter(att => att.name_english.toLowerCase() == 'mag')[0].total);
         clonedActorSource.system.force = magic;
         this.importSpiritType(clonedActorSource.system, chummerChar)
 
@@ -108,7 +108,7 @@ export class SpiritInfoUpdater {
              "vucub",
         ]
 
-        const type = spiritTypes.find(v => chummerType.toLowerCase().includes(v));
+        const type = spiritTypes.find(v => chummerType?.toLowerCase().includes(v));
        
         if(type == undefined) {
             ui.notifications?.error(game.i18n.format("SR5.Import.Spirit.SpiritTypeNotFound"))
