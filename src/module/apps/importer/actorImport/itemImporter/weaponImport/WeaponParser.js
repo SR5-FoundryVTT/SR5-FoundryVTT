@@ -170,7 +170,6 @@ export class WeaponParser {
         // Create the item
         const itemData = createItemData(chummerWeapon.name, 'weapon', system);
 
-        //currently does not work
         this.handleClips(itemData, chummerWeapon)
         this.handleAccessories(itemData, chummerWeapon) 
         return itemData;
