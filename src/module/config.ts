@@ -580,6 +580,7 @@ export const SR5 = {
     modificationTypes: {
         weapon: 'SR5.Weapon.Weapon',
         armor: 'SR5.Armor',
+        vehicle: 'SR5.Vehicle.Vehicle'
     },
 
     mountPoints: {
@@ -589,6 +590,15 @@ export const SR5 = {
         top: 'SR5.Top',
         side: 'SR5.Side',
         internal: 'SR5.Internal',
+    },
+
+    modificationCategories: {
+        body: 'SR5.Vehicle.ModificationCategoryTypes.body',
+        cosmetic: 'SR5.Vehicle.ModificationCategoryTypes.cosmetic',
+        electromagnetic: 'SR5.Vehicle.ModificationCategoryTypes.electromagnetic',
+        power_train: 'SR5.Vehicle.ModificationCategoryTypes.power_train',
+        protection: 'SR5.Vehicle.ModificationCategoryTypes.protection',
+        weapons: 'SR5.Vehicle.ModificationCategoryTypes.weapons',
     },
 
     lifestyleTypes: {

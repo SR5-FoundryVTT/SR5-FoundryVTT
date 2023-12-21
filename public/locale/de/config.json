@@ -622,6 +622,9 @@
         "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, entstehenden Modifikatoren werden reduziert"
     },
     "SR5.Modification": "Modifikation",
+    "SR5.ModificationSlots": "Modification Slots",
+    "SR5.ModificationCategory": "Modification Category",
+    "SR5.ModificationCategories": "Modification Categories",
     "SR5.Modified": "Modifiziert",
     "SR5.ModifiedArmor": "Mod. Panzerung",
     "SR5.ModifiedDamage": "Modifiziert",
@@ -1152,13 +1155,15 @@
         "IsDrone": "Ist Drohne",
         "IsOffRoad": "Ist im Gelände",
         "Maneuvering": "Manövrieren",
-        "MissingDriver": "Fahrer per Drag&Drop zufügen",        
-        "ModCategorySlots_Body": "Modification Category Slots - Body",
-        "ModCategorySlots_PowerTrain": "Modification Category Slots - Power Train",
-        "ModCategorySlots_Protection": "Modification Category Slots - Protection",
-        "ModCategorySlots_Electromagnetic": "Modification Category Slots - Electromagnetic",
-        "ModCategorySlots_Cosmetic": "Modification Category Slots - Cosmetic",
-        "ModCategorySlots_Weapons": "Modification Category Slots - Weapons",
+        "MissingDriver": "Fahrer per Drag&Drop zufügen",
+        "ModificationCategoryTypes": {
+            "body": "Body",
+            "cosmetic": "Cosmetic",
+            "electromagnetic": "Electromagnetic",
+            "power_train": "Power Train",
+            "protection": "Protection",
+            "weapons": "Weapons"
+        },
         "Stats": {
             "Acceleration": "Beschleunigung",
             "Handling": "Handling",
@@ -1179,6 +1184,7 @@
             "Water": "Schiff"
         }
     },
+    "SR5.Vehicle.Vehicle": "Vehicle",
     "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Vision": {
         "AstralPerception": "Astral Perception",

@@ -426,6 +426,9 @@
     "SR5.Miscellaneous": "Divers",
     "SR5.MissingItemForOpposedTest": "Le test opposé ne peut pas être lancé puisque l'item concerné est manquant",
     "SR5.Modification": "Modification",
+    "SR5.ModificationSlots": "Modification Slots",
+    "SR5.ModificationCategory": "Modification Category",
+    "SR5.ModificationCategories": "Modification Categories",
     "SR5.Modified": "Modifié",
     "SR5.ModifiedArmor": "Mod. Blindage",
     "SR5.Modifier": "Modificateur",
@@ -780,13 +783,15 @@
         "IsDrone": "Est un drone",
         "IsOffRoad": "Est hors route",
         "Maneuvering": "Manoeuvre",
-        "MissingDriver": "Glisser-déposer un personnage comme conducteur",        
-        "ModCategorySlots_Body": "Modification Category Slots - Body",
-        "ModCategorySlots_PowerTrain": "Modification Category Slots - Power Train",
-        "ModCategorySlots_Protection": "Modification Category Slots - Protection",
-        "ModCategorySlots_Electromagnetic": "Modification Category Slots - Electromagnetic",
-        "ModCategorySlots_Cosmetic": "Modification Category Slots - Cosmetic",
-        "ModCategorySlots_Weapons": "Modification Category Slots - Weapons",
+        "MissingDriver": "Glisser-déposer un personnage comme conducteur",
+        "ModificationCategoryTypes": {
+            "body": "Body",
+            "cosmetic": "Cosmetic",
+            "electromagnetic": "Electromagnetic",
+            "power_train": "Power Train",
+            "protection": "Protection",
+            "weapons": "Weapons"
+        },
         "Stats": {
             "Acceleration": "Accelération",
             "Handling": "Maniabilité",
@@ -807,6 +812,7 @@
             "Water": "Véhicule nautique"
         }
     },
+    "SR5.Vehicle.Vehicle": "Vehicle",
     "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Vision": {
         "AstralPerception": "Astral Perception",

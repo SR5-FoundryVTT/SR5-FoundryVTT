@@ -85,6 +85,12 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return modification.system.type === 'armor';
     }
 
+    isVehicleModification(): boolean {
+        if (!this.isModification()) return false;
+        const modification = this.data as ModificationItemData;
+        return modification.system.type === 'vehicle';
+    }
+
     isProgram(): boolean {
         return this.data.type === 'program';
     }
@@ -416,6 +422,14 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
         if (this.data.type === 'weapon')
             return this.data.system.range as RangeWeaponData;
+    }
+
+    getModificationCategory(): string {
+        return this.getData().modification_category ?? '';
+    }
+
+    getModificationCategorySlots(): number {
+        return this.getData().slots ?? 0;
     }
 
     hasDefenseTest(): boolean {
