@@ -91,9 +91,6 @@ export class Migrator {
             if (!consent) return;
         }
 
-        console.error('User consented');
-        
-
         await this.migrateWorld(game, migrations);
         await this.migrateCompendium(game, migrations);
 
