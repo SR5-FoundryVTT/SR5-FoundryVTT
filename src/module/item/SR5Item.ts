@@ -49,7 +49,6 @@ import HostItemData = Shadowrun.HostItemData;
 import ActionResultData = Shadowrun.ActionResultData;
 import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
-import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
@@ -75,6 +74,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -967,10 +967,10 @@ export class SR5Item extends Item {
             return game.i18n.localize('SR5.MeleeWeaponAttack');
         }
         if (this.isCombatSpell) {
-            return game.i18n.localize('SR5.SpellAttack');
+            return game.i18n.localize('SR5.Spell.Attack');
         }
         if (this.isSpell) {
-            return game.i18n.localize('SR5.SpellCast');
+            return game.i18n.localize('SR5.Spell.Cast');
         }
         if (this.hasRoll) {
             return this.name as string;

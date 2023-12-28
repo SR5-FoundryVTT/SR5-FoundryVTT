@@ -1,7 +1,7 @@
 import { DataDefaults } from '../data/DataDefaults';
 import { PartsList } from '../parts/PartsList';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
-
+import { Translation } from '../utils/strings';
 
 export interface SkillTestData extends SuccessTestData {
     attribute: string
@@ -36,7 +36,7 @@ export class SkillTest extends SuccessTest {
      */
     override get title() {
         if (!this.actor) return super.title;
-        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill))} ${game.i18n.localize('SR5.Test')}`;
+        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill) as Translation)} ${game.i18n.localize('SR5.Test')}`;
     }
 
     override _prepareData(data: any, options: TestOptions) {
@@ -75,7 +75,7 @@ export class SkillTest extends SuccessTest {
         if (!usedAttribute || !lastUsedAttribute) return; 
 
 
-        const pool = new PartsList(this.pool.mod);
+        const pool: PartsList<number> = new PartsList(this.pool.mod);
 
         // Replace previous attribute with new one, without changing other modifiers
         pool.removePart(lastUsedAttribute.label);

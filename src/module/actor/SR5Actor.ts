@@ -27,6 +27,7 @@ import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
+import { Translation } from '../utils/strings';
 
 
 /**
@@ -720,7 +721,7 @@ export class SR5Actor extends Actor {
     getSkillByLabel(searchedFor: string): Shadowrun.SkillField | undefined {
         if (!searchedFor) return;
 
-        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
 
         const skills = this.getSkills();
 
@@ -759,7 +760,7 @@ export class SR5Actor extends Actor {
             return '';
         }
 
-        return skill.label ? skill.label : skill.name ? skill.name : '';
+        return skill.label ?? skill.name ?? '';
     }
 
     /**
@@ -2121,5 +2122,23 @@ export class SR5Actor extends Actor {
 
         if (this.isMatrixActor) await this.setMatrixDamage(0);
         if (updateData) await this.update(updateData);
+    }
+
+    /**
+     * Will unequip all other items of the same type as the given item.
+     * 
+     * It's not necessary for the given item to be equipped.
+     * 
+     * @param item Input item that will be equipped while unequipping all others of the same type.
+     */
+    async equipOnlyOneItemOfType(item: SR5Item) {
+        const updateData = this.items
+            .filter(ownedItem => ownedItem.type === item.type)
+            .map(ownedItem => ({
+                _id: ownedItem.id,
+                'system.technology.equipped': ownedItem.id === item.id
+        }));
+
+        await this.updateEmbeddedDocuments('Item', updateData);
     }
 }

@@ -320,6 +320,8 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.select-ranged-range-category').on('change', this._onSelectRangedRangeCategory.bind(this));
         html.find('.select-thrown-range-category').on('change', this._onSelectThrownRangeCategory.bind(this));
 
+        html.find('input[name="system.technology.equipped"').on('change', this._onToggleEquippedDisableOtherDevices.bind(this))
+
         this._activateTagifyListeners(html);
     }
 
@@ -786,5 +788,20 @@ export class SR5ItemSheet extends ItemSheet {
         if (item.system.importFlags) {
             await item.update({ 'system.importFlags.isFreshImport': onOff });
         }
+    }
+
+    /**
+     * Clicking on equipped status should trigger unequipping all other devices of the same type.
+     * @param event Click event on the equipped checkbox.
+     */
+    async _onToggleEquippedDisableOtherDevices(event: PointerEvent) {
+        event.preventDefault();
+
+        // Assure owned item device.
+        if (!(this.document.parent instanceof SR5Actor)) return;
+        if (!this.document.isDevice) return;
+        if (!this.document.isEquipped()) return;
+
+        await this.document.parent.equipOnlyOneItemOfType(this.document);
     }
 }

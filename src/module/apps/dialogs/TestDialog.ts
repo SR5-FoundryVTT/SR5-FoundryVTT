@@ -1,9 +1,9 @@
 import {FormDialog, FormDialogData, FormDialogOptions} from "./FormDialog";
 import {SuccessTest} from "../../tests/SuccessTest";
-import { SuccessTestData } from './../../tests/SuccessTest';
+import { SuccessTestData } from '../../tests/SuccessTest';
 import {SR5} from "../../config";
 import {Helpers} from "../../helpers";
-
+import { Translation } from '../../utils/strings';
 
 export interface TestDialogData extends FormDialogData {
     test: SuccessTest
@@ -98,7 +98,7 @@ export class TestDialog extends FormDialog {
      */
     override get title() {
         const data = this.data as unknown as TestDialogData;
-        return game.i18n.localize(data.test.title);
+        return game.i18n.localize(data.test.title as Translation);
     }
 
     /**

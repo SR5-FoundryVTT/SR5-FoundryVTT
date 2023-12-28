@@ -200,20 +200,20 @@ export const TestCreator = {
         }
 
         // Determine actors to roll test with.
-        // First - use selection or targets.
-        let actors = Helpers.userHasControlledTokens() ? 
-            Helpers.getControlledTokenActors() :
-            await Helpers.getTestTargetActors(testData.data);
-
+        let actors = await Helpers.getOpposedTestActors(testData.data);
         // Second - filter out actors current user shouldn't be able to test with.
         actors = actors.filter(actor => actor.isOwner);
         // Last - Fallback to player character.
-        if (actors.length === 0 && game.user.character) actors.push(game.user.character);
+        if (actors.length === 0 && game.user.character) {
+            actors.push(game.user.character);
+        }
 
-        if (actors.length === 0)
+        if (actors.length === 0) {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
-        else 
+        } 
+        else {
             console.log('Shadowrun 5e | Casting an opposed test using these actors', actors, testData);
+        }
 
         for (const actor of actors) {
             const data = await testClass._getOpposedActionTestData(testData.data, actor, id);
@@ -336,7 +336,8 @@ export const TestCreator = {
         if (!game.shadowrun5e.tests.hasOwnProperty(testName)) { //@ts-expect-error
             console.error(`Shadowrun 5e | Tried getting a Test Class ${testName}, which isn't registered in: `, game.shadowrun5e.tests);
             return;
-        } //@ts-expect-error
+        } 
+        //@ts-expect-error
         return game.shadowrun5e.tests[testName];
     },
 
@@ -353,7 +354,9 @@ export const TestCreator = {
 
         // Get user defined action configuration.
         let action = item.getAction();
-        if (!action || !actor) return data;
+        if (!action || !actor) {
+            return data;
+        }
 
         action = TestCreator._mergeMinimalActionDataInOrder(
             action,

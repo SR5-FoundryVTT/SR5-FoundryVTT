@@ -1,5 +1,6 @@
 import {_mergeWithMissingSkillFields} from "../actor/prep/functions/SkillsPrep";
-import {CharacterImporter} from "./characterImport/CharacterImporter"
+import { CharacterImporter } from "./importer/actorImport/characterImporter/CharacterImporter"
+import { SpiritImporter } from "./importer/actorImport/spiritImporter/SpiritImporter"
 
 export class ChummerImportForm extends FormApplication {
     static get defaultOptions() {
@@ -36,7 +37,11 @@ export class ChummerImportForm extends FormApplication {
                 assignIcons: $('.assignIcons').is(':checked'),
             }
 
-            const importer = new CharacterImporter();
+            let importer;
+            switch(this.object.type) {
+                case 'character': importer = new CharacterImporter(); break;
+                case 'spirit': importer = new SpiritImporter(); break;
+            }
             await importer.importChummerCharacter(this.object, chummerFile, importOptions);
 
             ui.notifications?.info(

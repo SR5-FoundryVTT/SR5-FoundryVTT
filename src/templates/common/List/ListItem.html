@@ -10,11 +10,11 @@
             {{#if (itemMarking "ICON")}}
                 {{#if (itemMarking "COLOR")}}
                     <div class="item-img">
-                        <img src="systems/shadowrun5e/dist/icons/checklist.svg" title="{{localize "SR5.IsFreshImport"}}" height="24px" width="24px"/>
+                        <img src="systems/shadowrun5e/dist/icons/checklist.svg" data-tooltip="SR5.IsFreshImport" height="24px" width="24px"/>
                     </div>
                 {{else}}
                     <div class="item-img">
-                        <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" title="{{localize "SR5.IsFreshImport"}}" height="24px" width="24px"/>
+                        <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" data-tooltip="SR5.IsFreshImport" height="24px" width="24px"/>
                     </div>
                 {{/if}}
             {{/if}}
@@ -25,7 +25,7 @@
                 {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}}
                 {{#each additionalCssClass}}{{this }}{{/each}}
                 {{#unless img}}{{#if hasRoll}}roll{{/if}}{{/unless}}"
-                {{#unless img}}{{#if hasRoll}}title="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=bindings.skip descr=bindings.card}}"{{/if}}{{/unless}}
+                {{#unless img}}{{#unless tooltip}}{{#if hasRoll}}data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}"{{/if}}{{/unless}}{{/unless}}
                 {{#if tooltip}}data-tooltip="{{tooltip}}"{{/if}}
             >
                 {{name}}
@@ -54,7 +54,7 @@
                         <div class="item-text {{option.cssClass}}">
                             {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
                                     cssClass=(concatStrings "short " option.input.cssClass)
-                                    title=(localize 'SR5.Quantity')
+                                    title="SR5.Quantity"
                                     size="5"
                                     maxLength="5"
                                     value=option.input.value

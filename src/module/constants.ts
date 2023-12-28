@@ -48,7 +48,8 @@ export const FLAGS = {
     TurnsSinceLastAttack: 'turnsSinceLastAttack',
     ManualRollOnSuccessTest: 'ManualRollOnSuccessTest',
     MarkImports: 'MarkImports',
-    CreateTargetedEffects: 'CreateTargetedEffects'
+    CreateTargetedEffects: 'CreateTargetedEffects',
+    DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

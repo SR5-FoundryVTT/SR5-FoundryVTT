@@ -7,13 +7,13 @@
         <div class="document">
             <a class="chat-select-link" data-token-id="{{token.id}}"><img
                     src="{{speakerImg actor}}" class="entity-selectable"
-                    title="{{speakerName actor}}"/></a>
+                    data-tooltip="{{speakerName actor}}"/></a>
             <h3 class="header-name"><a class="chat-document-link" data-uuid="{{actor.uuid}}">{{speakerName
                 actor}}</a></h3>
         </div>
         {{#if item}}
         <div class="document">
-            <img src="{{item.data.img}}" title="{{item.data.name}}"/>
+            <img src="{{item.data.img}}" data-tooltip="{{item.data.name}}"/>
             <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}"
                                         data-uuid="{{item.uuid}}">{{item.data.name}}</a></h3>
         </div>

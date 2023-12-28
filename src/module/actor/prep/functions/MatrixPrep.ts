@@ -4,7 +4,6 @@ import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { PartsList } from '../../../parts/PartsList';
 import {SR5} from "../../../config";
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
-import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 import CommonData = Shadowrun.CommonData;
 import {AttributesPrep} from "./AttributesPrep";
 
