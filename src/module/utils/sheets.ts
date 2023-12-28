@@ -5,6 +5,7 @@
 import Tagify from '@yaireo/tagify';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { SYSTEM_NAME } from '../constants';
+import { Translation } from './strings';
 
 // A single whitelist / dropdown / tag element
 interface TagData {
@@ -51,7 +52,7 @@ export function createTagify(input: HTMLInputElement|HTMLTextAreaElement|null, o
 }
 
 interface TagifyValue {
-    label: string
+    label: Translation
     id: string
 }
 interface TagifyTag {

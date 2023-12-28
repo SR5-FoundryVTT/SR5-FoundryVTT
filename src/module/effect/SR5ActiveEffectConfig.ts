@@ -1,8 +1,8 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5 } from "../config";
 import { ActionFlow } from "../item/flows/ActionFlow";
-import { SuccessTest } from "../tests/SuccessTest";
-import { createTagify, createTagifyOnInput } from "../utils/sheets";
+import { createTagifyOnInput } from "../utils/sheets";
+import { Translation } from "../utils/strings";
 import { SR5ActiveEffect } from "./SR5ActiveEffect";
 
 /**
@@ -169,7 +169,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
         // Use ActionFlow to assure either custom skills or global skills to be included.
         const skills = ActionFlow.sortedActiveSkills(actorOrNothing);
-        const options = Object.entries(skills).map(([id, label]) => ({label, id}));
+        const options = Object.entries(skills).map(([id, label]) => ({label: label as Translation, id}));
         const maxItems = options.length;
         const value = this.object.getFlag('shadowrun5e', 'selection_skills') as string;
         const selected = value ? JSON.parse(value) : [];
