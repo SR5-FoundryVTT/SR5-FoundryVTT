@@ -108,7 +108,7 @@ export class Version0_18_0 extends VersionMigration {
         
         if (itemOriginEffects.length === 0) return {};
 
-        console.log('Actor (${actor.uuid}). Disable these effects:', itemOriginEffects);
+        console.log(`Actor (${actor.uuid}). Disable these effects:`, itemOriginEffects);
         const updateData = {effects: itemOriginEffects.map(effect => {
             return {_id: effect.id, disabled: true, name: `DISABLED: ${effect.name}`};
         })};
