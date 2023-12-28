@@ -2,15 +2,17 @@
     <div class="inventory">
         <div class="split-container">
             <div class="scroll-area">
-                {{#if isCharacter}}
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <button type="button" class="display import-character">
-                                {{localize "SR5.ImportCharacter"}}
-                            </button>
-                        </div>
-                        {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html' }}{{/if}}
+                <div class="list-item">
+                    {{#if (or isCharacter isSpirit)}}
+                    <div class="list-item-content">
+                        <button type="button" class="display import-character">
+                            {{localize "SR5.ImportCharacter"}}
+                        </button>
                     </div>
+                    {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html' }}{{/if}}
+                    {{/if}}
+                </div>
+                {{#if isCharacter}}
                     <div class="list-item">
                         <div class="list-item-content">
                             <div class="item-left">
