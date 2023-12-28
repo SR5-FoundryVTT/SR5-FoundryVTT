@@ -12,7 +12,7 @@
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.17.0",
+  "version": "0.18.0",
   "compatibility": {
     "minimum": "11",
     "maximum": "11",
