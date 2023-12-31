@@ -66,6 +66,12 @@ jobs:
       with:
             file_path: "system.json"
 
+    - run: |
+        echo "Version: ${{steps.system_properties.outputs.version}}"
+        echo "Minimum: ${{steps.system_properties.outputs.compatibility.minimum}}"
+        echo "Verified: ${{steps.system_properties.outputs.compatibility.verified}}"
+        echo "Maximum: ${{steps.system_properties.outputs.compatibility.maximum}}"
+
     - name: Deploy Release
       uses: fjogeleit/http-request-action@v1
       with:
