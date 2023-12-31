@@ -18,11 +18,13 @@ import ActionRollData = Shadowrun.ActionRollData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ActionResultData = Shadowrun.ActionResultData;
 import ResultActionData = Shadowrun.ResultActionData;
-import {TestCreator} from "./TestCreator";
+import { TestCreator } from "./TestCreator";
 import Template from "../template";
-import {TestRules} from "../rules/TestRules";
+import { TestRules } from "../rules/TestRules";
 
-import {ActionResultFlow} from "../item/flows/ActionResultFlow";
+import { ActionResultFlow } from "../item/flows/ActionResultFlow";
+import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 
 export interface TestDocuments {
@@ -166,12 +168,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     public rolls: SR5Roll[];
     public targets: TokenDocument[];
 
+    // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
+    public effects: SuccessTestEffectsFlow<this>;
+
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
         this.item = documents?.item;
         this.rolls = documents?.rolls || [];
-        
+
         // User selected targets of this test.
         this.targets = [];
 
@@ -179,9 +184,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         this.data = this._prepareData(data, options);
 
+        this.effects = new SuccessTestEffectsFlow<this>(this);
+
         this.calculateBaseValues();
 
-        console.log(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
+        console.debug(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
 
     /**
@@ -219,27 +226,29 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.secondChance = data.secondChance !== undefined ? data.secondChance : false;
 
         // Set possible missing values.
-        data.pool = data.pool || DataDefaults.valueData({label: 'SR5.DicePool'});
-        data.threshold = data.threshold || DataDefaults.valueData({label: 'SR5.Threshold'});
-        data.limit = data.limit || DataDefaults.valueData({label: 'SR5.Limit'});
+        data.pool = data.pool || DataDefaults.valueData({ label: 'SR5.DicePool' });
+        data.threshold = data.threshold || DataDefaults.valueData({ label: 'SR5.Threshold' });
+        data.limit = data.limit || DataDefaults.valueData({ label: 'SR5.Limit' });
 
         data.values = data.values || {};
 
         // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
         // active tests.
-        data.values.hits = data.values.hits || DataDefaults.valueData({label: "SR5.Hits"});
-        data.values.extendedHits = data.values.extendedHits || DataDefaults.valueData({label: "SR5.ExtendedHits"});
-        data.values.netHits = data.values.netHits || DataDefaults.valueData({label: "SR5.NetHits"});
-        data.values.glitches = data.values.glitches || DataDefaults.valueData({label: "SR5.Glitches"});
+        data.values.hits = data.values.hits || DataDefaults.valueData({ label: "SR5.Hits" });
+        data.values.extendedHits = data.values.extendedHits || DataDefaults.valueData({ label: "SR5.ExtendedHits" });
+        data.values.netHits = data.values.netHits || DataDefaults.valueData({ label: "SR5.NetHits" });
+        data.values.glitches = data.values.glitches || DataDefaults.valueData({ label: "SR5.Glitches" });
 
         // User reported manual hits.
-        data.manualHits = data.manualHits || DataDefaults.valueData({label: "SR5.ManualHits"});
-        data.manualGlitches = data.manualGlitches || DataDefaults.valueData({label: "SR5.ManualGlitches"});
+        data.manualHits = data.manualHits || DataDefaults.valueData({ label: "SR5.ManualHits" });
+        data.manualGlitches = data.manualGlitches || DataDefaults.valueData({ label: "SR5.ManualGlitches" });
 
         data.opposed = data.opposed || undefined;
         data.modifiers = this._prepareModifiersData(data.modifiers);
 
         data.damage = data.damage || DataDefaults.damageData();
+
+        console.debug('Shadowrun 5e | Prepared test data', data);
 
         return data;
     }
@@ -260,7 +269,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This should be used for whenever a Test doesn't modifiers specified externally.
      */
     _prepareModifiersData(modifiers?: ValueField) {
-        return modifiers || DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'});
+        return modifiers || DataDefaults.valueData({ label: 'SR5.Labels.Action.Modifiers' });
     }
 
     /**
@@ -383,7 +392,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      */
     get formula(): string {
-        const pool = Helpers.calcTotal(this.data.pool, {min: 0});
+        const pool = Helpers.calcTotal(this.data.pool, { min: 0 });
         return this.buildFormula(pool, this.hasPushTheLimit);
     }
 
@@ -478,7 +487,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @override This method if you want to use a different TestDialog.
      */
     _createTestDialog() {
-        return new TestDialog({test: this, templatePath: this._dialogTemplate}, undefined, this._testDialogListeners());
+        return new TestDialog({ test: this, templatePath: this._dialogTemplate }, undefined, this._testDialogListeners());
     }
 
     /**
@@ -526,13 +535,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Override this method if there needs to be some cleanup after a user has canceled a dialog 
      * but before the tests actual execution.
      */
-    async cleanupAfterExecutionCancel() {}
+    async cleanupAfterExecutionCancel() { }
 
     /**
      * Override this method if you want to save any document data after a user has selected values
      * during user facing dialog.
      */
-    async saveUserSelectionAfterDialog() {}
+    async saveUserSelectionAfterDialog() { }
 
     /**
      * The general base value preparation. This will be re applied at multiple points before execution.
@@ -591,7 +600,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             if (value.override) value.override.value = Math.ceil(value.override.value);
             value.mod.forEach(mod => mod.value = Math.ceil(mod.value));
         }
-        
+
         roundAllMods(this.data.modifiers);
         roundAllMods(this.data.pool);
         roundAllMods(this.data.threshold);
@@ -608,12 +617,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         this.data.modifiers.value = Helpers.calcTotal(this.data.modifiers);
 
-        this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
-        this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
-        this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
+        this.data.pool.value = Helpers.calcTotal(this.data.pool, { min: 0 });
+        this.data.threshold.value = Helpers.calcTotal(this.data.threshold, { min: 0 });
+        this.data.limit.value = Helpers.calcTotal(this.data.limit, { min: 0 });
 
-        this.data.manualHits.value = Helpers.calcTotal(this.data.manualHits, {min: 0});
-        this.data.manualGlitches.value = Helpers.calcTotal(this.data.manualGlitches, {min: 0});
+        this.data.manualHits.value = Helpers.calcTotal(this.data.manualHits, { min: 0 });
+        this.data.manualGlitches.value = Helpers.calcTotal(this.data.manualGlitches, { min: 0 });
 
         // Shows AP on incoming attacks
         this.data.damage.ap.value = Helpers.calcTotal(this.data.damage.ap);
@@ -624,7 +633,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Allow implementations to validate values before execution.
      */
-    validateBaseValues() {}
+    validateBaseValues() { }
 
     /**
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
@@ -635,7 +644,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             for (const roll of this.rolls) {
                 // @ts-expect-error // foundry-vtt-types is missing evaluated.
                 if (!roll._evaluated)
-                    await roll.evaluate({async: true});
+                    await roll.evaluate({ async: true });
             }
         }
 
@@ -648,7 +657,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Allow subclasses to populate a test before execution and any other steps.
      */
-    async populateTests() {}
+    async populateTests() { }
 
     /**
      * Rehydrate this test with Documents, should they be missing.
@@ -708,7 +717,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * Main purpose is to populate the configured modifiers for this test based on actor / items used.
      */
-    prepareDocumentModifiers()  {
+    prepareDocumentModifiers() {
         this.prepareActorModifiers();
         this.prepareItemModifiers();
     }
@@ -717,7 +726,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Allow implementations to overwrite default modifiers after document modifiers have been applied to influence
      * pool calculation.
      */
-    prepareTestModifiers() {}
+    prepareTestModifiers() { }
 
     /**
      * Prepare general modifiers based on the actor, as defined within the action or test implementation.
@@ -728,7 +737,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (this.data.action.modifiers.length > 0) return;
 
         for (const type of this.testModifiers) {
-            const {name, value} = this.prepareActorModifier(this.actor, type);
+            const { name, value } = this.prepareActorModifier(this.actor, type);
             PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
         }
     }
@@ -741,13 +750,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param actor The actor to fetch modifier information for.
      * @param type The modifier type to be prepared.
      */
-    prepareActorModifier(actor: SR5Actor, type: ModifierTypes): {name: string, value: number} {
-        const options = {test: this};
-        // TODO: ModifierFlow ALWAYS recalculates a total for ALL it's modifiers, even if not necessary... fix that
+    prepareActorModifier(actor: SR5Actor, type: ModifierTypes): { name: string, value: number } {
+        const options = { test: this, reapply: true };
         const value = actor.modifiers.totalFor(type, options);
         const name = this._getModifierTypeLabel(type);
 
-        return {name, value};
+        return { name, value };
     }
 
     _getModifierTypeLabel(type: ModifierTypes): string {
@@ -757,7 +765,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Allow subclasses to alter test modifiers based on the item used for casting.
      */
-    async prepareItemModifiers() {}
+    async prepareItemModifiers() { }
 
     /**
      * Calculate the total of all values.
@@ -836,7 +844,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             label: "SR5.NetHits",
             base
         });
-        netHits.value = Helpers.calcTotal(netHits, {min: 0});
+        netHits.value = Helpers.calcTotal(netHits, { min: 0 });
 
         return netHits;
     }
@@ -850,19 +858,19 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     calculateHits(): ValueField {
         // Use manual or automated roll for hits.
-        const rollHits = this.usingManualRoll ? 
+        const rollHits = this.usingManualRoll ?
             this.manualHits.value :
             this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
 
-        const hits = DataDefaults.valueData({
-            label: "SR5.Hits",
-            base: this.hasLimit ?
-                Math.min(this.limit.value, rollHits) :
-                rollHits
-        });
-        hits.value = Helpers.calcTotal(hits, {min: 0});
+        // Sum of all rolls!
+        this.hits.base = rollHits;
+        
+        // First, calculate hits based on roll and modifiers.
+        this.hits.value = Helpers.calcTotal(this.hits, { min: 0 });
+        // Second, reduce hits by limit.
+        this.hits.value = this.hasLimit ? Math.min(this.limit.value, this.hits.value) : this.hits.value;
 
-        return hits;
+        return this.hits;
     }
 
     get hits(): ValueField {
@@ -871,7 +879,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     get extendedHits(): ValueField {
         // Return a default value field, for when no extended hits have been derived yet (or ever).
-        return this.data.values.extendedHits || DataDefaults.valueData({label: 'SR5.ExtendedHits'});
+        return this.data.values.extendedHits || DataDefaults.valueData({ label: 'SR5.ExtendedHits' });
     }
 
     get manualHits(): ValueField {
@@ -911,7 +919,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Determine if this success test must automated roll or can use a manual roll given by user.
      */
     get usingManualRoll(): boolean {
-        return this.allowManualHits && (Boolean(this.data.manualHits.override) || Boolean(this.data.manualGlitches.override)) 
+        return this.allowManualHits && (Boolean(this.data.manualHits.override) || Boolean(this.data.manualGlitches.override))
     }
 
     /**
@@ -927,7 +935,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             label: "SR5.Glitches",
             base: rollGlitches
         })
-        glitches.value = Helpers.calcTotal(glitches, {min: 0});
+        glitches.value = Helpers.calcTotal(glitches, { min: 0 });
 
         return glitches;
     }
@@ -936,12 +944,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Gather hits across multiple extended test executions.
      */
     calculateExtendedHits(): ValueField {
-        if (!this.extended) return DataDefaults.valueData({label: 'SR5.ExtendedHits'});
+        if (!this.extended) return DataDefaults.valueData({ label: 'SR5.ExtendedHits' });
 
         const extendedHits = this.extendedHits;
         extendedHits.mod = PartsList.AddPart(extendedHits.mod, 'SR5.Hits', this.hits.value);
 
-        Helpers.calcTotal(extendedHits, {min: 0});
+        Helpers.calcTotal(extendedHits, { min: 0 });
 
         return extendedHits;
     }
@@ -1067,7 +1075,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Helper to get an items action result information.
      */
-    get results(): ActionResultData|undefined {
+    get results(): ActionResultData | undefined {
         if (!this.item) return;
         return this.item.getActionResult();
     }
@@ -1122,12 +1130,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
         // According to rules, second chance can't be used on glitched tests.
         if (this.glitched) {
-            ui.notifications?.warn('SR5.Warnings.CantSecondChanceAGlitch', {localize: true});
+            ui.notifications?.warn('SR5.Warnings.CantSecondChanceAGlitch', { localize: true });
             return false;
         }
 
         if (this.hasPushTheLimit || this.hasSecondChance) {
-            ui.notifications?.warn('SR5.Warnings.CantSpendMulitplePointsOfEdge', {localize: true});
+            ui.notifications?.warn('SR5.Warnings.CantSpendMulitplePointsOfEdge', { localize: true });
             return false;
         }
 
@@ -1143,7 +1151,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get canPushTheLimit(): boolean {
         if (this.hasPushTheLimit || this.hasSecondChance) {
-            ui.notifications?.warn('SR5.Warnings.CantSpendMulitplePointsOfEdge', {localize: true});
+            ui.notifications?.warn('SR5.Warnings.CantSpendMulitplePointsOfEdge', { localize: true });
             return false;
         }
 
@@ -1168,7 +1176,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             parts.removePart('SR5.PushTheLimit');
             return;
         }
-        
+
         // Edge will be applied differently for when the test has been already been cast or not.
         // Exploding dice will be handled during normal roll creation.
         const edge = this.actor.getEdge().value;
@@ -1176,7 +1184,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Before casting edge will be part of the whole dice pool and that pool will explode.
         if (!this.evaluated) return;
-        
+
         // After casting use a separate roll, as only those will be rolled again and explode.
         const explodeDice = true;
         const formula = this.buildFormula(edge, explodeDice);
@@ -1206,7 +1214,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const lastRoll = this.rolls[this.rolls.length - 1];
         const dice = lastRoll.poolThrown - lastRoll.hits;
         if (dice <= 0) {
-            ui.notifications?.warn('SR5.Warnings.CantSecondChanceWithoutNoneHits', {localize: true});
+            ui.notifications?.warn('SR5.Warnings.CantSecondChanceWithoutNoneHits', { localize: true });
             return this;
         }
 
@@ -1230,9 +1238,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     canConsumeDocumentResources(): boolean {
         // No actor present? Nothing to consume...
         if (!this.actor) return true;
-        
+
         // Edge consumption.
-        if (this.hasPushTheLimit || this.hasSecondChance) {      
+        if (this.hasPushTheLimit || this.hasSecondChance) {
             if (this.actor.getEdge().uses <= 0) {
                 ui.notifications?.error(game.i18n.localize('SR5.MissingRessource.Edge'));
                 return false;
@@ -1251,7 +1259,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.actor) return true;
 
         // Edge consumption.
-        if (this.hasPushTheLimit || this.hasSecondChance) {            
+        if (this.hasPushTheLimit || this.hasSecondChance) {
             await this.actor.useEdge();
         }
 
@@ -1290,6 +1298,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async execute(): Promise<this> {
         await this.populateTests();
         await this.populateDocuments();
+
+        // Effects need to be applied before any values are calculated.
+        this.effects.applyAllEffects();
+
         await this.prepareDocumentData();
 
         // Initial base value preparation will show default result without any user input.
@@ -1324,10 +1336,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         console.debug(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
 
         if (!this.data.sourceActorUuid) {
-            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
             return this;
-        }
-        if (!this.canSecondChance)  return this;
+        };
+        if (!this.canSecondChance) return this;
 
         // Fetch documents.
         await this.populateDocuments();
@@ -1342,7 +1354,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
         if (!actorConsumedResources) return this;
-        
+
         // Remove second chance to avoid edge consumption on any kind of re-rolls.
         this.data.secondChance = false;
 
@@ -1361,7 +1373,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         console.debug(`Shadowrun 5e | ${this.constructor.name} will push the limit rules`);
 
         if (!this.data.sourceActorUuid) {
-            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', {localize: true});
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
             return this;
         }
         if (!this.canPushTheLimit) return this;
@@ -1412,7 +1424,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This can be used to alter values after a test succeeded.
      * @override
      */
-    async processSuccess() {}
+    async processSuccess() { }
 
     /**
      * Allow subclasses to override behavior after a failure test result
@@ -1420,7 +1432,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This can be used to alter values after a test failed.
      * @override
      */
-    async processFailure() {}
+    async processFailure() { }
 
     /**
      * Allow subclasses to override behavior after a test is fully done. This will be called after processResults
@@ -1450,13 +1462,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Allow subclasses to override followup behavior after a successful test result
      * @override
      */
-    async afterSuccess()  {}
+    async afterSuccess() { }
 
     /**
      * Allow subclasses to override followup behavior after a failed test result
      * @override
      */
-    async afterFailure() {}
+    async afterFailure() { }
 
     /**
      * Allow a test to determine if it's follow up tests should auto cast after test completion.
@@ -1484,7 +1496,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.canBeExtended) return;
 
         const data = foundry.utils.duplicate(this.data);
-    
+
         // No extension possible, if test type / class is unknown.
         if (!data.type) return;
 
@@ -1501,10 +1513,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             pool.addUniquePart('SR5.ExtendedTest', nextModifierValue);
         }
 
-        Helpers.calcTotal(data.pool, {min: 0});
+        Helpers.calcTotal(data.pool, { min: 0 });
 
         if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
-            return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', {localize: true});
+            return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
         }
 
         // Fetch original tests documents.
@@ -1515,7 +1527,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!testCls) return;
         // The new test will be incomplete.
         data.evaluated = false;
-        const test = new testCls(data, {actor: this.actor, item: this.item}, this.data.options);
+        const test = new testCls(data, { actor: this.actor, item: this.item }, this.data.options);
 
         // Remove previous edge usage.
         test.data.pushTheLimit = false;
@@ -1550,7 +1562,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const roll = this.rolls[this.rolls.length - 1];
 
         // Limit users to show dice to...
-        let whisper: User[]|null = null;
+        let whisper: User[] | null = null;
         // ...for gmOnlyContent check permissions
         if (this._applyGmOnlyContent && this.actor) {
             // @ts-expect-error
@@ -1581,7 +1593,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const content = await renderTemplate(this._chatMessageTemplate, templateData);
         // Prepare the actual message.
         const messageData = this._prepareMessageData(content);
-        const options = {rollMode: this._rollMode};
+        const options = { rollMode: this._rollMode };
 
         //@ts-expect-error // TODO: foundry-vtt-types v10
         const message = await ChatMessage.create(messageData, options);
@@ -1627,7 +1639,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             description: this.item?.getChatData() || '',
             // Some message segments are only meant for the gm, when the gm is the one creating the message.
             // When this test doesn't use an actor, don't worry about hiding anything.
-            applyGmOnlyContent: this._applyGmOnlyContent
+            applyGmOnlyContent: this._applyGmOnlyContent,
+            
+            // Effects that should be shown in this tests message for manual drag & drop application.
+            effects: [] as SR5ActiveEffect[]
         }
     }
 
@@ -1661,7 +1676,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * This class should be used for the opposing test implementation.
      */
-    get _opposedTestClass(): any|undefined {
+    get _opposedTestClass(): any | undefined {
         if (!this.data.opposed || !this.data.opposed.test) return;
         return TestCreator._getTestClass(this.data.opposed.test);
     }
@@ -1698,7 +1713,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     _prepareFollowupActionsTemplateData(): Shadowrun.FollowupAction[] {
         const testCls = TestCreator._getTestClass(this.data.action.followed.test);
         if (!testCls) return [];
-        return [{label: testCls.label}]
+        return [{ label: testCls.label }]
     }
 
     /**
@@ -1744,8 +1759,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const formula = `0d6`;
         const roll = new SR5Roll(formula);
         // evaluation is necessary for Roll DataModel validation.
-        roll.evaluate({async: false});
-        
+        roll.evaluate({ async: false });
+
         const messageData = {
             user: game.user?.id,
             // Use type roll, for Foundry built in content visibility.
@@ -1778,11 +1793,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Save this test to the given message uuid
      * @param uuid 
      */
-    async saveToMessage(uuid: string|undefined=this.data.messageUuid) {
+    async saveToMessage(uuid: string | undefined = this.data.messageUuid) {
         if (!uuid) return;
 
         const message = await fromUuid(uuid);
-        
+
         await message?.setFlag(SYSTEM_NAME, FLAGS.Test, this.toJSON());
     }
 
@@ -1917,7 +1932,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
             await test.executeWithPushTheLimit();
         }
-        
+
         const secondChance = async (li) => {
             const messageId = li.data().messageId;
             const test = await TestCreator.fromMessage(messageId);
@@ -1932,7 +1947,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 
             if (!test.canBeExtended) {
-                return ui.notifications?.warn('SR5.Warnings.CantExtendTest', {localize: true});
+                return ui.notifications?.warn('SR5.Warnings.CantExtendTest', { localize: true });
             }
 
             await test.executeAsExtended();
@@ -1947,7 +1962,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             condition: true,
             icon: '<i class="fas fa-meteor"></i>'
         })
-        
+
         options.push({
             name: game.i18n.localize('SR5.SecondChance'),
             callback: secondChance,
@@ -2015,9 +2030,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         const messageId = element.closest('.chat-message').data('messageId');
         const test = await TestCreator.fromMessage(messageId);
-        
+
         if (!test) return console.error(`Shadowrun5e | Couldn't find both a result action ('${resultAction}') and extract test from message ('${messageId}')`);
-        
+
         await test.populateDocuments();
         await ActionResultFlow.executeResult(resultAction, test);
     }

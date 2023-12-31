@@ -29,8 +29,8 @@ declare global {
     interface DocumentClassConfig {
         Item: typeof SR5Item;
         Actor: typeof SR5Actor;
-        Combat: typeof SR5Combat;
         ActiveEffect: typeof SR5ActiveEffect;
+        Combat: typeof SR5Combat;
         Roll: typeof SR5Roll;
     }
 

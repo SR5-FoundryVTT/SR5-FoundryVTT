@@ -86,14 +86,22 @@
     "SR5.Active": "Active",
     "SR5.ActiveDefense": "Active Defense",
     "SR5.ActiveEffect": {
+        "ApplyTo": "Apply-To",
+        "ApplyTos": {
+            "TargetedActor": "Targeted Actor",
+            "TestItem": "Test via Item"
+        },
         "Modes": {
             "Modify": "Modify"
         },
         "New": "New Effect",
-        "Types": {
-            "Inactive": "Inactive Effects",
-            "Persistent": "Persistent Effects",
-            "Temporary": "Temporary Effects"
+        "OnlyForWireless": "Apply for wireless active only",
+        "OnlyForEquipped": "Apply for equipped item only",
+        "Test": {
+            "Tests": "Tests Filter",
+            "Skills": "Skills Filter",
+            "Attributes": "Attributes Filter",
+            "Limits": "Limits Filter"
         }
     },
     "SR5.ActiveSkills": "Active Skills",
@@ -571,7 +579,8 @@
             "OpenInventory": "Inventory"
         },
         "Message": {
-            "ClickToSelect": "Click to select on scene"
+            "ClickToSelect": "Click to select on scene",
+            "TestEffects": "Applied effects"
         },
         "Sheet": {
             "AddOne": "Add One",
@@ -580,7 +589,8 @@
             "NetworkDevices": "Networked Devices",
             "PAN": "PAN",
             "SubtractOne": "Subtract One",
-            "WAN": "WAN"
+            "WAN": "WAN",
+            "ItemEffects": "Item Effects"
         },
         "Sidebar": {
             "Changelog": "Changelog",
@@ -652,6 +662,17 @@
     "SR5.MigrationComplete": "Migration Complete",
     "SR5.MigrationUpdateCompendiumNoUpdateActor": "Due to technical limitations within FoundryVTT, actor compendium packs are unable to be updated at this time. You will have to manually update these packs.",
     "SR5.MigrationUpdateCompendiumUpdateMessage": "Any world compendium packs that exist in the world were also updated",
+    "SR5.Migrator": {
+        "Version18_0_0": {
+            "Line1": "From version 0.18.0 onwards effects on owned items will directly apply without them having to be copied to the actor.",
+            "Line2": "Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects with an item origin will be deleted.",
+            "Line3": "Effects created directly on actors aren't affected.",
+            "Line4": "Should you heavily use effects and effects modules and aren't sure about 'item owned effects', you set this migration to disable and review your disabled effects. Disabled effects will be marked as such.",
+            "Line5": "Also be aware that enabled effects on actor items will now be applied. You'll be able to see all applied effects in the actors effects tab.",
+            "OnlyDisable": "Disable Effects only",
+            "Warning": "NOTE!"
+        }
+    },
     "SR5.Miscellaneous": "Misc",
     "SR5.MissingItemForOpposedTest": "Opposed Test can't be rolled due to the acting item now missing",
     "SR5.MissingRessource": {
@@ -1145,9 +1166,13 @@
             "SpriteType": "Type of the compiled sprite"
         },
         "Effect": {
-            "Inactive": "Inactive effects don't apply their changes until they are enabled",
-            "Persistent": "Effects with an unlimited life span",
-            "Temporary": "Effects with a limited life span"
+            "ApplyTo": "Changes of this effect will apply to this target only",
+            "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
+            "OnlyForWireless": "This effect will apply only for items that have wireless enabled",
+            "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
+            "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
+            "ItemEffects": "Effects collected from items on this document",
+            "DocumentEffects": "Effects directly on this document"
         },
         "Item": {
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",

@@ -25,6 +25,7 @@ import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
+import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 
@@ -163,6 +164,29 @@ export class SR5Actor extends Actor {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
             console.error(error);
             ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+        }
+    }
+
+    /**
+     * Get all ActiveEffects applicable to this actor.
+     * 
+     * The system uses a custom method of determining what ActiveEffect is applicable that doesn't 
+     * use default FoundryVTT allApplicableEffect.
+     * 
+     * The system has additional support for:
+     * - taking actor effects from items (apply-To actor)
+     * - having effects apply that are part of a targeted action against this actor (apply-To targeted_actor)
+     * 
+     * NOTE: FoundryVTT applyActiveEffects will check for disabled effects.
+     */
+    //@ts-expect-error TODO: foundry-vtt-types v10
+    override *allApplicableEffects() {
+        for (const effect of allApplicableDocumentEffects(this, {applyTo: ['actor', 'targeted_actor']})) {
+            yield effect;
+        }
+
+        for (const effect of allApplicableItemsEffects(this, {applyTo: ['actor']})) {
+            yield effect;
         }
     }
 
@@ -1830,12 +1854,12 @@ export class SR5Actor extends Actor {
     }
 
     /** 
-     * Get all situational modifiers from this actor.
+     * Get all situaitional modifiers from this actor.
+     * NOTE: These will return selections only without higher level selections applied.
+     *       You'll have to manually trigger .applyAll or apply what's needed.
      */
-    getSituationModifiers(options?): DocumentSituationModifiers {
-        const modifiers = DocumentSituationModifiers.getDocumentModifiers(this);
-        modifiers.applyAll(options);
-        return modifiers;
+    getSituationModifiers(): DocumentSituationModifiers {
+        return DocumentSituationModifiers.getDocumentModifiers(this);
     }
 
     /**

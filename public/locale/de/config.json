@@ -80,15 +80,16 @@
     "SR5.Active": "Aktiv",
     "SR5.ActiveDefense": "Unterbrechungsh.",
     "SR5.ActiveEffect": {
+        "ApplyTo": "Anwenden auf",
+        "ApplyTos": {
+            "TargetedActor": "Anvisierten Akteur",
+            "TestItem": "Test aus Gegenstand"
+        },
         "Modes": {
             "Modify": "Modifizieren"
         },
         "New": "New Effect",
-        "Types": {
-            "Inactive": "Inaktive Effekte",
-            "Persistent": "Anhaltende Effekte",
-            "Temporary": "Temporäre Effekte"
-        }
+        "OnlyForWireless": "Nur bei aktivem wireless"
     },
     "SR5.ActiveSkills": "Aktive Fertigkeiten",
     "SR5.ActorTypes": {
@@ -613,6 +614,17 @@
     "SR5.MigrationComplete": "Migration vollständig",
     "SR5.MigrationUpdateCompendiumNoUpdateActor": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kompendien vom Typ Actor manuell aktualisiert werden.",
     "SR5.MigrationUpdateCompendiumUpdateMessage": "Alle in der Welt vorhandenen Kompendiumpakete wurden aktualisiert",
+    "SR5.Migrator": {
+        "Version18_0_0": {
+            "Line1": "Ab Version 0.18.0 werden Effekte auf Akteur Gegenständen direkt angewendet, ohne auf den Akteur kopiert zu werden.",
+            "Line2": "Bisher kopierte Effekte müssen gelöscht oder kopiert werden, um zu verhindern, dass diese Effekte doppelt angewendet werden. Das betrifft alle Effekte mit einem Item im Origin Feld.",
+            "Line3": "Direkt auf dem Akteur erstellte Effekte bleiben bestehen.",
+            "Line4": "Solltest du viele Effekte nutzen, vor allem zusammen mit Effekt-Modulen, and bist unsicher welche Effekte einen Item-Origin haben, setzte die Migration auf Deaktivieren. Dadurch werden betroffene Effekte deaktiviert und umbenannt, wodurch diese leicht zu prüfen sind.",
+            "Line5": "Achte außerdem auf aktivierte Effekte in Akteur Gegenständen, die jetzt angewendet werden. Du kannst alle angewendeten Effekte eines Akteurs im Effekts-Tab sehen.",
+            "OnlyDisable": "Effekte nur deaktivieren!",
+            "Warning": "Warnung!"
+        }
+    },
     "SR5.Miscellaneous": "Diverses",
     "SR5.MissingItemForOpposedTest": "Probe kann nicht durchgeführt werden, da der ausführende Gegenstand jetzt fehlt",
     "SR5.MissingRessource": {
@@ -1054,11 +1066,6 @@
         },
         "CallInAction": {
             "ActorType": "Herbeizurufender Akteurtyp"
-        },
-        "Effect": {
-            "Inactive": "Inaktive Effekte wenden ihre Änderungen erst wieder an, wenn sie aktiviert werden",
-            "Persistent": "Effekte ohne zeitliche Begrenzung",
-            "Temporary": "Effekte mit zeitlicher Begrenzung"
         },
         "Item": {
             "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",

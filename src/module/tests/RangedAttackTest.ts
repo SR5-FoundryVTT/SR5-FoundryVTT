@@ -18,6 +18,8 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
     targetRanges: Shadowrun.TargetRangeTemplateData[]
     // index of selected target range in targetRanges
     targetRangesSelected: number
+    // Distance to target in meters.
+    distance: number
 }
 
 
@@ -30,6 +32,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         data.fireModes = [];
         data.fireMode = {value: 0, defense: 0, label: ''};
         WeaponRangeTestBehavior.prepareData(this, data);
+
 
         return data;
     }

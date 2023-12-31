@@ -1,28 +1,47 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='effects'}}
     <div class="inventory">
         <div class="scroll-area">
-        {{#each effects as |section sid|}}
-            {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                name=section.label
-                tooltip=section.tooltip
-                icons=(ItemHeaderIcons 'effect')
-                itemData=(EffectData section.type)
-                itemCssClass='list-item-effect'
+        <!-- Local Document Effects. Actor and Item. -->
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+            name=(localize 'SR5.Effects')
+            itemCssClass='list-item-effect'
+            rightSide=(ItemHeaderRightSide 'effects')
+            icons=(ItemHeaderIcons 'effect')
+            tooltip=(localize 'SR5.Tooltips.Effect.DocumentEffects')
+        }}
+        {{#each effects}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+            img=this.icon
+            name=this.name
+            itemId=this.id
+            icons=(EffectIcons this)
+            rightSide=(EffectRightSide this)
+            hasDesc=false
+            hasRoll=false
+            itemCssClass='list-item-effect'
             }}
-
-            {{#each section.effects as |effect|}}
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                    img=effect.icon
-                    name=effect.label
-                    itemId=effect.id
-                    icons=(EffectIcons effect)
-                    rightSide=[]
-                    hasDesc=false
-                    hasRoll=false
-                    itemCssClass='list-item-effect'
-                }}
-            {{/each}}
         {{/each}}
+        <!-- Owned Item Effects. Actor only. -->
+        {{#if itemEffects}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+            name=(localize 'SR5.Labels.Sheet.ItemEffects')
+            tooltip=(localize 'SR5.Tooltips.Effect.ItemEffects')
+            itemCssClass='list-item-effect'
+            rightSide=(ItemHeaderRightSide 'itemEffects')
+        }}
+        {{#each itemEffects}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+            img=this.icon
+            name=this.sheetName
+            itemId=this.uuid
+            icons=(ItemEffectIcons this)
+            rightSide=(EffectRightSide this)
+            hasDesc=false
+            hasRoll=false
+            itemCssClass='list-item-effect'
+            }}
+        {{/each}}
+        {{/if}}
         </div>
     </div>
 {{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

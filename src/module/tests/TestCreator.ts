@@ -148,14 +148,20 @@ export const TestCreator = {
 
         // Check if message contains any test data.
         const flagData = message.getFlag(SYSTEM_NAME, FLAGS.Test);
-        if (!flagData) return;
+        if (!flagData) {console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`); return;}
 
+        return this._fromMessageTestData(flagData);
+    },
+
+    /**
+     * Create a test implemenation directly from a message flags test data.
+     * @param testData 
+     * @returns 
+     */
+    _fromMessageTestData: function(testData) {
         // Use test data to create the original test from it.
-        const testData = foundry.utils.duplicate(flagData) as SuccessTestMessageData;
-        if (!testData) {
-            console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
-            return;
-        }
+        testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
+        if (!testData) return;
 
         const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll as any));
         const documents = {rolls};
@@ -521,11 +527,11 @@ export const TestCreator = {
         }
 
         // Apply applicable selections and collect modifiers.
-        for (const [modifier, applicable] of Object.entries(modifiers)) {
+        for (const [name, applicable] of Object.entries(modifiers)) {
             // Setup the resulting modifier value.
-            const label = SR5.modifierTypes[modifier];
+            const label = SR5.modifierTypes[name];
             const options = {applicable};
-            const value = actor.modifiers.totalFor(modifier, options);
+            const value = actor.modifiers.totalFor(name, options);
             data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
         }
 

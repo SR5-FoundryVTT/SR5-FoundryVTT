@@ -79,12 +79,7 @@
         "Modes": {
             "Modify": "수정"
         },
-        "New": "새로운 효과",
-        "Types": {
-            "Inactive": "비활성화 효과",
-            "Persistent": "지속 효과",
-            "Temporary": "일시적 효과"
-        }
+        "New": "새로운 효과"
     },
     "SR5.ActiveSkills": "활성형 기술",
     "SR5.ActorTypes": {
@@ -1045,11 +1040,6 @@
             "Level": "컴파일한 요정의 단계",
             "PreparedSprite": "신규 생성 대신 준비된 요정 액터 사용",
             "SpriteType": "컴파일된 요정 종류"
-        },
-        "Effect": {
-            "Inactive": "비활성화된 효과는 활성 전까지 변경점이 적용되지 않음",
-            "Persistent": "지속 시간이 무제한인 효과",
-            "Temporary": "지속 시간이 제한된 효과"
         },
         "Item": {
             "ActionModifier": "테스트의 기본 수정치 대신에 선택한 풀 수정치 사용",

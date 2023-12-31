@@ -193,6 +193,10 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData().technology?.equipped || false;
     }
 
+    isWireless(): boolean {
+        return this.getData().technology?.wireless || false;
+    }
+
     isCyberdeck(): boolean {
         if (!this.isDevice()) return false;
         const deviceData = this.getData() as DeviceData;

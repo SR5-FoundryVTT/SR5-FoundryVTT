@@ -2,7 +2,7 @@ import {SYSTEM_SOCKET} from "./constants";
 import SocketMessageBody = Shadowrun.SocketMessageData;
 
 /**
- * Simple handling of creating and emiting socket messages
+ * Simple handling of creating and emitting socket messages
  * Use emit for messages meant for all users
  * > SocketMessage.emit(FLAGS.<yourFlag>, {yourDataField: 'yourData'})
  *
@@ -20,7 +20,7 @@ export class SocketMessage {
         if (!game.socket) return;
 
         const message = SocketMessage._createMessage(type, data);
-        console.trace('Shadowrun 5e | Emiting Shadowrun5e system socket message', message);
+        console.trace('Shadowrun 5e | Emitting Shadowrun5e system socket message', message);
         await game.socket.emit(SYSTEM_SOCKET, message);
     }
 
@@ -32,7 +32,7 @@ export class SocketMessage {
         if (!gmUser) return console.error('No active GM user! One GM must be active for this action to work.');
 
         const message = SocketMessage._createMessage(type, data, gmUser.id);
-        console.trace('Shadowrun 5e | Emiting Shadowrun5e system socket message', message);
+        console.trace('Shadowrun 5e | Emitting Shadowrun5e system socket message', message);
         await game.socket.emit(SYSTEM_SOCKET, message);
     }
 }

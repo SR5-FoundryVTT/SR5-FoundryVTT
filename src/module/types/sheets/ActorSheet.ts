@@ -13,21 +13,10 @@ declare namespace Shadowrun {
         hasSkills: boolean
         canAlterSpecial: boolean
         hasFullDefense: boolean
-        effects: EffectsSheetData
-    }
-
-    interface EffectsSheetData {
-        temporary: EffectsCategoryData
-        persistant: EffectsCategoryData
-        inactive: EffectsCategoryData
-    }
-
-    interface EffectsCategoryData {
-        type: "temporary"|"persistent"|"inactive"
-        label: string
-        tooltip: string
         effects: any[]
     }
+
+    type AllEnabledEffectsSheetData = any[];
 
     export interface SR5SheetFilters {
         skills: string

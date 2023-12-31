@@ -12,6 +12,8 @@ import { DefenseModifier } from './modifiers/DefenseModifier';
 
 
 interface DocumentSituationModifiersTotalForOptions {
+    // Set true to always re-apply selections.
+    reapply?: boolean;
     // Only apply these modifier categories.
     applicable?: string[]
     // Modifiers are calculated within this tests context.
@@ -195,8 +197,7 @@ export class DocumentSituationModifiers {
     getTotalFor(category: keyof SituationModifiersSourceData|string, options:DocumentSituationModifiersTotalForOptions={}): number {
         const modifier = this._modifiers[category];
 
-        // re-apply to limit applicable selections.
-        if (options.applicable) {
+        if (options.reapply || options.applicable) {
             modifier.apply({applicable: options.applicable, test: options.test})
         }
 

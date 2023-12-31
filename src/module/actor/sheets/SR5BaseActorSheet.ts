@@ -2,7 +2,7 @@ import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { Helpers } from "../../helpers";
 import { SR5Item } from "../../item/SR5Item";
-import { onManageActiveEffect, prepareActiveEffectCategories } from "../../effects";
+import { onManageActiveEffect, onManageItemActiveEffect, prepareSortedItemEffects, prepareSortedEffects } from "../../effects";
 import { SR5 } from "../../config";
 import { SkillEditSheet } from "../../apps/skills/SkillEditSheet";
 import { SR5Actor } from "../SR5Actor";
@@ -236,7 +236,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareSkillsWithFilters(data);
 
         data.itemType = this._prepareItemTypes(data);
-        data.effects = prepareActiveEffectCategories(this.actor.effects);  // All actor types have effects.
+        data.effects = prepareSortedEffects(this.actor.effects.contents);
+        data.itemEffects = prepareSortedItemEffects(this.actor);
         data.inventories = this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);
@@ -266,6 +267,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Active Effect management
         html.find(".effect-control").on('click', event => onManageActiveEffect(event, this.actor));
+        html.find(".item-effect-control").on('click', event => onManageItemActiveEffect(event));
 
         // Inventory visibility switch
         html.find('.item-toggle').on('click', this._onInventorySectionVisiblitySwitch.bind(this));

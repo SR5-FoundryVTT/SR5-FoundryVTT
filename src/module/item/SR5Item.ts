@@ -1181,6 +1181,10 @@ export class SR5Item extends Item {
         return this.wrapper.isEquipped();
     }
 
+    isWireless(): boolean {
+        return this.wrapper.isWireless();
+    }
+
     isCyberdeck(): boolean {
         return this.wrapper.isCyberdeck();
     }
