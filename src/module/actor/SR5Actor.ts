@@ -1513,36 +1513,50 @@ export class SR5Actor extends Actor {
     /**
      * Depending on this actors defeated status, apply the correct effect and status.
      * 
+     * This will only work when the actor is connected to a token.
+     * 
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async applyDefeatedStatus(defeated?: DefeatedStatus) {
-        defeated = defeated || ConditionRules.determineDefeatedStatus(this);
-        await this.removeDefeatedStatus(defeated);
+        // TODO: combat-utility-belt seems to replace the default status effects, causing some issue I don't yet understand.
+        //       For now, we'll just disable this feature.
+        return;
+    //     const token = this.getToken();
+    //     if (token === null) return;
 
-        if (!defeated.unconscious && !defeated.dying && !defeated.dead) return this.combatant?.update({defeated: false});
-        else this.combatant?.update({defeated: true});
+    //     defeated = defeated ?? ConditionRules.determineDefeatedStatus(this);
 
-        let newStatus = 'unconscious';
-        if (defeated.dying) newStatus = 'unconscious';
-        if (defeated.dead) newStatus = 'dead';
+    //     // Remove unapplicable defeated token status.
+    //     await this.removeDefeatedStatus(defeated);
 
-        // Find fitting status and fallback to dead if not found.
-        const status = CONFIG.statusEffects.find(e => e.id === newStatus);
-        const effect = status || CONFIG.controlIcons.defeated;
+    //     // Apply the appropriate combatant status.
+    //     if (!defeated.unconscious && !defeated.dying && !defeated.dead) { 
+    //         return await this.combatant?.update({ defeated: false }); 
+    //     } else { 
+    //         await this.combatant?.update({defeated: true});
+    //     }
 
-        // Avoid applying defeated status multiple times.
-        const existing = this.effects.reduce((arr, e) => {
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) arr.push(e.id);
-            return arr;
-        }, []);
+    //     let newStatus = 'unconscious';
+    //     if (defeated.dying) newStatus = 'unconscious';
+    //     if (defeated.dead) newStatus = 'dead';
 
-        if (existing.length) return;
+    //     // Find fitting status and fallback to dead if not found.
+    //     const status = CONFIG.statusEffects.find(e => e.id === newStatus);
+    //     const effect = status || CONFIG.controlIcons.defeated;
 
-        // @ts-expect-error
-        // Set effect as active, as we've already made sure it isn't.
-        // Otherwise Foundry would toggle on/off, even though we're still dead.
-        await this.getToken().object.toggleEffect(effect, { overlay: true, active: true });
+    //     // Avoid applying defeated status multiple times.
+    //     const existing = this.effects.reduce((arr, e) => {
+    //         // @ts-expect-error TODO: foundry-vtt-types v10
+    //         if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) arr.push(e.id);
+    //         return arr;
+    //     }, []);
+
+    //     if (existing.length) return;
+
+    //     // @ts-expect-error
+    //     // Set effect as active, as we've already made sure it isn't.
+    //     // Otherwise Foundry would toggle on/off, even though we're still dead.
+    //     await token.object.toggleEffect(effect, { overlay: true, active: true });
     }
 
     /**
@@ -1551,7 +1565,7 @@ export class SR5Actor extends Actor {
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async removeDefeatedStatus(defeated?: DefeatedStatus) {
-        defeated = defeated || ConditionRules.determineDefeatedStatus(this);
+        defeated = defeated ?? ConditionRules.determineDefeatedStatus(this);
 
         const removeStatus: string[] = [];
         if ((!defeated.unconscious && !defeated.dying) || defeated.dead) removeStatus.push('unconscious');
