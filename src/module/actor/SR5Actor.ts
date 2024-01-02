@@ -1854,7 +1854,7 @@ export class SR5Actor extends Actor {
     }
 
     /** 
-     * Get all situaitional modifiers from this actor.
+     * Get all situational modifiers from this actor.
      * NOTE: These will return selections only without higher level selections applied.
      *       You'll have to manually trigger .applyAll or apply what's needed.
      */

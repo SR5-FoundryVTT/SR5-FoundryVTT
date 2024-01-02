@@ -1762,6 +1762,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _prepareSituationModifiers(): { category: string, label: string, value: number, hidden: boolean }[] {
         const modifiers = this.actor.getSituationModifiers();
+        modifiers.applyAll();
         if (!modifiers) return [];
 
         return Object.entries(modifiers._modifiers).map(([category, modifier]: [Shadowrun.SituationModifierType, SituationModifier]) => {
