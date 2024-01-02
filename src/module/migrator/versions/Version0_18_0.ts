@@ -4,7 +4,7 @@ import { SR5ActiveEffect } from "../../effect/SR5ActiveEffect";
 import { VersionMigration } from "../VersionMigration";
 
 /**
- * Version 0.12.0 disables Foundry CONFIG.Active.Effect.legacyTransferal.
+ * Version 0.18.0 disables Foundry CONFIG.Active.Effect.legacyTransferal.
  * 
  * This causes effects on owned items to also be applied on actors. As these effects will have been
  * transferred onto the actor before, they're now collected and applied twice.
@@ -23,7 +23,8 @@ export class Version0_18_0 extends VersionMigration {
     }
 
     static get TargetVersion(): string {
-        return '0.18.0'; // TODO: check the consent dialog for this version
+        // First migration with 0.18.0 target didn't quite work out. This is the second attempt.
+        return '0.18.1';
     }
 
     // By default item effects will be deleted. should users want to keep them, they can 
@@ -110,7 +111,8 @@ export class Version0_18_0 extends VersionMigration {
 
         console.log(`Actor (${actor.uuid}). Disable these effects:`, itemOriginEffects);
         const updateData = {effects: itemOriginEffects.map(effect => {
-            return {_id: effect.id, disabled: true, name: `DISABLED: ${effect.name}`};
+            // this migration might have run twice, therefore we remove a name prefix before readding :)
+            return {_id: effect.id, disabled: true, name: `DISABLED: ${effect.name?.replace('DISABLED: ', '')}`};
         })};
 
         return updateData;
@@ -123,7 +125,7 @@ export class Version0_18_0 extends VersionMigration {
 class ConfigurationDialog extends FormDialog {
     constructor(data = {} as any) {
         data.templateData = {onlyDisableEffects: data.onlyDisableEffects};
-        data.templatePath = `systems/shadowrun5e/dist/templates/apps/migrator/Version${Version0_18_0.TargetVersion}.hbs`;
+        data.templatePath = `systems/shadowrun5e/dist/templates/apps/migrator/Version0.18.0.hbs`;
         data.title = Version0_18_0.TargetVersion;
         //@ts-expect-error
         super(data, {applyFormChangesOnSubmit: true});
@@ -149,7 +151,5 @@ class ConfigurationDialog extends FormDialog {
  * @returns 
  */
 const migrateEffects = (actor: SR5Actor) => {
-    return actor.effects
-    //@ts-expect-error TODO: foundry-vtt-types v10
-    .filter(effect => !!effect.origin && effect.origin.includes('.Item.') && !effect.disabled);
+    return actor.effects.filter(effect => !!effect.origin && effect.origin.includes('.Item.'));
 }
