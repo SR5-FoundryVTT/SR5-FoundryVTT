@@ -63,7 +63,7 @@ export class WeaponRangeTestBehavior {
 
         const modifiers = actor.getSituationModifiers();
         // If no range is active, set to zero.
-        test.data.range = modifiers.environmental.applied.active.range || 0;
+        test.data.range = modifiers.environmental.applied?.active.range || 0;
     }
 
     /**
