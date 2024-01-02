@@ -108,7 +108,16 @@ export class SpiritInfoUpdater {
              "vucub",
         ]
 
-        const type = spiritTypes.find(v => chummerType?.toLowerCase().includes(v));
+        let specialMapping = new Map([
+            ['Noxious Spirit', 'toxic_air'],
+            ['Abomination Spirit', 'toxic_beasts'],
+            ['Barren Spirit', 'toxic_earth'],
+            ['Nuclear Spirit', 'toxic_fire'],
+            ['Plague Spirit', 'toxic_man'],
+            ['Sludge Spirit', 'toxic_water']
+        ])
+
+        const type = spiritTypes.find(v => chummerType?.toLowerCase().includes(v)) ?? specialMapping.get(chummerType);
        
         if(type == undefined) {
             ui.notifications?.error(game.i18n.format("SR5.Import.Spirit.SpiritTypeNotFound"))
