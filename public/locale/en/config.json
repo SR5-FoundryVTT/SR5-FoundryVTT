@@ -1346,7 +1346,7 @@
         "RitualNotEnoughReagents": "Not enough reagents offered.",
         "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
         "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
-        "TokenSelectionNeeded": "One ore more tokens need to be selected"
+        "TokenSelectionNeeded": "One or more tokens need to be selected"
     },
     "SR5.Weapon": {
         "AmmoCount": "Ammo Count",
