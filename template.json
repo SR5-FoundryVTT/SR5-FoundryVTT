@@ -1046,12 +1046,14 @@
             "isDrone": false,
             "isOffRoad": false,
             "driver": "",
-            "modCategorySlots_Body": 0,
-            "modCategorySlots_PowerTrain": 0,
-            "modCategorySlots_Protection": 0,
-            "modCategorySlots_Electromagnetic": 0,
-            "modCategorySlots_Cosmetic": 0,
-            "modCategorySlots_Weapons": 0,
+            "modificationCategories": {
+                "body": 0,
+                "power_tain": 0,
+                "protection": 0,
+                "electromagnetic": 0,
+                "cosmetic": 0,
+                "weapons": 0
+            },          
             "vehicle_stats": {
                 "pilot": {
                     "base": 0,
