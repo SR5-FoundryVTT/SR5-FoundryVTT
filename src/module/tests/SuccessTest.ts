@@ -434,7 +434,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
 
         // Add action static value modifiers as numbers.
-        if (this.pool.base > 0) pool.push(String(this.pool.base));
+        if (this.pool.base > 0 && !this.pool.override) pool.push(String(this.pool.base));
         if (this.threshold.base > 0 && !this.threshold.override) threshold.push(String(this.threshold.base));
         if (this.limit.base > 0 && !this.limit.override) limit.push(String(this.limit.base));
 
