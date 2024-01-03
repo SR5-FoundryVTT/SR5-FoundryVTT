@@ -139,7 +139,7 @@ export const TestCreator = {
      * 
      * @param id The message id to retrieve test data from.
      */
-    fromMessage: async function(id: string): Promise<SuccessTest | undefined> {
+    fromMessage: async function(id: string, options?: TestOptions): Promise<SuccessTest | undefined> {
         const message = game.messages?.get(id);
         if (!message) {
             console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
@@ -150,7 +150,7 @@ export const TestCreator = {
         const flagData = message.getFlag(SYSTEM_NAME, FLAGS.Test);
         if (!flagData) {console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`); return;}
 
-        return this._fromMessageTestData(flagData);
+        return this._fromMessageTestData(flagData, options);
     },
 
     /**
@@ -158,14 +158,17 @@ export const TestCreator = {
      * @param testData 
      * @returns 
      */
-    _fromMessageTestData: function(testData) {
+    _fromMessageTestData: function(testData, options?: TestOptions) {
         // Use test data to create the original test from it.
         testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
         if (!testData) return;
 
         const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll as any));
         const documents = {rolls};
-        return TestCreator.fromTestData(testData.data, documents, testData.data.options);
+
+        // Allow callers to overwrite previous test options, otherwise fall back.
+        options = options ?? testData.data.options;
+        return TestCreator.fromTestData(testData.data, documents, options);
     },
 
     /**
