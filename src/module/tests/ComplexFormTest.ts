@@ -53,7 +53,7 @@ export class ComplexFormTest extends SuccessTest {
 
     // TODO: Add missing modifiers (gitter) // SR5#251
     override get testModifiers(): ModifierTypes[] {
-        return ['global', 'wounds', 'noise'];
+        return ['global', 'wounds'];
     }
 
     override async prepareDocumentData() {
