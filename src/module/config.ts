@@ -545,6 +545,15 @@ export const SR5 = {
         pilot_ground_craft: 'SR5.Skill.PilotGroundCraft',
         pilot_water_craft: 'SR5.Skill.PilotWaterCraft',
         pilot_exotic_vehicle: 'SR5.Skill.PilotExoticVehicle',
+        flight: 'SR5.Skill.Flight'
+    },
+
+    /**
+     * Some skills are created on the fly and don't exist on all actors.
+     * These values are used for those.
+     */
+    activeSkillAttribute: {
+        flight: 'agility'
     },
 
     actionTypes: {
