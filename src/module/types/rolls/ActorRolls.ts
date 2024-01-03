@@ -4,8 +4,6 @@ declare namespace Shadowrun {
 
     type ActorRollOptions = {
         event?: RollEvent
-        title?: string
-        hideRollMessage?: boolean
     };
     type DefenseRollOptions = ActorRollOptions & {
         fireModeDefense?: number;

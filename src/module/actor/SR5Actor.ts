@@ -1056,12 +1056,13 @@ export class SR5Actor extends Actor {
      * @param name The attributes name as defined within data
      * @param options Change general roll options.
      */
-    async rollAttribute(name, options?: Shadowrun.ActorRollOptions) {
+    async rollAttribute(name, options: Shadowrun.ActorRollOptions={}) {
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
         const action = DataDefaults.actionRollData({attribute: name, test: AttributeOnlyTest.name});
-        const test = await this.tests.fromAction(action, this);
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.tests.fromAction(action, this, {showDialog});
         if (!test) return;
 
         return await test.execute();
