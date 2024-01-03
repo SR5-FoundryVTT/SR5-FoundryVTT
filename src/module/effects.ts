@@ -114,8 +114,6 @@ export function prepareSortedItemEffects(document: SR5Actor|SR5Item): Shadowrun.
     const enabledEffects: Shadowrun.AllEnabledEffectsSheetData = [];
 
     for (const effect of allApplicableItemsEffects(document)) {
-        if (!effect.active) continue;
-
         enabledEffects.push(effect);
     }
 
