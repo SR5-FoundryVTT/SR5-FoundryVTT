@@ -48,7 +48,8 @@ export class OpposedRitualTest extends OpposedTest {
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        PartsList.AddUniquePart(this.data.pool.mod, 'SR5.Force', 2*this.against.data.force);
+        PartsList.AddUniquePart(this.data.pool.mod, 'SR5.Force', this.against.data.force);
+        PartsList.AddPart(this.data.pool.mod, 'SR5.Force', this.against.data.force);
     }
 
     /**
@@ -77,9 +78,8 @@ export class OpposedRitualTest extends OpposedTest {
     async updateRitualTestForFollowup() {
         // Finalize the original test values.
         let opposingHits = this.hits.value
-        let casterHits = this.against.data.values.hits.value
 
-        this.against.calcDrain(casterHits, opposingHits);
+        this.against.calcDrain(opposingHits);
         await this.against.saveToMessage();
     }
 }
