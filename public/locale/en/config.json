@@ -1226,6 +1226,10 @@
             "RecoilCompensation": "Total RC, including actor and item RC",
             "ResetRecoil": "Reset progressive recoil to none"
         },
+        "Ritual": {
+            "Force": "Force of the ritual",
+            "ReagentDrams": "Drams of reagents used for altering drain"
+        },
         "SituationalModifier": {
             "Recoil": "Amount of bullets fired"
         },
