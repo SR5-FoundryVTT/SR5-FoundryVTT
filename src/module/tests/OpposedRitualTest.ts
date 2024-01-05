@@ -32,7 +32,7 @@ export class OpposedRitualTest extends OpposedTest {
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/opposed-actor-creator-message.html'
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.html'
     }
 
     /**
