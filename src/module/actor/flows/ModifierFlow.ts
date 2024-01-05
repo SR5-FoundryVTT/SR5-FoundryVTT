@@ -5,6 +5,8 @@ import {SR5Actor} from "../SR5Actor";
  * Options for calling the general modifier access helper method ModifierFlow#totalFor.
  */
 export interface ModifierFlowOptions {
+    // Set true to always re-apply selections.
+    reapply?: boolean;
     // See SituationModifier applicable
     applicable?: string[]
     // If called from SuccessTest or sub-class context, allow it's documents and data to 
@@ -41,7 +43,7 @@ export class ModifierFlow {
         if (this[name] !== undefined) return this[name];
 
         // Get global modifiers that can come from the general modifier system.
-        const modifiers = this.actor.getSituationModifiers(options);
+        const modifiers = this.actor.getSituationModifiers();
         if (modifiers.handlesTotalFor(name)) return modifiers.getTotalFor(name, options);
 
         // Get global modifiers that come from the legacy actor modifier system.

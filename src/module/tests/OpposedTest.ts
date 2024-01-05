@@ -219,4 +219,27 @@ export class OpposedTest extends SuccessTest {
     static override async chatMessageListeners(message: ChatMessage, html, data) {
         html.find('.opposed-action').on('click', OpposedTest._castOpposedAction);
     }
+
+    /**
+     * Inject effects taken from the active original test and inject them into the opposed chat message.
+     */
+    override _prepareMessageTemplateData() {
+        const templateData = super._prepareMessageTemplateData();
+
+        if (!this.against) return templateData;
+
+        for (const effect of this.against.effects.allApplicableEffectsToTargetActor()) {
+            templateData.effects.push(effect);
+        }
+
+        return templateData;
+    }
+
+    /**
+     * Targeted Actor effects are currently disabled, as they need more time.
+     */
+    override async afterFailure() {
+        await super.afterFailure();
+        await this.effects.createTargetActorEffectsAfterOpposedTest();
+    }
 }

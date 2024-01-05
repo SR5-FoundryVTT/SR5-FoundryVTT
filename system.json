@@ -12,9 +12,9 @@
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.17.0",
+  "version": "0.18.3",
   "compatibility": {
-    "minimum": "10",
+    "minimum": "11",
     "maximum": "11",
     "verified": "11"
   },
@@ -91,6 +91,10 @@
       "system": "shadowrun5e"
     }
   ],
+  "relationships": [{
+    "id": "autocomplete-inline-properties",
+    "type": "module"
+  }],
   "socket": true,
   "manifest": null,
   "download": null,

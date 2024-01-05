@@ -545,6 +545,15 @@ export const SR5 = {
         pilot_ground_craft: 'SR5.Skill.PilotGroundCraft',
         pilot_water_craft: 'SR5.Skill.PilotWaterCraft',
         pilot_exotic_vehicle: 'SR5.Skill.PilotExoticVehicle',
+        flight: 'SR5.Skill.Flight'
+    },
+
+    /**
+     * Some skills are created on the fly and don't exist on all actors.
+     * These values are used for those.
+     */
+    activeSkillAttribute: {
+        flight: 'agility'
     },
 
     actionTypes: {
@@ -1097,6 +1106,20 @@ export const SR5 = {
         mode: 'full_auto'
     }
     ] as Shadowrun.FireModeData[],
+
+    /**
+     * Active/AdvancedEffect apply To types and their labels.
+     * 
+     * actor is the default Foundry apply to type of ActiveEffects and will be affect actor data.
+     */
+    effectApplyTo: {
+        'actor': 'SR5.FOUNDRY.Actor',
+        // 'item': 'SR5.FOUNDRY.Item', // Disabled, as systems nested item approach brings issues.
+        'targeted_actor': 'SR5.ActiveEffect.ApplyTos.TargetedActor',
+        'test_all': 'SR5.Test',
+        'test_item': 'SR5.ActiveEffect.ApplyTos.TestItem',
+        'modifier': 'SR5.Modifier'
+    },
 
     itemSubTypeIconOverrides: {
         action: {},

@@ -139,7 +139,7 @@ export const TestCreator = {
      * 
      * @param id The message id to retrieve test data from.
      */
-    fromMessage: async function(id: string): Promise<SuccessTest | undefined> {
+    fromMessage: async function(id: string, options?: TestOptions): Promise<SuccessTest | undefined> {
         const message = game.messages?.get(id);
         if (!message) {
             console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
@@ -148,18 +148,27 @@ export const TestCreator = {
 
         // Check if message contains any test data.
         const flagData = message.getFlag(SYSTEM_NAME, FLAGS.Test);
-        if (!flagData) return;
+        if (!flagData) {console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`); return;}
 
+        return this._fromMessageTestData(flagData, options);
+    },
+
+    /**
+     * Create a test implemenation directly from a message flags test data.
+     * @param testData 
+     * @returns 
+     */
+    _fromMessageTestData: function(testData, options?: TestOptions) {
         // Use test data to create the original test from it.
-        const testData = foundry.utils.duplicate(flagData) as SuccessTestMessageData;
-        if (!testData) {
-            console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
-            return;
-        }
+        testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
+        if (!testData) return;
 
         const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll as any));
         const documents = {rolls};
-        return TestCreator.fromTestData(testData.data, documents, testData.data.options);
+
+        // Allow callers to overwrite previous test options, otherwise fall back.
+        options = options ?? testData.data.options;
+        return TestCreator.fromTestData(testData.data, documents, options);
     },
 
     /**
@@ -521,11 +530,11 @@ export const TestCreator = {
         }
 
         // Apply applicable selections and collect modifiers.
-        for (const [modifier, applicable] of Object.entries(modifiers)) {
+        for (const [name, applicable] of Object.entries(modifiers)) {
             // Setup the resulting modifier value.
-            const label = SR5.modifierTypes[modifier];
+            const label = SR5.modifierTypes[name];
             const options = {applicable};
-            const value = actor.modifiers.totalFor(modifier, options);
+            const value = actor.modifiers.totalFor(name, options);
             data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
         }
 

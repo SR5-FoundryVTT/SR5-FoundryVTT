@@ -3,6 +3,7 @@ import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
 
 /**
@@ -358,6 +359,40 @@ export const registerItemLineHelpers = () => {
                         }
                     }
                 ]
+            case 'itemEffects':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.ActiveEffect.ApplyTo')
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Duration')
+                        }
+                    },
+                    {
+                        text: {
+                            // Used as a placeholder for effect line icons.
+                            // This way the header column is empty (as no +Add makes sense)
+                            // However the line column contains the normal interaction icons.
+                            text: ''
+                        }
+                    }
+                ]
+            case 'effects':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.ActiveEffect.ApplyTo')
+                        }
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Duration')
+                        }
+                    }
+                ]
             default:
                 return [];
         }
@@ -679,6 +714,37 @@ export const registerItemLineHelpers = () => {
         return icons;
     });
 
+    /**
+     * Used for the actor sheets display of active effects.
+     */
+    Handlebars.registerHelper('EffectRightSide', function (effect: SR5ActiveEffect) {
+        const getDurationLabel = () => {
+            // @ts-expect-error
+            if (effect.duration.seconds) return `${effect.duration.seconds}s`;
+            // @ts-expect-error
+            if (effect.duration.rounds) return `${effect.duration.rounds}r`;
+
+            return '';
+        }
+
+        return [
+            {
+                // Apply To Column
+                text: {
+                    text: game.i18n.localize(SR5.effectApplyTo[effect.applyTo]),
+                    cssClass: 'six',
+                }
+            },
+            {
+                // Duration Column
+                text: {
+                    text: getDurationLabel(),
+                    cssClass: 'six',
+                }
+            }
+        ];
+    });
+
     Handlebars.registerHelper('InventoryItemIcons', function (item: ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
         const moveIcon = {
@@ -750,8 +816,27 @@ export const registerItemLineHelpers = () => {
         return icons;
     });
 
-    Handlebars.registerHelper('EffectData', function(effectType: string) {
-        return {'effect-type': effectType};
+    /**
+     * Helper specifically for active effect icons sourced from an actors items to display in list form.
+     */
+    Handlebars.registerHelper('ItemEffectIcons', function (effect) {
+        const openOriginIcon = {
+            icon: 'fas fa-file item-effect-control',
+            title: game.i18n.localize('SR5.OpenOrigin'),
+            data: {action: "open-origin"}
+        }
+        const disableIcon = {
+            icon: `${effect.disabled ? 'far fa-circle' : 'fas fa-check-circle'} item-effect-control`,
+            title: game.i18n.localize('SR5.ToggleActive'),
+            data: {action: "toggle"}
+        };
+        const editIcon = {
+            icon: 'fas fa-edit item-effect-control',
+            title: game.i18n.localize('SR5.EditItem'),
+            data: {action: 'edit'}
+        };        
+
+        return [openOriginIcon, disableIcon, editIcon];
     });
 
     // Allow Matrix Marks to be changed on the spot on a Sheet.

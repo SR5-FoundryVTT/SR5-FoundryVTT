@@ -1,7 +1,6 @@
 import { SkillsPrep } from './functions/SkillsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { LimitsPrep } from './functions/LimitsPrep';
-import { ConditionMonitorsPrep } from './functions/ConditionMonitorsPrep';
 import { MovementPrep } from './functions/MovementPrep';
 import { WoundsPrep } from './functions/WoundsPrep';
 import { ModifiersPrep } from './functions/ModifiersPrep';
@@ -14,6 +13,8 @@ import SpiritType = Shadowrun.SpiritType;
 import SpiritData = Shadowrun.SpiritData;
 import { CharacterPrep } from './CharacterPrep';
 import { GruntPrep } from './functions/GruntPrep';
+import { DataDefaults } from '../../data/DataDefaults';
+import { SR5 } from '../../config';
 
 
 export class SpiritPrep {
@@ -68,13 +69,15 @@ export class SpiritPrep {
                 }
             }
 
-            // set base of skill according to force and spirit type
-            for (const [skillId, skill] of Object.entries(skills.active)) {
-                // Leave custom skills alone to allow users to change those at will.
-                if (SkillFlow.isCustomSkill(skill)) continue;
+            // set the base of skills to the provided force
+            for (const skillId of overrides.skills) {
+                // Custom skills need to be created on the actor.
+                const skill = SpiritPrep.prepareActiveSkill(skillId, skills.active);
+                if (skill === undefined) continue;
+                if (SkillFlow.isCustomSkill(skill)) continue
 
-                // Change default skills to the force rating.
-                skill.base = overrides.skills.find((s) => s === skillId) ? force : 0;
+                skill.base = force;
+                skills.active[skillId] = skill;
             }
 
             // prepare initiative data
@@ -88,6 +91,21 @@ export class SpiritPrep {
             initiative.astral.dice.base = 3;
             initiative.astral.dice.mod = PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", Number(modifiers['astral_initiative_dice']));
         }
+    }
+
+    /**
+     * Spirits can have some none default skills. The must be created first and don't count as custom skills.
+     * @param skillId Whatever skill id should be used.
+     * @param skills The list of active skills of the sprite.
+     * @returns A prepared SkillField without levels.
+     */
+    static prepareActiveSkill(skillId: string, skills: Shadowrun.Skills): Shadowrun.SkillField {
+        if (skills[skillId]) return skills[skillId];
+
+        const label = SR5.activeSkills[skillId];
+        const attribute = SR5.activeSkillAttribute[skillId];
+
+        return DataDefaults.skillData({ label, attribute, canDefault: false })
     }
 
     static prepareSpiritArmor(data: SpiritData) {
@@ -669,7 +687,7 @@ export class SpiritPrep {
                 overrides.skills.push("assensing", "flight", "perception", "unarmed_combat");
                 break;
 
-            }
+        }
 
         return overrides;
     }

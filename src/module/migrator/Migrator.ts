@@ -1,6 +1,7 @@
 import { VersionMigration } from './VersionMigration';
+import {Version0_8_0} from "./versions/Version0_8_0";
+import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
-import { Version0_8_0 } from "./versions/Version0_8_0";
 
 type VersionDefinition = {
     versionNumber: string;
@@ -10,11 +11,12 @@ export class Migrator {
     // Map of all version migrations to their target version numbers.
     private static readonly s_Versions: VersionDefinition[] = [
         { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
-        { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() },
+        { versionNumber: Version0_18_0.TargetVersion, migration: new Version0_18_0() },
+        { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() }
     ];
 
     /**
-     * Check if the current world is empty of any migratable documents.
+     * Check if the current world is empty of any migrate documents.
      * 
      */
     public static get isEmptyWorld(): boolean {
@@ -81,6 +83,13 @@ export class Migrator {
         migrations.sort((a, b) => {
             return this.compareVersion(a.versionNumber, b.versionNumber);
         });
+        
+        // Before starting, configure each migration
+        for (const {migration} of migrations) {
+            // Show a configuration or information dialog and abort if necessary.
+            const consent = await migration.AskForUserConsentAndConfiguration();
+            if (!consent) return;
+        }
 
         await this.migrateWorld(game, migrations);
         await this.migrateCompendium(game, migrations);
@@ -115,6 +124,7 @@ export class Migrator {
     private static async migrateWorld(game: Game, migrations: VersionDefinition[]) {
         // Run the migrations in order
         for (const { migration } of migrations) {
+            // Migrate after user accepted.
             await migration.Migrate(game);
         }
     }

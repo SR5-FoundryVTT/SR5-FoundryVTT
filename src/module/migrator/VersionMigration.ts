@@ -1,6 +1,5 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import {SR5Item} from "../item/SR5Item";
-import {ActorData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 
@@ -43,6 +42,13 @@ export abstract class VersionMigration {
         this.m_Abort = true;
         this.m_AbortReason = reason;
         ui.notifications?.error(`Data migration has been aborted: ${reason}`, { permanent: true });
+    }
+
+    /**
+     * Show a version specific dialog to the user to inform or confirm about certain migration aspects.
+     */
+    public async AskForUserConsentAndConfiguration(): Promise<boolean> {
+        return true;
     }
 
     /**
@@ -106,7 +112,8 @@ export abstract class VersionMigration {
     protected async Apply(documentUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of documentUpdates) {
             
-            const updateSystem = updateData.data ? {system: updateData.data} : updateData;
+            // v9 -> v10 workaround, should be removed when safe.
+            const updateSystem = updateData?.data ? {system: updateData.data} : updateData;
 
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
@@ -134,12 +141,13 @@ export abstract class VersionMigration {
 
                 // Migrate SceneData itself.
                 console.log(`Migrating Scene entity ${scene.name}`);
-                const updateData = await this.MigrateSceneData(duplicate(scene.data));
+                const updateData = await this.MigrateSceneData(scene);
 
                 expandObject(updateData);
                 entityUpdates.set(scene, {
                     updateData,
                     embeddedItems: null,
+                    embeddedEffects: null,
                 });
 
                 // Migrate embedded TokenDocument / ActorData within SceneData
@@ -150,13 +158,13 @@ export abstract class VersionMigration {
                     //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(token.actor.data)) continue;
 
-                    // @ts-expect-error
-                    const updateData = await this.MigrateActorData(foundry.utils.duplicate(token.actor.data));
+                    const updateData = await this.MigrateActorData(token.actor);
 
                     expandObject(updateData);
                     entityUpdates.set(token.actor, {
                         updateData: updateData.data || null,
-                        embeddedItems: updateData.items || null
+                        embeddedItems: updateData.items || null,
+                        embeddedEffects: updateData.effects || null
                     });
                 }
 
@@ -169,6 +177,7 @@ export abstract class VersionMigration {
                 entityUpdates.set(scene, {
                     updateData,
                     embeddedItems: null,
+                    embeddedEffects: null
                 });
             } catch (error) {
                 console.error(error);
@@ -185,12 +194,12 @@ export abstract class VersionMigration {
         // @ts-expect-error // ignore null state
         for (const item of game.items.contents) {
             try {
-                if (!(await this.ShouldMigrateItemData(item.data))) {
+                if (!(await this.ShouldMigrateItemData(item))) {
                     continue;
                 }
 
                 console.log(`Migrating Item: ${item.name}`);
-                const updateData = await this.MigrateItemData(item.data);
+                const updateData = await this.MigrateItemData(item);
 
                 //@ts-expect-error // TODO: foundry-vtt-types v10
                 if (foundry.utils.isEmpty(updateData)) {
@@ -201,6 +210,7 @@ export abstract class VersionMigration {
                 entityUpdates.set(item, {
                     updateData,
                     embeddedItems: null,
+                    embeddedEffects: updateData.effects || null
                 });
             } catch (error) {
                 console.error(error);
@@ -217,14 +227,13 @@ export abstract class VersionMigration {
         // @ts-expect-error // ignore null state
         for (const actor of game.actors.contents) {
             try {
-                if (!(await this.ShouldMigrateActorData(actor.data))) {
+                if (!(await this.ShouldMigrateActorData(actor))) {
                     continue;
                 }
 
                 console.log(`Migrating Actor ${actor.name}`);
                 console.log(actor);
-                // @ts-expect-error
-                const updateData = await this.MigrateActorData(duplicate(actor.data));
+                const updateData = await this.MigrateActorData(actor);
                 console.log(updateData);
                 let items = [];
                 if (updateData.items) {
@@ -237,6 +246,7 @@ export abstract class VersionMigration {
                 entityUpdates.set(actor, {
                     updateData,
                     embeddedItems: items,
+                    embeddedEffects: updateData.effects || null
                 });
             } catch (error) {
                 console.error(error);
@@ -247,24 +257,22 @@ export abstract class VersionMigration {
 
     /**
      * Iterate over an actor's items, updating those that need updating.
-     * @param actorData The actor to iterate over
+     * @param actor The actor to iterate over
      * @param updateData The existing update data to merge into
      */
-    protected async IterateActorItems(actorData: ShadowrunActorData, updateData) {
+    protected async IterateActorItems(actor: SR5Actor, updateData) {
         let hasItemUpdates = false;
-        // @ts-expect-error
-        if (actorData.items !== undefined) {
+        if (actor.items !== undefined) {
             const items = await Promise.all(
-                // @ts-expect-error
-                actorData.items.map(async (itemData) => {
-                    if (itemData instanceof SR5Item) console.error('Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object');
-                    if (!await this.ShouldMigrateItemData(itemData)) return itemData;
-                    let itemUpdate = await this.MigrateItemData(itemData);
+                actor.items.map(async (item) => {
+                    if (item instanceof SR5Item) console.error('Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object');
+                    if (!await this.ShouldMigrateItemData(item)) return item;
+                    let itemUpdate = await this.MigrateItemData(item);
 
                     hasItemUpdates = true;
-                    itemUpdate['_id'] = itemData._id;
+                    itemUpdate['_id'] = item.id;
 
-                    return mergeObject(itemData, itemUpdate.data, {
+                    return mergeObject(item, itemUpdate.data, {
                         enforceTypes: false,
                         inplace: false,
                     });
@@ -291,7 +299,7 @@ export abstract class VersionMigration {
      * @param scene The scene to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected async MigrateSceneData(scene: any): Promise<any> {
+    protected async MigrateSceneData(scene: Scene): Promise<any> {
         return {};
     }
     /**
@@ -312,7 +320,7 @@ export abstract class VersionMigration {
      * @param item The item to check.
      * @return A promise that resolves true or false.
      */
-    protected async ShouldMigrateItemData(item: ShadowrunItemData): Promise<boolean> {
+    protected async ShouldMigrateItemData(item: SR5Item): Promise<boolean> {
         return false;
     }
     /**
@@ -320,7 +328,7 @@ export abstract class VersionMigration {
      * @param item The item to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected async MigrateItemData(item: ShadowrunItemData): Promise<any> {
+    protected async MigrateItemData(item: SR5Item): Promise<any> {
         return {};
     }
     /**
@@ -341,7 +349,7 @@ export abstract class VersionMigration {
      * @param actor The actor to check.
      * @return A promise that resolves true or false.
      */
-    protected async ShouldMigrateActorData(actor: ActorData): Promise<boolean> {
+    protected async ShouldMigrateActorData(actor: SR5Actor): Promise<boolean> {
         return false;
     }
     /**
@@ -349,7 +357,7 @@ export abstract class VersionMigration {
      * @param actor The actor to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected async MigrateActorData(actor: ActorData): Promise<any> {
+    protected async MigrateActorData(actor: SR5Actor): Promise<any> {
         return {};
     }
     /**
@@ -382,7 +390,7 @@ export abstract class VersionMigration {
                 let updateData: any = null;
                 if (pack.metadata.type === 'Item') {
                     // @ts-expect-error // TODO: vtt-types v9 document.data.type check added to type gate... but didn't work
-                    updateData = await this.MigrateItemData(foundry.utils.duplicate(document.data));
+                    updateData = await this.MigrateItemData(document);
 
                     //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
@@ -395,8 +403,8 @@ export abstract class VersionMigration {
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
-                    //@ts-expect-error TODO: foundry-vtt-types v10
-                    updateData = await this.MigrateActorData(foundry.utils.duplicate(document.data));
+                    //@ts-expect-error
+                    updateData = await this.MigrateActorData(document);
 
                     //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
@@ -417,7 +425,7 @@ export abstract class VersionMigration {
                     }
 
                 } else if (pack.metadata.type === 'Scene') {
-                    updateData = await this.MigrateSceneData(foundry.utils.duplicate(document.data));
+                    updateData = await this.MigrateSceneData(document as unknown as Scene);
 
                     //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
@@ -440,4 +448,5 @@ export abstract class VersionMigration {
 type DocumentUpdate = {
     updateData: any;
     embeddedItems: null | any[];
+    embeddedEffects: null | any[];
 };

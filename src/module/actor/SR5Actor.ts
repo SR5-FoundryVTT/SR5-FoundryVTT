@@ -25,6 +25,7 @@ import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
+import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 
@@ -163,6 +164,29 @@ export class SR5Actor extends Actor {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
             console.error(error);
             ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+        }
+    }
+
+    /**
+     * Get all ActiveEffects applicable to this actor.
+     * 
+     * The system uses a custom method of determining what ActiveEffect is applicable that doesn't 
+     * use default FoundryVTT allApplicableEffect.
+     * 
+     * The system has additional support for:
+     * - taking actor effects from items (apply-To actor)
+     * - having effects apply that are part of a targeted action against this actor (apply-To targeted_actor)
+     * 
+     * NOTE: FoundryVTT applyActiveEffects will check for disabled effects.
+     */
+    //@ts-expect-error TODO: foundry-vtt-types v10
+    override *allApplicableEffects() {
+        for (const effect of allApplicableDocumentEffects(this, {applyTo: ['actor', 'targeted_actor']})) {
+            yield effect;
+        }
+
+        for (const effect of allApplicableItemsEffects(this, {applyTo: ['actor']})) {
+            yield effect;
         }
     }
 
@@ -1032,12 +1056,13 @@ export class SR5Actor extends Actor {
      * @param name The attributes name as defined within data
      * @param options Change general roll options.
      */
-    async rollAttribute(name, options?: Shadowrun.ActorRollOptions) {
+    async rollAttribute(name, options: Shadowrun.ActorRollOptions={}) {
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
         const action = DataDefaults.actionRollData({attribute: name, test: AttributeOnlyTest.name});
-        const test = await this.tests.fromAction(action, this);
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.tests.fromAction(action, this, {showDialog});
         if (!test) return;
 
         return await test.execute();
@@ -1513,36 +1538,50 @@ export class SR5Actor extends Actor {
     /**
      * Depending on this actors defeated status, apply the correct effect and status.
      * 
+     * This will only work when the actor is connected to a token.
+     * 
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async applyDefeatedStatus(defeated?: DefeatedStatus) {
-        defeated = defeated || ConditionRules.determineDefeatedStatus(this);
-        await this.removeDefeatedStatus(defeated);
+        // TODO: combat-utility-belt seems to replace the default status effects, causing some issue I don't yet understand.
+        //       For now, we'll just disable this feature.
+        return;
+    //     const token = this.getToken();
+    //     if (token === null) return;
 
-        if (!defeated.unconscious && !defeated.dying && !defeated.dead) return this.combatant?.update({defeated: false});
-        else this.combatant?.update({defeated: true});
+    //     defeated = defeated ?? ConditionRules.determineDefeatedStatus(this);
 
-        let newStatus = 'unconscious';
-        if (defeated.dying) newStatus = 'unconscious';
-        if (defeated.dead) newStatus = 'dead';
+    //     // Remove unapplicable defeated token status.
+    //     await this.removeDefeatedStatus(defeated);
 
-        // Find fitting status and fallback to dead if not found.
-        const status = CONFIG.statusEffects.find(e => e.id === newStatus);
-        const effect = status || CONFIG.controlIcons.defeated;
+    //     // Apply the appropriate combatant status.
+    //     if (!defeated.unconscious && !defeated.dying && !defeated.dead) { 
+    //         return await this.combatant?.update({ defeated: false }); 
+    //     } else { 
+    //         await this.combatant?.update({defeated: true});
+    //     }
 
-        // Avoid applying defeated status multiple times.
-        const existing = this.effects.reduce((arr, e) => {
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) arr.push(e.id);
-            return arr;
-        }, []);
+    //     let newStatus = 'unconscious';
+    //     if (defeated.dying) newStatus = 'unconscious';
+    //     if (defeated.dead) newStatus = 'dead';
 
-        if (existing.length) return;
+    //     // Find fitting status and fallback to dead if not found.
+    //     const status = CONFIG.statusEffects.find(e => e.id === newStatus);
+    //     const effect = status || CONFIG.controlIcons.defeated;
 
-        // @ts-expect-error
-        // Set effect as active, as we've already made sure it isn't.
-        // Otherwise Foundry would toggle on/off, even though we're still dead.
-        await this.getToken().object.toggleEffect(effect, { overlay: true, active: true });
+    //     // Avoid applying defeated status multiple times.
+    //     const existing = this.effects.reduce((arr, e) => {
+    //         // @ts-expect-error TODO: foundry-vtt-types v10
+    //         if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) arr.push(e.id);
+    //         return arr;
+    //     }, []);
+
+    //     if (existing.length) return;
+
+    //     // @ts-expect-error
+    //     // Set effect as active, as we've already made sure it isn't.
+    //     // Otherwise Foundry would toggle on/off, even though we're still dead.
+    //     await token.object.toggleEffect(effect, { overlay: true, active: true });
     }
 
     /**
@@ -1551,7 +1590,7 @@ export class SR5Actor extends Actor {
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async removeDefeatedStatus(defeated?: DefeatedStatus) {
-        defeated = defeated || ConditionRules.determineDefeatedStatus(this);
+        defeated = defeated ?? ConditionRules.determineDefeatedStatus(this);
 
         const removeStatus: string[] = [];
         if ((!defeated.unconscious && !defeated.dying) || defeated.dead) removeStatus.push('unconscious');
@@ -1817,11 +1856,11 @@ export class SR5Actor extends Actor {
 
     /** 
      * Get all situational modifiers from this actor.
+     * NOTE: These will return selections only without higher level selections applied.
+     *       You'll have to manually trigger .applyAll or apply what's needed.
      */
-    getSituationModifiers(options?): DocumentSituationModifiers {
-        const modifiers = DocumentSituationModifiers.getDocumentModifiers(this);
-        modifiers.applyAll(options);
-        return modifiers;
+    getSituationModifiers(): DocumentSituationModifiers {
+        return DocumentSituationModifiers.getDocumentModifiers(this);
     }
 
     /**

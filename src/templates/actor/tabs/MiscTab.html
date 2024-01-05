@@ -2,26 +2,28 @@
     <div class="inventory">
         <div class="split-container">
             <div class="scroll-area">
-                {{#if isCharacter}}
                 <div class="list-item">
+                    {{#if (or isCharacter isSpirit)}}
                     <div class="list-item-content">
                         <button type="button" class="display import-character">
                             {{localize "SR5.ImportCharacter"}}
                         </button>
                     </div>
                     {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html' }}{{/if}}
+                    {{/if}}
                 </div>
-                <div class="list-item">
-                    <div class="list-item-content">
-                        <div class="item-left">
-                            <div class="item-text item-name">
-                                {{localize "SR5.Nuyen"}}
+                {{#if isCharacter}}
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.Nuyen"}}
+                                </div>
                             </div>
-                        </div>
-                        <div class="item-right">
-                            <div class="item-text input">
-                                <input class="display" type="text" name="system.nuyen" value="{{system.nuyen}}" data-dtype="Number" />
-                                <span class="unit">
+                            <div class="item-right">
+                                <div class="item-text input">
+                                    <input class="display" type="text" name="system.nuyen" value="{{system.nuyen}}" data-dtype="Number" />
+                                    <span class="unit">
                                     <i class="fas fa-yen-sign"></i>
                                 </span>
                             </div>

@@ -1,9 +1,11 @@
 import {Helpers} from '../helpers';
 import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
-import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
+import {onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
 
 /**
@@ -33,7 +35,8 @@ interface FoundryItemSheetData {
 export interface SR5BaseItemSheetData extends FoundryItemSheetData {
     // SR5-FoundryVTT configuration
     config: typeof SR5
-    effects: Shadowrun.EffectsSheetData
+    effects: SR5ActiveEffect[]
+    itemEffects: SR5ActiveEffect[]
     // FoundryVTT rollmodes
     rollModes: CONFIG.Dice.RollModes
 }
@@ -177,8 +180,8 @@ export class SR5ItemSheet extends ItemSheet {
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
 
-        // Active Effects data.
-        data['effects'] = prepareActiveEffectCategories(this.item.effects);
+        data['effects'] = prepareSortedEffects(this.item.effects.contents);
+        data['itemEffects'] = prepareSortedItemEffects(this.object);
 
         if (this.item.isHost) {
             data['markedDocuments'] = this.item.getAllMarkedDocuments();
@@ -242,23 +245,8 @@ export class SR5ItemSheet extends ItemSheet {
      * Sorted (by translation) active skills either from the owning actor or general configuration.
      */
     _getSortedActiveSkillsForSelect() {
-        // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
-        const actor = this.item.actorOwner;
-        // Fallback for actors without skills.
-        if (!actor || actor.isIC()) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
-
-        const activeSkills = Helpers.sortSkills(actor.getActiveSkills());
-
-        const activeSkillsForSelect: Record<string, string> = {};
-        for (const [id, skill] of Object.entries(activeSkills)) {
-            // Legacy skills have no name, but their name is their id!
-            // Custom skills have a name and their id is random.
-            const key = skill.name || id;
-            const label = skill.label || skill.name;
-            activeSkillsForSelect[key] = label;
-        }
-
-        return activeSkillsForSelect;
+        // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
+        return ActionFlow.sortedActiveSkills(this.item.actorOwner);
     }
 
     _getNetworkDevices(): SR5Item[] {
