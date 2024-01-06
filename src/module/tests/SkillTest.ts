@@ -27,6 +27,9 @@ export class SkillTest extends SuccessTest {
         this.lastUsedLimit = this.data.limitSelection;
     }
 
+    /**
+     * Allow users to alter detailed skill values.
+     */
     override get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.html';
     }
@@ -39,6 +42,9 @@ export class SkillTest extends SuccessTest {
         return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill) as Translation)} ${game.i18n.localize('SR5.Test')}`;
     }
 
+    /**
+     * A SkillTest has the need to store attribute and limit selections
+     */
     override _prepareData(data: any, options: TestOptions) {
         data = super._prepareData(data, options);
 
@@ -51,11 +57,11 @@ export class SkillTest extends SuccessTest {
         return data;
     }
 
-    override async prepareDocumentData() {
-        await super.prepareDocumentData();
-    }
-
+    /**
+     * Skill test provides a selection for attribute and limit during TestDialog.
+     */
     override prepareBaseValues() {
+        super.prepareBaseValues();
         this.prepareAttributeSelection();
         this.prepareLimitSelection();
     }
@@ -75,7 +81,7 @@ export class SkillTest extends SuccessTest {
         if (!usedAttribute || !lastUsedAttribute) return; 
 
 
-        const pool: PartsList<number> = new PartsList(this.pool.mod);
+        const pool = new PartsList<number>(this.pool.mod);
 
         // Replace previous attribute with new one, without changing other modifiers
         pool.removePart(lastUsedAttribute.label);
@@ -101,8 +107,8 @@ export class SkillTest extends SuccessTest {
 
         if (!usedLimit || !lastUsedLimit) return;
 
-        const limit = new PartsList(this.limit.mod);
-        const pool = new PartsList(this.pool.mod);
+        const limit = new PartsList<number>(this.limit.mod);
+        const pool = new PartsList<number>(this.pool.mod);
 
         // Replace previous limit with new one, without changing other modifiers.
         limit.removePart(lastUsedLimit.label);
