@@ -73,4 +73,4 @@ jobs:
         method: 'POST'
         contentType: 'application/json'
         customHeaders: '{"Authorization": "${{ secrets.FVTT_PACKAGE_RELEASE_TOKEN }}"}'
-        data: '{"id": "shadowrun5e","dry-run":true,"release":{"version":"v${{steps.system_properties.outputs.version}}","manifest":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/latest/download/system.json","notes":"https://github.com/smilligan93/SR5-FoundryVTT/releases/tag/${{steps.system_properties.outputs.version}}","compatibility":{"minimum":"11","verified":"11","maximum":"11"}}}'
+        data: '{"id": "shadowrun5e","release":{"version":"v${{steps.system_properties.outputs.version}}","manifest":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/latest/download/system.json","notes":"https://github.com/smilligan93/SR5-FoundryVTT/releases/tag/${{steps.system_properties.outputs.version}}","compatibility":{"minimum":"11","verified":"11","maximum":"11"}}}'
