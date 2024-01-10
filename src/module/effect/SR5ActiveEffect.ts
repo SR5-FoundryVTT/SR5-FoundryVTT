@@ -279,8 +279,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (change.value.length === 0) return;
 
         // Use Foundry Roll Term parser to both resolve dynamic values and resolve calculations.
-        const terms = Roll.parse(change.value, source);
-        const expression = terms.map(term => term.total).join(' ');
+        const expression = Roll.replaceFormulaData(change.value, source);
         const value = Roll.validate(expression) ? Roll.safeEval(expression) : change.value;
 
         // Overwrite change value with graceful default, to avoid NaN errors during change application.
