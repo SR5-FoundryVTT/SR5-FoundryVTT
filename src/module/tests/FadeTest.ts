@@ -8,6 +8,7 @@ import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
+import { DataDefaults } from "../data/DataDefaults";
 
 export interface FadeTestData extends SuccessTestData {
     incomingFade: DamageData
@@ -23,10 +24,15 @@ export class FadeTest extends SuccessTest {
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
-        data.against = data.against || new ComplexFormTest({}, {}, options).data;
-
-        data.incomingFade = foundry.utils.duplicate(data.against.fadeDamage);
-        data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
+        // Is this test part of a followup test chain? complex form => fade
+        if (data.against) {
+            data.incomingFade = foundry.utils.duplicate(data.against.fadeDamage);
+            data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
+        // This test is part of either a standalone test or created with its own data (i.e. edge reroll).
+        } else {
+            data.incomingFade = data.incomingFade ?? DataDefaults.damageData();
+            data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
+        }
 
         return data;
     }
