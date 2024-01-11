@@ -39,9 +39,15 @@ export class PhysicalResistTest extends SuccessTest {
     override _prepareData(data: PhysicalResistTestData, options): any {
         data = super._prepareData(data, options);
 
-        // Get incoming damage from test before or default.
-        data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.damageData());
-        data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+        // Is this test part of a followup test chain? defense => resist
+        if (data.following) {
+            data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.damageData());
+            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+        // This test is part of either a standalone resist or created with its own data (i.e. edge reroll).
+        } else {
+            data.incomingDamage = data.incomingDamage ?? DataDefaults.damageData();
+            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+        }
 
         const armor = this.actor?.getArmor();
         if(armor?.hardened){
