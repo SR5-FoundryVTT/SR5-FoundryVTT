@@ -213,19 +213,6 @@ export class SR5ActiveEffect extends ActiveEffect {
         return tagifyFlagsToIds(this, 'selection_limits');
     }
 
-    /**
-     * Check if this effect should be applied in any context, depending on it's parent items state.
-     * 
-     * @param item The item to check against.
-     * @returns true, if this effect should be skipped according to it's configuration.
-     */
-    activeWithItem(item: SR5Item): boolean {
-        if (this.onlyForEquipped && !item.isEquipped()) return true;
-        if (this.onlyForWireless && !item.isWireless()) return true;
-
-        return false;
-    }
-
     override get isSuppressed(): boolean {
         if (!(this.parent instanceof SR5Item)) return false;
 
