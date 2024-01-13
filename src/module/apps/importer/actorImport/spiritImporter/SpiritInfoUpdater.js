@@ -7,7 +7,7 @@ export class SpiritInfoUpdater {
 
     /**
      * Parses the actor data from the chummer file and returns an updated clone of the actor data.
-     * @param {*} actorSource The actor data (actor.data not actor.system) that is used as the basis for the import. Will not be changed.
+     * @param {*} actorSource The actor data (actor not actor.system) that is used as the basis for the import. Will not be changed.
      * @param {*} chummerChar The chummer character to parse.
      */
     async update(actorSource, chummerChar) {

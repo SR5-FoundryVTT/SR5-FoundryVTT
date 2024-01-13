@@ -33,7 +33,7 @@ import { Translation } from '../utils/strings';
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
  *
- * To easily access Actor.data without any typing issues us the SR5Actor.asCritter helpers.
+ * To easily access ActorData without any typing issues us the SR5Actor.asCritter helpers.
  * They are set up in a way that will handle both error management and type narrowing.
  * Example:
  * <pre><code>
