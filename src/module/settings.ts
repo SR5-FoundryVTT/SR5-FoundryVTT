@@ -138,6 +138,15 @@ export const registerSystemSettings = () => {
         default: false
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.UseDamageCondition, {
+        name: 'SETTINGS.UseDamageConditionName',
+        hint: 'SETTINGS.UseDamageConditionDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
+
     /**
      * Control automation of creating the defense modification after mulitple attacks
      * on an actor unti their next action phase.

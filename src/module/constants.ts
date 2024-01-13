@@ -49,7 +49,8 @@ export const FLAGS = {
     ManualRollOnSuccessTest: 'ManualRollOnSuccessTest',
     MarkImports: 'MarkImports',
     CreateTargetedEffects: 'CreateTargetedEffects',
-    DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection'
+    DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
+    UseDamageCondition: 'UseDamageCondition'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

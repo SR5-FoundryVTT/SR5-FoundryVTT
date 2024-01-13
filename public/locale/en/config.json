@@ -71,7 +71,9 @@
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
         "TokenHealthBars": "Token health bars",
-        "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring"
+        "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
+        "UseDamageConditionName": "Use system handling for token status effects",
+        "UseDamageConditionDescription" : "System marks tokens according to their condition monitor"
     },
     "SR5.AP": "AP",
     "SR5.Accessory": "Accessory",
