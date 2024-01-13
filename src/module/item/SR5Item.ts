@@ -185,13 +185,6 @@ export class SR5Item extends Item {
             if (item.effects && !Array.isArray(item.effects)) {
                 item.effects = Helpers.convertIndexedObjectToArray(item.effects);
             }
-            // TODO: foundry-vtt-types v10 - TODO: Move into migration...
-            // if (item.data) {
-            //     item.system = item.system || {};
-            //     mergeObject(item.system, item.data);
-            //     item.system = item.data;
-            //     delete item.data;
-            // }
             return item;
         });
 

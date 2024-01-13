@@ -156,7 +156,7 @@ export abstract class VersionMigration {
                     if (!token.actor || token.data.actorLink) continue;
                     
                     //@ts-expect-error // TODO: foundry-vtt-types v10
-                    if (foundry.utils.isEmpty(token.actor.data)) continue;
+                    if (foundry.utils.isEmpty(token.actor)) continue;
 
                     const updateData = await this.MigrateActorData(token.actor);
 

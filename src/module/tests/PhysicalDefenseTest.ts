@@ -111,7 +111,7 @@ export class PhysicalDefenseTest extends DefenseTest {
         // Take the highest equipped melee reach to defend with...
         // NOTE: ... this should be a choice of the player
         // TODO: This is a legacy selection approach as there wasn't a way to access to used item in the original attack test.
-        //       Instead this might be replaced with a direct reference with this.against.item.data.defenseReach?
+        //       Instead this might be replaced with a direct reference with this.against.item.system.defenseReach?
         const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((weapon) => weapon.isMeleeWeapon);
         equippedMeleeWeapons.forEach(weapon => {
             this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());
