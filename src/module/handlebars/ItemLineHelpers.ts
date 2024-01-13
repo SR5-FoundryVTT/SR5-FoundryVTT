@@ -226,7 +226,7 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
-            case 'modification':
+            case 'modification':               
             case 'ammo':
                 return [
                     {
@@ -480,7 +480,24 @@ export const registerItemLineHelpers = () => {
                 ];
             case 'armor':
             case 'ammo':
-            case 'modification':
+            case 'modification':                
+                if (wrapper.isVehicleModification())
+                {
+                    return [
+                        {
+                            text: {
+                                text: game.i18n.localize(SR5.modificationCategories[wrapper.getModificationCategory() ?? ''])
+                            },
+
+                        },
+                        {
+                            text: {
+                                text: wrapper.getModificationCategorySlots() ?? ''
+                            },
+                        },
+                        qtyInput,
+                    ];
+                }                                
             case 'device':
             case 'equipment':
             case 'cyberware':

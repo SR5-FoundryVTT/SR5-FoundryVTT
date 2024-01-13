@@ -34,15 +34,13 @@
             {{localize "SR5.DicePool"}}
         </div>
         <div class="inputs">
-            <input
-                type="text"
-                maxlength="2"
-                size="2"
-                name="system.dice_pool"
-                value="{{system.dice_pool}}"
-                data-dtype="Number"
-                placeholder="Dice Pool"
-            />
+            <input type="text"
+                   maxlength="2"
+                   size="2"
+                   name="system.dice_pool"
+                   value="{{system.dice_pool}}"
+                   data-dtype="Number"
+                   placeholder="Dice Pool" />
         </div>
     </div>
     <div class="form-line">
@@ -50,15 +48,15 @@
             {{localize "SR5.Accuracy"}}
         </div>
         <div class="inputs">
-            <input
-                type="text"
-                maxlength="2"
-                size="2"
-                name="system.accuracy"
-                value="{{system.accuracy}}"
-                data-dtype="Number"
-                placeholder="Accuracy"
-            />
+            <input 
+                   type="text"
+                   maxlength="2"
+                   size="2"
+                   name="system.accuracy"
+                   value="{{system.accuracy}}"
+                   data-dtype="Number"
+                   placeholder="Accuracy" 
+                   />
         </div>
     </div>
     <div class="form-line">
@@ -66,13 +64,11 @@
             {{localize "SR5.RecoilCompensation"}}
         </div>
         <div class="inputs">
-            <input
-                type="text"
-                name="system.rc"
-                value="{{system.rc}}"
-                data-dtype="Number"
-                placeholder="RC"
-            />
+            <input type="text"
+                   name="system.rc"
+                   value="{{system.rc}}"
+                   data-dtype="Number"
+                   placeholder="RC" />
         </div>
     </div>
     <div class="form-line">
@@ -80,13 +76,40 @@
             {{localize "SR5.Conceal"}}
         </div>
         <div class="inputs">
-            <input
-                type="text"
-                name="system.conceal"
-                value="{{system.conceal}}"
-                data-dtype="Number"
-                placeholder="{{localize "SR5.Conceal"}}"
-            />
+            <input type="text"
+                   name="system.conceal"
+                   value="{{system.conceal}}"
+                   data-dtype="Number"
+                   placeholder="{{localize "SR5.Conceal"}}" />
+        </div>
+    </div>
+    {{/ife}}
+    {{#ife system.type 'vehicle'}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.ModificationCategory"}}
+        </div>
+        <div class="inputs">
+            <select name="system.modification_category">
+                <option value=""></option>
+                {{#select system.modification_category}} {{#each config.modificationCategories as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.ModificationSlots"}}
+        </div>
+        <div class="inputs">
+            <input type="text"
+                   maxlength="2"
+                   size="5"
+                   name="system.slots"
+                   value="{{system.slots}}"
+                   data-dtype="Number"
+                   placeholder="Slots" />
         </div>
     </div>
     {{/ife}}

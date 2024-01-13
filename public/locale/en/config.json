@@ -163,7 +163,7 @@
     "SR5.Biography": "Bio",
     "SR5.Blackmail": "Blackmail",
     "SR5.BlastRadius": "Blast Radius",
-    "SR5.Block": "Block",
+    "SR5.Block": "Block",    
     "SR5.Bonus": "Bonus",
     "SR5.Bonuses": "Bonuses",
     "SR5.Bullet": "Round",
@@ -682,6 +682,9 @@
         "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced."
     },
     "SR5.Modification": "Modification",
+     "SR5.ModificationSlots": "Modification Slots",
+    "SR5.ModificationCategory": "Modification Category",    
+    "SR5.ModificationCategories": "Modification Categories",
     "SR5.Modified": "Modified",
     "SR5.ModifiedArmor": "Mod. Armor",
     "SR5.ModifiedDamage": "Mod. Damage",
@@ -785,8 +788,8 @@
     "SR5.PowerType": "Type",
     "SR5.Powers": "Powers",
     "SR5.Program": "Program",
-    "SR5.ProgramType": "Type",
     "SR5.Programs": "Programs",
+    "SR5.ProgramType": "Type",    
     "SR5.PublicAwareness": "Public Awareness",
     "SR5.PushTheLimit": "Push The Limit",
     "SR5.Qty": "Qty",
@@ -1290,7 +1293,15 @@
         "IsDrone": "Is Drone",
         "IsOffRoad": "Is Off Road",
         "Maneuvering": "Maneuvering",
-        "MissingDriver": "Drag&Drop an actor as a driver",
+        "MissingDriver": "Drag&Drop an actor as a driver",         
+        "ModificationCategoryTypes": {
+            "body": "Body",
+            "cosmetic": "Cosmetic",
+            "electromagnetic": "Electromagnetic",
+            "power_train": "Power Train",
+            "protection": "Protection",
+            "weapons": "Weapons"
+        },
         "Stats": {
             "Acceleration": "Acceleration",
             "Handling": "Handling",
@@ -1312,6 +1323,7 @@
             "Water": "Water Craft"
         }
     },
+    "SR5.Vehicle.Vehicle": "Vehicle",
     "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Vision": {
         "AstralPerception": "Astral Perception",
@@ -1414,6 +1426,6 @@
         "Reload": "Reload",
         "Type": "Type",
         "Weapon": "Weapon"
-    },
+    },   
     "SR5.Wireless": "Wireless"
 }

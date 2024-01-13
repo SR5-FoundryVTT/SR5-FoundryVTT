@@ -49,6 +49,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     ammunition: Shadowrun.AmmoItemData[]
     weaponMods: Shadowrun.ModificationItemData[]
     armorMods: Shadowrun.ModificationItemData[]
+    vehicleMods: Shadowrun.ModificationItemData[]
 
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
@@ -152,8 +153,8 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Reduce nested items into typed lists.
          */
-        const [ammunition, weaponMods, armorMods] = this.item.items.reduce(
-            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
+        const [ammunition, weaponMods, armorMods, vehicleMods] = this.item.items.reduce(
+            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
                 const itemData = nestedItem.toObject();
                 //@ts-expect-error
                 itemData.descriptionHTML = this.enrichEditorFieldToHTML(itemData.system.description.value);
@@ -164,14 +165,17 @@ export class SR5ItemSheet extends ItemSheet {
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
                 //@ts-expect-error TODO: foundry-vtt-types v10
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
+                //@ts-expect-error TODO: foundry-vtt-types v10
+                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'vehicle') sheetItemData[3].push(itemData);
 
                 return sheetItemData;
             },
-            [[], [], []],
+            [[], [], [], []],
         );
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
+        data['vehicleMods'] = vehicleMods;
         data['activeSkills'] = this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();

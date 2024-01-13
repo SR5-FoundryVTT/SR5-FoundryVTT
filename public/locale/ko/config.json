@@ -601,6 +601,9 @@
         "SomeAmmo": "선택된 사격 방식으로 사격하기에 탄약이 충분하지 않음, 사격 방식 수정치가 감소됨"
     },
     "SR5.Modification": "개조",
+    "SR5.ModificationSlots": "Modification Slots",
+    "SR5.ModificationCategory": "Modification Category",
+    "SR5.ModificationCategories": "Modification Categories",
     "SR5.Modified": "수정치",
     "SR5.ModifiedArmor": "개조된 방어구",
     "SR5.ModifiedDamage": "수정된 피해량",
@@ -1134,6 +1137,14 @@
         "IsOffRoad": "비포장도로 주행",
         "Maneuvering": "기동",
         "MissingDriver": "운전자로 할 플레이어 끌어서 놓기",
+        "ModificationCategoryTypes": {
+            "body": "Body",
+            "cosmetic": "Cosmetic",
+            "electromagnetic": "Electromagnetic",
+            "power_train": "Power Train",
+            "protection": "Protection",
+            "weapons": "Weapons"
+        },
         "Stats": {
             "Acceleration": "가속력",
             "Handling": "조작력",
@@ -1154,6 +1165,7 @@
             "Water": "선박"
         }
     },
+    "SR5.Vehicle.Vehicle": "Vehicle",
     "SR5.VehicleImport.MissingPermission": "액터 생성에 대한 권한 없음",
     "SR5.Vision": {
         "AstralPerception": "Astral Perception",
