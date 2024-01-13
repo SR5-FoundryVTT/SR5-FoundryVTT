@@ -14,7 +14,7 @@
   },
   "version": "0.18.3",
   "compatibility": {
-    "minimum": "11",
+    "minimum": "11.315",
     "maximum": "11",
     "verified": "11"
   },
