@@ -81,7 +81,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     async toggleDisabled() {
-        // @ts-expect-error
+        // @ts-expect-error  TODO: foundry-vtt-types v10
         return this.update({ disabled: !this.disabled });
     }
 
@@ -213,19 +213,6 @@ export class SR5ActiveEffect extends ActiveEffect {
         return tagifyFlagsToIds(this, 'selection_limits');
     }
 
-    /**
-     * Check if this effect should be applied in any context, depending on it's parent items state.
-     * 
-     * @param item The item to check against.
-     * @returns true, if this effect should be skipped according to it's configuration.
-     */
-    activeWithItem(item: SR5Item): boolean {
-        if (this.onlyForEquipped && !item.isEquipped()) return true;
-        if (this.onlyForWireless && !item.isWireless()) return true;
-
-        return false;
-    }
-
     override get isSuppressed(): boolean {
         if (!(this.parent instanceof SR5Item)) return false;
 
@@ -279,8 +266,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (change.value.length === 0) return;
 
         // Use Foundry Roll Term parser to both resolve dynamic values and resolve calculations.
-        const terms = Roll.parse(change.value, source);
-        const expression = terms.map(term => term.total).join(' ');
+        const expression = Roll.replaceFormulaData(change.value, source);
         const value = Roll.validate(expression) ? Roll.safeEval(expression) : change.value;
 
         // Overwrite change value with graceful default, to avoid NaN errors during change application.
@@ -312,10 +298,10 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             if (targetType === "Array") {
                 const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
-                //@ts-expect-error
+                //@ts-expect-error TODO: foundry-vtt-types v10
                 delta = this._castArray(change.value, innerType);
             }
-            //@ts-expect-error
+            //@ts-expect-error TODO: foundry-vtt-types v10
             else delta = this._castDelta(change.value, targetType);
         } catch (err) {
             console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
@@ -327,11 +313,11 @@ export class SR5ActiveEffect extends ActiveEffect {
         const changes = {};
         switch (change.mode) {
             case modes.ADD:
-                //@ts-expect-error
+                //@ts-expect-error TODO: foundry-vtt-types v10
                 this._applyAdd(object, change, current, delta, changes);
                 break;
             case modes.MULTIPLY:
-                //@ts-expect-error
+                //@ts-expect-error TODO: foundry-vtt-types v10
                 this._applyMultiply(object, change, current, delta, changes);
                 break;
             case modes.OVERRIDE:
@@ -339,7 +325,7 @@ export class SR5ActiveEffect extends ActiveEffect {
                 break;
             case modes.UPGRADE:
             case modes.DOWNGRADE:
-                //@ts-expect-error
+                //@ts-expect-error TODO: foundry-vtt-types v10
                 this._applyUpgrade(object, change, current, delta, changes);
                 break;
             default:
@@ -369,7 +355,7 @@ export class SR5ActiveEffect extends ActiveEffect {
          * label -> name
          * @deprecated since v11
          */
-        // @ts-expect-error
+        // @ts-expect-error TODO: foundry-vtt-types v10
         this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
 
         return data;

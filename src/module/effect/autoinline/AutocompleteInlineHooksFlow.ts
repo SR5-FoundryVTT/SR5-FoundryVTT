@@ -75,7 +75,7 @@ export const AutocompleteInlineHooksFlow =  {
         const effect = EffectConfig.object;
 
         // For  effects targeting specific tests, we can provide a merge of all tests data.
-        if (effect.selectionTests) {
+        if (effect.selectionTests.length > 0) {
             const actor = effect.actor;
             const testData = {};
             for (const TestClassName of effect.selectionTests) {

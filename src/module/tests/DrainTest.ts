@@ -1,5 +1,5 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {SpellCastingTest, SpellCastingTestData} from "./SpellCastingTest";
+import {SpellCastingTestData} from "./SpellCastingTest";
 import {DrainRules} from "../rules/DrainRules";
 import {Helpers} from "../helpers";
 import DamageData = Shadowrun.DamageData;
@@ -7,6 +7,7 @@ import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import GenericValueField = Shadowrun.GenericValueField;
 import { Translation } from '../utils/strings';
+import { DataDefaults } from "../data/DataDefaults";
 
 export interface DrainTestData extends SuccessTestData {
     incomingDrain: DamageData
@@ -28,10 +29,15 @@ export class DrainTest extends SuccessTest {
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
-        data.against = data.against || new SpellCastingTest({}, {}, options).data;
-
-        data.incomingDrain = foundry.utils.duplicate(data.against.drainDamage);
-        data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
+        // Is this test part of a followup test chain? spell => drain
+        if (data.against) {
+            data.incomingDrain = foundry.utils.duplicate(data.against.drainDamage);
+            data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
+        // This test is part of either a standalone test or created with its own data (i.e. edge reroll).
+        } else {
+            data.incomingDrain = data.incomingDrain ?? DataDefaults.damageData();
+            data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
+        }
 
         return data;
     }
