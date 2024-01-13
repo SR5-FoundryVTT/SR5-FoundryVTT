@@ -806,7 +806,7 @@
     "SR5.RangeWeaponAttack": "Range Weapon Attack",
     "SR5.Rating": "Rating",
     "SR5.Reach": "Reach",
-    "SR5.Reagent": "Reagent",
+    "SR5.Reagent": "Reagents",
     "SR5.RecklessSpellButton": "Reckless",
     "SR5.Recoil": "Recoil",
     "SR5.RecoilCompensation": "Recoil Comp.",
@@ -1134,7 +1134,7 @@
         "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
         "NaturalRecoveryStunTest": "Natural Recovery Stun",
         "OpposedCompileSpriteTest": "Oppose Compilation",
-        "OpposedRitualTest": "Seal the ritual",
+        "OpposedRitualTest": "Seal the Ritual",
         "OpposedSummonSpiritTest": "Oppose Summoning",
         "OpposedTest": "Opposed Test",
         "PhysicalDefenseTest": "Physical Defense",
@@ -1228,6 +1228,10 @@
             "RecoilBeforeAttack": "Progressive Recoil now, befor attacking",
             "RecoilCompensation": "Total RC, including actor and item RC",
             "ResetRecoil": "Reset progressive recoil to none"
+        },
+        "Ritual": {
+            "Force": "Force of the ritual",
+            "ReagentDrams": "Drams of reagents used for altering drain"
         },
         "SituationalModifier": {
             "Recoil": "Amount of bullets fired"
