@@ -679,7 +679,8 @@
         "Ammo": "Nicht genug Munition zum Feuern",
         "Edge": "Kein Edge übrig",
         "Initiative": "Zu geringer Initiative-Wert",
-        "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, Feuermodus-Modifikatoren werden reduziert"
+        "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, Feuermodus-Modifikatoren werden reduziert",
+        "SomeAmmoMelee": "Nicht genug Munition übrig, um zu zuschlagen"
     },
     "SR5.Modification": "Modifikation",
     "SR5.ModificationSlots": "Modification Slots",

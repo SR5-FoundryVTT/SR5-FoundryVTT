@@ -895,8 +895,8 @@ export const SR5 = {
      * set in it's system.action_type property.
      */
     callInActorTypes: {
-        'spirit': 'ACTOR.TypeSpirit',
-        'sprite': 'ACTOR.TypeSprite'
+        'spirit': 'TYPES.Actor.spirit',
+        'sprite': 'TYPES.Actor.sprite'
     },
 
     critterPower: {
