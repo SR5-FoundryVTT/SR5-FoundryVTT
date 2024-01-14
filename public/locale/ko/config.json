@@ -23,7 +23,7 @@
     "TYPES.Item.sprite_power": "요정 능력",
     "TYPES.Item.weapon": "무기",
     "TYPES.Actor.character": "캐릭터",
-    "TYPES.Actor.critter": "생물",
+    "TYPES.Actor.critter": "생물 (deprecated)",
     "TYPES.Actor.spirit": "영혼",
     "TYPES.Actor.sprite": "요정",
     "TYPES.Actor.vehicle": "탑승물/드론",

@@ -1406,7 +1406,7 @@
     },
     "SR5.Wireless": "Wireless",
     "TYPES.Actor.character": "Character",
-    "TYPES.Actor.critter": "Critter",
+    "TYPES.Actor.critter": "Critter (deprecated)",
     "TYPES.Actor.ic": "IC",
     "TYPES.Actor.spirit": "Spirit",
     "TYPES.Actor.sprite": "Sprite",
