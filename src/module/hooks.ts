@@ -27,6 +27,7 @@ import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
 
 import {SR5Roll} from "./rolls/SR5Roll";
 import {SuccessTest} from "./tests/SuccessTest";
+import {TeamworkTest} from "./actor/flows/TeamworkFlow";
 import {OpposedTest} from "./tests/OpposedTest";
 import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
 import {RangedAttackTest} from "./tests/RangedAttackTest";
@@ -465,7 +466,8 @@ ___________________
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
             [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage],
-            [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage]
+            [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage],
+            [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage]
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {
@@ -488,12 +490,14 @@ ___________________
         await SuccessTest.chatMessageListeners(message, html, data);
         await OpposedTest.chatMessageListeners(message, html, data);
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
+        await TeamworkTest.chatMessageListeners(message, html);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
         await SuccessTest.chatLogListeners(chatLog, html, data);
         await OpposedTest.chatLogListeners(chatLog, html, data);
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
+        await TeamworkTest.chatLogListeners(chatLog, html);
     }
 
     static configureVision() {

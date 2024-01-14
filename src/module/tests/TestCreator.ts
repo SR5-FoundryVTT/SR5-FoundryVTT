@@ -161,7 +161,7 @@ export const TestCreator = {
     _fromMessageTestData: function(testData, options?: TestOptions) {
         // Use test data to create the original test from it.
         testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
-        if (!testData) return;
+        if (!testData || !testData.rolls) return;
 
         const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll as any));
         const documents = {rolls};

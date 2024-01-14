@@ -28,6 +28,7 @@ import { CombatRules } from '../rules/CombatRules';
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
+import { TeamworkMessageData } from './flows/TeamworkFlow';
 
 
 /**
@@ -1067,6 +1068,82 @@ export class SR5Actor extends Actor {
 
         return await test.execute();
     }
+
+    /**
+     * Roll a skill test for a specific skill
+     * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
+     * @param options Optional options to configure the roll.
+     * @param options.byLabel true to search the skill by label as displayed on the sheet.
+     * @param options.specialization true to configure the skill test to use a specialization.
+     */
+    async startTeamworkTest(skillId: string, options: Shadowrun.SkillRollOptions={}) {
+        console.info(`Shadowrun5e | Starting teamwork test for ${skillId}`);
+
+        // Prepare message content.
+        const templateData = {
+            title: "Teamwork " + skillId,
+            // Note: While ChatData uses ids, this uses full documents.
+            speaker: {
+                actor: this,
+                token: this.token
+            },
+            participants: []
+        };
+        const content = await renderTemplate('systems/shadowrun5e/src/templates/rolls/teamwork-test-message.html', templateData);
+        // Prepare the actual message.
+        const messageData =  {
+            user: game.user?.id,
+            // Use type roll, for Foundry built in content visibility.
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+            speaker: {
+                actor: this.id,
+                alias: game.user?.name,
+                token: this.token
+            },
+            content,
+            // Manually build flag data to give renderChatMessage hook flag access.
+            // This test data is needed for all subsequent testing based on this chat messages.
+            flags: {
+                // Add test data to message to allow ChatMessage hooks to access it.
+                [SYSTEM_NAME]: {[FLAGS.Test]: {skill: skillId}},
+                'core.canPopout': true
+            },
+            sound: CONFIG.sounds.dice,
+        };
+
+        //@ts-expect-error // TODO: foundry-vtt-types v10
+        const message = await ChatMessage.create(messageData, options);
+
+        if (!message) return;
+
+        return message;
+    }
+
+        /**
+     * Roll a skill test for a specific skill
+     * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
+     * @param options Optional options to configure the roll.
+     * @param options.byLabel true to search the skill by label as displayed on the sheet.
+     * @param options.specialization true to configure the skill test to use a specialization.
+     */
+        async rollTeamworktest(skillId: string, teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions={}) {
+            console.info(`Shadowrun5e | Rolling teamwork test for ${skillId}`);
+    
+            const action = this.skillActionData(skillId, options);
+            if (!action) return;
+            if(teamworkData.criticalGlitch != true) {
+                action.limit.mod.push({name: "Teamwork", value: teamworkData.additionalLimit})
+            }
+
+            action.dice_pool_mod.push({name: "Teamwork", value: teamworkData.additionalDice})
+    
+            const showDialog = this.tests.shouldShowDialog(options.event);
+            const test = await this.tests.fromAction(action, this, {showDialog});
+            if (!test) return;
+
+    
+            return await test.execute();
+        }
 
     /**
      * Is the given attribute id a matrix attribute
