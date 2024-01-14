@@ -9,6 +9,7 @@ import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { FLAGS, SYSTEM_NAME } from "../constants";
 import { Translation } from '../utils/strings';
+import { ActiveDefenseRules } from "../rules/ActiveDefenseRules";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
@@ -62,42 +63,19 @@ export class PhysicalDefenseTest extends DefenseTest {
         await super.prepareDocumentData();
     }
 
+    /**
+     * Depending on the weapon used for attack different active defenses are available.
+     */
     prepareActiveDefense() {
         if (!this.actor) return;
         const actor = this.actor;
 
-        // Default active defenses.
-        this.data.activeDefenses = {
-            full_defense: {
-                label: 'SR5.FullDefense',
-                value: actor.getFullDefenseAttribute()?.value,
-                initMod: -10,
-            },
-            dodge: {
-                label: 'SR5.Dodge',
-                value: actor.findActiveSkill('gymnastics')?.value,
-                initMod: -5,
-            },
-            block: {
-                label: 'SR5.Block',
-                value: actor.findActiveSkill('unarmed_combat')?.value,
-                initMod: -5,
-            }
-        };
+        const weapon = this.against.item;
+        if (weapon === undefined) return;
+        
+        this.data.activeDefenses = ActiveDefenseRules.availableActiveDefenses(weapon, actor);
 
-        // Collect weapon based defense options.
-        // NOTE: This would be way better if the current weapon (this.item) would be used.
-        const equippedMeleeWeapons = actor.getEquippedWeapons().filter((weapon) => weapon.isMeleeWeapon);
-        equippedMeleeWeapons.forEach((weapon) => {
-            this.data.activeDefenses['parry'] = {
-                label: 'SR5.Parry',
-                weapon: weapon.name || '',
-                value: actor.findActiveSkill(weapon.getActionSkill())?.value,
-                initMod: -5,
-            };
-        });
-
-        // Filter available active defenes by available ini score.
+        // Filter available active defenses by available ini score.
         this._filterActiveDefenses();
     }
 
