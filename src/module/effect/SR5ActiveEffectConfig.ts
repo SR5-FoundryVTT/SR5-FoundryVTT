@@ -81,7 +81,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * This is to avoid configured changes breaking when changing to other applyTo types
      * that do not support the same change keys.
      */
-    async _onApplyToChange(event: JQuery.ClickEvent) {
+    async _onApplyToChange(event: Event) {
         event.preventDefault();
 
         const select = event.currentTarget as HTMLSelectElement;
@@ -91,10 +91,10 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         if (this.object.changes.length) {
             ui.notifications?.error('You must delete changes before changing the apply-to type.');
         } else {
-            await this.object.update({ 'flags.shadowrun5e.applyTo': select.value });
+            // Make sure applyTo is saved but also save all other form data on sheet.
+            const updateData = { 'flags.shadowrun5e.applyTo': select.value };
+            await this._onSubmit(event, {updateData, preventClose: true})
         }
-
-        this.render();
     }
 
     /**
