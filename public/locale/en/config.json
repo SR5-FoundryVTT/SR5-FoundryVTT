@@ -651,7 +651,8 @@
         "Ammo": "Not enough ammunition to fire",
         "Edge": "No Edge left to consume",
         "Initiative": "Not enough initiative score",
-        "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced."
+        "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
+        "SomeAmmoMelee": "Not enough ammunition left to punch"
     },
     "SR5.Modification": "Modification",
     "SR5.ModificationCategories": "Modification Categories",

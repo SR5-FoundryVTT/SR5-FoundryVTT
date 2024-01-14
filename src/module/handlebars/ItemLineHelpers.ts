@@ -504,7 +504,8 @@ export const registerItemLineHelpers = () => {
             case 'bioware':
                 return [qtyInput];
             case 'weapon':
-                if (wrapper.isRangedWeapon()) {
+                // Both Ranged and Melee Weapons can have ammo.
+                if (wrapper.isRangedWeapon() || (wrapper.isMeleeWeapon() && item.system.ammo?.current.max > 0)) {
                     const count = wrapper.getAmmo()?.current.value ?? 0;
                     const max = wrapper.getAmmo()?.current.max ?? 0;
                     // Show reload on both no ammo configured and partially consumed clips.
