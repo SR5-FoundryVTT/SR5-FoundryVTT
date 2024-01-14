@@ -12,7 +12,39 @@ export const UpdateActionFlow = {
      * @param item The item as context of what's being changed.
      */
     onUpdateAlterActionData(changeData: DeepPartial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+        UpdateActionFlow.onSkillUpdateAlterAttribute(changeData, item);
         UpdateActionFlow.onSkillUpdateAlterAttribute2(changeData, item);
+    },
+
+    /**
+     * If a skill is selected, try to autofill the connect attribute of it.
+     * 
+     * This differs for items on actors, as here we can access actual skill data.
+     * For item outside of actors we can only use default values.
+     * @param changeData  The _update changes given by the event
+     * @param item The item as context of what's being changed.
+     */
+    onSkillUpdateAlterAttribute(changeData: DeepPartial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+        // Only change to connected attribute when no attribute has already been chosen.
+        if (item.system.action?.attribute !== '') return;
+        const skillIdOrLabel = foundry.utils.getProperty(changeData, 'system.action.skill');
+        if (skillIdOrLabel === undefined || skillIdOrLabel === '') return;
+
+        // CASE - Sidebar item not owned by actor.
+        if (item.actor === null) {
+            const skill = game.model.Actor.character.skills.active[skillIdOrLabel];
+            if (skill === undefined) return;
+
+            changeData['system.action.attribute'] = skill.attribute;
+        
+        // CASE - Owned Item on actor.
+        } else {
+            // Support both legacy and custom skills.
+            const skill = item.actor.getSkill(skillIdOrLabel) ?? item.actor.getSkillByLabel(skillIdOrLabel);
+            if (skill === undefined) return;
+    
+            changeData['system.action.attribute'] = skill.attribute;
+        }
     },
 
     /**
