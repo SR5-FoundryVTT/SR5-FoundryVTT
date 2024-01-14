@@ -586,6 +586,8 @@ export class SR5ItemSheet extends ItemSheet {
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
+        if (!this.item.isAction()) return;
+
         var inputElement = html.find('input#action-modifier').get(0);
 
         // Tagify expects this format for localized tags.
@@ -611,21 +613,6 @@ export class SR5ItemSheet extends ItemSheet {
             // render would loose tagify input focus. submit on close will save.
             await this.item.update({'system.action.modifiers': modifiers}, {render:false});
         });
-    }
-
-    /** This is needed to circumvent Application.close setting closed state early, due to it's async animation
-     * - The length of the closing animation can't be longer then any await time in the closing cycle
-     * - FormApplication._onSubmit will otherwise set ._state to RENDERED even if the Application window has closed already
-     * - Subsequent render calls then will show the window again, due to it's state
-     *
-     * @private
-     */
-    private fixStaleRenderedState() {
-        if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
-            console.warn(`SR5ItemSheet app for ${this.item.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
-            // Hotfix instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
-            this._state = Application.RENDER_STATES.CLOSED;
-        }
     }
 
     /**
