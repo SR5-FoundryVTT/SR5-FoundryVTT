@@ -408,12 +408,17 @@ export const SR5 = {
         memory: 'SR5.RollMemory',
     },
 
+    /**
+     * Used for complex form targeting options.
+     */
     matrixTargets: {
         persona: 'SR5.TargetPersona',
         device: 'SR5.TargetDevice',
         file: 'SR5.TargetFile',
         self: 'SR5.TargetSelf',
         sprite: 'SR5.TargetSprite',
+        host: 'TYPES.Item.host',
+        ic: 'TYPES.Actor.ic',
         other: 'SR5.TargetOther',
     },
 
