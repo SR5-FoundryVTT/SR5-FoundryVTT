@@ -8,7 +8,7 @@ import {CORE_FLAGS, CORE_NAME} from './constants';
  * @param template The dist path to be used as a template file.
  * @param templateData An untyped object carrying data to display. The template should itself check for what properties are available and only renders what's given.
  */
-async function createChatMessage(template: string, templateData): Promise<ChatMessage|null> {
+export async function createChatMessage(template: string, templateData): Promise<ChatMessage|null> {
     const chatData = await createChatData(template, templateData);
     const message = await ChatMessage.create(chatData);
 

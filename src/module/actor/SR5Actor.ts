@@ -1043,6 +1043,9 @@ export class SR5Actor extends Actor {
 
         const action = this.skillActionData(skillId, options);
         if (!action) return;
+        if(options.threshold) {
+            action.threshold = options.threshold
+        }
 
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, {showDialog});
@@ -1081,7 +1084,7 @@ export class SR5Actor extends Actor {
 
         // Prepare message content.
         const templateData = {
-            title: "Teamwork " + skillId,
+            title: "Teamwork " + Helpers.getSkillTranslation(skillId),
             // Note: While ChatData uses ids, this uses full documents.
             speaker: {
                 actor: this,

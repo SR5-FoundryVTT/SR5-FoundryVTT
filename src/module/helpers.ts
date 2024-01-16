@@ -1019,4 +1019,47 @@ export class Helpers {
         spicyCharacters.forEach(character => key = key.replace(character, replace));
         return key;
     }
+
+    static async chooseFromAvailableActors() {
+        let availableActors =  game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
+
+        if(availableActors.length == 0) {
+            return
+        }
+
+        if(availableActors.length == 1) {
+            return availableActors[0]
+        }
+        else {
+            let allActors = ''
+            game.actors?.filter( e => e.isOwner && e.hasPlayerOwner).forEach(t => {
+                    allActors = allActors.concat(`
+                            <option value="${t.id}">${t.name}</option>`);
+                });
+            const  dialog_content = `  
+                <select name ="actor">
+                ${allActors}
+                </select>`;
+    
+            let choosenActor = await Dialog.prompt({
+                title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
+                content: dialog_content,
+                callback: (html) => html.find('select').val()
+            }) as string;
+    
+            return game.actors?.get(choosenActor) as SR5Actor;
+        }
+    }
+
+    static capitalizeFirstLetter(string: string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }  
+
+    static getSkillTranslation(skill: string) : string {
+        return game.i18n.localize(`SR5.Skill.${this.capitalizeFirstLetter(skill)}` as Translation)
+    }
+
+    static getAttributeTranslation(attribute: string) : string {
+        return game.i18n.localize(`SR5.Attr${this.capitalizeFirstLetter(attribute)}` as Translation)
+    }
 }

@@ -2,6 +2,7 @@ import { SR5Actor } from '../SR5Actor';
 import {FLAGS, SYSTEM_NAME} from '../../constants';
 import { SocketMessage } from "../../sockets";
 import { SuccessTest } from '../../tests/SuccessTest';
+import { Helpers } from '../../helpers'
 
 export interface TeamworkMessageData {
     skill: string,
@@ -33,38 +34,15 @@ export class TeamworkTest {
     }
 
     static async addParticipant(message: ChatMessage) {
-        let availableActors =  game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
-        let teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
+        let actor = await Helpers.chooseFromAvailableActors()
 
-        let actor: SR5Actor;
-
-        if(availableActors.length == 0) {
+        if(actor == undefined) {
+            //in a normal running game this should not happen
+            ui.notifications?.error('SR5.Errors.NoAvailableActorFound', {localize: true});
             return
         }
 
-        if(availableActors.length == 1) {
-            actor = availableActors[0]
-        }
-        else {
-            let allKeys = ''
-            game.actors?.filter( e => e.isOwner && e.hasPlayerOwner).forEach(t => {
-                    allKeys = allKeys.concat(`
-                            <option value="${t.id}">${t.name}</option>`);
-                });
-            const  dialog_content = `  
-                <select name ="actor">
-                ${allKeys}
-                </select>`;
-    
-            let choosenActor = await Dialog.prompt({
-                title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
-                content: dialog_content,
-                callback: (html) => html.find('select').val()
-            }) as string;
-    
-            actor = game.actors?.get(choosenActor) as SR5Actor;
-        }
-
+        let teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
         let results = await actor?.rollSkill(teamworkData.skill) as SuccessTest;
         this.addResultsToMessage(message, actor, results, teamworkData)
     }

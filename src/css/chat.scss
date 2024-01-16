@@ -62,8 +62,8 @@
             margin-top: 0.5em;
             margin-left: auto;
             margin-right: auto;
-            padding-top: 2px;
-            padding-bottom: 2px;
+            padding-top: 0.2em;
+            padding-bottom: 0.2em;
             padding-left: 1em;
             padding-right: 1em;
         }
@@ -82,7 +82,7 @@
             .card-description-content {
                 border-bottom: $groove;
             }
-        }        
+        }
 
         .damage-line {
             margin-top: 0.25em;
@@ -302,7 +302,7 @@
                 text-align: center;
                 width: 24px;
                 line-height: 24px;
-                
+
                 // Consistent margin on top, if missing result boxes will clip.
                 margin-top: 5px;
 
@@ -410,5 +410,16 @@
     .chat-select-link img:hover {
         padding: 0;
         border: $groove;
+    }
+    &.chat-card.rollRequest-card{
+
+        .rollRequest-button{
+            margin-top: 0.3em;
+            border: 0.1em solid $yellow;
+            padding: 0.2em;
+            border-radius: 0.3em;
+            box-shadow: $rollBox;
+            display: inline-block;
+        }
     }
 }
