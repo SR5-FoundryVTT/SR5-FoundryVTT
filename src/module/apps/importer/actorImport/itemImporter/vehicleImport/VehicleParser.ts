@@ -1,7 +1,8 @@
 import { getArray } from "../importHelper/BaseParserFunctions.js";
 import { WeaponParser } from "../weaponImport/WeaponParser";
 import { GearsParser } from "../importHelper/GearsParser.js";
-import { MountedWeaponParser } from "./MountedWeaponParser.js";
+import MountedWeaponParser from "./MountedWeaponParser";
+import VehicleModsParser from "./VehicleModsParser";
 import { SR5Actor } from '../../../../../actor/SR5Actor';
 
 export default class VehicleParser {
@@ -28,6 +29,7 @@ export default class VehicleParser {
             promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));
             promises.push(new GearsParser().parseGears(getArray(vehicle.gears?.gear),  importOptions.assignIcons));
             promises.push(new MountedWeaponParser().parseWeapons(vehicle, importOptions.assignIcons))
+            promises.push(new VehicleModsParser().parseMods(vehicle, importOptions.assignIcons))
 
             let handling;
             let off_road_handling;

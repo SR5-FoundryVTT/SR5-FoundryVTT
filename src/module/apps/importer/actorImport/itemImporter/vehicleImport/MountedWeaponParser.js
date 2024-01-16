@@ -1,7 +1,7 @@
 import { getArray } from "../importHelper/BaseParserFunctions.js"
 import { WeaponParser } from "../weaponImport/WeaponParser.js";
 
-export class MountedWeaponParser {
+export default class MountedWeaponParser {
 
     async parseWeapons(vehicle, assignIcons) {
         const mods = getArray(vehicle.mods?.mod);
