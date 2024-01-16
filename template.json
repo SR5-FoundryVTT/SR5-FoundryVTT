@@ -1039,13 +1039,21 @@
             }
         },
         "vehicle": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values"],
+            "templates": [ "common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values" ],
             "vehicleType": "ground",
             "controlMode": "autopilot",
             "environment": "speed",
             "isDrone": false,
             "isOffRoad": false,
             "driver": "",
+            "modificationCategories": {
+                "body": 0,
+                "power_tain": 0,
+                "protection": 0,
+                "electromagnetic": 0,
+                "cosmetic": 0,
+                "weapons": 0
+            },          
             "vehicle_stats": {
                 "pilot": {
                     "base": 0,
@@ -1078,6 +1086,11 @@
                     "mod": []
                 },
                 "sensor": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "seats": {
                     "base": 0,
                     "value": 0,
                     "mod": []

@@ -59,6 +59,14 @@ input[type='text'].display {
     table {
         background: linear-gradient(to bottom, #3d3c3f, #000000);
         font-size: 90%;
+        caption{
+            background: inherit;
+            text-align: left;
+            color: $yellow;
+            font-family: 'klavika-medium';
+            font-size: medium;
+            padding: 9px;
+        }
     }
 
     th {
@@ -67,6 +75,10 @@ input[type='text'].display {
         color: $yellow;
         text-align: left;
     }
+    td{
+        text-align: left;
+        padding: 9px;
+    }
 
     tr {
         color: white;
@@ -74,22 +86,6 @@ input[type='text'].display {
 
     tr:nth-child(even) {
         background-color: #59595b;
-    }
-
-    table td:first-child {
-        text-align: left;
-    }
-
-    td:not(.column-1) {
-        text-align: center;
-    }
-
-    table th:first-child {
-        text-align: left;
-    }
-
-    th:not(.column-1) {
-        text-align: center;
     }
 
     tr:first-child th {

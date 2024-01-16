@@ -59,11 +59,14 @@ import {canvasInit} from './canvas';
 import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
 import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
+import { SR5ChatMessage } from './chatMessage/SR5ChatMessage';
 import VisionConfigurator from './vision/visionConfigurator';
 import { DataDefaults } from './data/DataDefaults';
+import { AutocompleteInlineHooksFlow } from './effect/autoinline/AutocompleteInlineHooksFlow';
 import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 import { RenderSettings } from './systemLinks';
 import registerSR5Tours from './tours/tours';
+import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 
 
 
@@ -76,7 +79,7 @@ export class HooksManager {
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
         Hooks.once('init', HooksManager.init);
-        Hooks.once('setup', HooksManager.setupAutocompleteInlinePropertiesSupport);
+        Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
 
         Hooks.on('canvasInit', canvasInit);
         Hooks.on('ready', HooksManager.ready);
@@ -243,8 +246,13 @@ ___________________
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
         CONFIG.Combat.documentClass = SR5Combat;
+        CONFIG.ChatMessage.documentClass = SR5ChatMessage;
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
-        // Register object classes
+        //@ts-expect-error TODO: foundry-vtt-types v11
+        // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
+        // Setting to true, will duplicate item effects on actors. Only effects on actors will be traversed.
+        CONFIG.ActiveEffect.legacyTransferral = false;
+        
         CONFIG.Token.objectClass = SR5Token;
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
@@ -447,7 +455,7 @@ ___________________
     /**
      * This method is used as a simple place to register socket hook handlers for the system.
      *
-     * You can use the SocketMessage
+     * You can use the SocketMessage for sending messages using a socket event message id and generic data object.
      */
     static registerSocketListeners() {
         if (!game.socket || !game.user) return;
@@ -456,7 +464,8 @@ ___________________
             [FLAGS.addNetworkController]: [NetworkDeviceFlow._handleAddNetworkControllerSocketMessage],
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
-            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage]
+            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage],
+            [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage]
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {
@@ -473,38 +482,6 @@ ___________________
                 await handler(message);
             }
         });
-    }
-
-    /**
-     * Add support for https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties module
-     * to give auto complete for active effect attribute keys.
-     *
-     * This is taken from: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/CONTRIBUTING.md
-     * It partially uses: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/package-config.mjs#L141
-     */
-    static setupAutocompleteInlinePropertiesSupport() {
-        // Module might not be installed.
-        const aipModule = game.modules.get("autocomplete-inline-properties");
-        if (!aipModule) return;
-        // @ts-expect-error
-        // API might be missing.
-        const api = aipModule.API;
-        if (!api) return;
-
-        console.log('Shadowrun 5e | Registering support for autocomplete-inline-properties');
-        const DATA_MODE = api.CONST.DATA_MODE;
-
-        const config = {
-            packageName: "shadowrun5e",
-            sheetClasses: [{
-                name: "ActiveEffectConfig",
-                fieldConfigs: [
-                    { selector: `.tab[data-tab="effects"] .key input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
-                ]
-            }]
-        };
-
-        api.PACKAGE_CONFIG.push(config);
     }
 
     static async chatMessageListeners(message: ChatMessage, html, data) {

@@ -5,6 +5,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Combat } from "../combat/SR5Combat";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
+import { Translation } from '../utils/strings';
 
 declare global {
     // Configuration of foundry-vtt-types
@@ -28,8 +29,8 @@ declare global {
     interface DocumentClassConfig {
         Item: typeof SR5Item;
         Actor: typeof SR5Actor;
-        Combat: typeof SR5Combat;
         ActiveEffect: typeof SR5ActiveEffect;
+        Combat: typeof SR5Combat;
         Roll: typeof SR5Roll;
     }
 
@@ -60,4 +61,11 @@ declare global {
      */
     declare function fromUuidSync(uuid: string): foundry.abstract.Document<any, any> | null;
 
+    // Use declaration merging to add strong typing to Foundry's game.i18n localize and format functions,
+    // sourcing valid translation strings from this system's english translations file
+    declare class Localization {
+        localize(stringId: Translation): string;
+
+        format(stringId: Translation, data?: Record<string, unknown>): string;
+    }
 }

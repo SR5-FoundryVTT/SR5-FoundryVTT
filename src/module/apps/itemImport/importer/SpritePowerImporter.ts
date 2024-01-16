@@ -1,4 +1,4 @@
-import { SpritePowerParser } from './../parser/critter-power/SpritePowerParser';
+import { SpritePowerParser } from '../parser/critter-power/SpritePowerParser';
 import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { DataImporter } from "./DataImporter";
@@ -48,7 +48,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
 
     public async Parse(chummerData: object, setIcons: boolean): Promise<Item> {
         const parser = new SpritePowerParser();
-        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('ITEM.TypeSprite_power')}`, true);
+        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('TYPES.Item.sprite_power')}`, true);
 
         const items: Shadowrun.SpritePowerItemData[] = [];
         const chummerSpritePowers = this.filterObjects(chummerData['powers']['power']);

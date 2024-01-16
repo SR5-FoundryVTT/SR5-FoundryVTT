@@ -407,10 +407,10 @@ export class SituationModifiersApplication extends FormApplication {
 
     get _targetTypeLabel(): string {
         if (this.target instanceof Scene) {
-            return game.i18n.localize('DOCUMENT.Scene');
+            return game.i18n.localize('SR5.FOUNDRY.Scene');
         }
         if (this.target instanceof SR5Actor) {
-            return game.i18n.localize('DOCUMENT.Actor');
+            return game.i18n.localize('SR5.FOUNDRY.Actor');
         }
 
         return '';

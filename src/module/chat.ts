@@ -1,6 +1,5 @@
 import {CORE_FLAGS, CORE_NAME} from './constants';
 
-
 /**
  * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
  *

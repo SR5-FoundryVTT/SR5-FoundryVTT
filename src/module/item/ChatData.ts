@@ -4,6 +4,7 @@ import DeviceData = Shadowrun.DeviceData;
 import { SR5Item } from './SR5Item';
 import AmmoData = Shadowrun.AmmoData;
 import { SR5 } from "../config";
+import { Translation } from '../utils/strings';
 
 /**
  * ChatData returns little info boxes for each item type.
@@ -243,39 +244,39 @@ export const ChatData = {
     // add properties for spell data, follow order in book
     spell: (system, labels, props) => {
         // first category and type
-        props.push(Helpers.label(system.category), Helpers.label(system.type));
+        props.push(game.i18n.localize(SR5.spellCategories[system.category]), game.i18n.localize(SR5.spellTypes[system.type]));
 
         // add subtype tags
         if (system.category === 'combat') {
-            props.push(Helpers.label(system.combat.type));
+            props.push(game.i18n.localize(SR5.combatSpellTypes[system.combat.type]));
         } else if (system.category === 'health') {
         } else if (system.category === 'illusion') {
-            props.push(system.illusion.type);
-            props.push(system.illusion.sense);
+            props.push(game.i18n.localize(SR5.illusionSpellTypes[system.illusion.type]));
+            props.push(game.i18n.localize(SR5.illusionSpellSenses[system.illusion.sense]));
         } else if (system.category === 'manipulation') {
-            if (system.manipulation.damaging) props.push('Damaging');
-            if (system.manipulation.mental) props.push('Mental');
-            if (system.manipulation.environmental) props.push('Environmental');
-            if (system.manipulation.physical) props.push('Physical');
+            if (system.manipulation.damaging) props.push(game.i18n.localize('SR5.Spell.ManipulationDamaging'));
+            if (system.manipulation.mental) props.push(game.i18n.localize('SR5.Spell.ManipulationMental'));
+            if (system.manipulation.environmental) props.push(game.i18n.localize('SR5.Spell.ManipulationEnvironmental'));
+            if (system.manipulation.physical) props.push(game.i18n.localize('SR5.Spell.ManipulationPhysical'));
         } else if (system.category === 'detection') {
-            props.push(system.illusion.type);
-            props.push(system.illusion.passive ? 'Passive' : 'Active');
-            if (system.illusion.extended) props.push('Extended');
+            props.push(game.i18n.localize(SR5.detectionSpellTypes[system.detection.type]));
+            props.push(system.detection.passive ? game.i18n.localize('SR5.Passive') :  game.i18n.localize('SR5.Active'));
+            if (system.detection.extended) props.push(game.i18n.localize('SR5.DetectionSpellExtended'));
         }
         // add range
-        props.push(Helpers.label(system.range));
+        props.push(game.i18n.localize(SR5.spellRanges[system.range]));
 
         // add action data
         ChatData.action(system, labels, props);
 
         // add duration data
-        props.push(Helpers.label(system.duration));
+        props.push(game.i18n.localize(SR5.durations[system.duration]));
 
         // add drain data
         const { drain } = system;
-        if (drain > 0) props.push(`Drain F+${drain}`);
-        else if (drain < 0) props.push(`Drain F${drain}`);
-        else props.push('Drain F');
+        if (drain > 0) props.push(game.i18n.format('SR5.QuickInfo.DrainForce', {sign: '+', drain}));
+        else if (drain < 0) props.push(game.i18n.format('SR5.QuickInfo.DrainForce', {sign: '', drain}));
+        else props.push(game.i18n.format('SR5.QuickInfo.DrainForce', {sign: '', drain: ''}));
 
         labels.roll = 'Cast';
     },
@@ -318,12 +319,12 @@ export const ChatData = {
                 props.push(rcString);
             }
             if (system.range.modes) {
-                const newModes: string[] = [];
+                const newModes: Translation[] = [];
                 const { modes } = system.range;
-                if (modes.single_shot) newModes.push('SR5.WeaponModeSingleShotShort');
-                if (modes.semi_auto) newModes.push('SR5.WeaponModeSemiAutoShort');
-                if (modes.burst_fire) newModes.push('SR5.WeaponModeBurstFireShort');
-                if (modes.full_auto) newModes.push('SR5.WeaponModeFullAutoShort');
+                if (modes.single_shot) newModes.push('SR5.Weapon.Mode.SingleShotShort');
+                if (modes.semi_auto) newModes.push('SR5.Weapon.Mode.SemiAutoShort');
+                if (modes.burst_fire) newModes.push('SR5.Weapon.Mode.BurstFireShort');
+                if (modes.full_auto) newModes.push('SR5.Weapon.Mode.FullAutoShort');
                 props.push(newModes.map((m) => game.i18n.localize(m)).join('/'));
             }
             if (system.range.ranges) props.push(Array.from(Object.values(system.range.ranges)).join('/'));

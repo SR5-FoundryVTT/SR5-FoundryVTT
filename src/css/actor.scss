@@ -2,7 +2,7 @@
 
 .sr5.actor {
     min-height: 690px;
-    min-width: 800px;
+    min-width: 870px;
     .wholesheet {
         height: 100%;
         display: flex;
@@ -30,7 +30,7 @@
         flex-wrap: nowrap;
         justify-content: space-between;
         &.center {
-            justify-content: center;
+            justify-content: space-evenly;
         }
         &.no-border {
             border-top: none;
@@ -190,6 +190,19 @@
     // Interaction Element for Skill Lists
     .skill-header {
         @include rollable;
+    }
+
+    // Sprite sheet power tab list had broken flex/block relations, causing missing a scrollbar.
+    // Other actor sheet tabs miss-use the 'inventory' class. To not further miss-use it,
+    // this hacky class pierces through .sr5 .tab .tabbody > * flex:0 and broken scroll-area
+    // formatting in general to have a localized solution for the sprite power list.
+    // If you're looking at this, and have a better solution, please burn this in the fires of hell.
+    .scroll-area-sprite-power {
+        display: block;
+        flex: 1 !important;
+        height: 100%;
+        width: 100%;
+        overflow: auto;
     }
 }
 

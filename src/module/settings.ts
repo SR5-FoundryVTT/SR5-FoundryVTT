@@ -2,6 +2,7 @@
 
 import { VersionMigration } from './migrator/VersionMigration';
 import { FLAGS, SYSTEM_NAME } from './constants';
+import { boolean } from 'fast-check';
 
 export const registerSystemSettings = () => {
 
@@ -15,14 +16,14 @@ export const registerSystemSettings = () => {
         config: true,
         type: String,
         default: 'EUCL',
-        // @ts-expect-error
+        // @ts-expect-error TODO: foundry-vtt-types v10
         choices: {
             '1-1-1': 'SETTINGS.IgnoreDiagonal',
             '1-2-1': 'SETTINGS.EstimateDiagonal',
             'EUCL': 'SETTINGS.Euclidean',
         },
         onChange: (rule) => {
-            // @ts-expect-error
+            // @ts-expect-error canvas grid should not be undefined here...
             // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
             canvas.grid.diagonalRule = rule
         },
@@ -137,6 +138,15 @@ export const registerSystemSettings = () => {
         default: false
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.UseDamageCondition, {
+        name: 'SETTINGS.UseDamageConditionName',
+        hint: 'SETTINGS.UseDamageConditionDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
+
     /**
      * Control automation of creating the defense modification after mulitple attacks
      * on an actor unti their next action phase.
@@ -179,6 +189,18 @@ export const registerSystemSettings = () => {
     });
 
     /**
+     * Control default behavior for opposed test actors
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection, {
+        name: 'SETTINGS.DefaultOpposedTestActorSelection',
+        hint: 'SETTINGS.DefaultOpposedTestActorSelectionDescription',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: false
+    });
+
+    /**
      * Register diagonal movement rule setting
      */
     game.settings.register(SYSTEM_NAME, FLAGS.MarkImports, {
@@ -188,7 +210,7 @@ export const registerSystemSettings = () => {
         config: true,
         type: String,
         default: 'BOTH',
-        // @ts-expect-error
+        // @ts-expect-error TODO: foundry-vtt-types v10
         choices: {
             'BOTH': 'SETTINGS.FreshColorAndIcon',
             'COLOR': 'SETTINGS.FreshColor',

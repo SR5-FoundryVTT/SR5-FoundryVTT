@@ -2,7 +2,7 @@ import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { Helpers } from "../../helpers";
 import { SR5Item } from "../../item/SR5Item";
-import { onManageActiveEffect, prepareActiveEffectCategories } from "../../effects";
+import { onManageActiveEffect, onManageItemActiveEffect, prepareSortedItemEffects, prepareSortedEffects } from "../../effects";
 import { SR5 } from "../../config";
 import { SkillEditSheet } from "../../apps/skills/SkillEditSheet";
 import { SR5Actor } from "../SR5Actor";
@@ -18,7 +18,6 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
-
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -237,7 +236,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareSkillsWithFilters(data);
 
         data.itemType = this._prepareItemTypes(data);
-        data.effects = prepareActiveEffectCategories(this.actor.effects);  // All actor types have effects.
+        data.effects = prepareSortedEffects(this.actor.effects.contents);
+        data.itemEffects = prepareSortedItemEffects(this.actor);
         data.inventories = this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);
@@ -267,6 +267,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Active Effect management
         html.find(".effect-control").on('click', event => onManageActiveEffect(event, this.actor));
+        html.find(".item-effect-control").on('click', event => onManageItemActiveEffect(event));
 
         // Inventory visibility switch
         html.find('.item-toggle').on('click', this._onInventorySectionVisiblitySwitch.bind(this));
@@ -974,7 +975,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param item: The item to transform into a 'sheet item'
      */
     _prepareSheetItem(item: SR5Item): SheetItemData {
-        const sheetItem = item.toObject() as unknown as SheetItemData;
+        // Copy derived schema data instead of source data (false)
+        const sheetItem = item.toObject(false) as unknown as SheetItemData;
 
         const chatData = item.getChatData();
         sheetItem.description = chatData.description;
@@ -1043,6 +1045,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         sheetData.isCharacter = this.actor.isCharacter();
         sheetData.isSpirit = this.actor.isSpirit();
         sheetData.isCritter = this.actor.isCritter();
+        sheetData.isVehicle = this.actor.isVehicle();
         sheetData.hasSkills = this.actor.hasSkills;
         sheetData.canAlterSpecial = this.actor.canAlterSpecial;
         sheetData.hasFullDefense = this.actor.hasFullDefense;
@@ -1475,41 +1478,19 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
-        if (item) {
-            const newItems = [] as any[];
+        if (!item) return;
 
-            // Handle the equipped state.
-            if (item.isDevice) {
-                // Only allow one equipped device item. Unequip all other.
-                for (const item of this.actor.items.filter(actorItem => actorItem.isDevice)) {
-                    newItems.push({
-                        '_id': item.id,
-                        'system.technology.equipped': item.id === iid,
-                    });
-                }
-
-            } else {
-                // Toggle equip status.
-                newItems.push({
-                    '_id': iid,
-                    'system.technology.equipped': !item.isEquipped(),
-                });
-            }
-
-            // Handle active effects based on equipped status.
-            // NOTE: This is commented out for later ease of enabling effects based on equip status AND if they are
-            //       meant to enable on eqiup or not.
-            // this.actor.effects.forEach(effect => {
-            //     if (effect.system.origin !== item.uuid) return;
-            //
-            //     // @ts-expect-error
-            //     effect.disable(item.isEquipped());
-            // })
-
-            await this.actor.updateEmbeddedDocuments('Item', newItems);
-
-            this.actor.render(false);
+        // Handle the equipped state.
+        if (item.isDevice) {
+            await this.document.equipOnlyOneItemOfType(item);
+        } else {
+            await this.actor.updateEmbeddedDocuments('Item', [{
+                '_id': iid,
+                'system.technology.equipped': !item.isEquipped(),
+            }]);
         }
+
+        this.actor.render(false);
     }
 
     /**
@@ -1782,6 +1763,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _prepareSituationModifiers(): { category: string, label: string, value: number, hidden: boolean }[] {
         const modifiers = this.actor.getSituationModifiers();
+        modifiers.applyAll();
         if (!modifiers) return [];
 
         return Object.entries(modifiers._modifiers).map(([category, modifier]: [Shadowrun.SituationModifierType, SituationModifier]) => {
@@ -1853,8 +1835,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _prepareKeybindings() {
         return {
-            skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => `${binding.key.replace('Key', '')}`).join(', '),
-            card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => `${binding.key.replace('Key', '')}`).join(', '),
+            skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+            card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
         }
     }
 }

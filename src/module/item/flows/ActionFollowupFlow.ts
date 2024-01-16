@@ -29,7 +29,8 @@ export const ActionFollowupFlow = {
         const card = button.closest('.chat-message');
         const messageId = card.data('messageId');
 
-        const test = await TestCreator.fromMessage(messageId);
+        const showDialog = TestCreator.shouldShowDialog(event);
+        const test = await TestCreator.fromMessage(messageId, {showDialog});
         if (!test) return;
 
         // Populate data before executing follow up.

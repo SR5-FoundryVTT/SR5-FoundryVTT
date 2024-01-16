@@ -51,7 +51,7 @@ export class VehiclePrep {
     }
 
     static prepareVehicleStats(system: Shadowrun.VehicleData) {
-        const { vehicle_stats, isOffRoad } = system;
+        const { vehicle_stats, isOffRoad, isDrone } = system;
         // set the value for the stats
         for (let [key, stat] of Object.entries(vehicle_stats)) {
             // this turns the Object model into the list mod
@@ -80,6 +80,9 @@ export class VehiclePrep {
             vehicle_stats.speed.hidden = false;
             vehicle_stats.handling.hidden = false;
         }
+
+        // Hide vehicle seats for drones
+        vehicle_stats.seats.hidden = isDrone;
     }
 
     /**
@@ -179,7 +182,7 @@ export class VehiclePrep {
         movement.walk.value = Helpers.calcTotal(movement.walk, {min: 0});
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = Helpers.calcTotal(movement.run, {min: 0});;
+        movement.run.value = Helpers.calcTotal(movement.run, {min: 0});
     }
 
     static prepareMeatspaceInit(system: Shadowrun.VehicleData) {

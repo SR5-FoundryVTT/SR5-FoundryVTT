@@ -5,7 +5,7 @@
                 <div class="item-left">
                     <div class="item-text rtg"></div>
                     <div class="item-text item-name">
-                        {{localize "SR5.WeaponMod"}}
+                        {{localize "SR5.Weapon.Mod"}}
                     </div>
                 </div>
                 <div class="item-right">
@@ -25,7 +25,7 @@
                         {{localize "SR5.Conceal"}}
                     </div>
                     <div class="item-text item-icons">
-                        <a class="add-new-mod roll" title="Add Ammo" >
+                        <a class="add-new-mod roll" data-tooltip="SR5.AddMod" >
                             <i class="fas fa-plus"></i>
                             {{localize "SR5.Add"}}
                         </a>
@@ -39,7 +39,7 @@
                 <div class="item-left">
                     <div class="item-text rtg">
                         <i
-                            title="{{localize 'SR5.ToggleEquip'}}"
+                            data-tooltip="SR5.ToggleEquip"
                             class="mod-equip roll
                                 {{#if mod.system.technology.equipped}}
                                 fas fa-check-circle
@@ -103,8 +103,8 @@
                         />
                     </div>
                     <div class="item-text item-icons">
-                        <i class="roll fas fa-edit edit-item" title="Edit Mod"></i>
-                        <i class="roll fas fa-trash mod-delete" title="Delete Mod"></i>
+                        <i class="roll fas fa-edit edit-item" data-tooltip="SR5.EditMod"></i>
+                        <i class="roll fas fa-trash mod-delete" data-tooltip="SR5.DeleteMod"></i>
                     </div>
                 </div>
             </div>

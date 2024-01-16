@@ -1,9 +1,11 @@
 import {Helpers} from '../helpers';
 import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
-import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
+import {onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects} from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
 
 /**
@@ -33,7 +35,8 @@ interface FoundryItemSheetData {
 export interface SR5BaseItemSheetData extends FoundryItemSheetData {
     // SR5-FoundryVTT configuration
     config: typeof SR5
-    effects: Shadowrun.EffectsSheetData
+    effects: SR5ActiveEffect[]
+    itemEffects: SR5ActiveEffect[]
     // FoundryVTT rollmodes
     rollModes: CONFIG.Dice.RollModes
 }
@@ -46,6 +49,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     ammunition: Shadowrun.AmmoItemData[]
     weaponMods: Shadowrun.ModificationItemData[]
     armorMods: Shadowrun.ModificationItemData[]
+    vehicleMods: Shadowrun.ModificationItemData[]
 
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
@@ -149,8 +153,8 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Reduce nested items into typed lists.
          */
-        const [ammunition, weaponMods, armorMods] = this.item.items.reduce(
-            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
+        const [ammunition, weaponMods, armorMods, vehicleMods] = this.item.items.reduce(
+            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
                 const itemData = nestedItem.toObject();
                 //@ts-expect-error
                 itemData.descriptionHTML = this.enrichEditorFieldToHTML(itemData.system.description.value);
@@ -161,20 +165,23 @@ export class SR5ItemSheet extends ItemSheet {
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
                 //@ts-expect-error TODO: foundry-vtt-types v10
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
+                //@ts-expect-error TODO: foundry-vtt-types v10
+                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'vehicle') sheetItemData[3].push(itemData);
 
                 return sheetItemData;
             },
-            [[], [], []],
+            [[], [], [], []],
         );
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
+        data['vehicleMods'] = vehicleMods;
         data['activeSkills'] = this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
 
-        // Active Effects data.
-        data['effects'] = prepareActiveEffectCategories(this.item.effects);
+        data['effects'] = prepareSortedEffects(this.item.effects.contents);
+        data['itemEffects'] = prepareSortedItemEffects(this.object);
 
         if (this.item.isHost) {
             data['markedDocuments'] = this.item.getAllMarkedDocuments();
@@ -238,23 +245,8 @@ export class SR5ItemSheet extends ItemSheet {
      * Sorted (by translation) active skills either from the owning actor or general configuration.
      */
     _getSortedActiveSkillsForSelect() {
-        // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
-        const actor = this.item.actorOwner;
-        // Fallback for actors without skills.
-        if (!actor || actor.isIC()) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
-
-        const activeSkills = Helpers.sortSkills(actor.getActiveSkills());
-
-        const activeSkillsForSelect: Record<string, string> = {};
-        for (const [id, skill] of Object.entries(activeSkills)) {
-            // Legacy skills have no name, but their name is their id!
-            // Custom skills have a name and their id is random.
-            const key = skill.name || id;
-            const label = skill.label || skill.name;
-            activeSkillsForSelect[key] = label;
-        }
-
-        return activeSkillsForSelect;
+        // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
+        return ActionFlow.sortedActiveSkills(this.item.actorOwner);
     }
 
     _getNetworkDevices(): SR5Item[] {
@@ -331,6 +323,8 @@ export class SR5ItemSheet extends ItemSheet {
 
         html.find('.select-ranged-range-category').on('change', this._onSelectRangedRangeCategory.bind(this));
         html.find('.select-thrown-range-category').on('change', this._onSelectThrownRangeCategory.bind(this));
+
+        html.find('input[name="system.technology.equipped"').on('change', this._onToggleEquippedDisableOtherDevices.bind(this))
 
         this._activateTagifyListeners(html);
     }
@@ -592,6 +586,8 @@ export class SR5ItemSheet extends ItemSheet {
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
+        if (!this.item.isAction()) return;
+
         var inputElement = html.find('input#action-modifier').get(0);
 
         // Tagify expects this format for localized tags.
@@ -617,21 +613,6 @@ export class SR5ItemSheet extends ItemSheet {
             // render would loose tagify input focus. submit on close will save.
             await this.item.update({'system.action.modifiers': modifiers}, {render:false});
         });
-    }
-
-    /** This is needed to circumvent Application.close setting closed state early, due to it's async animation
-     * - The length of the closing animation can't be longer then any await time in the closing cycle
-     * - FormApplication._onSubmit will otherwise set ._state to RENDERED even if the Application window has closed already
-     * - Subsequent render calls then will show the window again, due to it's state
-     *
-     * @private
-     */
-    private fixStaleRenderedState() {
-        if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
-            console.warn(`SR5ItemSheet app for ${this.item.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
-            // Hotfix instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
-            this._state = Application.RENDER_STATES.CLOSED;
-        }
     }
 
     /**
@@ -798,5 +779,20 @@ export class SR5ItemSheet extends ItemSheet {
         if (item.system.importFlags) {
             await item.update({ 'system.importFlags.isFreshImport': onOff });
         }
+    }
+
+    /**
+     * Clicking on equipped status should trigger unequipping all other devices of the same type.
+     * @param event Click event on the equipped checkbox.
+     */
+    async _onToggleEquippedDisableOtherDevices(event: PointerEvent) {
+        event.preventDefault();
+
+        // Assure owned item device.
+        if (!(this.document.parent instanceof SR5Actor)) return;
+        if (!this.document.isDevice) return;
+        if (!this.document.isEquipped()) return;
+
+        await this.document.parent.equipOnlyOneItemOfType(this.document);
     }
 }

@@ -47,7 +47,10 @@ export const FLAGS = {
     AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
     TurnsSinceLastAttack: 'turnsSinceLastAttack',
     ManualRollOnSuccessTest: 'ManualRollOnSuccessTest',
-    MarkImports: 'MarkImports'
+    MarkImports: 'MarkImports',
+    CreateTargetedEffects: 'CreateTargetedEffects',
+    DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
+    UseDamageCondition: 'UseDamageCondition'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

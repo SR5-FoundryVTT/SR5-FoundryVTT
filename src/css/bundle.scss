@@ -10,6 +10,7 @@
 @import 'modifiers-container';
 @import 'foundry';
 @import 'module';
+@import 'effect';
 
 @font-face {
     font-family: 'klavika-medium';
@@ -461,7 +462,7 @@ input[type='text'].display {
     }
 
     .description>.editor {
-        height: 100%;
+        height: 250px;
         min-height: 15em;
         width: 100%;
         color: $color;
@@ -1270,13 +1271,6 @@ input[type='text'].display {
     padding: 1px !important;
 }
 
-.desc {
-   margin-left: -1em !important;
-   margin-right: 1em !important;
-}
-
-
-
 /* New or updated rules */
 .license-section .item-text.rtg.rate,
 .license-section .rtg-rate.item-text {  /* Updated */
@@ -1310,8 +1304,9 @@ input[type='text'].display {
     width: 100%;  /* Takes the maximum width of the parent */
     max-width: 100%;  /* Optional, ensures it doesn't go beyond parent */
 }
+// This class is only used for sin license descriptions and seems to be mostly a hack to get the description to better align with the license rating.
 .display.desc-sin {
-    margin-left: 2em;
+    margin-left: 0.9em;
 }
 .license-section .list-item.item-section .item-left .item-text,
 .license-section .list-item .item-left .item-text.item-name-header {

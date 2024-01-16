@@ -11,7 +11,7 @@
 
                 {{#if damage.element.value}}
                 <i class="{{elementIcon damage.element.value}} icon"
-                 title="{{localize damage.element.value}}"></i>
+                   data-tooltip="{{damage.element.value}}"></i>
                 {{/if}}
                 
                 {{#if damage.ap.value}} {{#if showAP}}

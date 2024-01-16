@@ -62,6 +62,7 @@ export class WeaponRangeTestBehavior {
         if (!actor) return;
 
         const modifiers = actor.getSituationModifiers();
+        modifiers.environmental.apply();
         // If no range is active, set to zero.
         test.data.range = modifiers.environmental.applied.active.range || 0;
     }
@@ -106,6 +107,7 @@ export class WeaponRangeTestBehavior {
 
         // if no range is active, set to first target selected.
         const modifiers = test.actor.getSituationModifiers();
+        modifiers.environmental.apply();
         test.data.range = modifiers.environmental.applied.active.range || test.data.targetRanges[0].range.modifier;
     }
 

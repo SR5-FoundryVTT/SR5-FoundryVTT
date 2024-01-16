@@ -40,7 +40,20 @@ For the `gulp link` command to work, you need to include the following file as _
 Instead of using the built in `gulp link` command, you can also execute this from within your `cmd` or `Windows Terminal`:
 `mklink /D "C:\Users\<yourUser>\AppData\Local\FoundryVTT\Data\systems\shadowrun5e" "<yourClonedRepoPath>"`
 
-<yourClonedRepoPath> must be the cloned repositiry that includes the `dist` folder within it.
+<yourClonedRepoPath> must be the cloned repository that includes the `dist` folder within it.
+
+## ESLint / Prettier
+
+This project uses ESLint and Prettier to enforce code style and formatting.
+
+It is strongly recommended to set up Prettier and ESLint in your IDE to run automatically as you develop. ESLint is also ran as part of the PR build pipeline.
+
+The relevant commands are:
+ * `npm run lint`: Run the linter, outputting all errors and warnings
+ * `npm run lint:fix`: Run the linter, fixing all errors and warnings it can auto-fix and outputting the rest
+ * `npm run lint:errors`: Run the linter, outputting only errors
+ * `npm run lint:errors:fix`: Run the linter, fixing all errors it can auto-fix and outputting the rest
+ * `npm run prettier`: Run prettier, auto-formatting your changeset
 
 # System Architecture
 A broad overview of the different areas of the shadowrun5e system. For more explanations around system specific concepts see `System Concepts`.
@@ -56,7 +69,7 @@ Source code
 
 
 ## Translations
-The FoundryVTT language config files used by Foundry will be at `/dist/lang/<language>/config.json`. The `/dist` directory does only exist on releases and changes made here to language files won't be accepted into the GitHub repository. Instead use `/public/lang/<language>/config.json` as these are copied over to `/dist/lang` when running `gulp build` or `gulp watch`.
+The FoundryVTT language config files used by Foundry will be at `/dist/lang/<language>/config.json`. The `/dist` directory does only exist on releases and changes made here to language files won't be accepted into the GitHub repository. Instead, use `/public/lang/<language>/config.json` as these are copied over to `/dist/lang` when running `gulp build` or `gulp watch`.
 
 In order to get your translation changes to the `/public` language files into the system, you'll have to create a GitHub pull request against the systems `master`/`main` branch. 
 
@@ -76,9 +89,9 @@ Additional separations are made for
 We'll gladly accept pull requests for all things moving the system forward. :)
 
 The system branch workflow is simple:
-`master` is the main and stable branch that is *save* to pull from and is meant to adress your pull requests into. It's setup with an GitHub action performing a TypeScript build dry run; this action has to succeed for any pull request to be considered.
+`master` is the main and stable branch that is *safe* to pull from and is meant to adress your pull requests into. It's setup with an GitHub action performing a TypeScript build dry run; this action has to succeed for any pull request to be considered.
 
-`release/**` is the active branch for upcoming releases. It's temporary and will be removed once merged into `master`. If you're actively working on changes for that release, you can pull from it and address your pull request into it. It's setup using the same GitHub action as `master`. You should only pull from this branch, if you need commits in it's history. Otherwise use `master`.
+`release/**` is the active branch for upcoming releases. It's temporary and will be removed once merged into `master`. If you're actively working on changes for that release, you can pull from it and address your pull request into it. It's setup using the same GitHub action as `master`. You should only pull from this branch, if you need commits in its history. Otherwise, use `master`.
 
 ## Unittesting
 There is unit testing support using the FVTT Quench module. It's encouraged to do some unit testing where possible but it's not mandatory. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules. 
@@ -94,7 +107,7 @@ You should see a success message and a little arrow symbol on the shadowrun5e fo
 > **NOTE:** This approach is considered legacy and not actively used anymore. @taMiF left it here for your consideration.
 
 On Linux you can use `docker` (or another container runtime like `podman`) to
-quickly setup a local instance of `foundry`:
+quickly set up a local instance of `foundry`:
 
 This will use `docker-compose` (or `podman-compose`) to manage the containers.
 

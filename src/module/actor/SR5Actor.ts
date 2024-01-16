@@ -25,13 +25,15 @@ import {TestCreator} from "../tests/TestCreator";
 import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
 import {RecoveryRules} from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
+import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
+import { Translation } from '../utils/strings';
 
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
  *
- * To easily access Actor.data without any typing issues us the SR5Actor.asCritter helpers.
+ * To easily access ActorData without any typing issues us the SR5Actor.asCritter helpers.
  * They are set up in a way that will handle both error management and type narrowing.
  * Example:
  * <pre><code>
@@ -162,6 +164,29 @@ export class SR5Actor extends Actor {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
             console.error(error);
             ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+        }
+    }
+
+    /**
+     * Get all ActiveEffects applicable to this actor.
+     * 
+     * The system uses a custom method of determining what ActiveEffect is applicable that doesn't 
+     * use default FoundryVTT allApplicableEffect.
+     * 
+     * The system has additional support for:
+     * - taking actor effects from items (apply-To actor)
+     * - having effects apply that are part of a targeted action against this actor (apply-To targeted_actor)
+     * 
+     * NOTE: FoundryVTT applyActiveEffects will check for disabled effects.
+     */
+    //@ts-expect-error TODO: foundry-vtt-types v10
+    override *allApplicableEffects() {
+        for (const effect of allApplicableDocumentEffects(this, {applyTo: ['actor', 'targeted_actor']})) {
+            yield effect;
+        }
+
+        for (const effect of allApplicableItemsEffects(this, {applyTo: ['actor']})) {
+            yield effect;
         }
     }
 
@@ -696,7 +721,7 @@ export class SR5Actor extends Actor {
     getSkillByLabel(searchedFor: string): Shadowrun.SkillField | undefined {
         if (!searchedFor) return;
 
-        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
 
         const skills = this.getSkills();
 
@@ -735,7 +760,7 @@ export class SR5Actor extends Actor {
             return '';
         }
 
-        return skill.label ? skill.label : skill.name ? skill.name : '';
+        return skill.label ?? skill.name ?? '';
     }
 
     /**
@@ -1031,12 +1056,13 @@ export class SR5Actor extends Actor {
      * @param name The attributes name as defined within data
      * @param options Change general roll options.
      */
-    async rollAttribute(name, options?: Shadowrun.ActorRollOptions) {
+    async rollAttribute(name, options: Shadowrun.ActorRollOptions={}) {
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
         const action = DataDefaults.actionRollData({attribute: name, test: AttributeOnlyTest.name});
-        const test = await this.tests.fromAction(action, this);
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.tests.fromAction(action, this, {showDialog});
         if (!test) return;
 
         return await test.execute();
@@ -1512,14 +1538,28 @@ export class SR5Actor extends Actor {
     /**
      * Depending on this actors defeated status, apply the correct effect and status.
      * 
+     * This will only work when the actor is connected to a token.
+     * 
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async applyDefeatedStatus(defeated?: DefeatedStatus) {
-        defeated = defeated || ConditionRules.determineDefeatedStatus(this);
+        // TODO: combat-utility-belt seems to replace the default status effects, causing some issue I don't yet understand.
+        // thus a setting is added so GMs can turn it off if they handle it in another way
+
+        const token = this.getToken();
+        if (!token || !game.settings.get(SYSTEM_NAME, FLAGS.UseDamageCondition)) return;
+
+        defeated = defeated ?? ConditionRules.determineDefeatedStatus(this);
+
+        // Remove unapplicable defeated token status.
         await this.removeDefeatedStatus(defeated);
 
-        if (!defeated.unconscious && !defeated.dying && !defeated.dead) return this.combatant?.update({defeated: false});
-        else this.combatant?.update({defeated: true});
+        // Apply the appropriate combatant status.
+        if (defeated.unconscious || defeated.dying || defeated.dead) {
+            await this.combatant?.update({defeated: true});
+        } else {
+            return await this.combatant?.update({ defeated: false });
+        }
 
         let newStatus = 'unconscious';
         if (defeated.dying) newStatus = 'unconscious';
@@ -1532,7 +1572,10 @@ export class SR5Actor extends Actor {
         // Avoid applying defeated status multiple times.
         const existing = this.effects.reduce((arr, e) => {
             // @ts-expect-error TODO: foundry-vtt-types v10
-            if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) arr.push(e.id);
+            if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
+                // @ts-expect-error
+                arr.push(e.id);
+            }
             return arr;
         }, []);
 
@@ -1541,7 +1584,7 @@ export class SR5Actor extends Actor {
         // @ts-expect-error
         // Set effect as active, as we've already made sure it isn't.
         // Otherwise Foundry would toggle on/off, even though we're still dead.
-        await this.getToken().object.toggleEffect(effect, { overlay: true, active: true });
+        await token.object.toggleEffect(effect, { overlay: true, active: true });
     }
 
     /**
@@ -1550,7 +1593,7 @@ export class SR5Actor extends Actor {
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async removeDefeatedStatus(defeated?: DefeatedStatus) {
-        defeated = defeated || ConditionRules.determineDefeatedStatus(this);
+        defeated = defeated ?? ConditionRules.determineDefeatedStatus(this);
 
         const removeStatus: string[] = [];
         if ((!defeated.unconscious && !defeated.dying) || defeated.dead) removeStatus.push('unconscious');
@@ -1816,11 +1859,11 @@ export class SR5Actor extends Actor {
 
     /** 
      * Get all situational modifiers from this actor.
+     * NOTE: These will return selections only without higher level selections applied.
+     *       You'll have to manually trigger .applyAll or apply what's needed.
      */
-    getSituationModifiers(options?): DocumentSituationModifiers {
-        const modifiers = DocumentSituationModifiers.getDocumentModifiers(this);
-        modifiers.applyAll(options);
-        return modifiers;
+    getSituationModifiers(): DocumentSituationModifiers {
+        return DocumentSituationModifiers.getDocumentModifiers(this);
     }
 
     /**
@@ -2097,5 +2140,23 @@ export class SR5Actor extends Actor {
 
         if (this.isMatrixActor) await this.setMatrixDamage(0);
         if (updateData) await this.update(updateData);
+    }
+
+    /**
+     * Will unequip all other items of the same type as the given item.
+     * 
+     * It's not necessary for the given item to be equipped.
+     * 
+     * @param item Input item that will be equipped while unequipping all others of the same type.
+     */
+    async equipOnlyOneItemOfType(item: SR5Item) {
+        const updateData = this.items
+            .filter(ownedItem => ownedItem.type === item.type)
+            .map(ownedItem => ({
+                _id: ownedItem.id,
+                'system.technology.equipped': ownedItem.id === item.id
+        }));
+
+        await this.updateEmbeddedDocuments('Item', updateData);
     }
 }

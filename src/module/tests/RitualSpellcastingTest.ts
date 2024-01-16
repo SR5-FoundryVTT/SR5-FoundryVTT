@@ -13,7 +13,7 @@ interface RitualSpellcastingTestData extends SuccessTestData {
     drainDamage: Shadowrun.DamageData
 
     // Reagent value as described on SR5#296 'Give the offering'
-    reagent: number
+    reagents: number
 
     // Determine that ritual concluded and drain is ready to be cast.
     drainReady: boolean
@@ -106,10 +106,9 @@ export class RitualSpellcastingTest extends SuccessTest {
     }
 
     warnAboutInvalidReagents() {
-        const reagents = Number(this.data.reagent);
+        const reagents = Number(this.data.reagents);
         const force = Number(this.data.force);
 
-        //currently we dont check for the lodge, so we always allow it
         if (!RitualRules.validReagent(reagents, force)) {
             ui.notifications?.warn('SR5.Warnings.RitualNotEnoughReagents', {localize: true});
         }
@@ -136,7 +135,7 @@ export class RitualSpellcastingTest extends SuccessTest {
         // Lower from more to less explicit values being given.
         // Don't let force go below one.
         data.force = Math.max(data.force || 1, 1);
-        data.reagent = data.reagent || data.force;
+        data.reagents = data.reagents || data.force;
     }
 
     /**
@@ -144,11 +143,11 @@ export class RitualSpellcastingTest extends SuccessTest {
      * 
      * NOTE: This will be called by the opposing test via a follow up test action.
      */
-    calcDrain(casterHits, opposingHits: number) {
+    calcDrain(opposingHits: number) {
         if (!this.actor) return DataDefaults.damageData();
 
-        this.data.drain = RitualRules.drainValue(opposingHits, this.data.reagent, this.data.force);
-        this.data.drainDamage = RitualRules.calcDrainDamage(casterHits, this.data.drain, this.actor.getAttribute('magic').value);
+        this.data.drain = RitualRules.drainValue(opposingHits, this.data.reagents, this.data.force);
+        this.data.drainDamage = RitualRules.calcDrainDamage(opposingHits, this.data.drain, this.actor.getAttribute('magic').value);
         this.data.drainReady = true;
     }
 }

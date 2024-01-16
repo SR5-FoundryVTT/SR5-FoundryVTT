@@ -4,7 +4,6 @@ import InventoryData = Shadowrun.InventoryData;
 import InventoriesData = Shadowrun.InventoriesData;
 import { SR5Item } from "../../item/SR5Item";
 
-
 /**
  * Handle all inventory related actions on an SR5Actor'.
  *

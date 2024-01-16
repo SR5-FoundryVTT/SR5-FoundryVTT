@@ -1,30 +1,35 @@
+import { DataDefaults } from '../data/DataDefaults';
 import { PartsList } from '../parts/PartsList';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
-
+import { Translation } from '../utils/strings';
 
 export interface SkillTestData extends SuccessTestData {
     attribute: string
     limitSelection: string
-    sepcialization: boolean
 }
 
 
 /**
- * Handle skill test allowing for alterting the attribtue used for that skill away from the
- * pre configuration.
+ * Skill tests allow users to change the connected attribute and limit.
  * 
  * Rule wise a skill test doesn't alter a default success test.
  */
 export class SkillTest extends SuccessTest {
     override data: SkillTestData
+    // temporary selection information.
     lastUsedAttribute: string;
+    lastUsedLimit: string;
 
     constructor(data, documents, options) {
         super(data, documents, options);
 
         this.lastUsedAttribute = this.data.attribute;
+        this.lastUsedLimit = this.data.limitSelection;
     }
 
+    /**
+     * Allow users to alter detailed skill values.
+     */
     override get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.html';
     }
@@ -34,68 +39,84 @@ export class SkillTest extends SuccessTest {
      */
     override get title() {
         if (!this.actor) return super.title;
-        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill))} ${game.i18n.localize('SR5.Test')}`;
+        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill) as Translation)} ${game.i18n.localize('SR5.Test')}`;
     }
 
+    /**
+     * A SkillTest has the need to store attribute and limit selections
+     */
     override _prepareData(data: any, options: TestOptions) {
         data = super._prepareData(data, options);
 
-        // Preselect attribute based on action.
+        data.action = data.action || DataDefaults.actionRollData();
+
+        // Preselect based on action.
         data.attribute = data.action.attribute;
         data.limitSelection = data.action.limit.attribute;
 
         return data;
     }
 
+    /**
+     * Skill test provides a selection for attribute and limit during TestDialog.
+     */
     override prepareBaseValues() {
+        super.prepareBaseValues();
         this.prepareAttributeSelection();
         this.prepareLimitSelection();
-
-        super.prepareBaseValues();
     }
 
     /**
-     * Only add selected attribute values to the pool
-     * 
+     * Change out previous attribute with new selection.
      */
     prepareAttributeSelection() {
         if (!this.actor) return;
 
-        // Remove last used attribute and it's modifiers and replace with new selection.
+        // Remove last used attribute and its modifiers and replace with new selection.
         const useSelection = this.data.attribute !== this.data.action.attribute;
-        const usedAttribute = useSelection ? this.data.attribute : this.data.action.attribute;
-        const attribute = this.actor.getAttribute(usedAttribute);
+        const selectedAttribute = useSelection ? this.data.attribute : this.data.action.attribute;
+        const usedAttribute = this.actor.getAttribute(selectedAttribute);
         const lastUsedAttribute = this.actor.getAttribute(this.lastUsedAttribute);
 
-        if (!attribute || !lastUsedAttribute) return console.error('Shadowrun 5e | An attribute was used that does not exist on', this.actor, attribute, lastUsedAttribute);
+        if (!usedAttribute || !lastUsedAttribute) return; 
 
 
-        const pool = new PartsList(this.pool.mod);
+        const pool = new PartsList<number>(this.pool.mod);
 
-        // Remove both original action and .
+        // Replace previous attribute with new one, without changing other modifiers
         pool.removePart(lastUsedAttribute.label);
         this.actor._removeMatrixParts(pool);
+        pool.addPart(usedAttribute.label, usedAttribute.value);
 
-        // Add pool values related to either selected or action attribute
-        pool.addPart(attribute.label, attribute.value);
-        if (this.actor._isMatrixAttribute(usedAttribute)) this.actor._addMatrixParts(pool, true);
+        if (this.actor._isMatrixAttribute(selectedAttribute)) this.actor._addMatrixParts(pool, true);
 
-        // Save this attribtue selection as last used for next selection cycle
-        this.lastUsedAttribute = usedAttribute;
+        this.lastUsedAttribute = selectedAttribute;
     }
 
     /**
-     * Rebuild limit after limit selection.
+     * Change out previous limit with new selection.
      */
     prepareLimitSelection() {
         if (!this.actor) return;
 
-        this.data.limit.mod = [];
-        const limitMod = new PartsList(this.limit.mod);
-        const poolMod = new PartsList(this.pool.mod);
+        // Remove last used limit and its modifiers and replace with new selection.
+        const useSelection = this.data.limitSelection !== this.data.action.limit.attribute;
+        const selectedLimit = useSelection ? this.data.limitSelection : this.data.action.limit.attribute;
+        const usedLimit = this.actor.getLimit(selectedLimit);
+        const lastUsedLimit = this.actor.getLimit(this.lastUsedLimit);
 
-        const limit = this.actor.getLimit(this.data.limitSelection);
-        if (limit) limitMod.addUniquePart(limit.label, limit.value);
-        if (limit && this.actor._isMatrixAttribute(this.data.limitSelection)) this.actor._addMatrixParts(poolMod, true);
+        if (!usedLimit || !lastUsedLimit) return;
+
+        const limit = new PartsList<number>(this.limit.mod);
+        const pool = new PartsList<number>(this.pool.mod);
+
+        // Replace previous limit with new one, without changing other modifiers.
+        limit.removePart(lastUsedLimit.label);
+        limit.addPart(usedLimit.label, usedLimit.value);
+        this.actor._removeMatrixParts(pool);
+
+        if (limit && this.actor._isMatrixAttribute(selectedLimit)) this.actor._addMatrixParts(pool, true);
+
+        this.lastUsedLimit = selectedLimit;
     }
 }

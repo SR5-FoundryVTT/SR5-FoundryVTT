@@ -58,7 +58,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         const data = await super.getData(options);
 
         // Vehicle actor type specific fields.
-        data.vehicle = this._prepareVehicleFields();
+        data.vehicle = await this._prepareVehicleFields();
 
         return data;
     }

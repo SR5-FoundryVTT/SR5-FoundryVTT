@@ -1,6 +1,8 @@
 /**
  * Add a few system links to the settings sidebar menu for easier access and better visibility by users.
  */
+import { Translation } from './utils/strings';
+
 export const RenderSettings = {
     listen: () => {
         Hooks.on("renderSettings", async (_app, $html) => {
@@ -29,7 +31,7 @@ export const RenderSettings = {
                     url: "http://sr5-foundryvtt.privateworks.com/index.php/Main_Page",
                     label: "SR5.Labels.Sidebar.Wiki",
                 },
-            ].map((data): HTMLAnchorElement => {
+            ].map((data: { url: string, label: Translation }): HTMLAnchorElement => {
                 const anchor = document.createElement('a');
                 anchor.href = data.url;
                 anchor.innerText = game.i18n.localize(data.label);

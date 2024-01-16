@@ -10,6 +10,7 @@ import DamageSource = Shadowrun.DamageSource;
 import LimitField = Shadowrun.LimitField;
 import ValueField = Shadowrun.ValueField;
 import {PartsList} from "../../parts/PartsList";
+import { SR5 } from "../../config";
 
 export class ActionFlow {
     /**
@@ -97,5 +98,29 @@ export class ActionFlow {
         if (damage.element) return true;
 
         return false;
+    }
+
+    /**
+     * Collect all active skills either from global context or from within a given document.
+     * 
+     * @param actor An optional actor to retrieve skills from (including custom skills)
+     * @returns Sorted list of skills for sheet usage.
+     */
+    static sortedActiveSkills(actor?: SR5Actor) {
+        // Fallback for actors without skills.
+        if (!actor || actor.isIC()) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
+
+        // Normalize custom and legacy skills to a single format.
+        // Legacy skills have no name, but use their name as id.
+        // Custom skills have a name but their id is random.
+        const normalizedSkills: Record<string, string> = {};
+        const skills = Helpers.sortSkills(actor.getActiveSkills());
+        for (const [id, skill] of Object.entries(skills)) {
+            const key = skill.name || id;
+            const label = skill.label || skill.name;
+            normalizedSkills[key] = label;
+        }
+
+        return normalizedSkills;
     }
 }

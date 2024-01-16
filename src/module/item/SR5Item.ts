@@ -49,7 +49,6 @@ import HostItemData = Shadowrun.HostItemData;
 import ActionResultData = Shadowrun.ActionResultData;
 import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
-import MarkedDocument = Shadowrun.MarkedDocument;
 import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
@@ -75,6 +74,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -185,13 +185,6 @@ export class SR5Item extends Item {
             if (item.effects && !Array.isArray(item.effects)) {
                 item.effects = Helpers.convertIndexedObjectToArray(item.effects);
             }
-            // TODO: foundry-vtt-types v10 - TODO: Move into migration...
-            // if (item.data) {
-            //     item.system = item.system || {};
-            //     mergeObject(item.system, item.data);
-            //     item.system = item.data;
-            //     delete item.data;
-            // }
             return item;
         });
 
@@ -967,10 +960,10 @@ export class SR5Item extends Item {
             return game.i18n.localize('SR5.MeleeWeaponAttack');
         }
         if (this.isCombatSpell) {
-            return game.i18n.localize('SR5.SpellAttack');
+            return game.i18n.localize('SR5.Spell.Attack');
         }
         if (this.isSpell) {
-            return game.i18n.localize('SR5.SpellCast');
+            return game.i18n.localize('SR5.Spell.Cast');
         }
         if (this.hasRoll) {
             return this.name as string;
@@ -1179,6 +1172,10 @@ export class SR5Item extends Item {
 
     isEquipped(): boolean {
         return this.wrapper.isEquipped();
+    }
+
+    isWireless(): boolean {
+        return this.wrapper.isWireless();
     }
 
     isCyberdeck(): boolean {
