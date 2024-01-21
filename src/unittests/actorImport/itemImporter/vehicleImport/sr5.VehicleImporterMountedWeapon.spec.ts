@@ -1,5 +1,5 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { MountedWeaponParser } from '../../../../module/apps/importer/actorImport/itemImporter/vehicleImport/MountedWeaponParser';
+import MountedWeaponParser from '../../../../module/apps/importer/actorImport/itemImporter/vehicleImport/MountedWeaponParser';
 import * as chummerVehicle from './drone.json';
 
 export const mountedWeaponParserTesting = (context: QuenchBatchContext) => {
