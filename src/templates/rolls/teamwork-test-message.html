@@ -1,0 +1,38 @@
+<div class="sr5 chat-card teamworktest-card">
+    <div class="card-title card-header">
+        <span class="test-name">{{localize title}}</span>
+    </div>
+    {{#if speaker.actor}}
+    <div class="card-title card-header">
+        <div class="container container--fluid">
+            <div class="container__row">
+                <div class="container__col">
+                    <div class="document">
+                        <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speakerImg speaker.actor}}" class="entity-selectable" data-tooltip="{{speakerName speaker.actor}}"/></a>
+                            <h3 class="header-name"><a class="chat-document-link" data-uuid="{{speaker.actor.uuid}}">{{speakerName speaker.actor}}</a></h3>
+                    </div>
+                </div>
+            </div>
+            {{#if item}}
+            <div class="container__row">
+                <div class="container__col">
+                    <div class="document">
+                        <img src="{{item.img}}" data-tooltip="{{item.name}}"/>
+                        <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{item.name}}</a></h3>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+    {{/if}}
+    <div class="sr5-teamwork-participants">
+        <!-- Code will add the participants here -->
+    </div>
+    <div class="card-main-content">
+        <button class="sr5-teamwork-addparticipant">{{localize "SR5.Skill.Teamwork.TakePart"}}</button>
+    </div>
+    <div class="card-main-content">
+        <button class="sr5-teamwork-start">{{localize "SR5.Skill.Teamwork.RollIt"}}</button>
+    </div>
+</div>

@@ -912,7 +912,13 @@
         "Swimming": "Swimming",
         "ThrowingWeapons": "Throwing Weapons",
         "Tracking": "Tracking",
-        "UnarmedCombat": "Unarmed Combat"
+        "UnarmedCombat": "Unarmed Combat",
+        "Teamwork": {
+            "ParticipantActor": "Choose actor",
+            "Glitched": "Glitched",
+            "TakePart": "Take part",
+            "RollIt": "Roll it"
+        }
     },
     "SR5.Soak": "Soak",
     "SR5.SoakTest": "Damage Resist Test",

@@ -50,6 +50,7 @@ export const FLAGS = {
     MarkImports: 'MarkImports',
     CreateTargetedEffects: 'CreateTargetedEffects',
     DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
+    TeamworkTestFlow: 'TeamworkTestFlow',
     UseDamageCondition: 'UseDamageCondition'
 };
 export const CORE_NAME = 'core';
