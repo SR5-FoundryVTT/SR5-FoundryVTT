@@ -3,7 +3,7 @@
         <div class="item-left">
             {{#if img}}
                 <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">                    
-                    <img src="{{img}}" data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}" data-tooltip-direction="LEFT" height="24px" width="24px"/>
+                    <img src="{{img}}" {{#if hasRoll}}data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}" data-tooltip-direction="LEFT"{{/if}} height="24px" width="24px"/>
                 </div>
             {{/if}}
             {{#if system.importFlags.isFreshImport}}

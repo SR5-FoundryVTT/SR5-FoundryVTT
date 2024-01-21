@@ -34,6 +34,7 @@ declare namespace Shadowrun {
             attributes: VehicleAttributes
             networkController: string
             modifiers: Modifiers & CommonModifiers
+            modificationCategories: VehicleModCategories          
         }
 
     export interface VehicleStats {
@@ -45,5 +46,14 @@ declare namespace Shadowrun {
         acceleration: VehicleStat
         sensor: VehicleStat
         seats: VehicleStat
+    }
+
+    export interface VehicleModCategories {
+        body: number
+        power_tain: number
+        protection: number
+        electromagnetic: number
+        cosmetic: number
+        weapons: number
     }
 }

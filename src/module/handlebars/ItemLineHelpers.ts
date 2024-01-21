@@ -226,7 +226,7 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
-            case 'modification':
+            case 'modification':               
             case 'ammo':
                 return [
                     {
@@ -480,14 +480,32 @@ export const registerItemLineHelpers = () => {
                 ];
             case 'armor':
             case 'ammo':
-            case 'modification':
+            case 'modification':                
+                if (wrapper.isVehicleModification())
+                {
+                    return [
+                        {
+                            text: {
+                                text: game.i18n.localize(SR5.modificationCategories[wrapper.getModificationCategory() ?? ''])
+                            },
+
+                        },
+                        {
+                            text: {
+                                text: wrapper.getModificationCategorySlots() ?? ''
+                            },
+                        },
+                        qtyInput,
+                    ];
+                }                                
             case 'device':
             case 'equipment':
             case 'cyberware':
             case 'bioware':
                 return [qtyInput];
             case 'weapon':
-                if (wrapper.isRangedWeapon()) {
+                // Both Ranged and Melee Weapons can have ammo.
+                if (wrapper.isRangedWeapon() || (wrapper.isMeleeWeapon() && item.system.ammo?.current.max > 0)) {
                     const count = wrapper.getAmmo()?.current.value ?? 0;
                     const max = wrapper.getAmmo()?.current.max ?? 0;
                     // Show reload on both no ammo configured and partially consumed clips.

@@ -408,12 +408,17 @@ export const SR5 = {
         memory: 'SR5.RollMemory',
     },
 
+    /**
+     * Used for complex form targeting options.
+     */
     matrixTargets: {
         persona: 'SR5.TargetPersona',
         device: 'SR5.TargetDevice',
         file: 'SR5.TargetFile',
         self: 'SR5.TargetSelf',
         sprite: 'SR5.TargetSprite',
+        host: 'TYPES.Item.host',
+        ic: 'TYPES.Actor.ic',
         other: 'SR5.TargetOther',
     },
 
@@ -589,6 +594,7 @@ export const SR5 = {
     modificationTypes: {
         weapon: 'SR5.Weapon.Weapon',
         armor: 'SR5.Armor',
+        vehicle: 'SR5.Vehicle.Vehicle'
     },
 
     mountPoints: {
@@ -598,6 +604,15 @@ export const SR5 = {
         top: 'SR5.Top',
         side: 'SR5.Side',
         internal: 'SR5.Internal',
+    },
+
+    modificationCategories: {
+        body: 'SR5.Vehicle.ModificationCategoryTypes.body',
+        cosmetic: 'SR5.Vehicle.ModificationCategoryTypes.cosmetic',
+        electromagnetic: 'SR5.Vehicle.ModificationCategoryTypes.electromagnetic',
+        power_train: 'SR5.Vehicle.ModificationCategoryTypes.power_train',
+        protection: 'SR5.Vehicle.ModificationCategoryTypes.protection',
+        weapons: 'SR5.Vehicle.ModificationCategoryTypes.weapons',
     },
 
     lifestyleTypes: {
@@ -885,8 +900,8 @@ export const SR5 = {
      * set in it's system.action_type property.
      */
     callInActorTypes: {
-        'spirit': 'ACTOR.TypeSpirit',
-        'sprite': 'ACTOR.TypeSprite'
+        'spirit': 'TYPES.Actor.spirit',
+        'sprite': 'TYPES.Actor.sprite'
     },
 
     critterPower: {

@@ -25,7 +25,7 @@ export const RitualRules = {
      * @param hits The amount of hits of the opposing ritual
      */
     drainValue: (hits: number, reagents: number, force: number): number => {
-        let reduction = Math.max((reagents / force) - 1, 0);
+        let reduction = Math.max(Math.floor(reagents / force) - 1, 0);
         return Math.max(hits * 2 - reduction, 2);
     },
 
@@ -35,14 +35,12 @@ export const RitualRules = {
      * See SR5#296 and general Drain Rules.
      * 
      * @param hits The amount of hits of the opposing ritual
-     * @param force The force level chosen for the ritual
+     * @param drain The drain for the ritual
      * @param magic The magic attribute level of the ritual leader
      */
     calcDrainDamage: (hits, drain: number, magic: number): Shadowrun.DamageData => {
         if (hits < 0) hits = 0;
         if (magic < 0) magic = 1;
-
-        console.log(hits)
 
         const damage = DataDefaults.damageData();
         damage.base = drain;

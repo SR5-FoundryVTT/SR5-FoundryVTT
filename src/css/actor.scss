@@ -191,6 +191,19 @@
     .skill-header {
         @include rollable;
     }
+
+    // Sprite sheet power tab list had broken flex/block relations, causing missing a scrollbar.
+    // Other actor sheet tabs miss-use the 'inventory' class. To not further miss-use it,
+    // this hacky class pierces through .sr5 .tab .tabbody > * flex:0 and broken scroll-area
+    // formatting in general to have a localized solution for the sprite power list.
+    // If you're looking at this, and have a better solution, please burn this in the fires of hell.
+    .scroll-area-sprite-power {
+        display: block;
+        flex: 1 !important;
+        height: 100%;
+        width: 100%;
+        overflow: auto;
+    }
 }
 
 .sr5 #filter-skills.display.text.left {

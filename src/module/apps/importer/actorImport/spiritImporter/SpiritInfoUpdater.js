@@ -7,7 +7,7 @@ export class SpiritInfoUpdater {
 
     /**
      * Parses the actor data from the chummer file and returns an updated clone of the actor data.
-     * @param {*} actorSource The actor data (actor.data not actor.system) that is used as the basis for the import. Will not be changed.
+     * @param {*} actorSource The actor data (actor not actor.system) that is used as the basis for the import. Will not be changed.
      * @param {*} chummerChar The chummer character to parse.
      */
     async update(actorSource, chummerChar) {
@@ -108,7 +108,16 @@ export class SpiritInfoUpdater {
              "vucub",
         ]
 
-        const type = spiritTypes.find(v => chummerType?.toLowerCase().includes(v));
+        let specialMapping = new Map([
+            ['Noxious Spirit', 'toxic_air'],
+            ['Abomination Spirit', 'toxic_beasts'],
+            ['Barren Spirit', 'toxic_earth'],
+            ['Nuclear Spirit', 'toxic_fire'],
+            ['Plague Spirit', 'toxic_man'],
+            ['Sludge Spirit', 'toxic_water']
+        ])
+
+        const type = spiritTypes.find(v => chummerType?.toLowerCase().includes(v)) ?? specialMapping.get(chummerType);
        
         if(type == undefined) {
             ui.notifications?.error(game.i18n.format("SR5.Import.Spirit.SpiritTypeNotFound"))

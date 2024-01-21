@@ -34,7 +34,7 @@ import { TeamworkMessageData } from './flows/TeamworkFlow';
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
  *
- * To easily access Actor.data without any typing issues us the SR5Actor.asCritter helpers.
+ * To easily access ActorData without any typing issues us the SR5Actor.asCritter helpers.
  * They are set up in a way that will handle both error management and type narrowing.
  * Example:
  * <pre><code>
@@ -1621,44 +1621,47 @@ export class SR5Actor extends Actor {
      */
     async applyDefeatedStatus(defeated?: DefeatedStatus) {
         // TODO: combat-utility-belt seems to replace the default status effects, causing some issue I don't yet understand.
-        //       For now, we'll just disable this feature.
-        return;
-    //     const token = this.getToken();
-    //     if (token === null) return;
+        // thus a setting is added so GMs can turn it off if they handle it in another way
 
-    //     defeated = defeated ?? ConditionRules.determineDefeatedStatus(this);
+        const token = this.getToken();
+        if (!token || !game.settings.get(SYSTEM_NAME, FLAGS.UseDamageCondition)) return;
 
-    //     // Remove unapplicable defeated token status.
-    //     await this.removeDefeatedStatus(defeated);
+        defeated = defeated ?? ConditionRules.determineDefeatedStatus(this);
 
-    //     // Apply the appropriate combatant status.
-    //     if (!defeated.unconscious && !defeated.dying && !defeated.dead) { 
-    //         return await this.combatant?.update({ defeated: false }); 
-    //     } else { 
-    //         await this.combatant?.update({defeated: true});
-    //     }
+        // Remove unapplicable defeated token status.
+        await this.removeDefeatedStatus(defeated);
 
-    //     let newStatus = 'unconscious';
-    //     if (defeated.dying) newStatus = 'unconscious';
-    //     if (defeated.dead) newStatus = 'dead';
+        // Apply the appropriate combatant status.
+        if (defeated.unconscious || defeated.dying || defeated.dead) {
+            await this.combatant?.update({defeated: true});
+        } else {
+            return await this.combatant?.update({ defeated: false });
+        }
 
-    //     // Find fitting status and fallback to dead if not found.
-    //     const status = CONFIG.statusEffects.find(e => e.id === newStatus);
-    //     const effect = status || CONFIG.controlIcons.defeated;
+        let newStatus = 'unconscious';
+        if (defeated.dying) newStatus = 'unconscious';
+        if (defeated.dead) newStatus = 'dead';
 
-    //     // Avoid applying defeated status multiple times.
-    //     const existing = this.effects.reduce((arr, e) => {
-    //         // @ts-expect-error TODO: foundry-vtt-types v10
-    //         if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) arr.push(e.id);
-    //         return arr;
-    //     }, []);
+        // Find fitting status and fallback to dead if not found.
+        const status = CONFIG.statusEffects.find(e => e.id === newStatus);
+        const effect = status || CONFIG.controlIcons.defeated;
 
-    //     if (existing.length) return;
+        // Avoid applying defeated status multiple times.
+        const existing = this.effects.reduce((arr, e) => {
+            // @ts-expect-error TODO: foundry-vtt-types v10
+            if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
+                // @ts-expect-error
+                arr.push(e.id);
+            }
+            return arr;
+        }, []);
 
-    //     // @ts-expect-error
-    //     // Set effect as active, as we've already made sure it isn't.
-    //     // Otherwise Foundry would toggle on/off, even though we're still dead.
-    //     await token.object.toggleEffect(effect, { overlay: true, active: true });
+        if (existing.length) return;
+
+        // @ts-expect-error
+        // Set effect as active, as we've already made sure it isn't.
+        // Otherwise Foundry would toggle on/off, even though we're still dead.
+        await token.object.toggleEffect(effect, { overlay: true, active: true });
     }
 
     /**

@@ -1,4 +1,7 @@
 import { MonitorRules } from './../rules/MonitorRules';
+import { SR5Item } from './../item/SR5Item';
+import ModificationCategoryType = Shadowrun.ModificationCategoryType;
+
 export const registerActorHelpers = () => {
     /** 
      * Determine if a wound modifier should be shown for a specific box on a damage track, including pain rules.
@@ -17,4 +20,21 @@ export const registerActorHelpers = () => {
         const wounds = MonitorRules.wounds(box, woundBoxesThreshold, painTolerance);
         return MonitorRules.woundModifier(wounds);
     });
+
+    /** 
+    * Determine the amount of Modification Category slots in use by a Vehicle actor, for the given Modification Category
+    * 
+    * @param items The items to be considered
+    * @param modificationCategory The modification category 
+    */
+    Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item], modificationCategory: ModificationCategoryType): number => {        
+        if (!Array.isArray(items) || !items.length) { return 0 }        
+        const slotSum = items.reduce((arr, item) => {
+            if (item.system.modification_category == modificationCategory) { return arr += item.system.slots ? item.system.slots : 0 } else {return arr};            
+        } ,0)
+
+        return slotSum;
+    });
+
+
 }

@@ -1,11 +1,11 @@
 /// <reference path="./Shadowrun.ts" />
 // NOTE: See https://github.com/League-of-Foundry-Developers/foundry-vtt-types/wiki/%5B0.8.x%5D-Actors-and-Items for reference
 /**
- * Types for Actor.data and actor.system with foundry-vtt-types pattern used:
+ * Types for Actor and actor.system with foundry-vtt-types pattern used:
  * https://github.com/League-of-Foundry-Developers/foundry-vtt-types/wiki/%5B0.7.x%5D-Actors-and-Items
  *
  * The naming pattern is as follows:
- * - Actor.data => XYZActorData (CharacterData)
+ * - Actor => XYZActorData (CharacterData)
  * - actor.system => XYZData (CharacterData)
  *
  * * Don't put property definitions here. Keep the top level definitions clean.

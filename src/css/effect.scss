@@ -1,0 +1,14 @@
+/**
+ * Everything relating to the SR5ActiveEffectConfig sheet
+ * 
+ * In general the effect config isn't changed much from default Foundry styling.
+ * Design here is only for added elements to adhere to Foundry styling.
+*/
+.active-effect-sheet {
+    
+    // Match tagify input selection to Foundry's default input selection
+    .tagify-selection {
+        border: 1px solid var(--color-border-light-tertiary);
+        border-radius: 3px;
+    }
+}

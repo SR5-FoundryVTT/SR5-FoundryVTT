@@ -154,19 +154,19 @@
         </div>
     </div>
     {{/if}}
-    {{#if followupActions}}
+    {{#if test.opposed}}
     <div class="card-buttons">
-        {{#each followupActions}}
-        <div class="button followup-action">
+        {{#each opposedActions}}
+        <div class="button opposed-action" data-action="{{this.test}}">
             {{localize this.label}}
         </div>
         {{/each}}
     </div>
     {{/if}}
-    {{#if test.opposed}}
+    {{#if followupActions}}
     <div class="card-buttons">
-        {{#each opposedActions}}
-        <div class="button opposed-action" data-action="{{this.test}}">
+        {{#each followupActions}}
+        <div class="button followup-action">
             {{localize this.label}}
         </div>
         {{/each}}

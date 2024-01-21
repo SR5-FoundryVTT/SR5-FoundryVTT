@@ -49,6 +49,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     ammunition: Shadowrun.AmmoItemData[]
     weaponMods: Shadowrun.ModificationItemData[]
     armorMods: Shadowrun.ModificationItemData[]
+    vehicleMods: Shadowrun.ModificationItemData[]
 
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
@@ -152,8 +153,8 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Reduce nested items into typed lists.
          */
-        const [ammunition, weaponMods, armorMods] = this.item.items.reduce(
-            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
+        const [ammunition, weaponMods, armorMods, vehicleMods] = this.item.items.reduce(
+            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
                 const itemData = nestedItem.toObject();
                 //@ts-expect-error
                 itemData.descriptionHTML = this.enrichEditorFieldToHTML(itemData.system.description.value);
@@ -164,14 +165,17 @@ export class SR5ItemSheet extends ItemSheet {
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
                 //@ts-expect-error TODO: foundry-vtt-types v10
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
+                //@ts-expect-error TODO: foundry-vtt-types v10
+                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'vehicle') sheetItemData[3].push(itemData);
 
                 return sheetItemData;
             },
-            [[], [], []],
+            [[], [], [], []],
         );
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
+        data['vehicleMods'] = vehicleMods;
         data['activeSkills'] = this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
@@ -582,6 +586,8 @@ export class SR5ItemSheet extends ItemSheet {
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
+        if (!this.item.isAction()) return;
+
         var inputElement = html.find('input#action-modifier').get(0);
 
         // Tagify expects this format for localized tags.
@@ -607,21 +613,6 @@ export class SR5ItemSheet extends ItemSheet {
             // render would loose tagify input focus. submit on close will save.
             await this.item.update({'system.action.modifiers': modifiers}, {render:false});
         });
-    }
-
-    /** This is needed to circumvent Application.close setting closed state early, due to it's async animation
-     * - The length of the closing animation can't be longer then any await time in the closing cycle
-     * - FormApplication._onSubmit will otherwise set ._state to RENDERED even if the Application window has closed already
-     * - Subsequent render calls then will show the window again, due to it's state
-     *
-     * @private
-     */
-    private fixStaleRenderedState() {
-        if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
-            console.warn(`SR5ItemSheet app for ${this.item.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
-            // Hotfix instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
-            this._state = Application.RENDER_STATES.CLOSED;
-        }
     }
 
     /**

@@ -1,37 +1,7 @@
 {
-    "ACTOR.TypeCharacter": "Character",
-    "ACTOR.TypeCritter": "Critter",
-    "ACTOR.TypeIc": "IC",
-    "ACTOR.TypeSpirit": "Spirit",
-    "ACTOR.TypeSprite": "Sprite",
-    "ACTOR.TypeVehicle": "Vehicle/Drone",
     "CONTROLS.SR5.EnvironmentalModifiers": "Environmental Modifiers",
     "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker",
     "CONTROLS.SR5.SituationalModifiers": "Situational Modifiers",
-    "ITEM.TypeAction": "Action",
-    "ITEM.TypeAdept_power": "Adept Power",
-    "ITEM.TypeAmmo": "Ammunition",
-    "ITEM.TypeArmor": "Armor",
-    "ITEM.TypeBioware": "Bioware",
-    "ITEM.TypeCall_in_action": "Summon/Compile",
-    "ITEM.TypeComplex_form": "Complex Form",
-    "ITEM.TypeContact": "Contact",
-    "ITEM.TypeCritter_power": "Critter Power",
-    "ITEM.TypeCyberware": "Cyberware",
-    "ITEM.TypeDevice": "Device",
-    "ITEM.TypeEcho": "Echo",
-    "ITEM.TypeEquipment": "Equipment",
-    "ITEM.TypeHost": "Host",
-    "ITEM.TypeLifestyle": "Lifestyle",
-    "ITEM.TypeMetamagic": "Metamagic",
-    "ITEM.TypeModification": "Gear Modification",
-    "ITEM.TypeProgram": "Program",
-    "ITEM.TypeQuality": "Quality",
-    "ITEM.TypeRitual": "Ritual",
-    "ITEM.TypeSin": "SIN",
-    "ITEM.TypeSpell": "Spell",
-    "ITEM.TypeSprite_power": "Sprite Power",
-    "ITEM.TypeWeapon": "Weapon",
     "SETTINGS": {
         "ApplyLimitsDescription": "Should Limits be applied to rolls",
         "ApplyLimitsName": "Apply Limits to Rolls",
@@ -71,7 +41,9 @@
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
         "TokenHealthBars": "Token health bars",
-        "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring"
+        "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
+        "UseDamageConditionDescription": "System marks tokens according to their condition monitor",
+        "UseDamageConditionName": "Use system handling for token status effects"
     },
     "SR5.AP": "AP",
     "SR5.Accessory": "Accessory",
@@ -679,9 +651,13 @@
         "Ammo": "Not enough ammunition to fire",
         "Edge": "No Edge left to consume",
         "Initiative": "Not enough initiative score",
-        "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced."
+        "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
+        "SomeAmmoMelee": "Not enough ammunition left to punch"
     },
     "SR5.Modification": "Modification",
+    "SR5.ModificationCategories": "Modification Categories",
+    "SR5.ModificationCategory": "Modification Category",
+    "SR5.ModificationSlots": "Modification Slots",
     "SR5.Modified": "Modified",
     "SR5.ModifiedArmor": "Mod. Armor",
     "SR5.ModifiedDamage": "Mod. Damage",
@@ -803,7 +779,7 @@
     "SR5.RangeWeaponAttack": "Range Weapon Attack",
     "SR5.Rating": "Rating",
     "SR5.Reach": "Reach",
-    "SR5.Reagent": "Reagent",
+    "SR5.Reagent": "Reagents",
     "SR5.RecklessSpellButton": "Reckless",
     "SR5.Recoil": "Recoil",
     "SR5.RecoilCompensation": "Recoil Comp.",
@@ -1137,7 +1113,7 @@
         "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
         "NaturalRecoveryStunTest": "Natural Recovery Stun",
         "OpposedCompileSpriteTest": "Oppose Compilation",
-        "OpposedRitualTest": "Seal the ritual",
+        "OpposedRitualTest": "Seal the Ritual",
         "OpposedSummonSpiritTest": "Oppose Summoning",
         "OpposedTest": "Opposed Test",
         "PhysicalDefenseTest": "Physical Defense",
@@ -1232,6 +1208,10 @@
             "RecoilCompensation": "Total RC, including actor and item RC",
             "ResetRecoil": "Reset progressive recoil to none"
         },
+        "Ritual": {
+            "Force": "Force of the ritual",
+            "ReagentDrams": "Drams of reagents used for altering drain"
+        },
         "SituationalModifier": {
             "Recoil": "Amount of bullets fired"
         },
@@ -1297,6 +1277,14 @@
         "IsOffRoad": "Is Off Road",
         "Maneuvering": "Maneuvering",
         "MissingDriver": "Drag&Drop an actor as a driver",
+        "ModificationCategoryTypes": {
+            "body": "Body",
+            "cosmetic": "Cosmetic",
+            "electromagnetic": "Electromagnetic",
+            "power_train": "Power Train",
+            "protection": "Protection",
+            "weapons": "Weapons"
+        },
         "Stats": {
             "Acceleration": "Acceleration",
             "Handling": "Handling",
@@ -1318,6 +1306,7 @@
             "Water": "Water Craft"
         }
     },
+    "SR5.Vehicle.Vehicle": "Vehicle",
     "SR5.VehicleImport.MissingPermission": "You are missing the permission to create actors",
     "SR5.Vision": {
         "AstralPerception": "Astral Perception",
@@ -1421,5 +1410,35 @@
         "Type": "Type",
         "Weapon": "Weapon"
     },
-    "SR5.Wireless": "Wireless"
+    "SR5.Wireless": "Wireless",
+    "TYPES.Actor.character": "Character",
+    "TYPES.Actor.critter": "Critter (deprecated)",
+    "TYPES.Actor.ic": "IC",
+    "TYPES.Actor.spirit": "Spirit",
+    "TYPES.Actor.sprite": "Sprite",
+    "TYPES.Actor.vehicle": "Vehicle/Drone",
+    "TYPES.Item.action": "Action",
+    "TYPES.Item.adept_power": "Adept Power",
+    "TYPES.Item.ammo": "Ammunition",
+    "TYPES.Item.armor": "Armor",
+    "TYPES.Item.bioware": "Bioware",
+    "TYPES.Item.call_in_action": "Summon/Compile",
+    "TYPES.Item.complex_form": "Complex Form",
+    "TYPES.Item.contact": "Contact",
+    "TYPES.Item.critter_power": "Critter Power",
+    "TYPES.Item.cyberware": "Cyberware",
+    "TYPES.Item.device": "Device",
+    "TYPES.Item.echo": "Echo",
+    "TYPES.Item.equipment": "Equipment",
+    "TYPES.Item.host": "Host",
+    "TYPES.Item.lifestyle": "Lifestyle",
+    "TYPES.Item.metamagic": "Metamagic",
+    "TYPES.Item.modification": "Gear Modification",
+    "TYPES.Item.program": "Program",
+    "TYPES.Item.quality": "Quality",
+    "TYPES.Item.ritual": "Ritual",
+    "TYPES.Item.sin": "SIN",
+    "TYPES.Item.spell": "Spell",
+    "TYPES.Item.sprite_power": "Sprite Power",
+    "TYPES.Item.weapon": "Weapon"
 }

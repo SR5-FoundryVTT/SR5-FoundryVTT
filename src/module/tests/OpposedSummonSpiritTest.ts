@@ -178,7 +178,7 @@ export class OpposedSummonSpiritTest extends OpposedTest {
             // Create a new spirit actor from scratch...
             const spiritType = this.against.data.spiritTypeSelected;
             const spiritTypeLabel = game.i18n.localize(SR5.spiritTypes[spiritType]);
-            const name = `${summoner.name} ${spiritTypeLabel} ${game.i18n.localize('ACTOR.TypeSpirit')}`;
+            const name = `${summoner.name} ${spiritTypeLabel} ${game.i18n.localize('TYPES.Actor.spirit')}`;
             const force = this.against.data.force;
             const system = { force, spiritType };
     
