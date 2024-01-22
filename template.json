@@ -1404,7 +1404,8 @@
                     "name": "",
                     "type": "",
                     "subType": "",
-                    "isFreshImport": false
+                    "isFreshImport": false,
+                    "isImported": false
                 }
             }
         },
@@ -1573,7 +1574,7 @@
             "level": 0
         },
         "quality": {
-            "templates": ["description", "action"],
+            "templates": ["description", "action", "importFlags"],
             "type": "positive",
             "rating": 0
         },
