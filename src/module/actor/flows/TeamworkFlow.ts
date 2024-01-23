@@ -66,7 +66,9 @@ export class TeamworkTest {
         }
 
         let results = await actor?.rollSkill(teamworkData.skill) as SuccessTest;
-        this.addResultsToMessage(message, actor, results, teamworkData)
+        if(results.rolls.length > 0) {
+            this.addResultsToMessage(message, actor, results, teamworkData)
+        }
     }
 
     static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest, teamworkData: TeamworkMessageData) {
