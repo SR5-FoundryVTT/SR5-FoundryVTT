@@ -3,6 +3,7 @@
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
         <!--<a class="item" data-tab="info">{{localize "SR5.Information"}}</a>-->
+        <a class="item" data-tab="action">{{localize "SR5.Action"}}</a>
         <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
     </nav>
     <section class="sheetbody">
@@ -11,6 +12,19 @@
                 {{> "systems/shadowrun5e/dist/templates/item/parts/description.html"}}
             </div>
         </div>
+        <div class="tab" data-group="primary" data-tab="action">
+            <div class="tabbody">
+                <div class="inventory">
+                    <div class="scroll-area">
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/action.html" header="Test Details"}}
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/modifier.html" header="SR5.Labels.Action.Modifiers"}}
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/damage.html" header="Damage"}}
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/opposed.html" header="Opposed Test"}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!--
         <div class="tab" data-group="primary" data-tab="info">
             <div class="tabbody">
