@@ -40,7 +40,14 @@ export class CharacterImporter {
     }
 
     async resetCharacter(actor) {
-        let toDeleteItems = actor.items?.filter(item => item.type !== "action").map(item => item.id)
+        let toDeleteItems = actor.items?.filter(item => item.type !== "action")
+            //filter items that were not imported
+            //first line is for legacy items, user need to delete these manually
+            .filter(item => item.system.importFlags != undefined)
+            .filter(item => item.system.importFlags.isImported)
+            .filter(item => item.effects.size == 0)
+            .map(item => item.id)
+
         let deletedItems = actor.deleteEmbeddedDocuments("Item", toDeleteItems );
 
         let removed = {

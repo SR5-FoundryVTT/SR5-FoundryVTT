@@ -113,7 +113,8 @@ export const formatAsSlug = (name) => {
         name: name, // original english name
         type: type,
         subType: '',
-        isFreshImport: true
+        isFreshImport: true,
+        isImported: true
     }
     return flags;
  }
