@@ -62,7 +62,8 @@ export class WeaponRangeTestBehavior {
         if (!actor) return;
 
         const modifiers = actor.getSituationModifiers();
-        modifiers.environmental.apply();
+        // Provide test context to allow effects to limit application.
+        modifiers.environmental.apply({test});
         // If no range is active, set to zero.
         test.data.range = modifiers.environmental.applied.active.range || 0;
     }
@@ -107,7 +108,8 @@ export class WeaponRangeTestBehavior {
 
         // if no range is active, set to first target selected.
         const modifiers = test.actor.getSituationModifiers();
-        modifiers.environmental.apply();
+        // Provide test context to allow effects to limit application.
+        modifiers.environmental.apply({test});
         test.data.range = modifiers.environmental.applied.active.range || test.data.targetRanges[0].range.modifier;
     }
 
@@ -175,7 +177,7 @@ export class WeaponRangeTestBehavior {
 
         // Locally set env modifier temporarily.
         modifiers.environmental.setActive('range', Number(range));
-        modifiers.environmental.apply({reapply: true});
+        modifiers.environmental.apply({reapply: true, test});
 
         poolMods.addUniquePart(SR5.modifierTypes.environmental, modifiers.environmental.total);
     }
