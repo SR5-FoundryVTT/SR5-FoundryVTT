@@ -11,5 +11,8 @@ declare namespace Shadowrun {
             registered: boolean;
             spriteType: SpriteType;
             modifiers: Modifiers & CommonModifiers;
+
+            // FoundryVTT uuid of the compiling technomancer of this sprite.
+            technomancerUuid: string;
     }
 }

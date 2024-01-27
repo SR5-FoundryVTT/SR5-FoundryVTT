@@ -1034,8 +1034,10 @@
     },
     "SR5.Sprite": {
         "Level": "Stufe",
+        "MissingTechnomancer": "Kein aktiver Technomancer",
         "Registered": "Registriert",
         "Services": "Aufgaben",
+        "Technomancer": "Technomancer",
         "Type": "Art",
         "Types": {
             "Companion": "Begleiter",
@@ -1128,7 +1130,8 @@
             "Critter": "Ermöglicht die Nutzung von Critterkräften",
             "Grunt": "Nutze Schergen-Regeln für Akteur",
             "Metatype": "Ein NSC-Akteur bekommt automatische Attributemodifikatoren abhängig vom Metatyp",
-            "MissingSummoner": "Drag&Drop Charakter benutze Beschwörungs-Aktion",
+            "MissingSummoner": "Drag&Drop Charakter oder nutze Beschwörungs-Aktion",
+            "MissingTechnomancer": "Drag&Drop Charakter oder nutze Kompilierungs-Aktion",
             "NPC": "Makriere Akteur als NSC und ermöglicht weitere NSC-Funktionen",
             "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück"
         },

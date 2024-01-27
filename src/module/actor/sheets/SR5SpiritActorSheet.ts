@@ -75,7 +75,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         const actor = await fromUuid(dropData.uuid) as SR5Actor;
         if (!actor.isCharacter()) return;
 
-        this.document.addSummoner(actor);
+        await this.document.addSummoner(actor);
     }
 
     /**
@@ -86,6 +86,6 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         event.preventDefault();
         event.stopPropagation();
 
-        this.document.removeSummoner();
+        await this.document.removeSummoner();
     }
 }

@@ -1915,7 +1915,7 @@ export class SR5Actor extends Actor {
      */
     async addSummoner(actor: SR5Actor) {
         if (!this.isSpirit() || !actor.isCharacter()) return;
-        this.update({ 'system.summonerUuid': actor.uuid });
+        await this.update({ 'system.summonerUuid': actor.uuid });
     }
 
     /**
@@ -1923,9 +1923,25 @@ export class SR5Actor extends Actor {
      */
     async removeSummoner() {
         if (!this.isSpirit()) return;
-        this.update({ 'system.summonerUuid': null });
+        await this.update({ 'system.summonerUuid': null });
     }
 
+    /**
+     * Add an actor as this sprites technomancers.
+     * @param actor A character actor to be used as technomancer
+     */
+    async addTechnomancer(actor: SR5Actor) {
+        if (!this.isSprite() || !actor.isCharacter()) return;
+        await this.update({ 'system.technomancerUuid': actor.uuid });
+    }
+
+    /**
+     * Remove a technomancer from this sprite actor.
+     */
+    async removeTechnomancer() {
+        if (!this.isSprite()) return;
+        await this.update({ 'system.technomancerUuid': '' });
+    }
     /** Check if this actor is of one or multiple given actor types
      *
      * @param types A list of actor types to check.
