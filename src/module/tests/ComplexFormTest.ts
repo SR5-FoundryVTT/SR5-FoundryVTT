@@ -16,8 +16,7 @@ export interface ComplexFormTestData extends SuccessTestData {
 /**
  * Handles threading complex forms as described on SR5#251.
  */
-export class ComplexFormTest extends SuccessTest {
-    override data: ComplexFormTestData
+export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
 
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);

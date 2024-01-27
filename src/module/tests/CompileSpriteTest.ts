@@ -27,8 +27,7 @@ interface CompileSpriteTestData extends SuccessTestData {
  * This test is designed to work together with the compilation item type as it's
  * defined within
  */
-export class CompileSpriteTest extends SuccessTest {
-    override data: CompileSpriteTestData
+export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
 
     override _prepareData(data: any, options: TestOptions) {
         data = super._prepareData(data, options);

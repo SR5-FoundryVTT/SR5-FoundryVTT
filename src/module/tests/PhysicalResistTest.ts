@@ -33,8 +33,7 @@ export type PhysicalResistSuccessCondition = {
  *
  * Physical resist specifically handles physical damage dealt by ranged, melee and physical spell attacks.
  */
-export class PhysicalResistTest extends SuccessTest {
-    override data: PhysicalResistTestData
+export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
     override _prepareData(data: PhysicalResistTestData, options): any {
         data = super._prepareData(data, options);

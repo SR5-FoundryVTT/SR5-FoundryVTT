@@ -25,8 +25,7 @@ export interface OpposedTestData extends
 /**
  * An opposed test results from a normal success test as an opposed action.
  */
-export class OpposedTest extends SuccessTest {
-    public override data: OpposedTestData;
+export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends SuccessTest<T> {
     public against: SuccessTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {

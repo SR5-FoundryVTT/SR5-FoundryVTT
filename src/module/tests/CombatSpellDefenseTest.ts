@@ -12,8 +12,7 @@ export interface CombatSpellDefenseTestData extends DefenseTestData {
     against: SpellCastingTestData
 }
 
-export class CombatSpellDefenseTest extends DefenseTest {
-    override data: CombatSpellDefenseTestData
+export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestData> {
     override against: SpellCastingTest
 
     /**

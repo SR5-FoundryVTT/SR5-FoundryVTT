@@ -14,8 +14,7 @@ interface OpposedRitualTestData extends OpposedTestData {
  * 
  * The summoner is the active actor and the spirit is the opposed actor.
  */
-export class OpposedRitualTest extends OpposedTest {
-    override data: OpposedRitualTestData
+export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
     public override against: RitualSpellcastingTest
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {

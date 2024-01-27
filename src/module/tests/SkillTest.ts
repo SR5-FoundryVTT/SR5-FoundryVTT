@@ -14,8 +14,7 @@ export interface SkillTestData extends SuccessTestData {
  * 
  * Rule wise a skill test doesn't alter a default success test.
  */
-export class SkillTest extends SuccessTest {
-    override data: SkillTestData
+export class SkillTest extends SuccessTest<SkillTestData> {
     // temporary selection information.
     lastUsedAttribute: string;
     lastUsedLimit: string;

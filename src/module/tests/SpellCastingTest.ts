@@ -21,8 +21,7 @@ export interface SpellCastingTestData extends SuccessTestData {
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
  *
  */
-export class SpellCastingTest extends SuccessTest {
-    override data: SpellCastingTestData
+export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
 
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
