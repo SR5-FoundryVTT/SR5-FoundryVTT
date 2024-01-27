@@ -1032,6 +1032,7 @@
             "level": 0,
             "spriteType": "",
             "special": "resonance",
+            "technomancerUuid": "",
             "visibilityChecks": {
                 "matrix": {
                     "hasIcon": true

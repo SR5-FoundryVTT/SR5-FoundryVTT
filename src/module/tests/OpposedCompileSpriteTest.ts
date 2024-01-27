@@ -128,11 +128,11 @@ export class OpposedCompileSpriteTest extends OpposedTest {
     async finalizeSummonedSprite() {
         if (!this.actor) return;
 
-        const summoner = this.against.actor as Actor;
+        const technomancer = this.against.actor as Actor;
 
         const updateData = {
-            // 'system.services': this.deriveSpiritServices(),
-            // 'system.summonerUuid': summoner.uuid
+            // 'system.services': this.deriveSpriteServices(),
+            'system.technomancerUuid': technomancer.uuid
         }
 
         this._addOwnershipToUpdateData(updateData);
@@ -176,7 +176,7 @@ export class OpposedCompileSpriteTest extends OpposedTest {
             // Reuse a prepared actor...
             const preparedActor = await this.getPreparedSpriteActor();
             if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared actor');
-            //preparedActor.update({ 'system.summonerUuid': technomancer.uuid });
+            await preparedActor.addTechnomancer(technomancer);
             console.error('Add compiler/mancer? reference to sprite');
             
         } else {

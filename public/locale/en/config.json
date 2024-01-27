@@ -910,15 +910,15 @@
         "Summoning": "Summoning",
         "Survival": "Survival",
         "Swimming": "Swimming",
+        "Teamwork": {
+            "Glitched": "Glitched",
+            "ParticipantActor": "Choose actor",
+            "RollIt": "Roll it",
+            "TakePart": "Take part"
+        },
         "ThrowingWeapons": "Throwing Weapons",
         "Tracking": "Tracking",
-        "UnarmedCombat": "Unarmed Combat",
-        "Teamwork": {
-            "ParticipantActor": "Choose actor",
-            "Glitched": "Glitched",
-            "TakePart": "Take part",
-            "RollIt": "Roll it"
-        }
+        "UnarmedCombat": "Unarmed Combat"
     },
     "SR5.Soak": "Soak",
     "SR5.SoakTest": "Damage Resist Test",
@@ -1042,8 +1042,10 @@
     },
     "SR5.Sprite": {
         "Level": "Level",
+        "MissingTechnomancer": "No active technomancer",
         "Registered": "Registered",
         "Services": "Services",
+        "Technomancer": "Technomancer",
         "Type": "Type",
         "Types": {
             "Companion": "Companion",
@@ -1137,6 +1139,7 @@
             "Grunt": "Apply grunt rules to this actor",
             "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
             "MissingSummoner": "Drag&Drop Character or use summoning action",
+            "MissingTechnomancer": "Drag&Drop Character or use compilation action",
             "NPC": "Mark actor as NPC to get additional features",
             "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
         },
