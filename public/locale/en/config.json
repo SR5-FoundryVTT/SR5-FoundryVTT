@@ -69,6 +69,7 @@
         },
         "New": "New Effect",
         "OnlyForEquipped": "Apply for equipped item only",
+        "OnlyForItemTest": "Apply for parent item test only",
         "OnlyForWireless": "Apply for wireless active only",
         "Test": {
             "Attributes": "Attributes Filter",
@@ -1158,6 +1159,7 @@
             "ItemEffects": "Effects collected from items on this document",
             "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
             "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
+            "OnlyForItemTest": "Only affect test of parent item",
             "OnlyForWireless": "This effect will apply only for items that have wireless enabled"
         },
         "Item": {

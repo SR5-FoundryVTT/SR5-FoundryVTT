@@ -197,6 +197,15 @@ export class SR5ActiveEffect extends ActiveEffect {
         return this.getFlag(SYSTEM_NAME, 'onlyForEquipped') as boolean || false;
     }
 
+    /**
+     * Some modifier effects should only be applied if they're applied for their parent items test.
+     * 
+     * When this flag is set, this effect shouldn't apply always.
+     */
+    get onlyForItemTest(): boolean {
+        return this.getFlag(SYSTEM_NAME, 'onlyForItemTest') as boolean || false;
+    }
+
     get selectionTests(): string[] {
         return tagifyFlagsToIds(this, 'selection_tests');
     }

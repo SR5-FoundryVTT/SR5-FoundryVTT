@@ -1,8 +1,6 @@
-import { NestedKeys } from './../../utils/types';
-import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5ActiveEffect } from "../SR5ActiveEffect";
-import { SituationModifier, SituationalModifierApplyOptions } from "../../rules/modifiers/SituationModifier";
+import { SituationModifier } from "../../rules/modifiers/SituationModifier";
 import { imageMagnification, lowLightVision, smartlink, tracerRounds, ultrasound } from "./EnvironmentalChangeFlow";
 import { SuccessTest } from "../../tests/SuccessTest";
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
@@ -38,7 +36,9 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
         console.debug('Shadowrun 5e | Applying Situation Modifier Effects', this);
         const changes: any[] = [];
         for (const effect of this.allApplicableEffects()) {
-            if (!effect.active) return;
+            if (!effect.active) continue;
+            // Special case for modifier effects: Some only apply to tests of their parent item.
+            if (effect.onlyForItemTest && (test === undefined || effect.parent !== test?.item)) continue;
 
             changes.push(...effect.changes.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
@@ -72,6 +72,7 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
      * Reduce all actor effects to those applicable to Situational Modifiers.
      * 
      * Since Foundry Core uses a generator, keep this pattern for consistency.
+     * @param test An optional SuccessTest implementation to use for context.
      */
     *allApplicableEffects(): Generator<SR5ActiveEffect> {
         if (this.modifier.sourceDocumentIsActor && this.modifier.modifiers?.document) {

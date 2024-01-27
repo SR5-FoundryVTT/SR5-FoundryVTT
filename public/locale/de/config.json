@@ -67,6 +67,7 @@
         },
         "New": "Neuer Effekt",
         "OnlyForEquipped": "Nur bei ausgerüstetem Item anwenden",
+        "OnlyForItemTest": "Nur bei Tests des Items anwenden",
         "OnlyForWireless": "Nur bei aktivem WiFi anwenden",
         "Test": {
             "Attributes": "Attributs-Filter",
@@ -1150,6 +1151,7 @@
             "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
             "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
             "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
+            "OnlyForItemTest": "Dieser Effekt gilt nur für Proben dieses Items.",
             "OnlyForWireless": "Dieser Effekt gilt nur für Items, bei denen WiFi aktiviert ist."
         },
         "Item": {

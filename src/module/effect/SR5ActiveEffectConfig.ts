@@ -42,6 +42,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         data.applyTo = this.document.applyTo;
         data.onlyForWireless = this.document.onlyForWireless;
         data.onlyForEquipped = this.document.onlyForEquipped;
+        data.onlyForItemTest = this.document.onlyForItemTest;
 
         data.applyToOptions = this.prepareApplyToOptions();
         data.hasChanges = this.prepareEffectHasChanges();
