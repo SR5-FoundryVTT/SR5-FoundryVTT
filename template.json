@@ -1625,7 +1625,7 @@
             "ic": []
         },
         "metamagic": {
-            "templates": ["description", "importFlags"]
+            "templates": ["description", "action", "importFlags"]
         },
         "echo" : {
             "templates": ["description", "importFlags"]
