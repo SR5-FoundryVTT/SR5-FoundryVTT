@@ -17,8 +17,7 @@ export interface FadeTestData extends SuccessTestData {
     against: ComplexFormTestData
 }
 
-export class FadeTest extends SuccessTest {
-    override data: FadeTestData
+export class FadeTest extends SuccessTest<FadeTestData> {
     against: ComplexFormTest
 
     override _prepareData(data, options): any {

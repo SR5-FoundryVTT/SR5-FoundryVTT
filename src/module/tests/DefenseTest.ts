@@ -21,8 +21,7 @@ export interface DefenseTestData extends OpposedTestData {
  *
  * Handle general damage data as well as general defense rules.
  */
-export class DefenseTest extends OpposedTest {
-    override data: DefenseTestData
+export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends OpposedTest<T> {
 
     override _prepareData(data, options?) {
         data = super._prepareData(data, options);

@@ -23,8 +23,7 @@ export interface DrainTestData extends SuccessTestData {
  * Drain defines it's incoming drain and modifies it to it's modified drain,
  * both of which the user can apply.
  */
-export class DrainTest extends SuccessTest {
-    override data: DrainTestData
+export class DrainTest extends SuccessTest<DrainTestData> {
 
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);

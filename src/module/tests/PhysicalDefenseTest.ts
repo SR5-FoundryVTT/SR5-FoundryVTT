@@ -27,8 +27,7 @@ export type PhysicalDefenseNoDamageCondition = {
     label: Translation,
 }
 
-export class PhysicalDefenseTest extends DefenseTest {
-    public override data: PhysicalDefenseTestData;
+export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDefenseTestData> extends DefenseTest<T> {
 
     override _prepareData(data, options?): any {
         data = super._prepareData(data, options);

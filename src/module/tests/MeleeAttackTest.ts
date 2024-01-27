@@ -7,8 +7,7 @@ export interface MeleeAttackData extends SuccessTestData {
     reach: number
 }
 
-export class MeleeAttackTest extends SuccessTest {
-    override data: MeleeAttackData;
+export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
 
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);

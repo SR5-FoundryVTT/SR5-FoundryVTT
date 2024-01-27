@@ -33,8 +33,7 @@ interface SummonSpiritTestData extends SuccessTestData {
  * 
  * Summoning uses the default Success Test, Opposed Test and Followup Flow.
  */
-export class SummonSpiritTest extends SuccessTest {
-    override data: SummonSpiritTestData
+export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
 
     override _prepareData(data: any, options: any) {
         data = super._prepareData(data, options);

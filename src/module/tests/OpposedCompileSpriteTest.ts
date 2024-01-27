@@ -16,8 +16,7 @@ interface OpposedCompileSpriteTestData extends OpposedTestData {
  * 
  * The technomancer is the active actor and the sprite the opposed actor.
  */
-export class OpposedCompileSpriteTest extends OpposedTest {
-    override data: OpposedCompileSpriteTestData
+export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTestData> {
     public override against: CompileSpriteTest
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {

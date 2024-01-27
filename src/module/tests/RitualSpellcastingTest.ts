@@ -25,8 +25,7 @@ interface RitualSpellcastingTestData extends SuccessTestData {
  * 
  * Ritual Spellcasting uses the default Success Test, Opposed Test and Followup Flow.
  */
-export class RitualSpellcastingTest extends SuccessTest {
-    override data: RitualSpellcastingTestData
+export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestData> {
 
     override _prepareData(data: any, options: any) {
         data = super._prepareData(data, options);
