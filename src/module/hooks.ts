@@ -413,6 +413,10 @@ ___________________
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {
+        if(!game.user?.isGM){
+            return 
+        }
+        
         const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
         html.find('footer').before(button);
         button.on('click', (event) => {
