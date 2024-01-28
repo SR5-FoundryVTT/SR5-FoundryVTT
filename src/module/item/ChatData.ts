@@ -282,7 +282,10 @@ export const ChatData = {
     },
 
     ritual: (system, labels, props) => {
-        // TODO: add info boxes for rituals. These will show on sheets underneath the item description and on item chat cards
+        props.push(game.i18n.localize(SR5.spellTypes[system.type]));
+        props.push(system.descriptors);
+
+        ChatData.action(system, labels, props);
     },
 
     weapon: (system, labels, props, item: SR5Item) => {
