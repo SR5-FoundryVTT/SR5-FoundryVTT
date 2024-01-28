@@ -410,6 +410,7 @@
     "SR5.Hits": "Erfolge",
     "SR5.Host": {
         "Attributes": "Attribute",
+        "CustomAttributes": "Eigene Attributsaufteilung",
         "DropICActor": "Drag&Drop IC Acteure in gewünschter Reihenfolge",
         "ICOrder": "IC-Reihenfolge",
         "MissingIC": "Fehlende IC",

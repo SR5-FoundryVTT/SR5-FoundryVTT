@@ -8,5 +8,8 @@ declare namespace Shadowrun {
             rating: number,
             marks: MatrixMarks,
             ic: SourceEntityField[]
+
+            // Disable host attribute calculation
+            customAttributes: boolean
     }
 }
