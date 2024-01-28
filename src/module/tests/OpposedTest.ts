@@ -234,11 +234,15 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         return templateData;
     }
 
-    /**
-     * Targeted Actor effects are currently disabled, as they need more time.
-     */
     override async afterFailure() {
         await super.afterFailure();
-        await this.effects.createTargetActorEffectsAfterOpposedTest();
+
+        // When an opposed test fails, the original test documents targeted actor effects can be applied
+        const against = this.against;
+        const actor = this.actor;
+        if (against === undefined && !this.opposing) return;
+        if (actor === undefined) return;
+
+        await this.effects.createTargetActorEffects(actor);
     }
 }

@@ -208,6 +208,8 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
     }
 
     override async afterFailure() {
+        await super.afterFailure();
+
         // If attack hits but does no damage, don't perform the follow-up physical resist test
         if(this.getNoDamageCondition()) {
             return;

@@ -106,25 +106,34 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     }
 
     /**
-     * Create Effects of applyTo 'targeted_actor' after an opposed test has finished.
+     * Create Effects of applyTo 'test_all' after a success test has finished.
      * 
+     * This only applies for SuccessTest that aren't opposed.
+     * Opposed tests have their own flow of creating effects on the target actor.
+     *
      * Before creating effects onto the target actor, resolve the dynamic values from the source context
      * of the opposed test causing the effects. When created on the target actor, the values can't be resolved
      * as there is no good reference to the causing test anymore.
      * 
      * Therefore effects on the original item can have dynamic values, while the created effects are copies with
-     * static values.
+     * 
+     * @param actor The actor to create the effects on.
      */
-    async createTargetActorEffectsAfterOpposedTest() {
-        //@ts-expect-error Assure test is an opposed test.
-        const against = this.test.against;
+    async createTargetActorEffects(actor: SR5Actor) {
+        const effectsData = this._collectTargetActorEffectsData();
+        if (effectsData === undefined) return;
+
+        if (!game.user?.isGM) {
+            await this._sendCreateTargetedEffectsSocketMessage(actor, effectsData);
+        } else {
+            await SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, effectsData);
+        }
+    }
+
+    _collectTargetActorEffectsData() {
         const actor = this.test.actor;
 
-        if (!against && !this.test.opposing) return;
-        if (!actor) return;
-        if (!this.test.item) return;
-
-        console.debug('Shadowrun5e | Creating effects on target actor after opposed test.', this.test);
+        if (actor === undefined || this.test.item === undefined) return;
 
         const effectsData: ActiveEffectData[] = [];
         for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
@@ -153,11 +162,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         console.debug(`Shadowrun5e | To be created effects on target actor ${actor.name}`, effectsData);
 
-        if (!game.user?.isGM) {
-            await this._sendCreateTargetedEffectsSocketMessage(actor, effectsData);
-        } else {
-            await SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, effectsData);
-        }
+        return effectsData;
     }
 
     /**

@@ -97,6 +97,8 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
      * Combat Spell Defense allows a resist test for the defending actor.
      */
     override async afterFailure() {
+        await super.afterFailure();
+
         const spell = this.item?.asSpell;
         if (!spell) return;
 
