@@ -1165,7 +1165,8 @@
         "Item": {
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",
             "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
-            "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it"
+            "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
+            "DisabledForPreparedActor": "Disabled due to use of prepared actor"
         },
         "Modifiers": {
             "armor": "Modifies total armor value",

@@ -9,11 +9,12 @@
         value="{{system.sprite.level}}"
         data-dtype="Number"
         min="0"
-        placeholder="1">
+        placeholder="1"
+        {{#if sprite}}disabled data-tooltip="SR5.Tooltips.Item.DisabledForPreparedActor"{{/if}}>
 </div>
 <div class="flexrow nowrap">
     <label data-tooltip="SR5.Tooltips.CompilationTest.SpriteType">{{localize "SR5.Compilation.SpriteType"}}</label>
-    <select name="system.sprite.type" class="display">
+    <select name="system.sprite.type" class="display" {{#if sprite}}disabled data-tooltip="SR5.Tooltips.Item.DisabledForPreparedActor"{{/if}}>
         {{#select system.sprite.type}} {{#each config.spriteTypes as |name type|}}
         <option value="{{type}}">{{localize name}}</option>
         {{/each}} {{/select}}
