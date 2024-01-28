@@ -1062,7 +1062,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper to check if opposing tests exist for this test.
      */
     get opposed(): boolean {
-        return !!this.data.opposed && this.data.opposed.test !== '';
+        return !!this.data.opposed && this.data.opposed.test !== undefined && this.data.opposed.test !== '';
     }
 
     /**
@@ -1462,7 +1462,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Allow subclasses to override followup behavior after a successful test result
      * @override
      */
-    async afterSuccess() { }
+    async afterSuccess() {
+        
+        // When an unopposed test succeeds, the test documents targeted effects can be applied
+        if (this.opposing) return;
+        if (this.opposed) return;
+
+        for (const target of this.targets) {
+            if (target.actor === null) continue;
+            await this.effects.createTargetActorEffects(target.actor);
+        }
+    }
 
     /**
      * Allow subclasses to override followup behavior after a failed test result
