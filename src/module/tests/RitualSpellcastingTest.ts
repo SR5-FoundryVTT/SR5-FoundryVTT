@@ -66,6 +66,23 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
         }
     }
 
+    override async prepareDocumentData() {
+        this.prepareInitialForceValue();
+        await super.prepareDocumentData();
+    }
+
+    /**
+     * Set a default force value based on the force last used for this ritual.
+     * 
+     * If ritual hasn't been cast before, fallback to a useable value.
+     */
+    prepareInitialForceValue() {
+        if (!this.item) return;
+
+        const lastUsedForce = this.item.getLastSpellForce();
+        this.data.force = lastUsedForce.value || 1;
+    }
+
     /**
      * Rituals uses Force as limit, which needs to be injected into the normal test flow.
      */
@@ -156,5 +173,14 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
         this.data.drain = RitualRules.drainValue(opposingHits, this.data.reagents, this.data.force);
         this.data.drainDamage = RitualRules.calcDrainDamage(opposingHits, this.data.drain, this.actor.getAttribute('magic').value);
         this.data.drainReady = true;
+    }
+
+    /**
+     * Allow the currently used force value of this ritual to be reused next time it is cast.
+     */
+    override async saveUserSelectionAfterDialog() {
+        if (!this.item) return;
+
+        await this.item.setLastSpellForce({value: this.data.force});
     }
 }
