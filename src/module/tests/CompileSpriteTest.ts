@@ -152,4 +152,11 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
 
         return CompilationRules.calcFadeDamage(opposingHits, level, resonance);
     }
+
+    /**
+     * Indicate the use of a prepared actor.
+     */
+    get preparedActorUsed(): boolean {
+        return this.data.preparedSpriteUuid !== '';
+    }
 }

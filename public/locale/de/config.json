@@ -1157,7 +1157,8 @@
         "Item": {
             "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",
             "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
-            "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren"
+            "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
+            "DisabledForPreparedActor": "Deaktiviert da ein vorbereiteter Akteur verwendet wird"
         },
         "Modifiers": {
             "armor": "Modifiziert den Panzerungswert",

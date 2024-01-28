@@ -187,4 +187,11 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         
         return ConjuringRules.calcDrainDamage(opposingHits, force, magic);
     }
+
+    /**
+     * Indicate the use of a prepared actor.
+     */
+    get preparedActorUsed(): boolean {
+        return this.data.preparedSpiritUuid !== '';
+    }
 }
