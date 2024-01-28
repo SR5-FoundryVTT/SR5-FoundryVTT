@@ -32,14 +32,24 @@
             <div class="tabbody">
                 <div class="inventory">
                     <div class="scroll-area">
+                        <!-- Input for Host Matrix Attributes -->
                         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                                 name=(localize "SR5.Host.Attributes")
                         }}
                         {{> "systems/shadowrun5e/dist/templates/item/parts/matrix.html"}}
+                        <!-- Selection for Custom Matrix Attributes -->
+                        <div class="item-form">
+                            <div class="form-line">
+                                <div class="label"><label for="custom-host-attributes">{{localize "SR5.Host.CustomAttributes"}}</label></div>
+                                <div class="inputs"><input id="custom-host-attributes" type="checkbox" name="system.customAttributes" {{#if system.customAttributes}}checked{{/if}}/></div>
+                            </div>
+                        </div>
                         {{#if false}}
+                        <!-- Disabled possible future feature of IC deploy order -->
                         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                                 name=(localize "SR5.Host.ICOrder")
                         }}
+                        <!-- List of IC connected to host -->
                         {{#each system.ic as | ic |}}
                         {{> 'systems/shadowrun5e/dist/templates/common/List/ListEntityItem.html'
                                 id=ic.id

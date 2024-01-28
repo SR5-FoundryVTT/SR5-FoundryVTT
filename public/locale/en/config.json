@@ -412,6 +412,7 @@
     "SR5.Hits": "Hits",
     "SR5.Host": {
         "Attributes": "Host Attributes",
+        "CustomAttributes": "Custom Attributes",
         "DropICActor": "Drag&Drop an IC actor in order of security response",
         "ICOrder": "IC Order",
         "MissingIC": "Missing IC",

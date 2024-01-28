@@ -1134,6 +1134,7 @@
             "host": {
                 "id": null,
                 "rating": 0,
+                "customAttribute": false,
                 "atts": {
                     "att1": {
                         "value": 0,
