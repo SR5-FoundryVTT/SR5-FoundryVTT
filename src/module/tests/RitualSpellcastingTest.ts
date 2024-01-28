@@ -66,12 +66,30 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
         }
     }
 
+    override async prepareDocumentData() {
+        this.prepareInitialForceValue();
+        await super.prepareDocumentData();
+    }
+
+    /**
+     * Set a default force value based on the force last used for this ritual.
+     * 
+     * If ritual hasn't been cast before, fallback to a useable value.
+     */
+    prepareInitialForceValue() {
+        if (!this.item) return;
+
+        const lastUsedForce = this.item.getLastSpellForce();
+        this.data.force = lastUsedForce.value || 1;
+    }
+
     /**
      * Rituals uses Force as limit, which needs to be injected into the normal test flow.
      */
     override prepareBaseValues() {
         super.prepareBaseValues();
         this.prepareLimitValue();
+        this.prepareReagents();
     }
 
     /**
@@ -98,7 +116,7 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
     warnAboutInvalidForce() {
         const force = Number(this.data.force);
 
-        //currently we dont check for the lodge, so we always allow it
+        //currently we don't check for the lodge, so we always allow it
         if (!RitualRules.validForce(force, force)) {
             ui.notifications?.warn('SR5.Warnings.RitualInvalidForce', {localize: true});
         }
@@ -126,6 +144,13 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
     }
 
     /**
+     * For rituals reagents must match the force of the ritual at a minimum.
+     */
+    prepareReagents() {
+        this.data.reagents = RitualRules.deriveReagents(this.data.force, this.data.reagents);
+    }
+
+    /**
      *
      * @param data Test data to be extended
      */
@@ -148,5 +173,14 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
         this.data.drain = RitualRules.drainValue(opposingHits, this.data.reagents, this.data.force);
         this.data.drainDamage = RitualRules.calcDrainDamage(opposingHits, this.data.drain, this.actor.getAttribute('magic').value);
         this.data.drainReady = true;
+    }
+
+    /**
+     * Allow the currently used force value of this ritual to be reused next time it is cast.
+     */
+    override async saveUserSelectionAfterDialog() {
+        if (!this.item) return;
+
+        await this.item.setLastSpellForce({value: this.data.force});
     }
 }
