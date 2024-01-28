@@ -72,5 +72,19 @@ export const RitualRules = {
         }
 
         return force <= reagents;
+    },
+
+    /**
+     * Reagents used must either match force exactly or be a multiple of force.
+     * 
+     * See SR5#296 'Give the offering'
+     * @param force 
+     */
+    deriveReagents: (force: number, reagents: number): number => {
+        if (reagents <= force) return force;
+
+        const remainder = reagents % force;
+        if (remainder > 0) return reagents - remainder + force;
+        else return reagents;
     }
 }

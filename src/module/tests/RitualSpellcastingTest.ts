@@ -72,6 +72,7 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
     override prepareBaseValues() {
         super.prepareBaseValues();
         this.prepareLimitValue();
+        this.prepareReagents();
     }
 
     /**
@@ -98,7 +99,7 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
     warnAboutInvalidForce() {
         const force = Number(this.data.force);
 
-        //currently we dont check for the lodge, so we always allow it
+        //currently we don't check for the lodge, so we always allow it
         if (!RitualRules.validForce(force, force)) {
             ui.notifications?.warn('SR5.Warnings.RitualInvalidForce', {localize: true});
         }
@@ -123,6 +124,13 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
             'SR5.Force',
             this.data.force
         )
+    }
+
+    /**
+     * For rituals reagents must match the force of the ritual at a minimum.
+     */
+    prepareReagents() {
+        this.data.reagents = RitualRules.deriveReagents(this.data.force, this.data.reagents);
     }
 
     /**
