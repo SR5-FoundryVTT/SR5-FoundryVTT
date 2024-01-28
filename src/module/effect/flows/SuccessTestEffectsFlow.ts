@@ -121,7 +121,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      */
     async createTargetActorEffects(actor: SR5Actor) {
         const effectsData = this._collectTargetActorEffectsData();
-        if (effectsData === undefined) return;
+        if (!effectsData || effectsData.length === 0) return;
 
         if (!game.user?.isGM) {
             await this._sendCreateTargetedEffectsSocketMessage(actor, effectsData);
