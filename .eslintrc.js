@@ -41,8 +41,8 @@ module.exports = {
         "@typescript-eslint/consistent-type-assertions": "warn",
 
         // Warnings for things that could be better
-        "@typescript-eslint/explicit-function-return-type": "warn",
-        "@typescript-eslint/strict-boolean-expressions": "warn", // I might turn this off.  Javascript's fluid truthiness logic is just too nice
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/strict-boolean-expressions": "off", // I might turn this off.  Javascript's fluid truthiness logic is just too nice
         "@typescript-eslint/class-literal-property-style": "warn",
         "@typescript-eslint/ban-ts-comment": "warn",
         "@typescript-eslint/no-unused-vars": "warn",
