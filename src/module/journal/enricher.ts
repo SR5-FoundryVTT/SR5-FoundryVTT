@@ -33,6 +33,12 @@ export class JournalEnrichers {
         )
     }    
 
+    /**
+     * This hook listens to roll-request clicks, extracts the data and forwards it to create a chat message
+     * @param journal The journal where the roll is triggered
+     * @param html the triggering html
+     * @param data 
+     */
     static async setEnricherHooks(journal, html, data) {
         const rolls = { 
             "Teamwork": "startTeamworkTest",
@@ -61,6 +67,12 @@ export class JournalEnrichers {
         })
     }
 
+    /**
+     * This method provides translations respecting the rollType
+     * @param type what rollType is requestd
+     * @param rollEntity what should be rolled
+     * @returns the translation or rollEntity when the keyword is unknown
+     */
     static getRollEntityTranslation(type: string, rollEntity: string) {
         if(JournalEnrichers.skillKeywords.includes(type)) {
            return Helpers.getSkillTranslation(rollEntity)

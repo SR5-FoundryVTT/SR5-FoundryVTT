@@ -33,6 +33,13 @@ export class TeamworkTest {
         html.find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
     }
 
+    /**
+     * This method prompts the user to roll the skill chosen in the teamwork test from a chosen actor @see Helpers.chooseFromAvailableActors
+     * The result is forwarded to @see addResultsToMessage to add text and flag data to the original message
+     * 
+     * @param message 
+     * @returns 
+     */
     static async addParticipant(message: ChatMessage) {
         let actor = await Helpers.chooseFromAvailableActors()
 
@@ -47,6 +54,13 @@ export class TeamworkTest {
         this.addResultsToMessage(message, actor, results, teamworkData)
     }
 
+    /**
+     * This method analyses the roll result and adds the text and flag data to the original message
+     * @param message to add text too
+     * @param actor that made the roll
+     * @param results of the roll
+     * @param teamworkData flag data to add too
+     */
     static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest, teamworkData: TeamworkMessageData) {
         //wrap the old content to presever it, this is necessary for pre-render hooks
         const wrapper = document.createElement("dív");
@@ -86,6 +100,10 @@ export class TeamworkTest {
 
     }
 
+    /**
+     * This method prompts the roll of the final teamwork test of the leader
+     * @param message 
+     */
     static async rollTeamworkTest(message: ChatMessage) {
         let teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
         //@ts-expect-error v11 type
