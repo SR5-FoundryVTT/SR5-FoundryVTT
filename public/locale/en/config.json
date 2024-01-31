@@ -377,7 +377,8 @@
         "MarksCantBePlacedOn": "The chosen actor type can't receive any marks.",
         "MissingSkill": "The actor doesn't have the requested skill.",
         "SkillWithoutAttribute": "The skill has no attribute configured.",
-        "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor"
+        "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor",
+        "NoAvailableActorFound": "No available actor was found for this action"
     },
     "SR5.EssenceCost": "Essence",
     "SR5.Expand": "Expand",
@@ -405,6 +406,13 @@
     "SR5.Glitch": "Glitch!",
     "SR5.GlitchCritical": "Critical Glitch!",
     "SR5.Glitches": "Glitches:",
+    "SR5.GMRequest": {
+        "General": "Your GM wants you to do a",
+        "Threshold": " with a threshold of ",
+        "RollSkill": "Skill Check",
+        "RollAttribute": "Attribute Check",
+        "Teamwork": "Teamwork Test"
+    },
     "SR5.GoodCover": "Good Cover",
     "SR5.GroupContact": "Group",
     "SR5.HackingProgram": "Hacking Program",

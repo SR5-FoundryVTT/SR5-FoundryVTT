@@ -56,6 +56,7 @@ declare namespace Shadowrun {
         specialization?: boolean
         // Skills should be searched not by id but their label.
         byLabel?: boolean
+        threshold?: BaseValuePair<number>
     };
 
     type SkillDialogOptions = {

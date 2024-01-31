@@ -68,6 +68,7 @@ import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 import { RenderSettings } from './systemLinks';
 import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
+import { JournalEnrichers } from './journal/enricher';
 
 
 
@@ -323,6 +324,8 @@ ___________________
 
         HooksManager.configureVision()
 
+        HooksManager.configureTextEnrichers();
+
         // Preload might reduce loading time during play.
         HandlebarManager.loadTemplates();
 
@@ -354,6 +357,7 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await TestCreator.promptSuccessTest());
 
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
+        Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks);
         HooksManager.registerSocketListeners();
     }
 
@@ -495,6 +499,7 @@ ___________________
         await OpposedTest.chatMessageListeners(message, html, data);
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
         await TeamworkTest.chatMessageListeners(message, html);
+        await JournalEnrichers.messageRequestHooks(html);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
@@ -502,6 +507,7 @@ ___________________
         await OpposedTest.chatLogListeners(chatLog, html, data);
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
         await TeamworkTest.chatLogListeners(chatLog, html);
+        await JournalEnrichers.chatlogRequestHooks(html)
     }
 
     static configureVision() {
@@ -510,5 +516,9 @@ ___________________
         VisionConfigurator.configureThermographicVision()
         VisionConfigurator.configureLowlight()
         VisionConfigurator.configureAR()
+    }
+
+    static async configureTextEnrichers() {
+       await JournalEnrichers.setEnrichers();
     }
 }

@@ -1019,4 +1019,71 @@ export class Helpers {
         spicyCharacters.forEach(character => key = key.replace(character, replace));
         return key;
     }
+
+    /**
+     * This method tries to get an owned actor of the user.
+     * If none are found it will return null
+     * If exactly one is found, it will automatically return the found actor
+     * If several are found it prompts the user to choose on of the available actors
+     * @returns an actor
+     */
+    static async chooseFromAvailableActors() {
+        let availableActors =  game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
+
+        if(availableActors.length == 0) {
+            return
+        }
+
+        if(availableActors.length == 1) {
+            return availableActors[0]
+        }
+        else {
+            let allActors = ''
+            game.actors?.filter( e => e.isOwner && e.hasPlayerOwner).forEach(t => {
+                    allActors = allActors.concat(`
+                            <option value="${t.id}">${t.name}</option>`);
+                });
+            const  dialog_content = `  
+                <select name ="actor">
+                ${allActors}
+                </select>`;
+    
+            let choosenActor = await Dialog.prompt({
+                title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
+                content: dialog_content,
+                callback: (html) => html.find('select').val()
+            }) as string;
+    
+            return game.actors?.get(choosenActor) as SR5Actor;
+        }
+    }
+
+    /**
+     * A method to capitalize the first letter of a given string.
+     * This allows to transform skill and attribute ids to the corresponding translation sub-keys
+     * See @see getSkillTranslation @see getAttributeTranslaton
+     * @param string 
+     * @returns the string with a capitalized first letter
+     */
+    static capitalizeFirstLetter(string: string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }  
+
+    /**
+     * Translates a skillId
+     * @param skill 
+     * @returns translation
+     */
+    static getSkillTranslation(skill: string) : string {
+        return game.i18n.localize(`SR5.Skill.${this.capitalizeFirstLetter(skill)}` as Translation)
+    }
+
+    /**
+     * Translate an attribute
+     * @param attribute 
+     * @returns translation
+     */
+    static getAttributeTranslation(attribute: string) : string {
+        return game.i18n.localize(`SR5.Attr${this.capitalizeFirstLetter(attribute)}` as Translation)
+    }
 }
