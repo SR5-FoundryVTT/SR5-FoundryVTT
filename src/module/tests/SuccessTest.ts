@@ -1834,18 +1834,30 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         await this._showGmOnlyContent(message, html, data)
     }
 
+    /**
+     * Callback handler for the Foundry 'renderChatMessage' hook.
+     * 
+     * Looks for chat messages containing success test data and show or hide 
+     * any GM only content within their html depending on the user.
+     * 
+     * @param message The message to show gm-only-content for
+     * @param html The DOM elements of the chat message contents
+     * @param data The message data used to render the chat message
+     */
     static async _showGmOnlyContent(message: ChatMessage, html, data) {
-        const test = await TestCreator.fromMessage(message.id as string);
-        if (!test) return;
-        await test.populateDocuments();
+        // Directly access test data to avoid unnecessary test creation.
+        const testData = TestCreator.getTestDataFromMessage(message.id as string);
+        if (!testData) return;
+        const actorUuid = testData.data.sourceActorUuid as string;
+        const actor = await fromUuid(actorUuid) as SR5Actor | null;
 
         // SuccessTest doesn't NEED an actor, if one is cast that way: show gm-only-content
-        if (!test.actor || !game.user) {
+        if (!actor || !game.user) {
             html.find('.gm-only-content').removeClass('gm-only-content');
             // @ts-expect-error
             ui.chat.scrollBottom();
         }
-        else if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
+        else if (game.user.isGM || game.user.isTrusted || actor.isOwner) {
             html.find('.gm-only-content').removeClass('gm-only-content');
             // @ts-expect-error
             ui.chat.scrollBottom();
