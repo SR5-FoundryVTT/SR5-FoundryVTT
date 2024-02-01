@@ -47,7 +47,7 @@ export const GmOnlyMessageContentFlow = {
     async showGmOnlyContent(message: ChatMessage, html, data) {
         // Directly access test data to avoid unnecessary test creation.
         const testData = TestCreator.getTestDataFromMessage(message.id as string);
-        if (!testData) return;
+        if (!testData?.data) return;
         const actorUuid = testData.data.sourceActorUuid as string;
         const actor = await fromUuid(actorUuid) as SR5Actor | null;
 
