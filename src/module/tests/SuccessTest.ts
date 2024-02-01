@@ -26,6 +26,7 @@ import { ActionResultFlow } from "../item/flows/ActionResultFlow";
 import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
+import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -1574,8 +1575,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Limit users to show dice to...
         let whisper: User[] | null = null;
         // ...for gmOnlyContent check permissions
-        if (this._applyGmOnlyContent && this.actor) {
-            // @ts-expect-error
+        if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
+            // @ts-expect-error TODO: foundry-vtt-types v10
             whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER'));
         }
         // ...for rollMode include GM when GM roll
@@ -1649,7 +1650,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             description: this.item?.getChatData() || '',
             // Some message segments are only meant for the gm, when the gm is the one creating the message.
             // When this test doesn't use an actor, don't worry about hiding anything.
-            applyGmOnlyContent: this._applyGmOnlyContent,
+            applyGmOnlyContent: GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor),
             
             // Effects that should be shown in this tests message for manual drag & drop application.
             effects: [] as SR5ActiveEffect[]
@@ -1671,16 +1672,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get _canPlaceBlastTemplate(): boolean {
         return this.item?.hasBlastTemplate || false;
-    }
-
-    /**
-     * This test should hide information / rolls / dice for when cast by the GM.
-     */
-    get _applyGmOnlyContent(): boolean {
-        // Enable GM only content only when the global setting is set.
-        const enableFeature = game.settings.get(SYSTEM_NAME, FLAGS.HideGMOnlyChatContent) as boolean;
-
-        return enableFeature && !!game.user && game.user.isGM && !!this.actor;
     }
 
     /**
@@ -1831,26 +1822,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         DamageApplicationFlow.handleRenderChatMessage(message, html, data);
 
-        await this._showGmOnlyContent(message, html, data)
+        await GmOnlyMessageContentFlow.chatMessageListeners(message, html, data);
     }
 
-    static async _showGmOnlyContent(message: ChatMessage, html, data) {
-        const test = await TestCreator.fromMessage(message.id as string);
-        if (!test) return;
-        await test.populateDocuments();
-
-        // SuccessTest doesn't NEED an actor, if one is cast that way: show gm-only-content
-        if (!test.actor || !game.user) {
-            html.find('.gm-only-content').removeClass('gm-only-content');
-            // @ts-expect-error
-            ui.chat.scrollBottom();
-        }
-        else if (game.user.isGM || game.user.isTrusted || test.actor?.isOwner) {
-            html.find('.gm-only-content').removeClass('gm-only-content');
-            // @ts-expect-error
-            ui.chat.scrollBottom();
-        }
-    }
 
     /** 
      * Select a Token on the current scene based on the link id.

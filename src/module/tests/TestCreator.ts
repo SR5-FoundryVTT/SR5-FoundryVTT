@@ -140,6 +140,19 @@ export const TestCreator = {
      * @param id The message id to retrieve test data from.
      */
     fromMessage: async function(id: string, options?: TestOptions): Promise<SuccessTest | undefined> {
+        const flagData = TestCreator.getTestDataFromMessage(id);
+        return this._fromMessageTestData(flagData, options);
+    },
+
+    /**
+     * Retrieve possible test data from a given message id.
+     * 
+     * If you need the test implementation, use @fromMessage instead.
+     * 
+     * @param id The message id to retrieve test data from.
+     * @returns Raw test data from message flags or undefined if none found.
+     */
+    getTestDataFromMessage(id: string): SuccessTestMessageData | undefined {
         const message = game.messages?.get(id);
         if (!message) {
             console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
@@ -147,14 +160,15 @@ export const TestCreator = {
         }
 
         // Check if message contains any test data.
-        const flagData = message.getFlag(SYSTEM_NAME, FLAGS.Test);
-        if (!flagData) {console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`); return;}
+        const flagData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestMessageData;
+        if (!flagData) return;
 
-        return this._fromMessageTestData(flagData, options);
+        return flagData;
     },
-
+    
+    
     /**
-     * Create a test implemenation directly from a message flags test data.
+     * Create a test implementation directly from a message flags test data.
      * @param testData 
      * @returns 
      */
