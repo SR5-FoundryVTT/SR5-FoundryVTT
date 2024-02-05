@@ -121,9 +121,13 @@
         height: 100%;
         min-height: 16em;
         overflow-y: auto;
+        grid-column-start: 2; //will be ignored by flex and is used to place when grid is on
     }
     .item-form {
         padding: 0 0.5em;
+        &.des{
+            max-width: 14em;
+        }
         .header {
             @include title;
             font-size: 1.75em;
