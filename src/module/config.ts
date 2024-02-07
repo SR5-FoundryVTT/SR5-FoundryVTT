@@ -85,7 +85,7 @@ export const SR5 = {
     damageTypes: {
         physical: 'SR5.DmgTypePhysical',
         stun: 'SR5.DmgTypeStun',
-        matrix: 'SR5.DmgTypeMatrix',
+        matrix: 'SR5.DmgTypeMatrix'
     },
 
     weaponRangeCategories: {
@@ -1343,3 +1343,5 @@ export const SR5 = {
         }
     }
 } as const;
+
+    
