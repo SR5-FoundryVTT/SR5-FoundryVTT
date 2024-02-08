@@ -138,7 +138,7 @@ export const ChatData = {
     },
 
     lifestyle: (system, labels, props) => {
-        props.push(Helpers.label(game.i18n.localize(SR5.lifestyleTypes[system.type])));
+        props.push(Helpers.label(system.type));
         if (system.cost) props.push(`¥${system.cost}`);
         if (system.comforts) props.push(`${game.i18n.localize('SR5.LifestyleComforts')} ${system.comforts}`);
         if (system.security) props.push(`${game.i18n.localize('SR5.LifestyleSecurity')} ${system.security}`);
@@ -178,7 +178,7 @@ export const ChatData = {
 
     complex_form: (system, labels, props) => {
         ChatData.action(system, labels, props);
-        props.push(Helpers.label(game.i18n.localize(SR5.matrixTargets[system.target])), Helpers.label(game.i18n.localize(SR5.durations[system.duration])));
+        props.push(Helpers.label(system.target)), Helpers.label(system.duration);
         const { fade } = system;
         if (fade > 0) props.push(`${game.i18n.localize('SR5.Fade')} ${game.i18n.localize('SR5.Level').charAt(0)}+${fade}`);
         else if (fade < 0) props.push(`${game.i18n.localize('SR5.Fade')} ${game.i18n.localize('SR5.Level').charAt(0)}${fade}`);

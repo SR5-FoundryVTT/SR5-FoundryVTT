@@ -506,7 +506,7 @@ export class SR5ItemSheet extends ItemSheet {
         const type = 'modification';
         // TODO: Move this into DataDefaults...
         const itemData = {
-            name: `New ${Helpers.label(type)}`,
+            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type: type,
             system: {type: 'weapon'}
         };
@@ -533,7 +533,7 @@ export class SR5ItemSheet extends ItemSheet {
         event.preventDefault();
         const type = 'ammo';
         const itemData = {
-            name: `New ${Helpers.label(type)}`,
+            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type: type
         };
         // @ts-expect-error

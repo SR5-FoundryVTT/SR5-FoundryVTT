@@ -590,7 +590,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // TODO: Add translation for item names...
         const itemData = {
-            name: `New ${type}`,
+            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type: type,
         };
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
