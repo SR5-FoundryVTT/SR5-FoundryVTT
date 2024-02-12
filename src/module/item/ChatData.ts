@@ -331,8 +331,12 @@ export const ChatData = {
                 props.push(newModes.map((m) => game.i18n.localize(m)).join('/'));
             }
             if (system.range.ranges) {
+                /**
+                 * Display weapon ranges in this format: <CATEGORY (short/medium/long/extreme/attribute)
+                 */
                 const { short, medium, long, extreme, category, attribute } = system.range.ranges;
-                let output = `${category}: ${short}/${medium}/${long}/${extreme}`;
+                const categoryLabel = game.i18n.localize(SR5.weaponRangeCategories[category]?.label ?? '');
+                let output = `${categoryLabel} (${short}/${medium}/${long}/${extreme})`;
                 if (attribute) {
                     output += `/${attribute}`;
                 }
