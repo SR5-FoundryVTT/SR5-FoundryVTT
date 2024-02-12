@@ -41,17 +41,18 @@
         "ShowTokenNameForChatOutputDescription": "Soll der Name des Tokens statt des Akteurs für die Würfelkarte angezeigt werden, wenn ein Token verfügbar ist?",
         "ShowTokenNameForChatOutputName": "Token-Namen für Würfelkarte",
         "TokenHealthBars": "Token Lebensbalken",
-        "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken."
+        "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken.",
+        "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
+        "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden"
     },
-    "SR5.AP": "DK",
     "SR5.Accessory": "Zubehör",
     "SR5.Accuracy": "Präz.",
-    "SR5.Action": "Aktion",
+    "SR5.Action": "Handlung",
     "SR5.ActionType": "Handlung",
-    "SR5.ActionTypeComplex": "Komplex",
-    "SR5.ActionTypeFree": "Frei",
+    "SR5.ActionTypeComplex": "Komplexe",
+    "SR5.ActionTypeFree": "Freie",
     "SR5.ActionTypeNone": "Keine",
-    "SR5.ActionTypeSimple": "Einfach",
+    "SR5.ActionTypeSimple": "Einfache",
     "SR5.ActionTypeVaries": "Variiert",
     "SR5.Actions": "Aktionen",
     "SR5.Active": "Aktiv",
@@ -103,6 +104,7 @@
     "SR5.AmmoFull": "Vollgeladen",
     "SR5.AmmoGelRounds": "Gelmunition",
     "SR5.Aoe": "Flächeneffekt",
+    "SR5.AP": "DK",
     "SR5.ApplyWounds": "Wunden anwenden",
     "SR5.Armor": "Panzerung",
     "SR5.ArmorHardened": "Verstärkt",
@@ -375,7 +377,8 @@
         "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
         "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
         "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
-        "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden"
+        "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
+        "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden"
     },
     "SR5.EssenceCost": "Essenz",
     "SR5.Expand": "Ausklappen",
@@ -403,6 +406,13 @@
     "SR5.Glitch": "Patzer!",
     "SR5.GlitchCritical": "Kritischer Patzer!",
     "SR5.Glitches": "Patzer:",
+    "SR5.GMRequest": {
+        "General": "Your GM wants you to do a",
+        "Threshold": " with a threshold of ",
+        "RollSkill": "Skill Check",
+        "RollAttribute": "Attribute Check",
+        "Teamwork": "Teamwork Test"
+    },
     "SR5.GoodCover": "Gute Deckung",
     "SR5.GroupContact": "Gruppe",
     "SR5.HackingProgram": "Hackingprogramm",
@@ -590,10 +600,10 @@
     "SR5.LifestyleType": "Typ",
     "SR5.Lifestyles": "Lebensstile",
     "SR5.Limit": "Limit",
-    "SR5.LimitAstral": "Astrales Limit",
-    "SR5.LimitMental": "Geistiges Limit",
-    "SR5.LimitPhysical": "Körperliches Limit",
-    "SR5.LimitSocial": "Soziales Limit",
+    "SR5.LimitAstral": "Astral",
+    "SR5.LimitMental": "Geistig",
+    "SR5.LimitPhysical": "Körperlich",
+    "SR5.LimitSocial": "Sozial",
     "SR5.LivingPersona": "Lebende Persona",
     "SR5.Load": "Laden",
     "SR5.Loaded": "Geladen",
@@ -723,6 +733,7 @@
     "SR5.Mundane": "Mundan",
     "SR5.Name": "Name",
     "SR5.NetHits": "Nettoerfolge",
+    "SR5.New": "Neu:",
     "SR5.NoCover": "Keine Deckung",
     "SR5.NoSelectableToken": "Charakter hat kein auswählbares Token auf der Karte",
     "SR5.None": "-",
@@ -760,6 +771,7 @@
     "SR5.PowerPoints": "Kraftpunkte",
     "SR5.PowerType": "Typ",
     "SR5.Powers": "Kräfte",
+    "SR5.PP": "KP",
     "SR5.Program": "Programm",
     "SR5.ProgramType": "Typ",
     "SR5.Programs": "Programme",
@@ -910,6 +922,12 @@
         "Summoning": "Herbeirufen",
         "Survival": "Survival",
         "Swimming": "Schwimmen",
+        "Teamwork": {
+            "Glitched": "Glitched",
+            "ParticipantActor": "Choose actor",
+            "RollIt": "Roll it",
+            "TakePart": "Take part"
+        },
         "ThrowingWeapons": "Wurfwaffen",
         "Tracking": "Spurenlesen",
         "UnarmedCombat": "Waffenloser Kampf"
@@ -1207,6 +1225,10 @@
             "RecoilCompensation": "Gesamte RK, inklusive RK der Waffe",
             "ResetRecoil": "Setze kumulativen Rückstoß zurück"
         },
+        "Ritual": {
+            "Force": "Kraftstufe des Rituals",
+            "ReagentDrams": "Dram aus Reagenzien zur Veränderung des Entzugs"
+        },
         "SituationalModifier": {
             "Recoil": "Anzahl abgefeuerter Kugeln"
         },
@@ -1301,6 +1323,7 @@
             "Water": "Schiff"
         }
     },
+    "SR5.Vehicle.Vehicle": "Fahrzeug",
     "SR5.VehicleImport.MissingPermission": "Dir fehlt die Berechtigung, Akteure zu erstellen.",
     "SR5.Vision": {
         "AstralPerception": "Astrale Wahrnehmung",
