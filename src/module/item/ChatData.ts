@@ -330,7 +330,18 @@ export const ChatData = {
                 if (modes.full_auto) newModes.push('SR5.Weapon.Mode.FullAutoShort');
                 props.push(newModes.map((m) => game.i18n.localize(m)).join('/'));
             }
-            if (system.range.ranges) props.push(Array.from(Object.values(system.range.ranges)).join('/'));
+            if (system.range.ranges) {
+                /**
+                 * Display weapon ranges in this format: <CATEGORY (short/medium/long/extreme/attribute)
+                 */
+                const { short, medium, long, extreme, category, attribute } = system.range.ranges;
+                const categoryLabel = game.i18n.localize(SR5.weaponRangeCategories[category]?.label ?? '');
+                let output = `${categoryLabel} (${short}/${medium}/${long}/${extreme})`;
+                if (attribute) {
+                    output += `/${attribute}`;
+                }
+                props.push(output);
+            }
         } else if (system.category === 'melee') {
             if (system.melee.reach) {
                 const reachString = `${game.i18n.localize('SR5.Reach')} ${system.melee.reach}`;
