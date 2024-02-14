@@ -1,181 +1,183 @@
-<div class="item-form">
-    <div class="header">
-        {{localize header}}
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Labels.Action.ActiveTest"}}
+<div class="grid-2-col">
+    <div class="item-form">
+        <div class="header bar">
+            {{localize header}}
         </div>
-        <div class="inputs">
-            <select name="system.action.test" disabled>
-                {{#select system.action.test}}
-                <option value=""></option>
-                {{#each activeTests}}
-                <option value="{{this.name}}">{{localize this.label}}</option>
-                {{/each}}
-                {{/select}}
-            </select>
-        </div>
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.ActionType"}}
-        </div>
-        <div class="inputs">
-            {{#if system.action.type}}
-            <label>
-                {{localize "SR5.Extended"}}<input
-                    data-tooltip="SR5.Specialization"
-                    type="checkbox"
-                    name="system.action.extended"
-                    {{checked system.action.extended}}
-                />
-            </label>
-            {{/if}}
-            <select name="system.action.type">
-                {{#select system.action.type}}
-                <option value=""></option>
-                {{#each config.actionTypes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-        </div>
-    </div>
-    {{#if system.action.type}}
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Skill.Skill"}}
-        </div>
-        <div class="inputs">
-            {{#if system.action.skill}}
-            <label>
-                {{localize "SR5.Specialization"}}
-                <input
-                    data-tooltip="SR5.Specialization"
-                    type="checkbox"
-                    name="system.action.spec"
-                    {{checked system.action.spec}}
-                />
-            </label>
-            {{/if}}
-            <select name="system.action.skill">
-                {{#select system.action.skill}}
-                <option value=""></option>
-                {{#each activeSkills as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-        </div>
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Attribute"}}
-        </div>
-        <div class="inputs">
-            <select name="system.action.attribute">
-                {{#select system.action.attribute}}
-                <option value=""></option>
-                {{#each attributes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-            {{#unless system.action.skill}}
-            <select name="system.action.attribute2">
-                {{#select system.action.attribute2}}
-                <option value=""></option>
-                {{#each attributes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-            {{/unless}}
-        </div>
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Armor"}}
-        </div>
-        <div class="inputs">
-            <input
-                    data-tooltip="SR5.Armor"
-                    type="checkbox"
-                    name="system.action.armor"
-                    {{checked system.action.armor}}
-            />
-        </div>
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.DicePoolModifier"}}
-        </div>
-        <div class="inputs">
-            <input
-                size="4"
-                maxlength="3"
-                type="number"
-                name="system.action.mod"
-                value="{{system.action.mod}}"
-                data-dtype="Number"
-                placeholder="+Mod"
-            />
-        </div>
-    </div>
-    {{#ifne item.type "spell"}} {{#ifne item.type "complex_form"}}
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Limit"}}
-        </div>
-        <div class="inputs">
-            <input
-                size="4"
-                maxlength="3"
-                type="number"
-                name="system.action.limit.base"
-                value="{{system.action.limit.base}}"
-                data-dtype="Number"
-                placeholder=""
-            />
-            <div>
-                +
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Labels.Action.ActiveTest"}}
             </div>
-            <select name="system.action.limit.attribute" data-dtype="Text">
-                {{#select system.action.limit.attribute}}
-                <option value=""></option>
-                {{#each limits as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}}
-                {{/select}}
-            </select>
+            <div class="inputs">
+                <select name="system.action.test" disabled>
+                    {{#select system.action.test}}
+                    <option value=""></option>
+                    {{#each activeTests}}
+                    <option value="{{this.name}}">{{localize this.label}}</option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            </div>
         </div>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.ActionType"}}
+            </div>
+            <div class="inputs">
+                {{#if system.action.type}}
+                <label>
+                    {{localize "SR5.Extended"}}<input
+                        data-tooltip="SR5.Specialization"
+                        type="checkbox"
+                        name="system.action.extended"
+                        {{checked system.action.extended}}
+                    />
+                </label>
+                {{/if}}
+                <select name="system.action.type">
+                    {{#select system.action.type}}
+                    <option value=""></option>
+                    {{#each config.actionTypes as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+            </div>
+        </div>
+        {{#if system.action.type}}
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Skill.Skill"}}
+            </div>
+            <div class="inputs">
+                {{#if system.action.skill}}
+                <label>
+                    {{localize "SR5.Specialization"}}
+                    <input
+                        data-tooltip="SR5.Specialization"
+                        type="checkbox"
+                        name="system.action.spec"
+                        {{checked system.action.spec}}
+                    />
+                </label>
+                {{/if}}
+                <select name="system.action.skill">
+                    {{#select system.action.skill}}
+                    <option value=""></option>
+                    {{#each activeSkills as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+            </div>
+        </div>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Attribute"}}
+            </div>
+            <div class="inputs">
+                <select name="system.action.attribute">
+                    {{#select system.action.attribute}}
+                    <option value=""></option>
+                    {{#each attributes as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+                {{#unless system.action.skill}}
+                <select name="system.action.attribute2">
+                    {{#select system.action.attribute2}}
+                    <option value=""></option>
+                    {{#each attributes as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+                {{/unless}}
+            </div>
+        </div>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Armor"}}
+            </div>
+            <div class="inputs">
+                <input
+                        data-tooltip="SR5.Armor"
+                        type="checkbox"
+                        name="system.action.armor"
+                        {{checked system.action.armor}}
+                />
+            </div>
+        </div>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.DicePoolModifier"}}
+            </div>
+            <div class="inputs">
+                <input
+                    size="4"
+                    maxlength="3"
+                    type="number"
+                    name="system.action.mod"
+                    value="{{system.action.mod}}"
+                    data-dtype="Number"
+                    placeholder="+Mod"
+                />
+            </div>
+        </div>
+        {{#ifne item.type "spell"}} {{#ifne item.type "complex_form"}}
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Limit"}}
+            </div>
+            <div class="inputs">
+                <input
+                    size="4"
+                    maxlength="3"
+                    type="number"
+                    name="system.action.limit.base"
+                    value="{{system.action.limit.base}}"
+                    data-dtype="Number"
+                    placeholder=""
+                />
+                <div>
+                    +
+                </div>
+                <select name="system.action.limit.attribute" data-dtype="Text">
+                    {{#select system.action.limit.attribute}}
+                    <option value=""></option>
+                    {{#each limits as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            </div>
+        </div>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Threshold"}}
+            </div>
+            <div class="inputs">
+                <input
+                    size="4"
+                    maxlength="3"
+                    type="number"
+                    name="system.action.threshold.base"
+                    value="{{system.action.threshold.base}}"
+                    data-dtype="Number"
+                    placeholder=""
+                />
+            </div>
+        </div>
+        <div class="form-line">
+            <div class="label advanced" data-tooltip="SR5.Tooltips.Item.ActionRollMode">
+                {{localize "SR5.RollMode"}}
+            </div>
+            <div class="inputs">
+                <select name="system.action.roll_mode">
+                    {{#select system.action.roll_mode}} 
+                    <option value=""></option>
+                    {{#each rollModes as |label mode|}}
+                    <option value="{{mode}}">{{localize label}}</option>
+                    {{/each}} {{/select}}
+                </select>
+            </div>
+        </div>
+        {{/ifne}} {{/ifne}} {{/if}}
     </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Threshold"}}
-        </div>
-        <div class="inputs">
-            <input
-                size="4"
-                maxlength="3"
-                type="number"
-                name="system.action.threshold.base"
-                value="{{system.action.threshold.base}}"
-                data-dtype="Number"
-                placeholder=""
-            />
-        </div>
-    </div>
-    <div class="form-line">
-        <div class="label" data-tooltip="SR5.Tooltips.Item.ActionRollMode">
-            {{localize "SR5.RollMode"}}
-        </div>
-        <div class="inputs">
-            <select name="system.action.roll_mode">
-                {{#select system.action.roll_mode}} 
-                <option value=""></option>
-                {{#each rollModes as |label mode|}}
-                <option value="{{mode}}">{{localize label}}</option>
-                {{/each}} {{/select}}
-            </select>
-        </div>
-    </div>
-    {{/ifne}} {{/ifne}} {{/if}}
 </div>

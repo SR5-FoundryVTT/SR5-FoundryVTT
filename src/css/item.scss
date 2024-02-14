@@ -131,6 +131,9 @@
         .header {
             @include title;
             font-size: 1.75em;
+            &.bar{
+                border-bottom: 0.1em solid $yellow;
+            }
         }
         .form-line {
             display: flex;

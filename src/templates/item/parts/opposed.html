@@ -1,146 +1,148 @@
-<div class="item-form">
-    <div class="header">
-        {{header}}
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Labels.Action.OpposedTest"}}
+<div class="grid-2-col">
+    <div class="item-form">
+        <div class="header bar">
+            {{header}}
         </div>
-        <div class="inputs">
-            <select name="system.action.opposed.test" {{#if disableTestSelection}}disabled{{/if}}>
-                {{#select system.action.opposed.test}}
-                <option value=""></option>
-                {{#each opposedTests}}
-                <option value="{{this.name}}">{{localize this.label}}</option>
-                {{/each}}
-                {{/select}}
-            </select>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Labels.Action.OpposedTest"}}
+            </div>
+            <div class="inputs">
+                <select name="system.action.opposed.test" {{#if disableTestSelection}}disabled{{/if}}>
+                    {{#select system.action.opposed.test}}
+                    <option value=""></option>
+                    {{#each opposedTests}}
+                    <option value="{{this.name}}">{{localize this.label}}</option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            </div>
         </div>
-    </div>
-    {{#if system.action.opposed.test}}
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Skill.Skill"}}
+        {{#if system.action.opposed.test}}
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Skill.Skill"}}
+            </div>
+            <div class="inputs">
+                <select name="system.action.opposed.skill">
+                    {{#select system.action.opposed.skill}}
+                    <option value=""></option>
+                    {{#each activeSkills as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+            </div>
         </div>
-        <div class="inputs">
-            <select name="system.action.opposed.skill">
-                {{#select system.action.opposed.skill}}
-                <option value=""></option>
-                {{#each activeSkills as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Attribute"}}
+            </div>
+            <div class="inputs">
+                <select name="system.action.opposed.attribute">
+                    {{#select system.action.opposed.attribute}}
+                    <option value=""></option>
+                    {{#each config.attributes as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+                {{#unless system.action.opposed.skill}}
+                <select name="system.action.opposed.attribute2">
+                    {{#select system.action.opposed.attribute2}}
+                    <option value=""></option>
+                    {{#each config.attributes as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{#each config.matrixAttributes as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+                {{/unless}}
+            </div>
         </div>
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Attribute"}}
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Armor"}}
+            </div>
+            <div class="inputs">
+                <input
+                        data-tooltip="SR5.Armor"
+                        type="checkbox"
+                        name="system.action.opposed.armor"
+                        {{checked system.action.opposed.armor}}
+                />
+            </div>
         </div>
-        <div class="inputs">
-            <select name="system.action.opposed.attribute">
-                {{#select system.action.opposed.attribute}}
-                <option value=""></option>
-                {{#each config.attributes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-            {{#unless system.action.opposed.skill}}
-            <select name="system.action.opposed.attribute2">
-                {{#select system.action.opposed.attribute2}}
-                <option value=""></option>
-                {{#each config.attributes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{#each config.matrixAttributes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-            {{/unless}}
-        </div>
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Armor"}}
-        </div>
-        <div class="inputs">
-            <input
-                    data-tooltip="SR5.Armor"
-                    type="checkbox"
-                    name="system.action.opposed.armor"
-                    {{checked system.action.opposed.armor}}
-            />
-        </div>
-    </div>
-    {{/if}}
-    <div class="header">
-        {{localize "SR5.Labels.Action.DamageResistanceTest"}}
-    </div>
-    <div class="form-line">
-        <div class="label">
+        {{/if}}
+        <div class="header">
             {{localize "SR5.Labels.Action.DamageResistanceTest"}}
         </div>
-        <div class="inputs">
-            <select name="system.action.opposed.resist.test" {{#if disableTestSelection}}disabled{{/if}}>
-                {{#select system.action.opposed.resist.test}}
-                <option value=""></option>
-                {{#each resistTests}}
-                <option value="{{this.name}}">{{localize this.label}}</option>
-                {{/each}}
-                {{/select}}
-            </select>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Labels.Action.DamageResistanceTest"}}
+            </div>
+            <div class="inputs">
+                <select name="system.action.opposed.resist.test" {{#if disableTestSelection}}disabled{{/if}}>
+                    {{#select system.action.opposed.resist.test}}
+                    <option value=""></option>
+                    {{#each resistTests}}
+                    <option value="{{this.name}}">{{localize this.label}}</option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            </div>
         </div>
+        {{#if system.action.opposed.resist.test}}
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Skill.Skill"}}
+            </div>
+            <div class="inputs">
+                <select name="system.action.opposed.resist.skill">
+                    {{#select system.action.opposed.resist.skill}}
+                    <option value=""></option>
+                    {{#each activeSkills as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+            </div>
+        </div>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Attribute"}}
+            </div>
+            <div class="inputs">
+                <select name="system.action.opposed.resist.attribute">
+                    {{#select system.action.opposed.resist.attribute}}
+                    <option value=""></option>
+                    {{#each config.attributes as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+                {{#unless system.action.opposed.resist.skill}}
+                <select name="system.action.opposed.resist.attribute2">
+                    {{#select system.action.opposed.resist.attribute2}}
+                    <option value=""></option>
+                    {{#each config.attributes as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{#each config.matrixAttributes as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+                {{/unless}}
+            </div>
+        </div>
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Armor"}}
+            </div>
+            <div class="inputs">
+                <input
+                        data-tooltip="SR5.Armor"
+                        type="checkbox"
+                        name="system.action.opposed.resist.armor"
+                        {{checked system.action.opposed.resist.armor}}
+                />
+            </div>
+        </div>
+        {{/if}}
     </div>
-    {{#if system.action.opposed.resist.test}}
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Skill.Skill"}}
-        </div>
-        <div class="inputs">
-            <select name="system.action.opposed.resist.skill">
-                {{#select system.action.opposed.resist.skill}}
-                <option value=""></option>
-                {{#each activeSkills as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-        </div>
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Attribute"}}
-        </div>
-        <div class="inputs">
-            <select name="system.action.opposed.resist.attribute">
-                {{#select system.action.opposed.resist.attribute}}
-                <option value=""></option>
-                {{#each config.attributes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-            {{#unless system.action.opposed.resist.skill}}
-            <select name="system.action.opposed.resist.attribute2">
-                {{#select system.action.opposed.resist.attribute2}}
-                <option value=""></option>
-                {{#each config.attributes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{#each config.matrixAttributes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
-            </select>
-            {{/unless}}
-        </div>
-    </div>
-    <div class="form-line">
-        <div class="label">
-            {{localize "SR5.Armor"}}
-        </div>
-        <div class="inputs">
-            <input
-                    data-tooltip="SR5.Armor"
-                    type="checkbox"
-                    name="system.action.opposed.resist.armor"
-                    {{checked system.action.opposed.resist.armor}}
-            />
-        </div>
-    </div>
-    {{/if}}
 </div>
