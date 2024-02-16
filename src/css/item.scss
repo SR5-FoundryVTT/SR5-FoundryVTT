@@ -128,6 +128,16 @@
         &.des{
             max-width: 14em;
         }
+        &.action{
+            max-width: 98%;
+            &.col2{
+                grid-column-start: 2
+            }
+            &.col2end{
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+        }
         .header {
             @include title;
             font-size: 1.75em;

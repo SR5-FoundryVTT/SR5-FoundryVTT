@@ -588,6 +588,7 @@ input[type='text'].display {
         flex: 1;
         overflow-y: auto;
         color: $white;
+        display: grid;
     }
     .flexcontainer-skills{
         display: flex;
