@@ -121,12 +121,29 @@
         height: 100%;
         min-height: 16em;
         overflow-y: auto;
+        grid-column-start: 2; //will be ignored by flex and is used to place when grid is on
     }
     .item-form {
         padding: 0 0.5em;
+        &.des{
+            max-width: 14em;
+        }
+        &.action{
+            max-width: 98%;
+            &.col2{
+                grid-column-start: 2
+            }
+            &.col2end{
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+        }
         .header {
             @include title;
             font-size: 1.75em;
+            &.bar{
+                border-bottom: 0.1em solid $yellow;
+            }
         }
         .form-line {
             display: flex;
@@ -134,6 +151,9 @@
             justify-content: space-between;
             align-content: center;
             padding: 0.1em 0.25em;
+            &.advanced{
+                color: $yellow;
+            }
             > * {
                 flex: 1;
             }
@@ -141,6 +161,9 @@
                 color: $light;
                 font-size: 1.15em;
                 @include systemFonts;
+                &.advanced{
+                    color: $yellow;
+                }
             }
             .inputs {
                 display: flex;
