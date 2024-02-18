@@ -138,7 +138,7 @@ export const ChatData = {
     },
 
     lifestyle: (system, labels, props) => {
-        props.push(Helpers.label(game.i18n.localize(SR5.lifestyleTypes[system.target])));
+        props.push(game.i18n.localize(SR5.lifestyleTypes[system.type]));
         if (system.cost) props.push(`¥${system.cost}`);
         if (system.comforts) props.push(`${game.i18n.localize('SR5.LifestyleComforts')} ${system.comforts}`);
         if (system.security) props.push(`${game.i18n.localize('SR5.LifestyleSecurity')} ${system.security}`);
