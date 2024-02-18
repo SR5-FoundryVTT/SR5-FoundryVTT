@@ -177,3 +177,47 @@ input[type='text'].display {
         }
     }
 }
+/** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
+ * otherwise cause issues with custom button styling.
+ */
+ .form-dialog .window-content .dialog-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.form-dialog .window-content .dialog-buttons>* {
+    flex: 1;
+}
+
+.dialog-button.remove-token-modifiers-from-scene,
+.dialog-button.remove-modifiers-from-target{
+    background-color: $bgrButton;
+}
+.far-right {
+    justify-content: center;
+    right: -150px;
+}
+
+.list-header.item-section[data-item-id="weapon"][data-item-type=""] {
+    color: $yellow;  /* set the color to yellow */
+    font-size: small;
+}
+
+.common-test{
+    margin-bottom: 4px;
+    margin-top: 4px;
+    color: $white;
+    display: flex;
+    .test-icon {
+        width: 17px;
+        height: 17px;
+        margin-left: 5px;
+        margin-bottom: 0;
+        border: 0;
+    }
+}
+.fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
+{
+    color: $pdfColor;
+}
