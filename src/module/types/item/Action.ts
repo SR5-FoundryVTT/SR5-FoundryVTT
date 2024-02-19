@@ -1,7 +1,5 @@
 
 declare namespace Shadowrun {
-
-
     export interface ActionData extends
         ActionPartData,
         ImportFlags,
@@ -24,11 +22,10 @@ declare namespace Shadowrun {
         // Test test class used for the active action test
         // Should be defined in game.shadowrun5e.activeTests
         test: string
-        // The type of combat action to be performed.
+        // The type of combat action to be performed. @taMiF: I don't think this is in use.
         type: string
-        // An additional action category. This field is unused as of v.0.8.0 but intended for
-        // a test category (social, matrix, magic, physical, ...)
-        category: string
+        // A grouping of actions for different purposes.
+        category: '' | ActionCategories
         // When set to true, the skill specialization modifier must be applied.
         spec: boolean
         // Unused legacy field. Not shown on any template, not set anywhere in system. Unsure about it's original intention.
@@ -45,7 +42,7 @@ declare namespace Shadowrun {
         opposed: OpposedTestData
         // A follow up test to be cast by the same actor that cast this resulting test after it's completion.
         followed: TestData
-        // Unused legecy field. Not shown on any template, not set anywhere in system. Unsure about it's original intention.
+        // Unused legacy field. Not shown on any template, not set anywhere in system. Unsure about it's original intention.
         alt_mod: number
         // Modification values for the test dice pool applied to this action item.
         // These can come from both the item itself and nested items.
@@ -166,4 +163,25 @@ declare namespace Shadowrun {
      * The actual usable values for an action.
      */
     type ActionRollMode = FoundryRollMode | ''
+
+    /**
+     * What kind of action is being performed.
+     * 
+     * This can be used to group different actions together for different purposes.
+     * A specific purpose is for ActiveEffect to only apply to tests with specific action categories.
+     */
+    type ActionCategories = 
+        'skill_social' |
+        // 'skill_leadership' | 
+        'attack' |
+        'defense' |
+        'resist' |
+        'spell_combat' | 
+        'spell_detection' |
+        'spell_manipulation' |
+        'spell_healing' | 
+        'spell_illusion' |
+        'action_matrix' |
+        'action_resonance' |
+        'action_rigging'
 }

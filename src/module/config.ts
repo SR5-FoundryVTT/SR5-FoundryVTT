@@ -577,6 +577,12 @@ export const SR5 = {
         divide: '/'
     },
 
+    // System provided categories to group actions with and address them.
+    actionCategories: {
+        'skill_social': 'SR5.ActionCategory.SkillSocial',
+        'action_matrix': 'SR5.ActionCategory.ActionMatrix',
+    },
+
     matrixAttributes: {
         attack: 'SR5.MatrixAttrAttack',
         sleaze: 'SR5.MatrixAttrSleaze',
