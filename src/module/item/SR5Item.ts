@@ -465,6 +465,15 @@ export class SR5Item extends Item {
     }
 
     /**
+     * Can this item (weapon, melee, ranged, whatever) use ammunition?
+     * 
+     * @returns true, for weapons with ammunition.
+     */
+    get usesAmmo(): boolean {
+        return this.system.ammo?.current.max !== 0 && this.system.ammo?.current.max !== null;
+    }
+
+    /**
      * Reload this weapon according to information in:
      * - its current clips
      * - its available spare clips (when given)

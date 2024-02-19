@@ -71,12 +71,11 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
      */
     override canConsumeDocumentResources(): boolean {
         if (this.item === undefined) return true;
-        // Only check ammo for melee weapons with ammo defined.
-        if (this.item.system.ammo?.current.max === 0 || this.item.system.ammo?.current.max === null) return true;
+        if (!this.item.usesAmmo) return true;
 
         // Consume one ammo per attack.
         if (!this.item.hasAmmo(1)) {
-            ui.notifications?.error('SR5.MissingRessource.Ammo', {localize: true});
+            ui.notifications?.error('SR5.MissingRessource.SomeAmmoMelee', {localize: true});
             return false;
         }
 
@@ -98,6 +97,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
      */
     async consumeWeaponAmmo(): Promise<boolean> {  
         if (this.item === undefined) return true;
+        if (!this.item.usesAmmo) return true;
 
         // Notify user about some but not no ammo. Still let them punch though.
         if (!this.item.hasAmmo(1)) {
