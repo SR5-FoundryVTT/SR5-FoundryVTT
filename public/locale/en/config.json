@@ -76,6 +76,7 @@
         "OnlyForItemTest": "Apply for parent item test only",
         "OnlyForWireless": "Apply for wireless active only",
         "Test": {
+            "ActionCategories": "Action Categories Filter",
             "Attributes": "Attributes Filter",
             "Limits": "Limits Filter",
             "Skills": "Skills Filter",

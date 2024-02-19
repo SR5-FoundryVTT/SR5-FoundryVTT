@@ -25,7 +25,7 @@ declare namespace Shadowrun {
         // The type of combat action to be performed. @taMiF: I don't think this is in use.
         type: string
         // A grouping of actions for different purposes.
-        category: '' | ActionCategories
+        category: ActionCategories
         // When set to true, the skill specialization modifier must be applied.
         spec: boolean
         // Unused legacy field. Not shown on any template, not set anywhere in system. Unsure about it's original intention.
@@ -171,6 +171,7 @@ declare namespace Shadowrun {
      * A specific purpose is for ActiveEffect to only apply to tests with specific action categories.
      */
     type ActionCategories = 
+        '' | // Empty values are allowed to allow users not having to set an action category.
         'skill_social' |
         // 'skill_leadership' | 
         'attack' |

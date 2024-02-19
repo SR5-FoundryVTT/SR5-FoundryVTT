@@ -86,11 +86,18 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (tests.length === 0 && this.test.opposing) return true;
         if (tests.length > 0 && !tests.includes(this.test.type)) return true;
 
+        // Check for action categories
+        const categories = effect.selectionCategories;
+        const category = this.test.data.action.category;
+        if (categories.length > 0 && !categories.includes(category)) return true;
+
+        // Check for test skill.
         const skills = effect.selectionSkills;
         const skillId = this.test.data.action.skill;
         const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
         if (skills.length > 0 && !skills.includes(skillName)) return true;
 
+        // Check for test attributes used.
         const attributes = effect.selectionAttributes;
         const attribute = this.test.data.action.attribute;
         const attribute2 = this.test.data.action.attribute2;
@@ -98,6 +105,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (attributes.length > 0 && attribute2 && !attributes.includes(attribute2)) return true;
         if (attributes.length > 0 && !attribute && !attribute2) return true;
 
+        // Check for test limits used.
         const limits = effect.selectionLimits;
         const limit = this.test.data.action.limit.attribute;
         if (limits.length > 0 && !limits.includes(limit)) return true;

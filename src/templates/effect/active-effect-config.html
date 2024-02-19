@@ -81,6 +81,7 @@
         {{/if}}
     </section>
 
+    <!-- Apply To Tab -->
     <section class="tab" data-tab="applyTo">
         <div class="form-group">
             <label data-tooltip="{{localize 'SR5.Tooltips.Effect.ApplyTo'}}">{{ localize "SR5.ActiveEffect.ApplyTo" }}</label>
@@ -99,6 +100,12 @@
             <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Tests" }}</label>
             <div class="form-fields">
                 <input name="flags.shadowrun5e.selection_tests" id="test-selection" class="tagify-selection" data-dtype="Text"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.ActionCategories" }}</label>
+            <div class="form-fields">
+                <input name="flags.shadowrun5e.selection_categories" id="categories-selection" class="tagify-selection" data-dtype="Text"/>
             </div>
         </div>
         <div class="form-group">
