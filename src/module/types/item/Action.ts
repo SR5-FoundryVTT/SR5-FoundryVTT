@@ -184,5 +184,6 @@ declare namespace Shadowrun {
         'spell_illusion' |
         'action_matrix' |
         'action_resonance' |
-        'action_rigging'
+        'action_rigging' |
+        'action_healing'
 }
