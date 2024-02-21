@@ -1092,7 +1092,7 @@ export class SR5Actor extends Actor {
             },
             participants: []
         };
-        const content = await renderTemplate('systems/shadowrun5e/src/templates/rolls/teamwork-test-message.html', templateData);
+        const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.html', templateData);
         // Prepare the actual message.
         const messageData =  {
             user: game.user?.id,
@@ -1129,7 +1129,7 @@ export class SR5Actor extends Actor {
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-        async rollTeamworktest(skillId: string, teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions={}) {
+        async rollTeamworkTest(skillId: string, teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions={}) {
             console.info(`Shadowrun5e | Rolling teamwork test for ${skillId}`);
     
             const action = this.skillActionData(skillId, options);
