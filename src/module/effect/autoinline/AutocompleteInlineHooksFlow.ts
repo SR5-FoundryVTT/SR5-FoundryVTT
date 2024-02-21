@@ -120,8 +120,6 @@ export const AutocompleteInlineHooksFlow =  {
             values['actor'] = effect.parent.parent.toObject();
         }
 
-        console.error('parent', effect.parent)
-        console.error('values', values);
         return values;
     },
 
