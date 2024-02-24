@@ -45,6 +45,7 @@
         "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
         "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden"
     },
+    "SR5.AP": "DK",
     "SR5.Accessory": "Zubehör",
     "SR5.Accuracy": "Präz.",
     "SR5.Action": "Handlung",
@@ -104,7 +105,6 @@
     "SR5.AmmoFull": "Vollgeladen",
     "SR5.AmmoGelRounds": "Gelmunition",
     "SR5.Aoe": "Flächeneffekt",
-    "SR5.AP": "DK",
     "SR5.ApplyWounds": "Wunden anwenden",
     "SR5.Armor": "Panzerung",
     "SR5.ArmorHardened": "Verstärkt",
@@ -376,9 +376,9 @@
         "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
         "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
         "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
+        "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
         "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
-        "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
-        "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden"
+        "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden"
     },
     "SR5.EssenceCost": "Essenz",
     "SR5.Expand": "Ausklappen",
@@ -402,17 +402,17 @@
     "SR5.Force": "Kraft",
     "SR5.FullDefense": "Volle Abwehr",
     "SR5.FullDefenseAttribute": "Attribut für Volle Abwehr",
+    "SR5.GMRequest": {
+        "General": "Your GM wants you to do a",
+        "RollAttribute": "Attribute Check",
+        "RollSkill": "Skill Check",
+        "Teamwork": "Teamwork Test",
+        "Threshold": " with a threshold of "
+    },
     "SR5.Gear": "Ausrüstung",
     "SR5.Glitch": "Patzer!",
     "SR5.GlitchCritical": "Kritischer Patzer!",
     "SR5.Glitches": "Patzer:",
-    "SR5.GMRequest": {
-        "General": "Your GM wants you to do a",
-        "Threshold": " with a threshold of ",
-        "RollSkill": "Skill Check",
-        "RollAttribute": "Attribute Check",
-        "Teamwork": "Teamwork Test"
-    },
     "SR5.GoodCover": "Gute Deckung",
     "SR5.GroupContact": "Gruppe",
     "SR5.HackingProgram": "Hackingprogramm",
@@ -758,6 +758,7 @@
         "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert."
     },
     "SR5.OverwatchScoreTrackerTitle": "Mr. Johnsons Baby-Monitor",
+    "SR5.PP": "KP",
     "SR5.Parry": "Parieren",
     "SR5.PartialCover": "Teildeckung",
     "SR5.Passive": "Passiv",
@@ -771,7 +772,6 @@
     "SR5.PowerPoints": "Kraftpunkte",
     "SR5.PowerType": "Typ",
     "SR5.Powers": "Kräfte",
-    "SR5.PP": "KP",
     "SR5.Program": "Programm",
     "SR5.ProgramType": "Typ",
     "SR5.Programs": "Programme",
@@ -1274,6 +1274,7 @@
         }
     },
     "SR5.UnderBarrel": "Unterlaufmontiert",
+    "SR5.UseEdgeForInitiativeRoll": "Benutze Edge Regel Blitz für Initiative",
     "SR5.Value": "Wert",
     "SR5.Vehicle": {
         "ChaseEnvironment": "Verfolgungsumgebung",
