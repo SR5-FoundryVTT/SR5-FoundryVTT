@@ -112,7 +112,15 @@ export const AutocompleteInlineHooksFlow =  {
         const effect = EffectConfig.object;
         if (!effect.parent) return {};
 
-        return effect.parent;
+        // Autocomplete inline properties module doesn't support get-er properties.
+        // For this reason we have to manually convert those nested objects we want provide.
+        const values = effect.parent.toObject();
+        
+        if (effect.parent.parent) {
+            values['actor'] = effect.parent.parent.toObject();
+        }
+
+        return values;
     },
 
     /**

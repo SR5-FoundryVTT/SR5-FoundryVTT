@@ -89,6 +89,120 @@
     .show-situation-modifiers-application {
         @include rollable;
     }
+    .grid-2-col{
+        display: grid;
+    }
+
+    // new SIN Layout
+    .license-section .list-item-content,
+    .license-section .list-item.item-section .list-item-content {
+        display: flex !important;
+        flex-direction: row;
+        justify-content: flex-start !important;
+        margin: 0 !important;
+        padding: 1px !important;
+    }
+
+    /* New or updated rules */
+    .license-section .item-text.rtg.rate,
+    .license-section .rtg-rate.item-text {  /* Updated */
+        margin-left: 0;
+        padding-left: 0;
+        text-align: left;
+        width: 22px;  /* Updated */
+    }
+    //Header Rating
+    .license-section .item-text.rtg.rate-header {
+        max-width: 2em;
+        margin-left: -1em;
+    }
+    //Header detail
+    .detail{
+        margin-left: 1em !important;
+    }
+    //Rating width
+    .license-section .list-item .rtg-rate.item-text {
+        max-width: 2em;
+    }
+    //Item Name field size
+    .license-section .list-item .rtg-rate.item-text {
+        max-width: 1em;
+    }
+    .item-name-field {
+        max-width: 11em;  /* Set to your desired max width */
+    }
+
+    .display.left.name-display {
+        width: 100%;  /* Takes the maximum width of the parent */
+        max-width: 100%;  /* Optional, ensures it doesn't go beyond parent */
+    }
+    // This class is only used for sin license descriptions and seems to be mostly a hack to get the description to better align with the license rating.
+    .display.desc-sin {
+        margin-left: 0.9em;
+    }
+    .license-section .list-item.item-section .item-left .item-text,
+    .license-section .list-item .item-left .item-text.item-name-header {
+        flex-basis: calc(15% - 1em);
+        text-align: left;
+    }
+
+    .item-text.item-name-header {
+        /* Set to your desired width */
+        max-width: 11em;  /* Optional, ensures it doesn't go beyond the set width */
+    }
+
+    .license-section .list-item.item-section .item-text.rtg.rate,
+    .license-section .list-item .rtg-rate.item-text {  /* Updated */
+        flex-basis: calc(25% - 1em);
+        text-align: left;
+        width: 22px;  /* Updated */
+    }
+
+    .license-section .list-item.item-section .item-text.desc.detail,
+    .license-section .list-item {
+        flex-basis: calc(25% - 1em);
+        text-align: left;
+    }
+
+    /* Specifics for the rtg-rate input field */
+    .license-section .list-item .rtg-rate.item-text input {  /* Updated */
+        width: 22px;  /* Updated */
+    }
+
+    // Specific em
+    .license-section .sr5 .list-header .list-item-content .item-text.desc,
+    .license-section .sr5 .list-item .list-item-content .item-text.desc {
+        width: 30em;
+        margin-right: 5px;
+    }
+
+    .license-section .item-left {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .license-section .item-left .item-text {
+        align-self: flex-start;
+    }
+
+    .license-section .sr5 .list-item .list-item-content .item-text.desc {
+        width: 30em !important;
+        margin-left: -1em !important;
+        text-align: left;
+    }
+
+    a.inventory-remove.action-icon.roll {
+        padding: 0.5em;
+        padding-left: 0.1em;
+    }
+    a.inventory-edit.action-icon.roll {
+        padding: 0.5em;
+    }
+    span.selection-inventory {
+        display: flex;
+        margin: 0.2em;
+    }
 }
 
 .align-items-center {
@@ -462,7 +576,7 @@ input[type='text'].display {
     }
 
     .description>.editor {
-        height: 250px;
+        height: 95%;
         min-height: 15em;
         width: 100%;
         color: $color;
@@ -1161,49 +1275,7 @@ input[type='text'].display {
         color: $pdfColor;
     }
 }
-
-/** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
- * otherwise cause issues with custom button styling.
- */
-.form-dialog .window-content .dialog-buttons {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-.form-dialog .window-content .dialog-buttons>* {
-    flex: 1;
-}
-
-.dialog-button.remove-token-modifiers-from-scene,
-.dialog-button.remove-modifiers-from-target{
-    background-color: $bgrButton;
-}
-.far-right {
-    justify-content: center;
-    right: -150px;
-}
 //END SR5 Style
-
-
-.list-header.item-section[data-item-id="weapon"][data-item-type=""] {
-    color: $yellow;  /* set the color to yellow */
-    font-size: small;
-}
-
-.common-test{
-    margin-bottom: 4px;
-    margin-top: 4px;
-    color: $white;
-    display: flex;
-    .test-icon {
-        width: 17px;
-        height: 17px;
-        margin-left: 5px;
-        margin-bottom: 0;
-        border: 0;
-    }
-}
 
 .custom-item-element {
     color: $white;               /* Text color */
@@ -1247,121 +1319,4 @@ input[type='text'].display {
 }
 .SR5 tr p:not(th p) {
     padding-left: 10px;  /* Padding on the left */
-}
-
-.fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
-{
-    color: $pdfColor;
-}
-
-// Test new SIN Layout
-
-.license-section .list-item-content,
-.license-section .list-item.item-section .list-item-content {
-    display: flex !important;
-    flex-direction: row;
-    justify-content: flex-start !important;
-    margin: 0 !important;
-    padding: 1px !important;
-}
-
-/* New or updated rules */
-.license-section .item-text.rtg.rate,
-.license-section .rtg-rate.item-text {  /* Updated */
-    margin-left: 0;
-    padding-left: 0;
-    text-align: left;
-    width: 22px;  /* Updated */
-}
-//Header Rating
-.license-section .item-text.rtg.rate-header {
-    max-width: 2em;
-    margin-left: -1em;
-}
-//Header detail
-.detail{
-    margin-left: 1em !important;
-}
-//Rating width
-.license-section .list-item .rtg-rate.item-text {
-    max-width: 2em;
-}
-//Item Name field size
-.license-section .list-item .rtg-rate.item-text {
-    max-width: 1em;
-}
-.item-name-field {
-    max-width: 11em;  /* Set to your desired max width */
-}
-
-.display.left.name-display {
-    width: 100%;  /* Takes the maximum width of the parent */
-    max-width: 100%;  /* Optional, ensures it doesn't go beyond parent */
-}
-// This class is only used for sin license descriptions and seems to be mostly a hack to get the description to better align with the license rating.
-.display.desc-sin {
-    margin-left: 0.9em;
-}
-.license-section .list-item.item-section .item-left .item-text,
-.license-section .list-item .item-left .item-text.item-name-header {
-    flex-basis: calc(15% - 1em);
-    text-align: left;
-}
-
-.item-text.item-name-header {
-    /* Set to your desired width */
-    max-width: 11em;  /* Optional, ensures it doesn't go beyond the set width */
-}
-
-.license-section .list-item.item-section .item-text.rtg.rate,
-.license-section .list-item .rtg-rate.item-text {  /* Updated */
-    flex-basis: calc(25% - 1em);
-    text-align: left;
-    width: 22px;  /* Updated */
-}
-
-.license-section .list-item.item-section .item-text.desc.detail,
-.license-section .list-item {
-    flex-basis: calc(25% - 1em);
-    text-align: left;
-}
-
-/* Specifics for the rtg-rate input field */
-.license-section .list-item .rtg-rate.item-text input {  /* Updated */
-    width: 22px;  /* Updated */
-}
-
-// Specific em
-.license-section .sr5 .list-header .list-item-content .item-text.desc,
-.license-section .sr5 .list-item .list-item-content .item-text.desc {
-    width: 30em;
-    margin-right: 5px;
-}
-
-.license-section .item-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.license-section .item-left .item-text {
-    align-self: flex-start;
-}
-
-.license-section .sr5 .list-item .list-item-content .item-text.desc {
-    width: 30em !important;
-    margin-left: -1em !important;
-    text-align: left;
-}
-
-a.inventory-remove.action-icon.roll {
-    padding: 0.5em;
-    padding-left: 0.1em;
-}
-a.inventory-edit.action-icon.roll {
-    padding: 0.5em;
-}
-span.selection-inventory {
-    display: flex;
-    margin: 0.2em;
 }
