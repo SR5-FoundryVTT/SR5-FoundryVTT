@@ -178,7 +178,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         const value = this.object.getFlag(SYSTEM_NAME, 'selection_categories') as string;
         const selected = value ? JSON.parse(value) : [];
 
-        createTagifyOnInput(inputElement, options, maxItems, selected);
+        createTagifyOnInput(inputElement, options, maxItems, selected, undefined);
     }
 
     _prepareSkillSelectionTagify(html: JQuery) {

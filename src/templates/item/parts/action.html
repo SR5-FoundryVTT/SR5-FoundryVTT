@@ -22,14 +22,7 @@
             {{localize "SR5.Labels.Action.Category"}}
         </div>
         <div class="inputs">
-            <select name="system.action.category">
-                {{#select system.action.category}}
-                <option value=""></option>
-                {{#each config.actionCategories as |label type|}}
-                <option value="{{type}}">{{localize label}}</option>
-                {{/each}}
-                {{/select}}
-            </select>
+            <input id="action-categories" class="tagify-selection"/>
         </div>
     </div>
     <div class="form-line">

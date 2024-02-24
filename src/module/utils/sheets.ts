@@ -22,6 +22,8 @@ interface TagifyOptions {
     maxItems?: number
     // Tags to be pre-applied
     tags?: TagData[]
+    // Should only tags in whitelist be allowed?
+    enforceWhitelist?: boolean
 }
 
 /**
@@ -33,7 +35,7 @@ interface TagifyOptions {
  */
 export function createTagify(input: HTMLInputElement|HTMLTextAreaElement|null, options: TagifyOptions = {}) {
     const tagify = new Tagify(input, {
-        enforceWhitelist: true,
+        enforceWhitelist: options.enforceWhitelist ?? false,
         editTags: false,
         skipInvalid: true,
         dropdown: {
@@ -62,21 +64,27 @@ interface TagifyTag {
 
 export type TagifyValues = TagifyValue[]
 export type TagifyTags = TagifyTag[]
+export type OnEventCallback = (event: Event) => void
 
 /**
  * Create a tagify from a given input element.
  * 
+ * TODO: This function is horrific and in need of a refactor for clarity.
+ * 
  * @param element 
- * @param whitelist 
+ * @param values 
  * @param maxItems 
- * @param selected 
+ * @param tags 
+ * @param onChangeCallback
+ * @param options
  */
-export function createTagifyOnInput(element: HTMLInputElement, options: TagifyValues, maxItems: number, selected: TagifyTags, onChangeCallback?: Function): Tagify {
-    const whitelist = options.map(value => ({value: game.i18n.localize(value.label), id: value.id}));
-    // const tags = selected.map(value => ({value: game.i18n.localize(value), id: value}));
-    const tagify = createTagify(element, {whitelist, maxItems, tags: selected});
+export function createTagifyOnInput(element: HTMLInputElement, values: TagifyValues, maxItems: number, tags: TagifyTags, onChangeCallback?: OnEventCallback, options?: TagifyOptions): Tagify {
+    options = options ?? {};
 
-    // @ts-expect-error
+    const whitelist = values.map(value => ({value: game.i18n.localize(value.label), id: value.id}));
+    // const tags = selected.map(value => ({value: game.i18n.localize(value), id: value}));
+    const tagify = createTagify(element, {whitelist, maxItems, tags, ...options});
+
     if (onChangeCallback) $(element).on('change', onChangeCallback);
 
     return tagify;

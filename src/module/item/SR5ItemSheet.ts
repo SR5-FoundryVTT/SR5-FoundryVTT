@@ -582,13 +582,20 @@ export class SR5ItemSheet extends ItemSheet {
      * Add a tagify element for an action-modifier dom element.
      *
      * Usage: Call method after render with a singular item's html sub-dom-tree.
+     * 
+     * Only action items will trigger the creation of a tagify element.
      *
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
         if (!this.item.isAction()) return;
 
-        var inputElement = html.find('input#action-modifier').get(0);
+        const inputElement = html.find('input#action-modifier').get(0);
+
+        if (!inputElement) {
+            console.error('Shadowrun 5e | Action item sheet does not contain an action-modifier input element');
+            return;
+        }
 
         // Tagify expects this format for localized tags.
         const whitelist = Object.keys(SR5.modifierTypes).map(modifier => ({
@@ -612,6 +619,50 @@ export class SR5ItemSheet extends ItemSheet {
             const modifiers = tagify.value.map(tag => tag.id);
             // render would loose tagify input focus. submit on close will save.
             await this.item.update({'system.action.modifiers': modifiers}, {render:false});
+        });
+    }
+
+    /**
+     * Add a tagify element for an action-categories dom element.
+     * 
+     * Usage: Call method after render with a singular item's html sub-dom-tree.
+     * 
+     * Only action items will trigger the creation of a tagify element.
+     * @param html 
+     */
+    _createActionCategoriesTagify(html) {
+        if (!this.item.isAction()) return;
+        
+        const inputElement = html.find('input#action-categories').get(0) as HTMLInputElement;
+
+        if (!inputElement) {
+            console.error('Shadowrun 5e | Action item sheet does not contain an action-categories input element');
+            return;
+        }
+
+        // Tagify expects this format for localized tags.
+        const whitelist = Object.keys(SR5.actionCategories).map(category => ({
+            value: game.i18n.localize(SR5.actionCategories[category]),
+            id: category
+        }));
+
+        // Tagify dropdown should show all whitelist tags.
+        const maxItems = Object.keys(SR5.actionCategories).length;
+
+        // Use localized label as value, and category as the later to be extracted value
+        const categories = this.item.system.action?.categories ?? [];
+        const tags = categories.map(category => ({
+            value: game.i18n.localize(SR5.actionCategories[category]) ?? category,
+            id: category
+        }));
+
+        const tagify = createTagify(inputElement, {whitelist, maxItems, tags});
+
+        html.find('input#action-categories').on('change', async (event) => {
+            // Custom tags will not have an id, so use value as id.
+            const categories = tagify.value.map(tag => tag.id ?? tag.value);
+            // render would loose tagify input focus. submit on close will save.
+            await this.item.update({'system.action.categories': categories}, {render:false});
         });
     }
 
@@ -734,6 +785,7 @@ export class SR5ItemSheet extends ItemSheet {
         if (!['action', 'equipment'].includes(this.document.type)) return;
 
         this._createActionModifierTagify(html);
+        this._createActionCategoriesTagify(html);
     }
 
     /**
