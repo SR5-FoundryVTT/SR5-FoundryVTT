@@ -710,6 +710,8 @@ export class SR5Actor extends Actor {
                 }
             }
         }
+
+        return this.getSkillByLabel(id)
     }
 
     /**
@@ -726,11 +728,6 @@ export class SR5Actor extends Actor {
 
         const skills = this.getSkills();
 
-        for (const [id, skill] of Object.entries(skills.active)) {
-            if (searchedFor === possibleMatch(skill))
-                return {...skill, id};
-        }
-
         for (const [id, skill] of Object.entries(skills.language.value)) {
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
@@ -745,6 +742,11 @@ export class SR5Actor extends Actor {
                 if (searchedFor === possibleMatch(skill))
                     return {...skill, id};
             }
+        }
+
+        for (const [id, skill] of Object.entries(skills.active)) {
+            if (searchedFor === possibleMatch(skill))
+                return {...skill, id};
         }
     }
 
