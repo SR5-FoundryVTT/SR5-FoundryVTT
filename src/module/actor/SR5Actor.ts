@@ -192,6 +192,20 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * The all temporary ActiveEffects that should display on the Token
+     * 
+     * The system uses a custom method of ActiveEffect applicable to. Some ActiveEffects don't apply to the actor,
+     * but still should show on it's token.
+     * 
+     * While default Foundry relies on allApplicableEffects, as it only knows apply-to actor effects, we have to 
+     * return all effects that are temporary instead, to include none-actor apply-to effects.
+     */
+    // @ts-expect-error NOTE: I don't fully understand the typing here. As typing is done for sy
+    override get temporaryEffects() {
+        return this.effects.filter(effect => effect.isTemporary);
+    }
+
+    /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
      *
      * At the moment general actor data preparation has been moved to derived data preparation, due it's dependence
