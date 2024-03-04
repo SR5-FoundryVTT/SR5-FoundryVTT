@@ -29,6 +29,7 @@ import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effe
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 
 
 /**
@@ -199,10 +200,28 @@ export class SR5Actor extends Actor {
      * 
      * While default Foundry relies on allApplicableEffects, as it only knows apply-to actor effects, we have to 
      * return all effects that are temporary instead, to include none-actor apply-to effects.
+     * 
+     * NOTE: Foundry also shows disabled effects by default. We behave the same.
      */
     // @ts-expect-error NOTE: I don't fully understand the typing here. As typing is done for sy
     override get temporaryEffects() {
-        return this.effects.filter(effect => effect.isTemporary);
+        // @ts-expect-error // TODO: foundry-vtt-types v10
+        const showEffectIcon = (effect: SR5ActiveEffect) => !effect.disabled && !effect.isSuppressed && effect.isTemporary;
+
+        // Collect actor effects.
+        let effects = this.effects.filter(showEffectIcon);
+
+        // Collect item effects.
+        for (const item of this.items) {
+            effects = effects.concat(item.effects.filter(showEffectIcon));
+
+            // Collect nested item effects.
+            for (const nestedItem of item.items) {
+                effects = effects.concat(nestedItem.effects.filter(showEffectIcon));
+            }
+        }
+
+        return effects;
     }
 
     /**
