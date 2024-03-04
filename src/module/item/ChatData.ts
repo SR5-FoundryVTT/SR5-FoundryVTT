@@ -178,7 +178,10 @@ export const ChatData = {
 
     complex_form: (system, labels, props) => {
         ChatData.action(system, labels, props);
-        props.push(Helpers.label(game.i18n.localize(SR5.matrixTargets[system.target])), Helpers.label(system.duration));
+        
+        props.push(game.i18n.localize(SR5.matrixTargets[system.target]));
+        props.push(system.duration);
+
         const { fade } = system;
         if (fade > 0) props.push(`${game.i18n.localize('SR5.Fade')} ${game.i18n.localize('SR5.Level').charAt(0)}+${fade}`);
         else if (fade < 0) props.push(`${game.i18n.localize('SR5.Fade')} ${game.i18n.localize('SR5.Level').charAt(0)}${fade}`);
