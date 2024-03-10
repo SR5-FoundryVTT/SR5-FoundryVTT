@@ -16,6 +16,7 @@ declare namespace Shadowrun {
     // Register your global ItemData types here.  Try sorting your ItemData types alphabetically.
     export type ShadowrunItemData =
         | ActionItemData
+        | ActiveEffectItemData
         | AdeptPowerItemData
         | AmmoItemData
         | ArmorItemData
@@ -61,6 +62,7 @@ declare namespace Shadowrun {
      */
     export type ShadowrunItemDataData =
         Partial<ActionData> &
+        Partial<ActiveEffectData> &
         Partial<AdeptPowerData> &
         Partial<AmmoData> &
         Partial<ArmorData> &
@@ -90,6 +92,14 @@ declare namespace Shadowrun {
         img: string;
         data: ActionData;
         system: ActionData;
+    }
+
+    export interface ActiveEffectItemData {
+        type: 'active_effect';
+        name: string;
+        img: string;
+        data: ActiveEffectData;
+        system: ActiveEffectData;
     }
 
     export interface AdeptPowerItemData {

@@ -1168,6 +1168,7 @@
     "Item": {
         "types": [
             "action",
+            "active_effect",
             "adept_power",
             "ammo",
             "armor",
@@ -1631,6 +1632,9 @@
         },
         "echo" : {
             "templates": ["description", "importFlags"]
+        },
+        "active_effect": {
+            "templates": ["description"]
         }
     }
 }

@@ -7,6 +7,7 @@
 export const SR5 = {
     itemTypes: {
         action: 'SR5.ItemTypes.Action',
+        active_effect: 'SR5.ItemTypes.ActiveEffect',
         adept_power: 'SR5.ItemTypes.AdeptPower',
         ammo: 'SR5.ItemTypes.Ammo',
         armor: 'SR5.ItemTypes.Armor',
