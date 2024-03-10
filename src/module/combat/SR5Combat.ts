@@ -371,11 +371,15 @@ export class SR5Combat extends Combat {
         const round = SR.combat.INITIAL_INI_ROUND;
         const initiativePass = SR.combat.INITIAL_INI_PASS;
 
-        await this.update({
+        const updateData = {
             turn,
             round,
             [`flags.${SYSTEM_NAME}.${FLAGS.CombatInitiativePass}`]: initiativePass
-        });
+        }
+        await this.update(updateData);
+
+        super._playCombatSound("startEncounter");
+        Hooks.callAll("combatStart", this, updateData);
 
         await this.handleActionPhase();
 
