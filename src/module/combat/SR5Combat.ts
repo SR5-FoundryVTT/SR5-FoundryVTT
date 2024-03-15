@@ -378,9 +378,12 @@ export class SR5Combat extends Combat {
         }
         await this.update(updateData);
 
-        super._playCombatSound("startEncounter");
+        // Implement super.startCombat behavior.
+        //@ts-expect-error foundry-vtt-types v10
+        this._playCombatSound("startEncounter");
         Hooks.callAll("combatStart", this, updateData);
-
+        
+        // After starting combat immediately go to the first action phase.
         await this.handleActionPhase();
 
         return this;
