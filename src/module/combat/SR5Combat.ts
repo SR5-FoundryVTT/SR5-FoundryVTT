@@ -371,12 +371,19 @@ export class SR5Combat extends Combat {
         const round = SR.combat.INITIAL_INI_ROUND;
         const initiativePass = SR.combat.INITIAL_INI_PASS;
 
-        await this.update({
+        const updateData = {
             turn,
             round,
             [`flags.${SYSTEM_NAME}.${FLAGS.CombatInitiativePass}`]: initiativePass
-        });
+        }
+        await this.update(updateData);
 
+        // Implement super.startCombat behavior.
+        //@ts-expect-error foundry-vtt-types v10
+        this._playCombatSound("startEncounter");
+        Hooks.callAll("combatStart", this, updateData);
+        
+        // After starting combat immediately go to the first action phase.
         await this.handleActionPhase();
 
         return this;
