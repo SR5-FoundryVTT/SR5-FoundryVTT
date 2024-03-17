@@ -201,7 +201,7 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Register diagonal movement rule setting
+     * Determines whether freshly imported items should be marked with an icon and/or modified text color
      */
     game.settings.register(SYSTEM_NAME, FLAGS.MarkImports, {
         name: 'SETTINGS.MarkImportsName',
@@ -217,5 +217,17 @@ export const registerSystemSettings = () => {
             'ICON': 'SETTINGS.FreshIcon',
             'NONE': 'SETTINGS.NoMarking'
         }
+    });
+
+    /**
+     * Sets the default importer icon folder
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.ImportIconFolder, {
+        name: 'SETTINGS.ImportIconFolderName',
+        hint: 'SETTINGS.ImportIconFolderDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        default: 'systems/shadowrun5e/dist/icons/importer/'
     });
 };
