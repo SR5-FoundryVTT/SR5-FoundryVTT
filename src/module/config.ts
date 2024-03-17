@@ -579,8 +579,34 @@ export const SR5 = {
 
     // System provided categories to group actions with and address them.
     actionCategories: {
-        'skill_social': 'SR5.ActionCategory.SkillSocial',
-        'action_matrix': 'SR5.ActionCategory.ActionMatrix',
+        'attack_melee': "SR5.ActionCategory.AttackMelee",
+        'attack_ranged': "SR5.ActionCategory.AttackRanged", 
+        'attack_thrown': "SR5.ActionCategory.AttackThrown",
+        'attack': "SR5.ActionCategory.Attack",
+        'brute_force': "SR5.ActionCategory.BruteForce",
+        'compiling': "SR5.ActionCategory.Compiling",
+        'complex_form': "SR5.ActionCategory.ComplexForm",
+        'defense_suppression': "SR5.ActionCategory.DefenseSuppression",
+        'defense': "SR5.ActionCategory.Defense", 
+        'drain': "SR5.ActionCategory.Drain",
+        'fade': "SR5.ActionCategory.Fade", 
+        'hack_on_the_fly': "SR5.ActionCategory.HackOnTheFly",
+        'magic': "SR5.ActionCategory.Magic",
+        'matrix': 'SR5.ActionCategory.Matrix',
+        'recovery_physical': "SR5.ActionCategory.RecoveryPhysical",
+        'recovery_stun': "SR5.ActionCategory.RecoveryStun",
+        'recovery': "SR5.ActionCategory.Recovery",
+        'resist': "SR5.ActionCategory.Resist",
+        'resonance': "SR5.ActionCategory.Resonance",
+        'rigging': "SR5.ActionCategory.Rigging",
+        'social': 'SR5.ActionCategory.Social',
+        'spell_combat': "SR5.ActionCategory.SpellCombat",
+        'spell_detection': "SR5.ActionCategory.SpellDetection",
+        'spell_healing': "SR5.ActionCategory.SpellHealing",
+        'spell_illusion': "SR5.ActionCategory.SpellIllusion", 
+        'spell_manipulation': "SR5.ActionCategory.SpellManipulation",
+        'spell_ritual': "SR5.ActionCategory.SpellRitual",
+        'summoning': "SR5.ActionCategory.Summoning"
     },
 
     matrixAttributes: {

@@ -51,7 +51,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
-        return ['action_compiling'];
+        return ['compiling'];
     }
 
     // TODO: Add missing modifiers (gitter) // SR5#251

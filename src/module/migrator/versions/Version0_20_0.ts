@@ -38,6 +38,7 @@ export class Version0_20_0 extends VersionMigration {
         for (const item of actor.items) {
             if (await this.ShouldMigrateItemData(item)) {
                 const {data} = await this.MigrateItemData(item);
+                // @ts-expect-error - Don't care enough to resolve this local typing issue...
                 updateData.items.push({_id: item.id, ...data});
             }
         }

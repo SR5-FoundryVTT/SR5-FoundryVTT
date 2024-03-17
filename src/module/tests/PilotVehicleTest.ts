@@ -32,6 +32,6 @@ export class PilotVehicleTest extends SuccessTest {
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
-        return ['action_rigging']
+        return ['rigging']
     }
 }

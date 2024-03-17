@@ -173,33 +173,32 @@ declare namespace Shadowrun {
      */
     type ActionCategories = 
         '' | // Empty values are allowed to allow users not having to set an action category.
-        'skill_social' |
-        // 'skill_leadership' | 
-        'attack' |
         'attack_melee' | 
         'attack_ranged' | 
         'attack_thrown' |
-        'defense' |
+        'attack' |
+        'brute_force' |
+        'compiling' |
+        'complex_form' |
         'defense_suppression' |
-        'resist' |
-        'spell_combat' | 
-        'spell_detection' |
-        'spell_manipulation' |
-        'spell_healing' | 
-        'spell_illusion' |
-        'spell_ritual' | 
+        'defense' |
         'drain' | 
         'fade' | 
-        'action_magic' | 
-        'action_magic_summoning' |
-        'action_matrix' |
-        'action_hack_on_the_fly' |
-        'action_brute_force' |
-        'action_resonance' |
-        'action_complex_form' |
-        'action_compiling' |
-        'action_rigging' |
-        'action_recovery' |
-        'action_recovery_physical' |
-        'action_recovery_stun'
+        'hack_on_the_fly' |
+        'magic' | 
+        'matrix' |
+        'recovery_physical' |
+        'recovery_stun' |
+        'recovery' |
+        'resist' |
+        'resonance' |
+        'rigging' |
+        'social' |
+        'spell_combat' | 
+        'spell_detection' |
+        'spell_healing' | 
+        'spell_illusion' |
+        'spell_manipulation' |
+        'spell_ritual' | 
+        'summoning' 
 }

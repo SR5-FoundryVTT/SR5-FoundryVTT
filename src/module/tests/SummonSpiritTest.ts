@@ -51,7 +51,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
-        return ['action_magic_summoning']
+        return ['summoning']
     }
 
     /**

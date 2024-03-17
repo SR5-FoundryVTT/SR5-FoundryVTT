@@ -18,7 +18,7 @@ export class NaturalRecoveryPhysicalTest extends SuccessTest {
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
-        return ['action_recovery', 'action_recovery_physical']
+        return ['recovery', 'recovery_physical']
     }
 
     /**

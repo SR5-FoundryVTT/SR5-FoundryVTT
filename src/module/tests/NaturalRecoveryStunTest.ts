@@ -8,7 +8,7 @@ export class NaturalRecoveryStunTest extends SuccessTest {
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
-        return ['action_recovery', 'action_recovery_stun']
+        return ['recovery', 'recovery_stun']
     }
 
     /**
