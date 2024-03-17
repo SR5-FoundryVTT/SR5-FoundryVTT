@@ -230,4 +230,16 @@ export const registerSystemSettings = () => {
         type: String,
         default: 'systems/shadowrun5e/dist/icons/importer/'
     });
+
+    /**
+     * Use the default icon overrides setting
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.UseImportIconOverrides, {
+        name: 'SETTINGS.UseImportIconOverridesName',
+        hint: 'SETTINGS.UseImportIconOverridesDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true
+    });
 };

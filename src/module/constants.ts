@@ -49,6 +49,7 @@ export const FLAGS = {
     ManualRollOnSuccessTest: 'ManualRollOnSuccessTest',
     MarkImports: 'MarkImports',
     ImportIconFolder: 'ImportIconFolder',
+    UseImportIconOverrides: 'UseImportIconOverrides',
     CreateTargetedEffects: 'CreateTargetedEffects',
     DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
     TeamworkTestFlow: 'TeamworkTestFlow',

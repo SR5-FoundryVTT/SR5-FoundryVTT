@@ -45,7 +45,9 @@
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
         "UseDamageConditionDescription": "System marks tokens according to their condition monitor",
-        "UseDamageConditionName": "Use system handling for token status effects"
+        "UseDamageConditionName": "Use system handling for token status effects",
+        "UseImportIconOverridesDescription": "When importing items, use the same icons for some different item types when it makes sense. Uncheck if using custom icons.",
+        "UseImportIconOverridesName": "Use Default Importer Icon Overrides"
     },
     "SR5.AP": "AP",
     "SR5.Accessory": "Accessory",
