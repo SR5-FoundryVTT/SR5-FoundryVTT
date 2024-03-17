@@ -1280,6 +1280,7 @@
         }
     },
     "SR5.UnderBarrel": "Under Barrel",
+    "SR5.UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
     "SR5.Value": "Value",
     "SR5.Vehicle": {
         "ChaseEnvironment": "Chase Environment",

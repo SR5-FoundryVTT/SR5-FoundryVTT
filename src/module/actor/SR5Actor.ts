@@ -29,6 +29,7 @@ import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effe
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 
 
 /**
@@ -189,6 +190,38 @@ export class SR5Actor extends Actor {
         for (const effect of allApplicableItemsEffects(this, {applyTo: ['actor']})) {
             yield effect;
         }
+    }
+
+    /**
+     * The all temporary ActiveEffects that should display on the Token
+     * 
+     * The system uses a custom method of ActiveEffect applicable to. Some ActiveEffects don't apply to the actor,
+     * but still should show on it's token.
+     * 
+     * While default Foundry relies on allApplicableEffects, as it only knows apply-to actor effects, we have to 
+     * return all effects that are temporary instead, to include none-actor apply-to effects.
+     * 
+     * NOTE: Foundry also shows disabled effects by default. We behave the same.
+     */
+    // @ts-expect-error NOTE: I don't fully understand the typing here. As typing is done for sy
+    override get temporaryEffects() {
+        // @ts-expect-error // TODO: foundry-vtt-types v10
+        const showEffectIcon = (effect: SR5ActiveEffect) => !effect.disabled && !effect.isSuppressed && effect.isTemporary;
+
+        // Collect actor effects.
+        let effects = this.effects.filter(showEffectIcon);
+
+        // Collect item effects.
+        for (const item of this.items) {
+            effects = effects.concat(item.effects.filter(showEffectIcon));
+
+            // Collect nested item effects.
+            for (const nestedItem of item.items) {
+                effects = effects.concat(nestedItem.effects.filter(showEffectIcon));
+            }
+        }
+
+        return effects;
     }
 
     /**
@@ -710,6 +743,8 @@ export class SR5Actor extends Actor {
                 }
             }
         }
+
+        return this.getSkillByLabel(id)
     }
 
     /**
@@ -726,11 +761,6 @@ export class SR5Actor extends Actor {
 
         const skills = this.getSkills();
 
-        for (const [id, skill] of Object.entries(skills.active)) {
-            if (searchedFor === possibleMatch(skill))
-                return {...skill, id};
-        }
-
         for (const [id, skill] of Object.entries(skills.language.value)) {
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
@@ -745,6 +775,11 @@ export class SR5Actor extends Actor {
                 if (searchedFor === possibleMatch(skill))
                     return {...skill, id};
             }
+        }
+
+        for (const [id, skill] of Object.entries(skills.active)) {
+            if (searchedFor === possibleMatch(skill))
+                return {...skill, id};
         }
     }
 
@@ -1092,7 +1127,7 @@ export class SR5Actor extends Actor {
             },
             participants: []
         };
-        const content = await renderTemplate('systems/shadowrun5e/src/templates/rolls/teamwork-test-message.html', templateData);
+        const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.html', templateData);
         // Prepare the actual message.
         const messageData =  {
             user: game.user?.id,
@@ -1129,7 +1164,7 @@ export class SR5Actor extends Actor {
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-        async rollTeamworktest(skillId: string, teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions={}) {
+        async rollTeamworkTest(skillId: string, teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions={}) {
             console.info(`Shadowrun5e | Rolling teamwork test for ${skillId}`);
     
             const action = this.skillActionData(skillId, options);
