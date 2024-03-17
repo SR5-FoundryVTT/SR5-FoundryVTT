@@ -19,7 +19,7 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
 
     const defaultImg = "icons/svg/item-bag.svg";
     const imgFolder = "systems/shadowrun5e/dist/icons/importer/";
-    const imgExtension = '.svg';
+    const imgExtensionOptions = ['.svg', '.webp', '.png', '.jpg', '.jpeg', '.avif'];
     const imgName = importFlags.name;
     const imgType = importFlags.type;
     const imgSubType = importFlags.subType;
@@ -30,11 +30,11 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
 
     // Priority of file names to check
     let fileNamePriority = [
-        override,
-        imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension,
-        imgFolder + imgType + '/' + imgType + imgExtension,
-        imgFolder + imgSubType + imgExtension,
-        imgFolder + imgType + imgExtension
+        imgFolder + override,
+        imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType,
+        imgFolder + imgType + '/' + imgType,
+        imgFolder + imgSubType,
+        imgFolder + imgType
     ]
     switch (imgType) {
         case 'armor':
@@ -44,12 +44,12 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
 
         case 'weapon':
             fileNamePriority = [
-                override,
-                imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension,
-                imgFolder + imgType + '/' + system.category + imgExtension,
-                imgFolder + imgType + '/' + imgType + imgExtension,
-                imgFolder + imgSubType + imgExtension,
-                imgFolder + imgType + imgExtension
+                imgFolder + override,
+                imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType,
+                imgFolder + imgType + '/' + system.category,
+                imgFolder + imgType + '/' + imgType,
+                imgFolder + imgSubType,
+                imgFolder + imgType
             ]
             break;
 
@@ -59,8 +59,11 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
 
     // Run through potential file names, taking the first one that has an icon that exists
     for (const iconFileName of fileNamePriority) {
-        if (iconList.includes(iconFileName)) {
-            return iconFileName
+        for (const imgExtension of imgExtensionOptions) {
+            const withExtension = iconFileName + imgExtension;
+            if (iconList.includes(withExtension)) {
+                return withExtension
+            }
         }
     }
 

@@ -1114,7 +1114,7 @@ export const SR5 = {
 
     /**
      * Active/AdvancedEffect apply To types and their labels.
-     * 
+     *
      * actor is the default Foundry apply to type of ActiveEffects and will be affect actor data.
      */
     effectApplyTo: {
@@ -1129,7 +1129,7 @@ export const SR5 = {
     itemSubTypeIconOverrides: {
         action: {},
         adept_power: {
-            'adept-spell': 'systems/shadowrun5e/dist/icons/importer/spell/spell.svg'
+            'adept-spell': 'spell/spell.svg'
         },
         ammo: {
             'ammo': '',
@@ -1151,7 +1151,7 @@ export const SR5 = {
             'specialty-armor': ''
         },
         bioware: {
-            'basic': 'systems/shadowrun5e/dist/icons/importer/bioware/bioware.svg',
+            'basic': 'bioware/bioware.svg',
             'bio-weapons': '',
             'biosculpting': '',
             'chemical-gland-modifications': '',
@@ -1163,21 +1163,21 @@ export const SR5 = {
             'genetic-restoration': '',
             'immunization': '',
             'orthoskin-upgrades': '',
-            'phenotype-adjustment': 'systems/shadowrun5e/dist/icons/importer/bioware/biosculpting.svg',
-            'symbionts': 'systems/shadowrun5e/dist/icons/importer/bioware/cultured.svg',
-            'transgenic-alteration': 'systems/shadowrun5e/dist/icons/importer/bioware/transgenic-alteration.svg',
+            'phenotype-adjustment': 'bioware/biosculpting.svg',
+            'symbionts': 'bioware/cultured.svg',
+            'transgenic-alteration': 'bioware/transgenic-alteration.svg',
             'transgenics': ''
         },
         complex_form: {},
         contact: {},
         critter_power: {
             'mana': '',
-            'physical': 'systems/shadowrun5e/dist/icons/importer/critter_power/critter_power.svg'
+            'physical': 'critter_power/critter_power.svg'
         },
         cyberware: {
             'auto-injector-mods': '',
             'bodyware': '',
-            'cosmetic-enhancement': 'systems/shadowrun5e/dist/icons/importer/bioware/cosmetic-bioware.svg',
+            'cosmetic-enhancement': 'bioware/cosmetic-bioware.svg',
             'cyber-implant-weapon': '',
             'cyber-implant-weapon-accessory': '',
             'cyberlimb': '',
@@ -1187,13 +1187,13 @@ export const SR5 = {
             'earware': '',
             'eyeware': '',
             'hard-nanoware': '',
-            'headware': 'systems/shadowrun5e/dist/icons/importer/cyberware/cyberware.svg',
-            'nanocybernetics': 'systems/shadowrun5e/dist/icons/importer/cyberware/hard-nanoware.svg',
-            'soft-nanoware': 'systems/shadowrun5e/dist/icons/importer/cyberware/hard-nanoware.svg',
+            'headware': 'cyberware/cyberware.svg',
+            'nanocybernetics': 'cyberware/hard-nanoware.svg',
+            'soft-nanoware': 'cyberware/hard-nanoware.svg',
             'special-biodrone-cyberware': ''
         },
         device: {
-            'commlink': 'systems/shadowrun5e/dist/icons/importer/device.svg',
+            'commlink': 'device.svg',
             'cyberdeck': '',
             'rcc': ''
         },
@@ -1204,23 +1204,23 @@ export const SR5 = {
             'armor-enhancements': '',
             'audio-devices': '',
             'audio-enhancements': '',
-            'autosofts': 'systems/shadowrun5e/dist/icons/importer/equipment/software.svg',
+            'autosofts': 'equipment/software.svg',
             'biotech': '',
             'booster-chips': '',
             'breaking-and-entering-gear': '',
             'btls': '',
             'chemicals': '',
             'commlink-accessories': '',
-            'commlink-apps': 'systems/shadowrun5e/dist/icons/importer/equipment/software.svg',
+            'commlink-apps': 'equipment/software.svg',
             'commlink-cyberdeck-form-factors': '',
-            'communications-and-countermeasures': 'systems/shadowrun5e/dist/icons/importer/equipment/pi-tac.svg',
+            'communications-and-countermeasures': 'equipment/pi-tac.svg',
             'contracts-upkeep': '',
             'critter-gear': '',
             'currency': '',
             'custom-cyberdeck-attributes': '',
             'cyberdeck-modules': '',
-            'cyberterminals': 'systems/shadowrun5e/dist/icons/importer/equipment/pi-tac.svg',
-            'disguises': 'systems/shadowrun5e/dist/icons/importer/equipment/appearance-modification.svg',
+            'cyberterminals': 'equipment/pi-tac.svg',
+            'disguises': 'equipment/appearance-modification.svg',
             'drug-grades': '',
             'drugs': '',
             'electronic-accessories': '',
@@ -1234,7 +1234,7 @@ export const SR5 = {
             'food': '',
             'formulae': '',
             'grapple-gun': '',
-            'hard-nanoware': 'systems/shadowrun5e/dist/icons/importer/cyberware/hard-nanoware.svg',
+            'hard-nanoware': 'cyberware/hard-nanoware.svg',
             'housewares': '',
             'id-credsticks': '',
             'magical-compounds': '',
@@ -1243,21 +1243,21 @@ export const SR5 = {
             'metatype-specific': '',
             'miscellany': '',
             'musical-instruments': '',
-            'nanogear': 'systems/shadowrun5e/dist/icons/importer/cyberware/hard-nanoware.svg',
+            'nanogear': 'cyberware/hard-nanoware.svg',
             'paydata': '',
             'pi-tac': '',
-            'pi-tac-programs': 'systems/shadowrun5e/dist/icons/importer/equipment/software.svg',
+            'pi-tac-programs': 'equipment/software.svg',
             'printing': '',
             'reporter-gear': '',
-            'rfid-tags': 'systems/shadowrun5e/dist/icons/importer/equipment/pi-tac.svg',
+            'rfid-tags': 'equipment/pi-tac.svg',
             'security-devices': '',
             'sensor-functions': '',
             'sensor-housings': '',
-            'sensors': 'systems/shadowrun5e/dist/icons/importer/equipment/pi-tac.svg',
+            'sensors': 'equipment/pi-tac.svg',
             'services': '',
-            'skillsofts': 'systems/shadowrun5e/dist/icons/importer/equipment/software.svg',
+            'skillsofts': 'equipment/software.svg',
             'software': '',
-            'software-tweaks': 'systems/shadowrun5e/dist/icons/importer/equipment/software.svg',
+            'software-tweaks': 'equipment/software.svg',
             'survival-gear': '',
             'tailored-perfume-cologne': '',
             'tools': '',
@@ -1275,7 +1275,7 @@ export const SR5 = {
             'side': '',
             'stock': '',
             'top': '',
-            'under': 'systems/shadowrun5e/dist/icons/importer/modification/modification.svg'
+            'under': 'modification/modification.svg'
         },
         program:        {
             'common_program': '',
@@ -1303,43 +1303,43 @@ export const SR5 = {
             'thrown': '',
             'assault-cannons': '',
             'assault-rifles': '',
-            'bio-weapon': 'systems/shadowrun5e/dist/icons/importer/cyberware/cyber-implant-weapon.svg',
+            'bio-weapon': 'cyberware/cyber-implant-weapon.svg',
             'blades': '',
             'bows': '',
             'carbines': '',
             'clubs': '',
             'crossbows': '',
-            'cyberweapon': 'systems/shadowrun5e/dist/icons/importer/cyberware/cyber-implant-weapon.svg',
+            'cyberweapon': 'cyberware/cyber-implant-weapon.svg',
             'exotic-melee-weapons': '',
             'exotic-ranged-weapons': '',
             'flamethrowers': '',
-            'gear': 'systems/shadowrun5e/dist/icons/importer/equipment/equipment.svg',
+            'gear': 'equipment/equipment.svg',
             'grenade-launchers': '',
-            'grenade': 'systems/shadowrun5e/dist/icons/importer/ammo/grenade.svg',
-            'heavy-machine-guns': 'systems/shadowrun5e/dist/icons/importer/weapon/assault-cannons.svg',
+            'grenade': 'ammo/grenade.svg',
+            'heavy-machine-guns': 'weapon/assault-cannons.svg',
             'heavy-pistols': '',
             'holdouts': '',
             'improvised-weapons': '',
             'laser-weapons': '',
-            'light-machine-guns': 'systems/shadowrun5e/dist/icons/importer/weapon/assault-cannons.svg',
+            'light-machine-guns': 'weapon/assault-cannons.svg',
             'light-pistols': '',
             'machine-pistols': '',
-            'medium-machine-guns': 'systems/shadowrun5e/dist/icons/importer/weapon/assault-cannons.svg',
+            'medium-machine-guns': 'weapon/assault-cannons.svg',
             'micro-drone-weapons': '',
-            'micro-torpedo': 'systems/shadowrun5e/dist/icons/importer/ammo/micro-torpedo.svg',
-            'minigrenade': 'systems/shadowrun5e/dist/icons/importer/ammo/minigrenade.svg',
-            'missile': 'systems/shadowrun5e/dist/icons/importer/ammo/missile.svg',
+            'micro-torpedo': 'ammo/micro-torpedo.svg',
+            'minigrenade': 'ammo/minigrenade.svg',
+            'missile': 'ammo/missile.svg',
             'missile-launchers': '',
-            'quality': 'systems/shadowrun5e/dist/icons/importer/quality/quality.svg',
-            'rocket': 'systems/shadowrun5e/dist/icons/importer/ammo/rocket.svg',
+            'quality': 'quality/quality.svg',
+            'rocket': 'ammo/rocket.svg',
             'shotguns': '',
             'sniper-rifles': '',
-            'sporting-rifles': 'systems/shadowrun5e/dist/icons/importer/weapon/carbines.svg',
+            'sporting-rifles': 'weapon/carbines.svg',
             'submachine-guns': '',
             'tasers': '',
-            'torpedo-grenade': 'systems/shadowrun5e/dist/icons/importer/ammo/torpedo-grenade.svg',
+            'torpedo-grenade': 'ammo/torpedo-grenade.svg',
             'unarmed': '',
-            'underbarrel-weapons': 'systems/shadowrun5e/dist/icons/importer/modification/modification.svg'
+            'underbarrel-weapons': 'modification/modification.svg'
         }
     }
 } as const;
