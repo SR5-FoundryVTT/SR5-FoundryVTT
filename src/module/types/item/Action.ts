@@ -173,32 +173,38 @@ declare namespace Shadowrun {
      */
     type ActionCategories = 
         '' | // Empty values are allowed to allow users not having to set an action category.
-        'attack_melee' | 
-        'attack_ranged' | 
-        'attack_thrown' |
-        'attack' |
-        'brute_force' |
-        'compiling' |
-        'complex_form' |
-        'defense_suppression' |
-        'defense' |
-        'drain' | 
-        'fade' | 
-        'hack_on_the_fly' |
-        'magic' | 
-        'matrix' |
-        'recovery_physical' |
-        'recovery_stun' |
-        'recovery' |
-        'resist' |
-        'resonance' |
-        'rigging' |
-        'social' |
-        'spell_combat' | 
-        'spell_detection' |
-        'spell_healing' | 
-        'spell_illusion' |
-        'spell_manipulation' |
-        'spell_ritual' | 
-        'summoning' 
+        'addiction_mental' | // resisting against mental addiction
+        'addiction_physical' | // resisting against physical addiction
+        'addiction' | // resisting against addiction in general
+        'attack_melee' | // attacks made with melee weapons
+        'attack_ranged' | // attacks made with ranged weapons
+        'attack_thrown' | // attacks made with thrown weapons
+        'attack' | // attacks in general, includes all other attack types
+        'brute_force' | // matrix brute force action
+        'climbing' | // using climbing skills
+        'compiling' | // technomancer compiling sprites action
+        'complex_form' | // technomancer threading complex form action
+        'defense_suppression' | // defending against suppression attacks
+        'defense' | // defending in general, includes all other defense types
+        'drain' | // resisting against drain
+        'fade' | // resisting against fade
+        'hack_on_the_fly' | // matrix hack on the fly action
+        'magic' | // all magic actions in general
+        'matrix' | // all  matrix actions in general
+        'recovery_physical' | // natural recovery of physical damage
+        'recovery_stun' | // natural recovery of stun damage
+        'recovery' | // natural recovery in general, includes all other recovery types
+        'resist' | // resisting damage after getting hit
+        'resist_disease' | // resisting against diseases
+        'resist_toxin' | // resisting against toxins
+        'resonance' | // all resonance actions in general
+        'rigging' | // all rigging actions in general
+        'social' | // all social skill actions
+        'spell_combat' |  // all combat spells
+        'spell_detection' | // all detection spells
+        'spell_healing' | // all healing spells
+        'spell_illusion' | // all illusion spells
+        'spell_manipulation' | // all manipulation spells
+        'spell_ritual' |  // all ritual spells
+        'summoning' // magical summoning of spirits
 }

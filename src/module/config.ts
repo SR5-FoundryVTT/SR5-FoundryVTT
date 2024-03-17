@@ -577,13 +577,18 @@ export const SR5 = {
         divide: '/'
     },
 
-    // System provided categories to group actions with and address them.
+    // Map all Shadowrun.ActionCategories to their matching labels.
+    // For more information around action categories, see type documentation.
     actionCategories: {
+        'addiction_mental': "SR5.ActionCategory.AddictionMental",
+        'addiction_physical': "SR5.ActionCategory.AddictionPhysical",
+        'addiction': "SR5.ActionCategory.Addiction",
         'attack_melee': "SR5.ActionCategory.AttackMelee",
         'attack_ranged': "SR5.ActionCategory.AttackRanged", 
         'attack_thrown': "SR5.ActionCategory.AttackThrown",
         'attack': "SR5.ActionCategory.Attack",
         'brute_force': "SR5.ActionCategory.BruteForce",
+        "climbing": "SR5.ActionCategory.Climbing",
         'compiling': "SR5.ActionCategory.Compiling",
         'complex_form': "SR5.ActionCategory.ComplexForm",
         'defense_suppression': "SR5.ActionCategory.DefenseSuppression",
@@ -596,6 +601,8 @@ export const SR5 = {
         'recovery_physical': "SR5.ActionCategory.RecoveryPhysical",
         'recovery_stun': "SR5.ActionCategory.RecoveryStun",
         'recovery': "SR5.ActionCategory.Recovery",
+        'resist_disease': "SR5.ActionCategory.ResistDisease",
+        'resist_toxin': "SR5.ActionCategory.ResistToxin",
         'resist': "SR5.ActionCategory.Resist",
         'resonance': "SR5.ActionCategory.Resonance",
         'rigging': "SR5.ActionCategory.Rigging",
@@ -606,7 +613,7 @@ export const SR5 = {
         'spell_illusion': "SR5.ActionCategory.SpellIllusion", 
         'spell_manipulation': "SR5.ActionCategory.SpellManipulation",
         'spell_ritual': "SR5.ActionCategory.SpellRitual",
-        'summoning': "SR5.ActionCategory.Summoning"
+        'summoning': "SR5.ActionCategory.Summoning",
     },
 
     matrixAttributes: {
