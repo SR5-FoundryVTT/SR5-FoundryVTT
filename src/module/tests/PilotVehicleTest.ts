@@ -30,4 +30,8 @@ export class PilotVehicleTest extends SuccessTest {
                 return actor.skillActionData(skillId);
         }
     }
+
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['action_rigging']
+    }
 }

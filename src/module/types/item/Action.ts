@@ -168,22 +168,38 @@ declare namespace Shadowrun {
      * What kind of action is being performed.
      * 
      * This can be used to group different actions together for different purposes.
-     * A specific purpose is for ActiveEffect to only apply to tests with specific action categories.
+     * It can also be used for ActiveEffects to target a group of tests, if skill or test implementations used
+     * are to specific.
      */
     type ActionCategories = 
         '' | // Empty values are allowed to allow users not having to set an action category.
         'skill_social' |
         // 'skill_leadership' | 
         'attack' |
+        'attack_melee' | 
+        'attack_ranged' | 
+        'attack_thrown' |
         'defense' |
+        'defense_suppression' |
         'resist' |
         'spell_combat' | 
         'spell_detection' |
         'spell_manipulation' |
         'spell_healing' | 
         'spell_illusion' |
+        'spell_ritual' | 
+        'drain' | 
+        'fade' | 
+        'action_magic' | 
+        'action_magic_summoning' |
         'action_matrix' |
+        'action_hack_on_the_fly' |
+        'action_brute_force' |
         'action_resonance' |
+        'action_complex_form' |
+        'action_compiling' |
         'action_rigging' |
-        'action_healing'
+        'action_recovery' |
+        'action_recovery_physical' |
+        'action_recovery_stun'
 }

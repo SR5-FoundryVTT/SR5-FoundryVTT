@@ -46,6 +46,10 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
         return 'SR5.TestResults.AttackHits';
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['defense'];
+    }
+
     /**
      * This test has changed the initiative score of its caster.
      */

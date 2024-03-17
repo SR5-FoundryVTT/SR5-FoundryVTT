@@ -17,6 +17,10 @@ export class NaturalRecoveryPhysicalTest extends SuccessTest {
         this.prepareThreshold();
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['action_recovery', 'action_recovery_physical']
+    }
+
     /**
      * A recovery test has its damage track as a threshold.
      */

@@ -62,6 +62,10 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         return false;
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['drain'];
+    }
+
     override get testModifiers(): ModifierTypes[] {
         return ['global', 'drain']
     }

@@ -703,6 +703,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * What Action Categories should be used for this test by default.
+     * 
+     * NOTE: These categories can be overwritten by the source action used to create a test instance.
+     * Override this method if you test implementation needs to define different default categories.
+     */
+    get testCategories(): Shadowrun.ActionCategories[] {
+        return [];
+    }
+
+    /**
      * What modifiers should be used for this test type by default.
      *
      * NOTE: These modifiers are routed through ModifierFlow.totalFor()

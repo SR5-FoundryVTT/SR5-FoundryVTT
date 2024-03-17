@@ -50,6 +50,10 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/summonspirit-test-dialog.html';
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['action_magic_summoning']
+    }
+
     /**
      * A summoning test can't be extended.
      */

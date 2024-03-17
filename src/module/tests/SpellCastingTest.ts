@@ -56,6 +56,26 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         };
     }
 
+    /**
+     * Spellcasting test category directly depends on the spell cast.
+     */
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        const spell = this.item?.asSpell;
+        if (!spell) return [];
+
+        switch (spell.system.category) {
+            case 'combat': return ['spell_combat'];
+            case 'detection': return ['spell_detection'];
+            case 'health': return ['spell_healing'];
+            case 'illusion': return ['spell_illusion'];
+            case 'manipulation': return ['spell_manipulation'];
+            case 'ritual': return ['spell_ritual'];
+        }
+
+        return []
+
+    }
+
     override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'background_count'];
     }

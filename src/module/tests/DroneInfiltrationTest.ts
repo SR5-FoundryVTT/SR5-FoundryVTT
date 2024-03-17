@@ -24,4 +24,8 @@ export class DroneInfiltrationTest extends SuccessTest {
                 return actor.skillActionData('perception');
         }
     }
+
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['action_rigging'];
+    }
 }
