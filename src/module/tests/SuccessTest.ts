@@ -552,7 +552,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The general base value preparation. This will be re applied at multiple points before execution.
      */
     prepareBaseValues() {
-        this.prepareTestCategories();
         // Re-apply document modifiers first, as those might have changed in between calculations.
         this.prepareDocumentModifiers();
         this.prepareTestModifiers();
@@ -730,6 +729,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Prepare this tests categories.
      * 
      * By default categories are taken from the test implementation but can be overwritten by the source action.
+     * 
+     * Test categories must be ready before active effects are applied as they rely on this data to be present.
      */
     prepareTestCategories() {
         this.data.categories = this.data.action.categories || this.testCategories;
@@ -1323,6 +1324,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async execute(): Promise<this> {
         await this.populateTests();
         await this.populateDocuments();
+
+        this.prepareTestCategories();
 
         // Effects need to be applied before any values are calculated.
         this.effects.applyAllEffects();

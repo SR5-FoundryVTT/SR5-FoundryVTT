@@ -35,7 +35,7 @@ interface TagifyOptions {
  */
 export function createTagify(input: HTMLInputElement|HTMLTextAreaElement|null, options: TagifyOptions = {}) {
     const tagify = new Tagify(input, {
-        enforceWhitelist: options.enforceWhitelist ?? false,
+        enforceWhitelist: options.enforceWhitelist ?? true,
         editTags: false,
         skipInvalid: true,
         dropdown: {
