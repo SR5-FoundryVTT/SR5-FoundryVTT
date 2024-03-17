@@ -81,6 +81,10 @@ export interface TestData {
     // modifiers: Record<ModifierTypes, TestModifier>
     modifiers: ValueField
 
+    // A list of test categories to be used for this test.
+    // Check typing documentation for more information.
+    categories: Shadowrun.ActionCategories[]
+
     // Edge related triggers
     pushTheLimit: boolean
     secondChance: boolean
@@ -548,6 +552,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The general base value preparation. This will be re applied at multiple points before execution.
      */
     prepareBaseValues() {
+        this.prepareTestCategories();
         // Re-apply document modifiers first, as those might have changed in between calculations.
         this.prepareDocumentModifiers();
         this.prepareTestModifiers();
@@ -722,6 +727,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * Prepare this tests categories.
+     * 
+     * By default categories are taken from the test implementation but can be overwritten by the source action.
+     */
+    prepareTestCategories() {
+        this.data.categories = this.data.action.categories || this.testCategories;
+    }
+
+    /**
      * Prepare modifiers based on connected documents.
      * 
      * Documents MUST've been be populated before hand.
@@ -776,7 +790,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Allow subclasses to alter test modifiers based on the item used for casting.
      */
-    async prepareItemModifiers() { }
+    prepareItemModifiers() { }
 
     /**
      * Calculate the total of all values.

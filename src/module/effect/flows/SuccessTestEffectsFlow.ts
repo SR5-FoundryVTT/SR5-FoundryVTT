@@ -90,7 +90,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Both the effect and test can both define multiple categories.
         // One match is enough.
         const categories = effect.selectionCategories;
-        const testCategories = this.test.data.action.categories;
+        const testCategories = this.test.data.categories;
         if (categories.length > 0 && !categories.find(category => testCategories.includes(category))) return true;
 
         // Check for test skill.
