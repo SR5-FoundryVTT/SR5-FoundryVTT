@@ -24,6 +24,10 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
         return false;
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['attack', 'attack_melee'];
+    }
+
     override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'environmental'];
     }

@@ -210,6 +210,10 @@ export class SR5ActiveEffect extends ActiveEffect {
         return tagifyFlagsToIds(this, 'selection_tests');
     }
 
+    get selectionCategories() {
+        return tagifyFlagsToIds(this, 'selection_categories') as Shadowrun.ActionCategories[];
+    }
+
     get selectionSkills(): string[] {
         return tagifyFlagsToIds(this, 'selection_skills');
     }

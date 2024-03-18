@@ -133,10 +133,10 @@ export class DataDefaults {
      * @param partialActionRollData 
      * @returns 
      */
-    static actionRollData(partialActionRollData: Partial<ActionRollData> = {}): ActionRollData {
+    static actionRollData(partialActionRollData: DeepPartial<ActionRollData> = {}): ActionRollData {
         return mergeObject({
             type: '',
-            category: '',
+            categories: [],
             attribute: '',
             attribute2: '',
             skill: '',

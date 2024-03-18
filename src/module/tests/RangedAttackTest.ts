@@ -99,6 +99,10 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         this._selectFireMode(this.data.fireModeSelected);
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['attack', 'attack_ranged']
+    }
+
     override get testModifiers(): Shadowrun.ModifierTypes[] {
         return ['global', 'wounds', 'environmental', 'recoil'];
     }

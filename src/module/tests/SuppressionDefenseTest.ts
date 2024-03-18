@@ -12,6 +12,10 @@ export class SuppressionDefenseTest extends PhysicalDefenseTest<PhysicalDefenseT
         };
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['defense_suppression'];
+    }
+
     override async processFailure() {
         this.data.modifiedDamage = CombatRules.modifyDamageAfterSuppressionHit(this.data.incomingDamage);
     }

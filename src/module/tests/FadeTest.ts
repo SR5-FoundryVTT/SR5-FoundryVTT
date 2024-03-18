@@ -67,6 +67,10 @@ export class FadeTest extends SuccessTest<FadeTestData> {
         return documentAction;
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['fade'];
+    }
+
     override get testModifiers(): ModifierTypes[] {
         return ['global', 'fade']
     }

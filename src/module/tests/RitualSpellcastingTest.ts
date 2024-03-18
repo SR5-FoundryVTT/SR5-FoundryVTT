@@ -42,6 +42,10 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/ritualspellcasting-test-dialog.html';
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['spell_ritual']
+    }
+
     /**
      * A ritual test can't be extended.
      */

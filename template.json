@@ -1281,7 +1281,7 @@
                 "action": {
                     "type": "",
                     "test": "SuccessTest",
-                    "category": "",
+                    "categories": [],
                     "attribute": "",
                     "attribute2": "",
                     "skill": "",

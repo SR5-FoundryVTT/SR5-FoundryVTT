@@ -7,6 +7,7 @@ import { SuccessTest } from "../module/tests/SuccessTest";
 import { DataDefaults } from "../module/data/DataDefaults";
 import { RangedAttackTest } from "../module/tests/RangedAttackTest";
 import { SkillTest } from "../module/tests/SkillTest";
+import { Helpers } from "../module/helpers";
 
 export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
@@ -516,7 +517,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            // @ts-expect-error
+            // @ts-expect-error DeepPartial fails for partial sub object literals
             const action = DataDefaults.actionRollData({ test: SkillTest.name, limit: {attribute: 'social'} });
             const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
 
@@ -543,4 +544,51 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(test.limit.value, actor.getLimit('physical').value + 3);
         });
     });
+    
+    describe('AdvanceEffects apply modification based on test categories', () => {
+        it('Should apply modifier to a single category only', async () => {
+            const actor = await testActor.create({ type: 'character' });
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                flags: { shadowrun5e: { applyTo: 'test_all', selection_categories: '[{"value":"Social Actions","id":"social"}]' } },
+                changes: [{ key: 'data.pool', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }]);
+
+            // CASE - Test uses the same category
+            let action = DataDefaults.actionRollData({ test: 'SkillTest', categories: ['social'] });
+            let test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+
+            // Simulate relevant part of #execute
+            test.prepareTestCategories();
+            test.effects.applyAllEffects();
+
+            Helpers.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 3);
+
+            // CASE - Test uses different category
+            action = DataDefaults.actionRollData({ test: 'SkillTest', categories: ['matrix'] });
+            test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+
+            // Simulate relevant part of #execute
+            test.prepareTestCategories();
+            test.effects.applyAllEffects();
+
+            Helpers.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 0);
+
+            // CASE - Test uses no category
+            action = DataDefaults.actionRollData({ test: 'SkillTest', categories: [] });
+            test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+
+            // Simulate relevant part of #execute
+            test.prepareTestCategories();
+            test.effects.applyAllEffects();
+
+            Helpers.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 0);
+        });
+    })
 };

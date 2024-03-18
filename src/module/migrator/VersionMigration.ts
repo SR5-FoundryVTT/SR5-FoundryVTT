@@ -1,9 +1,15 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import {SR5Item} from "../item/SR5Item";
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 
 export type SystemMigrationDocuments = SR5Actor|SR5Item|Scene;
+
+// This interface is used as data container between migration methods and the actual document update.
+export interface UpdateData {
+    data?: any
+    items?: any
+    effects?: any
+}
+
 /**
  * Converts a game's data model from source version to a target version.
  * Extending classes are only required to handle items, actors, and scenes,
@@ -101,7 +107,7 @@ export abstract class VersionMigration {
         // Apply the updates, this should *always* work, now that parsing is complete.
         await this.Apply(entityUpdates);
 
-        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
+        // await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
         ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
@@ -267,7 +273,7 @@ export abstract class VersionMigration {
                 actor.items.map(async (item) => {
                     if (item instanceof SR5Item) console.error('Shadowrun 5e | Migration encountered an Item when it should have encountered ItemData / Object');
                     if (!await this.ShouldMigrateItemData(item)) return item;
-                    let itemUpdate = await this.MigrateItemData(item);
+                    const itemUpdate = await this.MigrateItemData(item);
 
                     hasItemUpdates = true;
                     itemUpdate['_id'] = item.id;
@@ -299,7 +305,7 @@ export abstract class VersionMigration {
      * @param scene The scene to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected async MigrateSceneData(scene: Scene): Promise<any> {
+    protected async MigrateSceneData(scene: Scene): Promise<UpdateData> {
         return {};
     }
     /**
@@ -328,7 +334,7 @@ export abstract class VersionMigration {
      * @param item The item to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected async MigrateItemData(item: SR5Item): Promise<any> {
+    protected async MigrateItemData(item: SR5Item): Promise<UpdateData> {
         return {};
     }
     /**
@@ -357,7 +363,7 @@ export abstract class VersionMigration {
      * @param actor The actor to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected async MigrateActorData(actor: SR5Actor): Promise<any> {
+    protected async MigrateActorData(actor: SR5Actor): Promise<UpdateData> {
         return {};
     }
     /**

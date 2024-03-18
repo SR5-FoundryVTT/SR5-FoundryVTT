@@ -531,7 +531,7 @@ export const TestCreator = {
         }
 
         
-        // Prepare action modifiers and possible applicable selections
+        // Prepare test modifiers and possible applicable selections
         const modifiers: {[key in Shadowrun.ModifierTypes]?: string[]} = {};
         for (const modifier of data.action.modifiers) {
             // A modifier with an applicable selection is found.

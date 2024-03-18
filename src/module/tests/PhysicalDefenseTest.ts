@@ -52,6 +52,10 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         };
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['defense']
+    }
+
     override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds', 'defense', 'multi_defense'];
     }

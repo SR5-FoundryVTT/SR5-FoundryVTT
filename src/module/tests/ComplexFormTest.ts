@@ -50,6 +50,10 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         };
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['compiling'];
+    }
+
     // TODO: Add missing modifiers (gitter) // SR5#251
     override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds'];
