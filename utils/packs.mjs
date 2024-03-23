@@ -198,9 +198,7 @@ function slugify(name) {
 function cleanPackEntry(data, { clearSourceId = true, ownership = 0 } = {}) {
     if (data.ownership) data.ownership = { default: ownership };
     if (clearSourceId) delete data.flags?.core?.sourceId;
-    delete data.flags?.importSource;
-    delete data.flags?.exportSource;
-    if (data._stats?.lastModifiedBy) data._stats.lastModifiedBy = 'dnd5ebuilder0000';
+    if (data._stats?.lastModifiedBy) data._stats.lastModifiedBy = 'sr5ebuilder';
 
     // Remove empty entries in flags
     if (!data.flags) data.flags = {};
@@ -208,20 +206,8 @@ function cleanPackEntry(data, { clearSourceId = true, ownership = 0 } = {}) {
         if (Object.keys(contents).length === 0) delete data.flags[key];
     });
 
-    if (data.system?.activation?.cost === 0) data.system.activation.cost = null;
-    if (data.system?.duration?.value === '0') data.system.duration.value = '';
-    if (data.system?.target?.value === 0) data.system.target.value = null;
-    if (data.system?.target?.width === 0) data.system.target.width = null;
-    if (data.system?.range?.value === 0) data.system.range.value = null;
-    if (data.system?.range?.long === 0) data.system.range.long = null;
-    if (data.system?.uses?.value === 0) data.system.uses.value = null;
-    if (data.system?.uses?.max === '0') data.system.duration.value = '';
-    if (data.system?.save?.dc === 0) data.system.save.dc = null;
-    if (data.system?.capacity?.value === 0) data.system.capacity.value = null;
-    if (data.system?.strength === 0) data.system.strength = null;
-
     // Remove mystery-man.svg from Actors
-    if (['character', 'npc'].includes(data.type) && data.img === 'icons/svg/mystery-man.svg') {
+    if (['character'].includes(data.type) && data.img === 'icons/svg/mystery-man.svg') {
         data.img = '';
         data.prototypeToken.texture.src = '';
     }
