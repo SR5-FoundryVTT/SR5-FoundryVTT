@@ -43,8 +43,9 @@ jobs:
 
     - run: |
           npm ci
-          gulp build     
-          zip -r ./shadowrun5e.zip system.json template.json LICENSE README.md README-DEV.md dist/ packs/
+          gulp build
+          npm run build:db
+          zip -r ./shadowrun5e.zip system.json template.json LICENSE README.md README-DEV.md dist/ packs/ --exclude "packs/_source/*"
     
     - name: Update Release with Files
       id: create_version_release

@@ -1,0 +1,118 @@
+{
+  "name": "Crack File",
+  "type": "action",
+  "flags": {},
+  "img": "systems/shadowrun5e/dist/icons/compact-disc.svg",
+  "effects": [],
+  "_id": "EcRsJOjgnhnVj2XX",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5 238"
+    },
+    "action": {
+      "type": "complex",
+      "test": "SuccessTest",
+      "category": "",
+      "attribute": "logic",
+      "attribute2": "",
+      "skill": "hacking",
+      "armor": false,
+      "spec": false,
+      "mod": null,
+      "mod_description": "",
+      "limit": {
+        "value": 0,
+        "base": 0,
+        "attribute": "attack",
+        "mod": []
+      },
+      "threshold": {
+        "value": 0,
+        "base": 0
+      },
+      "extended": false,
+      "damage": {
+        "type": {
+          "value": "",
+          "base": ""
+        },
+        "element": {
+          "value": "",
+          "base": ""
+        },
+        "value": 0,
+        "base": 0,
+        "ap": {
+          "value": 0,
+          "base": 0,
+          "mod": []
+        },
+        "base_formula_operator": "add",
+        "attribute": "",
+        "source": {
+          "actorId": "",
+          "itemId": "",
+          "itemType": "",
+          "itemName": ""
+        },
+        "mod": []
+      },
+      "opposed": {
+        "type": "custom",
+        "test": "OpposedTest",
+        "attribute": "firewall",
+        "attribute2": "firewall",
+        "skill": "",
+        "armor": false,
+        "mod": 0,
+        "description": "",
+        "resist": {
+          "test": "",
+          "skill": "",
+          "attribute": "",
+          "attribute2": "",
+          "armor": false,
+          "mod": 0
+        }
+      },
+      "followed": {
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0
+      },
+      "modifiers": [
+        "noise",
+        "global",
+        "wounds"
+      ],
+      "alt_mod": 0,
+      "dice_pool_mod": []
+    },
+    "result": {
+      "success": {
+        "matrix": {
+          "placeMarks": false
+        }
+      }
+    }
+  },
+  "ownership": {
+    "default": 0
+  },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.8.6",
+    "coreVersion": "10.291",
+    "createdTime": null,
+    "modifiedTime": 1670064675058,
+    "lastModifiedBy": "dnd5ebuilder0000"
+  },
+  "_key": "!items!EcRsJOjgnhnVj2XX"
+}
