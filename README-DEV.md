@@ -207,3 +207,11 @@ These modifiers can also be used to apply rules that need to recalculate between
 ## Actions
 Any item can contain the action template allowing it to cast it as a Shadowrun 5e success test.
 
+
+# Extending compendium contents
+
+FoundryVTT uses nedb to implement their compendiums, internally called packs. These nedb's are build from scratch on each release and need source document json files to be built from.
+
+If changes are to be made on compendium items, you can either make those directly within their source file underneath `./packs/_source` or using Foundry GUI. To make these changes persistent, extract compendium content to their source using `node ./utils/packs.mjs package unpack`. Since source documents are stored using their name, be careful when changing that and compare their on disk name with expectations.
+
+Since nedb packs aren't stored in git, changing pack contents will trigger changes for system compendiums as soon as the next GitHub release workflow is triggered.

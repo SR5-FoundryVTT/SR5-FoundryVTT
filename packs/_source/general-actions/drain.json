@@ -1,0 +1,117 @@
+{
+  "name": "Drain",
+  "type": "action",
+  "img": "systems/shadowrun5e/dist/icons/redist/swirl.svg",
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "flags": {},
+  "_id": "GTxxBDG11vx7px9e",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "action": {
+      "type": "none",
+      "test": "DrainTest",
+      "category": "",
+      "attribute": "",
+      "attribute2": "",
+      "skill": "",
+      "armor": false,
+      "spec": "",
+      "mod": null,
+      "mod_description": "",
+      "limit": {
+        "value": 0,
+        "base": 0,
+        "attribute": ""
+      },
+      "threshold": {
+        "value": 0,
+        "base": 0
+      },
+      "extended": false,
+      "damage": {
+        "type": {
+          "value": "",
+          "base": ""
+        },
+        "element": {
+          "value": "",
+          "base": ""
+        },
+        "value": 0,
+        "base": 0,
+        "ap": {
+          "value": 0,
+          "base": 0
+        },
+        "base_formula_operator": "add",
+        "attribute": "",
+        "source": {
+          "actorId": "",
+          "itemId": "",
+          "itemType": "",
+          "itemName": ""
+        },
+        "itemSource": {
+          "actorId": "",
+          "itemId": "",
+          "itemType": "",
+          "itemName": ""
+        }
+      },
+      "opposed": {
+        "type": "",
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0,
+        "description": "",
+        "resist": {
+          "test": "",
+          "skill": "",
+          "attribute": "",
+          "attribute2": "",
+          "armor": false,
+          "mod": 0
+        }
+      },
+      "followed": {
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0
+      },
+      "modifiers": [
+        "drain"
+      ]
+    },
+    "result": {
+      "success": {
+        "matrix": {
+          "placeMarks": false
+        }
+      }
+    }
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.8.10",
+    "coreVersion": "10.291",
+    "createdTime": null,
+    "modifiedTime": 1676126405212,
+    "lastModifiedBy": "sr5ebuilder"
+  },
+  "_key": "!items!GTxxBDG11vx7px9e"
+}

@@ -1,0 +1,121 @@
+{
+  "name": "Invite Mark",
+  "type": "action",
+  "flags": {},
+  "img": "systems/shadowrun5e/dist/icons/check-mark.svg",
+  "effects": [],
+  "_id": "cXDEcqOyy1IE4JkO",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5 240"
+    },
+    "action": {
+      "type": "simple",
+      "test": "SuccessTest",
+      "category": "",
+      "attribute": "",
+      "attribute2": "",
+      "skill": "",
+      "armor": false,
+      "spec": false,
+      "mod": null,
+      "mod_description": "",
+      "roll_mode": "",
+      "limit": {
+        "value": 0,
+        "base": 0,
+        "attribute": "",
+        "mod": []
+      },
+      "threshold": {
+        "value": 0,
+        "base": 0
+      },
+      "extended": false,
+      "damage": {
+        "type": {
+          "value": "",
+          "base": ""
+        },
+        "element": {
+          "value": "",
+          "base": ""
+        },
+        "value": 0,
+        "base": 0,
+        "ap": {
+          "value": 0,
+          "base": 0,
+          "mod": []
+        },
+        "base_formula_operator": "add",
+        "attribute": "",
+        "source": {
+          "actorId": "",
+          "itemId": "",
+          "itemType": "",
+          "itemName": ""
+        },
+        "mod": []
+      },
+      "opposed": {
+        "type": "",
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0,
+        "description": "",
+        "resist": {
+          "test": "",
+          "skill": "",
+          "attribute": "",
+          "attribute2": "",
+          "armor": false,
+          "mod": 0
+        }
+      },
+      "followed": {
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0
+      },
+      "modifiers": [],
+      "alt_mod": 0,
+      "dice_pool_mod": []
+    },
+    "result": {
+      "success": {
+        "matrix": {
+          "placeMarks": false
+        }
+      }
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false
+    }
+  },
+  "ownership": {
+    "default": 0
+  },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.13.0",
+    "coreVersion": "10.303",
+    "createdTime": null,
+    "modifiedTime": 1697731172227,
+    "lastModifiedBy": "sr5ebuilder"
+  },
+  "_key": "!items!cXDEcqOyy1IE4JkO"
+}

@@ -55,9 +55,9 @@
   ],
   "packs": [
     {
-      "name": "Matrix Actions",
+      "name": "matrix-actions",
       "label": "SR5e Matrix Actions",
-      "path": "./packs/sr5e-matrix-actions.db",
+      "path": "packs/matrix-actions",
       "ownership": {
         "PLAYER": "OBSERVER",
         "TRUSTED": "OBSERVER",
@@ -67,9 +67,9 @@
       "system": "shadowrun5e"
     },
     {
-      "name": "General Actions",
+      "name": "general-actions",
       "label": "SR5e General Actions",
-      "path": "./packs/sr5e-general-actions.db",
+      "path": "packs/general-actions",
       "ownership": {
         "PLAYER": "OBSERVER",
         "TRUSTED": "OBSERVER",
@@ -79,9 +79,9 @@
       "system": "shadowrun5e"
     },
     {
-      "name": "System Macros",
+      "name": "system-macros",
       "label": "SR5e System Macros",
-      "path": "./packs/sr5e-system-macros.db",
+      "path": "packs/system-macros",
       "ownership": {
         "PLAYER": "OBSERVER",
         "TRUSTED": "OBSERVER",

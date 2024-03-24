@@ -841,8 +841,8 @@ export const SR5 = {
      * Names of FoundryVTT packs supplied by the system to be used as action sources.
      */
     packNames: {
-        'generalActions': 'General Actions',
-        'matrixActions': 'Matrix Actions'
+        'generalActions': 'general-actions',
+        'matrixActions': 'matrix-actions'
     },
 
     programTypes: {

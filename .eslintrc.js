@@ -5,7 +5,7 @@ module.exports = {
         "es2021": true
     },
     "extends": ["standard-with-typescript", "prettier"],
-    ignorePatterns: ["**/*.js"],
+    ignorePatterns: ["**/*.js", "**/*.mjs"],
     "overrides": [
         {
             "env": {
