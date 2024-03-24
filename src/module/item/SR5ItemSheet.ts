@@ -246,7 +246,7 @@ export class SR5ItemSheet extends ItemSheet {
      */
     _getSortedActiveSkillsForSelect() {
         // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
-        return ActionFlow.sortedActiveSkills(this.item.actorOwner);
+        return ActionFlow.sortedActiveSkills(this.item.actorOwner, this.document.system.action?.skill);
     }
 
     _getNetworkDevices(): SR5Item[] {
