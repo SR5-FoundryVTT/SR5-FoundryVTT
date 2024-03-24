@@ -108,12 +108,13 @@ export function prepareSortedEffects(effects: SR5ActiveEffect[], byKey: string =
  * 
  * TODO: Move into data preparation phase, similar to how actor.effects works.
  * @param document The document to collect item effects from.
+ * @param options See allApplicableItemEffects documentation
  * @returns A data object containing all enabled effects with their name as key and sorted alphabetically.
  */
-export function prepareSortedItemEffects(document: SR5Actor|SR5Item): Shadowrun.AllEnabledEffectsSheetData {
+export function prepareSortedItemEffects(document: SR5Actor|SR5Item, options: ApplicableItemEffectOptions = {}): Shadowrun.AllEnabledEffectsSheetData {
     const enabledEffects: Shadowrun.AllEnabledEffectsSheetData = [];
 
-    for (const effect of allApplicableItemsEffects(document)) {
+    for (const effect of allApplicableItemsEffects(document, options)) {
         enabledEffects.push(effect);
     }
 
