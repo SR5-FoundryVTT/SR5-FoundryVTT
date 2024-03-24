@@ -7,6 +7,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
+import { MarksFlow } from '../actor/flows/MarksFlow';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -184,7 +185,7 @@ export class SR5ItemSheet extends ItemSheet {
         data['itemEffects'] = prepareSortedItemEffects(this.object);
 
         if (this.item.isHost) {
-            data['markedDocuments'] = this.item.getAllMarkedDocuments();
+            data['markedDocuments'] = await this.item.getAllMarkedDocuments();
         }
 
         if (this.item.canBeNetworkController) {
@@ -706,13 +707,11 @@ export class SR5ItemSheet extends ItemSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedIdDocuments) return;
-        const {scene, target, item} = markedIdDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await MarksFlow.getMarkedDocument(markId);
+        if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
-        await this.item.setMarks(target, marks, {scene, item, overwrite: true});
+        await this.item.setMarks(markedDocument, marks, { overwrite: true });
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -723,12 +722,10 @@ export class SR5ItemSheet extends ItemSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedIdDocuments) return;
-        const {scene, target, item} = markedIdDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await MarksFlow.getMarkedDocument(markId);
+        if (!markedDocument) return;
 
-        await this.item.setMarks(target, by, {scene, item});
+        await this.item.setMarks(markedDocument, by);
     }
 
     async _onMarksDelete(event) {

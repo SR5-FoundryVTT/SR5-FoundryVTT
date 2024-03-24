@@ -1,3 +1,4 @@
+import { shadowrunMarks } from './sr5.Marks.spec';
 import { shadowrunRolling } from './sr5.SR5Roll.spec';
 import { shadowrunSR5RangedWeaponRules } from './sr5.RangedWeapon.spec';
 import { shadowrunAttackTesting } from './sr5.AttackTests.spec';
@@ -110,6 +111,9 @@ export const quenchRegister = (quench: Quench) => {
 
     quench.registerBatch('shadowrun5e.flow.networkDevices', shadowrunNetworkDevices, {
         displayName: 'SHADOWRUN5e: Matrix Network Devices Test',
+    });
+    quench.registerBatch('shadowrun5e.flow.marks', shadowrunMarks, {
+        displayName: 'SHADOWRUN5e: Matrix Marks Test',
     });
     quench.registerBatch('shadowrun5e.flow.inventory', shadowrunInventoryFlow, {
         displayName: 'SHADOWRUN5e: InventoryFlow Test',

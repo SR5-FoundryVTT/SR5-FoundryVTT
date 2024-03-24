@@ -66,8 +66,9 @@ declare namespace Shadowrun {
     }
 
     /**
-     * Matrix Marks are stored using a single string to identify the target, scene and item id the marks have been placed
-     * on.
+     * Matrix Marks are stored using the uuid of the target they've been placed on.
+     * 
+     * Record<uuid, number>
      */
     export interface MatrixMarks extends Record<string, number>{}
 

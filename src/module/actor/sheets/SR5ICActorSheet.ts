@@ -28,7 +28,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         data.host = this.actor.getICHost();
 
         // Display Matrix Marks
-        data.markedDocuments = this.actor.getAllMarkedDocuments();
+        data.markedDocuments = await this.actor.getAllMarkedDocuments();
         data.disableMarksEdit = this.actor.hasHost();
 
         return data;

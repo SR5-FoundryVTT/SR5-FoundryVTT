@@ -74,6 +74,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+import { MarksFlow } from '../actor/flows/MarksFlow';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -1417,7 +1418,7 @@ export class SR5Item extends Item {
      * TODO: It might be useful to create a 'MatrixDocument' class sharing matrix methods to avoid duplication between
      *       SR5Item and SR5Actor.
      */
-    async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: Item, overwrite?: boolean}) {
+    async setMarks(target: SR5Actor|SR5Item, marks: number, options?: {scene?: Scene, item?: Item, overwrite?: boolean}) {
         if (!canvas.ready) return;
 
         if (!this.isHost) {
@@ -1425,19 +1426,12 @@ export class SR5Item extends Item {
             return;
         }
 
-        // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene as Scene;
-        const item = options?.item;
-
-        // Build the markId string. If no item has been given, there still will be a third split element.
-        // Use Helpers.deconstructMarkId to get the elements.
-        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
         const host = this.asHost;
-
         if (!host) return;
 
-        const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
-        host.system.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
+        const targetUuid = target.uuid;
+        const currentMarks = options?.overwrite ? 0 : this.getMarksById(targetUuid);
+        host.system.marks[targetUuid] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
         await this.update({'system.marks': host.system.marks});
     }
@@ -1451,33 +1445,6 @@ export class SR5Item extends Item {
         const host = this.asHost;
         if (!host) return;
         return host.system.marks;
-    }
-
-    /**
-     * Receive the marks placed on either the given target as a whole or one it's owned items.
-     *
-     * @param target
-     * @param item
-     * @param options
-     *
-     * TODO: Check with technomancers....
-     *
-     * @return Will always return a number. At least zero, for no marks placed.
-     */
-    getMarks(target: SR5Actor, item?: SR5Item, options?: {scene?: Scene}): number {
-        if (!canvas.ready) return 0;
-        if (!this.isHost) return 0;
-
-        // Scene is optional.
-        const scene = options?.scene || canvas.scene as Scene;
-        item = item || target.getMatrixDevice();
-
-        const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);
-        const host = this.asHost;
-
-        if (!host) return 0
-
-        return host.system.marks[markId] || 0;
     }
 
     /**
@@ -1550,21 +1517,13 @@ export class SR5Item extends Item {
         return await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
     }
 
-    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
+    async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
         if (!this.isHost) return [];
 
         const marks = this.getAllMarks();
         if (!marks) return [];
 
-        // Deconstruct all mark ids into documents.
-        // @ts-expect-error
-        return Object.entries(marks)
-            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
-            .map(([markId, marks]) => ({
-                ...Helpers.getMarkIdDocuments(markId),
-                marks,
-                markId
-            })) 
+        return await MarksFlow.getMarkedDocuments(marks);
     }
 
     /**

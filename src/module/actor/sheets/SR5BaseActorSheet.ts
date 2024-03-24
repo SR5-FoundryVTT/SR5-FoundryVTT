@@ -18,6 +18,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
+import { MarksFlow } from '../flows/MarksFlow';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -1061,13 +1062,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedDocuments) return;
-        const { scene, target, item } = markedDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await MarksFlow.getMarkedDocument(markId);
+        if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
-        await this.actor.setMarks(target, marks, { scene, item, overwrite: true });
+        await this.actor.setMarks(markedDocument, marks, { overwrite: true });
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -1080,12 +1079,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedDocuments) return;
-        const { scene, target, item } = markedDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await MarksFlow.getMarkedDocument(markId);
+        if (!markedDocument) return;
 
-        await this.actor.setMarks(target, by, { scene, item });
+        await this.actor.setMarks(markedDocument, by);
     }
 
     async _onMarksDelete(event) {

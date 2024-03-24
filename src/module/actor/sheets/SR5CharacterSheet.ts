@@ -73,7 +73,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
         // Character actor types are matrix actors.
         super._prepareMatrixAttributes(data);
-        data['markedDocuments'] = this.actor.getAllMarkedDocuments();
+        data['markedDocuments'] = await this.actor.getAllMarkedDocuments();
 
         return data;
     }

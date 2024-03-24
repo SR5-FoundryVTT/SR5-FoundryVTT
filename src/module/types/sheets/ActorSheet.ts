@@ -26,9 +26,7 @@ declare namespace Shadowrun {
 
     // Use to target a specific owned item anywhere in Foundry.
     export interface TargetedDocument {
-        scene: Scene // The Foundry Scene the target/item can be found on.
         target: any // The Foundry Document marked.
-        item: any|undefined // The Foundry Item marked..
     }
 
     // Use to display Matrix Marks which Foundry Document their placed on.

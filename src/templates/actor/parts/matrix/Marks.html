@@ -6,14 +6,12 @@
             icons=(MarkListHeaderIcons)
     }}
     {{#each markedDocuments}}
-        {{!-- Don't use the ListItem Handlebar helper as to avoid it's item drag&drop functionality. --}}
-        <div class="list-item" data-mark-id="{{this.markId}}">
+    {{!-- Don't use the ListItem Handlebar helper as to avoid it's item drag&drop functionality. --}}
+    <div class="list-item" data-mark-id="{{this.markId}}">
+        <div class="list-item-content">
             <div class="item-left">
                 <div class="item-img">
-                    <img src="{{this.target.img}}"
-                         data-tooltip="{{this.target.name}}"
-                         height="24px"
-                         width="24px"/>
+                    <img src="{{this.target.img}}" data-tooltip="{{this.target.name}}" height="24px" width="24px"/>
                 </div>
                 <div class="item-text item-name">{{this.target.name}}</div>
             </div>
@@ -40,5 +38,6 @@
                 </div>
             </div>
         </div>
+    </div>
     {{/each}}
 </div>

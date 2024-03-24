@@ -3,6 +3,7 @@ import {SR5Actor} from "../../actor/SR5Actor";
 import {SuccessTest} from "../../tests/SuccessTest";
 import { PhysicalDefenseTest } from "../../tests/PhysicalDefenseTest";
 import ResultActions = Shadowrun.ResultActions;
+import { SR5Item } from "../SR5Item";
 
 
 /**
@@ -43,7 +44,7 @@ export class ActionResultFlow {
     /**
      * Matrix Marks are placed on either actors (persona, ic) or items (device, host, technology).
      */
-    static async placeMatrixMarks(active: SR5Actor, targets: Token[], marks: number) {
+    static async placeMatrixMarks(active: SR5Actor, targets: SR5Actor[]|SR5Item[], marks: number) {
         if (!MatrixRules.isValidMarksCount(marks)) {
             return ui.notifications?.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
         }

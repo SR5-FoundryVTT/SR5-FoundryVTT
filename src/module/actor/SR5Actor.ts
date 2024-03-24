@@ -30,6 +30,7 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { MarksFlow } from './flows/MarksFlow';
 
 
 /**
@@ -2031,71 +2032,22 @@ export class SR5Actor extends Actor {
      * @param options.item The item that the mark is to be placed on
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
-        if (!canvas.ready) return;
-
-        if (this.isIC() && this.hasHost()) {
-            return await this.getICHost()?.setMarks(target, marks, options);
-        }
-
-        if (!this.isMatrixActor) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
-            return console.error(`The actor type ${this.type} can't receive matrix marks!`);
-        }
-        if (target.actor && !target.actor.isMatrixActor) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
-            return console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
-        }
-        if (!target.actor) {
-            return console.error(`The token ${target.name} is missing it's actor`);
-        }
-
-        // It hurt itself in confusion.
-        if (this.id === target.actor.id) {
-            return;
-        }
-
-        // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene as Scene;
-        const item = options?.item;
-
-        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        const matrixData = this.matrixData;
-
-        if (!matrixData) return;
-
-        const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
-        matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
-
-        await this.update({'system.matrix.marks': matrixData.marks});
+    async setMarks(target: SR5Actor|SR5Item, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
+        await MarksFlow.setMarks(this, target, marks, options)
     }
 
     /**
      * Remove ALL marks placed by this actor
      */
     async clearMarks() {
-        const matrixData = this.matrixData;
-        if (!matrixData) return;
-
-        // Delete all markId properties from ActorData
-        const updateData = {}
-        for (const markId of Object.keys(matrixData.marks)) {
-            updateData[`-=${markId}`] = null;
-        }
-
-        await this.update({'system.matrix.marks': updateData});
+        await MarksFlow.clearMarks(this);
     }
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
      */
     async clearMark(markId: string) {
-        if (!this.isMatrixActor) return;
-
-        const updateData = {}
-        updateData[`-=${markId}`] = null;
-
-        await this.update({'system.matrix.marks': updateData});
+        await MarksFlow.clearMark(this, markId);
     }
 
     getAllMarks(): Shadowrun.MatrixMarks | undefined {
@@ -2107,34 +2059,21 @@ export class SR5Actor extends Actor {
     /**
      * Return the amount of marks this actor has on another actor or one of their items.
      *
-     * TODO: It's unclear what this method will be used for
-     *       What does the caller want?
-     *
-     * TODO: Check with technomancers....
-     *
      * @param target
      * @param item
      * @param options
      */
-    getMarks(target: Token, item?: SR5Item, options?: { scene?: Scene }): number {
-        if (!canvas.ready) return 0;
-        if (target instanceof SR5Item) {
-            console.error('Not yet supported');
-            return 0;
-        }
-        if (!target.actor || !target.actor.isMatrixActor) return 0;
-
-
-        const scene = options?.scene || canvas.scene as Scene;
-        // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
-        item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
-
-        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        return this.getMarksById(markId);
+    getMarks(target: Token, item?: SR5Item, options?: { scene?: Scene }) {
+        return MarksFlow.getMarks(this, target, item, options);
     }
 
-    getMarksById(markId: string): number {
-        return this.matrixData?.marks[markId] || 0;
+    /**
+     * Get amount of Matrix marks placed by this actor on this target.
+     * @param targetUuid 
+     * @returns Amount of marks placed
+     */
+    getMarksById(targetUuid: string) {
+        return MarksFlow.getMarksById(this, targetUuid);
     }
 
     /**
@@ -2154,19 +2093,11 @@ export class SR5Actor extends Actor {
         return this;
     }
 
-    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
+    async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
         const marks = this.matrixController.getAllMarks();
         if (!marks) return [];
 
-        // Deconstruct all mark ids into documents.
-        // @ts-expect-error
-        return Object.entries(marks)
-            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
-            .map(([markId, marks]) => ({
-                ...Helpers.getMarkIdDocuments(markId),
-                marks,
-                markId
-            }))
+        return await MarksFlow.getMarkedDocuments(marks);
     }
 
     /**
