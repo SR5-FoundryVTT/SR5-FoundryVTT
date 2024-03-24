@@ -7,6 +7,13 @@
  *
  * # Extract all compendium packs into JSON files
  * $ node ./utils/packs.mjs package unpack
+ * 
+ * # Pack all compendium packs into nedb files
+ * $ node ./utils/packs.mjs package pack
+ * # OR
+ * $ npm run build:db
+ * 
+ * Both pack and unpack allow targeting specific packs by name, check command help for that.
  */
 import fs from 'fs';
 import yargs from 'yargs';
