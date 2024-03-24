@@ -29,7 +29,7 @@ export const SR5 = {
         spell: 'SR5.ItemTypes.Spell',
         sprite_power: 'SR5.ItemTypes.SpritePower',
         weapon: 'SR5.ItemTypes.Weapon',
-        call_in_action: 'ITEM.TypeCall_in_action'
+        call_in_action: 'TYPES.Item.call_in_action'
     },
 
     // All available attributes. These are available as testable attributes across all actor types.
