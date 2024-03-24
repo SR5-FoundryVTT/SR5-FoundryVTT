@@ -12,7 +12,7 @@
     "action": {
       "type": "none",
       "test": "PhysicalDefenseTest",
-      "category": "",
+      "categories": ["defense"],
       "attribute": "reaction",
       "attribute2": "intuition",
       "skill": "",

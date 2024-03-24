@@ -11,7 +11,7 @@
     "action": {
       "type": "",
       "test": "DronePerceptionTest",
-      "category": "",
+      "categories": [],
       "attribute": "",
       "attribute2": "",
       "skill": "",

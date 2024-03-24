@@ -14,7 +14,7 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "category": "",
+      "categories": ["matrix"],
       "attribute": "intuition",
       "attribute2": "",
       "skill": "computer",

@@ -16,7 +16,7 @@
     "action": {
       "type": "none",
       "test": "PhysicalResistTest",
-      "category": "",
+      "categories": ["resist"],
       "attribute": "body",
       "attribute2": "",
       "skill": "",

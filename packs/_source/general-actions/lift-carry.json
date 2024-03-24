@@ -12,7 +12,7 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "category": "",
+      "categories": [],
       "attribute": "strength",
       "attribute2": "body",
       "skill": "",

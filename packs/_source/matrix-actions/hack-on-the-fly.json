@@ -14,7 +14,7 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "category": "",
+      "categories": ["matrix", "hack_on_the_fly"],
       "attribute": "logic",
       "attribute2": "",
       "skill": "hacking",

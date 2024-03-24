@@ -20,7 +20,7 @@
     "action": {
       "type": "simple",
       "test": "SuccessTest",
-      "category": "",
+      "categories": ["matrix"],
       "attribute": "willpower",
       "attribute2": "",
       "skill": "hardware",

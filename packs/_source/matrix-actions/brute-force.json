@@ -14,7 +14,7 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "category": "",
+      "categories": ["matrix", "brute_force"],
       "attribute": "logic",
       "attribute2": "logic",
       "skill": "cybercombat",
