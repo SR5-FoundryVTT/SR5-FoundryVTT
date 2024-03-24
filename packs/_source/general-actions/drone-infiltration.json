@@ -11,7 +11,7 @@
     "action": {
       "type": "",
       "test": "DroneInfiltrationTest",
-      "category": "",
+      "categories": [],
       "attribute": "",
       "attribute2": "",
       "skill": "",

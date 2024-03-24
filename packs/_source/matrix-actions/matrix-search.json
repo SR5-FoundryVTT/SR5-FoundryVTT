@@ -20,7 +20,7 @@
     "action": {
       "type": "varies",
       "test": "SuccessTest",
-      "category": "",
+      "categories": ["matrix"],
       "attribute": "intuition",
       "attribute2": "",
       "skill": "computer",

@@ -12,7 +12,7 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "category": "",
+      "categories": [],
       "attribute": "charisma",
       "attribute2": "intuition",
       "skill": "",

@@ -14,7 +14,7 @@
     "action": {
       "type": "simple",
       "test": "SuccessTest",
-      "category": "",
+      "categories": ["matrix"],
       "attribute": "",
       "attribute2": "",
       "skill": "",

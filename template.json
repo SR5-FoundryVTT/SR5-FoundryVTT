@@ -1536,6 +1536,7 @@
             "fade": 0,
             "action": {
                 "test": "ComplexFormTest",
+                "categories": ["complex_form"],
                 "opposed": {
                     "test": "OpposedTest"
                 },

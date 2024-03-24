@@ -12,7 +12,7 @@
     "action": {
       "type": "simple",
       "test": "PilotVehicleTest",
-      "category": "",
+      "categories": [],
       "attribute": "",
       "attribute2": "",
       "skill": "",

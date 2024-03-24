@@ -12,7 +12,7 @@
     "action": {
       "type": "complex",
       "test": "NaturalRecoveryStunTest",
-      "category": "",
+      "categories": ["recovery_stun"],
       "attribute": "body",
       "attribute2": "willpower",
       "skill": "",

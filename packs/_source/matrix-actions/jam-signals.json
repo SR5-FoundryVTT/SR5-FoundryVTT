@@ -14,7 +14,7 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "category": "",
+      "categories": ["matrix"],
       "attribute": "logic",
       "attribute2": "",
       "skill": "electronic_warfare",

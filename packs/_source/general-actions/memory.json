@@ -12,7 +12,7 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "category": "",
+      "categories": [],
       "attribute": "willpower",
       "attribute2": "logic",
       "skill": "",

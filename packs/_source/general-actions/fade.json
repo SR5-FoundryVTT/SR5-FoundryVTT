@@ -16,7 +16,7 @@
     "action": {
       "type": "none",
       "test": "FadeTest",
-      "category": "",
+      "categories": ["fade"],
       "attribute": "",
       "attribute2": "",
       "skill": "",

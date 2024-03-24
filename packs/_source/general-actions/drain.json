@@ -16,7 +16,7 @@
     "action": {
       "type": "none",
       "test": "DrainTest",
-      "category": "",
+      "categories": ["drain"],
       "attribute": "",
       "attribute2": "",
       "skill": "",

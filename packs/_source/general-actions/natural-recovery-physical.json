@@ -12,7 +12,7 @@
     "action": {
       "type": "complex",
       "test": "NaturalRecoveryPhysicalTest",
-      "category": "",
+      "categories": ["recovery_physical"],
       "attribute": "body",
       "attribute2": "body",
       "skill": "",
