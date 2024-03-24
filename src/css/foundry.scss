@@ -159,6 +159,10 @@ input[type='text'].display {
     color: $light-2;
 }
 
+// Description for roll tables shown on chat messages for a rolled result drawn.
+.chat-message .table-draw .table-description {
+    color: $light;
+}
 /**
  * Settings Sidebar
  */
@@ -180,7 +184,7 @@ input[type='text'].display {
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
  * otherwise cause issues with custom button styling.
  */
- .form-dialog .window-content .dialog-buttons {
+.form-dialog .window-content .dialog-buttons {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
