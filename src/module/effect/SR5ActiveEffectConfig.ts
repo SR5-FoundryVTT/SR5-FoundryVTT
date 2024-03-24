@@ -113,10 +113,18 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     }
 
     /**
-     * Prepare apply to select options.
+     * Depending on this effects source document being actor or item, some effect apply to
+     * should not be available.
      */
     prepareApplyToOptions(): Record<string, string> {
-        return SR5.effectApplyTo;
+        const effectApplyTo = foundry.utils.deepClone(SR5.effectApplyTo) as Record<string, string>;
+
+        // Actors can't use effects that only apply to tests from items.
+        if (this.object.parent instanceof SR5Actor) {
+            delete effectApplyTo.test_item;
+        }
+
+        return effectApplyTo;
     }
 
     /**
