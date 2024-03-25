@@ -1,9 +1,10 @@
 import { SR5 } from "../../config";
+import {FLAGS, SYSTEM_NAME} from './../../constants';
 
 export async function getIconFiles(): Promise<string[]> {
 
     // Icon locations
-    const imgFolder = "systems/shadowrun5e/dist/icons/importer/";
+    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/dist/icons/importer/";
     const folderList = await FilePicker.browse("data", imgFolder).then(picker => picker.dirs);
     let fileList = await FilePicker.browse("data", imgFolder).then(picker => picker.files);
 
@@ -18,23 +19,24 @@ export async function getIconFiles(): Promise<string[]> {
 export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadowrun.ShadowrunItemDataData, iconList: string[]): Promise<string> {
 
     const defaultImg = "icons/svg/item-bag.svg";
-    const imgFolder = "systems/shadowrun5e/dist/icons/importer/";
-    const imgExtension = '.svg';
+    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/dist/icons/importer/";
+    const imgExtensionOptions = ['.svg', '.webp', '.png', '.jpg', '.jpeg', '.avif'];
     const imgName = importFlags.name;
     const imgType = importFlags.type;
     const imgSubType = importFlags.subType;
+    const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides) as boolean;
 
     // Get the override, if any
     let override = ''
-    if (imgSubType) override = SR5.itemSubTypeIconOverrides[imgType][imgSubType];
+    if (imgSubType && useOverrides) override = SR5.itemSubTypeIconOverrides[imgType][imgSubType];
 
     // Priority of file names to check
     let fileNamePriority = [
-        override,
-        imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension,
-        imgFolder + imgType + '/' + imgType + imgExtension,
-        imgFolder + imgSubType + imgExtension,
-        imgFolder + imgType + imgExtension
+        imgFolder + override,
+        imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType,
+        imgFolder + imgType + '/' + imgType,
+        imgFolder + imgSubType,
+        imgFolder + imgType
     ]
     switch (imgType) {
         case 'armor':
@@ -44,12 +46,12 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
 
         case 'weapon':
             fileNamePriority = [
-                override,
-                imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType + imgExtension,
-                imgFolder + imgType + '/' + system.category + imgExtension,
-                imgFolder + imgType + '/' + imgType + imgExtension,
-                imgFolder + imgSubType + imgExtension,
-                imgFolder + imgType + imgExtension
+                imgFolder + override,
+                imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType,
+                imgFolder + imgType + '/' + system.category,
+                imgFolder + imgType + '/' + imgType,
+                imgFolder + imgSubType,
+                imgFolder + imgType
             ]
             break;
 
@@ -59,8 +61,11 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
 
     // Run through potential file names, taking the first one that has an icon that exists
     for (const iconFileName of fileNamePriority) {
-        if (iconList.includes(iconFileName)) {
-            return iconFileName
+        for (const imgExtension of imgExtensionOptions) {
+            const withExtension = iconFileName + imgExtension;
+            if (iconList.includes(withExtension)) {
+                return withExtension
+            }
         }
     }
 
