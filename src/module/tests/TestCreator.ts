@@ -1,3 +1,4 @@
+import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlow';
 import {SR5Item} from "../item/SR5Item";
 import {SR5Actor} from "../actor/SR5Actor";
 import {
@@ -235,6 +236,21 @@ export const TestCreator = {
 
         if (actors.length === 0) {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
+
+            if (!testData.data.hasOwnProperty('targetUuid')) return;
+            const matrixTestData = testData.data as MatrixPlacementData;
+
+            // Some opposed tests only need an item, no actor...
+            const document = await fromUuid(matrixTestData.targetUuid);
+            if (!(document instanceof SR5Item)) return;
+            
+            const data = await testClass._getOpposedActionTestData(matrixTestData, document, id);
+            if (!data) return;
+
+            const documents = {item: document};
+            const test = new testClass(data, documents, options);
+
+            await test.execute();
         } 
         else {
             console.log('Shadowrun 5e | Casting an opposed test using these actors', actors, testData);
@@ -437,10 +453,19 @@ export const TestCreator = {
      * Prepare test data with source values based on action data.
      *
      * @param action Action data to prepare test data with.
-     * @param actor Actor to use for retrieving source values and execute test with.
+     * @param document Document to use for retrieving source values and execute test with.
      * @param data Any test implementations resulting basic test data.
      */
-    _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData) {
+    _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData) {
+        if (document instanceof SR5Actor) return await TestCreator._prepareTestDataWithActionForActor(action, document, data);
+        if (document instanceof SR5Item) return await TestCreator._prepareTestDataWithActionForItem(action, document, data);
+
+        //@ts-expect-error // Fallback to data for easy typing, though type gating would cause a typing error, however runtime errors might occur.
+        console.error(`Shadowrun 5e | Couldn't prepare test data for document type ${document.constructor.name}`, document, data);
+        return data;
+    },
+
+    _prepareTestDataWithActionForActor: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData) {
         // Action values might be needed later to redo the same test.
         data.action = action;
 
@@ -478,7 +503,7 @@ export const TestCreator = {
             if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
         }
         
-        // TODO: Test and check if this still works.
+        // Include pool modifiers for opposed and resist tests.
         if (action.mod) {
             data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, 'SR5.DicePoolModifier', action.mod);
         }
@@ -562,6 +587,11 @@ export const TestCreator = {
 
         // Mark test as extended.
         data.extended = action.extended;
+
+        return data;
+    },
+
+    _prepareTestDataWithActionForItem: async function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData) {
 
         return data;
     },
