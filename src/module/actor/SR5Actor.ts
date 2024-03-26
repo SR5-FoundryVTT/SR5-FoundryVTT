@@ -14,7 +14,6 @@ import {SpritePrep} from "./prep/SpritePrep";
 import {VehiclePrep} from "./prep/VehiclePrep";
 import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import {SkillRules} from "../rules/SkillRules";
-import {MatrixRules} from "../rules/MatrixRules";
 import {ICPrep} from "./prep/ICPrep";
 import {
     EffectChangeData
@@ -30,7 +29,7 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import { MarksFlow } from './flows/MarksFlow';
+import { ActorMarksFlow } from './flows/ActorMarksFlow';
 
 
 /**
@@ -2033,27 +2032,29 @@ export class SR5Actor extends Actor {
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
     async setMarks(target: SR5Actor|SR5Item, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
-        await MarksFlow.setMarks(this, target, marks, options)
+        await ActorMarksFlow.setMarks(this, target, marks, options)
     }
 
     /**
      * Remove ALL marks placed by this actor
      */
     async clearMarks() {
-        await MarksFlow.clearMarks(this);
+        await ActorMarksFlow.clearMarks(this);
     }
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
      */
     async clearMark(markId: string) {
-        await MarksFlow.clearMark(this, markId);
+        await ActorMarksFlow.clearMark(this, markId);
     }
 
+    /**
+     * Get all marks placed by this actor.
+     * @returns 
+     */
     getAllMarks(): Shadowrun.MatrixMarks | undefined {
-        const matrixData = this.matrixData;
-        if (!matrixData) return;
-        return matrixData.marks;
+        return ActorMarksFlow.getAllMarks(this);
     }
 
     /**
@@ -2064,7 +2065,7 @@ export class SR5Actor extends Actor {
      * @param options
      */
     getMarks(target: Token, item?: SR5Item, options?: { scene?: Scene }) {
-        return MarksFlow.getMarks(this, target, item, options);
+        return ActorMarksFlow.getMarks(this, target, item, options);
     }
 
     /**
@@ -2073,7 +2074,7 @@ export class SR5Actor extends Actor {
      * @returns Amount of marks placed
      */
     getMarksById(targetUuid: string) {
-        return MarksFlow.getMarksById(this, targetUuid);
+        return ActorMarksFlow.getMarksById(this, targetUuid);
     }
 
     /**
@@ -2097,7 +2098,7 @@ export class SR5Actor extends Actor {
         const marks = this.matrixController.getAllMarks();
         if (!marks) return [];
 
-        return await MarksFlow.getMarkedDocuments(marks);
+        return await ActorMarksFlow.getMarkedDocuments(marks);
     }
 
     /**

@@ -6,8 +6,9 @@ import { SR5Actor } from "../SR5Actor";
  * This flow handles everything around matrix mark management.
  * 
  * NOTE: this flow often uses decker to refer to deckers and technomancers interchangeably.
+ * NOTE: This flow has a companion flow for items ItemMarksFlow.
  */
-export const MarksFlow = {
+export const ActorMarksFlow = {
     /**
      * Place a number of marks by decker onto any kind of target.
      * 
@@ -44,7 +45,7 @@ export const MarksFlow = {
         }
 
         // TODO: this should be replaced
-        const targetUuid = MarksFlow.buildMarkUuid(target.uuid);
+        const targetUuid = ActorMarksFlow.buildMarkUuid(target.uuid);
         const matrixData = decker.matrixData;
 
         if (!matrixData) return;
@@ -84,6 +85,16 @@ export const MarksFlow = {
     },
 
     /**
+     * Get all mark data for this actor.
+     * @param decker 
+     */
+    getAllMarks(decker: SR5Actor): Shadowrun.MatrixMarks | undefined {
+        const matrixData = this.matrixData;
+        if (!matrixData) return;
+        return matrixData.marks;
+    },
+
+    /**
      * Return the amount of marks this actor has on another actor or one of their items.
      *
      * TODO: It's unclear what this method will be used for
@@ -118,7 +129,7 @@ export const MarksFlow = {
      * @returns Amount of marks placed
      */
     getMarksById(decker: SR5Actor, targetUuid: string): number {
-        const markId = MarksFlow.buildMarkUuid(targetUuid);
+        const markId = ActorMarksFlow.buildMarkUuid(targetUuid);
         return decker.matrixData?.marks[markId] || 0;
     },
 
@@ -149,7 +160,7 @@ export const MarksFlow = {
      * @param markId A mark uuid
      */
     async getMarkedDocument(markId: string) {
-        const uuid = MarksFlow.buildDocumentUuid(markId);
+        const uuid = ActorMarksFlow.buildDocumentUuid(markId);
         return await fromUuid(uuid) as SR5Actor | SR5Item | null;
     },
 
@@ -162,7 +173,7 @@ export const MarksFlow = {
         const documents: Shadowrun.MarkedDocument[] = [];
 
         for (const [markId, amount] of Object.entries(marks)) {
-            const target = await MarksFlow.getMarkedDocument(markId);
+            const target = await ActorMarksFlow.getMarkedDocument(markId);
             if (!target) continue;
 
             documents.push({target, marks: amount, markId});

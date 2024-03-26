@@ -18,7 +18,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
-import { MarksFlow } from '../flows/MarksFlow';
+import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -1062,7 +1062,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedDocument = await MarksFlow.getMarkedDocument(markId);
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
         if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
@@ -1079,7 +1079,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedDocument = await MarksFlow.getMarkedDocument(markId);
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
         if (!markedDocument) return;
 
         await this.actor.setMarks(markedDocument, by);

@@ -7,7 +7,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
-import { MarksFlow } from '../actor/flows/MarksFlow';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -707,7 +707,7 @@ export class SR5ItemSheet extends ItemSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedDocument = await MarksFlow.getMarkedDocument(markId);
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
         if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
@@ -722,7 +722,7 @@ export class SR5ItemSheet extends ItemSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedDocument = await MarksFlow.getMarkedDocument(markId);
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
         if (!markedDocument) return;
 
         await this.item.setMarks(markedDocument, by);

@@ -74,7 +74,8 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
-import { MarksFlow } from '../actor/flows/MarksFlow';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { ItemMarksFlow } from './flows/ItemMarksFlow';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -1384,7 +1385,7 @@ export class SR5Item extends Item {
         data._id = this.id;
 
         // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
-        // @ts-expect-error
+        // @ts-expect-error 
         await this.parent.updateNestedItems(data);
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
@@ -1398,11 +1399,11 @@ export class SR5Item extends Item {
     override async update(data, options?): Promise<this> {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem) {
-            return this.updateNestedItem(data);
+            return await this.updateNestedItem(data);
         }
 
         // Actor.item => Directly owned item by an actor!
-        // @ts-expect-error
+        // @ts-expect-error foundry-vtt-types v10
         return await super.update(data, options);
     }
 
@@ -1415,69 +1416,40 @@ export class SR5Item extends Item {
      * @param options.scene The scene the targeted actor lives on.
      * @param options.item
      *
-     * TODO: It might be useful to create a 'MatrixDocument' class sharing matrix methods to avoid duplication between
-     *       SR5Item and SR5Actor.
      */
     async setMarks(target: SR5Actor|SR5Item, marks: number, options?: {scene?: Scene, item?: Item, overwrite?: boolean}) {
-        if (!canvas.ready) return;
-
-        if (!this.isHost) {
-            console.error('Only Host item types can place matrix marks!');
-            return;
-        }
-
-        const host = this.asHost;
-        if (!host) return;
-
-        const targetUuid = target.uuid;
-        const currentMarks = options?.overwrite ? 0 : this.getMarksById(targetUuid);
-        host.system.marks[targetUuid] = MatrixRules.getValidMarksCount(currentMarks + marks);
-
-        await this.update({'system.marks': host.system.marks});
+        await ItemMarksFlow.setMarks(this, target, marks, options);
     }
 
+    /**
+     * Get the marks placed for a single target
+     * @param markId The id of that target
+     * @returns Amount of marks
+     */
     getMarksById(markId: string): number {
-        const host = this.asHost;
-        return host ? host.system.marks[markId] : 0;
+        return ItemMarksFlow.getMarksById(this, markId);
     }
 
-    getAllMarks(): MatrixMarks|undefined {
-        const host = this.asHost;
-        if (!host) return;
-        return host.system.marks;
+    /**
+     * Get all marks placed by this item.
+     * @returns The set of marks
+     */
+    getAllMarks() {
+        return ItemMarksFlow.getAllMarks(this);
     }
 
     /**
      * Remove ALL marks placed by this item.
-     *
-     * TODO: Allow partial deletion based on target / item
      */
     async clearMarks() {
-        if (!this.isHost) return;
-
-        const host = this.asHost;
-
-        if (!host) return;
-
-        // Delete all markId properties from ActorData
-        const updateData = {}
-        for (const markId of Object.keys(host.system.marks)) {
-            updateData[`-=${markId}`] = null;
-        }
-
-        await this.update({'system.marks': updateData});
+        await ItemMarksFlow.clearMarks(this);
     }
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
      */
     async clearMark(markId: string) {
-        if (!this.isHost) return;
-
-        const updateData = {}
-        updateData[`-=${markId}`] = null;
-
-        await this.update({'system.marks': updateData});
+        await ItemMarksFlow.clearMark(this, markId);
     }
 
     /**
@@ -1506,15 +1478,14 @@ export class SR5Item extends Item {
         // Convert the index to a device link.
         if (controllerData.system.networkDevices[index] === undefined) return;
         const networkDeviceLink = controllerData.system.networkDevices[index];
-        const controller = this;
-        return await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, networkDeviceLink);
+        await NetworkDeviceFlow.removeDeviceLinkFromNetwork(this, networkDeviceLink);
     }
 
     async removeAllNetworkDevices() {
         const controllerData = this.asController();
         if (!controllerData) return;
 
-        return await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
+        await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
     }
 
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
@@ -1523,7 +1494,7 @@ export class SR5Item extends Item {
         const marks = this.getAllMarks();
         if (!marks) return [];
 
-        return await MarksFlow.getMarkedDocuments(marks);
+        return await ActorMarksFlow.getMarkedDocuments(marks);
     }
 
     /**
@@ -1544,7 +1515,7 @@ export class SR5Item extends Item {
         const controller = this.asDevice || this.asHost;
         if (!controller) return [];
 
-        return NetworkDeviceFlow.getNetworkDevices(this);
+        return await NetworkDeviceFlow.getNetworkDevices(this);
     }
 
     /**

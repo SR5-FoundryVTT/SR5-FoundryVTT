@@ -56,7 +56,7 @@ module.exports = {
         "@typescript-eslint/no-empty-interface": "warn",
         "@typescript-eslint/consistent-indexed-object-style": "warn",
         "@typescript-eslint/ban-types": "warn", //Maybe this should be error?
-        "no-prototype-builtins": "warn",
+        "no-prototype-builtins": "off",
         "@typescript-eslint/unbound-method": "warn",
         "no-useless-return": "warn",
         "@typescript-eslint/return-await": "warn",
