@@ -79,6 +79,16 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         return againstNetHits;
     }
 
+    /**
+     * Prepare any OpposedTest from given test data. This test data should origin from a original success test, that is to be opposed.
+     * 
+     * Typically this would be as part of a test => message => oppose flow
+     * 
+     * @param againstData The original test to be opposed in raw data.
+     * @param actor The actor used to oppose this original test with.
+     * @param previousMessageId The chat message the original test is stored within.
+     * @returns TestData for the opposed test.
+     */
     static override async _getOpposedActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
@@ -102,7 +112,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
             pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
             limit: DataDefaults.valueData({label: 'SR5.Limit'}),
             threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
-            //@ts-expect-error
+            //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
             values: {},
 
             sourceItemUuid: againstData.sourceItemUuid,
@@ -114,7 +124,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         // and calculate netHits accordingly.
         data.threshold.base = againstData.values.netHits.value;
 
-        // Casting an opposed action doesn't give as complete ActionData from the original.
+        // The original action doesn't contain a complete set of ActionData.
         // Therefore we must create an empty dummy action.
         let action = DataDefaults.actionRollData();
 
@@ -135,8 +145,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
             }
         }
 
-        //@ts-expect-error
-        return await this._prepareActionTestData(action, actor, data);
+        return await this._prepareActionTestData(action, actor, data) as OpposedTestData;
     }
 
     /**

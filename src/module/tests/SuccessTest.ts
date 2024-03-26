@@ -360,7 +360,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     static async _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {
-        return TestCreator._prepareTestDataWithAction(action, actor, data);
+        return await TestCreator._prepareTestDataWithAction(action, actor, data);
     }
 
     /**
@@ -378,7 +378,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     static async _getOpposedActionTestData(testData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
-        return;
+        return undefined;
     }
 
     /**
