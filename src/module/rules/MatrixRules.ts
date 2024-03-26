@@ -1,4 +1,4 @@
-import {SR} from "../constants";
+import { SR } from "../constants";
 
 export class MatrixRules {
     /**
@@ -65,9 +65,41 @@ export class MatrixRules {
         return 0;
     }
 
+    /**
+     * Amount of marks that is valid in general for a target (includes zero marks)
+     * @param marks The possibly faulty amount of marks
+     * @returns A valid amount of marks
+     */
     static getValidMarksCount(marks: number): number {
         marks = Math.min(marks, MatrixRules.maxMarksCount());
         return Math.max(marks, MatrixRules.minMarksCount());
+    }
+
+    /**
+     * Amount of marks that can be placed. SR5#240 'Hack on the Fly'
+     * @param marks The possibly faulty amount of marks
+     * @returns A valid amount of marks
+     */
+    static getValidMarksPlacementCount(marks: number): number {
+        // As we handle mark placement, we must assure at least one mark is placed.
+        marks = Math.min(marks, MatrixRules.maxMarksCount());
+        return Math.max(marks, 1);
+    }
+
+
+    /**
+     * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brut Force'
+     * @param marks Mount of marks to be placed
+     */
+    static getMarkPlacementModifier(marks: number): number {
+        marks = MatrixRules.getValidMarksPlacementCount(marks);
+
+        // Only handle cases with actual modifiers and otherwise return zero for a secure fallback.
+        switch (marks) {
+            case 2: return -4;
+            case 3: return -10;
+        }
+        return 0;
     }
 
     /**
@@ -76,5 +108,12 @@ export class MatrixRules {
      */
     static hostMatrixAttributeRatings(hostRating): number[] {
         return [0, 1, 2, 3].map(rating => rating + hostRating);
+    }
+
+    /**
+     * Determine the modifier when decking a target on a different Grid. See SR5#233 'Grids on a run'
+     */
+    static differentGridModifier(): number {
+        return -2;
     }
 }

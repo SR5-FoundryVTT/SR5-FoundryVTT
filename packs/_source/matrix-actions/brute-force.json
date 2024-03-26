@@ -13,7 +13,7 @@
     },
     "action": {
       "type": "complex",
-      "test": "SuccessTest",
+      "test": "BruteForceTest",
       "categories": ["matrix", "brute_force"],
       "attribute": "logic",
       "attribute2": "logic",

@@ -1,4 +1,4 @@
-import { TestDialogListener } from '../apps/dialogs/TestDialog';
+import { TestDialog, TestDialogListener } from '../apps/dialogs/TestDialog';
 import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
 import {SR5Actor} from "../actor/SR5Actor";
 import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from "../constants";
@@ -7,7 +7,6 @@ import {Helpers} from "../helpers";
 import {SR5Item} from "../item/SR5Item";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {PartsList} from "../parts/PartsList";
-import {TestDialog} from "../apps/dialogs/TestDialog";
 import {SR5} from "../config";
 import {ActionFlow} from "../item/flows/ActionFlow";
 import ValueField = Shadowrun.ValueField;

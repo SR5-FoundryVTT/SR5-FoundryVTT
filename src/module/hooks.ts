@@ -69,6 +69,7 @@ import { RenderSettings } from './systemLinks';
 import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
+import { BruteForceTest } from './tests/BruteForceTest';
 
 
 
@@ -179,6 +180,7 @@ ___________________
                 OpposedSummonSpiritTest,
                 CompileSpriteTest,
                 OpposedCompileSpriteTest,
+                BruteForceTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -204,7 +206,8 @@ ___________________
                 DroneInfiltrationTest,
                 SummonSpiritTest,
                 CompileSpriteTest,
-                RitualSpellcastingTest
+                RitualSpellcastingTest,
+                BruteForceTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.

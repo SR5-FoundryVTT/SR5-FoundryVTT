@@ -54,7 +54,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         return ['complex_form'];
     }
 
-    // TODO: Add missing modifiers (gitter) // SR5#251
+    // TODO: Add missing modifiers (Grid) // SR5#251
     override get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds'];
     }
