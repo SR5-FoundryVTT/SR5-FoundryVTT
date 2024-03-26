@@ -61,7 +61,7 @@
       },
       "opposed": {
         "type": "custom",
-        "test": "OpposedTest",
+        "test": "OpposedBruteForceTest",
         "attribute": "firewall",
         "attribute2": "willpower",
         "skill": "",

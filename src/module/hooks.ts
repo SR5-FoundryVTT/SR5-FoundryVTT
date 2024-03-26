@@ -70,6 +70,7 @@ import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { BruteForceTest } from './tests/BruteForceTest';
+import { OpposedBruteForceTest } from './tests/OpposedBruteForceTest';
 
 
 
@@ -180,7 +181,8 @@ ___________________
                 OpposedSummonSpiritTest,
                 CompileSpriteTest,
                 OpposedCompileSpriteTest,
-                BruteForceTest
+                BruteForceTest,
+                OpposedBruteForceTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -221,7 +223,8 @@ ___________________
                 CombatSpellDefenseTest,
                 OpposedSummonSpiritTest,
                 OpposedCompileSpriteTest,
-                OpposedRitualTest
+                OpposedRitualTest,
+                OpposedBruteForceTest
             },
             /**
              * Subset of tests meant to be used as resist tests.

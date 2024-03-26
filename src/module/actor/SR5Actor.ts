@@ -2027,11 +2027,9 @@ export class SR5Actor extends Actor {
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks The amount of marks to be placed
      * @param options Additional options that may be needed
-     * @param options.scene The scene the actor lives on. If empty, will be current active scene
-     * @param options.item The item that the mark is to be placed on
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: SR5Actor|SR5Item, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
+    async setMarks(target: SR5Actor|SR5Item, marks: number, options: { overwrite?: boolean } = {}) {
         await ActorMarksFlow.setMarks(this, target, marks, options)
     }
 

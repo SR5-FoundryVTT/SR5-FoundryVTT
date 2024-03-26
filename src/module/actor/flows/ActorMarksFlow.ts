@@ -17,7 +17,7 @@ export const ActorMarksFlow = {
      * @param marks 
      * @param options 
      */
-    async setMarks(decker: SR5Actor, target: SR5Actor|SR5Item, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
+    async setMarks(decker: SR5Actor, target: SR5Actor|SR5Item, marks: number, options: { overwrite?: boolean } = {}) {
         // Don't allow self marking.
         if (decker.id === target.id) {
             return;
@@ -28,7 +28,6 @@ export const ActorMarksFlow = {
             return;
         }
 
-        // TODO: is the scene / item options still needed? Couldn't it be replaced by a general target?
         if (decker.isIC() && decker.hasHost()) {
             return await decker.getICHost()?.setMarks(target, marks, options);
         }
@@ -44,7 +43,6 @@ export const ActorMarksFlow = {
             return;
         }
 
-        // TODO: this should be replaced
         const targetUuid = ActorMarksFlow.buildMarkUuid(target.uuid);
         const matrixData = decker.matrixData;
 
@@ -89,7 +87,7 @@ export const ActorMarksFlow = {
      * @param decker 
      */
     getAllMarks(decker: SR5Actor): Shadowrun.MatrixMarks | undefined {
-        const matrixData = this.matrixData;
+        const matrixData = decker.matrixData;
         if (!matrixData) return;
         return matrixData.marks;
     },
