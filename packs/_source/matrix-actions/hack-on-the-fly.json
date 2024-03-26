@@ -13,7 +13,7 @@
     },
     "action": {
       "type": "complex",
-      "test": "SuccessTest",
+      "test": "HackOnTheFlyTest",
       "categories": ["matrix", "hack_on_the_fly"],
       "attribute": "logic",
       "attribute2": "",
@@ -62,7 +62,7 @@
       },
       "opposed": {
         "type": "custom",
-        "test": "OpposedTest",
+        "test": "OpposedHackOnTheFlyTest",
         "attribute": "intuition",
         "attribute2": "firewall",
         "skill": "",

@@ -4,21 +4,29 @@ import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlo
 
 
 /**
- * Brute force tests implement the Brute Force action on SR5#238
+ * Hack on the Fly tests implement the Hack on the Fly action on SR5#240
  */
-export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
+export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
     override actor: SR5Actor;
 
     override _prepareData(data: MatrixPlacementData, options): any {
         data = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareData(data, options);
+
+        // Place a single mark as default
+        data.marks = data.marks ?? 1;
+        // Assume decker and target reside on the same Grid
+        data.sameGrid = data.sameGrid ?? true;
+        // Assume no direct connection
+        data.directConnection = data.directConnection ?? false;
+
+        return data;
     }
 
     /**
      * Brute Force is a matrix action.
      */
     override get testCategories(): Shadowrun.ActionCategories[] {
-        return ['matrix', 'brute_force'];
+        return ['matrix', 'hack_on_the_fly'];
     }
 
     /**
@@ -34,9 +42,6 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.html';
     }
 
-    /**
-     * Base on test dialog selection, different modifiers apply.
-     */
     override prepareTestModifiers() {
         super.prepareTestModifiers();
 

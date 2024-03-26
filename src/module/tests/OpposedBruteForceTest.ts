@@ -1,5 +1,6 @@
 import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
+import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
 import { OpposedTest } from "./OpposedTest";
 
@@ -8,8 +9,17 @@ export class OpposedBruteForceTest extends OpposedTest {
     override get _chatMessageTemplate() {
         return 'systems/shadowrun5e/dist/templates/rolls/opposing-mark-test-message.html';
     }
+
+    override get successLabel(): Translation {
+        return "SR5.TestResults.BruteForceFailure";
+    }
+
+    override get failureLabel(): Translation {
+        return "SR5.TestResults.BruteForceSuccess";
+    }
+    
     /**
-     * When failing against brute force, the decker gets a mark on the target.
+     * When failing against brute force, the decker gets a mark on the target and can deal damage.
      */
     override async processFailure() {
         if (!this.actor || !this.against.actor) return;
