@@ -732,7 +732,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Test categories must be ready before active effects are applied as they rely on this data to be present.
      */
     prepareTestCategories() {
-        this.data.categories = this.data.action.categories || this.testCategories;
+        this.data.categories = this.data.action?.categories || this.testCategories;
     }
 
     /**

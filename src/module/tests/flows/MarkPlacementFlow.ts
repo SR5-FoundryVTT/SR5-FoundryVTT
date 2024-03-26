@@ -12,7 +12,7 @@ export interface MatrixPlacementData extends SuccessTestData {
     // If decker has a direct connection to the target
     directConnection: boolean
     // The uuid of the target actor / device / host.
-    targetUuid: string
+    targetUuid?: string
 }
 /**
  * Handle test flows for placing marks between different tests / actions.
@@ -25,6 +25,8 @@ export const MarkPlacementFlow = {
         data.sameGrid = data.sameGrid ?? true;
         // Assume no direct connection
         data.directConnection = data.directConnection ?? false;
+        // A uuid for a matrix target (actor or item)
+        data.targetUuid = data.targetUuid ?? undefined;
 
         return data;
     },

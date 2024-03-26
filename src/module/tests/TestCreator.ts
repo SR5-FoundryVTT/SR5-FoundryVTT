@@ -132,7 +132,7 @@ export const TestCreator = {
             return;
         }
 
-        return TestCreator.fromItem(item, actor, options);
+        return await TestCreator.fromItem(item, actor, options);
     },
 
     /**
@@ -241,7 +241,7 @@ export const TestCreator = {
             const matrixTestData = testData.data as MatrixPlacementData;
 
             // Some opposed tests only need an item, no actor...
-            const document = await fromUuid(matrixTestData.targetUuid);
+            const document = await fromUuid(matrixTestData.targetUuid as string);
             if (!(document instanceof SR5Item)) return;
             
             const data = await testClass._getOpposedActionTestData(matrixTestData, document, id);
@@ -592,7 +592,6 @@ export const TestCreator = {
     },
 
     _prepareTestDataWithActionForItem: async function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData) {
-
         return data;
     },
 

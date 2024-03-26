@@ -675,6 +675,9 @@
     "SR5.MatrixAttrFirewall": "Firewall",
     "SR5.MatrixAttrSleaze": "Sleaze",
     "SR5.MatrixTarget": "Matrix Target",
+    "SR5.MatrixTargetAcquisitionApplication": {
+        "Title": "Matrix Target Acquisition"
+    },
     "SR5.MeleeWeaponAttack": "Melee Weapon Attack",
     "SR5.MentalLimit": "Mental Limit",
     "SR5.Metamagic": "Metamagic",

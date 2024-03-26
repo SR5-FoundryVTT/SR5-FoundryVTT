@@ -1,15 +1,13 @@
+import { MatrixTargetAcquisitionApplication } from './../../apps/matrix/MatrixTargetAquisition';
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import MarkedDocument = Shadowrun.MarkedDocument;
 import { Helpers } from "../../helpers";
-import { SR5 } from "../../config";
 
 
-export interface CharacterSheetData extends SR5ActorSheetData {
+export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     awakened: boolean
     emerged: boolean
     woundTolerance: number
-    markedDocuments: MarkedDocument[]
+    markedDocuments: Shadowrun.MarkedDocument[]
     handledItemTypes: string[]
     inventory: Record<string, any>
 }
@@ -78,6 +76,12 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         return data;
     }
 
+    override async activateListeners(html: any) {
+        super.activateListeners(html);
+
+        html.find('.show-matrix-target-acquisition').click(this._onShowMatrixTargetAcquisition.bind(this));
+    }
+
     /**
      * Inject special case handling for call in action items, only usable by character actors.
      */
@@ -111,5 +115,15 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         };
 
         await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
+    }
+
+    /**
+     * Handle the user request to show the matrix target acquisition application.
+     * @param event Any pointer event
+     */
+    async _onShowMatrixTargetAcquisition(event: Event) {
+        const app = new MatrixTargetAcquisitionApplication(this.document);
+
+        app.render(true);
     }
 }

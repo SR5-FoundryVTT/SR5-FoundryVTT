@@ -5,7 +5,6 @@ import { DataDefaults } from "../data/DataDefaults";
 import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
-import { MatrixRules } from "../rules/MatrixRules";
 import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
 import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
@@ -48,7 +47,6 @@ import WeaponItemData = Shadowrun.WeaponItemData;
 import HostItemData = Shadowrun.HostItemData;
 import ActionResultData = Shadowrun.ActionResultData;
 import ActionTestLabel = Shadowrun.ActionTestLabel;
-import MatrixMarks = Shadowrun.MatrixMarks;
 import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
@@ -1187,6 +1185,15 @@ export class SR5Item extends Item {
 
     isWireless(): boolean {
         return this.wrapper.isWireless();
+    }
+
+    /**
+     * Determine if this item is an item that can be used in the matrix.
+     * 
+     * @returns true, if this item is a matrix item.
+     */
+    get isMatrixItem(): boolean {
+        return this.getTechnologyData() !== undefined
     }
 
     isCyberdeck(): boolean {

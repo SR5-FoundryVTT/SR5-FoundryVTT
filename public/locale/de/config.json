@@ -671,6 +671,9 @@
     "SR5.MatrixAttrFirewall": "Firewall",
     "SR5.MatrixAttrSleaze": "Schleicher",
     "SR5.MatrixTarget": "Matrixziel",
+    "SR5.MatrixTargetAcquisitionApplication": {
+        "Title": "Matrix Zielerfassung"
+    },
     "SR5.MeleeWeaponAttack": "Nahkampfangriff",
     "SR5.MentalLimit": "Geistiges Limit",
     "SR5.Metamagic": "Metamagie",

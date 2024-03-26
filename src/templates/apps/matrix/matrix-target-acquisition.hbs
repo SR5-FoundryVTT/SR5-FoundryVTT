@@ -1,0 +1,10 @@
+<div>
+    {{#each targets}}
+    <div><img src="{{speakerImg this.actor}}" height="24px" width="24px"/><span class="Roll show-matrix-placement">{{speakerName this.actor}}</span></div>
+    <ul>
+        {{#each this.matrixItems}}
+        <li><span class="Roll show-matrix-placement" data-target-uuid="{{this.item.uuid}}">{{this.item.name}}</span>{{#ifne this.item.marks 0}}: {{this.item.marks}}{{/ifne}}</li>
+        {{/each}}
+        </ul>
+    {{/each}}
+</div>
