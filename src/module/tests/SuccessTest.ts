@@ -171,6 +171,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     public item: SR5Item | undefined;
     public rolls: SR5Roll[];
     public targets: TokenDocument[];
+    public dialog: TestDialog | null;
 
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
     public effects: SuccessTestEffectsFlow<this>;
@@ -191,6 +192,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.effects = new SuccessTestEffectsFlow<this>(this);
 
         this.calculateBaseValues();
+
+        this.dialog = null;
 
         console.debug(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
@@ -516,11 +519,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async showDialog(): Promise<boolean> {
         if (!this.data.options?.showDialog) return true;
 
-        const dialog = this._createTestDialog();
+        this.dialog = this._createTestDialog();
 
-        const data = await dialog.select();
-        if (dialog.canceled) {
+        const data = await this.dialog.select();
+        if (this.dialog.canceled) {
             await this.cleanupAfterExecutionCancel();
+            this.dialog = null;
             return false
         }
 
@@ -669,7 +673,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     async populateDocuments() {
         // Populate the actor document.
-        if (!this.actor && this.data.sourceActorUuid) {
+        if (this.data.sourceActorUuid) {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
             const document = await fromUuid(this.data.sourceActorUuid) || undefined;
             // @ts-expect-error
@@ -679,7 +683,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Populate the item document.
-        if (!this.item && this.data.sourceItemUuid)
+        if (this.data.sourceItemUuid)
             this.item = await fromUuid(this.data.sourceItemUuid) as SR5Item || undefined;
 
         // Populate targeted token documents.
@@ -1305,6 +1309,23 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return await this.consumeDocumentRessources();
     }
 
+    async _prepareExecution() {
+        await this.populateTests();
+        await this.populateDocuments();
+
+        this.prepareTestCategories();
+
+        // Effects need to be applied before any values are calculated.
+        this.effects.applyAllEffects();
+
+        await this.prepareDocumentData();
+
+        // Initial base value preparation will show default result without any user input.
+        this.prepareBaseValues();
+        this.calculateBaseValues();
+        this.validateBaseValues();
+    }
+
     /**
      * Executing a test will start all behaviors necessary to:
      * - Calculate its values
@@ -1321,20 +1342,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * NOTE: Currently none of these methods trigger Foundry hooks.
      */
     async execute(): Promise<this> {
-        await this.populateTests();
-        await this.populateDocuments();
-
-        this.prepareTestCategories();
-
-        // Effects need to be applied before any values are calculated.
-        this.effects.applyAllEffects();
-
-        await this.prepareDocumentData();
-
-        // Initial base value preparation will show default result without any user input.
-        this.prepareBaseValues();
-        this.calculateBaseValues();
-        this.validateBaseValues();
+        await this._prepareExecution();
 
         // Allow user to change details.
         const userConsented = await this.showDialog();
@@ -2045,5 +2053,45 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         await test.populateDocuments();
         await ActionResultFlow.executeResult(resultAction, test);
+    }
+
+    /**
+     * Update a test instance in place while switching out it's documents.
+     * 
+     * This is done by removing action specific information from test data, while keeping data related
+     * to this individual test, including data that might have been altered by the user using the test dialog.
+     * 
+     * Use this method whenever you have an active test instance and want to re-use it with different documents.
+     * 
+     * @param document The new main source document use.
+     */
+    async _updateTestData(document: SR5Actor|SR5Item) {
+        const action = this.item?.getAction();
+        if (!action) return;
+        
+        const minimalData = TestCreator._minimalTestData();
+        for (const [key, value] of Object.entries(minimalData)) {
+            this.data[key] = value;
+        }
+
+        // Switch out source document.
+        this.data.sourceActorUuid = document instanceof SR5Actor ? document.uuid : undefined;
+        this.data.sourceItemUuid = document instanceof SR5Item ? document.uuid : undefined;
+        
+        this.data = await TestCreator._prepareTestDataWithAction(action, document, this.data) as T;
+        
+        // If no dialog has been shown yet, execution hasn't been triggered.
+        // Wait for the next execution.
+        if (!this.dialog) return;
+
+        // Re prepare data to add missing base information.
+        const options = this.data.options ?? {};
+        this._prepareData(this.data, options);
+
+        // Re prepare execution data to add missing modifiers / effects and so forth.
+        await this._prepareExecution();
+
+        // During .execute this would now show the dialog, therefore rerender and we're at the same state.
+        this.dialog.render(true);
     }
 }
