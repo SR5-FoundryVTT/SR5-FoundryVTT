@@ -35,8 +35,8 @@ export class ActionFlow {
         return damage;
     }
 
-    static _applyModifiableValue(value: Shadowrun.ModifiableValueLinked, actor: SR5Actor) {
-        const attribute = actor.findAttribute(value.attribute);
+    static _applyModifiableValue(value: Shadowrun.ModifiableValueLinked, document: SR5Actor|SR5Item) {
+        const attribute = document.getAttribute(value.attribute);
         if (!attribute) return;
 
         if (!value.base_formula_operator) {

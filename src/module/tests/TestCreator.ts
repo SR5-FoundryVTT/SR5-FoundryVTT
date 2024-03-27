@@ -56,16 +56,16 @@ export const TestCreator = {
      * Create a Test from action item configuration.
      *
      * @param item Any item type that defines an action.
-     * @param actor The actor to use for the resulting SR5Roll,
+     * @param document The actor to use for the resulting SR5Roll,
      *              will default to the items parent otherwise.
      * @param options See SuccessTestOptions documentation.
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    fromItem: async function(item: SR5Item, actor?: SR5Actor, options?: TestOptions): Promise<any | undefined> {
+    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item, options?: TestOptions): Promise<any | undefined> {
         //@ts-expect-error Default to item parent actor, if none given.
-        if (!actor) actor = item.parent;
-        if (!(actor instanceof SR5Actor)) {
+        if (!document) document = item.parent;
+        if (!(document instanceof SR5Actor)) {
             console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
             return;
         }
@@ -86,8 +86,8 @@ export const TestCreator = {
 
         // Any action item will return a list of values to create the test pool from.
         const cls = TestCreator._getTestClass(action.test);
-        const data = await TestCreator._getTestDataFromItemAction(cls, item, actor);
-        const documents = {item, actor};
+        const data = await TestCreator._getTestDataFromItemAction(cls, item, document);
+        const documents = {item, actor: document};
         return new cls(data, documents, options);
     },
 
@@ -95,10 +95,10 @@ export const TestCreator = {
      * Create a test from action data only, when not having an item.
      *
      * @param action The action data to use for the test.
-     * @param actor The actor to use for retrieving source values defined within the action.
+     * @param document The source document to use for retrieving source values defined within the action.
      * @param options See TestOptions documentation.
      */
-    fromAction: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, options?: TestOptions): Promise<SuccessTest | undefined> {
+    fromAction: async function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, options?: TestOptions): Promise<SuccessTest | undefined> {
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
@@ -112,8 +112,10 @@ export const TestCreator = {
 
         // Any action item will return a list of values to create the test pool from.
         const cls = TestCreator._getTestClass(action.test);
-        const data = await TestCreator._prepareTestDataWithAction(action, actor, TestCreator._minimalTestData());
-        const documents = {actor};
+        const data = await TestCreator._prepareTestDataWithAction(action, document, TestCreator._minimalTestData());
+        const actor = document instanceof SR5Actor ? document : undefined;
+        const item = document instanceof SR5Item ? document : undefined;
+        const documents = {actor, item};
 
         return new cls(data, documents, options);
     },
@@ -122,17 +124,17 @@ export const TestCreator = {
      * Create a test using an Action item stored in any collection
      * @param packName The package / compendium name to search for the action
      * @param actionName The items name within the given packName
-     * @param actor The actor used to roll the test with
+     * @param document The document used to roll the test with
      * @param options General TestOptions
      */
-    fromPackAction: async function(packName: string, actionName: string, actor: SR5Actor, options?: TestOptions): Promise<SuccessTest|undefined> {
+    fromPackAction: async function(packName: string, actionName: string, document: SR5Actor|SR5Item, options?: TestOptions): Promise<SuccessTest|undefined> {
         const item = await Helpers.getPackAction(packName, actionName);
         if (!item) {
             console.error(`Shadowrun5 | The pack ${packName} doesn't include an item ${actionName}`);
             return;
         }
 
-        return await TestCreator.fromItem(item, actor, options);
+        return await TestCreator.fromItem(item, document, options);
     },
 
     /**
@@ -457,6 +459,9 @@ export const TestCreator = {
      * @param data Any test implementations resulting basic test data.
      */
     _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData) {
+        // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
+        data.action = action;
+
         if (document instanceof SR5Actor) return await TestCreator._prepareTestDataWithActionForActor(action, document, data);
         if (document instanceof SR5Item) return await TestCreator._prepareTestDataWithActionForItem(action, document, data);
 
@@ -466,8 +471,6 @@ export const TestCreator = {
     },
 
     _prepareTestDataWithActionForActor: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData) {
-        // Action values might be needed later to redo the same test.
-        data.action = action;
 
         const pool = new PartsList<number>(data.pool.mod);
 
@@ -591,7 +594,27 @@ export const TestCreator = {
         return data;
     },
 
+    /**
+     * Prepare Test Data with SR5Item source document for rollData
+     * 
+     * @param action The base action to configure test data with.
+     * @param item The source document to pull values from.
+     * @param data The test data to write values into.
+     * @returns TestData that's ready to be used to construct a new test instance.
+     */
     _prepareTestDataWithActionForItem: async function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData) {
+        const pool = new PartsList<number>(data.pool.mod);
+
+        if (action.attribute) {
+            const attribute = item.getAttribute(action.attribute);
+            if (attribute) pool.addUniquePart(attribute.label, attribute.value);
+        }
+
+        if (action.attribute2) {
+            const attribute = item.getAttribute(action.attribute2);
+            if (attribute) pool.addUniquePart(attribute.label, attribute.value);
+        }
+
         return data;
     },
 

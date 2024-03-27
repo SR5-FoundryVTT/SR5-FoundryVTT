@@ -97,6 +97,9 @@ export interface TestData {
     // Documents the test might has been derived from.
     sourceItemUuid?: string
     sourceActorUuid?: string
+    // The document used for values.
+    sourceDocumentUuid?: string
+    sourceDocumentIsActor?: boolean
 
     // Message the test has been represented with.
     messageUuid?: string
@@ -169,6 +172,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     public data: T;
     public actor: SR5Actor | undefined;
     public item: SR5Item | undefined;
+    public source: SR5Actor | SR5Item | undefined;
+
     public rolls: SR5Roll[];
     public targets: TokenDocument[];
     public dialog: TestDialog | null;
@@ -180,6 +185,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
         this.item = documents?.item;
+        // Prefer actors as source documents.
+        this.source = documents?.actor ?? documents?.item;
         this.rolls = documents?.rolls || [];
 
         // User selected targets of this test.
@@ -215,6 +222,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Store given document uuids to be fetched during evaluation.
         data.sourceActorUuid = data.sourceActorUuid || this.actor?.uuid;
         data.sourceItemUuid = data.sourceItemUuid || this.item?.uuid;
+        data.sourceDocumentUuid = data.sourceDocumentUuid || this.source?.uuid;
 
         // @ts-expect-error // Prepare general test information.
         data.title = data.title || this.constructor.label;

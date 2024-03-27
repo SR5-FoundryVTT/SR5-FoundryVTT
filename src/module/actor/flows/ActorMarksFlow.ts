@@ -37,11 +37,26 @@ export const ActorMarksFlow = {
             console.error(`The actor type ${decker.type} can't receive matrix marks!`);
             return;
         }
+
+        // Abort for non-matrix actors
         if (target instanceof SR5Actor && !target.isMatrixActor) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
             console.error(`The actor type ${target.type} can't receive matrix marks!`);
             return;
         }
+
+        // If the actor doesn't have living persona, target the persona matrix device instead.
+        if (target instanceof SR5Actor && !target.hasActorPersona) {
+            const matrixDevice = target.getMatrixDevice();
+            if (!matrixDevice) {
+                ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedWithoutPersona'));
+                return;
+            };
+
+            target = matrixDevice;
+        }
+
+
 
         const targetUuid = ActorMarksFlow.buildMarkUuid(target.uuid);
         const matrixData = decker.matrixData;
@@ -159,7 +174,11 @@ export const ActorMarksFlow = {
      */
     async getMarkedDocument(markId: string) {
         const uuid = ActorMarksFlow.buildDocumentUuid(markId);
-        return await fromUuid(uuid) as SR5Actor | SR5Item | null;
+        const target = await fromUuid(uuid) as SR5Actor | SR5Item | null;
+
+        if (target instanceof SR5Item && ActorMarksFlow.targetIsPersonaDevice(target)) return target.parent;
+
+        return target;
     },
 
     /**
@@ -178,5 +197,15 @@ export const ActorMarksFlow = {
         }
 
         return documents;
+    },
+
+    /**
+     * Actor owned items can be persona devices or just devices.
+     * 
+     * @param target Any matrix device
+     * @return true, if the given matrix device is used as a persona device by an actor.
+     */
+    targetIsPersonaDevice(target: SR5Item): boolean {
+        return target === target.parent?.getMatrixDevice();
     }
 }

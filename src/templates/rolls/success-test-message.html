@@ -2,9 +2,9 @@
     <div class="card-title card-header">
         <span class="test-name">{{localize title}}</span>
     </div>
-    {{#if speaker.actor}}
     <div class="card-title card-header">
         <div class="container container--fluid">
+            {{#if speaker.actor}}
             <div class="container__row">
                 <div class="container__col">
                     <div class="document">
@@ -13,6 +13,7 @@
                     </div>
                 </div>
             </div>
+            {{/if}}
             {{#if item}}
             <div class="container__row">
                 <div class="container__col">
@@ -25,7 +26,6 @@
             {{/if}}
         </div>
     </div>
-    {{/if}}
     <div class="card-main-content">
         {{#if test.hasAction}}
         <div class="card-content {{#if applyGmOnlyContent}}gm-only-content{{/if}}">

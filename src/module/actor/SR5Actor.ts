@@ -2014,6 +2014,24 @@ export class SR5Actor extends Actor {
         return 'matrix' in this.system;
     }
 
+    /**
+     * Check if the current actor is a matrix first class citizen.
+     * 
+     * @returns true, when the actor lives in the matrix.
+     */
+    get hasActorPersona(): boolean {
+        return this.isVehicle() || this.isIC() || this.isEmerged;
+    }
+
+    /**
+     * Check if the current actor has a normal persona given by an matrix device.
+     * 
+     * @returns true, when the actor has an active persona.
+     */
+    get hasDevicePersona(): boolean {
+        return this.getMatrixDevice() !== undefined;
+    }
+
     get matrixData(): Shadowrun.MatrixData | undefined {
         if (!this.isMatrixActor) return;
         // @ts-expect-error // isMatrixActor handles it, TypeScript doesn't know.

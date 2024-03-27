@@ -57,6 +57,9 @@ export const SR5 = {
         rating: 'SR5.Rating',
     },
 
+    mentalAttributes: ['charisma', 'intuition', 'logic', 'willpower'],
+    physicalAttributes: ['agility', 'body', 'reaction', 'strength'],
+
     /**
      * All labels for all limits used across all actor and item types.
      */

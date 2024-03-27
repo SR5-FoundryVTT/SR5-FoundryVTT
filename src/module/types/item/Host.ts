@@ -4,6 +4,7 @@ declare namespace Shadowrun {
     export interface HostData extends
         DevicePartData,
         ImportFlags,
+        AttributesPartsData,
         DescriptionPartData {
             rating: number,
             marks: MatrixMarks,

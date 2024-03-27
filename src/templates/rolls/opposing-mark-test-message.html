@@ -1,4 +1,5 @@
 {{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.html'}}
+{{#if test.failure}}
 <div class="sr5 chat-card roll-card">
     <div class="card-content can-wrap">
         <div class="left-side">
@@ -12,3 +13,4 @@
         </div>
     </div>
 </div>
+{{/if}}

@@ -133,4 +133,11 @@ declare namespace Shadowrun {
         // Custom data. Whatever you want.
         data?: Record<string, any>
     };
+
+    /**
+     * Unspecific 
+     */
+    export interface AttributesPartsData {
+        attributes: Record<string, AttributeField>
+    }
 }

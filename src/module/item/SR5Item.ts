@@ -8,7 +8,7 @@ import { PartsList } from '../parts/PartsList';
 import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
 import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
-import { HostDataPreparation } from "./prep/HostPrep";
+import { HostPrep } from "./prep/HostPrep";
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
 import FireModeData = Shadowrun.FireModeData;
@@ -229,8 +229,12 @@ export class SR5Item extends Item {
      * - this caused issues with Actions that have a Limit or Damage attribute and so those were moved
      */
     override prepareData() {
-        super.prepareData();
         this.prepareNestedItems();
+        super.prepareData();
+    }
+
+    override prepareBaseData(): void {
+        super.prepareBaseData();
 
         // Description labels might have changed since last data prep.
         // NOTE: this here is likely unused and heavily legacy.
@@ -260,13 +264,23 @@ export class SR5Item extends Item {
         // ... this is ongoing work to clean up SR5item.prepareData
         switch (this.type) {
             case 'host':
-                HostDataPreparation(this.system as Shadowrun.HostData);
+                HostPrep.prepareBaseData(this.system as Shadowrun.HostData);
                 break;
             case 'adept_power':
                 AdeptPowerPrep.prepareBaseData(this.system as unknown as Shadowrun.AdeptPowerData);
                 break;
             case 'sin':
                 SinPrep.prepareBaseData(this.system as unknown as Shadowrun.SinData);
+                break;
+        }
+    }
+
+    override prepareDerivedData(): void {
+        super.prepareDerivedData();
+
+        switch (this.type) {
+            case 'host': 
+                HostPrep.prepareDerivedData(this.system as Shadowrun.HostData);
                 break;
         }
     }
@@ -1546,6 +1560,23 @@ export class SR5Item extends Item {
     async disconnectFromNetwork() {
         if (this.canBeNetworkController) await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
         if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
+    }
+
+
+
+    /**
+     * Return the given attribute, no matter its source.
+     * 
+     * This might be an actual attribute or another value type used as one during testing.
+     * 
+     * @param name An attribute or other stats name.
+     * @returns Either an AttributeField or undefined, if the attribute doesn't exist on this document.
+     */
+    getAttribute(name: string): Shadowrun.AttributeField | undefined {
+        if (this.type === 'host') {
+            const rollData = this.getRollData() as Shadowrun.HostData;
+            return rollData.attributes[name];
+        }
     }
 
     override async _onCreate(changed, options, user) {
