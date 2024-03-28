@@ -1895,16 +1895,15 @@ export class SR5Actor extends Actor {
     async addICHost(item: SR5Item) {
         if (!this.isIC()) return;
         if (!item.isHost) return;
-
-        const host = item.asHost;
-        if (!host) return;
-        await this._updateICHostData(host);
+        await this._updateICHostData(item);
     }
 
-    async _updateICHostData(hostData: Shadowrun.HostItemData) {
+    async _updateICHostData(host: SR5Item) {
+        const hostData = host.asHost;
+        if (!hostData) return;
+
         const updateData = {
-            // @ts-expect-error _id is missing on internal typing...
-            id: hostData._id,
+            id: host.uuid,
             rating: hostData.system.rating,
             atts: duplicate(hostData.system.atts)
         }
@@ -1941,10 +1940,12 @@ export class SR5Actor extends Actor {
     /**
      * Get the host item connect to this ic type actor.
      */
-    getICHost(): SR5Item | undefined {
+    async getICHost(): Promise<SR5Item | undefined> {
         const ic = this.asIC();
         if (!ic) return;
-        return game.items?.get(ic?.system?.host.id);
+        const document = await fromUuid(ic?.system?.host.id);
+        if ((document instanceof SR5Item) && document.isHost) return document;
+        return;
     }
 
     /**
@@ -2047,7 +2048,7 @@ export class SR5Actor extends Actor {
      * @param options Additional options that may be needed
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: SR5Actor|SR5Item, marks: number, options: { overwrite?: boolean } = {}) {
+    async setMarks(target: SR5Actor|SR5Item|undefined, marks: number, options: { overwrite?: boolean } = {}) {
         await ActorMarksFlow.setMarks(this, target, marks, options)
     }
 
@@ -2101,9 +2102,9 @@ export class SR5Actor extends Actor {
      * - A matrix actor within a PAN will provide the controlling actor
      * - A matrix actor without a PAN will provide itself
      */
-    get matrixController(): SR5Actor | SR5Item {
+    async matrixController(): Promise<SR5Actor | SR5Item> {
         // In case of a broken host connection, return the IC actor.
-        if (this.isIC() && this.hasHost()) return this.getICHost() || this;
+        if (this.isIC() && this.hasHost()) return await this.getICHost() || this;
         // TODO: Implement PAN
         // if (this.isMatrixActor && this.hasController()) return this.getController();
 
@@ -2111,7 +2112,8 @@ export class SR5Actor extends Actor {
     }
 
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
-        const marks = this.matrixController.getAllMarks();
+        const controller = await this.matrixController();
+        const marks = controller.getAllMarks();
         if (!marks) return [];
 
         return await ActorMarksFlow.getMarkedDocuments(marks);

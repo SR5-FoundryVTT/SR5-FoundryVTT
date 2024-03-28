@@ -9,7 +9,7 @@ import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlo
  */
 export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     override actor: SR5Actor;
-    target: SR5Actor|SR5Item;
+    icon: SR5Actor|SR5Item;
 
     override _prepareData(data: MatrixPlacementData, options): any {
         data = super._prepareData(data, options);
@@ -29,7 +29,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
      * @param uuid The uuid to target for. This can point to an actor or item.
      */
     setTarget(uuid: string) {
-        this.data.targetUuid = uuid;
+        this.data.iconUuid = uuid;
     }
 
     /**
@@ -54,14 +54,14 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     override async populateDocuments() {
         await super.populateDocuments();
 
-        if (this.data.targetUuid) {
-            const target = await fromUuid(this.data.targetUuid);
-            if (!(target instanceof SR5Actor) && !(target instanceof SR5Item)) {
-                console.error('Shadowrun 5e | Invalid target for mark placement', target);
+        if (this.data.iconUuid) {
+            const icon = await fromUuid(this.data.iconUuid);
+            if (!(icon instanceof SR5Actor) && !(icon instanceof SR5Item)) {
+                console.error('Shadowrun 5e | Invalid target for mark placement', icon);
                 return;
             }
 
-            this.target = target;
+            this.icon = icon;
         }
     }
 

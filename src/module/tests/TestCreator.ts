@@ -243,7 +243,7 @@ export const TestCreator = {
             const matrixTestData = testData.data as MatrixPlacementData;
 
             // Some opposed tests only need an item, no actor...
-            const document = await fromUuid(matrixTestData.targetUuid as string);
+            const document = await fromUuid(matrixTestData.iconUuid as string);
             if (!(document instanceof SR5Item)) return;
             
             const data = await testClass._getOpposedActionTestData(matrixTestData, document, id);

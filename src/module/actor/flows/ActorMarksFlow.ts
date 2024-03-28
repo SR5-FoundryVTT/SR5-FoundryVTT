@@ -17,7 +17,12 @@ export const ActorMarksFlow = {
      * @param marks 
      * @param options 
      */
-    async setMarks(decker: SR5Actor, target: SR5Actor|SR5Item, marks: number, options: { overwrite?: boolean } = {}) {
+    async setMarks(decker: SR5Actor, target: SR5Actor|SR5Item|undefined, marks: number, options: { overwrite?: boolean } = {}) {
+        // Avoid dirty input by breaking early.
+        if (!target) {
+            return;
+        }
+
         // Don't allow self marking.
         if (decker.id === target.id) {
             return;
@@ -28,8 +33,11 @@ export const ActorMarksFlow = {
             return;
         }
 
+        // TODO: Is it correct that ic place host marks?
         if (decker.isIC() && decker.hasHost()) {
-            return await decker.getICHost()?.setMarks(target, marks, options);
+            const host = await decker.getICHost();
+            await host?.setMarks(target, marks, options);
+            return;
         }
 
         if (!decker.isMatrixActor) {
@@ -43,6 +51,12 @@ export const ActorMarksFlow = {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
             console.error(`The actor type ${target.type} can't receive matrix marks!`);
             return;
+        }
+
+        // For IC targets: place marks on both ic and host.
+        if (target instanceof SR5Actor && target.isIC() && target.hasHost()) {
+            const host = await target.getICHost();
+            await decker.setMarks(host, marks, options);
         }
 
         // If the actor doesn't have living persona, target the persona matrix device instead.

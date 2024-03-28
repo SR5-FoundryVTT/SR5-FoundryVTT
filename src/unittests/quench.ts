@@ -26,6 +26,7 @@ import { mountedWeaponParserTesting } from './actorImport/itemImporter/vehicleIm
 import { shadowrunSR5ItemDataPrep } from './sr5.ItemDataPrep.spec';
 import { vehicleImporterTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleImporter.spec';
 import { vehilceModParserTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleModImporter.spec';
+import { shadowrunMatrixTesting } from './sr5.MatrixTesting.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
 
@@ -122,6 +123,7 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.tests_attack', shadowrunAttackTesting, {
         displayName: 'SHADOWRUN5e: Attack Test',
     });
+    quench.registerBatch('shadowrun5e.flow.tests_matrix', shadowrunMatrixTesting, { displayName: 'SHADOWRUN5e: Matrix Test' });
     quench.registerBatch('shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
 
     quench.registerBatch('shadowrun5e.parser.weapon', weaponParserBaseTesting, {

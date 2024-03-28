@@ -19,27 +19,14 @@ export class OpposedBruteForceTest extends OpposedTest {
         return "SR5.TestResults.BruteForceSuccess";
     }
     
-    override async populateDocuments() {
-        // It's possible this test has been called without an actor but a matrix target only.
-        if (this.against.data.targetUuid) {
-            const item = await fromUuid(this.against.data.targetUuid) as SR5Item | undefined;
-            const actor = item?.actorOwner;
-            this.data.sourceItemUuid = this.against.data.targetUuid;
-            this.data.sourceActorUuid = actor?.uuid;
-        }
-
-        // Otherwise, let default behavior populate the documents
-        await super.populateDocuments();
-    }
-    
     /**
      * When failing against brute force, the decker gets a mark on the target and can deal damage.
      */
     override async processFailure() {
-        // Place a mark on the target
+        // How many marks did the user want to place?
         const marks = this.against.data.marks;
         // Either use a matrix target or the actor itself
-        const target = this.against.target ?? this.actor;
+        const target = this.against.icon ?? this.actor;
         await this.against.actor.setMarks(target, marks);
 
         // Setup optional damage value

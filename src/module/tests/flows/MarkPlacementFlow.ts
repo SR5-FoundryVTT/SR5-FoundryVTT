@@ -12,7 +12,7 @@ export interface MatrixPlacementData extends SuccessTestData {
     // If decker has a direct connection to the target
     directConnection: boolean
     // The uuid of the target actor / device / host.
-    targetUuid?: string
+    iconUuid?: string
     // Should the mark be placed on the main icon / persona or icons connected to it?
     placeOnMainIcon: boolean
 }
@@ -28,7 +28,7 @@ export const MarkPlacementFlow = {
         // Assume no direct connection
         data.directConnection = data.directConnection ?? false;
         // A uuid for a matrix target (actor or item)
-        data.targetUuid = data.targetUuid ?? undefined;
+        data.iconUuid = data.iconUuid ?? undefined;
         // By default a decker can place marks either on the main icon or its connected icon.
         // This can be a persona or device relationship or a host and its devices.
         data.placeOnMainIcon = data.placeOnMainIcon ?? true;

@@ -459,11 +459,9 @@ ___________________
             ];
 
             // Update host data on the ic actor.
-            const host = item.asHost;
-            if (!host) return;
             for (const ic of connectedIC) {
                 if (!ic) continue;
-                await ic._updateICHostData(host);
+                await ic._updateICHostData(item);
             }
         }
     }
