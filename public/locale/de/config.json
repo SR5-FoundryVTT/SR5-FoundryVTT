@@ -403,6 +403,7 @@
     "SR5.Equipped": "Ausgerüstet",
     "SR5.Errors": {
         "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden.",
+        "MasterDeviceIsMissing": "Der Master des Geräts kann nicht gefunden werden. Die Werte des Geräts werden verwendet.",
         "MarksCantBePlacedWithoutPersona": "Der als Ziel ausgewählte Akteur hat keine aktive Persona.",
         "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
         "DefaultInventoryCantBeRemoved": "Das Standardinventar kann nicht entfernt werden.",

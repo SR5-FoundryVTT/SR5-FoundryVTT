@@ -603,15 +603,16 @@ export const TestCreator = {
      * @returns TestData that's ready to be used to construct a new test instance.
      */
     _prepareTestDataWithActionForItem: async function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData) {
+        const testData = await item.getTestData();
         const pool = new PartsList<number>(data.pool.mod);
 
         if (action.attribute) {
-            const attribute = item.getAttribute(action.attribute);
+            const attribute = item.getAttribute(action.attribute, {testData});
             if (attribute) pool.addUniquePart(attribute.label, attribute.value);
         }
 
         if (action.attribute2) {
-            const attribute = item.getAttribute(action.attribute2);
+            const attribute = item.getAttribute(action.attribute2, {testData});
             if (attribute) pool.addUniquePart(attribute.label, attribute.value);
         }
 

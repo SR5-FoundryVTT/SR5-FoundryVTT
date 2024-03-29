@@ -626,13 +626,13 @@ export class SR5Actor extends Actor {
         return this.system.skills.active;
     }
 
-    getNetworkController(): string|undefined {
+    getNetworkControllerUuid(): string|undefined {
         if(!this.isVehicle()) return;
 
         return this.asVehicle()?.system?.networkController;
     }
 
-    async setNetworkController(networkController: string|undefined): Promise<void> {
+    async setNetworkControllerUuid(networkController: string|undefined): Promise<void> {
         if(!this.isVehicle()) return;
 
         await this.update({ 'system.networkController': networkController });

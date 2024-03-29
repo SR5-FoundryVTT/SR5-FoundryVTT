@@ -981,7 +981,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const chatData = item.getChatData();
         sheetItem.description = chatData.description;
-        // @ts-expect-error
+        // @ts-expect-error bad typing
         sheetItem.properties = chatData.properties;
 
         return sheetItem as unknown as SheetItemData;

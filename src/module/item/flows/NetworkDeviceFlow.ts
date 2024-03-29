@@ -1,7 +1,7 @@
-import {SR5Actor} from "../../actor/SR5Actor";
-import {SR5Item} from "../SR5Item";
-import {SocketMessage} from "../../sockets";
-import {FLAGS} from "../../constants";
+import { SR5Actor } from "../../actor/SR5Actor";
+import { SR5Item } from "../SR5Item";
+import { SocketMessage } from "../../sockets";
+import { FLAGS } from "../../constants";
 import SocketAddNetworkControllerMessageData = Shadowrun.SocketAddNetworkControllerMessageData;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 
@@ -11,13 +11,13 @@ export class NetworkDeviceFlow {
      *
      * @param target Whatever Document you want to link to.
      */
-    static buildLink(target: SR5Item|SR5Actor|TokenDocument) {
+    static buildLink(target: SR5Item | SR5Actor | TokenDocument) {
         return target.uuid;
     }
 
     //Pass-through to resolveLink for cases in which we know it will return an item and not an actor
     static async resolveItemLink(link: string) {
-        return await this.resolveLink(link) as SR5Item|undefined;
+        return await this.resolveLink(link) as SR5Item | undefined;
     }
 
     /**
@@ -28,13 +28,13 @@ export class NetworkDeviceFlow {
     static async resolveLink(link: string) {
         if (!link) return;
 
-        return await fromUuid(link) as SR5Item|SR5Actor|undefined;
+        return await fromUuid(link) as SR5Item | SR5Actor | undefined;
     }
 
     static async emitAddNetworkControllerSocketMessage(controller: SR5Item, networkDeviceLink: string) {
         const controllerLink = NetworkDeviceFlow.buildLink(controller);
 
-        await SocketMessage.emitForGM(FLAGS.addNetworkController, {controllerLink, networkDeviceLink});
+        await SocketMessage.emitForGM(FLAGS.addNetworkController, { controllerLink, networkDeviceLink });
     }
 
     /**
@@ -62,7 +62,7 @@ export class NetworkDeviceFlow {
      * @param controller
      * @param device
      */
-    static async addDeviceToNetwork(controller: SR5Item, device: SR5Item|SR5Actor) {
+    static async addDeviceToNetwork(controller: SR5Item, device: SR5Item | SR5Actor) {
         console.log(`Shadowrun5e | Adding an the item ${device.name} to the controller ${controller.name}`, controller, device);
         if (controller.id === device.id) return console.warn('Shadowrun 5e | A device cant be its own network controller');
         if (!device.canBeNetworkDevice) return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
@@ -82,12 +82,19 @@ export class NetworkDeviceFlow {
      * @param controller
      * @param device
      */
-    private static async _handleAddDeviceToNetwork(controller: SR5Item, device: SR5Item|SR5Actor): Promise<any> {
-        if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller) && !NetworkDeviceFlow._currentUserCanModifyDevice(device)) return console.error(`User isn't owner or GM of this device`, controller);
+    private static async _handleAddDeviceToNetwork(controller: SR5Item, device: SR5Item | SR5Actor): Promise<undefined> {
+        if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller) && !NetworkDeviceFlow._currentUserCanModifyDevice(device)) { 
+            console.error(`User isn't owner or GM of this device`, controller);
+            return;
+        };
 
         const controllerData = controller.asDevice || controller.asHost;
-        if (!controllerData) return console.error(`Device isn't capable of accepting network devices`, controller);
-        const networkController = device.getNetworkController();
+        if (!controllerData) {
+            console.error(`Device isn't capable of accepting network devices`, controller);
+            return;
+        }
+
+        const networkController = device.getNetworkControllerUuid();
 
         // Remove device from a network it's already connected to.
         if (networkController) await NetworkDeviceFlow._removeDeviceFromController(device);
@@ -101,7 +108,7 @@ export class NetworkDeviceFlow {
         const networkDevices = controllerData.system.networkDevices;
         if (networkDevices.includes(networkDeviceLink)) return;
 
-        return NetworkDeviceFlow._setDevicesOnController(controller, [...networkDevices, networkDeviceLink]);
+        await NetworkDeviceFlow._setDevicesOnController(controller, [...networkDevices, networkDeviceLink]);
     }
 
     /**
@@ -109,7 +116,7 @@ export class NetworkDeviceFlow {
 
      * @param device A network device that's connected to a controller.
      */
-    static async removeDeviceFromController(device: SR5Item|SR5Actor|undefined) {
+    static async removeDeviceFromController(device: SR5Item | SR5Actor | undefined) {
         if (!device) return;
 
         console.log(`Shadowrun 5e | Removing device ${device.name} from its controller`);
@@ -131,7 +138,7 @@ export class NetworkDeviceFlow {
 
         // Remove an existing item from the network.
         if (device) {
-            const networkController = device.getNetworkController();
+            const networkController = device.getNetworkControllerUuid();
             if (networkController) await NetworkDeviceFlow._removeControllerFromDevice(device);
         }
 
@@ -155,9 +162,9 @@ export class NetworkDeviceFlow {
         await NetworkDeviceFlow._removeAllDevicesFromController(controller);
     }
 
-    private static async _setControllerFromLink(device: SR5Item|SR5Actor, controllerLink: string) {
+    private static async _setControllerFromLink(device: SR5Item | SR5Actor, controllerLink: string) {
         if (!device.canBeNetworkDevice) return console.error('Shadowrun 5e | Given device cant be part of a network', device);
-        await device.setNetworkController(controllerLink);
+        await device.setNetworkControllerUuid(controllerLink);
     }
 
     /**
@@ -165,20 +172,20 @@ export class NetworkDeviceFlow {
      * @param device The device to remove a connected controller from.
      * @private
      */
-    private static async _removeControllerFromDevice(device: SR5Item|SR5Actor) {
+    private static async _removeControllerFromDevice(device: SR5Item | SR5Actor) {
         if (!device.canBeNetworkDevice) return console.error('Shadowrun 5e | Given device cant be part of a network', device);
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(device)) return;
-        await device.setNetworkController("");
+        await device.setNetworkControllerUuid("");
     }
 
     private static async _setDevicesOnController(controller: SR5Item, deviceLinks: string[]) {
         if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
-        await controller.update({'data.networkDevices': deviceLinks});
+        await controller.update({ 'data.networkDevices': deviceLinks });
     }
 
     private static async _removeAllDevicesFromController(controller: SR5Item) {
         if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
-        await controller.update({'data.networkDevices': []});
+        await controller.update({ 'data.networkDevices': [] });
     }
 
     /**
@@ -186,9 +193,9 @@ export class NetworkDeviceFlow {
      * @param device The device that is to be removed from the network controller.
      * @private
      */
-    private static async _removeDeviceFromController(device: SR5Item|SR5Actor){
+    private static async _removeDeviceFromController(device: SR5Item | SR5Actor) {
         if (!device.canBeNetworkDevice) return console.error('Shadowrun 5e | Given device cant be part of a network', device);
-        const networkController = device.getNetworkController();
+        const networkController = device.getNetworkControllerUuid();
         if (!networkController) return;
 
         // Controller might not exist anymore.
@@ -214,7 +221,7 @@ export class NetworkDeviceFlow {
 
         // Remove controller from all its connected devices.
         if (networkDevices) {
-            const devices: (SR5Item|SR5Actor)[] = [];
+            const devices: (SR5Item | SR5Actor)[] = [];
             for (const deviceLink of networkDevices) {
                 const device = await NetworkDeviceFlow.resolveLink(deviceLink);
                 if (device) devices.push(device);
@@ -233,13 +240,13 @@ export class NetworkDeviceFlow {
      * @param controller
      */
     static async getNetworkDevices(controller: SR5Item): Promise<(SR5Item | SR5Actor)[]> {
-        const devices: (SR5Item|SR5Actor)[] = [];
+        const devices: (SR5Item | SR5Actor)[] = [];
         const controllerData = controller.asController();
         if (!controllerData) return devices;
 
         for (const link of controllerData.system.networkDevices) {
             const device = await NetworkDeviceFlow.resolveLink(link);
-            if (device)  devices.push(device);
+            if (device) devices.push(device);
             else console.warn(`Shadowrun5e | Controller ${controller.name} has a network device ${link} that doesn't exist anymore`);
         }
 
@@ -262,7 +269,7 @@ export class NetworkDeviceFlow {
         if (item.canBeNetworkDevice) return await NetworkDeviceFlow._removeDeviceFromController(item);
     }
 
-    static _currentUserCanModifyDevice(device: SR5Item|SR5Actor): boolean {
+    static _currentUserCanModifyDevice(device: SR5Item | SR5Actor): boolean {
         return game.user?.isGM || device.isOwner;
     }
 }

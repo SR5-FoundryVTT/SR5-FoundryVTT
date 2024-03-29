@@ -33,6 +33,8 @@ export const ActorMarksFlow = {
             return;
         }
 
+        // CASES - DECKER IS SPECIAL.
+
         // TODO: Is it correct that ic place host marks?
         if (decker.isIC() && decker.hasHost()) {
             const host = await decker.getICHost();
@@ -45,6 +47,8 @@ export const ActorMarksFlow = {
             console.error(`The actor type ${decker.type} can't receive matrix marks!`);
             return;
         }
+
+        // CASES - TARGET IS AN ACTOR.
 
         // Abort for non-matrix actors
         if (target instanceof SR5Actor && !target.isMatrixActor) {
@@ -70,7 +74,16 @@ export const ActorMarksFlow = {
             target = matrixDevice;
         }
 
+        // CASES - TARGET IS AN ITEM
 
+        // If the targeted devices is within a WAN, place mark on the host as well.
+        if (target instanceof SR5Item && target.isNetworkDevice) {
+            const host = await target.networkController();
+            await decker.setMarks(host, marks, options);
+        }
+
+
+        // DEFAULT CASE
 
         const targetUuid = ActorMarksFlow.buildMarkUuid(target.uuid);
         const matrixData = decker.matrixData;

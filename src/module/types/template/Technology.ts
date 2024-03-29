@@ -1,5 +1,6 @@
 declare namespace Shadowrun {
     export type TechnologyPartData = {
+        attributes: AttributesData
         technology: TechnologyData
     };
     export type TechnologyData = {

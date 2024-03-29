@@ -99,7 +99,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     async _prepareVehicleFields(): Promise<VehicleSheetDataFields> {
         const driver = this.actor.getVehicleDriver();
 
-        const networkControllerLink = this.actor.getNetworkController();
+        const networkControllerLink = this.actor.getNetworkControllerUuid();
         const networkController = networkControllerLink ? await NetworkDeviceFlow.resolveItemLink(networkControllerLink) : undefined;
 
         return {

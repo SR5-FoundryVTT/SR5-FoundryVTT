@@ -71,7 +71,12 @@ export class Helpers {
         return value.value;
     }
 
-    static calcValue<ValueType>(value: GenericValueField): any {
+    /**
+     * Type generic, simple version of calcTotal for generic (mostly string) based values instead number based totals.
+     * @param value Any type of data that is used as .base and .value for a ValueField
+     * @returns The calculated value.
+     */
+    static calcValue<ValueType>(value: GenericValueField): ValueType {
         if (value.mod === undefined) value.mod = [];
 
         if (value.override) {

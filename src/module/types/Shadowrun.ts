@@ -135,9 +135,7 @@ declare namespace Shadowrun {
     };
 
     /**
-     * Unspecific 
+     * Unspecific set of attributes, separate from Attributes as to now include character specific attributes (edge)
      */
-    export interface AttributesPartsData {
-        attributes: Record<string, AttributeField>
-    }
+    export type AttributesData = Record<string, AttributeField>
 }

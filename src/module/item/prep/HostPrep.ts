@@ -2,7 +2,7 @@ import { SR5 } from "../../config";
 import HostData = Shadowrun.HostData;
 import { MatrixRules } from "../../rules/MatrixRules";
 import { DataDefaults } from "../../data/DataDefaults";
-import { AttributesPrep } from "../../actor/prep/functions/AttributesPrep";
+import { TechnologyPrep } from "./functions/TechnologyPrep";
 
 
 export class HostPrep {
@@ -18,7 +18,7 @@ export class HostPrep {
      * @param system 
      */
     static prepareDerivedData(system: HostData) {
-        HostPrep.calcMentalAttributes(system);
+        TechnologyPrep.calculateAttributes(system.attributes);
     }
 
     static setDeviceCategory(system: HostData) {
@@ -71,18 +71,6 @@ export class HostPrep {
 
             const attribute = DataDefaults.attributeData({ label, base });
             system.attributes[name] = attribute;
-        }
-    }
-
-    /**
-     * Calculate derived item attributes.
-     * 
-     * TODO: refactor this into a common module.
-     * @param system 
-     */
-    static calcMentalAttributes(system: HostData) {
-        for (const [name, attribute] of Object.entries(system.attributes)) {
-            AttributesPrep.calculateAttribute(name, attribute);
         }
     }
 }

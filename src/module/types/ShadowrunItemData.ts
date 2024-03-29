@@ -54,6 +54,19 @@ declare namespace Shadowrun {
         WeaponItemData;
 
     /**
+     * The subset of items with technology system part.
+     */
+    export type ShadowrunTechnologyItemDataData =
+        AmmoData |
+        ArmorData |
+        DeviceData |
+        EquipmentData |
+        ModificationData |
+        ProgramData |
+        SinData |
+        WareData |
+        WeaponData;
+    /**
      * The whole item data data as an inclusive union.
      *
      * At the moment this is only used for ShadowrunItemDataWrapper.getData to work a type narrowing rework.

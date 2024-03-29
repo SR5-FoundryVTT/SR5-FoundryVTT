@@ -57,6 +57,10 @@ import { SinPrep } from './prep/SinPrep';
 import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
+import { UpdateActionFlow } from './flows/UpdateActionFlow';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { ItemMarksFlow } from './flows/ItemMarksFlow';
+import { ItemTestDataFlow } from './flows/ItemTestDataFlow';
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
@@ -71,9 +75,6 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  * NOTE: still not fixed with esbuild@0.19.5
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
-import { UpdateActionFlow } from './flows/UpdateActionFlow';
-import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
-import { ItemMarksFlow } from './flows/ItemMarksFlow';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -248,6 +249,8 @@ export class SR5Item extends Item {
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
             TechnologyPrep.prepareConceal(technology, equippedMods);
+            TechnologyPrep.prepareAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
+            TechnologyPrep.prepareMentalAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
         }
         
         const action = this.getAction();
@@ -277,6 +280,12 @@ export class SR5Item extends Item {
 
     override prepareDerivedData(): void {
         super.prepareDerivedData();
+
+        const technology = this.getTechnologyData();
+        if (technology) {
+            TechnologyPrep.prepareMatrixAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
+            TechnologyPrep.calculateAttributes(this.system.attributes as Shadowrun.AttributesData);
+        }
 
         switch (this.type) {
             case 'host': 
@@ -690,6 +699,18 @@ export class SR5Item extends Item {
     }
 
     /**
+     * Determine if this item is part of a WAN / PAN network.
+     * 
+     * @returns true, when item is part of any network, false if not.
+     */
+    get isNetworkDevice(): boolean {
+        const technology = this.getTechnologyData();
+        if (!technology) return false;
+
+        return technology.networkController !== '';
+    }
+
+    /**
      * SIN Item - remove a single license within this SIN
      * 
      * @param index The license list index
@@ -958,11 +979,11 @@ export class SR5Item extends Item {
         return this.wrapper.getTechnology();
     }
 
-    getNetworkController(): string|undefined {
+    getNetworkControllerUuid(): string|undefined {
         return this.getTechnologyData()?.networkController;
     }
 
-    async setNetworkController(networkController: string|undefined): Promise<void> {
+    async setNetworkControllerUuid(networkController: string|undefined): Promise<void> {
         await this.update({ 'system.technology.networkController': networkController });
     }
 
@@ -1110,12 +1131,12 @@ export class SR5Item extends Item {
     }
 
     get isSummoning(): boolean {
-        //@ts-expect-error
+        //@ts-expect-error bad typing?
         return this.type === 'call_in_action' && this.system.actor_type === 'spirit';
     }
 
     get isCompilation(): boolean {
-        //@ts-expect-error
+        //@ts-expect-error bad typing?
         return this.type === 'call_in_action' && this.system.actor_type === 'sprite';
     }
 
@@ -1478,7 +1499,6 @@ export class SR5Item extends Item {
      * @param target The matrix item to be connected.
      */
     async addNetworkDevice(target: SR5Item|SR5Actor) {
-        // TODO: Add device to WAN network
         // TODO: Add IC actor to WAN network
         // TODO: setup networkController link on networked devices.
         await NetworkDeviceFlow.addDeviceToNetwork(this, target);
@@ -1572,11 +1592,61 @@ export class SR5Item extends Item {
      * @param name An attribute or other stats name.
      * @returns Either an AttributeField or undefined, if the attribute doesn't exist on this document.
      */
-    getAttribute(name: string): Shadowrun.AttributeField | undefined {
+    getAttribute(name: string, options: {testData?: Shadowrun.ShadowrunItemDataData} = {}): Shadowrun.AttributeField | undefined {
+        const rollData = options.testData || this.getRollData() as Shadowrun.ShadowrunItemDataData;
+        // Attributes for hosts work only within their own attributes.
         if (this.type === 'host') {
             const rollData = this.getRollData() as Shadowrun.HostData;
-            return rollData.attributes[name];
+            return rollData.attributes?.[name];
         }
+
+        return rollData.attributes?.[name];
+    }
+
+    /**
+     * Transparently build a set of roll data based on this items type and network status.
+     * 
+     * This roll data can depend upon other actors and items.
+     * 
+     * NOTE: We can't override getRollData as this would make use of Promise necessary, however Foundry uses getRollData as a sync method
+     */
+    async getTestData(): Promise<any> {
+        // Duplicate to avoid cross-changing actual system data.
+        const rollData = foundry.utils.duplicate(super.getRollData());
+
+        const actor = this.actorOwner;
+
+        const technologyData = this.getTechnologyData();
+        if (technologyData && actor) {
+            ItemTestDataFlow.injectOwnerMentalAttributes(actor, rollData)
+        }
+
+        // All technology items can be part of a PAN or WAN
+        if (technologyData && this.isNetworkDevice) {
+
+            const controller = await this.networkController();
+            if (!controller) {
+                ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
+                return rollData;
+            }
+
+            
+            switch (controller.type) {
+                // CASE PAN
+                case 'device': {
+                    ItemTestDataFlow.injectPANAttributes(controller as unknown as Shadowrun.ShadowrunTechnologyItemData, actor, rollData)
+                    break;
+                }
+
+                // CASE AN
+                case 'host': {
+                    break;
+                }
+            }
+
+        }
+
+        return rollData;
     }
 
     override async _onCreate(changed, options, user) {
