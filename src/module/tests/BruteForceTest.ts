@@ -68,7 +68,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
             } else {
                 const target = this.targets[0];
                 const actor = target.actor as SR5Actor;
-                const controller = await actor.matrixController();
+                const controller = await actor.getController();
                 this.data.controllerUuid = controller?.uuid as string;
                 this.data.iconUuid = controller?.uuid ?? target.uuid;
             }

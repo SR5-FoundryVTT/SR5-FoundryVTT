@@ -1945,7 +1945,6 @@ export class SR5Actor extends Actor {
         if (!ic) return;
         const document = await fromUuid(ic?.system?.host.id);
         if ((document instanceof SR5Item) && document.isHost) return document;
-        return;
     }
 
     /**
@@ -2104,12 +2103,15 @@ export class SR5Actor extends Actor {
      * 
      * @returns Either the controller icon or this actor, when uuid links are broken.
      */
-    async matrixController(): Promise<SR5Actor | SR5Item> {
-        // CASE 1 - WAN: For broken connections, return 
-        if (this.isIC() && this.hasHost()) return await this.getICHost() || this;
-        if (this.isMatrixActor && this.hasController) return this.controller || this;
-
-        return this;
+    async getController(): Promise<SR5Item|undefined> {
+        // CASE 1 - WAN: IC to Host network
+        if (this.isIC() && this.hasHost()) {
+            return await this.getICHost();
+        }
+        // CASE 2 - PAN: Device to Controller network
+        if (this.isMatrixActor && this.hasController) {
+            return this.items.find((item) => item.isEquipped() && item.isDevice);
+        }
     }
 
     /**
@@ -2120,14 +2122,11 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Get the active matrix device.
+     * #TODO: Matrix. What is this method actually for?
      */
-    get controller(): SR5Item|undefined {
-        return this.items.find((item) => item.isEquipped() && item.isDevice);
-    }
-
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
-        const controller = await this.matrixController();
+        const controller = await this.getController();
+        if (!controller) return [];
         const marks = controller.getAllMarks();
         if (!marks) return [];
 

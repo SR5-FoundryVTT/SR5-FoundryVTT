@@ -1615,7 +1615,7 @@ export class SR5Item extends Item {
         const rollData = foundry.utils.duplicate(super.getRollData());
 
         const actor = this.actorOwner;
-        const controller = actor?.controller;
+        const controller = await actor?.getController();
 
         const technologyData = this.getTechnologyData();
         if (technologyData && actor) {
