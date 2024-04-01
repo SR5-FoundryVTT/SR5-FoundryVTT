@@ -1,6 +1,7 @@
 import { PartsList } from '../../parts/PartsList';
 import { MatrixRules } from '../../rules/MatrixRules';
 import { HackOnTheFlyTest } from '../HackOnTheFlyTest';
+import { OpposedTestData } from '../OpposedTest';
 import { SuccessTestData } from '../SuccessTest';
 import { BruteForceTest } from './../BruteForceTest';
 
@@ -11,10 +12,17 @@ export interface MatrixPlacementData extends SuccessTestData {
     sameGrid: boolean
     // If decker has a direct connection to the target
     directConnection: boolean
+    controllerUuid: string
     // The uuid of the target actor / device / host.
-    iconUuid?: string
+    iconUuid: string
     // Should the mark be placed on the main icon / persona or icons connected to it?
-    placeOnMainIcon: boolean
+    placeOnController: boolean
+}
+
+export interface OpposeMarkPlacementData extends OpposedTestData {
+    against: MatrixPlacementData
+    controllerUuid: string
+    iconUuid: string
 }
 /**
  * Handle test flows for placing marks between different tests / actions.
@@ -27,12 +35,19 @@ export const MarkPlacementFlow = {
         data.sameGrid = data.sameGrid ?? true;
         // Assume no direct connection
         data.directConnection = data.directConnection ?? false;
+        data.controllerUuid = data.controllerUuid ?? undefined;
         // A uuid for a matrix target (actor or item)
         data.iconUuid = data.iconUuid ?? undefined;
         // By default a decker can place marks either on the main icon or its connected icon.
         // This can be a persona or device relationship or a host and its devices.
-        data.placeOnMainIcon = data.placeOnMainIcon ?? true;
+        data.placeOnController = data.placeOnController ?? true;
 
+        return data;
+    },
+    
+    _prepareOpposedData(data: OpposeMarkPlacementData, options): any {
+        data.controllerUuid = data.controllerUuid ?? data.against.controllerUuid;
+        data.iconUuid = data.iconUuid ?? data.against.iconUuid;
         return data;
     },
 

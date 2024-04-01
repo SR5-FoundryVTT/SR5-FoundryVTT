@@ -1,0 +1,9 @@
+<form>
+    {{#if test.icon}}
+    <div class="document">
+        <img src="{{test.icon.img}}" />
+        {{test.icon.name}}
+    </div>
+    {{/if}}
+    {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
+</form>

@@ -16,10 +16,28 @@
                 <label>{{localize "SR5.DirectConnection"}}</label>
                 <input type="checkbox" class="checkbox" name="test.data.directConnection" {{checked test.data.directConnection}}/>
             </div>
+            {{#if test.controller}}
+            <div class="document">
+                <img src="{{test.controller.img}}"/>
+                {{test.controller.name}}
+            </div>
+            {{/if}}
             <div class="form-group">
                 <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnMainIcon"}}</label>
-                <input type="checkbox" class="checkbox" name="test.data.placeOnMainIcon" {{checked test.data.placeOnMainIcon}}/>
+                <input type="checkbox" class="checkbox" name="test.data.placeOnController" {{checked test.data.placeOnController}}/>
             </div>
+            {{#ife test.data.placeOnController false}}
+            <div class="form-group">
+                <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnMainIcon"}}</label>
+                <select name="test.data.iconUuid" class="display">
+                    {{#select test.data.iconUuid}}
+                    {{#each test.icons}}
+                    <option value="{{this.uuid}}">{{this.name}}</option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            </div>
+            {{/ife}}
         </div>
     <div>
         {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}

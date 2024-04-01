@@ -239,7 +239,8 @@ export const TestCreator = {
         if (actors.length === 0) {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
 
-            if (!testData.data.hasOwnProperty('targetUuid')) return;
+            //@ts-expect-error Allow auto-rename to work instead of using hasOwnProperty.
+            if (!testData.data.iconUuid) return;
             const matrixTestData = testData.data as MatrixPlacementData;
 
             // Some opposed tests only need an item, no actor...

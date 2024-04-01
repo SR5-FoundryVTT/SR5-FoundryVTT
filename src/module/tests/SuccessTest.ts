@@ -1317,6 +1317,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return await this.consumeDocumentRessources();
     }
 
+    /**
+     * Prepare everything needed for test execution.
+     * 
+     * This is both necessary before a first execution or when re-calculation a test when execution has already
+     * been prepared.
+     */
     async _prepareExecution() {
         await this.populateTests();
         await this.populateDocuments();

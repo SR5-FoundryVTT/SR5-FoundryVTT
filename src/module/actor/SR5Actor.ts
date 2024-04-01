@@ -2101,14 +2101,29 @@ export class SR5Actor extends Actor {
      * - IC without a host will provide itself
      * - A matrix actor within a PAN will provide the controlling actor
      * - A matrix actor without a PAN will provide itself
+     * 
+     * @returns Either the controller icon or this actor, when uuid links are broken.
      */
     async matrixController(): Promise<SR5Actor | SR5Item> {
-        // In case of a broken host connection, return the IC actor.
+        // CASE 1 - WAN: For broken connections, return 
         if (this.isIC() && this.hasHost()) return await this.getICHost() || this;
-        // TODO: Implement PAN
-        // if (this.isMatrixActor && this.hasController()) return this.getController();
+        if (this.isMatrixActor && this.hasController) return this.controller || this;
 
         return this;
+    }
+
+    /**
+     * Check if an active matrix device is equipped.
+     */
+    get hasController(): boolean {
+        return !!this.items.find((item) => item.isEquipped() && item.isDevice);
+    }
+
+    /**
+     * Get the active matrix device.
+     */
+    get controller(): SR5Item|undefined {
+        return this.items.find((item) => item.isEquipped() && item.isDevice);
     }
 
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {

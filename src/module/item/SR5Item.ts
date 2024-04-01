@@ -707,7 +707,7 @@ export class SR5Item extends Item {
         const technology = this.getTechnologyData();
         if (!technology) return false;
 
-        return technology.networkController !== '';
+        return !!technology.networkController;
     }
 
     /**
@@ -1615,14 +1615,20 @@ export class SR5Item extends Item {
         const rollData = foundry.utils.duplicate(super.getRollData());
 
         const actor = this.actorOwner;
+        const controller = actor?.controller;
 
         const technologyData = this.getTechnologyData();
         if (technologyData && actor) {
-            ItemTestDataFlow.injectOwnerMentalAttributes(actor, rollData)
+            ItemTestDataFlow.injectOwnerMentalAttributes(actor, rollData);
+        }
+
+        // Is this technology item the controller?
+        if (technologyData && actor && this.isEquipped() && this.isDevice) {
+            ItemTestDataFlow.injectOwnerPANMatrixAttributes(actor, rollData);
         }
 
         // All technology items can be part of a PAN or WAN
-        if (technologyData && this.isNetworkDevice) {
+        if (technologyData && this.isNetworkDevice ) {
 
             const controller = await this.networkController();
             if (!controller) {
@@ -1630,7 +1636,6 @@ export class SR5Item extends Item {
                 return rollData;
             }
 
-            
             switch (controller.type) {
                 // CASE PAN
                 case 'device': {
@@ -1643,7 +1648,6 @@ export class SR5Item extends Item {
                     break;
                 }
             }
-
         }
 
         return rollData;

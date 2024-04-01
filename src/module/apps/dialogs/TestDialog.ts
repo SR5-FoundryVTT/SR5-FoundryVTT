@@ -78,8 +78,7 @@ export class TestDialog extends FormDialog {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html';
     }
 
-    //@ts-expect-error
-    getData() {
+    override getData() {
         const data = super.getData() as unknown as TestDialogData;
 
         //@ts-expect-error //TODO: default to general roll mode user setting

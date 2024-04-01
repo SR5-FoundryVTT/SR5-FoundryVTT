@@ -601,6 +601,9 @@
             "Carried": "Carried",
             "OpenInventory": "Inventory"
         },
+        "MarkPlacement": {
+            "PlaceOnMainIcon": "Place on persona/host"
+        },
         "Message": {
             "ClickToSelect": "Click to select on scene",
             "TestEffects": "Applied effects"

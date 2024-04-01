@@ -403,8 +403,6 @@
     "SR5.Equipped": "Ausgerüstet",
     "SR5.Errors": {
         "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden.",
-        "MasterDeviceIsMissing": "Der Master des Geräts kann nicht gefunden werden. Die Werte des Geräts werden verwendet.",
-        "MarksCantBePlacedWithoutPersona": "Der als Ziel ausgewählte Akteur hat keine aktive Persona.",
         "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
         "DefaultInventoryCantBeRemoved": "Das Standardinventar kann nicht entfernt werden.",
         "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
@@ -412,6 +410,8 @@
         "MarkCouldNotBePlaced": "Interner Fehler: Die Marken konnten nicht platziert werden.",
         "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
         "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
+        "MarksCantBePlacedWithoutPersona": "Der als Ziel ausgewählte Akteur hat keine aktive Persona.",
+        "MasterDeviceIsMissing": "Der Master des Geräts kann nicht gefunden werden. Die Werte des Geräts werden verwendet.",
         "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
         "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
         "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
@@ -596,6 +596,9 @@
             "All": "Alle",
             "Carried": "Mitgeführt",
             "OpenInventory": "Inventar"
+        },
+        "MarkPlacement": {
+            "PlaceOnMainIcon": "Platziere auf Persona/Host"
         },
         "Message": {
             "ClickToSelect": "Klicke um in Szene auzuwählen",

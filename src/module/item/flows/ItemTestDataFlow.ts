@@ -23,6 +23,23 @@ export const ItemTestDataFlow = {
         }
     },
 
+
+    /**
+     * Inject actors matrix attributes into an items test data.
+     * 
+     * While the actual controller would be the one to provide matrix attributes, the system uses the device
+     * item as value carrier while the actual matrix attributes are derived from the item onto the actor owner.
+     * 
+     * @param actor The carrier of the controller item
+     * @param testData TestData that will get modified in place
+     */
+    injectOwnerPANMatrixAttributes: (actor: SR5Actor, testData: Shadowrun.ShadowrunItemDataData) => {
+        if (!testData.attributes) return;
+
+        const PANMatrixAttributes = ['data_processing', 'firewall'];
+        ItemTestDataFlow._injectAttributes(PANMatrixAttributes, actor.system.attributes, testData, { bigger: true });
+    },
+
     /**
      * Inject a PAN controller and it's owners attributes into an items test data.
      * 
@@ -34,10 +51,12 @@ export const ItemTestDataFlow = {
     injectPANAttributes: (controller: Shadowrun.ShadowrunTechnologyItemData, owner: SR5Actor | undefined, testData: Shadowrun.ShadowrunItemDataData) => {
         const attributes = controller.system.attributes;
 
-        const injectAttributes = [...SR5.mentalAttributes, 'data_processing', 'firewall', 'rating'];
-        ItemTestDataFlow._injectAttributes(injectAttributes, attributes, testData, {bigger: true});
+        const injectAttributes = ['data_processing', 'firewall', 'rating'];
+        ItemTestDataFlow._injectAttributes(injectAttributes, attributes, testData, { bigger: true });
 
-        if (owner) ItemTestDataFlow.injectOwnerMentalAttributes(owner, attributes);
+        if (owner) { 
+            ItemTestDataFlow.injectOwnerPANMatrixAttributes(owner, testData);
+        }
     },
 
     /**
@@ -50,7 +69,7 @@ export const ItemTestDataFlow = {
      * @param testData The testData to inject attributes into
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    _injectAttributes(names: string[], attributes: Shadowrun.AttributesData, testData: Shadowrun.ShadowrunItemDataData, options: {bigger: boolean}) {
+    _injectAttributes(names: string[], attributes: Shadowrun.AttributesData, testData: Shadowrun.ShadowrunItemDataData, options: { bigger: boolean }) {
         const targetAttributes = testData.attributes as Shadowrun.AttributesData;
         for (const name of names) {
             const sourceAttribute = foundry.utils.duplicate(attributes[name]);
