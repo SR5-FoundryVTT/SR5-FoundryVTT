@@ -34,7 +34,8 @@ declare namespace Shadowrun {
             attributes: VehicleAttributes
             networkController: string
             modifiers: Modifiers & CommonModifiers
-            modificationCategories: VehicleModCategories          
+            modificationCategories: VehicleModCategories
+            modPoints: number
         }
 
     export interface VehicleStats {

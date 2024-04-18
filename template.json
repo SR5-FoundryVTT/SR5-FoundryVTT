@@ -1049,12 +1049,13 @@
             "driver": "",
             "modificationCategories": {
                 "body": 0,
-                "power_tain": 0,
+                "power_train": 0,
                 "protection": 0,
                 "electromagnetic": 0,
                 "cosmetic": 0,
                 "weapons": 0
-            },          
+            },   
+            "modPoints": 0,
             "vehicle_stats": {
                 "pilot": {
                     "base": 0,

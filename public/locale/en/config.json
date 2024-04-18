@@ -760,6 +760,7 @@
         "WoundTolerance": "Wound Tolerance",
         "Wounds": "Wounds"
     },
+    "SR5.ModPoints": "Mod Points",
     "SR5.MountPoint": "Mount Point",
     "SR5.MoveInventoryDialog": {
         "Cancel": "Cancel",
@@ -811,8 +812,8 @@
     "SR5.PowerType": "Type",
     "SR5.Powers": "Powers",
     "SR5.Program": "Program",
-    "SR5.ProgramType": "Type",
     "SR5.Programs": "Programs",
+    "SR5.ProgramType": "Type",    
     "SR5.PublicAwareness": "Public Awareness",
     "SR5.PushTheLimit": "Push The Limit",
     "SR5.Qty": "Qty",
@@ -1325,6 +1326,7 @@
             "Rigger": "Rigger"
         },
         "Driver": "Driver",
+        "Drone": "Drone",
         "Environments": {
             "Handling": "Handling",
             "Speed": "Speed"
