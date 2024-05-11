@@ -91,6 +91,12 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return modification.system.type === 'vehicle';
     }
 
+    isDroneModification(): boolean {
+        if (!this.isModification()) return false;
+        const modification = this.data as ModificationItemData;
+        return modification.system.type === 'drone';
+    }
+
     isProgram(): boolean {
         return this.data.type === 'program';
     }
