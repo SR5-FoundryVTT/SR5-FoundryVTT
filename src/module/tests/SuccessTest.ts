@@ -28,8 +28,13 @@ import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
 
 export interface TestDocuments {
+    // Legacy field that used be the source document.
     actor?: SR5Actor
+    // The action document the action has been taken from
     item?: SR5Item
+    // The main document values have been taken from
+    source?: SR5Actor | SR5Item
+    // Rolls already taken for this test.
     rolls?: SR5Roll[]
 }
 
@@ -185,8 +190,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
         this.item = documents?.item;
-        // Prefer actors as source documents.
-        this.source = documents?.actor ?? documents?.item;
+        // If no specific source document is given, fallback to actor.
+        this.source = documents?.source ?? documents?.actor;
         this.rolls = documents?.rolls || [];
 
         // User selected targets of this test.
@@ -691,8 +696,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Populate the item document.
-        if (this.data.sourceItemUuid)
+        if (this.data.sourceItemUuid) {
             this.item = await fromUuid(this.data.sourceItemUuid) as SR5Item || undefined;
+        }
+
+        // Populate the value source document.
+        if (this.data.sourceDocumentUuid) {
+            this.source = await fromUuid(this.data.sourceDocumentUuid) as SR5Actor | SR5Item || undefined;
+            this.data.sourceDocumentIsActor = this.source instanceof SR5Actor;
+            if (this.data.sourceDocumentIsActor) this.actor = this.source as SR5Actor;
+        }
 
         // Populate targeted token documents.
         if (this.targets.length === 0 && this.data.targetActorsUuid) {
@@ -704,7 +717,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
                 const token = document instanceof SR5Actor ? document.getToken() : document;
                 if (!(token instanceof TokenDocument)) continue;
 
-                this.targets.push(token as TokenDocument);
+                this.targets.push(token);
             }
         }
     }
