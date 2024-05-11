@@ -29,7 +29,7 @@ export const SR5 = {
         spell: 'SR5.ItemTypes.Spell',
         sprite_power: 'SR5.ItemTypes.SpritePower',
         weapon: 'SR5.ItemTypes.Weapon',
-        call_in_action: 'ITEM.TypeCall_in_action'
+        call_in_action: 'TYPES.Item.call_in_action'
     },
 
     // All available attributes. These are available as testable attributes across all actor types.
@@ -577,6 +577,45 @@ export const SR5 = {
         divide: '/'
     },
 
+    // Map all Shadowrun.ActionCategories to their matching labels.
+    // For more information around action categories, see type documentation.
+    actionCategories: {
+        'addiction_mental': "SR5.ActionCategory.AddictionMental",
+        'addiction_physical': "SR5.ActionCategory.AddictionPhysical",
+        'addiction': "SR5.ActionCategory.Addiction",
+        'attack_melee': "SR5.ActionCategory.AttackMelee",
+        'attack_ranged': "SR5.ActionCategory.AttackRanged", 
+        'attack_thrown': "SR5.ActionCategory.AttackThrown",
+        'attack': "SR5.ActionCategory.Attack",
+        'brute_force': "SR5.ActionCategory.BruteForce",
+        "climbing": "SR5.ActionCategory.Climbing",
+        'compiling': "SR5.ActionCategory.Compiling",
+        'complex_form': "SR5.ActionCategory.ComplexForm",
+        'defense_suppression': "SR5.ActionCategory.DefenseSuppression",
+        'defense': "SR5.ActionCategory.Defense", 
+        'drain': "SR5.ActionCategory.Drain",
+        'fade': "SR5.ActionCategory.Fade", 
+        'hack_on_the_fly': "SR5.ActionCategory.HackOnTheFly",
+        'magic': "SR5.ActionCategory.Magic",
+        'matrix': 'SR5.ActionCategory.Matrix',
+        'recovery_physical': "SR5.ActionCategory.RecoveryPhysical",
+        'recovery_stun': "SR5.ActionCategory.RecoveryStun",
+        'recovery': "SR5.ActionCategory.Recovery",
+        'resist_disease': "SR5.ActionCategory.ResistDisease",
+        'resist_toxin': "SR5.ActionCategory.ResistToxin",
+        'resist': "SR5.ActionCategory.Resist",
+        'resonance': "SR5.ActionCategory.Resonance",
+        'rigging': "SR5.ActionCategory.Rigging",
+        'social': 'SR5.ActionCategory.Social',
+        'spell_combat': "SR5.ActionCategory.SpellCombat",
+        'spell_detection': "SR5.ActionCategory.SpellDetection",
+        'spell_healing': "SR5.ActionCategory.SpellHealing",
+        'spell_illusion': "SR5.ActionCategory.SpellIllusion", 
+        'spell_manipulation': "SR5.ActionCategory.SpellManipulation",
+        'spell_ritual': "SR5.ActionCategory.SpellRitual",
+        'summoning': "SR5.ActionCategory.Summoning",
+    },
+
     matrixAttributes: {
         attack: 'SR5.MatrixAttrAttack',
         sleaze: 'SR5.MatrixAttrSleaze',
@@ -802,8 +841,8 @@ export const SR5 = {
      * Names of FoundryVTT packs supplied by the system to be used as action sources.
      */
     packNames: {
-        'generalActions': 'General Actions',
-        'matrixActions': 'Matrix Actions'
+        'generalActions': 'general-actions',
+        'matrixActions': 'matrix-actions'
     },
 
     programTypes: {

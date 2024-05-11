@@ -237,7 +237,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.itemType = this._prepareItemTypes(data);
         data.effects = prepareSortedEffects(this.actor.effects.contents);
-        data.itemEffects = prepareSortedItemEffects(this.actor);
+        data.itemEffects = prepareSortedItemEffects(this.actor, {applyTo: this.itemEffectApplyTos});
         data.inventories = this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);
@@ -1838,5 +1838,15 @@ export class SR5BaseActorSheet extends ActorSheet {
             skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
             card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
         }
+    }
+
+    /**
+     * These effect apply to types are meant to be shown on the item effects section of the effects sheet.
+     * 
+     * They are limited to those effects directly affecting this actor. Effects affecting other actors, aren't shown 
+     * on the actors own sheet.
+     */
+    get itemEffectApplyTos() {
+        return ['actor', 'item', 'test_all', 'test_item', 'modifier'];
     }
 }

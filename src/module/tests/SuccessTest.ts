@@ -81,6 +81,10 @@ export interface TestData {
     // modifiers: Record<ModifierTypes, TestModifier>
     modifiers: ValueField
 
+    // A list of test categories to be used for this test.
+    // Check typing documentation for more information.
+    categories: Shadowrun.ActionCategories[]
+
     // Edge related triggers
     pushTheLimit: boolean
     secondChance: boolean
@@ -703,12 +707,33 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * What Action Categories should be used for this test by default.
+     * 
+     * NOTE: These categories can be overwritten by the source action used to create a test instance.
+     * Override this method if you test implementation needs to define different default categories.
+     */
+    get testCategories(): Shadowrun.ActionCategories[] {
+        return [];
+    }
+
+    /**
      * What modifiers should be used for this test type by default.
      *
      * NOTE: These modifiers are routed through ModifierFlow.totalFor()
      */
     get testModifiers(): ModifierTypes[] {
         return ['global', 'wounds'];
+    }
+
+    /**
+     * Prepare this tests categories.
+     * 
+     * By default categories are taken from the test implementation but can be overwritten by the source action.
+     * 
+     * Test categories must be ready before active effects are applied as they rely on this data to be present.
+     */
+    prepareTestCategories() {
+        this.data.categories = this.data.action.categories || this.testCategories;
     }
 
     /**
@@ -766,7 +791,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Allow subclasses to alter test modifiers based on the item used for casting.
      */
-    async prepareItemModifiers() { }
+    prepareItemModifiers() { }
 
     /**
      * Calculate the total of all values.
@@ -1299,6 +1324,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async execute(): Promise<this> {
         await this.populateTests();
         await this.populateDocuments();
+
+        this.prepareTestCategories();
 
         // Effects need to be applied before any values are calculated.
         this.effects.applyAllEffects();

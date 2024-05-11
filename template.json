@@ -1171,26 +1171,26 @@
             "adept_power",
             "ammo",
             "armor",
+            "bioware",
+            "call_in_action",
             "complex_form",
             "contact",
             "critter_power",
-            "bioware",
             "cyberware",
             "device",
             "echo",
             "equipment",
+            "host",
             "lifestyle",
             "metamagic",
             "modification",
             "program",
             "quality",
+            "ritual",
             "sin",
             "spell",
-            "ritual",
             "sprite_power",
-            "weapon",
-            "host",
-            "call_in_action"
+            "weapon"
         ],
         "templates": {
             "description": {
@@ -1281,7 +1281,7 @@
                 "action": {
                     "type": "",
                     "test": "SuccessTest",
-                    "category": "",
+                    "categories": [],
                     "attribute": "",
                     "attribute2": "",
                     "skill": "",
@@ -1536,6 +1536,7 @@
             "fade": 0,
             "action": {
                 "test": "ComplexFormTest",
+                "categories": ["complex_form"],
                 "opposed": {
                     "test": "OpposedTest"
                 },

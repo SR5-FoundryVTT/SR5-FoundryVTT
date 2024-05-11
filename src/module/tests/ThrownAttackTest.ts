@@ -28,6 +28,10 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
         return this.success;
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['attack', 'attack_thrown']
+    }
+
     override get testModifiers(): Shadowrun.ModifierTypes[] {
         return ['global', 'wounds', 'environmental'];
     }

@@ -9,6 +9,7 @@ const gulpsass = require('gulp-sass')(require('node-sass'));
 gulpsass.compiler = require('node-sass');
 
 // Gulp
+var cp = require('child_process');
 const gulp = require('gulp');
 const sourcemaps = require('gulp-sourcemaps');
 const esbuild = require('esbuild');
@@ -76,24 +77,7 @@ async function watch() {
     watch('src/module/tours/jsons/**/*', 'tours');
 
     gulp.watch('src/**/*.scss').on('change', async () => await buildSass());
-
-    // esbuild.build({
-    //     entryPoints: [entryPoint],
-    //     bundle: true,
-    //     minify: false, // BEWARE: minify: true will break the system as class names are used as string references
-    //     sourcemap: true,
-    //     format: 'esm',
-    //     outfile: path.resolve(destFolder, jsBundle),
-    //     plugins: [typecheckPlugin()],
-    //     watch: {
-    //         onRebuild(error, result) {
-    //             if (error) console.error('watch build failed:', error)
-    //             else console.log('watch build succeeded:', result)
-    //         },
-    //     },
-    // }).catch((err) => {
-    //     console.log(err)
-    // })
+    gulp.watch('packs/_source/**/*.scss').on('change', async () => await compil());
 
     const context = await esbuild.context({
             entryPoints: [entryPoint],
@@ -120,6 +104,19 @@ async function buildSass() {
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(destFolder));
+}
+
+/**
+ * FoundryVTT compendium/packs.
+ * Create all needed packs from their source files.
+ * 
+ * Since gulp tasks uses a commonJS file, while pack uses a es6 module, we have to use the node execution of packs.
+ * 
+ * Rebuilding packs.mjs to be commonJS as well, would mean to deviate from the dnd5e source of it, which I avoid to 
+ * keep future changes on their side easier to merge.
+ */
+async function buildPacks() {
+    cp.exec('npm run build:db');
 }
 
 
@@ -157,7 +154,7 @@ async function linkUserData() {
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
-exports.build = gulp.series(copyAssets, buildSass, buildJS);
-exports.watch = gulp.series(copyAssets, buildSass, watch);
+exports.build = gulp.series(copyAssets, buildSass, buildJS, buildPacks);
+exports.watch = gulp.series(copyAssets, buildSass, buildPacks, watch);
 exports.rebuild = gulp.series(cleanDist, exports.build);
 exports.link = linkUserData;

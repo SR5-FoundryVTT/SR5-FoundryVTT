@@ -36,6 +36,18 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
         this.calculateCombatSpellDamage();
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        const spell = this.item?.asSpell;
+        if (!spell) return [];
+
+        // Defending against a indirect physical spell, is a physical defense test.
+        if (spell.system.type === 'physical' && spell.system.combat.type === 'indirect') {
+            return ['defense'];
+        }
+
+        return [];
+    }
+
     override get testModifiers(): ModifierTypes[] {
         const spell = this.item?.asSpell;
         if (!spell) return ['global'];

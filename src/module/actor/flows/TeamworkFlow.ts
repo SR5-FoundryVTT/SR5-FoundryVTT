@@ -111,7 +111,7 @@ export class TeamworkTest {
         //@ts-expect-error v11 type
         let actor = game.actors?.get(message.speaker.actor)
         
-        actor?.rollTeamworktest(teamworkData.skill, teamworkData)
+        actor?.rollTeamworkTest(teamworkData.skill, teamworkData)
     }
 
     /**

@@ -48,6 +48,42 @@
     "SR5.Accessory": "Accessory",
     "SR5.Accuracy": "Accuracy",
     "SR5.Action": "Action",
+    "SR5.ActionCategory": {
+        "Addiction": "Addiction Actions",
+        "AddictionMental": "Mental Addiction",
+        "AddictionPhysical": "Physical Addiction",
+        "Attack": "Attack Actions",
+        "AttackMelee": "Attack Melee",
+        "AttackRanged": "Attack Ranged",
+        "AttackThrown": "Attack Thrown",
+        "BruteForce": "Matrix Brute Force",
+        "Climbing": "Climbing Actions",
+        "Compiling": "Compiling Actions",
+        "ComplexForm": "Complex Form Actions",
+        "Defense": "Defense Actions",
+        "DefenseSuppression": "Defense Suppression",
+        "Drain": "Drain Actions",
+        "Fade": "Fade Actions",
+        "HackOnTheFly": "Matrix Hack on the Fly",
+        "Magic": "Magic Actions",
+        "Matrix": "Matrix Actions",
+        "Recovery": "Recovery Actions",
+        "RecoveryPhysical": "Recovery Physical",
+        "RecoveryStun": "Recovery Stun",
+        "Resist": "Resisting Actions",
+        "ResistDisease": "Resisting Disease",
+        "ResistToxin": "Resisting Toxin",
+        "Resonance": "Resonance Actions",
+        "Rigging": "Rigging Actions",
+        "Social": "Social Actions",
+        "SpellCombat": "Spellcasting Combat",
+        "SpellDetection": "Spellcasting Detection",
+        "SpellHealing": "Spellcasting Healing",
+        "SpellIllusion": "Spellcasting Illusion",
+        "SpellManipulation": "Spellcasting Manipulation",
+        "SpellRitual": "Spellcasting Ritual",
+        "Summoning": "Summoning Actions"
+    },
     "SR5.ActionType": "Type",
     "SR5.ActionTypeComplex": "Complex",
     "SR5.ActionTypeFree": "Free",
@@ -71,6 +107,7 @@
         "OnlyForItemTest": "Apply for parent item test only",
         "OnlyForWireless": "Apply for wireless active only",
         "Test": {
+            "ActionCategories": "Action Categories Filter",
             "Attributes": "Attributes Filter",
             "Limits": "Limits Filter",
             "Skills": "Skills Filter",
@@ -376,9 +413,9 @@
         "MarksCantBePlacedBy": "The active actor can't place marks.",
         "MarksCantBePlacedOn": "The chosen actor type can't receive any marks.",
         "MissingSkill": "The actor doesn't have the requested skill.",
+        "NoAvailableActorFound": "No available actor was found for this action",
         "SkillWithoutAttribute": "The skill has no attribute configured.",
-        "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor",
-        "NoAvailableActorFound": "No available actor was found for this action"
+        "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor"
     },
     "SR5.EssenceCost": "Essence",
     "SR5.Expand": "Expand",
@@ -402,17 +439,17 @@
     "SR5.Force": "Force",
     "SR5.FullDefense": "Full Defense",
     "SR5.FullDefenseAttribute": "Full Defense Attribute",
+    "SR5.GMRequest": {
+        "General": "Your GM wants you to do a",
+        "RollAttribute": "Attribute Check",
+        "RollSkill": "Skill Check",
+        "Teamwork": "Teamwork Test",
+        "Threshold": " with a threshold of "
+    },
     "SR5.Gear": "Gear",
     "SR5.Glitch": "Glitch!",
     "SR5.GlitchCritical": "Critical Glitch!",
     "SR5.Glitches": "Glitches:",
-    "SR5.GMRequest": {
-        "General": "Your GM wants you to do a",
-        "Threshold": " with a threshold of ",
-        "RollSkill": "Skill Check",
-        "RollAttribute": "Attribute Check",
-        "Teamwork": "Teamwork Test"
-    },
     "SR5.GoodCover": "Good Cover",
     "SR5.GroupContact": "Group",
     "SR5.HackingProgram": "Hacking Program",
@@ -528,6 +565,7 @@
     "SR5.Labels": {
         "Action": {
             "ActiveTest": "Test",
+            "Category": "Category",
             "DamageResistanceTest": "Damage Resistance Test",
             "Modifier": "Modifier",
             "Modifiers": "Modifiers",
@@ -662,7 +700,7 @@
         "Edge": "No Edge left to consume",
         "Initiative": "Not enough initiative score",
         "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
-        "SomeAmmoMelee": "Not enough ammunition left to punch"
+        "SomeAmmoMelee": "Not enough ammunition left to make a melee attack"
     },
     "SR5.Modification": "Modification",
     "SR5.ModificationCategories": "Modification Categories",
@@ -758,6 +796,7 @@
         "OnlyLinkedActorsSupported": "Only linked actors are supported. Selected tokens with unlinked actors will be ignored."
     },
     "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
+    "SR5.PP": "PP",
     "SR5.Parry": "Parry",
     "SR5.PartialCover": "Partial Cover",
     "SR5.Passive": "Passive",
@@ -1274,6 +1313,7 @@
         }
     },
     "SR5.UnderBarrel": "Under Barrel",
+    "SR5.UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
     "SR5.Value": "Value",
     "SR5.Vehicle": {
         "ChaseEnvironment": "Chase Environment",

@@ -81,6 +81,10 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         };
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['resist']
+    }
+
     override get testModifiers(): ModifierTypes[] {
         return ['soak'];
     }

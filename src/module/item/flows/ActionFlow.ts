@@ -2,15 +2,11 @@
  * Handle all things related to the action template (template.json)
  */
 import {SR5Actor} from "../../actor/SR5Actor";
-import DamageData = Shadowrun.DamageData;
 import {Helpers} from "../../helpers";
-import FormulaOperator = Shadowrun.FormulaOperator;
 import {SR5Item} from "../SR5Item";
-import DamageSource = Shadowrun.DamageSource;
-import LimitField = Shadowrun.LimitField;
-import ValueField = Shadowrun.ValueField;
 import {PartsList} from "../../parts/PartsList";
 import { SR5 } from "../../config";
+import { DataDefaults } from "../../data/DataDefaults";
 
 export class ActionFlow {
     /**
@@ -20,7 +16,7 @@ export class ActionFlow {
      * @param actor The actor to use should a dynamic calculation be needed.
      * @param item
      */
-    static calcDamageData(damage: DamageData, actor?: SR5Actor, item?: SR5Item): DamageData {
+    static calcDamageData(damage: Shadowrun.DamageData, actor?: SR5Actor, item?: SR5Item): Shadowrun.DamageData {
         // Avoid manipulation on original data, which might come from database values.
         damage = foundry.utils.duplicate(damage);
 
@@ -75,7 +71,7 @@ export class ActionFlow {
      * @param actor The actor used to determine damage
      * @param item The item from which damage's been determined from.
      */
-    static _damageSource(actor: SR5Actor, item: SR5Item): DamageSource {
+    static _damageSource(actor: SR5Actor, item: SR5Item): Shadowrun.DamageSource {
         return {
             actorId: actor.id || '',
             itemId: item.id || '',
@@ -87,11 +83,11 @@ export class ActionFlow {
     /**
      * Does an action based damage contain any damaging content.
      * 
-     * @param damage Any DamageData taken from an template action section
+     * @param damage Any Shadowrun.DamageData taken from an template action section
      * 
      * @returns true, when the user configured damage contains any parts.
      */
-    static hasDamage(damage: DamageData): boolean {
+    static hasDamage(damage: Shadowrun.DamageData): boolean {
         if (damage.base !== 0) return true;
         if (damage.attribute) return true;
         if (damage.type) return true;
@@ -104,16 +100,29 @@ export class ActionFlow {
      * Collect all active skills either from global context or from within a given document.
      * 
      * @param actor An optional actor to retrieve skills from (including custom skills)
+     * @param skillName An optional skill that should be included in the selection, even if it's missing from the global list.
      * @returns Sorted list of skills for sheet usage.
      */
-    static sortedActiveSkills(actor?: SR5Actor) {
+    static sortedActiveSkills(actor?: SR5Actor, skillName?: string) {
         // Fallback for actors without skills.
-        if (!actor || actor.isIC()) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
+        if (!actor || actor.isIC()) {
+            // Inject this items custom skill into the global skill list.
+            const activeSkills = foundry.utils.deepClone(SR5.activeSkills);
+            if (skillName && !activeSkills[skillName]) activeSkills[skillName] = skillName;
+
+            const skillValues = Helpers.sortConfigValuesByTranslation(activeSkills);
+            return skillValues;
+        }
 
         // Normalize custom and legacy skills to a single format.
         // Legacy skills have no name, but use their name as id.
         // Custom skills have a name but their id is random.
         const normalizedSkills: Record<string, string> = {};
+
+        // Inject this items custom skill into the global skill list.
+        const activeSkills = actor.getActiveSkills();
+        if (skillName && !activeSkills[skillName]) activeSkills[skillName] = DataDefaults.skillData({name: skillName});
+
         const skills = Helpers.sortSkills(actor.getActiveSkills());
         for (const [id, skill] of Object.entries(skills)) {
             const key = skill.name || id;

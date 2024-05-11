@@ -1,5 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5 } from "../config";
+import { SYSTEM_NAME } from "../constants";
 import { ActionFlow } from "../item/flows/ActionFlow";
 import { createTagifyOnInput } from "../utils/sheets";
 import { Translation } from "../utils/strings";
@@ -87,7 +88,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
         const select = event.currentTarget as HTMLSelectElement;
 
-        if (this.object.getFlag('shadowrun5e', 'applyTo') === select.value) return;
+        if (this.object.getFlag(SYSTEM_NAME, 'applyTo') === select.value) return;
 
         if (this.object.changes.length) {
             ui.notifications?.error('You must delete changes before changing the apply-to type.');
@@ -112,10 +113,18 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     }
 
     /**
-     * Prepare apply to select options.
+     * Depending on this effects source document being actor or item, some effect apply to
+     * should not be available.
      */
     prepareApplyToOptions(): Record<string, string> {
-        return SR5.effectApplyTo;
+        const effectApplyTo = foundry.utils.deepClone(SR5.effectApplyTo) as Record<string, string>;
+
+        // Actors can't use effects that only apply to tests from items.
+        if (this.object.parent instanceof SR5Actor) {
+            delete effectApplyTo.test_item;
+        }
+
+        return effectApplyTo;
     }
 
     /**
@@ -132,6 +141,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         switch (this.object.applyTo) {
             case 'test_all':
                 this._prepareTestSelectionTagify(html);
+                this._prepareActionCategoriesSelectionTagify(html);
                 this._prepareSkillSelectionTagify(html);
                 this._prepareAttributesSelectionTagify(html);
                 this._prepareLimitsSelectionTagify(html);
@@ -144,18 +154,39 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
         // Tagify expects this format for localized tags.
         // @ts-expect-error TODO: I've been lazy and need proper typing of class SuccessTest
-        const options = Object.values(game.shadowrun5e.tests).map(((test: any) => ({
+        const values = Object.values(game.shadowrun5e.tests).map(((test: any) => ({
             label: test.label, id: test.name
         })));
 
         // Tagify dropdown should show all whitelist tags.
-        const maxItems = options.length;
+        const maxItems = values.length;
 
         // Fetch current selections.
-        const value = this.object.getFlag('shadowrun5e', 'selection_tests') as string;
+        const value = this.object.getFlag(SYSTEM_NAME, 'selection_tests') as string;
         const selected = value ? JSON.parse(value) : [];
         
-        createTagifyOnInput(inputElement, options, maxItems, selected);
+        createTagifyOnInput(inputElement, values, maxItems, selected);
+    }
+
+    /**
+     * Action Categories multi selection via tagify element.
+     * 
+     * @param html ActiveEffectConfig html
+     */
+    _prepareActionCategoriesSelectionTagify(html: JQuery) {
+        const inputElement = html.find('input#categories-selection').get(0) as HTMLInputElement;
+
+        // Tagify expects this format for localized tags.
+        const values = Object.entries(SR5.actionCategories).map(([category, label]) => ({label, id: category}));
+
+        // Tagify dropdown should show all whitelist tags.
+        const maxItems = values.length;
+
+        // Fetch current selections.
+        const value = this.object.getFlag(SYSTEM_NAME, 'selection_categories') as string;
+        const selected = value ? JSON.parse(value) : [];
+
+        createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 
     _prepareSkillSelectionTagify(html: JQuery) {
@@ -170,33 +201,33 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
         // Use ActionFlow to assure either custom skills or global skills to be included.
         const skills = ActionFlow.sortedActiveSkills(actorOrNothing);
-        const options = Object.entries(skills).map(([id, label]) => ({label: label as Translation, id}));
-        const maxItems = options.length;
-        const value = this.object.getFlag('shadowrun5e', 'selection_skills') as string;
+        const values = Object.entries(skills).map(([id, label]) => ({label: label as Translation, id}));
+        const maxItems = values.length;
+        const value = this.object.getFlag(SYSTEM_NAME, 'selection_skills') as string;
         const selected = value ? JSON.parse(value) : [];
 
-        createTagifyOnInput(inputElement, options, maxItems, selected);
+        createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 
     _prepareAttributesSelectionTagify(html: JQuery) {
         const inputElement = html.find('input#attribute-selection').get(0) as HTMLInputElement;
 
-        const options = Object.entries(SR5.attributes).map(([attribute, label]) => ({label, id: attribute}));
-        const maxItems = options.length;
-        const value = this.object.getFlag('shadowrun5e', 'selection_attributes') as string;
+        const values = Object.entries(SR5.attributes).map(([attribute, label]) => ({label, id: attribute}));
+        const maxItems = values.length;
+        const value = this.object.getFlag(SYSTEM_NAME, 'selection_attributes') as string;
         const selected = value ? JSON.parse(value) : [];
 
-        createTagifyOnInput(inputElement, options, maxItems, selected);
+        createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 
     _prepareLimitsSelectionTagify(html: JQuery) {
         const inputElement = html.find('input#limit-selection').get(0) as HTMLInputElement;
 
-        const options = Object.entries(SR5.limits).map(([limit, label]) => ({label, id: limit}));
-        const maxItems = options.length;
-        const value = this.object.getFlag('shadowrun5e', 'selection_limits') as string;
+        const values = Object.entries(SR5.limits).map(([limit, label]) => ({label, id: limit}));
+        const maxItems = values.length;
+        const value = this.object.getFlag(SYSTEM_NAME, 'selection_limits') as string;
         const selected = value ? JSON.parse(value) : [];
 
-        createTagifyOnInput(inputElement, options, maxItems, selected);
+        createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 }

@@ -186,6 +186,30 @@ Opposing tests must be triggered manually by targeted actors through the chat me
 
 These behaviors are implemented within the `SuccessTest` and `OpposedTest` base classes and can be altered by implementing classes.
 
+### Actions and tests
+Test implementations can be created fully without actions, though most players will trigger tests using any of the action items (action, weapon, spell, ...).
+
+Values from actions are taken to create configured test implementation. In general whenever a test defines default values (attributes, skill, modifiers, categories) these can be fully overwritten by what the action configures the test to use. If an action is given no configuration for any of a value, the default value of the test implementation will be used.
+
+### Tests and Active Effects
+Active Effects can apply to tests, both in general and with a specific filter.
+
+#### Test implementations
+Active Effects can target specific test implementations. In this case, the effect will only apply to actions using these tests.
+
+In general this should be used sparingly and is mostly a technical way of addressing tests. Instead, try using action categories. If you're missing an action category, inform us on our Discord channel on the FoundryVTT server or, better, the GitHub issues.
+
+#### Categories
+Tests and actions can have categories. These are used to give tests a set of labels, allowing them to be targeted by an Active Effect.
+
+Typical use cases would be:
+- matrix => a matrix action
+- spell => any spell action
+- social => any social skill action
+- climbing => a climbing action
+
+Categories can be mixed and matched at will and don't have to adhere to sr5 rules.
+
 ## Modifier implementation
 The shadowrun5e system has multiple ways of handling modifiers on actors, items and 'situations':
 - actor local modifiers
@@ -207,3 +231,11 @@ These modifiers can also be used to apply rules that need to recalculate between
 ## Actions
 Any item can contain the action template allowing it to cast it as a Shadowrun 5e success test.
 
+
+# Extending compendium contents
+
+FoundryVTT uses nedb to implement their compendiums, internally called packs. These nedb's are build from scratch on each release and need source document json files to be built from.
+
+If changes are to be made on compendium items, you can either make those directly within their source file underneath `./packs/_source` or using Foundry GUI. To make these changes persistent, extract compendium content to their source using `node ./utils/packs.mjs package unpack`. Since source documents are stored using their name, be careful when changing that and compare their on disk name with expectations.
+
+Since nedb packs aren't stored in git, changing pack contents will trigger changes for system compendiums as soon as the next GitHub release workflow is triggered.

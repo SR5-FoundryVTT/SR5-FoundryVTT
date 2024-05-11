@@ -218,9 +218,17 @@ export const TestCreator = {
 
         // Determine actors to roll test with.
         let actors = await Helpers.getOpposedTestActors(testData.data);
-        // Second - filter out actors current user shouldn't be able to test with.
+
+        // Inform user about tokens with deleted sidebar actors.
+        // This can both happen for linked tokens immediately and unlinked tokens after reloading.
+        if (actors.filter(actor => !actor).length > 0) {
+            ui.notifications?.warn('TOKEN.WarningNoActor', {localize: true});
+            return;
+        }
+
+        // filter out actors current user shouldn't be able to test with.
         actors = actors.filter(actor => actor.isOwner);
-        // Last - Fallback to player character.
+        // Fallback to player character.
         if (actors.length === 0 && game.user.character) {
             actors.push(game.user.character);
         }
@@ -523,7 +531,7 @@ export const TestCreator = {
         }
 
         
-        // Prepare action modifiers and possible applicable selections
+        // Prepare test modifiers and possible applicable selections
         const modifiers: {[key in Shadowrun.ModifierTypes]?: string[]} = {};
         for (const modifier of data.action.modifiers) {
             // A modifier with an applicable selection is found.

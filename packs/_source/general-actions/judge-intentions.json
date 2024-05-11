@@ -1,0 +1,106 @@
+{
+  "_id": "0RHkpnQA1qNjyxKE",
+  "name": "Judge Intentions",
+  "type": "action",
+  "img": "systems/shadowrun5e/dist/icons/redist/eye.svg",
+  "data": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "action": {
+      "type": "complex",
+      "test": "SuccessTest",
+      "categories": [],
+      "attribute": "charisma",
+      "attribute2": "intuition",
+      "skill": "",
+      "armor": false,
+      "spec": "",
+      "mod": null,
+      "mod_description": "",
+      "limit": {
+        "value": 0,
+        "base": 0,
+        "attribute": null
+      },
+      "threshold": {
+        "value": 0,
+        "base": 0
+      },
+      "extended": false,
+      "damage": {
+        "type": {
+          "value": "",
+          "base": ""
+        },
+        "element": {
+          "value": "",
+          "base": ""
+        },
+        "value": 0,
+        "base": 0,
+        "ap": {
+          "value": 0,
+          "base": 0
+        },
+        "base_formula_operator": "add",
+        "attribute": "",
+        "itemSource": {
+          "actorId": "",
+          "itemId": "",
+          "itemType": "",
+          "itemName": ""
+        }
+      },
+      "opposed": {
+        "type": "",
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0,
+        "description": "",
+        "resist": {
+          "test": "",
+          "skill": "",
+          "attribute": "",
+          "attribute2": "",
+          "armor": false,
+          "mod": 0
+        }
+      },
+      "followed": {
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0
+      },
+      "modifiers": [
+        "global",
+        "judge_intentions",
+        "wounds"
+      ]
+    },
+    "result": {
+      "success": {
+        "matrix": {
+          "placeMarks": false
+        }
+      }
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "permission": {
+    "default": 0,
+    "SPXNNTkUujenPCaS": 3
+  },
+  "flags": {},
+  "_key": "!items!0RHkpnQA1qNjyxKE"
+}

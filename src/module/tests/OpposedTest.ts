@@ -184,7 +184,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     /**
      * Apply opposed test modifiers based on the item implementation
      */
-    override async prepareItemModifiers() {
+    override prepareItemModifiers() {
         if (!this.item) return;
 
         // NOTE: This is a legacy method for applying item data based modifiers, but it will do.

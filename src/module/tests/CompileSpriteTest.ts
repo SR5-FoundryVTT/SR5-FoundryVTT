@@ -73,6 +73,10 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
         return false;
     }
 
+    override get testCategories(): Shadowrun.ActionCategories[] {
+        return ['compiling'];
+    }
+
     /**
      * Skill + Attribute [Limit] as defined in SR5#254 'Compiling a Sprite'
      * 

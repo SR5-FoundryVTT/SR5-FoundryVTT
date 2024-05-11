@@ -1,7 +1,5 @@
 
 declare namespace Shadowrun {
-
-
     export interface ActionData extends
         ActionPartData,
         ImportFlags,
@@ -24,11 +22,10 @@ declare namespace Shadowrun {
         // Test test class used for the active action test
         // Should be defined in game.shadowrun5e.activeTests
         test: string
-        // The type of combat action to be performed.
+        // The type of combat action to be performed. @taMiF: I don't think this is in use.
         type: string
-        // An additional action category. This field is unused as of v.0.8.0 but intended for
-        // a test category (social, matrix, magic, physical, ...)
-        category: string
+        // A grouping of actions for different purposes.
+        categories: ActionCategories[]
         // When set to true, the skill specialization modifier must be applied.
         spec: boolean
         // Unused legacy field. Not shown on any template, not set anywhere in system. Unsure about it's original intention.
@@ -45,7 +42,7 @@ declare namespace Shadowrun {
         opposed: OpposedTestData
         // A follow up test to be cast by the same actor that cast this resulting test after it's completion.
         followed: TestData
-        // Unused legecy field. Not shown on any template, not set anywhere in system. Unsure about it's original intention.
+        // Unused legacy field. Not shown on any template, not set anywhere in system. Unsure about it's original intention.
         alt_mod: number
         // Modification values for the test dice pool applied to this action item.
         // These can come from both the item itself and nested items.
@@ -166,4 +163,48 @@ declare namespace Shadowrun {
      * The actual usable values for an action.
      */
     type ActionRollMode = FoundryRollMode | ''
+
+    /**
+     * What kind of action is being performed.
+     * 
+     * This can be used to group different actions together for different purposes.
+     * It can also be used for ActiveEffects to target a group of tests, if skill or test implementations used
+     * are to specific.
+     */
+    type ActionCategories = 
+        '' | // Empty values are allowed to allow users not having to set an action category.
+        'addiction_mental' | // resisting against mental addiction
+        'addiction_physical' | // resisting against physical addiction
+        'addiction' | // resisting against addiction in general
+        'attack_melee' | // attacks made with melee weapons
+        'attack_ranged' | // attacks made with ranged weapons
+        'attack_thrown' | // attacks made with thrown weapons
+        'attack' | // attacks in general, includes all other attack types
+        'brute_force' | // matrix brute force action
+        'climbing' | // using climbing skills
+        'compiling' | // technomancer compiling sprites action
+        'complex_form' | // technomancer threading complex form action
+        'defense_suppression' | // defending against suppression attacks
+        'defense' | // defending in general, includes all other defense types
+        'drain' | // resisting against drain
+        'fade' | // resisting against fade
+        'hack_on_the_fly' | // matrix hack on the fly action
+        'magic' | // all magic actions in general
+        'matrix' | // all  matrix actions in general
+        'recovery_physical' | // natural recovery of physical damage
+        'recovery_stun' | // natural recovery of stun damage
+        'recovery' | // natural recovery in general, includes all other recovery types
+        'resist' | // resisting damage after getting hit
+        'resist_disease' | // resisting against diseases
+        'resist_toxin' | // resisting against toxins
+        'resonance' | // all resonance actions in general
+        'rigging' | // all rigging actions in general
+        'social' | // all social skill actions
+        'spell_combat' |  // all combat spells
+        'spell_detection' | // all detection spells
+        'spell_healing' | // all healing spells
+        'spell_illusion' | // all illusion spells
+        'spell_manipulation' | // all manipulation spells
+        'spell_ritual' |  // all ritual spells
+        'summoning' // magical summoning of spirits
 }
