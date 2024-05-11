@@ -23,6 +23,8 @@
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
+        "ImportIconFolderDescription": "The folder where the importer can find icon files. Default location: 'systems/shadowrun5e/dist/icons/importer/'",
+        "ImportIconFolderName": "Importer Icon Folder",
         "ManualRollOnSuccessTest": "Manual dice roll on any test",
         "ManualRollOnSuccessTestDescription": "Allow user to manually roll dice on tests and report back hits",
         "MarkImportsDescription": "Denote freshly imported items on actor sheets to highlight that they should be reviewed",
@@ -43,7 +45,9 @@
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
         "UseDamageConditionDescription": "System marks tokens according to their condition monitor",
-        "UseDamageConditionName": "Use system handling for token status effects"
+        "UseDamageConditionName": "Use system handling for token status effects",
+        "UseImportIconOverridesDescription": "When importing items, use the same icons for some different item types when it makes sense. Uncheck if using custom icons.",
+        "UseImportIconOverridesName": "Use Default Importer Icon Overrides"
     },
     "SR5.Accessory": "Accessory",
     "SR5.Accuracy": "Accuracy",
