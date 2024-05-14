@@ -1,7 +1,5 @@
-<div class="flexcol scroll-area">
-    {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
-            name=(localize "SR5.Labels.ActorSheet.VehicleConfiguration")
-    }}
+<div class="flexcol">
+    {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html" name=(localize "SR5.Labels.ActorSheet.VehicleConfiguration")}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.Driver") }}
     <div>
         {{#if vehicle.driver}}
@@ -60,8 +58,16 @@
     {{/if}}
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
 
+    {{#if system.isDrone}}
+    {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html" name=(localize "SR5.ModPoints")}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.ModPoints") }}
+    <span style="white-space: nowrap">
+        {{calcModPointSlots items}} /
+    </span>
+    <input class="display" type="text" size="5" name="system.modPoints" value="{{system.modPoints}}" data-dtype="Number" />
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{else}}
     {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html" name=(localize "SR5.ModificationCategories")}}
-
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.body") }}
     <span style="white-space: nowrap">
         {{calcModificationCategorySlots items "body"}} /
@@ -98,4 +104,6 @@
     </span>
     <input class="display" type="text" size="5" name="system.modificationCategories.weapons" value="{{system.modificationCategories.weapons}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{/if}}
+
 </div>

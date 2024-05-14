@@ -23,6 +23,8 @@
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
+        "ImportIconFolderDescription": "The folder where the importer can find icon files. Default location: 'systems/shadowrun5e/dist/icons/importer/'",
+        "ImportIconFolderName": "Importer Icon Folder",
         "ManualRollOnSuccessTest": "Manual dice roll on any test",
         "ManualRollOnSuccessTestDescription": "Allow user to manually roll dice on tests and report back hits",
         "MarkImportsDescription": "Denote freshly imported items on actor sheets to highlight that they should be reviewed",
@@ -43,9 +45,10 @@
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
         "UseDamageConditionDescription": "System marks tokens according to their condition monitor",
-        "UseDamageConditionName": "Use system handling for token status effects"
+        "UseDamageConditionName": "Use system handling for token status effects",
+        "UseImportIconOverridesDescription": "When importing items, use the same icons for some different item types when it makes sense. Uncheck if using custom icons.",
+        "UseImportIconOverridesName": "Use Default Importer Icon Overrides"
     },
-    "SR5.AP": "AP",
     "SR5.Accessory": "Accessory",
     "SR5.Accuracy": "Accuracy",
     "SR5.Action": "Action",
@@ -142,6 +145,7 @@
     "SR5.AmmoFull": "Ammo Full",
     "SR5.AmmoGelRounds": "Gel Rounds",
     "SR5.Aoe": "AoE",
+    "SR5.AP": "AP",
     "SR5.ApplyWounds": "Apply Wounds",
     "SR5.Armor": "Armor",
     "SR5.ArmorHardened": "Hardened",
@@ -475,13 +479,19 @@
             "Binder": "Binder",
             "BlackIC": "Black IC",
             "Blaster": "Blaster",
+            "Bloodhound": "Bloodhound",
+            "BlooGoo": "Blauer Schleim",
+            "Catapult": "Catapult",
             "Crash": "Crash",
+            "Flicker": "Flicker",
             "Jammer": "Jammer",
             "Killer": "Killer",
             "Marker": "Marker",
             "Patrol": "Patrol",
             "Probe": "Probe",
             "Scramble": "Scramble",
+            "Shocker": "Shocker",
+            "Sleuther": "Sleuther",
             "Sparky": "Sparky",
             "TarBaby": "Tar Baby",
             "Track": "Track"
@@ -771,6 +781,7 @@
         "WoundTolerance": "Wound Tolerance",
         "Wounds": "Wounds"
     },
+    "SR5.ModPoints": "Mod Points",
     "SR5.MountPoint": "Mount Point",
     "SR5.MoveInventoryDialog": {
         "Cancel": "Cancel",
@@ -821,9 +832,10 @@
     "SR5.PowerPoints": "PP",
     "SR5.PowerType": "Type",
     "SR5.Powers": "Powers",
+    "SR5.PP": "PP",
     "SR5.Program": "Program",
-    "SR5.ProgramType": "Type",
     "SR5.Programs": "Programs",
+    "SR5.ProgramType": "Type",    
     "SR5.PublicAwareness": "Public Awareness",
     "SR5.PushTheLimit": "Push The Limit",
     "SR5.Qty": "Qty",
@@ -1345,6 +1357,7 @@
             "Rigger": "Rigger"
         },
         "Driver": "Driver",
+        "Drone": "Drone",
         "Environments": {
             "Handling": "Handling",
             "Speed": "Speed"

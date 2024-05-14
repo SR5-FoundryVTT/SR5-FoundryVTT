@@ -497,7 +497,18 @@ export const registerItemLineHelpers = () => {
                         },
                         qtyInput,
                     ];
-                }                                
+                };
+
+                if (wrapper.isDroneModification()) {
+                    return [                        
+                        {
+                            text: {
+                                text: wrapper.getModificationCategorySlots() ?? ''
+                            },
+                        },
+                        qtyInput,
+                    ];
+                }
             case 'device':
             case 'equipment':
             case 'cyberware':
