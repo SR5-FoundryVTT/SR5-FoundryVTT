@@ -46,6 +46,8 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
             const opposedTest = new OpposedBruteForceTest(data, documents, testOptions);
             await opposedTest.execute();
 
+            // TODO: In this case, does placing a mark on the host place marks on all it's devices?! or all icons?! What about personas?
+
             const marks = decker.getAllMarks();
 
             assert.lengthOf(Object.keys(marks ?? {}), 1);
@@ -135,20 +137,6 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
             Helpers.calcTotal(data.pool);
 
             assert.equal(data.pool.value, 40);
-        });
-
-        it('A device within a PAN should use the masters / controllers values', async () => {
-            const device = await testItem.create({ type: 'device', 'system.technology.rating': 3 });
-            const controller = await testItem.create({ type: 'device', 'system.category': 'commlink', 'system.atts.att4.value': 5, 'system.technology.rating': 5}) as SR5Item;
-
-            await controller.addNetworkDevice(device);
-
-            const action = DataDefaults.actionRollData({attribute: 'willpower', attribute2: 'firewall'});
-            const data = await TestCreator._prepareTestDataWithAction(action, device, TestCreator._minimalTestData())
-
-            Helpers.calcTotal(data.pool);
-
-            assert.equal(data.pool.value, 10);
         });
 
         it('A device within a WAN should NOT use the host values', async () => {

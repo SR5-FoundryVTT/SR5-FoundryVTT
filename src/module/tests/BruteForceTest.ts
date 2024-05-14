@@ -9,7 +9,10 @@ import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlo
  */
 export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     override actor: SR5Actor;
+
+    // TODO: Is this the target controller in case of PAN?
     controller: SR5Actor|SR5Item;
+    // TODO: Is this the target icon chosen by the user?
     icons: (SR5Actor|SR5Item)[];
 
     override _prepareData(data: MatrixPlacementData, options): any {
@@ -26,6 +29,8 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
 
     /**
      * Set a target for this test.
+     * 
+     * TODO: What is the use case for this method?
      * 
      * @param uuid The uuid to target for. This can point to an actor or item.
      */
@@ -53,15 +58,16 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     }
 
     /**
-     * When placing a mark the actual target might not be a token or actor. Instead of the default targeting 
-     * use a specific way for matrix targets.
+     * TODO: What am I even thinking here? Add an actual documentation of the test flow making these cases necessary
+     * 
+     * Icon can be both the hacking device and the target device? What even?!
      * 
      * @returns 
      */
     override async populateDocuments() {
         await super.populateDocuments();
 
-        // If not iconUuid has been given, try to use a token target.
+        // If no iconUuid has been given, try to use a token target.
         if (!this.data.iconUuid && this.hasTargets) {
             if (this.targets.length !== 1) {
                 console.error('Shadowrun 5e | Multiple targets for mark placement', this.targets);
@@ -74,6 +80,8 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
             }
         }
 
+        // If a specific controller is given, use this instead.
+        // TODO: What is the use case for this?
         if (this.data.controllerUuid) {
             const controller = await fromUuid(this.data.controllerUuid);
             if (!(controller instanceof SR5Item)) {
@@ -87,12 +95,15 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
 
     /**
      * Retrieve all icons connected to the controller network
+     * 
+     * TODO: This seems to rely on the main use case of this test to be a targeted actor having a set of network devices.
      */
     async _prepareNetworkIcons() {
+        // No controller is used.
+        if (!this.controller) return;
         // An actor controller can't have a network.
-        if (this.controller instanceof SR5Actor) {
-            return;
-        }
+        if (this.controller instanceof SR5Actor) return;
+
         // Collect network devices
         this.icons = await this.controller.networkDevices();
 

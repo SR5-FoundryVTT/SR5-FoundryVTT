@@ -12,6 +12,7 @@ export interface MatrixPlacementData extends SuccessTestData {
     sameGrid: boolean
     // If decker has a direct connection to the target
     directConnection: boolean
+    // TODO: What are you even? 
     controllerUuid: string
     // The uuid of the target actor / device / host.
     iconUuid: string
