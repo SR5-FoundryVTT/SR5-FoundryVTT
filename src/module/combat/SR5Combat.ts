@@ -1,7 +1,7 @@
-import {SR5Actor} from "../actor/SR5Actor";
-import {FLAGS, SR, SYSTEM_NAME} from "../constants";
-import {CombatRules} from "../rules/CombatRules";
-import {SocketMessage} from "../sockets";
+import { SR5Actor } from "../actor/SR5Actor";
+import { FLAGS, SR, SYSTEM_NAME } from "../constants";
+import { CombatRules } from "../rules/CombatRules";
+import { SocketMessage } from "../sockets";
 import SocketMessageData = Shadowrun.SocketMessageData;
 
 /**
@@ -15,7 +15,7 @@ import SocketMessageData = Shadowrun.SocketMessageData;
 export class SR5Combat extends Combat {
     // Overwrite foundry-vtt-types v9 combatTrackerSettings type definitions.
     override get settings() {
-        return super.settings as {resource: string, skipDefeated: boolean};
+        return super.settings as { resource: string, skipDefeated: boolean };
     }
 
     get initiativePass(): number {
@@ -124,10 +124,10 @@ export class SR5Combat extends Combat {
         const turn = 0;
 
         // Collect all combatants ini changes for singular update.
-        const combatants: {_id: string|null, initiative: number}[] = [];
+        const combatants: { _id: string | null, initiative: number }[] = [];
         for (const combatant of combat.combatants) {
             const initiative = CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
-            
+
             combatants.push({
                 _id: combatant.id,
                 initiative
@@ -135,8 +135,8 @@ export class SR5Combat extends Combat {
         }
 
         await combat.update({
-            turn, 
-            combatants, 
+            turn,
+            combatants,
             [`flags.${SYSTEM_NAME}.${FLAGS.CombatInitiativePass}`]: initiativePass
         });
 
@@ -160,7 +160,7 @@ export class SR5Combat extends Combat {
         }
 
         const turn = 0;
-        await combat.update({turn});
+        await combat.update({ turn });
         await combat.handleActionPhase();
     }
 
@@ -168,9 +168,9 @@ export class SR5Combat extends Combat {
      * New action phase might need changes on the actor that only the GM can reliable make.
      */
     async handleActionPhase() {
-        if (!game.user?.isGM)            
+        if (!game.user?.isGM)
             await this._createNewActionPhaseSocketMessage();
-        else 
+        else
             await SR5Combat.handleActionPhase(this.id as string);
     }
 
@@ -193,7 +193,7 @@ export class SR5Combat extends Combat {
 
         const turnsSinceLastAttackSetting = combatant.getFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack);
         if (foundry.utils.getType(turnsSinceLastAttackSetting) !== 'number') return await combatant.actor?.clearProgressiveRecoil();
-        
+
         const turnsSinceLastAttack = Number(turnsSinceLastAttackSetting);
         if (turnsSinceLastAttack > 0) await combatant.actor?.clearProgressiveRecoil();
         else await combatant.setFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack, 1);
@@ -241,7 +241,7 @@ export class SR5Combat extends Combat {
                 Number(actor.getEdge().value),
                 Number(actor.findAttribute('reaction')?.value),
                 Number(actor.findAttribute('intuition')?.value),
-                new Roll('1d2').evaluate({async: false}).total as number,
+                new Roll('1d2').evaluate({ async: false }).total as number,
             ];
         };
 
@@ -333,7 +333,7 @@ export class SR5Combat extends Combat {
 
         // Just step from one combatant to the next!
         if (nextTurn < this.turns.length) {
-            await this.update({turn: nextTurn});
+            await this.update({ turn: nextTurn });
             await this.handleActionPhase();
             return;
         }
@@ -356,14 +356,14 @@ export class SR5Combat extends Combat {
         return this.nextRound();
     }
 
-    override async startCombat() {        
+    override async startCombat() {
         // Roll initiative for all combatants.
         // Disable Foundry behavior of keeping the 'current' combatants turn.
         // Shadowrun 5 starts at the top of the ini order, this avoids an .update
-        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {            
-            await this.rollNPC({updateTurn: false});
+        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
+            await this.rollNPC({ updateTurn: false });
         } else {
-            await this.rollAll({updateTurn: false});
+            await this.rollAll({ updateTurn: false });
         }
 
         // Start at top of the ini order.
@@ -379,10 +379,9 @@ export class SR5Combat extends Combat {
         await this.update(updateData);
 
         // Implement super.startCombat behavior.
-        //@ts-expect-error foundry-vtt-types v10
         this._playCombatSound("startEncounter");
         Hooks.callAll("combatStart", this, updateData);
-        
+
         // After starting combat immediately go to the first action phase.
         await this.handleActionPhase();
 
@@ -475,15 +474,15 @@ export class SR5Combat extends Combat {
     }
 
     async _createDoNextRoundSocketMessage() {
-        await SocketMessage.emitForGM(FLAGS.DoNextRound, {id: this.id});
+        await SocketMessage.emitForGM(FLAGS.DoNextRound, { id: this.id });
     }
 
     async _createDoIniPassSocketMessage() {
-        await SocketMessage.emitForGM(FLAGS.DoInitPass, {id: this.id});
+        await SocketMessage.emitForGM(FLAGS.DoInitPass, { id: this.id });
     }
 
     async _createNewActionPhaseSocketMessage() {
-        await SocketMessage.emitForGM(FLAGS.DoNewActionPhase, {id: this.id});
+        await SocketMessage.emitForGM(FLAGS.DoNewActionPhase, { id: this.id });
     }
 
     override delete(...args): Promise<this | undefined> {

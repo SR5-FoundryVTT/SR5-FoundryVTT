@@ -25,7 +25,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
         delete documents?.actor;
         delete data.sourceActorUuid;
 
-        super(data, documents, options);       
+        super(data, documents, options);
 
         this._assertCorrectAgainst();
     }
@@ -157,7 +157,8 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
         users.forEach(user => {
             if (user.isGM) return;
             // #TODO: Add a setting to define that this should be done and what permission it should be done with.
-            ownership[user.id] = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+            //@ts-expect-error v10
+            ownership[user.id] = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
         })
         updateData['ownership'] = ownership
     }
@@ -177,7 +178,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
             if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared actor');
             await preparedActor.addTechnomancer(technomancer);
             console.error('Add compiler/mancer? reference to sprite');
-            
+
         } else {
             // Create a new sprite actor from scratch...
             const spriteType = this.against.data.spriteTypeSelected;
@@ -185,11 +186,11 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
             const name = `${technomancer.name} ${spriteTypeLabel} ${game.i18n.localize('TYPES.Actor.sprite')}`;
             const level = this.against.data.level;
             const system = { level, spriteType };
-    
-            const actor = await Actor.create({ name, type: 'sprite', system, prototypeToken: {actorLink: true}});
-    
+
+            const actor = await Actor.create({ name, type: 'sprite', system, prototypeToken: { actorLink: true } });
+
             if (!actor) return console.error('Shadowrun 5e | Could not create the compiled sprite actor');
-    
+
             this.data.compiledSpriteUuid = actor.uuid;
         }
     }
@@ -199,7 +200,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      * 
      * @returns 
      */
-    async getPreparedSpriteActor(): Promise<SR5Actor|null> {
+    async getPreparedSpriteActor(): Promise<SR5Actor | null> {
         return await fromUuid(this.data.compiledSpriteUuid as string) as SR5Actor;
     }
 }
