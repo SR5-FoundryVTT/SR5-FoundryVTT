@@ -388,6 +388,10 @@ export class SR5Combat extends Combat {
         return this;
     }
 
+    override _playCombatSound(name: string) {
+        super._playCombatSound(name)
+    }
+
     override async nextRound(): Promise<any> {
         // Let Foundry handle time and some other things.
         await super.nextRound();

@@ -1,7 +1,7 @@
-import {Helpers} from '../helpers';
-import {SR5Item} from './SR5Item';
-import {SR5} from "../config";
-import {onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects} from "../effects";
+import { Helpers } from '../helpers';
+import { SR5Item } from './SR5Item';
+import { SR5 } from "../config";
+import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from "../effects";
 import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
@@ -59,7 +59,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Host Item.
     markedDocuments: Shadowrun.MarkedDocument[]
-    networkDevices: (SR5Item|SR5Actor)[]
+    networkDevices: (SR5Item | SR5Actor)[]
     networkController: SR5Item | undefined
 
     // Action Items. (not only type = action)
@@ -154,7 +154,7 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Reduce nested items into typed lists.
          */
-        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = this.item.items.reduce(
+        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = await this.item.items.reduce(
             (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
                 const itemData = nestedItem.toObject();
                 //@ts-expect-error
@@ -210,7 +210,7 @@ export class SR5ItemSheet extends ItemSheet {
         data.resistTests = game.shadowrun5e.resistTests;
 
         // @ts-expect-error TODO: foundry-vtt-types v10
-        data.descriptionHTML = this.enrichEditorFieldToHTML(this.item.system.description.value);
+        data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
         data.sourceIsURL = this.item.sourceIsUrl;
 
         data.isUsingRangeCategory = this.item.isUsingRangeCategory;
@@ -227,7 +227,7 @@ export class SR5ItemSheet extends ItemSheet {
      * @param options TextEditor, enrichHTML.options passed through
      * @returns Enriched HTML result
      */
-    enrichEditorFieldToHTML(editorValue: string, options:any={async: false}): string {
+    enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): string {
         return TextEditor.enrichHTML(editorValue, options);
     }
 
@@ -352,10 +352,10 @@ export class SR5ItemSheet extends ItemSheet {
                     return console.warn('Shadowrun 5e | Cant drop items onto themselves');
                 }
                 item = data;
-            // Case 2 - From a Compendium Pack
+                // Case 2 - From a Compendium Pack
             } else if (data.pack) {
                 item = await Helpers.getEntityFromCollection(data.pack, data.id);
-            // Case 3 - From a World Entity
+                // Case 3 - From a World Entity
             } else {
                 item = await fromUuid(data.uuid);
             }
@@ -370,7 +370,7 @@ export class SR5ItemSheet extends ItemSheet {
         if (this.item.isHost && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid);
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-            return await this.item.addIC(actor.id , data.pack);
+            return await this.item.addIC(actor.id, data.pack);
         }
 
         // Add items to a network (PAN/WAN).
@@ -388,7 +388,7 @@ export class SR5ItemSheet extends ItemSheet {
 
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
-            if(!actor.isVehicle()) {
+            if (!actor.isVehicle()) {
                 return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
             }
 
@@ -418,7 +418,7 @@ export class SR5ItemSheet extends ItemSheet {
         event.stopPropagation();
         const selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.weaponRangeCategories;
 
-        if(selectedRangeCategory === "manual") {
+        if (selectedRangeCategory === "manual") {
             await this.item.update({
                 [key]: {
                     category: selectedRangeCategory,
@@ -451,7 +451,7 @@ export class SR5ItemSheet extends ItemSheet {
         let data = {}
 
         Object.entries(this.item.system.atts).forEach(([slot, { att }]) => {
-            if(slot === changedSlot) {
+            if (slot === changedSlot) {
                 data[`system.atts.${slot}.att`] = selectedAtt;
             } else if (att === selectedAtt) {
                 data[`system.atts.${slot}.att`] = oldValue;
@@ -512,10 +512,10 @@ export class SR5ItemSheet extends ItemSheet {
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type: type,
-            system: {type: 'weapon'}
+            system: { type: 'weapon' }
         };
         // @ts-expect-error
-        const item = new SR5Item(itemData, {parent: this.item});
+        const item = new SR5Item(itemData, { parent: this.item });
         //@ts-expect-error TODO: foundry-vtt-types v10
         await this.item.createNestedItem(item._source);
     }
@@ -541,13 +541,13 @@ export class SR5ItemSheet extends ItemSheet {
             type: type
         };
         // @ts-expect-error
-        const item = new SR5Item(itemData, {parent: this.item});
+        const item = new SR5Item(itemData, { parent: this.item });
         // @ts-expect-error TODO: foundry-vtt-types v10
         await this.item.createNestedItem(item._source);
     }
 
     async _onOwnedItemRemove(event) {
-        event.preventDefault();1
+        event.preventDefault(); 1
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -617,12 +617,12 @@ export class SR5ItemSheet extends ItemSheet {
             id: modifier
         }));
 
-        const tagify = createTagify(inputElement, {whitelist, maxItems, tags});
+        const tagify = createTagify(inputElement, { whitelist, maxItems, tags });
 
         html.find('input#action-modifier').on('change', async (event) => {
             const modifiers = tagify.value.map(tag => tag.id);
             // render would loose tagify input focus. submit on close will save.
-            await this.item.update({'system.action.modifiers': modifiers}, {render:false});
+            await this.item.update({ 'system.action.modifiers': modifiers }, { render: false });
         });
     }
 
@@ -636,7 +636,7 @@ export class SR5ItemSheet extends ItemSheet {
      */
     _createActionCategoriesTagify(html) {
         if (!this.item.isAction()) return;
-        
+
         const inputElement = html.find('input#action-categories').get(0) as HTMLInputElement;
 
         if (!inputElement) {
@@ -660,13 +660,13 @@ export class SR5ItemSheet extends ItemSheet {
             id: category
         }));
 
-        const tagify = createTagify(inputElement, {whitelist, maxItems, tags});
+        const tagify = createTagify(inputElement, { whitelist, maxItems, tags });
 
         html.find('input#action-categories').on('change', async (event) => {
             // Custom tags will not have an id, so use value as id.
             const categories = tagify.value.map(tag => tag.id ?? tag.value);
             // render would loose tagify input focus. submit on close will save.
-            await this.item.update({'system.action.categories': categories}, {render:false});
+            await this.item.update({ 'system.action.categories': categories }, { render: false });
         });
     }
 
@@ -712,11 +712,11 @@ export class SR5ItemSheet extends ItemSheet {
 
         const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
         if (!markedIdDocuments) return;
-        const {scene, target, item} = markedIdDocuments;
+        const { scene, target, item } = markedIdDocuments;
         if (!scene || !target) return; // item can be undefined.
 
         const marks = parseInt(event.currentTarget.value);
-        await this.item.setMarks(target, marks, {scene, item, overwrite: true});
+        await this.item.setMarks(target, marks, { scene, item, overwrite: true });
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -729,10 +729,10 @@ export class SR5ItemSheet extends ItemSheet {
 
         const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
         if (!markedIdDocuments) return;
-        const {scene, target, item} = markedIdDocuments;
+        const { scene, target, item } = markedIdDocuments;
         if (!scene || !target) return; // item can be undefined.
 
-        await this.item.setMarks(target, by, {scene, item});
+        await this.item.setMarks(target, by, { scene, item });
     }
 
     async _onMarksDelete(event) {
@@ -801,7 +801,7 @@ export class SR5ItemSheet extends ItemSheet {
      * @param event
      * @returns undefined when an DropData couldn't be parsed from it's JSON.
      */
-    parseDropData(event): any|undefined {
+    parseDropData(event): any | undefined {
         try {
             return JSON.parse(event.dataTransfer.getData('text/plain'));
         } catch (error) {
