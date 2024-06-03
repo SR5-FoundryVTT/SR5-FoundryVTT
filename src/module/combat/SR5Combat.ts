@@ -388,7 +388,9 @@ export class SR5Combat extends Combat {
         return this;
     }
 
+    //@ts-expect-error TODO: foundry-vtt-types v11
     override _playCombatSound(name: string) {
+    //@ts-expect-error TODO: foundry-vtt-types v11
         super._playCombatSound(name)
     }
 
