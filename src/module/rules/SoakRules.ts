@@ -39,7 +39,7 @@ export class SoakRules {
      * @returns The updated damage data
      */
     static modifyPhysicalDamageForArmor(damage: DamageData, actor : SR5Actor): DamageData {
-        const updatedDamage = duplicate(damage) as DamageData;
+        const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
 
         if (damage.type.value === 'physical') {
             // Physical damage is only transformed for some actors
@@ -67,7 +67,7 @@ export class SoakRules {
      * @returns The updated damage data
      */
     static modifyMatrixDamageForBiofeedback(damage: DamageData, actor : SR5Actor): DamageData {
-        const updatedDamage = duplicate(damage) as DamageData;
+        const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
 
         if (damage.type.value === 'matrix') {
             const actorData = actor.system as CharacterActorData;

@@ -39,8 +39,8 @@ export class DataDefaults {
         const name = itemData.name ?? 'Unnamed';
         const type = itemData.type;
 
-        // Duplicate source to avoid keeping reference to model data.
-        const modelSystemData = duplicate(game.model.Item[type]);
+        // foundry.utils.duplicate source to avoid keeping reference to model data.
+        const modelSystemData = foundry.utils.duplicate(game.model.Item[type]);
         if (!modelSystemData) throw new Error(`FoundryVTT doesn't have item type: ${type} registered`);
         return {
             name, type,

@@ -262,7 +262,7 @@ export class CombatRules {
     static modifyDamageTypeAfterHit(damage: DamageData, actor : SR5Actor) : DamageData {
         // Careful, order of damage conversion is very important
         // Electricity stun damage is considered physical for vehicles
-        let updatedDamage = duplicate(damage) as DamageData;
+        let updatedDamage = foundry.utils.duplicate(damage) as DamageData;
         if (actor.isVehicle() && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
             updatedDamage.type.value = 'physical';
         }

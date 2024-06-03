@@ -668,7 +668,7 @@ export class Helpers {
      * @param modificationLabel The translatable label for the modification
      */
     static modifyDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
-        const modified = duplicate(incoming) as DamageData;
+        const modified = foundry.utils.duplicate(incoming) as DamageData;
         modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
