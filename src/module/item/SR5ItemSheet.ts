@@ -93,7 +93,7 @@ export class SR5ItemSheet extends ItemSheet {
      * @returns {Object}
      */
     static override get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'item'],
             width: 735,
             height: 450,

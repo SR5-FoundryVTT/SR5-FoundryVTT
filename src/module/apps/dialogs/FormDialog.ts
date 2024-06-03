@@ -109,7 +109,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         const data = super.getData();
 
         // Merge default Dialog data with whatever's been given.
-        return mergeObject(data, {
+        return foundry.utils.mergeObject(data, {
             ...this.data,
             content: ''
         });

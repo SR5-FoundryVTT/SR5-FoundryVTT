@@ -7,7 +7,7 @@ export class LanguageSkillEditSheet extends SkillEditSheet {
     }
 
     override getData() {
-        return mergeObject(super.getData(), {
+        return foundry.utils.mergeObject(super.getData(), {
             editable_name: true,
             editable_canDefault: false,
             editable_attribute: false

@@ -174,7 +174,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @returns {Object}
      */
     static override get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
             width: 930,
             height: 690,
