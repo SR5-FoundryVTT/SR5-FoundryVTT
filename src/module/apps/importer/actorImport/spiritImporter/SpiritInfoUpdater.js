@@ -12,7 +12,7 @@ export class SpiritInfoUpdater {
      */
     async update(actorSource, chummerChar) {
 
-        const clonedActorSource = duplicate(actorSource);
+        const clonedActorSource = foundry.utils.duplicate(actorSource);
 
         // Name is required, so we need to always set something (even if the chummer field is empty)
         if (chummerChar.alias) {

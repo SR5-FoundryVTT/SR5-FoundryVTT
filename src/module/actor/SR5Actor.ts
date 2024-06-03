@@ -1340,7 +1340,7 @@ export class SR5Actor extends Actor {
         if (track.value === track.max) return track;
 
         //  Avoid cross referencing.
-        track = duplicate(track);
+        track = foundry.utils.duplicate(track);
 
         track.value += damage.value;
         if (track.value > track.max) {
@@ -1411,7 +1411,7 @@ export class SR5Actor extends Actor {
         if (track.overflow.value === track.overflow.max) return;
 
         //  Avoid cross referencing.
-        const overflow = duplicate(track.overflow);
+        const overflow = foundry.utils.duplicate(track.overflow);
 
         // Don't over apply damage to the track overflow.
         overflow.value += damage.value;
@@ -1607,8 +1607,8 @@ export class SR5Actor extends Actor {
         const restDamage = damage.value - overflowDamage;
 
         //  Avoid cross referencing.
-        const overflow = duplicate(damage);
-        const rest = duplicate(damage);
+        const overflow = foundry.utils.duplicate(damage);
+        const rest = foundry.utils.duplicate(damage);
 
         overflow.value = overflowDamage;
         rest.value = restDamage;
@@ -1731,7 +1731,7 @@ export class SR5Actor extends Actor {
             return this.getArmor();
         }
 
-        const modified = duplicate(this.getArmor());
+        const modified = foundry.utils.duplicate(this.getArmor());
         if (modified) {
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
             modified.value = Helpers.calcTotal(modified, {min: 0});
@@ -1906,7 +1906,7 @@ export class SR5Actor extends Actor {
             // @ts-expect-error _id is missing on internal typing...
             id: hostData._id,
             rating: hostData.system.rating,
-            atts: duplicate(hostData.system.atts)
+            atts: foundry.utils.duplicate(hostData.system.atts)
         }
 
         // Some host data isn't stored on the IC actor (marks) and won't cause an automatic render.

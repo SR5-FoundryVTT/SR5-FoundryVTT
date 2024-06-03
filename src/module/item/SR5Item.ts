@@ -311,7 +311,7 @@ export class SR5Item extends Item {
      * @returns 
      */
     getChatData(htmlOptions = {}) {
-        const system = duplicate(this.system);
+        const system = foundry.utils.duplicate(this.system);
         const { labels } = this;
         if (!system.description) system.description = { chat: '', source: '', value: '' };
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
@@ -772,10 +772,10 @@ export class SR5Item extends Item {
         if (!Array.isArray(itemData)) itemData = [itemData];
         // weapons accept items
         if (this.type === 'weapon') {
-            const currentItems = duplicate(this.getNestedItems());
+            const currentItems = foundry.utils.duplicate(this.getNestedItems());
 
             itemData.forEach((ogItem) => {
-                const item = duplicate(ogItem);
+                const item = foundry.utils.duplicate(ogItem);
                 item._id = randomID(16);
                 if (item.type === 'ammo' || item.type === 'modification') {
                     if (item?.system?.technology?.equipped) {
@@ -847,7 +847,7 @@ export class SR5Item extends Item {
 
     // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     async updateNestedItems(changes) {
-        const items = duplicate(this.getNestedItems());
+        const items = foundry.utils.duplicate(this.getNestedItems());
         if (!items) return;
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
@@ -892,7 +892,7 @@ export class SR5Item extends Item {
      * @returns {Promise<boolean>}
      */
     async deleteOwnedItem(deleted) {
-        const items = duplicate(this.getNestedItems());
+        const items = foundry.utils.duplicate(this.getNestedItems());
         if (!items) return;
 
         const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
