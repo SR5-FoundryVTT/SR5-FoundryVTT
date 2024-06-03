@@ -278,7 +278,7 @@ export abstract class VersionMigration {
                     hasItemUpdates = true;
                     itemUpdate['_id'] = item.id;
 
-                    return mergeObject(item, itemUpdate.data, {
+                    return foundry.utils.mergeObject(item, itemUpdate.data, {
                         enforceTypes: false,
                         inplace: false,
                     });

@@ -104,5 +104,5 @@ export const _mergeWithMissingSkillFields = (givenSkill) => {
     // causes problems down the line with active skills taken from a preexisting
     // data structure.
     // overwrite false to prohibit existing values to be overwritten with empty values.
-    mergeObject(givenSkill, template, {overwrite: false});
+    foundry.utils.mergeObject(givenSkill, template, {overwrite: false});
 }

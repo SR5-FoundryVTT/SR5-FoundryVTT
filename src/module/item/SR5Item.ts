@@ -815,7 +815,7 @@ export class SR5Item extends Item {
             //@ts-expect-error v10
             const data = game.user ? { ownership: { [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER } } :
                 {};
-            item = mergeObject(item, data);
+            item = foundry.utils.mergeObject(item, data);
 
             // Case: MODIFY => Update existing item.
             if (item._id in loaded) {
@@ -861,7 +861,7 @@ export class SR5Item extends Item {
 
             if (item) {
                 itemChanges = expandObject(itemChanges);
-                mergeObject(item, itemChanges);
+                foundry.utils.mergeObject(item, itemChanges);
                 items[index] = item;
                 // this.items[index].data = items[index];
             }
