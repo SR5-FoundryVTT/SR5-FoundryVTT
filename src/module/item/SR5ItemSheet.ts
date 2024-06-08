@@ -154,11 +154,10 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Reduce nested items into typed lists.
          */
-        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = await this.item.items.reduce(
+        const itemTypes = this.item.items.reduce(
             (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
                 const itemData = nestedItem.toObject();
-                //@ts-expect-error
-                itemData.descriptionHTML = this.enrichEditorFieldToHTML(itemData.system.description.value);
+                // itemData.descriptionHTML = await TextEditor.enrichHTML(itemData.system.description.value);
 
                 //@ts-expect-error
                 if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData); // TODO: foundry-vtt-types v10
@@ -175,6 +174,15 @@ export class SR5ItemSheet extends ItemSheet {
             },
             [[], [], [], [], []],
         );
+
+        for (const itemType of itemTypes) {
+            for (const item of itemType) {
+                // @ts-expect-error
+                item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value);
+            }
+        }
+
+        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = itemTypes;
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
@@ -227,8 +235,8 @@ export class SR5ItemSheet extends ItemSheet {
      * @param options TextEditor, enrichHTML.options passed through
      * @returns Enriched HTML result
      */
-    enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): string {
-        return TextEditor.enrichHTML(editorValue, options);
+    async enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): Promise<string> {
+        return await TextEditor.enrichHTML(editorValue, options);
     }
 
     /**

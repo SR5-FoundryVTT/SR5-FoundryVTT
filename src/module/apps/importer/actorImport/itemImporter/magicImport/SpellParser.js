@@ -11,7 +11,7 @@ export class SpellParser {
         spells.forEach(async (chummerSpell) => {
             try {
                 if (chummerSpell.alchemy.toLowerCase() !== 'true') {
-                    const itemData = this.parseSpell(chummerSpell);
+                    const itemData = await this.parseSpell(chummerSpell);
 
                     // Assign the icon if enabled
                     if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
@@ -26,7 +26,7 @@ export class SpellParser {
         return parsedSpells;
     }
 
-    parseSpell(chummerSpell) {
+    async parseSpell(chummerSpell) {
         const parserType = 'spell';
         const system = {};
 
@@ -35,7 +35,7 @@ export class SpellParser {
         let description = '';
         if (chummerSpell.descriptors) description = chummerSpell.descriptors;
         if (chummerSpell.description) description += `\n${chummerSpell.description}`;
-        system.description.value = TextEditor.enrichHTML(description);
+        system.description.value = await TextEditor.enrichHTML(description);
 
         this.parseDuration(chummerSpell, system)
         this.prepareAction(system)
