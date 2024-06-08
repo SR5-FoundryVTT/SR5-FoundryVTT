@@ -1344,7 +1344,8 @@ export class SR5Item extends Item {
             type: 'Actor',
             pack,
             // Custom fields for IC
-            data: { icType: icData.data.icType },
+            // @ts-expect-error foundry-vtt
+            system: { icType: icData.system.icType },
         });
         host.system.ic.push(sourceEntity);
 

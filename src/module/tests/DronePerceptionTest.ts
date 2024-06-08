@@ -11,7 +11,7 @@ export class DronePerceptionTest extends SuccessTest {
             return {};
         }
 
-        switch (vehicleData.data.controlMode) {
+        switch (vehicleData.system.controlMode) {
             case "autopilot": {
                 const attribute = 'pilot';
                 const skill = 'perception';

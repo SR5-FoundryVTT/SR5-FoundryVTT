@@ -733,7 +733,7 @@ export class Helpers {
      * @param key The single sub property within the path that's meant to be deleted. 'test'
      *
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
-     *         remove the Pistols key from the 'data.skills.active' path within Entity.data.data.skills.active.
+     *         remove the Pistols key from the 'data.skills.active' path within Entity.system.skills.active.
      */
     static getDeleteKeyUpdateData(path: string, key: string): { [path: string]: { [key: string]: null } } {
         // Entity.update utilizes the mergeObject function within Foundry.

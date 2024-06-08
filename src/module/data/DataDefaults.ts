@@ -245,7 +245,8 @@ export class DataDefaults {
             name: '',
             pack: null,
             type: 'Actor',
-            system: partialSourceEntityData.data || undefined
+            // @ts-expect-error
+            system: partialSourceEntityData.system || undefined
         }, partialSourceEntityData) as SourceEntityField;
     }
 
