@@ -37,7 +37,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
         it('remove an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = await testActor.create({ 'type': 'character', 'data.inventories': inventoriesData });
+            const actor = await testActor.create({ 'type': 'character', 'system.inventories': inventoriesData });
 
             await actor.inventory.remove('test');
 
@@ -46,7 +46,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
         it('add and remove an item to and from an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = await testActor.create({ 'type': 'character', 'data.inventories': inventoriesData });
+            const actor = await testActor.create({ 'type': 'character', 'system.inventories': inventoriesData });
             const item = await actor.createEmbeddedDocuments('Item', [{ type: 'weapon', name: 'Test Weapon' }]);
 
             await actor.inventory.addItems('test', item);
@@ -59,7 +59,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
         it('rename an existing inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: ['notAnItemId'] } };
-            const actor = await testActor.create({ 'type': 'character', 'data.inventories': inventoriesData });
+            const actor = await testActor.create({ 'type': 'character', 'system.inventories': inventoriesData });
 
             const before = 'test';
             const after = 'betterTest';
