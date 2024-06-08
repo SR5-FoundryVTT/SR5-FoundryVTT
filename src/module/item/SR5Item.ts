@@ -274,7 +274,7 @@ export class SR5Item extends Item {
     async postItemCard() {
         const options = {
             actor: this.actor,
-            description: this.getChatData(),
+            description: await this.getChatData(),
             item: this,
             previewTemplate: this.hasBlastTemplate,
             tests: this.getActionTests()
@@ -310,14 +310,13 @@ export class SR5Item extends Item {
      * @param htmlOptions 
      * @returns 
      */
-    getChatData(htmlOptions = {}) {
+    async getChatData(htmlOptions = {}) {
         const system = foundry.utils.duplicate(this.system);
         const { labels } = this;
         if (!system.description) system.description = { chat: '', source: '', value: '' };
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
         if (!system.description.value) system.description.value = '';
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        system.description.value = TextEditor.enrichHTML(system.description.value, { ...htmlOptions, async: false });
+        system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions });
 
         const props = [];
         // Add additional chat data fields depending on item type.
