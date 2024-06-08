@@ -73,15 +73,15 @@ export class OverwatchScoreTracker extends Application {
         }
 
         // Warn user about selected unlinked token actors.
-        const unlinkedActor = tokens.find(token => !token.data.actorLink);
+        const unlinkedActor = tokens.find(token => !token.document.actorLink);
         if (unlinkedActor !== undefined) {
             ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported'));
         }
 
         // Add linked token actors.
-        tokens.filter(token => token.data.actorLink).forEach(token => {
+        tokens.filter(token => token.document.actorLink).forEach(token => {
             // Double check that the actor actually lives in the actors collection.
-            const actor = game.actors.get(token.data.actorId);
+            const actor = game.actors.get(token.document.actorId);
             if (!actor) return;
             if (this._isActorOnTracker(actor)) return;
 
