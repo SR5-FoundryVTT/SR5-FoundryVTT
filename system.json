@@ -12,13 +12,13 @@
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.19.5",
+  "version": "0.20.0",
   "compatibility": {
     "minimum": "11.315",
     "maximum": "12",
-    "verified": "11"
+    "verified": "12"
   },
-  "minimumCoreVersion": "10",
+  "minimumCoreVersion": "11",
   "scripts": [],
   "esmodules": [
     "dist/bundle.js"
