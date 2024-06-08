@@ -49,6 +49,7 @@
         "UseImportIconOverridesDescription": "When importing items, use the same icons for some different item types when it makes sense. Uncheck if using custom icons.",
         "UseImportIconOverridesName": "Use Default Importer Icon Overrides"
     },
+    "SR5.AP": "AP",
     "SR5.Accessory": "Accessory",
     "SR5.Accuracy": "Accuracy",
     "SR5.Action": "Action",
@@ -145,7 +146,6 @@
     "SR5.AmmoFull": "Ammo Full",
     "SR5.AmmoGelRounds": "Gel Rounds",
     "SR5.Aoe": "AoE",
-    "SR5.AP": "AP",
     "SR5.ApplyWounds": "Apply Wounds",
     "SR5.Armor": "Armor",
     "SR5.ArmorHardened": "Hardened",
@@ -476,8 +476,8 @@
             "Binder": "Binder",
             "BlackIC": "Black IC",
             "Blaster": "Blaster",
-            "Bloodhound": "Bloodhound",
             "BlooGoo": "Blauer Schleim",
+            "Bloodhound": "Bloodhound",
             "Catapult": "Catapult",
             "Crash": "Crash",
             "Flicker": "Flicker",
@@ -712,6 +712,7 @@
         "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
         "SomeAmmoMelee": "Not enough ammunition left to make a melee attack"
     },
+    "SR5.ModPoints": "Mod Points",
     "SR5.Modification": "Modification",
     "SR5.ModificationCategories": "Modification Categories",
     "SR5.ModificationCategory": "Modification Category",
@@ -770,7 +771,6 @@
         "WoundTolerance": "Wound Tolerance",
         "Wounds": "Wounds"
     },
-    "SR5.ModPoints": "Mod Points",
     "SR5.MountPoint": "Mount Point",
     "SR5.MoveInventoryDialog": {
         "Cancel": "Cancel",
@@ -803,8 +803,12 @@
     "SR5.Override": "Override",
     "SR5.OverwatchScore": "Overwatch Score",
     "SR5.OverwatchScoreTracker": {
+        "AddSelect": "Add selected tokens linked actor",
+        "CantDeleteUserCharacter": "Player Character can't be removed from the tracker",
+        "DeleteScore": "Delete score from tracker",
         "NotifyNoSelectedTokens": "At least one linked token must be selected.",
-        "OnlyLinkedActorsSupported": "Only linked actors are supported. Selected tokens with unlinked actors will be ignored."
+        "OnlyLinkedActorsSupported": "Only linked actors are supported. Selected tokens with unlinked actors will be ignored.",
+        "ResetScore": "Reset Overwatch Score"
     },
     "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
     "SR5.PP": "PP",
@@ -821,10 +825,9 @@
     "SR5.PowerPoints": "PP",
     "SR5.PowerType": "Type",
     "SR5.Powers": "Powers",
-    "SR5.PP": "PP",
     "SR5.Program": "Program",
+    "SR5.ProgramType": "Type",
     "SR5.Programs": "Programs",
-    "SR5.ProgramType": "Type",    
     "SR5.PublicAwareness": "Public Awareness",
     "SR5.PushTheLimit": "Push The Limit",
     "SR5.Qty": "Qty",
@@ -847,7 +850,6 @@
     "SR5.RecoilCompensation": "Recoil Comp.",
     "SR5.RemoveBonus": "Remove Bonus",
     "SR5.RemoveSpecialization": "Remove Specialization",
-    "SR5.ResetOverwatchScore": "Reset Overwatch Score",
     "SR5.Resist": "Resist",
     "SR5.RestoreDefaultSkills": "Restore Default Skills",
     "SR5.RightClickToClear": "Right Click to Clear",

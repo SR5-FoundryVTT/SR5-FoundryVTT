@@ -17,6 +17,7 @@ export class OverwatchScoreTracker extends Application {
         return options;
     }
 
+    // Contains only non-user actors added manually by the GM.
     static addedActors = [];
 
     getData(options) {
@@ -54,6 +55,7 @@ export class OverwatchScoreTracker extends Application {
         html.find('.overwatch-score-input').on('change', this._setOverwatchScore.bind(this));
         html.find('.overwatch-score-roll-15-minutes').on('click', this._rollFor15Minutes.bind(this));
         html.find('.overwatch-score-add-actor').on('click', this._onAddActor.bind(this));
+        html.find('.overwatch-score-delete').on('click', this._onDeleteActor.bind(this));
     }
 
     // returns the actor that this event is acting on
@@ -122,6 +124,27 @@ export class OverwatchScoreTracker extends Application {
         if (actor) {
             actor.setOverwatchScore(0).then(() => this.render());
         }
+    }
+
+    /**
+     * Remove the connected actor from the tracker.
+     * @param {*} event 
+     */
+    _onDeleteActor(event) {
+        event.preventDefault();
+        const actor = this._getActorFromEvent(event);
+        if (!actor) return;
+
+
+        const index = OverwatchScoreTracker.addedActors.indexOf(actor.id);
+        if (index === -1) {
+            ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.CantDeleteUserCharacter'), {localize: true});
+            return;
+        }
+
+        OverwatchScoreTracker.addedActors.splice(index, 1);
+
+        this.render();
     }
 
     _rollFor15Minutes(event) {
