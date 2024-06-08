@@ -649,7 +649,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             for (const roll of this.rolls) {
                 // @ts-expect-error // foundry-vtt-types is missing evaluated.
                 if (!roll._evaluated)
-                    await roll.evaluate({ async: true });
+                    await roll.evaluate();
             }
         }
 
@@ -1787,7 +1787,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const formula = `0d6`;
         const roll = new SR5Roll(formula);
         // evaluation is necessary for Roll DataModel validation.
-        roll.evaluate({ async: false });
+        // v11 has no evaluateSync, v12 has no {async: false} option
+        if (game.version.startsWith('0.11')) roll.evaluate({async: false})
+        // @ts-expect-error TODO: foundry-vtt-types v12. 
+        else roll.evaluateSync();
 
         const messageData = {
             user: game.user?.id,
