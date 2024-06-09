@@ -45,7 +45,7 @@ export class DamageApplicationFlow {
     }
 
     private changeStunToPhysicalForGrunts(actor : SR5Actor, damage: DamageData): DamageData {
-        const updatedDamage = duplicate(damage) as DamageData;
+        const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
         if (!actor.isGrunt()) {
             return updatedDamage;
         }

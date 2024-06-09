@@ -33,11 +33,11 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.id, fromCollection?.id);
         });
 
-        it('update an actor of any time', async () => {
+        it('update an actor of any type', async () => {
             const actor = await testActor.create({type: 'character'});
 
             assert.notProperty(actor.system, 'test');
-            await actor.update({'data.test': true});
+            await actor.update({'system.test': true});
 
             assert.property(actor.system, 'test');
             assert.propertyVal(actor.system, 'test', true);

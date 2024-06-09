@@ -1,6 +1,5 @@
 import {SKILL_DEFAULT_NAME} from "../constants";
 import DamageData = Shadowrun.DamageData;
-import ActorArmorData = Shadowrun.ActorArmorData;
 import FireModeData = Shadowrun.FireModeData;
 import ActionRollData = Shadowrun.ActionRollData;
 import LimitField = Shadowrun.LimitField;
@@ -40,12 +39,12 @@ export class DataDefaults {
         const name = itemData.name ?? 'Unnamed';
         const type = itemData.type;
 
-        // Duplicate source to avoid keeping reference to model data.
-        const modelSystemData = duplicate(game.model.Item[type]);
+        // foundry.utils.duplicate source to avoid keeping reference to model data.
+        const modelSystemData = foundry.utils.duplicate(game.model.Item[type]);
         if (!modelSystemData) throw new Error(`FoundryVTT doesn't have item type: ${type} registered`);
         return {
             name, type,
-            system: mergeObject(modelSystemData, systemData)
+            system: foundry.utils.mergeObject(modelSystemData, systemData)
         } as ItemData;
     }
     /**
@@ -82,7 +81,7 @@ export class DataDefaults {
                 itemName: ''
             }
         }
-        return mergeObject(data, partialDamageData) as DamageData;
+        return foundry.utils.mergeObject(data, partialDamageData) as DamageData;
     }
 
     /**
@@ -91,7 +90,7 @@ export class DataDefaults {
      * @param partialActorArmorData Inject partial armor data
      */
     static actorArmor(partialActorArmorData: Partial<Shadowrun.ActorArmor> = {}): Shadowrun.ActorArmor {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             value: 0,
             mod: [],
             base: 0,
@@ -110,7 +109,7 @@ export class DataDefaults {
      * @param partialActionData Inject any minimal action property
      */
     static minimalActionData(partialActionData: Partial<MinimalActionData> = {}) {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             attribute: '',
             attribute2: '',
             skill: '',
@@ -134,7 +133,7 @@ export class DataDefaults {
      * @returns 
      */
     static actionRollData(partialActionRollData: DeepPartial<ActionRollData> = {}): ActionRollData {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             type: '',
             categories: [],
             attribute: '',
@@ -183,7 +182,7 @@ export class DataDefaults {
      * @param partialLimitField Inject any limit property
      */
     static limitField(partialLimitField: Partial<LimitField> = {}): LimitField {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             value: 0,
             base: 0,
             attribute: '',
@@ -199,7 +198,7 @@ export class DataDefaults {
      * @param partialSkillData Inject any skill property
      */
     static skillData(partialSkillData: Partial<SkillField> = {}): SkillField {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             name: SKILL_DEFAULT_NAME,
             base: 0,
             value: 0,
@@ -219,7 +218,7 @@ export class DataDefaults {
      * @returns 
      */
     static trackData(partialTrackData: Partial<TrackType> = {}): TrackType {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             value: 0,
             max: 0,
             label: '',
@@ -241,12 +240,13 @@ export class DataDefaults {
      * @returns 
      */
     static sourceItemData(partialSourceEntityData: Partial<SourceEntityField> = {}): SourceEntityField {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             id: '',
             name: '',
             pack: null,
             type: 'Actor',
-            system: partialSourceEntityData.data || undefined
+            // @ts-expect-error
+            system: partialSourceEntityData.system || undefined
         }, partialSourceEntityData) as SourceEntityField;
     }
 
@@ -256,7 +256,7 @@ export class DataDefaults {
      * @param partialValueData Inject any value property
      */
     static valueData(partialValueData: Partial<ValueField> = {}) {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             base: 0,
             value: 0,
             temp: 0,
@@ -271,7 +271,7 @@ export class DataDefaults {
      * @param partialGenericValueData Inject any value property
      */
     static genericValueData(partialGenericValueData: Partial<GenericValueField> = {}) {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             base: 0,
             value: 0,
             temp: 0,
@@ -286,7 +286,7 @@ export class DataDefaults {
      * @param partialFireModeData Inject any fire mode property
      */
     static fireModeData(partialFireModeData: Partial<FireModeData> = {}): FireModeData {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             value: 0,
             label: '',
             defense: 0,
@@ -298,7 +298,7 @@ export class DataDefaults {
     }
 
     static weaponRangeData(partialRangeData: Partial<RangeData> = {}): RangeData {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             short: 0,
             medium: 0,
             long: 0,
@@ -314,7 +314,7 @@ export class DataDefaults {
      * @returns 
      */
     static descriptionData(partialDescriptionData: Partial<Shadowrun.DescriptionData> = {}) {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             value: '',
             chat: '',
             source: ''
@@ -328,7 +328,7 @@ export class DataDefaults {
      * @returns 
      */
     static technologyData(partialTechnologyData: Partial<Shadowrun.TechnologyData> = {}) {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             rating: '',
             availability: '',
             quantity: 1,
@@ -356,7 +356,7 @@ export class DataDefaults {
      * @returns Merged of partial and basic attribute data
      */
     static attributeData(partialAttributeData: Partial<Shadowrun.AttributeField> = {}) {
-        return mergeObject({
+        return foundry.utils.mergeObject({
             value: 0,
             mod: [],
             base: 0,

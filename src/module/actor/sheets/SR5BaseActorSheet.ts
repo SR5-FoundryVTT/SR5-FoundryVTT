@@ -175,7 +175,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @returns {Object}
      */
     static override get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
             width: 930,
             height: 690,
@@ -236,10 +236,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareSpecialFields(data);
         this._prepareSkillsWithFilters(data);
 
-        data.itemType = this._prepareItemTypes(data);
+        data.itemType = await this._prepareItemTypes(data);
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, {applyTo: this.itemEffectApplyTos});
-        data.inventories = this._prepareItemsInventory();
+        data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
@@ -251,7 +251,6 @@ export class SR5BaseActorSheet extends ActorSheet {
             // secrets: this.actor.isOwner,
             // rollData: this.actor.getRollData.bind(this.actor),
             // @ts-expect-error TODO: foundry-vtt-types v10
-            async: true,
             relativeTo: this.actor
         });
 
@@ -852,7 +851,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * Each item can  be in one custom inventory or the default inventory.
      */
-    _prepareItemsInventory() {
+    async _prepareItemsInventory() {
         // All custom and default actor inventories.
         const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
@@ -900,13 +899,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         const handledTypes = this.getHandledItemTypes();
 
         // Check all items and using the item to inventory mapping add them to that inventory.
-        this.actor.items.forEach((item) => {
-            if (!item.id) return;
+        for (const item of this.actor.items) {
+            if (!item.id) continue;
 
             // Handled types are on the sheet outside the inventory.
-            if (handledTypes.includes(item.type)) return;
+            if (handledTypes.includes(item.type)) continue;
 
-            const sheetItem = this._prepareSheetItem(item);
+            const sheetItem = await this._prepareSheetItem(item);
 
             // Determine what inventory the item sits in.
             const inventory = itemIdInventory[item.id] || this.actor.defaultInventory;
@@ -929,7 +928,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
                 inventorySheet.types[item.type].items.push(sheetItem);
             })
-        });
+        }
 
         Object.values(inventoriesSheet).forEach(inventory => {
             this._addInventoryItemTypes(inventory);
@@ -975,11 +974,11 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param item: The item to transform into a 'sheet item'
      */
-    _prepareSheetItem(item: SR5Item): SheetItemData {
+    async _prepareSheetItem(item: SR5Item): Promise<SheetItemData> {
         // Copy derived schema data instead of source data (false)
         const sheetItem = item.toObject(false) as unknown as SheetItemData;
 
-        const chatData = item.getChatData();
+        const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
         // @ts-expect-error bad typing
         sheetItem.properties = chatData.properties;
@@ -996,7 +995,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      * @returns Sorted item lists per sheet item type.
      */
-    _prepareItemTypes(data): Record<string, SheetItemData[]> {
+    async _prepareItemTypes(data): Promise<Record<string, SheetItemData[]>> {
         const itemsByType: Record<string, SheetItemData[]> = {};
 
         // Most sheet items are raw item types, some are sub types.
@@ -1013,13 +1012,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         });
 
         // Add existing items to their sheet types as sheet items
-        this.actor.items.forEach((item: SR5Item) => {
-            const sheetItem = this._prepareSheetItem(item);
+        for (const item of this.actor.items) {
+            const sheetItem = await this._prepareSheetItem(item);
             itemsByType[sheetItem.type].push(sheetItem);
 
             if (item.isSummoning) itemsByType['summoning'].push(sheetItem);
             if (item.isCompilation) itemsByType['compilation'].push(sheetItem);
-        });
+        }
 
         // Sort items for each sheet type.
         Object.entries(itemsByType).forEach(([type, items]) => {

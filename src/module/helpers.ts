@@ -673,7 +673,7 @@ export class Helpers {
      * @param modificationLabel The translatable label for the modification
      */
     static modifyDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
-        const modified = duplicate(incoming) as DamageData;
+        const modified = foundry.utils.duplicate(incoming) as DamageData;
         modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
@@ -738,7 +738,7 @@ export class Helpers {
      * @param key The single sub property within the path that's meant to be deleted. 'test'
      *
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
-     *         remove the Pistols key from the 'data.skills.active' path within Entity.data.data.skills.active.
+     *         remove the Pistols key from the 'data.skills.active' path within Entity.system.skills.active.
      */
     static getDeleteKeyUpdateData(path: string, key: string): { [path: string]: { [key: string]: null } } {
         // Entity.update utilizes the mergeObject function within Foundry.

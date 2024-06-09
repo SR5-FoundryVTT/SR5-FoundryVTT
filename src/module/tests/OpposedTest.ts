@@ -233,8 +233,8 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     /**
      * Inject effects taken from the active original test and inject them into the opposed chat message.
      */
-    override _prepareMessageTemplateData() {
-        const templateData = super._prepareMessageTemplateData();
+    override async _prepareMessageTemplateData() {
+        const templateData = await super._prepareMessageTemplateData();
 
         if (!this.against) return templateData;
 

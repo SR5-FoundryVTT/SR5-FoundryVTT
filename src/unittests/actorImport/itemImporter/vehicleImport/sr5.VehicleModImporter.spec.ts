@@ -2,7 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import VehicleModsParser from '../../../../module/apps/importer/actorImport/itemImporter/vehicleImport/VehicleModsParser';
 import * as chummerDrone from './drone.json';
 
-export const vehilceModParserTesting = (context: QuenchBatchContext) => {
+export const vehicleModParserTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
 
     let parser = new VehicleModsParser();

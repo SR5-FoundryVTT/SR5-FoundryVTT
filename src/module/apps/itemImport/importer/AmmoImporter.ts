@@ -84,15 +84,15 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
                     return item.type === 'weapon' && item.name.toLowerCase() === nameLower;
                 });
 
-                if (foundWeapon != null && "action" in foundWeapon.data.data) {
-                    const weaponData = foundWeapon.data.data as Shadowrun.WeaponData;
+                if (foundWeapon != null && "action" in foundWeapon.system) {
+                    const weaponData = foundWeapon.system as Shadowrun.WeaponData;
                     item.system.damage = weaponData.action.damage.value;
                     item.system.ap =weaponData.action.damage.ap.value;
                 }
             }
 
             // ammo doesn't have conceal rating from looking at the data
-            // data.data.technology.conceal.base = ImportHelper.intValue(jsonData, "conceal");
+            // system.technology.conceal.base = ImportHelper.intValue(jsonData, "conceal");
             item.system.technology.conceal.base = 0;
 
             // Translate Item Name

@@ -22,7 +22,7 @@ export class SkillEditSheet extends DocumentSheet {
 
     static override get defaultOptions() {
         const options = super.defaultOptions;
-        return mergeObject(options, {
+        return foundry.utils.mergeObject(options, {
             id: 'skill-editor',
             classes: ['sr5', 'sheet', 'skill-edit-window'],
             template: 'systems/shadowrun5e/dist/templates/apps/skill-edit.html',

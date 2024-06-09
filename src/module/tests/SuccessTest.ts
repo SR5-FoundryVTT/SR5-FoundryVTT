@@ -665,7 +665,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             for (const roll of this.rolls) {
                 // @ts-expect-error // foundry-vtt-types is missing evaluated.
                 if (!roll._evaluated)
-                    await roll.evaluate({ async: true });
+                    await roll.evaluate();
             }
         }
 
@@ -1661,10 +1661,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.data.options?.showMessage) return;
 
         // Prepare message content.
-        const templateData = this._prepareMessageTemplateData();
+        const templateData = await this._prepareMessageTemplateData();
         const content = await renderTemplate(this._chatMessageTemplate, templateData);
         // Prepare the actual message.
-        const messageData = this._prepareMessageData(content);
+        const messageData = await this._prepareMessageData(content);
         const options = { rollMode: this._rollMode };
 
         //@ts-expect-error // TODO: foundry-vtt-types v10
@@ -1688,7 +1688,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * TODO: Add template data typing.
      */
-    _prepareMessageTemplateData() {
+    async _prepareMessageTemplateData() {
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = this.actor?.getActiveTokens(true) || [];
@@ -1708,7 +1708,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             resultActions: this._prepareResultActionsTemplateData(),
             previewTemplate: this._canPlaceBlastTemplate,
             showDescription: this._canShowDescription,
-            description: this.item?.getChatData() || '',
+            description: await this.item?.getChatData() || '',
             // Some message segments are only meant for the gm, when the gm is the one creating the message.
             // When this test doesn't use an actor, don't worry about hiding anything.
             applyGmOnlyContent: GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor),
@@ -1809,7 +1809,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * @param content Pre rendered template content.
      */
-    _prepareMessageData(content: string) {
+    async _prepareMessageData(content: string) {
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = this.actor?.getActiveTokens(true) || [];
@@ -1821,7 +1821,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const formula = `0d6`;
         const roll = new SR5Roll(formula);
         // evaluation is necessary for Roll DataModel validation.
-        roll.evaluate({ async: false });
+        await roll.evaluate();
 
         const messageData = {
             user: game.user?.id,

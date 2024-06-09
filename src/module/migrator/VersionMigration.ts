@@ -107,7 +107,7 @@ export abstract class VersionMigration {
         // Apply the updates, this should *always* work, now that parsing is complete.
         await this.Apply(entityUpdates);
 
-        // await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
+        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
         ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
@@ -278,7 +278,7 @@ export abstract class VersionMigration {
                     hasItemUpdates = true;
                     itemUpdate['_id'] = item.id;
 
-                    return mergeObject(item, itemUpdate.data, {
+                    return foundry.utils.mergeObject(item, itemUpdate.data, {
                         enforceTypes: false,
                         inplace: false,
                     });

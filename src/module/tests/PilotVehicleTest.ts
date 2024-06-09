@@ -16,11 +16,11 @@ export class PilotVehicleTest extends SuccessTest {
             return {};
         }
 
-        switch (vehicleData.data.controlMode) {
+        switch (vehicleData.system.controlMode) {
             case "autopilot": {
                 const attribute = 'pilot';
                 const skill = actor.getVehicleTypeSkillName();
-                const limit = {attribute: vehicleData.data.environment};
+                const limit = {attribute: vehicleData.system.environment};
 
                 return {attribute, skill, limit};
             }

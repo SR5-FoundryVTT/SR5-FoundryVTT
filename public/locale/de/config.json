@@ -45,6 +45,7 @@
         "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
         "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden"
     },
+    "SR5.AP": "DK",
     "SR5.Accessory": "Zubehör",
     "SR5.Accuracy": "Präz.",
     "SR5.Action": "Handlung",
@@ -138,7 +139,6 @@
     "SR5.AmmoFull": "Vollgeladen",
     "SR5.AmmoGelRounds": "Gelmunition",
     "SR5.Aoe": "Flächeneffekt",
-    "SR5.AP": "DK",
     "SR5.ApplyWounds": "Wunden anwenden",
     "SR5.Armor": "Panzerung",
     "SR5.ArmorHardened": "Verstärkt",
@@ -415,8 +415,7 @@
         "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
         "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
         "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
-        "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
-        "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden"
+        "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden"
     },
     "SR5.EssenceCost": "Essenz",
     "SR5.Expand": "Ausklappen",
@@ -451,13 +450,6 @@
     "SR5.Glitch": "Patzer!",
     "SR5.GlitchCritical": "Kritischer Patzer!",
     "SR5.Glitches": "Patzer:",
-    "SR5.GMRequest": {
-        "General": "Your GM wants you to do a",
-        "Threshold": " with a threshold of ",
-        "RollSkill": "Skill Check",
-        "RollAttribute": "Attribute Check",
-        "Teamwork": "Teamwork Test"
-    },
     "SR5.GoodCover": "Gute Deckung",
     "SR5.GroupContact": "Gruppe",
     "SR5.HackingProgram": "Hackingprogramm",
@@ -480,8 +472,8 @@
             "Binder": "Bremse",
             "BlackIC": "Schwarzes IC",
             "Blaster": "Blaster",
-            "Bloodhound": "Bluthund",
             "BlooGoo": "Blue Goo",
+            "Bloodhound": "Bluthund",
             "Catapult": "Katapult",
             "Crash": "Absturz",
             "Flicker": "Flackern",
@@ -813,8 +805,12 @@
     "SR5.Override": "Override",
     "SR5.OverwatchScore": "Overwatch-Wert",
     "SR5.OverwatchScoreTracker": {
+        "AddSelect": "Füge den verbundenen Actor des ausgewählten und Tokens hinzu",
+        "CantDeleteUserCharacter": "Spielercharakter können nicht aus dem Tracker entfernt werden",
+        "DeleteScore": "Lösche Wert aus dem Tracker",
         "NotifyNoSelectedTokens": "Mindestens ein verbundenes Token muss ausgewählt werden.",
-        "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert."
+        "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert.",
+        "ResetScore": "Setze Overwatch-Wert zurück"
     },
     "SR5.OverwatchScoreTrackerTitle": "Mr. Johnsons Baby-Monitor",
     "SR5.PP": "KP",
@@ -831,7 +827,6 @@
     "SR5.PowerPoints": "Kraftpunkte",
     "SR5.PowerType": "Typ",
     "SR5.Powers": "Kräfte",
-    "SR5.PP": "KP",
     "SR5.Program": "Programm",
     "SR5.ProgramType": "Typ",
     "SR5.Programs": "Programme",
@@ -857,7 +852,6 @@
     "SR5.RecoilCompensation": "Rückstoßkomp.",
     "SR5.RemoveBonus": "Entferne Bonus",
     "SR5.RemoveSpecialization": "Entferne Spezialisierung",
-    "SR5.ResetOverwatchScore": "Setze Overwatch-Wert zurück",
     "SR5.Resist": "Widerstehen",
     "SR5.RestoreDefaultSkills": "Standardfertigkeiten wiederherstellen",
     "SR5.RightClickToClear": "Rechtsklick zum Leeren",
@@ -1243,6 +1237,7 @@
             "OnlyForWireless": "Dieser Effekt gilt nur für Items, bei denen WiFi aktiviert ist."
         },
         "Item": {
+            "ActionCategories": "Überschreibe alle Standardkategorien der Probe mit dieser Auswahl. Mit einem Active Effect können dadurch die Werte der Action modifiziert werden.",
             "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",
             "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
             "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
