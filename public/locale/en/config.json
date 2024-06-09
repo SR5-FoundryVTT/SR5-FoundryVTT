@@ -1226,6 +1226,7 @@
             "OnlyForWireless": "This effect will apply only for items that have wireless enabled"
         },
         "Item": {
+            "ActionCategories": "Select action categories to use instead of the test's default categories. Using Active Effects you can use categories to modify test values",
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",
             "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
             "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",

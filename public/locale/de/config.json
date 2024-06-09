@@ -795,11 +795,11 @@
     "SR5.OverwatchScore": "Overwatch-Wert",
     "SR5.OverwatchScoreTracker": {
         "AddSelect": "Füge den verbundenen Actor des ausgewählten und Tokens hinzu",
+        "CantDeleteUserCharacter": "Spielercharakter können nicht aus dem Tracker entfernt werden",
+        "DeleteScore": "Lösche Wert aus dem Tracker",
         "NotifyNoSelectedTokens": "Mindestens ein verbundenes Token muss ausgewählt werden.",
         "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert.",
-        "ResetScore": "Setze Overwatch-Wert zurück",
-        "DeleteScore": "Lösche Wert aus dem Tracker",
-        "CantDeleteUserCharacter": "Spielercharakter können nicht aus dem Tracker entfernt werden"
+        "ResetScore": "Setze Overwatch-Wert zurück"
     },
     "SR5.OverwatchScoreTrackerTitle": "Mr. Johnsons Baby-Monitor",
     "SR5.PP": "KP",
@@ -1217,6 +1217,7 @@
             "OnlyForWireless": "Dieser Effekt gilt nur für Items, bei denen WiFi aktiviert ist."
         },
         "Item": {
+            "ActionCategories": "Überschreibe alle Standardkategorien der Probe mit dieser Auswahl. Mit einem Active Effect können dadurch die Werte der Action modifiziert werden.",
             "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",
             "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
             "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",

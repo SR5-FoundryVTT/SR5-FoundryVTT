@@ -17,14 +17,16 @@
             </select>
         </div>
     </div>
+    {{#if (not hideActionCategory)}}
     <div class="form-line">
-        <div class="label">
+        <div class="label" data-tooltip="SR5.Tooltips.Item.ActionCategories">
             {{localize "SR5.Labels.Action.Category"}}
         </div>
         <div class="inputs">
             <input id="action-categories" class="tagify-selection"/>
         </div>
     </div>
+    {{/if}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.ActionType"}}

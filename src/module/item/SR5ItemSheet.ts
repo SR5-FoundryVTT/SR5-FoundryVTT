@@ -600,8 +600,6 @@ export class SR5ItemSheet extends ItemSheet {
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
-        if (!this.item.isAction()) return;
-
         const inputElement = html.find('input#action-modifier').get(0);
 
         if (!inputElement) {
@@ -643,8 +641,6 @@ export class SR5ItemSheet extends ItemSheet {
      * @param html 
      */
     _createActionCategoriesTagify(html) {
-        if (!this.item.isAction()) return;
-
         const inputElement = html.find('input#action-categories').get(0) as HTMLInputElement;
 
         if (!inputElement) {
@@ -794,7 +790,7 @@ export class SR5ItemSheet extends ItemSheet {
      * @param html The JQuery HTML as given by the activateListeners method.
      */
     _activateTagifyListeners(html) {
-        if (!['action', 'equipment'].includes(this.document.type)) return;
+        if (!['action', 'metamagic', 'bioware', 'cyberware', 'equipment', 'quality', 'ritual', 'call_in_action', 'sprite_power', 'critter_power', 'adept_power'].includes(this.document.type)) return;
 
         this._createActionModifierTagify(html);
         this._createActionCategoriesTagify(html);
