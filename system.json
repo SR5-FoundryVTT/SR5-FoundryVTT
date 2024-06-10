@@ -14,8 +14,7 @@
   },
   "version": "0.20.0",
   "compatibility": {
-    "minimum": "11.315",
-    "maximum": "12",
+    "minimum": "11",
     "verified": "12"
   },
   "minimumCoreVersion": "11",
