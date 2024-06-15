@@ -537,7 +537,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const data = await this.dialog.select();
         if (this.dialog.canceled) {
             await this.cleanupAfterExecutionCancel();
-            this.dialog = null;
             return false
         }
 
@@ -556,7 +555,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Override this method if there needs to be some cleanup after a user has canceled a dialog 
      * but before the tests actual execution.
      */
-    async cleanupAfterExecutionCancel() { }
+    async cleanupAfterExecutionCancel() {
+        this.dialog = null;
+    }
 
     /**
      * Override this method if you want to save any document data after a user has selected values
@@ -2090,12 +2091,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * Use this method whenever you have an active test instance and want to re-use it with different documents.
      * 
+     * TODO: I'm unsure if this method was designed to be shown during dialog or allow for both before and during dialog to be used.
+     * 
      * @param document The new main source document use.
      */
     async _updateTestData(document: SR5Actor|SR5Item) {
         const action = this.item?.getAction();
         if (!action) return;
         
+        // Remove values from the previous source document.
         const minimalData = TestCreator._minimalTestData();
         for (const [key, value] of Object.entries(minimalData)) {
             this.data[key] = value;
@@ -2105,17 +2109,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.data.sourceActorUuid = document instanceof SR5Actor ? document.uuid : undefined;
         this.data.sourceItemUuid = document instanceof SR5Item ? document.uuid : undefined;
         
-        this.data = await TestCreator._prepareTestDataWithAction(action, document, this.data) as T;
+        this.data = await TestCreator._prepareTestDataWithAction(action, document, this.data, this) as T;
         
         // If no dialog has been shown yet, execution hasn't been triggered.
         // Wait for the next execution.
         if (!this.dialog) return;
 
-        // Re prepare data to add missing base information.
+        // Re-prepare data to add missing base information.
         const options = this.data.options ?? {};
         this._prepareData(this.data, options);
 
-        // Re prepare execution data to add missing modifiers / effects and so forth.
+        // Re-prepare execution data to add missing modifiers / effects and so forth.
         await this._prepareExecution();
 
         // During .execute this would now show the dialog, therefore rerender and we're at the same state.

@@ -458,20 +458,33 @@ export const TestCreator = {
      * @param action Action data to prepare test data with.
      * @param document Document to use for retrieving source values and execute test with.
      * @param data Any test implementations resulting basic test data.
+     * @param test An optional test instance to derive testing context from. This might influence some source values.
+     * 
+     * @returns Resulting TestData
      */
-    _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData) {
+    _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData, test?: SuccessTest) {
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 
-        if (document instanceof SR5Actor) return await TestCreator._prepareTestDataWithActionForActor(action, document, data);
-        if (document instanceof SR5Item) return await TestCreator._prepareTestDataWithActionForItem(action, document, data);
+        if (document instanceof SR5Actor) return await TestCreator._prepareTestDataWithActionForActor(action, document, data, test);
+        if (document instanceof SR5Item) return await TestCreator._prepareTestDataWithActionForItem(action, document, data, test);
 
         //@ts-expect-error // Fallback to data for easy typing, though type gating would cause a typing error, however runtime errors might occur.
         console.error(`Shadowrun 5e | Couldn't prepare test data for document type ${document.constructor.name}`, document, data);
         return data;
     },
 
-    _prepareTestDataWithActionForActor: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData) {
+    /**
+     * Prepare test data with SR5Actor source document for rollData
+     * 
+     * @param action The source action to base test data on
+     * @param actor The source document to use values defined within the action from
+     * @param data The resulting test data object to write those values into
+     * @param test An optional test instance to derive testing context from. This might influence some source values.
+     * 
+     * @returns resulting TestData
+     */
+    _prepareTestDataWithActionForActor: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData, test?: SuccessTest) {
 
         const pool = new PartsList<number>(data.pool.mod);
 
@@ -601,9 +614,10 @@ export const TestCreator = {
      * @param action The base action to configure test data with.
      * @param item The source document to pull values from.
      * @param data The test data to write values into.
+     * @param test An optional test instance to derive testing context from. This might influence some source values.
      * @returns TestData that's ready to be used to construct a new test instance.
      */
-    _prepareTestDataWithActionForItem: async function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData) {
+    _prepareTestDataWithActionForItem: async function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData, test?: SuccessTest) {
         const testData = await item.getTestData();
         const pool = new PartsList<number>(data.pool.mod);
 

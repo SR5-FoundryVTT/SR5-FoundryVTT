@@ -75,6 +75,7 @@ import { ItemTestDataFlow } from './flows/ItemTestDataFlow';
  * NOTE: still not fixed with esbuild@0.19.5
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
+import { RollDataOptions } from './Types';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -1611,9 +1612,10 @@ export class SR5Item extends Item {
      * 
      * NOTE: We can't override getRollData as this would make use of Promise necessary, however Foundry uses getRollData as a sync method
      */
-    async getTestData(): Promise<any> {
-        // Duplicate to avoid cross-changing actual system data.
+    async getTestData(options:RollDataOptions={}): Promise<any> {
+        // TODO: Check if foundry is actually just passing down this.system. Then duplicate is necessary.
         const rollData = foundry.utils.duplicate(super.getRollData());
+        const test = options.test ?? null;
 
         const actor = this.actorOwner;
         const controller = await actor?.getController();
