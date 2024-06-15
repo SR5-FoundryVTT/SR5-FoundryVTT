@@ -102,9 +102,10 @@ export interface TestData {
     // Documents the test might has been derived from.
     sourceItemUuid?: string
     sourceActorUuid?: string
-    // The document used for values.
-    sourceDocumentUuid?: string
-    sourceDocumentIsActor?: boolean
+
+    // The document test values have been taken from. This can be both actor and item.
+    sourceUuid?: string
+    sourceIsActor?: boolean
 
     // Message the test has been represented with.
     messageUuid?: string
@@ -227,7 +228,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Store given document uuids to be fetched during evaluation.
         data.sourceActorUuid = data.sourceActorUuid || this.actor?.uuid;
         data.sourceItemUuid = data.sourceItemUuid || this.item?.uuid;
-        data.sourceDocumentUuid = data.sourceDocumentUuid || this.source?.uuid;
+        data.sourceUuid = data.sourceUuid || this.source?.uuid;
 
         // @ts-expect-error // Prepare general test information.
         data.title = data.title || this.constructor.label;
@@ -702,10 +703,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Populate the value source document.
-        if (this.data.sourceDocumentUuid) {
-            this.source = await fromUuid(this.data.sourceDocumentUuid) as SR5Actor | SR5Item || undefined;
-            this.data.sourceDocumentIsActor = this.source instanceof SR5Actor;
-            if (this.data.sourceDocumentIsActor) this.actor = this.source as SR5Actor;
+        if (this.data.sourceUuid) {
+            this.source = await fromUuid(this.data.sourceUuid) as SR5Actor | SR5Item || undefined;
+            this.data.sourceIsActor = this.source instanceof SR5Actor;
+            if (this.data.sourceIsActor) this.actor = this.source as SR5Actor;
         }
 
         // Populate targeted token documents.
