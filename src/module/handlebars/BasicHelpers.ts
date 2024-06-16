@@ -199,4 +199,17 @@ export const registerBasicHelpers = () => {
 
         return false;
     });
+
+    /**
+     * Allow to give two values and either use the first or the second.
+     * 
+     * This matches a ?? b behavior.
+     * 
+     * @param a The first value, use this if it's not undefined.
+     * @param v The second value, use this if a is undefined.
+     * @returns the value to use
+     */
+    Handlebars.registerHelper('or', function(a, b) {
+        return a ?? b;
+    });
 };
