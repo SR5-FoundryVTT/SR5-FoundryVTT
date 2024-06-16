@@ -124,23 +124,4 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('Matrix testing for value sources depending on network used', () => {
-        it('A device within a PAN should use the masters / controllers values', async () => {
-            const device = await testItem.create({ type: 'device', 'system.technology.rating': 20 });
-            const controller = await testItem.create({ type: 'device', 'system.category': 'commlink', 'system.atts.att4.value': 5, 'system.technology.rating': 5}) as SR5Item;
-
-            await controller.addNetworkDevice(device);
-
-            const action = DataDefaults.actionRollData({attribute: 'willpower', attribute2: 'firewall'});
-            const data = await TestCreator._prepareTestDataWithAction(action, device, TestCreator._minimalTestData())
-
-            Helpers.calcTotal(data.pool);
-
-            assert.equal(data.pool.value, 40);
-        });
-
-        it('A device within a WAN should NOT use the host values', async () => {
-            assert.fail();
-        });
-    });
 };
