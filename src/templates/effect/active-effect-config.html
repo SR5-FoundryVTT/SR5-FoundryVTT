@@ -2,7 +2,8 @@
 
     <!-- Effect Header -->
     <header class="sheet-header">
-        <img class="effect-icon" src="{{ data.icon }}" data-edit="icon">
+        <img src="{{ data.img }}"/>
+        <!-- <img class="effect-icon" src="{{ data.icon }}" data-edit="icon"> -->
         <h1 class="effect-title">{{ data.name }}</h1>
     </header>
 
@@ -26,15 +27,15 @@
         </div>
 
         <div class="form-group">
-            <label>{{ localize "EFFECT.Icon" }}</label>
+            <label>{{ localize "EFFECT.Image" }}</label>
             <div class="form-fields">
-                {{filePicker target="icon" type="image"}}
-                <input class="image" type="text" name="icon" placeholder="path/image.png" value="{{data.icon}}"/>
+                {{filePicker target="img" type="image"}}
+                <input class="image" type="text" name="img" placeholder="path/image.png" value="{{data.img}}"/>
             </div>
         </div>
 
         <div class="form-group">
-            <label>{{ localize "EFFECT.IconTint" }}</label>
+            <label>{{ localize "EFFECT.Tint" }}</label>
             <div class="form-fields">
                 <input class="color" type="text" name="tint" value="{{data.tint}}"/>
                 <input type="color" value="{{data.tint}}" data-edit="tint"/>
