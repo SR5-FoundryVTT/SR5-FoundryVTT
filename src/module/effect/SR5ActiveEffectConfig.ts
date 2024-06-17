@@ -47,6 +47,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
         data.applyToOptions = this.prepareApplyToOptions();
         data.hasChanges = this.prepareEffectHasChanges();
+        data.isv11 = game.version.startsWith('11.');
 
         return data;
     }
