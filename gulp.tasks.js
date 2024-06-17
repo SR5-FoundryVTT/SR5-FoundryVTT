@@ -58,7 +58,7 @@ async function buildJS() {
  * COPY ASSETS
  */
 async function copyAssets() {
-    gulp.src('public/**/*').pipe(gulp.dest(destFolder));
+    gulp.src('public/**/*', {encoding: false}).pipe(gulp.dest(destFolder));
     gulp.src('src/templates/**/*').pipe(gulp.dest(path.resolve(destFolder, 'templates')));
     gulp.src('src/module/tours/jsons/**/*').pipe(gulp.dest(path.resolve(destFolder, 'tours')));
 }
