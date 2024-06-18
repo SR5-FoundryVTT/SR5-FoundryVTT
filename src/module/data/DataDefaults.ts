@@ -144,6 +144,7 @@ export class DataDefaults {
             mod_description: '',
             damage: this.damageData(),
             modifiers: [],
+            test: '',
             limit: {
                 value: 0,
                 base: 0,

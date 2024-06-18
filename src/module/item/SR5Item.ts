@@ -76,6 +76,8 @@ import { ItemTestDataFlow } from './flows/ItemTestDataFlow';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { RollDataOptions } from './Types';
+import { BruteForceTest } from '../tests/BruteForceTest';
+import { HackOnTheFlyTest } from '../tests/HackOnTheFlyTest';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -1611,6 +1613,10 @@ export class SR5Item extends Item {
      * This roll data can depend upon other actors and items.
      * 
      * NOTE: We can't override getRollData as this would make use of Promise necessary, however Foundry uses getRollData as a sync method
+     *       HOWEVER, this might STILL be good, as getRollData is used to build journal roll values. AND async is only needed for compendium entires
+     *       which we could easily not support.
+     * 
+     * TODO: Refactor this method using the Composition Pattern for each story.
      */
     async getTestData(options:RollDataOptions={}): Promise<any> {
         // TODO: Check if foundry is actually just passing down this.system. Then duplicate is necessary.
@@ -1618,7 +1624,6 @@ export class SR5Item extends Item {
         const test = options.test ?? null;
 
         const actor = this.actorOwner;
-        const controller = await actor?.getController();
 
         const technologyData = this.getTechnologyData();
         if (technologyData && actor) {
@@ -1627,22 +1632,22 @@ export class SR5Item extends Item {
 
         // Is this technology item the controller?
         if (technologyData && actor && this.isEquipped() && this.isDevice) {
-            ItemTestDataFlow.injectOwnerPANMatrixAttributes(actor, rollData);
+            ItemTestDataFlow.injectOwnerRatingsForPAN(actor, rollData);
         }
 
-        // All technology items can be part of a PAN or WAN
+        // Handle devices within a PAN or WAN
         if (technologyData && this.isNetworkDevice ) {
-
-            const controller = await this.networkController();
-            if (!controller) {
+            const master = await this.networkController();
+            if (!master) {
                 ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
                 return rollData;
             }
 
-            switch (controller.type) {
+            switch (master.type) {
                 // CASE PAN
                 case 'device': {
-                    ItemTestDataFlow.injectPANAttributes(controller as unknown as Shadowrun.ShadowrunTechnologyItemData, actor, rollData)
+                    // @ts-expect-error I'm to lazy to type cast this.
+                    ItemTestDataFlow.injectMasterAndOwnerRatingsForPAN(master, actor, rollData, test?.data.directConnection)
                     break;
                 }
 
@@ -1651,6 +1656,10 @@ export class SR5Item extends Item {
                     break;
                 }
             }
+        }
+        // Handle devices outside a PAN or WAN, however with an owner.
+        else if (technologyData && this.actorOwner) {
+            ItemTestDataFlow.injectOwnerRatingsForPAN(this.actorOwner, rollData);
         }
 
         return rollData;

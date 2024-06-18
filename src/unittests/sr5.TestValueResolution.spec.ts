@@ -4,6 +4,7 @@ import { DataDefaults } from '../module/data/DataDefaults';
 import { TestCreator } from '../module/tests/TestCreator';
 import { SR5Actor } from '../module/actor/SR5Actor';
 import { SR5TestingDocuments } from './utils';
+import { BruteForceTest } from '../module/tests/BruteForceTest';
 
 /**
  * Tests handle value resolution based on test context and actor / device type.
@@ -27,12 +28,34 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
     })
 
     /**
+     * Helper method to setup a decker actor with a cyberdeck.
+     */
+    async function createDecker(deckerSystem = {}, deckSystem = {}): Promise<SR5Actor> {
+        const actorSystem = {
+            'attributes.willpower.base': 5,
+            'attributes.logic.base': 5,
+            ...deckerSystem
+        };
+
+        const itemSystem = {
+            'technology.rating': 3,
+            'category': 'cyberdeck',
+            ...deckSystem
+        };
+
+        const decker = await testActor.create({ type: 'character', system: actorSystem });
+        await decker.createEmbeddedDocuments('Item', [{ type: 'device', name: 'test', system: itemSystem }]);
+
+        return decker;
+    }
+
+    /**
      * Matrix related value resolutions based on owner, PAN, WAN, and direct connections.
      */
     describe('Matrix Tests', () => {
         it('Calculate matrix device without owner', async () => {
             // @ts-expect-error
-            const device = new SR5Item({type: 'device', name: 'test', system: {'technology.rating': 3}});
+            const device = new SR5Item({ type: 'device', name: 'test', system: { 'technology.rating': 3 } });
 
             assert.equal(device.system.technology?.rating, 3);
             assert.equal(device.system.attributes?.willpower.value, 3);
@@ -45,8 +68,8 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
         });
 
         it('Calculate matrix device with owner', async () => {
-            const owner = await testActor.create({type: 'character', system: {'attributes.willpower.base': 5}});
-            const devices = await owner.createEmbeddedDocuments('Item', [{type: 'device', name: 'test', system: {'technology.rating': 3}}]);
+            const owner = await testActor.create({ type: 'character', system: { 'attributes.willpower.base': 5 } });
+            const devices = await owner.createEmbeddedDocuments('Item', [{ type: 'device', name: 'test', system: { 'technology.rating': 3 } }]);
             const device = devices[0];
 
             assert.equal(device.system.technology?.rating, 3);
@@ -61,8 +84,8 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             assert.equal(test?.pool.value, 8);
         });
         it('Calculate matrix device inside a PAN', async () => {
-            const master = await testItem.create({type: 'device', system: {'technology.rating': 5, 'category': 'commlink'}}) as SR5Item;
-            const slave = await testItem.create({type: 'equipment', system: {'technology.rating': 3}}) as SR5Item;
+            const master = await testItem.create({ type: 'device', system: { 'technology.rating': 5, 'category': 'commlink' } }) as SR5Item;
+            const slave = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3 } }) as SR5Item;
 
             assert.equal(master.system.technology?.rating, 5);
             assert.equal(slave.system.technology?.rating, 3);
@@ -75,12 +98,41 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             assert.equal(test?.pool.value, 8);
         });
 
-        it('Calculate matrix device with owner and a direct connection', () => {
-            assert.fail();
+        it('Calculate matrix device with an owner', async () => {
+            const owner = await createDecker();
+            const device = owner.items.contents[0];
+
+            // Owner rating is used for mental attributes.
+            const rollData = await device.getTestData();
+            assert.equal(rollData.attributes.willpower.value, 5);
         });
 
-        it('Calculate matrix device inside a PAN with a direct connection', () => {
-            assert.fail();
+        it('Calculate matrix device inside a PAN with a direct connection', async () => {
+            // TODO: Remake with only test mockup data.
+            const decker = await createDecker({ 'skills.active.hacking.base': 5 });
+
+            const action = DataDefaults.actionRollData({ attribute: 'logic', skill: 'hacking', test: 'BruteForceTest' });
+            const test = await TestCreator.fromAction(action, decker) as BruteForceTest;
+
+            const master = await testItem.create({ type: 'device', system: { 'technology.rating': 5, 'category': 'commlink' } }) as SR5Item;
+            const slave = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3 } }) as SR5Item;
+            await master.addNetworkDevice(slave);
+
+            // Assert initial wireless connection.
+            test.data.directConnection = false;
+
+            let rollData = await slave.getTestData({ test });
+
+            // Master rating is used for firewall.
+            assert.equal(rollData.attributes.firewall.value, 5);
+
+            // Assert direct connection.
+            test.data.directConnection = true;
+
+            rollData = await slave.getTestData({ test });
+
+            // Slave rating is used for firewall.
+            assert.equal(rollData.attributes.firewall.value, 3);
         });
 
         it('Calculate matrix device inside a WAN', () => {
