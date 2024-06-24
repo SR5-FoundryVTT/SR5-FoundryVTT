@@ -408,7 +408,7 @@ export class SR5Actor extends Actor {
 
         const uses = Math.min(edge.value, usesLeft + by);
 
-        await this.update({'data.attributes.edge.uses': uses});
+        await this.update({'system.attributes.edge.uses': uses});
     }
 
     getEdge(): Shadowrun.EdgeAttributeField {
