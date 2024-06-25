@@ -236,6 +236,18 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
+     * Determine if this effect is meant to be applied to the actor it's existing on.
+     * 
+     * Some effects are meant to be applied to other actors, and those shouldn't apply or show
+     * on the actor that will cause them.
+     * 
+     * @return true, when the effect is meant to be applied to the actor it's existing on.
+     */
+    get appliesToLocalActor(): boolean {
+        return !['targeted_actor'].includes(this.applyTo);
+    }
+
+    /**
      * Inject features into default FoundryVTT ActiveEffect implementation.
      * 
      * - dynamic source properties as change values
