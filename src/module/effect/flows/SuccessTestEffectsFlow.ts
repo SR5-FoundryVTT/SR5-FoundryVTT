@@ -133,6 +133,12 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         const effectsData = this._collectTargetActorEffectsData();
         if (!effectsData || effectsData.length === 0) return;
 
+        // Inject a flag to mark the effect as applied by a test.
+        // This is necessary so we can differentiate between effects created and applied.
+        for (const effectData of effectsData) {
+            effectData['flags.shadowrun5e.appliedByTest'] = true;
+        }
+
         if (!game.user?.isGM) {
             await this._sendCreateTargetedEffectsSocketMessage(actor, effectsData);
         } else {
@@ -200,7 +206,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         const messageData = {
             content
         };
-        ChatMessage.create(messageData);
+        await ChatMessage.create(messageData);
 
         return effects;
     }
