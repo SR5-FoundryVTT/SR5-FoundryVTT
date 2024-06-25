@@ -193,20 +193,20 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * The all temporary ActiveEffects that should display on the Token
+     * All temporary ActiveEffects that should display on the Token
      * 
-     * The system uses a custom method of ActiveEffect applicable to. Some ActiveEffects don't apply to the actor,
-     * but still should show on it's token.
+     * The shadowrun5e system uses a custom application method with different effect application targets. Some of
+     * these effects exist on the actor or one of it's items, however still shouldn't show in their token.
      * 
      * While default Foundry relies on allApplicableEffects, as it only knows apply-to actor effects, we have to 
      * return all effects that are temporary instead, to include none-actor apply-to effects.
      * 
      * NOTE: Foundry also shows disabled effects by default. We behave the same.
      */
-    // @ts-expect-error NOTE: I don't fully understand the typing here. As typing is done for sy
+    // @ts-expect-error NOTE: I don't fully understand the typing here.
     override get temporaryEffects() {
         // @ts-expect-error // TODO: foundry-vtt-types v10
-        const showEffectIcon = (effect: SR5ActiveEffect) => !effect.disabled && !effect.isSuppressed && effect.isTemporary;
+        const showEffectIcon = (effect: SR5ActiveEffect) => !effect.disabled && !effect.isSuppressed && effect.isTemporary && effect.appliesToLocalActor;
 
         // Collect actor effects.
         let effects = this.effects.filter(showEffectIcon);
