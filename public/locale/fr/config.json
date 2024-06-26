@@ -108,7 +108,6 @@
         "LatestChangelog": "Dernier Changelog",
         "Reason": "La dernière version a été mis à jour!",
         "ReportIssues": "Rapporter les bugs et proposer des changements",
-        "ReportUsingBugReporter": "Vous pouvez aussi utiliser le module 'bug-reporter' pour rapporter des bugs via FoundryVTT sans avoir de compte GitHub!",
         "Title": "Mise à jour Shadowrun5e"
     },
     "SR5.Character": {

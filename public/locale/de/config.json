@@ -197,7 +197,6 @@
         "LatestChangelog": "Aktueller Changelog",
         "Reason": "Du hast die aktuellste Version installiert!",
         "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
-        "ReportUsingBugReporter": "Fehler und mehr können auch über das bug-reporter-Modul direkt aus Foundry und ohne GitHub Konto erstellt werden!",
         "Title": "Shadowrun5e Update"
     },
     "SR5.Character": {
