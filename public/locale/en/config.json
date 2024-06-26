@@ -204,7 +204,6 @@
         "LatestChangelog": "Latest Changelog",
         "Reason": "You've updated to the latest version!",
         "ReportIssues": "Please report bugs and feature requests",
-        "ReportUsingBugReporter": "You can also use the bug-reporter module to report bugs directly from within your Foundry session and without a GitHub account!",
         "Title": "Shadowrun5e Update"
     },
     "SR5.Character": {
