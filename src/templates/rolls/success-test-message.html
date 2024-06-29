@@ -119,19 +119,12 @@
             
         </div>
     </div>
-    {{#if test.usingManualRoll}}
-    <div class="card-main-content">
-        <div class="card-content">* {{localize "SR5.ManualHits"}}</div>
-    </disv>
-    {{/if}}
     <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
-        {{#if (not test.usingManualRoll)}}
-        {{#each test.rolls}}
-            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'
-                roll=this
-            }}
-        {{/each}}
-        {{/if}}
+    {{#each test.rolls}}
+        {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'
+            roll=this
+        }}
+    {{/each}}
     </div>
     {{#if test.targets}}
     <div class="test-line">

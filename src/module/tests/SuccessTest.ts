@@ -64,10 +64,6 @@ export interface TestData {
     threshold: ValueField
     limit: ValueField
 
-    // Hits as reported by an external dice roll.
-    manualHits: ValueField
-    manualGlitches: ValueField
-
     hitsIcon?: IconWithTooltip
     autoSuccess?: boolean
 
@@ -243,10 +239,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.values.extendedHits = data.values.extendedHits || DataDefaults.valueData({ label: "SR5.ExtendedHits" });
         data.values.netHits = data.values.netHits || DataDefaults.valueData({ label: "SR5.NetHits" });
         data.values.glitches = data.values.glitches || DataDefaults.valueData({ label: "SR5.Glitches" });
-
-        // User reported manual hits.
-        data.manualHits = data.manualHits || DataDefaults.valueData({ label: "SR5.ManualHits" });
-        data.manualGlitches = data.manualGlitches || DataDefaults.valueData({ label: "SR5.ManualGlitches" });
 
         data.opposed = data.opposed || undefined;
         data.modifiers = this._prepareModifiersData(data.modifiers);
@@ -626,9 +618,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, { min: 0 });
         this.data.limit.value = Helpers.calcTotal(this.data.limit, { min: 0 });
 
-        this.data.manualHits.value = Helpers.calcTotal(this.data.manualHits, { min: 0 });
-        this.data.manualGlitches.value = Helpers.calcTotal(this.data.manualGlitches, { min: 0 });
-
         // Shows AP on incoming attacks
         this.data.damage.ap.value = Helpers.calcTotal(this.data.damage.ap);
 
@@ -644,13 +633,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
      */
     async evaluate(): Promise<this> {
-        if (!this.usingManualRoll) {
-            // Evaluate all rolls.
-            for (const roll of this.rolls) {
-                // @ts-expect-error // foundry-vtt-types is missing evaluated.
-                if (!roll._evaluated)
-                    await roll.evaluate();
-            }
+        // Evaluate all rolls.
+        for (const roll of this.rolls) {
+            // @ts-expect-error // foundry-vtt-types is missing evaluated.
+            if (!roll._evaluated)
+                await roll.evaluate();
         }
 
         this.data.evaluated = true;
@@ -883,12 +870,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper to get the hits value for this success test with a possible limit.
      */
     calculateHits(): ValueField {
-        // Use manual or automated roll for hits.
-        const rollHits = this.usingManualRoll ?
-            this.manualHits.value :
-            this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
-
         // Sum of all rolls!
+        const rollHits = this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
         this.hits.base = rollHits;
         
         // First, calculate hits based on roll and modifiers.
@@ -906,14 +889,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     get extendedHits(): ValueField {
         // Return a default value field, for when no extended hits have been derived yet (or ever).
         return this.data.values.extendedHits || DataDefaults.valueData({ label: 'SR5.ExtendedHits' });
-    }
-
-    get manualHits(): ValueField {
-        return this.data.manualHits;
-    }
-
-    get manualGlitches(): ValueField {
-        return this.data.manualGlitches;
     }
 
     get hitsIcon(): IconWithTooltip | undefined {
@@ -935,27 +910,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Depending on system settings allow manual hits to skip automated roll.
-     */
-    get allowManualHits(): boolean {
-        return game.settings.get(SYSTEM_NAME, FLAGS.ManualRollOnSuccessTest) as boolean;
-    }
-
-    /**
-     * Determine if this success test must automated roll or can use a manual roll given by user.
-     */
-    get usingManualRoll(): boolean {
-        return this.allowManualHits && (Boolean(this.data.manualHits.override) || Boolean(this.data.manualGlitches.override))
-    }
-
-    /**
      * Helper to get the glitches values for this success test.
      */
     calculateGlitches(): ValueField {
-        // When using a manual roll, don't derive glitches from automated rolls.
-        const rollGlitches = this.usingManualRoll ?
-            this.manualGlitches.value :
-            this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
+        const rollGlitches = this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
 
         const glitches = DataDefaults.valueData({
             label: "SR5.Glitches",

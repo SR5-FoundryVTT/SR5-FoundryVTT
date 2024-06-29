@@ -23,8 +23,6 @@
         "HideGMOnlyChatContent": "Verstecke kritische Informationen bei SL-Proben",
         "HideGMOnlyChatContentDescription": "Nachrichten durch SL-Proben zeigen kritische Informationen nur Spielern mit Besitzer-Rechten für den genutzten Akteur.",
         "IgnoreDiagonal": "Ignoriere diagonale Bewegung (1-1-1)",
-        "ManualRollOnSuccessTest": "Manuelles Würfeln bei Proben",
-        "ManualRollOnSuccessTestDescription": "Erlaubt Benutzern manuelle Würfelwürfe bei Proben und Rückmeldungen von Erfolgen und Patzern.",
         "MarkImportsDescription": "Hervorheben von frisch importierten Einträgen in Akteur-Blättern, um zu verdeutlichen, dass sie überprüft werden sollten.",
         "MarkImportsName": "Markiere frische Importe",
         "MustHaveRessourcesOnTest": "Proben nur mit ausreichenden Ressourcen möglich",
