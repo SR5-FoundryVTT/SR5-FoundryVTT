@@ -907,11 +907,7 @@
                     }
                 },
                 "modifiers": {},
-                "situation_modifiers": {
-                    "environmental": {"active": {}},
-                    "noise": {"active": {}},
-                    "background_count": {"active": {}}
-                },
+                "situation_modifiers": {},
                 "inventories": {
                     "All": {
                         "name": "All",
@@ -986,7 +982,8 @@
                 "matrix": {
                     "hasIcon": true
                 }
-            }
+            }, 
+            "situation_modifiers": {}
         },
         "spirit": {
             "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt"],
