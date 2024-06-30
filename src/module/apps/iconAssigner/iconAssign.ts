@@ -1,7 +1,11 @@
 import { SR5 } from "../../config";
-import {FLAGS, SYSTEM_NAME} from './../../constants';
+import { FLAGS, SYSTEM_NAME } from './../../constants';
 
 export async function getIconFiles(): Promise<string[]> {
+
+    if (!game.user?.can("FILES_BROWSE")) {
+        return []
+    }
 
     // Icon locations
     const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/dist/icons/importer/";

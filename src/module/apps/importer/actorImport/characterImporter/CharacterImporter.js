@@ -1,5 +1,5 @@
-import {CharacterInfoUpdater} from "./CharacterInfoUpdater"
-import {ItemsParser} from "../itemImporter/ItemsParser";
+import { CharacterInfoUpdater } from "./CharacterInfoUpdater"
+import { ItemsParser } from "../itemImporter/ItemsParser";
 import VehicleParser from "../itemImporter/vehicleImport/VehicleParser.ts";
 
 
@@ -48,14 +48,14 @@ export class CharacterImporter {
             .filter(item => item.effects.size == 0)
             .map(item => item.id)
 
-        let deletedItems = actor.deleteEmbeddedDocuments("Item", toDeleteItems );
+        let deletedItems = actor.deleteEmbeddedDocuments("Item", toDeleteItems);
 
         let removed = {
-            'system.skills.language.-=value' : null,
-            'system.skills.knowledge.academic.-=value' : null,
-            'system.skills.knowledge.interests.-=value' : null,
-            'system.skills.knowledge.professional.-=value' : null,
-            'system.skills.knowledge.street.-=value' : null
+            'system.skills.language.-=value': null,
+            'system.skills.knowledge.academic.-=value': null,
+            'system.skills.knowledge.interests.-=value': null,
+            'system.skills.knowledge.professional.-=value': null,
+            'system.skills.knowledge.street.-=value': null
         }
         let removeSkills = actor.update(removed)
 
