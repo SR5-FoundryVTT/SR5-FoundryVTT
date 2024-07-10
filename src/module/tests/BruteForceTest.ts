@@ -1,5 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
+import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
 import { SuccessTest } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
@@ -9,11 +10,11 @@ import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlo
  */
 export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     override actor: SR5Actor;
-
-    // TODO: Is this the target controller in case of PAN?
-    controller: SR5Actor|SR5Item;
-    // TODO: Is this the target icon chosen by the user?
-    icons: (SR5Actor|SR5Item)[];
+    
+    // The icon to place a mark on.
+    // This can be the actor itself or a device connected to it.
+    icon: NetworkDevice;
+    devices: (SR5Item)[];
 
     override _prepareData(data: MatrixPlacementData, options): any {
         data = super._prepareData(data, options);
@@ -28,14 +29,11 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     }
 
     /**
-     * Set a target for this test.
-     * 
-     * TODO: What is the use case for this method?
-     * 
-     * @param uuid The uuid to target for. This can point to an actor or item.
+     * Helper to determine if the targeted icon is an actor or not.
+     * @returns true, for actor. false, for anything else.
      */
-    setTarget(uuid: string) {
-        this.data.iconUuid = uuid;
+    get iconIsActor(): boolean {
+        return this.icon instanceof SR5Actor;
     }
 
     /**
@@ -53,8 +51,6 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
 
     override async prepareDocumentData() {
         await super.prepareDocumentData();
-
-        this._prepareNetworkIcons();
     }
 
     /**
@@ -67,52 +63,54 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     override async populateDocuments() {
         await super.populateDocuments();
 
-        // If no iconUuid has been given, try to use a token target.
-        if (!this.data.iconUuid && this.hasTargets) {
-            if (this.targets.length !== 1) {
-                console.error('Shadowrun 5e | Multiple targets for mark placement', this.targets);
-            } else {
-                const target = this.targets[0];
-                const actor = target.actor as SR5Actor;
-                const controller = await actor.getController();
-                this.data.controllerUuid = controller?.uuid as string;
-                this.data.iconUuid = controller?.uuid ?? target.uuid;
-            }
-        }
-
-        // If a specific controller is given, use this instead.
-        // TODO: What is the use case for this?
-        if (this.data.controllerUuid) {
-            const controller = await fromUuid(this.data.controllerUuid);
-            if (!(controller instanceof SR5Item)) {
-                console.error('Shadowrun 5e | Invalid controller for mark placement', controller);
-                return;
-            }
-
-            this.controller = controller;
-        }
+        this._prepareIcon();
+        this._prepareTargetIcon();
+        this._prepareActorDevices();
     }
 
     /**
-     * Retrieve all icons connected to the controller network
+     * Prepare a icon based on test data.
      * 
-     * TODO: This seems to rely on the main use case of this test to be a targeted actor having a set of network devices.
+     * This can be these cases:
+     * - an icon has been given into the test by outside sources
+     * - an icon has been selected by the user
+     * @returns 
      */
-    _prepareNetworkIcons() {
-        // No controller is used.
-        if (!this.controller) return;
-        // An actor controller can't have a network.
-        if (this.controller instanceof SR5Actor) return;
+    _prepareIcon() {
+        if (!this.data.iconUuid) return;
+
+        // Fetch the icon as selected or given.
+        this.icon = fromUuidSync(this.data.iconUuid) as NetworkDevice;
+
+        // Switch to main icon if user selected it.
+        if (this.data.placeOnMainIcon) this.icon = this.icon.parent as SR5Actor;
+    }
+    /**
+     * Prepare a icon based on token targeting.
+     * 
+     */
+    _prepareTargetIcon() {
+        if (this.data.iconUuid || !this.hasTargets) return;
+        if (this.targets.length !== 1) return console.error('Shadowrun 5e | Multiple targets for mark placement', this.targets);
+
+        const target = this.targets[0];
+        const actor = target.actor as SR5Actor;
+
+        // Retrieve the target icon document.
+        this.icon = fromUuidSync(actor.uuid) as NetworkDevice;
+    }
+
+    /**
+     * Retrieve all devices connected with the persona actor.
+     */
+    _prepareActorDevices() {
+        this.devices = [];
+        if (!this.icon) return;
+        const actor = this.iconIsActor ? this.icon as SR5Actor : this.icon.parent as SR5Actor;
+        if (!actor.isCharacter || !actor.isCritter) return;
 
         // Collect network devices
-        this.icons = this.controller.slaves();
-
-        // Remove possible persona icon from list or pre-select.
-        if (this.data.placeOnController) {
-            this.data.iconUuid = this.data.controllerUuid;
-        } else {
-            this.icons = this.icons.filter((icon) => icon.uuid !== this.data.controllerUuid);
-        }
+        this.devices = actor.wirelessDevices;
     }
 
     /**

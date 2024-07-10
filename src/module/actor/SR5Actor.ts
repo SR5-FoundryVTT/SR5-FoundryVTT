@@ -30,6 +30,7 @@ import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
+import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 
 
 /**
@@ -2032,6 +2033,23 @@ export class SR5Actor extends Actor {
         return this.getMatrixDevice() !== undefined;
     }
 
+    /**
+     * Check if the current actor has a active living persona.
+     * If a technomancer uses a matrix device to connect with, they don't have a living persona!
+     * 
+     * @returns true, when a mancer uses their living persona
+     */
+    get hasLivingPersona(): boolean {
+        return !this.hasDevicePersona && this.isEmerged;
+    }
+
+    /**
+     * Retrieve all matrix devices of this actor that are equipped and set to wireless.
+     */
+    get wirelessDevices(): SR5Item[] {
+        return this.items.filter((item) => item.isMatrixDevice && item.isEquipped() && item.isWireless());
+    }
+
     get matrixData(): Shadowrun.MatrixData | undefined {
         if (!this.isMatrixActor) return;
         // @ts-expect-error // isMatrixActor handles it, TypeScript doesn't know.
@@ -2048,7 +2066,7 @@ export class SR5Actor extends Actor {
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
     async setMarks(target: SR5Actor|SR5Item|undefined, marks: number, options: { overwrite?: boolean } = {}) {
-        await ActorMarksFlow.setMarks(this, target, marks, options)
+        await ActorMarksFlow.setMarks(this, target, marks, options);
     }
 
     /**
@@ -2105,15 +2123,17 @@ export class SR5Actor extends Actor {
      * 
      * @returns Either the controller icon or this actor, when uuid links are broken.
      */
-    async getController(): Promise<SR5Item|undefined> {
+    async getMarkDevice(): Promise<NetworkDevice|undefined> {
         // CASE 1 - WAN: IC to Host network
         if (this.isIC() && this.hasHost()) {
             return await this.getICHost();
         }
-        // CASE 2 - PAN: Device to Controller network
+        // CASE 2 - PAN
         if (this.isMatrixActor && this.hasMaster) {
-            return this.items.find((item) => item.isEquipped() && item.isDevice);
+            return this.master;
         }
+        // CASE 3 - No network
+        return this;
     }
 
     /**
@@ -2124,12 +2144,23 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * #TODO: Matrix. What is this method actually for?
+     * Get the master device of this matrix actor.
+     * 
+     * This applies only to actors that act as matrix devices (vehicles).
+     */
+    get master(): SR5Item|undefined {
+        const masterUuid = this.getMasterUuid();
+        if (!masterUuid) return;
+        return fromUuidSync(masterUuid) as SR5Item;
+    }
+
+    /**
+     * Retrieve all documents this actor has a mark placed on, directly or indirectly.
      */
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
-        const controller = await this.getController();
-        if (!controller) return [];
-        const marks = controller.getAllMarks();
+        const marksDevice = await this.getMarkDevice();
+        if (!marksDevice) return [];
+        const marks = marksDevice.getAllMarks();
         if (!marks) return [];
 
         return await ActorMarksFlow.getMarkedDocuments(marks);

@@ -1568,6 +1568,10 @@ export class SR5Item extends Item {
      * Assume all items with that are technology (therefore have a rating) are active matrix devices.
      */
     get canBeSlave(): boolean {
+        return this.isMatrixDevice;
+    }
+
+    get isMatrixDevice(): boolean {
         const technologyData = this.getTechnologyData();
         return !!technologyData;
     }

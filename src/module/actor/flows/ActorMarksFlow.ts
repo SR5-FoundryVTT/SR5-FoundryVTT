@@ -49,6 +49,12 @@ export const ActorMarksFlow = {
             return;
         }
 
+        if (decker.hasLivingPersona) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
+            console.error(`Shadowrun 5e| Technomancers can't place marks without using a matrix device.`);
+            return;
+        }
+
         // CASES - TARGET IS AN ACTOR.
 
         // Abort for non-matrix actors

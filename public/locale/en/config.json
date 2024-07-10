@@ -611,7 +611,8 @@
             "OpenInventory": "Inventory"
         },
         "MarkPlacement": {
-            "PlaceOnMainIcon": "Place on persona/host"
+            "PlaceOnMainIcon": "Place on persona/host",
+            "PlaceOnDevice": "Place on device"
         },
         "Message": {
             "ClickToSelect": "Click to select on scene",

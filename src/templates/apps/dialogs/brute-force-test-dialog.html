@@ -24,14 +24,14 @@
             {{/if}}
             <div class="form-group">
                 <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnMainIcon"}}</label>
-                <input type="checkbox" class="checkbox" name="test.data.placeOnController" {{checked test.data.placeOnController}}/>
+                <input type="checkbox" class="checkbox" name="test.data.placeOnMainIcon" {{checked test.data.placeOnMainIcon}}/>
             </div>
-            {{#ife test.data.placeOnController false}}
+            {{#ife test.data.placeOnMainIcon false}}
             <div class="form-group">
-                <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnMainIcon"}}</label>
+                <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnDevice"}}</label>
                 <select name="test.data.iconUuid" class="display">
                     {{#select test.data.iconUuid}}
-                    {{#each test.icons}}
+                    {{#each test.devices}}
                     <option value="{{this.uuid}}">{{this.name}}</option>
                     {{/each}}
                     {{/select}}

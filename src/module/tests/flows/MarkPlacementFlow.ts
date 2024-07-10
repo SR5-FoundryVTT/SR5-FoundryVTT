@@ -17,7 +17,7 @@ export interface MatrixPlacementData extends SuccessTestData {
     // The uuid of the target actor / device / host.
     iconUuid: string
     // Should the mark be placed on the main icon / persona or icons connected to it?
-    placeOnController: boolean
+    placeOnMainIcon: boolean
 }
 
 export interface OpposeMarkPlacementData extends OpposedTestData {
@@ -41,7 +41,7 @@ export const MarkPlacementFlow = {
         data.iconUuid = data.iconUuid ?? undefined;
         // By default a decker can place marks either on the main icon or its connected icon.
         // This can be a persona or device relationship or a host and its devices.
-        data.placeOnController = data.placeOnController ?? true;
+        data.placeOnMainIcon = data.placeOnMainIcon ?? true;
 
         return data;
     },
