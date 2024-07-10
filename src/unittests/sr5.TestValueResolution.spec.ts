@@ -135,13 +135,27 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             assert.equal(rollData.attributes.firewall.value, 3);
         });
 
-        it('Calculate matrix device inside a WAN', () => {
-            assert.fail();
+        it('Calculate matrix device inside a WAN without a direct connection', async () => {
+            const host = await testItem.create({ type: 'device', system: { 'technology.rating': 5, 'category': 'host' } }) as SR5Item;
+            const device = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3, 'technology.networkController': host.uuid } }) as SR5Item;
+
+            const rollData = device.getRollData();
+
+            assert.equal(rollData.attributes.firewall.value, 5);
         });
 
-        it('Calculate Decker in foundation', () => {
-            assert.fail();
+        it('Calculate matrix device inside a WAN with a direct connection', async () => {
+            const host = await testItem.create({ type: 'device', system: { 'technology.rating': 5, 'category': 'host' } }) as SR5Item;
+            const device = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3, 'technology.networkController': host.uuid } }) as SR5Item;
+
+            const test = {data: {directConnection: true}};
+            // @ts-expect-error Mockup.
+            const rollData = device.getRollData({test});
+
+            assert.equal(rollData.attributes.firewall.value, 3);
         });
+
+        it('Calculate Decker in foundation');
 
         // describe('Matrix testing for value sources depending on network used', () => {
         //     it('A device within a PAN should use the masters / controllers values', async () => {

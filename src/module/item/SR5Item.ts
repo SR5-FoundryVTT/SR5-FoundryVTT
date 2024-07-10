@@ -1641,20 +1641,10 @@ export class SR5Item extends Item {
                 ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
                 return rollData;
             }
-
-            switch (master.type) {
-                // CASE PAN
-                case 'device': {
-                    // @ts-expect-error I'm to lazy to type cast this.
-                    ItemTestDataFlow.injectMasterAndOwnerRatingsForPAN(master, actor, rollData, test?.data.directConnection)
-                    break;
-                }
-
-                // CASE AN
-                case 'host': {
-                    break;
-                }
-            }
+            
+            // @ts-expect-error No idea how to improve testing to be more specific with SuccessTest sub types.
+            const directConnection = test?.data.directConnection ?? false;;
+            ItemTestDataFlow.injectMasterAndOwnerRatingsForPAN(master, actor, rollData, directConnection)
         }
         // Handle devices outside a PAN or WAN, however with an owner.
         else if (technologyData && this.actorOwner) {

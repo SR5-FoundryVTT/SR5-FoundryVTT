@@ -24,9 +24,7 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
     })
 
     describe('Network Devices handling', () => {
-        it('Handle PAN/WAN networks and device linking', () => {
-            assert.fail('Test suite is deactivated');
-        })
+        it('Handle PAN/WAN networks and device linking');
         // TODO: Redesign them with only necessary update methods in place. Instead start of with ActorData prefilled on create.
         // it('give a network link to given document class', async () => {
         //     const actor = await testActor.create({'type': 'character'});

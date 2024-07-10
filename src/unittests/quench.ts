@@ -124,7 +124,7 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.tests_attack', shadowrunAttackTesting, {
         displayName: 'SHADOWRUN5e: Attack Test',
     });
-    quench.registerBatch('shadowrun5e.flow.tests', shadowrunTestValueResolution, { displayName: 'SHADOWRUN5e: Test Value Resolution' });
+    quench.registerBatch('shadowrun5e.flow.test_value_resolution', shadowrunTestValueResolution, { displayName: 'SHADOWRUN5e: Test Value Resolution' });
     quench.registerBatch('shadowrun5e.flow.tests_matrix', shadowrunMatrixTesting, { displayName: 'SHADOWRUN5e: Matrix Test' });
     quench.registerBatch('shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
 

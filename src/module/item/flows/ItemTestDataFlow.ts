@@ -2,6 +2,7 @@ import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5 } from "../../config";
 import { BruteForceTest } from "../../tests/BruteForceTest";
 import { HackOnTheFlyTest } from "../../tests/HackOnTheFlyTest";
+import { SR5Item } from "../SR5Item";
 
 /**
  * Handle value retrieval for SR5Item test data values.
@@ -51,11 +52,11 @@ export const ItemTestDataFlow = {
      * @param testData The test data to be altered
      * @param directConnection true, a direct connection has been made. false, a wire-less connection is used.
      */
-    injectMasterAndOwnerRatingsForPAN: (master: Shadowrun.ShadowrunTechnologyItemData, owner: SR5Actor | undefined, testData: Shadowrun.ShadowrunItemDataData, directConnection?: Boolean) => {
+    injectMasterAndOwnerRatingsForPAN: (master: SR5Item, owner: SR5Actor | undefined, testData: Shadowrun.ShadowrunItemDataData, directConnection?: boolean) => {
         // As per SR5#233, slaved devices can't use the masters ratings.
         if (directConnection) return;
 
-        const attributes = master.system.attributes;
+        const attributes = master.system.attributes as Shadowrun.AttributesData;
 
         const injectAttributes = ['data_processing', 'firewall', 'rating'];
         ItemTestDataFlow._injectAttributes(injectAttributes, attributes, testData, { bigger: true });
