@@ -79,7 +79,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
         it('Target a host device and place a mark on it and the host', async () => {
             const host = await testItem.create({ type: 'host', 'system.rating': 1 }) as SR5Item;
             const device = await testItem.create({ type: 'device' });
-            await host.addNetworkDevice(device);
+            await host.addSlave(device);
 
             const decker = await testActor.create({ type: 'character' }) as SR5Actor;
 
@@ -110,7 +110,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
             const controller = await testItem.create({ type: 'device', 'system.category': 'commlink' }) as SR5Item;
             const decker = await testActor.create({ type: 'character' }) as SR5Actor;
 
-            await controller.addNetworkDevice(device);
+            await controller.addSlave(device);
             await decker.setMarks(device, 1);
 
             const marks = decker.getAllMarks(); 

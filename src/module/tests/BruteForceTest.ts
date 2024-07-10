@@ -105,7 +105,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
         if (this.controller instanceof SR5Actor) return;
 
         // Collect network devices
-        this.icons = this.controller.networkDevices();
+        this.icons = this.controller.slaves();
 
         // Remove possible persona icon from list or pre-select.
         if (this.data.placeOnController) {

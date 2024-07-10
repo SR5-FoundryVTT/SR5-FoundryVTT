@@ -1,3 +1,4 @@
+import { NetworkDevice } from "../../item/flows/MatrixNetworkFlow";
 import { SR5Item } from "../../item/SR5Item";
 import { MatrixRules } from "../../rules/MatrixRules";
 import { SR5Actor } from "../SR5Actor";
@@ -17,7 +18,7 @@ export const ActorMarksFlow = {
      * @param marks 
      * @param options 
      */
-    async setMarks(decker: SR5Actor, target: SR5Actor|SR5Item|undefined, marks: number, options: { overwrite?: boolean } = {}) {
+    async setMarks(decker: SR5Actor, target: NetworkDevice|undefined, marks: number, options: { overwrite?: boolean } = {}) {
         // Avoid dirty input by breaking early.
         if (!target) {
             return;
@@ -77,8 +78,8 @@ export const ActorMarksFlow = {
         // CASES - TARGET IS AN ITEM
 
         // If the targeted devices is within a WAN, place mark on the host as well.
-        if (target instanceof SR5Item && target.isNetworkDevice) {
-            const host = target.networkController();
+        if (target instanceof SR5Item && target.isSlave) {
+            const host = target.master();
             await decker.setMarks(host, marks, options);
         }
 

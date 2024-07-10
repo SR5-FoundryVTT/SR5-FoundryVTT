@@ -7,7 +7,7 @@ import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
 import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
-import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
+import { NetworkDevice, MatrixNetworkFlow } from "./flows/MatrixNetworkFlow";
 import { HostPrep } from "./prep/HostPrep";
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
@@ -705,11 +705,11 @@ export class SR5Item extends Item {
      * 
      * @returns true, when item is part of any network, false if not.
      */
-    get isNetworkDevice(): boolean {
+    get isSlave(): boolean {
         const technology = this.getTechnologyData();
         if (!technology) return false;
 
-        return !!technology.networkController;
+        return !!technology.master;
     }
 
     /**
@@ -982,12 +982,12 @@ export class SR5Item extends Item {
         return this.wrapper.getTechnology();
     }
 
-    getNetworkControllerUuid(): string|undefined {
-        return this.getTechnologyData()?.networkController;
+    getMasterUuid(): string|undefined {
+        return this.getTechnologyData()?.master;
     }
 
-    async setNetworkControllerUuid(networkController: string|undefined): Promise<void> {
-        await this.update({ 'system.technology.networkController': networkController });
+    async setMasterUuid(masterUuid: string|undefined): Promise<void> {
+        await this.update({ 'system.technology.master': masterUuid });
     }
 
     getRange(): CritterPowerRange | SpellRange | RangeWeaponData | undefined {
@@ -1202,7 +1202,7 @@ export class SR5Item extends Item {
         }
     }
 
-    asController(): HostItemData | DeviceItemData | undefined {
+    asMaster(): HostItemData | DeviceItemData | undefined {
         return this.asHost || this.asDevice || undefined;
     }
 
@@ -1502,35 +1502,27 @@ export class SR5Item extends Item {
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
      * @param target The matrix item to be connected.
      */
-    async addNetworkDevice(target: SR5Item|SR5Actor) {
+    async addSlave(target: NetworkDevice) {
         // TODO: Add IC actor to WAN network
-        // TODO: setup networkController link on networked devices.
-        await NetworkDeviceFlow.addDeviceToNetwork(this, target);
+        // TODO: setup master link on networked devices.
+        await MatrixNetworkFlow.addSlave(this, target);
     }
 
-    /**
-     * Alias method for addNetworkDevice, both do the same.
-     * @param target
-     */
-    async addNetworkController(target: SR5Item) {
-        await this.addNetworkDevice(target);
-    }
-
-    async removeNetworkDevice(index: number) {
-        const controllerData = this.asController();
-        if (!controllerData) return;
+    async removeSlave(index: number) {
+        const masterData = this.asMaster();
+        if (!masterData) return;
 
         // Convert the index to a device link.
-        if (controllerData.system.networkDevices[index] === undefined) return;
-        const networkDeviceLink = controllerData.system.networkDevices[index];
-        await NetworkDeviceFlow.removeDeviceLinkFromNetwork(this, networkDeviceLink);
+        if (masterData.system.slaves[index] === undefined) return;
+        const slaveLink = masterData.system.slaves[index];
+        await MatrixNetworkFlow.removeSlaveFromNetwork(this, slaveLink);
     }
 
-    async removeAllNetworkDevices() {
-        const controllerData = this.asController();
-        if (!controllerData) return;
+    async removeAllSlaves() {
+        const masterData = this.asMaster();
+        if (!masterData) return;
 
-        await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
+        await MatrixNetworkFlow.removeAllSlaves(this);
     }
 
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
@@ -1543,37 +1535,39 @@ export class SR5Item extends Item {
     }
 
     /**
-     * Return the network controller item when connected to a PAN or WAN.
+     * Return the network master item when connected to a PAN or WAN.
+     * 
+     * @returns The master item or undefined if not connected to a network.
      */
-    networkController() {
+    master() {
         const technologyData = this.getTechnologyData();
         if (!technologyData) return;
-        if (!technologyData.networkController) return;
+        if (!technologyData.master) return;
 
-        return NetworkDeviceFlow.resolveLink(technologyData.networkController) as unknown as SR5Item;
+        return MatrixNetworkFlow.resolveItemLink(technologyData.master);
     }
 
     /**
      * Return all network device items within a possible PAN or WAN.
      */
-    networkDevices() {
-        const controller = this.asDevice || this.asHost;
-        if (!controller) return [];
+    slaves() {
+        const master = this.asDevice || this.asHost;
+        if (!master) return [];
 
-        return NetworkDeviceFlow.getNetworkDevices(this);
+        return MatrixNetworkFlow.getSlaves(this);
     }
 
     /**
      * Only devices can control a network.
      */
-    get canBeNetworkController(): boolean {
+    get canBeMaster(): boolean {
         return this.isDevice || this.isHost;
     }
 
     /**
      * Assume all items with that are technology (therefore have a rating) are active matrix devices.
      */
-    get canBeNetworkDevice(): boolean {
+    get canBeSlave(): boolean {
         const technologyData = this.getTechnologyData();
         return !!technologyData;
     }
@@ -1582,8 +1576,8 @@ export class SR5Item extends Item {
      * Disconnect any kind of item from a PAN or WAN.
      */
     async disconnectFromNetwork() {
-        if (this.canBeNetworkController) await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
-        if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
+        if (this.canBeMaster) await MatrixNetworkFlow.removeAllSlaves(this);
+        if (this.canBeSlave) await MatrixNetworkFlow.removeSlaveFromMaster(this);
     }
 
 
@@ -1629,14 +1623,14 @@ export class SR5Item extends Item {
             ItemTestDataFlow.injectOwnerMentalAttributes(actor, rollData);
         }
 
-        // Is this technology item the controller?
+        // Check for owned matrix devices.
         if (technologyData && actor && this.isEquipped() && this.isDevice) {
             ItemTestDataFlow.injectOwnerRatingsForPAN(actor, rollData);
         }
 
         // Handle devices within a PAN or WAN
-        if (technologyData && this.isNetworkDevice ) {
-            const master = this.networkController();
+        if (technologyData && this.isSlave ) {
+            const master = this.master();
             if (!master) {
                 ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
                 return rollData;

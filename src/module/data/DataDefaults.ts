@@ -346,7 +346,7 @@ export class DataDefaults {
                 max: 0,
             },
             wireless: true,
-            networkController: undefined
+            master: undefined
         }, partialTechnologyData) as Shadowrun.TechnologyData;
     }
 

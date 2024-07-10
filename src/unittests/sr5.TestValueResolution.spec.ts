@@ -90,7 +90,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             assert.equal(master.system.technology?.rating, 5);
             assert.equal(slave.system.technology?.rating, 3);
 
-            await master.addNetworkDevice(slave);
+            await master.addSlave(slave);
 
             const action = DataDefaults.actionRollData({ attribute: 'willpower', attribute2: 'firewall' });
             const test = await TestCreator.fromAction(action, slave);
@@ -116,7 +116,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
 
             const master = await testItem.create({ type: 'device', system: { 'technology.rating': 5, 'category': 'commlink' } }) as SR5Item;
             const slave = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3 } }) as SR5Item;
-            await master.addNetworkDevice(slave);
+            await master.addSlave(slave);
 
             // Assert initial wireless connection.
             test.data.directConnection = false;
@@ -137,7 +137,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
 
         it('Calculate matrix device inside a WAN without a direct connection', async () => {
             const host = await testItem.create({ type: 'device', system: { 'technology.rating': 5, 'category': 'host' } }) as SR5Item;
-            const device = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3, 'technology.networkController': host.uuid } }) as SR5Item;
+            const device = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3, 'technology.master': host.uuid } }) as SR5Item;
 
             const rollData = device.getRollData();
 
@@ -146,7 +146,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
 
         it('Calculate matrix device inside a WAN with a direct connection', async () => {
             const host = await testItem.create({ type: 'device', system: { 'technology.rating': 5, 'category': 'host' } }) as SR5Item;
-            const device = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3, 'technology.networkController': host.uuid } }) as SR5Item;
+            const device = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3, 'technology.master': host.uuid } }) as SR5Item;
 
             const test = {data: {directConnection: true}};
             // @ts-expect-error Mockup.

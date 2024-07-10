@@ -2,11 +2,11 @@ import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5Actor} from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
-import { NetworkDeviceFlow } from '../../item/flows/NetworkDeviceFlow';
+import { MatrixNetworkFlow } from '../../item/flows/MatrixNetworkFlow';
 
 interface VehicleSheetDataFields {
     driver: SR5Actor|undefined
-    networkController: SR5Item | undefined
+    master: SR5Item | undefined
 }
 
 interface VehicleActorSheetData extends SR5ActorSheetData {
@@ -98,12 +98,12 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     _prepareVehicleFields(): VehicleSheetDataFields {
         const driver = this.actor.getVehicleDriver();
 
-        const networkControllerLink = this.actor.getNetworkControllerUuid();
-        const networkController = networkControllerLink ? NetworkDeviceFlow.resolveItemLink(networkControllerLink) : undefined;
+        const masterLink = this.actor.getMasterUuid();
+        const master = masterLink ? MatrixNetworkFlow.resolveItemLink(masterLink) : undefined;
 
         return {
             driver,
-            networkController,
+            master,
         };
     }
 
@@ -128,6 +128,6 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     async _onControllerRemove(event) {
         event.preventDefault();
 
-        await NetworkDeviceFlow.removeDeviceFromController(this.actor);
+        await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
     }
 }

@@ -60,8 +60,8 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Host Item.
     markedDocuments: Shadowrun.MarkedDocument[]
-    networkDevices: (SR5Item | SR5Actor)[]
-    networkController: SR5Item | undefined
+    slaves: (SR5Item | SR5Actor)[]
+    master: SR5Item | undefined
 
     // Action Items. (not only type = action)
     //@ts-expect-error
@@ -200,12 +200,12 @@ export class SR5ItemSheet extends ItemSheet {
             data['markedDocuments'] = await this.item.getAllMarkedDocuments();
         }
 
-        if (this.item.canBeNetworkController) {
-            data['networkDevices'] = this.item.networkDevices();
+        if (this.item.canBeMaster) {
+            data['slaves'] = this.item.slaves();
         }
 
-        if (this.item.canBeNetworkDevice) {
-            data['networkController'] = this.item.networkController();
+        if (this.item.canBeSlave) {
+            data['master'] = this.item.master();
         }
 
         // Provide action parts with all test variants.
@@ -262,13 +262,6 @@ export class SR5ItemSheet extends ItemSheet {
         return ActionFlow.sortedActiveSkills(this.item.actorOwner, this.document.system.action?.skill);
     }
 
-    _getNetworkDevices(): SR5Item[] {
-        // return NetworkDeviceFlow.getNetworkDevices(this.item);
-        return [];
-    }
-
-    /* -------------------------------------------- */
-
     /**
      * Activate event listeners using the prepared sheet HTML
      * @param html -  The prepared HTML object ready to be rendered into the DOM
@@ -315,8 +308,8 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
 
-        html.find('.network-clear').on('click', this._onRemoveAllNetworkDevices.bind(this));
-        html.find('.network-device-remove').on('click', this._onRemoveNetworkDevice.bind(this));
+        html.find('.network-clear').on('click', this._onRemoveAllSlaves.bind(this));
+        html.find('.network-device-remove').on('click', this._onRemoveSlave.bind(this));
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
@@ -379,20 +372,22 @@ export class SR5ItemSheet extends ItemSheet {
         if (this.item.isHost && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid);
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-            return await this.item.addIC(actor.id, data.pack);
+            await this.item.addIC(actor.id, data.pack);
+            return;
         }
 
         // Add items to a network (PAN/WAN).
-        if (this.item.canBeNetworkController && data.type === 'Item') {
+        if (this.item.canBeMaster && data.type === 'Item') {
             const item = await fromUuid(data.uuid) as SR5Item;
 
             if (!item || !item.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
 
-            return await this.item.addNetworkDevice(item);
+            await this.item.addSlave(item);
+            return;
         }
 
         // Add vehicles to a network (PAN/WAN).
-        if (this.item.canBeNetworkController && data.type === 'Actor') {
+        if (this.item.canBeMaster && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid) as SR5Actor;
 
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
@@ -401,7 +396,8 @@ export class SR5ItemSheet extends ItemSheet {
                 return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
             }
 
-            return await this.item.addNetworkDevice(actor);
+            await this.item.addSlave(actor);
+            return;
         }
     }
 
@@ -564,24 +560,24 @@ export class SR5ItemSheet extends ItemSheet {
         await this.item.deleteOwnedItem(this._eventId(event));
     }
 
-    async _onRemoveAllNetworkDevices(event) {
+    async _onRemoveAllSlaves(event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.item.removeAllNetworkDevices();
+        await this.item.removeAllSlaves();
     }
 
-    async _onRemoveNetworkDevice(event) {
+    async _onRemoveSlave(event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const networkDeviceIndex = Helpers.parseInputToNumber(event.currentTarget.closest('.list-item').dataset.listItemIndex);
+        const slaveIndex = Helpers.parseInputToNumber(event.currentTarget.closest('.list-item').dataset.listItemIndex);
 
-        await this.item.removeNetworkDevice(networkDeviceIndex);
+        await this.item.removeSlave(slaveIndex);
     }
 
     /**
@@ -764,7 +760,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onOpenOriginLink(event) {
         event.preventDefault();
 
-        console.log('Shadowrun 5e | Opening PAN/WAN network controller');
+        console.log('Shadowrun 5e | Opening PAN/WAN master');
 
         const originLink = event.currentTarget.dataset.originLink;
         const device = await fromUuid(originLink);

@@ -1044,6 +1044,7 @@
             "isDrone": false,
             "isOffRoad": false,
             "driver": "",
+            "master": "",
             "modificationCategories": {
                 "body": 0,
                 "power_train": 0,
@@ -1272,7 +1273,7 @@
                         "max": 9
                     },
                     "wireless": true,
-                    "networkController": null
+                    "master": ""
                 }
             },
             "action": {
@@ -1397,7 +1398,7 @@
                         "editable": true
                     }
                 },
-                "networkDevices": []
+                "slaves": []
             },
             "importFlags": {
                 "importFlags": {

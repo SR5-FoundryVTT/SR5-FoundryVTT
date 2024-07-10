@@ -56,7 +56,7 @@ import { OpposedBruteForceTest } from './tests/OpposedBruteForceTest';
 import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
-import { NetworkDeviceFlow } from './item/flows/NetworkDeviceFlow';
+import { MatrixNetworkFlow } from './item/flows/MatrixNetworkFlow';
 import { registerSystemKeybindings } from './keybindings';
 import { SkillTest } from './tests/SkillTest';
 
@@ -467,7 +467,7 @@ ___________________
     }
 
     static async removeDeletedItemsFromNetworks(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
-        await NetworkDeviceFlow.handleOnDeleteItem(item, data, id);
+        await MatrixNetworkFlow.handleOnDeleteItem(item, data, id);
     }
 
     /**
@@ -479,7 +479,7 @@ ___________________
         if (!game.socket || !game.user) return;
         console.log('Registering Shadowrun5e system socket messages...');
         const hooks: Shadowrun.SocketMessageHooks = {
-            [FLAGS.addNetworkController]: [NetworkDeviceFlow._handleAddNetworkControllerSocketMessage],
+            [FLAGS.addNetworkMaster]: [MatrixNetworkFlow._handleAddMasterSocketMessage],
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
             [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage],

@@ -38,7 +38,7 @@ export const FLAGS = {
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
     DoNewActionPhase: 'doNewActionPhase',
-    addNetworkController: 'addNetworkController',
+    addNetworkMaster: 'addNetworkMaster',
     TokenHealthBars: 'tokenHealthBars',
     Test: 'TestData',
     HideGMOnlyChatContent: 'HideGMOnlyChatContent',

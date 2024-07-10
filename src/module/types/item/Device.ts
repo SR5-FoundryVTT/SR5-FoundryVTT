@@ -14,7 +14,7 @@ declare namespace Shadowrun {
     export interface DevicePartData {
         category: DeviceCategory
         atts: MatrixAttributes
-        networkDevices: string[]
+        slaves: string[]
     }
 
     export interface DeviceAttribute {
@@ -24,14 +24,5 @@ declare namespace Shadowrun {
         att: MatrixAttribute;
         // Is used to determine if a device attribute should be editable on the sheet.
         editable: boolean
-    }
-
-    // PAN / WAN networking
-    export type NetworkDeviceType = 'Token' | 'Actor' | 'Host';
-    export interface NetworkDeviceLink {
-        sceneId: string|undefined,
-        ownerId: string|undefined,
-        targetId: string,
-        type: NetworkDeviceType
     }
 }

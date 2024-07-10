@@ -12,7 +12,8 @@ declare namespace Shadowrun {
         conceal: ModifiableValue
         condition_monitor: ConditionData
         wireless: boolean
-        networkController: string
+        // Network PAN/WAN master device uuid
+        master: string
     };
 
 }

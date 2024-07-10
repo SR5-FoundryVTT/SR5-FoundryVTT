@@ -626,19 +626,19 @@ export class SR5Actor extends Actor {
         return this.system.skills.active;
     }
 
-    getNetworkControllerUuid(): string|undefined {
+    getMasterUuid(): string|undefined {
         if(!this.isVehicle()) return;
 
-        return this.asVehicle()?.system?.networkController;
+        return this.asVehicle()?.system?.master;
     }
 
-    async setNetworkControllerUuid(networkController: string|undefined): Promise<void> {
+    async setMasterUuid(masterLink: string|undefined): Promise<void> {
         if(!this.isVehicle()) return;
 
-        await this.update({ 'system.networkController': networkController });
+        await this.update({ 'system.master': masterLink });
     }
 
-    get canBeNetworkDevice(): boolean {
+    get canBeSlave(): boolean {
         return this.isVehicle();
     }
 
@@ -2094,12 +2094,14 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Return the actor or item that is the network controller of this actor.
+     * Return the item that is the network master of this actor.
      * These cases are possible:
      * - IC with a host connected will provide the host item
      * - IC without a host will provide itself
      * - A matrix actor within a PAN will provide the controlling actor
      * - A matrix actor without a PAN will provide itself
+     * 
+     * TODO: Check this method if it's used as a catch all 'get persona device' making it actually return SR5Actor and SR5Item
      * 
      * @returns Either the controller icon or this actor, when uuid links are broken.
      */
@@ -2109,16 +2111,16 @@ export class SR5Actor extends Actor {
             return await this.getICHost();
         }
         // CASE 2 - PAN: Device to Controller network
-        if (this.isMatrixActor && this.hasController) {
+        if (this.isMatrixActor && this.hasMaster) {
             return this.items.find((item) => item.isEquipped() && item.isDevice);
         }
     }
 
     /**
-     * Check if an active matrix device is equipped.
+     * Check if this actor is part of a Matrix network as a slave.
      */
-    get hasController(): boolean {
-        return !!this.items.find((item) => item.isEquipped() && item.isDevice);
+    get hasMaster(): boolean {
+        return this.canBeSlave && !!this.getMasterUuid();
     }
 
     /**
