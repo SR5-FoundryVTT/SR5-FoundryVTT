@@ -78,7 +78,7 @@ export const ActorMarksFlow = {
 
         // If the targeted devices is within a WAN, place mark on the host as well.
         if (target instanceof SR5Item && target.isNetworkDevice) {
-            const host = await target.networkController();
+            const host = target.networkController();
             await decker.setMarks(host, marks, options);
         }
 

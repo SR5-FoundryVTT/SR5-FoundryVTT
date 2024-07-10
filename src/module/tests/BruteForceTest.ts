@@ -54,7 +54,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     override async prepareDocumentData() {
         await super.prepareDocumentData();
 
-        await this._prepareNetworkIcons();
+        this._prepareNetworkIcons();
     }
 
     /**
@@ -98,14 +98,14 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
      * 
      * TODO: This seems to rely on the main use case of this test to be a targeted actor having a set of network devices.
      */
-    async _prepareNetworkIcons() {
+    _prepareNetworkIcons() {
         // No controller is used.
         if (!this.controller) return;
         // An actor controller can't have a network.
         if (this.controller instanceof SR5Actor) return;
 
         // Collect network devices
-        this.icons = await this.controller.networkDevices();
+        this.icons = this.controller.networkDevices();
 
         // Remove possible persona icon from list or pre-select.
         if (this.data.placeOnController) {

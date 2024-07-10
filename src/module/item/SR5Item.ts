@@ -1545,22 +1545,22 @@ export class SR5Item extends Item {
     /**
      * Return the network controller item when connected to a PAN or WAN.
      */
-    async networkController() {
+    networkController() {
         const technologyData = this.getTechnologyData();
         if (!technologyData) return;
         if (!technologyData.networkController) return;
 
-        return await NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
+        return NetworkDeviceFlow.resolveLink(technologyData.networkController) as unknown as SR5Item;
     }
 
     /**
      * Return all network device items within a possible PAN or WAN.
      */
-    async networkDevices() {
+    networkDevices() {
         const controller = this.asDevice || this.asHost;
         if (!controller) return [];
 
-        return await NetworkDeviceFlow.getNetworkDevices(this);
+        return NetworkDeviceFlow.getNetworkDevices(this);
     }
 
     /**
@@ -1612,13 +1612,12 @@ export class SR5Item extends Item {
      * 
      * This roll data can depend upon other actors and items.
      * 
-     * NOTE: We can't override getRollData as this would make use of Promise necessary, however Foundry uses getRollData as a sync method
-     *       HOWEVER, this might STILL be good, as getRollData is used to build journal roll values. AND async is only needed for compendium entires
-     *       which we could easily not support.
+     * NOTE: Since getRollData is sync by default, we can't retrieve compendium documents here, resulting in fromUuidSync calls down
+     *       the line.
      * 
      * TODO: Refactor this method using the Composition Pattern for each story.
      */
-    async getTestData(options:RollDataOptions={}): Promise<any> {
+    override getRollData(options: RollDataOptions={}): any {
         // TODO: Check if foundry is actually just passing down this.system. Then duplicate is necessary.
         const rollData = foundry.utils.duplicate(super.getRollData());
         const test = options.test ?? null;
@@ -1637,7 +1636,7 @@ export class SR5Item extends Item {
 
         // Handle devices within a PAN or WAN
         if (technologyData && this.isNetworkDevice ) {
-            const master = await this.networkController();
+            const master = this.networkController();
             if (!master) {
                 ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
                 return rollData;
@@ -1663,6 +1662,7 @@ export class SR5Item extends Item {
         }
 
         return rollData;
+        
     }
 
     override async _onCreate(changed, options, user) {

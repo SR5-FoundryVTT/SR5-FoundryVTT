@@ -376,8 +376,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return {};
     }
 
-    static async _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {
-        return await TestCreator._prepareTestDataWithAction(action, actor, data);
+    static _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {
+        return TestCreator._prepareTestDataWithAction(action, actor, data);
     }
 
     /**
@@ -2105,7 +2105,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.data.sourceActorUuid = document instanceof SR5Actor ? document.uuid : undefined;
         this.data.sourceItemUuid = document instanceof SR5Item ? document.uuid : undefined;
         
-        this.data = await TestCreator._prepareTestDataWithAction(action, document, this.data, this) as T;
+        this.data = TestCreator._prepareTestDataWithAction(action, document, this.data, this) as T;
         
         // If no dialog has been shown yet, execution hasn't been triggered.
         // Wait for the next execution.

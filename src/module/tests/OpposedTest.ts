@@ -147,7 +147,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
             }
         }
 
-        return await this._prepareActionTestData(action, actor, data) as OpposedTestData;
+        return this._prepareActionTestData(action, actor, data) as OpposedTestData;
     }
 
     /**

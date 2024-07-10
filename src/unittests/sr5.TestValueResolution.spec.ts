@@ -103,7 +103,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             const device = owner.items.contents[0];
 
             // Owner rating is used for mental attributes.
-            const rollData = await device.getTestData();
+            const rollData = device.getRollData();
             assert.equal(rollData.attributes.willpower.value, 5);
         });
 
@@ -121,7 +121,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             // Assert initial wireless connection.
             test.data.directConnection = false;
 
-            let rollData = await slave.getTestData({ test });
+            let rollData = slave.getRollData({ test });
 
             // Master rating is used for firewall.
             assert.equal(rollData.attributes.firewall.value, 5);
@@ -129,7 +129,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             // Assert direct connection.
             test.data.directConnection = true;
 
-            rollData = await slave.getTestData({ test });
+            rollData = slave.getRollData({ test });
 
             // Slave rating is used for firewall.
             assert.equal(rollData.attributes.firewall.value, 3);

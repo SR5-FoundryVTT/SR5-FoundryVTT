@@ -201,11 +201,11 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         if (this.item.canBeNetworkController) {
-            data['networkDevices'] = await this.item.networkDevices();
+            data['networkDevices'] = this.item.networkDevices();
         }
 
         if (this.item.canBeNetworkDevice) {
-            data['networkController'] = await this.item.networkController();
+            data['networkController'] = this.item.networkController();
         }
 
         // Provide action parts with all test variants.

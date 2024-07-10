@@ -140,7 +140,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         it('Extract roll data from an SR5Item as source', async () => {
             const item = await testItem.create({ type: 'host', 'system.rating': 5 });
             const action = DataDefaults.actionRollData({ attribute: 'willpower', attribute2: 'firewall' });
-            const data = await TestCreator._prepareTestDataWithActionForItem(action, item, TestCreator._minimalTestData());
+            const data = TestCreator._prepareTestDataWithActionForItem(action, item, TestCreator._minimalTestData());
 
             Helpers.calcTotal(data.pool);
 

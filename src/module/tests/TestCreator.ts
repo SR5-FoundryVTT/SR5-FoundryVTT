@@ -93,6 +93,8 @@ export const TestCreator = {
 
     /**
      * Create a test from action data only, when not having an item.
+     * 
+     * NOTE: While this method doesn't need to be async, keep async for consistency with other TestCreator.from* apis.
      *
      * @param action The action data to use for the test.
      * @param document The source document to use for retrieving source values defined within the action.
@@ -112,7 +114,7 @@ export const TestCreator = {
 
         // Any action item will return a list of values to create the test pool from.
         const cls = TestCreator._getTestClass(action.test);
-        const data = await TestCreator._prepareTestDataWithAction(action, document, TestCreator._minimalTestData());
+        const data = TestCreator._prepareTestDataWithAction(action, document, TestCreator._minimalTestData());
         const actor = document instanceof SR5Actor ? document : undefined;
         const item = document instanceof SR5Item ? document : undefined;
         const documents = {actor, item};
@@ -310,7 +312,7 @@ export const TestCreator = {
 
         const resistTestCls = TestCreator._getTestClass(opposedData.against.opposed.resist.test);
 
-        const data = await TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.actor, opposed.data.messageUuid);
+        const data = TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.actor, opposed.data.messageUuid);
         const documents = {actor: opposed.actor};
 
         return new resistTestCls(data, documents, options);
@@ -407,7 +409,7 @@ export const TestCreator = {
             await testCls._getDocumentTestAction(item, actor),
             testCls._getDefaultTestAction());
 
-        return await TestCreator._prepareTestDataWithAction(action, actor, data);
+        return TestCreator._prepareTestDataWithAction(action, actor, data);
     },
 
     /**
@@ -421,7 +423,7 @@ export const TestCreator = {
      * @param actor The actor doing the testing.
      * @param previousMessageId The Message id of the originating opposing test.
      */
-    _getOpposedResistTestData: async function(resistTestCls, opposedData: OpposedTestData, actor: SR5Actor, previousMessageId?: string) {
+    _getOpposedResistTestData: function(resistTestCls, opposedData: OpposedTestData, actor: SR5Actor, previousMessageId?: string) {
         if (!opposedData.against.opposed.resist.test) {
             console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, opposedData, this);
             return;
@@ -449,7 +451,7 @@ export const TestCreator = {
         );
 
         // Alter default action information with user defined information.
-        return await TestCreator._prepareTestDataWithAction(action, actor, data);
+        return TestCreator._prepareTestDataWithAction(action, actor, data);
     },
 
     /**
@@ -462,15 +464,16 @@ export const TestCreator = {
      * 
      * @returns Resulting TestData
      */
-    _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData, test?: SuccessTest) {
+    _prepareTestDataWithAction: function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData, test?: SuccessTest) {
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 
-        if (document instanceof SR5Actor) return await TestCreator._prepareTestDataWithActionForActor(action, document, data, test);
-        if (document instanceof SR5Item) return await TestCreator._prepareTestDataWithActionForItem(action, document, data, test);
+        if (document instanceof SR5Actor) return TestCreator._prepareTestDataWithActionForActor(action, document, data, test);
+        if (document instanceof SR5Item) return TestCreator._prepareTestDataWithActionForItem(action, document, data, test);
 
         //@ts-expect-error // Fallback to data for easy typing, though type gating would cause a typing error, however runtime errors might occur.
         console.error(`Shadowrun 5e | Couldn't prepare test data for document type ${document.constructor.name}`, document, data);
+        ui.notifications?.error('Remove the console.error here');
         return data;
     },
 
@@ -484,7 +487,7 @@ export const TestCreator = {
      * 
      * @returns resulting TestData
      */
-    _prepareTestDataWithActionForActor: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData, test?: SuccessTest) {
+    _prepareTestDataWithActionForActor: function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData, test?: SuccessTest) {
 
         const pool = new PartsList<number>(data.pool.mod);
 
@@ -579,7 +582,7 @@ export const TestCreator = {
             // A modifier with an applicable selection is found.
             if (modifier.includes('.')) {
                 // Assert correct action modifier segment structure.
-                const segments = modifier.split('.') as string[];
+                const segments = modifier.split('.');
                 if (segments.length > 2) console.error('Shadowrun 5e | Action contained a partial modifier with more than two segments', modifier, data.action);
 
                 // Record the modifier category with it's single applicable.
@@ -617,8 +620,8 @@ export const TestCreator = {
      * @param test An optional test instance to derive testing context from. This might influence some source values.
      * @returns TestData that's ready to be used to construct a new test instance.
      */
-    _prepareTestDataWithActionForItem: async function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData, test?: SuccessTest) {
-        const testData = await item.getTestData();
+    _prepareTestDataWithActionForItem: function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData, test?: SuccessTest) {
+        const testData = item.getRollData();
         const pool = new PartsList<number>(data.pool.mod);
 
         if (action.attribute) {

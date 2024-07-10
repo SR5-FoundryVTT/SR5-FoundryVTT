@@ -15,20 +15,29 @@ export class NetworkDeviceFlow {
         return target.uuid;
     }
 
-    //Pass-through to resolveLink for cases in which we know it will return an item and not an actor
-    static async resolveItemLink(link: string) {
-        return await this.resolveLink(link) as SR5Item | undefined;
+    /**
+     * Pass-through to resolveLink for cases in which we know it will return an item and not an actor.
+     * 
+     * @returns Guaranteed SR5Item.
+     */
+    static resolveItemLink(link: string) {
+        const document = this.resolveLink(link);
+        if (!(document instanceof SR5Item)) throw new Error(`Document with uuid ${link} is not an item`);
+        return document as unknown as SR5Item;
     }
 
     /**
      * Repacking FoundryVTT fromUuid without async promise to make it usable in sync functions.
+     * 
+     * NOTE: We're using fromUuidSync instead of fromUuid, to allow Document.getRollData (which is sync).
+     *       This way we loose the ability to resolve compendium documents but gain the default Foundry behavior.
      *
      * @param link
      */
-    static async resolveLink(link: string) {
+    static resolveLink(link: string) {
         if (!link) return;
 
-        return await fromUuid(link) as SR5Item | SR5Actor | undefined;
+        return fromUuidSync(link) as SR5Item | SR5Actor | undefined;
     }
 
     static async emitAddNetworkControllerSocketMessage(controller: SR5Item, networkDeviceLink: string) {
@@ -45,8 +54,8 @@ export class NetworkDeviceFlow {
         console.log('Shadowrun 5e | Handle add network controller socket message', message);
         if (!game.user?.isGM) return console.error(`Shadowrun 5e | Abort handling of message. Current user isn't a GM`, game.user);
 
-        const controller = await NetworkDeviceFlow.resolveItemLink(message.data.controllerLink);
-        const device = await NetworkDeviceFlow.resolveLink(message.data.networkDeviceLink);
+        const controller = NetworkDeviceFlow.resolveItemLink(message.data.controllerLink);
+        const device = NetworkDeviceFlow.resolveLink(message.data.networkDeviceLink);
 
         if (!controller || !device) return console.error('Shadowrun 5e | Either the networks controller or device did not resolve.');
 
@@ -134,7 +143,7 @@ export class NetworkDeviceFlow {
     static async removeDeviceLinkFromNetwork(controller: SR5Item, deviceLink: string) {
         console.log(`Shadowrun 5e | Removing device with uuid ${deviceLink} from network`);
         const controllerData = controller.asController();
-        const device = await NetworkDeviceFlow.resolveLink(deviceLink);
+        const device = NetworkDeviceFlow.resolveLink(deviceLink);
 
         // Remove an existing item from the network.
         if (device) {
@@ -199,7 +208,7 @@ export class NetworkDeviceFlow {
         if (!networkController) return;
 
         // Controller might not exist anymore.
-        const controller = await NetworkDeviceFlow.resolveItemLink(networkController);
+        const controller = NetworkDeviceFlow.resolveItemLink(networkController);
         if (!controller) return;
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller)) return;
 
@@ -223,7 +232,7 @@ export class NetworkDeviceFlow {
         if (networkDevices) {
             const devices: (SR5Item | SR5Actor)[] = [];
             for (const deviceLink of networkDevices) {
-                const device = await NetworkDeviceFlow.resolveLink(deviceLink);
+                const device = NetworkDeviceFlow.resolveLink(deviceLink);
                 if (device) devices.push(device);
             }
             for (const device of devices) {
@@ -239,13 +248,13 @@ export class NetworkDeviceFlow {
      *
      * @param controller
      */
-    static async getNetworkDevices(controller: SR5Item): Promise<(SR5Item | SR5Actor)[]> {
-        const devices: (SR5Item | SR5Actor)[] = [];
+    static getNetworkDevices(controller: SR5Item) {
+        const devices: SR5Item[] = [];
         const controllerData = controller.asController();
         if (!controllerData) return devices;
 
         for (const link of controllerData.system.networkDevices) {
-            const device = await NetworkDeviceFlow.resolveLink(link);
+            const device = NetworkDeviceFlow.resolveItemLink(link);
             if (device) devices.push(device);
             else console.warn(`Shadowrun5e | Controller ${controller.name} has a network device ${link} that doesn't exist anymore`);
         }

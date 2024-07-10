@@ -57,8 +57,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     override async getData(options) {
         const data = await super.getData(options);
 
-        // Vehicle actor type specific fields.
-        data.vehicle = await this._prepareVehicleFields();
+        data.vehicle = this._prepareVehicleFields();
 
         return data;
     }
@@ -96,11 +95,11 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         return super._onDrop(event);
     }
 
-    async _prepareVehicleFields(): Promise<VehicleSheetDataFields> {
+    _prepareVehicleFields(): VehicleSheetDataFields {
         const driver = this.actor.getVehicleDriver();
 
         const networkControllerLink = this.actor.getNetworkControllerUuid();
-        const networkController = networkControllerLink ? await NetworkDeviceFlow.resolveItemLink(networkControllerLink) : undefined;
+        const networkController = networkControllerLink ? NetworkDeviceFlow.resolveItemLink(networkControllerLink) : undefined;
 
         return {
             driver,
