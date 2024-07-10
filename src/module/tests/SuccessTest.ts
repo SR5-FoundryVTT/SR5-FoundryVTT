@@ -1762,11 +1762,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             label: testCls.label
         };
 
-        // Show the flat dice pool modifier on the chat action.
-        if (this.data.opposed.mod) {
-            action.label += ` ${this.data.opposed.mod}`;
-        }
-
         return [action]
     }
 

@@ -158,7 +158,7 @@
     <div class="card-buttons">
         {{#each opposedActions}}
         <div class="button opposed-action" data-action="{{this.test}}">
-            {{localize this.label}}
+            {{localize this.label}} {{#if ../test.data.opposed.mod}}{{../test.data.opposed.mod}}{{/if}}
         </div>
         {{/each}}
     </div>
