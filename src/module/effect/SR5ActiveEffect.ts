@@ -206,6 +206,16 @@ export class SR5ActiveEffect extends ActiveEffect {
         return this.getFlag(SYSTEM_NAME, 'onlyForItemTest') as boolean || false;
     }
 
+    /**
+     * Determine if this effect has been created using the test effect application flow
+     * typically reserved for targeted_actor effects.
+     * 
+     * @returns true, when the effect has been applied by a test.
+     */
+    get appliedByTest(): boolean {
+        return this.getFlag(SYSTEM_NAME, 'appliedByTest') as boolean || false;
+    }
+
     get selectionTests(): string[] {
         return tagifyFlagsToIds(this, 'selection_tests');
     }
@@ -233,6 +243,27 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this.onlyForWireless && !this.parent.isWireless()) return true;
 
         return false; 
+    }
+
+    /**
+     * Determine if this effect is meant to be applied to the actor it's existing on.
+     * 
+     * Some effects are meant to be applied to other actors, and those shouldn't apply or show
+     * on the actor that will cause them.
+     * 
+     * Especially targeted_actor effects are meant to be applied to another actor acted upon but not the one acting.
+     * 
+     * @return true, when the effect is meant to be applied to the actor it's existing on.
+     */
+    get appliesToLocalActor(): boolean {
+        const actor = this.actor;
+        if (!actor) return false;
+
+        if (this.applyTo === 'targeted_actor') {
+            return this.appliedByTest;
+        }
+
+        return true;
     }
 
     /**

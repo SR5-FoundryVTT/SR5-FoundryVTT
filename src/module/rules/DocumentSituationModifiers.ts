@@ -361,9 +361,8 @@ export class DocumentSituationModifiers {
      */
     static async setDocumentModifiers(document: ModifiableDocumentTypes, modifiers: SituationModifiersSourceData) {
         if (document instanceof SR5Actor) {
-            // Due to active selection merging by Foundry mergeObject, we need to delete first.
-            await document.update({'system.-=situation_modifiers': null}, {render: false});
-            await document.update({'system.situation_modifiers': modifiers});
+            // Disable diffing to overwrite the whole object. 
+            await document.update({'system.situation_modifiers': modifiers}, {diff: false});
         } else {
             // Due to active selection merging by Foundry mergeObject, we need to delete first.
             await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);

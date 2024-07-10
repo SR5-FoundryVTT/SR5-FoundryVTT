@@ -3,16 +3,15 @@
   "name": "shadowrun5e",
   "title": "Shadowrun 5th Edition",
   "description": "Shadowrun 5th Edition game",
-  "authors": [{
+  "authors": [
+    {
       "name": "Jan Schoska",
       "discord": "taM#9507"
-  }],
+    }
+  ],
   "url": "https://github.com/SR5-FoundryVTT/SR5-FoundryVTT",
   "bugs": "https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/issues",
-  "flags": {
-    "allowBugReporter": true
-  },
-  "version": "0.20.1",
+  "version": "0.20.3",
   "compatibility": {
     "minimum": "11",
     "verified": "12"
@@ -90,10 +89,12 @@
       "system": "shadowrun5e"
     }
   ],
-  "relationships": [{
-    "id": "autocomplete-inline-properties",
-    "type": "module"
-  }],
+  "relationships": [
+    {
+      "id": "autocomplete-inline-properties",
+      "type": "module"
+    }
+  ],
   "socket": true,
   "manifest": null,
   "download": null,
