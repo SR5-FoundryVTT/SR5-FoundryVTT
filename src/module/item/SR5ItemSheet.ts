@@ -8,6 +8,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { MatrixRules } from '../rules/MatrixRules';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -202,6 +203,8 @@ export class SR5ItemSheet extends ItemSheet {
 
         if (this.item.canBeMaster) {
             data['slaves'] = this.item.slaves();
+            // Prepare PAN counter (1/3) for simple use in handlebar
+            data['pan_counter'] = `(${data['slaves'].length}/${MatrixRules.maxPANSlaves(this.item.getRating())})`;
         }
 
         if (this.item.canBeSlave) {

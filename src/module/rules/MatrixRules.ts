@@ -116,4 +116,28 @@ export class MatrixRules {
     static differentGridModifier(): number {
         return -2;
     }
+
+    /**
+     * Determine the maximum count of PAN slaves for a master device.
+     * 
+     * See SR5#233 'PANS and WANS'
+     * @param rating The device rating of the master device
+     * @returns The max amount of slaves
+     */
+    static maxPANSlaves(rating: number): number {
+        return rating * 3;
+    }
+
+    /**
+     * Determine if the current number of slaves in a PAN is valid.
+     * 
+     * See SR5#233 'PANS and WANS'
+     * @param rating The device rating of the master device
+     * @param slaves Amount of slaves in the PAN
+     * 
+     * @returns true, amount of slaves is valid.
+     */
+    static validPANSlaveCount(rating: number, slaves: number): boolean {
+        return this.maxPANSlaves(rating) <= slaves;
+    }
 }

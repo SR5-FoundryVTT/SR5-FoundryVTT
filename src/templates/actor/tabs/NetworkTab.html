@@ -2,7 +2,7 @@
 <div class="inventory">
     <div class="scroll-area">
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                name=(localize "SR5.Labels.Sheet.NetworkDevices")
+                name=(concatStrings (localize "SR5.Labels.Sheet.NetworkDevices") " " ../pan_counter) 
                 itemId='slave'
                 rightSide=(SlavesListRightSide)
                 icons=(SlavesListHeaderIcons)
