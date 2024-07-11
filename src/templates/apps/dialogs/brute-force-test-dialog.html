@@ -26,6 +26,23 @@
                 <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnMainIcon"}}</label>
                 <input type="checkbox" class="checkbox" name="test.data.placeOnMainIcon" {{checked test.data.placeOnMainIcon}}/>
             </div>
+            {{#if test.hasTargets}}
+            <div class="form-group">
+                <label>{{localize "SR5.Target"}}</label>
+                <div>{{test.icon.name}}</div>
+            </div>
+            {{else}}
+            <div class="form-group">
+                <label>{{localize "SR5.Hosts"}}</label>
+                <select name="test.data.iconUuid" class="display">
+                    {{#select test.data.iconUuid}}
+                    {{#each test.hosts}}
+                    <option value="{{this.uuid}}">{{this.name}}</option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            </div>
+            {{/if}}
             {{#ife test.data.placeOnMainIcon false}}
             <div class="form-group">
                 <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnDevice"}}</label>

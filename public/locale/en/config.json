@@ -469,6 +469,7 @@
         "MissingIC": "Missing IC",
         "Rating": "Host Rating"
     },
+    "SR5.Hosts": "Hosts",
     "SR5.HotSim": "Hot Sim",
     "SR5.IC": {
         "MissingHost": "Drag&Drop a host item",

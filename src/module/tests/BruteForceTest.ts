@@ -14,7 +14,10 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     // The icon to place a mark on.
     // This can be the actor itself or a device connected to it.
     icon: NetworkDevice;
+    // The devices connected to the main icon persona / host.
     devices: (SR5Item)[];
+    // All available hosts.
+    hosts: (SR5Item)[];
 
     override _prepareData(data: MatrixPlacementData, options): any {
         data = super._prepareData(data, options);
@@ -66,6 +69,8 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
         this._prepareIcon();
         this._prepareTargetIcon();
         this._prepareActorDevices();
+
+        this._prepareHosts();
     }
 
     /**
@@ -111,6 +116,17 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
 
         // Collect network devices
         this.devices = actor.wirelessDevices;
+    }
+
+    /**
+     * Retrieve all hosts available for a decker to hack.
+     * 
+     * If any token is selected, don't retrieve hosts.
+     */
+    _prepareHosts() {
+        if (this.hasTargets) return;
+
+        this.hosts = game.items?.filter(item => item.isHost) as SR5Item[];
     }
 
     /**
