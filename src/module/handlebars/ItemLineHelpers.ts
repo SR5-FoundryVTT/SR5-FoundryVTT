@@ -887,11 +887,6 @@ export const registerItemLineHelpers = () => {
         return [
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Scene'),
-                },
-            },
-            {
-                text: {
                     text: game.i18n.localize('SR5.FOUNDRY.Item'),
                 },
             },
