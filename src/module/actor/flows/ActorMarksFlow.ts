@@ -13,19 +13,19 @@ export const ActorMarksFlow = {
     /**
      * Place a number of marks by decker onto any kind of target.
      * 
-     * @param decker 
-     * @param target 
-     * @param marks 
+     * @param persona The persona placing the marks
+     * @param target The icon being marked
+     * @param marks The amount of marks placed
      * @param options 
      */
-    async setMarks(decker: SR5Actor, target: NetworkDevice|undefined, marks: number, options: { overwrite?: boolean } = {}) {
+    async setMarks(persona: SR5Actor, target: NetworkDevice|undefined, marks: number, options: { overwrite?: boolean } = {}) {
         // Avoid dirty input by breaking early.
         if (!target) {
             return;
         }
 
         // Don't allow self marking.
-        if (decker.id === target.id) {
+        if (persona.id === target.id) {
             return;
         }
         // Assert that the target is valid document.
@@ -37,19 +37,19 @@ export const ActorMarksFlow = {
         // CASES - DECKER IS SPECIAL.
 
         // TODO: Is it correct that ic place host marks?
-        if (decker.isIC() && decker.hasHost()) {
-            const host = await decker.getICHost();
+        if (persona.isIC() && persona.hasHost()) {
+            const host = await persona.getICHost();
             await host?.setMarks(target, marks, options);
             return;
         }
 
-        if (!decker.isMatrixActor) {
+        if (!persona.isMatrixActor) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
-            console.error(`The actor type ${decker.type} can't receive matrix marks!`);
+            console.error(`The actor type ${persona.type} can't receive matrix marks!`);
             return;
         }
 
-        if (decker.hasLivingPersona) {
+        if (persona.hasLivingPersona) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
             console.error(`Shadowrun 5e| Technomancers can't place marks without using a matrix device.`);
             return;
@@ -67,7 +67,7 @@ export const ActorMarksFlow = {
         // For IC targets: place marks on both ic and host.
         if (target instanceof SR5Actor && target.isIC() && target.hasHost()) {
             const host = await target.getICHost();
-            await decker.setMarks(host, marks, options);
+            await persona.setMarks(host, marks, options);
         }
 
         // If the actor doesn't have living persona, target the persona matrix device instead.
@@ -86,59 +86,54 @@ export const ActorMarksFlow = {
         // If the targeted devices is within a WAN, place mark on the host as well.
         if (target instanceof SR5Item && target.isSlave) {
             const host = target.master();
-            await decker.setMarks(host, marks, options);
+            await persona.setMarks(host, marks, options);
         }
 
 
         // DEFAULT CASE
-
-        const targetUuid = ActorMarksFlow.buildMarkUuid(target.uuid);
-        const matrixData = decker.matrixData;
+        const matrixData = persona.matrixData;
 
         if (!matrixData) return;
 
-        const currentMarks = options?.overwrite ? 0 : decker.getMarksById(targetUuid);
-        matrixData.marks[targetUuid] = MatrixRules.getValidMarksCount(currentMarks + marks);
+        const currentMarks = options?.overwrite ? 0 : persona.getMarksById(target.uuid);
+        const mark = {
+            uuid: target.uuid,
+            name: target.name ?? '',
+            marks: MatrixRules.getValidMarksCount(currentMarks + marks)
+        }
+        matrixData.marks.push(mark);
 
-        await decker.update({'system.matrix.marks': matrixData.marks});
+        await persona.update({'system.matrix.marks': matrixData.marks});
     },
 
     /**
      * Remove ALL marks placed by this actor
      */
-    async clearMarks(decker: SR5Actor) {
-        const matrixData = decker.matrixData;
+    async clearMarks(persona: SR5Actor) {
+        const matrixData = persona.matrixData;
         if (!matrixData) return;
 
         // Delete all markId properties from ActorData
-        const updateData = {}
-        for (const markId of Object.keys(matrixData.marks)) {
-            updateData[`-=${markId}`] = null;
-        }
-
-        await decker.update({'system.matrix.marks': updateData});
+        await persona.update({'system.matrix.marks': []});
     },
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
      */
-    async clearMark(decker: SR5Actor, markId: string) {
-        if (!decker.isMatrixActor) return;
+    async clearMark(persona: SR5Actor, uuid: string) {
+        if (!persona.isMatrixActor) return;
 
-        const updateData = {}
-        updateData[`-=${markId}`] = null;
-
-        await decker.update({'system.matrix.marks': updateData});
+        const marks = persona.matrixData?.marks.filter(mark => mark.uuid !== uuid) ?? [];
+        await persona.update({'system.matrix.marks': marks});
     },
 
     /**
      * Get all mark data for this actor.
-     * @param decker 
+     *
+     * @param persona The persona actor to pull marks from
      */
-    getAllMarks(decker: SR5Actor): Shadowrun.MatrixMarks | undefined {
-        const matrixData = decker.matrixData;
-        if (!matrixData) return;
-        return matrixData.marks;
+    getAllMarks(persona: SR5Actor): Shadowrun.MatrixMarks | undefined {
+        return persona.matrixData?.marks;
     },
 
     /**
@@ -150,11 +145,12 @@ export const ActorMarksFlow = {
      * TODO: Check with technomancers....
      * TODO: check options necessary?
      *
-     * @param target
+     * @param persona The persona having placed the marks
+     * @param target The icon to retrieve the personas marks from
      * @param item
      * @param options
      */
-    getMarks(decker: SR5Actor, target: Token, item?: SR5Item, options?: { scene?: Scene }): number {
+    getMarks(persona: SR5Actor, target: Token, item?: SR5Item, options?: { scene?: Scene }): number {
         if (!canvas.ready) return 0;
         if (target instanceof SR5Item) {
             console.error('Not yet supported');
@@ -167,47 +163,31 @@ export const ActorMarksFlow = {
         item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
         if (!item) return 0;
 
-        return decker.getMarksById(item.uuid);
+        return ActorMarksFlow.getMarksById(persona, item.uuid);
     },
 
     /**
      * Get amount of Matrix marks placed by this actor on this target.
-     * @param targetUuid A FoundryVTT document uuid
+     *
+     * @param persona The persona having placed marks
+     * @param uuid Icon uuid the persona has placed marks on.
+     * 
      * @returns Amount of marks placed
      */
-    getMarksById(decker: SR5Actor, targetUuid: string): number {
-        const markId = ActorMarksFlow.buildMarkUuid(targetUuid);
-        return decker.matrixData?.marks[markId] || 0;
-    },
-
-    /**
-     * FoundryVTT auto splits dot separated key values during it's update flow.
-     * 
-     * This method will build a mark uuid from a target uuid.
-     * @param uuid A document uuid
-     * @returns A mark uuid, using | instead of .
-     */
-    buildMarkUuid(uuid: string): string {
-        return uuid.replace(/\./g, '|');
-    },
-
-    /**
-     * See buildMarkUuid for the companion method for this method as well as documentation.
-     * @param markUuid A mark uuid
-     * @returns A document uuid
-     */
-    buildDocumentUuid(markUuid: string): string {
-        return markUuid.replace(/\|/g, '.');
+    getMarksById(persona: SR5Actor, uuid: string): number {
+        return persona.matrixData?.marks.find(mark => mark.uuid === uuid)?.marks ?? 0;
     },
 
     /**
      * See buildMarkUuid for a companion method for this method as well as documentation.
      * 
      * This method is a thin wrapper around FoundryVTT fromUuid to convert a mark uuid to a document.
-     * @param markId A mark uuid
+     *
+     * @param uuid The icon uuid for a marked document to be retrieved
+     * 
+     * @returns The document matching the given uuid.
      */
-    async getMarkedDocument(markId: string) {
-        const uuid = ActorMarksFlow.buildDocumentUuid(markId);
+    async getMarkedDocument(uuid: string) {
         const target = await fromUuid(uuid) as SR5Actor | SR5Item | null;
 
         if (target instanceof SR5Item && ActorMarksFlow.targetIsPersonaDevice(target)) return target.parent;
@@ -218,16 +198,15 @@ export const ActorMarksFlow = {
     /**
      * Retrieve all documents marked by this decker.
      * 
-     * @param marks A record of markIds to marks
+     * @param matrixMarks Any documents matrix mark data.
+     * @returns The documents that have been marked.
      */
-    async getMarkedDocuments(marks: Shadowrun.MatrixMarks) {
+    async getMarkedDocuments(matrixMarks: Shadowrun.MatrixMarks) {
         const documents: Shadowrun.MarkedDocument[] = [];
 
-        for (const [markId, amount] of Object.entries(marks)) {
-            const target = await ActorMarksFlow.getMarkedDocument(markId);
-            if (!target) continue;
-
-            documents.push({target, marks: amount, markId});
+        for (const {uuid, name, marks} of matrixMarks) {
+            const target = uuid ? await ActorMarksFlow.getMarkedDocument(uuid) : null;
+            documents.push({target, marks, markId: uuid, name});
         }
 
         return documents;

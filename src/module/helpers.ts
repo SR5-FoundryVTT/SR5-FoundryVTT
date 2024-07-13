@@ -9,7 +9,6 @@ import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import Skills = Shadowrun.Skills;
-import TargetedDocument = Shadowrun.TargetedDocument;
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
 import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";

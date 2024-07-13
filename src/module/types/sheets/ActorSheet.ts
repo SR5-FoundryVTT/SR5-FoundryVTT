@@ -26,12 +26,14 @@ declare namespace Shadowrun {
 
     // Use to target a specific owned item anywhere in Foundry.
     export interface TargetedDocument {
-        target: any // The Foundry Document marked.
+        // Name of the document or manually entered by user.
+        name: string
+        target: any|null // The Foundry Document marked.
     }
 
     // Use to display Matrix Marks which Foundry Document their placed on.
     export interface MarkedDocument extends TargetedDocument {
         marks: number // The amount of marks placed.
-        markId: string // For example <sceneId>/<targetId>/<itemId>. See Helpers.buildMarkId
+        markId: string|null // For example <sceneId>/<targetId>/<itemId>. See Helpers.buildMarkId
     }
 }

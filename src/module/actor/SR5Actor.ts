@@ -29,8 +29,8 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
+import { ActorMarksFlow } from './flows/ActorMarksFlow';
 
 
 /**

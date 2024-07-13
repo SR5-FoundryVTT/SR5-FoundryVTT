@@ -1,4 +1,3 @@
-import { ActorMarksFlow } from './../module/actor/flows/ActorMarksFlow';
 import { SR5TestingDocuments } from "./utils";
 import { SR5Actor } from "../module/actor/SR5Actor";
 import { SR5Item } from "../module/item/SR5Item";
@@ -6,9 +5,6 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { BruteForceTest } from "../module/tests/BruteForceTest";
 import { OpposedBruteForceTest } from "../module/tests/OpposedBruteForceTest";
-import { MarkPlacementFlow } from "../module/tests/flows/MarkPlacementFlow";
-import { DataDefaults } from '../module/data/DataDefaults';
-import { Helpers } from '../module/helpers';
 
 export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
@@ -48,9 +44,9 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
 
             // TODO: In this case, does placing a mark on the host place marks on all it's devices?! or all icons?! What about personas?
 
-            const marks = decker.getAllMarks();
+            const marksData = decker.getAllMarks() ?? [];
 
-            assert.lengthOf(Object.keys(marks ?? {}), 1);
+            assert.lengthOf(marksData, 1);
         });
 
         it('Target a host IC and place a mark on it and the host', async () => {
@@ -71,9 +67,9 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
             const opposedTest = new OpposedBruteForceTest(data, documents, testOptions);
             await opposedTest.execute();
 
-            const marks = decker.getAllMarks();
+            const marksData = decker.getAllMarks() ?? [];
 
-            assert.lengthOf(Object.keys(marks ?? {}), 2);
+            assert.lengthOf(marksData, 2);
         });
 
         it('Target a host device and place a mark on it and the host', async () => {
@@ -85,14 +81,14 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
 
             await decker.setMarks(device, 1);
 
-            const marks = decker.getAllMarks(); 
+            const marksData = decker.getAllMarks() ?? []; 
 
-            assert.lengthOf(Object.keys(marks ?? {}), 2);
+            assert.lengthOf(marksData, 2);
 
-            const markUuids = [ActorMarksFlow.buildMarkUuid(host.uuid), ActorMarksFlow.buildMarkUuid(device.uuid)];
-            for (const [markUuid, count] of Object.entries(marks ?? {})) {
-                assert.equal(count, 1);
-                assert.include(markUuids, markUuid);
+            const markUuids = [host.uuid, device.uuid];
+            for (const {marks, uuid} of marksData){
+                assert.equal(marks, 1);
+                assert.include(markUuids, uuid);
             }
         });
 
@@ -113,13 +109,13 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
             await controller.addSlave(device);
             await decker.setMarks(device, 1);
 
-            const marks = decker.getAllMarks(); 
-            assert.lengthOf(Object.keys(marks ?? {}), 2);
+            const marksData = decker.getAllMarks() ?? []; 
+            assert.lengthOf(marksData, 2);
 
-            const markUuids = [ActorMarksFlow.buildMarkUuid(device.uuid), ActorMarksFlow.buildMarkUuid(controller.uuid)];
-            for (const [markUuid, count] of Object.entries(marks ?? {})) {
-                assert.equal(count, 1);
-                assert.include(markUuids, markUuid);
+            const markUuids = [device.uuid, controller.uuid];
+            for (const {marks, uuid} of marksData) {
+                assert.equal(marks, 1);
+                assert.include(markUuids, uuid);
             }
         });
     });

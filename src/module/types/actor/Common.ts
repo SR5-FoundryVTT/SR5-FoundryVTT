@@ -66,11 +66,22 @@ declare namespace Shadowrun {
     }
 
     /**
-     * Matrix Marks are stored using the uuid of the target they've been placed on.
+     * Matrix marks are stored as a list of targets to allow
+     * - free form mark placements (manual entry)
+     * - avoid having to mask uuid, due to Foundries auto extending behavior for keys with . separators
      * 
-     * Record<uuid, number>
+     * While key-value store would be simpler to access, the small amount of marks placed at any one time,
+     * doesn't make it a performance issue. Therefore we can use a simple list.
      */
-    export interface MatrixMarks extends Record<string, number>{}
+    export interface MatrixMarkTarget {
+        // Optional document uuid
+        uuid: string|null
+        // Document or free-form name
+        name: string
+        // Amount of marks placed on
+        marks: number
+    }
+    export type MatrixMarks = MatrixMarkTarget[]
 
     export type InventoriesData = Record<string, InventoryData>
     /**
