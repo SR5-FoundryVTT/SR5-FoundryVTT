@@ -238,7 +238,7 @@ export class DataDefaults {
      * @param partialSourceEntityData 
      * @returns 
      */
-    static sourceItemData(partialSourceEntityData: Partial<SourceEntityField> = {}): SourceEntityField {
+    static sourceItemData(partialSourceEntityData: Partial<Shadowrun.SourceEntityField> = {}): Shadowrun.SourceEntityField {
         return foundry.utils.mergeObject({
             id: '',
             name: '',
@@ -246,7 +246,7 @@ export class DataDefaults {
             type: 'Actor',
             // @ts-expect-error
             system: partialSourceEntityData.system || undefined
-        }, partialSourceEntityData);
+        }, partialSourceEntityData) as Shadowrun.SourceEntityField;
     }
 
     /**
@@ -254,14 +254,14 @@ export class DataDefaults {
      * 
      * @param partialValueData Inject any value property
      */
-    static valueData(partialValueData: Partial<ValueField> = {}) {
+    static valueData(partialValueData: Partial<Shadowrun.ValueField> = {}) {
         return foundry.utils.mergeObject({
             base: 0,
             value: 0,
             temp: 0,
             mod: [],
             label: ''
-        }, partialValueData);
+        }, partialValueData) as Shadowrun.ValueField;
     }
 
     /**
@@ -269,14 +269,14 @@ export class DataDefaults {
      * Differs from valueData as it's not only allowing number type values.
      * @param partialGenericValueData Inject any value property
      */
-    static genericValueData(partialGenericValueData: Partial<GenericValueField> = {}) {
+    static genericValueData(partialGenericValueData: Partial<Shadowrun.GenericValueField> = {}) {
         return foundry.utils.mergeObject({
             base: 0,
             value: 0,
             temp: 0,
             mod: [],
             label: ''
-        }, partialGenericValueData);
+        }, partialGenericValueData) as Shadowrun.GenericValueField;
     }
 
     /**
@@ -364,7 +364,7 @@ export class DataDefaults {
             device_att: '',
             temp: 0,
             limit: ''
-        }, partialAttributeData);
+        }, partialAttributeData) as Shadowrun.AttributeField;
     }
 
     static matrixData(partialMatrixTargetData: Partial<Shadowrun.MatrixMarkTarget> = {}) {
