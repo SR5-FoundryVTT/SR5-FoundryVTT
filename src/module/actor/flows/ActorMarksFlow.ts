@@ -90,18 +90,25 @@ export const ActorMarksFlow = {
         }
 
 
-        // DEFAULT CASE
+        // DEFAULT CASE - PLACE MARKS ON TARGET
         const matrixData = persona.matrixData;
 
         if (!matrixData) return;
 
         const currentMarks = options?.overwrite ? 0 : persona.getMarksById(target.uuid);
-        const mark = {
-            uuid: target.uuid,
-            name: target.name ?? '',
-            marks: MatrixRules.getValidMarksCount(currentMarks + marks)
+        let mark = matrixData.marks.find(mark => mark.uuid === target.uuid);
+
+        // Either alter the existing mark or create a new one.
+        if (mark) {
+            mark.marks = MatrixRules.getValidMarksCount(currentMarks + marks);
+        } else {
+            mark = {
+                uuid: target.uuid,
+                name: target.name ?? '',
+                marks: MatrixRules.getValidMarksCount(currentMarks + marks)
+            }
+            matrixData.marks.push(mark);
         }
-        matrixData.marks.push(mark);
 
         await persona.update({'system.matrix.marks': matrixData.marks});
     },
@@ -143,14 +150,14 @@ export const ActorMarksFlow = {
      *       What does the caller want?
      *
      * TODO: Check with technomancers....
-     * TODO: check options necessary?
      *
      * @param persona The persona having placed the marks
      * @param target The icon to retrieve the personas marks from
      * @param item
-     * @param options
+     * 
+     * @returns 
      */
-    getMarks(persona: SR5Actor, target: Token, item?: SR5Item, options?: { scene?: Scene }): number {
+    getMarks(persona: SR5Actor, target: Token, item?: SR5Item): number {
         if (!canvas.ready) return 0;
         if (target instanceof SR5Item) {
             console.error('Not yet supported');
