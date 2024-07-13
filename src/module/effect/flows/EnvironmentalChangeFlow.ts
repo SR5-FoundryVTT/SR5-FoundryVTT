@@ -31,9 +31,7 @@ export const lowLightVision = (modifier: EnvironmentalModifier, test?: SuccessTe
 export const imageMagnification = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Image Magnification Effect', modifier);
 
-    if (!modifier.applied.active.range) return;    
-
-    modifier.applied.active.range = _shiftUpByOneRow(modifier.applied.active.range);
+    if (modifier.applied.active.range) modifier.applied.active.range = _shiftUpByOneRow(modifier.applied.active.range);
 
     console.debug('Shadowrun 5e | Applied Image Magnification Effect', modifier);
 }
@@ -45,9 +43,8 @@ export const imageMagnification = (modifier: EnvironmentalModifier, test?: Succe
 export const thermographicVision = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Thermographic Vision Effect', modifier);
 
-    if (!modifier.applied.active.light) return;
-
-    modifier.applied.active.light = _shiftUpByOneRow(modifier.applied.active.light);
+    if (modifier.applied.active.light) modifier.applied.active.light = _shiftUpByOneRow(modifier.applied.active.light);
+    if (modifier.applied.active.visibility) modifier.applied.active.visibility = _shiftUpByOneRow(modifier.applied.active.visibility);
 
     console.debug('Shadowrun 5e | Applied Thermographic Vision Effect', modifier);
 }
@@ -77,9 +74,8 @@ export const tracerRounds = (modifier: EnvironmentalModifier, test?: SuccessTest
 export const smartlink = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Smartlink Effect', modifier);
 
-    if (!modifier.applied.active.wind) return;
-
-    modifier.applied.active.wind = _shiftUpByOneRow(modifier.applied.active.wind);
+    if (modifier.applied.active.wind) modifier.applied.active.wind = _shiftUpByOneRow(modifier.applied.active.wind);
+    
 }
 
 /**

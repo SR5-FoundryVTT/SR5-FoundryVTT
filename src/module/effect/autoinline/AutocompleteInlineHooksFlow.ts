@@ -141,7 +141,8 @@ export const AutocompleteInlineHooksFlow =  {
             image_magnification: '',
             tracer_rounds: '',
             smartlink: '',
-            ultrasound: ''
+            ultrasound: '',
+            thermographic_vision: ''
         }}
     },
 
