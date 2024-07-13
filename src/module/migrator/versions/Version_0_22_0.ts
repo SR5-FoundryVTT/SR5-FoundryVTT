@@ -1,5 +1,6 @@
 import { SR5Actor } from "../../actor/SR5Actor";
-import { VersionMigration } from "../VersionMigration";
+import { SR5Item } from "../../item/SR5Item";
+import { UpdateData, VersionMigration } from "../VersionMigration";
 
 /**
  * Migration for new matrix system:
@@ -20,9 +21,25 @@ export class Version_0_22_0 extends VersionMigration {
     static get TargetVersion(): string {
         return "0.22.0";
     }
+
+    protected override async ShouldMigrateItemData(item: SR5Item) {
+        return item.isHost;
+    }
     
     protected override async ShouldMigrateActorData(actor: SR5Actor) {
         return actor.isMatrixActor;
+    }
+
+    protected override async MigrateItemData(item: SR5Item) {
+        const updateData = {data: {}};
+
+        const marksData = item.system['marks'];
+        if (!marksData) return updateData;
+
+        //@ts-expect-error Typing must disagree here, however it's correct.
+        updateData.data['marks'] = migrateMarksData(marksData);
+
+        return updateData;
     }
 
     protected override async MigrateActorData(actor: SR5Actor) {
