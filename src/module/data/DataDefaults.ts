@@ -3,8 +3,6 @@ import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
 import ActionRollData = Shadowrun.ActionRollData;
 import LimitField = Shadowrun.LimitField;
-import SkillField = Shadowrun.SkillField;
-import TrackType = Shadowrun.TrackType;
 import SourceEntityField = Shadowrun.SourceEntityField;
 import ValueField = Shadowrun.ValueField;
 import GenericValueField = Shadowrun.GenericValueField;
@@ -190,7 +188,7 @@ export class DataDefaults {
             label: '',
             hidden: false,
             mod: []
-        }, partialLimitField) as LimitField;
+        }, partialLimitField) as Shadowrun.LimitField;
     }
 
     /**
@@ -198,7 +196,7 @@ export class DataDefaults {
      * 
      * @param partialSkillData Inject any skill property
      */
-    static skillData(partialSkillData: Partial<SkillField> = {}): SkillField {
+    static skillData(partialSkillData: Partial<Shadowrun.SkillField> = {}): Shadowrun.SkillField {
         return foundry.utils.mergeObject({
             name: SKILL_DEFAULT_NAME,
             base: 0,
@@ -210,15 +208,15 @@ export class DataDefaults {
             specs: [],
             mod: [],
             attribute: ''
-        }, partialSkillData) as SkillField;
+        }, partialSkillData) as Shadowrun.SkillField;
     }
 
     /**
      * Build a damage track field for use in document data.
-     * @param partialTrackData Injet any track property
+     * @param partialTrackData Inject any track property
      * @returns 
      */
-    static trackData(partialTrackData: Partial<TrackType> = {}): TrackType {
+    static trackData(partialTrackData: Partial<Shadowrun.TrackType> = {}): Shadowrun.TrackType {
         return foundry.utils.mergeObject({
             value: 0,
             max: 0,
@@ -226,7 +224,7 @@ export class DataDefaults {
             mod: [],
             disabled: false,
             wounds: 0
-        }, partialTrackData) as TrackType;
+        }, partialTrackData) as Shadowrun.TrackType;
     }
 
     /**
@@ -248,7 +246,7 @@ export class DataDefaults {
             type: 'Actor',
             // @ts-expect-error
             system: partialSourceEntityData.system || undefined
-        }, partialSourceEntityData) as SourceEntityField;
+        }, partialSourceEntityData);
     }
 
     /**
@@ -263,7 +261,7 @@ export class DataDefaults {
             temp: 0,
             mod: [],
             label: ''
-        }, partialValueData) as ValueField;
+        }, partialValueData);
     }
 
     /**
@@ -278,7 +276,7 @@ export class DataDefaults {
             temp: 0,
             mod: [],
             label: ''
-        }, partialGenericValueData) as GenericValueField;
+        }, partialGenericValueData);
     }
 
     /**
@@ -319,7 +317,7 @@ export class DataDefaults {
             value: '',
             chat: '',
             source: ''
-        }, partialDescriptionData) as Shadowrun.DescriptionData;
+        }, partialDescriptionData);
     }
 
     /**
@@ -347,7 +345,7 @@ export class DataDefaults {
             },
             wireless: true,
             master: undefined
-        }, partialTechnologyData) as Shadowrun.TechnologyData;
+        }, partialTechnologyData);
     }
 
     /**
@@ -366,6 +364,14 @@ export class DataDefaults {
             device_att: '',
             temp: 0,
             limit: ''
-        }, partialAttributeData) as Shadowrun.AttributeField;
+        }, partialAttributeData);
+    }
+
+    static matrixData(partialMatrixTargetData: Partial<Shadowrun.MatrixMarkTarget> = {}) {
+        return foundry.utils.mergeObject({
+            uuid: null,
+            name: '',
+            marks: 0
+        }, partialMatrixTargetData);
     }
 }

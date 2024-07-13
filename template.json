@@ -21,7 +21,7 @@
                     "name": "",
                     "silent": false,
                     "hot_sim": false,
-                    "marks": {},
+                    "marks":[],
                     "firewall": {
                         "value": 0,
                         "mod": [],
