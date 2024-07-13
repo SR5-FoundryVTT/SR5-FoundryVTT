@@ -30,7 +30,7 @@ import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
-import { ActorMarksFlow } from './flows/ActorMarksFlow';
+import { ActorMarksFlow, SetMarksOptions } from './flows/ActorMarksFlow';
 
 
 /**
@@ -2065,7 +2065,7 @@ export class SR5Actor extends Actor {
      * @param options Additional options that may be needed
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: SR5Actor|SR5Item|undefined, marks: number, options: { overwrite?: boolean } = {}) {
+    async setMarks(target: SR5Actor|SR5Item|undefined, marks: number, options: SetMarksOptions = {}) {
         await ActorMarksFlow.setMarks(this, target, marks, options);
     }
 
