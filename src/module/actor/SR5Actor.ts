@@ -2102,27 +2102,29 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Return the item that is the network master of this actor.
-     * These cases are possible:
+     * Return the document used to store marks placed for this actor.
+     * 
+     * For a normal character/technomancer this will be the actor itself, though for others this can differ.
+     * 
+     * These special cases are possible:
      * - IC with a host connected will provide the host item
      * - IC without a host will provide itself
-     * - A matrix actor within a PAN will provide the controlling actor
-     * - A matrix actor without a PAN will provide itself
+     * - A vehicle within a PAN will provide the controlling actor
      * 
-     * TODO: Check this method if it's used as a catch all 'get persona device' making it actually return SR5Actor and SR5Item
-     * 
-     * @returns Either the controller icon or this actor, when uuid links are broken.
+     * @returns The document to retrieve all marks this actor has access to.
      */
-    async getMarkDevice(): Promise<NetworkDevice|undefined> {
-        // CASE 1 - WAN: IC to Host network
+    async _getDocumentWithMarks(): Promise<NetworkDevice|undefined> {
+        // CASE 1 - IC marks are stored on their host item.
         if (this.isIC() && this.hasHost()) {
             return await this.getICHost();
         }
-        // CASE 2 - PAN
-        if (this.isMatrixActor && this.hasMaster) {
-            return this.master;
+        // CASE 2 - Vehicle marks are stored on their master actor.
+        if (this.isVehicle() && this.hasMaster) {
+            const master = this.master;
+            return master?.actorOwner;
         }
-        // CASE 3 - No network
+        
+        // DEFAULT CASE
         return this;
     }
 
@@ -2148,7 +2150,7 @@ export class SR5Actor extends Actor {
      * Retrieve all documents this actor has a mark placed on, directly or indirectly.
      */
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
-        const marksDevice = await this.getMarkDevice();
+        const marksDevice = await this._getDocumentWithMarks();
         if (!marksDevice) return [];
         const marks = marksDevice.marksData;
         if (!marks) return [];

@@ -1524,6 +1524,13 @@ export class SR5Item extends Item {
         await MatrixNetworkFlow.removeAllSlaves(this);
     }
 
+    /**
+     * Return all documents marked by this host and it's IC.
+     * 
+     * For other items, fall back to no documents.
+     * 
+     * @returns Foundry Documents with marks placed.
+     */
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
         if (!this.isHost) return [];
 
