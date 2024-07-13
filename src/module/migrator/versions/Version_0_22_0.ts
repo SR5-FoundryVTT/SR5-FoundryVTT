@@ -6,8 +6,6 @@ import { UpdateData, VersionMigration } from "../VersionMigration";
  * Migration for new matrix system:
  * - Migrate actor.system.matrix.marks from key-value to list storage
  * - TODO: Migrate ic.system.host.id to uuid
- * - TODO: Check if 
- * - TODO: Check if VersionMigrator needs data in updateData instead of system
  */
 export class Version_0_22_0 extends VersionMigration {
     get SourceVersion(): string {
@@ -35,8 +33,8 @@ export class Version_0_22_0 extends VersionMigration {
 
         const marksData = item.system['marks'];
         if (!marksData) return updateData;
+        if (Array.isArray(marksData)) return updateData;
 
-        //@ts-expect-error Typing must disagree here, however it's correct.
         updateData.data['marks'] = migrateMarksData(marksData);
 
         return updateData;
@@ -47,6 +45,7 @@ export class Version_0_22_0 extends VersionMigration {
 
         const matrixData = actor.system['matrix'];
         if (!matrixData) return updateData;
+        if (Array.isArray(matrixData.marks)) return updateData;
 
         updateData.data['matrix.marks'] = migrateMarksData(matrixData.marks);
 
