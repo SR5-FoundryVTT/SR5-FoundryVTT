@@ -1,6 +1,7 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { MarkFlow, SetMarksOptions } from "../../flows/MarksFlow";
 import { SR5Item } from "../SR5Item";
+import { NetworkDevice } from "./MatrixNetworkFlow";
 
 /**
  * This flow handles everything around matrix mark management.
@@ -40,29 +41,32 @@ export const ItemMarksFlow = {
     /**
      * Place a Matrix Mark for this Item.
      *
-     * @param device The matrix device that places the marks.
+     * @param host The matrix device that places the marks.
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks Amount of marks to be placed.
      * @param options Additional options that may be needed.
      *
      */
-    async setMarks(device: SR5Item, target: SR5Actor | SR5Item | undefined, marks: number, options?: SetMarksOptions) {
-        if (!canvas.ready) return;
-
-        if (!device.isHost) {
+    async setMarks(host: SR5Item, target: NetworkDevice | undefined, marks: number, options: SetMarksOptions={}) {
+        if (!host.isHost) {
             console.error('Only Host item types can place matrix marks!');
             return;
         }
 
-        const host = device.asHost;
-        if (!host) return;
-
         // TODO: Support no target, use options.name
         if (!target) return;
 
-        const currentMarks = device.getMarksById(target.uuid);
-        const marksData = MarkFlow.setMarks(host.system.marks, target, currentMarks, marks, options);
-        await device.update({ 'system.marks': marksData });
+        // Place marks on master icon as well. See SR5#233 'PANS and WANS'
+        if (target.hasMaster) {
+            const master = target.master;
+            if (master) await host.setMarks(master, marks, options);
+        }
+
+        // Place marks on the target icon itself.
+        const currentMarks = host.getMarksById(target.uuid);
+        let marksData = host.marksData ?? [];
+        marksData = MarkFlow.setMarks(marksData, target, currentMarks, marks, options);
+        await host.update({ 'system.marks': marksData });
     },
 
     /**
@@ -82,7 +86,7 @@ export const ItemMarksFlow = {
      * @param device The device to get marks for    
      * @returns The marks data for this item.
      */
-    getMarks(device: SR5Item): Shadowrun.MatrixMarks|undefined {
+    getMarksData(device: SR5Item): Shadowrun.MatrixMarks|undefined {
         const host = device.asHost;
         if (!host) return;
         return host.system.marks;

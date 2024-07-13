@@ -61,6 +61,8 @@ import { UpdateActionFlow } from './flows/UpdateActionFlow';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { ItemMarksFlow } from './flows/ItemMarksFlow';
 import { ItemTestDataFlow } from './flows/ItemTestDataFlow';
+import { RollDataOptions } from './Types';
+import { SetMarksOptions } from '../flows/MarksFlow';
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
@@ -75,10 +77,6 @@ import { ItemTestDataFlow } from './flows/ItemTestDataFlow';
  * NOTE: still not fixed with esbuild@0.19.5
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
-import { RollDataOptions } from './Types';
-import { BruteForceTest } from '../tests/BruteForceTest';
-import { HackOnTheFlyTest } from '../tests/HackOnTheFlyTest';
-import { SetMarksOptions } from '../flows/MarksFlow';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -1480,7 +1478,7 @@ export class SR5Item extends Item {
      * @returns The set of marks
      */
     get marksData() {
-        return ItemMarksFlow.getMarks(this);
+        return ItemMarksFlow.getMarksData(this);
     }
 
     /**
@@ -1545,7 +1543,7 @@ export class SR5Item extends Item {
      * 
      * @returns The master item or undefined if not connected to a network.
      */
-    master() {
+    get master() {
         const technologyData = this.getTechnologyData();
         if (!technologyData) return;
         if (!technologyData.master) return;
@@ -1583,14 +1581,22 @@ export class SR5Item extends Item {
     }
 
     /**
+     * Is this matrix device part of an active network?
+     */
+    get hasMaster(): boolean {
+        const technologyData = this.getTechnologyData();
+        if (!technologyData) return false;
+
+        return !!technologyData.master;
+    }
+
+    /**
      * Disconnect any kind of item from a PAN or WAN.
      */
     async disconnectFromNetwork() {
         if (this.canBeMaster) await MatrixNetworkFlow.removeAllSlaves(this);
         if (this.canBeSlave) await MatrixNetworkFlow.removeSlaveFromMaster(this);
     }
-
-
 
     /**
      * Return the given attribute, no matter its source.
@@ -1640,7 +1646,7 @@ export class SR5Item extends Item {
 
         // Handle devices within a PAN or WAN
         if (technologyData && this.isSlave ) {
-            const master = this.master();
+            const master = this.master;
             if (!master) {
                 ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
                 return rollData;

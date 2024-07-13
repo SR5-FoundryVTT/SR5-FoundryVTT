@@ -414,7 +414,7 @@
         "InventoryAlreadyExists": "An inventory with this name already exists.",
         "KeyNotModifyableByActiveEffect": "The active effect mode 'modify' can only affect mod properties.",
         "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed.",
-        "MarksCantBePlacedBy": "The active actor can't place marks.",
+        "MarksCantBePlacedBy": "Only personas can place marks.",
         "MarksCantBePlacedOn": "The chosen actor type can't receive any marks.",
         "MarksCantBePlacedWithoutPersona": "The chosen actor doesn't have an active persona.",
         "MasterDeviceIsMissing": "The master device is missing. Falling back to local device values.",

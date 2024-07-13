@@ -407,7 +407,7 @@
         "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
         "KeyNotModifyableByActiveEffect": "Aktiver Effekt Modus Modifizieren kann nur auf mod Felder angewendet werden.",
         "MarkCouldNotBePlaced": "Interner Fehler: Die Marken konnten nicht platziert werden.",
-        "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
+        "MarksCantBePlacedBy": "Nur Personas können Marken platzieren.",
         "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
         "MarksCantBePlacedWithoutPersona": "Der als Ziel ausgewählte Akteur hat keine aktive Persona.",
         "MasterDeviceIsMissing": "Der Master des Geräts kann nicht gefunden werden. Die Werte des Geräts werden verwendet.",

@@ -208,7 +208,7 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         if (this.item.canBeSlave) {
-            data['master'] = this.item.master();
+            data['master'] = this.item.master;
         }
 
         // Provide action parts with all test variants.

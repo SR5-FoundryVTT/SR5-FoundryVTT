@@ -1,7 +1,6 @@
 import { MarkFlow, SetMarksOptions } from "../../flows/MarksFlow";
 import { NetworkDevice } from "../../item/flows/MatrixNetworkFlow";
 import { SR5Item } from "../../item/SR5Item";
-import { MatrixRules } from "../../rules/MatrixRules";
 import { SR5Actor } from "../SR5Actor";
 
 /**
@@ -17,7 +16,6 @@ export const ActorMarksFlow = {
      * @param persona The persona placing the marks
      * @param target The icon being marked
      * @param marks The amount of marks placed
-     * @param options 
      */
     async setMarks(persona: SR5Actor, target: NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
 
@@ -31,28 +29,19 @@ export const ActorMarksFlow = {
             return;
         }
 
-        // CASES - DECKER IS SPECIAL.
-
-        // TODO: Is it correct that ic place host marks?
+        // CASE - IC and hosts
         if (persona.isIC() && persona.hasHost()) {
             const host = await persona.getICHost();
             await host?.setMarks(target, marks, options);
             return;
         }
 
+        // CASE - Persona isn't a matrix actor.
         if (!persona.isMatrixActor) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
-            console.error(`The actor type ${persona.type} can't receive matrix marks!`);
+            console.error(`The actor type ${persona.type} can't place matrix marks!`);
             return;
         }
-
-        if (persona.hasLivingPersona) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
-            console.error(`Shadowrun 5e| Technomancers can't place marks without using a matrix device.`);
-            return;
-        }
-
-        // CASES - TARGET IS AN ACTOR.
 
         // Abort for non-matrix actors
         if (target instanceof SR5Actor && !target.isMatrixActor) {
@@ -67,7 +56,7 @@ export const ActorMarksFlow = {
             await persona.setMarks(host, marks, options);
         }
 
-        // If the actor doesn't have living persona, target the persona matrix device instead.
+        // Assure targeting of the persona device if necessary, if one is in use.
         if (target instanceof SR5Actor && !target.hasActorPersona) {
             const matrixDevice = target.getMatrixDevice();
             if (!matrixDevice) {
@@ -82,7 +71,7 @@ export const ActorMarksFlow = {
 
         // If the targeted devices is within a WAN, place mark on the host as well.
         if (target instanceof SR5Item && target.isSlave) {
-            const host = target.master();
+            const host = target.master;
             await persona.setMarks(host, marks, options);
         }
 
