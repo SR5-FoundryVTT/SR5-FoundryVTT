@@ -2037,7 +2037,7 @@ export class SR5Actor extends Actor {
      * Check if the current actor has a active living persona.
      * If a technomancer uses a matrix device to connect with, they don't have a living persona!
      * 
-     * @returns true, when a mancer uses their living persona
+     * @returns true, when a technomancer uses their living persona
      */
     get hasLivingPersona(): boolean {
         return !this.hasDevicePersona && this.isEmerged;
@@ -2098,8 +2098,8 @@ export class SR5Actor extends Actor {
      * @param item
      * @param options
      */
-    getMarks(target: Token, item?: SR5Item, options?: { scene?: Scene }) {
-        return ActorMarksFlow.getMarks(this, target, item, options);
+    getMarks(target: Token, item?: SR5Item) {
+        return ActorMarksFlow.getMarks(this, target, item);
     }
 
     /**
