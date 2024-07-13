@@ -4,6 +4,14 @@ import { MatrixRules } from "../../rules/MatrixRules";
 import { SR5Actor } from "../SR5Actor";
 
 /**
+ * Options for the setMarks method.
+ */
+export interface SetMarksOptions {
+    // Overwrite current marks with 0
+    overwrite?: boolean
+    name?: string
+}
+/**
  * This flow handles everything around matrix mark management.
  * 
  * NOTE: this flow often uses decker to refer to deckers and technomancers interchangeably.
@@ -18,18 +26,14 @@ export const ActorMarksFlow = {
      * @param marks The amount of marks placed
      * @param options 
      */
-    async setMarks(persona: SR5Actor, target: NetworkDevice|undefined, marks: number, options: { overwrite?: boolean } = {}) {
-        // Avoid dirty input by breaking early.
-        if (!target) {
-            return;
-        }
+    async setMarks(persona: SR5Actor, target: NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
 
         // Don't allow self marking.
-        if (persona.id === target.id) {
+        if (persona.id === target?.id) {
             return;
         }
         // Assert that the target is valid document.
-        if (!(target instanceof SR5Item) && !(target instanceof SR5Actor)) {
+        if (target && !(target instanceof SR5Item) && !(target instanceof SR5Actor)) {
             console.error('Shadowrun 5e | Setting marks is not supported on this target', target)
             return;
         }
@@ -94,9 +98,11 @@ export const ActorMarksFlow = {
         const matrixData = persona.matrixData;
 
         if (!matrixData) return;
+        // TODO: Support not target, use options.name
+        if (!target) return;
 
-        const currentMarks = options?.overwrite ? 0 : persona.getMarksById(target.uuid);
-        let mark = matrixData.marks.find(mark => mark.uuid === target.uuid);
+        const currentMarks = options?.overwrite ? 0 : persona.getMarksById(target?.uuid);
+        let mark = matrixData.marks.find(mark => mark.uuid === target?.uuid);
 
         // Either alter the existing mark or create a new one.
         if (mark) {

@@ -58,7 +58,7 @@ import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
-import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { ActorMarksFlow, SetMarksOptions } from '../actor/flows/ActorMarksFlow';
 import { ItemMarksFlow } from './flows/ItemMarksFlow';
 import { ItemTestDataFlow } from './flows/ItemTestDataFlow';
 
@@ -1459,11 +1459,9 @@ export class SR5Item extends Item {
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks Amount of marks to be placed.
      * @param options Additional options that may be needed.
-     * @param options.scene The scene the targeted actor lives on.
-     * @param options.item
      *
      */
-    async setMarks(target: SR5Actor|SR5Item, marks: number, options?: {scene?: Scene, item?: Item, overwrite?: boolean}) {
+    async setMarks(target: SR5Actor|SR5Item|undefined, marks: number, options?: SetMarksOptions) {
         await ItemMarksFlow.setMarks(this, target, marks, options);
     }
 

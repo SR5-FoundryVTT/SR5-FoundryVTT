@@ -1,3 +1,4 @@
+import { SetMarksOptions } from "../../actor/flows/ActorMarksFlow";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { MatrixRules } from "../../rules/MatrixRules";
 import { SR5Item } from "../SR5Item";
@@ -52,11 +53,9 @@ export const ItemMarksFlow = {
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks Amount of marks to be placed.
      * @param options Additional options that may be needed.
-     * @param options.scene The scene the targeted actor lives on.
-     * @param options.item
      *
      */
-    async setMarks(device: SR5Item, target: SR5Actor | SR5Item, marks: number, options?: { scene?: Scene, item?: Item, overwrite?: boolean }) {
+    async setMarks(device: SR5Item, target: SR5Actor | SR5Item | undefined, marks: number, options?: SetMarksOptions) {
         if (!canvas.ready) return;
 
         if (!device.isHost) {
@@ -66,6 +65,9 @@ export const ItemMarksFlow = {
 
         const host = device.asHost;
         if (!host) return;
+
+        // TODO: Support no target, use options.name
+        if (!target) return;
 
         const targetUuid = target.uuid;
         const currentMarks = options?.overwrite ? 0 : device.getMarksById(targetUuid);
