@@ -58,7 +58,7 @@ import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
-import { ActorMarksFlow, SetMarksOptions } from '../actor/flows/ActorMarksFlow';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { ItemMarksFlow } from './flows/ItemMarksFlow';
 import { ItemTestDataFlow } from './flows/ItemTestDataFlow';
 
@@ -78,6 +78,7 @@ import { ActionResultFlow } from './flows/ActionResultFlow';
 import { RollDataOptions } from './Types';
 import { BruteForceTest } from '../tests/BruteForceTest';
 import { HackOnTheFlyTest } from '../tests/HackOnTheFlyTest';
+import { SetMarksOptions } from '../flows/MarksFlow';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -1471,15 +1472,15 @@ export class SR5Item extends Item {
      * @returns Amount of marks
      */
     getMarksById(markId: string): number {
-        return ItemMarksFlow.getMarksById(this, markId);
+        return ItemMarksFlow.getMark(this, markId);
     }
 
     /**
      * Get all marks placed by this item.
      * @returns The set of marks
      */
-    getAllMarks() {
-        return ItemMarksFlow.getAllMarks(this);
+    get marksData() {
+        return ItemMarksFlow.getMarks(this);
     }
 
     /**
@@ -1526,10 +1527,10 @@ export class SR5Item extends Item {
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
         if (!this.isHost) return [];
 
-        const marks = this.getAllMarks();
-        if (!marks) return [];
+        const marksData = this.marksData;
+        if (!marksData) return [];
 
-        return await ActorMarksFlow.getMarkedDocuments(marks);
+        return await ActorMarksFlow.getMarkedDocuments(marksData);
     }
 
     /**

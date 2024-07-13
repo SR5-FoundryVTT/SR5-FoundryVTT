@@ -22,7 +22,7 @@ export const shadowrunMarks = (context: QuenchBatchContext) => {
     describe('Matrix Marks handling', () => {
         it('Should return zero marks for an actor without any marks', async () => {
             const decker = await testActor.create({type: 'character'}) as SR5Actor;
-            const falseMarks = decker.getMarksById('Actor.123');
+            const falseMarks = decker.getMarksPlaced('Actor.123');
             assert.equal(falseMarks, 0);
         });
 
@@ -31,10 +31,10 @@ export const shadowrunMarks = (context: QuenchBatchContext) => {
             const target = await testActor.create({type: 'character'}) as SR5Actor;
             await decker.setMarks(target, 2);
 
-            const correctMarks = decker.getMarksById(target.uuid);
+            const correctMarks = decker.getMarksPlaced(target.uuid);
             assert.equal(correctMarks, 2)
 
-            const falseMarks = decker.getMarksById('Actor.123');
+            const falseMarks = decker.getMarksPlaced('Actor.123');
             assert.equal(falseMarks, 0);
         });
 
@@ -43,7 +43,7 @@ export const shadowrunMarks = (context: QuenchBatchContext) => {
             const target = await testItem.create({type: 'weapon'}) as SR5Item;
             await decker.setMarks(target, 2);
 
-            const correctMarks = decker.getMarksById(target.uuid);
+            const correctMarks = decker.getMarksPlaced(target.uuid);
             assert.equal(correctMarks, 2)
         });
     });

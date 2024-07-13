@@ -30,7 +30,8 @@ import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
-import { ActorMarksFlow, SetMarksOptions } from './flows/ActorMarksFlow';
+import { ActorMarksFlow } from './flows/ActorMarksFlow';
+import { SetMarksOptions } from '../flows/MarksFlow';
 
 
 /**
@@ -2087,19 +2088,8 @@ export class SR5Actor extends Actor {
      * Get all marks placed by this actor.
      * @returns 
      */
-    getAllMarks(): Shadowrun.MatrixMarks | undefined {
-        return ActorMarksFlow.getAllMarks(this);
-    }
-
-    /**
-     * Return the amount of marks this actor has on another actor or one of their items.
-     *
-     * @param target
-     * @param item
-     * @param options
-     */
-    getMarks(target: Token, item?: SR5Item) {
-        return ActorMarksFlow.getMarks(this, target, item);
+    get marksData(): Shadowrun.MatrixMarks | undefined {
+        return this.matrixData?.marks;
     }
 
     /**
@@ -2107,8 +2097,8 @@ export class SR5Actor extends Actor {
      * @param targetUuid 
      * @returns Amount of marks placed
      */
-    getMarksById(targetUuid: string) {
-        return ActorMarksFlow.getMarksById(this, targetUuid);
+    getMarksPlaced(targetUuid: string) {
+        return ActorMarksFlow.getMarksPlaced(this, targetUuid);
     }
 
     /**
@@ -2160,7 +2150,7 @@ export class SR5Actor extends Actor {
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
         const marksDevice = await this.getMarkDevice();
         if (!marksDevice) return [];
-        const marks = marksDevice.getAllMarks();
+        const marks = marksDevice.marksData;
         if (!marks) return [];
 
         return await ActorMarksFlow.getMarkedDocuments(marks);

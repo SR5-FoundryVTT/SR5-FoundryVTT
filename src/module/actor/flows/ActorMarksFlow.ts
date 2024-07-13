@@ -1,16 +1,9 @@
+import { MarkFlow, SetMarksOptions } from "../../flows/MarksFlow";
 import { NetworkDevice } from "../../item/flows/MatrixNetworkFlow";
 import { SR5Item } from "../../item/SR5Item";
 import { MatrixRules } from "../../rules/MatrixRules";
 import { SR5Actor } from "../SR5Actor";
 
-/**
- * Options for the setMarks method.
- */
-export interface SetMarksOptions {
-    // Overwrite current marks with 0
-    overwrite?: boolean
-    name?: string
-}
 /**
  * This flow handles everything around matrix mark management.
  * 
@@ -101,22 +94,8 @@ export const ActorMarksFlow = {
         // TODO: Support not target, use options.name
         if (!target) return;
 
-        const currentMarks = options?.overwrite ? 0 : persona.getMarksById(target?.uuid);
-        let mark = matrixData.marks.find(mark => mark.uuid === target?.uuid);
-
-        // Either alter the existing mark or create a new one.
-        if (mark) {
-            mark.marks = MatrixRules.getValidMarksCount(currentMarks + marks);
-        } else {
-            mark = {
-                uuid: target.uuid,
-                name: target.name ?? '',
-                marks: MatrixRules.getValidMarksCount(currentMarks + marks)
-            }
-            matrixData.marks.push(mark);
-        }
-
-        await persona.update({'system.matrix.marks': matrixData.marks});
+        const marksData = MarkFlow.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
+        await persona.update({'system.matrix.marks': marksData});
     },
 
     /**
@@ -141,45 +120,6 @@ export const ActorMarksFlow = {
     },
 
     /**
-     * Get all mark data for this actor.
-     *
-     * @param persona The persona actor to pull marks from
-     */
-    getAllMarks(persona: SR5Actor): Shadowrun.MatrixMarks | undefined {
-        return persona.matrixData?.marks;
-    },
-
-    /**
-     * Return the amount of marks this actor has on another actor or one of their items.
-     *
-     * TODO: It's unclear what this method will be used for
-     *       What does the caller want?
-     *
-     * TODO: Check with technomancers....
-     *
-     * @param persona The persona having placed the marks
-     * @param target The icon to retrieve the personas marks from
-     * @param item
-     * 
-     * @returns 
-     */
-    getMarks(persona: SR5Actor, target: Token, item?: SR5Item): number {
-        if (!canvas.ready) return 0;
-        if (target instanceof SR5Item) {
-            console.error('Not yet supported');
-            return 0;
-        }
-        if (!target.actor || !target.actor.isMatrixActor) return 0;
-
-
-        // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
-        item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
-        if (!item) return 0;
-
-        return ActorMarksFlow.getMarksById(persona, item.uuid);
-    },
-
-    /**
      * Get amount of Matrix marks placed by this actor on this target.
      *
      * @param persona The persona having placed marks
@@ -187,8 +127,8 @@ export const ActorMarksFlow = {
      * 
      * @returns Amount of marks placed
      */
-    getMarksById(persona: SR5Actor, uuid: string): number {
-        return persona.matrixData?.marks.find(mark => mark.uuid === uuid)?.marks ?? 0;
+    getMarksPlaced(persona: SR5Actor, uuid: string): number {
+        return MarkFlow.getMark(persona.matrixData?.marks ?? [], uuid);
     },
 
     /**
@@ -211,13 +151,13 @@ export const ActorMarksFlow = {
     /**
      * Retrieve all documents marked by this decker.
      * 
-     * @param matrixMarks Any documents matrix mark data.
+     * @param matrixData Any documents matrix mark data.
      * @returns The documents that have been marked.
      */
-    async getMarkedDocuments(matrixMarks: Shadowrun.MatrixMarks) {
+    async getMarkedDocuments(matrixData: Shadowrun.MatrixMarks) {
         const documents: Shadowrun.MarkedDocument[] = [];
 
-        for (const {uuid, name, marks} of matrixMarks) {
+        for (const {uuid, name, marks} of matrixData) {
             const target = uuid ? await ActorMarksFlow.getMarkedDocument(uuid) : null;
             documents.push({target, marks, markId: uuid, name});
         }

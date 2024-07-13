@@ -1,6 +1,5 @@
-import { SetMarksOptions } from "../../actor/flows/ActorMarksFlow";
 import { SR5Actor } from "../../actor/SR5Actor";
-import { MatrixRules } from "../../rules/MatrixRules";
+import { MarkFlow, SetMarksOptions } from "../../flows/MarksFlow";
 import { SR5Item } from "../SR5Item";
 
 /**
@@ -12,7 +11,6 @@ export const ItemMarksFlow = {
     /**
      * Remove ALL marks placed by this item.
      *
-     * TODO: Allow partial deletion based on target / item
      * @param device The matrix device that could've placed marks.
      */
     async clearMarks(device: SR5Item) {
@@ -23,27 +21,20 @@ export const ItemMarksFlow = {
         if (!host) return;
 
         // Delete all markId properties from ActorData
-        const updateData = {}
-        for (const markId of Object.keys(host.system.marks)) {
-            updateData[`-=${markId}`] = null;
-        }
-
-        await device.update({ 'system.marks': updateData });
+        await device.update({ 'system.marks': [] });
     },
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
      * 
-     * @param device The matrix device that could've placed marks.
-     * @param markId The markId to remove.
+     * @param device The host to remove active mark from.
+     * @param uuid The icon to remove mark for.
      */
-    async clearMark(device: SR5Item, markId: string) {
+    async clearMark(device: SR5Item, uuid: string) {
         if (!device.isHost) return;
 
-        const updateData = {}
-        updateData[`-=${markId}`] = null;
-
-        await device.update({ 'system.marks': updateData });
+        const marks = device.system.marks?.filter(mark => mark.uuid !== uuid) ?? [];
+        await device.update({ 'system.marks': marks });
     },
 
     /**
@@ -69,11 +60,9 @@ export const ItemMarksFlow = {
         // TODO: Support no target, use options.name
         if (!target) return;
 
-        const targetUuid = target.uuid;
-        const currentMarks = options?.overwrite ? 0 : device.getMarksById(targetUuid);
-        host.system.marks[targetUuid] = MatrixRules.getValidMarksCount(currentMarks + marks);
-
-        await device.update({ 'system.marks': host.system.marks });
+        const currentMarks = device.getMarksById(target.uuid);
+        const marksData = MarkFlow.setMarks(host.system.marks, target, currentMarks, marks, options);
+        await device.update({ 'system.marks': marksData });
     },
 
     /**
@@ -82,9 +71,10 @@ export const ItemMarksFlow = {
      * @param markId The markId to get the marks for.
      * @returns The amount of marks placed on the target.
      */
-    getMarksById(device: SR5Item, markId: string): number {
+    getMark(device: SR5Item, markId: string): number {
         const host = device.asHost;
-        return host ? host.system.marks[markId] : 0;
+        if (!host) return 0;
+        return MarkFlow.getMark(host.system.marks, markId);
     },
 
     /**
@@ -92,7 +82,7 @@ export const ItemMarksFlow = {
      * @param device The device to get marks for    
      * @returns The marks data for this item.
      */
-    getAllMarks(device: SR5Item): Shadowrun.MatrixMarks|undefined {
+    getMarks(device: SR5Item): Shadowrun.MatrixMarks|undefined {
         const host = device.asHost;
         if (!host) return;
         return host.system.marks;

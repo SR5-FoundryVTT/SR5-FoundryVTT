@@ -85,7 +85,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
 
             for (const item of token.actor.items) {
                 if (!item.isMatrixItem) continue;
-                const marks = this.actor.getMarksById(item.uuid);
+                const marks = this.actor.getMarksPlaced(item.uuid);
 
                 matrixItems.push({
                     item, marks
@@ -94,7 +94,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
 
             targets.push({
                 actor: token.actor,
-                marks: this.actor.getMarksById(token.actor.uuid),
+                marks: this.actor.getMarksPlaced(token.actor.uuid),
                 matrixItems,
                 runningSilent: false
             })

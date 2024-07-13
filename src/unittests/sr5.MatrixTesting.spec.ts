@@ -81,7 +81,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
 
             await decker.setMarks(device, 1);
 
-            const marksData = decker.getAllMarks() ?? []; 
+            const marksData = decker.marksData ?? []; 
 
             assert.lengthOf(marksData, 2);
 
@@ -97,7 +97,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
             const decker = await testActor.create({ type: 'character' }) as SR5Actor;
             await decker.setMarks(device, 1);
 
-            const marks = decker.getAllMarks(); 
+            const marks = decker.marksData; 
             assert.lengthOf(Object.keys(marks ?? {}), 1);
         });
 
@@ -109,7 +109,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
             await controller.addSlave(device);
             await decker.setMarks(device, 1);
 
-            const marksData = decker.getAllMarks() ?? []; 
+            const marksData = decker.marksData ?? []; 
             assert.lengthOf(marksData, 2);
 
             const markUuids = [device.uuid, controller.uuid];
