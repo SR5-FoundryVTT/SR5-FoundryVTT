@@ -72,7 +72,7 @@ async function watch() {
         gulp.watch(pattern).on('change', () => gulp.src(pattern).pipe(gulp.dest(path.resolve(destFolder, out))));
     }
 
-    gulp.watch('public/**/*').on('change', () => gulp.src('public/**/*').pipe(gulp.dest(destFolder)));
+    gulp.watch('public/**/*').on('change', () => gulp.src('public/**/*', {encoding: false}).pipe(gulp.dest(destFolder)));
     watch('src/templates/**/*', 'templates');
     watch('src/module/tours/jsons/**/*', 'tours');
 
