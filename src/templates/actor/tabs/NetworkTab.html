@@ -29,7 +29,8 @@
                         {{/if}}
                     </div>
                     <div class="item-text">
-                        {{localizeDocumentType this}}
+                        {{log this.type }}
+                        {{localizeOb this.type ../config.itemTypes}}
                     </div>
                     <div class="item-text item-icons">
                         <a class="" data-tooltip="SR5.Del">
