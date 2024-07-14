@@ -18,7 +18,6 @@ export class ActionResultFlow {
          */
     static get _handlersResultAction(): Map<ResultActions, Function> {
         const handlers = new Map();
-        handlers.set('placeMarks', () => ui.notifications?.error('Placing marks currently isnt suported. Sorry!'));
         handlers.set('modifyCombatantInit', ActionResultFlow._castInitModifierAction);
 
         return handlers;

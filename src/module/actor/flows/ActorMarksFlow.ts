@@ -121,13 +121,11 @@ export const ActorMarksFlow = {
     },
 
     /**
-     * See buildMarkUuid for a companion method for this method as well as documentation.
+     * Retrieve the document for the given FoundryVTT uuid.
      * 
-     * This method is a thin wrapper around FoundryVTT fromUuid to convert a mark uuid to a document.
-     *
      * @param uuid The icon uuid for a marked document to be retrieved
      * 
-     * @returns The document matching the given uuid.
+     * @returns FoundryVTT Document
      */
     async getMarkedDocument(uuid: string) {
         const target = await fromUuid(uuid) as SR5Actor | SR5Item | null;
@@ -155,12 +153,13 @@ export const ActorMarksFlow = {
     },
 
     /**
-     * Actor owned items can be persona devices or just devices.
+     * Check if the given device is the persona device of it's owning actor.
      * 
-     * @param target Any matrix device
+     * @param device Any matrix device
+     * 
      * @return true, if the given matrix device is used as a persona device by an actor.
      */
-    targetIsPersonaDevice(target: SR5Item): boolean {
-        return target === target.parent?.getMatrixDevice();
+    targetIsPersonaDevice(device: SR5Item): boolean {
+        return device.isMatrixDevice && device === device.parent?.getMatrixDevice();
     }
 }

@@ -1354,11 +1354,7 @@
             },
             "action_result": {
                 "result": {
-                    "success": {
-                        "matrix": {
-                            "placeMarks": false
-                        }
-                    }
+                    "success": {}
                 }
             },
             "armor": {

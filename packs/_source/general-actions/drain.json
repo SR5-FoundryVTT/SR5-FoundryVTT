@@ -95,11 +95,7 @@
       ]
     },
     "result": {
-      "success": {
-        "matrix": {
-          "placeMarks": false
-        }
-      }
+      "success": {}
     }
   },
   "ownership": {

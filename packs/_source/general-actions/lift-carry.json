@@ -93,11 +93,7 @@
       ]
     },
     "result": {
-      "success": {
-        "matrix": {
-          "placeMarks": false
-        }
-      }
+      "success": {}
     }
   },
   "effects": [],

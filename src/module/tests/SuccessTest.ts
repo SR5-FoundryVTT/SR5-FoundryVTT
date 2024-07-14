@@ -1783,14 +1783,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const actionResultData = this.results;
         if (!actionResultData) return actions;
 
-        if (actionResultData.success.matrix.placeMarks) {
-            actions.push({
-                action: 'placeMarks',
-                label: 'SR5.PlaceMarks',
-                value: ''
-            });
-        }
-
         return actions;
     }
 
