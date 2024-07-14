@@ -63,6 +63,7 @@ import { ItemMarksFlow } from './flows/ItemMarksFlow';
 import { ItemTestDataFlow } from './flows/ItemTestDataFlow';
 import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../flows/MarksFlow';
+import { MatrixFlow } from '../flows/MatrixFlow';
 
 /**
  * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
@@ -1615,6 +1616,18 @@ export class SR5Item extends Item {
         }
 
         return rollData.attributes?.[name];
+    }
+
+    /**
+     * Change a matrix attribute to a new slot and switch it's place with the previous attribute residing there.
+     * 
+     * @param changedSlot 'att1', ... 'att4' 
+     * @param changedAttribute 'attack'
+     */
+    async changeMatrixAttributeSlot(changedSlot: string, changedAttribute: Shadowrun.MatrixAttribute) {
+        if (!this.system.atts) return;
+        const updateData = MatrixFlow.changeMatrixAttribute(this.system.atts, changedSlot, changedAttribute);
+        return await this.update(updateData);
     }
 
     /**
