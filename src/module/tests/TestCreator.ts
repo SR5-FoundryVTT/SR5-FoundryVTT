@@ -41,7 +41,7 @@ export const TestCreator = {
      * @param values The values to use for the test.
      * @param options See TestOptions documentation.
      */
-    fromPool: function(values: { pool: number, limit?: number, threshold?: number }={pool: 0, limit: 0, threshold: 0}, options?: TestOptions): SuccessTest {
+    fromPool: function(values: { pool: number, limit?: number, threshold?: number }={pool: 0, limit: 0, threshold: 0}, options: TestOptions={}): SuccessTest {
         const data = TestCreator._minimalTestData();
         data.pool.base = values.pool;
         data.threshold.base = values.threshold || 0;
@@ -62,7 +62,7 @@ export const TestCreator = {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item, options?: TestOptions): Promise<any | undefined> {
+    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item, options: TestOptions={}): Promise<any | undefined> {
         //@ts-expect-error Default to item parent actor, if none given.
         if (!document) document = item.parent;
         if (!(document instanceof SR5Actor)) {
@@ -100,7 +100,7 @@ export const TestCreator = {
      * @param document The source document to use for retrieving source values defined within the action.
      * @param options See TestOptions documentation.
      */
-    fromAction: async function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, options?: TestOptions): Promise<SuccessTest | undefined> {
+    fromAction: async function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, options: TestOptions={}): Promise<SuccessTest | undefined> {
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
@@ -129,7 +129,7 @@ export const TestCreator = {
      * @param document The document used to roll the test with
      * @param options General TestOptions
      */
-    fromPackAction: async function(packName: string, actionName: string, document: SR5Actor|SR5Item, options?: TestOptions): Promise<SuccessTest|undefined> {
+    fromPackAction: async function(packName: string, actionName: string, document: SR5Actor|SR5Item, options: TestOptions={}): Promise<SuccessTest|undefined> {
         const item = await Helpers.getPackAction(packName, actionName);
         if (!item) {
             console.error(`Shadowrun5 | The pack ${packName} doesn't include an item ${actionName}`);
@@ -144,7 +144,7 @@ export const TestCreator = {
      * 
      * @param id The message id to retrieve test data from.
      */
-    fromMessage: async function(id: string, options?: TestOptions): Promise<SuccessTest | undefined> {
+    fromMessage: async function(id: string, options: TestOptions={}): Promise<SuccessTest | undefined> {
         const flagData = TestCreator.getTestDataFromMessage(id);
         return this._fromMessageTestData(flagData, options);
     },
@@ -177,7 +177,7 @@ export const TestCreator = {
      * @param testData 
      * @returns 
      */
-    _fromMessageTestData: function(testData, options?: TestOptions) {
+    _fromMessageTestData: function(testData, options: TestOptions={}) {
         // Use test data to create the original test from it.
         testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
         if (!testData || !testData.rolls) return;
@@ -199,7 +199,7 @@ export const TestCreator = {
      * @param testClsName The test class name to be used with the message test data.
      * @param options See TestOptions documentation.
      */
-    fromMessageAction: async function(id: string, testClsName: string, options?: TestOptions): Promise<SuccessTest | undefined> {
+    fromMessageAction: async function(id: string, testClsName: string, options: TestOptions={}): Promise<SuccessTest | undefined> {
         if (!game.user) return;
         
         const message = game.messages?.get(id);
@@ -246,7 +246,7 @@ export const TestCreator = {
             const matrixTestData = testData.data as MatrixPlacementData;
 
             // Some opposed tests only need an item, no actor...
-            const document = await fromUuid(matrixTestData.iconUuid as string);
+            const document = await fromUuid(matrixTestData.iconUuid);
             if (!(document instanceof SR5Item)) return;
             
             const data = await testClass._getOpposedActionTestData(matrixTestData, document, id);
@@ -283,7 +283,7 @@ export const TestCreator = {
      *                  won't be used for retrieving source values.
      * @param options Optional test options.
      */
-    fromTestData: function(data: TestData, documents?: TestDocuments, options?: TestOptions): SuccessTest {
+    fromTestData: function(data: TestData, documents?: TestDocuments, options: TestOptions={}): SuccessTest {
         const type = data.type || 'SuccessTest';
         const cls = TestCreator._getTestClass(type);
         return new cls(data, documents, options);
@@ -303,7 +303,7 @@ export const TestCreator = {
      * @param opposed The opposed test to create a resist test with.
      * @param options See TestOptions documentation.
      */
-    fromOpposedTestResistTest: async function(opposed: OpposedTest, options?: TestOptions): Promise<SuccessTest | void> {
+    fromOpposedTestResistTest: async function(opposed: OpposedTest, options: TestOptions={}): Promise<SuccessTest | void> {
         // Don't change the data's source.
         const opposedData = foundry.utils.duplicate(opposed.data);
 
@@ -328,7 +328,7 @@ export const TestCreator = {
      * @param test Any test implementation with an action providing a follow up test.
      * @param options See TestOptions documentation.
      */
-    fromFollowupTest: async function(test: SuccessTest, options?: TestOptions): Promise<SuccessTest  | void> {
+    fromFollowupTest: async function(test: SuccessTest, options: TestOptions={}): Promise<SuccessTest  | void> {
         if (!test?.data?.action?.followed?.test) return;
         if (!test.item) return console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
         if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
@@ -460,16 +460,16 @@ export const TestCreator = {
      * @param action Action data to prepare test data with.
      * @param document Document to use for retrieving source values and execute test with.
      * @param data Any test implementations resulting basic test data.
-     * @param test An optional test instance to derive testing context from. This might influence some source values.
+     * @param againstData Optional testData to use for additional context. This is data from a previous test.
      * 
      * @returns Resulting TestData
      */
-    _prepareTestDataWithAction: function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData, test?: SuccessTest) {
+    _prepareTestDataWithAction: function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData, againstData?: any) {
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 
-        if (document instanceof SR5Actor) return TestCreator._prepareTestDataWithActionForActor(action, document, data, test);
-        if (document instanceof SR5Item) return TestCreator._prepareTestDataWithActionForItem(action, document, data, test);
+        if (document instanceof SR5Actor) return TestCreator._prepareTestDataWithActionForActor(action, document, data, againstData);
+        if (document instanceof SR5Item) return TestCreator._prepareTestDataWithActionForItem(action, document, data, againstData);
 
         //@ts-expect-error // Fallback to data for easy typing, though type gating would cause a typing error, however runtime errors might occur.
         console.error(`Shadowrun 5e | Couldn't prepare test data for document type ${document.constructor.name}`, document, data);
@@ -483,11 +483,11 @@ export const TestCreator = {
      * @param action The source action to base test data on
      * @param actor The source document to use values defined within the action from
      * @param data The resulting test data object to write those values into
-     * @param test An optional test instance to derive testing context from. This might influence some source values.
+     * @param againstData Optional testData to use for additional context. This is data from a previous test.
      * 
      * @returns resulting TestData
      */
-    _prepareTestDataWithActionForActor: function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData, test?: SuccessTest) {
+    _prepareTestDataWithActionForActor: function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData, againstData?: any) {
 
         const pool = new PartsList<number>(data.pool.mod);
 
@@ -617,20 +617,20 @@ export const TestCreator = {
      * @param action The base action to configure test data with.
      * @param item The source document to pull values from.
      * @param data The test data to write values into.
-     * @param test An optional test instance to derive testing context from. This might influence some source values.
+     * @param againstData Optional testData to use for additional context. This is data from a previous test.
      * @returns TestData that's ready to be used to construct a new test instance.
      */
-    _prepareTestDataWithActionForItem: function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData, test?: SuccessTest) {
-        const testData = item.getRollData();
+    _prepareTestDataWithActionForItem: function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData, againstData?: any) {
+        const rollData = item.getRollData({againstData});
         const pool = new PartsList<number>(data.pool.mod);
 
         if (action.attribute) {
-            const attribute = item.getAttribute(action.attribute, {testData});
+            const attribute = item.getAttribute(action.attribute, {rollData});
             if (attribute) pool.addUniquePart(attribute.label, attribute.value);
         }
 
         if (action.attribute2) {
-            const attribute = item.getAttribute(action.attribute2, {testData});
+            const attribute = item.getAttribute(action.attribute2, {rollData});
             if (attribute) pool.addUniquePart(attribute.label, attribute.value);
         }
 

@@ -60,7 +60,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { ItemMarksFlow } from './flows/ItemMarksFlow';
-import { ItemTestDataFlow } from './flows/ItemTestDataFlow';
+import { ItemRollDataFlow } from './flows/ItemRollDataFlow';
 import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../flows/MarksFlow';
 import { MatrixFlow } from '../flows/MatrixFlow';
@@ -70,7 +70,7 @@ import { MatrixFlow } from '../flows/MatrixFlow';
  * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of execution within transpiled bundle.js code, 
  * resulting OpposedTest not finding SuccessTest (undefined) when extending it.
  * 
- * ... I'd love to remove this, or even just comment it, but tree-shaking will do it's job.
+ * ... I'd love to remove this, or even just comment it out, but tree-shaking will do it's job.
  * 
  * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
  * 
@@ -78,7 +78,6 @@ import { MatrixFlow } from '../flows/MatrixFlow';
  * NOTE: still not fixed with esbuild@0.19.5
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
-
 ActionResultFlow; // DON'T TOUCH!
 
 /**
@@ -1607,8 +1606,8 @@ export class SR5Item extends Item {
      * @param name An attribute or other stats name.
      * @returns Either an AttributeField or undefined, if the attribute doesn't exist on this document.
      */
-    getAttribute(name: string, options: {testData?: Shadowrun.ShadowrunItemDataData} = {}): Shadowrun.AttributeField | undefined {
-        const rollData = options.testData || this.getRollData() as Shadowrun.ShadowrunItemDataData;
+    getAttribute(name: string, options: {rollData?: Shadowrun.ShadowrunItemDataData} = {}): Shadowrun.AttributeField | undefined {
+        const rollData = options.rollData || this.getRollData() as Shadowrun.ShadowrunItemDataData;
         // Attributes for hosts work only within their own attributes.
         if (this.type === 'host') {
             const rollData = this.getRollData() as Shadowrun.HostData;
@@ -1641,41 +1640,9 @@ export class SR5Item extends Item {
      * TODO: Refactor this method using the Composition Pattern for each story.
      */
     override getRollData(options: RollDataOptions={}): any {
-        // TODO: Check if foundry is actually just passing down this.system. Then duplicate is necessary.
+        // Foundry is simply passing down 'system', so we have to duplicate to avoid contamination.
         const rollData = foundry.utils.duplicate(super.getRollData());
-        const test = options.test ?? null;
-
-        const actor = this.actorOwner;
-
-        const technologyData = this.getTechnologyData();
-        if (technologyData && actor) {
-            ItemTestDataFlow.injectOwnerMentalAttributes(actor, rollData);
-        }
-
-        // Check for owned matrix devices.
-        if (technologyData && actor && this.isEquipped() && this.isDevice) {
-            ItemTestDataFlow.injectOwnerRatingsForPAN(actor, rollData);
-        }
-
-        // Handle devices within a PAN or WAN
-        if (technologyData && this.isSlave ) {
-            const master = this.master;
-            if (!master) {
-                ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
-                return rollData;
-            }
-            
-            // @ts-expect-error No idea how to improve testing to be more specific with SuccessTest sub types.
-            const directConnection = test?.data.directConnection ?? false;;
-            ItemTestDataFlow.injectMasterAndOwnerRatingsForPAN(master, actor, rollData, directConnection)
-        }
-        // Handle devices outside a PAN or WAN, however with an owner.
-        else if (technologyData && this.actorOwner) {
-            ItemTestDataFlow.injectOwnerRatingsForPAN(this.actorOwner, rollData);
-        }
-
-        return rollData;
-        
+        return ItemRollDataFlow.getRollData(this, rollData, options);
     }
 
     override async _onCreate(changed, options, user) {

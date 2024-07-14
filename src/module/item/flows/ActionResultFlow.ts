@@ -1,9 +1,6 @@
-import {MatrixRules} from "../../rules/MatrixRules";
-import {SR5Actor} from "../../actor/SR5Actor";
 import {SuccessTest} from "../../tests/SuccessTest";
 import { PhysicalDefenseTest } from "../../tests/PhysicalDefenseTest";
 import ResultActions = Shadowrun.ResultActions;
-import { SR5Item } from "../SR5Item";
 
 
 /**
@@ -16,9 +13,9 @@ export class ActionResultFlow {
          * 
          * @returns A Map mapping action name to function handler
          */
-    static get _handlersResultAction(): Map<ResultActions, Function> {
+    static get _handlersResultAction(): Map<ResultActions, ((test: SuccessTest) => Promise<void>)> {
         const handlers = new Map();
-        handlers.set('modifyCombatantInit', ActionResultFlow._castInitModifierAction);
+        handlers.set('modifyCombatantInit', ActionResultFlow._castInitModifierAction.bind(this));
 
         return handlers;
     }
@@ -38,19 +35,6 @@ export class ActionResultFlow {
             return console.error(`Shadowrun 5e | Action result ${resultAction} has not handler registered`);
 
         await handler(test);
-
-    }
-    /**
-     * Matrix Marks are placed on either actors (persona, ic) or items (device, host, technology).
-     */
-    static async placeMatrixMarks(active: SR5Actor, targets: SR5Actor[]|SR5Item[], marks: number) {
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            return ui.notifications?.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
-        }
-
-        for (const target of targets) {
-            await active.setMarks(target, marks);
-        }
     }
 
     /**

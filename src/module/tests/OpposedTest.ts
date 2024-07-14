@@ -4,6 +4,7 @@ import {TestCreator} from "./TestCreator";
 import {SR5Item} from "../item/SR5Item";
 import {PartsList} from "../parts/PartsList";
 import { Helpers } from "../helpers";
+import { SR5Actor } from "../actor/SR5Actor";
 
 
 export interface OpposedTestValues extends SuccessTestValues {
@@ -89,7 +90,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      * @param previousMessageId The chat message the original test is stored within.
      * @returns TestData for the opposed test.
      */
-    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
+    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor: SR5Actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;
@@ -147,7 +148,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
             }
         }
 
-        return this._prepareActionTestData(action, actor, data) as OpposedTestData;
+        return this._prepareActionTestData(action, actor, data, againstData) as OpposedTestData;
     }
 
     /**
@@ -227,7 +228,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     }
 
     static override async chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.opposed-action').on('click', OpposedTest._castOpposedAction);
+        html.find('.opposed-action').on('click', OpposedTest._castOpposedAction.bind(this));
     }
 
     /**

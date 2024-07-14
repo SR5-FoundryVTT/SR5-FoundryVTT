@@ -121,7 +121,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             // Assert initial wireless connection.
             test.data.directConnection = false;
 
-            let rollData = slave.getRollData({ test });
+            let rollData = slave.getRollData({ againstData: test.data });
 
             // Master rating is used for firewall.
             assert.equal(rollData.attributes.firewall.value, 5);
@@ -129,7 +129,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             // Assert direct connection.
             test.data.directConnection = true;
 
-            rollData = slave.getRollData({ test });
+            rollData = slave.getRollData({ againstData: test.data });
 
             // Slave rating is used for firewall.
             assert.equal(rollData.attributes.firewall.value, 3);

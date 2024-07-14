@@ -376,8 +376,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return {};
     }
 
-    static _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {
-        return TestCreator._prepareTestDataWithAction(action, actor, data);
+    static _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data: any, againstData: any) {
+        return TestCreator._prepareTestDataWithAction(action, actor, data, againstData);
     }
 
     /**
