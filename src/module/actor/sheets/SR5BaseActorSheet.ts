@@ -14,7 +14,6 @@ import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
 import Skills = Shadowrun.Skills;
-import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
@@ -834,7 +833,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         //@ts-expect-error Since we're field checking, we can ignore typing...
         const { matrix } = sheetData.system;
         if (matrix) {
-            const cleanupAttribute = (attribute: MatrixAttribute) => {
+            const cleanupAttribute = (attribute: Shadowrun.MatrixAttribute) => {
                 const att = matrix[attribute];
                 if (att) {
                     if (!att.mod) att.mod = [];
@@ -842,7 +841,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 }
             };
 
-            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
+            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: Shadowrun.MatrixAttribute) => cleanupAttribute(att));
         }
     }
 
@@ -1693,29 +1692,11 @@ export class SR5BaseActorSheet extends ActorSheet {
             return;
         }
         // grab matrix attribute (sleaze, attack, etc.)
-        let att = event.currentTarget.dataset.att;
+        let attribute = event.currentTarget.dataset.att;
         // grab device attribute (att1, att2, ...)
-        let deviceAtt = event.currentTarget.value;
+        let changedSlot = event.currentTarget.value;
 
-        // get current matrix attribute on the device
-        const deviceData = item.system as DeviceData;
-        let oldVal = deviceData.atts[deviceAtt].att;
-        let data = {
-            _id: iid,
-        };
-
-        // go through atts on device, setup matrix attributes on it
-        // This logic swaps the two slots when a new one is selected
-        for (let i = 1; i <= 4; i++) {
-            let tmp = `att${i}`;
-            let key = `system.atts.att${i}.att`;
-            if (tmp === deviceAtt) {
-                data[key] = att;
-            } else if (deviceData.atts[`att${i}`].att === att) {
-                data[key] = oldVal;
-            }
-        }
-        await this.actor.updateEmbeddedDocuments('Item', [data]);
+        await item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
 
     /**

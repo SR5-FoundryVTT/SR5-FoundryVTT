@@ -9,6 +9,7 @@ import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { MatrixRules } from '../rules/MatrixRules';
+import { MatrixFlow } from '../flows/MatrixFlow';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -445,28 +446,17 @@ export class SR5ItemSheet extends ItemSheet {
         }
     }
 
-    //Swap slots (att1, att2, etc.) for ASDF matrix attributes
+    /**
+     * User selected a new matrix attribute on a specific matrix attribute slot (att1, att2,)
+     * Switch out slots for the old and selected matrix attribute.
+     */
     async _onMatrixAttributeSelected(event) {
         if (!this.item.system.atts) return;
 
-        // sleaze, attack, etc.
-        const selectedAtt = event.currentTarget.value;
-        // att1, att2, etc..
+        const attribute = event.currentTarget.value;
         const changedSlot = event.currentTarget.dataset.att;
 
-        const oldValue = this.item.system.atts[changedSlot].att;
-
-        let data = {}
-
-        Object.entries(this.item.system.atts).forEach(([slot, { att }]) => {
-            if (slot === changedSlot) {
-                data[`system.atts.${slot}.att`] = selectedAtt;
-            } else if (att === selectedAtt) {
-                data[`system.atts.${slot}.att`] = oldValue;
-            }
-        });
-
-        await this.item.update(data);
+        await this.item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
 
     async _onEditItem(event) {
