@@ -1,8 +1,8 @@
-import { SR5 } from './../config';
 import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
+import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
 import { OpposedTest } from "./OpposedTest";
@@ -10,7 +10,8 @@ import { MarkPlacementFlow } from './flows/MarkPlacementFlow';
 
 export class OpposedBruteForceTest extends OpposedTest {
     override against: BruteForceTest;
-    icon: SR5Item|SR5Actor;
+    icon: NetworkDevice;
+    persona: SR5Actor;
 
     override _prepareData(data: any, options?: any) {
         data = super._prepareData(data, options);
@@ -43,11 +44,15 @@ export class OpposedBruteForceTest extends OpposedTest {
      * When failing against brute force, the decker gets a mark on the target and can deal damage.
      */
     override async processFailure() {
-        // How many marks did the user want to place?
+        // Prepare marks and target icon.
         const marks = this.against.data.marks;
-        // Either use a matrix target or the actor itself
         const target = this.icon;
-        if (!target) return;
+
+        if (!target) {
+            console.error('Shadowrun 5e | Expected a target icon to be set.');
+            return;
+        }
+
         await this.against.actor.setMarks(target, marks);
 
         // Setup optional damage value

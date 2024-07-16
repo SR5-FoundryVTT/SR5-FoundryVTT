@@ -1,4 +1,10 @@
 <form>
+    {{#if test.persona}}
+    <div class="document">
+        <img src="{{test.persona.img}}" />
+        {{test.persona.name}}
+    </div>
+    {{/if}}
     {{#if test.icon}}
     <div class="document">
         <img src="{{test.icon.img}}" />

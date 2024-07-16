@@ -8,7 +8,8 @@ declare namespace Shadowrun {
             attributes: AttributesData
             rating: number,
             marks: MatrixMarks,
-            ic: SourceEntityField[]
+            // uuid of started ic on this actor.
+            ic: string[]
 
             // Disable host attribute calculation
             customAttributes: boolean

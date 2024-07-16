@@ -1,25 +1,34 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
-import { SuccessTest } from "./SuccessTest";
+import { SuccessTest, TestOptions } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
 
 /**
  * Brute force tests implement the Brute Force action on SR5#238
+ * 
+ * See MarkPlacementFlow for more details on the test flow.
  */
 export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     override actor: SR5Actor;
     
     // The icon to place a mark on.
-    // This can be the actor itself or a device connected to it.
+    // If an actor was selected, this will point to either the persona device or the actor itself, if no persona device is used.
     icon: NetworkDevice;
+    // The persona matrix actor. If in use, icon will either point to the actor, if no persona device is used, or the persona device.
+    persona: SR5Actor;
     // The devices connected to the main icon persona / host.
-    devices: (SR5Item)[];
+    devices: (NetworkDevice)[];
+    // Started ic on selected host.
+    ic: SR5Actor[];
     // All available hosts.
     hosts: (SR5Item)[];
+    // All available gitters.
+    // TODO: gitters aren't implemented yet.
+    gitters: any;
 
-    override _prepareData(data: MatrixPlacementData, options): any {
+    override _prepareData(data: MatrixPlacementData, options: TestOptions={}): any {
         data = super._prepareData(data, options);
         return MarkPlacementFlow._prepareData(data, options);
     }
@@ -29,14 +38,6 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
      */
     override get testCategories(): Shadowrun.ActionCategories[] {
         return ['matrix', 'brute_force'];
-    }
-
-    /**
-     * Helper to determine if the targeted icon is an actor or not.
-     * @returns true, for actor. false, for anything else.
-     */
-    get iconIsActor(): boolean {
-        return this.icon instanceof SR5Actor;
     }
 
     /**
@@ -57,29 +58,27 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     }
 
     /**
-     * TODO: What am I even thinking here? Add an actual documentation of the test flow making these cases necessary
+     * Prepare icon and persona based on given uuid or user selection.
      * 
-     * Icon can be both the hacking device and the target device? What even?!
-     * 
-     * @returns 
      */
     override async populateDocuments() {
         await super.populateDocuments();
 
+        // Handle icons around targeting.
         this._prepareIcon();
-        this._prepareTargetIcon();
+        this._prepareTokenTargetIcon();
+
+        // Target is a persona or a persona device.
         this._prepareActorDevices();
 
+        // Target is a host or a host device.
         this._prepareHosts();
+        this._prepareHostDevices();
     }
 
     /**
-     * Prepare a icon based on test data.
+     * Prepare Icon and Persona for this test based on data.
      * 
-     * This can be these cases:
-     * - an icon has been given into the test by outside sources
-     * - an icon has been selected by the user
-     * @returns 
      */
     _prepareIcon() {
         if (!this.data.iconUuid) return;
@@ -87,22 +86,33 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
         // Fetch the icon as selected or given.
         this.icon = fromUuidSync(this.data.iconUuid) as NetworkDevice;
 
-        // Switch to main icon if user selected it.
-        if (this.data.placeOnMainIcon) this.icon = this.icon.parent as SR5Actor;
+        if (this.icon instanceof SR5Actor) this.persona = this.icon;
+
+        if (!this.data.personaUuid) return;
+        this.persona = fromUuidSync(this.data.personaUuid) as SR5Actor;
     }
     /**
      * Prepare a icon based on token targeting.
-     * 
      */
-    _prepareTargetIcon() {
-        if (this.data.iconUuid || !this.hasTargets) return;
-        if (this.targets.length !== 1) return console.error('Shadowrun 5e | Multiple targets for mark placement', this.targets);
+    _prepareTokenTargetIcon() {
+        // If a persona has been loaded via uuid already, don't determine it anymore via token targeting.
+        if (this.persona || !this.hasTargets) return;
+        if (this.targets.length !== 1) {
+            console.error('Shadowrun 5e | Multiple targets for mark placement', this.targets);
+            return;
+        }
 
         const target = this.targets[0];
         const actor = target.actor as SR5Actor;
-
+        
+        this.persona = actor;
         // Retrieve the target icon document.
-        this.icon = fromUuidSync(actor.uuid) as NetworkDevice;
+        this.icon = actor.hasDevicePersona ? 
+            actor.getMatrixDevice() as SR5Item : 
+            actor;
+
+        this.data.iconUuid = this.icon.uuid;
+        this.data.personaUuid = this.persona.uuid;
     }
 
     /**
@@ -110,23 +120,42 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
      */
     _prepareActorDevices() {
         this.devices = [];
-        if (!this.icon) return;
-        const actor = this.iconIsActor ? this.icon as SR5Actor : this.icon.parent as SR5Actor;
-        if (!actor.isCharacter || !actor.isCritter) return;
+        if (!this.persona) return;
+        if (!this.persona.isCharacter || !this.persona.isCritter || !this.persona.isVehicle) return;
 
         // Collect network devices
-        this.devices = actor.wirelessDevices;
+        this.devices = this.persona.wirelessDevices;
     }
 
     /**
-     * Retrieve all hosts available for a decker to hack.
-     * 
-     * If any token is selected, don't retrieve hosts.
+     * Retrieve all hosts available for a decker to hack, if no persona has been selected.
      */
     _prepareHosts() {
-        if (this.hasTargets) return;
+        if (this.persona) return;
 
         this.hosts = game.items?.filter(item => item.isHost) as SR5Item[];
+    }
+
+    /**
+     * Retrieve all devices connected to the host.
+     */
+    _prepareHostDevices() {
+        if (this.icon instanceof SR5Item && !this.icon.isHost) return;
+
+        // Whatever is connected to a host, is always 'wireless'.
+        this.devices = this.icon.items.filter(item => item.isMatrixDevice);
+    }
+
+    /**
+     * Retrieve all started IC connected to the host.
+     */
+    _prepareHostIC() {
+        if (this.icon instanceof SR5Actor) return;
+        const host = this.icon.asHost;
+        if (!host) return;
+
+        // Whatever is connected to a host, is always 'wireless'.
+        this.ic = host.system.ic.map(uuid => fromUuidSync(uuid) as SR5Actor);
     }
 
     /**

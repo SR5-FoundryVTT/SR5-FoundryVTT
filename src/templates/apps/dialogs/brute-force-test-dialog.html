@@ -26,12 +26,14 @@
                 <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnMainIcon"}}</label>
                 <input type="checkbox" class="checkbox" name="test.data.placeOnMainIcon" {{checked test.data.placeOnMainIcon}}/>
             </div>
-            {{#if test.hasTargets}}
+            {{#if test.persona}}
+            <!-- Persona targeted -->
             <div class="form-group">
                 <label>{{localize "SR5.Target"}}</label>
-                <div>{{test.icon.name}}</div>
+                <div>{{test.persona.name}}</div>
             </div>
             {{else}}
+            <!-- List of hosts available -->
             <div class="form-group">
                 <label>{{localize "SR5.Hosts"}}</label>
                 <select name="test.data.iconUuid" class="display">
@@ -43,6 +45,7 @@
                 </select>
             </div>
             {{/if}}
+            <!-- Devices connected to persona or host -->
             {{#ife test.data.placeOnMainIcon false}}
             <div class="form-group">
                 <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnDevice"}}</label>

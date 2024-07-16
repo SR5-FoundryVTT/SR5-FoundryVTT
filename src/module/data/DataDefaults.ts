@@ -3,9 +3,6 @@ import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
 import ActionRollData = Shadowrun.ActionRollData;
 import LimitField = Shadowrun.LimitField;
-import SourceEntityField = Shadowrun.SourceEntityField;
-import ValueField = Shadowrun.ValueField;
-import GenericValueField = Shadowrun.GenericValueField;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import RangeData = Shadowrun.RangeData;
 
