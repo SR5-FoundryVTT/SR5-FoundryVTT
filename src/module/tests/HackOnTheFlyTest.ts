@@ -1,4 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
+import { SR5Item } from "../item/SR5Item";
+import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
 import { SuccessTest } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
@@ -9,17 +11,24 @@ import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlo
 export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
     override actor: SR5Actor;
 
+    // The icon to place a mark on.
+    // If an actor was selected, this will point to either the persona device or the actor itself, if no persona device is used.
+    icon: NetworkDevice;
+    // The persona matrix actor. If in use, icon will either point to the actor, if no persona device is used, or the persona device.
+    persona: SR5Actor;
+    // The devices connected to the main icon persona / host.
+    devices: (NetworkDevice)[];
+    // Started ic on selected host.
+    ic: SR5Actor[];
+    // All available hosts.
+    hosts: (SR5Item)[];
+    // All available gitters.
+    // TODO: gitters aren't implemented yet.
+    gitters: any;
+
     override _prepareData(data: MatrixPlacementData, options): any {
         data = super._prepareData(data, options);
-
-        // Place a single mark as default
-        data.marks = data.marks ?? 1;
-        // Assume decker and target reside on the same Grid
-        data.sameGrid = data.sameGrid ?? true;
-        // Assume no direct connection
-        data.directConnection = data.directConnection ?? false;
-
-        return data;
+        return MarkPlacementFlow._prepareData(data, options);
     }
 
     /**
@@ -40,6 +49,11 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
 
     override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.html';
+    }
+
+    override async populateDocuments() {
+        await super.populateDocuments();
+        MarkPlacementFlow.populateDocuments(this);
     }
 
     override prepareTestModifiers() {

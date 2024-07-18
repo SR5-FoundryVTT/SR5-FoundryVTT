@@ -1,3 +1,6 @@
+import { SR5Actor } from '../../actor/SR5Actor';
+import { NetworkDevice } from '../../item/flows/MatrixNetworkFlow';
+import { SR5Item } from '../../item/SR5Item';
 import { PartsList } from '../../parts/PartsList';
 import { MatrixRules } from '../../rules/MatrixRules';
 import { HackOnTheFlyTest } from '../HackOnTheFlyTest';
@@ -27,6 +30,9 @@ export interface OpposeMarkPlacementData extends OpposedTestData {
 }
 /**
  * Handle test flows for placing marks between different tests / actions.
+ * 
+ * This assumes that:
+ * - A persona will be selected BEFORE testing starts and won't be changeable during.
  */
 export const MarkPlacementFlow = {
     /**
@@ -91,6 +97,112 @@ export const MarkPlacementFlow = {
         } else {
             modifiers.addUniquePart('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
         }
+    },
+
+    /**
+     * Prepare icon and persona based on given uuid or user selection.
+     * 
+     * @param test 
+     */
+    populateDocuments(test: BruteForceTest|HackOnTheFlyTest) {
+        // Handle icons around targeting.
+        MarkPlacementFlow._prepareIcon(test);
+        MarkPlacementFlow._prepareTokenTargetIcon(test);
+
+        // Target is a persona or a persona device.
+        MarkPlacementFlow._prepareActorDevices(test);
+
+        // Target is a host or a host device.
+        MarkPlacementFlow._prepareHosts(test);
+        MarkPlacementFlow._prepareHostDevices(test);
+    },
+    /**
+     * Prepare Icon and Persona for this test based on data.
+     * 
+     */
+    _prepareIcon(test: BruteForceTest|HackOnTheFlyTest) {
+        if (!test.data.iconUuid) return;
+
+        // Fetch the icon as selected or given.
+        test.icon = fromUuidSync(test.data.iconUuid) as NetworkDevice;
+
+        if (test.icon instanceof SR5Actor) test.persona = test.icon;
+
+        if (!test.data.personaUuid) return;
+        test.persona = fromUuidSync(test.data.personaUuid) as SR5Actor;
+    },
+
+    /**
+     * Prepare a icon based on token targeting.
+     */
+    _prepareTokenTargetIcon(test: BruteForceTest|HackOnTheFlyTest) {
+        // If a persona has been loaded via uuid already, don't determine it anymore via token targeting.
+        if (test.persona || !test.hasTargets) return;
+        if (test.targets.length !== 1) {
+            console.error('Shadowrun 5e | Multiple targets for mark placement', test.targets);
+            return;
+        }
+
+        const target = test.targets[0];
+        const actor = target.actor as SR5Actor;
+        
+        test.persona = actor;
+        // Retrieve the target icon document.
+        test.icon = actor.hasDevicePersona ? 
+            actor.getMatrixDevice() as SR5Item : 
+            actor;
+
+        test.data.iconUuid = test.icon.uuid;
+        test.data.personaUuid = test.persona.uuid;
+    },
+
+    /**
+     * Retrieve all devices connected with the persona actor.
+     */
+    _prepareActorDevices(test: BruteForceTest|HackOnTheFlyTest) {
+        test.devices = [];
+        if (!test.persona) return;
+        if (!test.persona.isCharacter || !test.persona.isCritter || !test.persona.isVehicle) return;
+
+        // Collect network devices
+        test.devices = test.persona.wirelessDevices;
+    },
+
+    /**
+     * Retrieve all hosts available for a decker to hack, if no persona has been selected.
+     */
+    _prepareHosts(test: BruteForceTest|HackOnTheFlyTest) {
+        if (test.persona) return;
+
+        test.hosts = game.items?.filter(item => item.isHost) as SR5Item[];
+
+        // By default, select the first host in list.
+        test.icon = test.hosts[0];
+        test.data.iconUuid = test.icon.uuid;
+    },
+
+    /**
+     * Retrieve all devices connected to the host.
+     */
+    _prepareHostDevices(test: BruteForceTest|HackOnTheFlyTest) {
+        if (!(test.icon instanceof SR5Item)) return;
+        const host = test.icon.asHost;
+        if (!host) return;
+
+        // Whatever is connected to a host, is always 'wireless'.
+        test.devices = host.system.slaves.map(uuid => fromUuidSync(uuid) as SR5Item);
+    },
+
+    /**
+     * Retrieve all started IC connected to the host.
+     */
+    _prepareHostIC(test: BruteForceTest|HackOnTheFlyTest) {
+        if (test.icon instanceof SR5Actor) return;
+        const host = test.icon.asHost;
+        if (!host) return;
+
+        // Whatever is connected to a host, is always 'wireless'.
+        test.ic = host.system.ic.map(uuid => fromUuidSync(uuid) as SR5Actor);
     },
 
     /**

@@ -213,7 +213,8 @@ ___________________
                 SummonSpiritTest,
                 CompileSpriteTest,
                 RitualSpellcastingTest,
-                BruteForceTest
+                BruteForceTest,
+                HackOnTheFlyTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.

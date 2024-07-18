@@ -53,7 +53,7 @@ export class OpposedBruteForceTest extends OpposedTest {
             return;
         }
 
-        await this.against.actor.setMarks(target, marks);
+        await this.against.persona.setMarks(target, marks);
 
         // Setup optional damage value
         const damage = Math.floor(this.againstNetHits.value / 2);
