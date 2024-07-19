@@ -50,7 +50,7 @@ module.exports = {
         "@typescript-eslint/no-confusing-void-expression": "warn",
         "@typescript-eslint/no-misused-promises": "warn",
         "@typescript-eslint/prefer-optional-chain": "warn",
-        "@typescript-eslint/no-floating-promises": "warn",
+        "@typescript-eslint/no-floating-promises": "off", // Allow executing async functions in a sync method, if async isn't needed.
         "no-case-declarations": "warn",
         "@typescript-eslint/promise-function-async": "warn",
         "@typescript-eslint/no-empty-interface": "warn",
