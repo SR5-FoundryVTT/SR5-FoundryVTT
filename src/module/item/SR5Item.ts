@@ -66,21 +66,6 @@ import { SetMarksOptions } from '../flows/MarksFlow';
 import { MatrixFlow } from '../flows/MatrixFlow';
 
 /**
- * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
- * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of execution within transpiled bundle.js code, 
- * resulting OpposedTest not finding SuccessTest (undefined) when extending it.
- * 
- * ... I'd love to remove this, or even just comment it out, but tree-shaking will do it's job.
- * 
- * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
- * 
- * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
- * NOTE: still not fixed with esbuild@0.19.5
- */
-import { ActionResultFlow } from './flows/ActionResultFlow';
-ActionResultFlow; // DON'T TOUCH!
-
-/**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
  *
  *       tamIf here: The current legacy nested items approach has been cleaned up a bit but is still causing some issues

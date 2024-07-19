@@ -1,5 +1,5 @@
+import { PhysicalDefenseTestData } from './../../tests/PhysicalDefenseTest';
 import {SuccessTest} from "../../tests/SuccessTest";
-import { PhysicalDefenseTest } from "../../tests/PhysicalDefenseTest";
 import ResultActions = Shadowrun.ResultActions;
 
 
@@ -42,10 +42,10 @@ export class ActionResultFlow {
      * 
      * @param test The test instance causing the initiative modification
      */
-    static async _castInitModifierAction(test: PhysicalDefenseTest) {
-        if (!(test instanceof PhysicalDefenseTest)) return;
-        
-        if (!test.data.iniMod) return;
-        await test.actor?.changeCombatInitiative(test.data.iniMod);
+    static async _castInitModifierAction(test: SuccessTest) {
+        // NOTE: Use test data typing here, as including PhysicalDefenseTest would cause circular dependencies, breaking SuccessTest/OpposedTest import order.
+        const data = test.data as PhysicalDefenseTestData;
+        if (!data.iniMod) return;
+        await test.actor?.changeCombatInitiative(data.iniMod);
     }
 }
