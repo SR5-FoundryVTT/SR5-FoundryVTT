@@ -39,6 +39,16 @@ declare global {
         sheet: FormApplication;
     }
 
+    /**
+     * Inject v11 types into 
+     */
+    interface Item {
+        updateSource(data: any, options?): Promise<this>;
+    }
+    interface Actor {
+        updateSource(data: any, options?): Promise<this>;
+    }
+
     // Inject model basic structure into foundry-vtt-types
     interface Game {
         model: {
