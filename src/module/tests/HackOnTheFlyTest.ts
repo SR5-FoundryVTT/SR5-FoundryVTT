@@ -28,7 +28,7 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
 
     override _prepareData(data: MatrixPlacementData, options): any {
         data = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareData(data, options);
+        return MarkPlacementFlow._prepareData(data);
     }
 
     /**

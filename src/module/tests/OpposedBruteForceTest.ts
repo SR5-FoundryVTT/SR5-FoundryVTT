@@ -1,7 +1,6 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
-import { SR5Item } from '../item/SR5Item';
 import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
@@ -9,6 +8,9 @@ import { OpposedTest } from "./OpposedTest";
 import { TestCreator } from './TestCreator';
 import { MarkPlacementFlow } from './flows/MarkPlacementFlow';
 
+/**
+ * Implement the opposing test for Brute Force action. See SR5#238 'Brute Force'
+ */
 export class OpposedBruteForceTest extends OpposedTest {
     override against: BruteForceTest;
     icon: NetworkDevice;
@@ -16,7 +18,7 @@ export class OpposedBruteForceTest extends OpposedTest {
 
     override _prepareData(data: any, options?: any) {
         data = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareOpposedData(data, options);
+        return MarkPlacementFlow._prepareOpposedData(data);
     }
 
     override get _dialogTemplate() {
@@ -36,12 +38,7 @@ export class OpposedBruteForceTest extends OpposedTest {
     }
 
     override async populateDocuments() {
-        if (this.against.data.personaUuid) {
-            this.persona = await fromUuid(this.against.data.personaUuid) as SR5Actor;
-        }
-        if (this.against.data.iconUuid) {
-            this.icon = await fromUuid(this.against.data.iconUuid) as SR5Item;
-        }
+        MarkPlacementFlow.populateOpposedDocuments(this);
     }
     
     /**
@@ -50,14 +47,14 @@ export class OpposedBruteForceTest extends OpposedTest {
     override async processFailure() {
         // Prepare marks and target icon.
         const marks = this.against.data.marks;
-        const target = this.icon;
+        const icon = this.icon;
 
-        if (!target) {
+        if (!icon) {
             console.error('Shadowrun 5e | Expected a target icon to be set.');
             return;
         }
 
-        await this.against.persona.setMarks(target, marks);
+        await this.against.actor.setMarks(icon, marks);
 
         // Setup optional damage value
         const damage = Math.floor(this.againstNetHits.value / 2);

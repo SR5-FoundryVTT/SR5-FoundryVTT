@@ -30,7 +30,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
 
     override _prepareData(data: MatrixPlacementData, options: TestOptions={}): any {
         data = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareData(data, options);
+        return MarkPlacementFlow._prepareData(data);
     }
 
     /**

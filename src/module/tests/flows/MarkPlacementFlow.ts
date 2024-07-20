@@ -4,6 +4,8 @@ import { SR5Item } from '../../item/SR5Item';
 import { PartsList } from '../../parts/PartsList';
 import { MatrixRules } from '../../rules/MatrixRules';
 import { HackOnTheFlyTest } from '../HackOnTheFlyTest';
+import { OpposedBruteForceTest } from '../OpposedBruteForceTest';
+import { OpposedHackOnTheFlyTest } from '../OpposedHackOnTheFlyTest';
 import { OpposedTestData } from '../OpposedTest';
 import { SuccessTestData, TestOptions } from '../SuccessTest';
 import { BruteForceTest } from './../BruteForceTest';
@@ -42,7 +44,7 @@ export const MarkPlacementFlow = {
      * @param options 
      * @returns 
      */
-    _prepareData(data: MatrixPlacementData, options: TestOptions): any {
+    _prepareData(data: MatrixPlacementData): any {
         // Place a single mark as default
         data.marks = data.marks ?? 1;
         // Assume decker and target reside on the same Grid
@@ -61,10 +63,9 @@ export const MarkPlacementFlow = {
     /**
      * Prepare data for the opposing mark placement test.
      * @param data 
-     * @param options 
      * @returns 
      */
-    _prepareOpposedData(data: OpposeMarkPlacementData, options: TestOptions): any {
+    _prepareOpposedData(data: OpposeMarkPlacementData): any {
         data.personaUuid = data.personaUuid ?? data.against.personaUuid;
         data.iconUuid = data.iconUuid ?? data.against.iconUuid;
         return data;
@@ -115,6 +116,21 @@ export const MarkPlacementFlow = {
         // Target is a host or a host device.
         MarkPlacementFlow._prepareHosts(test);
         MarkPlacementFlow._prepareHostDevices(test);
+    },
+
+    /**
+     * Prepare icon and persona within a an opposing test context.
+     * 
+     * The active success test will provide an icon, which is the target and an optional persona, connected to it.
+     * @param test The test to populate with documents.
+     */
+    async populateOpposedDocuments(test: OpposedBruteForceTest|OpposedHackOnTheFlyTest) {
+        if (test.against.data.personaUuid) {
+            test.persona = await fromUuid(test.against.data.personaUuid) as SR5Actor;
+        }
+        if (test.against.data.iconUuid) {
+            test.icon = await fromUuid(test.against.data.iconUuid) as SR5Item;
+        }
     },
     /**
      * Prepare Icon and Persona for this test based on data.

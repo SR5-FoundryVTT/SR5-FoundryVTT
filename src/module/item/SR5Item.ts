@@ -237,6 +237,7 @@ export class SR5Item extends Item {
             TechnologyPrep.prepareConditionMonitor(technology);
             TechnologyPrep.prepareConceal(technology, equippedMods);
             TechnologyPrep.prepareAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
+            TechnologyPrep.prepareMatrixAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
             TechnologyPrep.prepareMentalAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
         }
 
@@ -270,7 +271,6 @@ export class SR5Item extends Item {
 
         const technology = this.getTechnologyData();
         if (technology) {
-            TechnologyPrep.prepareMatrixAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
             TechnologyPrep.calculateAttributes(this.system.attributes as Shadowrun.AttributesData);
         }
 
