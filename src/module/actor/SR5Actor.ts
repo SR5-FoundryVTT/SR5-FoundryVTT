@@ -2069,7 +2069,7 @@ export class SR5Actor extends Actor {
      * @param options Additional options that may be needed
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: SR5Actor|SR5Item|undefined, marks: number, options: SetMarksOptions = {}) {
+    async setMarks(target: NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
         await ActorMarksFlow.setMarks(this, target, marks, options);
     }
 
@@ -2083,8 +2083,8 @@ export class SR5Actor extends Actor {
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
      */
-    async clearMark(markId: string) {
-        await ActorMarksFlow.clearMark(this, markId);
+    async clearMark(uuid: string) {
+        await ActorMarksFlow.clearMark(this, uuid);
     }
 
     /**
@@ -2097,11 +2097,12 @@ export class SR5Actor extends Actor {
 
     /**
      * Get amount of Matrix marks placed by this actor on this target.
-     * @param targetUuid 
+     * 
+     * @param uuid Target uuid
      * @returns Amount of marks placed
      */
-    getMarksPlaced(targetUuid: string) {
-        return ActorMarksFlow.getMarksPlaced(this, targetUuid);
+    getMarksPlaced(uuid: string) {
+        return ActorMarksFlow.getMarksPlaced(this, uuid);
     }
 
     /**
