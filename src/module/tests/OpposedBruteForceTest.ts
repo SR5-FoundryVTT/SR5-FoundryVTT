@@ -6,6 +6,7 @@ import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
 import { OpposedTest } from "./OpposedTest";
+import { TestCreator } from './TestCreator';
 import { MarkPlacementFlow } from './flows/MarkPlacementFlow';
 
 export class OpposedBruteForceTest extends OpposedTest {
@@ -35,6 +36,9 @@ export class OpposedBruteForceTest extends OpposedTest {
     }
 
     override async populateDocuments() {
+        if (this.against.data.personaUuid) {
+            this.persona = await fromUuid(this.against.data.personaUuid) as SR5Actor;
+        }
         if (this.against.data.iconUuid) {
             this.icon = await fromUuid(this.against.data.iconUuid) as SR5Item;
         }
@@ -59,5 +63,18 @@ export class OpposedBruteForceTest extends OpposedTest {
         const damage = Math.floor(this.againstNetHits.value / 2);
         this.data.damage = DataDefaults.damageData({base: damage, type: {base: 'matrix', value: 'matrix'}});
         Helpers.calcTotal(this.data.damage);
+    }
+
+    /**
+     * Allow users to resist against possible matrix damage taken.
+     */
+    override async afterFailure() {
+        await super.afterFailure();
+
+        // Don't resist if no damage was taken.
+        if (this.data.damage.value === 0) return;
+        const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
+        if (!test) return;
+        await test.execute();
     }
 }

@@ -73,6 +73,7 @@ import { RenderSettings } from './systemLinks';
 import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
+import { MatrixResistTest } from './tests/MatrixResistTest';
 
 
 
@@ -186,7 +187,8 @@ ___________________
                 BruteForceTest,
                 OpposedBruteForceTest,
                 HackOnTheFlyTest,
-                OpposedHackOnTheFlyTest
+                OpposedHackOnTheFlyTest,
+                MatrixResistTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -238,7 +240,8 @@ ___________________
              * Instead of showing on the action configuration these are connected to active or opposed test.
              */
             resistTests: {
-                PhysicalResistTest
+                PhysicalResistTest,
+                MatrixResistTest
             },
             /**
              * Subset of tests meant to follow a main active test

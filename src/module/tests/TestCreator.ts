@@ -252,7 +252,7 @@ export const TestCreator = {
             const data = await testClass._getOpposedActionTestData(matrixTestData, document, id);
             if (!data) return;
 
-            const documents = {item: document};
+            const documents = {source: document};
             const test = new testClass(data, documents, options);
 
             await test.execute();
@@ -265,7 +265,7 @@ export const TestCreator = {
             const data = await testClass._getOpposedActionTestData(testData.data, actor, id);
             if (!data) return;
 
-            const documents = {actor};
+            const documents = {source: actor};
             const test = new testClass(data, documents, options);
 
             // Await test chain resolution for each actor, to avoid dialog spam.
@@ -308,12 +308,12 @@ export const TestCreator = {
         const opposedData = foundry.utils.duplicate(opposed.data);
 
         if (!opposedData?.against?.opposed?.resist?.test) return console.error(`Shadowrun 5e | Given test doesn't define an opposed resist test`, opposed);
-        if (!opposed.actor) return console.error(`Shadowrun 5e | A ${opposed.title} can't operate without a populated actor given`);
+        if (!opposed.source) return console.error(`Shadowrun 5e | Given test doesn't have a source actor`, opposed);
 
         const resistTestCls = TestCreator._getTestClass(opposedData.against.opposed.resist.test);
 
-        const data = TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.actor, opposed.data.messageUuid);
-        const documents = {actor: opposed.actor};
+        const data = TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.source, opposed.data.messageUuid);
+        const documents = {source: opposed.source};
 
         return new resistTestCls(data, documents, options);
     },
@@ -350,7 +350,7 @@ export const TestCreator = {
         const testData = await testCls._prepareActionTestData(action, test.actor, data);
         testData.following = test.data;
 
-        const documents = {item: test.item, actor: test.actor};
+        const documents = {source: test.source, item: test.item, actor: test.actor};
 
         return new testCls(testData, documents, options);
     },
@@ -420,15 +420,15 @@ export const TestCreator = {
      *
      * @param resistTestCls The resist test class to be used.
      * @param opposedData The opposing test, including the original test being opposed.
-     * @param actor The actor doing the testing.
+     * @param document The actor doing the testing.
      * @param previousMessageId The Message id of the originating opposing test.
      */
-    _getOpposedResistTestData: function(resistTestCls, opposedData: OpposedTestData, actor: SR5Actor, previousMessageId?: string) {
+    _getOpposedResistTestData: function(resistTestCls, opposedData: OpposedTestData, document: SR5Actor|SR5Item, previousMessageId?: string) {
         if (!opposedData.against.opposed.resist.test) {
             console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, opposedData, this);
             return;
         }
-        if (!actor) {
+        if (!document) {
             console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, resistTestCls);
         }
 
@@ -451,7 +451,7 @@ export const TestCreator = {
         );
 
         // Alter default action information with user defined information.
-        return TestCreator._prepareTestDataWithAction(action, actor, data);
+        return TestCreator._prepareTestDataWithAction(action, document, data);
     },
 
     /**

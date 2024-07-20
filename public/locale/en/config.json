@@ -612,8 +612,8 @@
             "OpenInventory": "Inventory"
         },
         "MarkPlacement": {
-            "PlaceOnMainIcon": "Place on persona/host",
-            "PlaceOnDevice": "Place on device"
+            "PlaceOnDevice": "Place on device",
+            "PlaceOnMainIcon": "Place on persona/host"
         },
         "Message": {
             "ClickToSelect": "Click to select on scene",
@@ -1193,6 +1193,7 @@
         "ExtendedTest": "Extended Test",
         "FadeTest": "Fade Test",
         "HackOnTheFlyTest": "Hack on the Fly",
+        "MatrixResistTest": "Matrix Damage Resist",
         "MeleeAttackTest": "Melee Weapon Attack",
         "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
         "NaturalRecoveryStunTest": "Natural Recovery Stun",

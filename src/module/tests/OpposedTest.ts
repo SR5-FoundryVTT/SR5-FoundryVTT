@@ -86,11 +86,11 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      * Typically this would be as part of a test => message => oppose flow
      * 
      * @param againstData The original test to be opposed in raw data.
-     * @param actor The actor used to oppose this original test with.
+     * @param document The actor used to oppose this original test with.
      * @param previousMessageId The chat message the original test is stored within.
      * @returns TestData for the opposed test.
      */
-    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor: SR5Actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
+    static override async _getOpposedActionTestData(againstData: SuccessTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<OpposedTestData | undefined> {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;
@@ -98,7 +98,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         if (againstData.opposed.type !== '') {
             console.warn(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
         }
-        if (!actor) {
+        if (!document) {
             console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
             return;
         }
@@ -143,12 +143,12 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         if (againstData.sourceItemUuid) {
             const item = await fromUuid(againstData.sourceItemUuid) as SR5Item;
             if (item) {
-                const itemAction = await this._getDocumentTestAction(item, actor);
+                const itemAction = await this._getDocumentTestAction(item, document);
                 action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
             }
         }
 
-        return this._prepareActionTestData(action, actor, data, againstData) as OpposedTestData;
+        return this._prepareActionTestData(action, document, data, againstData) as OpposedTestData;
     }
 
     /**

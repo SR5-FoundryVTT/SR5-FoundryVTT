@@ -370,14 +370,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * directly part of the action template.
      *
      * @param item The item holding the action configuration.
-     * @param actor The actor used for value calculation.
+     * @param document The actor used for value calculation.
      */
-    static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<Partial<MinimalActionData>> {
+    static async _getDocumentTestAction(item: SR5Item, document: SR5Actor|SR5Item): Promise<Partial<MinimalActionData>> {
         return {};
     }
 
-    static _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data: any, againstData: any) {
-        return TestCreator._prepareTestDataWithAction(action, actor, data, againstData);
+    static _prepareActionTestData(action: ActionRollData, document: SR5Actor|SR5Item, data: any, againstData: any) {
+        return TestCreator._prepareTestDataWithAction(action, document, data, againstData);
     }
 
     /**

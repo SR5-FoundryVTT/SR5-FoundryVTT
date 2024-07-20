@@ -1182,6 +1182,7 @@
         "ExtendedTest": "Ausgedehnte Probe",
         "FadeTest": "Schwundwiderstand",
         "HackOnTheFlyTest": "Eiliges Hacken",
+        "MatrixResistTest": "Matrix Schadenswiderstand",
         "MeleeAttackTest": "Nahkampfangriff",
         "NaturalRecoveryPhysicalTest": "Natürliche körperliche Genesung",
         "NaturalRecoveryStunTest": "Natürliche geistige Genesung",
