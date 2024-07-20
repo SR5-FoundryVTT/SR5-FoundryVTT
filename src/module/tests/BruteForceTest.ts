@@ -1,7 +1,7 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
-import { SuccessTest, TestOptions } from "./SuccessTest";
+import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
 
@@ -28,7 +28,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     // TODO: gitters aren't implemented yet.
     gitters: any;
 
-    override _prepareData(data: MatrixPlacementData, options: TestOptions={}): any {
+    override _prepareData(data: MatrixPlacementData, options: TestOptions = {}): any {
         data = super._prepareData(data, options);
         return MarkPlacementFlow._prepareData(data);
     }
@@ -72,4 +72,5 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
 
         MarkPlacementFlow.validateBaseValues(this);
     }
+
 }

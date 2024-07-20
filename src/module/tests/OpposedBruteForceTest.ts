@@ -5,8 +5,9 @@ import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
 import { OpposedTest } from "./OpposedTest";
+import { TestOptions } from './SuccessTest';
 import { TestCreator } from './TestCreator';
-import { MarkPlacementFlow } from './flows/MarkPlacementFlow';
+import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlow';
 
 /**
  * Implement the opposing test for Brute Force action. See SR5#238 'Brute Force'
@@ -73,5 +74,9 @@ export class OpposedBruteForceTest extends OpposedTest {
         const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
         if (!test) return;
         await test.execute();
+    }
+
+    static override async executeMessageAction(againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
+        await MarkPlacementFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }

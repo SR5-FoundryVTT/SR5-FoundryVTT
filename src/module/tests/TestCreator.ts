@@ -219,58 +219,9 @@ export const TestCreator = {
         if (!testClass) {
             console.error(`Shadowrun 5e | Couldn't find a registered test implementation for ${testClsName}`);
             return;
-        }
+        }   
 
-        // Determine actors to roll test with.
-        let actors = await Helpers.getOpposedTestActors(testData.data);
-
-        // Inform user about tokens with deleted sidebar actors.
-        // This can both happen for linked tokens immediately and unlinked tokens after reloading.
-        if (actors.filter(actor => !actor).length > 0) {
-            ui.notifications?.warn('TOKEN.WarningNoActor', {localize: true});
-            return;
-        }
-
-        // filter out actors current user shouldn't be able to test with.
-        actors = actors.filter(actor => actor.isOwner);
-        // Fallback to player character.
-        if (actors.length === 0 && game.user.character) {
-            actors.push(game.user.character);
-        }
-
-        if (actors.length === 0) {
-            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
-
-            //@ts-expect-error Allow auto-rename to work instead of using hasOwnProperty.
-            if (!testData.data.iconUuid) return;
-            const matrixTestData = testData.data as MatrixPlacementData;
-
-            // Some opposed tests only need an item, no actor...
-            const document = await fromUuid(matrixTestData.iconUuid);
-            if (!(document instanceof SR5Item)) return;
-            
-            const data = await testClass._getOpposedActionTestData(matrixTestData, document, id);
-            if (!data) return;
-
-            const documents = {source: document};
-            const test = new testClass(data, documents, options);
-
-            await test.execute();
-        } 
-        else {
-            console.log('Shadowrun 5e | Casting an opposed test using these actors', actors, testData);
-        }
-
-        for (const actor of actors) {
-            const data = await testClass._getOpposedActionTestData(testData.data, actor, id);
-            if (!data) return;
-
-            const documents = {source: actor};
-            const test = new testClass(data, documents, options);
-
-            // Await test chain resolution for each actor, to avoid dialog spam.
-            await test.execute();
-        }
+        await testClass.executeMessageAction(testData.data, id, options);
     },
 
     /**

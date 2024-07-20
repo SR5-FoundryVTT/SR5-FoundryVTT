@@ -393,7 +393,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
-    static async _getOpposedActionTestData(testData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getOpposedActionTestData(testData, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
         return undefined;
     }
@@ -1741,7 +1741,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This class should be used for the opposing test implementation.
      */
     get _opposedTestClass(): any | undefined {
-        if (!this.data.opposed || !this.data.opposed.test) return;
+        if (!this.data?.opposed?.test) return;
         return TestCreator._getTestClass(this.data.opposed.test);
     }
 
@@ -2069,6 +2069,43 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         await test.populateDocuments();
         await ActionResultFlow.executeResult(resultAction, test);
+    }
+
+    /**
+     * Execute actions triggered by a tests chat message.
+     * 
+     * This can be used to trigger opposing tests.
+     */
+    static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: TestOptions) {
+        // Determine actors to roll test with.
+        let actors = await Helpers.getOpposedTestActors(againstData);
+
+        // Inform user about tokens with deleted sidebar actors.
+        // This can both happen for linked tokens immediately and unlinked tokens after reloading.
+        if (actors.filter(actor => !actor).length > 0) {
+            ui.notifications?.warn('TOKEN.WarningNoActor', {localize: true});
+            return;
+        }
+
+        // filter out actors current user shouldn't be able to test with.
+        actors = actors.filter(actor => actor.isOwner);
+        // Fallback to player character.
+        if (actors.length === 0 && game.user?.character) {
+            actors.push(game.user.character);
+        }
+
+        console.log('Shadowrun 5e | Casting an opposed test using these actors', actors, againstData);
+
+        for (const actor of actors) {
+            const data = await this._getOpposedActionTestData(againstData, actor, messageId);
+            if (!data) return;
+
+            const documents = {source: actor};
+            const test = new this(data, documents, options);
+
+            // Await test chain resolution for each actor, to avoid dialog spam.
+            await test.execute();
+        }
     }
 
     /**

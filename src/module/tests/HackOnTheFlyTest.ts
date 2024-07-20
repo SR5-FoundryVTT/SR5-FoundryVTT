@@ -1,7 +1,7 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
-import { SuccessTest } from "./SuccessTest";
+import { SuccessTest, TestOptions } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
 

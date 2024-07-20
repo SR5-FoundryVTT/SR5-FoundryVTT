@@ -228,5 +228,30 @@ export const MarkPlacementFlow = {
      */
     validateBaseValues(test: BruteForceTest|HackOnTheFlyTest) {
         test.data.marks = MatrixRules.getValidMarksPlacementCount(test.data.marks);
-    }
+    },
+
+    /**
+     * Handle target selection flow for matrix mark placement actions.
+     * 
+     * NOTE: This method is bound to the calling class and should be called after .bind(this) by the caller.
+     * 
+     * @param againstData 
+     * @param messageId 
+     * @param options 
+     */
+    async executeMessageAction(testCls: any, againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
+        if (!againstData.iconUuid) return;
+
+        // Some opposed tests only need an item, no actor...
+        const document = await fromUuid(againstData.iconUuid);
+        if (!(document instanceof SR5Item)) return;
+
+        const data = await testCls._getOpposedActionTestData(againstData, document, messageId);
+        if (!data) return;
+
+        const documents = { source: document };
+        const test = new testCls(data, documents, options);
+
+        await test.execute();
+    },
 }

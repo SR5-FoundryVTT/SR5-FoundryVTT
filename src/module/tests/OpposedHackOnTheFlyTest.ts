@@ -1,7 +1,7 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
 import { Translation } from "../utils/strings";
-import { MarkPlacementFlow } from "./flows/MarkPlacementFlow";
+import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 import { HackOnTheFlyTest } from "./HackOnTheFlyTest";
 import { OpposedTest } from "./OpposedTest";
 import { TestOptions } from "./SuccessTest";
@@ -51,5 +51,9 @@ export class OpposedHackOnTheFlyTest extends OpposedTest {
         // Place a mark on the target
         const marks = this.against.data.marks;
         await this.against.actor.setMarks(this.icon, marks);
+    }
+
+    static override async executeMessageAction(againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
+        await MarkPlacementFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }
