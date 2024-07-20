@@ -1,11 +1,10 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from "../../item/SR5Item";
-import { UpdateData, VersionMigration } from "../VersionMigration";
+import { VersionMigration } from "../VersionMigration";
 
 /**
  * Migration for new matrix system:
  * - Migrate actor.system.matrix.marks from key-value to list storage
- * - TODO: Migrate ic.system.host.id to uuid
  */
 export class Version_0_22_0 extends VersionMigration {
     get SourceVersion(): string {

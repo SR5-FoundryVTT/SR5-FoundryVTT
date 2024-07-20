@@ -1940,12 +1940,15 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Get the host item connect to this ic type actor.
+     * Return the host this IC actor is connected with.
+     * 
+     * @returns A item of type host or undefined.
      */
     async getICHost(): Promise<SR5Item | undefined> {
         const ic = this.asIC();
         if (!ic) return;
-        const document = await fromUuid(ic?.system?.host.id);
+        // legacy used id, new uses uuid. Try both.
+        const document = await fromUuid(ic?.system?.host.id) || game.actors?.get(ic?.system?.host.id);
         if ((document instanceof SR5Item) && document.isHost) return document;
     }
 
