@@ -951,10 +951,18 @@
                     "is_grunt": false,
                     "professional_rating": 0
                 }
+            },
+            "matrix_network": {
+                "matrix": {
+                    "network": {
+                        "id": "",
+                        "type": ""
+                    }
+                }
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "technomancer", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": ["common", "skills", "attributes", "matrix", "matrix_network", "limits", "armor", "magic", "technomancer", "movement", "condition_monitors", "physical_combat_values", "grunt"],
             "ethnicity": "",
             "age": "",
             "sex": "",
@@ -1011,7 +1019,7 @@
             }
         },
         "critter": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "matrix_network", "movement", "condition_monitors", "physical_combat_values", "grunt"],
             "is_npc": true,
             "visibilityChecks": {
                 "astral": {

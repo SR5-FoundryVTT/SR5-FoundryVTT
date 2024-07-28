@@ -1,6 +1,7 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from "../../item/SR5Item";
 import { BruteForceTest } from "../../tests/BruteForceTest";
+import { HackOnTheFlyTest } from "../../tests/HackOnTheFlyTest";
 import { TestCreator } from "../../tests/TestCreator";
 
 /**
@@ -23,8 +24,12 @@ interface MatrixTargetSheetData {
 
 // Overall Sheet Data for this application.
 interface MatrixTargetAcquisitionSheetData {
+    placementActions: string[]
     targets: MatrixTargetSheetData[]
+    hosts: SR5Item[]
 }
+
+type MatrixPlacementTests = BruteForceTest | HackOnTheFlyTest;
 
 
 /**
@@ -57,10 +62,18 @@ export class MatrixTargetAcquisitionApplication extends Application {
         return options;
     }
 
+    override activateListeners(html: JQuery<HTMLElement>): void {
+        super.activateListeners(html);
+
+        html.find('.show-matrix-placement').on('click', this.handleMatrixPlacement.bind(this));
+    }
+
     override async getData(options?: Partial<ApplicationOptions> | undefined): Promise<MatrixTargetAcquisitionSheetData> {
         const data = await super.getData(options) as MatrixTargetAcquisitionSheetData;
 
+        data.placementActions = ['brute_force', 'hack_on_the_fly'];
         data.targets = this.prepareMatrixTargets();
+        data.hosts = this.prepareMatrixHosts();
 
         return data;
     }
@@ -103,11 +116,13 @@ export class MatrixTargetAcquisitionApplication extends Application {
         return targets;
     }
 
-    override activateListeners(html: JQuery<HTMLElement>): void {
-        super.activateListeners(html);
-
-        html.find('.show-matrix-placement').on('click', this.handleMatrixPlacement.bind(this));
+    /**
+     * Collect all hosts for selection, based on current network.
+     */
+    prepareMatrixHosts() {
+        return game.items?.filter(item => item.isHost) ?? [];
     }
+
 
     async handleMatrixPlacement(event) {
         event.preventDefault();
@@ -119,13 +134,14 @@ export class MatrixTargetAcquisitionApplication extends Application {
         if (!targetUuid) return;
 
         const target = await fromUuid(targetUuid);
-        if (!target) return;
+        if (!target) {
+            console.error('Shadowrun 5e | Could not find target with uuid', targetUuid);
+            return;
+        }
 
-        const test = await TestCreator.fromPackAction('matrix-actions', 'brute_force', this.actor);
+        const test = await TestCreator.fromPackAction('matrix-actions', 'brute_force', this.actor) as MatrixPlacementTests;
         if (!test) return;
-        //@ts-expect-error Typing issues with dynamic classes based on actions.
-        test.data.targetUuid = targetUuid;
-        // const test = new BruteForceTest({targetUuid}, {actor: this.actor});
+        test.data.iconUuid = targetUuid;
         await test.execute();
     }
 }

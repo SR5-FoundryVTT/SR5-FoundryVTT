@@ -1,3 +1,10 @@
+<h2>Hosts</h2>
+<div>
+    {{#each hosts}}
+    <div><img src="{{this.img}}" height="24px" width="24px"/><span class="Roll show-matrix-placement" data-target-uuid="{{this.uuid}}">{{this.name}}</span></div>
+    {{/each}}
+</div>
+<h2>Personas</h2>
 <div>
     {{#each targets}}
     <div><img src="{{speakerImg this.actor}}" height="24px" width="24px"/><span class="Roll show-matrix-placement">{{speakerName this.actor}}</span></div>

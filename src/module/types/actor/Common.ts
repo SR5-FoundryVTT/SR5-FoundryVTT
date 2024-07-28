@@ -43,6 +43,19 @@ declare namespace Shadowrun {
         marks: MatrixMarks
     }
 
+    enum MatrixNetworkTypes {
+        HOST = "host",
+        GRID = "grid"
+    }
+
+    export interface MatrixNetworkData {
+        network: {
+            // empty string or uuid of used network (host/grid) NOT PAN
+            id: string
+            type: MatrixNetworkTypes
+        }
+    }
+
     // A interchangeable list of device attributes.
     export interface MatrixAttributes {
         att1: DeviceAttribute;

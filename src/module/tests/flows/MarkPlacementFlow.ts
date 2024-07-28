@@ -114,7 +114,6 @@ export const MarkPlacementFlow = {
         MarkPlacementFlow._prepareActorDevices(test);
 
         // Target is a host or a host device.
-        MarkPlacementFlow._prepareHosts(test);
         MarkPlacementFlow._prepareHostDevices(test);
     },
 
@@ -137,13 +136,15 @@ export const MarkPlacementFlow = {
      * 
      */
     _prepareIcon(test: BruteForceTest|HackOnTheFlyTest) {
+        // When given an icon uuid, load it.
         if (!test.data.iconUuid) return;
-
-        // Fetch the icon as selected or given.
         test.icon = fromUuidSync(test.data.iconUuid) as NetworkDevice;
 
+        // Depending on icon type, categorize targets for display and device selection.
         if (test.icon instanceof SR5Actor) test.persona = test.icon;
+        if (test.icon instanceof SR5Item && test.icon.isHost) test.host = test.icon;
 
+        // When given a persona uuid, load it.
         if (!test.data.personaUuid) return;
         test.persona = fromUuidSync(test.data.personaUuid) as SR5Actor;
     },
@@ -182,19 +183,6 @@ export const MarkPlacementFlow = {
 
         // Collect network devices
         test.devices = test.persona.wirelessDevices;
-    },
-
-    /**
-     * Retrieve all hosts available for a decker to hack, if no persona has been selected.
-     */
-    _prepareHosts(test: BruteForceTest|HackOnTheFlyTest) {
-        if (test.persona) return;
-
-        test.hosts = game.items?.filter(item => item.isHost) as SR5Item[];
-
-        // By default, select the first host in list.
-        test.icon = test.hosts[0];
-        test.data.iconUuid = test.icon.uuid;
     },
 
     /**

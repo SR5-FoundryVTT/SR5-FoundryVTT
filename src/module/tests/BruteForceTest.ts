@@ -1,7 +1,7 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
-import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
+import { SuccessTest, TestOptions } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
 
@@ -23,10 +23,8 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     // Started ic on selected host.
     ic: SR5Actor[];
     // All available hosts.
-    hosts: (SR5Item)[];
-    // All available gitters.
-    // TODO: gitters aren't implemented yet.
-    gitters: any;
+    host: SR5Item|null;
+    grid: SR5Item|null;
 
     override _prepareData(data: MatrixPlacementData, options: TestOptions = {}): any {
         data = super._prepareData(data, options);

@@ -20,11 +20,9 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
     devices: (NetworkDevice)[];
     // Started ic on selected host.
     ic: SR5Actor[];
-    // All available hosts.
-    hosts: (SR5Item)[];
-    // All available gitters.
-    // TODO: gitters aren't implemented yet.
-    gitters: any;
+
+    host: SR5Item|null;
+    grid: SR5Item|null;
 
     override _prepareData(data: MatrixPlacementData, options): any {
         data = super._prepareData(data, options);

@@ -32,17 +32,12 @@
                 <label>{{localize "SR5.Target"}}</label>
                 <div>{{test.persona.name}}</div>
             </div>
-            {{else}}
+            {{/if}}
+            {{#if test.host}}
             <!-- List of hosts available -->
             <div class="form-group">
-                <label>{{localize "SR5.Hosts"}}</label>
-                <select name="test.data.iconUuid" class="display">
-                    {{#select test.data.iconUuid}}
-                    {{#each test.hosts}}
-                    <option value="{{this.uuid}}">{{this.name}}</option>
-                    {{/each}}
-                    {{/select}}
-                </select>
+                <label>{{localize "SR5.Host"}}</label>
+                <div>{{test.host.name}}</div>
             </div>
             {{/if}}
             <!-- Devices connected to persona or host -->
