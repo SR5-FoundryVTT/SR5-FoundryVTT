@@ -313,6 +313,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
+        html.find('.marks-connect-network').on('click', this._onMarksConnectToNetwork.bind(this));
 
         // Skill Filter handling...
         html.find('.skill-header').find('.item-name').on('click', this._onFilterUntrainedSkills.bind(this));
@@ -1110,6 +1111,23 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!userConsented) return;
 
         await this.actor.clearMarks();
+    }
+
+    /**
+     * When clicking on a specific mark, connect to the actor to this host/grid behind that.
+     * 
+     * @param event Any interaction action
+     */
+    async _onMarksConnectToNetwork(event) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const target = fromUuidSync(markId) as SR5Item;
+        if (!target || !(target instanceof SR5Item)) return;
+
+        await this.actor.connectNetwork(target);
     }
 
     /**

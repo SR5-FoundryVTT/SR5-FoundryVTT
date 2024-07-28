@@ -29,7 +29,7 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
+import { MatrixNetworkFlow, NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../flows/MarksFlow';
 
@@ -642,6 +642,39 @@ export class SR5Actor extends Actor {
 
     get canBeSlave(): boolean {
         return this.isVehicle();
+    }
+
+    /**
+     * The network (host/grid) this matrix actor is connected to.
+     */
+    get network(): SR5Item|undefined {
+        if (!this.isMatrixActor) return
+
+        // Avoid typing issues by using [''] notation.
+        const network = this.system['matrix'].network;
+        // Matrix actor without ability to connect to network
+        if (!network) return;
+
+        const item = fromUuidSync(network.uuid) as SR5Item;
+        if (!item) return;
+
+        return item;
+    }
+
+    /**
+     * Connect this actor to a host / grid
+     * 
+     * @param network Must be an item of matching type
+     */
+    async connectNetwork(network: SR5Item) {
+        await MatrixNetworkFlow.connectNetwork(this, network);
+    }
+
+    /**
+     * Disconnect this actor from a host / grid
+     */
+    async disconnectNetwork() {
+        await MatrixNetworkFlow.disconnectNetwork(this);
     }
 
     /**
@@ -2074,17 +2107,41 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Remove ALL marks placed by this actor
+     * Remove ALL marks placed by this actor and maybe disconnect from host / grid if necessary.
      */
     async clearMarks() {
+        // Keep marks for later use
+        const marks = this.marksData 
+
         await ActorMarksFlow.clearMarks(this);
+
+        // Check if marks have been used to connect to host/grid
+        const network = this.network;
+        if (!network) return;
+        if (!marks) return;
+
+        for (const {uuid} of marks) {
+            if (network.uuid === uuid) {
+                return await this.disconnectNetwork();
+            }
+        }
     }
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     * 
+     * Maybe disconnect from host/grid as well, if necessary
      */
     async clearMark(uuid: string) {
         await ActorMarksFlow.clearMark(this, uuid);
+
+        // Check if marks have been used to connect to host/grid
+        const network = this.network;
+        if (!network) return;
+
+        if (network.uuid === uuid) {
+            await this.disconnectNetwork();
+        }
     }
 
     /**

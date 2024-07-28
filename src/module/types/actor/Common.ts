@@ -51,7 +51,7 @@ declare namespace Shadowrun {
     export interface MatrixNetworkData {
         network: {
             // empty string or uuid of used network (host/grid) NOT PAN
-            id: string
+            uuid: string
             type: MatrixNetworkTypes
         }
     }

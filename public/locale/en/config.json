@@ -794,6 +794,7 @@
     "SR5.Mundane": "Mundane",
     "SR5.Name": "Name",
     "SR5.NetHits": "Net Hits",
+    "SR5.Network": "Network",
     "SR5.New": "New",
     "SR5.NoCover": "No Cover",
     "SR5.NoSelectableToken": "Actor has no selectable token on canvas",
@@ -1220,6 +1221,7 @@
     "SR5.ToggleEquip": "Toggle Equipped",
     "SR5.Tooltips": {
         "Actor": {
+            "ConnectNetwork": "Enter this host/grid",
             "Critter": "Allow the use of critter powers",
             "Grunt": "Apply grunt rules to this actor",
             "Metatype": "As NPC the metatype will also apply attribute quick modifiers",

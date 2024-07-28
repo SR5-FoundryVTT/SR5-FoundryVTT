@@ -783,6 +783,7 @@
     "SR5.Mundane": "Mundan",
     "SR5.Name": "Name",
     "SR5.NetHits": "Nettoerfolge",
+    "SR5.Network": "Netzwerk",
     "SR5.New": "Neu:",
     "SR5.NoCover": "Keine Deckung",
     "SR5.NoSelectableToken": "Charakter hat kein auswählbares Token auf der Karte",
@@ -1209,6 +1210,7 @@
     "SR5.ToggleEquip": "Anlegen/Ablegen",
     "SR5.Tooltips": {
         "Actor": {
+            "ConnectNetwork": "Betrete diesen Host/Gitter",
             "Critter": "Ermöglicht die Nutzung von Critterkräften",
             "Grunt": "Nutze Schergen-Regeln für Akteur",
             "Metatype": "Ein NSC-Akteur bekommt automatische Attributemodifikatoren abhängig vom Metatyp",

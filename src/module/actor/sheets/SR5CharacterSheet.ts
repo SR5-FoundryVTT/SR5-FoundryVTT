@@ -1,6 +1,7 @@
 import { MatrixTargetAcquisitionApplication } from './../../apps/matrix/MatrixTargetAquisition';
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
+import { SR5Item } from '../../item/SR5Item';
 
 
 export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
@@ -10,6 +11,7 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     markedDocuments: Shadowrun.MarkedDocument[]
     handledItemTypes: string[]
     inventory: Record<string, any>
+    network: SR5Item|undefined
 }
 
 
@@ -73,6 +75,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         super._prepareMatrixAttributes(data);
 
         data.markedDocuments = await this.actor.getAllMarkedDocuments();
+        data.network = this.actor.network;
 
         return data;
     }

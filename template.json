@@ -955,7 +955,7 @@
             "matrix_network": {
                 "matrix": {
                     "network": {
-                        "id": "",
+                        "uuid": "",
                         "type": ""
                     }
                 }

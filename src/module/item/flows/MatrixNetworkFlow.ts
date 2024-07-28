@@ -295,4 +295,32 @@ export class MatrixNetworkFlow {
     static _currentUserCanModifyDevice(device: NetworkDevice): boolean {
         return game.user?.isGM || device.isOwner;
     }
+
+    /**
+     * Connect the given actor to the given network item.
+     * @param actor This actor will be connected to a network.
+     * @param network Must be a host or grid.
+     */
+    static async connectNetwork(actor: SR5Actor, network: SR5Item) {
+        if (!actor.isMatrixActor) return console.error('Shadowrun 5e | Actor is not a matrix actor', actor);
+        if (!network.isHost && !network.isGrid) return console.error('Shadowrun 5e | Network is not a host or grid', network);
+
+        await actor.update({ 
+            'system.matrix.network.uuid': network.uuid,
+            'system.matrix.network.type': network.type
+        });
+    } 
+
+    /**
+     * Disconnect the given actor from the network.
+     * @param actor This actor will be connected to a network.
+     */
+    static async disconnectNetwork(actor: SR5Actor) {
+        if (!actor.isMatrixActor) return console.error('Shadowrun 5e | Actor is not a matrix actor', actor);
+
+        await actor.update({
+            'system.matrix.network.uuid': "",
+            'system.matrix.network.type': ""
+        });
+    }
 }

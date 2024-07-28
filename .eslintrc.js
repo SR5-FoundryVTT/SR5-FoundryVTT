@@ -47,7 +47,7 @@ module.exports = {
         "@typescript-eslint/ban-ts-comment": "warn",
         "@typescript-eslint/no-unused-vars": "warn",
         "prefer-const": "warn",
-        "@typescript-eslint/no-confusing-void-expression": "warn",
+        "@typescript-eslint/no-confusing-void-expression": "off", // I do like my if () return console.error() and similar statements...
         "@typescript-eslint/no-misused-promises": "warn",
         "@typescript-eslint/prefer-optional-chain": "warn",
         "@typescript-eslint/no-floating-promises": "off", // Allow executing async functions in a sync method, if async isn't needed.

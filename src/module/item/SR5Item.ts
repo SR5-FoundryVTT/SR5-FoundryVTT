@@ -672,7 +672,6 @@ export class SR5Item extends Item {
             return this as AdeptPowerItemData;
     }
 
-
     get isHost(): boolean {
         return this.type === 'host';
     }
@@ -682,6 +681,18 @@ export class SR5Item extends Item {
             //@ts-expect-error TODO: foundry-vtt-types v10
             return this as HostItemData;
         }
+    }
+
+    get isGrid(): boolean {
+        // @ts-expect-error Type didn't exist as of writing this. If it does now, remove this.
+        return this.type === 'grid';
+    }
+
+    /**
+     * This item is a network, which can be entered by a persona.
+     */
+    get isNetwork(): boolean {
+        return this.isHost || this.isGrid;
     }
 
     /**
