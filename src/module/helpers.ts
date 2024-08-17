@@ -230,7 +230,10 @@ export class Helpers {
         return '';
     }
 
-    static label(str) {
+    static label(str: string) {
+        // Gracefully fail if for falsy values.
+        if (!str) return '';
+
         const frags = str.split('_');
         for (let i = 0; i < frags.length; i++) {
             frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);

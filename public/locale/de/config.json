@@ -824,6 +824,7 @@
     "SR5.Quality": "Vorteile/Nachteile",
     "SR5.QualityType": "Typ",
     "SR5.QualityTypeNegative": "Nachteil",
+    "SR5.QualityTypeLifeModule": "Lebensmodul",
     "SR5.QualityTypePositive": "Vorteil",
     "SR5.Quantity": "Menge",
     "SR5.QuickInfo": {
