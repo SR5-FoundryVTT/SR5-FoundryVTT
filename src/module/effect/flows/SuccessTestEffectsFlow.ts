@@ -33,6 +33,10 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      *       Changes can't be applied as unique modifiers as they're names are not unique.
      */
     applyAllEffects() {
+        // Extended tests have their effects applied on first run.
+        // As soon as a test is extended, it's effects are already applied and shouldn't be applied again
+        if (this.test.extended) return;
+
         // Since we're extending EffectChangeData by a effect field only locally, I don't care enough to resolve the typing issue.
         const changes: any[] = [];
 
