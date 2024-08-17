@@ -832,6 +832,7 @@
     "SR5.Qty": "Qty",
     "SR5.Quality": "Quality",
     "SR5.QualityType": "Type",
+    "SR5.QualityTypeLifeModule": "Life Module",
     "SR5.QualityTypeNegative": "Negative",
     "SR5.QualityTypePositive": "Positive",
     "SR5.Quantity": "Quantity",
