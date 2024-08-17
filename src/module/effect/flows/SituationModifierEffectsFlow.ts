@@ -1,7 +1,7 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5ActiveEffect } from "../SR5ActiveEffect";
 import { SituationModifier } from "../../rules/modifiers/SituationModifier";
-import { imageMagnification, lowLightVision, smartlink, tracerRounds, ultrasound } from "./EnvironmentalChangeFlow";
+import { imageMagnification, lowLightVision, smartlink, thermographicVision, tracerRounds, ultrasound } from "./EnvironmentalChangeFlow";
 import { SuccessTest } from "../../tests/SuccessTest";
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
 
@@ -22,7 +22,8 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             'image_magnification': imageMagnification,
             'tracer_rounds': tracerRounds,
             'smartlink': smartlink,
-            'ultrasound': ultrasound
+            'ultrasound': ultrasound,
+            'thermographic_vision': thermographicVision
         }
     }
 

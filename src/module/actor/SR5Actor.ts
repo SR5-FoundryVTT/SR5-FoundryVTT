@@ -2328,14 +2328,21 @@ export class SR5Actor extends Actor {
      * 
      * It's not necessary for the given item to be equipped.
      * 
-     * @param item Input item that will be equipped while unequipping all others of the same type.
+     * @param unequipItem Input item that will be equipped while unequipping all others of the same type.
      */
-    async equipOnlyOneItemOfType(item: SR5Item) {
-        const updateData = this.items
-            .filter(ownedItem => ownedItem.type === item.type)
-            .map(ownedItem => ({
-                _id: ownedItem.id,
-                'system.technology.equipped': ownedItem.id === item.id
+    async equipOnlyOneItemOfType(unequipItem: SR5Item) {
+        const sameTypeItems = this.items.filter(item => item.type === unequipItem.type);
+
+        // If the given item is the only of it's type, allow unequipping.
+        if (sameTypeItems.length === 1 && sameTypeItems[0].id === unequipItem.id) {
+            await unequipItem.update({'system.technology.equipped': !unequipItem.isEquipped()});
+            return
+        }
+        
+        // For a set of items, assure only the selected is equipped.
+        const updateData = sameTypeItems.map(item => ({
+                _id: item.id,
+                'system.technology.equipped': item.id === unequipItem.id
         }));
 
         await this.updateEmbeddedDocuments('Item', updateData);

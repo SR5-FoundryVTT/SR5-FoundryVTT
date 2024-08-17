@@ -447,6 +447,7 @@ export const SR5 = {
     qualityTypes: {
         positive: 'SR5.QualityTypePositive',
         negative: 'SR5.QualityTypeNegative',
+        lifemodule: 'SR5.QualityTypeLifeModule'
     },
 
     adeptPower: {
