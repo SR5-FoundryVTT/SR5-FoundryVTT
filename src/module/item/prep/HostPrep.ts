@@ -11,6 +11,7 @@ export class HostPrep {
         HostPrep.prepareAttributes(system);
         HostPrep.prepareMatrixAttributes(system);
         HostPrep.prepareMentalAttributes(system);
+        HostPrep.prepareRatingAttribute(system);
     }
 
     /**
@@ -72,5 +73,16 @@ export class HostPrep {
             const attribute = DataDefaults.attributeData({ label, base });
             system.attributes[name] = attribute;
         }
+    }
+
+    /**
+     * Allow hosts using their rating as a derived attribute.
+     * @param system 
+     */
+    static prepareRatingAttribute(system: HostData) {
+        const base = system.rating;
+        const label = SR5.attributes.rating;
+        const attribute = DataDefaults.attributeData({ label, base });
+        system.attributes.rating = attribute;
     }
 }
