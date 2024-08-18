@@ -150,10 +150,11 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         it('Use an source item to execute a test', async () => {
             const item = await testItem.create({ type: 'host', 'system.rating': 5 });
             const action = DataDefaults.actionRollData({ attribute: 'willpower', attribute2: 'firewall' });
-            const test = await TestCreator.fromAction(action, item, { showMessage: true, showDialog: true });
+            const test = await TestCreator.fromAction(action, item, { showMessage: false, showDialog: false });
             await test?.execute();
 
             assert.equal(test?.data.evaluated, true);
+            assert.equal(test?.data.pool.value, 10);
         });
     });
 };
