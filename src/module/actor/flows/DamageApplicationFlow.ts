@@ -1,30 +1,31 @@
-import {DamageApplicationDialog} from "../../apps/dialogs/DamageApplicationDialog";
-import {SR5Actor} from "../SR5Actor";
+import { DamageApplicationDialog } from "../../apps/dialogs/DamageApplicationDialog";
+import { SR5Actor } from "../SR5Actor";
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import { Helpers } from '../../helpers';
 import { TestCreator } from '../../tests/TestCreator';
+import { SR5Item } from "../../item/SR5Item";
 
 export class DamageApplicationFlow {
 
     /**
      * Runs the flow to apply damage to multiple actors with user interaction
      * This will also take care of changing the damage type if necessary
-     * @param actors The actors that are affected
+     * @param targets The actors that are affected
      * @param damage The damage the actors will receive
      */
-    async runApplyDamage(actors: SR5Actor[], damage : DamageData) {
+    async runApplyDamage(targets: (SR5Actor | SR5Item)[], damage: DamageData) {
         // Show user the affected actors and the damage values
-        const damageApplicationDialog = await new DamageApplicationDialog(actors, damage);
+        const damageApplicationDialog = new DamageApplicationDialog(targets, damage);
         await damageApplicationDialog.select();
 
         if (damageApplicationDialog.canceled) {
             return;
         }
 
-        actors.forEach((actor) => {
-            this.applyDamageToActor(actor, damage);
+        targets.forEach((target) => {
+            this.applyDamageToActor(target, damage);
         });
     }
 
@@ -32,19 +33,21 @@ export class DamageApplicationFlow {
      *
      * @param damage The damage to apply. Stun damage will be turned to physical for grunts.
      */
-    async applyDamageToActor(actor : SR5Actor, damage: DamageData) {
+    async applyDamageToActor(target: SR5Actor | SR5Item, damage: DamageData) {
         if (damage.value <= 0) {
             return;
         }
 
-        // We change the damage type from stun to physical for grunts (they do not have a stun track)
-        // We are not doing this earlier in the soak flow to avoid confusing the user
-        damage = this.changeStunToPhysicalForGrunts(actor, damage);
+        if (target instanceof SR5Actor) {
+            // We change the damage type from stun to physical for grunts (they do not have a stun track)
+            // We are not doing this earlier in the soak flow to avoid confusing the user
+            damage = this.changeStunToPhysicalForGrunts(target, damage);
+        }
 
-        await actor.addDamage(damage);
+        await target.addDamage(damage);
     }
 
-    private changeStunToPhysicalForGrunts(actor : SR5Actor, damage: DamageData): DamageData {
+    private changeStunToPhysicalForGrunts(actor: SR5Actor, damage: DamageData): DamageData {
         const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
         if (!actor.isGrunt()) {
             return updatedDamage;
@@ -77,12 +80,12 @@ export class DamageApplicationFlow {
         const type = String(applyDamage.data('damageType')) as DamageType;
         const ap = Number(applyDamage.data('damageAp'));
         const element = String(applyDamage.data('damageElement')) as DamageElement;
-        let damage = Helpers.createDamageData(value, type, ap, element);
+        const damage = Helpers.createDamageData(value, type, ap, element);
 
-        let actors = Helpers.getSelectedActorsOrCharacter();
+        const targets = Helpers.getSelectedActorsOrCharacter();
 
         // Should no selection be available try guessing.
-        if (actors.length === 0) {
+        if (targets.length === 0) {
             const messageId = html.data('messageId');
 
             const test = await TestCreator.fromMessage(messageId);
@@ -90,17 +93,16 @@ export class DamageApplicationFlow {
             await test.populateDocuments();
 
             // If targeting is available, use that.
-            if (test.hasTargets) test.targets.forEach(target => actors.push(target.actor as SR5Actor));
-            // Otherwise apply to the actor casting the damage.
-            else actors.push(test.actor as SR5Actor);
+            if (test.hasTargets) test.targets.forEach(target => targets.push(target.actor as SR5Actor));
+            else targets.push(test.source as SR5Actor);
         }
 
-        // Abort if no actors could be collected.
-        if (actors.length === 0) {
+        // Abort if no targets could be collected.
+        if (targets.length === 0) {
             ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
             return;
         }
 
-        await new DamageApplicationFlow().runApplyDamage(actors, damage);
+        await new DamageApplicationFlow().runApplyDamage(targets, damage);
     }
 }

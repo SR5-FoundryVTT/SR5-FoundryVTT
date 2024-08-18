@@ -1543,10 +1543,11 @@ export class SR5Actor extends Actor {
      * Matrix damage can be added onto different tracks:
      * - IC has a local matrix.condition_monitor
      * - Characters have matrix devices (items) with their local track
+     * 
+     * @param damage: The matrix damage to be applied.
      */
     async addMatrixDamage(damage: Shadowrun.DamageData) {
         if (damage.type.value !== 'matrix') return;
-
 
         const device = this.getMatrixDevice();
         const track = this.getMatrixTrack();
@@ -1566,7 +1567,6 @@ export class SR5Actor extends Actor {
      * Apply damage of any type to this actor. This should be the main entry method to applying damage.
      * 
      * @param damage Damage to be applied
-     * @returns overflow damage.
      */
     async addDamage(damage: Shadowrun.DamageData) {
         switch(damage.type.value) {

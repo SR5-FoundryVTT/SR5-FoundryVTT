@@ -963,6 +963,36 @@ export class SR5Item extends Item {
         return !!action.damage.type.base;
     }
 
+    /**
+     * Apply damage to any type of technology item.
+     * 
+     * @param damage Damage to be applied.
+     */
+    async addDamage(damage: Shadowrun.DamageData) {
+        switch (damage.type.value) {
+            case 'matrix':
+                return await this.addMatrixDamage(damage);
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Apply matrix damage to a technology item.
+     * 
+     * @param damage The matrix damage to be applied.
+     */
+    async addMatrixDamage(damage: Shadowrun.DamageData) {
+        if (damage.type.value !== 'matrix') return;
+
+        const track = this.getConditionMonitor();
+        if (!track) return;
+
+        const toApply = Math.min(track.value + damage.value, track.max);
+
+        await this.update({ 'system.technology.condition_monitor.value': toApply });
+    }
+
     getAction(): ActionRollData | undefined {
         return this.wrapper.getAction();
     }
