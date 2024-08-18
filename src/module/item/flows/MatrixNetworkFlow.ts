@@ -232,9 +232,9 @@ export class MatrixNetworkFlow {
     }
 
     /**
+     * Remove the master link of all slave devices this master is connected to.
      * 
-     * @param master 
-     * @returns 
+     * @param master Any WAN/PAN device.
      */
     private static async _removeMasterFromAllSlaves(master: SR5Item) {
         if (!master.canBeMaster) return console.error('Shadowrun 5e | Given device cant control a network', master);
@@ -244,16 +244,23 @@ export class MatrixNetworkFlow {
         const slaveLinks = masterData.system.slaves;
 
         // Remove master from all its connected devices.
-        if (slaveLinks) {
-            const slaves: (NetworkDevice)[] = [];
-            for (const slaveLink of slaveLinks) {
-                const slave = MatrixNetworkFlow.resolveLink(slaveLink);
-                if (slave) slaves.push(slave);
-            }
-            for (const slave of slaves) {
-                if (!slave) continue;
-                await MatrixNetworkFlow._removeMaster(slave);
-            }
+        if (slaveLinks?.length === 0) return;
+
+        // Collect all slaves and remove the master link.
+        const slaves: (NetworkDevice)[] = [];
+        for (const slaveLink of slaveLinks) {
+            const slave = MatrixNetworkFlow.resolveLink(slaveLink);
+            // The slave might not exist anymore.
+            if (!slave) continue;
+            // When a master device with slaves is copied, the slave references the original document as master.
+            // When such a copy is deleted, we don't want to remove the master/slave connection of the original.
+            if (slave.getMasterUuid() !== master.uuid) continue;
+
+            slaves.push(slave);
+        }
+        for (const slave of slaves) {
+            if (!slave) continue;
+            await MatrixNetworkFlow._removeMaster(slave);
         }
     }
 
