@@ -31,7 +31,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
                 type: 'character',
                 'system.attributes.logic.base': 10,
                 'system.skills.active.cybercombat.base': 10
-            });
+            }) as SR5Actor;
 
             const test = await TestCreator.fromPackAction('matrix-actions', 'brute_force', decker, testOptions) as BruteForceTest;
             test.data.iconUuid = host.uuid;
@@ -44,7 +44,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
 
             // TODO: In this case, does placing a mark on the host place marks on all it's devices?! or all icons?! What about personas?
 
-            const marksData = decker.getAllMarks() ?? [];
+            const marksData = decker.marksData ?? [];
 
             assert.lengthOf(marksData, 1);
         });
@@ -56,7 +56,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
                 type: 'character',
                 'system.attributes.logic.base': 10,
                 'system.skills.active.cybercombat.base': 10
-            });
+            }) as SR5Actor;
 
             const test = await TestCreator.fromPackAction('matrix-actions', 'brute_force', decker, testOptions) as BruteForceTest;
             test.data.iconUuid = ic.uuid;
@@ -67,7 +67,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
             const opposedTest = new OpposedBruteForceTest(data, documents, testOptions);
             await opposedTest.execute();
 
-            const marksData = decker.getAllMarks() ?? [];
+            const marksData = decker.marksData ?? [];
 
             assert.lengthOf(marksData, 2);
         });
