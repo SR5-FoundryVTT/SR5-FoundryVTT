@@ -18,7 +18,7 @@ export interface TestDialogData extends FormDialogData {
 export interface TestDialogListener {
     query: string
     on: string
-    callback: (event: JQuery<HTMLElement>, dialog: TestDialog) => void
+    callback: (event: any, dialog: TestDialog) => void
 }
 
 /**

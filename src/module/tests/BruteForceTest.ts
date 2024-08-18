@@ -1,4 +1,5 @@
 import { SR5Actor } from "../actor/SR5Actor";
+import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
 import { SR5Item } from "../item/SR5Item";
 import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
 import { SuccessTest, TestOptions } from "./SuccessTest";
@@ -17,7 +18,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     // If an actor was selected, this will point to either the persona device or the actor itself, if no persona device is used.
     icon: NetworkDevice;
     // The persona matrix actor. If in use, icon will either point to the actor, if no persona device is used, or the persona device.
-    persona: SR5Actor;
+    persona: SR5Actor|null;
     // The devices connected to the main icon persona / host.
     devices: (NetworkDevice)[];
     // Started ic on selected host.
@@ -49,6 +50,14 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
 
     override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.html';
+    }
+
+    /**
+     * Clean up faulty test data after dialog has been shown.
+     */
+    override async _cleanUpAfterDialog() {
+        await super._cleanUpAfterDialog();
+        MarkPlacementFlow.setIconUuidBasedOnPlacementSelection(this);
     }
 
     override async populateDocuments() {

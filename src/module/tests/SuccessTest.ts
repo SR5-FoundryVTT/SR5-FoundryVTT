@@ -537,9 +537,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         const data = await this.dialog.select();
         if (this.dialog.canceled) {
-            await this.cleanupAfterExecutionCancel();
+            await this._cleanUpAfterDialogCancel();
             return false
         }
+
+        await this._cleanUpAfterDialog();
 
         // Overwrite current test state with whatever the dialog gives.
         this.data = data;
@@ -556,9 +558,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Override this method if there needs to be some cleanup after a user has canceled a dialog 
      * but before the tests actual execution.
      */
-    async cleanupAfterExecutionCancel() {
+    async _cleanUpAfterDialogCancel() {
         this.dialog = null;
     }
+
+    /**
+     * Allow implementations to clean up after a dialog has been shown.
+     */
+    async _cleanUpAfterDialog() {}
 
     /**
      * Override this method if you want to save any document data after a user has selected values

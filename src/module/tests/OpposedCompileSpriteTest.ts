@@ -86,7 +86,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      */
     override async processSuccess() {
         await this.updateCompilationTestForFollowup();
-        await this.cleanupAfterExecutionCancel();
+        await this._cleanUpAfterDialogCancel();
     }
 
     override get successLabel(): Translation {
@@ -102,7 +102,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      * 
      * When user cancels the dialog, the sprite has been created. Remove it.
      */
-    override async cleanupAfterExecutionCancel() {
+    override async _cleanUpAfterDialogCancel() {
         if (!this.data.compiledSpriteUuid) return;
         const actor = await fromUuid(this.data.compiledSpriteUuid);
         await actor?.delete();

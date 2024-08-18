@@ -20,7 +20,7 @@ export interface MatrixPlacementData extends SuccessTestData {
     // The persona uuid. This would be the user main persona icon, not necessarily the device.
     personaUuid: string
     // The icon uuid. This would be the actual mark placement target. Can be a device, a persona device, a host or actor.
-    iconUuid: string
+    iconUuid: string|undefined
     // Should the mark be placed on the main icon / persona or icons connected to it?
     placeOnMainIcon: boolean
 }
@@ -242,4 +242,21 @@ export const MarkPlacementFlow = {
 
         await test.execute();
     },
+
+    /**
+     * TestDialog has issues when show / hiding elements, here the iconUuid device selection, with cleaning up data set
+     * by previous render cycles.
+     * 
+     * Here:
+     * - First place mark on main icon
+     * - Then select a device to place the mark on
+     * - Reverse and place mark on main icon again
+     * - iconUuid is still set to the device, as the render flow of the TestDialog doesn't clean up the data set by the
+     * 
+     * @param test 
+     */
+    async setIconUuidBasedOnPlacementSelection(test: BruteForceTest|HackOnTheFlyTest) {
+        if (!this.data.placeOnMainIcon) return;
+        this.data.iconUuid = this.persona?.uuid ?? this.host?.uuid ?? undefined;
+    }
 }

@@ -48,6 +48,13 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
     override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.html';
     }
+    /**
+     * Clean up faulty test data after dialog has been shown.
+     */
+    override async _cleanUpAfterDialog() {
+        await super._cleanUpAfterDialog();
+        MarkPlacementFlow.setIconUuidBasedOnPlacementSelection(this);
+    }
 
     override async populateDocuments() {
         await super.populateDocuments();
