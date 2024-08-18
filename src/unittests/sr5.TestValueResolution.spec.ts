@@ -148,9 +148,8 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             const host = await testItem.create({ type: 'device', system: { 'technology.rating': 5, 'category': 'host' } }) as SR5Item;
             const device = await testItem.create({ type: 'equipment', system: { 'technology.rating': 3, 'technology.master': host.uuid } }) as SR5Item;
 
-            const test = {data: {directConnection: true}};
-            // @ts-expect-error Mockup.
-            const rollData = device.getRollData({test});
+            const againstData = {directConnection: true};
+            const rollData = device.getRollData({againstData});
 
             assert.equal(rollData.attributes.firewall.value, 3);
         });
@@ -182,17 +181,9 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
      * Rigging related value resolutions based on vehicle mode.
      */
     describe('Rigging Tests', () => {
-        it('Calculate vehicle values for autopilot', () => {
-            assert.fail();
-        });
-
-        it('Calculate vehicle values for rigged in', () => {
-            assert.fail();
-        });
-
-        it('Calculate vehicle values for remote controlled', () => {
-            assert.fail();
-        });
+        it('Calculate vehicle values for autopilot');
+        it('Calculate vehicle values for rigged in');
+        it('Calculate vehicle values for remote controlled');
     });
 
 
@@ -200,12 +191,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
      * Magic related value resolution based on astral / physical.
      */
     describe('Astral Tests', () => {
-        it('Calculate Magician in physical world', () => {
-            assert.fail();
-        });
-
-        it('Calculate Magician in astral world', () => {
-            assert.fail();
-        });
+        it('Calculate Magician in physical world');
+        it('Calculate Magician in astral world');
     });
 };
