@@ -69,7 +69,7 @@
         "mod": 0,
         "description": "",
         "resist": {
-          "test": "",
+          "test": "MatrixResistTest",
           "skill": "",
           "attribute": "",
           "attribute2": "",
