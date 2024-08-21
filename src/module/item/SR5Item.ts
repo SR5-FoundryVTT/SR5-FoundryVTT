@@ -1207,6 +1207,12 @@ export class SR5Item extends Item {
         return this.wrapper.getSource();
     }
 
+    setSource(source: string) {
+        if (!this.system.description) this.system.description = { chat: '', source: '', value: '' };
+        this.system.description.source = source;
+        this.render(true);
+    }
+
     getConditionMonitor(): ConditionData {
         return this.wrapper.getConditionMonitor();
     }

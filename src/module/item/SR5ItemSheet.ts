@@ -351,6 +351,11 @@ export class SR5ItemSheet extends ItemSheet {
         const data = this.parseDropData(event);
         if (!data) return;
 
+        if (event.toElement.name === 'system.description.source') {
+            this.item.setSource(data.uuid);
+            return;
+        }
+
         // Add items to a weapons modification / ammo
         if (this.item.isWeapon && data.type === 'Item') {
             let item;
