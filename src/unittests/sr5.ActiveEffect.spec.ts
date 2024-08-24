@@ -467,7 +467,45 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.lengthOf(actor.system.attributes.body.mod, 0);
             assert.equal(actor.system.attributes.body.value, 1);
-        })
+        });
+
+        it('A extended test should not apply effects on extended rolls', async () => {
+            /**
+             * Sum all modifier values for the given name.
+             * 
+             * @param name The modifier name
+             * @returns the sum of all modifier values matching the name
+             */
+            const reduceModifiersByName = (name: string) => (acc: number, { name: n, value }) => n === name ? acc + value : acc;
+
+            const actor = await testActor.create({ type: 'character' });
+            let actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action' }]);
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                label: 'Test Effect',
+                flags: { shadowrun5e: { applyTo: 'test_all', selection_tests: "[{\"value\":\"Success Test\",\"id\":\"SuccessTest\"}]" } },
+                changes: [{ key: 'data.pool', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }]);
+
+            let test = await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            await test.execute();
+
+            // The first roll should have the effect applied
+            assert.equal(test.pool.mod.reduce(reduceModifiersByName('Test Effect'), 0), 2);
+
+            // Trigger the extended roll...
+            test = await test.executeAsExtended();
+            // ... assure effects aren't re applied but taken from the first roll.
+            assert.equal(test.pool.mod.reduce(reduceModifiersByName('Test Effect'), 0), 2);
+
+            actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action', 'system.action.extended': true }]);
+            test = await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }) as SuccessTest;
+
+            // This will trigger the first and all extended rolls...
+            await test.execute();
+
+            /// ... the test reference is for the first roll and should have the effect applied.
+            assert.equal(test.pool.mod.reduce(reduceModifiersByName('Test Effect'), 0), 2);
+        });
     });
 
     describe('AdvancedEffects with dynamic values', () => {
