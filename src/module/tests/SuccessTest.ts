@@ -1598,6 +1598,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         test.data.extendedRoll = true;
 
         await test.execute();
+
+        return test;
     }
 
     /**
