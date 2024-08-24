@@ -35,7 +35,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     applyAllEffects() {
         // Extended tests have their effects applied on first run.
         // As soon as a test is extended, it's effects are already applied and shouldn't be applied again
-        if (this.test.extended) return;
+        if (this.test.extendedRoll) return;
 
         // Since we're extending EffectChangeData by a effect field only locally, I don't care enough to resolve the typing issue.
         const changes: any[] = [];
