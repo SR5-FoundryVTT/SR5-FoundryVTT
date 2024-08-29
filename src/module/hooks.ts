@@ -52,28 +52,30 @@ import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
 import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
 import { BruteForceTest } from './tests/BruteForceTest';
 import { OpposedBruteForceTest } from './tests/OpposedBruteForceTest';
+import { MatrixResistTest } from './tests/MatrixResistTest';
+import { SkillTest } from './tests/SkillTest';
+import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 
 import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
 import { MatrixNetworkFlow } from './item/flows/MatrixNetworkFlow';
+import { AutocompleteInlineHooksFlow } from './effect/autoinline/AutocompleteInlineHooksFlow';
+import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
+
 import { registerSystemKeybindings } from './keybindings';
-import { SkillTest } from './tests/SkillTest';
 
 import { canvasInit } from './canvas';
-import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
-import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
 import { SR5ChatMessage } from './chatMessage/SR5ChatMessage';
 import VisionConfigurator from './vision/visionConfigurator';
 import { DataDefaults } from './data/DataDefaults';
-import { AutocompleteInlineHooksFlow } from './effect/autoinline/AutocompleteInlineHooksFlow';
 import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 import { RenderSettings } from './systemLinks';
 import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
-import { MatrixResistTest } from './tests/MatrixResistTest';
+import { MatrixHooks } from './tests/hooks/MatrixHooks';
 
 
 
@@ -105,6 +107,8 @@ export class HooksManager {
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
 
         Hooks.on('quenchReady', quenchRegister);
+
+        MatrixHooks.registerHooks();
 
         RenderSettings.listen();
     }

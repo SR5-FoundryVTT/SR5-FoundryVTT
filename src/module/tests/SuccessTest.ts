@@ -588,6 +588,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Only then apply values and collected modifiers.
         this.applyPushTheLimit();
         this.applyPoolModifiers();
+
+        Hooks.call('sr5_testPrepareBaseValues', this);
     }
 
     /**
@@ -751,6 +753,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get testCategories(): Shadowrun.ActionCategories[] {
         return [];
+    }
+
+    /**
+     * Check if this test includes a specific action category.
+     * @param category The category name
+     * @returns true, when this test includes it. false, if not.
+     */
+    hasTestCategory(category: Shadowrun.ActionCategories): boolean {
+        return this.data.categories.includes(category);
     }
 
     /**

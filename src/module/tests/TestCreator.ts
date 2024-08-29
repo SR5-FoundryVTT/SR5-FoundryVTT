@@ -419,12 +419,12 @@ export const TestCreator = {
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 
-        if (document instanceof SR5Actor) return TestCreator._prepareTestDataWithActionForActor(action, document, data, againstData);
-        if (document instanceof SR5Item) return TestCreator._prepareTestDataWithActionForItem(action, document, data, againstData);
+        if (document instanceof SR5Actor) data = TestCreator._prepareTestDataWithActionForActor(action, document, data, againstData);
+        if (document instanceof SR5Item) data = TestCreator._prepareTestDataWithActionForItem(action, document, data, againstData);
 
-        //@ts-expect-error // Fallback to data for easy typing, though type gating would cause a typing error, however runtime errors might occur.
-        console.error(`Shadowrun 5e | Couldn't prepare test data for document type ${document.constructor.name}`, document, data);
-        ui.notifications?.error('Remove the console.error here');
+        // Allow rule specific parts of the system to further extend some tests under non-general circumstances.
+        Hooks.call('sr5_afterPrepareTestDataWithAction', data, action, document, againstData);
+
         return data;
     },
 
@@ -463,7 +463,7 @@ export const TestCreator = {
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
             // Apply matrix modifiers, when applicable
-            if (attribute && actor._isMatrixAttribute(action.attribute)) actor._addMatrixParts(pool, true);
+            // if (attribute && actor._isMatrixAttribute(action.attribute)) actor._addMatrixParts(pool, true);
         }
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
@@ -471,7 +471,7 @@ export const TestCreator = {
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
             // Apply matrix modifiers, when applicable
-            if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
+            // if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
         }
         
         // Include pool modifiers for opposed and resist tests.
@@ -507,7 +507,7 @@ export const TestCreator = {
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
             if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
-            if (limit && actor._isMatrixAttribute(action.limit.attribute)) actor._addMatrixParts(pool, true);
+            // if (limit && actor._isMatrixAttribute(action.limit.attribute)) actor._addMatrixParts(pool, true);
         }
 
         // Prepare threshold values...

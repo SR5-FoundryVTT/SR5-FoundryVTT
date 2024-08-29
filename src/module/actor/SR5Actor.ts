@@ -32,6 +32,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { MatrixNetworkFlow, NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../flows/MarksFlow';
+import { MatrixTestDataFlow } from '../tests/flows/MatrixTestDataFlow';
 
 
 /**
@@ -1217,41 +1218,6 @@ export class SR5Actor extends Actor {
     
             return await test.execute();
         }
-
-    /**
-     * Is the given attribute id a matrix attribute
-     * @param attribute
-     */
-    _isMatrixAttribute(attribute: string): boolean {
-        return SR5.matrixAttributes.hasOwnProperty(attribute);
-    }
-
-    /**
-     * Add matrix modifier values to the given modifier parts from whatever Value as part of 
-     * matrix success test.
-     * 
-     * @param parts The Value.mod field as a PartsList
-     * @param atts The attributes used for the success test.
-     */
-    _addMatrixParts(parts: PartsList<number>, atts) {
-        if (Helpers.isMatrix(atts)) {
-            if (!("matrix" in this.system)) return;
-
-            // Apply general matrix modifiers based on commlink/cyberdeck status.
-            const matrix = this.system.matrix;
-            if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
-            if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
-        }
-    }
-
-    /**
-     * Remove matrix modifier values to the given modifier part
-     * 
-     * @param parts A Value.mod field as a PartsList
-     */
-    _removeMatrixParts(parts: PartsList<number>) {
-        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.removePart(part));
-    }
 
     /**
      * Build an action for the given skill id based on it's configured values.
