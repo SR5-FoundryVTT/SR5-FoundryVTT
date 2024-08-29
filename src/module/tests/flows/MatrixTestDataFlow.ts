@@ -12,7 +12,7 @@ export const MatrixTestDataFlow = {
     addMatrixModifiers: function(test: SuccessTest) {
         if (test.source instanceof SR5Item) return;
 
-        MatrixTestDataFlow.removeMatrixModifiers(this);
+        MatrixTestDataFlow.removeMatrixModifiers(test);
 
         const pool = new PartsList<number>(test.data.pool.mod);
         const action = test.data.action;
