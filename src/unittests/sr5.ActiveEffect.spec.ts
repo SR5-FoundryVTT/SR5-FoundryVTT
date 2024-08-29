@@ -5,7 +5,6 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { SuccessTest } from "../module/tests/SuccessTest";
 import { DataDefaults } from "../module/data/DataDefaults";
-import { RangedAttackTest } from "../module/tests/RangedAttackTest";
 import { SkillTest } from "../module/tests/SkillTest";
 import { Helpers } from "../module/helpers";
 
@@ -28,7 +27,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     describe('SR5ActiveEffect', () => {
         it('MODIFY mode: apply system custom mode to main and sub value-keys', async () => {
             const actor = await testActor.create({ type: 'character' });
-            const effect = await actor.createEmbeddedDocuments('ActiveEffect', [{
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
                 origin: actor.uuid,
                 disabled: false,
                 label: 'Test Effect',
@@ -81,7 +80,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            // Body should be overwritten as a Valuefield.
+            // Body should be overwritten as a ValueField.
             assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3 });
             assert.strictEqual(actor.system.attributes.body.base, 0);
             assert.deepEqual(actor.system.attributes.body.mod, []);
@@ -95,7 +94,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.attributes.agility.value, 1);
 
             // A ValueField value outside of value calculation should still work
-            // Skill automatics normally can default, wich we overwrite here.
+            // Skill automatics normally can default, which we overwrite here.
             assert.deepEqual(actor.system.skills.active.automatics.mod, []);
             assert.strictEqual(actor.system.skills.active.automatics.override, undefined);
             assert.strictEqual(actor.system.skills.active.automatics.canDefault, false);
@@ -182,7 +181,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
         it('ACTOR apply-to: Only actor and targeted_actor effects should apply onto an actor', async () => {
             const actor = await testActor.create({ type: 'character' });
-            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
                 label: 'Actor Effect',
                 flags: { shadowrun5e: { applyTo: 'actor' } },
                 changes: [{ key: 'system.attributes.body', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
@@ -511,7 +510,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     describe('AdvancedEffects with dynamic values', () => {
         it('ACTOR apply-to: Grab dynamic actor values', async () => {
             const actor = await testActor.create({ type: 'character', system: { modifiers: { global: 6 } } });
-            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
                 label: 'Actor Effect',
                 changes: [
                     { key: 'system.attributes.body', value: '@system.modifiers.global', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
@@ -531,7 +530,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('TEST modify damage on RangedAttackTest', async () => {
             const actor = await testActor.create({ type: 'character' });
             const weapon = await testItem.create({ type: 'weapon', system: { category: 'ranged' } });
-            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { applyTo: 'test_all' } },
                 changes: [{ key: 'data.damage', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
@@ -546,7 +545,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
         it('TEST modify attribute and limit on SkillTest', async () => {
             const actor = await testActor.create({ type: 'character' });
-            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { applyTo: 'test_all' } },
                 changes: [
@@ -586,7 +585,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     describe('AdvanceEffects apply modification based on test categories', () => {
         it('Should apply modifier to a single category only', async () => {
             const actor = await testActor.create({ type: 'character' });
-            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { applyTo: 'test_all', selection_categories: '[{"value":"Social Actions","id":"social"}]' } },
                 changes: [{ key: 'data.pool', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
