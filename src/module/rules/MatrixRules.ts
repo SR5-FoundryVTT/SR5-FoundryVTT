@@ -1,4 +1,6 @@
 import { SR } from "../constants";
+import { OpposedTest } from "../tests/OpposedTest";
+import { SuccessTest } from "../tests/SuccessTest";
 
 export class MatrixRules {
     /**
@@ -139,5 +141,39 @@ export class MatrixRules {
      */
     static validPANSlaveCount(rating: number, slaves: number): boolean {
         return this.maxPANSlaves(rating) <= slaves;
+    }
+
+    /**
+     * Determine if the given attributes result in an illegal matrix action rolled.
+     * 
+     * See SR5#231-232 'Overwatch Score and Convergence'
+     * 
+     * @param attribute 
+     * @param attribute2 
+     * @param limit 
+     */
+    static isIllegalAction(attribute: Shadowrun.ActorAttribute, attribute2: Shadowrun.ActorAttribute, limit: Shadowrun.ActorAttribute): boolean {
+        for (const illegal of ['attack', 'sleaze']) {
+            if (attribute === illegal || attribute2 === illegal || limit === illegal) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if this test should add overwatch score. SR5#231-232 'Overwatch Score and Convergence'
+     *
+     * @param test Any test, though only tests opposing matrix tests will be considered.
+     */
+    static async addOverwatchScore(test: SuccessTest|OpposedTest) {
+        if (!test.opposing) return;
+        // @ts-expect-error - Only OpposedTest has this property
+        const against = test.against as SuccessTest;
+        if (!against) return;
+        if (!against.hasTestCategory('matrix')) return;
+        if (!MatrixRules.isIllegalAction(against.data.action.attribute, against.data.action.attribute2, against.data.action.limit.attribute)) return;
+
+        const overwatchScore = against.actor?.getOverwatchScore();
+        await against.actor?.setOverwatchScore(overwatchScore + test.hits.value);
     }
 }

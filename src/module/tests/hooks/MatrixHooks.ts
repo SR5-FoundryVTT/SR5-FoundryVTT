@@ -1,3 +1,4 @@
+import { MatrixRules } from '../../rules/MatrixRules';
 import { MatrixTestDataFlow } from '../flows/MatrixTestDataFlow';
 import { SuccessTest } from '../SuccessTest';
 
@@ -7,6 +8,7 @@ import { SuccessTest } from '../SuccessTest';
 export const MatrixHooks = {
     registerHooks: function () {
         Hooks.on('sr5_testPrepareBaseValues', MatrixHooks.onTestPrepareBaseValues_AddMatrixModifiers.bind(this));
+        Hooks.on('sr5_testProcessResults', MatrixHooks.onTestProcessResults_AddOverwatchScore.bind(this));
     },
 
     /**
@@ -16,5 +18,13 @@ export const MatrixHooks = {
      */
     onTestPrepareBaseValues_AddMatrixModifiers: function(test: SuccessTest) {
         MatrixTestDataFlow.addMatrixModifiers(test);
+    },
+
+    /**
+     * After a test has been executed, determine if it's an opposing matrix test and should add overwatch score.
+     * @param test 
+     */
+    onTestProcessResults_AddOverwatchScore: async function(test: SuccessTest) {
+        await MatrixRules.addOverwatchScore(test);
     },
 }

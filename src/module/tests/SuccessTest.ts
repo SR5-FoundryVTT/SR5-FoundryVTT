@@ -1509,6 +1509,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         } else {
             await this.processFailure();
         }
+
+        Hooks.call('sr5_testProcessResults', this);
     }
 
     /**
