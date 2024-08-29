@@ -11,7 +11,7 @@ export interface AttributeOnlyTestData extends SuccessTestData {
 /**
  * Handle custom attribute-only tests as defined in SR5#152.
  *
- * Attribute-Only Tests don't alter default SuccessTests rule wise but only Foundry behaviour wise.
+ * Attribute-Only Tests don't alter default SuccessTests rule wise but only Foundry behavior wise.
  * Main difference is the user ability to change attributes before rolling dice.
  */
 export class AttributeOnlyTest extends SuccessTest {
