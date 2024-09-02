@@ -5,8 +5,8 @@ const del = import('del'); //es6m
 const chalk = import('chalk'); //es6m
 
 // Sass
-const gulpsass = require('gulp-sass')(require('node-sass'));
-gulpsass.compiler = require('node-sass');
+const gulpsass = require('gulp-sass')(require('sass'));
+gulpsass.compiler = require('sass');
 
 // Gulp
 var cp = require('child_process');
