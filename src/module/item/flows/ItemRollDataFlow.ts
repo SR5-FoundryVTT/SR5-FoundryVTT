@@ -31,7 +31,7 @@ export const ItemRollDataFlow = {
                 return rollData;
             }
             
-            const directConnection = master.againstData?.directConnection ?? false;;
+            const directConnection = againstData?.directConnection ?? false;;
             ItemRollDataFlow.injectMasterRatingsForPAN(master, actor, rollData, directConnection)
         }
 
