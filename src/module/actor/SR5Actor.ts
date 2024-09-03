@@ -32,7 +32,8 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { MatrixNetworkFlow, NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../flows/MarksFlow';
-import { MatrixTestDataFlow } from '../tests/flows/MatrixTestDataFlow';
+import { RollDataOptions } from '../item/Types';
+import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 
 
 /**
@@ -2312,5 +2313,21 @@ export class SR5Actor extends Actor {
         }));
 
         await this.updateEmbeddedDocuments('Item', updateData);
+    }
+
+    /**
+     * Transparently build a set of roll data based on this actors type and status.
+     * 
+     * Values for rolling can depend on other actors and items.
+     * 
+     * NOTE: Since getRollData is sync by default, we can´t retrieve compendium documents,
+     *       resulting in fromUuidSync calls.
+     * 
+     * @param options System specific options influencing roll data.
+     */
+    override getRollData(options: RollDataOptions={}): any {
+        // Avoid changing actor system data as Foundry just returns it.
+        const rollData = foundry.utils.duplicate(super.getRollData());
+        return ActorRollDataFlow.getRollData(this, rollData, options);
     }
 }
