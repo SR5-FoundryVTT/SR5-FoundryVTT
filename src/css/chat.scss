@@ -47,13 +47,6 @@
             border-color: $yellow;
         }
         .button {
-            &:hover {
-                cursor: pointer;
-                // box-shadow: 0 0 0.25em 0.15em $black;
-                outline: none;
-                box-shadow: 0 0 5px var(--color-shadow-primary);
-            }
-            
             color: $color;
             border-color: $black;
             background: rgba($light, 0.2);
@@ -66,6 +59,13 @@
             padding-bottom: 2px;
             padding-left: 1em;
             padding-right: 1em;
+
+            &:hover {
+                cursor: pointer;
+                // box-shadow: 0 0 0.25em 0.15em $black;
+                outline: none;
+                box-shadow: 0 0 5px var(--color-shadow-primary);
+            }
         }
         .card-description {
             span {
