@@ -5,7 +5,9 @@ declare namespace Shadowrun {
         DescriptionPartData,
         ImportFlags,
         TechnologyPartData {
-
+        
+        // Amount of programs that can run on this device.
+        programs: number
     }
 
     // This category is used for both Device and Host item types to differentiate attribute handling.

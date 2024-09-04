@@ -26,6 +26,7 @@ export interface SheetItemData {
     type: string,
     name: string,
     data: Shadowrun.ShadowrunItemDataData
+    system: Shadowrun.ShadowrunItemDataData
     properties: any,
     description: any
 }
@@ -242,6 +243,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
+        data.program_count = this._prepareProgramCount(data.itemType);
 
         data.situationModifiers = this._prepareSituationModifiers();
 
@@ -1049,6 +1051,25 @@ export class SR5BaseActorSheet extends ActorSheet {
         sheetData.hasSkills = this.actor.hasSkills;
         sheetData.canAlterSpecial = this.actor.canAlterSpecial;
         sheetData.hasFullDefense = this.actor.hasFullDefense;
+    }
+
+    /**
+     * Count the currently active and max programs for sheet display in this style:
+     * 
+     * Only personas using a device will show this count.
+     * 
+     * @param itemTypes 
+     * @returns (<active>/<max>) or ''
+     */
+    _prepareProgramCount(itemTypes: Record<string, SheetItemData[]>): string {
+        if (!itemTypes.program) return '';
+        if (!this.actor.hasDevicePersona) return '';
+
+        const active = itemTypes.program.filter(program => program.system.technology?.equipped).length;
+        const activeDevice = this.actor.getMatrixDevice();
+        const max = activeDevice?.system.programs ?? 0;
+
+        return `(${active}/${max})`;
     }
 
     async _onMarksQuantityChange(event) {
