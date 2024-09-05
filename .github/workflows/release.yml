@@ -48,4 +48,4 @@ jobs:
                   method: 'POST'
                   contentType: 'application/json'
                   customHeaders: '{"Authorization": "${{ secrets.FVTT_PACKAGE_RELEASE_TOKEN }}"}'
-                  data: '{"id": "shadowrun5e", "dry-run": true, "release":{"version":"v${{github.event.release.tag_name}}","manifest":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/latest/download/system.json","notes":"https://github.com/smilligan93/SR5-FoundryVTT/releases/tag/${{github.event.release.tag_name}}","compatibility":{"minimum":"11","verified":"12","maximum":"12"}}}'
+                  data: '{"id": "shadowrun5e", "release":{"version":"v${{github.event.release.tag_name}}","manifest":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/latest/download/system.json","notes":"https://github.com/smilligan93/SR5-FoundryVTT/releases/tag/${{github.event.release.tag_name}}","compatibility":{"minimum":"11","verified":"12","maximum":"12"}}}'
