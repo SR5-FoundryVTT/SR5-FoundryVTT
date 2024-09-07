@@ -16,7 +16,6 @@ jobs:
               with:
                   files: 'system.json'
               env:
-                  VERSION: ${{github.event.release.tag_name}}
                   URL: https://github.com/${{github.repository}}
                   MANIFEST: https://github.com/${{github.repository}}/releases/latest/download/system.json
                   DOWNLOAD: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/shadowrun5e.zip
