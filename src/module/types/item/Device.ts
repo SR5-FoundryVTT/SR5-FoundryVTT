@@ -5,7 +5,9 @@ declare namespace Shadowrun {
         DescriptionPartData,
         ImportFlags,
         TechnologyPartData {
-
+        
+        // Amount of programs that can run on this device.
+        programs: number
     }
 
     // This category is used for both Device and Host item types to differentiate attribute handling.
@@ -14,7 +16,7 @@ declare namespace Shadowrun {
     export interface DevicePartData {
         category: DeviceCategory
         atts: MatrixAttributes
-        networkDevices: string[]
+        slaves: string[]
     }
 
     export interface DeviceAttribute {
@@ -24,14 +26,5 @@ declare namespace Shadowrun {
         att: MatrixAttribute;
         // Is used to determine if a device attribute should be editable on the sheet.
         editable: boolean
-    }
-
-    // PAN / WAN networking
-    export type NetworkDeviceType = 'Token' | 'Actor' | 'Host';
-    export interface NetworkDeviceLink {
-        sceneId: string|undefined,
-        ownerId: string|undefined,
-        targetId: string,
-        type: NetworkDeviceType
     }
 }

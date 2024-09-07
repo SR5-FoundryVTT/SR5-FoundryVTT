@@ -6,17 +6,14 @@ import {SYSTEM_NAME} from "../constants";
 import { Translation } from '../utils/strings';
 
 export const registerBasicHelpers = () => {
+    /**
+     * Localization helper for mapping a key to a key-localization mapping.
+     * 
+     * This is used for mapping an Item type to it's localization label and other similar mappings.
+     */
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj) strId = obj[strId];
         return game.i18n.localize(strId);
-    });
-
-    Handlebars.registerHelper('localizeDocumentType', function (document) {  
-        if (document.type.length < 1) return '';
-        const documentClass = document instanceof SR5Actor ? 'ACTOR' : 'ITEM';
-        const documentTypeLabel = document.type[0].toUpperCase() + document.type.slice(1);
-        const i18nTypeLabel = `${documentClass}.Type${documentTypeLabel}`;
-        return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
     Handlebars.registerHelper('localizeSkill', function (skill: SkillField): string {

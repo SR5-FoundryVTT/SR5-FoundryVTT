@@ -227,9 +227,13 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return deviceData.category === 'commlink';
     }
 
+    /**
+     * Any action that includes the matrix action category counts as a matrix action.
+     *
+     * @returns true, this item contains a matrix action
+     */
     isMatrixAction(): boolean {
-        // @ts-expect-error
-        return this.isAction() && this.getData().result.success.matrix.placeMarks;
+        return this.isAction() && !!this.getAction()?.categories.includes('matrix');
     }
 
     isSin(): boolean {

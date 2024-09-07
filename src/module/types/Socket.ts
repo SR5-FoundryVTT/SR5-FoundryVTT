@@ -6,16 +6,16 @@ declare namespace Shadowrun {
         userId?: string
     }
 
-    export interface SocketAddNetworkControllerMessageData extends SocketMessageData {
+    export interface SocketAddMasterMessageData extends SocketMessageData {
         data: {
-            controllerLink: string,
-            networkDeviceLink: string
+            masterLink: string,
+            slaveLink: string
         }
     }
 
-    export interface SocketRemoveControllerFromDeviceSocketMessageData extends SocketMessageData {
+    export interface SocketRemoveMasterSocketMessageData extends SocketMessageData {
         data: {
-            networkDeviceLink: string
+            slaveLink: string
         }
     }
 

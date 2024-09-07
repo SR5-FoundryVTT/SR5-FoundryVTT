@@ -7,7 +7,7 @@ declare namespace Shadowrun {
         result: ActionResultData
     }
     /**
-     * Action information for testing and throwing dice, including all the necessesary values
+     * Action information for testing and throwing dice, including all the necessary values
      * that need to be collected from both the action item and the actor using it.
      *
      * The main component being the test implementation string, defining what test to use.
@@ -85,7 +85,7 @@ declare namespace Shadowrun {
         skill: SkillName
         // The attribute to be used for this test pool. Using the attribute identifier.
         attribute: ActorAttribute
-        // Another attribtue to be used for this test pool. Using the attribute identifier.
+        // Another attribute to be used for this test pool. Using the attribute identifier.
         attribute2: ActorAttribute
         // A flat numerical pool modifier.
         mod: number
@@ -113,11 +113,7 @@ declare namespace Shadowrun {
     }
 
     export interface ActionResultData {
-        success: {
-            matrix: {
-                placeMarks: boolean
-            }
-        }
+        success: Record<string, any>
     }
 
     /**

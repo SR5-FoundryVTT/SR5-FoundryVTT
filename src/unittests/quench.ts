@@ -1,3 +1,5 @@
+import { shadowrunTestValueResolution } from './sr5.TestValueResolution.spec';
+import { shadowrunMarks } from './sr5.Marks.spec';
 import { shadowrunRolling } from './sr5.SR5Roll.spec';
 import { shadowrunSR5RangedWeaponRules } from './sr5.RangedWeapon.spec';
 import { shadowrunAttackTesting } from './sr5.AttackTests.spec';
@@ -24,6 +26,7 @@ import { weaponParserTesting } from './actorImport/itemImporter/weaponImport/sr5
 import { mountedWeaponParserTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleImporterMountedWeapon.spec';
 import { shadowrunSR5ItemDataPrep } from './sr5.ItemDataPrep.spec';
 import { vehicleImporterTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleImporter.spec';
+import { shadowrunMatrixTesting } from './sr5.MatrixTesting.spec';
 import { vehicleModParserTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleModImporter.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
@@ -111,6 +114,9 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.networkDevices', shadowrunNetworkDevices, {
         displayName: 'SHADOWRUN5e: Matrix Network Devices Test',
     });
+    quench.registerBatch('shadowrun5e.flow.marks', shadowrunMarks, {
+        displayName: 'SHADOWRUN5e: Matrix Marks Test',
+    });
     quench.registerBatch('shadowrun5e.flow.inventory', shadowrunInventoryFlow, {
         displayName: 'SHADOWRUN5e: InventoryFlow Test',
     });
@@ -118,6 +124,8 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.tests_attack', shadowrunAttackTesting, {
         displayName: 'SHADOWRUN5e: Attack Test',
     });
+    quench.registerBatch('shadowrun5e.flow.test_value_resolution', shadowrunTestValueResolution, { displayName: 'SHADOWRUN5e: Test Value Resolution' });
+    quench.registerBatch('shadowrun5e.flow.tests_matrix', shadowrunMatrixTesting, { displayName: 'SHADOWRUN5e: Matrix Test' });
     quench.registerBatch('shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
 
     quench.registerBatch('shadowrun5e.parser.weapon', weaponParserBaseTesting, {

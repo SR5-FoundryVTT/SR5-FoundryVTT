@@ -9,7 +9,6 @@ import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import Skills = Shadowrun.Skills;
-import TargetedDocument = Shadowrun.TargetedDocument;
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
 import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
@@ -71,7 +70,12 @@ export class Helpers {
         return value.value;
     }
 
-    static calcValue<ValueType>(value: GenericValueField): any {
+    /**
+     * Type generic, simple version of calcTotal for generic (mostly string) based values instead number based totals.
+     * @param value Any type of data that is used as .base and .value for a ValueField
+     * @returns The calculated value.
+     */
+    static calcValue<ValueType>(value: GenericValueField): ValueType {
         if (value.mod === undefined) value.mod = [];
 
         if (value.override) {
@@ -869,73 +873,6 @@ export class Helpers {
         const pack = game.packs.find((p) => p.collection === collection);
         // @ts-expect-error // All Document types COULD be returned...
         return await pack.getDocument(id);
-    }
-
-    /**
-     * A markId is valid if:
-     * - It's scene still exists
-     * - The token still exists on that scene
-     * - And a possible owned item still exists on that documents actor.
-     */
-    static isValidMarkId(markId: string): boolean {
-        if (!game.scenes) return false;
-
-        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
-
-        const scene = game.scenes.get(sceneId);
-        if (!scene) return false;
-
-        const tokenDocument = scene.tokens.get(targetId);
-        if (!tokenDocument) return false;
-
-        const actor = tokenDocument.actor;
-        // Some targets are allowed without a targeted owned item.
-        if (itemId && !actor?.items.get(itemId)) return false;
-
-        return true;
-    }
-
-    /**
-     * Build a markId string. See Helpers.deconstructMarkId for usage.
-     *
-     * @param sceneId Optional id in a markId
-     * @param targetId Mandatory id in a markId
-     * @param itemId Optional id in a markId
-     * @param separator Should you want to change the default separator used. Make sure not to use a . since Foundry will split the key into objects.
-     */
-    static buildMarkId(sceneId: string, targetId: string, itemId: string | undefined, separator = '/'): string {
-        return [sceneId, targetId, itemId || ''].join(separator);
-    }
-
-    /**
-     * Deconstruct the given markId string.
-     *
-     * @param markId 'sceneId.targetId.itemId' with itemId being optional
-     * @param separator Should you want to change the default separator used
-     */
-    static deconstructMarkId(markId: string, separator = '/'): [sceneId: string, targetId: string, itemId: string] {
-        const ids = markId.split(separator);
-
-        if (ids.length !== 3) {
-            console.error('A mark id must always be of length 3');
-        }
-
-        return ids as [string, string, string];
-    }
-
-    static getMarkIdDocuments(markId: string): TargetedDocument | undefined {
-        if (!game.scenes || !game.items) return;
-
-        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
-
-        const scene = game.scenes.get(sceneId);
-        if (!scene) return;
-        const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
-        const item = target?.actor?.items?.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
-
-        return {
-            scene, target, item
-        }
     }
 
     /**

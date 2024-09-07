@@ -14,7 +14,6 @@ import {SpritePrep} from "./prep/SpritePrep";
 import {VehiclePrep} from "./prep/VehiclePrep";
 import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import {SkillRules} from "../rules/SkillRules";
-import {MatrixRules} from "../rules/MatrixRules";
 import {ICPrep} from "./prep/ICPrep";
 import {
     EffectChangeData
@@ -30,6 +29,11 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { MatrixNetworkFlow, NetworkDevice } from '../item/flows/MatrixNetworkFlow';
+import { ActorMarksFlow } from './flows/ActorMarksFlow';
+import { SetMarksOptions } from '../flows/MarksFlow';
+import { RollDataOptions } from '../item/Types';
+import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 
 
 /**
@@ -626,20 +630,53 @@ export class SR5Actor extends Actor {
         return this.system.skills.active;
     }
 
-    getNetworkController(): string|undefined {
+    getMasterUuid(): string|undefined {
         if(!this.isVehicle()) return;
 
-        return this.asVehicle()?.system?.networkController;
+        return this.asVehicle()?.system?.master;
     }
 
-    async setNetworkController(networkController: string|undefined): Promise<void> {
+    async setMasterUuid(masterLink: string|undefined): Promise<void> {
         if(!this.isVehicle()) return;
 
-        await this.update({ 'system.networkController': networkController });
+        await this.update({ 'system.master': masterLink });
     }
 
-    get canBeNetworkDevice(): boolean {
+    get canBeSlave(): boolean {
         return this.isVehicle();
+    }
+
+    /**
+     * The network (host/grid) this matrix actor is connected to.
+     */
+    get network(): SR5Item|undefined {
+        if (!this.isMatrixActor) return
+
+        // Avoid typing issues by using [''] notation.
+        const network = this.system['matrix'].network;
+        // Matrix actor without ability to connect to network
+        if (!network) return;
+
+        const item = fromUuidSync(network.uuid) as SR5Item;
+        if (!item) return;
+
+        return item;
+    }
+
+    /**
+     * Connect this actor to a host / grid
+     * 
+     * @param network Must be an item of matching type
+     */
+    async connectNetwork(network: SR5Item) {
+        await MatrixNetworkFlow.connectNetwork(this, network);
+    }
+
+    /**
+     * Disconnect this actor from a host / grid
+     */
+    async disconnectNetwork() {
+        await MatrixNetworkFlow.disconnectNetwork(this);
     }
 
     /**
@@ -1184,41 +1221,6 @@ export class SR5Actor extends Actor {
         }
 
     /**
-     * Is the given attribute id a matrix attribute
-     * @param attribute
-     */
-    _isMatrixAttribute(attribute: string): boolean {
-        return SR5.matrixAttributes.hasOwnProperty(attribute);
-    }
-
-    /**
-     * Add matrix modifier values to the given modifier parts from whatever Value as part of 
-     * matrix success test.
-     * 
-     * @param parts The Value.mod field as a PartsList
-     * @param atts The attributes used for the success test.
-     */
-    _addMatrixParts(parts: PartsList<number>, atts) {
-        if (Helpers.isMatrix(atts)) {
-            if (!("matrix" in this.system)) return;
-
-            // Apply general matrix modifiers based on commlink/cyberdeck status.
-            const matrix = this.system.matrix;
-            if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
-            if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
-        }
-    }
-
-    /**
-     * Remove matrix modifier values to the given modifier part
-     * 
-     * @param parts A Value.mod field as a PartsList
-     */
-    _removeMatrixParts(parts: PartsList<number>) {
-        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.removePart(part));
-    }
-
-    /**
      * Build an action for the given skill id based on it's configured values.
      *
      * @param skillId Any skill, no matter if active, knowledge or language
@@ -1508,10 +1510,11 @@ export class SR5Actor extends Actor {
      * Matrix damage can be added onto different tracks:
      * - IC has a local matrix.condition_monitor
      * - Characters have matrix devices (items) with their local track
+     * 
+     * @param damage: The matrix damage to be applied.
      */
     async addMatrixDamage(damage: Shadowrun.DamageData) {
         if (damage.type.value !== 'matrix') return;
-
 
         const device = this.getMatrixDevice();
         const track = this.getMatrixTrack();
@@ -1531,7 +1534,6 @@ export class SR5Actor extends Actor {
      * Apply damage of any type to this actor. This should be the main entry method to applying damage.
      * 
      * @param damage Damage to be applied
-     * @returns overflow damage.
      */
     async addDamage(damage: Shadowrun.DamageData) {
         switch(damage.type.value) {
@@ -1895,16 +1897,15 @@ export class SR5Actor extends Actor {
     async addICHost(item: SR5Item) {
         if (!this.isIC()) return;
         if (!item.isHost) return;
-
-        const host = item.asHost;
-        if (!host) return;
-        await this._updateICHostData(host);
+        await this._updateICHostData(item);
     }
 
-    async _updateICHostData(hostData: Shadowrun.HostItemData) {
+    async _updateICHostData(host: SR5Item) {
+        const hostData = host.asHost;
+        if (!hostData) return;
+
         const updateData = {
-            // @ts-expect-error _id is missing on internal typing...
-            id: hostData._id,
+            id: host.uuid,
             rating: hostData.system.rating,
             atts: foundry.utils.duplicate(hostData.system.atts)
         }
@@ -1939,12 +1940,16 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Get the host item connect to this ic type actor.
+     * Return the host this IC actor is connected with.
+     * 
+     * @returns A item of type host or undefined.
      */
-    getICHost(): SR5Item | undefined {
+    async getICHost(): Promise<SR5Item | undefined> {
         const ic = this.asIC();
         if (!ic) return;
-        return game.items?.get(ic?.system?.host.id);
+        // legacy used id, new uses uuid. Try both.
+        const document = await fromUuid(ic?.system?.host.id) || game.actors?.get(ic?.system?.host.id);
+        if ((document instanceof SR5Item) && document.isHost) return document;
     }
 
     /**
@@ -2014,6 +2019,41 @@ export class SR5Actor extends Actor {
         return 'matrix' in this.system;
     }
 
+    /**
+     * Check if the current actor is a matrix first class citizen.
+     * 
+     * @returns true, when the actor lives in the matrix.
+     */
+    get hasActorPersona(): boolean {
+        return this.isVehicle() || this.isIC() || this.isEmerged;
+    }
+
+    /**
+     * Check if the current actor has a normal persona given by an matrix device.
+     * 
+     * @returns true, when the actor has an active persona.
+     */
+    get hasDevicePersona(): boolean {
+        return this.getMatrixDevice() !== undefined;
+    }
+
+    /**
+     * Check if the current actor has a active living persona.
+     * If a technomancer uses a matrix device to connect with, they don't have a living persona!
+     * 
+     * @returns true, when a technomancer uses their living persona
+     */
+    get hasLivingPersona(): boolean {
+        return !this.hasDevicePersona && this.isEmerged;
+    }
+
+    /**
+     * Retrieve all matrix devices of this actor that are equipped and set to wireless.
+     */
+    get wirelessDevices(): SR5Item[] {
+        return this.items.filter((item) => item.isMatrixDevice && item.isEquipped() && item.isWireless());
+    }
+
     get matrixData(): Shadowrun.MatrixData | undefined {
         if (!this.isMatrixActor) return;
         // @ts-expect-error // isMatrixActor handles it, TypeScript doesn't know.
@@ -2027,146 +2067,123 @@ export class SR5Actor extends Actor {
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks The amount of marks to be placed
      * @param options Additional options that may be needed
-     * @param options.scene The scene the actor lives on. If empty, will be current active scene
-     * @param options.item The item that the mark is to be placed on
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
-        if (!canvas.ready) return;
-
-        if (this.isIC() && this.hasHost()) {
-            return await this.getICHost()?.setMarks(target, marks, options);
-        }
-
-        if (!this.isMatrixActor) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
-            return console.error(`The actor type ${this.type} can't receive matrix marks!`);
-        }
-        if (target.actor && !target.actor.isMatrixActor) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
-            return console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
-        }
-        if (!target.actor) {
-            return console.error(`The token ${target.name} is missing it's actor`);
-        }
-
-        // It hurt itself in confusion.
-        if (this.id === target.actor.id) {
-            return;
-        }
-
-        // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene as Scene;
-        const item = options?.item;
-
-        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        const matrixData = this.matrixData;
-
-        if (!matrixData) return;
-
-        const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
-        matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
-
-        await this.update({'system.matrix.marks': matrixData.marks});
+    async setMarks(target: NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
+        await ActorMarksFlow.setMarks(this, target, marks, options);
     }
 
     /**
-     * Remove ALL marks placed by this actor
+     * Remove ALL marks placed by this actor and maybe disconnect from host / grid if necessary.
      */
     async clearMarks() {
-        const matrixData = this.matrixData;
-        if (!matrixData) return;
+        // Keep marks for later use
+        const marks = this.marksData 
 
-        // Delete all markId properties from ActorData
-        const updateData = {}
-        for (const markId of Object.keys(matrixData.marks)) {
-            updateData[`-=${markId}`] = null;
+        await ActorMarksFlow.clearMarks(this);
+
+        // Check if marks have been used to connect to host/grid
+        const network = this.network;
+        if (!network) return;
+        if (!marks) return;
+
+        for (const {uuid} of marks) {
+            if (network.uuid === uuid) {
+                return await this.disconnectNetwork();
+            }
         }
-
-        await this.update({'system.matrix.marks': updateData});
     }
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     * 
+     * Maybe disconnect from host/grid as well, if necessary
      */
-    async clearMark(markId: string) {
-        if (!this.isMatrixActor) return;
+    async clearMark(uuid: string) {
+        await ActorMarksFlow.clearMark(this, uuid);
 
-        const updateData = {}
-        updateData[`-=${markId}`] = null;
+        // Check if marks have been used to connect to host/grid
+        const network = this.network;
+        if (!network) return;
 
-        await this.update({'system.matrix.marks': updateData});
-    }
-
-    getAllMarks(): Shadowrun.MatrixMarks | undefined {
-        const matrixData = this.matrixData;
-        if (!matrixData) return;
-        return matrixData.marks;
-    }
-
-    /**
-     * Return the amount of marks this actor has on another actor or one of their items.
-     *
-     * TODO: It's unclear what this method will be used for
-     *       What does the caller want?
-     *
-     * TODO: Check with technomancers....
-     *
-     * @param target
-     * @param item
-     * @param options
-     */
-    getMarks(target: Token, item?: SR5Item, options?: { scene?: Scene }): number {
-        if (!canvas.ready) return 0;
-        if (target instanceof SR5Item) {
-            console.error('Not yet supported');
-            return 0;
+        if (network.uuid === uuid) {
+            await this.disconnectNetwork();
         }
-        if (!target.actor || !target.actor.isMatrixActor) return 0;
-
-
-        const scene = options?.scene || canvas.scene as Scene;
-        // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
-        item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
-
-        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        return this.getMarksById(markId);
-    }
-
-    getMarksById(markId: string): number {
-        return this.matrixData?.marks[markId] || 0;
     }
 
     /**
-     * Return the actor or item that is the network controller of this actor.
-     * These cases are possible:
+     * Get all marks placed by this actor.
+     * @returns 
+     */
+    get marksData(): Shadowrun.MatrixMarks | undefined {
+        return this.matrixData?.marks;
+    }
+
+    /**
+     * Get amount of Matrix marks placed by this actor on this target.
+     * 
+     * @param uuid Target uuid
+     * @returns Amount of marks placed
+     */
+    getMarksPlaced(uuid: string) {
+        return ActorMarksFlow.getMarksPlaced(this, uuid);
+    }
+
+    /**
+     * Return the document used to store marks placed for this actor.
+     * 
+     * For a normal character/technomancer this will be the actor itself, though for others this can differ.
+     * 
+     * These special cases are possible:
      * - IC with a host connected will provide the host item
      * - IC without a host will provide itself
-     * - A matrix actor within a PAN will provide the controlling actor
-     * - A matrix actor without a PAN will provide itself
+     * - A vehicle within a PAN will provide the controlling actor
+     * 
+     * @returns The document to retrieve all marks this actor has access to.
      */
-    get matrixController(): SR5Actor | SR5Item {
-        // In case of a broken host connection, return the IC actor.
-        if (this.isIC() && this.hasHost()) return this.getICHost() || this;
-        // TODO: Implement PAN
-        // if (this.isMatrixActor && this.hasController()) return this.getController();
-
+    async _getDocumentWithMarks(): Promise<NetworkDevice|undefined> {
+        // CASE 1 - IC marks are stored on their host item.
+        if (this.isIC() && this.hasHost()) {
+            return await this.getICHost();
+        }
+        // CASE 2 - Vehicle marks are stored on their master actor.
+        if (this.isVehicle() && this.hasMaster) {
+            const master = this.master;
+            return master?.actorOwner;
+        }
+        
+        // DEFAULT CASE
         return this;
     }
 
-    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
-        const marks = this.matrixController.getAllMarks();
+    /**
+     * Check if this actor is part of a Matrix network as a slave.
+     */
+    get hasMaster(): boolean {
+        return this.canBeSlave && !!this.getMasterUuid();
+    }
+
+    /**
+     * Get the master device of this matrix actor.
+     * 
+     * This applies only to actors that act as matrix devices (vehicles).
+     */
+    get master(): SR5Item|undefined {
+        const masterUuid = this.getMasterUuid();
+        if (!masterUuid) return;
+        return fromUuidSync(masterUuid) as SR5Item;
+    }
+
+    /**
+     * Retrieve all documents this actor has a mark placed on, directly or indirectly.
+     */
+    async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
+        const marksDevice = await this._getDocumentWithMarks();
+        if (!marksDevice) return [];
+        const marks = marksDevice.marksData;
         if (!marks) return [];
 
-        // Deconstruct all mark ids into documents.
-        // @ts-expect-error
-        return Object.entries(marks)
-            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
-            .map(([markId, marks]) => ({
-                ...Helpers.getMarkIdDocuments(markId),
-                marks,
-                markId
-            }))
+        return await ActorMarksFlow.getMarkedDocuments(marks);
     }
 
     /**
@@ -2296,5 +2313,21 @@ export class SR5Actor extends Actor {
         }));
 
         await this.updateEmbeddedDocuments('Item', updateData);
+    }
+
+    /**
+     * Transparently build a set of roll data based on this actors type and status.
+     * 
+     * Values for rolling can depend on other actors and items.
+     * 
+     * NOTE: Since getRollData is sync by default, we can´t retrieve compendium documents,
+     *       resulting in fromUuidSync calls.
+     * 
+     * @param options System specific options influencing roll data.
+     */
+    override getRollData(options: RollDataOptions={}): any {
+        // Avoid changing actor system data as Foundry just returns it.
+        const rollData = foundry.utils.duplicate(super.getRollData());
+        return ActorRollDataFlow.getRollData(this, rollData, options);
     }
 }

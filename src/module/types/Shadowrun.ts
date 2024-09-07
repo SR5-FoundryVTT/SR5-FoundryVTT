@@ -5,11 +5,12 @@ declare namespace Shadowrun {
     export type MentalAttribute = 'logic' | 'intuition' | 'charisma' | 'willpower';
     export type SpecialAttribute = 'edge' | 'essence' | 'magic' | 'resonance';
     export type MatrixAttribute = 'attack' | 'sleaze' | 'data_processing' | 'firewall';
+    export type TechnicalAttribute = 'rating';
 
     /**
      * Any valid attribute that an actor can have.
      */
-    export type ActorAttribute = PhysicalAttribute | MentalAttribute | SpecialAttribute | MatrixAttribute | '';
+    export type ActorAttribute = PhysicalAttribute | MentalAttribute | SpecialAttribute | MatrixAttribute | TechnicalAttribute | '';
 
     export type DamageType = 'physical' | 'stun' | 'matrix' | '';
 
@@ -133,4 +134,9 @@ declare namespace Shadowrun {
         // Custom data. Whatever you want.
         data?: Record<string, any>
     };
+
+    /**
+     * Unspecific set of attributes, separate from Attributes as to now include character specific attributes (edge)
+     */
+    export type AttributesData = Record<string, AttributeField>
 }

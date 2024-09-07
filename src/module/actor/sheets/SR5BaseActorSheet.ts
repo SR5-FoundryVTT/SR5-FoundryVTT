@@ -14,10 +14,10 @@ import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
 import Skills = Shadowrun.Skills;
-import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
+import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -26,6 +26,7 @@ export interface SheetItemData {
     type: string,
     name: string,
     data: Shadowrun.ShadowrunItemDataData
+    system: Shadowrun.ShadowrunItemDataData
     properties: any,
     description: any
 }
@@ -242,6 +243,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
+        data.program_count = this._prepareProgramCount(data.itemType);
 
         data.situationModifiers = this._prepareSituationModifiers();
 
@@ -313,6 +315,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
+        html.find('.marks-connect-network').on('click', this._onMarksConnectToNetwork.bind(this));
 
         // Skill Filter handling...
         html.find('.skill-header').find('.item-name').on('click', this._onFilterUntrainedSkills.bind(this));
@@ -833,7 +836,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         //@ts-expect-error Since we're field checking, we can ignore typing...
         const { matrix } = sheetData.system;
         if (matrix) {
-            const cleanupAttribute = (attribute: MatrixAttribute) => {
+            const cleanupAttribute = (attribute: Shadowrun.MatrixAttribute) => {
                 const att = matrix[attribute];
                 if (att) {
                     if (!att.mod) att.mod = [];
@@ -841,7 +844,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 }
             };
 
-            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
+            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: Shadowrun.MatrixAttribute) => cleanupAttribute(att));
         }
     }
 
@@ -979,7 +982,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
-        // @ts-expect-error
+        // @ts-expect-error bad typing
         sheetItem.properties = chatData.properties;
 
         return sheetItem as unknown as SheetItemData;
@@ -1050,6 +1053,25 @@ export class SR5BaseActorSheet extends ActorSheet {
         sheetData.hasFullDefense = this.actor.hasFullDefense;
     }
 
+    /**
+     * Count the currently active and max programs for sheet display in this style:
+     * 
+     * Only personas using a device will show this count.
+     * 
+     * @param itemTypes 
+     * @returns (<active>/<max>) or ''
+     */
+    _prepareProgramCount(itemTypes: Record<string, SheetItemData[]>): string {
+        if (!itemTypes.program) return '';
+        if (!this.actor.hasDevicePersona) return '';
+
+        const active = itemTypes.program.filter(program => program.system.technology?.equipped).length;
+        const activeDevice = this.actor.getMatrixDevice();
+        const max = activeDevice?.system.programs ?? 0;
+
+        return `(${active}/${max})`;
+    }
+
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
@@ -1060,13 +1082,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedDocuments) return;
-        const { scene, target, item } = markedDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
+        if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
-        await this.actor.setMarks(target, marks, { scene, item, overwrite: true });
+        await this.actor.setMarks(markedDocument, marks, { overwrite: true });
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -1079,12 +1099,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedDocuments) return;
-        const { scene, target, item } = markedDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
+        if (!markedDocument) return;
 
-        await this.actor.setMarks(target, by, { scene, item });
+        await this.actor.setMarks(markedDocument, by);
     }
 
     async _onMarksDelete(event) {
@@ -1114,6 +1132,23 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!userConsented) return;
 
         await this.actor.clearMarks();
+    }
+
+    /**
+     * When clicking on a specific mark, connect to the actor to this host/grid behind that.
+     * 
+     * @param event Any interaction action
+     */
+    async _onMarksConnectToNetwork(event) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const target = fromUuidSync(markId) as SR5Item;
+        if (!target || !(target instanceof SR5Item)) return;
+
+        await this.actor.connectNetwork(target);
     }
 
     /**
@@ -1696,29 +1731,11 @@ export class SR5BaseActorSheet extends ActorSheet {
             return;
         }
         // grab matrix attribute (sleaze, attack, etc.)
-        let att = event.currentTarget.dataset.att;
+        let attribute = event.currentTarget.dataset.att;
         // grab device attribute (att1, att2, ...)
-        let deviceAtt = event.currentTarget.value;
+        let changedSlot = event.currentTarget.value;
 
-        // get current matrix attribute on the device
-        const deviceData = item.system as DeviceData;
-        let oldVal = deviceData.atts[deviceAtt].att;
-        let data = {
-            _id: iid,
-        };
-
-        // go through atts on device, setup matrix attributes on it
-        // This logic swaps the two slots when a new one is selected
-        for (let i = 1; i <= 4; i++) {
-            let tmp = `att${i}`;
-            let key = `system.atts.att${i}.att`;
-            if (tmp === deviceAtt) {
-                data[key] = att;
-            } else if (deviceData.atts[`att${i}`].att === att) {
-                data[key] = oldVal;
-            }
-        }
-        await this.actor.updateEmbeddedDocuments('Item', [data]);
+        await item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
 
     /**

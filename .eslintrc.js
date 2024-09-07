@@ -41,22 +41,22 @@ module.exports = {
         "@typescript-eslint/consistent-type-assertions": "warn",
 
         // Warnings for things that could be better
-        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/explicit-function-return-type": "off", // Implicit type returns aren't a bad thing
         "@typescript-eslint/strict-boolean-expressions": "off", // I might turn this off.  Javascript's fluid truthiness logic is just too nice
-        "@typescript-eslint/class-literal-property-style": "warn",
+        "@typescript-eslint/class-literal-property-style": "off", // SuccessTest implementation heavily uses this and I don't see the value of refactoring it, yet.
         "@typescript-eslint/ban-ts-comment": "warn",
         "@typescript-eslint/no-unused-vars": "warn",
         "prefer-const": "warn",
-        "@typescript-eslint/no-confusing-void-expression": "warn",
+        "@typescript-eslint/no-confusing-void-expression": "off", // I do like my if () return console.error() and similar statements...
         "@typescript-eslint/no-misused-promises": "warn",
         "@typescript-eslint/prefer-optional-chain": "warn",
-        "@typescript-eslint/no-floating-promises": "warn",
+        "@typescript-eslint/no-floating-promises": "off", // Allow executing async functions in a sync method, if async isn't needed.
         "no-case-declarations": "warn",
         "@typescript-eslint/promise-function-async": "warn",
         "@typescript-eslint/no-empty-interface": "warn",
         "@typescript-eslint/consistent-indexed-object-style": "warn",
         "@typescript-eslint/ban-types": "warn", //Maybe this should be error?
-        "no-prototype-builtins": "warn",
+        "no-prototype-builtins": "off", // While this rule makes sense for public facing applications, it's not a concern for an app like ours and I'd rather have better readability.
         "@typescript-eslint/unbound-method": "warn",
         "no-useless-return": "warn",
         "@typescript-eslint/return-await": "warn",

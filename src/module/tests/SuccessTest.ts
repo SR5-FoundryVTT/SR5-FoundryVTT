@@ -1,4 +1,4 @@
-import { TestDialogListener } from '../apps/dialogs/TestDialog';
+import { TestDialog, TestDialogListener } from '../apps/dialogs/TestDialog';
 import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
 import {SR5Actor} from "../actor/SR5Actor";
 import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from "../constants";
@@ -7,7 +7,6 @@ import {Helpers} from "../helpers";
 import {SR5Item} from "../item/SR5Item";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {PartsList} from "../parts/PartsList";
-import {TestDialog} from "../apps/dialogs/TestDialog";
 import {SR5} from "../config";
 import {ActionFlow} from "../item/flows/ActionFlow";
 import ValueField = Shadowrun.ValueField;
@@ -29,8 +28,13 @@ import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
 
 export interface TestDocuments {
+    // Legacy field that used be the source document.
     actor?: SR5Actor
+    // The action document the action has been taken from
     item?: SR5Item
+    // The main document values have been taken from
+    source?: SR5Actor | SR5Item
+    // Rolls already taken for this test.
     rolls?: SR5Roll[]
 }
 
@@ -100,6 +104,10 @@ export interface TestData {
     // Documents the test might has been derived from.
     sourceItemUuid?: string
     sourceActorUuid?: string
+
+    // The document test values have been taken from. This can be both actor and item.
+    sourceUuid?: string
+    sourceIsActor?: boolean
 
     // Message the test has been represented with.
     messageUuid?: string
@@ -172,8 +180,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     public data: T;
     public actor: SR5Actor | undefined;
     public item: SR5Item | undefined;
+    public source: SR5Actor | SR5Item | undefined;
+
     public rolls: SR5Roll[];
     public targets: TokenDocument[];
+    public dialog: TestDialog | null;
 
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
     public effects: SuccessTestEffectsFlow<this>;
@@ -182,6 +193,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
         this.item = documents?.item;
+        // If no specific source document is given, fallback to actor.
+        this.source = documents?.source ?? documents?.actor;
         this.rolls = documents?.rolls || [];
 
         // User selected targets of this test.
@@ -194,6 +207,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.effects = new SuccessTestEffectsFlow<this>(this);
 
         this.calculateBaseValues();
+
+        this.dialog = null;
 
         console.debug(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
@@ -215,6 +230,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Store given document uuids to be fetched during evaluation.
         data.sourceActorUuid = data.sourceActorUuid || this.actor?.uuid;
         data.sourceItemUuid = data.sourceItemUuid || this.item?.uuid;
+        data.sourceUuid = data.sourceUuid || this.source?.uuid;
 
         // @ts-expect-error // Prepare general test information.
         data.title = data.title || this.constructor.label;
@@ -358,14 +374,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * directly part of the action template.
      *
      * @param item The item holding the action configuration.
-     * @param actor The actor used for value calculation.
+     * @param document The actor used for value calculation.
      */
-    static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<Partial<MinimalActionData>> {
+    static async _getDocumentTestAction(item: SR5Item, document: SR5Actor|SR5Item): Promise<Partial<MinimalActionData>> {
         return {};
     }
 
-    static async _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {
-        return TestCreator._prepareTestDataWithAction(action, actor, data);
+    static _prepareActionTestData(action: ActionRollData, document: SR5Actor|SR5Item, data: any, againstData: any) {
+        return TestCreator._prepareTestDataWithAction(action, document, data, againstData);
     }
 
     /**
@@ -381,9 +397,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
-    static async _getOpposedActionTestData(testData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getOpposedActionTestData(testData, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
-        return;
+        return undefined;
     }
 
     /**
@@ -521,13 +537,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async showDialog(): Promise<boolean> {
         if (!this.data.options?.showDialog) return true;
 
-        const dialog = this._createTestDialog();
+        this.dialog = this._createTestDialog();
 
-        const data = await dialog.select();
-        if (dialog.canceled) {
-            await this.cleanupAfterExecutionCancel();
+        const data = await this.dialog.select();
+        if (this.dialog.canceled) {
+            await this._cleanUpAfterDialogCancel();
             return false
         }
+
+        await this._cleanUpAfterDialog();
 
         // Overwrite current test state with whatever the dialog gives.
         this.data = data;
@@ -544,7 +562,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Override this method if there needs to be some cleanup after a user has canceled a dialog 
      * but before the tests actual execution.
      */
-    async cleanupAfterExecutionCancel() { }
+    async _cleanUpAfterDialogCancel() {
+        this.dialog = null;
+    }
+
+    /**
+     * Allow implementations to clean up after a dialog has been shown.
+     */
+    async _cleanUpAfterDialog() {}
 
     /**
      * Override this method if you want to save any document data after a user has selected values
@@ -563,6 +588,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Only then apply values and collected modifiers.
         this.applyPushTheLimit();
         this.applyPoolModifiers();
+
+        Hooks.call('sr5_testPrepareBaseValues', this);
     }
 
     /**
@@ -674,7 +701,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     async populateDocuments() {
         // Populate the actor document.
-        if (!this.actor && this.data.sourceActorUuid) {
+        if (this.data.sourceActorUuid) {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
             const document = await fromUuid(this.data.sourceActorUuid) || undefined;
             // @ts-expect-error
@@ -684,8 +711,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Populate the item document.
-        if (!this.item && this.data.sourceItemUuid)
+        if (this.data.sourceItemUuid) {
             this.item = await fromUuid(this.data.sourceItemUuid) as SR5Item || undefined;
+        }
+
+        // Populate the value source document.
+        if (this.data.sourceUuid) {
+            this.source = await fromUuid(this.data.sourceUuid) as SR5Actor | SR5Item || undefined;
+            this.data.sourceIsActor = this.source instanceof SR5Actor;
+            if (this.data.sourceIsActor) this.actor = this.source as SR5Actor;
+        }
 
         // Populate targeted token documents.
         if (this.targets.length === 0 && this.data.targetActorsUuid) {
@@ -697,7 +732,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
                 const token = document instanceof SR5Actor ? document.getToken() : document;
                 if (!(token instanceof TokenDocument)) continue;
 
-                this.targets.push(token as TokenDocument);
+                this.targets.push(token);
             }
         }
     }
@@ -721,6 +756,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * Check if this test includes a specific action category.
+     * @param category The category name
+     * @returns true, when this test includes it. false, if not.
+     */
+    hasTestCategory(category: Shadowrun.ActionCategories): boolean {
+        return this.data.categories.includes(category);
+    }
+
+    /**
      * What modifiers should be used for this test type by default.
      *
      * NOTE: These modifiers are routed through ModifierFlow.totalFor()
@@ -737,7 +781,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Test categories must be ready before active effects are applied as they rely on this data to be present.
      */
     prepareTestCategories() {
-        this.data.categories = this.data.action.categories || this.testCategories;
+        this.data.categories = this.data.action?.categories || this.testCategories;
     }
 
     /**
@@ -1318,6 +1362,29 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * Prepare everything needed for test execution.
+     * 
+     * This is both necessary before a first execution or when re-calculation a test when execution has already
+     * been prepared.
+     */
+    async _prepareExecution() {
+        await this.populateTests();
+        await this.populateDocuments();
+
+        this.prepareTestCategories();
+
+        // Effects need to be applied before any values are calculated.
+        this.effects.applyAllEffects();
+
+        await this.prepareDocumentData();
+
+        // Initial base value preparation will show default result without any user input.
+        this.prepareBaseValues();
+        this.calculateBaseValues();
+        this.validateBaseValues();
+    }
+
+    /**
      * Executing a test will start all behaviors necessary to:
      * - Calculate its values
      * - Show and handle a user facing test dialog
@@ -1333,20 +1400,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * NOTE: Currently none of these methods trigger Foundry hooks.
      */
     async execute(): Promise<this> {
-        await this.populateTests();
-        await this.populateDocuments();
-
-        this.prepareTestCategories();
-
-        // Effects need to be applied before any values are calculated.
-        this.effects.applyAllEffects();
-
-        await this.prepareDocumentData();
-
-        // Initial base value preparation will show default result without any user input.
-        this.prepareBaseValues();
-        this.calculateBaseValues();
-        this.validateBaseValues();
+        await this._prepareExecution();
 
         // Allow user to change details.
         const userConsented = await this.showDialog();
@@ -1455,6 +1509,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         } else {
             await this.processFailure();
         }
+
+        Hooks.call('sr5_testProcessResults', this);
     }
 
     /**
@@ -1725,7 +1781,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This class should be used for the opposing test implementation.
      */
     get _opposedTestClass(): any | undefined {
-        if (!this.data.opposed || !this.data.opposed.test) return;
+        if (!this.data?.opposed?.test) return;
         return TestCreator._getTestClass(this.data.opposed.test);
     }
 
@@ -1745,11 +1801,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             test: testCls.name,
             label: testCls.label
         };
-
-        // Show the flat dice pool modifier on the chat action.
-        if (this.data.opposed.mod) {
-            action.label += ` ${this.data.opposed.mod}`;
-        }
 
         return [action]
     }
@@ -1771,14 +1822,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const actions: ResultActionData[] = [];
         const actionResultData = this.results;
         if (!actionResultData) return actions;
-
-        if (actionResultData.success.matrix.placeMarks) {
-            actions.push({
-                action: 'placeMarks',
-                label: 'SR5.PlaceMarks',
-                value: ''
-            });
-        }
 
         return actions;
     }
@@ -2066,5 +2109,85 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         await test.populateDocuments();
         await ActionResultFlow.executeResult(resultAction, test);
+    }
+
+    /**
+     * Execute actions triggered by a tests chat message.
+     * 
+     * This can be used to trigger opposing tests.
+     */
+    static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: TestOptions) {
+        // Determine actors to roll test with.
+        let actors = await Helpers.getOpposedTestActors(againstData);
+
+        // Inform user about tokens with deleted sidebar actors.
+        // This can both happen for linked tokens immediately and unlinked tokens after reloading.
+        if (actors.filter(actor => !actor).length > 0) {
+            ui.notifications?.warn('TOKEN.WarningNoActor', {localize: true});
+            return;
+        }
+
+        // filter out actors current user shouldn't be able to test with.
+        actors = actors.filter(actor => actor.isOwner);
+        // Fallback to player character.
+        if (actors.length === 0 && game.user?.character) {
+            actors.push(game.user.character);
+        }
+
+        console.log('Shadowrun 5e | Casting an opposed test using these actors', actors, againstData);
+
+        for (const actor of actors) {
+            const data = await this._getOpposedActionTestData(againstData, actor, messageId);
+            if (!data) return;
+
+            const documents = {source: actor};
+            const test = new this(data, documents, options);
+
+            // Await test chain resolution for each actor, to avoid dialog spam.
+            await test.execute();
+        }
+    }
+
+    /**
+     * Update a test instance in place while switching out it's documents.
+     * 
+     * This is done by removing action specific information from test data, while keeping data related
+     * to this individual test, including data that might have been altered by the user using the test dialog.
+     * 
+     * Use this method whenever you have an active test instance and want to re-use it with different documents.
+     * 
+     * TODO: I'm unsure if this method was designed to be shown during dialog or allow for both before and during dialog to be used.
+     * 
+     * @param document The new main source document use.
+     */
+    async _updateTestData(document: SR5Actor|SR5Item) {
+        const action = this.item?.getAction();
+        if (!action) return;
+        
+        // Remove values from the previous source document.
+        const minimalData = TestCreator._minimalTestData();
+        for (const [key, value] of Object.entries(minimalData)) {
+            this.data[key] = value;
+        }
+
+        // Switch out source document.
+        this.data.sourceActorUuid = document instanceof SR5Actor ? document.uuid : undefined;
+        this.data.sourceItemUuid = document instanceof SR5Item ? document.uuid : undefined;
+        
+        this.data = TestCreator._prepareTestDataWithAction(action, document, this.data, this) as T;
+        
+        // If no dialog has been shown yet, execution hasn't been triggered.
+        // Wait for the next execution.
+        if (!this.dialog) return;
+
+        // Re-prepare data to add missing base information.
+        const options = this.data.options ?? {};
+        this._prepareData(this.data, options);
+
+        // Re-prepare execution data to add missing modifiers / effects and so forth.
+        await this._prepareExecution();
+
+        // During .execute this would now show the dialog, therefore rerender and we're at the same state.
+        this.dialog.render(true);
     }
 }

@@ -25,10 +25,10 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         const data = await super.getData(options) as ICActorSheetData;
 
         // Fetch a connected host.
-        data.host = this.actor.getICHost();
+        data.host = await this.actor.getICHost();
 
         // Display Matrix Marks
-        data.markedDocuments = this.actor.getAllMarkedDocuments();
+        data.markedDocuments = await this.actor.getAllMarkedDocuments();
         data.disableMarksEdit = this.actor.hasHost();
 
         return data;

@@ -65,6 +65,6 @@ export const registerRollAndLabelHelpers = () => {
         return value > 0 ?  `+${value}`: `${value}`;
     });
 
-    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName);
-    Handlebars.registerHelper('speakerImg', Helpers.getChatSpeakerImg);
+    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName.bind(this));
+    Handlebars.registerHelper('speakerImg', Helpers.getChatSpeakerImg.bind(this));
 };

@@ -41,14 +41,14 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         return [{
             query: '#reset-progressive-recoil',
             on: 'click',
-            callback: this._handleResetProgressiveRecoil
+            callback: this._handleResetProgressiveRecoil.bind(this)
         }]
     }
 
     /**
      * User want's to manually reset progressive recoil before casting the attack test.
      */
-    async _handleResetProgressiveRecoil(event: JQuery<HTMLElement>, test: TestDialog) {
+    async _handleResetProgressiveRecoil(event: any, test: TestDialog) {
         if (!this.actor) return;
         await this.actor.clearProgressiveRecoil();
 

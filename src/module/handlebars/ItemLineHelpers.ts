@@ -887,11 +887,6 @@ export const registerItemLineHelpers = () => {
         return [
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Scene'),
-                },
-            },
-            {
-                text: {
                     text: game.i18n.localize('SR5.FOUNDRY.Item'),
                 },
             },
@@ -911,7 +906,7 @@ export const registerItemLineHelpers = () => {
         }];
     });
 
-    Handlebars.registerHelper('NetworkDevicesListRightSide', () => {
+    Handlebars.registerHelper('SlavesListRightSide', () => {
         return [
             {
                 text: {
@@ -925,7 +920,7 @@ export const registerItemLineHelpers = () => {
             }]
     })
 
-    Handlebars.registerHelper('NetworkDevicesListHeaderIcons', () => {
+    Handlebars.registerHelper('SlavesListHeaderIcons', () => {
         return [{
             icon: 'fas fa-trash',
             title: game.i18n.localize('SR5.Labels.Sheet.ClearNetwork'),

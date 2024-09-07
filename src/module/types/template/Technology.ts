@@ -1,5 +1,6 @@
 declare namespace Shadowrun {
     export type TechnologyPartData = {
+        attributes: AttributesData
         technology: TechnologyData
     };
     export type TechnologyData = {
@@ -11,7 +12,8 @@ declare namespace Shadowrun {
         conceal: ModifiableValue
         condition_monitor: ConditionData
         wireless: boolean
-        networkController: string
+        // Network PAN/WAN master device uuid
+        master: string
     };
 
 }

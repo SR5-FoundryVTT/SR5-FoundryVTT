@@ -32,7 +32,8 @@ declare namespace Shadowrun {
             environment: VehicleEnvironment
             vehicle_stats: VehicleStats
             attributes: VehicleAttributes
-            networkController: string
+            // Master device uuid
+            master: string
             modifiers: Modifiers & CommonModifiers
             modificationCategories: VehicleModCategories
             modPoints: number

@@ -149,7 +149,7 @@ export abstract class VersionMigration {
                 console.log(`Migrating Scene entity ${scene.name}`);
                 const updateData = await this.MigrateSceneData(scene);
 
-                expandObject(updateData);
+                foundry.utils.expandObject(updateData);
                 entityUpdates.set(scene, {
                     updateData,
                     embeddedItems: null,
@@ -166,7 +166,7 @@ export abstract class VersionMigration {
 
                     const updateData = await this.MigrateActorData(token.actor);
 
-                    expandObject(updateData);
+                    foundry.utils.expandObject(updateData);
                     entityUpdates.set(token.actor, {
                         updateData: updateData.data || null,
                         embeddedItems: updateData.items || null,
@@ -179,7 +179,7 @@ export abstract class VersionMigration {
                     continue;
                 }
 
-                expandObject(updateData);
+                foundry.utils.expandObject(updateData);
                 entityUpdates.set(scene, {
                     updateData,
                     embeddedItems: null,
@@ -212,7 +212,7 @@ export abstract class VersionMigration {
                     continue;
                 }
 
-                expandObject(updateData);
+                foundry.utils.expandObject(updateData);
                 entityUpdates.set(item, {
                     updateData,
                     embeddedItems: null,
@@ -247,7 +247,7 @@ export abstract class VersionMigration {
                     delete updateData.items;
                 }
 
-                expandObject(updateData);
+                foundry.utils.expandObject(updateData);
 
                 entityUpdates.set(actor, {
                     updateData,
@@ -404,7 +404,7 @@ export abstract class VersionMigration {
                     }
 
                     if (updateData.data) {
-                        expandObject(updateData.data);
+                        foundry.utils.expandObject(updateData.data);
                         document.update({system: updateData.data});
                     }
 
@@ -426,7 +426,7 @@ export abstract class VersionMigration {
                     }
 
                     if (updateData.data) {
-                        expandObject(updateData.data);
+                        foundry.utils.expandObject(updateData.data);
                         await document.update({system: updateData.data});
                     }
 
@@ -439,7 +439,7 @@ export abstract class VersionMigration {
                     }
 
                     if (updateData.data) {
-                        expandObject(updateData.data);
+                        foundry.utils.expandObject(updateData.data);
                         await document.update(updateData.data);
                     }
                 }
