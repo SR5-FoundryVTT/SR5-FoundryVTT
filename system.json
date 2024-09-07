@@ -10,7 +10,7 @@
         }
     ],
     "url": "#{URL}#",
-    "version": "#{VERSION}#",
+    "version": "0.22.0",
     "compatibility": {
         "minimum": "11",
         "verified": "12"
