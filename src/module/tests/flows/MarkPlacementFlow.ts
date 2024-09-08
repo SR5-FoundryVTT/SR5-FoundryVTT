@@ -101,6 +101,16 @@ export const MarkPlacementFlow = {
     },
 
     /**
+     * Prepare base values for a mark placement test.
+     * 
+     * @param test The test placing any mark.
+     */
+    prepareBaseValues(test: BruteForceTest|HackOnTheFlyTest) {
+        // Host devices always use direct connections.
+        test.data.directConnection = !test.data.placeOnMainIcon && !!test.host;
+    },
+
+    /**
      * Prepare icon and persona based on given uuid or user selection.
      * 
      * @param test 

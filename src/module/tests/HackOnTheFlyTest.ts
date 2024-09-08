@@ -1,12 +1,13 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
-import { SuccessTest, TestOptions } from "./SuccessTest";
+import { SuccessTest } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
-
 
 /**
  * Hack on the Fly tests implement the Hack on the Fly action on SR5#240
+ *
+ * See MarkPlacementFlow for more details on the test flow.
  */
 export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
     override actor: SR5Actor;
@@ -20,8 +21,9 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
     devices: (NetworkDevice)[];
     // Started ic on selected host.
     ic: SR5Actor[];
-
+    // Host used as main icon.
     host: SR5Item|null;
+    // Grid used as main icon.
     grid: SR5Item|null;
 
     override _prepareData(data: MatrixPlacementData, options): any {
@@ -48,6 +50,11 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
     override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.html';
     }
+
+    override prepareBaseValues() {
+        MarkPlacementFlow.prepareBaseValues(this);
+    }
+
     /**
      * Clean up faulty test data after dialog has been shown.
      */

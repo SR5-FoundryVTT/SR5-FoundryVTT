@@ -1,10 +1,8 @@
 import { SR5Actor } from "../actor/SR5Actor";
-import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
 import { SR5Item } from "../item/SR5Item";
 import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
 import { SuccessTest, TestOptions } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
-
 
 /**
  * Brute force tests implement the Brute Force action on SR5#238
@@ -23,8 +21,9 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     devices: (NetworkDevice)[];
     // Started ic on selected host.
     ic: SR5Actor[];
-    // All available hosts.
+    // Host used as main icon.
     host: SR5Item|null;
+    // Grid used as main icon.
     grid: SR5Item|null;
 
     override _prepareData(data: MatrixPlacementData, options: TestOptions = {}): any {
@@ -52,6 +51,10 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.html';
     }
 
+    override prepareBaseValues() {
+        MarkPlacementFlow.prepareBaseValues(this);
+    }
+
     /**
      * Clean up faulty test data after dialog has been shown.
      */
@@ -65,9 +68,6 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
         MarkPlacementFlow.populateDocuments(this);
     }
 
-    /**
-     * Base on test dialog selection, different modifiers apply.
-     */
     override prepareTestModifiers() {
         super.prepareTestModifiers();
 
