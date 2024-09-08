@@ -1649,7 +1649,7 @@
         },
         "host": {
             "templates": ["description", "matrix", "importFlags"],
-            "marks": {},
+            "marks": [],
             "rating": 0,
             "ic": []
         },
