@@ -1,6 +1,5 @@
 import { SR } from "../constants";
-import { OpposedTest } from "../tests/OpposedTest";
-import { SuccessTest } from "../tests/SuccessTest";
+import { DataDefaults } from "../data/DataDefaults";
 
 export class MatrixRules {
     /**
@@ -161,19 +160,32 @@ export class MatrixRules {
     }
 
     /**
-     * Determine if this test should add overwatch score. SR5#231-232 'Overwatch Score and Convergence'
-     *
-     * @param test Any test, though only tests opposing matrix tests will be considered.
+     * At which score should Overwatch converge?
+     * 
+     * See SR5#231-232 'Overwatch Score and Convergence'
+     * 
      */
-    static async addOverwatchScore(test: SuccessTest|OpposedTest) {
-        if (!test.opposing) return;
-        // @ts-expect-error - Only OpposedTest has this property
-        const against = test.against as SuccessTest;
-        if (!against) return;
-        if (!against.hasTestCategory('matrix')) return;
-        if (!MatrixRules.isIllegalAction(against.data.action.attribute, against.data.action.attribute2, against.data.action.limit.attribute)) return;
+    static overwatchConvergenceScore() {
+        return 40;
+    }
 
-        const overwatchScore = against.actor?.getOverwatchScore();
-        await against.actor?.setOverwatchScore(overwatchScore + test.hits.value);
+    /**
+     * Determine if the given overwatch score should cause a Convergence by GOD.
+     * 
+     * See SR5#231-232 'Overwatch Score and Convergence'
+     * 
+     * @param score The overwatch score to check.
+     */
+    static isOverwatchScoreConvergence(score: number) {
+        return score >= MatrixRules.overwatchConvergenceScore();
+    }
+
+    /**
+     * Determine the damage value to convergence with.
+     * 
+     * See SR5#229-230 'User Mode' Virtual Reality sections.
+     */
+    static convergenceDamage(): Shadowrun.DamageData {
+        return DataDefaults.damageData({base: 12, value: 12, type: {base: 'matrix', value: 'matrix'}});
     }
 }
