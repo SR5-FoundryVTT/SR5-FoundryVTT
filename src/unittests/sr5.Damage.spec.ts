@@ -90,6 +90,18 @@ export const shadowrunDamage = (context: QuenchBatchContext) => {
             assert.equal(device?.system.technology.condition_monitor.value, 1);
             assert.equal(actor.asCharacter()?.system.matrix.condition_monitor.value, 1);
         });
+
+        it('Should apply as stun damage to technomancers', async () => {
+            const actor = await testActor.create({type: 'character', 'system.special': 'resonance'}) as SR5Actor;
+            const character = actor.asCharacter();
+            assert.equal(character?.system.track.stun.value, 0);
+            assert.equal(character?.system.matrix.condition_monitor.value, 0);
+
+            const damageData = createDamage('matrix', 1);
+            await actor.addDamage(damageData);
+            assert.equal(character?.system.track.stun.value, 1);
+            assert.equal(character?.system.matrix.condition_monitor.value, 0);
+        });
     });
 
     describe('Damage on armor', () => {

@@ -8,7 +8,13 @@ import { TestCreator } from '../../tests/TestCreator';
 import { SR5Item } from "../../item/SR5Item";
 import { CombatRules } from "../../rules/CombatRules";
 import { DataDefaults } from "../../data/DataDefaults";
+import { ResonsanceRules } from "../../rules/ResonanceRules";
 
+/**
+ * General flow to apply damage to documents.
+ * 
+ * The addDamage method should be used as the main entry method for applying damage.
+ */
 export class DamageApplicationFlow {
 
     /**
@@ -133,7 +139,7 @@ export class DamageApplicationFlow {
      * @param actor The actor to add the damage to.
      * @param damage The damage to add.
      * @returns The remaining damage that could not be applied fully and should overflow.
-     */
+    */
     static async addStunDamage(actor: SR5Actor, damage: DamageData) {
         if (damage.type.value !== 'stun') return damage;
 
@@ -184,6 +190,14 @@ export class DamageApplicationFlow {
     static async addMatrixDamage(actor: SR5Actor, damage: DamageData) {
         if (damage.type.value !== 'matrix') return;
 
+        // CASE - Technomancer with Living Persona.
+        if (actor.hasLivingPersona) {
+            damage = ResonsanceRules.convertMatrixDamage(damage);
+            await DamageApplicationFlow.addStunDamage(actor, damage);
+            return;
+        }
+
+        // CASE - Any other Persona, including Matrix actors.
         const device = actor.getMatrixDevice();
         const track = actor.getMatrixTrack();
         if (!track) return damage;
@@ -196,6 +210,7 @@ export class DamageApplicationFlow {
         if (actor.isIC() || actor.isSprite()) {
             await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
         }
+
     }
 
     /**
