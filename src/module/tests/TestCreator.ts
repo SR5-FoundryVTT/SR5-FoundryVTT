@@ -439,7 +439,10 @@ export const TestCreator = {
      * @returns resulting TestData
      */
     _prepareTestDataWithActionForActor: function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData, againstData?: any) {
+        // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
+        const rollData = actor.getRollData({againstData: againstData ?? data.following?.against});
 
+        
         const pool = new PartsList<number>(data.pool.mod);
 
         // Prepare pool values.
@@ -507,7 +510,6 @@ export const TestCreator = {
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
             if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
-            // if (limit && actor._isMatrixAttribute(action.limit.attribute)) actor._addMatrixParts(pool, true);
         }
 
         // Prepare threshold values...
@@ -572,7 +574,10 @@ export const TestCreator = {
      * @returns TestData that's ready to be used to construct a new test instance.
      */
     _prepareTestDataWithActionForItem: function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData, againstData?: any) {
-        const rollData = item.getRollData({againstData});
+        // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
+        const rollData = item.getRollData({againstData: againstData ?? data.following?.against});
+
+
         const pool = new PartsList<number>(data.pool.mod);
 
         if (action.attribute) {
