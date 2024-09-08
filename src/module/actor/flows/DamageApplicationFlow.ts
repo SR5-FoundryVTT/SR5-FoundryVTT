@@ -6,6 +6,8 @@ import DamageElement = Shadowrun.DamageElement;
 import { Helpers } from '../../helpers';
 import { TestCreator } from '../../tests/TestCreator';
 import { SR5Item } from "../../item/SR5Item";
+import { CombatRules } from "../../rules/CombatRules";
+import { DataDefaults } from "../../data/DataDefaults";
 
 export class DamageApplicationFlow {
 
@@ -104,5 +106,272 @@ export class DamageApplicationFlow {
         }
 
         await new DamageApplicationFlow().runApplyDamage(targets, damage);
+    }
+
+    /**
+     * Apply damage of any type to this actor. This should be the main entry method to applying damage.
+     * 
+     * @param actor The actor to apply the damage to.
+     * @param damage Damage to be applied
+     */
+    static async addDamage(actor: SR5Actor, damage: Shadowrun.DamageData) {
+        switch(damage.type.value) {
+            case 'matrix':
+                await DamageApplicationFlow.addMatrixDamage(actor, damage);
+                break;
+            case 'stun':
+                await DamageApplicationFlow.addStunDamage(actor, damage);
+                break;
+            case 'physical':
+                await DamageApplicationFlow.addPhysicalDamage(actor, damage);
+                break;
+        }
+    }
+
+    /**
+     * Add stun damage to an actor.
+     * @param actor The actor to add the damage to.
+     * @param damage The damage to add.
+     * @returns The remaining damage that could not be applied fully and should overflow.
+     */
+    static async addStunDamage(actor: SR5Actor, damage: DamageData) {
+        if (damage.type.value !== 'stun') return damage;
+
+        const track = actor.getStunTrack();
+        if (!track)
+            return damage;
+
+        const { overflow, rest } = DamageApplicationFlow._calcDamageOverflow(damage, track);
+
+        // Only change damage type when needed, in order to avoid confusion of callers.
+        if (overflow.value > 0) {
+            // Apply Stun overflow damage to physical track according to: SR5E#170
+            overflow.value = Math.floor(overflow.value / 2);
+            overflow.type.value = 'physical';
+        }
+
+        await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
+        await DamageApplicationFlow.addPhysicalDamage(actor, overflow);
+    }
+
+    /**
+     * Add physical damage to an actor.
+     * @param actor The actor to add the damage to.
+     * @param damage The damage to add.
+     */
+    static async addPhysicalDamage(actor: SR5Actor, damage: DamageData) {
+        if (damage.type.value !== 'physical') {
+            return damage;
+        }
+
+
+        const track = actor.getPhysicalTrack();
+        if (!track) {
+            return damage;
+        }
+
+        const { overflow, rest } = DamageApplicationFlow._calcDamageOverflow(damage, track);
+
+        await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
+        await DamageApplicationFlow._addDamageToOverflow(actor, overflow, track);
+    }
+
+    /**
+     * Add Matrix damage to an actor.
+     * @param actor The actor to add the damage to.
+     * @param damage The damage to add.
+     */
+    static async addMatrixDamage(actor: SR5Actor, damage: DamageData) {
+        if (damage.type.value !== 'matrix') return;
+
+        const device = actor.getMatrixDevice();
+        const track = actor.getMatrixTrack();
+        if (!track) return damage;
+
+        const { rest } = DamageApplicationFlow._calcDamageOverflow(damage, track);
+
+        if (device) {
+            await DamageApplicationFlow._addDamageToDeviceTrack(rest, device);
+        }
+        if (actor.isIC() || actor.isSprite()) {
+            await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
+        }
+    }
+
+    /**
+     * Directly set the matrix damage track of this actor to a set amount.
+     *
+     * This is mainly used for manual user input on an actor sheet.
+     *
+     * This is done by resetting all tracked damage and applying one manual damage set.
+     *
+     * @param actor The actor to set damage on.
+     * @param value The matrix damage to be applied.
+     */
+    static async setMatrixDamage(actor: SR5Actor, value: number) {
+        // Disallow negative values.
+        value = Math.max(value, 0);
+
+        // Use artificial damage to be consistent across other damage application Actor methods.
+        const damage = DataDefaults.damageData({
+            type: { base: 'matrix', value: 'matrix' },
+            base: value,
+            value
+        });
+
+        let track = actor.getMatrixTrack();
+        if (!track) return;
+
+        // Reduce track to minimal value and simply add new damage.
+        track.value = 0;
+        // As track has been reduced to zero already, setting it to zero is already done.
+        if (value > 0)
+            track = DamageApplicationFlow._addDamageToTrackValue(damage, track);
+
+        // If a matrix device is used, damage that instead of the actor.
+        const device = actor.getMatrixDevice();
+        if (device) {
+            return await device.update({ 'system.technology.condition_monitor': track });
+        }
+
+        // IC actors use a matrix track.
+        if (actor.isIC()) {
+            return await actor.update({ 'system.track.matrix': track });
+        }
+
+        // Emerged actors use a personal device like condition monitor.
+        if (actor.isMatrixActor) {
+            return await actor.update({ 'system.matrix.condition_monitor': track });
+        }
+    }
+
+    /**
+     * Apply damage to an actors physical overflow damage monitor / track.
+     * 
+     * @param actor The actor to apply the damage to.
+     * @param damage The damage to overflow.
+     * @param track The track to overflow the damage into.
+     * @returns 
+     */
+    static async _addDamageToOverflow(actor: SR5Actor, damage: Shadowrun.DamageData, track: Shadowrun.OverflowTrackType) {
+        if (damage.value === 0) return;
+        if (track.overflow.value === track.overflow.max) return;
+
+        //  Avoid cross referencing.
+        const overflow = foundry.utils.duplicate(track.overflow);
+
+        // Don't over apply damage to the track overflow.
+        overflow.value += damage.value;
+        overflow.value = Math.min(overflow.value, overflow.max);
+
+        const updateData = { [`system.track.${damage.type.value}.overflow`]: overflow };
+        await actor.update(updateData);
+    }
+
+    /**
+     * Apply damage to an actors main damage monitor / track.
+     * 
+     * This includes physical and stun for meaty actors and matrix for matrix actors.
+     * 
+     * Applying damage will also reduce the initiative score of an active combatant.
+     * 
+     * Handles rule 'Changing Initiative' on SR5#160.
+     * 
+     * @param actor The actor to apply the damage to.
+     * @param damage The damage to be taken.
+     * @param track The track to apply that damage to.
+     */
+    static async _addDamageToTrack(actor: SR5Actor, damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData) {
+        if (damage.value === 0) return;
+        if (track.value === track.max) return;
+
+        // Allow a wound modifier difference to be calculated after damage has been dealt.
+        const woundsBefore = actor.getWoundModifier();
+
+        // Apply damage to track and trigger derived value calculation.
+        track = DamageApplicationFlow._addDamageToTrackValue(damage, track);
+        const updateData = { [`system.track.${damage.type.value}`]: track };
+        await actor.update(updateData);
+
+        // Apply any wounds modifier delta to an active combatant.
+        const woundsAfter = actor.getWoundModifier();
+        const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
+
+        // Only actors that can have a wound modifier, will have a delta.
+        if (iniAdjustment < 0 && game.combat) game.combat.adjustActorInitiative(actor, iniAdjustment);
+    }
+
+    /**
+     * Adds the specified damage to the given track of the actor.
+     * This method ensures that the damage does not exceed the track's maximum value.
+     * This method is intended as a helper and doesn´t update any data itself.
+     * 
+     * @param damage The damage to be added.
+     * @param track The track to which the damage will be applied.
+     * @returns The updated track with the applied damage.
+     */
+    static _addDamageToTrackValue(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData): Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData {
+        if (damage.value === 0) return track;
+        if (track.value === track.max) return track;
+
+        //  Avoid cross referencing.
+        track = foundry.utils.duplicate(track);
+
+        track.value += damage.value;
+        if (track.value > track.max) {
+            // dev error, not really meant to be ever seen by users. Therefore no localization.
+            console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.")
+            track.value = track.max;
+        }
+
+        return track;
+    }
+
+    /**
+     * Add damage to a device's condition monitor.
+     * 
+     * @param damage 
+     * @param device 
+     * @returns 
+     */
+    static async _addDamageToDeviceTrack(damage: Shadowrun.DamageData, device: SR5Item) {
+        if (!device) return;
+
+        let condition = device.getCondition();
+        if (!condition) return damage;
+
+        if (damage.value === 0) return;
+        if (condition.value === condition.max) return;
+
+        condition = DamageApplicationFlow._addDamageToTrackValue(damage, condition);
+
+        const updateData = {'system.technology.condition_monitor': condition};
+        await device.update(updateData);
+    }
+
+    /** 
+     * Calculate damage overflow only based on max and current track values.
+     * 
+     * This is a helper method that doesn´t update any data itself.
+     * 
+     * @param damage The damage applied that might overflow.
+     * @param track The track to apply the damage to.
+     * @returns Any overflowing damage and the rest that can be applied.
+     */
+    static _calcDamageOverflow(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.ConditionData): { overflow: Shadowrun.DamageData, rest: Shadowrun.DamageData } {
+        const freeTrackDamage = track.max - track.value;
+        const overflowDamage = damage.value > freeTrackDamage ?
+            damage.value - freeTrackDamage :
+            0;
+        const restDamage = damage.value - overflowDamage;
+
+        //  Avoid cross referencing.
+        const overflow = foundry.utils.duplicate(damage);
+        const rest = foundry.utils.duplicate(damage);
+
+        overflow.value = overflowDamage;
+        rest.value = restDamage;
+
+        return {overflow, rest};
     }
 }

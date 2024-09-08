@@ -1,3 +1,4 @@
+import { shadowrunDamage } from './sr5.Damage.spec';
 import { shadowrunTestValueResolution } from './sr5.TestValueResolution.spec';
 import { shadowrunMarks } from './sr5.Marks.spec';
 import { shadowrunRolling } from './sr5.SR5Roll.spec';
@@ -127,6 +128,9 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.test_value_resolution', shadowrunTestValueResolution, { displayName: 'SHADOWRUN5e: Test Value Resolution' });
     quench.registerBatch('shadowrun5e.flow.tests_matrix', shadowrunMatrixTesting, { displayName: 'SHADOWRUN5e: Matrix Test' });
     quench.registerBatch('shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
+    quench.registerBatch('shadowrun5e.flow.damage', shadowrunDamage, {
+        displayName: 'SHADOWRUN5e: Data Importer Weapon Parsing',
+    });
 
     quench.registerBatch('shadowrun5e.parser.weapon', weaponParserBaseTesting, {
         displayName: 'SHADOWRUN5e: Data Importer Weapon Parsing',
