@@ -221,7 +221,7 @@ export const MarkPlacementFlow = {
     /**
      * Handle target selection flow for matrix mark placement actions.
      * 
-     * NOTE: This method is bound to the calling class and should be called after .bind(this) by the caller.
+     * NOTE: This method is bound to the calling class and should be called after .bind(s.this) by the caller.
      * 
      * @param againstData 
      * @param messageId 
@@ -256,7 +256,7 @@ export const MarkPlacementFlow = {
      * @param test 
      */
     async setIconUuidBasedOnPlacementSelection(test: BruteForceTest|HackOnTheFlyTest) {
-        if (!this.data.placeOnMainIcon) return;
-        this.data.iconUuid = this.persona?.uuid ?? this.host?.uuid ?? undefined;
+        if (!test.data.placeOnMainIcon) return;
+        test.data.iconUuid = test.persona?.uuid ?? test.host?.uuid ?? undefined;
     }
 }
