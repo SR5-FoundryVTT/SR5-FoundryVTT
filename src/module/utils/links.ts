@@ -22,7 +22,7 @@ export class LinksHelpers {
     static async checkUuid(source: string | undefined): Promise<{document: any, resolvedUuid: any, anchor: string | undefined} | undefined> {
         if (!source) return;
 
-        // @ts-ignore // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
+        // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
         let resolvedUuid = foundry.utils.parseUuid(source);
 
         const uuid = resolvedUuid.uuid.split('#')[0];
@@ -64,7 +64,7 @@ export class LinksHelpers {
 
         const [code, page] = source.split(' ');
 
-        //@ts-expect-error
+        //@ts-expect-error 
         ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
     }
 
@@ -80,7 +80,7 @@ export class LinksHelpers {
             if (document instanceof SR5Item || document instanceof SR5Actor || document instanceof JournalEntry) {
                 document.sheet?.render(true);
                 return;
-            // @ts-ignore
+            // @ts-expect-error 
             } else if (document instanceof JournalEntryPage) {
                 document.parent.sheet.render(true, {pageId: document.id, anchor: anchor ? anchor : undefined});
                     return;
