@@ -37,7 +37,13 @@ declare namespace Shadowrun {
         name: string
         device: string
         is_cyberdeck: boolean
+        // Is this actors persona using VR?
+        vr: boolean
+        // Is this actors persona link locked?
+        link_locked: boolean
+        // Is this actors using hot sim for their persona?
         hot_sim: boolean
+        // Is this actors persona running silently?
         running_silent: boolean
         item?: any
         marks: MatrixMarks

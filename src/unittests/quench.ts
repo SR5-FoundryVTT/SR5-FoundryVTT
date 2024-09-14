@@ -18,6 +18,7 @@ import { shadowrunSR5ActiveEffect } from './sr5.ActiveEffect.spec';
 import { shadowrunNetworkDevices } from './sr5.NetworkDevices.spec';
 import { shadowrunTesting } from './sr5.Testing.spec';
 import { shadowrunInventoryFlow } from './sr5.Inventory.spec';
+import { shadowrunMatrixFlow } from './sr5.MatrixFlow.spec';
 import { weaponParserBaseTesting } from './sr5.WeaponParser.spec';
 import { characterImporterTesting } from './actorImport/characterImporter/sr5.CharacterImporter.spec';
 import { characterInfoUpdaterTesting } from './actorImport/characterImporter/sr5.CharacterInfoUpdater.spec';
@@ -130,6 +131,9 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
     quench.registerBatch('shadowrun5e.flow.damage', shadowrunDamage, {
         displayName: 'SHADOWRUN5e: Damage Application',
+    });
+    quench.registerBatch('shadowrun5e.flow.matrix', shadowrunMatrixFlow, {
+        displayName: 'SHADOWRUN5e: Matrix Flow Test',
     });
 
     quench.registerBatch('shadowrun5e.parser.weapon', weaponParserBaseTesting, {

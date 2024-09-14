@@ -1730,6 +1730,36 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Is this actor currently using the VR matrix mode?
+     */
+    get isUsingVR(): boolean {
+        const matrixData = this.matrixData;
+        if (!matrixData) return false;
+        return matrixData.vr;
+    }
+
+    /**
+     * Is this actor currently using VR hot sim?
+     * 
+     * An actor must be using VR to be able to use hot sim.
+     */
+    get isUsingHotSim(): boolean {
+        if (!this.isUsingVR) return false;
+        const matrixData = this.matrixData;
+        if (!matrixData) return false;
+        return matrixData.hot_sim;
+    }
+
+    /**
+     * Is this actors persona currently being link locked?
+     */
+    get isLinkLocked(): boolean {
+        const matrixData = this.matrixData;
+        if (!matrixData) return false;
+        return matrixData.link_locked;
+    }
+
+    /**
      * Add an actor as this spirit actor's summoner.
      * @param actor A character actor to be used as summoner
      */
@@ -1761,13 +1791,6 @@ export class SR5Actor extends Actor {
     async removeTechnomancer() {
         if (!this.isSprite()) return;
         await this.update({ 'system.technomancerUuid': '' });
-    }
-    /** Check if this actor is of one or multiple given actor types
-     *
-     * @param types A list of actor types to check.
-     */
-    matchesActorTypes(types: string[]): boolean {
-        return types.includes(this.type);
     }
 
     /** 

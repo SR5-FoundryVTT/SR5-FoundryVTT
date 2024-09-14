@@ -188,4 +188,17 @@ export class MatrixRules {
     static convergenceDamage(): Shadowrun.DamageData {
         return DataDefaults.damageData({base: 12, value: 12, type: {base: 'matrix', value: 'matrix'}});
     }
+
+    /**
+     * Damage for Matrix dumpshock.
+     * 
+     * See SR5#229 'Dumpshock & Link-Locking'
+     * @param hotSim Is the persona using a hot sim?
+     */
+    static dumpshockDamage(hotSim: boolean): Shadowrun.DamageData {
+        const type = hotSim ? 'physical' : 'stun';
+        const damage = 6;
+        
+        return DataDefaults.damageData({type: {base: type, value: type}, base: damage, value: damage});
+    }
 }
