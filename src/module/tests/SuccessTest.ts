@@ -189,6 +189,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
     public effects: SuccessTestEffectsFlow<this>;
 
+    // Allow this.constructor to not reference Function.
+    ['constructor']: typeof SuccessTest;
+
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
@@ -232,7 +235,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.sourceItemUuid = data.sourceItemUuid || this.item?.uuid;
         data.sourceUuid = data.sourceUuid || this.source?.uuid;
 
-        // @ts-expect-error // Prepare general test information.
         data.title = data.title || this.constructor.label;
 
         options.rollMode = this._prepareRollMode(data, options);
