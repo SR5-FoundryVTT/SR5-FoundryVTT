@@ -6,10 +6,9 @@ import { createTagify } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
-import RangeData = Shadowrun.RangeData;
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { MatrixRules } from '../rules/MatrixRules';
-import { MatrixFlow } from '../flows/MatrixFlow';
+import RangeData = Shadowrun.RangeData;
 
 /**
  * FoundryVTT ItemSheetData typing
