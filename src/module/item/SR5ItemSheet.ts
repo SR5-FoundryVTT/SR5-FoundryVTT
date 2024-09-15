@@ -66,13 +66,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     master: SR5Item | undefined
 
     // Action Items. (not only type = action)
-    //@ts-expect-error
     tests: typeof game.shadowrun5e.tests
-    // @ts-expect-error
     opposedTests: typeof game.shadowrun5e.opposedTests
-    // @ts-expect-error
     activeTests: typeof game.shadowrun5e.activeTests
-    // @ts-expect-error
     resistTests: typeof game.shadowrun5e.resistTests
 
     // Rendered description field
@@ -213,13 +209,9 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // Provide action parts with all test variants.
-        // @ts-expect-error // TODO: put 'opposed test types' into config (see data.config)
         data.tests = game.shadowrun5e.tests;
-        // @ts-expect-error
         data.opposedTests = game.shadowrun5e.opposedTests;
-        // @ts-expect-error
         data.activeTests = game.shadowrun5e.activeTests;
-        // @ts-expect-error
         data.resistTests = game.shadowrun5e.resistTests;
 
         // @ts-expect-error TODO: foundry-vtt-types v10

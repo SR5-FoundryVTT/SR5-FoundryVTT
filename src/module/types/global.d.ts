@@ -1,3 +1,5 @@
+import { DocumentSituationModifiers } from './../rules/DocumentSituationModifiers';
+import { TestCreator } from './../tests/TestCreator';
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import { SR5Item } from "../item/SR5Item";
@@ -6,6 +8,8 @@ import { SR5Combat } from "../combat/SR5Combat";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { Translation } from '../utils/strings';
+import { SuccessTest } from "../tests/SuccessTest";
+import { DataDefaults } from '../data/DataDefaults';
 
 declare global {
     // Configuration of foundry-vtt-types
@@ -58,6 +62,24 @@ declare global {
             Cards: any;
             JournalEntryPage: any;
         };
+
+        shadowrun5e: {
+            tests: Record<string, any>,
+            activeTests: Record<string, any>
+            opposedTests: Record<string, any>,
+            resistTests: Record<string, any>,
+            followedTests: Record<string, any>,
+            SR5Actor: typeof SR5Actor,
+            SR5Item: typeof SR5Item,
+            SR5ActiveEffect: typeof SR5ActiveEffect,
+            rollItemMacro: any,
+            rollSkillMacro: any,
+            SR5Roll: typeof SR5Roll,
+            test: typeof TestCreator,
+            data: typeof DataDefaults,
+            modifiers: typeof DocumentSituationModifiers,
+            inputDelay: number
+        }
     }
 
     type RecursivePartial<T> = {
