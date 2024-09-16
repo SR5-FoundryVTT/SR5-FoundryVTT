@@ -7,31 +7,48 @@ import { SR5Item } from "../item/SR5Item";
 
 export class LinksHelpers {
     /**
+     * Determine if the given string contains a PDF pattern.
+     * 
+     * @param candidate The string that might contain a PDF pattern like SR5 123
+     */
+    static isPDF(candidate: string | undefined): boolean {
+        if (!candidate) return false;
+        return candidate.split(' ').length === 2;
+    }
+    /**
      * Determine if given string contains a url pattern.
+     * 
+     * Parsing an url is expensive and doing so on UUIDs for JournalEntryPages will kill the browser :)
+     * Therefore we assume what is not anything else, might be a url.
      * 
      * @param candidate The string that might contain a url
      * @returns true, when candidate contains a url pattern
      */
     static isURL(candidate: string | undefined): boolean {
         if (!candidate) return false;
-        return candidate.startsWith('http') || candidate.startsWith('https');
+
+        // Start in order of little performance expence
+        if (LinksHelpers.isPDF(candidate)) return false;
+        if (LinksHelpers.isUuid(candidate)) return false;
+
+        return true;
     }
     /**
      * Determine if given string contains a valid uuid pattern.
      * 
-     * foundry.utils.parseUuid throws an error when the uuid is invalid.
+     * FoundryVTT doesn't provide a method to check if a string is a valid uuid.
+     * We assume a uuid will end on a 16 digit id and will contain at least one dot.
      * 
-     * @param candidate  
+     * @param candidate A string containing a Document.uuid
      * @returns true, when candidate contains a valid uuid pattern
      */
     static isUuid(candidate: string | undefined) {
         if (!candidate) return false;
-        try {
-            // @ts-expect-error // TODO: foundry-vtt-types v10
-            foundry.utils.parseUuid(candidate);
-        } catch {
-            return false;
-        }
+
+        const parts = candidate.split('.');
+        if (parts.length < 2) return false;
+        const idPart = parts.pop();
+        if (idPart?.length !== 16) return false;
         
         return true;
     }
@@ -118,13 +135,14 @@ export class LinksHelpers {
      * Use the items source field and try different means of opening it.
      */
     static async openSource(source: string | undefined) {
-        if (LinksHelpers.isURL(source)) {
-            return LinksHelpers.openSourceURL(source);
+        if (LinksHelpers.isPDF(source)) {
+            return LinksHelpers.openSourcePDF(source);
         }
         if (LinksHelpers.isUuid(source)) {
             return await LinksHelpers.openSourceByUuid(source);
         }
-        
-        LinksHelpers.openSourcePDF(source);
+        if (LinksHelpers.isURL(source)) {
+            return LinksHelpers.openSourceURL(source);
+        }
     }
 }
