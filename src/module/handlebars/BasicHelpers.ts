@@ -198,15 +198,26 @@ export const registerBasicHelpers = () => {
     });
 
     /**
-     * Allow to give two values and either use the first or the second.
+     * Allow to give two values and compare them with logical OR.
      * 
-     * This matches a ?? b behavior.
+     * Uses JavaScript truthy/falsy values.
      * 
-     * @param a The first value, use this if it's not undefined.
-     * @param v The second value, use this if a is undefined.
-     * @returns the value to use
+     * @param a The first value
+     * @param v The second value
+     * @returns true or false
      */
     Handlebars.registerHelper('or', function(a, b) {
-        return a ?? b;
+        return a || b;
+    });
+
+    /**
+     * Allow using the first given value that's defined.
+     * @params * A open list of parameters, from which the first defined value will be returned.
+     */
+    Handlebars.registerHelper('firstDefined', function(...values) {
+        for (const value of values) {
+            if (value !== undefined) return value;
+        }
+        return undefined;
     });
 };
