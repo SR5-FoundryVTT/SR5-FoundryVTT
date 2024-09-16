@@ -509,6 +509,7 @@ export const registerItemLineHelpers = () => {
                         qtyInput,
                     ];
                 }
+                break;
             case 'device':
             case 'equipment':
             case 'cyberware':
@@ -684,10 +685,12 @@ export const registerItemLineHelpers = () => {
                         }
                     ]
                 }
-
+                break;
             default:
                 return [];
         }
+
+        return [];
     });
 
     Handlebars.registerHelper('ItemIcons', function (item: ShadowrunItemData) {

@@ -1,9 +1,9 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
-import { EffectChangeData, EffectChangeDataSource } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
+import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import { SYSTEM_NAME } from "../constants";
 import { SR5Item } from "../item/SR5Item";
-import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
+import { tagifyFlagsToIds } from "../utils/sheets";
 
 
 
@@ -276,7 +276,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param change 
      */
     override apply(object: any, change) {
-        // @ts-expect-error
+        // @ts-expect-error // TODO: foundry-vtt-types v11
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;

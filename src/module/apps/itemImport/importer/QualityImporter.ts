@@ -23,7 +23,6 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        const jsonNameTranslations = {};
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
         const parser = new QualityParserBase();
         const items: Shadowrun.QualityItemData[] = [];

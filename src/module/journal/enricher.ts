@@ -107,7 +107,7 @@ export class JournalEnrichers {
 
             const actor = await Helpers.chooseFromAvailableActors()
 
-            if(actor == undefined) {
+            if(actor === undefined) {
                 //in a normal running game this should not happen
                 ui.notifications?.error('SR5.Errors.NoAvailableActorFound', {localize: true});
                 return

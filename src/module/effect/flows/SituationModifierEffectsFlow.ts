@@ -11,7 +11,7 @@ import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../e
  */
 export class SituationModifierEffectsFlow<T extends SituationModifier> {
     modifier: T;
-    applyHandlers: Record<string, Function> = {};
+    applyHandlers: Record<string, (modifier: any, test?: SuccessTest) => void> = {};
 
     constructor(modifier: T) {
         this.modifier = modifier;

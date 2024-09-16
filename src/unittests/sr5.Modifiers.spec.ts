@@ -1,5 +1,3 @@
-import { BackgroundCountModifier } from './../module/rules/modifiers/BackgroundCountModifier';
-import { NoiseModifier } from './../module/rules/modifiers/NoiseModifier';
 import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
 
 import {DocumentSituationModifiers} from "../module/rules/DocumentSituationModifiers";

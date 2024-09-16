@@ -1,4 +1,3 @@
-import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 

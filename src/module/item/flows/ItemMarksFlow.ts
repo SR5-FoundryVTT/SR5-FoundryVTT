@@ -1,4 +1,3 @@
-import { SR5Actor } from "../../actor/SR5Actor";
 import { MarkFlow, SetMarksOptions } from "../../flows/MarksFlow";
 import { SR5Item } from "../SR5Item";
 import { NetworkDevice } from "./MatrixNetworkFlow";

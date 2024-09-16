@@ -38,7 +38,7 @@ module.exports = {
         "@typescript-eslint/no-invalid-void-type": "off", // This prohibits return console.asd in one line after an if statement. This might not be generally liked, though improves readability.
         "no-unreachable-loop": "warn",
         "no-return-assign": "warn",
-        "@typescript-eslint/consistent-type-assertions": "warn",
+        "@typescript-eslint/consistent-type-assertions": "off", // Sometimes this makes life so much easier when returning types.
 
         // Warnings for things that could be better
         "@typescript-eslint/explicit-function-return-type": "off", // Implicit type returns aren't a bad thing

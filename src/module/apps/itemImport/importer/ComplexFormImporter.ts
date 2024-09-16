@@ -69,7 +69,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             items.push(item);
         }
 
-        // @ts-expect-error
+        // @ts-expect-error // TODO: foundry-vtt-types v10 / Might not be solved by an update...
         return await Item.create(items) as Item;
     }
 }

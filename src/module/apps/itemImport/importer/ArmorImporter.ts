@@ -59,7 +59,7 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
             datas.push(item);
         }
 
-        // @ts-expect-error
+        // @ts-expect-error // TODO: foundry-vtt-types v10
         return await Item.create(datas) as Item;
     }
 }

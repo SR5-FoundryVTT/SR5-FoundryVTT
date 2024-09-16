@@ -296,7 +296,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         // TODO: Check ressource setting.
         const iniScore = this.actor.combatInitiativeScore;
         Object.values(this.data.activeDefenses).forEach(mode => 
-            mode.disabled = CombatRules.canUseActiveDefense(iniScore, mode.initMod)
+            { mode.disabled = CombatRules.canUseActiveDefense(iniScore, mode.initMod) }
         )
     }
 }

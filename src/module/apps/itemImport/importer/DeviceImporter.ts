@@ -131,7 +131,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(cyberdeck, 'name');
 
             // Get the item's folder information
-            // @ts-expect-error
+            // @ts-expect-error // TODO: foundry-vtt-types v10
             item.folder = folder.id;
 
             // Import Flags

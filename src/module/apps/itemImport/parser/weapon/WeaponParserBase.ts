@@ -19,7 +19,7 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
             if (Constants.MAP_CATEGORY_TO_SKILL.hasOwnProperty(jsonSkill)) {
                 return Constants.MAP_CATEGORY_TO_SKILL[jsonSkill];
             }
-            return jsonSkill.replace(/[\s\-]/g, '_').toLowerCase();
+        return jsonSkill.replace(/[\s-]/g, '_').toLowerCase();
         } else {
             const category = ImportHelper.StringValue(weaponJson, 'category');
             if (Constants.MAP_CATEGORY_TO_SKILL.hasOwnProperty(category)) {

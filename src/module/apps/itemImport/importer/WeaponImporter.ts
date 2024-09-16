@@ -41,7 +41,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
         folders['gear'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Gear`, true);
         folders['quality'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Quality`, true);
 
-        const parser = new ParserMap<WeaponItemData>(WeaponParserBase.GetWeaponType, [
+        const parser = new ParserMap<WeaponItemData>(WeaponParserBase.GetWeaponType.bind(WeaponParserBase), [
             { key: 'range', value: new RangedParser() },
             { key: 'melee', value: new MeleeParser() },
             { key: 'thrown', value: new ThrownParser() },
@@ -73,11 +73,11 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
             }
             // exception for thrown weapons and explosives
             const weaponCategory = this.formatAsSlug(item.system.subcategory);
-            if (!(subType && ( weaponCategory == 'gear'))) {
+            if (!(subType && ( weaponCategory === 'gear'))) {
                 subType = weaponCategory;
             }
             // deal with explosives and their weird formatting
-            if (weaponCategory == 'gear' && item.name.includes(':')) {
+            if (weaponCategory === 'gear' && item.name.includes(':')) {
                 subType = this.formatAsSlug(item.name.split(':')[0]);
             }
 

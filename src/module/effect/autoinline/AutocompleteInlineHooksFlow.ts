@@ -1,4 +1,3 @@
-import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from "../../item/SR5Item";
 import { OpposedTest } from "../../tests/OpposedTest";
 import { SuccessTest } from "../../tests/SuccessTest";
@@ -23,7 +22,7 @@ export const AutocompleteInlineHooksFlow =  {
         // Module might not be installed.
         const aipModule = game.modules.get("autocomplete-inline-properties");
         if (!aipModule) return;
-        // @ts-expect-error
+        // @ts-expect-error // Lazy Typing
         // API might be missing.
         const api = aipModule.API;
         if (!api) return;

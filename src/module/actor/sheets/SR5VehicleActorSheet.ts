@@ -1,5 +1,4 @@
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5Actor} from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
 import { MatrixNetworkFlow } from '../../item/flows/MatrixNetworkFlow';
@@ -8,11 +7,6 @@ interface VehicleSheetDataFields {
     driver: SR5Actor|undefined
     master: SR5Item | undefined
 }
-
-interface VehicleActorSheetData extends SR5ActorSheetData {
-    vehicle: VehicleSheetDataFields
-}
-
 
 export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     /**

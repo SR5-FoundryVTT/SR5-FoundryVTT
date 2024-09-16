@@ -174,7 +174,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         for (const itemType of itemTypes) {
             for (const item of itemType) {
-                // @ts-expect-error
+                // @ts-expect-error // Lazy typing
                 item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value);
             }
         }

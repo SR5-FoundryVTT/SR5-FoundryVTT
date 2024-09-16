@@ -87,24 +87,24 @@ export class HooksManager {
         console.log('Shadowrun 5e | Registering system hooks');
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
-        Hooks.once('init', HooksManager.init);
+        Hooks.once('init', HooksManager.init.bind(HooksManager));
         Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
 
-        Hooks.on('canvasInit', canvasInit);
-        Hooks.on('ready', HooksManager.ready);
-        Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
-        Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
-        Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
-        Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
-        Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
+        Hooks.on('canvasInit', canvasInit.bind(HooksManager));
+        Hooks.on('ready', HooksManager.ready.bind(HooksManager));
+        Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
+        Hooks.on('renderSceneControls', HooksManager.renderSceneControls.bind(HooksManager));
+        Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
+        Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(HooksManager));
+        Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory.bind(HooksManager));
         // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
-        Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD);
-        Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
-        Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
-        Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
+        Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(HooksManager));
+        Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
+        Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks.bind(HooksManager));
+        Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
-        Hooks.on("renderChatLog", HooksManager.chatLogListeners);
-        Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
+        Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
+        Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant.bind(SR5Combat));
 
         Hooks.on('quenchReady', quenchRegister);
 
@@ -278,7 +278,7 @@ ___________________
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
-        // @ts-expect-error
+        // @ts-expect-error // TODO: foundry-vtt-types v10
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
         // Register general SR5Roll for JSON serialization support.
@@ -375,8 +375,8 @@ ___________________
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, async () => await TestCreator.promptSuccessTest());
 
-        Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
-        Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks);
+        Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
+        Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
         HooksManager.registerSocketListeners();
     }
 
@@ -487,12 +487,12 @@ ___________________
         if (!game.socket || !game.user) return;
         console.log('Registering Shadowrun5e system socket messages...');
         const hooks: Shadowrun.SocketMessageHooks = {
-            [FLAGS.addNetworkMaster]: [MatrixNetworkFlow._handleAddMasterSocketMessage],
-            [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
-            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
-            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage],
-            [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage],
-            [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage]
+            [FLAGS.addNetworkMaster]: [MatrixNetworkFlow._handleAddMasterSocketMessage.bind(MatrixNetworkFlow)],
+            [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage.bind(MatrixNetworkFlow)],
+            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage.bind(MatrixNetworkFlow)],
+            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage.bind(MatrixNetworkFlow)],
+            [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(MatrixNetworkFlow)],
+            [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(MatrixNetworkFlow)]
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {

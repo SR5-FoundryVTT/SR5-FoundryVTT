@@ -17,7 +17,7 @@ export class SkillsPrep {
             // language.value is defined as an array in template.json
             // However what we actually want here is an object, so we set it manually
             // The same is done for the other knowledge skillgroups 'value' properties below
-            if (Array.isArray(language.value) && language.value.length == 0) {
+            if (Array.isArray(language.value) && language.value.length === 0) {
                 language.value = {};
             }
 

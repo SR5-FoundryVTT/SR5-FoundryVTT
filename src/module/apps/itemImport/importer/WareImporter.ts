@@ -13,8 +13,8 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
     public files = ['cyberware.xml', 'bioware.xml'];
 
     CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('cyberwares') && jsonObject['cyberwares'].hasOwnProperty('cyberware') ||
-               jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware');
+        return (jsonObject.hasOwnProperty('cyberwares') && jsonObject['cyberwares'].hasOwnProperty('cyberware')) ||
+               (jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware'));
     }
 
     GetDefaultCyberwareData(): CyberwareItemData {

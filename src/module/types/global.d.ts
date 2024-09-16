@@ -8,7 +8,6 @@ import { SR5Combat } from "../combat/SR5Combat";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { Translation } from '../utils/strings';
-import { SuccessTest } from "../tests/SuccessTest";
 import { DataDefaults } from '../data/DataDefaults';
 
 declare global {
