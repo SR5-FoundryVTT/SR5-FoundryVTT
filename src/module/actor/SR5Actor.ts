@@ -35,6 +35,7 @@ import { SetMarksOptions } from '../flows/MarksFlow';
 import { RollDataOptions } from '../item/Types';
 import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { DamageApplicationFlow } from './flows/DamageApplicationFlow';
+import { SuccessTest } from '../tests/SuccessTest';
 
 
 /**
@@ -94,7 +95,7 @@ export class SR5Actor extends Actor {
     async setOverwatchScore(value) {
         const num = parseInt(value);
         if (!isNaN(num)) {
-            return this.setFlag(SYSTEM_NAME, 'overwatchScore', num);
+            return await this.setFlag(SYSTEM_NAME, 'overwatchScore', num);
         }
     }
 
@@ -281,7 +282,7 @@ export class SR5Actor extends Actor {
                 .map(change => {
                     // @ts-expect-error // Foundry internal code, duplicate doesn't like EffectChangeData
                     change = foundry.utils.duplicate(change);
-                    // @ts-expect-error
+                    // @ts-expect-error We inject effect for ease of use, using the same method as FoundryVTT core...
                     change.effect = effect;
                     change.priority = change.priority ?? (change.mode * 10);
 
@@ -293,7 +294,7 @@ export class SR5Actor extends Actor {
         changes.sort((a, b) => a.priority - b.priority);
 
         for (const change of changes) {
-            // @ts-expect-error
+            // @ts-expect-error We inject effect for ease of use, using the same method as FoundryVTT core...
             change.effect.apply(this, change);
         }
     }
@@ -316,7 +317,7 @@ export class SR5Actor extends Actor {
         const overrides = {};
 
         for (const change of changes) {
-            // @ts-expect-error
+            // @ts-expect-error We inject effect for ease of use, using the same method as FoundryVTT core...
             const result = change.effect.apply(this, change);
             if (result !== null) overrides[change.key] = result;
         }
@@ -339,7 +340,7 @@ export class SR5Actor extends Actor {
                 .map(change => {
                     // @ts-expect-error // Foundry internal code, duplicate doesn't like EffectChangeData
                     change = foundry.utils.duplicate(change);
-                    // @ts-expect-error
+                    // @ts-expect-error We inject effect for ease of use, using the same method as FoundryVTT core...
                     change.effect = effect;
                     change.priority = change.priority ?? (change.mode * 10);
 
@@ -485,7 +486,7 @@ export class SR5Actor extends Actor {
      */
     get recoilCompensation(): number {
         if(!this.system.values.hasOwnProperty('recoil_compensation')) return 0;
-        //@ts-expect-error
+        //@ts-expect-error // We checked above, so let's ignore this typing.
         return this.system.values.recoil_compensation.value;
     }
 
@@ -504,7 +505,7 @@ export class SR5Actor extends Actor {
      */
     get recoil(): number {
         if(!this.system.values.hasOwnProperty('recoil')) return 0;
-        //@ts-expect-error
+        //@ts-expect-error // We checked above, so let's ignore this typing.
         return this.system.values.recoil.value;
     }
 
@@ -530,7 +531,7 @@ export class SR5Actor extends Actor {
     getAttribute(name: string): Shadowrun.AttributeField {
         // First check vehicle stats, as they don't always exist.
         const stats = this.getVehicleStats();
-        if (stats && stats[name]) return stats[name];
+        if (stats?.[name]) return stats[name];
 
         // Second check general attributes.
         const attributes = this.getAttributes();
@@ -608,7 +609,7 @@ export class SR5Actor extends Actor {
             case 'exotic':
                 return 'pilot_exotic_vehicle';
             default:
-                return;
+                
         }
     }
 
@@ -1007,7 +1008,7 @@ export class SR5Actor extends Actor {
 
         const skills = this.getActiveSkills();
         for (const [id, skill] of Object.entries(skills)) {
-            if (skill.hidden === true) {
+            if (skill.hidden) {
                 skill.hidden = false;
                 updateData[`system.skills.active.${id}`] = skill;
             }
@@ -1039,7 +1040,7 @@ export class SR5Actor extends Actor {
         const rating = this.getDeviceRating();
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        const testCls = this.tests._getTestClass('SuccessTest');
+        const testCls = this.tests._getTestClass('SuccessTest') as typeof SuccessTest;
         const test = new testCls({}, {actor: this}, {showDialog});
 
         // Build pool values.
@@ -1207,7 +1208,7 @@ export class SR5Actor extends Actor {
     
             const action = this.skillActionData(skillId, options);
             if (!action) return;
-            if(teamworkData.criticalGlitch != true) {
+            if(!teamworkData.criticalGlitch) {
                 action.limit.mod.push({name: "Teamwork", value: teamworkData.additionalLimit})
             }
 
@@ -1266,9 +1267,9 @@ export class SR5Actor extends Actor {
      * @param value
      */
     //@ts-expect-error // TODO: foundry-vtt-types v10
-    setFlag(scope: string, key: string, value: any): Promise<any> {
+    async setFlag(scope: string, key: string, value: any): Promise<any> {
         const newValue = Helpers.onSetFlag(value);
-        return super.setFlag(scope, key, newValue);
+        return await super.setFlag(scope, key, newValue);
     }
 
     /**
@@ -1334,7 +1335,6 @@ export class SR5Actor extends Actor {
     }
 
     getActivePlayerOwners(): User[] {
-        // @ts-expect-error
         return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
@@ -1349,10 +1349,10 @@ export class SR5Actor extends Actor {
     async healDamage(track: Shadowrun.DamageType, healing: number) {
         console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
 
-        // @ts-expect-error
+        // @ts-expect-error // Ease of typing...
         if (!this.system?.track.hasOwnProperty(track)) return
 
-        // @ts-expect-error
+        // @ts-expect-error // Ease of typing...
         const current = Math.max(this.system.track[track].value - healing, 0);
 
         await this.update({[`system.track.${track}.value`]: current});
@@ -1464,18 +1464,17 @@ export class SR5Actor extends Actor {
         const effect = status || CONFIG.controlIcons.defeated;
 
         // Avoid applying defeated status multiple times.
-        const existing = this.effects.reduce((arr, e) => {
+        const existing = this.effects.reduce<string[]>((arr, e) => {
             // @ts-expect-error TODO: foundry-vtt-types v10
             if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
-                // @ts-expect-error
-                arr.push(e.id);
+                arr.push(e.id as string);
             }
             return arr;
         }, []);
 
         if (existing.length) return;
 
-        // @ts-expect-error
+        // @ts-expect-error // TODO: foundry-vtt-types v11
         // Set effect as active, as we've already made sure it isn't.
         // Otherwise Foundry would toggle on/off, even though we're still dead.
         await token.object.toggleEffect(effect, { overlay: true, active: true });
@@ -1573,7 +1572,7 @@ export class SR5Actor extends Actor {
     get combatInitiativeScore(): number {
         if (!game.combat) return 0;
         const combatant = (game.combat as SR5Combat).getActorCombatant(this);
-        if (!combatant || !combatant.initiative) return 0;
+        if (!combatant?.initiative) return 0;
         return combatant.initiative;
     }
 

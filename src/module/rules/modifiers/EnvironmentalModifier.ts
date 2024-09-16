@@ -25,12 +25,12 @@ export class EnvironmentalModifier extends SituationModifier {
      * @param values Active modifier values to be matched to level values
      * @returns A count per level of modifiers on that level
      */
-    activeLevels(values: Number[]): Record<string, number> {
+    activeLevels(values: number[]): Record<string, number> {
         return {
-            light: values.reduce((count: number, value: number) => (value === this.levels.light ? count + 1 : count), 0) as number,
-            moderate: values.reduce((count: number, value: number) => (value === this.levels.moderate ? count + 1 : count), 0) as number,
-            heavy: values.reduce((count: number, value: number) => (value === this.levels.heavy ? count + 1 : count), 0) as number,
-            extreme: values.reduce((count: number, value: number) => (value === this.levels.extreme ? count + 1 : count), 0) as number
+            light: values.reduce((count: number, value: number) => (value === this.levels.light ? count + 1 : count), 0),
+            moderate: values.reduce((count: number, value: number) => (value === this.levels.moderate ? count + 1 : count), 0),
+            heavy: values.reduce((count: number, value: number) => (value === this.levels.heavy ? count + 1 : count), 0),
+            extreme: values.reduce((count: number, value: number) => (value === this.levels.extreme ? count + 1 : count), 0)
         }
     }
 
@@ -47,7 +47,7 @@ export class EnvironmentalModifier extends SituationModifier {
         // Calculation based on active modifier categories, excluding manual overwrite.
         const activeCategories = Object.entries(this.applied.active);
         // Should an active category miss a level set, ignore and fail gracefully.
-        const activeValues = activeCategories.map(([category, level]) => level ? level : 0);
+        const activeValues = activeCategories.map(([category, level]) => level || 0);
         // Calculate the amout of categor
         const count = this.activeLevels(activeValues);
 

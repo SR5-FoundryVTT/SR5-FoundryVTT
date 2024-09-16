@@ -141,7 +141,7 @@ export const registerBasicHelpers = () => {
     });
     Handlebars.registerHelper('disabledHelper', function (value) {
         const val = Boolean(value);
-        return val ? val : undefined;
+        return val || undefined;
     });
     // TODO: This helper doesn't work... Don't know why, but it doesn't.
     Handlebars.registerHelper('localizeShortened', function (label: string, length: number, options: any): SafeString {
@@ -151,7 +151,7 @@ export const registerBasicHelpers = () => {
     /**
      * Given an object return the value for a given key.
      */
-    Handlebars.registerHelper('objValue', function(obj: Object, key: string) {
+    Handlebars.registerHelper('objValue', function(obj: Record<string, unknown>, key: string) {
         return obj[key] ||  '';
     });
 
@@ -170,10 +170,10 @@ export const registerBasicHelpers = () => {
      */
     Handlebars.registerHelper('itemMarking', function(element: string) {
         const mark = game.settings.get(SYSTEM_NAME, 'MarkImports');
-        if (element == 'ANY' && mark != 'NONE') {
+        if (element === 'ANY' && mark !== 'NONE') {
             return true;
         }
-        if (mark == element || mark == 'BOTH') {
+        if (mark === element || mark === 'BOTH') {
             return true;
         }
         return false;
@@ -183,7 +183,7 @@ export const registerBasicHelpers = () => {
      * Check whether an actor has any items that are freshly imported
      */
     Handlebars.registerHelper('hasAnyFreshImports', function(actor: SR5Actor) {
-        if (game.settings.get(SYSTEM_NAME, 'MarkImports') != 'NONE') {
+        if (game.settings.get(SYSTEM_NAME, 'MarkImports') !== 'NONE') {
             const allItems = actor.items;
             for (const item of allItems) {
                 if (item.system.importFlags) {
@@ -198,15 +198,26 @@ export const registerBasicHelpers = () => {
     });
 
     /**
-     * Allow to give two values and either use the first or the second.
+     * Allow to give two values and compare them with logical OR.
      * 
-     * This matches a ?? b behavior.
+     * Uses JavaScript truthy/falsy values.
      * 
-     * @param a The first value, use this if it's not undefined.
-     * @param v The second value, use this if a is undefined.
-     * @returns the value to use
+     * @param a The first value
+     * @param v The second value
+     * @returns true or false
      */
     Handlebars.registerHelper('or', function(a, b) {
-        return a ?? b;
+        return a || b;
+    });
+
+    /**
+     * Allow using the first given value that's defined.
+     * @params * A open list of parameters, from which the first defined value will be returned.
+     */
+    Handlebars.registerHelper('firstDefined', function(...values) {
+        for (const value of values) {
+            if (value !== undefined) return value;
+        }
+        return undefined;
     });
 };

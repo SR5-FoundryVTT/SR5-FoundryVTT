@@ -17,7 +17,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
             return;
         }
 
-        let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonGeari18n);
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
@@ -51,7 +51,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
 
             // Get the item's folder information
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
-            let categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Programs')}/${category}`, true);
+            const categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Programs')}/${category}`, true);
             //@ts-expect-error TODO: foundry-vtt-types v10
             item.folder = categoryFolder.id;
 

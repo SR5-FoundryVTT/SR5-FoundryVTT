@@ -90,9 +90,7 @@ declare namespace Shadowrun {
     /**
      * In general modifiers should always be a number BUT legacy wise there were many issue with strings creeping in.
      */
-    export interface Modifiers {
-        [name: string]: NumberOrEmpty;
-    }
+    export type Modifiers = Record<string, NumberOrEmpty>;
 
     export type InitiativeType = {
         base: BaseValuePair<number> & ModifiableValue;

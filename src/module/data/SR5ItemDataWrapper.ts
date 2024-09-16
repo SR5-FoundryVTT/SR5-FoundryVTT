@@ -273,7 +273,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData()?.armor?.hardened ?? false;
     }
 
-    getArmorElements(): { [key: string]: number } {
+    getArmorElements(): Record<string, number> {
         const { fire, electricity, cold, acid, radiation } = this.getData().armor || {};
         return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0, radiation: radiation ?? 0 };
     }
@@ -330,7 +330,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         if (this.isCyberdeck() || this.isRCC() || this.isCommlink()) {
             const atts = this.getData().atts;
             if (atts) {
-                for (let [key, att] of Object.entries(atts)) {
+                for (const [key, att] of Object.entries(atts)) {
                     matrix[att.att].value = att.value;
                     matrix[att.att].device_att = key;
                 }
@@ -429,13 +429,13 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         if (!("range" in this.data.system)) return;
 
         if (this.data.type === 'critter_power')
-            return this.data.system.range as CritterPowerRange;
+            return this.data.system.range;
 
         if (this.data.type === 'spell')
-            return this.data.system.range as SpellRange;
+            return this.data.system.range;
 
         if (this.data.type === 'weapon')
-            return this.data.system.range as RangeWeaponData;
+            return this.data.system.range;
     }
 
     getModificationCategory(): string {
@@ -455,7 +455,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getActionResult(): ActionResultData {
-        // @ts-expect-error
+        // @ts-expect-error // Easy typing...
         return this.getData().result;
     }
 }

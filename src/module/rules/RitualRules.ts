@@ -25,7 +25,7 @@ export const RitualRules = {
      * @param hits The amount of hits of the opposing ritual
      */
     drainValue: (hits: number, reagents: number, force: number): number => {
-        let reduction = Math.max(Math.floor(reagents / force) - 1, 0);
+        const reduction = Math.max(Math.floor(reagents / force) - 1, 0);
         return Math.max(hits * 2 - reduction, 2);
     },
 

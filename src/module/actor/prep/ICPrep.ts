@@ -73,10 +73,10 @@ export class ICPrep {
 
         // Prepare internal matrix condition monitor values
         // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
-        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating as number);
+        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating);
 
         // Prepare user visible matrix track values
-        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating as number);
+        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating);
         track.matrix.mod = PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;

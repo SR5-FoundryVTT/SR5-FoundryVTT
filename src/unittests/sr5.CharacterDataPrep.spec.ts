@@ -2,11 +2,6 @@ import { SR5TestingDocuments } from "./utils";
 import { SR5Actor } from "../module/actor/SR5Actor";
 import { SR5Item } from "../module/item/SR5Item";
 import { SR } from "../module/constants";
-import CharacterActorData = Shadowrun.CharacterActorData;
-import SpiritActorData = Shadowrun.SpiritActorData;
-import SpriteActorData = Shadowrun.SpriteActorData;
-import ICActorData = Shadowrun.ICActorData;
-import VehicleActorData = Shadowrun.VehicleActorData;
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
 export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
@@ -63,7 +58,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         it('monitor calculation', async () => {
             const actor = await testActor.create({ type: 'character' }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            let character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             // Check default values.
             assert.strictEqual(character.system.track.stun.max, 9); // 8 + round_up(1 / 2)
@@ -76,7 +71,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.attributes.willpower.base': 6,
             });
 
-            character = actor.asCharacter() as CharacterActorData;
+            character = actor.asCharacter() as Shadowrun.CharacterActorData;
             assert.strictEqual(character.system.track.stun.max, 11); // 8 + round_up(6 / 2)
             assert.strictEqual(character.system.track.physical.max, 11); // 8 + round_up(6 / 2)
             assert.strictEqual(character.system.track.physical.overflow.max, 6); // body value
@@ -91,14 +86,14 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.technology.equipped': true
             }]);
 
-            const character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as Shadowrun.CharacterActorData;
             assert.equal(character.system.matrix.condition_monitor.max, 10); // 9 + 1
         });
 
         it('initiative calculation', async () => {
             const actor = await testActor.create({ type: 'character' }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             // Check default values.
             assert.strictEqual(character.system.initiative.meatspace.base.base, 2); // REA+INT
@@ -170,7 +165,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         it('limit calculation', async () => {
             const actor = await testActor.create({ type: 'character' }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            let character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             assert.strictEqual(character.system.limits.physical.value, 2); // (STR*2 + BOD + REA) / 3
             assert.strictEqual(character.system.limits.mental.value, 2);   // (LOG*2 + INT + WIL) / 3
@@ -187,7 +182,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.attributes.essence.base': 6,
             });
 
-            character = actor.asCharacter() as CharacterActorData;
+            character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             assert.strictEqual(character.system.limits.physical.value, 8);
             assert.strictEqual(character.system.limits.mental.value, 8);
@@ -197,7 +192,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         it('movement calculation', async () => {
             const actor = await testActor.create({ type: 'character' }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            let character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             assert.strictEqual(character.system.movement.walk.value, 2); // AGI * 2
             assert.strictEqual(character.system.movement.run.value, 4);  // AGI * 4
@@ -206,7 +201,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.attributes.agility.base': 6
             });
 
-            character = actor.asCharacter() as CharacterActorData;
+            character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             assert.strictEqual(character.system.movement.walk.value, 12);
             assert.strictEqual(character.system.movement.run.value, 24);
@@ -220,14 +215,14 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.skills.active.arcana.specs': ['Test']
             }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             assert.strictEqual(character.system.skills.active.arcana.value, 7);
         });
 
         it('damage application to wounds', async () => {
             const actor = await testActor.create({ type: 'character' }) as SR5Actor;
-            let character = actor.asCharacter() as CharacterActorData;
+            let character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             assert.strictEqual(character.system.track.stun.value, 0);
             assert.strictEqual(character.system.track.stun.wounds, 0);
@@ -241,7 +236,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.track.physical.value': 3,
             });
 
-            character = actor.asCharacter() as CharacterActorData;
+            character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             assert.strictEqual(character.system.track.stun.value, 3);
             assert.strictEqual(character.system.track.stun.wounds, 1);
@@ -259,7 +254,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.modifiers.wound_tolerance': -1
             }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             assert.strictEqual(character.system.track.stun.value, 6);
             assert.strictEqual(character.system.track.stun.wounds, 3); // would normally be 2
@@ -276,7 +271,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.modifiers.pain_tolerance_physical': 6
             }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             assert.strictEqual(character.system.track.stun.value, 9);
             assert.strictEqual(character.system.track.stun.wounds, 2); // would normally be 3
@@ -295,7 +290,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
 
             }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             /**
              * Wound tolerance should alter the amount of boxes of damage per wound

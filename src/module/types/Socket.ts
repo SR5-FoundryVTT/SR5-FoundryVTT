@@ -18,6 +18,5 @@ declare namespace Shadowrun {
             slaveLink: string
         }
     }
-
-    export type SocketMessageHooks = Record<string, Function[]>
+    export type SocketMessageHooks = Record<string, ((message: any) => any)[]>
 }

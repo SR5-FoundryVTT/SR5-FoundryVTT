@@ -241,7 +241,7 @@ export class DataDefaults {
             name: '',
             pack: null,
             type: 'Actor',
-            // @ts-expect-error
+            // @ts-expect-error // Lazy Typing
             system: partialSourceEntityData.system || undefined
         }, partialSourceEntityData) as Shadowrun.SourceEntityField;
     }

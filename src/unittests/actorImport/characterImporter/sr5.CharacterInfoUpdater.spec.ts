@@ -7,7 +7,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
 
     let testActorFactory;
-    let importOptions = {};
+    const importOptions = {};
     let chummerFile;
 
     before(async () => {
