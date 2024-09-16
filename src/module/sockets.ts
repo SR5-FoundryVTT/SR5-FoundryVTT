@@ -1,5 +1,4 @@
 import {SYSTEM_SOCKET} from "./constants";
-import SocketMessageBody = Shadowrun.SocketMessageData;
 
 /**
  * Simple handling of creating and emitting socket messages
@@ -12,7 +11,7 @@ import SocketMessageBody = Shadowrun.SocketMessageData;
  * To listen to these socket messages see Hooks#registerSocketListeners
  */
 export class SocketMessage {
-    static _createMessage(type, data, userId?): SocketMessageBody {
+    static _createMessage(type, data, userId?): Shadowrun.SocketMessageData {
         return {type, data, userId}
     }
 
