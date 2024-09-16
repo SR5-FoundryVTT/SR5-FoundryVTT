@@ -1,7 +1,7 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SYSTEM_NAME } from "../constants";
 import { Helpers } from "../helpers";
-import { ModifiableDocumentTypes, DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
+import { DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
 
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
@@ -249,13 +249,13 @@ export class SituationModifiersApplication extends FormApplication {
     
     // Manage modifiers stored on this target document. This might not be the document meant for those modifiers to be applied to.
     // While a scene can store modifiers, actors have them applied
-    target: ModifiableDocumentTypes
+    target: Shadowrun.ModifiableDocumentTypes
     // The modifiers as stored onto the target document.
     modifiers: DocumentSituationModifiers
     // Instance handlers contain all functionality for modifier categories as not to clutter the general application.
     handlers: ModifiersHandler[]
 
-    constructor(target: ModifiableDocumentTypes) {
+    constructor(target: Shadowrun.ModifiableDocumentTypes) {
         super(target);
         
         this.target = target;
@@ -488,7 +488,7 @@ export class SituationModifiersApplication extends FormApplication {
     static openForKeybinding() {
         console.debug(`Shadowrun 5e | Trying to open ${this.name}`);
 
-        let document: ModifiableDocumentTypes|null = null;
+        let document: Shadowrun.ModifiableDocumentTypes|null = null;
 
         const controlledActors = Helpers.getControlledTokenActors();
         // Only open on selection for a single token.

@@ -1,6 +1,5 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
-import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
 import { SuccessTest, TestOptions } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
@@ -14,11 +13,11 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
 
     // The icon to place a mark on.
     // If an actor was selected, this will point to either the persona device or the actor itself, if no persona device is used.
-    icon: NetworkDevice;
+    icon: Shadowrun.NetworkDevice;
     // The persona matrix actor. If in use, icon will either point to the actor, if no persona device is used, or the persona device.
     persona: SR5Actor|null;
     // The devices connected to the main icon persona / host.
-    devices: (NetworkDevice)[];
+    devices: (Shadowrun.NetworkDevice)[];
     // Started ic on selected host.
     ic: SR5Actor[];
     // Host used as main icon.

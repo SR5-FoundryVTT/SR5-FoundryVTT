@@ -29,7 +29,7 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import { MatrixNetworkFlow, NetworkDevice } from '../item/flows/MatrixNetworkFlow';
+import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../flows/MarksFlow';
 import { RollDataOptions } from '../item/Types';
@@ -1868,7 +1868,7 @@ export class SR5Actor extends Actor {
      * @param options Additional options that may be needed
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
+    async setMarks(target: Shadowrun.NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
         await ActorMarksFlow.setMarks(this, target, marks, options);
     }
 
@@ -1940,7 +1940,7 @@ export class SR5Actor extends Actor {
      * 
      * @returns The document to retrieve all marks this actor has access to.
      */
-    async _getDocumentWithMarks(): Promise<NetworkDevice|undefined> {
+    async _getDocumentWithMarks(): Promise<Shadowrun.NetworkDevice|undefined> {
         // CASE 1 - IC marks are stored on their host item.
         if (this.isIC() && this.hasHost()) {
             return await this.getICHost();

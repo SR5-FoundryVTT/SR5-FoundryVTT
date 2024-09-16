@@ -26,30 +26,10 @@ declare namespace Shadowrun {
         blast?: BlastData;
     };
 
-    // Use for actions with matrix content
-    type MatrixActionTestData = {
-        marks: number
-    }
-
-    type CombatData = {
-        initiative?: number
-    }
-
     type ModifiedDamageData = {
         incoming: DamageData
         modified: DamageData
     }
-
-    type DrainData = LabelField & {
-        value: number;
-    }
-
-    type SoakRollOptions = ActorRollOptions & {
-        damage?: DamageData;
-        attackerHits?: number;
-        defenderHits?: number;
-        netHits?: number;
-    };
 
     type SkillRollOptions = ActorRollOptions & {
         // A specialization should be used.
@@ -58,9 +38,4 @@ declare namespace Shadowrun {
         byLabel?: boolean
         threshold?: BaseValuePair<number>
     };
-
-    type SkillDialogOptions = {
-        skill: SkillField
-        attribute?: ActorAttribute
-    }
 }

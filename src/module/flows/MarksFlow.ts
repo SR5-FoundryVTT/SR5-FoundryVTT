@@ -1,5 +1,4 @@
 import { MatrixRules } from '../rules/MatrixRules';
-import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 
 /**
  * Options for the setMarks method.
@@ -32,7 +31,7 @@ export const MarkFlow = {
      * 
      * @returns marksData, altered in place.
      */
-    setMarks(marksData: Shadowrun.MatrixMarks, target: NetworkDevice | undefined, currentMarks: number, marks: number, options: SetMarksOptions={}) {
+    setMarks(marksData: Shadowrun.MatrixMarks, target: Shadowrun.NetworkDevice | undefined, currentMarks: number, marks: number, options: SetMarksOptions={}) {
         // TODO: Allow for no target
         if (!target) return [];
 

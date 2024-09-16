@@ -111,7 +111,7 @@ export class ImportHelper {
         return ImportHelper.s_Strategy.objectValue(jsonData, key, fallback);
     }
 
-    public static findItem(nameOrCmp: string | ItemComparer): SR5Item {
+    public static findItem(nameOrCmp: string | Shadowrun.ItemComparer): SR5Item {
         let result: any | null;
         if (typeof nameOrCmp === 'string') {
             result = game.items?.find((item) => item.name === nameOrCmp);
@@ -216,4 +216,3 @@ export class ImportHelper {
         return ImportHelper.MapNameToTranslationKey(translationMap, name, 'altpage', fallback);
     }
 }
-export type ItemComparer = (item: Item) => boolean;

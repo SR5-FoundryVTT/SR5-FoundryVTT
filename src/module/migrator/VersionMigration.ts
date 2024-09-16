@@ -1,8 +1,6 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import {SR5Item} from "../item/SR5Item";
 
-export type SystemMigrationDocuments = SR5Actor|SR5Item|Scene;
-
 // This interface is used as data container between migration methods and the actual document update.
 export interface UpdateData {
     data?: any
@@ -69,7 +67,7 @@ export abstract class VersionMigration {
 
         // Map of entities to update, store until later to reduce chance of partial updates
         // which may result in impossible game states.
-        const entityUpdates = new Map<SystemMigrationDocuments, DocumentUpdate>();
+        const entityUpdates = new Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>();
 
         // Migrate World Items
         await this.PreMigrateItemData(game, entityUpdates);
@@ -115,7 +113,7 @@ export abstract class VersionMigration {
      * Applies the specified mapping of entities, iteratively updating each.
      * @param documentUpdates A mapping of document updateData pairs.
      */
-    protected async Apply(documentUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+    protected async Apply(documentUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of documentUpdates) {
             
             // v9 -> v10 workaround, should be removed when safe.
@@ -137,7 +135,7 @@ export abstract class VersionMigration {
      * @param game
      * @param entityUpdates
      */
-    protected async IterateScenes(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+    protected async IterateScenes(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>) {
         // @ts-expect-error // ignore null state
         for (const scene of game.scenes.contents) {
             try {
@@ -196,7 +194,7 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async IterateItems(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+    protected async IterateItems(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>) {
         // @ts-expect-error // ignore null state
         for (const item of game.items.contents) {
             try {
@@ -229,7 +227,7 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async IterateActors(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+    protected async IterateActors(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>) {
         // @ts-expect-error // ignore null state
         for (const actor of game.actors.contents) {
             try {
@@ -313,13 +311,13 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PreMigrateSceneData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PreMigrateSceneData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PostMigrateSceneData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PostMigrateSceneData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
 
     /**
      * Check if an item requires updates.
@@ -342,13 +340,13 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PreMigrateItemData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PreMigrateItemData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PostMigrateItemData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PostMigrateItemData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
 
     /**
      * Check if an actor requires updates.
@@ -371,13 +369,13 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PreMigrateActorData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PreMigrateActorData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
     /**
      * Do something right after actor data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PostMigrateActorData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PostMigrateActorData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
 
     /**
      * Migrate a compendium pack

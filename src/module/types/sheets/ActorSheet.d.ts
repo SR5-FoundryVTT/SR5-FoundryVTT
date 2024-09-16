@@ -28,12 +28,39 @@ declare namespace Shadowrun {
     export interface TargetedDocument {
         // Name of the document or manually entered by user.
         name: string
-        target: any|null // The Foundry Document marked.
+        target: any | null // The Foundry Document marked.
     }
 
     // Use to display Matrix Marks which Foundry Document their placed on.
     export interface MarkedDocument extends TargetedDocument {
         marks: number // The amount of marks placed.
-        markId: string|null // For example <sceneId>/<targetId>/<itemId>. See Helpers.buildMarkId
+        markId: string | null // For example <sceneId>/<targetId>/<itemId>. See Helpers.buildMarkId
     }
+
+    /**
+     * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
+     */
+    interface SheetItemData {
+        type: string,
+        name: string,
+        data: Shadowrun.ShadowrunItemDataData
+        system: Shadowrun.ShadowrunItemDataData
+        properties: any,
+        description: any
+    }
+
+    interface InventorySheetDataByType {
+        type: string;
+        label: string;
+        isOpen: boolean;
+        items: SheetItemData[];
+    }
+
+    interface InventorySheetData {
+        name: string,
+        label: string,
+        types: Record<string, InventorySheetDataByType>
+    }
+
+    type InventoriesSheetData = Record<string, InventorySheetData>;
 }

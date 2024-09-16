@@ -1,12 +1,12 @@
 declare namespace Shadowrun {
-/**
-     * The general types of modifiers supported by the system.
-     * 
-     * These should match config.ts#SR5.modifierTypes
-     * 
-     * NOTE: normally I'd keyof typeof SR5.modifierTypes, but it doesn't
-     * work here and I don't know why :)
-     */
+    /**
+         * The general types of modifiers supported by the system.
+         * 
+         * These should match config.ts#SR5.modifierTypes
+         * 
+         * NOTE: normally I'd keyof typeof SR5.modifierTypes, but it doesn't
+         * work here and I don't know why :)
+         */
     export type ModifierTypes = 
         'armor' |
         'composure'|
@@ -34,7 +34,7 @@ declare namespace Shadowrun {
 
 
     export type SituationModifierType = keyof SituationModifiersData;
-    
+
     /** 
      * All situational modifier types of a document that selections can be made for.
      * 
@@ -140,4 +140,10 @@ declare namespace Shadowrun {
     export interface BackgroundCountModifiersData extends ModifierData {
         active: Partial<BackgroundCountModifierCategories>
     }
+
+    /**
+     * These documents can store situational modifiers
+     */
+    type ModifiableDocumentTypes = SR5Actor | Scene;
+    
 }

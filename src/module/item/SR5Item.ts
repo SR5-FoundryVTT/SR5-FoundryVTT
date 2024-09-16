@@ -7,10 +7,9 @@ import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
 import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
-import { NetworkDevice, MatrixNetworkFlow } from "./flows/MatrixNetworkFlow";
+import { MatrixNetworkFlow } from "./flows/MatrixNetworkFlow";
 import { HostPrep } from "./prep/HostPrep";
 import ModList = Shadowrun.ModList;
-import AttackData = Shadowrun.AttackData;
 import FireModeData = Shadowrun.FireModeData;
 import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
@@ -719,19 +718,6 @@ export class SR5Item extends Item {
     asAction(): ActionItemData | undefined {
         if (this.isAction()) {
             return this as ActionItemData;
-        }
-    }
-
-    async rollOpposedTest(target: SR5Actor, attack: AttackData, event): Promise<void> {
-        console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
-    }
-
-    async rollTestType(type: string, attack: AttackData, event, target: SR5Actor) {
-        if (type === 'opposed') {
-            await this.rollOpposedTest(target, attack, event);
-        }
-        if (type === 'action') {
-            await this.castAction(event);
         }
     }
 
@@ -1497,7 +1483,7 @@ export class SR5Item extends Item {
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
      * @param target The matrix item to be connected.
      */
-    async addSlave(target: NetworkDevice) {
+    async addSlave(target: Shadowrun.NetworkDevice) {
         // TODO: Add IC actor to WAN network
         // TODO: setup master link on networked devices.
         await MatrixNetworkFlow.addSlave(this, target);
