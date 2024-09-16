@@ -199,7 +199,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
         const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        if (!triggerElement?.dataset.hasOwnProperty('delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -334,7 +334,7 @@ export class SituationModifiersApplication extends FormApplication {
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
         const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        if (!triggerElement?.dataset.hasOwnProperty('delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -342,7 +342,7 @@ export class SituationModifiersApplication extends FormApplication {
 
         // Value DOMElement should contain the data key...
         const valueElement = $(triggerElement).siblings().closest('input');
-        if (!valueElement || !valueElement.attr('name')) 
+        if (!valueElement?.attr('name')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a name attribute');
 
         // Extract value from data using value DOMElement data key...
@@ -471,7 +471,7 @@ export class SituationModifiersApplication extends FormApplication {
         return async (event) => {
             event.preventDefault();
 
-            if (!token || !token.actor) return;
+            if (!token?.actor) return;
             const app = new SituationModifiersApplication(token.actor);
             // Use async render as activateTab needs tabs to bind to rendered result.
             await app._render(true);

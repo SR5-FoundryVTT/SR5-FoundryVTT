@@ -17,7 +17,7 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
             return;
         }
 
-        let jsonQualityi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonQualityi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonQualityi18n);
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonQualityi18n, 'qualities', 'quality');
     }
@@ -26,13 +26,13 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
         const jsonNameTranslations = {};
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
         const parser = new QualityParserBase();
-        let items: Shadowrun.QualityItemData[] = [];
-        let jsonDatas = jsonObject['qualities']['quality'];
+        const items: Shadowrun.QualityItemData[] = [];
+        const jsonDatas = jsonObject['qualities']['quality'];
         this.iconList = await this.getIconFiles();
         const parserType = 'quality';
 
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
@@ -40,8 +40,8 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
-            let category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
+            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
+            const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folders[category].id;
 

@@ -458,7 +458,7 @@ ___________________
 
         if (item.isHost) {
             // Collect actors from sidebar and active scene to update / rerender
-            let connectedIC = [
+            const connectedIC = [
                 // All sidebar actors should also include tokens with linked actors.
                 ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
                 // All token actors that aren't linked.

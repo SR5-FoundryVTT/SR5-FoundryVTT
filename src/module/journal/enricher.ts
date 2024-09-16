@@ -25,7 +25,7 @@ export class JournalEnrichers {
                     const type = match[1]
                     const rollEntity = match[3] as string
                     const threshold = match[4]
-                    let rollEntityName = JournalEnrichers.getRollEntityTranslation(type, rollEntity);
+                    const rollEntityName = JournalEnrichers.getRollEntityTranslation(type, rollEntity);
                     
                     return $(`<a class="sr5-roll-request" data-request="${type}" data-skill="${rollEntity}" data-threshold=${threshold}><em class="fas fa-dice"></em>${rollEntityName} ${threshold}</a>`)[0]
                 }
@@ -52,15 +52,15 @@ export class JournalEnrichers {
             const rollType = element.dataset.request
             const rollTypeName = "SR5.GMRequest." + rollType;
             const rollEntity = element.dataset.skill
-            let rollEntityName = JournalEnrichers.getRollEntityTranslation(rollType, rollEntity);
+            const rollEntityName = JournalEnrichers.getRollEntityTranslation(rollType, rollEntity);
             const threshold = element.dataset.threshold
 
             const templateData = {
                 rollType: rolls[rollType],
-                rollTypeName: rollTypeName,
-                rollEntity: rollEntity,
-                rollEntityName: rollEntityName,
-                threshold: threshold
+                rollTypeName,
+                rollEntity,
+                rollEntityName,
+                threshold
             }
 
             JournalEnrichers.createChatMessage(templateData);
@@ -105,7 +105,7 @@ export class JournalEnrichers {
             const rollEntity = element.dataset.rollentity
             const threshold = parseInt(element.dataset.threshold)
 
-            let actor = await Helpers.chooseFromAvailableActors()
+            const actor = await Helpers.chooseFromAvailableActors()
 
             if(actor == undefined) {
                 //in a normal running game this should not happen

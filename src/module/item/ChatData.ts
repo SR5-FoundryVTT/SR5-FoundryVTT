@@ -218,7 +218,7 @@ export const ChatData = {
 
     equipment: (system, labels, props) => {
         ChatData.action(system, labels, props);
-        if (system.technology && system.technology.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
+        if (system.technology?.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
     },
 
     quality: (system, labels, props) => {
@@ -300,14 +300,14 @@ export const ChatData = {
         }
 
         const equippedAmmo = item.getEquippedAmmo();
-        if (equippedAmmo && system.ammo && system.ammo.current?.max) {
+        if (equippedAmmo && system.ammo?.current?.max) {
             if (equippedAmmo) {
                 const ammoData = equippedAmmo.system as AmmoData;
                 const { current, spare_clips } = system.ammo;
                 if (equippedAmmo.name) props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
                 if (ammoData.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${ammoData.blast.radius}m`);
                 if (ammoData.blast.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} ${ammoData.blast.dropoff}/m`);
-                if (spare_clips && spare_clips.max) props.push(`${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${spare_clips.max})`);
+                if (spare_clips?.max) props.push(`${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${spare_clips.max})`);
             }
         }
 

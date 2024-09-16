@@ -156,5 +156,5 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
     ];
 
-    return loadTemplates(templatePaths);
+    return await loadTemplates(templatePaths);
 };

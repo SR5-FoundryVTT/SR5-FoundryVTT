@@ -98,7 +98,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         it('initiative calculation', async () => {
             const actor = await testActor.create({ type: 'character' }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as CharacterActorData;
 
             // Check default values.
             assert.strictEqual(character.system.initiative.meatspace.base.base, 2); // REA+INT
@@ -220,7 +220,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.skills.active.arcana.specs': ['Test']
             }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as CharacterActorData;
 
             assert.strictEqual(character.system.skills.active.arcana.value, 7);
         });
@@ -259,7 +259,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.modifiers.wound_tolerance': -1
             }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as CharacterActorData;
 
             assert.strictEqual(character.system.track.stun.value, 6);
             assert.strictEqual(character.system.track.stun.wounds, 3); // would normally be 2
@@ -276,7 +276,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 'system.modifiers.pain_tolerance_physical': 6
             }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as CharacterActorData;
 
             assert.strictEqual(character.system.track.stun.value, 9);
             assert.strictEqual(character.system.track.stun.wounds, 2); // would normally be 3
@@ -295,7 +295,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
 
             }) as SR5Actor;
 
-            let character = actor.asCharacter() as CharacterActorData;
+            const character = actor.asCharacter() as CharacterActorData;
 
             /**
              * Wound tolerance should alter the amount of boxes of damage per wound

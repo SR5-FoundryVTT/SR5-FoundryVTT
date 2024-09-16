@@ -23,7 +23,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -92,7 +92,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         }
 
         // Handle none specific drop events.
-        return super._onDrop(event);
+        return await super._onDrop(event);
     }
 
     _prepareVehicleFields(): VehicleSheetDataFields {
@@ -121,7 +121,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        // @ts-expect-error
+        // @ts-expect-error TODO: foundry-vtt-types v11
         device.sheet.render(true);
     }
 

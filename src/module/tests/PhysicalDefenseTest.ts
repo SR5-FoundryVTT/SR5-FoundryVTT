@@ -164,7 +164,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
 
 
     // Order is important in this array to determine which label is shown, determined by the first test whose function returns a truthy value
-    private noDamageConditions: PhysicalDefenseNoDamageCondition[] = [
+    private readonly noDamageConditions: PhysicalDefenseNoDamageCondition[] = [
         {
             test: () => this.actor !== undefined && CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor),
             label: "SR5.TestResults.AttackDoesNoPhysicalDamageToVehicle",
@@ -229,7 +229,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         if (this.actor && this.data.iniMod && game.combat) {
             const combat: SR5Combat = game.combat as unknown as SR5Combat;
             const combatant = combat.getActorCombatant(this.actor);
-            if (!combatant || !combatant.initiative) return true;
+            if (!combatant?.initiative) return true;
             
             if (combatant && combatant.initiative + this.data.iniMod < 0) {
                 ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});

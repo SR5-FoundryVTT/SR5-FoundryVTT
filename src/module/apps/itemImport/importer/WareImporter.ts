@@ -31,7 +31,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
             return;
         }
 
-        let jsonItemi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, fileName);
+        const jsonItemi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, fileName);
          // TODO: Move ExtractTranslation phase before the parsing phase and initiate it with the filename to parse.
             if (this.files.length !== 2) console.error('Lazily hacked code will fail for more or less than two files.');
 
@@ -51,13 +51,13 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, key);
 
         key = key.toLowerCase();
-        let items: WareItemData[] = [];
-        let jsonDatas = jsonObject[key + 's'][key];
+        const items: WareItemData[] = [];
+        const jsonDatas = jsonObject[key + 's'][key];
 
         this.iconList = await this.getIconFiles();
 
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
@@ -66,7 +66,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
 
             // Create the item
             const defaultData = key === 'cyberware' ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
-            let item = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
+            const item = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             // TODO: Does this type mixture cause later issues? Will it carry over?
             //@ts-expect-error

@@ -28,7 +28,7 @@ export class SkillsPrep {
         const prepareSkill = (skill) => {
             if (!skill.base) skill.base = 0;
             if (skill.bonus?.length) {
-                for (let bonus of skill.bonus) {
+                for (const bonus of skill.bonus) {
                     skill.mod = PartsList.AddUniquePart(skill.mod, bonus.key, Number(bonus.value));
                 }
             }
@@ -49,13 +49,13 @@ export class SkillsPrep {
         // remove entries which are deleted TODO figure out how to delete these from the data
         entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete system.skills.language.value[key]);
 
-        for (let skill of Object.values(language.value)) {
+        for (const skill of Object.values(language.value)) {
             prepareSkill(skill);
             skill.attribute = 'intuition';
         }
 
         // setup knowledge skills
-        for (let [, group] of Object.entries(knowledge)) {
+        for (const [, group] of Object.entries(knowledge)) {
 
             if(!group?.value) {
                 continue;
@@ -76,7 +76,7 @@ export class SkillsPrep {
         }
 
         // skill labels
-        for (let [skillKey, skillValue] of Object.entries(active)) {
+        for (const [skillKey, skillValue] of Object.entries(active)) {
             skillValue.label = SR5.activeSkills[skillKey];
         }
     }

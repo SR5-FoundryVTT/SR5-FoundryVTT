@@ -8,8 +8,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
 
     let testActor;
-    let importOptions = {};
-    let chummerFile = {
+    const importOptions = {};
+    const chummerFile = {
         characters: {
             character: {},
         },
@@ -23,7 +23,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
     });
 
     describe('Chummer Character Importer', () => {
-        let testItem = new SR5TestingDocuments(SR5Item);
+        const testItem = new SR5TestingDocuments(SR5Item);
 
         it('Does nothing when no character found', async () => {
             const item = await testItem.create({ type: 'weapon' }) as SR5Item;
@@ -80,7 +80,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         });
 
         it('Clears all items but effects', async () => {
-            let item = await testItem.create({ type: 'weapon' }) as Item;
+            const item = await testItem.create({ type: 'weapon' }) as Item;
             item.createEmbeddedDocuments('ActiveEffect', [{
                 origin: item.uuid,
                 disabled: false,

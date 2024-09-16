@@ -14,7 +14,6 @@ import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
 import Skills = Shadowrun.Skills;
-import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
@@ -41,9 +40,7 @@ export interface InventorySheetDataByType {
 export interface InventorySheetData {
     name: string,
     label: string,
-    types: {
-        [type: string]: InventorySheetDataByType
-    }
+    types: Record<string, InventorySheetDataByType>
 }
 
 export type InventoriesSheetData = Record<string, InventorySheetData>;
@@ -267,8 +264,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         Helpers.setupCustomCheckbox(this, html)
 
         // Active Effect management
-        html.find(".effect-control").on('click', event => onManageActiveEffect(event, this.actor));
-        html.find(".item-effect-control").on('click', event => onManageItemActiveEffect(event));
+        html.find(".effect-control").on('click', async event => await onManageActiveEffect(event, this.actor));
+        html.find(".item-effect-control").on('click', async event => await onManageItemActiveEffect(event));
 
         // Inventory visibility switch
         html.find('.item-toggle').on('click', this._onInventorySectionVisiblitySwitch.bind(this));
@@ -311,8 +308,8 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Matrix data handling...
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
-        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-add-one').on('click', async (event) => await this._onMarksQuantityChangeBy(event, 1));
+        html.find('.marks-remove-one').on('click', async (event) => await this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
         html.find('.marks-connect-network').on('click', this._onMarksConnectToNetwork.bind(this));
@@ -363,8 +360,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
         // Freshly imported item toggle
-        html.find('.toggle-fresh-import-all-off').on('click', async (event) => this._toggleAllFreshImportFlags(event, false));
-        html.find('.toggle-fresh-import-all-on').on('click', async (event) => this._toggleAllFreshImportFlags(event, true));
+        html.find('.toggle-fresh-import-all-off').on('click', async (event) => await this._toggleAllFreshImportFlags(event, false));
+        html.find('.toggle-fresh-import-all-on').on('click', async (event) => await this._toggleAllFreshImportFlags(event, true));
 
         // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
@@ -398,7 +395,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             if (inventory.types.hasOwnProperty(type)) continue;
 
             inventory.types[type] = {
-                type: type,
+                type,
                 label: SR5.itemTypes[type],
                 isOpen: this._inventoryOpenClose[type],
                 items: []
@@ -423,6 +420,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Handle different item type data transfers.
         // These handlers depend on behavior of the template partial ListItem.html.
         const element = event.currentTarget;
+        let skillId = '';
+
         switch (element.dataset.itemType) {
             // Skill data transfer. (Active and language skills)
             case 'skill':
@@ -441,7 +440,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             // Knowlege skill data transfer
             case 'knowledgeskill':
                 // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
-                const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
+                skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
 
                 dragData.type = 'Skill';
                 dragData.data = {
@@ -465,13 +464,13 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
-    // @ts-expect-error
-    async _onDrop(event: DragEvent) {
+    override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
         if (!event.dataTransfer) return;
         // Keep upstream document created for actions base on it.
+        // TODO: foundry-vtt-types v11
         const documents = await super._onDrop(event);
 
         // Handle specific system drop events.
@@ -513,7 +512,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Use together with _restoreInputCursorPosition during render calls.
      */
     _restoreInputCursorPosition(focus) {
-        if (focus && focus.name) {
+        if (focus?.name) {
             if (!this.form) return;
 
             const element = this.form[focus.name];
@@ -524,7 +523,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 // Set selection range for supported input types.
                 if (['checkbox', 'radio'].includes(element.type)) return;
                 // set the selection range on the focus formed from before (keeps track of cursor in input)
-                element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
+                element.setSelectionRange?.(focus.selectionStart, focus.selectionEnd);
             }
         }
 
@@ -593,7 +592,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         // TODO: Add translation for item names...
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type,
+            type,
         };
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
         if (!items) return;
@@ -815,7 +814,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     _prepareActorModifiers(sheetData: SR5ActorSheetData) {
         // Empty zero value modifiers for display purposes.
         const { modifiers } = sheetData.system;
-        for (let [key, value] of Object.entries(modifiers)) {
+        for (const [key, value] of Object.entries(modifiers)) {
             if (value === 0) modifiers[key] = '';
         }
 
@@ -825,7 +824,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     _prepareActorAttributes(sheetData: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
         const attributes = sheetData.system.attributes;
-        for (let [, attribute] of Object.entries(attributes)) {
+        for (const [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
                 if (attribute.temp === 0) delete attribute.temp;
             }
@@ -1162,7 +1161,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     _filterSkills(data: SR5ActorSheetData, skills: Skills = {}) {
         const filteredSkills = {};
-        for (let [key, skill] of Object.entries(skills)) {
+        for (const [key, skill] of Object.entries(skills)) {
             // Don't show hidden skills.
             if (skill.hidden) {
                 continue;
@@ -1223,7 +1222,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const searchKey = skill.name === undefined ? key : '';
         // some "specs" were a string from old code I think
         const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
-        let searchString = `${searchKey} ${name} ${specs}`;
+        const searchString = `${searchKey} ${name} ${specs}`;
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
     }
@@ -1271,7 +1270,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
         const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
         if (!skillId) return console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`);
-        return this.actor.rollSkill(skillId, { event });
+        return await this.actor.rollSkill(skillId, { event });
     }
 
     async _onRollSkillSpec(event) {
@@ -1279,7 +1278,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const itemId = Helpers.listItemId(event);
         // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
         const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
-        return this.actor.rollSkill(skillId, { event, specialization: true });
+        return await this.actor.rollSkill(skillId, { event, specialization: true });
     }
 
     async _onOpenSourceSkill(event) {
@@ -1303,7 +1302,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         }
 
         // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skill);
     }
 
     /** Keep track of each SkillEditSheet instance and close before opening another.
@@ -1333,7 +1332,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             KnowledgeSkillEditSheet,
             this.actor,
             {
-                event: event,
+                event,
             },
             skill,
             category,
@@ -1349,7 +1348,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         }
 
         // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event }, skill);
     }
 
     async _closeOpenSkillApp() {
@@ -1407,7 +1406,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skillId = await this.actor.addActiveSkill();
         if (!skillId) return;
 
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skillId);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skillId);
     }
 
     async _onRemoveActiveSkill(event: Event) {
@@ -1423,7 +1422,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onRollAttribute(event) {
         event.preventDefault();
         const attribute = event.currentTarget.closest('.attribute').dataset.attribute;
-        return this.actor.rollAttribute(attribute, { event: event });
+        return await this.actor.rollAttribute(attribute, { event });
     }
 
     /**
@@ -1432,7 +1431,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     async _onRollCellInput(event) {
         event.preventDefault();
-        let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
 
         switch (track) {
             case 'stun':
@@ -1468,7 +1467,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param item
      */
     _addDragSupportToListItemTemplatePartial(i, item) {
-        if (item.dataset && item.dataset.itemId) {
+        if (item.dataset?.itemId) {
             item.setAttribute('draggable', true);
             item.addEventListener('dragstart', this._onDragStart.bind(this), false);
         }
@@ -1709,7 +1708,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
-        if (item) return item.reloadAmmo();
+        if (item) return await item.reloadAmmo();
     }
 
     /**
@@ -1723,16 +1722,16 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMatrixAttributeSelected(event) {
         if (!("matrix" in this.actor.system)) return;
 
-        let iid = this.actor.system.matrix.device;
-        let item = this.actor.items.get(iid);
+        const iid = this.actor.system.matrix.device;
+        const item = this.actor.items.get(iid);
         if (!item) {
             console.error('could not find item');
             return;
         }
         // grab matrix attribute (sleaze, attack, etc.)
-        let attribute = event.currentTarget.dataset.att;
+        const attribute = event.currentTarget.dataset.att;
         // grab device attribute (att1, att2, ...)
-        let changedSlot = event.currentTarget.value;
+        const changedSlot = event.currentTarget.value;
 
         await item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
@@ -1766,7 +1765,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             setContent(this);
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
-        html.find('.submit-checkbox').change((event) => this._onSubmit(event));
+        html.find('.submit-checkbox').change(async (event) => await this._onSubmit(event));
     }
 
     /**

@@ -18,7 +18,7 @@ export class SoakFlow {
     }
 
     isDamageFromGelRounds(damage: DamageData) {
-        if (damage.source && damage.source.actorId && damage.source.itemId) {
+        if (damage.source?.actorId && damage.source.itemId) {
             const attacker = game.actors?.find(actor => actor.id == damage.source?.actorId);
             if (attacker) {
                 const item = attacker.items.find(item => item.id == damage.source?.itemId) as SR5Item;

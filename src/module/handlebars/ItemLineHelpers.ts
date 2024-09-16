@@ -38,7 +38,7 @@ interface ItemListRightSide {
 
 export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('InventoryHeaderIcons', function (section: InventorySheetDataByType) {
-        var icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
+        const icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
 
         icons.push(section.isOpen
             ? {
@@ -650,7 +650,7 @@ export const registerItemLineHelpers = () => {
              */
             case 'call_in_action':
                 if (item.system.actor_type === 'spirit') {
-                    const summoningData = item.system as Shadowrun.CallInActionData;
+                    const summoningData = item.system;
                     const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
 
                     return [
@@ -668,7 +668,7 @@ export const registerItemLineHelpers = () => {
                 }
 
                 if (item.system.actor_type === 'sprite') {
-                    const compilationData = item.system as Shadowrun.CallInActionData;
+                    const compilationData = item.system;
                     const spriteTypeLabel = SR5.spriteTypes[compilationData.sprite.type] ?? '';
 
                     return [

@@ -76,6 +76,6 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         }        
 
         // Default cases can be handled by the base class and Foundry.
-        return super._onDrop(event);
+        return await super._onDrop(event);
     }
 }

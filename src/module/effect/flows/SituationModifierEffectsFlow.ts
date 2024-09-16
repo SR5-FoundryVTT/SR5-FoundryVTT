@@ -21,8 +21,8 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             'low_light_vision': lowLightVision,
             'image_magnification': imageMagnification,
             'tracer_rounds': tracerRounds,
-            'smartlink': smartlink,
-            'ultrasound': ultrasound,
+            smartlink,
+            ultrasound,
             'thermographic_vision': thermographicVision
         }
     }

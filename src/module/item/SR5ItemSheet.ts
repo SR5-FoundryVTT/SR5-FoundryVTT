@@ -8,7 +8,6 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { MatrixRules } from '../rules/MatrixRules';
-import RangeData = Shadowrun.RangeData;
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -157,8 +156,8 @@ export class SR5ItemSheet extends ItemSheet {
                 const itemData = nestedItem.toObject();
                 // itemData.descriptionHTML = await TextEditor.enrichHTML(itemData.system.description.value);
 
-                //@ts-expect-error
-                if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData); // TODO: foundry-vtt-types v10
+                //@ts-expect-error// TODO: foundry-vtt-types v10
+                if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData); 
                 //@ts-expect-error TODO: foundry-vtt-types v10
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
                 //@ts-expect-error TODO: foundry-vtt-types v10
@@ -272,10 +271,10 @@ export class SR5ItemSheet extends ItemSheet {
         //@ts-expect-error
         this.form.ondragover = (event) => this._onDragOver(event);
         //@ts-expect-error
-        this.form.ondrop = (event) => this._onDrop(event);
+        this.form.ondrop = async (event) => await this._onDrop(event);
 
         // Active Effect management
-        html.find(".effect-control").click(event => onManageActiveEffect(event, this.item));
+        html.find(".effect-control").click(async event => await onManageActiveEffect(event, this.item));
 
         /**
          * General item handling
@@ -308,8 +307,8 @@ export class SR5ItemSheet extends ItemSheet {
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
-        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-add-one').on('click', async (event) => await this._onMarksQuantityChangeBy(event, 1));
+        html.find('.marks-remove-one').on('click', async (event) => await this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
 
@@ -320,7 +319,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Freshly imported item toggle
-        html.find('.toggle-fresh-import-off').on('click', async (event) => this._toggleFreshImportFlag(event, false));
+        html.find('.toggle-fresh-import-off').on('click', async (event) => await this._toggleFreshImportFlag(event, false));
 
         html.find('.select-ranged-range-category').on('change', this._onSelectRangedRangeCategory.bind(this));
         html.find('.select-thrown-range-category').on('change', this._onSelectThrownRangeCategory.bind(this));
@@ -366,7 +365,7 @@ export class SR5ItemSheet extends ItemSheet {
         // Add items to hosts WAN.
         if (this.item.isHost && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid);
-            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
             await this.item.addIC(actor.id, data.pack);
             return;
         }
@@ -375,7 +374,7 @@ export class SR5ItemSheet extends ItemSheet {
         if (this.item.canBeMaster && data.type === 'Item') {
             const item = await fromUuid(data.uuid) as SR5Item;
 
-            if (!item || !item.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
+            if (!item?.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
 
             await this.item.addSlave(item);
             return;
@@ -385,14 +384,14 @@ export class SR5ItemSheet extends ItemSheet {
         if (this.item.canBeMaster && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid) as SR5Actor;
 
-            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
             if (!actor.isVehicle()) {
                 return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
             }
 
             await this.item.addSlave(actor);
-            return;
+            
         }
     }
 
@@ -425,7 +424,7 @@ export class SR5ItemSheet extends ItemSheet {
                 },
             });
         } else {
-            const ranges: Omit<RangeData, 'category'> = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
+            const ranges: Omit<Shadowrun.RangeData, 'category'> = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
 
             await this.item.update({
                 [key]: {
@@ -500,10 +499,10 @@ export class SR5ItemSheet extends ItemSheet {
         // TODO: Move this into DataDefaults...
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type,
+            type,
             system: { type: 'weapon' }
         };
-        // @ts-expect-error
+        // @ts-expect-error // Lazy typing...
         const item = new SR5Item(itemData, { parent: this.item });
         //@ts-expect-error TODO: foundry-vtt-types v10
         await this.item.createNestedItem(item._source);
@@ -527,16 +526,16 @@ export class SR5ItemSheet extends ItemSheet {
         const type = 'ammo';
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type
+            type
         };
-        // @ts-expect-error
+        // @ts-expect-error // Lazy typing...
         const item = new SR5Item(itemData, { parent: this.item });
         // @ts-expect-error TODO: foundry-vtt-types v10
         await this.item.createNestedItem(item._source);
     }
 
     async _onOwnedItemRemove(event) {
-        event.preventDefault(); 1
+        event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -750,7 +749,7 @@ export class SR5ItemSheet extends ItemSheet {
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        // @ts-expect-error
+        // @ts-expect-error // TODO: foundry-vtt-types v10
         device.sheet.render(true);
     }
 

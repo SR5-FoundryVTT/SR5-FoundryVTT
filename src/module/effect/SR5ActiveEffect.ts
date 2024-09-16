@@ -82,11 +82,11 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     async toggleDisabled() {
         // @ts-expect-error  TODO: foundry-vtt-types v10
-        return this.update({ disabled: !this.disabled });
+        return await this.update({ disabled: !this.disabled });
     }
 
     async disable(disabled) {
-        return this.update({ disabled });
+        return await this.update({ disabled });
     }
 
     //@ts-expect-error // TODO: foundry-vtt-types
@@ -335,7 +335,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // }
 
         const target = foundry.utils.getProperty(object, change.key) ?? null;
-        let targetType = foundry.utils.getType(target);
+        const targetType = foundry.utils.getType(target);
 
         // Cast the effect change value to the correct type
         let delta;

@@ -26,20 +26,20 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
         }
 
         // Complexforms don't provide a category translation.
-        let jsonItemi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonItemi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.nameTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, 'complexforms', 'complexform');
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const parser = new ComplexFormParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
-        let items: Shadowrun.ComplexFormItemData[] = [];
-        let jsonDatas = jsonObject['complexforms']['complexform'];
+        const items: Shadowrun.ComplexFormItemData[] = [];
+        const jsonDatas = jsonObject['complexforms']['complexform'];
         this.iconList = await this.getIconFiles();
         const parserType = 'complex_form';
 
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
@@ -47,7 +47,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.nameTranslations);
+            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.nameTranslations);
 
             // Get the item's folder information
             // @ts-expect-error TODO: Foundry Where is my foundry base data?

@@ -17,7 +17,7 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
             return;
         }
 
-        let jsonArmori18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonArmori18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonArmori18n);
         this.armorTranslations = ImportHelper.ExtractItemTranslation(jsonArmori18n, 'armors', 'armor');
     }
@@ -25,13 +25,13 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Armor', this.categoryTranslations);
         const parser = new ArmorParserBase();
-        let datas: Shadowrun.ArmorItemData[] = [];
-        let jsonDatas = jsonObject['armors']['armor'];
+        const datas: Shadowrun.ArmorItemData[] = [];
+        const jsonDatas = jsonObject['armors']['armor'];
         this.iconList = await this.getIconFiles();
         const parserType = 'armor';
 
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
@@ -39,7 +39,7 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}));
+            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}));
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             // @ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folders[category].id;

@@ -226,7 +226,7 @@ export class CombatRules {
         if (hits < 0) hits = 0;
 
         // modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
-        let {modified} = SoakRules.reduceDamage(actor, damage, hits);
+        const {modified} = SoakRules.reduceDamage(actor, damage, hits);
 
         Helpers.calcTotal(modified, {min: 0});
 

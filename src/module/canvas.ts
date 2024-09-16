@@ -21,21 +21,21 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
 
     // Iterate over measured segments
     return segments.map((s) => {
-        let r = s.ray;
+        const r = s.ray;
 
         // Determine the total distance traveled
-        let nx = Math.abs(Math.ceil(r.dx / d.size));
-        let ny = Math.abs(Math.ceil(r.dy / d.size));
+        const nx = Math.abs(Math.ceil(r.dx / d.size));
+        const ny = Math.abs(Math.ceil(r.dy / d.size));
 
         // Determine the number of straight and diagonal moves
-        let nd = Math.min(nx, ny);
-        let ns = Math.abs(ny - nx);
+        const nd = Math.min(nx, ny);
+        const ns = Math.abs(ny - nx);
         nDiagonal += nd;
 
         // Estimate diagonal like other battle grid systems do. (DnD5e)
         if (rule === '1-2-1') {
-            let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
-            let spaces = nd10 * 2 + (nd - nd10) + ns;
+            const nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
+            const spaces = nd10 * 2 + (nd - nd10) + ns;
             // @ts-expect-error TODO: foundry-vtt-types v10
             return spaces * canvas.dimensions.distance;
         }

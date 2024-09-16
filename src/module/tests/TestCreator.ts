@@ -178,9 +178,9 @@ export const TestCreator = {
     _fromMessageTestData: function(testData, options: TestOptions={}) {
         // Use test data to create the original test from it.
         testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
-        if (!testData || !testData.rolls) return;
+        if (!testData?.rolls) return;
 
-        const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll as any));
+        const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll));
         const documents = {rolls};
 
         // Allow callers to overwrite previous test options, otherwise fall back.
@@ -208,7 +208,7 @@ export const TestCreator = {
 
         // Avoid altering test in flag.
         const testData = foundry.utils.duplicate(message.getFlag(SYSTEM_NAME, FLAGS.Test)) as SuccessTestMessageData;
-        if (!testData || !testData.data || !testData.rolls) {
+        if (!testData?.data || !testData.rolls) {
             console.error(`Shadowrun 5e | Message with id ${id} doesn't have valid test data in it's flags.`);
             return;
         }
@@ -691,7 +691,7 @@ export const TestCreator = {
         // This would affect .modifiers like fields.
         if (type === 'Array') return value.length > 0;
         // Booleans don't have a intrinsic default value on ActionRollData.
-        if (type === 'boolean' && key === 'armor') return action[key] === true; // default is false
+        if (type === 'boolean' && key === 'armor') return action[key]; // default is false
 
         return false;
     },
@@ -704,10 +704,7 @@ export const TestCreator = {
     shouldHideDialog(event: Shadowrun.RollEvent|undefined): boolean {
         if (!event) return false;
         const bindings = game.keybindings.get("shadowrun5e", "hide-test-dialog");
-        for (const binding of bindings) {
-            return event[binding.key] === true;
-        }
-        return false;
+        return bindings.some(binding => event[binding.key] === true);
     },
 
     /**
@@ -727,9 +724,6 @@ export const TestCreator = {
     shouldPostItemDescription(event: Shadowrun.RollEvent|undefined): boolean {
         if (!event) return false;
         const bindings = game.keybindings.get("shadowrun5e", "show-item-card");
-        for (const binding of bindings) {
-            return event[binding.key] === true;
-        }
-        return false;
+        return bindings.some(binding => event[binding.key] === true);
     }
 };

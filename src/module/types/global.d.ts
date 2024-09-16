@@ -17,6 +17,7 @@ declare global {
         game: never; // disable game ready checks
         canvas: never; // disable canvas ready checks
         socket: never; // disable socket ready checks
+        ui: never; // disable ui ready checks
     }
 
     // Configuration of shadowrun5e system

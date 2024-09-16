@@ -159,7 +159,7 @@ export const AutocompleteInlineHooksFlow =  {
         const effect = EffectConfig.object;
 
         if (effect.parent instanceof SR5Item) {
-            const item = effect.parent as SR5Item;
+            const item = effect.parent;
             const action = item.getAction();
             if (!action) return {};                
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;

@@ -1,8 +1,6 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type Skills = {
-        [id: string]: SkillField;
-    };
+    export type Skills = Record<string, SkillField>;
 
     export type SkillCategories = 'active'|'language'|'knowledge';
 

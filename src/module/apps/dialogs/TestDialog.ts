@@ -1,6 +1,6 @@
 import {FormDialog, FormDialogData, FormDialogOptions} from "./FormDialog";
-import {SuccessTest} from "../../tests/SuccessTest";
-import { SuccessTestData } from '../../tests/SuccessTest';
+import {SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
+
 import {SR5} from "../../config";
 import {Helpers} from "../../helpers";
 import { Translation } from '../../utils/strings';
@@ -45,7 +45,7 @@ export class TestDialog extends FormDialog {
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
-        // @ts-expect-error
+        // @ts-expect-error TODO: foundry-vtt-types v11
         options.width = 'auto';
         return options;
     }

@@ -88,7 +88,7 @@ export class SR5Item extends Item {
     items: SR5Item[];
 
     // Item Sheet labels for quick info on an item dropdown.
-    labels: {} = {};
+    labels: Record<string, unknown> = {};
 
     // Add v10 type helper
     system: ShadowrunItemDataData; // TODO: foundry-vtt-types v10
@@ -120,7 +120,7 @@ export class SR5Item extends Item {
         // An embedded item will have an item as an actor, which might have an actor owner.
         // NOTE: This is very likely wrong and should be fixed during embedded item prep / creation. this.actor will only
         //       check what is set in the items options.actor during it's construction.
-        //@ts-expect-error
+        //@ts-expect-error // Typescript doesn't know that this.actor CAN be an item here...
         return this.actor.actorOwner;
     }
 
@@ -134,25 +134,25 @@ export class SR5Item extends Item {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) as FireModeData || DataDefaults.fireModeData();
     }
     async setLastFireMode(fireMode: FireModeData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
+        return await this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
     }
     getLastSpellForce(): SpellForceData {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastSpellForce) as SpellForceData || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
+        return await this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel) as ComplexFormLevelData || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
+        return await this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
     }
     getLastFireRangeMod(): FireRangeData {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastFireRange) as FireRangeData || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
+        return await this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
     }
 
     /**
@@ -161,7 +161,7 @@ export class SR5Item extends Item {
     getNestedItems(): any[] {
         let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems) as any[];
 
-        items = items ? items : [];
+        items = items || [];
 
         // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
         if (items && !Array.isArray(items)) {
@@ -343,7 +343,7 @@ export class SR5Item extends Item {
 
     getActionTestName(): string {
         const testName = this.getRollName();
-        return testName ? testName : game.i18n.localize('SR5.Action');
+        return testName || game.i18n.localize('SR5.Action');
     }
 
     /**
@@ -754,7 +754,7 @@ export class SR5Item extends Item {
      * @param html
      */
     static getItemFromMessage(html): SR5Item | undefined {
-        if (!game || !game.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
+        if (!game?.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
 
         const card = html.find('.chat-card');
         let actor;
@@ -770,7 +770,7 @@ export class SR5Item extends Item {
     static getTargets() {
         if (!game.ready || !game.user) return;
         const { character } = game.user;
-        // @ts-expect-error
+        // @ts-expect-error // TODO: foundry-vtt-types v10
         const { controlled } = canvas.tokens;
         const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
         if (character && controlled.length === 0) targets.push(character);
@@ -933,9 +933,9 @@ export class SR5Item extends Item {
         // we need to clear the items when one is deleted or it won't actually be deleted
         await this.clearNestedItems();
         await this.setNestedItems(items);
-        await this.prepareNestedItems();
-        await this.prepareData();
-        await this.render(false);
+        this.prepareNestedItems();
+        this.prepareData();
+        this.render(false);
         return true;
     }
 
@@ -1291,7 +1291,7 @@ export class SR5Item extends Item {
         return this.wrapper.getArmorValue();
     }
 
-    getArmorElements(): { [key: string]: number } {
+    getArmorElements(): Record<string, number> {
         return this.wrapper.getArmorElements();
     }
 
@@ -1447,7 +1447,7 @@ export class SR5Item extends Item {
         data._id = this.id;
 
         // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
-        // @ts-expect-error 
+        // @ts-expect-error // We check for parent existance, though TypeScript still sees 'never'? :(
         await this.parent.updateNestedItems(data);
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.

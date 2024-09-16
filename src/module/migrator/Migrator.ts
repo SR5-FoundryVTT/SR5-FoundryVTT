@@ -72,7 +72,7 @@ export class Migrator {
             buttons: {
                 ok: {
                     label: localizedWarningBegin,
-                    callback: () => this.migrate(migrations),
+                    callback: async () => await this.migrate(migrations),
                 },
             },
             default: 'ok',
