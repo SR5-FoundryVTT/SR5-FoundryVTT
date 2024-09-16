@@ -77,6 +77,8 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Can be used to check if the source field contains a URL.
     sourceIsURL: boolean
+    sourceIsPDF: boolean
+    sourceIsUuid: boolean
 
     isUsingRangeCategory: boolean
 }
@@ -220,6 +222,8 @@ export class SR5ItemSheet extends ItemSheet {
         // @ts-expect-error TODO: foundry-vtt-types v10
         data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
         data.sourceIsURL = this.item.sourceIsUrl;
+        data.sourceIsPDF = this.item.sourceIsPDF;
+        data.sourceIsUuid = this.item.sourceIsUuid
 
         data.isUsingRangeCategory = this.item.isUsingRangeCategory;
 
