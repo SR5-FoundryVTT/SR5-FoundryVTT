@@ -1,4 +1,4 @@
-/// <reference path="./Shadowrun.ts" />
+/// <reference path="./Shadowrun.d.ts" />
 // NOTE: See https://github.com/League-of-Foundry-Developers/foundry-vtt-types/wiki/%5B0.8.x%5D-Actors-and-Items for reference
 /**
  * Types for Actor and actor.system with foundry-vtt-types pattern used:

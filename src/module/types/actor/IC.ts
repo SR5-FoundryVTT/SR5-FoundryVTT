@@ -1,4 +1,4 @@
-/// <reference path="../Shadowrun.ts" />
+/// <reference path="../Shadowrun.d.ts" />
 
 declare namespace Shadowrun {
     export type ICType = keyof typeof SR5CONFIG.ic.types

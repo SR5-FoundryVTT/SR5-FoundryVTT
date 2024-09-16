@@ -1,4 +1,4 @@
-/// <reference path="../Shadowrun.ts" />
+/// <reference path="../Shadowrun.d.ts" />
 declare namespace Shadowrun {
     /**
      * A valid weapon with all associated fields. Weapons still have all possible fields, but some

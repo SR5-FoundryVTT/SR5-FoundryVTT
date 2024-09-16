@@ -1,4 +1,4 @@
-/// <reference path="../Shadowrun.ts" />
+/// <reference path="../Shadowrun.d.ts" />
 
 /**
  * Typings around the 'AdvancedEffects' implementation of system on top of Foundry core ActiveEffects

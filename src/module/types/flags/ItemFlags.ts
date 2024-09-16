@@ -1,4 +1,4 @@
-/// <reference path="../Shadowrun.ts" />
+/// <reference path="../Shadowrun.d.ts" />
 /**
  * Typing specifically for Item.setFlag / getFlag
  *
