@@ -9,12 +9,12 @@ export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
 
         item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
 
-        let fade = ImportHelper.StringValue(jsonData, 'fv');
+        const fade = ImportHelper.StringValue(jsonData, 'fv');
         if (fade.includes('+') || fade.includes('-')) {
             item.system.fade = parseInt(fade.substring(1, fade.length));
         }
 
-        let duration = ImportHelper.StringValue(jsonData, 'duration');
+        const duration = ImportHelper.StringValue(jsonData, 'duration');
         if (duration === 'I') {
             item.system.duration = 'instant';
         } else if (duration === 'S') {
@@ -23,7 +23,7 @@ export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
             item.system.duration = 'permanent';
         }
 
-        let target = ImportHelper.StringValue(jsonData, 'target');
+        const target = ImportHelper.StringValue(jsonData, 'target');
         switch (target) {
             case 'Device':
             case 'File':

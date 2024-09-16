@@ -3,20 +3,22 @@
 
 import AugmentedRealityVisionFilter from "./arFilter";
 
-//@ts-expect-error
+//@ts-expect-error // TODO: foundry-vtt-types v10
 export default class AugmentedRealityVisionDetectionMode extends DetectionMode {
 
-  //@ts-expect-error
+  //@ts-expect-error // TODO: foundry-vtt-types v10
   static override getDetectionFilter() {
-    //@ts-expect-error
-    return this._detectionFilter ??= AugmentedRealityVisionFilter.create();
+    //@ts-expect-error // TODO: foundry-vtt-types v10
+    this._detectionFilter ??= AugmentedRealityVisionFilter.create();
+    //@ts-expect-error // TODO: foundry-vtt-types v10
+    return this._detectionFilter;
 
     // return this._detectionFilter ??= GlowOverlayFilter.create({
     //   glowColor: [0, 0.25, 0.75, 1]
     // });
   }
   
-    //@ts-expect-error
+    //@ts-expect-error // TODO: foundry-vtt-types v10
     override _canDetect(visionSource, target) {
       const tgt = target?.document;
       const targetHasIcon =

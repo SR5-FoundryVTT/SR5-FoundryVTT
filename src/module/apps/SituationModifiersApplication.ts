@@ -7,7 +7,7 @@ import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
 
 
-interface SituationalModifiersTemplateData extends FormApplication.Data<{}> {
+interface SituationalModifiersTemplateData extends FormApplication.Data<Record<string, unknown>> {
     targetType: string
     targetName: string
     modifiers: DocumentSituationModifiers
@@ -199,7 +199,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
         const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        if (!triggerElement?.dataset.hasOwnProperty('delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -281,7 +281,7 @@ export class SituationModifiersApplication extends FormApplication {
         options.id = 'situational-modifiers-application';
         options.title = game.i18n.localize('SR5.SituationalModifiersApplication.Title');
 
-        //@ts-expect-error
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         options.width = 'auto';
         options.height = 'auto';
         options.resizable = false;
@@ -334,7 +334,7 @@ export class SituationModifiersApplication extends FormApplication {
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
         const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        if (!triggerElement?.dataset.hasOwnProperty('delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -342,7 +342,7 @@ export class SituationModifiersApplication extends FormApplication {
 
         // Value DOMElement should contain the data key...
         const valueElement = $(triggerElement).siblings().closest('input');
-        if (!valueElement || !valueElement.attr('name')) 
+        if (!valueElement?.attr('name')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a name attribute');
 
         // Extract value from data using value DOMElement data key...
@@ -421,7 +421,7 @@ export class SituationModifiersApplication extends FormApplication {
             name: 'situational-modifiers-application',
             title: 'CONTROLS.SR5.SituationalModifiers',
             icon: 'fas fa-list',
-            onClick: SituationModifiersApplication.openForCurrentScene,
+            onClick: SituationModifiersApplication.openForCurrentScene.bind(SituationModifiersApplication),
             button: true
         }
     }
@@ -471,7 +471,7 @@ export class SituationModifiersApplication extends FormApplication {
         return async (event) => {
             event.preventDefault();
 
-            if (!token || !token.actor) return;
+            if (!token?.actor) return;
             const app = new SituationModifiersApplication(token.actor);
             // Use async render as activateTab needs tabs to bind to rendered result.
             await app._render(true);

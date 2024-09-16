@@ -48,7 +48,7 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
                 icon: '<i class="fas fa-caret-down"></i>',
                 callback: async (li) => {
-                    const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
+                    const combatant = game.combat?.combatants.get(li.data('combatant-id'));
                     if (combatant) {
                         const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -1);
@@ -59,7 +59,7 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
                 icon: '<i class="fas fa-angle-down"></i>',
                 callback: async (li) => {
-                    const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
+                    const combatant = game.combat?.combatants.get(li.data('combatant-id'));
                     if (combatant) {
                         const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -5);
@@ -70,7 +70,7 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
                 icon: '<i class="fas fa-angle-double-down"></i>',
                 callback: async (li) => {
-                    const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
+                    const combatant = game.combat?.combatants.get(li.data('combatant-id'));
                     if (combatant) {
                         const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -10);
@@ -204,7 +204,7 @@ export class SR5Combat extends Combat {
      */
     override setupTurns(): any[] {
         const turns = super.setupTurns();
-        return turns.sort(SR5Combat.sortByRERIC);
+        return turns.sort(SR5Combat.sortByRERIC.bind(SR5Combat));
     }
 
     /**
@@ -241,7 +241,7 @@ export class SR5Combat extends Combat {
                 Number(actor.getEdge().value),
                 Number(actor.findAttribute('reaction')?.value),
                 Number(actor.findAttribute('intuition')?.value),
-                new Roll('1d2').evaluate({ async: false }).total as number,
+                new Roll('1d2').evaluate({ async: false }).total,
             ];
         };
 
@@ -260,10 +260,10 @@ export class SR5Combat extends Combat {
      * Return the position in the current ini pass of the next undefeated combatant.
      */
     get nextUndefeatedTurnPosition(): number {
-        for (let [turnInPass, combatant] of this.turns.entries()) {
+        for (const [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            // @ts-expect-error
+            // @ts-expect-error TODO: foundry-vtt-types v11
             if (!combatant.defeated && combatant.initiative > 0) {
                 return turnInPass;
             }
@@ -277,10 +277,10 @@ export class SR5Combat extends Combat {
      */
     get nextViableTurnPosition(): number {
         // Start at the next position after the current one.
-        for (let [turnInPass, combatant] of this.turns.entries()) {
+        for (const [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            // @ts-expect-error
+            // @ts-expect-error TODO: foundry-vtt-types v11
             if (combatant.initiative > 0) {
                 return turnInPass;
             }
@@ -318,10 +318,10 @@ export class SR5Combat extends Combat {
      */
     override async nextTurn(): Promise<this | undefined> {
         // Maybe advance to the next round/init pass
-        let nextRound = this.round;
-        let initiativePass = this.initiativePass;
+        const nextRound = this.round;
+        const initiativePass = this.initiativePass;
         // Get the next viable turn position.
-        let nextTurn = this.settings?.skipDefeated ?
+        const nextTurn = this.settings?.skipDefeated ?
             this.nextUndefeatedTurnPosition :
             this.nextViableTurnPosition;
 
@@ -353,7 +353,7 @@ export class SR5Combat extends Combat {
         // Initiative Round Handling.
         // NOTE: It's not checked if the next is needed. This should result in the user noticing the turn going up, when it
         //       maybe shouldn't and reporting a unhandled combat phase flow case.
-        return this.nextRound();
+        return await this.nextRound();
     }
 
     override async startCombat() {
@@ -429,7 +429,7 @@ export class SR5Combat extends Combat {
      * @param combatant
      */
     _getInitiativeFormula(combatant: Combatant) {
-        if (this.initiativePass === SR.combat.INITIAL_INI_PASS) { // @ts-expect-error
+        if (this.initiativePass === SR.combat.INITIAL_INI_PASS) { // @ts-expect-error // TODO: foundry-vtt-types v11
             return super._getInitiativeFormula(combatant);
         }
 
@@ -491,10 +491,12 @@ export class SR5Combat extends Combat {
         await SocketMessage.emitForGM(FLAGS.DoNewActionPhase, { id: this.id });
     }
 
-    override delete(...args): Promise<this | undefined> {
+    override async delete(...args): Promise<this | undefined> {
         // Remove all combat related modifiers.
-        this.combatants.contents.forEach(combatant => combatant.actor?.removeDefenseMultiModifier());
-        return super.delete(...args);
+        for (const combatant of this.combatants) {
+            await combatant.actor?.removeDefenseMultiModifier();
+        }
+        return await super.delete(...args);
     }
 }
 

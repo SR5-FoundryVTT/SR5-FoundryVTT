@@ -102,11 +102,11 @@ export default class Template extends MeasuredTemplate {
         await this.draw();
         this.layer.activate();
         this.layer.preview.addChild(this);
-        return this.activatePreviewListeners(initialLayer);
+        return await this.activatePreviewListeners(initialLayer);
     }
 
-    activatePreviewListeners(initialLayer: CanvasLayer) {
-        return new Promise((resolve, reject) => {
+    async activatePreviewListeners(initialLayer: CanvasLayer) {
+        return await new Promise((resolve, reject) => {
             if (!canvas.ready || !canvas.stage || !canvas.app) return;
 
             this.#initialLayer = initialLayer;

@@ -2,8 +2,6 @@ import { SR5ActiveEffect } from "../SR5ActiveEffect";
 import { SuccessTest } from "../../tests/SuccessTest";
 import { ActiveEffectData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import { SR5Actor } from "../../actor/SR5Actor";
-import { OpposedTest } from "../../tests/OpposedTest";
-import { SR5Item } from "../../item/SR5Item";
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
 import { SocketMessage } from "../../sockets";
 import { FLAGS } from "../../constants";
@@ -195,8 +193,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         const linkedTokens = actor.getActiveTokens(true) || [];
         const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
 
-        // @ts-expect-error
-        const effects = await actor.createEmbeddedDocuments('ActiveEffect', effectsData) as SR5ActiveEffect[];
+        const effects = await actor.createEmbeddedDocuments('ActiveEffect', effectsData as unknown as Record<string, unknown>[]) as SR5ActiveEffect[];
 
         const templateData = {
             effects,

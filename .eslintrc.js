@@ -35,10 +35,10 @@ module.exports = {
         "prettier/prettier": ["off"],
 
         // TODO: ESLint Roadmap Step 2 - Set these rules to "error"
-        "@typescript-eslint/no-invalid-void-type": "warn",
+        "@typescript-eslint/no-invalid-void-type": "off", // This prohibits return console.asd in one line after an if statement. This might not be generally liked, though improves readability.
         "no-unreachable-loop": "warn",
         "no-return-assign": "warn",
-        "@typescript-eslint/consistent-type-assertions": "warn",
+        "@typescript-eslint/consistent-type-assertions": "off", // Sometimes this makes life so much easier when returning types.
 
         // Warnings for things that could be better
         "@typescript-eslint/explicit-function-return-type": "off", // Implicit type returns aren't a bad thing
@@ -51,14 +51,14 @@ module.exports = {
         "@typescript-eslint/no-misused-promises": "warn",
         "@typescript-eslint/prefer-optional-chain": "warn",
         "@typescript-eslint/no-floating-promises": "off", // Allow executing async functions in a sync method, if async isn't needed.
-        "no-case-declarations": "warn",
+        "no-case-declarations": "off", // We use this in switch / case and it does improve readability
         "@typescript-eslint/promise-function-async": "warn",
         "@typescript-eslint/no-empty-interface": "warn",
         "@typescript-eslint/consistent-indexed-object-style": "warn",
         "@typescript-eslint/ban-types": "warn", //Maybe this should be error?
         "no-prototype-builtins": "off", // While this rule makes sense for public facing applications, it's not a concern for an app like ours and I'd rather have better readability.
         "@typescript-eslint/unbound-method": "warn",
-        "no-useless-return": "warn",
+        "no-useless-return": "off", // A explicit return statement is never unnecessary, it may prevent bugs for future code changes.
         "@typescript-eslint/return-await": "warn",
         "@typescript-eslint/prefer-includes": "warn",
         "no-unneeded-ternary": "warn",
@@ -67,7 +67,7 @@ module.exports = {
         "eqeqeq": "warn",
         "@typescript-eslint/prefer-readonly": "warn",
         "@typescript-eslint/await-thenable": "warn",
-        "@typescript-eslint/no-dynamic-delete": "warn",
+        "@typescript-eslint/no-dynamic-delete": "off", // We do this often, I while I see the harm, I view the risk as acceptable.
         "@typescript-eslint/no-this-alias": "warn",
         "no-useless-computed-key": "warn",
         "no-mixed-operators": "warn",

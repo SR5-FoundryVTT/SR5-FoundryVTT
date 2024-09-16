@@ -141,7 +141,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
-    private successConditions: PhysicalResistSuccessCondition[] = [
+    private readonly successConditions: PhysicalResistSuccessCondition[] = [
         {
             test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
             label: "SR5.TestResults.SoakBlockedByHardenedArmor",

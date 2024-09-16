@@ -18,20 +18,20 @@ export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Sh
             return;
         }
 
-        let jsonWeaponsi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonWeaponsi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         // Parts of weapon accessory translations are within the application translation. Currently only data translation is used.
         this.accessoryTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponsi18n, 'accessories', 'accessory');
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const parser = new ModParserBase();
-        let datas: Shadowrun.ModificationItemData[] = [];
-        let jsonDatas = jsonObject['accessories']['accessory'];
+        const datas: Shadowrun.ModificationItemData[] = [];
+        const jsonDatas = jsonObject['accessories']['accessory'];
         this.iconList = await this.getIconFiles();
         const parserType = 'modification';
 
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
@@ -39,15 +39,15 @@ export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Sh
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}));
+            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}));
 
             // Get the item's folder information
             let folderName = item.system.mount_point !== undefined ? item.system.mount_point : 'Other';
             if (folderName.includes('/')) {
-                let splitName = folderName.split('/');
+                const splitName = folderName.split('/');
                 folderName = splitName[0];
             }
-            let folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Mods/${folderName}`, true);
+            const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Mods/${folderName}`, true);
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 

@@ -16,7 +16,7 @@ export class ParserMap<TResult> extends Parser<TResult> {
         }
     }
 
-    public Parse(jsonData: object, item: TResult, jsonTranslation?: object): TResult {
+    public Parse(jsonData: any, item: TResult, jsonTranslation?: object): TResult {
         let key;
         if (typeof this.m_BranchKey === 'function') {
             key = this.m_BranchKey(jsonData);
@@ -38,4 +38,4 @@ type CArg<TResult> = {
     key: string;
     value: Parser<TResult>;
 };
-type BranchFunc<TResult> = (TResult) => string;
+type BranchFunc<TResult> = (result: TResult) => string;

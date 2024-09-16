@@ -10,7 +10,7 @@ export class SR5Token extends Token {
         // Shadowrun condition trackers count up from 0 to the maximum.
         // We flip the values from Shadowrun format to FoundryVTT format here
         // for drawing.
-        if (tokenHealthBars && data && data.attribute.startsWith('track')) {
+        if (tokenHealthBars && data?.attribute.startsWith('track')) {
             const track = data as unknown as TrackType;
             track.value = track.max - track.value;
         }

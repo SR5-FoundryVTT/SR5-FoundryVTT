@@ -196,7 +196,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      * @returns 
      */
     async getPreparedSpiritActor(): Promise<SR5Actor|null> {
-        return await fromUuid(this.data.summonedSpiritUuid as string) as SR5Actor;
+        return await fromUuid(this.data.summonedSpiritUuid) as SR5Actor;
     }
 
     /**

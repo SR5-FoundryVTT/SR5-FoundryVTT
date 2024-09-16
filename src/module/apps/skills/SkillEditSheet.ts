@@ -58,32 +58,32 @@ export class SkillEditSheet extends DocumentSheet {
 
         // process specializations
         const specsRegex = /skill\.specs\.(\d+)/;
-        const specs = Object.entries(formData).reduce((running, [key, val]: [string, any]) => {
+        const specs = Object.entries(formData).reduce<any[]>((running, [key, val]: [string, any]) => {
             const found = key.match(specsRegex);
-            if (found && found[0]) {
+            if (found?.[0]) {
                 running.push(val);
             }
             return running;
-        }, [] as any[]);
+        }, []);
 
         // process bonuses
         const bonusKeyRegex = /skill\.bonus\.(\d+).key/;
         const bonusValueRegex = /skill\.bonus\.(\d+).value/;
-        const bonus = Object.entries(formData).reduce((running, [key, value]: [string, any]) => {
+        const bonus = Object.entries(formData).reduce<any[]>((running, [key, value]: [string, any]) => {
             const foundKey = key.match(bonusKeyRegex);
             const foundVal = key.match(bonusValueRegex);
-            if (foundKey && foundKey[0] && foundKey[1]) {
+            if (foundKey?.[0] && foundKey?.[1]) {
                 const index = foundKey[1];
                 if (running[index] === undefined) running[index] = {};
                 running[index].key = value;
-            } else if (foundVal && foundVal[0] && foundVal[1]) {
+            } else if (foundVal?.[0] && foundVal[1]) {
                 const index = foundVal[1];
                 if (running[index] === undefined) running[index] = {};
                 running[index].value = value;
             }
 
             return running;
-        }, [] as any[]);
+        }, []);
 
         updateData[this._updateString()] = {
             specs,

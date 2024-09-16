@@ -71,8 +71,8 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Spirit recoil compensation', () => {
-            let actor = new SR5Actor({ name: 'Testing', type: 'spirit', system: { attributes: { strength: { base: 5 } } } });
-            let spirit = actor.asSpirit();
+            const actor = new SR5Actor({ name: 'Testing', type: 'spirit', system: { attributes: { strength: { base: 5 } } } });
+            const spirit = actor.asSpirit();
             if (!spirit) return assert.fail();
 
             assert.strictEqual(spirit.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1

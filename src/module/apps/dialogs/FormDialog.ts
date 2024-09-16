@@ -1,7 +1,7 @@
 export interface FormDialogData extends Dialog.Data{
 	templateData: object;
 	templatePath: string;
-	onAfterClose?: Function;
+	onAfterClose?: (html: any, selectedButton: string) => Promise<object>;
 }
 
 export interface FormDialogOptions extends DialogOptions {
@@ -20,10 +20,10 @@ export class FormDialog extends Dialog<FormDialogOptions> {
     selectedButton: string;
     form: HTMLFormElement;
 
-    _onAfterClose: Function;
+    _onAfterClose: (html: any, selectedButton: string) => Promise<object>;
     _selectionPromise: Promise<object>;
-    _selectionResolve: Function;
-    _selectionReject: Function;
+    _selectionResolve: (event: any) => void;
+    _selectionReject: (event: any) => void;
     _templateData: object;
     _templatePath: string;
 
@@ -34,7 +34,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         this._templateData = templateData;
         this._templatePath = templatePath;
 
-        this._onAfterClose = data.onAfterClose || this.onAfterClose;
+        this._onAfterClose = data.onAfterClose || this.onAfterClose.bind(this);
 
         this.selection = this._emptySelection();
 
@@ -67,7 +67,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         this.applyFormData();
 
         super.submit(button);
-        // @ts-expect-error
+        // @ts-expect-error // Lazy Typing
         await this.afterSubmit("jQuery" in this.options ? this.element : this.element [0]);
     }
 
@@ -99,7 +99,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         foundry.utils.mergeObject(this.data.templateData, data);
     }
 
-    //@ts-expect-error
+    //@ts-expect-error // Lazy Typig
     getData() {
         // Dialog.getData expects buttons to be set.
         this.data.buttons = this.data.buttons || this.buttons;
@@ -166,7 +166,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
     /** Allow for the selected button to be addressed by its key, not it's localized label.
      */
     _amendButtonsWithName(buttons) {
-        Object.keys(buttons).forEach(name => buttons[name].name = name);
+        Object.keys(buttons).forEach(name => {buttons[name].name = name});
     }
 
     /**
@@ -188,8 +188,6 @@ export class FormDialog extends Dialog<FormDialogOptions> {
      * Based on FormDialog.options configuration apply changes to data.
      */
     async _onChangeInput(event) {
-        const el = event.target;
-
         if ( this.options.applyFormChangesOnSubmit ) {
             this.applyFormData();
             this.render();

@@ -69,39 +69,39 @@ export abstract class VersionMigration {
 
         // Map of entities to update, store until later to reduce chance of partial updates
         // which may result in impossible game states.
-        const entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate> = new Map();
+        const entityUpdates = new Map<SystemMigrationDocuments, DocumentUpdate>();
 
         // Migrate World Items
         await this.PreMigrateItemData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
         await this.IterateItems(game, entityUpdates);
         await this.PostMigrateItemData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
 
         // Migrate World Actors
         await this.PreMigrateActorData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
         await this.IterateActors(game, entityUpdates);
         await this.PostMigrateActorData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
 
         // Migrate Actor Tokens
         await this.PreMigrateSceneData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
         await this.IterateScenes(game, entityUpdates);
         await this.PostMigrateSceneData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
 
         // Apply the updates, this should *always* work, now that parsing is complete.
@@ -187,7 +187,7 @@ export abstract class VersionMigration {
                 });
             } catch (error) {
                 console.error(error);
-                return Promise.reject(error);
+                return await Promise.reject(error);
             }
         }
     }
@@ -220,7 +220,7 @@ export abstract class VersionMigration {
                 });
             } catch (error) {
                 console.error(error);
-                return Promise.reject(error);
+                return await Promise.reject(error);
             }
         }
     }
@@ -256,7 +256,7 @@ export abstract class VersionMigration {
                 });
             } catch (error) {
                 console.error(error);
-                return Promise.reject(error);
+                return await Promise.reject(error);
             }
         }
     }
@@ -391,7 +391,7 @@ export abstract class VersionMigration {
         const documents = await pack.getDocuments();
 
         // Iterate over compendium entries - applying fine-tuned migration functions
-        for (let document of documents) {
+        for (const document of documents) {
             try {
                 let updateData: any = null;
                 if (pack.metadata.type === 'Item') {
@@ -409,8 +409,7 @@ export abstract class VersionMigration {
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
-                    //@ts-expect-error
-                    updateData = await this.MigrateActorData(document);
+                    updateData = await this.MigrateActorData(document as unknown as SR5Actor);
 
                     //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {

@@ -8,7 +8,6 @@ import { SR5Combat } from "../combat/SR5Combat";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { Translation } from '../utils/strings';
-import { SuccessTest } from "../tests/SuccessTest";
 import { DataDefaults } from '../data/DataDefaults';
 
 declare global {
@@ -17,6 +16,7 @@ declare global {
         game: never; // disable game ready checks
         canvas: never; // disable canvas ready checks
         socket: never; // disable socket ready checks
+        ui: never; // disable ui ready checks
     }
 
     // Configuration of shadowrun5e system
@@ -80,6 +80,9 @@ declare global {
             modifiers: typeof DocumentSituationModifiers,
             inputDelay: number
         }
+
+        // Optional type for Dice so Nice module API
+        dice3d?: any
     }
 
     type RecursivePartial<T> = {

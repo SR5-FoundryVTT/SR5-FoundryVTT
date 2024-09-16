@@ -1,5 +1,3 @@
-import { BackgroundCountModifier } from './../module/rules/modifiers/BackgroundCountModifier';
-import { NoiseModifier } from './../module/rules/modifiers/NoiseModifier';
 import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
 
 import {DocumentSituationModifiers} from "../module/rules/DocumentSituationModifiers";
@@ -196,15 +194,12 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
             })
 
             it('use default modifiers for faulty constructor params', () => {
-                //@ts-expect-error
-                assert.deepEqual(new DocumentSituationModifiers({}).source, defaultSourceModifiers);
+                // Set faulty types to any to circumvent typescript errors.
+                assert.deepEqual(new DocumentSituationModifiers({} as any).source, defaultSourceModifiers);
                 assert.deepEqual(new DocumentSituationModifiers(undefined).source, defaultSourceModifiers);
-                //@ts-expect-error
-                assert.deepEqual(new DocumentSituationModifiers(null).source, defaultSourceModifiers);
-                //@ts-expect-error
-                assert.deepEqual(new DocumentSituationModifiers(0).source, defaultSourceModifiers);
-                //@ts-expect-error
-                assert.deepEqual(new DocumentSituationModifiers(1).source, defaultSourceModifiers);
+                assert.deepEqual(new DocumentSituationModifiers(null as any).source, defaultSourceModifiers);
+                assert.deepEqual(new DocumentSituationModifiers(0 as any).source, defaultSourceModifiers);
+                assert.deepEqual(new DocumentSituationModifiers(1 as any).source, defaultSourceModifiers);
                 assert.deepEqual(new DocumentSituationModifiers().source, defaultSourceModifiers);
             })
 

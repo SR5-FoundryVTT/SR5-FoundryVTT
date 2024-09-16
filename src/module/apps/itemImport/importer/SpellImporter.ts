@@ -28,7 +28,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             return;
         }
 
-        let jsonSpelli18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonSpelli18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonSpelli18n);
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonSpelli18n, 'spells', 'spell');
     }
@@ -46,13 +46,13 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             { key: 'Rituals', value: new SpellParserBase() },
         ]);
 
-        let items: Shadowrun.SpellItemData[] = [];
-        let jsonDatas = jsonObject['spells']['spell'];
+        const items: Shadowrun.SpellItemData[] = [];
+        const jsonDatas = jsonObject['spells']['spell'];
         this.iconList = await this.getIconFiles();
         const parserType = 'spell';
 
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
@@ -60,7 +60,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
+            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.category].id;
 

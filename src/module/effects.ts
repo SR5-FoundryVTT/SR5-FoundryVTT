@@ -1,4 +1,3 @@
-//@ts-nocheck // This is JavaScript code.
 /**
  * All functions have been taken from : https://gitlab.com/foundrynet/dnd5e/-/blob/master/module/effects.js
  *
@@ -8,7 +7,6 @@
 import {SR5Actor} from "./actor/SR5Actor";
 import {SR5Item} from "./item/SR5Item";
 import {Helpers} from "./helpers";
-import EffectsSheetData = Shadowrun.EffectsSheetData;
 import { SR5ActiveEffect } from "./effect/SR5ActiveEffect";
 
 /**
@@ -25,31 +23,35 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
     // These element grabs rely heavily on HTML structure within the templates.
     const icon = event.currentTarget;    
     const item = event.currentTarget.closest('.list-item-effect');
-    const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId) : null;
+    const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId) as SR5ActiveEffect : null;
+    let userConsented = false;
+
+    if (!effect) return;
+
     // The HTML dataset must be defined
     switch (icon.dataset.action) {
         case "create":
-            return owner.createEmbeddedDocuments('ActiveEffect', [{
+            return await owner.createEmbeddedDocuments('ActiveEffect', [{
                 label: game.i18n.localize("SR5.ActiveEffect.New"),
                 // icon: "icons/svg/aura.svg",
                 origin: owner.uuid
             }]);
 
         case "edit":
-            return effect.sheet.render(true);
+            return effect.sheet?.render(true);
 
         case "delete":
-            const userConsented = await Helpers.confirmDeletion();
+            userConsented = await Helpers.confirmDeletion();
             if (!userConsented) return;
 
-            return effect.delete();
+            return await effect.delete();
 
         case "toggle":
-            return effect.toggleDisabled();
+            return await effect.toggleDisabled();
         case "open-origin":
             return effect.renderSourceSheet();
         default:
-            return;
+            
     }
 }
 
@@ -58,7 +60,7 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
  * 
  * @param event The left-click event on the list-item-effect control
  */
-export async function onManageItemActiveEffect(event: MouseEvent) {
+export async function onManageItemActiveEffect(event) {
     event.preventDefault();
 
     const icon = event.currentTarget;
@@ -73,13 +75,13 @@ export async function onManageItemActiveEffect(event: MouseEvent) {
 
     switch (icon.dataset.action) {
         case "edit":
-            return effect.sheet.render(true);
+            return effect.sheet?.render(true);
         case "toggle":
-            return effect.toggleDisabled();
+            return await effect.toggleDisabled();
         case "open-origin":
             return effect.parent?.sheet?.render(true);
         default:
-            return;
+            
     }
 }
 

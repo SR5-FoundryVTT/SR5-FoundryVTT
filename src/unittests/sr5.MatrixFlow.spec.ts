@@ -4,7 +4,7 @@ import { SR5Item } from '../module/item/SR5Item';
 import { SR5Actor } from '../module/actor/SR5Actor';
 
 export const shadowrunMatrixFlow = (context: QuenchBatchContext) => {
-    const { describe, it, assert, should, before, after } = context;
+    const { describe, it, before, after } = context;
 
     let testActor;
     let testItem;

@@ -11,7 +11,7 @@
         }}
         {{#each effects}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-            img=(or this.img this.icon)
+            img=(firstDefined this.img this.icon)
             name=this.name
             itemId=this.id
             icons=(EffectIcons this)
@@ -31,7 +31,7 @@
         }}
         {{#each itemEffects}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-            img=(or this.img this.icon)
+            img=(firstDefined this.img this.icon)
             name=this.sheetName
             itemId=this.uuid
             icons=(ItemEffectIcons this)

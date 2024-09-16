@@ -1,11 +1,10 @@
 import {SR5TestingDocuments} from "./utils";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
-import {MatrixNetworkFlow} from "../module/item/flows/MatrixNetworkFlow";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
 export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const {describe, it, before, after} = context;
 
     let testActor;
     let testItem;

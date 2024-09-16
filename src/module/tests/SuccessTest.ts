@@ -38,17 +38,13 @@ export interface TestDocuments {
     rolls?: SR5Roll[]
 }
 
-export interface TestValues {
-    [name: string]: ValueField | DamageData
-}
-
-export interface SuccessTestValues extends TestValues {
+export type TestValues = Record<string, ValueField | DamageData>
+export type SuccessTestValues = TestValues & {
     hits: ValueField
     netHits: ValueField
     glitches: ValueField
     extendedHits: ValueField
 }
-
 export interface IconWithTooltip {
     icon: string;
     tooltip: Translation;
@@ -286,7 +282,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     _prepareRollMode(data, options: TestOptions): Shadowrun.FoundryRollMode {
         if (options.rollMode !== undefined) return options.rollMode;
-        if (data.action && data.action.roll_mode) return data.action.roll_mode;
+        if (data?.action.roll_mode) return data.action.roll_mode;
         else return game.settings.get(CORE_NAME, CORE_FLAGS.RollMode) as Shadowrun.FoundryRollMode;
     }
 
@@ -303,7 +299,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Overwrite this method to alter the title of test dialogs and messages.
      */
     get title(): string {
-        // @ts-expect-error
         return `${game.i18n.localize(this.constructor.label)}`;
     }
 
@@ -322,7 +317,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Get the label for this test type used for i18n.
      */
-    static get label(): string {
+    static get label(): Translation {
+        // @ts-expect-error This builds a Translation dynamically.
         return `SR5.Tests.${this.name}`;
     }
 
@@ -448,14 +444,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get code(): string {
         // Add action dynamic value sources as labels.
-        let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name as Translation)} ${mod.value}`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
+        const pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name as Translation)} ${mod.value}`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
         // let pool = this.pool.mod.map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
 
         // Threshold and Limit are values that can be overwritten.
-        let threshold = this.threshold.override
+        const threshold = this.threshold.override
             ? [game.i18n.localize(this.threshold.override.name as Translation)]
             : this.threshold.mod.map(mod => game.i18n.localize(mod.name as Translation));
-        let limit = this.limit.override
+        const limit = this.limit.override
             ? [game.i18n.localize(this.limit.override.name as Translation)]
             : this.limit.mod.map(mod => game.i18n.localize(mod.name as Translation));
 
@@ -636,7 +632,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const roundAllMods = (value: Shadowrun.ValueField) => {
             value.base = Math.ceil(value.base);
             if (value.override) value.override.value = Math.ceil(value.override.value);
-            value.mod.forEach(mod => mod.value = Math.ceil(mod.value));
+            value.mod.forEach(mod => { mod.value = Math.ceil(mod.value) });
         }
 
         roundAllMods(this.data.modifiers);
@@ -706,9 +702,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (this.data.sourceActorUuid) {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
             const document = await fromUuid(this.data.sourceActorUuid) || undefined;
-            // @ts-expect-error
             this.actor = document instanceof TokenDocument ?
-                document.actor :
+                document.actor !== null ? document.actor : undefined:
                 document as SR5Actor;
         }
 
@@ -1667,7 +1662,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
     async rollDiceSoNice() {
-        // @ts-expect-error
         if (!game.dice3d || !game.user || !game.users) return;
 
         console.debug('Shadowrun5e | Initiating DiceSoNice throw');
@@ -1694,7 +1688,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const blind = this.data.options?.rollMode === 'blindroll';
         const synchronize = this.data.options?.rollMode === 'publicroll';
 
-        // @ts-expect-error
         game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
@@ -1744,7 +1737,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             // Note: While ChatData uses ids, this uses full documents.
             speaker: {
                 actor: this.actor,
-                token: token
+                token
             },
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
@@ -1904,13 +1897,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param data
      */
     static async chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.show-roll').on('click', this._chatToggleCardRolls);
-        html.find('.show-description').on('click', this._chatToggleCardDescription);
-        html.find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
-        html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
-        html.find('.result-action').on('click', this._castResultAction);
-        html.find('.chat-select-link').on('click', this._selectSceneToken);
-        html.find('.test-action').on('click', this._castTestAction);
+        html.find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
+        html.find('.show-description').on('click', this._chatToggleCardDescription.bind(this));
+        html.find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers));
+        html.find('.place-template').on('click', this._placeItemBlastZoneTemplate.bind(this));
+        html.find('.result-action').on('click', this._castResultAction.bind(this));
+        html.find('.chat-select-link').on('click', this._selectSceneToken.bind(this));
+        html.find('.test-action').on('click', this._castTestAction.bind(this));
 
         DamageApplicationFlow.handleRenderChatMessage(message, html, data);
 

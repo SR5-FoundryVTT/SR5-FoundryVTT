@@ -167,11 +167,11 @@ export class Helpers {
         // iterate over the attributes and return true if we find a matrix att
         for (const att of atts) {
             if (typeof att === 'string') {
-                if (matrixLabels.indexOf(att) >= 0) {
+                if (matrixLabels.includes(att)) {
                     return true;
                 }
             } else if (typeof att === 'object' && (att as LabelField).label !== undefined) {
-                if (matrixLabels.indexOf(att.label ?? '') >= 0) {
+                if (matrixLabels.includes(att.label ?? '')) {
                     return true;
                 }
             }
@@ -346,7 +346,7 @@ export class Helpers {
     }
 
     static getUserTargets(user?: User | null): Token[] {
-        user = user ? user : game.user;
+        user = user || game.user;
 
         if (!user) return []
 
@@ -354,7 +354,7 @@ export class Helpers {
     }
 
     static userHasTargets(user?: User | null): boolean {
-        user = user ? user : game.user;
+        user = user || game.user;
 
         if (!user) return false;
 
@@ -492,7 +492,7 @@ export class Helpers {
             actors.push(game.user.character);
         }
 
-        return actors as SR5Actor[];
+        return actors;
     }
 
     /**
@@ -573,7 +573,7 @@ export class Helpers {
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        if (useTokenNameForChatOutput && token) return token.name as string;
+        if (useTokenNameForChatOutput && token) return token.name;
 
         return actor.name as string;
     }
@@ -608,7 +608,7 @@ export class Helpers {
         damage.element.base = element;
         damage.element.value = element;
 
-        if (sourceItem && sourceItem.actor) {
+        if (sourceItem?.actor) {
             damage.source = {
                 actorId: sourceItem.actor.id as string,
                 itemType: sourceItem.type,
@@ -708,7 +708,7 @@ export class Helpers {
      * @param skillField A SkillField with whatever values. You could use DataDefaults.skillData to create one.
      * @param idLength How long should the id (GUID) be?
      */
-    static getRandomIdSkillFieldDataEntry(skillDataPath: string, skillField: SkillField, idLength: number = DEFAULT_ID_LENGTH): { id: string, updateSkillData: { [skillDataPath: string]: { [id: string]: SkillField } } } | undefined {
+    static getRandomIdSkillFieldDataEntry(skillDataPath: string, skillField: SkillField, idLength: number = DEFAULT_ID_LENGTH): { id: string, updateSkillData: Record<string, Record<string, SkillField>> } | undefined {
         if (!skillDataPath || skillDataPath.length === 0) return;
 
         const id = randomID(idLength);
@@ -729,7 +729,7 @@ export class Helpers {
      * @param value Whatever needs to be stored.
      *
      */
-    static getUpdateDataEntry(path: string, value: any): { [path: string]: any } {
+    static getUpdateDataEntry(path: string, value: any): Record<string, any> {
         return {[path]: value};
     }
 
@@ -742,7 +742,7 @@ export class Helpers {
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
      *         remove the Pistols key from the 'data.skills.active' path within Entity.system.skills.active.
      */
-    static getDeleteKeyUpdateData(path: string, key: string): { [path: string]: { [key: string]: null } } {
+    static getDeleteKeyUpdateData(path: string, key: string): Record<string, Record<string, null>> {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
         return {[path]: {[`-=${key}`]: null}};
@@ -819,7 +819,7 @@ export class Helpers {
      * @param permission A foundry access permission
      * @param active If true, will only return users that are also currently active.
      */
-    static getPlayersWithPermission(document: foundry.abstract.Document<any>, permission: string, active: boolean = true): User[] {
+    static getPlayersWithPermission(document: SR5Actor|SR5Item, permission: string, active: boolean = true): User[] {
         if (!game.users) return [];
 
         return game.users.filter(user => {
@@ -943,7 +943,7 @@ export class Helpers {
         if (!document) return;
         if (document instanceof TokenDocument && resolveTokenToActor && document.actor)
             document = document.actor;
-        // @ts-expect-error
+        // @ts-expect-error TODO: foundry-vtt-types v11
         await document.sheet.render(true);
     }
 
@@ -956,7 +956,7 @@ export class Helpers {
      */
     static sanitizeDataKey(key: string, replace: string=''): string {
         const spicyCharacters = ['.', '-='];
-        spicyCharacters.forEach(character => key = key.replace(character, replace));
+        spicyCharacters.forEach(character => {key = key.replace(character, replace)});
         return key;
     }
 
@@ -968,13 +968,13 @@ export class Helpers {
      * @returns an actor
      */
     static async chooseFromAvailableActors() {
-        let availableActors =  game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
+        const availableActors =  game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
 
-        if(availableActors.length == 0) {
+        if(availableActors.length === 0) {
             return
         }
 
-        if(availableActors.length == 1) {
+        if(availableActors.length === 1) {
             return availableActors[0]
         }
         else {
@@ -988,7 +988,7 @@ export class Helpers {
                 ${allActors}
                 </select>`;
     
-            let choosenActor = await Dialog.prompt({
+            const choosenActor = await Dialog.prompt({
                 title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
                 content: dialog_content,
                 callback: (html) => html.find('select').val()

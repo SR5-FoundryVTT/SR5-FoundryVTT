@@ -44,12 +44,12 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
         });
 
         it('embedd a weapon into an actor and not the global item colection', async () => {
-            const actor = await testActor.create({type: 'character'});
-            const weapon = await testItem.create({type: 'weapon'});
+            const actor = await testActor.create({type: 'character'}) as SR5Actor;
+            const weapon = await testItem.create({type: 'weapon'}) as SR5Item;
 
-            await actor.createEmbeddedDocuments('Item', [weapon.toObject()]);
+            await actor.createEmbeddedDocuments('Item', [weapon.toObject() as any]);
 
-            const ownedItems = Array.from(actor.items) as SR5Item[];
+            const ownedItems = Array.from(actor.items);
             assert.isNotEmpty(ownedItems);
             assert.lengthOf(ownedItems, 1);
 

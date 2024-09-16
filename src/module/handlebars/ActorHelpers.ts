@@ -30,7 +30,7 @@ export const registerActorHelpers = () => {
     Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item], modificationCategory: ModificationCategoryType): number => {        
         if (!Array.isArray(items) || !items.length) { return 0 }        
         const slotSum = items.reduce((arr, item) => {
-            if (item.system.modification_category == modificationCategory) { return arr += item.system.slots ? item.system.slots : 0 } else {return arr};            
+            if (item.system.modification_category === modificationCategory) { return arr += item.system.slots ? item.system.slots : 0 } else {return arr};            
         } ,0)
 
         return slotSum;
@@ -43,9 +43,10 @@ export const registerActorHelpers = () => {
     */
     Handlebars.registerHelper('calcModPointSlots', (items: [SR5Item]): number => {
         if (!Array.isArray(items) || !items.length) { return 0 }
-        var dronestring = 'drone';
+        const dronestring = 'drone';
         const slotSum = items.reduce((arr, item) => {            
-            if (item.system.type == dronestring) { return arr += item.system.slots ? item.system.slots : 0 } else { return arr };            
+            // @ts-expect-error Includes assumption all items have a type field, though I'm not familiar enough with this code to alter this assumption
+            if (item.system.type === dronestring) { return arr += item.system.slots ? item.system.slots : 0 } else { return arr };            
         }, 0)
 
         return slotSum;
