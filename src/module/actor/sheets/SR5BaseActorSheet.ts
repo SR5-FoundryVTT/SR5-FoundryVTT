@@ -1419,13 +1419,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.actor.showHiddenSkills();
     }
 
-    _onOpenSource(event) {
+    async _onOpenSource(event) {
         event.preventDefault();
         const field = $(event.currentTarget).parents('.list-item');
         const iid = $(field).data().itemId;
         const item = this.actor.items.get(iid);
         if (item) {
-            item.openSource();
+            await item.openSource();
         }
     }
     /**

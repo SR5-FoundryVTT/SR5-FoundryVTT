@@ -351,6 +351,7 @@ export class SR5ItemSheet extends ItemSheet {
         const data = this.parseDropData(event);
         if (!data) return;
 
+        // Handle dropping of documents directly into the source field like urls and pdfs.
         if (event.toElement.name === 'system.description.source') {
             this.item.setSource(data.uuid);
             return;
@@ -414,9 +415,9 @@ export class SR5ItemSheet extends ItemSheet {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
-    _onOpenSource(event) {
+    async _onOpenSource(event) {
         event.preventDefault();
-        this.item.openSource();
+        await this.item.openSource();
     }
 
     async _onSelectRangedRangeCategory(event) {

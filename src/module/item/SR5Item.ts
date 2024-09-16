@@ -909,9 +909,9 @@ export class SR5Item extends Item {
     /**
      * Use the items source field and try different means of opening it.
      */
-    openSource() {
+    async openSource() {
         const source = this.getSource();
-        LinksHelpers.openSource(source);
+        await LinksHelpers.openSource(source);
     }
 
     /**
