@@ -16,20 +16,40 @@ export class LinksHelpers {
         if (!candidate) return false;
         return candidate.startsWith('http') || candidate.startsWith('https');
     }
+    /**
+     * Determine if given string contains a valid uuid pattern.
+     * 
+     * foundry.utils.parseUuid throws an error when the uuid is invalid.
+     * 
+     * @param candidate  
+     * @returns true, when candidate contains a valid uuid pattern
+     */
+    static isUuid(candidate: string | undefined) {
+        if (!candidate) return false;
+        try {
+            // @ts-expect-error // TODO: foundry-vtt-types v10
+            foundry.utils.parseUuid(candidate);
+        } catch {
+            return false;
+        }
+        
+        return true;
+    }
 
-    static async checkUuid(source: string | undefined): Promise<{document: any, resolvedUuid: any, anchor: string | undefined} | undefined> {
-        if (!source) return;
-
+    /**
+     * Resolve given uuid for better handling for different document types.
+     * @param source 
+     */
+    static async resolveUuid(source: string) {
         // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
-        let resolvedUuid = foundry.utils.parseUuid(source);
+        const resolvedUuid = foundry.utils.parseUuid(source);
 
         const uuid = resolvedUuid.uuid.split('#')[0];
         const anchor = resolvedUuid.uuid.split('#')[1];
 
-        const doc = await fromUuid(uuid);
-
-        if(!doc) return;
-        return {document: doc, resolvedUuid: resolvedUuid, anchor: anchor}
+        const document = await fromUuid(uuid);
+        
+        return { document, resolvedUuid, anchor }
     }
 
     /**
@@ -66,22 +86,26 @@ export class LinksHelpers {
         ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
     }
 
-    static async openSourceByUuid({document, resolvedUuid, anchor}: {document: any, resolvedUuid: any, anchor: string | undefined}) {
+    /**
+     * Open the document associated with the given uuid.
+     * 
+     * @param source 
+     */
+    static async openSourceByUuid(source: string|undefined) {
+        if (!source) return;
+        const { document, resolvedUuid, anchor } = await LinksHelpers.resolveUuid(source);
 
         if (!document) {
             ui.notifications?.error('SR5.SourceFieldEmptyError', { localize: true });
             return;
         }
 
-        try {             
-
+        try {
             if (document instanceof SR5Item || document instanceof SR5Actor || document instanceof JournalEntry) {
                 document.sheet?.render(true);
-                return;
-            // @ts-expect-error 
+                // @ts-expect-error TODO: foundry-vtt-types v10
             } else if (document instanceof JournalEntryPage) {
-                document.parent.sheet.render(true, {pageId: document.id, anchor: anchor ? anchor : undefined});
-                    return;
+                document.parent.sheet.render(true, { pageId: document.id, anchor: anchor ?? undefined });
             } else {
                 ui.notifications?.error(`The document has no associated sheet.`);
             }
@@ -95,14 +119,12 @@ export class LinksHelpers {
      */
     static async openSource(source: string | undefined) {
         if (LinksHelpers.isURL(source)) {
-            LinksHelpers.openSourceURL(source);
-        } else {
-            const uuidData = await this.checkUuid(source);
-            if (uuidData) {
-                LinksHelpers.openSourceByUuid(uuidData);
-            } else {
-                LinksHelpers.openSourcePDF(source);
-            }
+            return LinksHelpers.openSourceURL(source);
         }
+        if (LinksHelpers.isUuid(source)) {
+            return await LinksHelpers.openSourceByUuid(source);
+        }
+        
+        LinksHelpers.openSourcePDF(source);
     }
 }
