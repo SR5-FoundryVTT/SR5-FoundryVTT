@@ -80,6 +80,9 @@ declare global {
             modifiers: typeof DocumentSituationModifiers,
             inputDelay: number
         }
+
+        // Optional type for Dice so Nice module API
+        dice3d?: any
     }
 
     type RecursivePartial<T> = {
