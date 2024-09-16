@@ -409,8 +409,7 @@ export abstract class VersionMigration {
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
-                    //@ts-expect-error
-                    updateData = await this.MigrateActorData(document);
+                    updateData = await this.MigrateActorData(document as unknown as SR5Actor);
 
                     //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {

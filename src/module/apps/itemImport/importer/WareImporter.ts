@@ -69,7 +69,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
             const item = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             // TODO: Does this type mixture cause later issues? Will it carry over?
-            //@ts-expect-error
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             item.folder = folders[category].id;
 
             // Bioware has no wireless feature, so disable it by default

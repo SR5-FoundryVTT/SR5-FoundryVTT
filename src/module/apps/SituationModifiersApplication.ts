@@ -281,7 +281,7 @@ export class SituationModifiersApplication extends FormApplication {
         options.id = 'situational-modifiers-application';
         options.title = game.i18n.localize('SR5.SituationalModifiersApplication.Title');
 
-        //@ts-expect-error
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         options.width = 'auto';
         options.height = 'auto';
         options.resizable = false;

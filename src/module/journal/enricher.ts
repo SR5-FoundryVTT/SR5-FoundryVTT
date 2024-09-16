@@ -17,7 +17,7 @@ export class JournalEnrichers {
         const closing = "(\\]|\\))";
         const threshold = "\\s*(\\d*)"; 
 
-        //@ts-expect-error
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         CONFIG.TextEditor.enrichers.push(
             {
                 pattern: new RegExp(`\\@(${JournalEnrichers.actorKeywords.join("|")})${opening}([a-z]+)${threshold}${closing}`, "g"),

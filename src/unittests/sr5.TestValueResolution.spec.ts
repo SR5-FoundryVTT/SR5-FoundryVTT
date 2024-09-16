@@ -54,7 +54,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
      */
     describe('Matrix Tests', () => {
         it('Calculate matrix device without owner', async () => {
-            // @ts-expect-error
+            // @ts-expect-error // Lazy Typing
             const device = new SR5Item({ type: 'device', name: 'test', system: { 'technology.rating': 3 } });
 
             assert.equal(device.system.technology?.rating, 3);

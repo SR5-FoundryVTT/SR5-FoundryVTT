@@ -268,9 +268,9 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Drag and Drop Handling
          */
-        //@ts-expect-error
+        //@ts-expect-error // Ignore null-case
         this.form.ondragover = (event) => this._onDragOver(event);
-        //@ts-expect-error
+        //@ts-expect-error // Ignore null-case
         this.form.ondrop = async (event) => await this._onDrop(event);
 
         // Active Effect management

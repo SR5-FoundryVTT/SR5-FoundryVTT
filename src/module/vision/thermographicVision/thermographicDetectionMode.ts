@@ -1,33 +1,29 @@
 
 import ThermographicVisionFilter from './thermographicFilter';
 
-//todo: v10 foundry-vtt-types 
-//@ts-expect-error
+//@ts-expect-error // TODO: foundry-vtt-types v10
 export default class ThermographicVisionDetectionMode extends DetectionMode {
 
-  //@ts-expect-error
-  static override getDetectionFilter() {
-    //@ts-expect-error
+  static getDetectionFilter() {
+    //@ts-expect-error // TODO: foundry-vtt-types v10
     return (this._detectionFilter ??= ThermographicVisionFilter.create());
   }
 
-  
-    //@ts-expect-error
-    override _canDetect(visionSource, target) {
-      const tgt = target?.document;
-      const targetHasHeat =
-        tgt instanceof TokenDocument
-        && tgt.actor?.system.visibilityChecks.meat.hasHeat;
 
-      const targetIsVisible =
-        tgt instanceof TokenDocument
-        //@ts-expect-error
-        && !tgt.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
+  _canDetect(visionSource, target) {
+    const tgt = target?.document;
+    const targetHasHeat =
+      tgt instanceof TokenDocument
+      && tgt.actor?.system.visibilityChecks.meat.hasHeat;
 
-        const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
+    const targetIsVisible =
+      tgt instanceof TokenDocument
+      //@ts-expect-error // TODO: foundry-vtt-types v10
+      && !tgt.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
 
-      return targetHasHeat && targetIsVisible && !isAstralPerceiving
+    const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 
-    }
+    return targetHasHeat && targetIsVisible && !isAstralPerceiving
+
   }
-  
+}

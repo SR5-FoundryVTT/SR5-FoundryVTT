@@ -21,7 +21,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
     }
 
     async ParseCommlinkDevices(commlinks, folder, setIcons) {
-        const entries = [];
+        const entries: Shadowrun.DeviceItemData[] = [];
         this.iconList = await this.getIconFiles();
         const parserType = 'device';
 
@@ -37,7 +37,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(commlink, 'name');
 
             // Get the item's folder information
-            // @ts-expect-error
+            // @ts-expect-error // TODO: foundry-vtt-types v10
             item.folder = folder.id;
 
             // Import Flags
@@ -60,7 +60,6 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Add relevant action tests
             UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-expect-error
             entries.push(item);
         }
 
@@ -68,7 +67,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
     }
 
     async ParseRCCDevices(rccs, folder, setIcons) {
-        const entries = [];
+        const entries: Shadowrun.DeviceItemData[] = [];
         this.iconList = await this.getIconFiles();
         const parserType = 'device';
 
@@ -85,7 +84,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(rcc, 'name');
 
             // Get the item's folder information
-            // @ts-expect-error
+            // @ts-expect-error // TODO: foundry-vtt-types v10
             item.folder = folder.id;
 
             // Import Flags
@@ -108,7 +107,6 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Add relevant action tests
             UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-expect-error
             entries.push(item);
         }
 
@@ -116,7 +114,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
     }
 
     async ParseCyberdeckDevices(cyberdecks, folder, setIcons) {
-        const items = [];
+        const items: Shadowrun.DeviceItemData[] = [];
         this.iconList = await this.getIconFiles();
         const parserType = 'device';
 
@@ -175,7 +173,6 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Add relevant action tests
             UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-expect-error
             items.push(item);
         }
 
@@ -183,7 +180,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        let entries = [];
+        let entries: Shadowrun.DeviceItemData[] = [];
         const commlinks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Commlinks');
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
         const rccs = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Rigger Command Consoles');

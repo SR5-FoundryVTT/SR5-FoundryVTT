@@ -64,7 +64,7 @@ export class TestDialog extends FormDialog {
      */
     _injectExternalActiveListeners(html: JQuery) {
         for (const listener of this.listeners) {
-            //@ts-expect-error
+            //@ts-expect-error // Lazy Typing
             html.find(listener.query).on(listener.on, (event: JQuery<HTMLElement>) => listener.callback.bind(this.data.test)(event, this));
         }
     }

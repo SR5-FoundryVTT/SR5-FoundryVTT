@@ -30,7 +30,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
     }
 
     async ParseEquipment(equipments, setIcons) {
-        const items = [];
+        const items: Shadowrun.EquipmentItemData[] = [];
         this.iconList = await this.getIconFiles();
         const parserType = 'equipment';
 
@@ -55,7 +55,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             // Replace / as it's used as a separator in GetFolderAtPath.
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
             const categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
-            // @ts-expect-error
+            // @ts-expect-error // TODO: foundry-vtt-types v10
             item.folder = categoryFolder.id;
 
             // Import Flags
@@ -76,7 +76,6 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             // Add relevant action tests
             UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-expect-error
             items.push(item);
         }
 
