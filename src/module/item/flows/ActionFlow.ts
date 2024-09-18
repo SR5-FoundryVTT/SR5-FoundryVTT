@@ -120,7 +120,7 @@ export class ActionFlow {
         const normalizedSkills: Record<string, string> = {};
 
         // Inject this items custom skill into the global skill list.
-        const activeSkills = actor.getActiveSkills();
+        const activeSkills = foundry.utils.duplicate(actor.getActiveSkills());
         if (skillName && !activeSkills[skillName]) activeSkills[skillName] = DataDefaults.skillData({name: skillName});
 
         const skills = Helpers.sortSkills(actor.getActiveSkills());
