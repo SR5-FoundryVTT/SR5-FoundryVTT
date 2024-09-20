@@ -7,7 +7,7 @@ export class DroneInfiltrationTest extends SuccessTest {
 
         const vehicleData = actor.asVehicle();
         if (!vehicleData) {
-            await ui.notifications?.error(game.i18n.localize('SR5.Errors.TestExpectsVehicleOnly'))
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.TestExpectsVehicleOnly'));
             return {};
         }
 

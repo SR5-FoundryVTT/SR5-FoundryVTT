@@ -325,6 +325,8 @@ export class SR5Item extends Item {
         if (!system.description) system.description = { chat: '', source: '', value: '' };
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
         if (!system.description.value) system.description.value = '';
+        // TODO: foundry-vtt-types v10
+        // eslint-disable-next-line
         system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions });
 
         const props = [];

@@ -20,7 +20,7 @@ export class SocketMessage {
 
         const message = SocketMessage._createMessage(type, data);
         console.trace('Shadowrun 5e | Emitting Shadowrun5e system socket message', message);
-        await game.socket.emit(SYSTEM_SOCKET, message);
+        game.socket.emit(SYSTEM_SOCKET, message);
     }
 
     static async emitForGM(type, data) {
@@ -32,6 +32,6 @@ export class SocketMessage {
 
         const message = SocketMessage._createMessage(type, data, gmUser.id);
         console.trace('Shadowrun 5e | Emitting Shadowrun5e system socket message', message);
-        await game.socket.emit(SYSTEM_SOCKET, message);
+        game.socket.emit(SYSTEM_SOCKET, message);
     }
 }

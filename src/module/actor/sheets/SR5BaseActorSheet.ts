@@ -219,6 +219,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.situationModifiers = this._prepareSituationModifiers();
 
         // @ts-expect-error TODO: foundry-vtt-types v10
+        // eslint-disable-next-line
         data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
             // secrets: this.actor.isOwner,
             // rollData: this.actor.getRollData.bind(this.actor),
@@ -445,6 +446,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!event.dataTransfer) return;
         // Keep upstream document created for actions base on it.
         // TODO: foundry-vtt-types v11
+        // eslint-disable-next-line
         const documents = await super._onDrop(event);
 
         // Handle specific system drop events.
@@ -1218,7 +1220,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onFilterUntrainedSkills(event) {
         event.preventDefault();
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
-        await this.render();
+        this.render();
     }
 
     /**
