@@ -2,8 +2,7 @@ import { DataDefaults } from '.././../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
 import * as IconAssign from '../../../apps/iconAssigner/iconAssign';
 import { SR5 } from "../../../config";
-
-const xml2js = require('xml2js');
+import xml2js = require('xml2js');
 
 /**
  * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.

@@ -4,12 +4,6 @@ import { SocketMessage } from "../../sockets";
 import { FLAGS } from "../../constants";
 
 /**
- * Any document that can be part of a matrix network
- * - SR5Item => Equipment / Device
- * - SR5Actor => Vehicle
- */
-export type NetworkDevice = SR5Actor | SR5Item;
-/**
  * This flow handles everything involving how matrix devices are connected to network and what
  * device is the master of such a network.
  * 
@@ -21,7 +15,7 @@ export class MatrixNetworkFlow {
      *
      * @param target Whatever Document you want to link to.
      */
-    static buildLink(target: NetworkDevice | TokenDocument) {
+    static buildLink(target: Shadowrun.NetworkDevice | TokenDocument) {
         return target.uuid;
     }
 
@@ -47,7 +41,7 @@ export class MatrixNetworkFlow {
     static resolveLink(link: string) {
         if (!link) return;
 
-        return fromUuidSync(link) as NetworkDevice | undefined;
+        return fromUuidSync(link) as Shadowrun.NetworkDevice | undefined;
     }
 
     static async emitAddMasterSocketMessage(master: SR5Item, slaveLink: string) {
@@ -81,7 +75,7 @@ export class MatrixNetworkFlow {
      * @param master
      * @param slave
      */
-    static async addSlave(master: SR5Item, slave: NetworkDevice) {
+    static async addSlave(master: SR5Item, slave: Shadowrun.NetworkDevice) {
         console.log(`Shadowrun5e | Adding an the item ${slave.name} to the master ${master.name}`, master, slave);
         if (master.id === slave.id) return console.warn('Shadowrun 5e | A device cant be its own network master');
         if (!slave.canBeSlave) return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
@@ -101,7 +95,7 @@ export class MatrixNetworkFlow {
      * @param master
      * @param slave
      */
-    private static async _handleAddSlaveToNetwork(master: SR5Item, slave: NetworkDevice): Promise<undefined> {
+    private static async _handleAddSlaveToNetwork(master: SR5Item, slave: Shadowrun.NetworkDevice): Promise<undefined> {
         if (!MatrixNetworkFlow._currentUserCanModifyDevice(master) && !MatrixNetworkFlow._currentUserCanModifyDevice(slave)) { 
             console.error(`User isn't owner or GM of this device`, master);
             return;
@@ -135,7 +129,7 @@ export class MatrixNetworkFlow {
 
      * @param slave A network device that's connected to a master.
      */
-    static async removeSlaveFromMaster(slave: NetworkDevice | undefined) {
+    static async removeSlaveFromMaster(slave: Shadowrun.NetworkDevice | undefined) {
         if (!slave) return;
 
         console.log(`Shadowrun 5e | Removing device ${slave.name} from its master`);
@@ -181,7 +175,7 @@ export class MatrixNetworkFlow {
         await MatrixNetworkFlow._removeAllSlavesFromMaster(master);
     }
 
-    private static async _setMasterFromLink(slave: NetworkDevice, masterLink: string) {
+    private static async _setMasterFromLink(slave: Shadowrun.NetworkDevice, masterLink: string) {
         if (!slave.canBeSlave) return console.error('Shadowrun 5e | Given device cant be part of a network', slave);
         await slave.setMasterUuid(masterLink);
     }
@@ -191,7 +185,7 @@ export class MatrixNetworkFlow {
      * @param slave The device to remove a connected master from.
      * @private
      */
-    private static async _removeMaster(slave: NetworkDevice) {
+    private static async _removeMaster(slave: Shadowrun.NetworkDevice) {
         if (!slave.canBeSlave) return console.error('Shadowrun 5e | Given device cant be part of a network', slave);
         if (!MatrixNetworkFlow._currentUserCanModifyDevice(slave)) return;
         await slave.setMasterUuid("");
@@ -212,7 +206,7 @@ export class MatrixNetworkFlow {
      * @param slave The device that is to be removed from the network master.
      * @private
      */
-    private static async _removeSlaveFromNetwork(slave: NetworkDevice) {
+    private static async _removeSlaveFromNetwork(slave: Shadowrun.NetworkDevice) {
         if (!slave.canBeSlave) return console.error('Shadowrun 5e | Given device cant be part of a network', slave);
         const masterUuid = slave.getMasterUuid();
         if (!masterUuid) return;
@@ -247,7 +241,7 @@ export class MatrixNetworkFlow {
         if (slaveLinks?.length === 0) return;
 
         // Collect all slaves and remove the master link.
-        const slaves: (NetworkDevice)[] = [];
+        const slaves: (Shadowrun.NetworkDevice)[] = [];
         for (const slaveLink of slaveLinks) {
             const slave = MatrixNetworkFlow.resolveLink(slaveLink);
             // The slave might not exist anymore.
@@ -299,7 +293,7 @@ export class MatrixNetworkFlow {
         if (item.canBeSlave) return await MatrixNetworkFlow._removeSlaveFromNetwork(item);
     }
 
-    static _currentUserCanModifyDevice(device: NetworkDevice): boolean {
+    static _currentUserCanModifyDevice(device: Shadowrun.NetworkDevice): boolean {
         return game.user?.isGM || device.isOwner;
     }
 

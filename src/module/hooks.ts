@@ -371,9 +371,9 @@ ___________________
 
         // Connect chat dice icon to shadowrun basic success test roll.
         const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-        $(document).on('click', diceIconSelector, async () => await TestCreator.promptSuccessTest());
+        $(document).on('click', diceIconSelector, TestCreator.promptSuccessTest.bind(TestCreator));
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
-        $(document).on('click', diceIconSelectorNew, async () => await TestCreator.promptSuccessTest());
+        $(document).on('click', diceIconSelectorNew, await TestCreator.promptSuccessTest.bind(TestCreator));
 
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
@@ -536,6 +536,8 @@ ___________________
     }
 
     static async configureTextEnrichers() {
+        // TODO: foundry-vtt-types v10
+        // eslint-disable-next-line
         await JournalEnrichers.setEnrichers();
     }
 }

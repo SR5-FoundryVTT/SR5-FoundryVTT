@@ -907,6 +907,8 @@ export class Helpers {
         if (!pack) return;
 
         // TODO: Use predefined ids instead of names...
+        // TODO: use replaceAll instead, which needs an change to es2021 at least for the ts compiler   
+        // eslint-disable-next-line
         const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(new RegExp(' ', 'g'), '_') === actionName.toLowerCase());
         if (!packEntry) return;
 

@@ -1,6 +1,5 @@
 import { MarkFlow, SetMarksOptions } from "../../flows/MarksFlow";
 import { SR5Item } from "../SR5Item";
-import { NetworkDevice } from "./MatrixNetworkFlow";
 
 /**
  * This flow handles everything around matrix mark management.
@@ -46,7 +45,7 @@ export const ItemMarksFlow = {
      * @param options Additional options that may be needed.
      *
      */
-    async setMarks(host: SR5Item, target: NetworkDevice | undefined, marks: number, options: SetMarksOptions={}) {
+    async setMarks(host: SR5Item, target: Shadowrun.NetworkDevice | undefined, marks: number, options: SetMarksOptions={}) {
         if (!host.isHost) {
             console.error('Only Host item types can place matrix marks!');
             return;

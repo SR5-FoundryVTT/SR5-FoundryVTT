@@ -22,7 +22,6 @@ export class Import extends Application {
     private parsedFiles: string[] = [];
     private disableImportButton: boolean = true;
     private currentParsedFile: string;
-    private readonly icons: boolean;
 
     constructor() {
         super();

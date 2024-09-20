@@ -7,10 +7,9 @@ import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
 import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
-import { NetworkDevice, MatrixNetworkFlow } from "./flows/MatrixNetworkFlow";
+import { MatrixNetworkFlow } from "./flows/MatrixNetworkFlow";
 import { HostPrep } from "./prep/HostPrep";
 import ModList = Shadowrun.ModList;
-import AttackData = Shadowrun.AttackData;
 import FireModeData = Shadowrun.FireModeData;
 import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
@@ -326,6 +325,8 @@ export class SR5Item extends Item {
         if (!system.description) system.description = { chat: '', source: '', value: '' };
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
         if (!system.description.value) system.description.value = '';
+        // TODO: foundry-vtt-types v10
+        // eslint-disable-next-line
         system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions });
 
         const props = [];
@@ -590,7 +591,6 @@ export class SR5Item extends Item {
 
     get asSin(): SinItemData | undefined {
         if (this.isSin) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as SinItemData;
         }
     }
@@ -601,7 +601,6 @@ export class SR5Item extends Item {
 
     get asLifestyle(): LifestyleItemData | undefined {
         if (this.isLifestyle) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as LifestyleItemData;
         }
     }
@@ -616,7 +615,6 @@ export class SR5Item extends Item {
 
     get asAmmo(): AmmoItemData | undefined {
         if (this.isAmmo) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as AmmoItemData;
         }
     }
@@ -627,7 +625,6 @@ export class SR5Item extends Item {
 
     asModification(): ModificationItemData | undefined {
         if (this.isModification) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as ModificationItemData;
         }
     }
@@ -646,7 +643,6 @@ export class SR5Item extends Item {
 
     get asProgram(): ProgramItemData | undefined {
         if (this.isProgram) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as ProgramItemData;
         }
     }
@@ -657,7 +653,6 @@ export class SR5Item extends Item {
 
     get asQuality(): QualityItemData | undefined {
         if (this.isQuality) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as QualityItemData;
         }
     }
@@ -668,7 +663,6 @@ export class SR5Item extends Item {
 
     asAdeptPower(): AdeptPowerItemData | undefined {
         if (this.isAdeptPower)
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as AdeptPowerItemData;
     }
 
@@ -678,7 +672,6 @@ export class SR5Item extends Item {
 
     get asHost(): HostItemData | undefined {
         if (this.isHost) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as HostItemData;
         }
     }
@@ -726,21 +719,7 @@ export class SR5Item extends Item {
 
     asAction(): ActionItemData | undefined {
         if (this.isAction()) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as ActionItemData;
-        }
-    }
-
-    async rollOpposedTest(target: SR5Actor, attack: AttackData, event): Promise<void> {
-        console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
-    }
-
-    async rollTestType(type: string, attack: AttackData, event, target: SR5Actor) {
-        if (type === 'opposed') {
-            await this.rollOpposedTest(target, attack, event);
-        }
-        if (type === 'action') {
-            await this.castAction(event);
         }
     }
 
@@ -1061,7 +1040,6 @@ export class SR5Item extends Item {
 
     get asArmor(): ArmorItemData | undefined {
         if (this.isArmor) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as ArmorItemData;
         }
     }
@@ -1088,7 +1066,6 @@ export class SR5Item extends Item {
 
     get asWeapon(): WeaponItemData | undefined {
         if (this.isWeapon) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as WeaponItemData;
         }
     }
@@ -1107,7 +1084,6 @@ export class SR5Item extends Item {
 
     get asCyberware(): CyberwareItemData | undefined {
         if (this.isCyberware) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as CyberwareItemData;
         }
     }
@@ -1142,7 +1118,6 @@ export class SR5Item extends Item {
 
     get asSpell(): SpellItemData | undefined {
         if (this.isSpell) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as SpellItemData;
         }
     }
@@ -1174,7 +1149,6 @@ export class SR5Item extends Item {
 
     get asSpritePower(): SpritePowerItemData | undefined {
         if (this.isSpritePower) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as SpritePowerItemData;
         }
     }
@@ -1189,7 +1163,6 @@ export class SR5Item extends Item {
 
     get asComplexForm(): ComplexFormItemData | undefined {
         if (this.isComplexForm) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as ComplexFormItemData;
         }
     }
@@ -1200,7 +1173,6 @@ export class SR5Item extends Item {
 
     get asContact(): ContactItemData | undefined {
         if (this.isContact) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as ContactItemData;
         }
     }
@@ -1211,7 +1183,6 @@ export class SR5Item extends Item {
 
     get asCritterPower(): CritterPowerItemData | undefined {
         if (this.isCritterPower) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as CritterPowerItemData;
         }
     }
@@ -1222,7 +1193,6 @@ export class SR5Item extends Item {
 
     get asDevice(): DeviceItemData | undefined {
         if (this.isDevice) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as DeviceItemData;
         }
     }
@@ -1237,7 +1207,6 @@ export class SR5Item extends Item {
 
     get asEquipment(): EquipmentItemData | undefined {
         if (this.isEquipment()) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as EquipmentItemData;
         }
     }
@@ -1516,7 +1485,7 @@ export class SR5Item extends Item {
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
      * @param target The matrix item to be connected.
      */
-    async addSlave(target: NetworkDevice) {
+    async addSlave(target: Shadowrun.NetworkDevice) {
         // TODO: Add IC actor to WAN network
         // TODO: setup master link on networked devices.
         await MatrixNetworkFlow.addSlave(this, target);

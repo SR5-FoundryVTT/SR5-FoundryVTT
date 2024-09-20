@@ -1,5 +1,4 @@
 import { SR5Actor } from '../../actor/SR5Actor';
-import { NetworkDevice } from '../../item/flows/MatrixNetworkFlow';
 import { SR5Item } from '../../item/SR5Item';
 import { PartsList } from '../../parts/PartsList';
 import { MatrixRules } from '../../rules/MatrixRules';
@@ -148,7 +147,7 @@ export const MarkPlacementFlow = {
     _prepareIcon(test: BruteForceTest|HackOnTheFlyTest) {
         // When given an icon uuid, load it.
         if (!test.data.iconUuid) return;
-        test.icon = fromUuidSync(test.data.iconUuid) as NetworkDevice;
+        test.icon = fromUuidSync(test.data.iconUuid) as Shadowrun.NetworkDevice;
 
         // Depending on icon type, categorize targets for display and device selection.
         if (test.icon instanceof SR5Actor) test.persona = test.icon;

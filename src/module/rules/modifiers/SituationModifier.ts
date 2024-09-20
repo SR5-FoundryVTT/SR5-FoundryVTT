@@ -1,12 +1,10 @@
 import { SuccessTest } from './../../tests/SuccessTest';
 import { SR5Actor } from './../../actor/SR5Actor';
-import { DocumentSituationModifiers, ModifiableDocumentTypes } from '../DocumentSituationModifiers';
+import { DocumentSituationModifiers } from '../DocumentSituationModifiers';
 import Modifier = Shadowrun.ModifierData;
 import SourceModifierData = Shadowrun.SourceModifierData;
 import ActiveModifierValue = Shadowrun.ActiveModifierValue;
 import { SituationModifierEffectsFlow } from '../../effect/flows/SituationModifierEffectsFlow';
-import { SR5 } from '../../config';
-
 
 export interface SituationalModifierApplyOptions {
     // When set to true, applied will be regenerated always.
@@ -21,7 +19,6 @@ export interface SituationalModifierApplyOptions {
     test?: SuccessTest
 }
 
-export type ModifierTypes = Partial<keyof typeof SR5['modifierTypes']>;
 
 /**
  * Base class for handling a single modifier type that's applied to a document.
@@ -287,7 +284,7 @@ export class SituationModifier {
         sources.push(sceneSource);
     }
 
-    _getDocumentsSourceData(document: ModifiableDocumentTypes): SourceModifierData|undefined {
+    _getDocumentsSourceData(document: Shadowrun.ModifiableDocumentTypes): SourceModifierData|undefined {
         // To access another objects
         if (!this.type) return;
         // A placed token must apply it's scene modifiers first.

@@ -1,5 +1,4 @@
 import { MarkFlow, SetMarksOptions } from "../../flows/MarksFlow";
-import { NetworkDevice } from "../../item/flows/MatrixNetworkFlow";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
 
@@ -17,7 +16,7 @@ export const ActorMarksFlow = {
      * @param target The icon being marked
      * @param marks The amount of marks placed
      */
-    async setMarks(persona: SR5Actor, target: NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
+    async setMarks(persona: SR5Actor, target: Shadowrun.NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
 
         // Don't allow self marking.
         if (persona.id === target?.id) {

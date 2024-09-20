@@ -1,8 +1,5 @@
 import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
 import {SR5} from "../config";
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import MarkedDocument = Shadowrun.MarkedDocument;
-import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
 
@@ -37,7 +34,7 @@ interface ItemListRightSide {
 }
 
 export const registerItemLineHelpers = () => {
-    Handlebars.registerHelper('InventoryHeaderIcons', function (section: InventorySheetDataByType) {
+    Handlebars.registerHelper('InventoryHeaderIcons', function (section: Shadowrun.InventorySheetDataByType) {
         const icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
 
         icons.push(section.isOpen
@@ -412,7 +409,7 @@ export const registerItemLineHelpers = () => {
      *                   ItemRightSide does. This is due to ItemRightSide showing content, while ItemHeaderRightSide
      *                   showing dscriptors for that content.
      */
-    Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData): ItemListRightSide[] {
+    Handlebars.registerHelper('ItemRightSide', function (item: Shadowrun.ShadowrunItemData): ItemListRightSide[] {
         const wrapper = new SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -693,7 +690,7 @@ export const registerItemLineHelpers = () => {
         return [];
     });
 
-    Handlebars.registerHelper('ItemIcons', function (item: ShadowrunItemData) {
+    Handlebars.registerHelper('ItemIcons', function (item: Shadowrun.ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
 
         const editIcon = {
@@ -764,7 +761,7 @@ export const registerItemLineHelpers = () => {
         ];
     });
 
-    Handlebars.registerHelper('InventoryItemIcons', function (item: ShadowrunItemData) {
+    Handlebars.registerHelper('InventoryItemIcons', function (item: Shadowrun.ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
@@ -859,7 +856,7 @@ export const registerItemLineHelpers = () => {
     });
 
     // Allow Matrix Marks to be changed on the spot on a Sheet.
-    Handlebars.registerHelper('MarksRightSide', (marked: MarkedDocument) => {
+    Handlebars.registerHelper('MarksRightSide', (marked: Shadowrun.MarkedDocument) => {
         const quantityInput = {
             input: {
                 type: 'number',
@@ -871,7 +868,7 @@ export const registerItemLineHelpers = () => {
     });
 
     // Matrix Mark interaction on a Sheet.
-    Handlebars.registerHelper('MarksIcons', (marked: MarkedDocument) => {
+    Handlebars.registerHelper('MarksIcons', (marked: Shadowrun.MarkedDocument) => {
         const incrementIcon = {
             icon: 'fas fa-plus marks-add-one',
             title: game.i18n.localize('SR5.Labels.Sheet.AddOne'),

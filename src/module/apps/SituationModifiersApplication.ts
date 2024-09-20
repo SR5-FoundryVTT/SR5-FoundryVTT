@@ -1,7 +1,7 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SYSTEM_NAME } from "../constants";
 import { Helpers } from "../helpers";
-import { ModifiableDocumentTypes, DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
+import { DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
 
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
@@ -63,6 +63,7 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-matrix">${modifiers.environmental.applied.total}</div>`);
         const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Environmental")}</div>`);
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'environmental'));
 
         modifierColumn.append(modifier);
@@ -118,6 +119,7 @@ class MatrixModifiersHandler extends ModifiersHandler {
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-matrix">${modifiers.noise.applied.total}</div>`);
         const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Noise")}</div>`);
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'matrix'));
 
         modifierColumn.append(modifier);
@@ -145,6 +147,7 @@ class MagicModifiersHandler extends ModifiersHandler {
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-magic">${modifiers.background_count.applied.total}</div>`);
         const modifierDescription = $(`<div class="modifier-description open-magic-modifier">${game.i18n.localize("SR5.ModifierTypes.BackgroundCount")}</div>`);
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'magic'));
 
         modifierColumn.append(modifier);
@@ -172,6 +175,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
 
     override activateListeners(html: JQuery<HTMLElement>): void {
         html.find('.recoil-delta button').on('click', this.applyRecoilDelta.bind(this));
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         html.find('button#modifiers-recoil-total').on('click', async event => {
             if (this.app.modifiers.documentIsScene) return;
             const actor = this.app.modifiers.document as SR5Actor;
@@ -219,6 +223,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
         const modifier = $('<div class="modifier-row"></div>');
         const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied.total}</div>`);
         const modifierDescription = $(`<div class="modifier-description open-recoil-modifier">${game.i18n.localize("SR5.ModifierTypes.Recoil")}</div>`);
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'recoil'));
 
         modifierColumn.append(modifier);
@@ -249,13 +254,13 @@ export class SituationModifiersApplication extends FormApplication {
     
     // Manage modifiers stored on this target document. This might not be the document meant for those modifiers to be applied to.
     // While a scene can store modifiers, actors have them applied
-    target: ModifiableDocumentTypes
+    target: Shadowrun.ModifiableDocumentTypes
     // The modifiers as stored onto the target document.
     modifiers: DocumentSituationModifiers
     // Instance handlers contain all functionality for modifier categories as not to clutter the general application.
     handlers: ModifiersHandler[]
 
-    constructor(target: ModifiableDocumentTypes) {
+    constructor(target: Shadowrun.ModifiableDocumentTypes) {
         super(target);
         
         this.target = target;
@@ -397,6 +402,8 @@ export class SituationModifiersApplication extends FormApplication {
      * Override _onChangeInput to include a render on changing modifier values.
      */
     override async _onChangeInput(event) {
+        // TODO: foundry-vtt-types v10
+        // eslint-disable-next-line @typescript-eslint/await-thenable
         await super._onChangeInput(event);
         this.render(true);
     }
@@ -488,7 +495,7 @@ export class SituationModifiersApplication extends FormApplication {
     static openForKeybinding() {
         console.debug(`Shadowrun 5e | Trying to open ${this.name}`);
 
-        let document: ModifiableDocumentTypes|null = null;
+        let document: Shadowrun.ModifiableDocumentTypes|null = null;
 
         const controlledActors = Helpers.getControlledTokenActors();
         // Only open on selection for a single token.

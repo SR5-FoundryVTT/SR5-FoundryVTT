@@ -1,5 +1,4 @@
 import { SR5Actor } from "../actor/SR5Actor";
-import { NetworkDevice } from "../item/flows/MatrixNetworkFlow";
 import { Translation } from "../utils/strings";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 import { HackOnTheFlyTest } from "./HackOnTheFlyTest";
@@ -11,7 +10,7 @@ import { TestOptions } from "./SuccessTest";
  */
 export class OpposedHackOnTheFlyTest extends OpposedTest {
     override against: HackOnTheFlyTest;
-    icon: NetworkDevice
+    icon: Shadowrun.NetworkDevice
     persona: SR5Actor;
 
     override _prepareData(data: any, options?: TestOptions) {

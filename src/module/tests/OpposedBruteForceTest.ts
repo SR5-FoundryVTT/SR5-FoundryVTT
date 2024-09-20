@@ -1,7 +1,6 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
-import { NetworkDevice } from '../item/flows/MatrixNetworkFlow';
 import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
 import { OpposedTest } from "./OpposedTest";
@@ -14,7 +13,7 @@ import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlo
  */
 export class OpposedBruteForceTest extends OpposedTest {
     override against: BruteForceTest;
-    icon: NetworkDevice;
+    icon: Shadowrun.NetworkDevice;
     persona: SR5Actor;
 
     override _prepareData(data: any, options?: any) {

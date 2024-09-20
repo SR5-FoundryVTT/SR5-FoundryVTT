@@ -18,32 +18,6 @@ import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 
-/**
- * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
- */
-export interface SheetItemData {
-    type: string,
-    name: string,
-    data: Shadowrun.ShadowrunItemDataData
-    system: Shadowrun.ShadowrunItemDataData
-    properties: any,
-    description: any
-}
-
-export interface InventorySheetDataByType {
-    type: string;
-    label: string;
-    isOpen: boolean;
-    items: SheetItemData[];
-}
-
-export interface InventorySheetData {
-    name: string,
-    label: string,
-    types: Record<string, InventorySheetDataByType>
-}
-
-export type InventoriesSheetData = Record<string, InventorySheetData>;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -245,6 +219,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.situationModifiers = this._prepareSituationModifiers();
 
         // @ts-expect-error TODO: foundry-vtt-types v10
+        // eslint-disable-next-line
         data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
             // secrets: this.actor.isOwner,
             // rollData: this.actor.getRollData.bind(this.actor),
@@ -390,7 +365,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param inventory The inventory to check and add types to.
      */
-    _addInventoryTypes(inventory: InventorySheetData) {
+    _addInventoryTypes(inventory: Shadowrun.InventorySheetData) {
         for (const type of this.getInventoryItemTypes()) {
             if (inventory.types.hasOwnProperty(type)) continue;
 
@@ -471,6 +446,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!event.dataTransfer) return;
         // Keep upstream document created for actions base on it.
         // TODO: foundry-vtt-types v11
+        // eslint-disable-next-line
         const documents = await super._onDrop(event);
 
         // Handle specific system drop events.
@@ -854,7 +830,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     async _prepareItemsInventory() {
         // All custom and default actor inventories.
-        const inventoriesSheet: InventoriesSheetData = {};
+        const inventoriesSheet: Shadowrun.InventoriesSheetData = {};
         // Simple item to inventory mapping.
         const itemIdInventory: Record<string, Shadowrun.InventoryData> = {};
 
@@ -935,7 +911,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             this._addInventoryItemTypes(inventory);
 
             // Sort the items.
-            Object.values(inventory.types).forEach((type) => {
+            Object.values(inventory.types).forEach((type: any) => {
                 type.items.sort(sortByName);
             })
         });
@@ -948,7 +924,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param inventories
      */
-    _prepareSelectedInventory(inventories: InventoriesSheetData) {
+    _prepareSelectedInventory(inventories: Shadowrun.InventoriesSheetData) {
         return inventories[this.selectedInventory];
     }
 
@@ -960,7 +936,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param inventories
      */
-    _prepareHasInventory(inventories: InventoriesSheetData) {
+    _prepareHasInventory(inventories: Shadowrun.InventoriesSheetData) {
         if (this.getInventoryItemTypes().length > 0) return true;
 
         for (const inventory of Object.values(inventories)) {
@@ -975,16 +951,16 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param item: The item to transform into a 'sheet item'
      */
-    async _prepareSheetItem(item: SR5Item): Promise<SheetItemData> {
+    async _prepareSheetItem(item: SR5Item): Promise<Shadowrun.SheetItemData> {
         // Copy derived schema data instead of source data (false)
-        const sheetItem = item.toObject(false) as unknown as SheetItemData;
+        const sheetItem = item.toObject(false) as unknown as Shadowrun.SheetItemData;
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
         // @ts-expect-error bad typing
         sheetItem.properties = chatData.properties;
 
-        return sheetItem as unknown as SheetItemData;
+        return sheetItem as unknown as Shadowrun.SheetItemData;
     }
 
     /**
@@ -996,8 +972,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      * @returns Sorted item lists per sheet item type.
      */
-    async _prepareItemTypes(data): Promise<Record<string, SheetItemData[]>> {
-        const itemsByType: Record<string, SheetItemData[]> = {};
+    async _prepareItemTypes(data): Promise<Record<string, Shadowrun.SheetItemData[]>> {
+        const itemsByType: Record<string, Shadowrun.SheetItemData[]> = {};
 
         // Most sheet items are raw item types, some are sub types.
         // These are just for display purposes and has been done for call_in_action items.
@@ -1060,7 +1036,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param itemTypes 
      * @returns (<active>/<max>) or ''
      */
-    _prepareProgramCount(itemTypes: Record<string, SheetItemData[]>): string {
+    _prepareProgramCount(itemTypes: Record<string, Shadowrun.SheetItemData[]>): string {
         if (!itemTypes.program) return '';
         if (!this.actor.hasDevicePersona) return '';
 
@@ -1244,7 +1220,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onFilterUntrainedSkills(event) {
         event.preventDefault();
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
-        await this.render();
+        this.render();
     }
 
     /**

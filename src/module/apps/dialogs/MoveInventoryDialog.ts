@@ -63,7 +63,7 @@ export class MoveInventoryDialog extends FormDialog {
         if (sourceInventory !== actor.allInventories.name && actor.inventory.isItemInInventory(actor.allInventories.name, item)) {
             const inventories = Object.values(actor.inventory.getAll())
                 .filter(inventory => inventory.name !== actor.allInventories.name)
-                .sort();
+                .sort((a, b) => a.name.localeCompare(b.name));
 
             inventories.unshift(actor.defaultInventory);
             return inventories;
@@ -73,7 +73,7 @@ export class MoveInventoryDialog extends FormDialog {
         // The current item is shown in one inventory, so hide the currently active inventory.
         const inventories = Object.values(actor.inventory.getAll())
             .filter(inventory => inventory.name !== sourceInventory)
-            .sort();
+            .sort((a, b) => a.name.localeCompare(b.name));
 
         // Add the default inventories for selection when necessary.
         if (sourceInventory !== actor.defaultInventory.name) inventories.unshift(actor.defaultInventory);

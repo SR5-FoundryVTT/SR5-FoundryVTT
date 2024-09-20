@@ -174,7 +174,9 @@ export class SR5ItemSheet extends ItemSheet {
 
         for (const itemType of itemTypes) {
             for (const item of itemType) {
+                // TODO: foundry-vtt-types v10
                 // @ts-expect-error // Lazy typing
+                // eslint-disable-next-line 
                 item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value);
             }
         }
@@ -231,6 +233,8 @@ export class SR5ItemSheet extends ItemSheet {
      * @returns Enriched HTML result
      */
     async enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): Promise<string> {
+        // TODO: foundry-vtt-types v10
+        // eslint-disable-next-line 
         return await TextEditor.enrichHTML(editorValue, options);
     }
 
