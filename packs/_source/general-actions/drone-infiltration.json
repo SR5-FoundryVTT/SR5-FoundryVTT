@@ -55,10 +55,10 @@
       },
       "opposed": {
         "type": "",
-        "test": "",
-        "attribute": "",
+        "test": "OpposedTest",
+        "attribute": "intuition",
         "attribute2": "",
-        "skill": "",
+        "skill": "perception",
         "armor": false,
         "mod": 0,
         "description": "",
