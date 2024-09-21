@@ -858,6 +858,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * Helper to determine if this success test has a damage value.
+     * Use the type as if none is selected, even if damage is otherwise calculated, no damage should apply.
+     */
+    get hasDamage(): boolean {
+        return this.data.action.damage.type.base !== '';
+    }
+
+    /**
      * Helper to get the net hits value for this success test with a possible threshold.
      */
     calculateNetHits(): ValueField {
