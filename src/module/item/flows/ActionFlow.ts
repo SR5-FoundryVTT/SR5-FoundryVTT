@@ -114,7 +114,6 @@ export class ActionFlow {
         if (!actor || actor.isIC()) {
             // Inject this items custom skill into the global skill list.
             const globalSkills = foundry.utils.deepClone(SR5.activeSkills);
-            // if (skillName && !activeSkills[skillName]) activeSkills[skillName] = skillName;
             ActionFlow._injectMissingCustomSkill(globalSkills, skillName);
             return Helpers.sortConfigValuesByTranslation(globalSkills);
         }
@@ -122,7 +121,6 @@ export class ActionFlow {
         // CASE - Return actor skills when available.
         //        the major use case is owned items, where the actor is available.
         const activeSkills = actor.getActiveSkills();
-        // const skills = Helpers.sortSkills(activeSkills);
 
         // Convert skill data to a value label mapping.
         const skills: Record<string, Translation> = {};
