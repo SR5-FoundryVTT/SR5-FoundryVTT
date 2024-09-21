@@ -15,7 +15,7 @@ export class DroneInfiltrationTest extends SuccessTest {
             case "autopilot": {
                 const attribute = 'pilot';
                 const skill = 'sneaking';
-                const limit = 'sensor';
+                const limit = {attribute: 'handling'};
 
                 return {attribute, skill, limit};
             }
