@@ -2,7 +2,7 @@ import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
 import { SR5 } from "../config";
 import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from "../effects";
-import { createTagify } from '../utils/sheets';
+import { createTagify, parseDropData } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
@@ -352,7 +352,7 @@ export class SR5ItemSheet extends ItemSheet {
         event.stopPropagation();
 
         // Parse drop data.
-        const data = this.parseDropData(event);
+        const data = parseDropData(event);
         if (!data) return;
 
         // Handle dropping of documents directly into the source field like urls and pdfs.
@@ -804,23 +804,6 @@ export class SR5ItemSheet extends ItemSheet {
 
         this._createActionModifierTagify(html);
         this._createActionCategoriesTagify(html);
-    }
-
-    /**
-     * Helper to parse FoundryVTT DropData directly from it's source event
-     *
-     * This is a legacy handler for earlier FoundryVTT versions, however it's good
-     * practice to not trust faulty input and inform about.
-     *
-     * @param event
-     * @returns undefined when an DropData couldn't be parsed from it's JSON.
-     */
-    parseDropData(event): any | undefined {
-        try {
-            return JSON.parse(event.dataTransfer.getData('text/plain'));
-        } catch (error) {
-            return console.log('Shadowrun 5e | Dropping a document onto an item sheet caused this error', error);
-        }
     }
 
     /**

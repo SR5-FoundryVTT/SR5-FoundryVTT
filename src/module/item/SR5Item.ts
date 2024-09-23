@@ -1215,7 +1215,7 @@ export class SR5Item extends Item {
 
     setSource(source: string) {
         if (!this.system.description) this.system.description = { chat: '', source: '', value: '' };
-        this.system.description.source = source;
+        this.update({'system.description.source': source});
         this.render(true);
     }
 

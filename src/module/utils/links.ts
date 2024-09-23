@@ -33,6 +33,7 @@ export class LinksHelpers {
 
         return true;
     }
+
     /**
      * Determine if given string contains a valid uuid pattern.
      * 
@@ -45,12 +46,8 @@ export class LinksHelpers {
     static isUuid(candidate: string | undefined) {
         if (!candidate) return false;
 
-        const parts = candidate.split('.');
-        if (parts.length < 2) return false;
-        const idPart = parts.pop();
-        if (idPart?.length !== 16) return false;
-        
-        return true;
+        // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
+        return !!foundry.utils.parseUuid(candidate).collection;
     }
 
     /**
