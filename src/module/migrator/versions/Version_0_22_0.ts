@@ -4,7 +4,7 @@ import { VersionMigration } from "../VersionMigration";
 
 /**
  * Migration for new matrix system:
- * - Migrate actor.system.matrix.marks from key-value to list storage
+ * - Migrate actor.system.matrix.marks by removing it for an empty array. Legacy marks from 2 years ago shouldn't matter today.
  */
 export class Version_0_22_0 extends VersionMigration {
     get SourceVersion(): string {
@@ -22,7 +22,7 @@ export class Version_0_22_0 extends VersionMigration {
     protected override async ShouldMigrateItemData(item: SR5Item) {
         return item.isHost;
     }
-    
+
     protected override async ShouldMigrateActorData(actor: SR5Actor) {
         return actor.isMatrixActor;
     }
@@ -34,7 +34,7 @@ export class Version_0_22_0 extends VersionMigration {
         if (!marksData) return updateData;
         if (Array.isArray(marksData)) return updateData;
 
-        updateData.data['marks'] = migrateMarksData(marksData);
+        updateData.data['marks'] = [];
 
         return updateData;
     }
@@ -46,31 +46,8 @@ export class Version_0_22_0 extends VersionMigration {
         if (!matrixData) return updateData;
         if (Array.isArray(matrixData.marks)) return updateData;
 
-        updateData.data['matrix.marks'] = migrateMarksData(matrixData.marks);
+        updateData.data['matrix.marks'] = [];
 
         return updateData;
     }
-}
-
-/**
- * Migrate key-value store to list storage
- * 
- * Retrieve the target name based on sidebar documents. Should a document not be found, just use an empty name. This would have caused display issues already.
- * 
- * @param oldMarksData A key-value with uuid as key and marks as value.
- */
-function migrateMarksData(oldMarksData: Record<string, number>) {
-    const newMarksData: Shadowrun.MatrixMarks = [];
-
-    for (const [markUuid, marks] of Object.entries(oldMarksData)) {
-        const uuid = markUuid.replace(/\|/g, '.');
-        const name = fromUuidSync(uuid)?.name ?? '';
-        newMarksData.push({
-            uuid,
-            marks,
-            name
-        });
-    }
-
-    return newMarksData;
 }
