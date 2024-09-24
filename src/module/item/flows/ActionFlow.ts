@@ -1,12 +1,13 @@
 /**
  * Handle all things related to the action template (template.json)
  */
-import {SR5Actor} from "../../actor/SR5Actor";
-import {Helpers} from "../../helpers";
-import {SR5Item} from "../SR5Item";
-import {PartsList} from "../../parts/PartsList";
+import { SR5Actor } from "../../actor/SR5Actor";
+import { Helpers } from "../../helpers";
+import { SR5Item } from "../SR5Item";
+import { PartsList } from "../../parts/PartsList";
 import { SR5 } from "../../config";
 import { DataDefaults } from "../../data/DataDefaults";
+import { Translation } from "../../utils/strings";
 
 export class ActionFlow {
     /**
@@ -27,10 +28,10 @@ export class ActionFlow {
         }
 
         this._applyModifiableValue(damage, actor);
-        damage.value = Helpers.calcTotal(damage, {min: 0});
+        damage.value = Helpers.calcTotal(damage, { min: 0 });
 
         this._applyModifiableValue(damage.ap, actor);
-        damage.ap.value = Helpers.calcTotal(damage.ap, {min: 0});
+        damage.ap.value = Helpers.calcTotal(damage.ap, { min: 0 });
 
         return damage;
     }
@@ -98,38 +99,55 @@ export class ActionFlow {
 
     /**
      * Collect all active skills either from global context or from within a given document.
+     *
+     * Normalize custom and legacy skills to a single format.
+     * Legacy skills have no name, but use their name as id.
+     * Custom skills have a name but their id is random.
      * 
      * @param actor An optional actor to retrieve skills from (including custom skills)
      * @param skillName An optional skill that should be included in the selection, even if it's missing from the global list.
-     * @returns Sorted list of skills for sheet usage.
+     * @returns Sorted list of skills with a name : label key-value structure for select elements on sheets.
      */
     static sortedActiveSkills(actor?: SR5Actor, skillName?: string) {
-        // Fallback for actors without skills.
+        // CASE - Return default skills whenn no local actor skills are used.
+        //        The major use case is the sidebar item creation, where no actor is available.
         if (!actor || actor.isIC()) {
             // Inject this items custom skill into the global skill list.
-            const activeSkills = foundry.utils.deepClone(SR5.activeSkills);
-            if (skillName && !activeSkills[skillName]) activeSkills[skillName] = skillName;
-
-            const skillValues = Helpers.sortConfigValuesByTranslation(activeSkills);
-            return skillValues;
+            const globalSkills = foundry.utils.deepClone(SR5.activeSkills);
+            ActionFlow._injectMissingCustomSkill(globalSkills, skillName);
+            return Helpers.sortConfigValuesByTranslation(globalSkills);
         }
 
-        // Normalize custom and legacy skills to a single format.
-        // Legacy skills have no name, but use their name as id.
-        // Custom skills have a name but their id is random.
-        const normalizedSkills: Record<string, string> = {};
-
-        // Inject this items custom skill into the global skill list.
+        // CASE - Return actor skills when available.
+        //        the major use case is owned items, where the actor is available.
         const activeSkills = actor.getActiveSkills();
-        if (skillName && !activeSkills[skillName]) activeSkills[skillName] = DataDefaults.skillData({name: skillName});
 
-        const skills = Helpers.sortSkills(actor.getActiveSkills());
-        for (const [id, skill] of Object.entries(skills)) {
+        // Convert skill data to a value label mapping.
+        const skills: Record<string, Translation> = {};
+        for (const [id, skill] of Object.entries(activeSkills)) {
             const key = skill.name || id;
             const label = skill.label || skill.name;
-            normalizedSkills[key] = label;
+            skills[key] = label as Translation;
         }
 
-        return normalizedSkills;
+        ActionFlow._injectMissingCustomSkill(skills, skillName);
+        return Helpers.sortConfigValuesByTranslation(skills);
+    }
+
+    /**
+     * Insert the given skill as a default skill in case it's missing.
+     * 
+     * This is needed for sidebar items, that don´t have local custom skills like owned items, to still
+     * show the custom skill in the sill selection.
+     *  
+     * @param skills The set of active skills to be used.
+     * @param skillName The skill name to be injected.
+     */
+    static _injectMissingCustomSkill(skills: Record<string, Translation>, skillName?: string) {
+        if (!skillName) return;
+
+        const foundCustomSkill = Object.values(skills).some(name => name === skillName);
+        if (foundCustomSkill) return;
+        if (skillName && !skills[skillName]) skills[skillName] = skillName as Translation;
     }
 }

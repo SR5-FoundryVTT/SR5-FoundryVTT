@@ -91,6 +91,8 @@ export interface TestData {
 
     // When true this test is an extended test
     extended: boolean
+    // When false, this test is on it's first roll. When true, it's on an extended roll.
+    extendedRoll: boolean
 
     // The source action this test is derived from.
     action: ActionRollData
@@ -252,6 +254,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.modifiers = this._prepareModifiersData(data.modifiers);
 
         data.damage = data.damage || DataDefaults.damageData();
+
+        data.extendedRoll = data.extendedRoll || false;
 
         console.debug('Shadowrun 5e | Prepared test data', data);
 
@@ -854,6 +858,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * Helper to determine if this success test has a damage value.
+     * Use the type as if none is selected, even if damage is otherwise calculated, no damage should apply.
+     */
+    get hasDamage(): boolean {
+        return this.data.action.damage.type.base !== '';
+    }
+
+    /**
      * Helper to get the net hits value for this success test with a possible threshold.
      */
     calculateNetHits(): ValueField {
@@ -981,10 +993,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Helper to check if this test is currently being extended.
+     * Check if this test is currently being extended.
      */
     get extended(): boolean {
         return this.canBeExtended && this.data.extended;
+    }
+
+    /**
+     * Check if this test is on it's first or an extended roll.
+     */
+    get extendedRoll(): boolean {
+        return this.data.extendedRoll;
     }
 
     /**
@@ -1529,6 +1548,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     /**
      * Should this test be an extended test, re-execute it until it can't be anymore.
+     * 
+     * The first roll of extended test will use normal #execute, while the extended rolls
+     * will pass through this, both for the action and chat message extension flow.
      */
     async executeAsExtended() {
         if (!this.canBeExtended) return;
@@ -1579,7 +1601,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             test.calculateExtendedHits();
         }
 
+        // Mark this roll as an extended roll.
+        // This allows execution to determine if data needs to be prepared for the first roll or not.
+        test.data.extendedRoll = true;
+
         await test.execute();
+
+        return test;
     }
 
     /**
