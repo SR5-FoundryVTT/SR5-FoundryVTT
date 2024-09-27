@@ -1,3 +1,4 @@
+import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import { SR5Actor } from '../actor/SR5Actor';
 import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
@@ -52,7 +53,6 @@ import MatrixMarks = Shadowrun.MatrixMarks;
 import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
-import { RangedWeaponRules } from "../rules/RangedWeaponRules";
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
 import { SinPrep } from './prep/SinPrep';
@@ -482,7 +482,7 @@ export class SR5Item extends Item {
      * 
      * TODO: Currently only the minimal amount of bullets is reloaded. For weapons using ejectable clips, this should be full clip capacity.
      */
-    async reloadAmmo() {
+    async reloadAmmo(partialReload: boolean) {
         const weapon = this.asWeapon;
         if (!weapon) return;
 
@@ -496,6 +496,8 @@ export class SR5Item extends Item {
         const remainingBullets = Number(weapon.system.ammo.current.value);
         // Don't adhere to clip sizes, only reload from the point of capacity left.
         const missingBullets = Math.max(0, weapon.system.ammo.current.max - remainingBullets);
+        // This checks how many rounds are required for a partial reload.
+        const partialReloadBulletsNeeded = Math.min(weapon.system.ammo.current.max - remainingBullets, RangedWeaponRules.partialReload(weapon.system.ammo.clip_type, this.actor.getAttribute('agility').value));
         // If there aren't ANY ammo items, just use weapon max as to not enforce ammo onto users without.
         const availableBullets = ammoItems > 0 ? Number(ammo.system.technology?.quantity) : weapon.system.ammo.current.max;
 
@@ -508,11 +510,15 @@ export class SR5Item extends Item {
             return ui.notifications?.warn('SR5.Warnings.CantReloadAtAllDueToAmmo', { localize: true });
         }
         if (ammo && Number(ammo.system.technology?.quantity) < missingBullets) {
-            ui.notifications?.info('SR5.Warnings.CantReloadFullyDueToAmmo', { localize: true });
+            if(partialReload && partialReloadBulletsNeeded != -1 && Number(ammo.system.technology?.quantity) < partialReloadBulletsNeeded ) {
+                ui.notifications?.info('SR5.Warnings.CantReloadPartialDueToAmmo', { localize: true });
+            } else {
+                ui.notifications?.info('SR5.Warnings.CantReloadFullyDueToAmmo', { localize: true });
+            }
         }
 
         // Prepare what can be reloaded.
-        const reloadedBullets = Math.min(missingBullets, availableBullets);
+        const reloadedBullets = Math.min(missingBullets, availableBullets, partialReload ? partialReloadBulletsNeeded : Infinity);
 
 
         if (weapon.system.ammo.spare_clips.max > 0) {

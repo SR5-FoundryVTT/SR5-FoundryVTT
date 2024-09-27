@@ -1413,6 +1413,16 @@
             "Range": "Fernkampf",
             "Thrown": "Geworfen"
         },
+        "Cliptype": {
+            "RemovableClip": "Ladestreifen",
+            "BreakAction": "Klapplademechanismus",
+            "BeltFed": "Gurtmunition",
+            "InternalMagazin": "Internes Magazin",
+            "MuzzleLoader": "Vorderlader",
+            "Cylinder": "Aufklappbare Trommel",
+            "Drum": "Große Trommel",
+            "Bow": "Bogen"
+        },
         "Mod": "Mod",
         "Mode": {
             "BurstFire": "SM",
@@ -1469,6 +1479,8 @@
         },
         "Reach": "Reichweite",
         "Reload": "Nachladen",
+        "FullReload": "Komplett",
+        "PartialReload": "Teilweise",
         "Type": "Typ",
         "Weapon": "Waffen"
     },

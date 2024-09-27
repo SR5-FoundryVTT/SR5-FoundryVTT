@@ -28,11 +28,11 @@ export const RangedWeaponRules = {
         if (rangeKey) {
             return ranges[rangeKey];
         } else {
-            const {extreme} = ranges;
+            const { extreme } = ranges;
             return Helpers.createRangeDescription('SR5.OutOfRange', extreme.distance, SR.combat.environmental.range_modifiers.out_of_range);
         }
     },
-    
+
 
     /**
      * Calculate recoil compensation based on SR5#175 'Recoil' including SR5#178
@@ -112,7 +112,28 @@ export const RangedWeaponRules = {
      * Free recoil compensation according to SR5#175 'Recoil'
      * @param baseRc Optional parameter allowing you to define a custom base rc.
      */
-    humanoidBaseRecoilCompensation(baseRc:number=1): number {
+    humanoidBaseRecoilCompensation(baseRc: number = 1): number {
         return baseRc;
+    },
+
+    /**
+     * The number of bullets when reloading during a complex action according to SR5#163 'Reloading Weapons'
+     * @param clip The currently used clip
+     * @param dex The owning actors dexterity value
+     * @returns The number of bullets when reloading during a complex action or -1 if it can only be fully reloaded directly
+     */
+    partialReload(clip: string = '', dex: number = 1): number {
+        switch (clip) {
+            case 'internal_magazin':
+            case 'cylinder':
+                return dex;
+            case 'break_action':
+                return 2;
+            case 'muzzle_loader':
+            case 'bow':
+                return 1;
+            default:
+                return -1;
+        }
     }
 }
