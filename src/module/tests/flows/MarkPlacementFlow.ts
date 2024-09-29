@@ -241,7 +241,8 @@ export const MarkPlacementFlow = {
 
         // Some opposed tests only need an item, no actor...
         const document = await fromUuid(againstData.iconUuid);
-        if (!(document instanceof SR5Item)) return;
+        // if (!(document instanceof SR5Item)) return;
+        if (!document) return;
 
         const data = await testCls._getOpposedActionTestData(againstData, document, messageId);
         if (!data) return;
