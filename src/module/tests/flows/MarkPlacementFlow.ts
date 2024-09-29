@@ -105,8 +105,8 @@ export const MarkPlacementFlow = {
      * @param test The test placing any mark.
      */
     prepareBaseValues(test: BruteForceTest|HackOnTheFlyTest) {
-        // Host devices always use direct connections.
-        test.data.directConnection = !test.data.placeOnMainIcon && !!test.host;
+        // Host devices always use direct connections. // TODO: add rule reference
+        if (test.host) test.data.directConnection = true;
     },
 
     /**
