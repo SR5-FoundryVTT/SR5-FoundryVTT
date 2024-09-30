@@ -104,6 +104,7 @@
             "TargetedActor": "Targeted Actor",
             "TestItem": "Test via Item"
         },
+        "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
         "Modes": {
             "Modify": "Modify"
         },

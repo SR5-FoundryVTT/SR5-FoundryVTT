@@ -18,6 +18,8 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
+import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
+import EffectApplyTo = Shadowrun.EffectApplyTo;
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -451,10 +453,39 @@ export class SR5BaseActorSheet extends ActorSheet {
 
                 return;
 
+            // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
+            case 'ActiveEffect':
+            {
+                const effectId = element.dataset.itemId;
+                let effect = this.actor.effects.get(effectId);
+                if (!effect) {
+                    // check to see if it belongs to an item we own
+                    effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
+                }
+                if (effect) {
+                    // Prepare data transfer
+                    dragData.type = 'ActiveEffect';
+                    dragData.data = effect;
+
+                    // Set data transfer
+                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                }
+                return;
+            }
+
             // All default Foundry data transfer.
             default:
                 // Let default Foundry handler deal with default drag cases.
                 return super._onDragStart(event);
+        }
+    }
+
+    /// Parse Drop Data events so we can see if an effect was dropped
+    parseDropData(event): any | undefined {
+        try {
+            return JSON.parse(event.dataTransfer.getData('text/plain'));
+        } catch (error) {
+            return undefined;
         }
     }
 
@@ -468,6 +499,24 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (!event.dataTransfer) return;
+
+        const data = this.parseDropData(event);
+        if (data !== undefined) {
+            if (data.type === 'ActiveEffect' && data.actorId !== this.actor.id) {
+                const effect = data.data;
+                const applyTo = effect.flags.shadowrun5e.applyTo as EffectApplyTo;
+                // if the effect is just supposed to apply to the item's test, it won't work on an actor
+                if (applyTo === 'test_item') {
+                    ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
+                    return;
+                }
+                // delete the id so a new one is generated
+                delete effect._id;
+                await this.actor.createEmbeddedDocuments('ActiveEffect', [effect]);
+                // don't process anything else since we handled the drop
+                return;
+            }
+        }
         // Keep upstream document created for actions base on it.
         const documents = await super._onDrop(event);
 
