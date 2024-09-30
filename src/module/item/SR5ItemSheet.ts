@@ -2,7 +2,7 @@ import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
 import { SR5 } from "../config";
 import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from "../effects";
-import { createTagify } from '../utils/sheets';
+import { createTagify, parseDropData } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
@@ -77,6 +77,8 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Can be used to check if the source field contains a URL.
     sourceIsURL: boolean
+    sourceIsPDF: boolean
+    sourceIsUuid: boolean
 
     isUsingRangeCategory: boolean
 }
@@ -220,6 +222,8 @@ export class SR5ItemSheet extends ItemSheet {
         // @ts-expect-error TODO: foundry-vtt-types v10
         data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
         data.sourceIsURL = this.item.sourceIsUrl;
+        data.sourceIsPDF = this.item.sourceIsPDF;
+        data.sourceIsUuid = this.item.sourceIsUuid
 
         data.isUsingRangeCategory = this.item.isUsingRangeCategory;
 
@@ -348,8 +352,14 @@ export class SR5ItemSheet extends ItemSheet {
         event.stopPropagation();
 
         // Parse drop data.
-        const data = this.parseDropData(event);
+        const data = parseDropData(event);
         if (!data) return;
+
+        // Handle dropping of documents directly into the source field like urls and pdfs.
+        if (event.toElement.name === 'system.description.source') {
+            this.item.setSource(data.uuid);
+            return;
+        }
 
         // Add items to a weapons modification / ammo
         if (this.item.isWeapon && data.type === 'Item') {
@@ -409,9 +419,9 @@ export class SR5ItemSheet extends ItemSheet {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
-    _onOpenSource(event) {
+    async _onOpenSource(event) {
         event.preventDefault();
-        this.item.openSource();
+        await this.item.openSource();
     }
 
     async _onSelectRangedRangeCategory(event) {
@@ -794,23 +804,6 @@ export class SR5ItemSheet extends ItemSheet {
 
         this._createActionModifierTagify(html);
         this._createActionCategoriesTagify(html);
-    }
-
-    /**
-     * Helper to parse FoundryVTT DropData directly from it's source event
-     *
-     * This is a legacy handler for earlier FoundryVTT versions, however it's good
-     * practice to not trust faulty input and inform about.
-     *
-     * @param event
-     * @returns undefined when an DropData couldn't be parsed from it's JSON.
-     */
-    parseDropData(event): any | undefined {
-        try {
-            return JSON.parse(event.dataTransfer.getData('text/plain'));
-        } catch (error) {
-            return console.log('Shadowrun 5e | Dropping a document onto an item sheet caused this error', error);
-        }
     }
 
     /**

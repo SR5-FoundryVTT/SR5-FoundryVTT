@@ -909,18 +909,24 @@ export class SR5Item extends Item {
     /**
      * Use the items source field and try different means of opening it.
      */
-    openSource() {
+    async openSource() {
         const source = this.getSource();
-        LinksHelpers.openSource(source);
+        await LinksHelpers.openSource(source);
     }
 
-    /**
-     * Determine if the items source field points to a URL instead of an PDF code.
-     * @returns true if the source field is a URL.
-     */
     get sourceIsUrl(): boolean {
         const source = this.getSource();
         return LinksHelpers.isURL(source);
+    }
+
+    get sourceIsPDF(): boolean {
+        const source = this.getSource();
+        return LinksHelpers.isPDF(source);
+    }
+
+    get sourceIsUuid(): boolean {
+        const source = this.getSource();
+        return LinksHelpers.isUuid(source);
     }
 
     _canDealDamage(): boolean {
@@ -1205,6 +1211,12 @@ export class SR5Item extends Item {
 
     getSource(): string {
         return this.wrapper.getSource();
+    }
+
+    setSource(source: string) {
+        if (!this.system.description) this.system.description = { chat: '', source: '', value: '' };
+        this.update({'system.description.source': source});
+        this.render(true);
     }
 
     getConditionMonitor(): ConditionData {
