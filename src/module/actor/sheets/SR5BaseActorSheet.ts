@@ -460,14 +460,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 let effect = this.actor.effects.get(effectId);
                 if (!effect) {
                     // check to see if it belongs to an item we own
-                    effect = this.actor.items.reduce((effect: SR5ActiveEffect | undefined, item) => {
-                        // if we found the effect we can stop searching for it
-                        if (effect) {
-                            return effect;
-                        }
-                        // if we haven't found it yet, check our items
-                        return item.effects.get(effectId);
-                    }, undefined);
+                    effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
                 }
                 if (effect) {
                     // Prepare data transfer
