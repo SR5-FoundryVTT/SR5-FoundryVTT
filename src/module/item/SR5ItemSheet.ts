@@ -357,6 +357,8 @@ export class SR5ItemSheet extends ItemSheet {
         if (element) {
             // Create drag data object to use
             const dragData = {
+                actor: this.item.actor,
+                actorId: this.item.actor?.id,
                 itemId: this.item.id,
                 type: '',
                 data: {}
@@ -405,7 +407,6 @@ export class SR5ItemSheet extends ItemSheet {
             delete effect._id;
             // add this to the embedded ActiveEffect documents
             await this.item.createEmbeddedDocuments('ActiveEffect', [effect]);
-            this.render();
             return;
         }
 
