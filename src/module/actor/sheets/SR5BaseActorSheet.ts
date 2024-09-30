@@ -511,13 +511,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (data !== undefined) {
             if (data.type === 'ActiveEffect' && data.actorId !== this.actor.id) {
                 const effect = data.data;
-                console.log('effect', effect);
                 const applyTo = effect.flags.shadowrun5e.applyTo as EffectApplyTo;
                 // if the effect is just supposed to apply to the item's test, it won't work on an actor
                 if (applyTo === 'test_item') {
                     ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
                     return;
                 }
+                // delete the id so a new one is generated
+                delete effect._id;
                 await this.actor.createEmbeddedDocuments('ActiveEffect', [effect]);
                 // don't process anything else since we handled the drop
                 return;
