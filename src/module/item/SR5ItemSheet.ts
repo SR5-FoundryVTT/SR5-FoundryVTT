@@ -583,7 +583,7 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onOwnedItemRemove(event) {
-        event.preventDefault(); 1
+        event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
