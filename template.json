@@ -1209,7 +1209,9 @@
                     "current": {
                         "value": 0,
                         "max": 0
-                    }
+                    },
+                    "clip_type": "",
+                    "partial_reload_value": 0
                 },
                 "range": {
                     "category": "",
