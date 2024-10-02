@@ -510,7 +510,7 @@ export class SR5Item extends Item {
             return ui.notifications?.warn('SR5.Warnings.CantReloadAtAllDueToAmmo', { localize: true });
         }
         if (ammo && Number(ammo.system.technology?.quantity) < missingBullets) {
-            if(partialReload && partialReloadBulletsNeeded != -1 && Number(ammo.system.technology?.quantity) < partialReloadBulletsNeeded ) {
+            if(partialReload && partialReloadBulletsNeeded !== -1 && Number(ammo.system.technology?.quantity) < partialReloadBulletsNeeded ) {
                 ui.notifications?.info('SR5.Warnings.CantReloadPartialDueToAmmo', { localize: true });
             } else {
                 ui.notifications?.info('SR5.Warnings.CantReloadFullyDueToAmmo', { localize: true });
