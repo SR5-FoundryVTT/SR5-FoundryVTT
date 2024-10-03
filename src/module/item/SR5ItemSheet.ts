@@ -410,6 +410,25 @@ export class SR5ItemSheet extends ItemSheet {
             return;
         }
 
+        if (data.type === 'Macro') {
+            const effectMacro = await fromUuid(data.uuid) as Macro;
+            if (!effectMacro) return;
+            const command = effectMacro.toJSON().command
+            const macroStart = "game.shadowrun5e.copyEffectMacro(";
+            const macroEnd = ");";
+            const startIndex = command.indexOf(macroStart);
+            const endIndex = command.lastIndexOf(macroEnd);
+            if (startIndex !== -1 && endIndex !== -1) {
+                const effectString = command.substring(startIndex + macroStart.length, endIndex).trim();
+                try {
+                    await this.item.createEmbeddedDocuments('ActiveEffect', [JSON.parse(effectString)]);
+                } catch (e) {
+                    console.log(e);
+                    return;
+                }
+            }
+        }
+
         // Add items to a weapons modification / ammo
         if (this.item.isWeapon && data.type === 'Item') {
             let item;

@@ -105,6 +105,7 @@
             "TestItem": "Test via Item"
         },
         "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
+        "CopyEffectFromMacro": "You need to drag and drop the macro from the macro folder or a compendium onto an actor or item.",
         "Modes": {
             "Modify": "Modify"
         },
