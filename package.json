@@ -3,7 +3,7 @@
         "@ethaks/fvtt-quench": "^0.9.2",
         "@foundryvtt/foundryvtt-cli": "^1.0.3",
         "@jgoz/esbuild-plugin-typecheck": "^4.0.1",
-        "@league-of-foundry-developers/foundry-vtt-types": "^9.269.0",
+        "@league-of-foundry-developers/foundry-vtt-types": "^9.280.1",
         "@types/node": "^22.5.2",
         "@typescript-eslint/eslint-plugin": "^6.13.2",
         "@yaireo/tagify": "^4.17.9",
