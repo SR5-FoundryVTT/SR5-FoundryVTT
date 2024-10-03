@@ -455,22 +455,21 @@ export class SR5BaseActorSheet extends ActorSheet {
 
             // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
             case 'ActiveEffect':
-            {
-                const effectId = element.dataset.itemId;
-                let effect = this.actor.effects.get(effectId);
-                if (!effect) {
-                    // check to see if it belongs to an item we own
-                    effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
-                }
-                if (effect) {
-                    // Prepare data transfer
-                    dragData.type = 'ActiveEffect';
-                    dragData.data = effect;
-
-                    // Set data transfer
-                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                }
-                return;
+                {
+                    const effectId = element.dataset.itemId;
+                    let effect = this.actor.effects.get(effectId);
+                    if (!effect) {
+                        // check to see if it belongs to an item we own
+                        effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
+                    }
+                    if (effect) {
+                        // Prepare data transfer
+                        dragData.type = 'ActiveEffect';
+                        dragData.data = effect;
+                        // Set data transfer
+                        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                    }
+                    return;
             }
 
             // All default Foundry data transfer.
@@ -515,6 +514,32 @@ export class SR5BaseActorSheet extends ActorSheet {
                 await this.actor.createEmbeddedDocuments('ActiveEffect', [effect]);
                 // don't process anything else since we handled the drop
                 return;
+            }
+            if (data.type === 'Macro') {
+                const effectMacro = await fromUuid(data.uuid) as Macro;
+                if (!effectMacro) return;
+                const command = effectMacro.toJSON().command
+                const macroStart = "game.shadowrun5e.copyEffectMacro(";
+                const macroEnd = ");";
+                const startIndex = command.indexOf(macroStart);
+                const endIndex = command.lastIndexOf(macroEnd);
+                if (startIndex !== -1 && endIndex !== -1) {
+                    // Extrahiere den Inhalt zwischen den Klammern
+                    const effectString = command.substring(startIndex + macroStart.length, endIndex).trim();
+                    try {
+                        const effect = JSON.parse(effectString)
+                        const applyTo = effect.flags.shadowrun5e.applyTo as EffectApplyTo;
+                        // if the effect is just supposed to apply to the item's test, it won't work on an actor
+                        if (applyTo === 'test_item') {
+                            ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
+                            return;
+                        }
+                        await this.actor.createEmbeddedDocuments('ActiveEffect', [effect]);
+                    } catch (e) {
+                        console.log(e);
+                        return;
+                    }
+                }
             }
         }
         // Keep upstream document created for actions base on it.

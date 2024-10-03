@@ -98,6 +98,8 @@
             "TargetedActor": "Anvisierten Akteur",
             "TestItem": "Probe aus Item"
         },
+        "CannotAddTestViaItemToActor": "Es kann kein Effekt vom Typ 'Probe aus Item' zu einem Akteur hinzugefügt werden.",
+        "CopyEffectFromMacro": "Du musst das Makro per Drag and Drop aus dem Makro-Ordner oder einem Kompendium auf einen Akteur oder ein Item ziehen.",
         "Modes": {
             "Modify": "Modifizieren"
         },

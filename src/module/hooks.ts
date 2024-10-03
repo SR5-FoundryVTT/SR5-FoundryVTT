@@ -2,61 +2,61 @@ import { CompileSpriteTest } from './tests/CompileSpriteTest';
 import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
 import { OpposedRitualTest } from './tests/OpposedRitualTest';
 import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
-import {SR5} from './config';
-import {Migrator} from './migrator/Migrator';
-import {registerSystemSettings} from './settings';
-import {FLAGS, SYSTEM_NAME, SYSTEM_SOCKET} from './constants';
-import {SR5Actor} from './actor/SR5Actor';
-import {SR5Item} from './item/SR5Item';
-import {SR5ItemSheet} from './item/SR5ItemSheet';
-import {SR5Token} from './token/SR5Token';
-import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
-import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
-import {HandlebarManager} from './handlebars/HandlebarManager';
+import { SR5 } from './config';
+import { Migrator } from './migrator/Migrator';
+import { registerSystemSettings } from './settings';
+import { FLAGS, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
+import { SR5Actor } from './actor/SR5Actor';
+import { SR5Item } from './item/SR5Item';
+import { SR5ItemSheet } from './item/SR5ItemSheet';
+import { SR5Token } from './token/SR5Token';
+import { SR5ActiveEffect } from "./effect/SR5ActiveEffect";
+import { _combatantGetInitiativeFormula, SR5Combat } from './combat/SR5Combat';
+import { HandlebarManager } from './handlebars/HandlebarManager';
 
-import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
-import {Import} from './apps/itemImport/apps/import-form';
-import {ChangelogApplication} from "./apps/ChangelogApplication";
+import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import { Import } from './apps/itemImport/apps/import-form';
+import { ChangelogApplication } from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
-import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
-import {SR5ActiveEffectConfig} from "./effect/SR5ActiveEffectConfig";
-import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
-import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
-import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
-import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
+import { SR5ICActorSheet } from "./actor/sheets/SR5ICActorSheet";
+import { SR5ActiveEffectConfig } from "./effect/SR5ActiveEffectConfig";
+import { SR5VehicleActorSheet } from "./actor/sheets/SR5VehicleActorSheet";
+import { SR5CharacterSheet } from "./actor/sheets/SR5CharacterSheet";
+import { SR5SpiritActorSheet } from "./actor/sheets/SR5SpiritActorSheet";
+import { SR5SpriteActorSheet } from "./actor/sheets/SR5SpriteActorSheet";
 
-import {SR5Roll} from "./rolls/SR5Roll";
-import {SuccessTest} from "./tests/SuccessTest";
-import {TeamworkTest} from "./actor/flows/TeamworkFlow";
-import {OpposedTest} from "./tests/OpposedTest";
-import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
-import {RangedAttackTest} from "./tests/RangedAttackTest";
-import {PhysicalResistTest} from "./tests/PhysicalResistTest";
-import {MeleeAttackTest} from "./tests/MeleeAttackTest";
-import {SpellCastingTest} from "./tests/SpellCastingTest";
-import {DrainTest} from "./tests/DrainTest";
-import {TestCreator} from "./tests/TestCreator";
-import {CombatSpellDefenseTest} from "./tests/CombatSpellDefenseTest";
-import {ComplexFormTest} from "./tests/ComplexFormTest";
-import {AttributeOnlyTest} from "./tests/AttributeOnlyTest";
-import {NaturalRecoveryStunTest} from "./tests/NaturalRecoveryStunTest";
-import {NaturalRecoveryPhysicalTest} from "./tests/NaturalRecoveryPhysicalTest";
-import {FadeTest} from "./tests/FadeTest";
-import {ThrownAttackTest} from "./tests/ThrownAttackTest";
-import {PilotVehicleTest} from "./tests/PilotVehicleTest";
-import {DronePerceptionTest} from "./tests/DronePerceptionTest";
-import {DroneInfiltrationTest} from "./tests/DroneInfiltrationTest";
+import { SR5Roll } from "./rolls/SR5Roll";
+import { SuccessTest } from "./tests/SuccessTest";
+import { TeamworkTest } from "./actor/flows/TeamworkFlow";
+import { OpposedTest } from "./tests/OpposedTest";
+import { PhysicalDefenseTest } from "./tests/PhysicalDefenseTest";
+import { RangedAttackTest } from "./tests/RangedAttackTest";
+import { PhysicalResistTest } from "./tests/PhysicalResistTest";
+import { MeleeAttackTest } from "./tests/MeleeAttackTest";
+import { SpellCastingTest } from "./tests/SpellCastingTest";
+import { DrainTest } from "./tests/DrainTest";
+import { TestCreator } from "./tests/TestCreator";
+import { CombatSpellDefenseTest } from "./tests/CombatSpellDefenseTest";
+import { ComplexFormTest } from "./tests/ComplexFormTest";
+import { AttributeOnlyTest } from "./tests/AttributeOnlyTest";
+import { NaturalRecoveryStunTest } from "./tests/NaturalRecoveryStunTest";
+import { NaturalRecoveryPhysicalTest } from "./tests/NaturalRecoveryPhysicalTest";
+import { FadeTest } from "./tests/FadeTest";
+import { ThrownAttackTest } from "./tests/ThrownAttackTest";
+import { PilotVehicleTest } from "./tests/PilotVehicleTest";
+import { DronePerceptionTest } from "./tests/DronePerceptionTest";
+import { DroneInfiltrationTest } from "./tests/DroneInfiltrationTest";
 import { SuppressionDefenseTest } from './tests/SuppressionDefenseTest';
 import { SummonSpiritTest } from './tests/SummonSpiritTest';
 
 import { quenchRegister } from '../unittests/quench';
-import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
+import { createItemMacro, createSkillMacro, createEffectMacro, rollItemMacro, rollSkillMacro, copyEffectMacro } from './macros';
 
 import { NetworkDeviceFlow } from './item/flows/NetworkDeviceFlow';
 import { registerSystemKeybindings } from './keybindings';
 import { SkillTest } from './tests/SkillTest';
 
-import {canvasInit} from './canvas';
+import { canvasInit } from './canvas';
 import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
 import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
@@ -128,6 +128,7 @@ ___________________
              */
             rollItemMacro,
             rollSkillMacro,
+            copyEffectMacro,
             /**
              * Should you only really need dice handling, use this. If you need more complex testing behaviour,
              * check the Test implementations.
@@ -254,11 +255,11 @@ ___________________
         // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
         // Setting to true, will duplicate item effects on actors. Only effects on actors will be traversed.
         CONFIG.ActiveEffect.legacyTransferral = false;
-        
+
         CONFIG.Token.objectClass = SR5Token;
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
-        CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
+        CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-expect-error
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
@@ -341,7 +342,7 @@ ___________________
                 await Migrator.InitWorldForMigration();
                 return;
             }
-            
+
             // On populated worlds, try migrating
             await Migrator.BeginMigration();
 
@@ -376,6 +377,9 @@ ___________________
         switch (dropData.type) {
             case 'Item':
                 createItemMacro(dropData, slot);
+                return false;
+            case 'ActiveEffect':
+                createEffectMacro(dropData, slot);
                 return false;
             case 'Skill':
                 createSkillMacro(dropData.data, slot);
@@ -417,10 +421,10 @@ ___________________
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {
-        if(!game.user?.isGM){
-            return 
+        if (!game.user?.isGM) {
+            return
         }
-        
+
         const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
         html.find('footer').before(button);
         button.on('click', (event) => {
@@ -519,6 +523,6 @@ ___________________
     }
 
     static async configureTextEnrichers() {
-       await JournalEnrichers.setEnrichers();
+        await JournalEnrichers.setEnrichers();
     }
 }

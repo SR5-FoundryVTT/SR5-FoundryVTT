@@ -9,6 +9,7 @@ import { SR5Item } from './item/SR5Item';
 import {Helpers} from "./helpers";
 import SkillField = Shadowrun.SkillField;
 import {SR5Actor} from "./actor/SR5Actor";
+import { SR5ActiveEffect } from './effect/SR5ActiveEffect';
 
 /**
  * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.
@@ -107,4 +108,40 @@ export async function rollSkillMacro(skillLabel) {
     if (!actor) return;
     return await actor.rollSkill(skillLabel, {byLabel: true});
     // TODO: Macro for skills may need their own TestCreate.fromSkillMacro... as they need getSkill('Label', {byLabel: true});
+}
+
+/**
+ * Creates a copy effect action macro when an item is dropped from actor or item sheet onto the macro hotbar.
+ * 
+ * @param dropData Foundry DropData
+ * @param slot The slot to be dropped into on the Macro bar
+ */
+export async function createEffectMacro(dropData, slot) {
+    if (!game || !game.macros) return;
+    const effect = await SR5ActiveEffect.fromDropData(dropData);
+    if (!(effect instanceof SR5ActiveEffect)) return console.error(`Shadowrun 5e | Macro Drop expected an effect but got a different document type`, effect);
+    // // delete the id and origin so a new will be generated
+    const { _id, origin, ...effectJSON } = effect.toJSON();
+    let macro = game.macros.contents.find((m) => m.name === `Effect: ${effect.name}`);
+    //@ts-expect-error
+    const effectImg = game.version.startsWith('11.') ? effect.icon : effect.img;
+    if (!macro) {
+        macro = await Macro.create(
+            {
+                name: `Effect: ${effect.name}`,
+                type: 'script',
+                command: `game.shadowrun5e.copyEffectMacro(${JSON.stringify(effectJSON, null, 2)});`,
+                flags: { 'shadowrun5e.copyEffectMacro': true },
+                ...(effectImg && {img: effectImg}) 
+            },
+            { renderSheet: false },
+        );
+    }
+    if (macro) game.user?.assignHotbarMacro(macro, slot);
+}
+/**
+ * Creates a message explaining how to copy the effect from the macro into the desired document.
+ */
+export function copyEffectMacro(effectJSON: any) {
+    return ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CopyEffectFromMacro'));
 }
