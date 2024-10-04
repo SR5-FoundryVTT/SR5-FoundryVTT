@@ -10,14 +10,8 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Read file contents
-              id: read_file_1
-              uses: andstor/file-reader-action@v1
-              with:
-                path: "system.json"
-
-            - name: Show manifest
-              run: echo "${{ steps.read_file_1.outputs.content }}"
+            - name: Install prerequisites
+              run: sudo apt-get install moreutils
 
             - name: Modify System Manifest With Release-Specific Values
               env:
@@ -26,10 +20,11 @@ jobs:
                   DOWNLOAD: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/shadowrun5e.zip
                   VERSION: ${{github.event.release.tag_name}}
               run: |
-                    jq --arg url $URL '.url=$url' system.json > system.json
-                    jq --arg manifest $MANIFEST '.manifest=$manifest' system.json > system.json
-                    jq --arg download $DOWNLOAD '.download=$download' system.json > system.json
-                    jq --arg version $VERSION '.version=$version' system.json > system.json
+                    apt-get install moreutils
+                    jq --arg url $URL '.url=$url' system.json | sponge system.json
+                    jq --arg manifest $MANIFEST '.manifest=$manifest' system.json | sponge system.json
+                    jq --arg download $DOWNLOAD '.download=$download' system.json | sponge system.json
+                    jq --arg version $VERSION '.version=$version' system.json | sponge system.json
 
             - name: Read file contents
               id: read_file
@@ -37,8 +32,10 @@ jobs:
               with:
                 path: "system.json"
 
-            - name: Show manifest
-              run: echo "${{ steps.read_file.outputs.content }}"
+            - name: Read System manifest for later use
+              run: |
+                    cat system.json
+                    echo "MANIFEST_JSON=$(jq -c . < system.json)" >> $GITHUB_ENV
 
             - name: Build and package release artifacts
               run: |
@@ -63,8 +60,8 @@ jobs:
             - name: Deploy Release
               uses: fjogeleit/http-request-action@v1
               env:
-                  MINIMUM: ${{ fromJson(steps.read_file.outputs.content).compatibility.minimum }}
-                  VERIFIED: ${{ fromJson(steps.read_file.outputs.content).compatibility.verified }}
+                  MINIMUM: ${{ fromJson(env.MANIFEST_JSON).compatibility.minimum }}
+                  VERIFIED: ${{ fromJson(env.MANIFEST_JSON).compatibility.verified }}
               with:
                   url: 'https://api.foundryvtt.com/_api/packages/release_version'
                   method: 'POST'
