@@ -23,7 +23,10 @@ jobs:
                     jq --arg version $VERSION '.version=$version' system.json > system.json
 
             - name: Read System manifest for later use
-              run: echo "MANIFEST_JSON=$(jq -c . < system.json)" >> $GITHUB_ENV
+              run: |
+                    cat system.json
+                    echo "MANIFEST_JSON=$(jq -c . < system.json)" >> $GITHUB_ENV
+                    echo $GITHUB_ENV
 
             - name: Build and package release artifacts
               run: |
