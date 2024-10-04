@@ -11,23 +11,28 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: Modify System Manifest With Release-Specific Values
-              id: sub_manifest_link_version
-              uses: cschleiden/replace-tokens@v1
-              with:
-                  files: 'system.json'
               env:
                   URL: https://github.com/${{github.repository}}
                   MANIFEST: https://github.com/${{github.repository}}/releases/latest/download/system.json
                   DOWNLOAD: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/shadowrun5e.zip
+                  VERSION: ${{github.event.release.tag_name}}
+              run: |
+                    jq --arg url $URL '.url=$url' system.json > system.json
+                    jq --arg manifest $MANIFEST '.manifest=$manifest' system.json > system.json
+                    jq --arg download $DOWNLOAD '.download=$download' system.json > system.json
+                    jq --arg version $VERSION '.version=$version' system.json > system.json
 
-            - run: |
+            - name: Read System manifest for later use
+              run: echo "MANIFEST_JSON=$(jq -c . < system.json)" >> $GITHUB_ENV
+
+            - name: Build and package release artifacts
+              run: |
                   npm ci
                   gulp build
                   npm run build:db
                   zip -r ./shadowrun5e.zip system.json template.json LICENSE README.md README-DEV.md dist/ packs/ --exclude "packs/_source/*"
 
             - name: Update Release with Files
-              id: create_version_release
               uses: ncipollo/release-action@v1
               with:
                   makeLatest: false # Must be false, to allow test releases using this workflow.
@@ -42,9 +47,12 @@ jobs:
 
             - name: Deploy Release
               uses: fjogeleit/http-request-action@v1
+              env:
+                  MINIMUM: ${{ fromJson(env.MANIFEST_JSON).compatibility.minimum }}
+                  VERIFIED: ${{ fromJson(env.MANIFEST_JSON).compatibility.verified }}
               with:
                   url: 'https://api.foundryvtt.com/_api/packages/release_version'
                   method: 'POST'
                   contentType: 'application/json'
                   customHeaders: '{"Authorization": "${{ secrets.FVTT_PACKAGE_RELEASE_TOKEN }}"}'
-                  data: '{"id": "shadowrun5e", "release":{"version":"v${{github.event.release.tag_name}}","manifest":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/latest/download/system.json","notes":"https://github.com/smilligan93/SR5-FoundryVTT/releases/tag/${{github.event.release.tag_name}}","compatibility":{"minimum":"11","verified":"12","maximum":"12"}}}'
+                  data: '{"id": "shadowrun5e", "dry-run": true, "release":{"version":"v${{github.event.release.tag_name}}","manifest":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/latest/download/system.json","notes":"https://github.com/smilligan93/SR5-FoundryVTT/releases/tag/${{github.event.release.tag_name}}","compatibility":{"minimum":"$MINIMUM","verified":"$VERIFIED","maximum": 12}}}'
