@@ -57,8 +57,8 @@ jobs:
             - name: Deploy Release
               uses: fjogeleit/http-request-action@v1
               env:
-                  MINIMUM: ${{ fromJson(env.MANIFEST_JSON).compatibility.minimum }}
-                  VERIFIED: ${{ fromJson(env.MANIFEST_JSON).compatibility.verified }}
+                  MINIMUM: ${{ fromJson(steps.read_file.outputs.content).compatibility.minimum }}
+                  VERIFIED: ${{ fromJson(steps.read_file.outputs.content).compatibility.verified }}
               with:
                   url: 'https://api.foundryvtt.com/_api/packages/release_version'
                   method: 'POST'
