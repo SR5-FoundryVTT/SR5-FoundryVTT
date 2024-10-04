@@ -176,7 +176,6 @@
     "SR5.Base": "Base",
     "SR5.BaseValue": "Base Value",
     "SR5.Biography": "Bio",
-    "SR5.Blackmail": "Blackmail",
     "SR5.BlastRadius": "Blast Radius",
     "SR5.Block": "Block",
     "SR5.Bonus": "Bonus",
@@ -233,8 +232,15 @@
     "SR5.ComplexForms": "Complex Forms",
     "SR5.Conceal": "Conceal",
     "SR5.ConditionMonitor": "Con. Mon.",
-    "SR5.Connection": "Connection",
-    "SR5.ContactType": "Type",
+    "SR5.Contact": {
+        "Blackmail": "Blackmail",
+        "Connection": "Connection",
+        "Family": "Family",
+        "Group": "Group",
+        "LinkedActor": "Actor",
+        "Loyalty": "Loyalty",
+                "Type": "Type"
+    },
     "SR5.Contacts": "Contacts",
     "SR5.Continue": "Continue",
     "SR5.Cost": "Cost",
@@ -437,7 +443,6 @@
     "SR5.Fade": "Fade",
     "SR5.FadeAttribute": "Fade Attribute",
     "SR5.FadeValue": "Fade Value",
-    "SR5.Family": "Family",
     "SR5.Filter": "Filter",
     "SR5.FireMode": "Fire Mode",
     "SR5.Force": "Force",
@@ -455,7 +460,6 @@
     "SR5.GlitchCritical": "Critical Glitch!",
     "SR5.Glitches": "Glitches:",
     "SR5.GoodCover": "Good Cover",
-    "SR5.GroupContact": "Group",
     "SR5.HackingProgram": "Hacking Program",
     "SR5.Help": "Help",
     "SR5.Hits": "Hits",
@@ -655,7 +659,6 @@
     "SR5.LivingPersona": "Living Persona",
     "SR5.Load": "Load",
     "SR5.Loaded": "Loaded",
-    "SR5.Loyalty": "Loyalty",
     "SR5.MIGRATION.BeginMigration": "Begin Migration",
     "SR5.MIGRATION.BeginNotification": "Beginning Shadowrun system migration from version",
     "SR5.MIGRATION.DoNotCloseNotification": "Please do not close your game or shut down FoundryVTT.",
@@ -1210,6 +1213,9 @@
         },
         "CallInAction": {
             "ActorType": "Type of actor to call in"
+        },
+        "Contact": {
+            "LinkActor": "Drag&Drop an actor to link him to this contact"
         },
         "CompilationTest": {
             "Level": "Level of the compiled sprite",

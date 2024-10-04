@@ -51,6 +51,17 @@
                 <input type="checkbox" class="submit-checkbox" name="system.group" {{checked system.group}} />
             </div>
         </div>
+        <div class="flexrow nowrap">
+            <label data-tooltip="SR5.Tooltips.Contact.LinkActor">{{localize "SR5.Compilation.FixedSprite"}}</label>
+            {{#if sprite}}
+            <span>
+                <a class="origin-link" draggable="false" data-origin-link="{{sprite.uuid}}">{{sprite.name}}</a>
+                <a class="close sprite-remove"><i class="fas fa-times"></i></a>
+            </span>
+            {{else}}
+            <span>{{localize "SR5.Compilation.DropSprite"}}</span>
+            {{/if}}
+        </div>
     </div>
     <div class="description">
         {{editor descriptionHTML target="system.description.value" button=true editable=true engine="prosemirror" collaborate=false}}
