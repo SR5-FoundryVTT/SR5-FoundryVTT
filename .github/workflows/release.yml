@@ -20,7 +20,7 @@ jobs:
                   DOWNLOAD: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/shadowrun5e.zip
                   VERSION: ${{github.event.release.tag_name}}
               run: |
-                    apt-get install moreutils
+                    sudo apt-get install moreutils
                     jq --arg url $URL '.url=$url' system.json | sponge system.json
                     jq --arg manifest $MANIFEST '.manifest=$manifest' system.json | sponge system.json
                     jq --arg download $DOWNLOAD '.download=$download' system.json | sponge system.json
