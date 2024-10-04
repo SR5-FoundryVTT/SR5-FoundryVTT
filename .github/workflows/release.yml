@@ -10,6 +10,9 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - name: Show manifest
+              run: echo "${{ steps.read_file.outputs.content }}"
+
             - name: Modify System Manifest With Release-Specific Values
               env:
                   URL: https://github.com/${{github.repository}}
@@ -22,11 +25,14 @@ jobs:
                     jq --arg download $DOWNLOAD '.download=$download' system.json > system.json
                     jq --arg version $VERSION '.version=$version' system.json > system.json
 
-            - name: Read System manifest for later use
-              run: |
-                    cat system.json
-                    echo "MANIFEST_JSON=$(jq -c . < system.json)" >> $GITHUB_ENV
-                    echo $GITHUB_ENV
+            - name: Read file contents
+              id: read_file
+              uses: andstor/file-reader-action@v1
+              with:
+                path: "system.json"
+
+            - name: Show manifest
+              run: echo "${{ steps.read_file.outputs.content }}"
 
             - name: Build and package release artifacts
               run: |
