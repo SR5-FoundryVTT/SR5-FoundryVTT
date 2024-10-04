@@ -11,13 +11,13 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: Read file contents
-              id: read_file
+              id: read_file_1
               uses: andstor/file-reader-action@v1
               with:
                 path: "system.json"
 
             - name: Show manifest
-              run: echo "${{ steps.read_file.outputs.content }}"
+              run: echo "${{ steps.read_file_1.outputs.content }}"
 
             - name: Modify System Manifest With Release-Specific Values
               env:
