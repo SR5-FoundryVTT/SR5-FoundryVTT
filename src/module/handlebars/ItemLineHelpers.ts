@@ -1,5 +1,5 @@
-import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
-import {SR5} from "../config";
+import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
+import { SR5 } from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
@@ -12,13 +12,13 @@ import { formatStrict } from '../utils/strings';
 interface ItemListRightSide {
     // Provide a simple text, main use for column headers.
     text?: {
-        text: string|number|undefined
+        text: string | number | undefined
         title?: string // TODO: This doesn't seem to be doing anything in ListItem.html
         cssClass?: string
     }
     // Provide a button element, main use for column values.
     button?: {
-        text: string|number
+        text: string | number
         cssClass?: string
         // Shorten the button visually...
         short?: boolean
@@ -30,7 +30,7 @@ interface ItemListRightSide {
         cssClass?: string
     }
     // Provide html as string.
-    html? :{
+    html?: {
         text: string
         cssClass?: string
     }
@@ -155,21 +155,21 @@ export const registerItemLineHelpers = () => {
             case 'effect':
                 addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Effect' });
                 addIcon.cssClass = 'effect-control';
-                addIcon.data = {action: 'create'};
+                addIcon.data = { action: 'create' };
                 return [addIcon];
             default:
                 return [];
         }
     });
 
-    Handlebars.registerHelper('InventoryIcons', function(name: string) {
+    Handlebars.registerHelper('InventoryIcons', function (name: string) {
         const addItemIcon = {
             icon: 'fas fa-plus',
             text: game.i18n.localize('SR5.Add'),
             title: formatStrict('SR5.Create', { type: 'SR5.Item' }),
             cssClass: 'inventory-item-create',
             // Add HTML data attributes using a key<string>:value<string> structure
-            data: {inventory: name}
+            data: { inventory: name }
         };
 
         return [addItemIcon];
@@ -226,7 +226,7 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
-            case 'modification':               
+            case 'modification':
             case 'ammo':
                 return [
                     {
@@ -480,9 +480,8 @@ export const registerItemLineHelpers = () => {
                 ];
             case 'armor':
             case 'ammo':
-            case 'modification':                
-                if (wrapper.isVehicleModification())
-                {
+            case 'modification':
+                if (wrapper.isVehicleModification()) {
                     return [
                         {
                             text: {
@@ -500,7 +499,7 @@ export const registerItemLineHelpers = () => {
                 };
 
                 if (wrapper.isDroneModification()) {
-                    return [                        
+                    return [
                         {
                             text: {
                                 text: wrapper.getModificationCategorySlots() ?? ''
@@ -519,27 +518,54 @@ export const registerItemLineHelpers = () => {
                 if (wrapper.isRangedWeapon() || (wrapper.isMeleeWeapon() && item.system.ammo?.current.max > 0)) {
                     const count = wrapper.getAmmo()?.current.value ?? 0;
                     const max = wrapper.getAmmo()?.current.max ?? 0;
-                    // Show reload on both no ammo configured and partially consumed clips.
-                    const text = count < max || max === 0 ?
-                        `${game.i18n.localize('SR5.Weapon.Reload')} (${count}/${max})` :
-                        game.i18n.localize('SR5.AmmoFull');
+                    const partialReloadRounds = wrapper.getAmmo()?.partial_reload_value ?? -1;
 
-                    const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : 'faded');
-                    return [
-                        {
-                            text: {
-                                title: `${game.i18n.localize('SR5.Weapon.AmmoCount')}: ${count}`,
-                                text,
-                                cssClass,
-                            },
+                    const reloadLinks: ItemListRightSide[] = [];
+
+                    // Show reload on both no ammo configured and partially consumed clips.
+                    const textReload = count < max ?
+                        `${game.i18n.localize('SR5.Weapon.Reload')} ` :
+                        `${game.i18n.localize('SR5.AmmoFull')}`;
+                        
+                    const cssClassReload = 'no-break';
+                    
+                    reloadLinks.push({
+                        text: {
+                            title: `${game.i18n.localize('SR5.Weapon.AmmoCount')}: `,
+                            text: textReload,
+                            cssClass: cssClassReload,
                         },
-                        {
-                            text: {
-                                text: '',
+                    });
+
+                    if (count < max) {
+                        const textFullReload = `${game.i18n.localize('SR5.Weapon.FullReload')} (${count}/${max})`;
+                        const cssClassFullReload = 'no-break reload-ammo roll';
+
+                        reloadLinks.push({
+                            button: {
+                                short: true,
+                                text: textFullReload,
+                                cssClass: cssClassFullReload,
                             },
-                        },
-                        qtyInput,
-                    ];
+                        });
+                    }       
+
+                    if(count < max && partialReloadRounds > 0) {
+                        const textPartialReload = `${game.i18n.localize('SR5.Weapon.PartialReload')} (+${partialReloadRounds})`;
+                        const cssClassPartialReload = 'no-break partial-reload-ammo roll';
+
+                        reloadLinks.push({
+                            button: {
+                                short: true,
+                                text: textPartialReload,
+                                cssClass: cssClassPartialReload,
+                            },
+                        });
+                    }       
+
+                    reloadLinks.push(qtyInput)
+                    
+                    return reloadLinks;
                 } else {
                     return [qtyInput];
                 }
@@ -809,22 +835,22 @@ export const registerItemLineHelpers = () => {
         const editIcon = {
             icon: 'fas fa-edit effect-control',
             title: game.i18n.localize('SR5.EditItem'),
-            data: {action: 'edit'}
+            data: { action: 'edit' }
         };
         const removeIcon = {
             icon: 'fas fa-trash effect-control',
             title: game.i18n.localize('SR5.DeleteItem'),
-            data: {action: 'delete'}
+            data: { action: 'delete' }
         };
         const disableIcon = {
             icon: `${effect.disabled ? 'far fa-circle' : 'fas fa-check-circle'} effect-control`,
             title: game.i18n.localize('SR5.ToggleActive'),
-            data: {action: "toggle"}
+            data: { action: "toggle" }
         };
         const openOriginIcon = {
             icon: 'fas fa-file effect-control',
             title: game.i18n.localize('SR5.OpenOrigin'),
-            data: {action: "open-origin"}
+            data: { action: "open-origin" }
         }
         // Disallow changes to effects that aren't of direct origin.
         let icons = [disableIcon, editIcon, removeIcon];
@@ -839,18 +865,18 @@ export const registerItemLineHelpers = () => {
         const openOriginIcon = {
             icon: 'fas fa-file item-effect-control',
             title: game.i18n.localize('SR5.OpenOrigin'),
-            data: {action: "open-origin"}
+            data: { action: "open-origin" }
         }
         const disableIcon = {
             icon: `${effect.disabled ? 'far fa-circle' : 'fas fa-check-circle'} item-effect-control`,
             title: game.i18n.localize('SR5.ToggleActive'),
-            data: {action: "toggle"}
+            data: { action: "toggle" }
         };
         const editIcon = {
             icon: 'fas fa-edit item-effect-control',
             title: game.i18n.localize('SR5.EditItem'),
-            data: {action: 'edit'}
-        };        
+            data: { action: 'edit' }
+        };
 
         return [openOriginIcon, disableIcon, editIcon];
     });
@@ -872,12 +898,12 @@ export const registerItemLineHelpers = () => {
         const incrementIcon = {
             icon: 'fas fa-plus marks-add-one',
             title: game.i18n.localize('SR5.Labels.Sheet.AddOne'),
-            data: {action: 'add-one'}
+            data: { action: 'add-one' }
         };
         const decrementIcon = {
             icon: 'fas fa-minus marks-remove-one',
             title: game.i18n.localize('SR5.Labels.Sheet.SubtractOne'),
-            data: {action: 'remove-one'}
+            data: { action: 'remove-one' }
         }
 
         return [incrementIcon, decrementIcon];

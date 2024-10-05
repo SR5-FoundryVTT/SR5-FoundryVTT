@@ -239,7 +239,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.itemType = await this._prepareItemTypes(data);
         data.effects = prepareSortedEffects(this.actor.effects.contents);
-        data.itemEffects = prepareSortedItemEffects(this.actor, {applyTo: this.itemEffectApplyTos});
+        data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);
@@ -355,7 +355,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
 
         // Misc. item type actions...
-        html.find('.reload-ammo').on('click', this._onReloadAmmo.bind(this));
+        html.find('.reload-ammo').on('click', async (event) => this._onReloadAmmo(event, false));
+        html.find('.partial-reload-ammo').on('click', async (event) => this._onReloadAmmo(event, true));
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Situation modifiers application
@@ -1468,13 +1469,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.actor.showHiddenSkills();
     }
 
-    _onOpenSource(event) {
+    async _onOpenSource(event) {
         event.preventDefault();
         const field = $(event.currentTarget).parents('.list-item');
         const iid = $(field).data().itemId;
         const item = this.actor.items.get(iid);
         if (item) {
-            item.openSource();
+            await item.openSource();
         }
     }
     /**
@@ -1720,11 +1721,11 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
-    async _onReloadAmmo(event) {
+    async _onReloadAmmo(event, partialReload: boolean) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
-        if (item) return item.reloadAmmo();
+        if (item) return item.reloadAmmo(partialReload);
     }
 
     /**
