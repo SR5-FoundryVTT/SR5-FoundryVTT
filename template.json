@@ -1211,7 +1211,7 @@
                         "max": 0
                     },
                     "clip_type": "",
-                    "partial_reload_value": 0
+                    "partial_reload_value": -1
                 },
                 "range": {
                     "category": "",
