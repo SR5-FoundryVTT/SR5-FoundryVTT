@@ -1561,7 +1561,8 @@
         "quality": {
             "templates": ["description", "action", "importFlags"],
             "type": "positive",
-            "rating": 0
+            "rating": 0,
+            "karma": 0
         },
         "action": {
             "templates": ["description", "action", "action_result", "importFlags"]
