@@ -1,3 +1,4 @@
+import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
 import { SR5 } from "../config";
@@ -306,8 +307,10 @@ export class SR5ItemSheet extends ItemSheet {
          */
         html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
         html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
+        html.find('select[name="change-ammo"]').on('change', async (event) => this._onAmmoEquip(event.target.value));
         html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
-        html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
+        html.find('.ammo-reload').on('click', async (event) => this._onAmmoReload(event, false));
+        html.find('select[name="change-clip-type"]').on('change', async (event) => this._onClipEquip(event.target.value));
 
         html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
@@ -538,17 +541,25 @@ export class SR5ItemSheet extends ItemSheet {
         await this.item.createNestedItem(item._source);
     }
 
-    async _onAmmoReload(event) {
+    async _onAmmoReload(event, partialReload: boolean) {
         event.preventDefault();
-        await this.item.reloadAmmo();
+        await this.item.reloadAmmo(partialReload);
     }
 
     async _onAmmoRemove(event) {
         await this._onOwnedItemRemove(event);
     }
 
-    async _onAmmoEquip(event) {
-        await this.item.equipAmmo(this._eventId(event));
+    async _onAmmoEquip(input) {
+        let id;
+
+        if (input.currentTarget) {
+            id = this._eventId(input);
+        } else {
+            id = input;
+        }
+
+        await this.item.equipAmmo(id);
     }
 
     async _onAddNewAmmo(event) {
@@ -564,8 +575,15 @@ export class SR5ItemSheet extends ItemSheet {
         await this.item.createNestedItem(item._source);
     }
 
+    async _onClipEquip(clipType: string) {
+        await this.item.update({
+            'system.ammo.clip_type': clipType,
+            'system.ammo.partial_reload_value': RangedWeaponRules.partialReload(clipType, this.item.actor.getAttribute('agility').value)
+        }, { render: true });
+    }
+
     async _onOwnedItemRemove(event) {
-        event.preventDefault(); 1
+        event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;

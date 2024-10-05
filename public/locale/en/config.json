@@ -1397,6 +1397,7 @@
         "CantRecoverPhysicalWithStunDamage": "Cant recover from physical damage with stun damage still present",
         "CantReloadAtAllDueToAmmo": "You have no ammo left!",
         "CantReloadFullyDueToAmmo": "You didn't have enough ammo to fully reload!",
+        "CantReloadPartialDueToAmmo": "You didn't have enough ammo for a complex reload action!",
         "CantReloadWithoutSpareClip": "You're out of spare clips!",
         "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
         "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
@@ -1422,6 +1423,16 @@
             "Melee": "Melee",
             "Range": "Range",
             "Thrown": "Thrown"
+        },
+        "Cliptype": {
+            "RemovableClip": "Removable Clip",
+            "BreakAction": "Break Action",
+            "BeltFed": "Belt Fed",
+            "InternalMagazin": "Internal Magazin",
+            "MuzzleLoader": "Muzzle Loader",
+            "Cylinder": "Cylinder",
+            "Drum": "Drum",
+            "Bow": "Bow"
         },
         "Mod": "Mod",
         "Mode": {
@@ -1479,6 +1490,8 @@
         },
         "Reach": "Reach",
         "Reload": "Reload",
+        "FullReload": "Full",
+        "PartialReload": "Partial",
         "Type": "Type",
         "Weapon": "Weapon"
     },
