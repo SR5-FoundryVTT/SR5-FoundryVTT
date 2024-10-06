@@ -859,10 +859,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     /**
      * Helper to determine if this success test has a damage value.
-     * Use the type as if none is selected, even if damage is otherwise calculated, no damage should apply.
      */
     get hasDamage(): boolean {
-        return this.data.action.damage.type.base !== '';
+        // check that we don't have a damage value of 0 and a damage type that isn't empty
+        return this.data.action.damage.value !== 0 && this.data.action.damage.type.value !== '';
     }
 
     /**
@@ -1385,7 +1385,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.data.sourceActorUuid) {
             ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
             return this;
-        };
+        }
         if (!this.canSecondChance) return this;
 
         // Fetch documents.
