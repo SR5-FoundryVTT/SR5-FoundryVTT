@@ -5,7 +5,7 @@
         </div>-->
         <div class="form-line">
             <div class="label advanced">
-                {{localize "SR5.ContactType"}}
+                {{localize "SR5.Contact.Type"}}
             </div>
             <div class="inputs">
                 <input type="text" name="system.type" value="{{system.type}}" placeholder="" />
@@ -13,23 +13,25 @@
         </div>
         <div class="form-line">
             <div class="label advanced">
-                {{localize "SR5.Connection"}}
+                {{localize "SR5.Contact.Connection"}}
             </div>
             <div class="inputs">
-                <input type="text" name="system.connection" value="{{system.connection}}" data-dtype="Number" placeholder="1" />
+                <input type="text" name="system.connection" value="{{system.connection}}" data-dtype="Number"
+                    placeholder="1" />
             </div>
         </div>
         <div class="form-line">
             <div class="label advanced">
-                {{localize "SR5.Loyalty"}}
+                {{localize "SR5.Contact.Loyalty"}}
             </div>
             <div class="inputs">
-                <input type="text" name="system.loyalty" value="{{system.loyalty}}" data-dtype="Number" placeholder="1" />
+                <input type="text" name="system.loyalty" value="{{system.loyalty}}" data-dtype="Number"
+                    placeholder="1" />
             </div>
         </div>
         <div class="form-line">
             <div class="label advanced">
-                {{localize "SR5.Family"}}
+                {{localize "SR5.Contact.Family"}}
             </div>
             <div>
                 <input type="checkbox" class="submit-checkbox" name="system.family" {{checked system.family}} />
@@ -37,7 +39,7 @@
         </div>
         <div class="form-line">
             <div class="label advanced">
-                {{localize "SR5.Blackmail"}}
+                {{localize "SR5.Contact.Blackmail"}}
             </div>
             <div>
                 <input type="checkbox" class="submit-checkbox" name="system.blackmail" {{checked system.blackmail}} />
@@ -45,25 +47,32 @@
         </div>
         <div class="form-line">
             <div class="label advanced">
-                {{localize "SR5.GroupContact"}}
+                {{localize "SR5.Contact.Group"}}
             </div>
             <div>
                 <input type="checkbox" class="submit-checkbox" name="system.group" {{checked system.group}} />
             </div>
         </div>
-        <div class="flexrow nowrap">
-            <label data-tooltip="SR5.Tooltips.Contact.LinkActor">{{localize "SR5.Compilation.FixedSprite"}}</label>
-            {{#if sprite}}
-            <span>
-                <a class="origin-link" draggable="false" data-origin-link="{{sprite.uuid}}">{{sprite.name}}</a>
-                <a class="close sprite-remove"><i class="fas fa-times"></i></a>
-            </span>
-            {{else}}
-            <span>{{localize "SR5.Compilation.DropSprite"}}</span>
-            {{/if}}
+        <div class="form-line">
+            <div class="label advanced">
+                {{localize "SR5.Contact.LinkedActor"}}
+            </div>
+            <div>
+                {{#if linkedActor}}
+                <a class="entity-link content-link" draggable="false" data-type="Actor" data-id="{{linkedActor.id}}"
+                    data-uuid="{{linkedActor.uuid}}">
+                    <i class="fas fa-user"></i>
+                    {{linkedActor.name}}
+                </a>
+                <a class="close actor-remove"><i class="fas fa-times"></i></a>
+                {{else}}
+                {{localize "SR5.Contact.DropActor"}}
+                {{/if}}
+            </div>
         </div>
     </div>
     <div class="description">
-        {{editor descriptionHTML target="system.description.value" button=true editable=true engine="prosemirror" collaborate=false}}
+        {{editor descriptionHTML target="system.description.value" button=true editable=true engine="prosemirror"
+        collaborate=false}}
     </div>
 </div>

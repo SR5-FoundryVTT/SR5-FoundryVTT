@@ -238,7 +238,8 @@
         "Family": "Family",
         "Group": "Group",
         "LinkedActor": "Actor",
-        "Loyalty": "Loyalty",
+        "Loyalty": "Loyalty",        
+        "DropActor": "Drag&Drop an actor to link it to this contact",
                 "Type": "Type"
     },
     "SR5.Contacts": "Contacts",

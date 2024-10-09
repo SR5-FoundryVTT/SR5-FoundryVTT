@@ -20,6 +20,7 @@ import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
+import { parseDropData } from '../../utils/sheets';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -456,37 +457,28 @@ export class SR5BaseActorSheet extends ActorSheet {
 
             // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
             case 'ActiveEffect':
-            {
-                const effectId = element.dataset.itemId;
-                let effect = this.actor.effects.get(effectId);
-                if (!effect) {
-                    // check to see if it belongs to an item we own
-                    effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
-                }
-                if (effect) {
-                    // Prepare data transfer
-                    dragData.type = 'ActiveEffect';
-                    dragData.data = effect;
+                {
+                    const effectId = element.dataset.itemId;
+                    let effect = this.actor.effects.get(effectId);
+                    if (!effect) {
+                        // check to see if it belongs to an item we own
+                        effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
+                    }
+                    if (effect) {
+                        // Prepare data transfer
+                        dragData.type = 'ActiveEffect';
+                        dragData.data = effect;
 
-                    // Set data transfer
-                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                        // Set data transfer
+                        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                    }
+                    return;
                 }
-                return;
-            }
 
             // All default Foundry data transfer.
             default:
                 // Let default Foundry handler deal with default drag cases.
                 return super._onDragStart(event);
-        }
-    }
-
-    /// Parse Drop Data events so we can see if an effect was dropped
-    parseDropData(event): any | undefined {
-        try {
-            return JSON.parse(event.dataTransfer.getData('text/plain'));
-        } catch (error) {
-            return undefined;
         }
     }
 
@@ -501,7 +493,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         if (!event.dataTransfer) return;
 
-        const data = this.parseDropData(event);
+        const data = parseDropData(event);
         if (data !== undefined) {
             if (data.type === 'ActiveEffect' && data.actorId !== this.actor.id) {
                 const effect = data.data;
@@ -516,6 +508,15 @@ export class SR5BaseActorSheet extends ActorSheet {
                 await this.actor.createEmbeddedDocuments('ActiveEffect', [effect]);
                 // don't process anything else since we handled the drop
                 return;
+            }
+            if (data.type === 'Actor' && data.uuid !== this.actor.uuid) {
+                const actor = await fromUuid(data.uuid) as SR5Actor;
+                const itemData = {
+                    name: actor.name ?? `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes['contact']))}`,
+                    type: 'contact',
+                    'system.linkedActor': actor.uuid
+                };
+                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
             }
         }
         // Keep upstream document created for actions base on it.
