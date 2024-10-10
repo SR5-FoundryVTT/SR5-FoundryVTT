@@ -1154,6 +1154,15 @@ export class SR5Item extends Item {
         }
     }
 
+    async getLinkedActor() {    
+        const uuid = this.wrapper.getLinkedActorUuid();
+
+        // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
+        if(uuid && this.asContact && foundry.utils.parseUuid(uuid).documentType === 'Actor') {
+            return await fromUuid(uuid) as SR5Actor;
+        }
+    }
+
     get isCritterPower(): boolean {
         return this.wrapper.isCritterPower();
     }

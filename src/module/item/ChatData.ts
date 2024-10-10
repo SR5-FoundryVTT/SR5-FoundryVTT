@@ -127,14 +127,14 @@ export const ChatData = {
 
     contact: (system, labels, props) => {
         props.push(system.type);
-        props.push(`${game.i18n.localize('SR5.Connection')} ${system.connection}`);
-        props.push(`${game.i18n.localize('SR5.Loyalty')} ${system.loyalty}`);
+        props.push(`${game.i18n.localize('SR5.Contact.Connection')} ${system.connection}`);
+        props.push(`${game.i18n.localize('SR5.Contact.Loyalty')} ${system.loyalty}`);
         if (system.blackmail) {
-            props.push(game.i18n.localize('SR5.Blackmail'));
+            props.push(game.i18n.localize('SR5.Contact.Blackmail'));
         }
         if (system.family) {
-            props.push(game.i18n.localize('SR5.Family'));
-        }
+            props.push(game.i18n.localize('SR5.Contact.Family'));
+        }            
     },
 
     lifestyle: (system, labels, props) => {

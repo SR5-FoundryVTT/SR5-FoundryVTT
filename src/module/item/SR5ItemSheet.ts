@@ -63,6 +63,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     networkDevices: (SR5Item | SR5Actor)[]
     networkController: SR5Item | undefined
 
+    // Contact Item
+    linkedActor: SR5Actor | undefined
+
     // Action Items. (not only type = action)
     //@ts-expect-error
     tests: typeof game.shadowrun5e.tests
@@ -123,6 +126,8 @@ export class SR5ItemSheet extends ItemSheet {
         //@ts-expect-error // TODO: remove TODO: foundry-vtt-types v10
         data.data = data.item.system;
         const itemData = this.item.system;
+
+        const linkedActor = await this.item.getLinkedActor();
 
         if (itemData.action) {
             try {
@@ -210,6 +215,10 @@ export class SR5ItemSheet extends ItemSheet {
             data['networkController'] = await this.item.networkController();
         }
 
+        if (this.item.isContact) {
+            data['linkedActor'] = await this.item.getLinkedActor() as SR5Actor;
+        }
+
         // Provide action parts with all test variants.
         // @ts-expect-error // TODO: put 'opposed test types' into config (see data.config)
         data.tests = game.shadowrun5e.tests;
@@ -230,7 +239,12 @@ export class SR5ItemSheet extends ItemSheet {
 
         data.rollModes = CONFIG.Dice.rollModes;
 
-        return data;
+
+
+        return {
+            ...data,
+            linkedActor
+        }
     }
 
     /**
@@ -305,6 +319,11 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
 
         /**
+         * Contact item specific
+         */
+        html.find('.actor-remove').click(this.handleLinkedActorRemove.bind(this));
+
+        /**
          * Weapon item specific
          */
         html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
@@ -317,6 +336,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
+
         /**
          * SIN item specific
          */
@@ -352,6 +372,24 @@ export class SR5ItemSheet extends ItemSheet {
         this._activateTagifyListeners(html);
     }
 
+    /**
+     * User requested removal of the linked actor.
+     */
+    async handleLinkedActorRemove(event: any) {
+        await this.item.update({ 'system.linkedActor': '' });
+        this.item.render(true);
+    }
+
+    /**
+     * Updating the contacts linked actor.
+     * 
+     * @param actor The prepared actor
+     */
+    async updateLinkedActor(actor: SR5Actor) {
+        await this.item.update({ 'system.linkedActor': actor.uuid });
+        this.item.render(true);
+    }
+
     _addDragSupportToListItemTemplatePartial(i, item) {
         if (item.dataset && item.dataset.itemId) {
             item.setAttribute('draggable', true);
@@ -374,19 +412,19 @@ export class SR5ItemSheet extends ItemSheet {
             switch (element.dataset.itemType) {
                 // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
                 case 'ActiveEffect':
-                {
-                    const effectId = element.dataset.itemId;
-                    const effect = this.item.effects.get(effectId);
-                    if (effect) {
-                        // Prepare data transfer
-                        dragData.type = 'ActiveEffect';
-                        dragData.data = effect; // this may blow up
+                    {
+                        const effectId = element.dataset.itemId;
+                        const effect = this.item.effects.get(effectId);
+                        if (effect) {
+                            // Prepare data transfer
+                            dragData.type = 'ActiveEffect';
+                            dragData.data = effect; // this may blow up
 
-                        // Set data transfer
-                        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                        return;
+                            // Set data transfer
+                            event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                            return;
+                        }
                     }
-                }
             }
         }
         return super._onDragStart(event);
@@ -409,7 +447,7 @@ export class SR5ItemSheet extends ItemSheet {
             this.item.setSource(data.uuid);
             return;
         }
-        
+
         // CASE - Handle ActiveEffects
         if (data.type === 'ActiveEffect') {
             if (data.itemId === this.item.id) {
@@ -475,6 +513,15 @@ export class SR5ItemSheet extends ItemSheet {
             }
 
             return await this.item.addNetworkDevice(actor);
+        }
+
+        // link actors in existing contacts
+        if (this.item.isContact && data.type === 'Actor') {
+            const actor = await fromUuid(data.uuid) as SR5Actor;
+
+            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+
+            return this.updateLinkedActor(actor);
         }
     }
 
