@@ -374,19 +374,19 @@ export class SR5ItemSheet extends ItemSheet {
             switch (element.dataset.itemType) {
                 // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
                 case 'ActiveEffect':
-                {
-                    const effectId = element.dataset.itemId;
-                    const effect = this.item.effects.get(effectId);
-                    if (effect) {
-                        // Prepare data transfer
-                        dragData.type = 'ActiveEffect';
-                        dragData.data = effect; // this may blow up
+                    {
+                        const effectId = element.dataset.itemId;
+                        const effect = this.item.effects.get(effectId);
+                        if (effect) {
+                            // Prepare data transfer
+                            dragData.type = 'ActiveEffect';
+                            dragData.data = effect; // this may blow up
 
-                        // Set data transfer
-                        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                        return;
+                            // Set data transfer
+                            event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                            return;
+                        }
                     }
-                }
             }
         }
         return super._onDragStart(event);
@@ -403,13 +403,13 @@ export class SR5ItemSheet extends ItemSheet {
         const data = parseDropData(event);
         if (!data) return;
 
-
         // CASE - Handle dropping of documents directly into the source field like urls and pdfs.
-        if (event.toElement.name === 'system.description.source') {
+        const targetElement = event.toElement || event.target;
+        if (targetElement?.name === 'system.description.source') {
             this.item.setSource(data.uuid);
             return;
         }
-        
+
         // CASE - Handle ActiveEffects
         if (data.type === 'ActiveEffect') {
             if (data.itemId === this.item.id) {
