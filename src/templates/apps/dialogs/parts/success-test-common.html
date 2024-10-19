@@ -69,7 +69,6 @@
         <div class="form-group">
             <label data-tooltip="SR5.Tooltips.Test.RollMode">{{ localize "SR5.RollMode" }}</label>
             <select style="color: white" name="test.data.options.rollMode">
-                {{log rollModes}}
                 {{#select rollMode}} {{#each rollModes}}
                 <option value="{{@key}}">{{localize this.label}}</option>
                 {{/each}} {{/select}}
