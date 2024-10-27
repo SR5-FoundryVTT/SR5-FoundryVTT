@@ -437,6 +437,17 @@ export const SR5 = {
         thrown: 'SR5.Weapon.Category.Thrown',
     },
 
+    weaponCliptypes: {
+        removable_clip: 'SR5.Weapon.Cliptype.RemovableClip',
+        break_action:'SR5.Weapon.Cliptype.BreakAction',
+        belt_fed:'SR5.Weapon.Cliptype.BeltFed',
+        internal_magazin:'SR5.Weapon.Cliptype.InternalMagazin',
+        muzzle_loader:'SR5.Weapon.Cliptype.MuzzleLoader',
+        cylinder:'SR5.Weapon.Cliptype.Cylinder',
+        drum:'SR5.Weapon.Cliptype.Drum',
+        bow:'SR5.Weapon.Cliptype.Bow',
+    },
+
     weaponRanges: {
         short: 'SR5.Weapon.Range.Short',
         medium: 'SR5.Weapon.Range.Medium',

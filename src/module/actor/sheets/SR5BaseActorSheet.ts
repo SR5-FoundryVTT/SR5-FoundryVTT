@@ -17,6 +17,8 @@ import Skills = Shadowrun.Skills;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
+import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
+import EffectApplyTo = Shadowrun.EffectApplyTo;
 
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
@@ -209,7 +211,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.itemType = await this._prepareItemTypes(data);
         data.effects = prepareSortedEffects(this.actor.effects.contents);
-        data.itemEffects = prepareSortedItemEffects(this.actor, {applyTo: this.itemEffectApplyTos});
+        data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.hasInventory = this._prepareHasInventory(data.inventories);
@@ -328,7 +330,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
 
         // Misc. item type actions...
-        html.find('.reload-ammo').on('click', this._onReloadAmmo.bind(this));
+        html.find('.reload-ammo').on('click', async (event) => this._onReloadAmmo(event, false));
+        html.find('.partial-reload-ammo').on('click', async (event) => this._onReloadAmmo(event, true));
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Situation modifiers application
@@ -428,10 +431,39 @@ export class SR5BaseActorSheet extends ActorSheet {
 
                 return;
 
+            // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
+            case 'ActiveEffect':
+            {
+                const effectId = element.dataset.itemId;
+                let effect = this.actor.effects.get(effectId);
+                if (!effect) {
+                    // check to see if it belongs to an item we own
+                    effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
+                }
+                if (effect) {
+                    // Prepare data transfer
+                    dragData.type = 'ActiveEffect';
+                    dragData.data = effect;
+
+                    // Set data transfer
+                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                }
+                return;
+            }
+
             // All default Foundry data transfer.
             default:
                 // Let default Foundry handler deal with default drag cases.
                 return super._onDragStart(event);
+        }
+    }
+
+    /// Parse Drop Data events so we can see if an effect was dropped
+    parseDropData(event): any | undefined {
+        try {
+            return JSON.parse(event.dataTransfer.getData('text/plain'));
+        } catch (error) {
+            return undefined;
         }
     }
 
@@ -444,6 +476,24 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (!event.dataTransfer) return;
+
+        const data = this.parseDropData(event);
+        if (data !== undefined) {
+            if (data.type === 'ActiveEffect' && data.actorId !== this.actor.id) {
+                const effect = data.data;
+                const applyTo = effect.flags.shadowrun5e.applyTo as EffectApplyTo;
+                // if the effect is just supposed to apply to the item's test, it won't work on an actor
+                if (applyTo === 'test_item') {
+                    ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
+                    return;
+                }
+                // delete the id so a new one is generated
+                delete effect._id;
+                await this.actor.createEmbeddedDocuments('ActiveEffect', [effect]);
+                // don't process anything else since we handled the drop
+                return;
+            }
+        }
         // Keep upstream document created for actions base on it.
         // TODO: foundry-vtt-types v11
         // eslint-disable-next-line
@@ -1428,13 +1478,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         await this.actor.showHiddenSkills();
     }
 
-    _onOpenSource(event) {
+    async _onOpenSource(event) {
         event.preventDefault();
         const field = $(event.currentTarget).parents('.list-item');
         const iid = $(field).data().itemId;
         const item = this.actor.items.get(iid);
         if (item) {
-            item.openSource();
+            await item.openSource();
         }
     }
     /**
@@ -1680,11 +1730,11 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
-    async _onReloadAmmo(event) {
+    async _onReloadAmmo(event, partialReload: boolean) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
-        if (item) return await item.reloadAmmo();
+        if (item) return item.reloadAmmo(partialReload);
     }
 
     /**

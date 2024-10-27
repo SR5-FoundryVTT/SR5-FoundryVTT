@@ -1259,7 +1259,9 @@
                     "current": {
                         "value": 0,
                         "max": 0
-                    }
+                    },
+                    "clip_type": "",
+                    "partial_reload_value": -1
                 },
                 "range": {
                     "category": "",
@@ -1605,7 +1607,8 @@
         "quality": {
             "templates": ["description", "action", "importFlags"],
             "type": "positive",
-            "rating": 0
+            "rating": 0,
+            "karma": 0
         },
         "action": {
             "templates": ["description", "action", "action_result", "importFlags"]

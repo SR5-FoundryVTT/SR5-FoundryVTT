@@ -189,7 +189,7 @@
     </div>
     {{/if}}
 </div>
-{{#if test.data.damage}}{{#ifgt test.data.damage.base 0}}
+{{#if test.data.damage}}{{#if test.hasDamage}}
 <div class="sr5 chat-card roll-card">
     <div class="card-content">
         <div class="left-side">
@@ -202,4 +202,4 @@
         <div class="right-side"></div>
     </div>
 </div>
-{{/ifgt}}{{/if}}
+{{/if}}{{/if}}

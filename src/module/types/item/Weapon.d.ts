@@ -33,6 +33,8 @@ declare namespace Shadowrun {
     export interface AmmunitionData {
         spare_clips: ValueMaxPair<number>;
         current: ValueMaxPair<number>;
+        clip_type: 'removable_clip' | 'break_action' | 'belt_fed' | 'internal_magazin' | 'muzzle_loader' | 'cylinder' | 'drum' | 'bow' | '';
+        partial_reload_value: number;
     }
 
     /**
