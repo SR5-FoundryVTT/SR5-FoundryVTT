@@ -116,13 +116,15 @@ export class SkillEditSheet extends DocumentSheet {
     override activateListeners(html) {
         super.activateListeners(html);
 
+        // Assure a application form is available.
+        //         // Assure a application form is available.
+        if (!this.form) return;
+
         /**
          * Drag and Drop Handling
          */
-        //@ts-expect-error
         this.form.ondragover = (event) => this._onDragOver(event);
-        //@ts-expect-error
-        this.form.ondrop = (event) => this._onDrop(event);
+        this.form.ondrop = async (event) => await this._onDrop(event);
 
         $(html).find('.open-source').on('click', this._onOpenSource.bind(this));
         $(html).find('.add-spec').on('click', this._addNewSpec.bind(this));

@@ -330,8 +330,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
 
         // Misc. item type actions...
-        html.find('.reload-ammo').on('click', async (event) => this._onReloadAmmo(event, false));
-        html.find('.partial-reload-ammo').on('click', async (event) => this._onReloadAmmo(event, true));
+        html.find('.reload-ammo').on('click', async (event) => await this._onReloadAmmo(event, false));
+        html.find('.partial-reload-ammo').on('click', async (event) => await this._onReloadAmmo(event, true));
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Situation modifiers application
@@ -1734,7 +1734,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
-        if (item) return item.reloadAmmo(partialReload);
+        if (item) return await item.reloadAmmo(partialReload);
     }
 
     /**

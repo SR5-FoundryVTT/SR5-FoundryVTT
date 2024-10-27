@@ -436,7 +436,7 @@ export const TestCreator = {
     _prepareTestDataWithActionForActor: function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData, againstData?: any) {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = actor.getRollData({againstData: againstData ?? data.following?.against});
-
+        console.error('Dev check', rollData);
         
         const pool = new PartsList<number>(data.pool.mod);
 

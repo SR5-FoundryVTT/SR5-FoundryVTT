@@ -299,10 +299,10 @@ export class SR5ItemSheet extends ItemSheet {
          */
         html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
         html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
-        html.find('select[name="change-ammo"]').on('change', async (event) => this._onAmmoEquip(event.target.value));
+        html.find('select[name="change-ammo"]').on('change', async (event) => await this._onAmmoEquip(event.target.value));
         html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
-        html.find('.ammo-reload').on('click', async (event) => this._onAmmoReload(event, false));
-        html.find('select[name="change-clip-type"]').on('change', async (event) => this._onClipEquip(event.target.value));
+        html.find('.ammo-reload').on('click', async (event) => await this._onAmmoReload(event, false));
+        html.find('select[name="change-clip-type"]').on('change', async (event) => await this._onClipEquip(event.target.value));
 
         html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
@@ -343,7 +343,7 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     _addDragSupportToListItemTemplatePartial(i, item) {
-        if (item.dataset && item.dataset.itemId) {
+        if (item.dataset?.itemId) {
             item.setAttribute('draggable', true);
             item.addEventListener('dragstart', this._onDragStart.bind(this), false);
         }
