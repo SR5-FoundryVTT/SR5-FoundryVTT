@@ -1,3 +1,4 @@
+import { SR5Item } from './../item/SR5Item';
 import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
@@ -13,7 +14,11 @@ import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlo
  */
 export class OpposedBruteForceTest extends OpposedTest {
     override against: BruteForceTest;
+    // The target icon to place a mark on.
     icon: Shadowrun.NetworkDevice;
+    // The target icon, if it's representing a device.
+    device: SR5Item;
+    // The target icon, if it's representing a persona.
     persona: SR5Actor;
 
     override _prepareData(data: any, options?: any) {

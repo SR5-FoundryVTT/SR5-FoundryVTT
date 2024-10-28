@@ -129,15 +129,19 @@ export const MarkPlacementFlow = {
     /**
      * Prepare icon and persona within a an opposing test context.
      * 
-     * The active success test will provide an icon, which is the target and an optional persona, connected to it.
+     * The icon targeted by initial mark placement is either a persona or a device.
+     * Devices might be related to a persona, in which case a persona will be present.
      * @param test The test to populate with documents.
      */
     async populateOpposedDocuments(test: OpposedBruteForceTest|OpposedHackOnTheFlyTest) {
+        if (test.against.data.iconUuid) {
+            test.icon = await fromUuid(test.against.data.iconUuid) as SR5Item;
+        }
         if (test.against.data.personaUuid) {
             test.persona = await fromUuid(test.against.data.personaUuid) as SR5Actor;
         }
-        if (test.against.data.iconUuid) {
-            test.icon = await fromUuid(test.against.data.iconUuid) as SR5Item;
+        if (test.icon instanceof SR5Item) {
+            test.device = test.icon;
         }
     },
     /**
