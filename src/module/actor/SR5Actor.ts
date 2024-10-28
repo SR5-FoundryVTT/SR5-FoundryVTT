@@ -14,7 +14,6 @@ import {SpritePrep} from "./prep/SpritePrep";
 import {VehiclePrep} from "./prep/VehiclePrep";
 import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import {SkillRules} from "../rules/SkillRules";
-import {MatrixRules} from "../rules/MatrixRules";
 import {ICPrep} from "./prep/ICPrep";
 import {
     EffectChangeData
@@ -30,6 +29,13 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
+import { ActorMarksFlow } from './flows/ActorMarksFlow';
+import { SetMarksOptions } from '../flows/MarksFlow';
+import { RollDataOptions } from '../item/Types';
+import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
+import { DamageApplicationFlow } from './flows/DamageApplicationFlow';
+import { SuccessTest } from '../tests/SuccessTest';
 
 
 /**
@@ -89,7 +95,7 @@ export class SR5Actor extends Actor {
     async setOverwatchScore(value) {
         const num = parseInt(value);
         if (!isNaN(num)) {
-            return this.setFlag(SYSTEM_NAME, 'overwatchScore', num);
+            return await this.setFlag(SYSTEM_NAME, 'overwatchScore', num);
         }
     }
 
@@ -276,7 +282,7 @@ export class SR5Actor extends Actor {
                 .map(change => {
                     // @ts-expect-error // Foundry internal code, duplicate doesn't like EffectChangeData
                     change = foundry.utils.duplicate(change);
-                    // @ts-expect-error
+                    // @ts-expect-error We inject effect for ease of use, using the same method as FoundryVTT core...
                     change.effect = effect;
                     change.priority = change.priority ?? (change.mode * 10);
 
@@ -288,7 +294,7 @@ export class SR5Actor extends Actor {
         changes.sort((a, b) => a.priority - b.priority);
 
         for (const change of changes) {
-            // @ts-expect-error
+            // @ts-expect-error We inject effect for ease of use, using the same method as FoundryVTT core...
             change.effect.apply(this, change);
         }
     }
@@ -311,7 +317,7 @@ export class SR5Actor extends Actor {
         const overrides = {};
 
         for (const change of changes) {
-            // @ts-expect-error
+            // @ts-expect-error We inject effect for ease of use, using the same method as FoundryVTT core...
             const result = change.effect.apply(this, change);
             if (result !== null) overrides[change.key] = result;
         }
@@ -334,7 +340,7 @@ export class SR5Actor extends Actor {
                 .map(change => {
                     // @ts-expect-error // Foundry internal code, duplicate doesn't like EffectChangeData
                     change = foundry.utils.duplicate(change);
-                    // @ts-expect-error
+                    // @ts-expect-error We inject effect for ease of use, using the same method as FoundryVTT core...
                     change.effect = effect;
                     change.priority = change.priority ?? (change.mode * 10);
 
@@ -480,7 +486,7 @@ export class SR5Actor extends Actor {
      */
     get recoilCompensation(): number {
         if(!this.system.values.hasOwnProperty('recoil_compensation')) return 0;
-        //@ts-expect-error
+        //@ts-expect-error // We checked above, so let's ignore this typing.
         return this.system.values.recoil_compensation.value;
     }
 
@@ -499,7 +505,7 @@ export class SR5Actor extends Actor {
      */
     get recoil(): number {
         if(!this.system.values.hasOwnProperty('recoil')) return 0;
-        //@ts-expect-error
+        //@ts-expect-error // We checked above, so let's ignore this typing.
         return this.system.values.recoil.value;
     }
 
@@ -525,7 +531,7 @@ export class SR5Actor extends Actor {
     getAttribute(name: string): Shadowrun.AttributeField {
         // First check vehicle stats, as they don't always exist.
         const stats = this.getVehicleStats();
-        if (stats && stats[name]) return stats[name];
+        if (stats?.[name]) return stats[name];
 
         // Second check general attributes.
         const attributes = this.getAttributes();
@@ -603,7 +609,7 @@ export class SR5Actor extends Actor {
             case 'exotic':
                 return 'pilot_exotic_vehicle';
             default:
-                return;
+                
         }
     }
 
@@ -626,20 +632,53 @@ export class SR5Actor extends Actor {
         return this.system.skills.active;
     }
 
-    getNetworkController(): string|undefined {
+    getMasterUuid(): string|undefined {
         if(!this.isVehicle()) return;
 
-        return this.asVehicle()?.system?.networkController;
+        return this.asVehicle()?.system?.master;
     }
 
-    async setNetworkController(networkController: string|undefined): Promise<void> {
+    async setMasterUuid(masterLink: string|undefined): Promise<void> {
         if(!this.isVehicle()) return;
 
-        await this.update({ 'system.networkController': networkController });
+        await this.update({ 'system.master': masterLink });
     }
 
-    get canBeNetworkDevice(): boolean {
+    get canBeSlave(): boolean {
         return this.isVehicle();
+    }
+
+    /**
+     * The network (host/grid) this matrix actor is connected to.
+     */
+    get network(): SR5Item|undefined {
+        if (!this.isMatrixActor) return
+
+        // Avoid typing issues by using [''] notation.
+        const network = this.system['matrix'].network;
+        // Matrix actor without ability to connect to network
+        if (!network) return;
+
+        const item = fromUuidSync(network.uuid) as SR5Item;
+        if (!item) return;
+
+        return item;
+    }
+
+    /**
+     * Connect this actor to a host / grid
+     * 
+     * @param network Must be an item of matching type
+     */
+    async connectNetwork(network: SR5Item) {
+        await MatrixNetworkFlow.connectNetwork(this, network);
+    }
+
+    /**
+     * Disconnect this actor from a host / grid
+     */
+    async disconnectNetwork() {
+        await MatrixNetworkFlow.disconnectNetwork(this);
     }
 
     /**
@@ -969,7 +1008,7 @@ export class SR5Actor extends Actor {
 
         const skills = this.getActiveSkills();
         for (const [id, skill] of Object.entries(skills)) {
-            if (skill.hidden === true) {
+            if (skill.hidden) {
                 skill.hidden = false;
                 updateData[`system.skills.active.${id}`] = skill;
             }
@@ -1001,7 +1040,7 @@ export class SR5Actor extends Actor {
         const rating = this.getDeviceRating();
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        const testCls = this.tests._getTestClass('SuccessTest');
+        const testCls = this.tests._getTestClass('SuccessTest') as typeof SuccessTest;
         const test = new testCls({}, {actor: this}, {showDialog});
 
         // Build pool values.
@@ -1169,7 +1208,7 @@ export class SR5Actor extends Actor {
     
             const action = this.skillActionData(skillId, options);
             if (!action) return;
-            if(teamworkData.criticalGlitch != true) {
+            if(!teamworkData.criticalGlitch) {
                 action.limit.mod.push({name: "Teamwork", value: teamworkData.additionalLimit})
             }
 
@@ -1182,41 +1221,6 @@ export class SR5Actor extends Actor {
     
             return await test.execute();
         }
-
-    /**
-     * Is the given attribute id a matrix attribute
-     * @param attribute
-     */
-    _isMatrixAttribute(attribute: string): boolean {
-        return SR5.matrixAttributes.hasOwnProperty(attribute);
-    }
-
-    /**
-     * Add matrix modifier values to the given modifier parts from whatever Value as part of 
-     * matrix success test.
-     * 
-     * @param parts The Value.mod field as a PartsList
-     * @param atts The attributes used for the success test.
-     */
-    _addMatrixParts(parts: PartsList<number>, atts) {
-        if (Helpers.isMatrix(atts)) {
-            if (!("matrix" in this.system)) return;
-
-            // Apply general matrix modifiers based on commlink/cyberdeck status.
-            const matrix = this.system.matrix;
-            if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
-            if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
-        }
-    }
-
-    /**
-     * Remove matrix modifier values to the given modifier part
-     * 
-     * @param parts A Value.mod field as a PartsList
-     */
-    _removeMatrixParts(parts: PartsList<number>) {
-        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.removePart(part));
-    }
 
     /**
      * Build an action for the given skill id based on it's configured values.
@@ -1263,9 +1267,9 @@ export class SR5Actor extends Actor {
      * @param value
      */
     //@ts-expect-error // TODO: foundry-vtt-types v10
-    setFlag(scope: string, key: string, value: any): Promise<any> {
+    async setFlag(scope: string, key: string, value: any): Promise<any> {
         const newValue = Helpers.onSetFlag(value);
-        return super.setFlag(scope, key, newValue);
+        return await super.setFlag(scope, key, newValue);
     }
 
     /**
@@ -1331,95 +1335,9 @@ export class SR5Actor extends Actor {
     }
 
     getActivePlayerOwners(): User[] {
-        // @ts-expect-error
         return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
-    __addDamageToTrackValue(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData): Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData {
-        if (damage.value === 0) return track;
-        if (track.value === track.max) return track;
-
-        //  Avoid cross referencing.
-        track = foundry.utils.duplicate(track);
-
-        track.value += damage.value;
-        if (track.value > track.max) {
-            // dev error, not really meant to be ever seen by users. Therefore no localization.
-            console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.")
-            track.value = track.max;
-        }
-
-        return track;
-    }
-
-    async _addDamageToDeviceTrack(damage: Shadowrun.DamageData, device: SR5Item) {
-        if (!device) return;
-
-        let condition = device.getCondition();
-        if (!condition) return damage;
-
-        if (damage.value === 0) return;
-        if (condition.value === condition.max) return;
-
-        condition = this.__addDamageToTrackValue(damage, condition);
-
-        const updateData = {['system.technology.condition_monitor']: condition};
-        await device.update(updateData);
-    }
-
-    /**
-     * Apply damage to an actors main damage monitor / track.
-     * 
-     * This includes physical and stun for meaty actors and matrix for matrix actors.
-     * 
-     * Applying damage will also reduce the initiative score of an active combatant.
-     * 
-     * Handles rule 'Changing Initiative' on SR5#160.
-     * 
-     * @param damage The damage to be taken.
-     * @param track The track to apply that damage to.
-     */
-    async _addDamageToTrack(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData) {
-        if (damage.value === 0) return;
-        if (track.value === track.max) return;
-
-        // Allow a wound modifier difference to be calculated after damage has been dealt.
-        const woundsBefore = this.getWoundModifier();
-
-        // Apply damage to track and trigger derived value calculation.
-        track = this.__addDamageToTrackValue(damage, track);
-        const updateData = {[`system.track.${damage.type.value}`]: track};
-        await this.update(updateData);
-
-        // Apply any wounds modifier delta to an active combatant.
-        const woundsAfter = this.getWoundModifier();
-        const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
-
-        // Only actors that can have a wound modifier, will have a delta.
-        if (iniAdjustment < 0 && game.combat) game.combat.adjustActorInitiative(this, iniAdjustment);
-    }
-
-    /**
-     * Apply damage to an actors physical overflow damage monitor / track.
-     * 
-     * @param damage The damage to overflow.
-     * @param track The track to overflow the damage into.
-     * @returns 
-     */
-    async _addDamageToOverflow(damage: Shadowrun.DamageData, track: Shadowrun.OverflowTrackType) {
-        if (damage.value === 0) return;
-        if (track.overflow.value === track.overflow.max) return;
-
-        //  Avoid cross referencing.
-        const overflow = foundry.utils.duplicate(track.overflow);
-
-        // Don't over apply damage to the track overflow.
-        overflow.value += damage.value;
-        overflow.value = Math.min(overflow.value, overflow.max);
-
-        const updateData = {[`system.track.${damage.type.value}.overflow`]: overflow};
-        await this.update(updateData);
-    }
 
     /**
      * Heal damage on a given damage track. Be aware that healing damage doesn't equate to recovering damage
@@ -1431,10 +1349,10 @@ export class SR5Actor extends Actor {
     async healDamage(track: Shadowrun.DamageType, healing: number) {
         console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
 
-        // @ts-expect-error
+        // @ts-expect-error // Ease of typing...
         if (!this.system?.track.hasOwnProperty(track)) return
 
-        // @ts-expect-error
+        // @ts-expect-error // Ease of typing...
         const current = Math.max(this.system.track[track].value - healing, 0);
 
         await this.update({[`system.track.${track}.value`]: current});
@@ -1454,100 +1372,13 @@ export class SR5Actor extends Actor {
         return RecoveryRules.canHealPhysicalDamage(stun.value);
     }
 
-    /** 
-     * Apply damage to the stun track and get overflow damage for the physical track.
-     * 
-     * @param damage The to be applied damage.
-     * @returns overflow damage after stun damage is full.
-     */
-    async addStunDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData> {
-        if (damage.type.value !== 'stun') return damage;
-
-        const track = this.getStunTrack();
-        if (!track)
-            return damage;
-
-        const {overflow, rest} = this._calcDamageOverflow(damage, track);
-
-        // Only change damage type when needed, in order to avoid confusion of callers.
-        if (overflow.value > 0) {
-            // Apply Stun overflow damage to physical track according to: SR5E#170
-            overflow.value = Math.floor(overflow.value / 2);
-            overflow.type.value = 'physical';
-        }
-
-        await this._addDamageToTrack(rest, track);
-
-        return overflow;
-    }
-
-    /**
-     * Apply damage to the physical track and get overflow damage for the physical overflow track.
-     * 
-     * @param damage The to be applied damage.
-     */
-    async addPhysicalDamage(damage: Shadowrun.DamageData) {
-        if (damage.type.value !== 'physical') {
-            return damage;
-        }
-        
-
-        const track = this.getPhysicalTrack();
-        if (!track) {
-            return damage;
-        }  
-
-        const {overflow, rest} = this._calcDamageOverflow(damage, track);
-
-        await this._addDamageToTrack(rest, track);
-        await this._addDamageToOverflow(overflow, track);
-    }
-
-    
-    /**
-     * Matrix damage can be added onto different tracks:
-     * - IC has a local matrix.condition_monitor
-     * - Characters have matrix devices (items) with their local track
-     */
-    async addMatrixDamage(damage: Shadowrun.DamageData) {
-        if (damage.type.value !== 'matrix') return;
-
-
-        const device = this.getMatrixDevice();
-        const track = this.getMatrixTrack();
-        if (!track) return damage;
-
-        const {overflow, rest} = this._calcDamageOverflow(damage, track);
-
-        if (device) {
-            await this._addDamageToDeviceTrack(rest, device);
-        }
-        if (this.isIC() || this.isSprite()) {
-            await this._addDamageToTrack(rest, track);
-        }
-    }
-
     /**
      * Apply damage of any type to this actor. This should be the main entry method to applying damage.
      * 
      * @param damage Damage to be applied
-     * @returns overflow damage.
      */
     async addDamage(damage: Shadowrun.DamageData) {
-        switch(damage.type.value) {
-            case 'matrix':
-                await this.addMatrixDamage(damage);
-                break;
-            case 'stun':
-                // Let stun overflow to physical.
-                const overflow = await this.addStunDamage(damage);
-                await this.addPhysicalDamage(overflow);
-                break;
-            case 'physical':
-                await this.addPhysicalDamage(damage);
-                break;
-        }
-
+        await DamageApplicationFlow.addDamage(this, damage);
         await this.applyDefeatedStatus();
     }
 
@@ -1561,59 +1392,7 @@ export class SR5Actor extends Actor {
      * @param value The matrix damage to be applied.
      */
     async setMatrixDamage(value: number) {
-        // Disallow negative values.
-        value = Math.max(value, 0);
-
-        // Use artificial damage to be consistent across other damage application Actor methods.
-        const damage = DataDefaults.damageData({
-            type: {base: 'matrix', value: 'matrix'},
-            base: value,
-            value: value
-        });
-
-        let track = this.getMatrixTrack();
-        if (!track) return;
-
-        // Reduce track to minimal value and simply add new damage.
-        track.value = 0;
-        // As track has been reduced to zero already, setting it to zero is already done.
-        if (value > 0)
-            track = this.__addDamageToTrackValue(damage, track);
-
-        // If a matrix device is used, damage that instead of the actor.
-        const device = this.getMatrixDevice();
-        if (device) {
-            return await device.update({'system.technology.condition_monitor': track});
-        }
-
-        // IC actors use a matrix track.
-        if (this.isIC()) {
-            return await this.update({'system.track.matrix': track});
-        }
-
-        // Emerged actors use a personal device like condition monitor.
-        if (this.isMatrixActor) {
-            return await this.update({'system.matrix.condition_monitor': track});
-        }
-    }
-
-    /** Calculate damage overflow only based on max and current track values.
-     */
-    _calcDamageOverflow(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.ConditionData): { overflow: Shadowrun.DamageData, rest: Shadowrun.DamageData } {
-        const freeTrackDamage = track.max - track.value;
-        const overflowDamage = damage.value > freeTrackDamage ?
-            damage.value - freeTrackDamage :
-            0;
-        const restDamage = damage.value - overflowDamage;
-
-        //  Avoid cross referencing.
-        const overflow = foundry.utils.duplicate(damage);
-        const rest = foundry.utils.duplicate(damage);
-
-        overflow.value = overflowDamage;
-        rest.value = restDamage;
-
-        return {overflow, rest};
+        DamageApplicationFlow.setMatrixDamage(this, value);
     }
 
     getStunTrack(): Shadowrun.TrackType | undefined {
@@ -1685,18 +1464,17 @@ export class SR5Actor extends Actor {
         const effect = status || CONFIG.controlIcons.defeated;
 
         // Avoid applying defeated status multiple times.
-        const existing = this.effects.reduce((arr, e) => {
+        const existing = this.effects.reduce<string[]>((arr, e) => {
             // @ts-expect-error TODO: foundry-vtt-types v10
             if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
-                // @ts-expect-error
-                arr.push(e.id);
+                arr.push(e.id as string);
             }
             return arr;
         }, []);
 
         if (existing.length) return;
 
-        // @ts-expect-error
+        // @ts-expect-error // TODO: foundry-vtt-types v11
         // Set effect as active, as we've already made sure it isn't.
         // Otherwise Foundry would toggle on/off, even though we're still dead.
         await token.object.toggleEffect(effect, { overlay: true, active: true });
@@ -1794,7 +1572,7 @@ export class SR5Actor extends Actor {
     get combatInitiativeScore(): number {
         if (!game.combat) return 0;
         const combatant = (game.combat as SR5Combat).getActorCombatant(this);
-        if (!combatant || !combatant.initiative) return 0;
+        if (!combatant?.initiative) return 0;
         return combatant.initiative;
     }
 
@@ -1895,16 +1673,15 @@ export class SR5Actor extends Actor {
     async addICHost(item: SR5Item) {
         if (!this.isIC()) return;
         if (!item.isHost) return;
-
-        const host = item.asHost;
-        if (!host) return;
-        await this._updateICHostData(host);
+        await this._updateICHostData(item);
     }
 
-    async _updateICHostData(hostData: Shadowrun.HostItemData) {
+    async _updateICHostData(host: SR5Item) {
+        const hostData = host.asHost;
+        if (!hostData) return;
+
         const updateData = {
-            // @ts-expect-error _id is missing on internal typing...
-            id: hostData._id,
+            id: host.uuid,
             rating: hostData.system.rating,
             atts: foundry.utils.duplicate(hostData.system.atts)
         }
@@ -1939,12 +1716,46 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Get the host item connect to this ic type actor.
+     * Return the host this IC actor is connected with.
+     * 
+     * @returns A item of type host or undefined.
      */
-    getICHost(): SR5Item | undefined {
+    async getICHost(): Promise<SR5Item | undefined> {
         const ic = this.asIC();
         if (!ic) return;
-        return game.items?.get(ic?.system?.host.id);
+        // legacy used id, new uses uuid. Try both.
+        const document = await fromUuid(ic?.system?.host.id) || game.actors?.get(ic?.system?.host.id);
+        if ((document instanceof SR5Item) && document.isHost) return document;
+    }
+
+    /**
+     * Is this actor currently using the VR matrix mode?
+     */
+    get isUsingVR(): boolean {
+        const matrixData = this.matrixData;
+        if (!matrixData) return false;
+        return matrixData.vr;
+    }
+
+    /**
+     * Is this actor currently using VR hot sim?
+     * 
+     * An actor must be using VR to be able to use hot sim.
+     */
+    get isUsingHotSim(): boolean {
+        if (!this.isUsingVR) return false;
+        const matrixData = this.matrixData;
+        if (!matrixData) return false;
+        return matrixData.hot_sim;
+    }
+
+    /**
+     * Is this actors persona currently being link locked?
+     */
+    get isLinkLocked(): boolean {
+        const matrixData = this.matrixData;
+        if (!matrixData) return false;
+        return matrixData.link_locked;
     }
 
     /**
@@ -1980,13 +1791,6 @@ export class SR5Actor extends Actor {
         if (!this.isSprite()) return;
         await this.update({ 'system.technomancerUuid': '' });
     }
-    /** Check if this actor is of one or multiple given actor types
-     *
-     * @param types A list of actor types to check.
-     */
-    matchesActorTypes(types: string[]): boolean {
-        return types.includes(this.type);
-    }
 
     /** 
      * Get all situational modifiers from this actor.
@@ -2014,6 +1818,41 @@ export class SR5Actor extends Actor {
         return 'matrix' in this.system;
     }
 
+    /**
+     * Check if the current actor is a matrix first class citizen.
+     * 
+     * @returns true, when the actor lives in the matrix.
+     */
+    get hasActorPersona(): boolean {
+        return this.isVehicle() || this.isIC() || this.isEmerged;
+    }
+
+    /**
+     * Check if the current actor has a normal persona given by an matrix device.
+     * 
+     * @returns true, when the actor has an active persona.
+     */
+    get hasDevicePersona(): boolean {
+        return this.getMatrixDevice() !== undefined;
+    }
+
+    /**
+     * Check if the current actor has a active living persona.
+     * If a technomancer uses a matrix device to connect with, they don't have a living persona!
+     * 
+     * @returns true, when a technomancer uses their living persona
+     */
+    get hasLivingPersona(): boolean {
+        return !this.hasDevicePersona && this.isEmerged;
+    }
+
+    /**
+     * Retrieve all matrix devices of this actor that are equipped and set to wireless.
+     */
+    get wirelessDevices(): SR5Item[] {
+        return this.items.filter((item) => item.isMatrixDevice && item.isEquipped() && item.isWireless());
+    }
+
     get matrixData(): Shadowrun.MatrixData | undefined {
         if (!this.isMatrixActor) return;
         // @ts-expect-error // isMatrixActor handles it, TypeScript doesn't know.
@@ -2027,146 +1866,123 @@ export class SR5Actor extends Actor {
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks The amount of marks to be placed
      * @param options Additional options that may be needed
-     * @param options.scene The scene the actor lives on. If empty, will be current active scene
-     * @param options.item The item that the mark is to be placed on
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
-        if (!canvas.ready) return;
-
-        if (this.isIC() && this.hasHost()) {
-            return await this.getICHost()?.setMarks(target, marks, options);
-        }
-
-        if (!this.isMatrixActor) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
-            return console.error(`The actor type ${this.type} can't receive matrix marks!`);
-        }
-        if (target.actor && !target.actor.isMatrixActor) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
-            return console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
-        }
-        if (!target.actor) {
-            return console.error(`The token ${target.name} is missing it's actor`);
-        }
-
-        // It hurt itself in confusion.
-        if (this.id === target.actor.id) {
-            return;
-        }
-
-        // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene as Scene;
-        const item = options?.item;
-
-        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        const matrixData = this.matrixData;
-
-        if (!matrixData) return;
-
-        const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
-        matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
-
-        await this.update({'system.matrix.marks': matrixData.marks});
+    async setMarks(target: Shadowrun.NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
+        await ActorMarksFlow.setMarks(this, target, marks, options);
     }
 
     /**
-     * Remove ALL marks placed by this actor
+     * Remove ALL marks placed by this actor and maybe disconnect from host / grid if necessary.
      */
     async clearMarks() {
-        const matrixData = this.matrixData;
-        if (!matrixData) return;
+        // Keep marks for later use
+        const marks = this.marksData 
 
-        // Delete all markId properties from ActorData
-        const updateData = {}
-        for (const markId of Object.keys(matrixData.marks)) {
-            updateData[`-=${markId}`] = null;
+        await ActorMarksFlow.clearMarks(this);
+
+        // Check if marks have been used to connect to host/grid
+        const network = this.network;
+        if (!network) return;
+        if (!marks) return;
+
+        for (const {uuid} of marks) {
+            if (network.uuid === uuid) {
+                return await this.disconnectNetwork();
+            }
         }
-
-        await this.update({'system.matrix.marks': updateData});
     }
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     * 
+     * Maybe disconnect from host/grid as well, if necessary
      */
-    async clearMark(markId: string) {
-        if (!this.isMatrixActor) return;
+    async clearMark(uuid: string) {
+        await ActorMarksFlow.clearMark(this, uuid);
 
-        const updateData = {}
-        updateData[`-=${markId}`] = null;
+        // Check if marks have been used to connect to host/grid
+        const network = this.network;
+        if (!network) return;
 
-        await this.update({'system.matrix.marks': updateData});
-    }
-
-    getAllMarks(): Shadowrun.MatrixMarks | undefined {
-        const matrixData = this.matrixData;
-        if (!matrixData) return;
-        return matrixData.marks;
-    }
-
-    /**
-     * Return the amount of marks this actor has on another actor or one of their items.
-     *
-     * TODO: It's unclear what this method will be used for
-     *       What does the caller want?
-     *
-     * TODO: Check with technomancers....
-     *
-     * @param target
-     * @param item
-     * @param options
-     */
-    getMarks(target: Token, item?: SR5Item, options?: { scene?: Scene }): number {
-        if (!canvas.ready) return 0;
-        if (target instanceof SR5Item) {
-            console.error('Not yet supported');
-            return 0;
+        if (network.uuid === uuid) {
+            await this.disconnectNetwork();
         }
-        if (!target.actor || !target.actor.isMatrixActor) return 0;
-
-
-        const scene = options?.scene || canvas.scene as Scene;
-        // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
-        item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
-
-        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        return this.getMarksById(markId);
-    }
-
-    getMarksById(markId: string): number {
-        return this.matrixData?.marks[markId] || 0;
     }
 
     /**
-     * Return the actor or item that is the network controller of this actor.
-     * These cases are possible:
+     * Get all marks placed by this actor.
+     * @returns 
+     */
+    get marksData(): Shadowrun.MatrixMarks | undefined {
+        return this.matrixData?.marks;
+    }
+
+    /**
+     * Get amount of Matrix marks placed by this actor on this target.
+     * 
+     * @param uuid Target uuid
+     * @returns Amount of marks placed
+     */
+    getMarksPlaced(uuid: string) {
+        return ActorMarksFlow.getMarksPlaced(this, uuid);
+    }
+
+    /**
+     * Return the document used to store marks placed for this actor.
+     * 
+     * For a normal character/technomancer this will be the actor itself, though for others this can differ.
+     * 
+     * These special cases are possible:
      * - IC with a host connected will provide the host item
      * - IC without a host will provide itself
-     * - A matrix actor within a PAN will provide the controlling actor
-     * - A matrix actor without a PAN will provide itself
+     * - A vehicle within a PAN will provide the controlling actor
+     * 
+     * @returns The document to retrieve all marks this actor has access to.
      */
-    get matrixController(): SR5Actor | SR5Item {
-        // In case of a broken host connection, return the IC actor.
-        if (this.isIC() && this.hasHost()) return this.getICHost() || this;
-        // TODO: Implement PAN
-        // if (this.isMatrixActor && this.hasController()) return this.getController();
-
+    async _getDocumentWithMarks(): Promise<Shadowrun.NetworkDevice|undefined> {
+        // CASE 1 - IC marks are stored on their host item.
+        if (this.isIC() && this.hasHost()) {
+            return await this.getICHost();
+        }
+        // CASE 2 - Vehicle marks are stored on their master actor.
+        if (this.isVehicle() && this.hasMaster) {
+            const master = this.master;
+            return master?.actorOwner;
+        }
+        
+        // DEFAULT CASE
         return this;
     }
 
-    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
-        const marks = this.matrixController.getAllMarks();
+    /**
+     * Check if this actor is part of a Matrix network as a slave.
+     */
+    get hasMaster(): boolean {
+        return this.canBeSlave && !!this.getMasterUuid();
+    }
+
+    /**
+     * Get the master device of this matrix actor.
+     * 
+     * This applies only to actors that act as matrix devices (vehicles).
+     */
+    get master(): SR5Item|undefined {
+        const masterUuid = this.getMasterUuid();
+        if (!masterUuid) return;
+        return fromUuidSync(masterUuid) as SR5Item;
+    }
+
+    /**
+     * Retrieve all documents this actor has a mark placed on, directly or indirectly.
+     */
+    async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
+        const marksDevice = await this._getDocumentWithMarks();
+        if (!marksDevice) return [];
+        const marks = marksDevice.marksData;
         if (!marks) return [];
 
-        // Deconstruct all mark ids into documents.
-        // @ts-expect-error
-        return Object.entries(marks)
-            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
-            .map(([markId, marks]) => ({
-                ...Helpers.getMarkIdDocuments(markId),
-                marks,
-                markId
-            }))
+        return await ActorMarksFlow.getMarkedDocuments(marks);
     }
 
     /**
@@ -2296,5 +2112,21 @@ export class SR5Actor extends Actor {
         }));
 
         await this.updateEmbeddedDocuments('Item', updateData);
+    }
+
+    /**
+     * Transparently build a set of roll data based on this actors type and status.
+     * 
+     * Values for rolling can depend on other actors and items.
+     * 
+     * NOTE: Since getRollData is sync by default, we can´t retrieve compendium documents,
+     *       resulting in fromUuidSync calls.
+     * 
+     * @param options System specific options influencing roll data.
+     */
+    override getRollData(options: RollDataOptions={}): any {
+        // Avoid changing actor system data as Foundry just returns it.
+        const rollData = foundry.utils.duplicate(super.getRollData());
+        return ActorRollDataFlow.getRollData(this, rollData, options);
     }
 }

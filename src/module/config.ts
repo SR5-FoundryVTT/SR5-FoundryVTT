@@ -57,6 +57,9 @@ export const SR5 = {
         rating: 'SR5.Rating',
     },
 
+    mentalAttributes: ['charisma', 'intuition', 'logic', 'willpower'],
+    physicalAttributes: ['agility', 'body', 'reaction', 'strength'],
+
     /**
      * All labels for all limits used across all actor and item types.
      */
@@ -781,10 +784,10 @@ export const SR5 = {
         multi_defense: 'SR5.ModifierTypes.DefenseMulti',
         drain: 'SR5.ModifierTypes.Drain',
         environmental: 'SR5.ModifierTypes.Environmental',
-        ['environmental.light']: 'SR5.ModifierTypes.EnvironmentalLight',
-        ['environmental.visibility']: 'SR5.ModifierTypes.EnvironmentalVisibility',
-        ['environmental.wind']: 'SR5.ModifierTypes.EnvironmentalWind',
-        ['environmental.range']: 'SR5.ModifierTypes.EnvironmentalRange',
+        'environmental.light': 'SR5.ModifierTypes.EnvironmentalLight',
+        'environmental.visibility': 'SR5.ModifierTypes.EnvironmentalVisibility',
+        'environmental.wind': 'SR5.ModifierTypes.EnvironmentalWind',
+        'environmental.range': 'SR5.ModifierTypes.EnvironmentalRange',
         background_count: 'SR5.ModifierTypes.BackgroundCount',
         noise: 'SR5.ModifierTypes.Noise',
         fade: 'SR5.ModifierTypes.Fade',

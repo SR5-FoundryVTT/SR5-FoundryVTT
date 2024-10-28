@@ -1,3 +1,5 @@
+import { DocumentSituationModifiers } from './../rules/DocumentSituationModifiers';
+import { TestCreator } from './../tests/TestCreator';
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import { SR5Item } from "../item/SR5Item";
@@ -6,6 +8,7 @@ import { SR5Combat } from "../combat/SR5Combat";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { Translation } from '../utils/strings';
+import { DataDefaults } from '../data/DataDefaults';
 
 declare global {
     // Configuration of foundry-vtt-types
@@ -13,6 +16,7 @@ declare global {
         game: never; // disable game ready checks
         canvas: never; // disable canvas ready checks
         socket: never; // disable socket ready checks
+        ui: never; // disable ui ready checks
     }
 
     // Configuration of shadowrun5e system
@@ -39,6 +43,16 @@ declare global {
         sheet: FormApplication;
     }
 
+    /**
+     * Inject v11 types into 
+     */
+    interface Item {
+        updateSource: (data: any, options?) => Promise<this>;
+    }
+    interface Actor {
+        updateSource: (data: any, options?) => Promise<this>;
+    }
+
     // Inject model basic structure into foundry-vtt-types
     interface Game {
         model: {
@@ -48,6 +62,27 @@ declare global {
             Cards: any;
             JournalEntryPage: any;
         };
+
+        shadowrun5e: {
+            tests: Record<string, any>,
+            activeTests: Record<string, any>
+            opposedTests: Record<string, any>,
+            resistTests: Record<string, any>,
+            followedTests: Record<string, any>,
+            SR5Actor: typeof SR5Actor,
+            SR5Item: typeof SR5Item,
+            SR5ActiveEffect: typeof SR5ActiveEffect,
+            rollItemMacro: any,
+            rollSkillMacro: any,
+            SR5Roll: typeof SR5Roll,
+            test: typeof TestCreator,
+            data: typeof DataDefaults,
+            modifiers: typeof DocumentSituationModifiers,
+            inputDelay: number
+        }
+
+        // Optional type for Dice so Nice module API
+        dice3d?: any
     }
 
     type RecursivePartial<T> = {

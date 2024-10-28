@@ -15,13 +15,13 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             return;
         }
 
-        let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonGeari18n);
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
     async ParseCommlinkDevices(commlinks, folder, setIcons) {
-        const entries = [];
+        const entries: Shadowrun.DeviceItemData[] = [];
         this.iconList = await this.getIconFiles();
         const parserType = 'device';
 
@@ -37,7 +37,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(commlink, 'name');
 
             // Get the item's folder information
-            // @ts-expect-error
+            // @ts-expect-error // TODO: foundry-vtt-types v10
             item.folder = folder.id;
 
             // Import Flags
@@ -60,7 +60,6 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Add relevant action tests
             UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-expect-error
             entries.push(item);
         }
 
@@ -68,7 +67,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
     }
 
     async ParseRCCDevices(rccs, folder, setIcons) {
-        const entries = [];
+        const entries: Shadowrun.DeviceItemData[] = [];
         this.iconList = await this.getIconFiles();
         const parserType = 'device';
 
@@ -85,7 +84,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(rcc, 'name');
 
             // Get the item's folder information
-            // @ts-expect-error
+            // @ts-expect-error // TODO: foundry-vtt-types v10
             item.folder = folder.id;
 
             // Import Flags
@@ -108,7 +107,6 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Add relevant action tests
             UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-expect-error
             entries.push(item);
         }
 
@@ -116,7 +114,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
     }
 
     async ParseCyberdeckDevices(cyberdecks, folder, setIcons) {
-        const items = [];
+        const items: Shadowrun.DeviceItemData[] = [];
         this.iconList = await this.getIconFiles();
         const parserType = 'device';
 
@@ -133,7 +131,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             item.name = ImportHelper.StringValue(cyberdeck, 'name');
 
             // Get the item's folder information
-            // @ts-expect-error
+            // @ts-expect-error // TODO: foundry-vtt-types v10
             item.folder = folder.id;
 
             // Import Flags
@@ -175,7 +173,6 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Add relevant action tests
             UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            //@ts-expect-error
             items.push(item);
         }
 
@@ -183,14 +180,14 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        let entries = [];
+        let entries: Shadowrun.DeviceItemData[] = [];
         const commlinks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Commlinks');
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
         const rccs = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Rigger Command Consoles');
 
-        let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
-        let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
-        let rccsFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatRCC')}`, true);
+        const commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
+        const cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
+        const rccsFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatRCC')}`, true);
 
         entries = entries.concat(await this.ParseCommlinkDevices(commlinks, commlinksFolder, setIcons));
         entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder, setIcons));

@@ -2,7 +2,6 @@
 
 import { VersionMigration } from './migrator/VersionMigration';
 import { FLAGS, SYSTEM_NAME } from './constants';
-import { boolean } from 'fast-check';
 
 export const registerSystemSettings = () => {
 

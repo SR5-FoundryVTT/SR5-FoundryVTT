@@ -2,8 +2,7 @@ import { DataDefaults } from '.././../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
 import * as IconAssign from '../../../apps/iconAssigner/iconAssign';
 import { SR5 } from "../../../config";
-
-const xml2js = require('xml2js');
+import xml2js = require('xml2js');
 
 /**
  * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
@@ -75,16 +74,16 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * @param importFlags The importFlags data of an item
      * @param system The item's system data
      */
-    public iconAssign(importFlags: Shadowrun.ImportFlagData, system: any, iconList: string[]): Promise<string> {
+    public async iconAssign(importFlags: Shadowrun.ImportFlagData, system: any, iconList: string[]): Promise<string> {
         // if (!this.iconList) this.getIconFiles();
-        return IconAssign.iconAssign(importFlags, system, iconList);
+        return await IconAssign.iconAssign(importFlags, system, iconList);
     }
 
     /**
      * Gets a list of icons available in the importer's folder
      */
     public async getIconFiles(): Promise<string[]> {
-        return IconAssign.getIconFiles();
+        return await IconAssign.getIconFiles();
     }
 
     /**
@@ -104,7 +103,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
     public genImportFlags(name: string, type: string, subType: string): Shadowrun.ImportFlagData {
         const flags = {
             name: this.formatAsSlug(name), // original english name
-            type: type,
+            type,
             subType: '',
             isFreshImport: true
         }
@@ -153,7 +152,6 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      */
     filterObjects(objects: any[]) {
         if (!this.unsupportedCategories) return objects;
-        //@ts-expect-error
-        return objects.filter(object => !this.unsupportedCategories.includes(ImportHelper.StringValue(object, 'category', '')));
+        return objects.filter(object => !this.unsupportedCategories?.includes(ImportHelper.StringValue(object, 'category', '')));
     }
 }

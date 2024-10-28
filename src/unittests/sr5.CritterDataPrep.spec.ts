@@ -35,7 +35,7 @@ export const shadowrunSR5CritterDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('visibility checks', async () => {
-            let actor = new SR5Actor({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 5 } } } });
+            const actor = new SR5Actor({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 5 } } } });
             assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, true);
             assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);

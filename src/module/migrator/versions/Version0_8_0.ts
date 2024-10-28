@@ -8,7 +8,6 @@
  * 
  */
 import {VersionMigration} from "../VersionMigration";
-import {Helpers} from "../../helpers";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { UpdateActionFlow } from "../../item/flows/UpdateActionFlow";

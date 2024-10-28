@@ -1,5 +1,4 @@
 import {SYSTEM_SOCKET} from "./constants";
-import SocketMessageBody = Shadowrun.SocketMessageData;
 
 /**
  * Simple handling of creating and emitting socket messages
@@ -12,7 +11,7 @@ import SocketMessageBody = Shadowrun.SocketMessageData;
  * To listen to these socket messages see Hooks#registerSocketListeners
  */
 export class SocketMessage {
-    static _createMessage(type, data, userId?): SocketMessageBody {
+    static _createMessage(type, data, userId?): Shadowrun.SocketMessageData {
         return {type, data, userId}
     }
 
@@ -21,7 +20,7 @@ export class SocketMessage {
 
         const message = SocketMessage._createMessage(type, data);
         console.trace('Shadowrun 5e | Emitting Shadowrun5e system socket message', message);
-        await game.socket.emit(SYSTEM_SOCKET, message);
+        game.socket.emit(SYSTEM_SOCKET, message);
     }
 
     static async emitForGM(type, data) {
@@ -33,6 +32,6 @@ export class SocketMessage {
 
         const message = SocketMessage._createMessage(type, data, gmUser.id);
         console.trace('Shadowrun 5e | Emitting Shadowrun5e system socket message', message);
-        await game.socket.emit(SYSTEM_SOCKET, message);
+        game.socket.emit(SYSTEM_SOCKET, message);
     }
 }

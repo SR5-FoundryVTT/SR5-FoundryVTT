@@ -1,7 +1,5 @@
-import {MatrixRules} from "../../rules/MatrixRules";
-import {SR5Actor} from "../../actor/SR5Actor";
+import { PhysicalDefenseTestData } from './../../tests/PhysicalDefenseTest';
 import {SuccessTest} from "../../tests/SuccessTest";
-import { PhysicalDefenseTest } from "../../tests/PhysicalDefenseTest";
 import ResultActions = Shadowrun.ResultActions;
 
 
@@ -15,10 +13,9 @@ export class ActionResultFlow {
          * 
          * @returns A Map mapping action name to function handler
          */
-    static get _handlersResultAction(): Map<ResultActions, Function> {
+    static get _handlersResultAction(): Map<ResultActions, ((test: SuccessTest) => Promise<void>)> {
         const handlers = new Map();
-        handlers.set('placeMarks', () => ui.notifications?.error('Placing marks currently isnt suported. Sorry!'));
-        handlers.set('modifyCombatantInit', ActionResultFlow._castInitModifierAction);
+        handlers.set('modifyCombatantInit', ActionResultFlow._castInitModifierAction.bind(this));
 
         return handlers;
     }
@@ -38,19 +35,6 @@ export class ActionResultFlow {
             return console.error(`Shadowrun 5e | Action result ${resultAction} has not handler registered`);
 
         await handler(test);
-
-    }
-    /**
-     * Matrix Marks are placed on either actors (persona, ic) or items (device, host, technology).
-     */
-    static async placeMatrixMarks(active: SR5Actor, targets: Token[], marks: number) {
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            return ui.notifications?.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
-        }
-
-        for (const target of targets) {
-            await active.setMarks(target, marks);
-        }
     }
 
     /**
@@ -58,10 +42,10 @@ export class ActionResultFlow {
      * 
      * @param test The test instance causing the initiative modification
      */
-    static async _castInitModifierAction(test: PhysicalDefenseTest) {
-        if (!(test instanceof PhysicalDefenseTest)) return;
-        
-        if (!test.data.iniMod) return;
-        await test.actor?.changeCombatInitiative(test.data.iniMod);
+    static async _castInitModifierAction(test: SuccessTest) {
+        // NOTE: Use test data typing here, as including PhysicalDefenseTest would cause circular dependencies, breaking SuccessTest/OpposedTest import order.
+        const data = test.data as PhysicalDefenseTestData;
+        if (!data.iniMod) return;
+        await test.actor?.changeCombatInitiative(data.iniMod);
     }
 }

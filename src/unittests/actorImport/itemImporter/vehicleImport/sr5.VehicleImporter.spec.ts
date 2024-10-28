@@ -9,7 +9,7 @@ import { SR5Item } from '../../../../module/item/SR5Item';
 export const vehicleImporterTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
 
-    let vehicleParser = new VehicleParser();
+    const vehicleParser = new VehicleParser();
 
     let testActor;
     let testItem;
