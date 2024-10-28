@@ -637,9 +637,12 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onClipEquip(clipType: string) {
+        if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
+        
+        const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
         await this.item.update({
             'system.ammo.clip_type': clipType,
-            'system.ammo.partial_reload_value': RangedWeaponRules.partialReload(clipType, this.item.actor.getAttribute('agility').value)
+            'system.ammo.partial_reload_value': RangedWeaponRules.partialReload(clipType, agilityValue)
         }, { render: true });
     }
 
