@@ -377,7 +377,6 @@ export class SR5ItemSheet extends ItemSheet {
      */
     async handleLinkedActorRemove(event: any) {
         await this.item.update({ 'system.linkedActor': '' });
-        this.item.render(true);
     }
 
     /**
@@ -387,7 +386,6 @@ export class SR5ItemSheet extends ItemSheet {
      */
     async updateLinkedActor(actor: SR5Actor) {
         await this.item.update({ 'system.linkedActor': actor.uuid });
-        this.item.render(true);
     }
 
     _addDragSupportToListItemTemplatePartial(i, item) {

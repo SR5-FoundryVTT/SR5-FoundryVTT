@@ -512,7 +512,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             if (data.type === 'Actor' && data.uuid !== this.actor.uuid) {
                 const actor = await fromUuid(data.uuid) as SR5Actor;
                 const itemData = {
-                    name: actor.name ?? `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes['contact']))}`,
+                    name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
                     type: 'contact',
                     'system.linkedActor': actor.uuid
                 };
