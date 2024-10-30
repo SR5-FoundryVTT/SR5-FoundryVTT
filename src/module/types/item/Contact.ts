@@ -13,5 +13,6 @@ declare namespace Shadowrun {
         family: boolean;
         blackmail: boolean;
         group: boolean;
+        linkedActor: string;
     }
 }
