@@ -39,6 +39,7 @@ export const FLAGS = {
     DoNextRound: 'doNextRound',
     DoNewActionPhase: 'doNewActionPhase',
     addNetworkController: 'addNetworkController',
+    SetDataStorage: 'setDataStorage',
     TokenHealthBars: 'tokenHealthBars',
     Test: 'TestData',
     HideGMOnlyChatContent: 'HideGMOnlyChatContent',
@@ -53,7 +54,8 @@ export const FLAGS = {
     CreateTargetedEffects: 'CreateTargetedEffects',
     DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
     TeamworkTestFlow: 'TeamworkTestFlow',
-    UseDamageCondition: 'UseDamageCondition'
+    UseDamageCondition: 'UseDamageCondition',
+    GlobalDataStorage: 'GlobalDataStorage'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
