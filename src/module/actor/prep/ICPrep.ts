@@ -16,6 +16,7 @@ export class ICPrep {
     static prepareBaseData(system: ICData) {
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearLimitMods(system);
+        SkillsPrep.prepareSkillData(system);
 
         ICPrep.addMissingTracks(system);
         ICPrep.prepareModifiers(system);

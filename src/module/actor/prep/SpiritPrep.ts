@@ -20,6 +20,7 @@ import { SR5 } from '../../config';
 export class SpiritPrep {
     static prepareBaseData(system: SpiritData) {
         SpiritPrep.prepareSpiritSpecial(system);
+        SkillsPrep.prepareSkillData(system);
 
         ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
