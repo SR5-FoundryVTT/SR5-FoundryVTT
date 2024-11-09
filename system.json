@@ -1,107 +1,102 @@
 {
-  "id": "shadowrun5e",
-  "name": "shadowrun5e",
-  "title": "Shadowrun 5th Edition",
-  "description": "Shadowrun 5th Edition game",
-  "authors": [
-    {
-      "name": "Jan Schoska",
-      "discord": "taM#9507"
-    }
-  ],
-  "url": "https://github.com/SR5-FoundryVTT/SR5-FoundryVTT",
-  "bugs": "https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/issues",
-  "version": "0.21.2",
-  "compatibility": {
-    "minimum": "11",
-    "verified": "12"
-  },
-  "minimumCoreVersion": "11",
-  "scripts": [],
-  "esmodules": [
-    "dist/bundle.js"
-  ],
-  "styles": [
-    "dist/bundle.css"
-  ],
-  "languages": [
-    {
-      "lang": "en",
-      "name": "English",
-      "path": "dist/locale/en/config.json"
+    "id": "shadowrun5e",
+    "name": "shadowrun5e",
+    "title": "Shadowrun 5th Edition",
+    "description": "Shadowrun 5th Edition game",
+    "authors": [
+        {
+            "name": "Jan Schoska",
+            "discord": "taM#9507"
+        }
+    ],
+    "url": "#{URL}#",
+    "version": "0.22.0",
+    "compatibility": {
+        "minimum": "11",
+        "verified": "12"
     },
-    {
-      "lang": "de",
-      "name": "Deutsch",
-      "path": "dist/locale/de/config.json"
-    },
-    {
-      "lang": "pt-BR",
-      "name": "Português (Brasil)",
-      "path": "dist/locale/pt-BR/config.json"
-    },
-    {
-      "lang": "fr",
-      "name": "Français",
-      "path": "dist/locale/fr/config.json"
-    },
-    {
-      "lang": "ko",
-      "name": "Korean",
-      "path": "dist/locale/ko/config.json"
-    }
-  ],
-  "packs": [
-    {
-      "name": "matrix-actions",
-      "label": "SR5e Matrix Actions",
-      "path": "packs/matrix-actions",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "TRUSTED": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      },
-      "type": "Item",
-      "system": "shadowrun5e"
-    },
-    {
-      "name": "general-actions",
-      "label": "SR5e General Actions",
-      "path": "packs/general-actions",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "TRUSTED": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      },
-      "type": "Item",
-      "system": "shadowrun5e"
-    },
-    {
-      "name": "system-macros",
-      "label": "SR5e System Macros",
-      "path": "packs/system-macros",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "TRUSTED": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      },
-      "type": "Macro",
-      "system": "shadowrun5e"
-    }
-  ],
-  "relationships": [
-    {
-      "id": "autocomplete-inline-properties",
-      "type": "module"
-    }
-  ],
-  "socket": true,
-  "manifest": null,
-  "download": null,
-  "protected": false,
-  "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
-  "gridDistance": 1,
-  "gridUnits": "m",
-  "primaryTokenAttribute": "track.physical",
-  "secondaryTokenAttribute": "track.stun"
+    "minimumCoreVersion": "11",
+    "scripts": [],
+    "esmodules": ["dist/bundle.js"],
+    "styles": ["dist/bundle.css"],
+    "languages": [
+        {
+            "lang": "en",
+            "name": "English",
+            "path": "dist/locale/en/config.json"
+        },
+        {
+            "lang": "de",
+            "name": "Deutsch",
+            "path": "dist/locale/de/config.json"
+        },
+        {
+            "lang": "pt-BR",
+            "name": "Português (Brasil)",
+            "path": "dist/locale/pt-BR/config.json"
+        },
+        {
+            "lang": "fr",
+            "name": "Français",
+            "path": "dist/locale/fr/config.json"
+        },
+        {
+            "lang": "ko",
+            "name": "Korean",
+            "path": "dist/locale/ko/config.json"
+        }
+    ],
+    "packs": [
+        {
+            "name": "matrix-actions",
+            "label": "SR5e Matrix Actions",
+            "path": "packs/matrix-actions",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
+        },
+        {
+            "name": "general-actions",
+            "label": "SR5e General Actions",
+            "path": "packs/general-actions",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
+        },
+        {
+            "name": "system-macros",
+            "label": "SR5e System Macros",
+            "path": "packs/system-macros",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Macro",
+            "system": "shadowrun5e"
+        }
+    ],
+    "relationships": [
+        {
+            "id": "autocomplete-inline-properties",
+            "type": "module"
+        }
+    ],
+    "socket": true,
+    "manifest": "#{MANIFEST}#",
+    "download": "#{DOWNLOAD}#",
+    "protected": false,
+    "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
+    "gridDistance": 1,
+    "gridUnits": "m",
+    "primaryTokenAttribute": "track.physical",
+    "secondaryTokenAttribute": "track.stun"
 }

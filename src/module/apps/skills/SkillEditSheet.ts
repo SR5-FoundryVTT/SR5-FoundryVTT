@@ -2,6 +2,7 @@ import SkillEditFormData = Shadowrun.SkillEditFormData;
 import {SR5Actor} from "../../actor/SR5Actor";
 import {SR5} from "../../config";
 import { LinksHelpers } from "../../utils/links";
+import { parseDropData } from "../../utils/sheets";
 import { Translation } from '../../utils/strings';
 
 export class SkillEditSheet extends DocumentSheet {
@@ -114,6 +115,15 @@ export class SkillEditSheet extends DocumentSheet {
 
     override activateListeners(html) {
         super.activateListeners(html);
+
+        /**
+         * Drag and Drop Handling
+         */
+        //@ts-expect-error
+        this.form.ondragover = (event) => this._onDragOver(event);
+        //@ts-expect-error
+        this.form.ondrop = (event) => this._onDrop(event);
+
         $(html).find('.open-source').on('click', this._onOpenSource.bind(this));
         $(html).find('.add-spec').on('click', this._addNewSpec.bind(this));
         $(html).find('.remove-spec').on('click', this._removeSpec.bind(this));
@@ -130,6 +140,19 @@ export class SkillEditSheet extends DocumentSheet {
         // add blank line for new bonus
         updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: 0 }];
         await this.document.update(updateData);
+    }
+
+    override async _onDrop(event) {
+        if (!game.items || !game.actors || !game.scenes) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Parse drop data.
+        const data = parseDropData(event);
+        if (!data) return;
+
+        this.document.update({[`${this._updateString()}.link`]: data.uuid});
     }
 
     async _removeBonus(event) {

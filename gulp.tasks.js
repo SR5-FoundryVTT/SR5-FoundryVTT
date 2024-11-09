@@ -5,13 +5,13 @@ const del = import('del'); //es6m
 const chalk = import('chalk'); //es6m
 
 // Sass
-const gulpsass = require('gulp-sass')(require('node-sass'));
-gulpsass.compiler = require('node-sass');
+const gulpsass = require('gulp-sass')(require('sass'));
+gulpsass.compiler = require('sass');
 
 // Gulp
 var cp = require('child_process');
 const gulp = require('gulp');
-const sourcemaps = require('gulp-sourcemaps');
+// const sourcemaps = require('gulp-sourcemaps');
 const esbuild = require('esbuild');
 const {typecheckPlugin} = require("@jgoz/esbuild-plugin-typecheck");
 
@@ -101,8 +101,9 @@ async function buildSass() {
     return gulp
         .src('src/css/bundle.scss')
         .pipe(gulpsass().on('error', gulpsass.logError))
-        .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(sourcemaps.write('./'))
+        // NOTE: gulp-sourcemaps caused deprecation warnigns on node v22. As it's not really needed, disable it.
+        // .pipe(sourcemaps.init({loadMaps: true}))
+        // .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(destFolder));
 }
 
