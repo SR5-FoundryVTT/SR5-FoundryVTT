@@ -118,10 +118,35 @@ export const SR = {
     attributes: {
         // Use for min/max value ranges (general). This will need expanding for different metatypes, should that ever
         // come to  be.
+        // These are the most extreme outer, possible modified values for each attribute.
         ranges: {
             magic: {min: 0},
             edge: {min: 0},
             resonance: {min: 0},
+            essence: {min: 0},
+            body: {min: 0},
+            agility: {min: 0},
+            reaction: {min: 0},
+            strength: {min: 0},
+            willpower: {min: 0},
+            logic: {min: 0},
+            intuition: {min: 0},
+            charisma: {min: 0},
+            attack: {min: 0},
+            sleaze: {min: 0},
+            data_processing: {min: 0},
+            firewall: {min: 0},
+            host_rating: {min: 0, max: 12},
+            pilot: {min: 0},
+            force: {min: 0}
+        },
+        /**
+         * Spirits on creation can have calculated attributes that would lower them to 0 or lower, but still have to have a min value of
+         * 1 for each.
+         */
+        rangesSpirit: {
+            magic: {min: 0},
+            edge: {min: 0},
             essence: {min: 0},
             body: {min: 1},
             agility: {min: 1},
@@ -131,12 +156,7 @@ export const SR = {
             logic: {min: 1},
             intuition: {min: 1},
             charisma: {min: 1},
-            attack: {min: 0},
-            sleaze: {min: 0},
-            data_processing: {min: 0},
-            firewall: {min: 0},
-            host_rating: {min: 0, max: 12},
-            pilot: {min: 1},
+            pilot: {min: 0},
             force: {min: 1}
         },
         // Use for initial default values that aren't simply range.<>.min values.
