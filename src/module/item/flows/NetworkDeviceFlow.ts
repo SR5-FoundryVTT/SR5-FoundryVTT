@@ -173,12 +173,12 @@ export class NetworkDeviceFlow {
 
     private static async _setDevicesOnController(controller: SR5Item, deviceLinks: string[]) {
         if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
-        await controller.update({'data.networkDevices': deviceLinks});
+        await controller.update({'system.networkDevices': deviceLinks});
     }
 
     private static async _removeAllDevicesFromController(controller: SR5Item) {
         if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
-        await controller.update({'data.networkDevices': []});
+        await controller.update({'system.networkDevices': []});
     }
 
     /**

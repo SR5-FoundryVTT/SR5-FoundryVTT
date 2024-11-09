@@ -13,9 +13,8 @@ export const registerBasicHelpers = () => {
 
     Handlebars.registerHelper('localizeDocumentType', function (document) {  
         if (document.type.length < 1) return '';
-        const documentClass = document instanceof SR5Actor ? 'ACTOR' : 'ITEM';
-        const documentTypeLabel = document.type[0].toUpperCase() + document.type.slice(1);
-        const i18nTypeLabel = `${documentClass}.Type${documentTypeLabel}`;
+        const documentClass = document instanceof SR5Actor ? 'Actor' : 'Item';
+        const i18nTypeLabel = `TYPES.${documentClass}.${document.type}`;
         return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
