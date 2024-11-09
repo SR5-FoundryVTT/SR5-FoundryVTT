@@ -15,6 +15,8 @@ import { SR } from '../../constants';
 
 export class VehiclePrep {
     static prepareBaseData(system: Shadowrun.VehicleData) {
+        SkillsPrep.prepareSkillData(system);
+
         ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);

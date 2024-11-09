@@ -17,6 +17,7 @@ import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 export class SpritePrep {
     static prepareBaseData(data: SpriteData) {
         SpritePrep.prepareSpriteSpecial(data);
+        SkillsPrep.prepareSkillData(data);
 
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);

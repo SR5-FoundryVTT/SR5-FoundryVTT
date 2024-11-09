@@ -21,6 +21,7 @@ import { SR } from '../../constants';
 export class SpiritPrep {
     static prepareBaseData(system: SpiritData) {
         SpiritPrep.prepareSpiritSpecial(system);
+        SkillsPrep.prepareSkillData(system);
 
         ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
