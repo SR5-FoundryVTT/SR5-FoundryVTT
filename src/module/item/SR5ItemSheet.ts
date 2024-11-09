@@ -1,8 +1,9 @@
+import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
 import { SR5 } from "../config";
 import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from "../effects";
-import { createTagify } from '../utils/sheets';
+import { createTagify, parseDropData } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
@@ -77,6 +78,8 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Can be used to check if the source field contains a URL.
     sourceIsURL: boolean
+    sourceIsPDF: boolean
+    sourceIsUuid: boolean
 
     isUsingRangeCategory: boolean
 }
@@ -220,6 +223,8 @@ export class SR5ItemSheet extends ItemSheet {
         // @ts-expect-error TODO: foundry-vtt-types v10
         data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
         data.sourceIsURL = this.item.sourceIsUrl;
+        data.sourceIsPDF = this.item.sourceIsPDF;
+        data.sourceIsUuid = this.item.sourceIsUuid
 
         data.isUsingRangeCategory = this.item.isUsingRangeCategory;
 
@@ -281,7 +286,9 @@ export class SR5ItemSheet extends ItemSheet {
          * Drag and Drop Handling
          */
         //@ts-expect-error
-        this.form.ondragover = (event) => this._onDragOver(event);
+        this.form.ondragover = (event) => {
+            this._onDragOver(event);
+        }
         //@ts-expect-error
         this.form.ondrop = (event) => this._onDrop(event);
 
@@ -302,8 +309,10 @@ export class SR5ItemSheet extends ItemSheet {
          */
         html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
         html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
+        html.find('select[name="change-ammo"]').on('change', async (event) => this._onAmmoEquip(event.target.value));
         html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
-        html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
+        html.find('.ammo-reload').on('click', async (event) => this._onAmmoReload(event, false));
+        html.find('select[name="change-clip-type"]').on('change', async (event) => this._onClipEquip(event.target.value));
 
         html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
@@ -338,8 +347,51 @@ export class SR5ItemSheet extends ItemSheet {
 
         html.find('input[name="system.technology.equipped"').on('change', this._onToggleEquippedDisableOtherDevices.bind(this))
 
+        html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
+
         this._activateTagifyListeners(html);
     }
+
+    _addDragSupportToListItemTemplatePartial(i, item) {
+        if (item.dataset && item.dataset.itemId) {
+            item.setAttribute('draggable', true);
+            item.addEventListener('dragstart', this._onDragStart.bind(this), false);
+        }
+    }
+
+    override async _onDragStart(event) {
+        const element = event.currentTarget;
+        if (element) {
+            // Create drag data object to use
+            const dragData = {
+                actor: this.item.actor,
+                actorId: this.item.actor?.id,
+                itemId: this.item.id,
+                type: '',
+                data: {}
+            };
+
+            switch (element.dataset.itemType) {
+                // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
+                case 'ActiveEffect':
+                    {
+                        const effectId = element.dataset.itemId;
+                        const effect = this.item.effects.get(effectId);
+                        if (effect) {
+                            // Prepare data transfer
+                            dragData.type = 'ActiveEffect';
+                            dragData.data = effect; // this may blow up
+
+                            // Set data transfer
+                            event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                            return;
+                        }
+                    }
+            }
+        }
+        return super._onDragStart(event);
+    }
+
 
     override async _onDrop(event) {
         if (!game.items || !game.actors || !game.scenes) return;
@@ -348,10 +400,32 @@ export class SR5ItemSheet extends ItemSheet {
         event.stopPropagation();
 
         // Parse drop data.
-        const data = this.parseDropData(event);
+        const data = parseDropData(event);
         if (!data) return;
 
-        // Add items to a weapons modification / ammo
+        // CASE - Handle dropping of documents directly into the source field like urls and pdfs.
+        const targetElement = event.toElement || event.target;
+        if (targetElement?.name === 'system.description.source') {
+            this.item.setSource(data.uuid);
+            return;
+        }
+
+        // CASE - Handle ActiveEffects
+        if (data.type === 'ActiveEffect') {
+            if (data.itemId === this.item.id) {
+                return; // don't add effects to ourselves
+            }
+            // the effect should be just the data itself
+            const effect = data.data;
+            // delete the id on it so a new one is generated
+            delete effect._id;
+            // add this to the embedded ActiveEffect documents
+            await this.item.createEmbeddedDocuments('ActiveEffect', [effect]);
+
+            return;
+        }
+
+        // CASE - Add items to a weapons modification / ammo
         if (this.item.isWeapon && data.type === 'Item') {
             let item;
             // Case 1 - Data explicitly provided
@@ -409,9 +483,9 @@ export class SR5ItemSheet extends ItemSheet {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
-    _onOpenSource(event) {
+    async _onOpenSource(event) {
         event.preventDefault();
-        this.item.openSource();
+        await this.item.openSource();
     }
 
     async _onSelectRangedRangeCategory(event) {
@@ -528,17 +602,25 @@ export class SR5ItemSheet extends ItemSheet {
         await this.item.createNestedItem(item._source);
     }
 
-    async _onAmmoReload(event) {
+    async _onAmmoReload(event, partialReload: boolean) {
         event.preventDefault();
-        await this.item.reloadAmmo();
+        await this.item.reloadAmmo(partialReload);
     }
 
     async _onAmmoRemove(event) {
         await this._onOwnedItemRemove(event);
     }
 
-    async _onAmmoEquip(event) {
-        await this.item.equipAmmo(this._eventId(event));
+    async _onAmmoEquip(input) {
+        let id;
+
+        if (input.currentTarget) {
+            id = this._eventId(input);
+        } else {
+            id = input;
+        }
+
+        await this.item.equipAmmo(id);
     }
 
     async _onAddNewAmmo(event) {
@@ -554,8 +636,18 @@ export class SR5ItemSheet extends ItemSheet {
         await this.item.createNestedItem(item._source);
     }
 
+    async _onClipEquip(clipType: string) {
+        if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
+        
+        const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
+        await this.item.update({
+            'system.ammo.clip_type': clipType,
+            'system.ammo.partial_reload_value': RangedWeaponRules.partialReload(clipType, agilityValue)
+        }, { render: true });
+    }
+
     async _onOwnedItemRemove(event) {
-        event.preventDefault(); 1
+        event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -794,23 +886,6 @@ export class SR5ItemSheet extends ItemSheet {
 
         this._createActionModifierTagify(html);
         this._createActionCategoriesTagify(html);
-    }
-
-    /**
-     * Helper to parse FoundryVTT DropData directly from it's source event
-     *
-     * This is a legacy handler for earlier FoundryVTT versions, however it's good
-     * practice to not trust faulty input and inform about.
-     *
-     * @param event
-     * @returns undefined when an DropData couldn't be parsed from it's JSON.
-     */
-    parseDropData(event): any | undefined {
-        try {
-            return JSON.parse(event.dataTransfer.getData('text/plain'));
-        } catch (error) {
-            return console.log('Shadowrun 5e | Dropping a document onto an item sheet caused this error', error);
-        }
     }
 
     /**

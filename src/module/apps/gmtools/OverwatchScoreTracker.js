@@ -147,17 +147,13 @@ export class OverwatchScoreTracker extends Application {
         this.render();
     }
 
-    _rollFor15Minutes(event) {
+    async _rollFor15Minutes(event) {
         event.preventDefault();
         const actor = this._getActorFromEvent(event);
         if (actor) {
             //  use static value so it can be modified in modules
             const roll = new Roll(OverwatchScoreTracker.MatrixOverwatchDiceCount);
-            roll.evaluate({async: false});
-
-            // use GM Roll Mode so players don't see
-            // const rollMode = CONFIG.Dice.rollModes.gmroll;
-            // roll.toMessage({ rollMode });
+            await roll.evaluate();
 
             if (roll.total) {
                 const os = actor.getOverwatchScore();

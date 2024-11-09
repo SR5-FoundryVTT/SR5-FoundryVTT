@@ -1,4 +1,5 @@
 import { SR5Actor } from "../../actor/SR5Actor";
+import { parseDropData } from "../../utils/sheets";
 import { SR5BaseItemSheetData, SR5ItemSheet } from "../SR5ItemSheet";
 
 
@@ -47,7 +48,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
         event.preventDefault();
         event.stopPropagation();
 
-        const data = this.parseDropData(event);
+        const data = parseDropData(event);
         if (!data) return;
 
         if (data.type !== 'Actor') return;

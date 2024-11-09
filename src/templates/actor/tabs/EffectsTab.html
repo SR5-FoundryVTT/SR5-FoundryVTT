@@ -11,9 +11,10 @@
         }}
         {{#each effects}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-            img=(or this.img this.icon)
+            img=(firstDefined this.img this.icon)
             name=this.name
             itemId=this.id
+            itemType='ActiveEffect'
             icons=(EffectIcons this)
             rightSide=(EffectRightSide this)
             hasDesc=false
@@ -31,9 +32,10 @@
         }}
         {{#each itemEffects}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-            img=(or this.img this.icon)
+            img=(firstDefined this.img this.icon)
             name=this.sheetName
             itemId=this.uuid
+            itemType='ActiveEffect'
             icons=(ItemEffectIcons this)
             rightSide=(EffectRightSide this)
             hasDesc=false

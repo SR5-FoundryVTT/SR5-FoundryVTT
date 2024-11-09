@@ -21,23 +21,20 @@
             {{localize "SR5.Weapon.AmmoCount"}}
         </div>
         <div class="inputs">
-            <input
-                    size="2"
-                    type="text"
-                    name="system.ammo.current.value"
-                    value="{{system.ammo.current.value}}"
-                    data-dtype="Number"
-                    placeholder="0"
-            />
+            <input size="3" type="text" name="system.ammo.current.value" value="{{system.ammo.current.value}}"
+                data-dtype="Number" placeholder="0" />
             /
-            <input
-                    size="2"
-                    type="text"
-                    name="system.ammo.current.max"
-                    value="{{system.ammo.current.max}}"
-                    data-dtype="Number"
-                    placeholder="{{localize SR5.Max}}"
-            />
+            <input size="3" type="text" name="system.ammo.current.max" value="{{system.ammo.current.max}}"
+                data-dtype="Number" placeholder="{{localize SR5.Max}}" />
+            <select name="change-ammo">
+                {{#select ammunition}}
+                <option value=""></option>
+                {{#each ammunition as |ammo index|}}
+                <option value="{{ammo._id}}" {{#if ammo.system.technology.equipped}}selected{{/if}}>{{localize
+                    name}}
+                </option>
+                {{/each}} {{/select}}
+            </select>
         </div>
     </div>
     {{#if system.category}} {{#ife system.category "range"}}
@@ -46,23 +43,18 @@
             {{localize "SR5.SpareClips"}}
         </div>
         <div class="inputs">
-            <input
-                    size="2"
-                    type="text"
-                    name="system.ammo.spare_clips.value"
-                    value="{{system.ammo.spare_clips.value}}"
-                    data-dtype="Number"
-                    placeholder="0"
-            />
-            /
-            <input
-                    size="2"
-                    type="text"
-                    name="system.ammo.spare_clips.max"
-                    value="{{system.ammo.spare_clips.max}}"
-                    data-dtype="Number"
-                    placeholder="{{localize SR5.Max}}"
-            />
+        <input size="3" type="text" name="system.ammo.spare_clips.value" value="{{system.ammo.spare_clips.value}}"
+            data-dtype="Number" placeholder="0" />
+        /
+        <input size="3" type="text" name="system.ammo.spare_clips.max" value="{{system.ammo.spare_clips.max}}"
+            data-dtype="Number" placeholder="{{localize SR5.Max}}" />
+            <select style="width: auto;" name="change-clip-type">
+                {{#select system.ammo.clip_type}}
+                <option value=""></option>
+                {{#each config.weaponCliptypes as |name type|}}
+                <option value="{{type}}"{{#if system.ammo.clip_type}}selected{{/if}}>{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
         </div>
     </div>
     <div class="form-line">
@@ -71,36 +63,20 @@
         </div>
         <div class="inputs">
             <label>
-                {{localize "SR5.Weapon.Mode.SingleShot"}}<input
-                    type="checkbox"
-                    name="system.range.modes.single_shot"
-                    {{checked
-                    system.range.modes.single_shot}}
-                />
+                {{localize "SR5.Weapon.Mode.SingleShot"}}<input type="checkbox" name="system.range.modes.single_shot"
+                    {{checked system.range.modes.single_shot}} />
             </label>
             <label>
-                {{localize "SR5.Weapon.Mode.SemiAuto"}}<input
-                    type="checkbox"
-                    name="system.range.modes.semi_auto"
-                    {{checked
-                    system.range.modes.semi_auto}}
-                />
+                {{localize "SR5.Weapon.Mode.SemiAuto"}}<input type="checkbox" name="system.range.modes.semi_auto"
+                    {{checked system.range.modes.semi_auto}} />
             </label>
             <label>
-                {{localize "SR5.Weapon.Mode.BurstFire"}}<input
-                    type="checkbox"
-                    name="system.range.modes.burst_fire"
-                    {{checked
-                    system.range.modes.burst_fire}}
-                />
+                {{localize "SR5.Weapon.Mode.BurstFire"}}<input type="checkbox" name="system.range.modes.burst_fire"
+                    {{checked system.range.modes.burst_fire}} />
             </label>
             <label>
-                {{localize "SR5.Weapon.Mode.FullAuto"}}<input
-                    type="checkbox"
-                    name="system.range.modes.full_auto"
-                    {{checked
-                    system.range.modes.full_auto}}
-                />
+                {{localize "SR5.Weapon.Mode.FullAuto"}}<input type="checkbox" name="system.range.modes.full_auto"
+                    {{checked system.range.modes.full_auto}} />
             </label>
         </div>
     </div>
@@ -110,54 +86,25 @@
             {{localize "SR5.Weapon.Range.Ranges"}}
         </div>
         <div class="inputs ranges">
-            <select
-                name="system.range.ranges.category"
-                class="select-ranged-range-category"
-            >
+            <select name="system.range.ranges.category" class="select-ranged-range-category">
                 {{#each config.weaponRangeCategories as |val key|}}
-                <option value="{{key}}"{{#ife ../system.range.ranges.category key}}selected="selected"{{/ife}}>{{localize val.label}}</option>
+                <option value="{{key}}" {{#ife ../system.range.ranges.category key}}selected="selected" {{/ife}}>
+                    {{localize val.label}}</option>
                 {{/each}}
             </select>
-            <input
-                size="3"
-                type="text"
-                name="system.range.ranges.short"
-                value="{{system.range.ranges.short}}"
-                data-dtype="Number"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            />
+            <input size="3" type="text" name="system.range.ranges.short" value="{{system.range.ranges.short}}"
+                data-dtype="Number" {{#if this.isUsingRangeCategory}} disabled {{/if}} />
             /
-            <input
-                size="3"
-                type="text"
-                name="system.range.ranges.medium"
-                value="{{system.range.ranges.medium}}"
-                data-dtype="Number"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            />
+            <input size="3" type="text" name="system.range.ranges.medium" value="{{system.range.ranges.medium}}"
+                data-dtype="Number" {{#if this.isUsingRangeCategory}} disabled {{/if}} />
             /
-            <input
-                size="3"
-                type="text"
-                name="system.range.ranges.long"
-                value="{{system.range.ranges.long}}"
-                data-dtype="Number"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            />
+            <input size="3" type="text" name="system.range.ranges.long" value="{{system.range.ranges.long}}"
+                data-dtype="Number" {{#if this.isUsingRangeCategory}} disabled {{/if}} />
             /
-            <input
-                size="3"
-                type="text"
-                name="system.range.ranges.extreme"
-                value="{{system.range.ranges.extreme}}"
-                data-dtype="Number"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            />
+            <input size="3" type="text" name="system.range.ranges.extreme" value="{{system.range.ranges.extreme}}"
+                data-dtype="Number" {{#if this.isUsingRangeCategory}} disabled {{/if}} />
             <i class="fas fa-times"></i>
-            <select
-                name="system.range.ranges.attribute"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            >
+            <select name="system.range.ranges.attribute" {{#if this.isUsingRangeCategory}} disabled {{/if}}>
                 {{#select system.range.ranges.attribute}}
                 <option value=""></option>
                 {{#each config.attributes as |name type|}}
@@ -171,14 +118,8 @@
             {{localize "SR5.RecoilCompensation"}}
         </div>
         <div class="inputs">
-            <input
-                type="text"
-                size="2"
-                name="system.range.rc.base"
-                value="{{system.range.rc.base}}"
-                data-dtype="Number"
-                placeholder="1"
-            />
+            <input type="text" size="2" name="system.range.rc.base" value="{{system.range.rc.base}}" data-dtype="Number"
+                placeholder="1" />
         </div>
     </div>
     {{/ife}} {{#ife system.category "thrown"}}
@@ -187,54 +128,25 @@
             {{localize "SR5.Weapon.Range.Ranges"}}
         </div>
         <div class="inputs ranges">
-            <select
-                name="system.thrown.ranges.category"
-                class="select-thrown-range-category"
-            >
+            <select name="system.thrown.ranges.category" class="select-thrown-range-category">
                 {{#each config.weaponRangeCategories as |val key|}}
-                <option value="{{key}}"{{#ife ../system.thrown.ranges.category key}}selected="selected"{{/ife}}>{{localize val.label}}</option>
+                <option value="{{key}}" {{#ife ../system.thrown.ranges.category key}}selected="selected" {{/ife}}>
+                    {{localize val.label}}</option>
                 {{/each}}
             </select>
-            <input
-                size="3"
-                type="text"
-                name="system.thrown.ranges.short"
-                value="{{system.thrown.ranges.short}}"
-                data-dtype="Number"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            />
+            <input size="3" type="text" name="system.thrown.ranges.short" value="{{system.thrown.ranges.short}}"
+                data-dtype="Number" {{#if this.isUsingRangeCategory}} disabled {{/if}} />
             /
-            <input
-                size="3"
-                type="text"
-                name="system.thrown.ranges.medium"
-                value="{{system.thrown.ranges.medium}}"
-                data-dtype="Number"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            />
+            <input size="3" type="text" name="system.thrown.ranges.medium" value="{{system.thrown.ranges.medium}}"
+                data-dtype="Number" {{#if this.isUsingRangeCategory}} disabled {{/if}} />
             /
-            <input
-                size="3"
-                type="text"
-                name="system.thrown.ranges.long"
-                value="{{system.thrown.ranges.long}}"
-                data-dtype="Number"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            />
+            <input size="3" type="text" name="system.thrown.ranges.long" value="{{system.thrown.ranges.long}}"
+                data-dtype="Number" {{#if this.isUsingRangeCategory}} disabled {{/if}} />
             /
-            <input
-                size="3"
-                type="text"
-                name="system.thrown.ranges.extreme"
-                value="{{system.thrown.ranges.extreme}}"
-                data-dtype="Number"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            />
+            <input size="3" type="text" name="system.thrown.ranges.extreme" value="{{system.thrown.ranges.extreme}}"
+                data-dtype="Number" {{#if this.isUsingRangeCategory}} disabled {{/if}} />
             <i class="fas fa-times"></i>
-            <select
-                name="system.thrown.ranges.attribute"
-                {{#if this.isUsingRangeCategory}} disabled {{/if}}
-            >
+            <select name="system.thrown.ranges.attribute" {{#if this.isUsingRangeCategory}} disabled {{/if}}>
                 {{#select system.thrown.ranges.attribute}}
                 <option value=""></option>
                 {{#each config.attributes as |name type|}}
@@ -249,14 +161,8 @@
             {{localize "SR5.Weapon.Reach"}}
         </div>
         <div class="inputs">
-            <input
-                type="text"
-                size="2"
-                name="system.melee.reach"
-                value="{{system.melee.reach}}"
-                data-dtype="Number"
-                placeholder="1"
-            />
+            <input type="text" size="2" name="system.melee.reach" value="{{system.melee.reach}}" data-dtype="Number"
+                placeholder="1" />
         </div>
     </div>
     {{/ife}} {{#ife system.category "thrown"}}
@@ -265,14 +171,8 @@
             {{localize "SR5.Radius"}}
         </div>
         <div class="inputs">
-            <input
-                type="text"
-                size="4"
-                name="system.thrown.blast.radius"
-                value="{{system.thrown.blast.radius}}"
-                data-dtype="Number"
-                placeholder="1"
-            />
+            <input type="text" size="4" name="system.thrown.blast.radius" value="{{system.thrown.blast.radius}}"
+                data-dtype="Number" placeholder="1" />
             m
         </div>
     </div>
@@ -281,14 +181,8 @@
             {{localize "SR5.Dropoff"}}
         </div>
         <div class="inputs">
-            <input
-                size="3"
-                type="text"
-                name="system.thrown.blast.dropoff"
-                value="{{system.thrown.blast.dropoff}}"
-                data-dtype="Number"
-                placeholder="-1"
-            />
+            <input size="3" type="text" name="system.thrown.blast.dropoff" value="{{system.thrown.blast.dropoff}}"
+                data-dtype="Number" placeholder="-1" />
             /m
         </div>
     </div>

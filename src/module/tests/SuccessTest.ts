@@ -858,6 +858,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * Helper to determine if this success test has a damage value.
+     */
+    get hasDamage(): boolean {
+        // check that we don't have a damage value of 0 and a damage type that isn't empty
+        return this.data.action.damage.value !== 0 && this.data.action.damage.type.value !== '';
+    }
+
+    /**
      * Helper to get the net hits value for this success test with a possible threshold.
      */
     calculateNetHits(): ValueField {
@@ -1377,7 +1385,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.data.sourceActorUuid) {
             ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
             return this;
-        };
+        }
         if (!this.canSecondChance) return this;
 
         // Fetch documents.
