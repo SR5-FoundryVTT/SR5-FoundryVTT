@@ -69,6 +69,7 @@ import { RenderSettings } from './systemLinks';
 import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
+import { DataStorage } from './data/DataStorage';
 
 
 
@@ -241,7 +242,12 @@ ___________________
              * This came out of an unclear user issue regarding multi-char UTF symbol inputs, to allow
              * 'interactive' changing of the delay on the user side until a sweet spot could be found.
              */
-            inputDelay: 300
+            inputDelay: 300,
+
+            /**
+             * The global data storage for the system.
+             */
+            storage: DataStorage
         };
 
         // Register document classes
@@ -332,6 +338,7 @@ ___________________
         // Register Tours
         registerSR5Tours();
 
+        DataStorage.validate();
     }
 
     static async ready() {
@@ -475,7 +482,8 @@ ___________________
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
             [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage],
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage],
-            [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage]
+            [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage],
+            [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage],
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {
