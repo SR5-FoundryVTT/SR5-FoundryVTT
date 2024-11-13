@@ -31,7 +31,7 @@ import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
-import { SetMarksOptions } from '../flows/MarksFlow';
+import { SetMarksOptions } from '../flows/MarksStorageFlow';
 import { RollDataOptions } from '../item/Types';
 import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { DamageApplicationFlow } from './flows/DamageApplicationFlow';

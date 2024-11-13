@@ -1,4 +1,4 @@
-import { MarkFlow, SetMarksOptions } from "../../flows/MarksFlow";
+import { MarksStorageFlow, SetMarksOptions } from "../../flows/MarksStorageFlow";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
 
@@ -79,11 +79,14 @@ export const ActorMarksFlow = {
         const matrixData = persona.matrixData;
 
         if (!matrixData) return;
-        // TODO: Support not target, use options.name
+        // TODO: Support marking a non-document target (using only a name)
         if (!target) return;
 
-        const marksData = MarkFlow.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
-        await persona.update({'system.matrix.marks': marksData});
+        const marksData = MarksStorageFlow.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
+        
+        await MarksStorageFlow.storeMarks(persona, marksData);
+        // TODO: Remove this call once global storage works.
+        // await persona.update({'system.matrix.marks': marksData});
     },
 
     /**
@@ -93,18 +96,24 @@ export const ActorMarksFlow = {
         const matrixData = persona.matrixData;
         if (!matrixData) return;
 
+        await MarksStorageFlow.clearMarks(persona);
+        // TODO: remove this call once global storage works
         // Delete all markId properties from ActorData
-        await persona.update({'system.matrix.marks': []});
+        // await persona.update({'system.matrix.marks': []});
     },
 
     /**
-     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     * Remove marks for one target uuid. If you want to delete all marks, use clearMarks instead.
      */
     async clearMark(persona: SR5Actor, uuid: string) {
         if (!persona.isMatrixActor) return;
+        const marksData = MarksStorageFlow.getMarksData(persona);
+        const marks = marksData.filter(mark => mark.uuid !== uuid) ?? [];
+        await MarksStorageFlow.storeMarks(persona, marks);
 
-        const marks = persona.matrixData?.marks.filter(mark => mark.uuid !== uuid) ?? [];
-        await persona.update({'system.matrix.marks': marks});
+        // TODO: Remove once global data storage works
+        // const marks = persona.matrixData?.marks.filter(mark => mark.uuid !== uuid) ?? [];
+        // await persona.update({'system.matrix.marks': marks});
     },
 
     /**
@@ -116,7 +125,10 @@ export const ActorMarksFlow = {
      * @returns Amount of marks placed
      */
     getMarksPlaced(persona: SR5Actor, uuid: string): number {
-        return MarkFlow.getMark(persona.matrixData?.marks ?? [], uuid);
+        const marksData = MarksStorageFlow.getMarksData(persona);
+        return MarksStorageFlow.getMarksPlaced(marksData, uuid);
+        // TODO: remove this call once global storage works
+        // return MarksFlow.getMark(persona.matrixData?.marks ?? [], uuid);
     },
 
     /**

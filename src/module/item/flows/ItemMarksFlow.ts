@@ -1,4 +1,4 @@
-import { MarkFlow, SetMarksOptions } from "../../flows/MarksFlow";
+import { MarksStorageFlow, SetMarksOptions } from "../../flows/MarksStorageFlow";
 import { SR5Item } from "../SR5Item";
 
 /**
@@ -20,7 +20,8 @@ export const ItemMarksFlow = {
         if (!host) return;
 
         // Delete all markId properties from ActorData
-        await device.update({ 'system.marks': [] });
+        // await device.update({ 'system.marks': [] });
+        await MarksStorageFlow.clearMarks(device);
     },
 
     /**
@@ -31,9 +32,13 @@ export const ItemMarksFlow = {
      */
     async clearMark(device: SR5Item, uuid: string) {
         if (!device.isHost) return;
+        const marksData = MarksStorageFlow.getMarksData(device);
+        const marks = marksData.filter(mark => mark.uuid !== uuid) ?? [];
+        await MarksStorageFlow.storeMarks(device, marks);
 
-        const marks = device.system.marks?.filter(mark => mark.uuid !== uuid) ?? [];
-        await device.update({ 'system.marks': marks });
+        // TODO: Remove once global data storage works
+        // const marks = device.system.marks?.filter(mark => mark.uuid !== uuid) ?? [];
+        // await device.update({ 'system.marks': marks });
     },
 
     /**
@@ -56,15 +61,30 @@ export const ItemMarksFlow = {
 
         // Place marks on master icon as well. See SR5#233 'PANS and WANS'
         if (target.hasMaster) {
-            const master = target.master;
-            if (master) await host.setMarks(master, marks, options);
+            const master = target.master as SR5Item;
+            const marksData = MarksStorageFlow.getMarksData(master);
+            const currentMarks = MarksStorageFlow.getMarksPlaced(marksData, master.uuid);
+            MarksStorageFlow.setMarks(marksData, master, currentMarks, marks);
+            await MarksStorageFlow.storeMarks(master, marksData);
         }
 
+        // TODO: Remove once global data storage works
+        // if (target.hasMaster) {
+        //     const master = target.master;
+        //     if (master) await host.setMarks(master, marks, options);
+        // }
+
         // Place marks on the target icon itself.
-        const currentMarks = host.getMarksById(target.uuid);
-        let marksData = host.marksData ?? [];
-        marksData = MarkFlow.setMarks(marksData, target, currentMarks, marks, options);
-        await host.update({ 'system.marks': marksData });
+        const marksData = MarksStorageFlow.getMarksData(host);
+        const currentMarks = MarksStorageFlow.getMarksPlaced(marksData, target.uuid);
+        MarksStorageFlow.setMarks(marksData, target, currentMarks, marks, options);
+        await MarksStorageFlow.storeMarks(host, marksData);
+
+        // TODO: Remove once global data storage works
+        // const currentMarks = host.getMarksById(target.uuid);
+        // let marksData = host.marksData ?? [];
+        // marksData = MarksFlow.setMarks(marksData, target, currentMarks, marks, options);
+        // await host.update({ 'system.marks': marksData });
     },
 
     /**
@@ -76,7 +96,7 @@ export const ItemMarksFlow = {
     getMark(device: SR5Item, markId: string): number {
         const host = device.asHost;
         if (!host) return 0;
-        return MarkFlow.getMark(host.system.marks, markId);
+        return MarksStorageFlow.getMarksPlaced(host.system.marks, markId);
     },
 
     /**

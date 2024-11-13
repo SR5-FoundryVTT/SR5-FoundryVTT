@@ -61,7 +61,7 @@ import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { ItemMarksFlow } from './flows/ItemMarksFlow';
 import { ItemRollDataFlow } from './flows/ItemRollDataFlow';
 import { RollDataOptions } from './Types';
-import { SetMarksOptions } from '../flows/MarksFlow';
+import { SetMarksOptions } from '../flows/MarksStorageFlow';
 import { MatrixFlow } from '../flows/MatrixFlow';
 
 /**
@@ -1483,6 +1483,7 @@ export class SR5Item extends Item {
 
     /**
      * Get the marks placed for a single target
+     * TODO: Use MarksFlow global storage
      * @param markId The id of that target
      * @returns Amount of marks
      */
@@ -1492,6 +1493,7 @@ export class SR5Item extends Item {
 
     /**
      * Get all marks placed by this item.
+     * TODO: Use MarksFlow global storage
      * @returns The set of marks
      */
     get marksData() {
@@ -1500,6 +1502,7 @@ export class SR5Item extends Item {
 
     /**
      * Remove ALL marks placed by this item.
+     * TODO: Use MarksFlow global storage
      */
     async clearMarks() {
         await ItemMarksFlow.clearMarks(this);
