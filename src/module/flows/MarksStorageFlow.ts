@@ -18,7 +18,10 @@ export interface SetMarksOptions {
  * - actor mark placement => ActorMarksFlow
  * - item mark placement => ItemMarksFlow
  * - test mark placement => MarkPlacementFlow
- * 
+ *   
+ * TODO: Deleting an document (actor), must delete the storage marks as well
+ * TODO: Deleting a scene token must delete the storage marks as well
+ *  
  * Everything abstracted across those is placed here to avoid duplication.
  * Use the global storage to store and retrieve marks data for all documents.
  */
@@ -79,9 +82,6 @@ export const MarksStorageFlow = {
 
     /**
      * Store marks data in global storage for an active actor placing some marks on any kind of target.
-     * 
-     * TODO: Deleting an document (actor), must delete the storage marks as well
-     * TODO: Deleting a scene token must delete the storage marks as well
      * 
      * @param document The actor placing any number of marks
      * @param marksData The raw marks data of the actor.
