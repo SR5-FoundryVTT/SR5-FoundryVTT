@@ -1623,7 +1623,8 @@
             "loyalty": 0,
             "family": false,
             "blackmail": false,
-            "group": false
+            "group": false,
+            "linkedActor": ""
         },
         "sin": {
             "templates": ["description", "technology", "importFlags"],

@@ -4,6 +4,20 @@ import { VersionMigration } from './migrator/VersionMigration';
 import { FLAGS, SYSTEM_NAME } from './constants';
 
 export const registerSystemSettings = () => {
+    /**
+     * No actual setting.
+     * 
+     * Instead this is used to store global data outside of FoundryVTT document storage.
+     * See DataStorage.ts for more information.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.GlobalDataStorage, {
+        name: 'SETTINGS.GlobalDataStorageName',
+        hint: 'SETTINGS.GlobalDataStorageDescription',
+        scope: 'world',
+        config: false,
+        type: Object,
+        default: {}
+    });
 
     /**
      * Register diagonal movement rule setting

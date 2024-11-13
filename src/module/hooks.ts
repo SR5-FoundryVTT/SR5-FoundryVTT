@@ -76,6 +76,7 @@ import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { MatrixHooks } from './tests/hooks/MatrixHooks';
+import { DataStorage } from './data/DataStorage';
 
 
 
@@ -260,7 +261,12 @@ ___________________
              * This came out of an unclear user issue regarding multi-char UTF symbol inputs, to allow
              * 'interactive' changing of the delay on the user side until a sweet spot could be found.
              */
-            inputDelay: 300
+            inputDelay: 300,
+
+            /**
+             * The global data storage for the system.
+             */
+            storage: DataStorage
         };
 
         // Register document classes
@@ -351,6 +357,7 @@ ___________________
         // Register Tours
         registerSR5Tours();
 
+        DataStorage.validate();
     }
 
     static async ready() {
@@ -488,11 +495,12 @@ ___________________
         console.log('Registering Shadowrun5e system socket messages...');
         const hooks: Shadowrun.SocketMessageHooks = {
             [FLAGS.addNetworkMaster]: [MatrixNetworkFlow._handleAddMasterSocketMessage.bind(MatrixNetworkFlow)],
-            [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage.bind(MatrixNetworkFlow)],
-            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage.bind(MatrixNetworkFlow)],
-            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage.bind(MatrixNetworkFlow)],
-            [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(MatrixNetworkFlow)],
-            [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(MatrixNetworkFlow)]
+            [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage.bind(SR5Combat)],
+            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage.bind(SR5Combat)],
+            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage.bind(SR5Combat)],
+            [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(SuccessTestEffectsFlow)],
+            [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(TeamworkTest)],
+            [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)]
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {

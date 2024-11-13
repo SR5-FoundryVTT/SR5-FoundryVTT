@@ -64,6 +64,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     slaves: (SR5Item | SR5Actor)[]
     master: SR5Item | undefined
 
+    // Contact Item
+    linkedActor: SR5Actor | undefined
+
     // Action Items. (not only type = action)
     tests: typeof game.shadowrun5e.tests
     opposedTests: typeof game.shadowrun5e.opposedTests
@@ -120,6 +123,8 @@ export class SR5ItemSheet extends ItemSheet {
         //@ts-expect-error // TODO: remove TODO: foundry-vtt-types v10
         data.data = data.item.system;
         const itemData = this.item.system;
+
+        const linkedActor = await this.item.getLinkedActor();
 
         if (itemData.action) {
             try {
@@ -211,6 +216,10 @@ export class SR5ItemSheet extends ItemSheet {
             data['master'] = this.item.master;
         }
 
+        if (this.item.isContact) {
+            data['linkedActor'] = await this.item.getLinkedActor() as SR5Actor;
+        }
+
         // Provide action parts with all test variants.
         data.tests = game.shadowrun5e.tests;
         data.opposedTests = game.shadowrun5e.opposedTests;
@@ -227,7 +236,12 @@ export class SR5ItemSheet extends ItemSheet {
 
         data.rollModes = CONFIG.Dice.rollModes;
 
-        return data;
+
+
+        return {
+            ...data,
+            linkedActor
+        }
     }
 
     /**
@@ -295,6 +309,11 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
 
         /**
+         * Contact item specific
+         */
+        html.find('.actor-remove').click(this.handleLinkedActorRemove.bind(this));
+
+        /**
          * Weapon item specific
          */
         html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
@@ -307,6 +326,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
+
         /**
          * SIN item specific
          */
@@ -340,6 +360,22 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
 
         this._activateTagifyListeners(html);
+    }
+
+    /**
+     * User requested removal of the linked actor.
+     */
+    async handleLinkedActorRemove(event: any) {
+        await this.item.update({ 'system.linkedActor': '' });
+    }
+
+    /**
+     * Updating the contacts linked actor.
+     * 
+     * @param actor The prepared actor
+     */
+    async updateLinkedActor(actor: SR5Actor) {
+        await this.item.update({ 'system.linkedActor': actor.uuid });
     }
 
     _addDragSupportToListItemTemplatePartial(i, item) {
@@ -468,6 +504,15 @@ export class SR5ItemSheet extends ItemSheet {
 
             await this.item.addSlave(actor);
             
+        }
+
+        // link actors in existing contacts
+        if (this.item.isContact && data.type === 'Actor') {
+            const actor = await fromUuid(data.uuid) as SR5Actor;
+
+            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+
+            return this.updateLinkedActor(actor);
         }
     }
 

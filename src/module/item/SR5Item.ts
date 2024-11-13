@@ -521,7 +521,7 @@ export class SR5Item extends Item {
             return ui.notifications?.warn('SR5.Warnings.CantReloadAtAllDueToAmmo', { localize: true });
         }
         if (ammo && Number(ammo.system.technology?.quantity) < missingBullets) {
-            if(partialReload && partialReloadBulletsNeeded !== -1 && Number(ammo.system.technology?.quantity) < partialReloadBulletsNeeded ) {
+            if (partialReload && partialReloadBulletsNeeded !== -1 && Number(ammo.system.technology?.quantity) < partialReloadBulletsNeeded) {
                 ui.notifications?.info('SR5.Warnings.CantReloadPartialDueToAmmo', { localize: true });
             } else {
                 ui.notifications?.info('SR5.Warnings.CantReloadFullyDueToAmmo', { localize: true });
@@ -1189,6 +1189,19 @@ export class SR5Item extends Item {
         }
     }
 
+    /**    
+    * Retrieve the actor document linked to this item.
+    * e.g.: Contact items provide linked actors
+    */
+    async getLinkedActor(): Promise<SR5Actor | undefined> {
+        const uuid = this.wrapper.getLinkedActorUuid();
+
+        // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
+        if (uuid && this.asContact && foundry.utils.parseUuid(uuid).documentType === 'Actor') {
+            return await fromUuid(uuid) as SR5Actor;
+        }
+    }
+
     get isCritterPower(): boolean {
         return this.wrapper.isCritterPower();
     }
@@ -1262,7 +1275,7 @@ export class SR5Item extends Item {
 
     setSource(source: string) {
         if (!this.system.description) this.system.description = { chat: '', source: '', value: '' };
-        this.update({'system.description.source': source});
+        this.update({ 'system.description.source': source });
         this.render(true);
     }
 

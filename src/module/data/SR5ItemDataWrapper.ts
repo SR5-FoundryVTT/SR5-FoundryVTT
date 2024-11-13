@@ -278,6 +278,10 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0, radiation: radiation ?? 0 };
     }
 
+    getLinkedActorUuid(): string | undefined {
+        return this.getData().linkedActor;
+    }
+
     getName(): string {
         return this.data.name;
     }

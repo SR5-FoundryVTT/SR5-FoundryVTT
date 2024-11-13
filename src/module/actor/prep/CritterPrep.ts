@@ -19,6 +19,7 @@ export class CritterPrep {
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
+        SkillsPrep.prepareSkillData(system);
     }
 
     static prepareDerivedData(system: CritterData, items: SR5ItemDataWrapper[]) {

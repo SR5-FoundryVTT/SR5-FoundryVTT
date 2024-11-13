@@ -176,7 +176,6 @@
     "SR5.Base": "Base",
     "SR5.BaseValue": "Base Value",
     "SR5.Biography": "Bio",
-    "SR5.Blackmail": "Blackmail",
     "SR5.BlastRadius": "Blast Radius",
     "SR5.Block": "Block",
     "SR5.Bonus": "Bonus",
@@ -234,6 +233,16 @@
     "SR5.Conceal": "Conceal",
     "SR5.ConditionMonitor": "Con. Mon.",
     "SR5.Connection": "Connection",
+    "SR5.Contact": {
+        "Blackmail": "Blackmail",
+        "Connection": "Connection",
+        "Family": "Family",
+        "Group": "Group",
+        "LinkedActor": "Actor",
+        "Loyalty": "Loyalty",        
+        "DropActor": "Drag&Drop an actor to link it to this contact",
+                "Type": "Type"
+    },
     "SR5.Contacts": "Contacts",
     "SR5.ContactType": "Type",
     "SR5.Continue": "Continue",
@@ -434,7 +443,6 @@
     "SR5.Fade": "Fade",
     "SR5.FadeAttribute": "Fade Attribute",
     "SR5.FadeValue": "Fade Value",
-    "SR5.Family": "Family",
     "SR5.Filter": "Filter",
     "SR5.FireMode": "Fire Mode",
     "SR5.Force": "Force",
@@ -458,7 +466,6 @@
         "Threshold": " with a threshold of "
     },
     "SR5.GoodCover": "Good Cover",
-    "SR5.GroupContact": "Group",
     "SR5.HackingProgram": "Hacking Program",
     "SR5.Help": "Help",
     "SR5.Hits": "Hits",
@@ -1236,6 +1243,9 @@
         },
         "CallInAction": {
             "ActorType": "Type of actor to call in"
+        },
+        "Contact": {
+            "LinkActor": "Drag&Drop an actor to link him to this contact"
         },
         "CompilationTest": {
             "Level": "Level of the compiled sprite",

@@ -12,10 +12,18 @@ export class DroneInfiltrationTest extends SuccessTest {
         }
 
         switch (vehicleData.system.controlMode) {
+            // See SR5#270 'Drone Infiltration'
             case "autopilot": {
                 const attribute = 'pilot';
                 const skill = 'sneaking';
-                const limit = 'sensor';
+                const limit = {attribute: 'handling'};
+
+                return {attribute, skill, limit};
+            }
+            case "rigger": {
+                const attribute = 'intuition';
+                const skill = 'sneaking';
+                const limit = 'handling';
 
                 return {attribute, skill, limit};
             }

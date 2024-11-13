@@ -16,6 +16,13 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(strId);
     });
 
+    Handlebars.registerHelper('localizeDocumentType', function (document) {  
+        if (document.type.length < 1) return '';
+        const documentClass = document instanceof SR5Actor ? 'Actor' : 'Item';
+        const i18nTypeLabel = `TYPES.${documentClass}.${document.type}`;
+        return game.i18n.localize(i18nTypeLabel as Translation);
+    });
+
     Handlebars.registerHelper('localizeSkill', function (skill: SkillField): string {
         return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
         // NOTE: Below is code to append a shortened attribute name to the skill name. It's been removed for readability.
