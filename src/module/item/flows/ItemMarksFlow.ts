@@ -19,9 +19,7 @@ export const ItemMarksFlow = {
 
         if (!host) return;
 
-        // Delete all markId properties from ActorData
-        // await device.update({ 'system.marks': [] });
-        await MarksStorageFlow.clearMarks(device);
+        await device.update({ 'system.marks': [] });
     },
 
     /**
@@ -32,13 +30,9 @@ export const ItemMarksFlow = {
      */
     async clearMark(device: SR5Item, uuid: string) {
         if (!device.isHost) return;
-        const marksData = MarksStorageFlow.getMarksData(device);
-        const marks = marksData.filter(mark => mark.uuid !== uuid) ?? [];
-        await MarksStorageFlow.storeMarks(device, marks);
 
-        // TODO: Remove once global data storage works
-        // const marks = device.system.marks?.filter(mark => mark.uuid !== uuid) ?? [];
-        // await device.update({ 'system.marks': marks });
+        const marks = device.system.marks?.filter(mark => mark.uuid !== uuid) ?? [];
+        await device.update({ 'system.marks': marks });
     },
 
     /**
@@ -50,41 +44,23 @@ export const ItemMarksFlow = {
      * @param options Additional options that may be needed.
      *
      */
-    async setMarks(host: SR5Item, target: Shadowrun.NetworkDevice | undefined, marks: number, options: SetMarksOptions={}) {
+    async setMarks(host: SR5Item, target: Shadowrun.NetworkDevice | undefined, marks: number, options: SetMarksOptions = {}) {
         if (!host.isHost) {
             console.error('Only Host item types can place matrix marks!');
             return;
         }
 
-        // TODO: Support no target, use options.name
         if (!target) return;
 
-        // Place marks on master icon as well. See SR5#233 'PANS and WANS'
         if (target.hasMaster) {
-            const master = target.master as SR5Item;
-            const marksData = MarksStorageFlow.getMarksData(master);
-            const currentMarks = MarksStorageFlow.getMarksPlaced(marksData, master.uuid);
-            MarksStorageFlow.setMarks(marksData, master, currentMarks, marks);
-            await MarksStorageFlow.storeMarks(master, marksData);
+            const master = target.master;
+            if (master) await host.setMarks(master, marks, options);
         }
 
-        // TODO: Remove once global data storage works
-        // if (target.hasMaster) {
-        //     const master = target.master;
-        //     if (master) await host.setMarks(master, marks, options);
-        // }
-
-        // Place marks on the target icon itself.
-        const marksData = MarksStorageFlow.getMarksData(host);
-        const currentMarks = MarksStorageFlow.getMarksPlaced(marksData, target.uuid);
-        MarksStorageFlow.setMarks(marksData, target, currentMarks, marks, options);
-        await MarksStorageFlow.storeMarks(host, marksData);
-
-        // TODO: Remove once global data storage works
-        // const currentMarks = host.getMarksById(target.uuid);
-        // let marksData = host.marksData ?? [];
-        // marksData = MarksFlow.setMarks(marksData, target, currentMarks, marks, options);
-        // await host.update({ 'system.marks': marksData });
+        const currentMarks = host.getMarksPlaced(target.uuid);
+        let marksData = host.marksData ?? [];
+        marksData = MarksStorageFlow.setMarks(marksData, target, currentMarks, marks, options);
+        await host.update({ 'system.marks': marksData });
     },
 
     /**
@@ -93,7 +69,7 @@ export const ItemMarksFlow = {
      * @param markId The markId to get the marks for.
      * @returns The amount of marks placed on the target.
      */
-    getMark(device: SR5Item, markId: string): number {
+    getMarksPlaced(device: SR5Item, markId: string): number {
         const host = device.asHost;
         if (!host) return 0;
         return MarksStorageFlow.getMarksPlaced(host.system.marks, markId);
@@ -104,7 +80,7 @@ export const ItemMarksFlow = {
      * @param device The device to get marks for    
      * @returns The marks data for this item.
      */
-    getMarksData(device: SR5Item): Shadowrun.MatrixMarks|undefined {
+    getMarksData(device: SR5Item): Shadowrun.MatrixMarks | undefined {
         const host = device.asHost;
         if (!host) return;
         return host.system.marks;

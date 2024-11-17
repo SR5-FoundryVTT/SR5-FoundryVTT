@@ -84,9 +84,8 @@ export const ActorMarksFlow = {
 
         const marksData = MarksStorageFlow.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
         
-        await MarksStorageFlow.storeMarks(persona, marksData);
-        // TODO: Remove this call once global storage works.
-        // await persona.update({'system.matrix.marks': marksData});
+        await persona.update({'system.matrix.marks': marksData});
+        await MarksStorageFlow.storeRelations(persona, marksData);
     },
 
     /**
@@ -96,10 +95,8 @@ export const ActorMarksFlow = {
         const matrixData = persona.matrixData;
         if (!matrixData) return;
 
-        await MarksStorageFlow.clearMarks(persona);
-        // TODO: remove this call once global storage works
         // Delete all markId properties from ActorData
-        // await persona.update({'system.matrix.marks': []});
+        await persona.update({'system.matrix.marks': []});
     },
 
     /**
@@ -107,13 +104,9 @@ export const ActorMarksFlow = {
      */
     async clearMark(persona: SR5Actor, uuid: string) {
         if (!persona.isMatrixActor) return;
-        const marksData = MarksStorageFlow.getMarksData(persona);
-        const marks = marksData.filter(mark => mark.uuid !== uuid) ?? [];
-        await MarksStorageFlow.storeMarks(persona, marks);
 
-        // TODO: Remove once global data storage works
-        // const marks = persona.matrixData?.marks.filter(mark => mark.uuid !== uuid) ?? [];
-        // await persona.update({'system.matrix.marks': marks});
+        const marksData = persona.matrixData?.marks.filter(mark => mark.uuid !== uuid) ?? [];
+        await persona.update({'system.matrix.marks': marksData});
     },
 
     /**
@@ -125,10 +118,7 @@ export const ActorMarksFlow = {
      * @returns Amount of marks placed
      */
     getMarksPlaced(persona: SR5Actor, uuid: string): number {
-        const marksData = MarksStorageFlow.getMarksData(persona);
-        return MarksStorageFlow.getMarksPlaced(marksData, uuid);
-        // TODO: remove this call once global storage works
-        // return MarksFlow.getMark(persona.matrixData?.marks ?? [], uuid);
+        return MarksStorageFlow.getMarksPlaced(persona.matrixData?.marks ?? [], uuid);
     },
 
     /**

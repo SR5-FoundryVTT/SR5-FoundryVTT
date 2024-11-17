@@ -1882,6 +1882,7 @@ export class SR5Actor extends Actor {
         await ActorMarksFlow.clearMarks(this);
 
         // Check if marks have been used to connect to host/grid
+        // TODO: Refactor into MatrixNetworkFlow
         const network = this.network;
         if (!network) return;
         if (!marks) return;
@@ -1902,6 +1903,7 @@ export class SR5Actor extends Actor {
         await ActorMarksFlow.clearMark(this, uuid);
 
         // Check if marks have been used to connect to host/grid
+        // TODO: Refactor into MatrixNetworkFlow
         const network = this.network;
         if (!network) return;
 

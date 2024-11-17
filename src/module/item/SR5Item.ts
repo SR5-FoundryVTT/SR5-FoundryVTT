@@ -1483,17 +1483,15 @@ export class SR5Item extends Item {
 
     /**
      * Get the marks placed for a single target
-     * TODO: Use MarksFlow global storage
-     * @param markId The id of that target
+     * @param uuid The id of that target
      * @returns Amount of marks
      */
-    getMarksById(markId: string): number {
-        return ItemMarksFlow.getMark(this, markId);
+    getMarksPlaced(uuid: string): number {
+        return ItemMarksFlow.getMarksPlaced(this, uuid);
     }
 
     /**
      * Get all marks placed by this item.
-     * TODO: Use MarksFlow global storage
      * @returns The set of marks
      */
     get marksData() {
@@ -1509,10 +1507,11 @@ export class SR5Item extends Item {
     }
 
     /**
-     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     * Remove marks placed on one target document.
+     * @param uuid Of the target document.
      */
-    async clearMark(markId: string) {
-        await ItemMarksFlow.clearMark(this, markId);
+    async clearMark(uuid: string) {
+        await ItemMarksFlow.clearMark(this, uuid);
     }
 
     /**
