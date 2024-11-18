@@ -84,6 +84,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         super.activateListeners(html);
 
         html.find('.show-matrix-target-acquisition').click(this._onShowMatrixTargetAcquisition.bind(this));
+        html.find('.reboot-persona-device').click(this._onRebootPersonaDevice.bind(this));
     }
 
     /**
@@ -127,7 +128,14 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      */
     async _onShowMatrixTargetAcquisition(event: Event) {
         const app = new MatrixTargetAcquisitionApplication(this.document);
-
         app.render(true);
+    }
+
+    /**
+     * Handle the user request to reboot their main active matrix device or living persona.
+     * @param event Any pointer event
+     */
+    async _onRebootPersonaDevice(event: Event) {
+        await this.actor.rebootPersona();
     }
 }

@@ -36,6 +36,7 @@ import { RollDataOptions } from '../item/Types';
 import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { DamageApplicationFlow } from './flows/DamageApplicationFlow';
 import { SuccessTest } from '../tests/SuccessTest';
+import { MatrixFlow } from '../flows/MatrixFlow';
 
 
 /**
@@ -462,6 +463,13 @@ export class SR5Actor extends Actor {
         if (!("matrix" in this.system)) return;
         const matrix = this.system.matrix;
         if (matrix.device) return this.items.get(matrix.device);
+    }
+
+    /**
+     * Reboot this actors living or device based persona.
+     */
+    async rebootPersona() {
+        await MatrixFlow.rebootPersona(this);
     }
 
     getFullDefenseAttribute(): Shadowrun.AttributeField | undefined {

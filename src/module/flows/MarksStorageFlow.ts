@@ -15,7 +15,7 @@ export interface SetMarksOptions {
  * General functionality around storing matrix mark relationships in global storage.
  * 
  * Within global storage no marks data is found but only relationsships between documents
- * formed ny placing a mark on each other. This is used to avoid having to search all documents
+ * formed by placing a mark on each other. This is used to avoid having to search all documents
  * for marks during document deletion, reboots and similar operations having to remove ALL marks of
  * a document.
  * 
@@ -133,6 +133,12 @@ export const MarksStorageFlow = {
         // Remove marks placed on.
         for (const [uuidForStorage, markRelations] of Object.entries(storage)) {
             storage[uuidForStorage] = markRelations.filter(markedUuid => markedUuid !== uuid);
+
+            // Update lokal marks placed on the main uuid.
+            const document = fromUuidSync(MarksStorageFlow._uuidFromStorage(uuidForStorage)) as Shadowrun.NetworkDevice;
+            if (!document) continue;
+
+            await document.clearMark(uuid);
         }
 
         await DataStorage.set(MarksStorageFlow.key, storage);
@@ -155,10 +161,16 @@ export const MarksStorageFlow = {
         }
     },
 
+    /**
+     * Transform uuid into a format that can be stored as keys in Foundry without object splitting.
+     */
     _uuidForStorage(uuid) {
         return uuid.replace('.', '_');
     },
 
+    /**
+     * Reforms a transformed uuid back into a usable format.
+     */
     _uuidFromStorage(uuid) {
         return uuid.replace('_', '.');
     },

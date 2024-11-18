@@ -1,8 +1,10 @@
 import { SR5Actor } from '../actor/SR5Actor';
+import { DataDefaults } from '../data/DataDefaults';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
 import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
+import { MarksStorageFlow } from './MarksStorageFlow';
 
 /**
  * General handling around handling everything matrix related.
@@ -129,24 +131,45 @@ export const MatrixFlow = {
      * @param device The device to reboot.
      * @param delay The delay duration of combat turns after which the devices has rebooted.
      */
-    async rebootDevice(device: SR5Item, delay: number = 1) {
-        if (!device.isDevice) return;
-
+    async rebootPersona(actor: SR5Actor, delay: number = 1) {
+        console.debug('Shadowrun 5e | Rebooting Persona Device', actor);
         // TODO: Mark devices as rebooting to prohibit usage until end of next combat turn (effect with duration).
         // TODO: Allow for user input delay when rebooting device 
 
-        // Only reset overwatch score if the device rebooted is the persona device.
-        const personaDevice = device.actor?.getMatrixDevice();
-        if (personaDevice !== device) return;
-
         // Link Locked actors can´t be rebooted. (SR5#229 ´Dumpshock & Link-Locking´)
-        if (device.actor?.isLinkLocked) {
+        if (actor.isLinkLocked) {
             ui.notifications?.error('SR5.Matrix.Error.LinkLockedReboot');
             return;
         }
 
-        await device.actor?.setOverwatchScore(0);
-        await MatrixFlow.applyDumpshock(device.actor);
+        // Only reset overwatch score if the device rebooted is the persona device.
+        const device = actor.getMatrixDevice();
+
+        await actor.setOverwatchScore(0);
+        await actor.clearMarks();
+        await MarksStorageFlow.clearRelations(actor.uuid);
+        const damage = MatrixFlow.getDumpshockDamage(actor);
+
+        await MatrixFlow.sendRebootDeviceMessage(actor, device, delay, damage);
+    },
+
+    /**
+     * Inform GM and users about the result of a reboot action.
+     */
+    async sendRebootDeviceMessage(actor: SR5Actor, device: SR5Item|undefined, delay: number, damage: Shadowrun.DamageData) {
+        const speaker = {
+            actor,
+            alias: game.user?.name,
+            token: actor.getActiveTokens(true)[0]?.id,
+        };
+        const content = await renderTemplate('systems/shadowrun5e/dist/templates/chat/reboot-device-message.hbs', {
+            speaker,
+            delay,
+            device, 
+            damage
+        });
+        const messageData = { content };
+        await ChatMessage.create(messageData);
     },
 
     /**
@@ -156,10 +179,9 @@ export const MatrixFlow = {
      *
      * @param actor The actor that is affected by dumpshock.
      */
-    async applyDumpshock(actor: SR5Actor) {
-        if (!actor.isUsingVR) return; 
+    getDumpshockDamage(actor: SR5Actor) {
+        if (!actor.isUsingVR) return DataDefaults.damageData({type: {base: 'stun', value: 'stun'}}); 
 
-        const damage = MatrixRules.dumpshockDamage(actor.isUsingHotSim);
-        await actor.addDamage(damage);
+        return MatrixRules.dumpshockDamage(actor.isUsingHotSim);
     }
 };
