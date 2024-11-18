@@ -510,9 +510,9 @@ export class SR5ItemSheet extends ItemSheet {
         if (this.item.isContact && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid) as SR5Actor;
 
-            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
-            return this.updateLinkedActor(actor);
+            return await this.updateLinkedActor(actor);
         }
     }
 
