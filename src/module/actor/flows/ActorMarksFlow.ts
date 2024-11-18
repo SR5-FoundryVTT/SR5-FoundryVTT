@@ -85,7 +85,7 @@ export const ActorMarksFlow = {
         const marksData = MarksStorageFlow.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
         
         await persona.update({'system.matrix.marks': marksData});
-        await MarksStorageFlow.storeRelations(persona, marksData);
+        await MarksStorageFlow.storeRelations(persona.uuid, marksData);
     },
 
     /**

@@ -1,6 +1,4 @@
-import { SR5Actor } from '../actor/SR5Actor';
 import { DataStorage } from '../data/DataStorage';
-import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
 
 /**
@@ -23,7 +21,6 @@ export interface SetMarksOptions {
  * 
  * These are called mark relations here.
  * 
- * TODO: onDeleteScene for tokens must be handled
  * TODO: Unittesting for this.
  * 
  * Usage:
@@ -100,11 +97,12 @@ export const MarksStorageFlow = {
      * @param uuid The document placing marks
      * @param marksData The raw marks data of the actor.
      */
-    async storeRelations(uuid, marksData: Shadowrun.MatrixMarks) {
+    async storeRelations(uuid: string, marksData: Shadowrun.MatrixMarks) {
         uuid = MarksStorageFlow._uuidForStorage(uuid);
         const key = `${MarksStorageFlow.key}.${uuid}`;
         const marks = marksData.map(({uuid}) => uuid);
         await DataStorage.set(key, marks);
+        await MarksStorageFlow.cleanupOrphanedRelations();
     },
 
     /**
@@ -145,7 +143,7 @@ export const MarksStorageFlow = {
      * 
      * Normally this should be handled during deletion triggers for documents and scenes, but the world is not perfect.
      */
-    async cleanupOrphanedMarksData() {
+    async cleanupOrphanedRelations() {
         const storage = MarksStorageFlow.getStorage();
         for (const uuidFromStorage of Object.keys(storage)) {
             const uuid = MarksStorageFlow._uuidFromStorage(uuidFromStorage);
@@ -164,25 +162,4 @@ export const MarksStorageFlow = {
     _uuidFromStorage(uuid) {
         return uuid.replace('_', '.');
     },
-
-    /**
-     * Handle cleanup of marks placed and marks placed on a deleted actor document.
-     */
-    async onDeleteActor(actor: SR5Actor, options, id: string) {
-        // Only actors with matrix capabilities can even place marks.
-        if (!actor.isMatrixActor) return;
-
-        await MarksStorageFlow.clearRelations(actor.uuid);
-    },
-
-
-    /**
-     * Handle cleanup of marks placed and marks placed on a deleted item document.
-     */
-    async onDeleteItem(item: SR5Item, options, id: string) {
-        // Only actors with matrix capabilities can even place marks.
-        if (!item.isMatrixDevice && !item.isHost) return;
-
-        await MarksStorageFlow.clearRelations(item.uuid);
-    }
 }

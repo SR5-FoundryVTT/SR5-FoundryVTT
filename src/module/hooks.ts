@@ -77,9 +77,6 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { MatrixHooks } from './tests/hooks/MatrixHooks';
 import { DataStorage } from './data/DataStorage';
-import { MarksStorageFlow } from './flows/MarksStorageFlow';
-
-
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -103,8 +100,6 @@ export class HooksManager {
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(HooksManager));
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks.bind(HooksManager));
-        Hooks.on('deleteItem', MarksStorageFlow.onDeleteItem.bind(MarksStorageFlow));
-        Hooks.on('deleteActor', MarksStorageFlow.onDeleteActor.bind(MarksStorageFlow));
         Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
