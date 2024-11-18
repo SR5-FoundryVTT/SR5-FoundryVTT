@@ -36,54 +36,54 @@ module.exports = {
 
         // TODO: ESLint Roadmap Step 2 - Set these rules to "error"
         "@typescript-eslint/no-invalid-void-type": "off", // This prohibits return console.asd in one line after an if statement. This might not be generally liked, though improves readability.
-        "no-unreachable-loop": "warn",
-        "no-return-assign": "warn",
+        "no-unreachable-loop": "error",
+        "no-return-assign": "error",
         "@typescript-eslint/consistent-type-assertions": "off", // Sometimes this makes life so much easier when returning types.
 
         // Warnings for things that could be better
         "@typescript-eslint/explicit-function-return-type": "off", // Implicit type returns aren't a bad thing
         "@typescript-eslint/strict-boolean-expressions": "off", // I might turn this off.  Javascript's fluid truthiness logic is just too nice
         "@typescript-eslint/class-literal-property-style": "off", // SuccessTest implementation heavily uses this and I don't see the value of refactoring it, yet.
-        "@typescript-eslint/ban-ts-comment": "warn",
-        "@typescript-eslint/no-unused-vars": "warn",
-        "prefer-const": "warn",
+        "@typescript-eslint/ban-ts-comment": "error",
+        "@typescript-eslint/no-unused-vars": "error",
+        "prefer-const": "error",
         "@typescript-eslint/no-confusing-void-expression": "off", // I do like my if () return console.error() and similar statements...
-        "@typescript-eslint/no-misused-promises": "warn",
-        "@typescript-eslint/prefer-optional-chain": "warn",
+        "@typescript-eslint/no-misused-promises": "error",
+        "@typescript-eslint/prefer-optional-chain": "error",
         "@typescript-eslint/no-floating-promises": "off", // Allow executing async functions in a sync method, if async isn't needed.
         "no-case-declarations": "off", // We use this in switch / case and it does improve readability
-        "@typescript-eslint/promise-function-async": "warn",
-        "@typescript-eslint/no-empty-interface": "warn",
-        "@typescript-eslint/consistent-indexed-object-style": "warn",
-        "@typescript-eslint/ban-types": "warn", //Maybe this should be error?
+        "@typescript-eslint/promise-function-async": "error",
+        "@typescript-eslint/no-empty-interface": "error",
+        "@typescript-eslint/consistent-indexed-object-style": "error",
+        "@typescript-eslint/ban-types": "error", //Maybe this should be error?
         "no-prototype-builtins": "off", // While this rule makes sense for public facing applications, it's not a concern for an app like ours and I'd rather have better readability.
-        "@typescript-eslint/unbound-method": "warn",
+        "@typescript-eslint/unbound-method": "error",
         "no-useless-return": "off", // A explicit return statement is never unnecessary, it may prevent bugs for future code changes.
-        "@typescript-eslint/return-await": "warn",
-        "@typescript-eslint/prefer-includes": "warn",
-        "no-unneeded-ternary": "warn",
-        "@typescript-eslint/no-unnecessary-type-assertion": "warn",
-        "no-fallthrough": "warn",
-        "eqeqeq": "warn",
-        "@typescript-eslint/prefer-readonly": "warn",
-        "@typescript-eslint/await-thenable": "warn",
+        "@typescript-eslint/return-await": "error",
+        "@typescript-eslint/prefer-includes": "error",
+        "no-unneeded-ternary": "error",
+        "@typescript-eslint/no-unnecessary-type-assertion": "error",
+        "no-fallthrough": "error",
+        "eqeqeq": "error",
+        "@typescript-eslint/prefer-readonly": "error",
+        "@typescript-eslint/await-thenable": "error",
         "@typescript-eslint/no-dynamic-delete": "off", // We do this often, I while I see the harm, I view the risk as acceptable.
-        "@typescript-eslint/no-this-alias": "warn",
-        "no-useless-computed-key": "warn",
-        "no-mixed-operators": "warn",
-        "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
-        "no-useless-escape": "warn",
-        "@typescript-eslint/method-signature-style": "warn",
-        "prefer-promise-reject-errors": "warn",
-        "@typescript-eslint/no-var-requires": "warn",
-        "one-var": "warn",
-        "import/no-duplicates": "warn",
-        "no-empty": "warn",
-        "@typescript-eslint/no-unused-expressions": "warn",
-        "@typescript-eslint/consistent-generic-constructors": "warn",
-        "prefer-regex-literals": "warn",
-        "@typescript-eslint/prefer-reduce-type-parameter": "warn",
-        "@typescript-eslint/require-array-sort-compare": "warn",
+        "@typescript-eslint/no-this-alias": "error",
+        "no-useless-computed-key": "error",
+        "no-mixed-operators": "error",
+        "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
+        "no-useless-escape": "error",
+        "@typescript-eslint/method-signature-style": "error",
+        "prefer-promise-reject-errors": "error",
+        "@typescript-eslint/no-var-requires": "error",
+        "one-var": "error",
+        "import/no-duplicates": "error",
+        "no-empty": "error",
+        "@typescript-eslint/no-unused-expressions": "error",
+        "@typescript-eslint/consistent-generic-constructors": "error",
+        "prefer-regex-literals": "error",
+        "@typescript-eslint/prefer-reduce-type-parameter": "error",
+        "@typescript-eslint/require-array-sort-compare": "error",
 
         // These rules adjust minor spacing and formatting, but are clearly best practice and should be enabled soon
         "@typescript-eslint/comma-spacing": "off",
