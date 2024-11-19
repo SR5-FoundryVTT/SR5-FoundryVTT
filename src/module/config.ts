@@ -618,6 +618,7 @@ export const SR5 = {
         'recovery': "SR5.ActionCategory.Recovery",
         'resist_disease': "SR5.ActionCategory.ResistDisease",
         'resist_toxin': "SR5.ActionCategory.ResistToxin",
+        'resist_matrix': "SR5.ActionCategory.ResistMatrix",
         'resist': "SR5.ActionCategory.Resist",
         'resonance': "SR5.ActionCategory.Resonance",
         'rigging': "SR5.ActionCategory.Rigging",

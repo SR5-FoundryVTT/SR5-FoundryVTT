@@ -2103,15 +2103,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         event.stopPropagation();
 
         const element = $(event.currentTarget)
+        const messageId = element.closest('.chat-message').data('messageId');
         const resultAction = element.data('action');
 
-        const messageId = element.closest('.chat-message').data('messageId');
-        const test = await TestCreator.fromMessage(messageId);
-
-        if (!test) return console.error(`Shadowrun5e | Couldn't find both a result action ('${resultAction}') and extract test from message ('${messageId}')`);
-
-        await test.populateDocuments();
-        await ActionResultFlow.executeResult(resultAction, test);
+        await ActionResultFlow.executeResult(resultAction, {event, element, messageId});
     }
 
     /**

@@ -143,7 +143,7 @@ export const TestCreator = {
      */
     fromMessage: async function(id: string, options: TestOptions={}): Promise<SuccessTest | undefined> {
         const flagData = TestCreator.getTestDataFromMessage(id);
-        return this._fromMessageTestData(flagData, options);
+        if (flagData) return this._fromMessageTestData(flagData, options);
     },
 
     /**

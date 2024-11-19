@@ -132,6 +132,7 @@ declare namespace Shadowrun {
         | 'drain'
         | 'natural_recovery_stun'
         | 'natural_recovery_physical'
+        | 'resist_matrix'
         | 'armor'
         | 'fade'
         | 'composure'
@@ -193,6 +194,7 @@ declare namespace Shadowrun {
         'resist' | // resisting damage after getting hit
         'resist_disease' | // resisting against diseases
         'resist_toxin' | // resisting against toxins
+        'resist_matrix' | // resisting against matrix damage
         'resonance' | // all resonance actions in general
         'rigging' | // all rigging actions in general
         'social' | // all social skill actions

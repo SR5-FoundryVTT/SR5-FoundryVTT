@@ -20,18 +20,13 @@
     </div>
     {{#if resultActions}}
     <div class="card-content">
+        {{#each resultActions}}
         <div class="left-side">
-            {{#each resultActions}}
-            {{log this}}
-            <div class="test-value">
-                <span class="value">{{localize this.label}}: </span>
-                <span class="value-result">
-                    <span class="button result-action" data-action="{{this.action}}">{{this.value}}</span>
-                </span>
-            </div>
-            {{/each}}
+            <span class="button result-action" data-action="{{this.action}}">{{localize this.label}}</span>
         </div>
-        <div class="right-side"></div>
+        <div class="right-side">
+        </div>
+        {{/each}}
     </div>
     {{/if}}
 </div>
@@ -43,6 +38,5 @@
             damage=damage
             }}
         </div>
-        <div class="right-side"></div>
     </div>
 </div>

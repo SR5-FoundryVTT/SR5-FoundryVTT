@@ -9,8 +9,8 @@ declare namespace Shadowrun {
    /**
      * The set of results that are known.
      */
-   export type ResultActions = 
-      'modifyCombatantInit';
+   export type ResultActions =
+      'forceReboot' | 'modifyCombatantInit';
 
    /**
       * Describes resulting actions to be displayed on a success test message as a
@@ -18,9 +18,9 @@ declare namespace Shadowrun {
       * 
       * These designed to be manually applicable in a way depending on the action handler.
       */
-      export interface ResultActionData {
-         action: ResultActions, 
-         label: string,
-         value: string
+   export interface ResultActionData {
+      action: ResultActions,
+      label: string,
+      value: string
    }
 }

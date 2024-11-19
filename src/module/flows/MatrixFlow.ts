@@ -2,6 +2,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
+import { MatrixResistTest } from '../tests/MatrixResistTest';
 import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
 import { MarksStorageFlow } from './MarksStorageFlow';
@@ -80,16 +81,16 @@ export const MatrixFlow = {
         // Inform GM about convergenace.
         overwatchScore = against.actor?.getOverwatchScore();
         if (MatrixRules.isOverwatchScoreConvergence(overwatchScore)) {
-            await MatrixFlow.sendOverwatchConvergenaceMessage(actor);
+            await MatrixFlow.executeOverwatchConvergence(actor);
         }
     },
 
     /**
-     * Send out a chat message to inform the GM about convergenace and provide actions for it.
-     *
+     * Execute a convergence with the given actor based on SR5#231-232 'Overwatch Score and Convergence'.
+     * 
      * @param actor The actor targeted by Convergence.
      */
-    async sendOverwatchConvergenaceMessage(actor: SR5Actor) {
+    async executeOverwatchConvergence(actor: SR5Actor) {
         // Prepare speaker data.
         const alias = game.user?.name;
         const linkedTokens = actor.getActiveTokens(true) || [];
@@ -97,6 +98,7 @@ export const MatrixFlow = {
 
         // Prepare convergence damage
         const damage = MatrixRules.convergenceDamage();
+
         const resultActions = [
             {
                 label: 'SR5.Labels.Action.ForceReboot',
@@ -115,12 +117,47 @@ export const MatrixFlow = {
                 token,
             },
         };
+
+        await MatrixFlow.sendOverwatchConvergenceMessage(templateData);
+    },
+
+    /**
+     * Execute a matrix damage resistance test and modify the damage accordingly.
+     * 
+     * @param actor The actor to resist the damage.
+     * @param damage The damage to be resited.
+     * @returns Modified damage after resistance based on damage given.
+     */
+    async executeMatrixDamageResistance(actor: SR5Actor, damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData|undefined> {
+        const test = await actor.generalActionTest('resist_matrix') as MatrixResistTest;
+        if (!test) {
+            console.error('Shadowrun 5e | The General Action pack does not contain a recovery_matrix action.');
+            return;
+        }
+        
+        // Prepare test data for execution
+        test.data.incomingDamage = damage;
+        test.data = test._prepareData(test.data, test.data.options);
+
+        console.error(test.data.incomingDamage, test.data.modifiedDamage);
+
+        await test.execute();
+
+        return test.data.modifiedDamage;
+    },
+
+    /**
+     * Send out a chat message to inform the GM about convergenace and provide actions for it.
+     * TODO: Add param typing
+     */
+    async sendOverwatchConvergenceMessage(templateData) {
         const content = await renderTemplate(
             'systems/shadowrun5e/dist/templates/chat/overwatch-convergence-message.hbs',
             templateData,
         );
-        const messageData = { content };
+        const messageData = { content, speaker: templateData.speaker };
         await ChatMessage.create(messageData);
+
     },
 
     /**

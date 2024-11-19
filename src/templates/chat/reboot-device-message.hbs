@@ -1,7 +1,7 @@
 {{!-- Display an information about an actor being targeted by Overwatch Convergence --}}
 <div class="sr5 chat-card roll-card">
     <div class="cart-title card-header">
-        {{localize "SR5.Labels.Message.RebootDeviec"}}
+        {{localize "SR5.Labels.Action.ForceReboot"}}
     </div>
     <div class="card-title card-header">
         <div class="container container--fluid">
@@ -22,7 +22,6 @@
     <div class="card-content">
         <div class="left-side">
             {{#each resultActions}}
-            {{log this}}
             <div class="test-value">
                 <span class="value">{{localize this.label}}: </span>
                 <span class="value-result">

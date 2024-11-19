@@ -56,7 +56,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
-        return ['resist']
+        return ['resist', 'resist_matrix']
     }
 
     override async processResults() {

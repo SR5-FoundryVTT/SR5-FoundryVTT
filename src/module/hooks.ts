@@ -219,7 +219,8 @@ ___________________
                 CompileSpriteTest,
                 RitualSpellcastingTest,
                 BruteForceTest,
-                HackOnTheFlyTest
+                HackOnTheFlyTest,
+                MatrixResistTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
