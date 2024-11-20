@@ -13,30 +13,30 @@ export interface SetMarksOptions {
 
 /**
  * General functionality around storing matrix mark relationships in global storage.
- * 
+ *
  * Within global storage no marks data is found but only relationsships between documents
  * formed by placing a mark on each other. This is used to avoid having to search all documents
  * for marks during document deletion, reboots and similar operations having to remove ALL marks of
  * a document.
- * 
+ *
  * These are called mark relations here.
- * 
+ *
  * TODO: Unittesting for this.
- * 
+ *
  * Usage:
  * - Make sure to use the MarkStorageFlow#getStorage method rertrieve storage
  */
-export const MarksStorageFlow = {
+export const MarksStorage = {
     // The global data storage key for mark relationships.
     key: 'matrix.marks',
     /**
-     * Set a specific mark while overwriting a documents place marks fully. 
-     * 
+     * Set a specific mark while overwriting a documents place marks fully.
+     *
      * @param marksData The current marks data to be altered.
      * @param target The document that is marked.
      * @param currentMarks The current amount of marks on the document.
      * @param marks The amount of marks to be added or set.
-     * 
+     *
      * @returns marksData, altered in place.
      */
     setMarks(marksData: Shadowrun.MatrixMarks, target: Shadowrun.NetworkDevice | undefined, currentMarks: number, marks: number, options: SetMarksOptions = {}) {
@@ -77,7 +77,7 @@ export const MarksStorageFlow = {
      * Helper to retrieve a valid marks data storage.
      */
     getStorage(): Shadowrun.Storage['matrix']['marks'] {
-        return DataStorage.get(MarksStorageFlow.key) ?? {};
+        return DataStorage.get(MarksStorage.key) ?? {};
     },
 
     /**
@@ -86,23 +86,23 @@ export const MarksStorageFlow = {
      * @param uuid Uuid for that document.
      */
     getMarksRelations(uuid: string): string[] {
-        uuid = MarksStorageFlow._uuidForStorage(uuid);
-        const marksStorage = MarksStorageFlow.getStorage();
-        return marksStorage[`${MarksStorageFlow.key}.${uuid}`] ?? [];
+        uuid = MarksStorage._uuidForStorage(uuid);
+        const marksStorage = MarksStorage.getStorage();
+        return marksStorage[`${MarksStorage.key}.${uuid}`] ?? [];
     },
 
     /**
      * Store marks data in global storage for an active actor placing some marks on any kind of target.
-     * 
+     *
      * @param uuid The document placing marks
      * @param marksData The raw marks data of the actor.
      */
     async storeRelations(uuid: string, marksData: Shadowrun.MatrixMarks) {
-        uuid = MarksStorageFlow._uuidForStorage(uuid);
-        const key = `${MarksStorageFlow.key}.${uuid}`;
+        uuid = MarksStorage._uuidForStorage(uuid);
+        const key = `${MarksStorage.key}.${uuid}`;
         const marks = marksData.map(({uuid}) => uuid);
         await DataStorage.set(key, marks);
-        await MarksStorageFlow.cleanupOrphanedRelations();
+        await MarksStorage.cleanupOrphanedRelations();
     },
 
     /**
@@ -111,23 +111,23 @@ export const MarksStorageFlow = {
      * @returns The actors marks data
      */
     retrieveMarks(document: Shadowrun.NetworkDevice): string[] {
-        const storage = MarksStorageFlow.getStorage();
-        const uuid = MarksStorageFlow._uuidForStorage(document.uuid);
+        const storage = MarksStorage.getStorage();
+        const uuid = MarksStorage._uuidForStorage(document.uuid);
         return storage[uuid] ?? [];
     },
 
     /**
      * Clear all marks relating to this document from storage.
-     * 
+     *
      * This includes both marks placed by and marks placed on this document.
-     * 
+     *
      * @param uuid The document to clear all marks for.
      */
     async clearRelations(uuid: string) {
-        const storage = MarksStorageFlow.getStorage();
+        const storage = MarksStorage.getStorage();
 
         // Remove marks placed by.
-        const uuidForStorage = MarksStorageFlow._uuidForStorage(uuid);
+        const uuidForStorage = MarksStorage._uuidForStorage(uuid);
         delete storage[uuidForStorage];
 
         // Remove marks placed on.
@@ -135,29 +135,29 @@ export const MarksStorageFlow = {
             storage[uuidForStorage] = markRelations.filter(markedUuid => markedUuid !== uuid);
 
             // Update lokal marks placed on the main uuid.
-            const document = fromUuidSync(MarksStorageFlow._uuidFromStorage(uuidForStorage)) as Shadowrun.NetworkDevice;
+            const document = fromUuidSync(MarksStorage._uuidFromStorage(uuidForStorage)) as Shadowrun.NetworkDevice;
             if (!document) continue;
 
             await document.clearMark(uuid);
         }
 
-        await DataStorage.set(MarksStorageFlow.key, storage);
+        await DataStorage.set(MarksStorage.key, storage);
     },
 
     /**
      * Remove any marks data from documents that can´t be found anymore.
-     * 
+     *
      * Normally this should be handled during deletion triggers for documents and scenes, but the world is not perfect.
      */
     async cleanupOrphanedRelations() {
-        const storage = MarksStorageFlow.getStorage();
+        const storage = MarksStorage.getStorage();
         for (const uuidFromStorage of Object.keys(storage)) {
-            const uuid = MarksStorageFlow._uuidFromStorage(uuidFromStorage);
+            const uuid = MarksStorage._uuidFromStorage(uuidFromStorage);
 
             const document = fromUuidSync(uuid);
             if (document) continue;
 
-            await MarksStorageFlow.clearRelations(uuid);
+            await MarksStorage.clearRelations(uuid);
         }
     },
 

@@ -2,10 +2,10 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
+import { MarksStorage } from '../storage/MarksStorage';
 import { MatrixResistTest } from '../tests/MatrixResistTest';
 import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
-import { MarksStorageFlow } from './MarksStorageFlow';
 
 /**
  * General handling around handling everything matrix related.
@@ -87,7 +87,7 @@ export const MatrixFlow = {
 
     /**
      * Execute a convergence with the given actor based on SR5#231-232 'Overwatch Score and Convergence'.
-     * 
+     *
      * @param actor The actor targeted by Convergence.
      */
     async executeOverwatchConvergence(actor: SR5Actor) {
@@ -123,7 +123,7 @@ export const MatrixFlow = {
 
     /**
      * Execute a matrix damage resistance test and modify the damage accordingly.
-     * 
+     *
      * @param actor The actor to resist the damage.
      * @param damage The damage to be resited.
      * @returns Modified damage after resistance based on damage given.
@@ -134,7 +134,7 @@ export const MatrixFlow = {
             console.error('Shadowrun 5e | The General Action pack does not contain a recovery_matrix action.');
             return;
         }
-        
+
         // Prepare test data for execution
         test.data.incomingDamage = damage;
         test.data = test._prepareData(test.data, test.data.options);
@@ -164,14 +164,14 @@ export const MatrixFlow = {
      * Reboot this device and trigger all resulting effects of it based on
      * the reboot action.
      * See SR5#242 'Reboot Device'.
-     * 
+     *
      * @param device The device to reboot.
      * @param delay The delay duration of combat turns after which the devices has rebooted.
      */
     async rebootPersona(actor: SR5Actor, delay: number = 1) {
         console.debug('Shadowrun 5e | Rebooting Persona Device', actor);
         // TODO: Mark devices as rebooting to prohibit usage until end of next combat turn (effect with duration).
-        // TODO: Allow for user input delay when rebooting device 
+        // TODO: Allow for user input delay when rebooting device
 
         // Link Locked actors can´t be rebooted. (SR5#229 ´Dumpshock & Link-Locking´)
         if (actor.isLinkLocked) {
@@ -184,7 +184,7 @@ export const MatrixFlow = {
 
         await actor.setOverwatchScore(0);
         await actor.clearMarks();
-        await MarksStorageFlow.clearRelations(actor.uuid);
+        await MarksStorage.clearRelations(actor.uuid);
         const damage = MatrixFlow.getDumpshockDamage(actor);
 
         await MatrixFlow.sendRebootDeviceMessage(actor, device, delay, damage);
@@ -202,7 +202,7 @@ export const MatrixFlow = {
         const content = await renderTemplate('systems/shadowrun5e/dist/templates/chat/reboot-device-message.hbs', {
             speaker,
             delay,
-            device, 
+            device,
             damage
         });
         const messageData = { content };
@@ -211,13 +211,13 @@ export const MatrixFlow = {
 
     /**
      * Apply dumpshock to an actor and their persona (device).
-     * 
+     *
      * Dumpshock can´t be applied to actors not using VR.
      *
      * @param actor The actor that is affected by dumpshock.
      */
     getDumpshockDamage(actor: SR5Actor) {
-        if (!actor.isUsingVR) return DataDefaults.damageData({type: {base: 'stun', value: 'stun'}}); 
+        if (!actor.isUsingVR) return DataDefaults.damageData({type: {base: 'stun', value: 'stun'}});
 
         return MatrixRules.dumpshockDamage(actor.isUsingHotSim);
     }

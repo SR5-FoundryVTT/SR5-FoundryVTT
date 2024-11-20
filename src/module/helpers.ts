@@ -362,15 +362,15 @@ export class Helpers {
     }
 
     /**
-     * Measure the distance between two tokens on the canvas in length units, 
+     * Measure the distance between two tokens on the canvas in length units,
      * factoring in both 2D distance and 3D elevation difference.
-     * 
+     *
      * Depending on the scene distance unit the result will be converted.
-     * 
+     *
      * If wall-height is installed and using tokenHeight, it will be used for elevation.
-     * 
-     * @param tokenOrigin 
-     * @param tokenDest 
+     *
+     * @param tokenOrigin
+     * @param tokenDest
      * @returns Distance in scene distance unit
      */
     static measureTokenDistance(tokenOrigin: TokenDocument, tokenDest: TokenDocument): number {
@@ -394,7 +394,7 @@ export class Helpers {
         const elevationDifference = (tokenOrigin.elevation + originLOSHeight) - (tokenDest.elevation + destLOSHeight);
         const origin3D = new PIXI.Point(0, 0);
         const dest3D = new PIXI.Point(distanceInGridUnits2D, elevationDifference);
-        
+
         const distanceInGridUnits3D = Math.round(Helpers.measurePointDistance(origin3D, dest3D));
 
         //@ts-expect-error TODO: foundry-vtt-types v10
@@ -404,9 +404,9 @@ export class Helpers {
 
     /**
      * Measure distance between two points on a grid in length units.
-     * 
-     * @param origin 
-     * @param destination 
+     *
+     * @param origin
+     * @param destination
      * @returns Distance without a unit.
      */
     static measurePointDistance(origin: Point, destination: Point): number {
@@ -417,13 +417,13 @@ export class Helpers {
 
     /**
      * Determine a tokens line of sight height.
-     * 
+     *
      * Default Foundry will use 0, while wall-height might have defined another value on the token.
-     * 
+     *
      * The auto height generation of wall-height isn't supported.
-     * 
-     * @param token 
-     * @returns 
+     *
+     * @param token
+     * @returns
      */
     static getTokenLOSHeight(token: TokenDocument): number {
         //@ts-expect-error TODO: foundry-vtt-types v10
@@ -500,7 +500,7 @@ export class Helpers {
      *
      * BEWARE: A target will always be token based BUT linked actors provide an actor uuid instead of
      * pointing to their token actors.
-     * 
+     *
      * @param testData The test data containing target uuids.
      */
     static async getTestTargetActors(testData: SuccessTestData): Promise<SR5Actor[]> {
@@ -907,7 +907,7 @@ export class Helpers {
         if (!pack) return;
 
         // TODO: Use predefined ids instead of names...
-        // TODO: use replaceAll instead, which needs an change to es2021 at least for the ts compiler   
+        // TODO: use replaceAll instead, which needs an change to es2021 at least for the ts compiler
         // eslint-disable-next-line
         const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(new RegExp(' ', 'g'), '_') === actionName.toLowerCase());
         if (!packEntry) return;
@@ -951,10 +951,10 @@ export class Helpers {
 
     /**
      * Sanitize keys to not use characters used within FoundryVTT Document#update and expandObject methods.
-     * 
+     *
      * @param key The key, maybe containing prohibited characters
      * @param replace The characters to replaces prohibited characters with
-     * @returns key without 
+     * @returns key without
      */
     static sanitizeDataKey(key: string, replace: string=''): string {
         const spicyCharacters = ['.', '-='];
@@ -985,17 +985,17 @@ export class Helpers {
                     allActors = allActors.concat(`
                             <option value="${t.id}">${t.name}</option>`);
                 });
-            const  dialog_content = `  
+            const  dialog_content = `
                 <select name ="actor">
                 ${allActors}
                 </select>`;
-    
+
             const choosenActor = await Dialog.prompt({
                 title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
                 content: dialog_content,
                 callback: (html) => html.find('select').val()
             }) as string;
-    
+
             return game.actors?.get(choosenActor) as SR5Actor;
         }
     }
@@ -1004,16 +1004,16 @@ export class Helpers {
      * A method to capitalize the first letter of a given string.
      * This allows to transform skill and attribute ids to the corresponding translation sub-keys
      * See @see getSkillTranslation @see getAttributeTranslaton
-     * @param string 
+     * @param string
      * @returns the string with a capitalized first letter
      */
     static capitalizeFirstLetter(string: string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
-    }  
+    }
 
     /**
      * Translates a skillId
-     * @param skill 
+     * @param skill
      * @returns translation
      */
     static getSkillTranslation(skill: string) : string {
@@ -1022,10 +1022,24 @@ export class Helpers {
 
     /**
      * Translate an attribute
-     * @param attribute 
+     * @param attribute
      * @returns translation
      */
     static getAttributeTranslation(attribute: string) : string {
         return game.i18n.localize(`SR5.Attr${this.capitalizeFirstLetter(attribute)}` as Translation)
+    }
+
+    /**
+     * Transform uuid into a format that can be stored as keys in Foundry without object splitting.
+     */
+    static uuidForStorage(uuid: string) {
+        return uuid.replace('.', '_');
+    }
+
+    /**
+     * Reforms a transformed uuid back into a usable format.
+     */
+    static uuidFromStorage(uuid: string) {
+        return uuid.replace('_', '.');
     }
 }

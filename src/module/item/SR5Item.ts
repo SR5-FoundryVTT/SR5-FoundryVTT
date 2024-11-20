@@ -61,8 +61,8 @@ import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { ItemMarksFlow } from './flows/ItemMarksFlow';
 import { ItemRollDataFlow } from './flows/ItemRollDataFlow';
 import { RollDataOptions } from './Types';
-import { SetMarksOptions } from '../flows/MarksStorageFlow';
 import { MatrixFlow } from '../flows/MatrixFlow';
+import { SetMarksOptions } from '../storage/MarksStorage';
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -274,7 +274,7 @@ export class SR5Item extends Item {
         }
 
         switch (this.type) {
-            case 'host': 
+            case 'host':
                 HostPrep.prepareDerivedData(this.system as Shadowrun.HostData);
                 break;
         }
@@ -312,12 +312,12 @@ export class SR5Item extends Item {
     /**
      * Create display only information for this item. Used on sheets, chat messages and more.
      * Both actor and item sheets.
-     * 
+     *
      * The original naming leans on the dnd5e systems use of it for chat messages.
      * NOTE: This is very legacy, difficult to read and should be improved upon.
-     * 
-     * @param htmlOptions 
-     * @returns 
+     *
+     * @param htmlOptions
+     * @returns
      */
     async getChatData(htmlOptions = {}) {
         const system = foundry.utils.duplicate(this.system);
@@ -331,7 +331,7 @@ export class SR5Item extends Item {
 
         const props = [];
         // Add additional chat data fields depending on item type.
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const chatDataForItemType = ChatData[this.type];
         if (chatDataForItemType) chatDataForItemType(system, labels, props, this);
 
@@ -469,14 +469,14 @@ export class SR5Item extends Item {
     async useAmmo(fired) {
         if (this.type !== 'weapon') return;
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const value = Math.max(0, this.system.ammo.current.value - fired);
         return await this.update({ 'system.ammo.current.value': value });
     }
 
     /**
      * Can this item (weapon, melee, ranged, whatever) use ammunition?
-     * 
+     *
      * @returns true, for weapons with ammunition.
      */
     get usesAmmo(): boolean {
@@ -488,9 +488,9 @@ export class SR5Item extends Item {
      * - its current clips
      * - its available spare clips (when given)
      * - its equipped ammo
-     * 
+     *
      * This method will only reload the weapon to the max amount of ammo available.
-     * 
+     *
      * TODO: Currently only the minimal amount of bullets is reloaded. For weapons using ejectable clips, this should be full clip capacity.
      */
     async reloadAmmo(partialReload: boolean) {
@@ -563,7 +563,7 @@ export class SR5Item extends Item {
 
     /**
      * Equip one ammo item exclusively.
-     * 
+     *
      * @param id Item id of the to be exclusively equipped ammo item.
      */
     async equipAmmo(id) {
@@ -696,7 +696,7 @@ export class SR5Item extends Item {
 
     /**
      * Determine if this item is part of a WAN / PAN network.
-     * 
+     *
      * @returns true, when item is part of any network, false if not.
      */
     get isSlave(): boolean {
@@ -708,7 +708,7 @@ export class SR5Item extends Item {
 
     /**
      * SIN Item - remove a single license within this SIN
-     * 
+     *
      * @param index The license list index
      */
     async removeLicense(index) {
@@ -782,7 +782,7 @@ export class SR5Item extends Item {
      * Create an item in this item
      * @param itemData
      * @param options
-     * 
+     *
      * //@ts-expect-error TODO: foundry-vtt-types v10 Rework method...
      */
     async createNestedItem(itemData, options = {}) {
@@ -956,7 +956,7 @@ export class SR5Item extends Item {
 
     /**
      * Apply damage to any type of technology item.
-     * 
+     *
      * @param damage Damage to be applied.
      */
     async addDamage(damage: Shadowrun.DamageData) {
@@ -970,7 +970,7 @@ export class SR5Item extends Item {
 
     /**
      * Apply matrix damage to a technology item.
-     * 
+     *
      * @param damage The matrix damage to be applied.
      */
     async addMatrixDamage(damage: Shadowrun.DamageData) {
@@ -1037,10 +1037,10 @@ export class SR5Item extends Item {
 
     /**
      * An attack with this weapon will create an area of effect / blast.
-     * 
-     * There is a multitude of possibilities as to HOW an item can create an AoE, 
+     *
+     * There is a multitude of possibilities as to HOW an item can create an AoE,
      * both directly connected to the item and / or some of it's nested items.
-     * 
+     *
      */
     get isAreaOfEffect(): boolean {
         return this.wrapper.isAreaOfEffect() || this.hasExplosiveAmmo;
@@ -1189,7 +1189,7 @@ export class SR5Item extends Item {
         }
     }
 
-    /**    
+    /**
     * Retrieve the actor document linked to this item.
     * e.g.: Contact items provide linked actors
     */
@@ -1246,7 +1246,7 @@ export class SR5Item extends Item {
 
     /**
      * Determine if this item is an item that can be used in the matrix.
-     * 
+     *
      * @returns true, if this item is a matrix item.
      */
     get isMatrixItem(): boolean {
@@ -1349,7 +1349,7 @@ export class SR5Item extends Item {
 
     /**
      * Amount of recoil compensation totally available when using weapon
-     * 
+     *
      * This includes both actor and item recoil compensation.
      */
     get totalRecoilCompensation(): number {
@@ -1359,9 +1359,9 @@ export class SR5Item extends Item {
 
     /**
      * Current TOTAL recoil compensation with current recoil included.
-     * 
+     *
      * This includes both the items and it's parent actors recoil compensation and total progressive recoil.
-     * 
+     *
      * @returns A positive number or zero.
      */
     get currentRecoilCompensation(): number {
@@ -1543,9 +1543,9 @@ export class SR5Item extends Item {
 
     /**
      * Return all documents marked by this host and it's IC.
-     * 
+     *
      * For other items, fall back to no documents.
-     * 
+     *
      * @returns Foundry Documents with marks placed.
      */
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
@@ -1559,7 +1559,7 @@ export class SR5Item extends Item {
 
     /**
      * Return the network master item when connected to a PAN or WAN.
-     * 
+     *
      * @returns The master item or undefined if not connected to a network.
      */
     get master() {
@@ -1619,9 +1619,9 @@ export class SR5Item extends Item {
 
     /**
      * Return the given attribute, no matter its source.
-     * 
+     *
      * This might be an actual attribute or another value type used as one during testing.
-     * 
+     *
      * @param name An attribute or other stats name.
      * @returns Either an AttributeField or undefined, if the attribute doesn't exist on this document.
      */
@@ -1638,8 +1638,8 @@ export class SR5Item extends Item {
 
     /**
      * Change a matrix attribute to a new slot and switch it's place with the previous attribute residing there.
-     * 
-     * @param changedSlot 'att1', ... 'att4' 
+     *
+     * @param changedSlot 'att1', ... 'att4'
      * @param changedAttribute 'attack'
      */
     async changeMatrixAttributeSlot(changedSlot: string, changedAttribute: Shadowrun.MatrixAttribute) {
@@ -1650,12 +1650,12 @@ export class SR5Item extends Item {
 
     /**
      * Transparently build a set of roll data based on this items type and network status.
-     * 
+     *
      * This roll data can depend upon other actors and items.
-     * 
+     *
      * NOTE: Since getRollData is sync by default, we can't retrieve compendium documents here, resulting in fromUuidSync calls down
      *       the line.
-     * 
+     *
      * TODO: Refactor this method using the Composition Pattern for each story.
      */
     override getRollData(options: RollDataOptions={}): any {

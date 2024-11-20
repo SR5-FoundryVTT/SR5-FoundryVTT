@@ -31,12 +31,12 @@ import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
-import { SetMarksOptions } from '../flows/MarksStorageFlow';
 import { RollDataOptions } from '../item/Types';
 import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { DamageApplicationFlow } from './flows/DamageApplicationFlow';
 import { SuccessTest } from '../tests/SuccessTest';
 import { MatrixFlow } from '../flows/MatrixFlow';
+import { SetMarksOptions } from '../storage/MarksStorage';
 
 
 /**
@@ -178,14 +178,14 @@ export class SR5Actor extends Actor {
 
     /**
      * Get all ActiveEffects applicable to this actor.
-     * 
-     * The system uses a custom method of determining what ActiveEffect is applicable that doesn't 
+     *
+     * The system uses a custom method of determining what ActiveEffect is applicable that doesn't
      * use default FoundryVTT allApplicableEffect.
-     * 
+     *
      * The system has additional support for:
      * - taking actor effects from items (apply-To actor)
      * - having effects apply that are part of a targeted action against this actor (apply-To targeted_actor)
-     * 
+     *
      * NOTE: FoundryVTT applyActiveEffects will check for disabled effects.
      */
     //@ts-expect-error TODO: foundry-vtt-types v10
@@ -201,13 +201,13 @@ export class SR5Actor extends Actor {
 
     /**
      * All temporary ActiveEffects that should display on the Token
-     * 
+     *
      * The shadowrun5e system uses a custom application method with different effect application targets. Some of
      * these effects exist on the actor or one of it's items, however still shouldn't show in their token.
-     * 
-     * While default Foundry relies on allApplicableEffects, as it only knows apply-to actor effects, we have to 
+     *
+     * While default Foundry relies on allApplicableEffects, as it only knows apply-to actor effects, we have to
      * return all effects that are temporary instead, to include none-actor apply-to effects.
-     * 
+     *
      * NOTE: Foundry also shows disabled effects by default. We behave the same.
      */
     // @ts-expect-error NOTE: I don't fully understand the typing here.
@@ -428,14 +428,14 @@ export class SR5Actor extends Actor {
 
     /**
      * Return armor worn by this actor.
-     * 
+     *
      * @param damage If given will be applied to the armor to get modified armor.
      * @returns Armor or modified armor.
      */
     getArmor(damage?:Shadowrun.DamageData) {
         // Prepare base armor data.
-        const armor = "armor" in this.system ? 
-            foundry.utils.duplicate(this.system.armor) : 
+        const armor = "armor" in this.system ?
+            foundry.utils.duplicate(this.system.armor) :
             DataDefaults.actorArmor();
         // Prepare damage to apply to armor.
         damage = damage || DataDefaults.damageData();
@@ -446,14 +446,14 @@ export class SR5Actor extends Actor {
         // Modify by penetration
         if (damage.ap.value !== 0)
             PartsList.AddUniquePart(armor.mod, 'SR5.AP', damage.ap.value);
-                
+
         // Modify by element
         if (damage.element.value !== '') {
             const armorForDamageElement = armor[damage.element.value] || 0;
             if (armorForDamageElement > 0)
                 PartsList.AddUniquePart(armor.mod, 'SR5.Element', armorForDamageElement);
         }
-        
+
         Helpers.calcTotal(armor, {min: 0});
 
         return armor;
@@ -498,16 +498,16 @@ export class SR5Actor extends Actor {
         return this.system.values.recoil_compensation.value;
     }
 
-    
+
     /**
      * Current recoil compensation with current recoil included.
-     * 
+     *
      * @returns A positive number or zero.
     */
     get currentRecoilCompensation(): number {
         return Math.max(this.recoilCompensation - this.recoil, 0);
     }
-    
+
     /**
      * Amount of progressive recoil this actor has accrued.
      */
@@ -617,7 +617,7 @@ export class SR5Actor extends Actor {
             case 'exotic':
                 return 'pilot_exotic_vehicle';
             default:
-                
+
         }
     }
 
@@ -675,7 +675,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Connect this actor to a host / grid
-     * 
+     *
      * @param network Must be an item of matching type
      */
     async connectNetwork(network: SR5Item) {
@@ -833,7 +833,7 @@ export class SR5Actor extends Actor {
     /**
      * For the given skillId as it be would in the skill data structure for either
      * active, knowledge or language skill.
-     * 
+     *
      * @param skillId Legacy / default skills have human-readable ids, while custom one have machine-readable.
      * @returns The label (not yet translated) OR set custom name.
      */
@@ -848,10 +848,10 @@ export class SR5Actor extends Actor {
 
     /**
      * Add a new knowledge skill for a specific category.
-     * 
+     *
      * Knowledge skills are stored separately from active and language skills and have
      * some values pre-defined by their category (street, professional, ...)
-     * 
+     *
      * @param category Define the knowledge skill category
      * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The id of the created knowledge skill.
@@ -861,7 +861,7 @@ export class SR5Actor extends Actor {
             console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
             return;
         }
-        
+
         skill = DataDefaults.skillData(skill);
         const id = randomID(16);
         const value = {};
@@ -877,7 +877,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Add a new active skill.
-     * 
+     *
      * @param skillData Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The new active skill id.
      */
@@ -907,7 +907,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Add a language skill.
-     * 
+     *
      * @param skill Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The new language skill id.
      */
@@ -947,7 +947,7 @@ export class SR5Actor extends Actor {
         await this.update(updateData);
     }
 
-    /** 
+    /**
      * Delete the given active skill by it's id. It doesn't
      *
      * @param skillId Either a random id for custom skills or the skills name used as an id.
@@ -1008,7 +1008,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Show all hidden skills.
-     * 
+     *
      * For hiding/showing skill see SR5Actor#showSkill and SR5Actor#hideSkill.
      */
     async showHiddenSkills() {
@@ -1032,7 +1032,7 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Prompt the current user for a generic roll. 
+     * Prompt the current user for a generic roll.
      */
     async promptRoll() {
         await this.tests.promptSuccessTest();
@@ -1066,7 +1066,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Get an action from any pack with the given name, configured for this actor and let the caller handle it..
-     * 
+     *
      * @param packName The name of the item pack to search.
      * @param actionName The name within that pack.
      * @param options Success Test options
@@ -1095,9 +1095,9 @@ export class SR5Actor extends Actor {
 
     /**
      * Get an action as defined within the systems general action pack.
-     * 
+     *
      * @param actionName The action with in the general pack.
-     * @param options Success Test options 
+     * @param options Success Test options
      */
     async generalActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         return await this.packActionTest(SR5.packNames.generalActions as Shadowrun.PackName, actionName, options);
@@ -1213,7 +1213,7 @@ export class SR5Actor extends Actor {
      */
         async rollTeamworkTest(skillId: string, teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions={}) {
             console.info(`Shadowrun5e | Rolling teamwork test for ${skillId}`);
-    
+
             const action = this.skillActionData(skillId, options);
             if (!action) return;
             if(!teamworkData.criticalGlitch) {
@@ -1221,12 +1221,12 @@ export class SR5Actor extends Actor {
             }
 
             action.dice_pool_mod.push({name: "Teamwork", value: teamworkData.additionalDice})
-    
+
             const showDialog = this.tests.shouldShowDialog(options.event);
             const test = await this.tests.fromAction(action, this, {showDialog});
             if (!test) return;
 
-    
+
             return await test.execute();
         }
 
@@ -1382,7 +1382,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Apply damage of any type to this actor. This should be the main entry method to applying damage.
-     * 
+     *
      * @param damage Damage to be applied
      */
     async addDamage(damage: Shadowrun.DamageData) {
@@ -1439,9 +1439,9 @@ export class SR5Actor extends Actor {
 
     /**
      * Depending on this actors defeated status, apply the correct effect and status.
-     * 
+     *
      * This will only work when the actor is connected to a token.
-     * 
+     *
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async applyDefeatedStatus(defeated?: DefeatedStatus) {
@@ -1490,7 +1490,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Remove defeated status effects from this actor, depending on current status.
-     * 
+     *
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async removeDefeatedStatus(defeated?: DefeatedStatus) {
@@ -1499,13 +1499,13 @@ export class SR5Actor extends Actor {
         const removeStatus: string[] = [];
         if ((!defeated.unconscious && !defeated.dying) || defeated.dead) removeStatus.push('unconscious');
         if (!defeated.dead) removeStatus.push('dead');
-        
+
         // Remove out old defeated effects.
         if (removeStatus.length) {
             const existing = this.effects.reduce((arr, e) => {
                 // @ts-expect-error TODO: foundry-vtt-types v10
                 if ( (e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status)) ) arr.push(e.id);
-                return arr; 
+                return arr;
             }, []);
 
             if (existing.length) await this.deleteEmbeddedDocuments('ActiveEffect', existing);
@@ -1555,7 +1555,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Determine if this actor is an active combatant.
-     * 
+     *
      * @returns true, when active. false, when not in combat.
      */
     get combatActive(): boolean {
@@ -1574,7 +1574,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Return the initiative score for a currently active combat
-     * 
+     *
      * @returns The score or zero.
      */
     get combatInitiativeScore(): number {
@@ -1725,7 +1725,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Return the host this IC actor is connected with.
-     * 
+     *
      * @returns A item of type host or undefined.
      */
     async getICHost(): Promise<SR5Item | undefined> {
@@ -1747,7 +1747,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Is this actor currently using VR hot sim?
-     * 
+     *
      * An actor must be using VR to be able to use hot sim.
      */
     get isUsingHotSim(): boolean {
@@ -1800,7 +1800,7 @@ export class SR5Actor extends Actor {
         await this.update({ 'system.technomancerUuid': '' });
     }
 
-    /** 
+    /**
      * Get all situational modifiers from this actor.
      * NOTE: These will return selections only without higher level selections applied.
      *       You'll have to manually trigger .applyAll or apply what's needed.
@@ -1811,7 +1811,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Set all situational modifiers for this actor
-     * 
+     *
      * @param modifiers The DocumentSituationModifiers instance to save source modifiers from.
      *                  The actor will not be checked, so be careful.
      */
@@ -1828,7 +1828,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Check if the current actor is a matrix first class citizen.
-     * 
+     *
      * @returns true, when the actor lives in the matrix.
      */
     get hasActorPersona(): boolean {
@@ -1837,7 +1837,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Check if the current actor has a normal persona given by an matrix device.
-     * 
+     *
      * @returns true, when the actor has an active persona.
      */
     get hasDevicePersona(): boolean {
@@ -1847,7 +1847,7 @@ export class SR5Actor extends Actor {
     /**
      * Check if the current actor has a active living persona.
      * If a technomancer uses a matrix device to connect with, they don't have a living persona!
-     * 
+     *
      * @returns true, when a technomancer uses their living persona
      */
     get hasLivingPersona(): boolean {
@@ -1885,7 +1885,7 @@ export class SR5Actor extends Actor {
      */
     async clearMarks() {
         // Keep marks for later use
-        const marks = this.marksData 
+        const marks = this.marksData
 
         await ActorMarksFlow.clearMarks(this);
 
@@ -1904,7 +1904,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
-     * 
+     *
      * Maybe disconnect from host/grid as well, if necessary
      */
     async clearMark(uuid: string) {
@@ -1922,7 +1922,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Get all marks placed by this actor.
-     * @returns 
+     * @returns
      */
     get marksData(): Shadowrun.MatrixMarks | undefined {
         return this.matrixData?.marks;
@@ -1930,7 +1930,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Get amount of Matrix marks placed by this actor on this target.
-     * 
+     *
      * @param uuid Target uuid
      * @returns Amount of marks placed
      */
@@ -1940,14 +1940,14 @@ export class SR5Actor extends Actor {
 
     /**
      * Return the document used to store marks placed for this actor.
-     * 
+     *
      * For a normal character/technomancer this will be the actor itself, though for others this can differ.
-     * 
+     *
      * These special cases are possible:
      * - IC with a host connected will provide the host item
      * - IC without a host will provide itself
      * - A vehicle within a PAN will provide the controlling actor
-     * 
+     *
      * @returns The document to retrieve all marks this actor has access to.
      */
     async _getDocumentWithMarks(): Promise<Shadowrun.NetworkDevice|undefined> {
@@ -1960,7 +1960,7 @@ export class SR5Actor extends Actor {
             const master = this.master;
             return master?.actorOwner;
         }
-        
+
         // DEFAULT CASE
         return this;
     }
@@ -1974,7 +1974,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Get the master device of this matrix actor.
-     * 
+     *
      * This applies only to actors that act as matrix devices (vehicles).
      */
     get master(): SR5Item|undefined {
@@ -1997,7 +1997,7 @@ export class SR5Actor extends Actor {
 
     /**
      * How many previous attacks has this actor been subjected to?
-     * 
+     *
      * @returns A positive number or zero.
      */
     get previousAttacks(): number {
@@ -2006,7 +2006,7 @@ export class SR5Actor extends Actor {
     }
     /**
      * Apply a new consecutive defense multiplier based on the amount of attacks given
-     * 
+     *
      * @param previousAttacks Attacks within a combat turn. If left out, will guess based on current modifier.
      */
     async calculateNextDefenseMultiModifier(previousAttacks: number=this.previousAttacks) {
@@ -2034,7 +2034,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Add a firemode recoil to the progressive recoil.
-     * 
+     *
      * @param fireMode Ranged Weapon firemode used to attack with.
      */
     async addProgressiveRecoil(fireMode: Shadowrun.FireModeData) {
@@ -2043,7 +2043,7 @@ export class SR5Actor extends Actor {
 
         if (!this.hasPhysicalBody) return;
         if (!fireMode.recoil) return;
-        
+
         await this.addRecoil(fireMode.value);
     }
 
@@ -2067,7 +2067,7 @@ export class SR5Actor extends Actor {
 
     /**
      * Determine if the actor has a physical body
-     * 
+     *
      * @returns true, if the actor can interact with the physical plane
      */
     get hasPhysicalBody() {
@@ -2079,7 +2079,7 @@ export class SR5Actor extends Actor {
      */
     async resetRunData() {
         console.log(`Shadowrun 5e | Resetting actor ${this.name} (${this.id}) for a new run`);
-        
+
         const updateData: Record<string, any> = {};
 
         if (this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle()) {
@@ -2101,9 +2101,9 @@ export class SR5Actor extends Actor {
 
     /**
      * Will unequip all other items of the same type as the given item.
-     * 
+     *
      * It's not necessary for the given item to be equipped.
-     * 
+     *
      * @param unequipItem Input item that will be equipped while unequipping all others of the same type.
      */
     async equipOnlyOneItemOfType(unequipItem: SR5Item) {
@@ -2114,7 +2114,7 @@ export class SR5Actor extends Actor {
             await unequipItem.update({'system.technology.equipped': !unequipItem.isEquipped()});
             return
         }
-        
+
         // For a set of items, assure only the selected is equipped.
         const updateData = sameTypeItems.map(item => ({
                 _id: item.id,
@@ -2126,12 +2126,12 @@ export class SR5Actor extends Actor {
 
     /**
      * Transparently build a set of roll data based on this actors type and status.
-     * 
+     *
      * Values for rolling can depend on other actors and items.
-     * 
+     *
      * NOTE: Since getRollData is sync by default, we can´t retrieve compendium documents,
      *       resulting in fromUuidSync calls.
-     * 
+     *
      * @param options System specific options influencing roll data.
      */
     override getRollData(options: RollDataOptions={}): any {

@@ -1,17 +1,17 @@
-import { MarksStorageFlow, SetMarksOptions } from "../../flows/MarksStorageFlow";
+import { MarksStorage, SetMarksOptions } from "../../storage/MarksStorage";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
 
 /**
  * This flow handles everything around matrix mark management.
- * 
+ *
  * NOTE: this flow often uses decker to refer to deckers and technomancers interchangeably.
  * NOTE: This flow has a companion flow for items ItemMarksFlow.
  */
 export const ActorMarksFlow = {
     /**
      * Place a number of marks by decker onto any kind of target.
-     * 
+     *
      * @param persona The persona placing the marks
      * @param target The icon being marked
      * @param marks The amount of marks placed
@@ -82,10 +82,10 @@ export const ActorMarksFlow = {
         // TODO: Support marking a non-document target (using only a name)
         if (!target) return;
 
-        const marksData = MarksStorageFlow.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
-        
+        const marksData = MarksStorage.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
+
         await persona.update({'system.matrix.marks': marksData});
-        await MarksStorageFlow.storeRelations(persona.uuid, marksData);
+        await MarksStorage.storeRelations(persona.uuid, marksData);
     },
 
     /**
@@ -114,18 +114,18 @@ export const ActorMarksFlow = {
      *
      * @param persona The persona having placed marks
      * @param uuid Icon uuid the persona has placed marks on.
-     * 
+     *
      * @returns Amount of marks placed
      */
     getMarksPlaced(persona: SR5Actor, uuid: string): number {
-        return MarksStorageFlow.getMarksPlaced(persona.matrixData?.marks ?? [], uuid);
+        return MarksStorage.getMarksPlaced(persona.matrixData?.marks ?? [], uuid);
     },
 
     /**
      * Retrieve the document for the given FoundryVTT uuid.
-     * 
+     *
      * @param uuid The icon uuid for a marked document to be retrieved
-     * 
+     *
      * @returns FoundryVTT Document
      */
     async getMarkedDocument(uuid: string) {
@@ -138,7 +138,7 @@ export const ActorMarksFlow = {
 
     /**
      * Retrieve all documents marked by this decker.
-     * 
+     *
      * @param matrixData Any documents matrix mark data.
      * @returns The documents that have been marked.
      */
@@ -155,9 +155,9 @@ export const ActorMarksFlow = {
 
     /**
      * Check if the given device is the persona device of it's owning actor.
-     * 
+     *
      * @param device Any matrix device
-     * 
+     *
      * @return true, if the given matrix device is used as a persona device by an actor.
      */
     targetIsPersonaDevice(device: SR5Item): boolean {

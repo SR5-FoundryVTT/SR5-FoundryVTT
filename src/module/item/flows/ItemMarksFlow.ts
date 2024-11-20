@@ -1,9 +1,9 @@
-import { MarksStorageFlow, SetMarksOptions } from "../../flows/MarksStorageFlow";
+import { MarksStorage, SetMarksOptions } from "../../storage/MarksStorage";
 import { SR5Item } from "../SR5Item";
 
 /**
  * This flow handles everything around matrix mark management.
- * 
+ *
  * NOTE: this flow has companion flow for actors ActorMarksFlow.
  */
 export const ItemMarksFlow = {
@@ -24,7 +24,7 @@ export const ItemMarksFlow = {
 
     /**
      * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
-     * 
+     *
      * @param device The host to remove active mark from.
      * @param uuid The icon to remove mark for.
      */
@@ -59,7 +59,7 @@ export const ItemMarksFlow = {
 
         const currentMarks = host.getMarksPlaced(target.uuid);
         let marksData = host.marksData ?? [];
-        marksData = MarksStorageFlow.setMarks(marksData, target, currentMarks, marks, options);
+        marksData = MarksStorage.setMarks(marksData, target, currentMarks, marks, options);
         await host.update({ 'system.marks': marksData });
     },
 
@@ -72,12 +72,12 @@ export const ItemMarksFlow = {
     getMarksPlaced(device: SR5Item, markId: string): number {
         const host = device.asHost;
         if (!host) return 0;
-        return MarksStorageFlow.getMarksPlaced(host.system.marks, markId);
+        return MarksStorage.getMarksPlaced(host.system.marks, markId);
     },
 
     /**
      * Get all marks data for this item.
-     * @param device The device to get marks for    
+     * @param device The device to get marks for
      * @returns The marks data for this item.
      */
     getMarksData(device: SR5Item): Shadowrun.MatrixMarks | undefined {
