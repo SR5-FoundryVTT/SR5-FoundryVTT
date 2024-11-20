@@ -77,6 +77,7 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { MatrixHooks } from './tests/hooks/MatrixHooks';
 import { DataStorage } from './data/DataStorage';
+import { SRStorage } from './storage/storage';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -265,7 +266,7 @@ ___________________
             /**
              * The global data storage for the system.
              */
-            storage: DataStorage
+            storage: SRStorage
         };
 
         // Register document classes

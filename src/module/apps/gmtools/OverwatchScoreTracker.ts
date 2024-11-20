@@ -2,10 +2,11 @@
  * A GM-Tool to keep track of all players overwatch scores
  */
 import {Helpers} from "../../helpers";
+import { OverwatchStorage } from "../../storage/OverwatchStorage";
 
 export class OverwatchScoreTracker extends Application {
     static MatrixOverwatchDiceCount = '2d6';
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'overwatch-score-tracker';
         options.classes = ['sr5'];
@@ -17,39 +18,32 @@ export class OverwatchScoreTracker extends Application {
         return options;
     }
 
-    // Contains only non-user actors added manually by the GM.
-    static addedActors = [];
+    // List of raw user character data
+    actors: any[] = [];
 
-    getData(options) {
+    override async getData(options) {
         // Get list of user character actors
-        const actors = this._prepareCharacterActorsData();
-
-        // get actors manually added to the tracker by GM
-        OverwatchScoreTracker.addedActors.forEach(id => {
-            const actor = game.actors.get(id)
-            if (actor) {
-                actors.push(actor.toObject());
-            }
-        });
-
-        // Reference the currently displayed actors for better access.
-        this.actors = actors;
+        await this._addMissingUserCharactersToStorage();
+        this.actors = OverwatchStorage.trackedActors();
 
         return {
-            actors,
+            scores: this.actors.map(actor => ({score: actor.getOverwatchScore(), actor})),
         };
     }
 
-    _prepareCharacterActorsData() {
-        return game.users.reduce((acc, user) => {
-            if (!user.isGM && user.character) {
-                acc.push(user.character.toObject());
-            }
-            return acc;
-        }, []);
+    async _addMissingUserCharactersToStorage() {
+        if (!game.users) return;
+
+        for (const user of game.users) {
+            if (user.isGM || !user.character) continue;
+
+            const actor = user.character;
+            if (OverwatchStorage.isTrackedActor(actor)) continue;
+            await OverwatchStorage.trackActor(actor);
+        }
     }
 
-    activateListeners(html) {
+    override activateListeners(html) {
         html.find('.overwatch-score-reset').on('click', this._resetOverwatchScore.bind(this));
         html.find('.overwatch-score-add').on('click', this._addOverwatchScore.bind(this));
         html.find('.overwatch-score-input').on('change', this._setOverwatchScore.bind(this));
@@ -61,7 +55,7 @@ export class OverwatchScoreTracker extends Application {
     // returns the actor that this event is acting on
     _getActorFromEvent(event) {
         const id = $(event.currentTarget).closest('.list-item').data('actorId');
-        if (id) return game.actors.get(id);
+        if (id) return game.actors?.get(id);
     }
 
     _onAddActor(event) {
@@ -73,92 +67,73 @@ export class OverwatchScoreTracker extends Application {
         }
 
         // Warn user about selected unlinked token actors.
+        // @ts-expect-error TODO: foundry-vtt-types v10
         const unlinkedActor = tokens.find(token => !token.document.actorLink);
         if (unlinkedActor !== undefined) {
             ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported'));
         }
 
         // Add linked token actors.
+        // @ts-expect-error TODO: foundry-vtt-types v10
         tokens.filter(token => token.document.actorLink).forEach(token => {
             // Double check that the actor actually lives in the actors collection.
-            const actor = game.actors.get(token.document.actorId);
+            // @ts-expect-error TODO: foundry-vtt-types v10
+            const actor = game.actors?.get(token.document.actorId);
             if (!actor) return;
-            if (this._isActorOnTracker(actor)) return;
-
-            OverwatchScoreTracker.addedActors.push(actor.id);
+            if (OverwatchStorage.isTrackedActor(actor)) return;
+            OverwatchStorage.trackActor(actor);
         });
 
         this.render();
     }
 
-    /**
-     * Check if the given actor is already added and displayed on the current tracker.
-     *
-     * @param actor A actors collection actor.
-     * @returns {boolean} Will return true when the given actor already exists.
-     */
-    _isActorOnTracker(actor) {
-        return this.actors.find(actorData => actorData._id === actor.id) !== undefined;
-    }
-
-    _setOverwatchScore(event) {
+    _setOverwatchScore(event: Event) {
         const actor = this._getActorFromEvent(event);
-        const amount = event.currentTarget.value;
+        const amount = parseInt((event.currentTarget as HTMLInputElement).value);
         if (amount && actor) {
             actor.setOverwatchScore(amount).then(() => this.render());
         }
     }
 
-    _addOverwatchScore(event) {
+    _addOverwatchScore(event: Event) {
         const actor = this._getActorFromEvent(event);
-        const amount = parseInt(event.currentTarget.dataset.amount);
-        if (amount && actor) {
-            const os = actor.getOverwatchScore();
-            actor.setOverwatchScore(os + amount).then(() => this.render());
-        }
+        const amount = parseInt((event.currentTarget as HTMLElement).dataset.amount ?? '0');
+        if (!actor) return
+
+        const os = actor.getOverwatchScore();
+        actor.setOverwatchScore(os + amount).then(() => this.render());
     }
 
-    _resetOverwatchScore(event) {
-        event.preventDefault();
-        const actor = this._getActorFromEvent(event);
-        if (actor) {
-            actor.setOverwatchScore(0).then(() => this.render());
-        }
-    }
-
-    /**
-     * Remove the connected actor from the tracker.
-     * @param {*} event 
-     */
-    _onDeleteActor(event) {
+    _resetOverwatchScore(event: Event) {
         event.preventDefault();
         const actor = this._getActorFromEvent(event);
         if (!actor) return;
 
-
-        const index = OverwatchScoreTracker.addedActors.indexOf(actor.id);
-        if (index === -1) {
-            ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.CantDeleteUserCharacter'), {localize: true});
-            return;
-        }
-
-        OverwatchScoreTracker.addedActors.splice(index, 1);
-
-        this.render();
+        actor.setOverwatchScore(0).then(() => this.render());
     }
 
-    async _rollFor15Minutes(event) {
+    /**
+     * Remove the connected actor from the tracker.
+     */
+    _onDeleteActor(event: Event) {
+        event.preventDefault();
+        const actor = this._getActorFromEvent(event);
+        if (!actor) return;
+
+        OverwatchStorage.untrackActor(actor).then(() => this.render());
+    }
+
+    async _rollFor15Minutes(event: Event) {
         event.preventDefault();
         const actor = this._getActorFromEvent(event);
         if (actor) {
             //  use static value so it can be modified in modules
             const roll = new Roll(OverwatchScoreTracker.MatrixOverwatchDiceCount);
             await roll.evaluate();
+            if (!roll.total) return;
 
-            if (roll.total) {
-                const os = actor.getOverwatchScore();
-                actor.setOverwatchScore(os + roll.total).then(() => this.render());
-            }
+            const os = actor.getOverwatchScore();
+            actor.setOverwatchScore(os + roll.total).then(() => this.render());
         }
     }
 }

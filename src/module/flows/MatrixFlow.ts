@@ -79,7 +79,7 @@ export const MatrixFlow = {
         await actor.setOverwatchScore(overwatchScore + test.hits.value);
 
         // Inform GM about convergenace.
-        overwatchScore = against.actor?.getOverwatchScore();
+        overwatchScore = actor.getOverwatchScore();
         if (MatrixRules.isOverwatchScoreConvergence(overwatchScore)) {
             await MatrixFlow.executeOverwatchConvergence(actor);
         }

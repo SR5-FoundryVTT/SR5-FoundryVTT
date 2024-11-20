@@ -10,9 +10,10 @@ export const OverwatchStorage = {
     key: 'matrix.ow',
 
     /**
-    */
+     * Set a specific overwatch score for a given actor
+     */
     async setOverwatchScore(actor: SR5Actor, score: number) {
-        if (!isNaN(score)) return;
+        if (isNaN(score)) return;
         const uuid = Helpers.uuidForStorage(actor.uuid);
         const ow = OverwatchStorage.getStorage();
         ow[uuid] = { score };
@@ -23,7 +24,7 @@ export const OverwatchStorage = {
      * Retrieve the overwatch score for a given actor.
      */
     getOverwatchScore(actor: SR5Actor): number {
-        const uuid = Helpers.uuidFromStorage(actor.uuid);
+        const uuid = Helpers.uuidForStorage(actor.uuid);
         const ow = OverwatchStorage.getStorage();
         return ow[uuid]?.score ?? 0;
     },
@@ -54,7 +55,29 @@ export const OverwatchStorage = {
     trackedActors() {
         const ow = OverwatchStorage.getStorage();
         const uuids = Object.keys(ow).map(uuid => Helpers.uuidFromStorage(uuid));
-        return uuids.map(uuid => fromUuidSync(uuid)).filter(document => document !== null) as SR5Actor[];
+        const documents = uuids.map(uuid => ({uuid, document: fromUuidSync(uuid)}));
+        
+        // Remove any deleted actors.
+        const deletedActors = documents.filter(({uuid, document}) => document === null);
+        if (deletedActors.length > 0) {
+            deletedActors.forEach(({uuid}) => {
+                const uuidStorage = Helpers.uuidForStorage(uuid);
+                delete ow[uuidStorage];
+            });
+            // Ignore promise, as this can be handled in background.
+            DataStorage.set(OverwatchStorage.key, ow);
+        }
+
+        return documents.filter(document => document !== null).map(({document}) => document) as SR5Actor[];
+    },
+
+    /**
+     * Determine if the given actor is tracked for overwatch score.
+     */
+    isTrackedActor(actor: SR5Actor) {
+        const uuid = Helpers.uuidForStorage(actor.uuid);
+        const ow = OverwatchStorage.getStorage();
+        return ow[uuid] !== undefined;
     },
 
     /**
@@ -62,5 +85,12 @@ export const OverwatchStorage = {
      */
     getStorage(): Shadowrun.Storage['matrix']['ow'] {
         return DataStorage.get(OverwatchStorage.key) ?? {};
-    }
+    },
+
+    /**
+     * Helper to clear all overwatch scores.
+     */
+    async clear() {
+        await DataStorage.set(OverwatchStorage.key, {});
+    },
 }

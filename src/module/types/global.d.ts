@@ -9,7 +9,6 @@ import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { Translation } from '../utils/strings';
 import { DataDefaults } from '../data/DataDefaults';
-import { DataStorage } from '../data/DataStorage';
 
 declare global {
     // Configuration of foundry-vtt-types
@@ -80,7 +79,7 @@ declare global {
             data: typeof DataDefaults,
             modifiers: typeof DocumentSituationModifiers,
             inputDelay: number,
-            storage: typeof DataStorage
+            storage: typeof SRStorage
         }
 
         // Optional type for Dice so Nice module API

@@ -37,6 +37,7 @@ import { DamageApplicationFlow } from './flows/DamageApplicationFlow';
 import { SuccessTest } from '../tests/SuccessTest';
 import { MatrixFlow } from '../flows/MatrixFlow';
 import { SetMarksOptions } from '../storage/MarksStorage';
+import { OverwatchStorage } from '../storage/OverwatchStorage';
 
 
 /**
@@ -89,15 +90,11 @@ export class SR5Actor extends Actor {
     }
 
     getOverwatchScore() {
-        const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
-        return os !== undefined ? os : 0;
+        return OverwatchStorage.getOverwatchScore(this);
     }
 
-    async setOverwatchScore(value) {
-        const num = parseInt(value);
-        if (!isNaN(num)) {
-            return await this.setFlag(SYSTEM_NAME, 'overwatchScore', num);
-        }
+    async setOverwatchScore(value: number) {
+        await OverwatchStorage.setOverwatchScore(this, value);
     }
 
     /**
