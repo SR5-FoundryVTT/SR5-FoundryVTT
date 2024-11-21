@@ -16,6 +16,7 @@ export class ICPrep {
     static prepareBaseData(system: ICData) {
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearLimitMods(system);
+        SkillsPrep.prepareSkillData(system);
 
         ICPrep.addMissingTracks(system);
         ICPrep.prepareModifiers(system);
@@ -48,7 +49,7 @@ export class ICPrep {
      */
     static addMissingTracks(system: ICData) {
         // Newly created actors SHOULD have this by template.
-        // Legacy actors MIGHT not have it, therefore make sure it's their.
+        // Legacy actors MIGHT not have it, therefore make sure it's there.
         const track = system.track || {};
         if (!track.matrix) track.matrix = DataDefaults.trackData();
         system.track = track;

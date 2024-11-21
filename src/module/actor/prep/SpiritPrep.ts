@@ -15,11 +15,13 @@ import { CharacterPrep } from './CharacterPrep';
 import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 import { SR5 } from '../../config';
+import { SR } from '../../constants';
 
 
 export class SpiritPrep {
     static prepareBaseData(system: SpiritData) {
         SpiritPrep.prepareSpiritSpecial(system);
+        SkillsPrep.prepareSkillData(system);
 
         ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
@@ -30,7 +32,8 @@ export class SpiritPrep {
     static prepareDerivedData(system: SpiritData, items: SR5ItemDataWrapper[]) {
         SpiritPrep.prepareSpiritBaseData(system);
 
-        AttributesPrep.prepareAttributes(system);
+        // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.
+        AttributesPrep.prepareAttributes(system, SR.attributes.rangesSpirit);
         SpiritPrep.prepareAttributesWithForce(system);
         SkillsPrep.prepareSkills(system);
 

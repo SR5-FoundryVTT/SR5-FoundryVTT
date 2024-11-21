@@ -18,6 +18,8 @@ import { DataDefaults } from '../../data/DataDefaults';
 export class CharacterPrep {
     static prepareBaseData(system: Shadowrun.CharacterData) {
         CharacterPrep.addSpecialAttributes(system);
+        SkillsPrep.prepareSkillData(system);
+
         ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);

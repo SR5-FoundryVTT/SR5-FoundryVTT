@@ -11,7 +11,7 @@ export class AttributesPrep {
     /**
      * Prepare actor data for attributes
      */
-    static prepareAttributes(system: ActorTypesData) {
+    static prepareAttributes(system: ActorTypesData, ranges?: Record<string, {min: number, max?: number}>) {
         const {attributes} = system;
 
         // always have special attributes set to hidden
@@ -26,7 +26,7 @@ export class AttributesPrep {
             // needed to be able to migrate things correctly
             if (name === 'edge' && attribute['uses'] === undefined) return;
 
-            AttributesPrep.prepareAttribute(name, attribute)
+            AttributesPrep.prepareAttribute(name, attribute, ranges)
         }
     }
 
@@ -35,13 +35,13 @@ export class AttributesPrep {
      * @param name The key field (and name) of the attribute given
      * @param attribute The AttributeField to prepare
      */
-    static prepareAttribute(name: string, attribute: AttributeField) {
+    static prepareAttribute(name: string, attribute: AttributeField, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
-        AttributesPrep.calculateAttribute(name, attribute);
+        AttributesPrep.calculateAttribute(name, attribute, ranges);
 
         // add i18n labels.
         attribute.label = SR5.attributes[name];
@@ -53,13 +53,13 @@ export class AttributesPrep {
      * @param name The attributes name / id
      * @param attribute The attribute will be modified in place
      */
-    static calculateAttribute(name: string, attribute: AttributeField) {
+    static calculateAttribute(name: string, attribute: AttributeField, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
-        const range = SR.attributes.ranges[name];
+        const range = ranges ? ranges[name] : SR.attributes.ranges[name];
         Helpers.calcTotal(attribute, range);
     }
 
