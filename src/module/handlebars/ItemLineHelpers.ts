@@ -913,7 +913,12 @@ export const registerItemLineHelpers = () => {
         return [
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                    text: game.i18n.localize('SR5.Labels.Sheet.Type'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Labels.ActorSheet.Network'),
                 },
             },
             {

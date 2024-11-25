@@ -155,10 +155,15 @@ export class SR5BaseActorSheet extends ActorSheet {
             height: 690,
             tabs: [
                 {
-                    navSelector: '.tabs',
-                    contentSelector: '.sheetbody',
+                    navSelector: '.tabs[data-group="primary"]',
+                    contentSelector: '.tabsbody[data-group="primary"]',
                     initial: 'skills',
                 },
+                {
+                    navSelector: '.tabs[data-group="matrix"]',
+                    contentSelector: '.tabsbody[data-group="matrix"]',
+                    initial: 'actions',
+                }
             ],
         });
     }
@@ -291,6 +296,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
         html.find('.marks-connect-network').on('click', this._onMarksConnectToNetwork.bind(this));
+        html.find('.marks-place-mark').on('click', this._onMarksPlaceMark.bind(this));
+        html.find('.disconnect-network').on('click', this._onDisconnectNetwork.bind(this));
 
         // Skill Filter handling...
         html.find('.skill-header').find('.item-name').on('click', this._onFilterUntrainedSkills.bind(this));
@@ -1175,6 +1182,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!target || !(target instanceof SR5Item)) return;
 
         await this.actor.connectNetwork(target);
+    }
+
+    async _onMarksPlaceMark(event) {
+        console.error('IMPLEMENT PLACE MARK ON TARGET');
+    }
+
+    async _onDisconnectNetwork(event) {
+        console.error('IMPLEMENT NETWORK DISCONNECT');
     }
 
     /**

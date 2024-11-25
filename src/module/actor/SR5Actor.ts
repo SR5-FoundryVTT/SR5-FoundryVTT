@@ -654,6 +654,15 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Determine if this actor is connected to any matrix network
+     * @returns true, if connected to a network
+     */
+    get hasNetwork() {
+        if (!this.isMatrixActor) return false;
+        return !!this.system['matrix']?.network?.uuid;
+    }
+
+    /**
      * The network (host/grid) this matrix actor is connected to.
      */
     get network(): SR5Item|undefined {

@@ -1,6 +1,7 @@
 import { MarksStorage, SetMarksOptions } from "../../storage/MarksStorage";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
+import { Translation } from "../../utils/strings";
 
 /**
  * This flow handles everything around matrix mark management.
@@ -147,10 +148,50 @@ export const ActorMarksFlow = {
 
         for (const {uuid, name, marks} of matrixData) {
             const target = uuid ? await ActorMarksFlow.getMarkedDocument(uuid) : null;
-            documents.push({target, marks, markId: uuid, name});
+            const network = ActorMarksFlow.getDocumentNetwork(target);
+            const type = ActorMarksFlow.getDocumentType(target);
+            documents.push({target, marks, markId: uuid, name, type, network});
         }
 
         return documents;
+    },
+
+    /**
+     * Return a network name this document is using in the matrix.
+     * 
+     * NOTE: This function is part of sheet rendering, so we fail silently, to not break sheet rendering.
+     * 
+     * @param document Any markable document
+     * @returns A document name
+     */
+    getDocumentNetwork(document: Shadowrun.NetworkDevice) {
+        // A host/grid is it's own network.
+        if (document instanceof SR5Item && document.type === 'host') return '';
+        // if (document instanceof SR5Item && document.type === 'grid') return '';
+        if (document instanceof SR5Item && document.isMatrixDevice) return document.actor.name ?? '';
+        if (document instanceof SR5Actor && document.hasNetwork) return document.network?.name ?? '';
+
+        return '';
+    },
+
+    /**
+     * Trasnform the given document to a string type for sheet display.
+     *
+     * NOTE: This function is part of sheet rendering, so we fail silently, to not break sheet rendering.
+     * 
+     * @param document Any markable document
+     * @returns A translation key to be translated.
+     */
+    getDocumentType(document: Shadowrun.NetworkDevice): Translation {
+        // Determine special cases and default to persona.
+        if (document instanceof SR5Item && document.isMatrixDevice) return 'SR5.Device';
+        // if (document instanceof SR5Item && document.type === 'grid') return 'SR5.ItemTypes.Grid';
+        if (document instanceof SR5Item && document.type === 'host') return 'SR5.ItemTypes.Host';
+
+        if (document instanceof SR5Actor && document.type === 'ic') return 'SR5.ActorTypes.IC';
+        if (document instanceof SR5Actor && document.type === 'sprite') return 'SR5.ActorTypes.Sprite';
+
+        return 'SR5.Labels.ActorSheet.Persona'
     },
 
     /**

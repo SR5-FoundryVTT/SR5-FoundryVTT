@@ -35,6 +35,8 @@ declare namespace Shadowrun {
     export interface MarkedDocument extends TargetedDocument {
         marks: number // The amount of marks placed.
         markId: string | null // For example <sceneId>/<targetId>/<itemId>. See Helpers.buildMarkId
+        network: string // The host, grid or persona name the target is in
+        type: Translation // The type of matrix icon
     }
 
     /**
