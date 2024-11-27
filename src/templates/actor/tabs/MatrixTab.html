@@ -31,8 +31,27 @@
                 </div>
             </div>
         </div>
-        <div class="scroll-area scroll-area-matrix">
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html' }}
+        <div class="split-container">
+            <div class="scroll-area scroll-area-matrix-hacking">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html' }}
+            </div>
+            <div>
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Actions')
+                }}
+                <div class="scroll-area scroll-area-matrix-hacking matrix-hacking-actions">
+                    {{#each matrixActions}}
+                    {{log this}}
+                    {{log this.uuid}}
+                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                    name=this.name
+                    itemId=this.uuid
+                    itemType="matrix-action"
+                    hasRoll="true"
+                    }}
+                    {{/each}}
+                </div>
+            </div>
         </div>
     </div>
     {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

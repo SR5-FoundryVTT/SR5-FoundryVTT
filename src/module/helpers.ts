@@ -891,6 +891,20 @@ export class Helpers {
     }
 
     /**
+     * Pack document names don't necessarily match what is displayed in the UI.
+     *
+     * TODO: Why even do this? Does the ui actually not match to the pack document name?
+     * @param documentName A string to be transformed. Malformed values will result in empty strings.
+     * @returns 
+     */
+    static packDocumentName(documentName?: string) {
+        // Fail gracefully.
+        documentName ??= '';
+        // eslint-disable-next-line
+        return documentName.toLowerCase().replace(new RegExp(' ', 'g'), '_')
+    }
+
+    /**
      * Check packs for a given action.
      *
      * TODO: Use pack and action ids to avoid polluted user namespaces
@@ -908,8 +922,9 @@ export class Helpers {
 
         // TODO: Use predefined ids instead of names...
         // TODO: use replaceAll instead, which needs an change to es2021 at least for the ts compiler
+        actionName = Helpers.packDocumentName(actionName).toLocaleLowerCase();
         // eslint-disable-next-line
-        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(new RegExp(' ', 'g'), '_') === actionName.toLowerCase());
+        const packEntry = pack.index.find(data => Helpers.packDocumentName(data.name) === actionName);
         if (!packEntry) return;
 
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
@@ -918,6 +933,35 @@ export class Helpers {
         console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;
     }
+
+    /**
+     * Retrieve all actions from a given pack.
+     * 
+     * Other item types in that pack will be ignored.
+     * 
+     * TODO: Allow filtering by categories?
+     * TODO: Generalize this to search for items and make the type paramater
+     * 
+     * @param packName The item pack that contains actions.
+     */
+    static async getPackActions(packName: string): Promise<SR5Item[]> {
+        console.debug(`Shadowrun 5e | Trying to fetch all actions from pack ${packName}`);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName);
+        if (!pack) return [];
+
+        // @ts-expect-error foundry-vtt-types v10 
+        const packEntries = pack.index.filter(data => data.type === 'action');
+
+        const documents: SR5Item[] = [];
+        for (const packEntry of packEntries) {
+            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item;
+            if (!document) continue;
+            documents.push(document);
+        }
+
+        console.debug(`Shadowrun5e | Fetched all actions from pack ${packName}`, documents);
+        return documents;
+    }   
 
     /**
      * Show the DocumentSheet of whatever entity link uuid.
@@ -1042,4 +1086,17 @@ export class Helpers {
     static uuidFromStorage(uuid: string) {
         return uuid.replace('_', '.');
     }
+
+    /**
+     * Sort a list of documents by name in ascending alphabetical order.
+     *
+     * @param a Any type of document data
+     * @param b Any type of document data
+     * @returns
+     */
+    static sortByName(a, b) {
+        if (a.name > b.name) return 1;
+        if (a.name < b.name) return -1;
+        return 0;
+    };
 }

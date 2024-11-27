@@ -1,5 +1,5 @@
 import { MatrixTargetAcquisitionApplication } from './../../apps/matrix/MatrixTargetAquisition';
-import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
+import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
 
@@ -11,7 +11,8 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     markedDocuments: Shadowrun.MarkedDocument[]
     handledItemTypes: string[]
     inventory: Record<string, any>
-    network: SR5Item|undefined
+    network: SR5Item | undefined
+    matrixActions: SR5Item[]
 }
 
 
@@ -76,6 +77,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
         data.markedDocuments = await this.actor.getAllMarkedDocuments();
         data.network = this.actor.network;
+        data.matrixActions = await this.getMatrixActions();
 
         return data;
     }
@@ -85,6 +87,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
         html.find('.show-matrix-target-acquisition').click(this._onShowMatrixTargetAcquisition.bind(this));
         html.find('.reboot-persona-device').click(this._onRebootPersonaDevice.bind(this));
+        html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
     }
 
     /**
@@ -103,7 +106,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      *
      * @param type The call in action sub type.
      */
-    async _onCallInActionCreate(type: 'summoning'|'compilation') {
+    async _onCallInActionCreate(type: 'summoning' | 'compilation') {
         // Determine actor type from sub item type.
         const typeToActorType = {
             'summoning': 'spirit',
@@ -119,7 +122,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'system.actor_type': actor_type
         };
 
-        await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
+        await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
 
     /**
@@ -137,5 +140,29 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      */
     async _onRebootPersonaDevice(event: Event) {
         await this.actor.rebootPersona();
+    }
+
+    /**
+     * Retrieve all matrix actions from the corresponding pack to be displayed.
+     * 
+     * @returns Alphabetically sorted array of matrix actions.
+     */
+    async getMatrixActions() {
+        const actions = await Helpers.getPackActions('matrix-actions');
+        return actions.sort(Helpers.sortByName.bind(Helpers));
+    }
+
+    /**
+     * Cast a matrix action for this actor. Use the actions from the matrix pack for this.
+     */
+    async _onRollMatrixAction(event) {
+        event.preventDefault();
+
+        const id = Helpers.listItemId(event);
+        const action = await fromUuid(id) as SR5Item;
+        if (!action) return;
+
+        const options = { event };
+        this.actor.rollMatrixAction(action.name as string, options);
     }
 }

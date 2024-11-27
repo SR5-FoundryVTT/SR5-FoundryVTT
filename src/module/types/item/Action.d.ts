@@ -142,7 +142,8 @@ declare namespace Shadowrun {
         | 'physical_defense'
         | 'drone_pilot_vehicle'
         | 'drone_perception'
-        | 'drone_infiltration';
+        | 'drone_infiltration'
+        | string; // Allow document names to be given...
 
     /*
      * A test label for item action chat message casting button creation

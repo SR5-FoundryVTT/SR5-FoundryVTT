@@ -1120,6 +1120,16 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Roll an action as defined within the systems matrix action pack.
+     *
+     * @param actionName The action with in the general pack.
+     * @param options Success Test options
+     */
+    async rollMatrixAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
+        return await this.rollPackAction(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
+    }
+
+    /**
      * Roll a skill test for a specific skill
      * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
      * @param options Optional options to configure the roll.
