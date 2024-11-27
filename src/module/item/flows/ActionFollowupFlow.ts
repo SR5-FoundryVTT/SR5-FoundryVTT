@@ -8,9 +8,9 @@ import { TestCreator } from "../../tests/TestCreator";
 export const ActionFollowupFlow = {
     chatLogListeners: async (message: ChatLog, html, data) => {
         // setup chat listener messages for each message as some need the message context instead of chatlog context.
-        html.find('.chat-message').each(async (index, element) => {
-            element = $(element);
-            const id = element.data('messageId');
+        // @ts-expect-error TODO: .querySelectorAll ?
+        $(html).find('.chat-message').each(async (index, element) => {
+            const id = $(element).data('messageId');
             const message = game.messages?.get(id);
             if (!message) return;
 

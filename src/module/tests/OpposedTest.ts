@@ -216,7 +216,8 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     }
 
     static override async chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.opposed-action').on('click', OpposedTest._castOpposedAction);
+        // TODO: querySelectorAll ?
+        $(html).find('.opposed-action').on('click', OpposedTest._castOpposedAction);
     }
 
     /**
