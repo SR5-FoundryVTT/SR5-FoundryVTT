@@ -19,7 +19,7 @@ export const ActionFollowupFlow = {
     },
 
     chatMessageListeners: async (message: ChatMessage, html, data) => {
-        html.find('.followup-action').on('click', ActionFollowupFlow.castFollowupAction);
+        $(html).find('.followup-action').on('click', ActionFollowupFlow.castFollowupAction);
     },
 
     castFollowupAction: async (event) => {
