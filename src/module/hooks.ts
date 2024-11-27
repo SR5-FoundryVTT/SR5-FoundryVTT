@@ -86,7 +86,6 @@ export class HooksManager {
         Hooks.on('canvasInit', canvasInit);
         Hooks.on('ready', HooksManager.ready);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
-        Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
@@ -383,26 +382,20 @@ ___________________
         }
     }
 
-    static renderSceneControls(controls, html) {
-        html.find('[data-tool="overwatch-score-tracker"]').on('click', (event) => {
-            event.preventDefault();
-            new OverwatchScoreTracker().render(true);
-        });
-    }
-
     static getSceneControlButtons(controls) {
-        const tokenControls = controls.find((c) => c.name === 'token');
-
         if (game.user?.isGM) {
-            tokenControls.tools.push({
+            const overwatchScoreTrackControl = { 
                 name: 'overwatch-score-tracker',
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',
                 icon: 'fas fa-network-wired',
-                button: true
-            });
+                button: true,
+                onClick: () => new OverwatchScoreTracker().render(true)
+            };
+            controls.tokens.tools[overwatchScoreTrackControl.name] = overwatchScoreTrackControl;
         }
 
-        tokenControls.tools.push(SituationModifiersApplication.getControl());
+        const situationModifiersControl = SituationModifiersApplication.getControl();
+        controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
     }
 
     /**
