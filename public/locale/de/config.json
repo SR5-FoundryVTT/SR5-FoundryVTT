@@ -593,6 +593,10 @@
             "SpiritType": "Geister-Art",
             "SpriteType": "Sprite-Art"
         },
+        "Actions": {
+            "BruteForce": "Brute Force",
+            "HackontheFly": "Eiliges Hacken"
+        },
         "ActorSheet": {
             "CreateInventory": "Erstelle Inventar-Ort",
             "CritterPowers": "Critterkräfte",
@@ -1242,6 +1246,7 @@
             "MissingSummoner": "Drag&Drop Charakter oder nutze Beschwörungs-Aktion",
             "MissingTechnomancer": "Drag&Drop Charakter oder nutze Kompilierungs-Aktion",
             "NPC": "Makriere Akteur als NSC und ermöglicht weitere NSC-Funktionen",
+            "PlaceMark": "Nutze diese Handlung um Marken auf einem bereits markierten Ziel platzieren",
             "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück"
         },
         "CallInAction": {

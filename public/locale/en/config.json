@@ -596,6 +596,10 @@
             "SpiritType": "Spirit Type",
             "SpriteType": "Sprite Type"
         },
+        "Actions": {
+            "BruteForce": "Brute Force",
+            "HackontheFly": "Hack on the Fly"
+        },
         "ActorSheet": {
             "CreateInventory": "Create inventory place",
             "CritterPowers": "Critter Powers",
@@ -1247,6 +1251,7 @@
             "MissingSummoner": "Drag&Drop Character or use summoning action",
             "MissingTechnomancer": "Drag&Drop Character or use compilation action",
             "NPC": "Mark actor as NPC to get additional features",
+            "PlaceMark": "Action to be used to place marks on already marked targets",
             "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
         },
         "CallInAction": {

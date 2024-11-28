@@ -47,6 +47,9 @@ declare namespace Shadowrun {
         running_silent: boolean
         item?: any
         marks: MatrixMarks
+
+        // Define the preselection of what action should be used for placing marks.
+        markPlacementAction: string
     }
 
     enum MatrixNetworkTypes {

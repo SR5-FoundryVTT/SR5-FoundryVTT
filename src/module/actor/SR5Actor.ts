@@ -1110,6 +1110,16 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Get an action as defined within the systems general action pack.
+     *
+     * @param actionName The action with in the general pack.
+     * @param options Success Test options
+     */
+    async matrixlActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
+        return await this.packActionTest(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
+    }
+
+    /**
      * Roll an action as defined within the systems general action pack.
      *
      * @param actionName The action with in the general pack.

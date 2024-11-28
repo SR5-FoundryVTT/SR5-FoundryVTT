@@ -999,7 +999,10 @@
                     "hasIcon": true
                 }
             },
-            "situation_modifiers": {}
+            "situation_modifiers": {},
+            "matrix": {
+                "markPlacementAction": ""
+            }
         },
         "spirit": {
             "templates": [

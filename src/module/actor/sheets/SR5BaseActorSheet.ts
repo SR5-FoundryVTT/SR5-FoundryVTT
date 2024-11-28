@@ -291,7 +291,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Matrix data handling...
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
-        html.find('.marks-add-one').on('click', async (event) => await this._onMarksQuantityChangeBy(event, 1));
+        html.find('.marks-add-one').on('click', async (event) => await this._onMarkplacementAction(event));
         html.find('.marks-remove-one').on('click', async (event) => await this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
@@ -1120,6 +1120,32 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const marks = parseInt(event.currentTarget.value);
         await this.actor.setMarks(markedDocument, marks, { overwrite: true });
+    }
+
+    /**
+     * Handle placing a matrix mark on an already marked target.
+     * 
+     * This would be triggered through the marks list to add additional marks.
+     * @param event 
+     */
+    async _onMarkplacementAction(event) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const character = this.actor.asCharacter();
+        if (!character) return;
+
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
+        if (!markedDocument) return;
+
+        const options = { event };
+        const test = await this.actor.matrixlActionTest(character.system.matrix.markPlacementAction, options);
+        if (!test) return;
+
+        await test.addTarget(markedDocument);
+        await test.execute();
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {

@@ -632,6 +632,17 @@ export const SR5 = {
         'summoning': "SR5.ActionCategory.Summoning",
     },
 
+    /**
+     * Actions to be used for placing a mark.
+     * 
+     * Key is the action name as it would be in the compendium
+     * Value is the label to be displayed to the user
+     */
+    matrixMarkPlacementActions: {
+        'Brute Force': 'SR5.Labels.Actions.BruteForce',
+        'Hack on the Fly': 'SR5.Labels.Actions.HackontheFly'
+    },
+
     matrixAttributes: {
         attack: 'SR5.MatrixAttrAttack',
         sleaze: 'SR5.MatrixAttrSleaze',

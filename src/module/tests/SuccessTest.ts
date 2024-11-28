@@ -719,7 +719,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             if (this.data.sourceIsActor) this.actor = this.source as SR5Actor;
         }
 
-        // Populate targeted token documents.
+        await this.populateTargetDocuments();
+    }
+
+    /**
+     * Populate all targets connected to this test.
+     */
+    async populateTargetDocuments() {
         if (this.targets.length === 0 && this.data.targetActorsUuid) {
             this.targets = [];
             for (const uuid of this.data.targetActorsUuid) {
@@ -2187,5 +2193,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // During .execute this would now show the dialog, therefore rerender and we're at the same state.
         this.dialog.render(true);
+    }
+
+    /**
+     * Add an additional test target after test initialization
+     * 
+     * @param document Any targetable FoundryVTT document
+     */
+    async addTarget(document: SR5Actor|SR5Item) {
+        if (this.data.targetActorsUuid.includes(document.uuid)) return;
+
+        this.data.targetActorsUuid.push(document.uuid);
+        await this.populateTargetDocuments()        
     }
 }
