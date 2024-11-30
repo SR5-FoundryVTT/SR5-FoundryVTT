@@ -1046,10 +1046,12 @@
             "driver": "",
             "modificationCategories": {
                 "body": 0,
-                "power_train": 0,
-                "protection": 0,
-                "electromagnetic": 0,
                 "cosmetic": 0,
+                "electromagnetic": 0,
+                "enhancement": 0,
+                "exotic": 0,
+                "powertrain": 0,
+                "protection": 0,
                 "weapons": 0
             },   
             "modPoints": 0,

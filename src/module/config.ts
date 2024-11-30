@@ -662,7 +662,9 @@ export const SR5 = {
         body: 'SR5.Vehicle.ModificationCategoryTypes.body',
         cosmetic: 'SR5.Vehicle.ModificationCategoryTypes.cosmetic',
         electromagnetic: 'SR5.Vehicle.ModificationCategoryTypes.electromagnetic',
-        power_train: 'SR5.Vehicle.ModificationCategoryTypes.power_train',
+        enhancement: 'SR5.Vehicle.ModificationCategoryTypes.enhancement',
+        exotic: 'SR5.Vehicle.ModificationCategoryTypes.exotic',
+        powertrain: 'SR5.Vehicle.ModificationCategoryTypes.powertrain',
         protection: 'SR5.Vehicle.ModificationCategoryTypes.protection',
         weapons: 'SR5.Vehicle.ModificationCategoryTypes.weapons',
     },
@@ -1354,6 +1356,31 @@ export const SR5 = {
         },
         ritual: {},
         sprite_power: {},
+        vehicle: {
+            /* Vehicles */
+            'bikes': 'vehicle/bike',
+            'cars': 'vehicle/car',
+            'trucks': 'vehicle/truck',
+            'municipal-construction': 'vehicle/construction',
+            'corpsec-police-military': 'vehicle/military',
+            'boats': 'vehicle/boat',
+            'submarines': 'vehicle/submarine',
+            'fixed-wing-aircraft': 'vehicle/airplane',
+            'ltav': 'vehicle/ltav',
+            'rotorcraft': 'vehicle/rotorcraft',
+            'vtol-vstol': 'vehicle/vtol',
+            'hovercraft': 'vehicle/hovercraft',
+
+            /* Drones */
+            'micro': 'vehicle/drone',
+            'mini': 'vehicle/drone',
+            'small': 'vehicle/drone',
+            'medium': 'vehicle/drone',
+            'anthro': 'vehicle/anthro',
+            'large': 'vehicle/drone',
+            'huge': 'vehicle/drone',
+            'missile': 'vehicle/drone',
+        },
         weapon: {
             // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'
             'melee': '',

@@ -2,6 +2,7 @@ import { DataDefaults } from '.././../../data/DataDefaults';
 import { ImportHelper } from '../helper/ImportHelper';
 import * as IconAssign from '../../../apps/iconAssigner/iconAssign';
 import { SR5 } from "../../../config";
+import { SR5Actor } from '../../../actor/SR5Actor';
 
 const xml2js = require('xml2js');
 
@@ -30,8 +31,11 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * NOTE: We use temporary items to have a full set of item data instead of just
      *       system model data that game.model.Item would give us.
      */
-    public GetDefaultData({type}:{type:any}) {
-        return DataDefaults.baseItemData<ItemDataType, ItemSystemDataType>({type});
+    public GetDefaultData({ type, entityType }: { type: any; entityType: keyof Game["model"] }) {
+        return DataDefaults.baseEntityData<ItemDataType, ItemSystemDataType>(
+            entityType,
+            { type }
+        );
     }
 
     /**
@@ -68,7 +72,7 @@ export abstract class DataImporter<ItemDataType, ItemSystemDataType> {
      * @param chummerData The JSON data to parse.
      * @returns An array of created objects.
      */
-    public abstract Parse(chummerData: object, setIcons: boolean): Promise<Item>;
+    public abstract Parse(chummerData: object, setIcons: boolean): Promise<Item|StoredDocument<SR5Actor>[]>;
 
     /**
      * Get the appropriate default icon

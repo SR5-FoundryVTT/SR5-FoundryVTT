@@ -791,7 +791,9 @@
             "body": "Body",
             "cosmetic": "Cosmetic",
             "electromagnetic": "Electromagnetic",
-            "power_train": "Power Train",
+            "enhancement": "Enhancement",
+            "exotic": "Exotic",
+            "powertrain": "Power Train",
             "protection": "Protection",
             "weapons": "Weapons"
         },

@@ -86,11 +86,23 @@
     </span>
     <input class="display" type="text" size="5" name="system.modificationCategories.electromagnetic" value="{{system.modificationCategories.electromagnetic}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
-    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.power_train") }}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.enhancement") }}
     <span style="white-space: nowrap">
-        {{calcModificationCategorySlots items "power_train"}} /
+        {{calcModificationCategorySlots items "enhancement"}} /
     </span>
-    <input class="display" type="text" size="5" name="system.modificationCategories.power_train" value="{{system.modificationCategories.power_train}}" data-dtype="Number" />
+    <input class="display" type="text" size="5" name="system.modificationCategories.enhancement" value="{{system.modificationCategories.enhancement}}" data-dtype="Number" />
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.exotic") }}
+    <span style="white-space: nowrap">
+        {{calcModificationCategorySlots items "exotic"}} /
+    </span>
+    <input class="display" type="text" size="5" name="system.modificationCategories.exotic" value="{{system.modificationCategories.exotic}}" data-dtype="Number" />
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.powertrain") }}
+    <span style="white-space: nowrap">
+        {{calcModificationCategorySlots items "powertrain"}} /
+    </span>
+    <input class="display" type="text" size="5" name="system.modificationCategories.powertrain" value="{{system.modificationCategories.powertrain}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.protection") }}
     <span style="white-space: nowrap">
