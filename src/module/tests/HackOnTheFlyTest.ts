@@ -78,4 +78,8 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
 
         MarkPlacementFlow.validateBaseValues(this);
     }
+
+    override async addTarget(document: SR5Actor | SR5Item) {
+        await MarkPlacementFlow.addTarget(this, document);
+    }
 }

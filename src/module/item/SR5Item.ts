@@ -1571,6 +1571,18 @@ export class SR5Item extends Item {
     }
 
     /**
+     * Return the persona document for this matrix device.
+     * 
+     * @returns 
+     */
+    get persona() {
+        const technologyData = this.getTechnologyData();
+        if (!technologyData) return;
+
+        return this.actorOwner;
+    }
+
+    /**
      * Return all network device items within a possible PAN or WAN.
      */
     slaves() {

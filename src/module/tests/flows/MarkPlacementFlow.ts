@@ -17,7 +17,7 @@ export interface MatrixPlacementData extends SuccessTestData {
     // If decker has a direct connection to the target
     directConnection: boolean
     // The persona uuid. This would be the user main persona icon, not necessarily the device.
-    personaUuid: string
+    personaUuid: string|undefined
     // The icon uuid. This would be the actual mark placement target. Can be a device, a persona device, a host or actor.
     iconUuid: string|undefined
     // Should the mark be placed on the main icon / persona or icons connected to it?
@@ -29,6 +29,8 @@ export interface OpposeMarkPlacementData extends OpposedTestData {
     personaUuid: string
     iconUuid: string
 }
+
+type MarkPlacementTests = BruteForceTest | HackOnTheFlyTest;
 /**
  * Handle test flows for placing marks between different tests / actions.
  * 
@@ -75,7 +77,7 @@ export const MarkPlacementFlow = {
      * 
      * @param test The initial test to modify.
      */
-    prepareTestModifiers(test: BruteForceTest|HackOnTheFlyTest) {
+    prepareTestModifiers(test: MarkPlacementTests) {
 
         const modifiers = new PartsList<number>(test.data.modifiers.mod);
 
@@ -104,9 +106,11 @@ export const MarkPlacementFlow = {
      * 
      * @param test The test placing any mark.
      */
-    prepareBaseValues(test: BruteForceTest|HackOnTheFlyTest) {
+    prepareBaseValues(test: MarkPlacementTests) {
         // Host devices always use direct connections. // TODO: add rule reference
         if (test.host) test.data.directConnection = true;
+        // If a device has been pre-targeted before dialog, show this on the first render.
+        if (test.icon instanceof SR5Item && !test.icon.isHost) test.data.placeOnMainIcon = false;
     },
 
     /**
@@ -114,7 +118,7 @@ export const MarkPlacementFlow = {
      * 
      * @param test 
      */
-    populateDocuments(test: BruteForceTest|HackOnTheFlyTest) {
+    populateDocuments(test: MarkPlacementTests) {
         // Handle icons around targeting.
         MarkPlacementFlow._prepareIcon(test);
         MarkPlacementFlow._prepareTokenTargetIcon(test);
@@ -148,7 +152,7 @@ export const MarkPlacementFlow = {
      * Prepare Icon and Persona for this test based on data.
      * 
      */
-    _prepareIcon(test: BruteForceTest|HackOnTheFlyTest) {
+    _prepareIcon(test: MarkPlacementTests) {
         // When given an icon uuid, load it.
         if (!test.data.iconUuid) return;
         test.icon = fromUuidSync(test.data.iconUuid) as Shadowrun.NetworkDevice;
@@ -158,14 +162,20 @@ export const MarkPlacementFlow = {
         if (test.icon instanceof SR5Item && test.icon.isHost) test.host = test.icon;
 
         // When given a persona uuid, load it.
-        if (!test.data.personaUuid) return;
-        test.persona = fromUuidSync(test.data.personaUuid) as SR5Actor;
+        if (test.data.personaUuid) test.persona = fromUuidSync(test.data.personaUuid) as SR5Actor;
+
+        // If a device icon is targeted, it will not have a persona or host.
+        // TODO: Maybe we should show the persona for visibility and to make it the same as when targeting the persona first and selecting the device
+        if (test.icon instanceof SR5Item && !test.persona && !test.host) {
+            test.data.personaUuid = test.icon.persona?.uuid;
+            test.devices = [test.icon];
+        }
     },
 
     /**
      * Prepare a icon based on token targeting.
      */
-    _prepareTokenTargetIcon(test: BruteForceTest|HackOnTheFlyTest) {
+    _prepareTokenTargetIcon(test: MarkPlacementTests) {
         // If a persona has been loaded via uuid already, don't determine it anymore via token targeting.
         if (test.persona || !test.hasTargets) return;
         if (test.targets.length !== 1) {
@@ -189,7 +199,7 @@ export const MarkPlacementFlow = {
     /**
      * Retrieve all devices connected with the persona actor.
      */
-    _prepareActorDevices(test: BruteForceTest|HackOnTheFlyTest) {
+    _prepareActorDevices(test: MarkPlacementTests) {
         test.devices = [];
         if (!test.persona) return;
         if (!test.persona.isCharacter || !test.persona.isCritter || !test.persona.isVehicle) return;
@@ -201,7 +211,7 @@ export const MarkPlacementFlow = {
     /**
      * Retrieve all devices connected to the host.
      */
-    _prepareHostDevices(test: BruteForceTest|HackOnTheFlyTest) {
+    _prepareHostDevices(test: MarkPlacementTests) {
         if (!(test.icon instanceof SR5Item)) return;
         const host = test.icon.asHost;
         if (!host) return;
@@ -213,7 +223,7 @@ export const MarkPlacementFlow = {
     /**
      * Retrieve all started IC connected to the host.
      */
-    _prepareHostIC(test: BruteForceTest|HackOnTheFlyTest) {
+    _prepareHostIC(test: MarkPlacementTests) {
         if (test.icon instanceof SR5Actor) return;
         const host = test.icon.asHost;
         if (!host) return;
@@ -227,7 +237,7 @@ export const MarkPlacementFlow = {
      * 
      * @param test The initial test to validate.
      */
-    validateBaseValues(test: BruteForceTest|HackOnTheFlyTest) {
+    validateBaseValues(test: MarkPlacementTests) {
         test.data.marks = MatrixRules.getValidMarksPlacementCount(test.data.marks);
     },
 
@@ -269,8 +279,24 @@ export const MarkPlacementFlow = {
      * 
      * @param test 
      */
-    async setIconUuidBasedOnPlacementSelection(test: BruteForceTest|HackOnTheFlyTest) {
+    async setIconUuidBasedOnPlacementSelection(test: MarkPlacementTests) {
         if (!test.data.placeOnMainIcon) return;
         test.data.iconUuid = test.persona?.uuid ?? test.host?.uuid ?? undefined;
+    },
+
+    
+    /**
+     * Provide easy way to set a target for mark placement tests.
+     *
+     * @param document 
+     */
+    async addTarget(test: MarkPlacementTests, document: SR5Actor | SR5Item) {
+        if (test.targets.length > 1) {
+            console.error(`Shadowrun 5e | ${this.constructor.name} only supports a single target`);
+            return;
+        }
+
+        test.data.iconUuid = document.uuid;
+        await test.populateDocuments();
     }
 }
