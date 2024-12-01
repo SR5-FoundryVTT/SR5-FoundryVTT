@@ -10,7 +10,7 @@ export class SpellParserBase extends ItemParserBase<SpellItemData> {
         item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
         item.system.category = ImportHelper.StringValue(jsonData, 'category').toLowerCase() as SpellCateogry;
 
-        let damage = ImportHelper.StringValue(jsonData, 'damage');
+        const damage = ImportHelper.StringValue(jsonData, 'damage');
         if (damage === 'P') {
             item.system.action.damage.type.base = 'physical';
             item.system.action.damage.type.value = 'physical';
@@ -19,7 +19,7 @@ export class SpellParserBase extends ItemParserBase<SpellItemData> {
             item.system.action.damage.type.value = 'stun';
         }
 
-        let duration = ImportHelper.StringValue(jsonData, 'duration');
+        const duration = ImportHelper.StringValue(jsonData, 'duration');
         if (duration === 'I') {
             item.system.duration = 'instant';
         } else if (duration === 'S') {
@@ -28,12 +28,12 @@ export class SpellParserBase extends ItemParserBase<SpellItemData> {
             item.system.duration = 'permanent';
         }
 
-        let drain = ImportHelper.StringValue(jsonData, 'dv');
+        const drain = ImportHelper.StringValue(jsonData, 'dv');
         if (drain.includes('+') || drain.includes('-')) {
             item.system.drain = parseInt(drain.substring(1, drain.length));
         }
 
-        let range = ImportHelper.StringValue(jsonData, 'range');
+        const range = ImportHelper.StringValue(jsonData, 'range');
         if (range === 'T') {
             item.system.range = 'touch';
         } else if (range === 'LOS') {
@@ -42,7 +42,7 @@ export class SpellParserBase extends ItemParserBase<SpellItemData> {
             item.system.range = 'los_a';
         }
 
-        let type = ImportHelper.StringValue(jsonData, 'type');
+        const type = ImportHelper.StringValue(jsonData, 'type');
         if (type === 'P') {
             item.system.type = 'physical';
         } else if (type === 'M') {

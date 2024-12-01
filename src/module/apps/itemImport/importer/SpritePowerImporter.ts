@@ -32,7 +32,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
             return;
         }
 
-        let powerI18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const powerI18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(powerI18n);
         this.itemTranslations = ImportHelper.ExtractItemTranslation(powerI18n, 'powers', 'power');
     }
@@ -63,7 +63,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
             }
 
             // Create the item
-            let item = parser.Parse(chummerSpritePower, this.GetDefaultData({type: parserType}), this.itemTranslations);
+            const item = parser.Parse(chummerSpritePower, this.GetDefaultData({type: parserType}), this.itemTranslations);
             // @ts-expect-error TODO: foundry-vtt-type v10
             item.folder = folder.id;
 

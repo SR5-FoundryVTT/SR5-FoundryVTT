@@ -101,11 +101,7 @@
       "dice_pool_mod": []
     },
     "result": {
-      "success": {
-        "matrix": {
-          "placeMarks": false
-        }
-      }
+      "success": {}
     },
     "importFlags": {
       "name": "",

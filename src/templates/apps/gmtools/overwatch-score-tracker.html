@@ -18,22 +18,22 @@
                     </div>
                 </div>
             </div>
-            {{#each actors as |actor index|}}
-            <div class="list-item" data-actor-id="{{actor._id}}">
+            {{#each scores}}
+            <div class="list-item" data-actor-id="{{this.actor._id}}">
                 <div class="list-item-content">
                     <div class="item-left">
-                        {{#if actor.img}}
+                        {{#if this.actor.img}}
                             <div class="item-img">
                                 <img
-                                    src="{{actor.img}}"
-                                    data-tooltip="{{actor.name}}"
+                                    src="{{this.actor.img}}"
+                                    data-tooltip="{{this.actor.name}}"
                                     height="24px"
                                     width="24px"
                                 />
                             </div>
                         {{/if}}
                         <div class="item-text item-name">
-                            {{actor.name}}
+                            {{this.actor.name}}
                         </div>
                     </div>
                     <div class="item-right">
@@ -42,7 +42,7 @@
                                 class="display overwatch-score-input"
                                 size="3"
                                 type="text"
-                                value="{{actor.flags.shadowrun5e.overwatchScore}}"
+                                value="{{this.score}}"
                                 data-dtype="Number"
                                 placeholder="0"
                             />

@@ -50,9 +50,9 @@
     <input type="checkbox" class="checkbox" name="system.isOffRoad" {{checked system.isOffRoad}} />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Labels.Sheet.PAN") }}
-    {{#if vehicle.networkController}}
+    {{#if vehicle.hasMaster}}
     <span>
-        <a class="origin-link" draggable="false" data-origin-link="{{vehicle.networkController.uuid}}">{{vehicle.networkController.name}}</a>
+        <a class="origin-link" draggable="false" data-origin-link="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
         <a class="close controller-remove"><i class="fas fa-times"></i></a>
     </span>
     {{/if}}

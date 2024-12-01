@@ -1,8 +1,6 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import {SR5Item} from "../item/SR5Item";
 
-export type SystemMigrationDocuments = SR5Actor|SR5Item|Scene;
-
 // This interface is used as data container between migration methods and the actual document update.
 export interface UpdateData {
     data?: any
@@ -69,39 +67,39 @@ export abstract class VersionMigration {
 
         // Map of entities to update, store until later to reduce chance of partial updates
         // which may result in impossible game states.
-        const entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate> = new Map();
+        const entityUpdates = new Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>();
 
         // Migrate World Items
         await this.PreMigrateItemData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
         await this.IterateItems(game, entityUpdates);
         await this.PostMigrateItemData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
 
         // Migrate World Actors
         await this.PreMigrateActorData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
         await this.IterateActors(game, entityUpdates);
         await this.PostMigrateActorData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
 
         // Migrate Actor Tokens
         await this.PreMigrateSceneData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
         await this.IterateScenes(game, entityUpdates);
         await this.PostMigrateSceneData(game, entityUpdates);
         if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
+            return await Promise.reject(this.m_AbortReason);
         }
 
         // Apply the updates, this should *always* work, now that parsing is complete.
@@ -115,7 +113,7 @@ export abstract class VersionMigration {
      * Applies the specified mapping of entities, iteratively updating each.
      * @param documentUpdates A mapping of document updateData pairs.
      */
-    protected async Apply(documentUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+    protected async Apply(documentUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of documentUpdates) {
             
             // v9 -> v10 workaround, should be removed when safe.
@@ -137,7 +135,7 @@ export abstract class VersionMigration {
      * @param game
      * @param entityUpdates
      */
-    protected async IterateScenes(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+    protected async IterateScenes(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>) {
         // @ts-expect-error // ignore null state
         for (const scene of game.scenes.contents) {
             try {
@@ -149,7 +147,7 @@ export abstract class VersionMigration {
                 console.log(`Migrating Scene entity ${scene.name}`);
                 const updateData = await this.MigrateSceneData(scene);
 
-                expandObject(updateData);
+                foundry.utils.expandObject(updateData);
                 entityUpdates.set(scene, {
                     updateData,
                     embeddedItems: null,
@@ -166,7 +164,7 @@ export abstract class VersionMigration {
 
                     const updateData = await this.MigrateActorData(token.actor);
 
-                    expandObject(updateData);
+                    foundry.utils.expandObject(updateData);
                     entityUpdates.set(token.actor, {
                         updateData: updateData.data || null,
                         embeddedItems: updateData.items || null,
@@ -179,7 +177,7 @@ export abstract class VersionMigration {
                     continue;
                 }
 
-                expandObject(updateData);
+                foundry.utils.expandObject(updateData);
                 entityUpdates.set(scene, {
                     updateData,
                     embeddedItems: null,
@@ -187,7 +185,7 @@ export abstract class VersionMigration {
                 });
             } catch (error) {
                 console.error(error);
-                return Promise.reject(error);
+                return await Promise.reject(error);
             }
         }
     }
@@ -196,7 +194,7 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async IterateItems(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+    protected async IterateItems(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>) {
         // @ts-expect-error // ignore null state
         for (const item of game.items.contents) {
             try {
@@ -212,7 +210,7 @@ export abstract class VersionMigration {
                     continue;
                 }
 
-                expandObject(updateData);
+                foundry.utils.expandObject(updateData);
                 entityUpdates.set(item, {
                     updateData,
                     embeddedItems: null,
@@ -220,7 +218,7 @@ export abstract class VersionMigration {
                 });
             } catch (error) {
                 console.error(error);
-                return Promise.reject(error);
+                return await Promise.reject(error);
             }
         }
     }
@@ -229,7 +227,7 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async IterateActors(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+    protected async IterateActors(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>) {
         // @ts-expect-error // ignore null state
         for (const actor of game.actors.contents) {
             try {
@@ -247,7 +245,7 @@ export abstract class VersionMigration {
                     delete updateData.items;
                 }
 
-                expandObject(updateData);
+                foundry.utils.expandObject(updateData);
 
                 entityUpdates.set(actor, {
                     updateData,
@@ -256,7 +254,7 @@ export abstract class VersionMigration {
                 });
             } catch (error) {
                 console.error(error);
-                return Promise.reject(error);
+                return await Promise.reject(error);
             }
         }
     }
@@ -313,13 +311,13 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PreMigrateSceneData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PreMigrateSceneData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PostMigrateSceneData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PostMigrateSceneData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
 
     /**
      * Check if an item requires updates.
@@ -342,13 +340,13 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PreMigrateItemData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PreMigrateItemData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PostMigrateItemData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PostMigrateItemData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
 
     /**
      * Check if an actor requires updates.
@@ -371,13 +369,13 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PreMigrateActorData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PreMigrateActorData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
     /**
      * Do something right after actor data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PostMigrateActorData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PostMigrateActorData(game: Game, entityUpdates: Map<Shadowrun.SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
 
     /**
      * Migrate a compendium pack
@@ -391,7 +389,7 @@ export abstract class VersionMigration {
         const documents = await pack.getDocuments();
 
         // Iterate over compendium entries - applying fine-tuned migration functions
-        for (let document of documents) {
+        for (const document of documents) {
             try {
                 let updateData: any = null;
                 if (pack.metadata.type === 'Item') {
@@ -404,13 +402,12 @@ export abstract class VersionMigration {
                     }
 
                     if (updateData.data) {
-                        expandObject(updateData.data);
+                        foundry.utils.expandObject(updateData.data);
                         document.update({system: updateData.data});
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
-                    //@ts-expect-error
-                    updateData = await this.MigrateActorData(document);
+                    updateData = await this.MigrateActorData(document as unknown as SR5Actor);
 
                     //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
@@ -426,7 +423,7 @@ export abstract class VersionMigration {
                     }
 
                     if (updateData.data) {
-                        expandObject(updateData.data);
+                        foundry.utils.expandObject(updateData.data);
                         await document.update({system: updateData.data});
                     }
 
@@ -439,7 +436,7 @@ export abstract class VersionMigration {
                     }
 
                     if (updateData.data) {
-                        expandObject(updateData.data);
+                        foundry.utils.expandObject(updateData.data);
                         await document.update(updateData.data);
                     }
                 }

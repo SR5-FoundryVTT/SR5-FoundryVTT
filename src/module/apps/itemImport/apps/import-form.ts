@@ -22,7 +22,6 @@ export class Import extends Application {
     private parsedFiles: string[] = [];
     private disableImportButton: boolean = true;
     private currentParsedFile: string;
-    private icons: boolean;
 
     constructor() {
         super();
@@ -96,7 +95,7 @@ export class Import extends Application {
     ];
 
     async parseXML(xmlSource, fileName, setIcons) {
-        let jsonSource = await DataImporter.xml2json(xmlSource);
+        const jsonSource = await DataImporter.xml2json(xmlSource);
         ImportHelper.SetMode(ImportMode.XML);
 
         for (const di of Import.Importers) {
@@ -111,7 +110,7 @@ export class Import extends Application {
         if (!xmlSource) {
             return;
         }
-        let jsonSource = await DataImporter.xml2json(xmlSource);
+        const jsonSource = await DataImporter.xml2json(xmlSource);
 
         if (DataImporter.CanParseI18n(jsonSource)) {
             DataImporter.ParseTranslation(jsonSource);

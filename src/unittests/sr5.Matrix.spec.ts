@@ -2,7 +2,7 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import {MatrixRules} from "../module/rules/MatrixRules";
 
 export const shadowrunMatrix = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const {describe, it, assert} = context;
 
     describe('Matrix Rules', () => {
         it('calculate IC device rating', () => {

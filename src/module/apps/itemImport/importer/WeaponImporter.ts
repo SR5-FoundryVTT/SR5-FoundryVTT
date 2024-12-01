@@ -30,7 +30,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
             return;
         }
 
-        let jsonWeaponi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonWeaponi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonWeaponi18n);
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponi18n, 'weapons', 'weapon');
     }
@@ -41,19 +41,19 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
         folders['gear'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Gear`, true);
         folders['quality'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Quality`, true);
 
-        const parser = new ParserMap<WeaponItemData>(WeaponParserBase.GetWeaponType, [
+        const parser = new ParserMap<WeaponItemData>(WeaponParserBase.GetWeaponType.bind(WeaponParserBase), [
             { key: 'range', value: new RangedParser() },
             { key: 'melee', value: new MeleeParser() },
             { key: 'thrown', value: new ThrownParser() },
         ]);
 
-        let items: WeaponItemData[] = [];
-        let jsonDatas = jsonObject['weapons']['weapon'];
+        const items: WeaponItemData[] = [];
+        const jsonDatas = jsonObject['weapons']['weapon'];
         this.iconList = await this.getIconFiles();
         const parserType = 'weapon';
 
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
@@ -61,7 +61,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
+            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
             // @ts-expect-error // TODO: Foundry Where is my foundry base data?
             item.folder = folders[item.system.subcategory].id;
 
@@ -73,11 +73,11 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
             }
             // exception for thrown weapons and explosives
             const weaponCategory = this.formatAsSlug(item.system.subcategory);
-            if (!(subType && ( weaponCategory == 'gear'))) {
+            if (!(subType && ( weaponCategory === 'gear'))) {
                 subType = weaponCategory;
             }
             // deal with explosives and their weird formatting
-            if (weaponCategory == 'gear' && item.name.includes(':')) {
+            if (weaponCategory === 'gear' && item.name.includes(':')) {
                 subType = this.formatAsSlug(item.name.split(':')[0]);
             }
 

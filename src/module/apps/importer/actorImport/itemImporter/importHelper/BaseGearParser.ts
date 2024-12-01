@@ -10,7 +10,7 @@ export interface GearParser {
      * Parses a gear entry and returns the corresponding foundry sr item data.
      * @param chummerGear A chummer gear entry
      */
-    parse(chummerGear : any) : any
+    parse: (chummerGear : any) => any
 }
 
 /**

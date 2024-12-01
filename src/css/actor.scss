@@ -204,6 +204,13 @@
         width: 100%;
         overflow: auto;
     }
+
+    // Intended to be used in the matrix tab and hacking subtab for all columns.
+    .scroll-area-matrix-hacking {
+        // I hate this. It's necessary to make the scrollbar work together with .scroll-area
+        // Otherweise the height will grow out of the application bounds hide the overflow...
+        height: 390px;
+    }
 }
 
 .sr5 #filter-skills.display.text.left {

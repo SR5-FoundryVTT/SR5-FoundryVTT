@@ -13,7 +13,7 @@
     },
     "action": {
       "type": "complex",
-      "test": "SuccessTest",
+      "test": "BruteForceTest",
       "categories": ["matrix", "brute_force"],
       "attribute": "logic",
       "attribute2": "logic",
@@ -61,7 +61,7 @@
       },
       "opposed": {
         "type": "custom",
-        "test": "OpposedTest",
+        "test": "OpposedBruteForceTest",
         "attribute": "firewall",
         "attribute2": "willpower",
         "skill": "",
@@ -69,7 +69,7 @@
         "mod": 0,
         "description": "",
         "resist": {
-          "test": "",
+          "test": "MatrixResistTest",
           "skill": "",
           "attribute": "",
           "attribute2": "",
@@ -94,11 +94,7 @@
       "dice_pool_mod": []
     },
     "result": {
-      "success": {
-        "matrix": {
-          "placeMarks": false
-        }
-      }
+      "success": {}
     }
   },
   "ownership": {
