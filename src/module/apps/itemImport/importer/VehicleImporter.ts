@@ -16,7 +16,7 @@ export class VehicleImporter extends DataImporter<Shadowrun.VehicleActorData, Sh
             return;
         }
 
-        let jsonVehiclei18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonVehiclei18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonVehiclei18n);
         this.itemTranslations = { ... ImportHelper.ExtractItemTranslation(jsonVehiclei18n, 'vehicles', 'vehicle'),
                                   ... ImportHelper.ExtractItemTranslation(jsonVehiclei18n, 'weapons', 'weapon') };
@@ -51,22 +51,22 @@ export class VehicleImporter extends DataImporter<Shadowrun.VehicleActorData, Sh
     }
 
     async Parse(chummerData: object, setIcons: boolean): Promise<StoredDocument<SR5Actor>[]> {
-        let actors: Shadowrun.VehicleActorData[] = [];
-        let jsonDatas = chummerData['vehicles']['vehicle'];
+        const actors: Shadowrun.VehicleActorData[] = [];
+        const jsonDatas = chummerData['vehicles']['vehicle'];
         this.iconList = await this.getIconFiles();
         const parserType = 'vehicle';
         const parser = new VehicleParser();
         const folders = await this.createFolders(chummerData, this.categoryTranslations);
         
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            let actor = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Actor"}), this.itemTranslations);
+            const actor = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Actor"}), this.itemTranslations);
             const category = ImportHelper.StringValue(jsonData, 'category').replace(/^drones:\s*/i, '').toLowerCase();
             
             //@ts-expect-error TODO: Foundry Where is my foundry base data?

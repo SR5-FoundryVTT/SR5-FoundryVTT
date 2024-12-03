@@ -1302,7 +1302,7 @@
             "electromagnetic": "전자기품",
             "enhancement": "Enhancement",
             "exotic": "Exotic",
-            "powertrain": "동력 전달부",
+            "power_train": "동력 전달부",
             "protection": "보호",
             "weapons": "무기"
         },

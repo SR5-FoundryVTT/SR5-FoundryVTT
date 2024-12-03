@@ -190,7 +190,7 @@ export class ImportHelper {
      * @param typeKey The item type to translate. Tends to be plural.
      * @param listKey The item to translate. Tends to be singular.
      */
-    public static ExtractItemTranslation(jsonItemsi18n, typeKey, listKey) : {} {
+    public static ExtractItemTranslation(jsonItemsi18n, typeKey, listKey) {
         const itemTranslation = {};
         if (jsonItemsi18n && jsonItemsi18n[typeKey] && jsonItemsi18n[typeKey][listKey] && jsonItemsi18n[typeKey][listKey].length > 0) {
             jsonItemsi18n[typeKey][listKey].forEach((item) => {

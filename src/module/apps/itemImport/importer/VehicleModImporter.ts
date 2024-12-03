@@ -18,21 +18,21 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
             return;
         }
 
-        let jsonWeaponsi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonWeaponsi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         // Parts of weapon accessory translations are within the application translation. Currently only data translation is used.
         this.accessoryTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponsi18n, 'mods', 'mod');
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const parser = new VehicleModParserBase();
-        let datas: Shadowrun.ModificationItemData[] = [];
-        let jsonDatas = jsonObject['mods']['mod'];
+        const datas: Shadowrun.ModificationItemData[] = [];
+        const jsonDatas = jsonObject['mods']['mod'];
         this.iconList = await this.getIconFiles();
         const parserType = 'modification';
         const enhancement  = ["Acceleration", "Armor", "Handling", "Sensor", "Speed"];
 
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
@@ -40,7 +40,7 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}));
+            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}));
 
             const categoryName = ImportHelper.StringValue(jsonData, 'category');
 
@@ -50,7 +50,7 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
                                categoryName === "Model-Specific"  ? "Exotic" :
                                enhancement.includes(categoryName) ? "Other"  : categoryName;
 
-            let folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Vehicle-Mods/${folderName}`, true);
+            const folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Vehicle-Mods/${folderName}`, true);
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 

@@ -793,7 +793,7 @@
             "electromagnetic": "Electromagnetic",
             "enhancement": "Enhancement",
             "exotic": "Exotic",
-            "powertrain": "Power Train",
+            "power_train": "Power Train",
             "protection": "Protection",
             "weapons": "Weapons"
         },

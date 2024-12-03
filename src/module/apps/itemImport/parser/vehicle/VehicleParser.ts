@@ -25,7 +25,7 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
     }
 
     private createMod(item : any, jsonTranslation?: object | undefined) : any {
-        let itemJson = DataDefaults.baseEntityData<Shadowrun.ModificationItemData, Shadowrun.ModificationData>(
+        const itemJson = DataDefaults.baseEntityData<Shadowrun.ModificationItemData, Shadowrun.ModificationData>(
             "Item", { type: "modification" }
         );
 
@@ -42,10 +42,14 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
     private getMods(jsonData: object, jsonTranslation?: object | undefined) : any {
         const modsData = (ImportHelper.ObjectValue(jsonData, 'mods') as { name: any[] })?.name;
 
-        const modArray = getArray(modsData).map((item: { _TEXT: any; name: { _TEXT: any; }; }) => {
-            const itemName = item._TEXT ?? item.name?._TEXT;
+        const modArray = getArray(modsData).map((item: { _TEXT: any; name: { _TEXT: any; }; $: { select: string } }) => {
+            let itemName = item._TEXT ?? item.name?._TEXT;
+
+            if (itemName === "Special Equipment" && item?.$?.select)
+                itemName = item.$.select;
+
             const translatedName = ImportHelper.MapNameToTranslation(jsonTranslation, itemName);
-            const foundItem = game.items?.getName(translatedName);
+            const foundItem = ImportHelper.findItem(translatedName);
 
             if (foundItem)
                 return foundItem.toObject();
@@ -72,7 +76,7 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
         const weaponArray = getArray(weaponsData).map((item: { _TEXT: any; name: { _TEXT: any; }; }) => {
             const itemName = item._TEXT ?? item.name?._TEXT;
             const translatedName = ImportHelper.MapNameToTranslation(jsonTranslation, itemName);
-            const foundItem = game.items?.getName(translatedName);
+            const foundItem = ImportHelper.findItem(translatedName);
 
             if (!foundItem) {
                 console.log(`Vehicle Weapon ${itemName} not found on vehicle ${ImportHelper.StringValue(jsonData, 'name')}.`);
@@ -111,8 +115,8 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
         const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
         actor.system.vehicleType = /drone|hovercraft/.test(category) ? "exotic"    :
                                    /boats|submarines/.test(category) ? "water"     :
-                                   /craft/.test(category)            ? "air"       :
-                                   /vtol/.test(category)             ? "aerospace" : "ground";
+                                   category.includes('craft')        ? "air"       :
+                                   category.includes('vtol')         ? "aerospace" : "ground";
 
         //@ts-expect-error
         actor.items = [
