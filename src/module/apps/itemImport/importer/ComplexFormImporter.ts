@@ -17,7 +17,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
 
     public override GetDefaultData({ type }: { type: any; }): Shadowrun.ComplexFormItemData {
         const systemData = {action: {type: 'complex', attribute: 'resonance', skill: 'compiling'}} as Shadowrun.ComplexFormData;
-        return DataDefaults.baseItemData<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData>({type}, systemData);
+        return DataDefaults.baseEntityData<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData>("Item", {type}, systemData);
     }
 
     ExtractTranslation() {
@@ -32,7 +32,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const parser = new ComplexFormParserBase();
-        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
+        const folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
         let items: Shadowrun.ComplexFormItemData[] = [];
         let jsonDatas = jsonObject['complexforms']['complexform'];
         this.iconList = await this.getIconFiles();

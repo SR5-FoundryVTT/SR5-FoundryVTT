@@ -42,6 +42,6 @@ export class BaseGearParser implements GearParser {
     }
 
     private getDefaultData() {
-        return DataDefaults.baseItemData<Shadowrun.EquipmentItemData, Shadowrun.EquipmentData>({type: 'equipment'});
+        return DataDefaults.baseEntityData<Shadowrun.EquipmentItemData, Shadowrun.EquipmentData>("Item", {type: 'equipment'});
     }
 }

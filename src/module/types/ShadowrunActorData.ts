@@ -31,32 +31,44 @@ declare namespace Shadowrun {
 
     // Setup your global ActorData types below here. Try sorting your ActorData types alphabetically.
     export interface CharacterActorData {
+        name: string;
         type: 'character';
+        img: string;
         data: CharacterData; // TODO: foundry-vtt-type v10
         system: CharacterData;
     }
     export interface CritterActorData {
+        name: string;
         type: 'critter';
+        img: string;
         data: CritterData; // TODO: foundry-vtt-type v10
         system: CritterData;
     }
     export interface ICActorData {
+        name: string;
         type: 'ic';
+        img: string;
         data: ICData; // TODO: foundry-vtt-type v10
         system: ICData;
     }
     export interface SpiritActorData {
+        name: string;
         type: 'spirit';
+        img: string;
         data: SpiritData; // TODO: foundry-vtt-type v10
         system: SpiritData;
     }
     export interface SpriteActorData {
+        name: string;
         type: 'sprite';
+        img: string;
         data: SpriteData; // TODO: foundry-vtt-type v10
         system: SpriteData;
     }
     export interface VehicleActorData {
+        name: string;
         type: 'vehicle';
+        img: string;
         data: VehicleData; // TODO: foundry-vtt-type v10
         system: VehicleData;
     }

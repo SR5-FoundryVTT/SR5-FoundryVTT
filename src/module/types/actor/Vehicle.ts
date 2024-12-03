@@ -22,6 +22,7 @@ declare namespace Shadowrun {
         ArmorActorData,
         MatrixActorData,
         MovementActorData,
+        ImportFlags,
         PhysicalTrackActorData {
             values: PhysicalCombatValues
             vehicleType: VehicleTypes

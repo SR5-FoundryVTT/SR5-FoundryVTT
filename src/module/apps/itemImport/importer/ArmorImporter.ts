@@ -23,7 +23,7 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Armor', this.categoryTranslations);
+        const folders = await ImportHelper.MakeCategoryFolders("Item", jsonObject, 'Armor', this.categoryTranslations);
         const parser = new ArmorParserBase();
         let datas: Shadowrun.ArmorItemData[] = [];
         let jsonDatas = jsonObject['armors']['armor'];
@@ -39,7 +39,7 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}));
+            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}));
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             // @ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folders[category].id;

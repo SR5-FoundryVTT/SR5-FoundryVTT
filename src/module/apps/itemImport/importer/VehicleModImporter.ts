@@ -1,16 +1,16 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
-import { ModParserBase } from '../parser/mod/ModParserBase';
+import { VehicleModParserBase } from '../parser/mod/VehicleModParserBase';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
-export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Shadowrun.ModificationData> {
+export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemData, Shadowrun.ModificationData> {
     public override categoryTranslations: any;
     public accessoryTranslations: any;
-    public files = ['weapons.xml'];
+    public files = ['vehicles.xml'];
 
     CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('accessories') && jsonObject['accessories'].hasOwnProperty('accessory');
+        return jsonObject.hasOwnProperty('mods') && jsonObject['mods'].hasOwnProperty('mod');
     }
 
     ExtractTranslation() {
@@ -18,20 +18,21 @@ export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Sh
             return;
         }
 
-        let jsonWeaponsi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonWeaponsi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         // Parts of weapon accessory translations are within the application translation. Currently only data translation is used.
-        this.accessoryTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponsi18n, 'accessories', 'accessory');
+        this.accessoryTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponsi18n, 'mods', 'mod');
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        const parser = new ModParserBase();
-        let datas: Shadowrun.ModificationItemData[] = [];
-        let jsonDatas = jsonObject['accessories']['accessory'];
+        const parser = new VehicleModParserBase();
+        const datas: Shadowrun.ModificationItemData[] = [];
+        const jsonDatas = jsonObject['mods']['mod'];
         this.iconList = await this.getIconFiles();
         const parserType = 'modification';
+        const enhancement  = ["Acceleration", "Armor", "Handling", "Sensor", "Speed"];
 
         for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+            const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
@@ -39,15 +40,17 @@ export class ModImporter extends DataImporter<Shadowrun.ModificationItemData, Sh
             }
 
             // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}));
+            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}));
+
+            const categoryName = ImportHelper.StringValue(jsonData, 'category');
 
             // Get the item's folder information
-            let folderName = item.system.mount_point !== undefined ? item.system.mount_point : 'Other';
-            if (folderName.includes('/')) {
-                let splitName = folderName.split('/');
-                folderName = splitName[0];
-            }
-            let folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Mods/${folderName}`, true);
+            const folderName = categoryName === undefined         ? "" :
+                               categoryName === "All"             ? "Exotic" :
+                               categoryName === "Model-Specific"  ? "Exotic" :
+                               enhancement.includes(categoryName) ? "Other"  : categoryName;
+
+            const folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Vehicle-Mods/${folderName}`, true);
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 

@@ -22,7 +22,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
 
     public override GetDefaultData({ type }: { type: any; }): WeaponItemData {
         const systemData = {action: {type: 'varies', attribute: 'agility'}} as WeaponData;
-        return DataDefaults.baseItemData<WeaponItemData, WeaponData>({type}, systemData);
+        return DataDefaults.baseEntityData<WeaponItemData, WeaponData>("Item", {type}, systemData);
     }
 
     ExtractTranslation() {
@@ -36,10 +36,10 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Weapons', this.categoryTranslations);
+        const folders = await ImportHelper.MakeCategoryFolders("Item", jsonObject, 'Weapons', this.categoryTranslations);
 
-        folders['gear'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Gear`, true);
-        folders['quality'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Quality`, true);
+        folders['gear'] = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Gear`, true);
+        folders['quality'] = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Quality`, true);
 
         const parser = new ParserMap<WeaponItemData>(WeaponParserBase.GetWeaponType, [
             { key: 'range', value: new RangedParser() },

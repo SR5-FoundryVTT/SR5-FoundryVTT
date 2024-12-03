@@ -33,7 +33,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             }
 
             // Create the item
-            const item = this.GetDefaultData({type: parserType});
+            const item = this.GetDefaultData({type: parserType, entityType: "Item"});
             item.name = ImportHelper.StringValue(commlink, 'name');
 
             // Get the item's folder information
@@ -80,7 +80,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             }
 
             // Create the item
-            const item = this.GetDefaultData({type: parserType});
+            const item = this.GetDefaultData({type: parserType, entityType: "Item"});
             item.system.category = 'rcc';
             item.name = ImportHelper.StringValue(rcc, 'name');
 
@@ -128,7 +128,7 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             }
 
             // Create the item
-            const item = this.GetDefaultData({type: parserType});
+            const item = this.GetDefaultData({type: parserType, entityType: "Item"});
             item.system.category = 'cyberdeck';
             item.name = ImportHelper.StringValue(cyberdeck, 'name');
 
@@ -188,9 +188,9 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
         const rccs = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Rigger Command Consoles');
 
-        let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
-        let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
-        let rccsFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatRCC')}`, true);
+        let commlinksFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
+        let cyberdecksFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
+        let rccsFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatRCC')}`, true);
 
         entries = entries.concat(await this.ParseCommlinkDevices(commlinks, commlinksFolder, setIcons));
         entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder, setIcons));

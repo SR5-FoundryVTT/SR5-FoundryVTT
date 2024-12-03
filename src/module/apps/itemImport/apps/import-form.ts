@@ -3,7 +3,8 @@ import { WeaponImporter } from '../importer/WeaponImporter';
 import { ArmorImporter } from '../importer/ArmorImporter';
 import { DataImporter } from '../importer/DataImporter';
 import { AmmoImporter } from '../importer/AmmoImporter';
-import { ModImporter } from '../importer/ModImporter';
+import { WeaponModImporter } from '../importer/WeaponModImporter';
+import { VehicleModImporter } from '../importer/VehicleModImporter';
 import { SpellImporter } from '../importer/SpellImporter';
 import { QualityImporter } from '../importer/QualityImporter';
 import { ComplexFormImporter } from '../importer/ComplexFormImporter';
@@ -13,6 +14,7 @@ import { ImportHelper, ImportMode } from '../helper/ImportHelper';
 import { DeviceImporter } from "../importer/DeviceImporter";
 import { EquipmentImporter } from "../importer/EquipmentImporter";
 import { SpritePowerImporter } from '../importer/SpritePowerImporter';
+import { VehicleImporter } from '../importer/VehicleImporter';
 
 
 export class Import extends Application {
@@ -66,7 +68,13 @@ export class Import extends Application {
 
     private collectDataImporterFileSupport() {
         this.supportedDataFiles = [];
-        Import.Importers.forEach(importer => {
+        Import.ItemImporters.forEach(importer => {
+            if (this.supportedDataFiles.some(supported => importer.files.includes(supported))) {
+                return;
+            }
+            this.supportedDataFiles = this.supportedDataFiles.concat(importer.files);
+        });
+        Import.ActorImporters.forEach(importer => {
             if (this.supportedDataFiles.some(supported => importer.files.includes(supported))) {
                 return;
             }
@@ -79,8 +87,8 @@ export class Import extends Application {
     }
 
     //Order is important, ex. some weapons need mods to fully import
-    static Importers: DataImporter<Shadowrun.ShadowrunItemData, Shadowrun.ShadowrunItemDataData>[] = [
-        new ModImporter(),
+    static ItemImporters: DataImporter<Shadowrun.ShadowrunItemData, Shadowrun.ShadowrunItemDataData>[] = [
+        new WeaponModImporter(),
         new WeaponImporter(),
         new ArmorImporter(),
         new AmmoImporter(),
@@ -92,14 +100,27 @@ export class Import extends Application {
         new SpritePowerImporter(),
         new DeviceImporter(),
         new EquipmentImporter(),
-        new ProgramImporter()
+        new ProgramImporter(),
+        new VehicleModImporter()
+    ];
+
+    //Order is important, ex. some weapons need mods to fully import
+    static ActorImporters: DataImporter<Shadowrun.ShadowrunActorData, Shadowrun.ShadowrunActorDataData>[] = [
+        new VehicleImporter()
     ];
 
     async parseXML(xmlSource, fileName, setIcons) {
         let jsonSource = await DataImporter.xml2json(xmlSource);
         ImportHelper.SetMode(ImportMode.XML);
 
-        for (const di of Import.Importers) {
+        for (const di of Import.ItemImporters) {
+            if (di.CanParse(jsonSource)) {
+                di.ExtractTranslation(fileName);
+                await di.Parse(jsonSource, setIcons);
+            }
+        }
+
+        for (const di of Import.ActorImporters) {
             if (di.CanParse(jsonSource)) {
                 di.ExtractTranslation(fileName);
                 await di.Parse(jsonSource, setIcons);
