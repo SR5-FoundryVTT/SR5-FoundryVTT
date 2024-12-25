@@ -1,27 +1,33 @@
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
         name=(localize 'SR5.Hosts')
 }}
-<div>
-    {{#each hosts}}
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-            img=this.img
-            name=this.name
-            itemNameCssClass='Roll show-matrix-placement'
-            hasRoll=true
-            itemId=this.uuid
-    }}
-    {{/each}}
-</div>
+{{#each hosts}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=this.img
+        name=this.name
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.uuid
+}}
+{{/each}}
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
         name=(localize 'SR5.Personas')
 }}
-<div>
-    {{#each targets}}
-    <div><img src="{{speakerImg this.actor}}" height="24px" width="24px"/><span class="Roll show-matrix-placement" data-target-uuid="{{this.actor.uuid}}">{{speakerName this.actor}}</span></div>
-    <ul>
-        {{#each this.matrixItems}}
-        <li><span class="Roll show-matrix-placement" data-target-uuid="{{this.item.uuid}}">{{this.item.name}}</span>{{#ifne this.item.marks 0}}: {{this.item.marks}}{{/ifne}}</li>
-        {{/each}}
-        </ul>
-    {{/each}}
-</div>
+{{#each targets}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=(speakerImg this.actor)
+        name=(speakerName this.actor)
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.actor.uuid
+}}
+    {{!-- {{#each this.matrixItems}}
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=this.item.img
+        name=this.item.name
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.item.uuid
+    }}
+    {{/each}} --}}
+{{/each}}
