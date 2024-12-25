@@ -28,9 +28,11 @@
         <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
         <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
     </nav>
-    <section class="sheetbody">
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}} {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html"}} {{>
-        "systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.html"}} {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html"}} {{>
-        "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.html"}}
+    <section class="sheetbody tabsbody" data-group="primary">
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}} 
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html"}} 
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.html"}} 
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html"}} 
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.html"}}
     </section>
 </form>

@@ -612,6 +612,7 @@
             "NoNetwork": "No Network",
             "Persona": "Persona",
             "PersonalInventory": "On Person",
+            "Personas": "Personas",
             "ResetActorForNewRun": "New Run Reset",
             "Rituals": "Rituals",
             "RollDroneInfiltration": "Drone Infiltration",
@@ -646,7 +647,9 @@
             "MissingNetworkDevices": "Drag&Drop a network device to add it",
             "NetworkDevices": "Networked Devices",
             "PAN": "PAN",
+            "RebootDevice": "Reboot",
             "SubtractOne": "Subtract One",
+            "TargetAcquisition": "Target Acquisition",
             "Type": "Type",
             "WAN": "WAN"
         },
@@ -1245,6 +1248,7 @@
         "Actor": {
             "ConnectNetwork": "Enter this host/grid",
             "Critter": "Allow the use of critter powers",
+            "DisconnectNetwork": "Leave this host/grid",
             "Grunt": "Apply grunt rules to this actor",
             "MarkTarget": "Place additional marks on this target",
             "Metatype": "As NPC the metatype will also apply attribute quick modifiers",

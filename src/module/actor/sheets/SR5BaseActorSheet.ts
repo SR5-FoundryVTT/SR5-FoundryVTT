@@ -159,12 +159,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                     contentSelector: '.tabsbody[data-group="primary"]',
                     initial: 'skills',
                 },
-                {
-                    navSelector: '.tabs[data-group="matrix"]',
-                    contentSelector: '.tabsbody[data-group="matrix"]',
-                    initial: 'actions',
-                }
-            ],
+            ]
         });
     }
 

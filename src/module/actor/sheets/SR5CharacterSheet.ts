@@ -17,6 +17,17 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
 
 
 export class SR5CharacterSheet extends SR5BaseActorSheet {
+    static override get defaultOptions() {
+        const defaultOptions = super.defaultOptions;
+        return foundry.utils.mergeObject(defaultOptions, {
+            tabs: [...defaultOptions.tabs,
+            {
+                navSelector: '.tabs[data-group="matrix"]',
+                contentSelector: '.tabsbody[data-group="matrix"]',
+                initial: 'actions',
+            }]
+        });
+    }
     /**
      * Character actors will handle these item types specifically.
      *
