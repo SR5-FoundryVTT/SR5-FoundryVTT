@@ -1,4 +1,5 @@
 import { SR5Actor } from "../../actor/SR5Actor";
+import { Helpers } from "../../helpers";
 import { SR5Item } from "../../item/SR5Item";
 import { BruteForceTest } from "../../tests/BruteForceTest";
 import { HackOnTheFlyTest } from "../../tests/HackOnTheFlyTest";
@@ -124,13 +125,16 @@ export class MatrixTargetAcquisitionApplication extends Application {
     }
 
 
+    /**
+     * Trigger Mark Placement for selected target document.
+     * 
+     * @param event A event triggered from within a Handble ListItem
+     */
     async handleMatrixPlacement(event) {
         event.preventDefault();
         event.stopPropagation();
 
-        const element = event.currentTarget;
-        const targetUuid = element.dataset.targetUuid;
-
+        const targetUuid = Helpers.listItemId(event);
         if (!targetUuid) return;
 
         const target = await fromUuid(targetUuid);
@@ -139,8 +143,17 @@ export class MatrixTargetAcquisitionApplication extends Application {
             return;
         }
 
-        const test = await TestCreator.fromPackAction('matrix-actions', 'brute_force', this.actor) as MatrixPlacementTests;
+        // Get default mark placement action.
+        const character = this.actor.asCharacter();
+        if (!character) return;
+        const markPlacementAction = character.system.matrix.markPlacementAction;
+        if (!markPlacementAction) return;
+
+        // Get test for that action.
+        const test = await TestCreator.fromPackAction('matrix-actions', markPlacementAction, this.actor) as MatrixPlacementTests;
         if (!test) return;
+
+        // Prepare test for placing a mark on the target.
         test.data.iconUuid = targetUuid;
         await test.execute();
     }

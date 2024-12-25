@@ -1,10 +1,20 @@
-<h2>Hosts</h2>
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Hosts')
+}}
 <div>
     {{#each hosts}}
-    <div><img src="{{this.img}}" height="24px" width="24px"/><span class="Roll show-matrix-placement" data-target-uuid="{{this.uuid}}">{{this.name}}</span></div>
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+            img=this.img
+            name=this.name
+            itemNameCssClass='Roll show-matrix-placement'
+            hasRoll=true
+            itemId=this.uuid
+    }}
     {{/each}}
 </div>
-<h2>Personas</h2>
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Personas')
+}}
 <div>
     {{#each targets}}
     <div><img src="{{speakerImg this.actor}}" height="24px" width="24px"/><span class="Roll show-matrix-placement" data-target-uuid="{{this.actor.uuid}}">{{speakerName this.actor}}</span></div>
