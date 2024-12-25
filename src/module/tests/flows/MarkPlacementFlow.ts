@@ -283,8 +283,10 @@ export const MarkPlacementFlow = {
      * @param test 
      */
     async setIconUuidBasedOnPlacementSelection(test: MarkPlacementTests) {
-        if (!test.data.placeOnMainIcon) return;
-        test.data.iconUuid = test.persona?.uuid ?? test.host?.uuid ?? undefined;
+        // Assure main icon selection is set as the target icon.
+        if (test.data.placeOnMainIcon) test.data.iconUuid = test.persona?.uuid ?? test.host?.uuid ?? undefined;
+        // Document might have changed in between initial preparation and dialog selections.
+        test.icon = fromUuidSync(test.data.iconUuid as string);
     },
 
     

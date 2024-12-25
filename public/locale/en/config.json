@@ -637,6 +637,7 @@
         "Message": {
             "ClickToSelect": "Click to select on scene",
             "OverwatchConvergence": "Overwatch Convergence",
+            "TargetedIcon": "Targeted Icon",
             "TestEffects": "Applied effects"
         },
         "Sheet": {

@@ -543,10 +543,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             return false
         }
 
-        await this._cleanUpAfterDialog();
-
+        
         // Overwrite current test state with whatever the dialog gives.
         this.data = data;
+
+        // Provide entry points with dialog data.
+        await this._cleanUpAfterDialog();
         await this.saveUserSelectionAfterDialog();
 
         // Second base value preparation will show changes due to user input.

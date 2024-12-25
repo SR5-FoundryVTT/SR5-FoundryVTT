@@ -633,6 +633,7 @@
         "Message": {
             "ClickToSelect": "Klicke um in Szene auzuwählen",
             "OverwatchConvergence": "Overwatch Fokussierung",
+            "TargetedIcon": "Anvisiertes Icon",
             "TestEffects": "Effekte angewendet"
         },
         "Sheet": {

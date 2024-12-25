@@ -50,6 +50,10 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.html';
     }
 
+    override get _chatMessageTemplate() {
+        return 'systems/shadowrun5e/dist/templates/chat/matrix-test-message.hbs';
+    }
+
     override prepareBaseValues() {
         MarkPlacementFlow.prepareBaseValues(this);
     }
