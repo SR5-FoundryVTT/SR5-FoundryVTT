@@ -12,7 +12,7 @@ export class OverwatchScoreTracker extends Application {
         options.classes = ['sr5'];
         options.title = game.i18n.localize('SR5.OverwatchScoreTrackerTitle');
         options.template = 'systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.html';
-        options.width = 450;
+        options.width = 550;
         options.height = 'auto';
         options.resizable = true;
         return options;
