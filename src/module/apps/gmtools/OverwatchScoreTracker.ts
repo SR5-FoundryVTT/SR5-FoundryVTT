@@ -1,6 +1,7 @@
 /**
  * A GM-Tool to keep track of all players overwatch scores
  */
+import { SR5Actor } from "../../actor/SR5Actor";
 import {Helpers} from "../../helpers";
 import { OverwatchStorage } from "../../storage/OverwatchStorage";
 
@@ -54,8 +55,8 @@ export class OverwatchScoreTracker extends Application {
 
     // returns the actor that this event is acting on
     _getActorFromEvent(event) {
-        const id = $(event.currentTarget).closest('.list-item').data('actorId');
-        if (id) return game.actors?.get(id);
+        const uuid = $(event.currentTarget).closest('.list-item').data('uuid');
+        return fromUuidSync(uuid) as SR5Actor;
     }
 
     _onAddActor(event) {
