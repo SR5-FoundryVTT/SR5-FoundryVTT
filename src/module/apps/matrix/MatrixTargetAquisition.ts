@@ -90,9 +90,10 @@ export class MatrixTargetAcquisitionApplication extends Application {
         for (const token of canvas.scene?.tokens) {
             // Throw away unneeded tokens.
             if (!token.actor) continue;
-            if (token.actor?.id === this.actor.id) continue;
-            if (!token.actor.isMatrixActor) continue;
-            // TODO: Check for silent actors and for silent but found actors.
+            const target = token.actor;
+            if (target?.id === this.actor.id) continue;
+
+            if (!this.actor.matrixPersonaIsVisible(target)) continue;
 
             // Collect matrix items from each token
             const matrixItems: MatrixItemSheetData[] = [];
