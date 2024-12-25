@@ -2,6 +2,7 @@ import { MatrixTargetAcquisitionApplication } from './../../apps/matrix/MatrixTa
 import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
+import { FormDialog, FormDialogOptions } from '../../apps/dialogs/FormDialog';
 
 
 export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
@@ -150,6 +151,28 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      * @param event Any pointer event
      */
     async _onRebootPersonaDevice(event: Event) {
+        const data = {
+            title: game.i18n.localize("SR5.RebootConfirmationDialog.Title"),
+            buttons: {
+                confirm: {
+                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Confirm')
+                },
+                cancel: {
+                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Cancel')
+                }
+            },
+            content: '',
+            default: 'cancel',
+            templateData: {},
+            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.html'
+        }
+        const options = {
+            classes: ['sr5', 'form-dialog'],
+        } as FormDialogOptions;
+        const dialog = new FormDialog(data, options);
+        await dialog.select();
+        if (dialog.canceled || dialog.selectedButton !== 'confirm') return;
+
         await this.actor.rebootPersona();
     }
 
