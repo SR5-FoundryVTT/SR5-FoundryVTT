@@ -154,6 +154,8 @@ export class MatrixTargetAcquisitionApplication extends Application {
         const test = await TestCreator.fromPackAction('matrix-actions', markPlacementAction, this.actor) as MatrixPlacementTests;
         if (!test) return;
 
+        this.close();
+
         // Prepare test for placing a mark on the target.
         test.data.iconUuid = targetUuid;
         await test.execute();
