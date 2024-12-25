@@ -66,7 +66,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
     override activateListeners(html: JQuery<HTMLElement>): void {
         super.activateListeners(html);
 
-        html.find('.show-matrix-placement').on('click', this.handleMatrixPlacement.bind(this));
+        html.find('.show-matrix-placement').on('click', this.handleMarkPlacement.bind(this));
     }
 
     override async getData(options?: Partial<ApplicationOptions> | undefined): Promise<MatrixTargetAcquisitionSheetData> {
@@ -131,7 +131,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
      * 
      * @param event A event triggered from within a Handble ListItem
      */
-    async handleMatrixPlacement(event) {
+    async handleMarkPlacement(event) {
         event.preventDefault();
         event.stopPropagation();
 
