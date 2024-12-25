@@ -882,6 +882,12 @@
     "SR5.Rating": "Rating",
     "SR5.Reach": "Reach",
     "SR5.Reagent": "Reagents",
+    "SR5.RebootConfirmationDialog": {
+        "Cancel": "Cancel",
+        "Confirm": "Reboot",
+        "Description": "Are you sure you want to reboot this device?",
+        "Title": "Confirm Reboot"
+    },
     "SR5.RecklessSpellButton": "Reckless",
     "SR5.Recoil": "Recoil",
     "SR5.RecoilCompensation": "Recoil Comp.",
