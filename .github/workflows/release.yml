@@ -52,6 +52,7 @@ jobs:
                   body: ${{ github.event.release.body }}
 
             - name: Deploy Release
+              if: github.event.release.prerelease == false
               uses: fjogeleit/http-request-action@v1
               env:
                   MINIMUM: ${{ fromJson(env.MANIFEST_JSON).compatibility.minimum }}
@@ -62,4 +63,4 @@ jobs:
                   method: 'POST'
                   contentType: 'application/json'
                   customHeaders: '{"Authorization": "${{ secrets.FVTT_PACKAGE_RELEASE_TOKEN }}"}'
-                  data: '{"id": "shadowrun5e", "release":{"version":"v${{github.event.release.tag_name}}","manifest":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/latest/download/system.json","notes":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/tag/${{github.event.release.tag_name}}","compatibility":{"minimum":"${{ env.MINIMUM }}","verified":"${{ env.VERIFIED }}","maximum":"${{ env.MAXIMUM }}"}}}'
+                  data: '{"id": "shadowrun5e", "dry-run": true, "release":{"version":"v${{github.event.release.tag_name}}","manifest":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/latest/download/system.json","notes":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/tag/${{github.event.release.tag_name}}","compatibility":{"minimum":"${{ env.MINIMUM }}","verified":"${{ env.VERIFIED }}","maximum":"${{ env.MAXIMUM }}"}}}'
