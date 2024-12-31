@@ -862,7 +862,9 @@
                 "nuyen": 0,
                 "values": {},
                 "description": {
-                    "value": ""
+                    "value": "",
+                    "chat": "",
+                    "source": ""
                 },
                 "wounds": {
                     "value": 0
