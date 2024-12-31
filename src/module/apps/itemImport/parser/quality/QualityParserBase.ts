@@ -9,6 +9,7 @@ export class QualityParserBase extends ItemParserBase<QualityItemData> {
         item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
 
         item.system.type = ImportHelper.StringValue(jsonData, 'category') === 'Positive' ? 'positive' : 'negative';
+        item.system.karma = +ImportHelper.StringValue(jsonData, 'karma') || 0;
 
         if (jsonTranslation) {
             const origName = ImportHelper.StringValue(jsonData, 'name');

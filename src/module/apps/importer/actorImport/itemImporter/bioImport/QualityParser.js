@@ -29,6 +29,7 @@ export class QualityParser {
         const system = {};
         system.type = chummerQuality.qualitytype_english.toLowerCase();
         system.rating = parseInt(chummerQuality.extra) || 0;
+        system.karma = (parseInt(chummerQuality.bp) || 0) * Math.max(system.rating, 1);
         system.description = parseDescription(chummerQuality);
 
         // Assign import flags

@@ -18,6 +18,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
         'Mundane',
         'Paranormal',
         'Paranormal/Infected',
+        'Mundane/Infected',
         'Toxic Critter Powers',
         'Weakness',
         'Chimeric Modification',
