@@ -32,7 +32,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
         chummerPowers['categories']['category'] = chummerPowers['categories']['category'].filter(
             (power) => !["Emergent", "Toxic Critter Powers"].includes(power._TEXT)
         ).concat({ _TEXT: "Other" });
-        const folders = await ImportHelper.MakeCategoryFolders(chummerPowers, game.i18n.localize('TYPES.Item.critter_power'), this.categoryTranslations);
+        const folders = await ImportHelper.MakeCategoryFolders("Item", chummerPowers, game.i18n.localize('TYPES.Item.critter_power'), this.categoryTranslations);
 
         const items: Shadowrun.CritterPowerItemData[] = [];
         const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
