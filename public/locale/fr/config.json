@@ -143,9 +143,9 @@
     "SR5.Create": "Créer {type}",
     "SR5.CritterPower": {
         "Categories": {
-            "Drake": "Dragon",
-            "Echoes": "Echos",
-            "Emergent": "Emergent",
+            "Drake": "Drake",
+            "Echoes": "Échos",
+            "Emergent": "Émergent",
             "FreeSpirit": "Esprit libre",
             "Mundane": "Ordinaire",
             "Paranormal": "Paranormal",
