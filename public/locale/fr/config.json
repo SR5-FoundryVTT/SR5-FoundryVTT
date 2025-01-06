@@ -348,10 +348,10 @@
     },
     "SR5.Karma": "Karma",
     "SR5.KnockedDown": "Projeté au sol",
-    "SR5.KnowledgeSkillAcademic": "Académique",
-    "SR5.KnowledgeSkillInterests": "Hobby",
-    "SR5.KnowledgeSkillProfessional": "Professionnelle",
-    "SR5.KnowledgeSkillStreet": "Rue",
+    "SR5.KnowledgeSkillAcademic": "Connaissances académiques",
+    "SR5.KnowledgeSkillInterests": "Hobbies",
+    "SR5.KnowledgeSkillProfessional": "Connaissances professionnelles",
+    "SR5.KnowledgeSkillStreet": "Connaissances de la rue",
     "SR5.Labels": {
         "ActorSheet": {
             "CritterPowers": "Pouvoirs",
