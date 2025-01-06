@@ -18,11 +18,11 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
     }
 
     GetDefaultCyberwareData(): CyberwareItemData {
-        return this.GetDefaultData({type: 'cyberware'}) as CyberwareItemData;
+        return this.GetDefaultData({type: 'cyberware', entityType: "Item"}) as CyberwareItemData;
     }
 
     GetDefaultBiowareData(): BiowareItemData {
-        return this.GetDefaultData({type: 'bioware'}) as BiowareItemData;
+        return this.GetDefaultData({type: 'bioware', entityType: "Item"}) as BiowareItemData;
 
     }
 
@@ -48,7 +48,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
         const cyberParser = new CyberwareParser();
 
         let key = jsonObject.hasOwnProperty('cyberwares') ? 'Cyberware' : 'Bioware';
-        const folders = await ImportHelper.MakeCategoryFolders(jsonObject, key);
+        const folders = await ImportHelper.MakeCategoryFolders("Item", jsonObject, key);
 
         key = key.toLowerCase();
         const items: WareItemData[] = [];

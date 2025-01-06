@@ -18,6 +18,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
         'Mundane',
         'Paranormal',
         'Paranormal/Infected',
+        'Mundane/Infected',
         'Toxic Critter Powers',
         'Weakness',
         'Chimeric Modification',
@@ -48,7 +49,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
 
     public async Parse(chummerData: object, setIcons: boolean): Promise<Item> {
         const parser = new SpritePowerParser();
-        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('TYPES.Item.sprite_power')}`, true);
+        const folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('TYPES.Item.sprite_power')}`, true);
 
         const items: Shadowrun.SpritePowerItemData[] = [];
         const chummerSpritePowers = this.filterObjects(chummerData['powers']['power']);
@@ -63,7 +64,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
             }
 
             // Create the item
-            const item = parser.Parse(chummerSpritePower, this.GetDefaultData({type: parserType}), this.itemTranslations);
+            const item = parser.Parse(chummerSpritePower, this.GetDefaultData({type: parserType, entityType: "Item"}), this.itemTranslations);
             // @ts-expect-error TODO: foundry-vtt-type v10
             item.folder = folder.id;
 

@@ -30,17 +30,24 @@ export class DataDefaults {
      * @param systemData Whatever partial item system data you want to inject into general model system data.
      * @returns A minimum viable item data structure to use with Item#create
      */
-    static baseItemData<ItemData, ItemSystemData>(itemData: MinimalItemData, systemData: Partial<ItemSystemData>={}) {
+    static baseEntityData<EntityData, EntitySystemData>(
+        entityType: keyof Game["model"],
+        itemData: MinimalItemData,
+        systemData: Partial<EntitySystemData>={}
+    ) {
         const name = itemData.name ?? 'Unnamed';
         const type = itemData.type;
 
-        // foundry.utils.duplicate source to avoid keeping reference to model data.
-        const modelSystemData = foundry.utils.duplicate(game.model.Item[type]);
-        if (!modelSystemData) throw new Error(`FoundryVTT doesn't have item type: ${type} registered`);
-        return {
-            name, type,
-            system: foundry.utils.mergeObject(modelSystemData, systemData)
-        } as ItemData;
+        try {
+            // foundry.utils.duplicate source to avoid keeping reference to model data.
+            const modelSystemData = foundry.utils.duplicate(game.model[entityType][type]);
+            return {
+                name, type,
+                system: foundry.utils.mergeObject(modelSystemData, systemData)
+            } as EntityData;
+        } catch (error) {
+            throw new Error(`FoundryVTT doesn't have item type: ${type} registered in ${entityType}`);
+        }
     }
     /**
      * Damage data to hold everything around damaging actors.

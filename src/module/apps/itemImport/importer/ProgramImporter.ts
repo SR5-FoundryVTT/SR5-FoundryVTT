@@ -42,7 +42,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
             if (DataImporter.unsupportedEntry(program)) continue;
 
             // Create the item
-            const item = this.GetDefaultData({type: parserType});
+            const item = this.GetDefaultData({type: parserType, entityType: "Item"});
             item.name = ImportHelper.StringValue(program, 'name');
             item.system.type = Constants.MAP_CHUMMER_PROGRAMM_CATEGORY[ImportHelper.StringValue(program, 'category')]
 
@@ -51,7 +51,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
 
             // Get the item's folder information
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
-            const categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Programs')}/${category}`, true);
+            const categoryFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Programs')}/${category}`, true);
             //@ts-expect-error TODO: foundry-vtt-types v10
             item.folder = categoryFolder.id;
 

@@ -97,6 +97,7 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(HooksManager));
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory.bind(HooksManager));
+        Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(HooksManager));
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
@@ -440,6 +441,18 @@ ___________________
      */
     static renderChatMessage() {
         console.debug('Shadowrun5e | Registering new chat messages related hooks');
+    }
+
+    static renderActorDirectory(app: Application, html: JQuery) {
+        if(!game.user?.isGM){
+            return 
+        }
+        
+        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
+        html.find('footer').before(button);
+        button.on('click', (event) => {
+            new Import().render(true);
+        });
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {

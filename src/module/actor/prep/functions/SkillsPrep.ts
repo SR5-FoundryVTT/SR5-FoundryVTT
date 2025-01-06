@@ -9,14 +9,22 @@ export class SkillsPrep {
      * 
      * template.json is incomplete, so we need to fill in the missing fields.
      * This is mostly a legacy design and should be fixed in the future when DataModel's are used.
+     * 
+     * NOTE: Foundry also calls the prepareData multiple times with incomplete source data, causing some value properties to be missing.
      * @param system 
      */
     static prepareSkillData(system: ActorTypesData) {
         const { language, active, knowledge } = system.skills;
-        Object.values(language.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+
+        // Active skills aren't grouped and can be prepared skill by skill.
         Object.values(active).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+
+        // Language skills aren't group, but might lack the value property.
+        if (language.value) Object.values(language.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+
+        // Knowledge skills are groupd and might also lack the value property.
         Object.values(knowledge).forEach((group) => {
-            Object.values(group.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+            if (group.value) Object.values(group.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
         });
     }
 
@@ -49,7 +57,6 @@ export class SkillsPrep {
                 }
             }
             skill.value = Helpers.calcTotal(skill);
-
         };
 
         // setup active skills

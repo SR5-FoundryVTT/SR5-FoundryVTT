@@ -45,7 +45,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             // They should probably be removed from one category or the other
 
             // Create the item
-            const item = this.GetDefaultData({type: parserType});
+            const item = this.GetDefaultData({type: parserType, entityType: "Item"});
             item.name = ImportHelper.StringValue(equipment, 'name');
 
             // Get the equipment category
@@ -54,8 +54,8 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             // Get the item's folder information
             // Replace / as it's used as a separator in GetFolderAtPath.
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
-            const categoryFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
-            // @ts-expect-error // TODO: foundry-vtt-types v10
+            const categoryFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
+            // @ts-expect-error TODO: foundry-vtt-types v10
             item.folder = categoryFolder.id;
 
             // Import Flags

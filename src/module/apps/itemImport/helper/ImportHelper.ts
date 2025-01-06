@@ -3,6 +3,7 @@ import { XMLStrategy } from './XMLStrategy';
 import { JSONStrategy } from './JSONStrategy';
 import { ImportStrategy } from './ImportStrategy';
 import {SR5Item} from "../../../item/SR5Item";
+import FolderTypes = foundry.CONST.FOLDER_DOCUMENT_TYPES;
 
 export enum ImportMode {
     XML = 1,
@@ -42,9 +43,9 @@ export class ImportHelper {
      * @param folder The parent folder.
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
-    public static async NewFolder(name: string, folder: Folder | null = null) {
+    public static async NewFolder(folder_type: FolderTypes, name: string, folder: Folder | null = null) {
         return await Folder.create({
-            type: 'Item',
+            type: folder_type,
             folder: folder === null ? null : folder.id,
             name,
         });
@@ -55,24 +56,25 @@ export class ImportHelper {
      *
      * Traverse path and match folder structure to the last and current path segments.
      *
+     * @param folder_type The root path of the folder.
      * @param path The absolute path of the folder.
      * @param mkdirs If true, will make all folders along the hierarchy if they do not exist.
      * @returns A promise that will resolve with the found folder.
      */
-    public static async GetFolderAtPath(path: string, mkdirs: boolean = false): Promise<Folder> {
+    public static async GetFolderAtPath(folder_type: FolderTypes, path: string, mkdirs: boolean = false): Promise<Folder> {
         let currentFolder;
-            let lastFolder = null;
+        let lastFolder = null;
         const pathSegments = path.split('/');
         for (const pathSegment of pathSegments) {
              // Check if the path structure matches the folder structure.
             currentFolder = game.folders?.find((folder) => {
-                return folder.folder === lastFolder && folder.name === pathSegment
+                return folder.folder === lastFolder && folder.name === pathSegment && folder.type === folder_type
             });
 
             // Only create when allowed to. Otherwise abort with error.
             if (!currentFolder && !mkdirs) return await Promise.reject(new Error(`Unable to find folder: ${path}`));
             // Create the missing folder for the current segment
-            if (!currentFolder) currentFolder = await ImportHelper.NewFolder(pathSegment, lastFolder);
+            if (!currentFolder) currentFolder = await ImportHelper.NewFolder(folder_type, pathSegment, lastFolder);
 
             lastFolder = currentFolder;
         }
@@ -129,6 +131,7 @@ export class ImportHelper {
         return name;
     }
     public static async MakeCategoryFolders(
+        folder_type: FolderTypes,
         jsonData: object,
         path: string,
         jsonCategoryTranslations?: object | undefined,
@@ -141,7 +144,8 @@ export class ImportHelper {
             // use untranslated category name for easier mapping during DataImporter.Parse implementations.
             const origCategoryName = categoryName;
             categoryName = ImportHelper.TranslateCategory(categoryName, jsonCategoryTranslations);
-            folders[origCategoryName.toLowerCase()] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${path}/${categoryName}`, true);
+            categoryName = categoryName.replace(/[\/\\]/g, '_');
+            folders[origCategoryName.toLowerCase()] = await ImportHelper.GetFolderAtPath(folder_type, `${Constants.ROOT_IMPORT_FOLDER_NAME}/${path}/${categoryName}`, true);
         }
 
         return folders;

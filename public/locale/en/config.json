@@ -1414,6 +1414,8 @@
             "body": "Body",
             "cosmetic": "Cosmetic",
             "electromagnetic": "Electromagnetic",
+            "enhancement": "Enhancement",
+            "exotic": "Exotic",
             "power_train": "Power Train",
             "protection": "Protection",
             "weapons": "Weapons"
@@ -1586,5 +1588,6 @@
     "TYPES.Item.sin": "SIN",
     "TYPES.Item.spell": "Spell",
     "TYPES.Item.sprite_power": "Sprite Power",
+    "TYPES.Item.vehicle": "Vehicle",
     "TYPES.Item.weapon": "Weapon"
 }

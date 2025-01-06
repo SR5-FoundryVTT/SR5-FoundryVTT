@@ -23,7 +23,7 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
+        const folders = await ImportHelper.MakeCategoryFolders("Item", jsonObject, 'Qualities', this.categoryTranslations);
         const parser = new QualityParserBase();
         const items: Shadowrun.QualityItemData[] = [];
         const jsonDatas = jsonObject['qualities']['quality'];
@@ -39,7 +39,7 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
             }
 
             // Create the item
-            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
+            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}), this.itemTranslations);
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folders[category].id;

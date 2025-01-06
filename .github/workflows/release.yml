@@ -52,6 +52,7 @@ jobs:
                   body: ${{ github.event.release.body }}
 
             - name: Deploy Release
+              if: github.event.release.prerelease == false
               uses: fjogeleit/http-request-action@v1
               env:
                   MINIMUM: ${{ fromJson(env.MANIFEST_JSON).compatibility.minimum }}

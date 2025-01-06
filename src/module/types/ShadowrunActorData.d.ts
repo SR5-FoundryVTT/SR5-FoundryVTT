@@ -31,27 +31,39 @@ declare namespace Shadowrun {
 
     // Setup your global ActorData types below here. Try sorting your ActorData types alphabetically.
     export interface CharacterActorData {
+        name: string;
         type: 'character';
+        img: string;
         system: CharacterData;
     }
     export interface CritterActorData {
+        name: string;
         type: 'critter';
+        img: string;
         system: CritterData;
     }
     export interface ICActorData {
+        name: string;
         type: 'ic';
+        img: string;
         system: ICData;
     }
     export interface SpiritActorData {
+        name: string;
         type: 'spirit';
+        img: string;
         system: SpiritData;
     }
     export interface SpriteActorData {
+        name: string;
         type: 'sprite';
+        img: string;
         system: SpriteData;
     }
     export interface VehicleActorData {
+        name: string;
         type: 'vehicle';
+        img: string;
         system: VehicleData;
     }
 }
