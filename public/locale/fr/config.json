@@ -203,7 +203,7 @@
         "Cancel": "Non",
         "Consent": "Etes-vous sûr?",
         "Delete": "Oui",
-        "Description": "La suppression d'un item ne peut pas être inversée!",
+        "Description": "La suppression d'un item ne peut pas être annulée !",
         "Title": "Supprimer l'item   "
     },
     "SR5.Description": "Description",
