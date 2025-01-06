@@ -17,7 +17,6 @@
         <div><button class="show-matrix-target-acquisition">{{localize "SR5.Labels.Sheet.TargetAcquisition"}}</button></div>
         <div><button class="reboot-persona-device">{{localize "SR5.Labels.Sheet.RebootDevice"}}</button></div>
         <div>
-            {{log system.matrix.markPlacementAction}}
             <select name="system.matrix.markPlacementAction" data-tooltip="SR5.Tooltips.Actor.PlaceMark">
                 {{#select system.matrix.markPlacementAction}}
                 {{#each config.matrixMarkPlacementActions}}
