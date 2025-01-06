@@ -350,7 +350,7 @@
     "SR5.KnockedDown": "Projeté au sol",
     "SR5.KnowledgeSkillAcademic": "Connaissances académiques",
     "SR5.KnowledgeSkillInterests": "Hobbies",
-    "SR5.KnowledgeSkillProfessional": "Connaissances professionnelles",
+    "SR5.KnowledgeSkillProfessional": "Connaissances pro.",
     "SR5.KnowledgeSkillStreet": "Connaissances de la rue",
     "SR5.Labels": {
         "ActorSheet": {
@@ -368,7 +368,7 @@
             "VehicleConfiguration": "Configuration véhicule"
         }
     },
-    "SR5.Languages": "Langages",
+    "SR5.Languages": "Langues",
     "SR5.LastRoll": "Dernier lancé affiché",
     "SR5.Level": "Niveau",
     "SR5.License": "Permis",
