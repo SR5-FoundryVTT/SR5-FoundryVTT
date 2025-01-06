@@ -168,8 +168,10 @@ export const ActorMarksFlow = {
         // A host/grid is it's own network.
         if (document instanceof SR5Item && document.type === 'host') return '';
         // if (document instanceof SR5Item && document.type === 'grid') return '';
-        if (document instanceof SR5Item && document.isMatrixDevice) return document.actor.name ?? '';
+        // A matrix persona might be connected to a netowrk.
         if (document instanceof SR5Actor && document.hasNetwork) return document.network?.name ?? '';
+        // A matrix device might be part of a PAN/WAN
+        if (document instanceof SR5Item && document.isSlave) return document.master?.name ?? '';
 
         return '';
     },
