@@ -42,9 +42,13 @@ export const registerActorHelpers = () => {
     * 
     * @param actor The actor used to represent the vehicle
     */
-        Handlebars.registerHelper('calcModificationSlotsAvailable', (actor: SR5Actor): number => {
-            return actor.getAttributes().body.value | 0;
-        });
+    Handlebars.registerHelper('calcModificationSlotsAvailable', (actor: SR5Actor): number => {
+        const body = actor.getAttribute("body");
+        if (body === undefined)
+            return 0;
+        else
+            return body.value;
+    });
 
     /** 
     * Determine the amount of Mod Points slots in use by a Vehicle actor (Drone)
