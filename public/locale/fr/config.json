@@ -788,14 +788,14 @@
         "Maneuvering": "Manoeuvre",
         "MissingDriver": "Glisser-déposer un personnage comme conducteur",
         "ModificationCategoryTypes": {
-            "body": "Body",
-            "cosmetic": "Cosmetic",
-            "electromagnetic": "Electromagnetic",
+            "body": "Structure",
+            "cosmetic": "Apparence",
+            "electromagnetic": "Électronique",
             "enhancement": "Enhancement",
             "exotic": "Exotic",
-            "power_train": "Power Train",
-            "protection": "Protection",
-            "weapons": "Weapons"
+            "power_train": "Groupe motopropulseur",
+            "protection": "Blindage",
+            "weapons": "Armes"
         },
         "Stats": {
             "Acceleration": "Accelération",
