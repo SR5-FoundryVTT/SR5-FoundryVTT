@@ -203,8 +203,8 @@
         "Cancel": "Non",
         "Consent": "Etes-vous sûr?",
         "Delete": "Oui",
-        "Description": "La suppression d'un item ne peut pas être annulée !",
-        "Title": "Supprimer l'item   "
+        "Description": "La suppression d'un objet ne peut pas être annulée !",
+        "Title": "Supprimer l'objet   "
     },
     "SR5.Description": "Description",
     "SR5.Descriptors": "Descripteurs",
@@ -558,7 +558,7 @@
     "SR5.SelectTokenMessage": "Tu dois d'abord sélectionner un jeton",
     "SR5.SelectedTargets": "Cibles sélectionées",
     "SR5.SheetActor": "Fiche de personnage",
-    "SR5.SheetItem": "Fiche d'items",
+    "SR5.SheetItem": "Fiche d'objets",
     "SR5.Side": "Coté",
     "SR5.SituationalModifier": "Mod. Situationnel",
     "SR5.Skill": {
