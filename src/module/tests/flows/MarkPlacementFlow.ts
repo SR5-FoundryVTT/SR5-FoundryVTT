@@ -17,9 +17,9 @@ export interface MatrixPlacementData extends SuccessTestData {
     // If decker has a direct connection to the target
     directConnection: boolean
     // The persona uuid. This would be the user main persona icon, not necessarily the device.
-    personaUuid: string|undefined
+    personaUuid: string | undefined
     // The icon uuid. This would be the actual mark placement target. Can be a device, a persona device, a host or actor.
-    iconUuid: string|undefined
+    iconUuid: string | undefined
     // Should the mark be placed on the main icon / persona or icons connected to it?
     placeOnMainIcon: boolean
 }
@@ -140,7 +140,7 @@ export const MarkPlacementFlow = {
      * Devices might be related to a persona, in which case a persona will be present.
      * @param test The test to populate with documents.
      */
-    async populateOpposedDocuments(test: OpposedBruteForceTest|OpposedHackOnTheFlyTest) {
+    async populateOpposedDocuments(test: OpposedBruteForceTest | OpposedHackOnTheFlyTest) {
         if (test.against.data.iconUuid) {
             test.icon = await fromUuid(test.against.data.iconUuid) as SR5Item;
         }
@@ -161,7 +161,9 @@ export const MarkPlacementFlow = {
         test.icon = fromUuidSync(test.data.iconUuid) as Shadowrun.NetworkDevice;
 
         // Depending on icon type, categorize targets for display and device selection.
-        if (test.icon instanceof SR5Actor) test.persona = test.icon;
+        if (test.icon instanceof SR5Actor) { 
+            test.data.personaUuid = test.icon.uuid;
+        }
         if (test.icon instanceof SR5Item && test.icon.isHost) test.host = test.icon;
 
         // When given a persona uuid, load it.
@@ -188,11 +190,11 @@ export const MarkPlacementFlow = {
 
         const target = test.targets[0];
         const actor = target.actor as SR5Actor;
-        
+
         test.persona = actor;
         // Retrieve the target icon document.
-        test.icon = actor.hasDevicePersona ? 
-            actor.getMatrixDevice() as SR5Item : 
+        test.icon = actor.hasDevicePersona ?
+            actor.getMatrixDevice() as SR5Item :
             actor;
 
         test.data.iconUuid = test.icon.uuid;
@@ -289,7 +291,7 @@ export const MarkPlacementFlow = {
         test.icon = fromUuidSync(test.data.iconUuid as string);
     },
 
-    
+
     /**
      * Provide easy way to set a target for mark placement tests.
      *

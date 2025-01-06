@@ -138,7 +138,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
         const targetUuid = Helpers.listItemId(event);
         if (!targetUuid) return;
 
-        const target = await fromUuid(targetUuid);
+        const target = await fromUuid(targetUuid) as Shadowrun.NetworkDevice;
         if (!target) {
             console.error('Shadowrun 5e | Could not find target with uuid', targetUuid);
             return;
@@ -157,7 +157,8 @@ export class MatrixTargetAcquisitionApplication extends Application {
         this.close();
 
         // Prepare test for placing a mark on the target.
-        test.data.iconUuid = targetUuid;
+        // test.data.iconUuid = targetUuid;
+        test.addTarget(target);
         await test.execute();
     }
 }

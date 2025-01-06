@@ -83,7 +83,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
         MarkPlacementFlow.validateBaseValues(this);
     }
 
-    override async addTarget(document: SR5Actor | SR5Item) {
+    override async addTarget(document: Shadowrun.NetworkDevice) {
         await MarkPlacementFlow.addTarget(this, document);
     }
 }
