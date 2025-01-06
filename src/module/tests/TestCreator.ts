@@ -570,8 +570,7 @@ export const TestCreator = {
      */
     _prepareTestDataWithActionForItem: function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData, againstData?: any) {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
-        const rollData = item.getRollData({againstData: againstData ?? data.following?.against});
-
+        const rollData = item.getRollData({action, testData: data, againstData: againstData ?? data.following?.against});
 
         const pool = new PartsList<number>(data.pool.mod);
 

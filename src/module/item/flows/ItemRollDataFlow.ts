@@ -3,6 +3,8 @@ import { SR5 } from "../../config";
 import { SR5Item } from "../SR5Item";
 import { RollDataOptions } from "../Types";
 
+type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: Shadowrun.ActionRollData, testData?: any, againstData?: any) => undefined; 
+
 /**
  * Handle value retrieval for SR5Item test data values.
  */
@@ -18,28 +20,20 @@ export const ItemRollDataFlow = {
      *       the line.
      */
     getRollData(item: SR5Item, rollData: any, options: RollDataOptions) {
-        const againstData = options.againstData ?? null;
-        const actor = item.actorOwner;
+        // Change how roll data behaves based on the action categories used.
+        const handlers: Record<string, ActionCategoryRollDataCallback> = {
+            'matrix': ItemRollDataFlow.matrixTestRollDataFlow.bind(ItemRollDataFlow),
+        };
 
-        // CASE - Matrix Device is slaved inside a PAN or WAN
-        // => Weapon slaved to owned commlink
-        // => Camera slaved to host
-        if (item.isMatrixDevice && item.isSlave) {
-            const master = item.master;
-            if (!master) {
-                ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
-                return rollData;
-            }
-            
-            const directConnection = againstData?.directConnection ?? false;;
-            ItemRollDataFlow.injectMasterRatingsForPAN(master, actor, rollData, directConnection)
-        }
+        const action = options.action ?? undefined;
+        const testData = options.testData ?? undefined;
+        const againstData = options.againstData ?? undefined;
 
-        // CASE - General Matrix Device with owner
-        // => Carried weapon
-        // => Equipped persona icon
-        else if (item.isMatrixDevice && actor) {
-            ItemRollDataFlow.injectOwnerMentalAttributes(actor, rollData);
+        // Alter roll data for each action category used that provides different handling.
+        for (const category of againstData?.action?.categories) {
+            const callback = handlers[category];
+            if (!callback) continue;
+            callback(item, rollData, action, testData, againstData);
         }
 
         return rollData;
@@ -124,5 +118,42 @@ export const ItemRollDataFlow = {
                 targetAttributes[name] = sourceAttribute;
             }
         }
+    },
+
+    /**
+     * Apply changes to roll data for matrix actions.
+     * 
+     * TODO: Provide the rule basis for this... move it to a Rule file?
+     * 
+     * @param item The source item to use for roll data.
+     * @param rollData The roll data of that source item.
+     * @param testData The current tests data.
+     * @param againstData The original tests data, when testData is an OpposedTest.
+     * @returns 
+     */
+    matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: Shadowrun.ActionRollData, testData?: any, againstData?: any) {
+        const actor = item.actorOwner;
+
+        // CASE - Matrix Device is slaved inside a PAN or WAN
+        // => Weapon slaved to owned commlink
+        // => Camera slaved to host
+        if (item.isMatrixDevice && item.isSlave) {
+            const master = item.master;
+            if (!master) {
+                ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
+                return rollData;
+            }
+            
+            const directConnection = againstData?.directConnection ?? false;;
+            ItemRollDataFlow.injectMasterRatingsForPAN(master, actor, rollData, directConnection)
+        }
+
+        // CASE - General Matrix Device with owner
+        // => Carried weapon
+        // => Equipped persona icon
+        else if (item.isMatrixDevice && actor) {
+            ItemRollDataFlow.injectOwnerMentalAttributes(actor, rollData);
+        }
+
     }
 }
