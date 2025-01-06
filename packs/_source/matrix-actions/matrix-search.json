@@ -20,7 +20,9 @@
     "action": {
       "type": "varies",
       "test": "SuccessTest",
-      "categories": ["matrix"],
+      "categories": [
+        "matrix"
+      ],
       "attribute": "intuition",
       "attribute2": "",
       "skill": "computer",
@@ -107,7 +109,8 @@
       "name": "",
       "type": "",
       "subType": "",
-      "isFreshImport": false
+      "isFreshImport": false,
+      "isImported": false
     }
   },
   "ownership": {
@@ -118,10 +121,12 @@
   "_stats": {
     "systemId": "shadowrun5e",
     "systemVersion": "0.13.0",
-    "coreVersion": "10.303",
+    "coreVersion": "12.331",
     "createdTime": null,
     "modifiedTime": 1697731235928,
-    "lastModifiedBy": "sr5ebuilder"
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
   },
   "_key": "!items!oSFAPNvKX9jjc0G2"
 }

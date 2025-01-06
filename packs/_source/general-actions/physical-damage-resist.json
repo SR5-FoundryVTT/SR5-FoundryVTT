@@ -16,7 +16,9 @@
     "action": {
       "type": "none",
       "test": "PhysicalResistTest",
-      "categories": ["resist"],
+      "categories": [
+        "resist"
+      ],
       "attribute": "body",
       "attribute2": "",
       "skill": "",
@@ -24,6 +26,7 @@
       "spec": "",
       "mod": null,
       "mod_description": "",
+      "roll_mode": "",
       "limit": {
         "value": 0,
         "base": 0,
@@ -96,6 +99,13 @@
     },
     "result": {
       "success": {}
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false,
+      "isImported": false
     }
   },
   "ownership": {
@@ -104,10 +114,12 @@
   "_stats": {
     "systemId": "shadowrun5e",
     "systemVersion": "0.8.10",
-    "coreVersion": "10.291",
+    "coreVersion": "12.331",
     "createdTime": null,
     "modifiedTime": 1676126422272,
-    "lastModifiedBy": "sr5ebuilder"
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
   },
   "_key": "!items!wWeIV09KjkZvjJKb"
 }

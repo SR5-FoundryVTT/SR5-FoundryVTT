@@ -3,7 +3,24 @@
   "name": "Armor",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/redist/shield.svg",
-  "data": {
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "12.331",
+    "systemId": null,
+    "systemVersion": null,
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "ownership": {
+    "default": 0
+  },
+  "system": {
     "description": {
       "value": "",
       "chat": "",
@@ -11,6 +28,7 @@
     },
     "action": {
       "type": "none",
+      "test": "SuccessTest",
       "categories": [],
       "attribute": "",
       "attribute2": "",
@@ -19,6 +37,7 @@
       "spec": false,
       "mod": null,
       "mod_description": "",
+      "roll_mode": "",
       "limit": {
         "value": 0,
         "base": 0,
@@ -46,6 +65,12 @@
         },
         "base_formula_operator": "add",
         "attribute": "",
+        "source": {
+          "actorId": "",
+          "itemId": "",
+          "itemType": "",
+          "itemName": ""
+        },
         "itemSource": {
           "actorId": "",
           "itemId": "",
@@ -79,20 +104,18 @@
         "armor": false,
         "mod": 0
       },
-      "modifiers": [],
-      "test": "SuccessTest"
+      "modifiers": []
     },
     "result": {
       "success": {}
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false,
+      "isImported": false
     }
   },
-  "effects": [],
-  "folder": null,
-  "sort": 0,
-  "permission": {
-    "default": 0,
-    "SPXNNTkUujenPCaS": 3
-  },
-  "flags": {},
   "_key": "!items!12kCkFNP5jEaSV28"
 }

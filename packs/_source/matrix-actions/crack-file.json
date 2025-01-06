@@ -14,7 +14,9 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "categories": ["matrix"],
+      "categories": [
+        "matrix"
+      ],
       "attribute": "logic",
       "attribute2": "",
       "skill": "hacking",
@@ -22,6 +24,7 @@
       "spec": false,
       "mod": null,
       "mod_description": "",
+      "roll_mode": "",
       "limit": {
         "value": 0,
         "base": 0,
@@ -95,6 +98,13 @@
     },
     "result": {
       "success": {}
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false,
+      "isImported": false
     }
   },
   "ownership": {
@@ -105,10 +115,12 @@
   "_stats": {
     "systemId": "shadowrun5e",
     "systemVersion": "0.8.6",
-    "coreVersion": "10.291",
+    "coreVersion": "12.331",
     "createdTime": null,
     "modifiedTime": 1670064675058,
-    "lastModifiedBy": "sr5ebuilder"
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
   },
   "_key": "!items!EcRsJOjgnhnVj2XX"
 }
