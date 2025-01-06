@@ -1,7 +1,7 @@
 /// <reference path="../Shadowrun.ts" />
 
 declare namespace Shadowrun {
-    export interface CommonData {
+    export interface CommonData extends DescriptionPartData {
         attributes: Attributes
         limits: Limits
         skills: CharacterSkills

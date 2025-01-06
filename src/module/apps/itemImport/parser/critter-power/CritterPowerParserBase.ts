@@ -8,7 +8,9 @@ export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData>
         item.name = ImportHelper.StringValue(jsonData, 'name');
 
         item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
-        item.system.category = ImportHelper.StringValue(jsonData, 'category').toLowerCase() as CritterPowerCategory;
+
+        const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
+        item.system.category = (category.includes("infected") ? "infected" : category) as CritterPowerCategory;
 
         let duration = ImportHelper.StringValue(jsonData, 'duration');
         if (duration === 'Always') {
