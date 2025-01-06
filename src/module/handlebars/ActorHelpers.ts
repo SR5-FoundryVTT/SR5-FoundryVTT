@@ -1,5 +1,6 @@
 import { MonitorRules } from './../rules/MonitorRules';
 import { SR5Item } from './../item/SR5Item';
+import { SR5Actor } from './../actor/SR5Actor';
 import ModificationCategoryType = Shadowrun.ModificationCategoryType;
 
 export const registerActorHelpers = () => {
@@ -35,6 +36,15 @@ export const registerActorHelpers = () => {
 
         return slotSum;
     });
+
+    /** 
+    * Determine the amount of Modification slots available to a Vehicle actor from its Body attribute
+    * 
+    * @param actor The actor used to represent the vehicle
+    */
+        Handlebars.registerHelper('calcModificationSlotsAvailable', (actor: SR5Actor): number => {
+            return actor.getAttributes().body.value | 0;
+        });
 
     /** 
     * Determine the amount of Mod Points slots in use by a Vehicle actor (Drone)
