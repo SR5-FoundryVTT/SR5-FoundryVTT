@@ -1687,6 +1687,13 @@ export class SR5Item extends Item {
     }
 
     /**
+     * Reset everything that needs to be reset between two runs.
+     */
+    async restRunData() {
+        await this.clearMarks();
+    }
+
+    /**
      * Make sure all item data is in a persistent and valid status.
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.

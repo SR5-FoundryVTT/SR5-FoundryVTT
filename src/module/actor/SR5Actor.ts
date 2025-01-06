@@ -2155,6 +2155,8 @@ export class SR5Actor extends Actor {
 
         if (this.isMatrixActor) await this.setMatrixDamage(0);
         if (updateData) await this.update(updateData);
+
+        await this.clearMarks();
     }
 
     /**
