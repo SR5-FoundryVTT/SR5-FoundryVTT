@@ -62,29 +62,25 @@
     {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html" name=(localize "SR5.ModPoints")}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.ModPoints") }}
     <span style="white-space: nowrap">
-        {{calcModPointSlots items}} /
+        {{calcModPointSlots items}} / {{calcModificationSlotsAvailable actor}}
     </span>
-    <input class="display" type="text" size="5" name="system.modPoints" value="{{system.modPoints}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{else}}
     {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html" name=(localize "SR5.ModificationCategories")}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.body") }}
     <span style="white-space: nowrap">
-        {{calcModificationCategorySlots items "body"}} /
+        {{calcModificationCategorySlots items "body"}} / {{calcModificationSlotsAvailable actor}}
     </span>
-    <input class="display" type="text" size="5" name="system.modificationCategories.body" value="{{system.modificationCategories.body}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.cosmetic") }}
     <span style="white-space: nowrap">
-        {{calcModificationCategorySlots items "cosmetic"}} /
+        {{calcModificationCategorySlots items "cosmetic"}} / {{calcModificationSlotsAvailable actor}}
     </span>
-    <input class="display" type="text" size="5" name="system.modificationCategories.cosmetic" value="{{system.modificationCategories.cosmetic}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.electromagnetic") }}
     <span style="white-space: nowrap">
-        {{calcModificationCategorySlots items "electromagnetic"}} /
+        {{calcModificationCategorySlots items "electromagnetic"}} / {{calcModificationSlotsAvailable actor}}
     </span>
-    <input class="display" type="text" size="5" name="system.modificationCategories.electromagnetic" value="{{system.modificationCategories.electromagnetic}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.enhancement") }}
     <span style="white-space: nowrap">
@@ -100,21 +96,18 @@
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.power_train") }}
     <span style="white-space: nowrap">
-        {{calcModificationCategorySlots items "power_train"}} /
+        {{calcModificationCategorySlots items "power_train"}} / {{calcModificationSlotsAvailable actor}}
     </span>
-    <input class="display" type="text" size="5" name="system.modificationCategories.power_train" value="{{system.modificationCategories.power_train}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.protection") }}
     <span style="white-space: nowrap">
-        {{calcModificationCategorySlots items "protection"}} /
+        {{calcModificationCategorySlots items "protection"}} / {{calcModificationSlotsAvailable actor}}
     </span>
-    <input class="display" type="text" size="5" name="system.modificationCategories.protection" value="{{system.modificationCategories.protection}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.ModificationCategoryTypes.weapons") }}
     <span style="white-space: nowrap">
-        {{calcModificationCategorySlots items "weapons"}} /
+        {{calcModificationCategorySlots items "weapons"}} / {{calcModificationSlotsAvailable actor}}
     </span>
-    <input class="display" type="text" size="5" name="system.modificationCategories.weapons" value="{{system.modificationCategories.weapons}}" data-dtype="Number" />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{/if}}
 
