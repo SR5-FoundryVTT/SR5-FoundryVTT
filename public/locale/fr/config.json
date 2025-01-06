@@ -81,7 +81,7 @@
     "SR5.Attributes": "Attributs",
     "SR5.Availability": "Dispo",
     "SR5.Awakened": "Éveillé",
-    "SR5.AwakenedEmerged": "Éveillé/Submergé",
+    "SR5.AwakenedEmerged": "Éveillé/Émergé",
     "SR5.Barrel": "Canon",
     "SR5.Base": "Base",
     "SR5.BaseValue": "Valeur de base",
@@ -241,7 +241,7 @@
     "SR5.ElementElectricity": "Electrique",
     "SR5.ElementFire": "Feu",
     "SR5.ElementRadiation": "Radioactif",
-    "SR5.Emerged": "Submergé",
+    "SR5.Emerged": "Émergé",
     "SR5.EnvModifiersApplication": {
         "ClearModifiers": "Effacer les modificateurs personnels",
         "Extreme": "Combinaison de plusieurs conditions à -6",
