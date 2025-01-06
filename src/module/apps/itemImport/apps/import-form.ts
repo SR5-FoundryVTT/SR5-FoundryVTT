@@ -109,18 +109,29 @@ export class Import extends Application {
         new VehicleImporter()
     ];
 
+    /**
+     * Parse a single file with all applicable importers.
+     * 
+     * A file can contain actors and item documents, as well as both in a single file.
+     * 
+     * @param xmlSource The XML source as string.
+     * @param fileName The XML file name. Only imported supporting this file will be considered.
+     * @param setIcons Wether or not to apply system icons to the imported documents.
+     */
     async parseXML(xmlSource, fileName, setIcons) {
         let jsonSource = await DataImporter.xml2json(xmlSource);
         ImportHelper.SetMode(ImportMode.XML);
 
-        for (const di of Import.ItemImporters) {
+        // Apply Item Importers based on file and their ability to parse that file.
+        for (const di of Import.ItemImporters.filter(importer => importer.files.includes(fileName))) {
             if (di.CanParse(jsonSource)) {
                 di.ExtractTranslation(fileName);
                 await di.Parse(jsonSource, setIcons);
             }
         }
 
-        for (const di of Import.ActorImporters) {
+        // Apply Actor Importers based on their ability to parse that file.
+        for (const di of Import.ActorImporters.filter(importer => importer.files.includes(fileName))) {
             if (di.CanParse(jsonSource)) {
                 di.ExtractTranslation(fileName);
                 await di.Parse(jsonSource, setIcons);
