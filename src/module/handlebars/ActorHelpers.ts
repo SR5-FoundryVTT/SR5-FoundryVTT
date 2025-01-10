@@ -31,7 +31,7 @@ export const registerActorHelpers = () => {
     Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item], modificationCategory: ModificationCategoryType): number => {        
         if (!Array.isArray(items) || !items.length) { return 0 }        
         const slotSum = items.reduce((arr, item) => {
-            if (item.system.modification_category == modificationCategory) { return arr += item.system.slots ? item.system.slots : 0 } else {return arr};            
+            if (item.system.modification_category === modificationCategory) { return arr += item.system.slots ? item.system.slots : 0 } else {return arr};            
         } ,0)
 
         return slotSum;
