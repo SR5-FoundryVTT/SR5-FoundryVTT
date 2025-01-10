@@ -17,6 +17,8 @@ import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
+import SpellCategory = Shadowrun.SpellCateogry;
+import SpellData = Shadowrun.SpellData;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
@@ -28,7 +30,7 @@ import { parseDropData } from '../../utils/sheets';
 export interface SheetItemData {
     type: string,
     name: string,
-    data: Shadowrun.ShadowrunItemDataData
+    system: Shadowrun.ShadowrunItemDataData
     properties: any,
     description: any
 }
@@ -243,6 +245,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
+        data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
 
@@ -257,6 +260,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         });
 
         data.bindings = this._prepareKeybindings();
+
+        console.log(data);
 
         return data;
     }
@@ -999,6 +1004,34 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _prepareSelectedInventory(inventories: InventoriesSheetData) {
         return inventories[this.selectedInventory];
+    }
+
+    /**
+     * Categorize and sort spells to display cleanly.
+     * 
+     * @param inventories 
+     */
+    _prepareSortedCategorizedSpells(spellSheets: SheetItemData[]) {
+        const sortedSpells : Record<string, SheetItemData[]> = {};
+        const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
+
+        // Add all spell types in system.
+        spellTypes.forEach(type => {
+            sortedSpells[type] = [];
+        });
+
+        spellSheets.forEach(spell => {
+            const category = spell.system.category;
+            sortedSpells[category || 'notfound'].push(spell);
+        });
+
+        spellTypes.forEach(type => {
+            sortedSpells[type].sort((a, b) : number => {
+                return a.name.localeCompare(b.name);
+            });
+        });
+
+        return sortedSpells;
     }
 
     /**
