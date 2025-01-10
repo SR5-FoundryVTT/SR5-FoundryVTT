@@ -30,9 +30,15 @@ export const registerActorHelpers = () => {
     */
     Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item], modificationCategory: ModificationCategoryType): number => {        
         if (!Array.isArray(items) || !items.length) { return 0 }        
-        const slotSum = items.reduce((arr, item) => {
-            if (item.system.modification_category === modificationCategory) { return arr += item.system.slots ? item.system.slots : 0 } else {return arr};            
-        } ,0)
+        let slotSum = 0;
+        
+        for (const item of items) {
+            if (item.system.modification_category === modificationCategory) {
+                // If item's technology exists and quantity has been defined, use the item's quantity. Else use 1.
+                const quantity = (item.system.technology !== undefined) && (item.system.technology.quantity !== '') ? item.system.technology.quantity : 1;
+                slotSum += (item.system.slots || 0) * quantity;
+            }
+        }
 
         return slotSum;
     });
