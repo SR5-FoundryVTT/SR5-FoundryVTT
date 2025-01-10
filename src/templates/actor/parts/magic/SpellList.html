@@ -4,7 +4,7 @@
         icons=(ItemHeaderIcons 'spell')
         rightSide=(ItemHeaderRightSide 'spell')
 }}
-{{#each itemType.spell as |item i|}}
+{{#each spells.notfound as |item i|}}
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
             img=item.img
             name=item.name
@@ -16,3 +16,98 @@
             description=item.description.value
     }}
 {{/each}}
+
+{{#if spells.combat}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatCombat')
+                itemId='combatspells'
+        }}
+        {{#each spells.combat as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}
+
+{{#if spells.detection}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatDetection')
+                itemId='detectionspells'
+        }}
+        {{#each spells.detection as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}
+
+{{#if spells.health}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatHealth')
+                itemId='healthspells'
+        }}
+        {{#each spells.health as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}
+
+{{#if spells.illusion}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatIllusion')
+                itemId='illusionspells'
+        }}
+        {{#each spells.illusion as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}
+
+{{#if spells.manipulation}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatManipulation')
+                itemId='manipulationspells'
+        }}
+        {{#each spells.manipulation as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}
