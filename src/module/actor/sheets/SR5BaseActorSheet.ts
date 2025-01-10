@@ -1021,8 +1021,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         });
 
         spellSheets.forEach(spell => {
-            const category = spell.system.category;
-            sortedSpells[category || 'notfound'].push(spell);
+            // Check if the spell category is defined and if it's something we expect, if not we use the 'notfound' category
+            const category = ((spell.system.category === undefined) || !spellTypes.includes(spell.system.category)) ? 'notfound' : spell.system.category;
+            sortedSpells[category].push(spell);
         });
 
         spellTypes.forEach(type => {
