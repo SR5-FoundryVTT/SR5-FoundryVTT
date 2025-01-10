@@ -261,8 +261,6 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.bindings = this._prepareKeybindings();
 
-        console.log(data);
-
         return data;
     }
 
