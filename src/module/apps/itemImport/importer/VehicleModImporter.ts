@@ -46,9 +46,7 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
 
             // Get the item's folder information
             const folderName = categoryName === undefined         ? "" :
-                               categoryName === "All"             ? "Exotic" :
-                               categoryName === "Model-Specific"  ? "Exotic" :
-                               enhancement.includes(categoryName) ? "Other"  : categoryName;
+                               enhancement.includes(categoryName) ? categoryName : "Other";
 
             const folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Vehicle-Mods/${folderName}`, true);
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
