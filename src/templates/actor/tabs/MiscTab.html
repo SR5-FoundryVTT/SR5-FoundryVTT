@@ -251,6 +251,23 @@
                     </div>
                 </div>
                 {{/if}}               
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="item-left">
+                            <div class="item-text item-name" data-tooltip="SR5.Tooltips.Actor.DefaultCategoryVisibility">
+                                {{localize "SR5.DefaultCategoryVisibility"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text input">
+                                <div class="item-text input">
+                                    {{log this}}
+                                    <input type="checkbox" class="checkbox" name="system.category_visibility.default" {{checked system.category_visibility.default}} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {{#if hasSkills}}
                 <div class="list-item">
                     <div class="list-item-content">

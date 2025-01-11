@@ -251,6 +251,8 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.situationModifiers = this._prepareSituationModifiers();
 
+        data.contentVisibility = this._prepareContentVisibility(data);
+
         // @ts-expect-error TODO: foundry-vtt-types v10
         data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
             // secrets: this.actor.isOwner,
@@ -1031,6 +1033,28 @@ export class SR5BaseActorSheet extends ActorSheet {
         });
 
         return sortedSpells;
+    }
+
+    /**
+     * Used by the sheet to choose wether to show or hide hideable fields
+     */
+    _prepareContentVisibility(data) {
+        const contentVisibility : Record<string, boolean> = {}
+
+        const defaultVisibility = data.system.category_visibility.default;
+
+        // If prefix is empty uses the category as a prefix
+        const setVisibility = (category: string, prefix?: string) => {
+            contentVisibility[prefix || category + '_list'] = defaultVisibility || data.itemType[category].length > 0;
+        }
+
+        contentVisibility['default'] = defaultVisibility;
+        setVisibility('adept_power');
+        setVisibility('spell');
+        setVisibility('ritual');
+        setVisibility('summoning');
+
+        return contentVisibility;
     }
 
     /**
