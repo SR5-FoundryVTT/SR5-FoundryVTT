@@ -14,10 +14,7 @@ export class VehicleModParserBase extends TechnologyItemParserBase<ModificationI
 
         item.system.modification_category = (
             categoryName === undefined         ? "" :
-            categoryName === "All"             ? "exotic" :
-            categoryName === "Model-Specific"  ? "exotic" :
-            categoryName === "Powertrain"      ? "power_train" :
-            enhancement.includes(categoryName) ? "enhancement"
+            categoryName === "Powertrain"      ? "power_train"
                                                : categoryName.toLowerCase()
         ) as ModificationCategoryType;
 

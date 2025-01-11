@@ -677,8 +677,6 @@ export const SR5 = {
         body: 'SR5.Vehicle.ModificationCategoryTypes.body',
         cosmetic: 'SR5.Vehicle.ModificationCategoryTypes.cosmetic',
         electromagnetic: 'SR5.Vehicle.ModificationCategoryTypes.electromagnetic',
-        enhancement: 'SR5.Vehicle.ModificationCategoryTypes.enhancement',
-        exotic: 'SR5.Vehicle.ModificationCategoryTypes.exotic',
         power_train: 'SR5.Vehicle.ModificationCategoryTypes.power_train',
         protection: 'SR5.Vehicle.ModificationCategoryTypes.protection',
         weapons: 'SR5.Vehicle.ModificationCategoryTypes.weapons',

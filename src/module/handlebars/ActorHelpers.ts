@@ -28,16 +28,17 @@ export const registerActorHelpers = () => {
     * @param items The items to be considered
     * @param modificationCategory The modification category 
     */
-    Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item], modificationCategory: ModificationCategoryType): number => {
-        if (!Array.isArray(items) || !items.length) { return 0 }
-        const slotSum = items.reduce((arr, item) => {
+    Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item], modificationCategory: ModificationCategoryType): number => {        
+        if (!Array.isArray(items) || !items.length) { return 0 }        
+        let slotSum = 0;
+        
+        for (const item of items) {
             if (item.system.modification_category === modificationCategory) {
-                arr += item.system.slots ? item.system.slots : 0;
-                return arr;
-            } else {
-                return arr
-            };
-        }, 0)
+                // If item's technology exists and quantity has been defined, use the item's quantity. Else use 1.
+                const quantity = (item.system.technology !== undefined) && (item.system.technology.quantity !== '') ? item.system.technology.quantity : 1;
+                slotSum += (item.system.slots || 0) * quantity;
+            }
+        }
 
         return slotSum;
     });
@@ -47,9 +48,13 @@ export const registerActorHelpers = () => {
     * 
     * @param actor The actor used to represent the vehicle
     */
-        Handlebars.registerHelper('calcModificationSlotsAvailable', (actor: SR5Actor): number => {
-            return actor.getAttributes().body.value | 0;
-        });
+    Handlebars.registerHelper('calcModificationSlotsAvailable', (actor: SR5Actor): number => {
+        const body = actor.getAttribute("body");
+        if (body === undefined)
+            return 0;
+        else
+            return body.value;
+    });
 
     /** 
     * Determine the amount of Mod Points slots in use by a Vehicle actor (Drone)
