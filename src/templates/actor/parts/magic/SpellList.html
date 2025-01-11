@@ -8,6 +8,7 @@
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
             img=item.img
             name=item.name
+            itemCssClass='spell-item'
             itemId=item._id
             icons=(ItemIcons item)
             rightSide=(ItemRightSide item)
@@ -20,12 +21,15 @@
 {{#if spells.combat}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatCombat')
+                itemCssClass='spell-header'
                 itemId='combatspells'
+                rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.combat as |item i|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
+                        itemCssClass='spell-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)
@@ -39,12 +43,15 @@
 {{#if spells.detection}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatDetection')
+                itemCssClass='spell-header'
                 itemId='detectionspells'
+                rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.detection as |item i|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
+                        itemCssClass='spell-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)
@@ -58,12 +65,15 @@
 {{#if spells.health}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatHealth')
+                itemCssClass='spell-header'
                 itemId='healthspells'
+                rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.health as |item i|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
+                        itemCssClass='spell-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)
@@ -77,12 +87,15 @@
 {{#if spells.illusion}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatIllusion')
+                itemCssClass='spell-header'
                 itemId='illusionspells'
+                rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.illusion as |item i|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
+                        itemCssClass='spell-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)
@@ -96,12 +109,15 @@
 {{#if spells.manipulation}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatManipulation')
+                itemCssClass='spell-header'
                 itemId='manipulationspells'
+                rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.manipulation as |item i|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
+                        itemCssClass='spell-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)

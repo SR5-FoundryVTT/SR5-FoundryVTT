@@ -920,6 +920,15 @@ input[type='text'].display {
             // &:first-child {
             //     border-top: 1px solid $yellow;
             // }
+
+            &.spell-header {
+                margin-left: 10px;
+                border-bottom: none;
+            }
+        }
+
+        &.spell-item {
+            margin-left: 10px;
         }
 
         .list-item-content {
