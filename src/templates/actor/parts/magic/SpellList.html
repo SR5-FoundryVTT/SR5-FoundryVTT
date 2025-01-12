@@ -8,7 +8,7 @@
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
             img=item.img
             name=item.name
-            itemCssClass='spell-item'
+            itemCssClass='subcategory-item'
             itemId=item._id
             icons=(ItemIcons item)
             rightSide=(ItemRightSide item)
@@ -21,7 +21,7 @@
 {{#if spells.combat}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatCombat')
-                itemCssClass='spell-header'
+                itemCssClass='subcategory-header'
                 itemId='combatspells'
                 icons=(EmptyIcons)
                 rightSide=(ItemHeaderRightSide 'spell')
@@ -30,7 +30,7 @@
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
-                        itemCssClass='spell-item'
+                        itemCssClass='subcategory-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)
@@ -44,7 +44,7 @@
 {{#if spells.detection}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatDetection')
-                itemCssClass='spell-header'
+                itemCssClass='subcategory-header'
                 itemId='detectionspells'
                 icons=(EmptyIcons)
                 rightSide=(ItemHeaderRightSide 'spell')
@@ -53,7 +53,7 @@
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
-                        itemCssClass='spell-item'
+                        itemCssClass='subcategory-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)
@@ -67,7 +67,7 @@
 {{#if spells.health}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatHealth')
-                itemCssClass='spell-header'
+                itemCssClass='subcategory-header'
                 itemId='healthspells'
                 icons=(EmptyIcons)
                 rightSide=(ItemHeaderRightSide 'spell')
@@ -76,7 +76,7 @@
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
-                        itemCssClass='spell-item'
+                        itemCssClass='subcategory-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)
@@ -90,7 +90,7 @@
 {{#if spells.illusion}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatIllusion')
-                itemCssClass='spell-header'
+                itemCssClass='subcategory-header'
                 itemId='illusionspells'
                 icons=(EmptyIcons)
                 rightSide=(ItemHeaderRightSide 'spell')
@@ -99,7 +99,7 @@
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
-                        itemCssClass='spell-item'
+                        itemCssClass='subcategory-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)
@@ -113,7 +113,7 @@
 {{#if spells.manipulation}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Spell.CatManipulation')
-                itemCssClass='spell-header'
+                itemCssClass='subcategory-header'
                 itemId='manipulationspells'
                 icons=(EmptyIcons)
                 rightSide=(ItemHeaderRightSide 'spell')
@@ -122,7 +122,7 @@
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name
-                        itemCssClass='spell-item'
+                        itemCssClass='subcategory-item'
                         itemId=item._id
                         icons=(ItemIcons item)
                         rightSide=(ItemRightSide item)
