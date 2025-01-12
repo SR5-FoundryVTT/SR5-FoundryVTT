@@ -8,10 +8,7 @@
         </div>
         <div class="inputs">
             <select name="system.powerType">
-                {{#select system.powerType}}
-                    {{#each config.critterPower.types as |name type|}}
-                        <option value="{{type}}">{{localize name}}</option>
-                    {{/each}} {{/select}}
+                {{selectOptions config.critterPower.types selected=system.powerType localize=true}}
             </select>
         </div>
     </div>
@@ -21,9 +18,7 @@
         </div>
         <div class="inputs">
             <select name="system.duration">
-                {{#select system.duration}} {{#each config.critterPower.durations as |name type|}}
-                    <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
+                {{selectOptions config.critterPower.durations selected=system.duration localize=true}}
             </select>
         </div>
     </div>
@@ -33,9 +28,7 @@
         </div>
         <div class="inputs">
             <select name="system.range">
-                {{#select system.range}} {{#each config.critterPower.ranges as |name type|}}
-                    <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
+                {{selectOptions config.critterPower.ranges selected=system.range localize=true}}
             </select>
         </div>
     </div>
