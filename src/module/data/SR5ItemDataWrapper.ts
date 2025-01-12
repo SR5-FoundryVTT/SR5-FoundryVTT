@@ -205,6 +205,10 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData().technology?.equipped || false;
     }
 
+    isEnabled(): boolean {
+        return this.getData().enabled || false;
+    }
+
     isWireless(): boolean {
         return this.getData().technology?.wireless || false;
     }

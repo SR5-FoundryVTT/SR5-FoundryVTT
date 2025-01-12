@@ -1033,6 +1033,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         // @ts-expect-error
         sheetItem.properties = chatData.properties;
 
+        if(item.isCritterPower || item.isSpritePower)
+            console.log(item.system);
+
         return sheetItem as unknown as SheetItemData;
     }
 
