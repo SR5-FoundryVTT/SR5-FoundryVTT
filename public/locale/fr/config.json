@@ -175,6 +175,12 @@
         "Types": {
             "Mana": "Mana",
             "Physical": "Physique"
+        },
+        "IsOptional": "Optionel",
+        "Optional": {
+            "Standard": "Par défaut",
+            "EnabledOption": "Optionel, enabled",
+            "DisabledOption": "Optionel, disabled"
         }
     },
     "SR5.Cyberware": "Cyberware",
@@ -355,6 +361,8 @@
     "SR5.Labels": {
         "ActorSheet": {
             "CritterPowers": "Pouvoirs",
+            "EnabledOptionCritterPowers": "Pouvoirs Optionels - Activés",
+            "DisabledOptionCritterPowers": "Pouvoirs Optionels - Désactivés",
             "DeviceRating": "Indice d'appareil",
             "Rituals": "Rituels",
             "RollDroneInfiltration": "Infiltration du drone",
@@ -364,7 +372,9 @@
             "Spells": "Sorts",
             "SpiritConfiguration": "Configuration d'esprit",
             "SpriteConfiguration": "Configuration de sprite",
-            "SpritePowers": "Pouvoirs de sprites",
+            "SpritePowers": "Pouvoirs",
+            "EnabledOptionSpritePowers": "Pouvoirs Optionels - Activés",
+            "DisabledOptionSpritePowers": "Pouvoirs Optionels - Désactivés",
             "VehicleConfiguration": "Configuration véhicule"
         }
     },
@@ -744,7 +754,13 @@
         }
     },
     "SR5.SpritePower": {
-        "Type": "Type"
+        "Type": "Type",
+        "IsOptional": "Optionel",
+        "Optional": {
+            "Standard": "Par défaut",
+            "EnabledOption": "Optionel, enabled",
+            "DisabledOption": "Optionel, disabled"
+        }
     },
     "SR5.Stock": "Stock",
     "SR5.StreetCred": "Réputation",
