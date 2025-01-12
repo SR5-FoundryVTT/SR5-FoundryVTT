@@ -1041,7 +1041,8 @@ export class SR5BaseActorSheet extends ActorSheet {
     _prepareContentVisibility(data) {
         const contentVisibility : Record<string, boolean> = {}
 
-        const defaultVisibility = data.system.category_visibility.default;
+        // If category_visibility doesn't exist yet, assume true
+        const defaultVisibility = data.system.category_visibility !== undefined ? data.system.category_visibility.default : true;
 
         // If prefix is empty uses the category as a prefix
         const setVisibility = (category: string, prefix?: string) => {
