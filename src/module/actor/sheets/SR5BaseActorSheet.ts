@@ -283,6 +283,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
         html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
         html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
+        html.find('.item-enable-toggle').on('click', this._onListItemToggleEnabled.bind(this));
 
         // Item list description display handling...
         html.find('.hidden').hide();
@@ -1545,6 +1546,25 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         this.actor.render(false);
     }
+
+    /**
+     * Change the enabled status of an item shown within a sheet item list.
+     */
+        async _onListItemToggleEnabled(event) {
+            event.preventDefault();
+            const iid = Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            if (!item) return;
+            if (!item.isCritterPower && !item.isSpritePower) return;
+    
+            // Handle the enabled state.
+            await this.actor.updateEmbeddedDocuments('Item', [{
+                '_id': iid,
+                'system.enabled': !item.isEnabled(),
+            }]);
+    
+            this.actor.render(false);
+        }
 
     /**
      * Show / hide the items description within a sheet item l ist.

@@ -12,7 +12,28 @@
         <div class="tab" data-group="primary" data-tab="sprite_powers">
             <div class="tabbody">
                 <div class="inventory">
-                    <div class="scroll-area">
+                    <div class="scroll-area item-form">
+                        <div class="flexrow nowrap">
+                            <div class="label form-line">
+                                {{localize "SR5.SpritePower.Enabled"}}
+                            </div>
+                            <input
+                            class="checkbox"
+                            type="checkbox"
+                            name="system.enabled"
+                            {{checked
+                            system.enabled}}/>
+                        </div>
+                        <div class="form-line">
+                            <div class="label">
+                                {{localize "SR5.SpritePower.Optional"}}
+                            </div>
+                            <div class="inputs">
+                                <select name="system.optional">
+                                    {{selectOptions config.spritePower.optional selected=system.optional localize=true}}
+                                </select>
+                            </div>
+                        </div>
                         {{> "systems/shadowrun5e/dist/templates/item/parts/action.html" header="Test Details" }}
                         {{> "systems/shadowrun5e/dist/templates/item/parts/damage.html" header="Damage" }}
                         {{>"systems/shadowrun5e/dist/templates/item/parts/opposed.html" header="Opposed Test" }}
