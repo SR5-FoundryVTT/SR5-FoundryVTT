@@ -5,7 +5,7 @@
             icons=(ItemHeaderIcons 'sprite_power')
             rightSide=(ItemHeaderRightSide 'sprite_power')
     }}
-    {{#each itemType.sprite_power as |item i|}} {{#unless system.optional}}
+    {{#each itemType.sprite_power as |item i|}} {{#if (or (not system.optional) (eq system.optional "standard"))}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
             img=item.img
             name=item.name
@@ -16,26 +16,7 @@
             hasRoll="true"
             description=item.description.value
         }}
-    {{/unless}} {{/each}}
-
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-            name=(localize 'SR5.Labels.ActorSheet.StandardSpritePowers')
-            itemId='standard_sprite_power'
-            icons=(ItemHeaderIcons 'sprite_power')
-            rightSide=(ItemHeaderRightSide 'sprite_power')
-    }}
-    {{#each itemType.sprite_power as |item i|}} {{#ife system.optional "standard"}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-            img=item.img
-            name=item.name
-            itemId=item._id
-            icons=(ItemIcons item)
-            rightSide=(ItemRightSide item)
-            hasDesc="true"
-            hasRoll="true"
-            description=item.description.value
-        }}
-    {{/ife}} {{/each}}
+    {{/if}} {{/each}}
 
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
             name=(localize 'SR5.Labels.ActorSheet.EnabledOptionSpritePowers')

@@ -2,12 +2,12 @@
     <div class="inventory">
         <div class="scroll-area">
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                name=(localize "SR5.ItemTypes.CritterPower")
+                name=(localize "SR5.Labels.ActorSheet.CritterPowers")
                 itemId="critter_power"
                 icons=(ItemHeaderIcons "critter_power")
                 rightSide=(ItemHeaderRightSide "critter_power")
             }}
-            {{#each itemType.critter_power as |item i|}} {{#unless system.optional}}
+            {{#each itemType.critter_power as |item i|}} {{#if (or (not system.optional) (eq system.optional "standard"))}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                     img=item.img
                     name=item.name
@@ -18,29 +18,10 @@
                     hasRoll="true"
                     description=item.description.value
                 }}
-            {{/unless}} {{/each}}
+            {{/if}} {{/each}}
 
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                name=(localize "SR5.ItemTypes.StandardCritterPower")
-                itemId="standard_critter_power"
-                icons=(ItemHeaderIcons "critter_power")
-                rightSide=(ItemHeaderRightSide "critter_power")
-            }}
-            {{#each itemType.critter_power as |item i|}} {{#ife system.optional "standard"}}
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                    img=item.img
-                    name=item.name
-                    itemId=item._id
-                    icons=(ItemIcons item)
-                    rightSide=(ItemRightSide item)
-                    hasDesc="true"
-                    hasRoll="true"
-                    description=item.description.value
-                }}
-            {{/ife}} {{/each}}
-
-            {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                name=(localize "SR5.ItemTypes.EnabledOptionCritterPower")
+                name=(localize "SR5.Labels.ActorSheet.EnabledOptionCritterPowers")
                 itemId="enabled_option_critter_power"
                 icons=(ItemHeaderIcons "critter_power")
                 rightSide=(ItemHeaderRightSide "critter_power")
@@ -59,7 +40,7 @@
             {{/ife}} {{/each}}
 
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                name=(localize "SR5.ItemTypes.DisabledOptionCritterPower")
+                name=(localize "SR5.Labels.ActorSheet.DisabledOptionCritterPowers")
                 itemId="disabled_option_critter_power"
                 icons=(ItemHeaderIcons "critter_power")
                 rightSide=(ItemHeaderRightSide "critter_power")
