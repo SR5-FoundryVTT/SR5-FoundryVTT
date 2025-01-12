@@ -1034,9 +1034,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         // @ts-expect-error
         sheetItem.properties = chatData.properties;
 
-        if(item.isCritterPower || item.isSpritePower)
-            console.log(item.system);
-
         return sheetItem as unknown as SheetItemData;
     }
 
@@ -1550,21 +1547,34 @@ export class SR5BaseActorSheet extends ActorSheet {
     /**
      * Change the enabled status of an item shown within a sheet item list.
      */
-        async _onListItemToggleEnabled(event) {
-            event.preventDefault();
-            const iid = Helpers.listItemId(event);
-            const item = this.actor.items.get(iid);
-            if (!item) return;
-            if (!item.isCritterPower && !item.isSpritePower) return;
-    
-            // Handle the enabled state.
-            await this.actor.updateEmbeddedDocuments('Item', [{
-                '_id': iid,
-                'system.enabled': !item.isEnabled(),
-            }]);
-    
-            this.actor.render(false);
+    async _onListItemToggleEnabled(event) {
+        event.preventDefault();
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        if (!item) return;
+        if (!item.isCritterPower && !item.isSpritePower) return;
+
+        switch (item.system.optional) {
+            case 'standard':
+                return;
+            case 'enabled_option':
+                await this.actor.updateEmbeddedDocuments('Item', [{
+                    '_id': iid,
+                    'system.optional': 'disabled_option',
+                    'system.enabled': false,
+                }]);
+                break;
+            case 'disabled_option':
+                await this.actor.updateEmbeddedDocuments('Item', [{
+                    '_id': iid,
+                    'system.optional': 'enabled_option',
+                    'system.enabled': true,
+                }]);
+                break;
         }
+
+        this.actor.render(false);
+    }
 
     /**
      * Show / hide the items description within a sheet item l ist.

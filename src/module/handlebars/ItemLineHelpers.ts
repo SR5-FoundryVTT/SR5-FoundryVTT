@@ -754,7 +754,8 @@ export const registerItemLineHelpers = () => {
                 break;
             case 'critter_power':
             case 'sprite_power':
-                icons.unshift(enableIcon);
+                if(wrapper.canBeDisabled()) icons.unshift(enableIcon);
+                break;
         }
 
         return icons;

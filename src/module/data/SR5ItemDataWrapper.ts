@@ -15,6 +15,8 @@ import AmmunitionData = Shadowrun.AmmunitionData;
 import WeaponData = Shadowrun.WeaponData;
 import DeviceData = Shadowrun.DeviceData;
 import AmmoData = Shadowrun.AmmoData;
+import SpritePowerData = Shadowrun.SpritePowerData;
+import CritterPowerData = Shadowrun.CritterPowerData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
@@ -206,7 +208,13 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isEnabled(): boolean {
-        return this.getData().enabled || false;
+        if(!this.isCritterPower && !this.isSpritePower) return false;
+        return this.getData().enabled !== undefined ? this.getData().enabled === true : true;
+    }
+
+    canBeDisabled(): boolean {
+        if(!this.isCritterPower && !this.isSpritePower) return false;
+        return (this.getData().optional || 'standard') !== 'standard'
     }
 
     isWireless(): boolean {

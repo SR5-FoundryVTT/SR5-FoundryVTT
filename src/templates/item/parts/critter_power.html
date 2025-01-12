@@ -2,23 +2,12 @@
     <div class="header">
         {{header}}
     </div>
-    <div class="flexrow nowrap">
-        <div class="label form-line">
-            {{localize "SR5.CritterPower.Enabled"}}
-        </div>
-        <input
-        class="checkbox"
-        type="checkbox"
-        name="system.enabled"
-        {{checked
-        system.enabled}}/>
-    </div>
     <div class="form-line">
         <div class="label">
             {{localize "SR5.CritterPower.Optional"}}
         </div>
         <div class="inputs">
-            <select name="system.optional">
+            <select name="system.optional" class="power-optional-input">
                 {{selectOptions config.critterPower.optional selected=system.optional localize=true}}
             </select>
         </div>
