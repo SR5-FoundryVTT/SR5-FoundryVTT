@@ -2,17 +2,9 @@
     <div class="attribute-name Roll" data-attribute="{{key}}">
         {{localize label}}
     </div>
-    <div class="attribute-input-container">
-        <input
-            class="display attribute-input"
-            type="text"
-            maxlength="2"
-            size="2"
-            value="{{matrixAtt.value}}"
-            data-dtype="Number"
-            placeholder="1"
-            disabled
-        />
+    <div class="attribute-value value">
+        <span class="attribute-value-total">{{matrixAtt.value}}</span>
+        {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=matrixAtt}}
     </div>
     <div class="track center">
         {{#if isCyberdeck}}
