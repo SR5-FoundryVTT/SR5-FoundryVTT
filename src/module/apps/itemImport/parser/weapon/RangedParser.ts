@@ -5,8 +5,8 @@ import { DataDefaults } from '../../../../data/DataDefaults';
 
 export class RangedParser extends WeaponParserBase {
     protected GetAmmo(weaponJson: object) {
-        let jsonAmmo = ImportHelper.StringValue(weaponJson, 'ammo');
-        let match = jsonAmmo.match(/([0-9]+)/g)?.[0];
+        const jsonAmmo = ImportHelper.StringValue(weaponJson, 'ammo');
+        const match = jsonAmmo.match(/([0-9]+)/g)?.[0];
         return match !== undefined ? parseInt(match) : 0;
     }
 

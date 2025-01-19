@@ -21,7 +21,7 @@ export class AttributesPrep {
         attributes.essence.hidden = true;
 
         // set the value for the attributes
-        for (let [name, attribute] of Object.entries(attributes)) {
+        for (const [name, attribute] of Object.entries(attributes)) {
             // don't manage the attribute if it is using the old method of edge tracking
             // needed to be able to migrate things correctly
             if (name === 'edge' && attribute['uses'] === undefined) return;

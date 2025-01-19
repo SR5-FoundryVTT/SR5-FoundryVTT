@@ -1,5 +1,4 @@
-//todo: v10 foundry-vtt-types 
-//@ts-expect-error
+//@ts-expect-error // TODO: foundry-vtt-types v10
 export default class AugmentedRealityVisionBackgroundVisionShader extends AmplificationBackgroundVisionShader {
     static COLOR_TINT = [0.15, 0.15, 0.88];
   
