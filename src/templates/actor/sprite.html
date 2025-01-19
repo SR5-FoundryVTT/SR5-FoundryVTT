@@ -21,7 +21,12 @@
         </div>
         <div class="flexcol flex-end">
             <header class="flexrow">
-                <div class="flexcol flex-end attribute row space-around">
+                <div class="attributes center">
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
+                </div>
+            </header>
+            <div class="flexrow align-center">
+                <div class="attribute">
                     <div
                     data-tooltip="SR5.Roll"
                     class="attribute-name Roll fas fa-dice-six"
@@ -29,22 +34,19 @@
                     data-roll-id="prompt-roll"
                     ></div>
                 </div>
-                <div class="attributes center">
-                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
+                <div class="flex7">
+                    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Sprite.Services") }}
+                    <div class="item-text">
+                        {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                                cssClass="attribute-input"
+                                size="2"
+                                maxLength="2"
+                                value=system.services
+                                name="system.services"
+                        }}
+                    </div>
+                    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
                 </div>
-            </header>
-            <div>
-                {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Sprite.Services") }}
-                <div class="item-text">
-                    {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
-                            cssClass="attribute-input"
-                            size="2"
-                            maxLength="2"
-                            value=system.services
-                            name="system.services"
-                    }}
-                </div>
-                {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
             </div>
         </div>
     </header>
