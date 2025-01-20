@@ -283,6 +283,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
         html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
         html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
+        html.find('.item-enable-toggle').on('click', this._onListItemToggleEnabled.bind(this));
 
         // Item list description display handling...
         html.find('.hidden').hide();
@@ -1538,6 +1539,38 @@ export class SR5BaseActorSheet extends ActorSheet {
                 '_id': iid,
                 'system.technology.equipped': !item.isEquipped(),
             }]);
+        }
+
+        this.actor.render(false);
+    }
+
+    /**
+     * Change the enabled status of an item shown within a sheet item list.
+     */
+    async _onListItemToggleEnabled(event) {
+        event.preventDefault();
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        if (!item) return;
+        if (!item.isCritterPower && !item.isSpritePower) return;
+
+        switch (item.system.optional) {
+            case 'standard':
+                return;
+            case 'enabled_option':
+                await this.actor.updateEmbeddedDocuments('Item', [{
+                    '_id': iid,
+                    'system.optional': 'disabled_option',
+                    'system.enabled': false,
+                }]);
+                break;
+            case 'disabled_option':
+                await this.actor.updateEmbeddedDocuments('Item', [{
+                    '_id': iid,
+                    'system.optional': 'enabled_option',
+                    'system.enabled': true,
+                }]);
+                break;
         }
 
         this.actor.render(false);

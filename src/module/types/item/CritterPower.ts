@@ -5,7 +5,6 @@ declare namespace Shadowrun {
         DescriptionPartData,
         ImportFlags,
         ArmorPartData {
-
     }
 
     export interface CritterPowerPartData {
@@ -15,6 +14,8 @@ declare namespace Shadowrun {
         duration: keyof typeof SR5CONFIG.critterPower.durations;
         karma: number;
         rating: number;
+        optional: keyof typeof SR5CONFIG.critterPower.optional;
+        enabled: boolean
     }
 
     export type CritterPowerCategory = 'mundane' | 'paranormal' | 'weakness' | 'emergent' | 'drake' | 'shapeshifter' | 'free_spirit' | 'paranormal_infected' | 'echoes' | '';

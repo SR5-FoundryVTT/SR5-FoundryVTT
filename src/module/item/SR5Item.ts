@@ -1208,6 +1208,10 @@ export class SR5Item extends Item {
         return this.wrapper.isEquipped();
     }
 
+    isEnabled(): boolean {
+        return this.wrapper.isEnabled();
+    }
+
     isWireless(): boolean {
         return this.wrapper.isWireless();
     }
