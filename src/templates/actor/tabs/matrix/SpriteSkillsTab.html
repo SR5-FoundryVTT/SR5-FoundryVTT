@@ -1,5 +1,19 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='skills'}}
     <div class="inventory">
+        <div class="attributes">
+            {{#each config.matrixAttributes as |label key|}}
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html"
+                        matrixAtt=(lookup ../system.matrix key)
+                        key=key
+                        label=label
+                        matrixAttributes=../config/matrixAttributes
+                }}
+            {{/each}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                    attributeId='resonance'
+                    attribute=system.attributes.resonance
+            }}
+        </div>
         <div class="split-container">
 
             {{> 'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html' }}
@@ -7,7 +21,6 @@
                 <div class= "list-item item-section center sprite"> <!--Here starts the selector sprite-->
                     {{> 'systems/shadowrun5e/dist/templates/common/HeaderBlock.html' name=(localize "SR5.Labels.ActorSheet.SpriteConfiguration") }}
                     <div class="item-center">
-                    <!--Needs Section for the Compiler of the Sprite-->
                         <div class="list-item matrix">
                             <div class="list-item-content">
                                 <div class="item-left">
