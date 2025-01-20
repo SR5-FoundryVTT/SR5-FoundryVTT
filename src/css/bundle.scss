@@ -926,6 +926,15 @@ input[type='text'].display {
             // &:first-child {
             //     border-top: 1px solid $yellow;
             // }
+
+            &.subcategory-header {
+                margin-left: 0.5em;
+                border-bottom: none;
+            }
+        }
+
+        &.subcategory-item {
+            margin-left: 0.5em;
         }
 
         .list-item-content {
