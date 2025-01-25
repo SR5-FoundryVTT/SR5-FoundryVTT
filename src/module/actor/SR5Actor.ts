@@ -1885,6 +1885,13 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Check if the current actor has a Matrix persona.
+     */
+    get hasPersona(): boolean {
+        return this.hasActorPersona || this.hasDevicePersona;
+    }
+
+    /**
      * Check if the current actor is a matrix first class citizen.
      *
      * @returns true, when the actor lives in the matrix.

@@ -91,8 +91,12 @@ export class MatrixTargetAcquisitionApplication extends Application {
             // Throw away unneeded tokens.
             if (!token.actor) continue;
             const target = token.actor;
+            // Skip the deckers token.
             if (target?.id === this.actor.id) continue;
-
+            // Skip based on FoundryVTT details.
+            if (game.user?.isGM && token.hidden) continue;
+            // Skip actors based on their persona and visibility.
+            if (!target.hasPersona) continue;
             if (!this.actor.matrixPersonaIsVisible(target)) continue;
 
             // Collect matrix items from each token
