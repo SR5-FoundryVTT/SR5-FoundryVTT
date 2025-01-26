@@ -133,7 +133,7 @@ export class ModifiersPrep {
      * 
      */
     static clearValueMods(system: ShadowrunActorDataData) {
-        for (const [name, values] of Object.entries(system.values)) {
+        for (const values of Object.values(system.values)) {
             values.mod = [];
         }
     }

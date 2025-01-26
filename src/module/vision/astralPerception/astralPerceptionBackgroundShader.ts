@@ -1,5 +1,4 @@
-//todo: v10 foundry-vtt-types 
-//@ts-expect-error
+//@ts-expect-error // TODO: foundry-vtt-types v10
 export default class AstralPerceptionBackgroundVisionShader extends AmplificationBackgroundVisionShader {
     static COLOR_TINT = [1, 1, 0];
   

@@ -1,6 +1,5 @@
 import SkillField = Shadowrun.SkillField;
 import {PartsList} from "../parts/PartsList";
-import {SR5} from "../config";
 import {SR} from "../constants";
 
 export class SkillRules {

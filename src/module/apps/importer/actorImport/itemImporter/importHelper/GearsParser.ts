@@ -11,7 +11,7 @@ export class GearsParser {
      * @param chummerGears Array of chummer gear entries
      */
     async parseGears(chummerGears : any, assignIcons : boolean) : Promise<any> {
-        let items : any[] = [];
+        const items : any[] = [];
         const iconList = await IconAssign.getIconFiles();
 
         chummerGears.forEach(async (chummerGear) => {
