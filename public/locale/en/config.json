@@ -235,12 +235,12 @@
     "SR5.Contact": {
         "Blackmail": "Blackmail",
         "Connection": "Connection",
+        "DropActor": "Drag&Drop an actor to link it to this contact",
         "Family": "Family",
         "Group": "Group",
         "LinkedActor": "Actor",
-        "Loyalty": "Loyalty",        
-        "DropActor": "Drag&Drop an actor to link it to this contact",
-                "Type": "Type"
+        "Loyalty": "Loyalty",
+        "Type": "Type"
     },
     "SR5.Contacts": "Contacts",
     "SR5.Continue": "Continue",
@@ -268,7 +268,13 @@
             "Special": "Special",
             "Sustained": "Sustained"
         },
+        "IsOptional": "Optionality",
         "Karma": "Karma",
+        "Optional": {
+            "DisabledOption": "Optional, disabled",
+            "EnabledOption": "Optional, enabled",
+            "Standard": "By default"
+        },
         "Range": "Range",
         "Ranges": {
             "LineOfSight": "Line Of Sight",
@@ -281,12 +287,6 @@
         "Types": {
             "Mana": "Mana",
             "Physical": "Physical"
-        },
-        "IsOptional": "Optionality",
-        "Optional": {
-            "Standard": "By default",
-            "EnabledOption": "Optional, enabled",
-            "DisabledOption": "Optional, disabled"
         }
     },
     "SR5.Cyberware": "Cyberware",
@@ -488,8 +488,8 @@
             "Binder": "Binder",
             "BlackIC": "Black IC",
             "Blaster": "Blaster",
-            "BlueGoo": "Blauer Schleim",
             "Bloodhound": "Bloodhound",
+            "BlueGoo": "Blauer Schleim",
             "Catapult": "Catapult",
             "Crash": "Crash",
             "Flicker": "Flicker",
@@ -598,9 +598,11 @@
         "ActorSheet": {
             "CreateInventory": "Create inventory place",
             "CritterPowers": "Critter Powers",
-            "EnabledOptionCritterPowers": "Optional Critter Powers - Enabled",
-            "DisabledOptionCritterPowers": "Optional Critter Powers - Disabled",
             "DeviceRating": "Device Rating",
+            "DisabledOptionCritterPowers": "Optional Critter Powers - Disabled",
+            "DisabledOptionSpritePowers": "Optional Sprite Powers - Disabled",
+            "EnabledOptionCritterPowers": "Optional Critter Powers - Enabled",
+            "EnabledOptionSpritePowers": "Optional Sprite Powers - Enabled",
             "ICConfiguration": "IC Configuration",
             "Matrix": "Matrix",
             "PersonalInventory": "On Person",
@@ -614,8 +616,6 @@
             "SpiritConfiguration": "Spirit Configuration",
             "SpriteConfiguration": "Sprite Configuration",
             "SpritePowers": "Sprite Powers",
-            "EnabledOptionSpritePowers": "Optional Sprite Powers - Enabled",
-            "DisabledOptionSpritePowers": "Optional Sprite Powers - Disabled",
             "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
             "VehicleConfiguration": "Vehicle Configuration"
         },
@@ -1138,13 +1138,13 @@
         }
     },
     "SR5.SpritePower": {
-        "Type": "Type",
         "IsOptional": "Optionality",
         "Optional": {
-            "Standard": "By default",
+            "DisabledOption": "Optional, disabled",
             "EnabledOption": "Optional, enabled",
-            "DisabledOption": "Optional, disabled"
-        }
+            "Standard": "By default"
+        },
+        "Type": "Type"
     },
     "SR5.Stock": "Stock",
     "SR5.StreetCred": "Street Cred",
@@ -1229,16 +1229,17 @@
             "NPC": "Mark actor as NPC to get additional features",
             "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
         },
+        "Actor.DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
         "CallInAction": {
             "ActorType": "Type of actor to call in"
-        },
-        "Contact": {
-            "LinkActor": "Drag&Drop an actor to link him to this contact"
         },
         "CompilationTest": {
             "Level": "Level of the compiled sprite",
             "PreparedSprite": "Use a prepared sprite actor instead of creating a generic one",
             "SpriteType": "Type of the compiled sprite"
+        },
+        "Contact": {
+            "LinkActor": "Drag&Drop an actor to link him to this contact"
         },
         "Effect": {
             "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
@@ -1327,8 +1328,7 @@
             "PushTheLimit": "Apply push the limit edge rules",
             "RollMode": "FoundryVTT chat message roll visibility",
             "Threshold": "Calculated threshold value"
-        },
-        "Actor.DefaultCategoryVisibility": "Show item categories even if no item has been added to them"
+        }
     },
     "SR5.Top": "Top",
     "SR5.Total": "Total",
@@ -1453,15 +1453,16 @@
             "Thrown": "Thrown"
         },
         "Cliptype": {
-            "RemovableClip": "Removable Clip",
-            "BreakAction": "Break Action",
             "BeltFed": "Belt Fed",
-            "InternalMagazin": "Internal Magazin",
-            "MuzzleLoader": "Muzzle Loader",
+            "Bow": "Bow",
+            "BreakAction": "Break Action",
             "Cylinder": "Cylinder",
             "Drum": "Drum",
-            "Bow": "Bow"
+            "InternalMagazin": "Internal Magazin",
+            "MuzzleLoader": "Muzzle Loader",
+            "RemovableClip": "Removable Clip"
         },
+        "FullReload": "Full",
         "Mod": "Mod",
         "Mode": {
             "BurstFire": "BF",
@@ -1478,6 +1479,7 @@
             "SingleShotShort": "SS"
         },
         "Mods": "Mods",
+        "PartialReload": "Partial",
         "Range": {
             "Category": {
                 "AerodynamicThrownGrenade": "Aerodynamic Grenade",
@@ -1518,8 +1520,6 @@
         },
         "Reach": "Reach",
         "Reload": "Reload",
-        "FullReload": "Full",
-        "PartialReload": "Partial",
         "Type": "Type",
         "Weapon": "Weapon"
     },

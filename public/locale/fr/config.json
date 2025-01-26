@@ -162,7 +162,13 @@
             "Special": "Special",
             "Sustained": "Maintenu"
         },
+        "IsOptional": "Optionel",
         "Karma": "Karma",
+        "Optional": {
+            "DisabledOption": "Optionel, disabled",
+            "EnabledOption": "Optionel, enabled",
+            "Standard": "Par défaut"
+        },
         "Range": "Portée",
         "Ranges": {
             "LineOfSight": "Champ de vision",
@@ -175,12 +181,6 @@
         "Types": {
             "Mana": "Mana",
             "Physical": "Physique"
-        },
-        "IsOptional": "Optionel",
-        "Optional": {
-            "Standard": "Par défaut",
-            "EnabledOption": "Optionel, enabled",
-            "DisabledOption": "Optionel, disabled"
         }
     },
     "SR5.Cyberware": "Cyberware",
@@ -362,9 +362,11 @@
     "SR5.Labels": {
         "ActorSheet": {
             "CritterPowers": "Pouvoirs",
-            "EnabledOptionCritterPowers": "Pouvoirs Optionels - Activés",
-            "DisabledOptionCritterPowers": "Pouvoirs Optionels - Désactivés",
             "DeviceRating": "Indice d'appareil",
+            "DisabledOptionCritterPowers": "Pouvoirs Optionels - Désactivés",
+            "DisabledOptionSpritePowers": "Pouvoirs Optionels - Désactivés",
+            "EnabledOptionCritterPowers": "Pouvoirs Optionels - Activés",
+            "EnabledOptionSpritePowers": "Pouvoirs Optionels - Activés",
             "Rituals": "Rituels",
             "RollDroneInfiltration": "Infiltration du drone",
             "RollDronePerception": "Perception du drone",
@@ -374,8 +376,6 @@
             "SpiritConfiguration": "Configuration d'esprit",
             "SpriteConfiguration": "Configuration de sprite",
             "SpritePowers": "Pouvoirs",
-            "EnabledOptionSpritePowers": "Pouvoirs Optionels - Activés",
-            "DisabledOptionSpritePowers": "Pouvoirs Optionels - Désactivés",
             "VehicleConfiguration": "Configuration véhicule"
         }
     },
@@ -755,13 +755,13 @@
         }
     },
     "SR5.SpritePower": {
-        "Type": "Type",
         "IsOptional": "Optionel",
         "Optional": {
-            "Standard": "Par défaut",
+            "DisabledOption": "Optionel, disabled",
             "EnabledOption": "Optionel, enabled",
-            "DisabledOption": "Optionel, disabled"
-        }
+            "Standard": "Par défaut"
+        },
+        "Type": "Type"
     },
     "SR5.Stock": "Stock",
     "SR5.StreetCred": "Réputation",
