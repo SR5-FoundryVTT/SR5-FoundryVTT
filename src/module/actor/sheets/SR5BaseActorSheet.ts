@@ -17,6 +17,8 @@ import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
+import SpellCategory = Shadowrun.SpellCateogry;
+import SpellData = Shadowrun.SpellData;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
@@ -28,7 +30,7 @@ import { parseDropData } from '../../utils/sheets';
 export interface SheetItemData {
     type: string,
     name: string,
-    data: Shadowrun.ShadowrunItemDataData
+    system: Shadowrun.ShadowrunItemDataData
     properties: any,
     description: any
 }
@@ -243,10 +245,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
+        data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
 
         data.situationModifiers = this._prepareSituationModifiers();
+
+        data.contentVisibility = this._prepareContentVisibility(data);
 
         // @ts-expect-error TODO: foundry-vtt-types v10
         data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
@@ -1000,6 +1005,56 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     _prepareSelectedInventory(inventories: InventoriesSheetData) {
         return inventories[this.selectedInventory];
+    }
+
+    /**
+     * Categorize and sort spells to display cleanly.
+     * 
+     * @param inventories 
+     */
+    _prepareSortedCategorizedSpells(spellSheets: SheetItemData[]) {
+        const sortedSpells : Record<string, SheetItemData[]> = {};
+        const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
+
+        // Add all spell types in system.
+        spellTypes.forEach(type => {
+            sortedSpells[type] = [];
+        });
+
+        spellSheets.forEach(spell => {
+            // Check if the spell category is defined and if it's something we expect, if not we use the 'notfound' category
+            const category = ((spell.system.category === undefined) || !spellTypes.includes(spell.system.category)) ? 'notfound' : spell.system.category;
+            sortedSpells[category].push(spell);
+        });
+
+        spellTypes.forEach(type => {
+            sortedSpells[type].sort((a, b) : number => {
+                return a.name.localeCompare(b.name);
+            });
+        });
+
+        return sortedSpells;
+    }
+
+    /**
+     * Used by the sheet to choose whether to show or hide hideable fields
+     */
+    _prepareContentVisibility(data) {
+        const contentVisibility : Record<string, boolean> = {}
+        const defaultVisibility = data.system.category_visibility.default;
+
+        // If prefix is empty uses the category as a prefix
+        const setVisibility = (category: string, prefix?: string) => {
+            contentVisibility[prefix || category + '_list'] = defaultVisibility || data.itemType[category].length > 0;
+        }
+
+        contentVisibility['default'] = defaultVisibility;
+        setVisibility('adept_power');
+        setVisibility('spell');
+        setVisibility('ritual');
+        setVisibility('summoning');
+
+        return contentVisibility;
     }
 
     /**

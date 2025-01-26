@@ -968,4 +968,8 @@ export const registerItemLineHelpers = () => {
             cssClass: 'network-clear'
         }];
     })
+
+    Handlebars.registerHelper('EmptyIcons', () => {
+        return [{}];
+    })
 };

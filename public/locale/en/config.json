@@ -308,6 +308,7 @@
     "SR5.DamageReplace": "Replace Damage",
     "SR5.DamageType": "Type",
     "SR5.DamageValue": "Damage Value",
+    "SR5.DefaultCategoryVisibility": "Show empty categories",
     "SR5.Defaulting": "Defaulting",
     "SR5.Defender": "Defender",
     "SR5.DefenderNetHits": "Defender Net Hits",
@@ -1326,7 +1327,8 @@
             "PushTheLimit": "Apply push the limit edge rules",
             "RollMode": "FoundryVTT chat message roll visibility",
             "Threshold": "Calculated threshold value"
-        }
+        },
+        "Actor.DefaultCategoryVisibility": "Show item categories even if no item has been added to them"
     },
     "SR5.Top": "Top",
     "SR5.Total": "Total",
