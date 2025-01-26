@@ -144,7 +144,7 @@ export class ImportHelper {
             // use untranslated category name for easier mapping during DataImporter.Parse implementations.
             const origCategoryName = categoryName;
             categoryName = ImportHelper.TranslateCategory(categoryName, jsonCategoryTranslations);
-            categoryName = categoryName.replace(/[\/\\]/g, '_');
+            categoryName = categoryName.replace(/[/\\]/g, '_');
             folders[origCategoryName.toLowerCase()] = await ImportHelper.GetFolderAtPath(folder_type, `${Constants.ROOT_IMPORT_FOLDER_NAME}/${path}/${categoryName}`, true);
         }
 
