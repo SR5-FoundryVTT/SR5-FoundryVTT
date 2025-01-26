@@ -112,6 +112,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/modification.html',
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
         'systems/shadowrun5e/dist/templates/item/parts/critter_power.html',
+        'systems/shadowrun5e/dist/templates/item/parts/sprite_power.html',
         'systems/shadowrun5e/dist/templates/item/parts/summoning.html',
         'systems/shadowrun5e/dist/templates/item/parts/compilation.html',
         'systems/shadowrun5e/dist/templates/item/parts/ritual.html',

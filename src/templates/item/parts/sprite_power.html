@@ -1,0 +1,15 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.SpritePower.IsOptional"}}
+        </div>
+        <div class="inputs">
+            <select name="system.optional">
+                {{selectOptions config.spritePower.optional selected=system.optional localize=true}}
+            </select>
+        </div>
+    </div>
+</div>
