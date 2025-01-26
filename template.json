@@ -931,6 +931,9 @@
                         "hasIcon": false,
                         "runningSilent": false
                     }
+                },
+                "category_visibility": {
+                    "default": true
                 }
             },
             "physical_combat_values": {

@@ -1036,13 +1036,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * Used by the sheet to choose wether to show or hide hideable fields
+     * Used by the sheet to choose whether to show or hide hideable fields
      */
     _prepareContentVisibility(data) {
         const contentVisibility : Record<string, boolean> = {}
-
-        // If category_visibility doesn't exist yet, assume true
-        const defaultVisibility = data.system.category_visibility !== undefined ? data.system.category_visibility.default : true;
+        const defaultVisibility = data.system.category_visibility.default;
 
         // If prefix is empty uses the category as a prefix
         const setVisibility = (category: string, prefix?: string) => {
