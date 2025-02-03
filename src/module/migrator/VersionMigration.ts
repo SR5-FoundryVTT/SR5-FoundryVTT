@@ -157,9 +157,10 @@ export abstract class VersionMigration {
                 });
 
                 // Migrate embedded TokenDocument / ActorData within SceneData
-                for (const token of scene.data.tokens) {
+                for (const token of scene.tokens) {
                     // Don't migrate tokens without or a linked actor.
-                    if (!token.actor || token.data.actorLink) continue;
+                    // @ts-expect-error TODO: foundry-vtt-types v10
+                    if (!token.actor || token.actorLink) continue;
                     
                     //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(token.actor)) continue;
