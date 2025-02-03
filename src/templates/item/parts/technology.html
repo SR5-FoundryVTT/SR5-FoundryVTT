@@ -3,7 +3,7 @@
         {{#hasprop system 'grade'}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.CyberwareGrade"}}</label>
-            <select name="system.grade" class="display">
+            <select name="change-grade" class="display">
                 {{#select system.grade}} {{#each config.cyberwareGrades as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
@@ -16,10 +16,12 @@
                 class="display attribute-input"
                 type="text"
                 size="4"
-                name="system.essence"
-                value="{{system.essence}}"
+                name="system.baseEssence"
+                value="{{#ife system.grade 'standard'}}{{system.baseEssence}}{{else}}{{system.essence}}{{/ife}}"
                 data-dtype="Number"
                 placeholder="0"
+                data-action="update-essence"
+                {{#ifne system.grade 'standard'}}readonly{{/ifne}}
             />
         </div>
         {{/hasprop}} {{#hasprop system 'capacity'}}
@@ -64,7 +66,7 @@
         </div>
         {{#unless hideConceal}}
         <div class="flexrow nowrap">
-            <label>{{localize "SR5.Conceal"}}</label>
+            <label>{{localize "SR5.Conceal"}}</label>            
             <input
                 class="display"
                 type="text"
@@ -82,25 +84,57 @@
                 <input
                     class="display"
                     type="text"
-                    name="system.technology.cost"
-                    value="{{system.technology.cost}}"
+                    name="system.technology.baseCost"
+                    value="{{#if system.technology.costAdjusted}}{{system.technology.cost}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.cost}}{{else}}{{system.technology.baseCost}}{{/ifne}}{{else}}{{system.technology.baseCost}}{{/hasprop}}{{/if}}"
                     data-dtype="Number"
                     placeholder="100"
+                    data-action="update-cost"
+                    {{#if system.technology.costAdjusted}}readonly{{/if}}
+                    {{#hasprop system 'grade'}}
+                        {{#ifne system.grade 'standard'}}readonly{{/ifne}}
+                    {{/hasprop}}
                 />
                 <span class="unit">
                     <i class="fas fa-yen-sign"></i>
                 </span>
             </div>
+            <input
+                class="checkbox"
+                type="checkbox"
+                name="system.technology.costAdjusted"
+                {{checked system.technology.costAdjusted}}
+                data-tooltip="Toggle Cost Adjustment"                    
+                {{#hasprop system 'grade'}}
+                {{#ifne system.grade 'standard'}}disabled{{/ifne}}
+                {{/hasprop}}
+            />
         </div>
         <div class="flexrow nowrap">
             <label>{{localize "SR5.Availability"}}</label>
             <input
                 class="display"
                 type="text"
-                name="system.technology.availability"
-                value="{{system.technology.availability}}"
+                name="system.technology.baseAvailability"
+                value="{{#if system.technology.availabilityAdjusted}}{{system.technology.availability}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.availability}}{{else}}{{system.technology.baseAvailability}}{{/ifne}}{{else}}{{system.technology.baseAvailability}}{{/hasprop}}{{/if}}"
                 placeholder="2R"
+                data-action="update-availability"
+                {{#if system.technology.availabilityAdjusted}}readonly{{/if}}
+                {{#hasprop system 'grade'}}
+                    {{#ifne system.grade 'standard'}}readonly{{/ifne}}
+                {{/hasprop}}
             />
+            <div class="input">
+                <input
+                    class="checkbox"
+                    type="checkbox"
+                    name="system.technology.availabilityAdjusted"
+                    {{checked system.technology.availabilityAdjusted}}
+                    data-tooltip="Toggle Availability Adjustment"                    
+                    {{#hasprop system 'grade'}}
+                    {{#ifne system.grade 'standard'}}disabled{{/ifne}}
+                    {{/hasprop}}
+                />
+            </div>
         </div>
         {{#unless hideConditionMonitor}}
         <div class="flexrow nowrap">

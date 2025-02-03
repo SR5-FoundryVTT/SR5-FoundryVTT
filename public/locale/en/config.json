@@ -288,6 +288,8 @@
     "SR5.CyberwareGradeAlpha": "Alphaware",
     "SR5.CyberwareGradeBeta": "Betaware",
     "SR5.CyberwareGradeDelta": "Deltaware",
+    "SR5.CyberwareGradeGamma": "Gammaware",
+    "SR5.CyberwareGradeGrey": "Greyware",
     "SR5.CyberwareGradeStandard": "Standard",
     "SR5.CyberwareGradeUsed": "Used",
     "SR5.DIALOG.MissingModuleContent": "In order for source PDFs to be shown, the pdf-pager module must be installed and a PDF matching the code created.",

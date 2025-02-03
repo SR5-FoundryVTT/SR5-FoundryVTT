@@ -1265,8 +1265,12 @@
             "technology": {
                 "technology": {
                     "rating": 1,
+                    "availabilityAdjusted": false,
+                    "baseAvailability": "",
                     "availability": "",
-                    "quantity": 1,
+                    "quantity": 1,                    
+                    "costAdjusted": false,
+                    "baseCost": 0,
                     "cost": 0,
                     "equipped": false,
                     "conceal": {
@@ -1545,12 +1549,14 @@
         },
         "bioware": {
             "templates": ["description", "technology", "action", "armor", "importFlags"],
+            "baseEssence": 0,
             "essence": 0,
             "grade": "standard",
             "capacity": 0
         },
         "cyberware": {
             "templates": ["description", "technology", "action", "armor", "importFlags"],
+            "baseEssence": 0,
             "essence": 0,
             "grade": "standard",
             "capacity": 0
