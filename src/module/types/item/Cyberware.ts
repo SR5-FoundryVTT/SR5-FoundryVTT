@@ -11,8 +11,7 @@ declare namespace Shadowrun {
     }
 
     export interface CyberwarePartData {
-        baseEssence: number;
-        essence: number;
+        essence: BaseValuePair<number>;
         capacity: number;
         grade: string;
     }

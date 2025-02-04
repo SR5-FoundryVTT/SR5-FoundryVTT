@@ -18,7 +18,8 @@ export const vehicleModParserTesting = (context: QuenchBatchContext) => {
             assert.isNotNull(ecm)
             assert.strictEqual(ecm.name, "ECM")
             assert.strictEqual(ecm.type, "modification")
-            assert.strictEqual(ecm.system.technology.availability, "9V")
+            assert.strictEqual(ecm.system.technology.availability.base, "9V")
+            assert.strictEqual(ecm.system.technology.availability.value, "9V")
             assert.strictEqual(ecm.system.description.source, "R5 173")
         });
     });

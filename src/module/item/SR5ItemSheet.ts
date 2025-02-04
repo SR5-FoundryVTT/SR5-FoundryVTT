@@ -151,7 +151,7 @@ export class SR5ItemSheet extends ItemSheet {
                 const technology = itemData.technology as any;
                 if (technology.rating === 0) delete technology.rating;
                 if (technology.quantity === 0) delete technology.quantity;
-                if (technology.cost === 0) delete technology.cost;
+                if (technology.cost.base === 0) delete technology.cost.base;
             } catch (e) {
                 console.log(e);
             }
@@ -318,22 +318,27 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.hidden').hide();
         html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
 
-        html.find('input[name="system.technology.costAdjusted"]').on('change', async (event) => this._onCostAdjustmentChange(event.target.checked));
+        /**
+         * Technology item handling
+         */
+
+
+        html.find('input[name="system.technology.cost.adjusted"]').on('change', async (event) => this._onCostAdjustmentChange(event.target.checked));
         html.find('input[data-action="update-cost"]').on('change', async (event) => {
             const cost = parseFloat(event.target.value) || 0;
 
             await this.item.update({
-                'system.technology.baseCost': cost,
-                'system.technology.cost': cost,
+                'system.technology.cost.base': cost,
+                'system.technology.cost.value': cost,
             }, { render: true });
         });
 
-        html.find('input[name="system.technology.availabilityAdjusted"]').on('change', async (event) => await this._onAvailabilityAdjustmentChange(event));
+        html.find('input[name="system.technology.availability.adjusted"]').on('change', async (event) => await this._onAvailabilityAdjustmentChange(event));
         html.find('input[data-action="update-availability"]').on('change', async (event) => {
 
             await this.item.update({
-                'system.technology.baseAvailability': event.target.value,
-                'system.technology.availability': event.target.value,
+                'system.technology.availability.base': event.target.value,
+                'system.technology.availability.value': event.target.value,
             }, { render: true });
         });
 
@@ -346,8 +351,8 @@ export class SR5ItemSheet extends ItemSheet {
             const essence = parseFloat(event.target.value) || 0;
 
             await this.item.update({
-                'system.baseEssence': essence,
-                'system.essence': essence,
+                'system.essence.base': essence,
+                'system.essence.value': essence,
             }, { render: true });
         });
 
@@ -720,14 +725,14 @@ export class SR5ItemSheet extends ItemSheet {
         const availibilityAdjusted = event.target.checked;
 
 
-        const baseAvailability = String(this.item.system?.technology?.baseAvailability ?? 0);
+        const baseAvailability = String(this.item.getTechnologyData()?.availability.base ?? 0);
 
         const availParts = await this.item.parseAvailibility(baseAvailability);
 
         if (!availParts) {
             event.target.checked = false;
             await this.item.update({
-                'system.technology.availabilityAdjusted': false
+                'system.technology.availability.adjusted': false
             }, { render: true });
             return ui.notifications?.error("Availability must be in the format: Number-Letter (e.g., '12R') for calculation.");
         }
@@ -737,8 +742,8 @@ export class SR5ItemSheet extends ItemSheet {
         const actualAvailibility = availibilityAdjusted ? availParts.availability * rating : availParts.availability;
 
         await this.item.update({
-            'system.technology.availabilityAdjusted': availibilityAdjusted,
-            'system.technology.availability': `${actualAvailibility}${availParts.restriction}`
+            'system.technology.availability.adjusted': availibilityAdjusted,
+            'system.technology.availability.value': `${actualAvailibility}${availParts.restriction}`
         }, { render: true });
     }
 
@@ -753,18 +758,16 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onCostAdjustmentChange(costAdjusted: boolean) {
-        const baseCost = Number(this.item.system?.technology?.baseCost ?? 0);
+        const baseCost = Number(this.item.getTechnologyData()?.cost.base ?? 0);
         const rating = this.item.getRating();
 
         const actualCost = costAdjusted ? baseCost * rating : baseCost;
 
 
         await this.item.update({
-            'system.technology.costAdjusted': costAdjusted,
-            'system.technology.cost': actualCost
+            'system.technology.cost.adjusted': costAdjusted,
+            'system.technology.cost.value': actualCost
         }, { render: true });
-
-        console.log("Cost Adjusted:", typeof this.item.system?.technology?.costAdjusted);
     }
 
     async _onGradeChange(grade: string) {
@@ -785,30 +788,31 @@ export class SR5ItemSheet extends ItemSheet {
         const availMod = gradeModifiers[grade].avail ?? 0;
         const costMod = gradeModifiers[grade].cost ?? 1;
 
-        const actualEssence = Math.round(((Number(this.item.system?.baseEssence) ?? 0) * essenceMod) * 1e10) / 1e10;
+        const actualEssence = Math.round(((Number(this.item.system?.essence?.base) ?? 0) * essenceMod) * 1e10) / 1e10;
 
-        let availability = String(this.item.system?.technology?.baseAvailability ?? 0);
+        let availability = String(this.item.system?.technology?.availability?.base ?? 0);
 
         const availParts = await this.item.parseAvailibility(availability);
 
         if (!availParts) {
             availability += availMod !== 0 ? (availMod > 0 ? ` (+${availMod})` : ` (${availMod})`) : '';
         } else {
-            const availabilityAdjusted = this.item.system?.technology?.availabilityAdjusted ?? false;
+            const availabilityAdjusted = this.item.system?.technology?.availability.adjusted ?? false;
+              
             const actualAvailibility = availabilityAdjusted
                 ? availParts.availability * rating + availMod
                 : availParts.availability + availMod;
             availability = `${actualAvailibility}${availParts.restriction}`;
         }
 
-        const cost = Number(this.item.system?.technology?.baseCost ?? 0);
+        const cost = Number(this.item.system?.technology?.cost.base ?? 0);
         const actualCost = cost * rating * costMod;
 
         await this.item.update({
             'system.grade': grade,
-            'system.essence': actualEssence,
-            'system.technology.availability': availability,
-            'system.technology.cost': actualCost
+            'system.essence.value': actualEssence,
+            'system.technology.availability.value': availability,
+            'system.technology.cost.value': actualCost
         }, { render: true });
     }
 

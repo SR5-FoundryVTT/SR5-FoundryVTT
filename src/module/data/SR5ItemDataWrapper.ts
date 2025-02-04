@@ -293,7 +293,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
      * @returns A decimal as essence modifier
      */
     getEssenceLoss(): number {
-        const loss = Number(this.getData()?.essence) ?? 0;
+        const loss = Number(this.getData()?.essence?.value) ?? 0;
         const quantity = Number(this.getData()?.technology?.quantity) ?? 1;
 
         return loss * quantity

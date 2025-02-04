@@ -48,7 +48,7 @@ export const parseTechnology = (chummerEntry) => {
     }
 
     if (chummerEntry.avail) {
-        parsedTechnology.availability = chummerEntry.avail;
+        parsedTechnology.availability.base = parsedTechnology.availability.value = chummerEntry.avail;
     }
 
     if (chummerEntry.qty) {
@@ -56,7 +56,7 @@ export const parseTechnology = (chummerEntry) => {
     }
 
     if (chummerEntry.cost) {
-        parsedTechnology.cost = parseFloat(chummerEntry.cost.replace(/[^\d\.\-]/g, ""));
+        parsedTechnology.cost.base = parsedTechnology.cost.value = parseFloat(chummerEntry.cost.replace(/[^\d\.\-]/g, ""));        
     }
 
     if (chummerEntry.equipped?.toLowerCase() === 'true') {

@@ -4,13 +4,9 @@ declare namespace Shadowrun {
     };
     export type TechnologyData = {
         rating: NumberOrEmpty
-        availabilityAdjusted: boolean
-        baseAvailability: string
-        availability: string
+        availability: BaseValuePair<string> & { adjusted: boolean }
         quantity: NumberOrEmpty
-        costAdjusted: boolean
-        baseCost: NumberOrEmpty
-        cost: NumberOrEmpty
+        cost: BaseValuePair<NumberOrEmpty> & { adjusted: boolean }
         equipped: boolean
         conceal: ModifiableValue
         condition_monitor: ConditionData

@@ -16,8 +16,8 @@
                 class="display attribute-input"
                 type="text"
                 size="4"
-                name="system.baseEssence"
-                value="{{#ife system.grade 'standard'}}{{system.baseEssence}}{{else}}{{system.essence}}{{/ife}}"
+                name="system.essence.base"
+                value="{{#ife system.grade 'standard'}}{{system.essence.base}}{{else}}{{system.essence.value}}{{/ife}}"
                 data-dtype="Number"
                 placeholder="0"
                 data-action="update-essence"
@@ -49,6 +49,11 @@
                 value="{{system.technology.rating}}"
                 data-dtype="Number"
                 placeholder="0"
+                {{#if system.technology.cost.adjusted}}readonly{{/if}}
+                {{#if system.technology.availability.adjusted}}readonly{{/if}}
+                {{#hasprop system 'grade'}}
+                    {{#ifne system.grade 'standard'}}readonly{{/ifne}}
+                {{/hasprop}}
             />
         </div>
         <div class="flexrow nowrap">
@@ -84,12 +89,12 @@
                 <input
                     class="display"
                     type="text"
-                    name="system.technology.baseCost"
-                    value="{{#if system.technology.costAdjusted}}{{system.technology.cost}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.cost}}{{else}}{{system.technology.baseCost}}{{/ifne}}{{else}}{{system.technology.baseCost}}{{/hasprop}}{{/if}}"
+                    name="system.technology.cost.base"
+                    value="{{#if system.technology.cost.adjusted}}{{system.technology.cost.value}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.cost.value}}{{else}}{{system.technology.cost.base}}{{/ifne}}{{else}}{{system.technology.cost.base}}{{/hasprop}}{{/if}}"
                     data-dtype="Number"
                     placeholder="100"
                     data-action="update-cost"
-                    {{#if system.technology.costAdjusted}}readonly{{/if}}
+                    {{#if system.technology.cost.adjusted}}readonly{{/if}}
                     {{#hasprop system 'grade'}}
                         {{#ifne system.grade 'standard'}}readonly{{/ifne}}
                     {{/hasprop}}
@@ -101,8 +106,8 @@
             <input
                 class="checkbox"
                 type="checkbox"
-                name="system.technology.costAdjusted"
-                {{checked system.technology.costAdjusted}}
+                name="system.technology.cost.adjusted"
+                {{checked system.technology.cost.adjusted}}
                 data-tooltip="Toggle Cost Adjustment"                    
                 {{#hasprop system 'grade'}}
                 {{#ifne system.grade 'standard'}}disabled{{/ifne}}
@@ -114,11 +119,11 @@
             <input
                 class="display"
                 type="text"
-                name="system.technology.baseAvailability"
-                value="{{#if system.technology.availabilityAdjusted}}{{system.technology.availability}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.availability}}{{else}}{{system.technology.baseAvailability}}{{/ifne}}{{else}}{{system.technology.baseAvailability}}{{/hasprop}}{{/if}}"
+                name="system.technology.availability.base"
+                value="{{#if system.technology.availability.adjusted}}{{system.technology.availability.value}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.availability.value}}{{else}}{{system.technology.availability.base}}{{/ifne}}{{else}}{{system.technology.availability.base}}{{/hasprop}}{{/if}}"
                 placeholder="2R"
                 data-action="update-availability"
-                {{#if system.technology.availabilityAdjusted}}readonly{{/if}}
+                {{#if system.technology.availability.adjusted}}readonly{{/if}}
                 {{#hasprop system 'grade'}}
                     {{#ifne system.grade 'standard'}}readonly{{/ifne}}
                 {{/hasprop}}
@@ -127,11 +132,11 @@
                 <input
                     class="checkbox"
                     type="checkbox"
-                    name="system.technology.availabilityAdjusted"
-                    {{checked system.technology.availabilityAdjusted}}
+                    name="system.technology.availability.adjusted"
+                    {{checked system.technology.availability.adjusted}}
                     data-tooltip="Toggle Availability Adjustment"                    
                     {{#hasprop system 'grade'}}
-                    {{#ifne system.grade 'standard'}}disabled{{/ifne}}
+                        {{#ifne system.grade 'standard'}}disabled{{/ifne}}
                     {{/hasprop}}
                 />
             </div>
