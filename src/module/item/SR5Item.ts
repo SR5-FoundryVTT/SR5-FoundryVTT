@@ -956,15 +956,6 @@ export class SR5Item extends Item {
         return this.wrapper.getTechnology();
     }
 
-    get isAvailabilityAdjusted(): boolean {
-        const availabilityAdjusted = (
-            this.getTechnologyData()?.availability?.base !== undefined &&
-            this.getTechnologyData()?.availability?.value !== undefined &&
-            this.getTechnologyData()?.availability?.base !== this.getTechnologyData()?.availability?.value
-          ) ? true : false;
-          return availabilityAdjusted;
-    }
-
     async parseAvailibility(avail: string) {
         console.log(avail);
 
