@@ -19,6 +19,8 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpritePowersTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ConfigTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/HackingTab.html',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.html',
@@ -96,7 +98,6 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/weapon-ammo-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/action.html',
-        'systems/shadowrun5e/dist/templates/item/parts/action_results.html',
         'systems/shadowrun5e/dist/templates/item/parts/modifier.html',
         'systems/shadowrun5e/dist/templates/item/parts/damage.html',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.html',
@@ -159,5 +160,5 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
     ];
 
-    return loadTemplates(templatePaths);
+    return await loadTemplates(templatePaths);
 };

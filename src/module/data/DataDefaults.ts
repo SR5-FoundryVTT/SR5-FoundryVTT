@@ -3,11 +3,6 @@ import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
 import ActionRollData = Shadowrun.ActionRollData;
 import LimitField = Shadowrun.LimitField;
-import SkillField = Shadowrun.SkillField;
-import TrackType = Shadowrun.TrackType;
-import SourceEntityField = Shadowrun.SourceEntityField;
-import ValueField = Shadowrun.ValueField;
-import GenericValueField = Shadowrun.GenericValueField;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import RangeData = Shadowrun.RangeData;
 
@@ -151,6 +146,7 @@ export class DataDefaults {
             mod_description: '',
             damage: this.damageData(),
             modifiers: [],
+            test: '',
             limit: {
                 value: 0,
                 base: 0,
@@ -196,7 +192,7 @@ export class DataDefaults {
             label: '',
             hidden: false,
             mod: []
-        }, partialLimitField) as LimitField;
+        }, partialLimitField) as Shadowrun.LimitField;
     }
 
     /**
@@ -204,7 +200,7 @@ export class DataDefaults {
      * 
      * @param partialSkillData Inject any skill property
      */
-    static skillData(partialSkillData: Partial<SkillField> = {}): SkillField {
+    static skillData(partialSkillData: Partial<Shadowrun.SkillField> = {}): Shadowrun.SkillField {
         return foundry.utils.mergeObject({
             name: SKILL_DEFAULT_NAME,
             base: 0,
@@ -216,15 +212,15 @@ export class DataDefaults {
             specs: [],
             mod: [],
             attribute: ''
-        }, partialSkillData) as SkillField;
+        }, partialSkillData) as Shadowrun.SkillField;
     }
 
     /**
      * Build a damage track field for use in document data.
-     * @param partialTrackData Injet any track property
+     * @param partialTrackData Inject any track property
      * @returns 
      */
-    static trackData(partialTrackData: Partial<TrackType> = {}): TrackType {
+    static trackData(partialTrackData: Partial<Shadowrun.TrackType> = {}): Shadowrun.TrackType {
         return foundry.utils.mergeObject({
             value: 0,
             max: 0,
@@ -232,7 +228,7 @@ export class DataDefaults {
             mod: [],
             disabled: false,
             wounds: 0
-        }, partialTrackData) as TrackType;
+        }, partialTrackData) as Shadowrun.TrackType;
     }
 
     /**
@@ -246,15 +242,15 @@ export class DataDefaults {
      * @param partialSourceEntityData 
      * @returns 
      */
-    static sourceItemData(partialSourceEntityData: Partial<SourceEntityField> = {}): SourceEntityField {
+    static sourceItemData(partialSourceEntityData: Partial<Shadowrun.SourceEntityField> = {}): Shadowrun.SourceEntityField {
         return foundry.utils.mergeObject({
             id: '',
             name: '',
             pack: null,
             type: 'Actor',
-            // @ts-expect-error
+            // @ts-expect-error // Lazy Typing
             system: partialSourceEntityData.system || undefined
-        }, partialSourceEntityData) as SourceEntityField;
+        }, partialSourceEntityData) as Shadowrun.SourceEntityField;
     }
 
     /**
@@ -262,14 +258,14 @@ export class DataDefaults {
      * 
      * @param partialValueData Inject any value property
      */
-    static valueData(partialValueData: Partial<ValueField> = {}) {
+    static valueData(partialValueData: Partial<Shadowrun.ValueField> = {}) {
         return foundry.utils.mergeObject({
             base: 0,
             value: 0,
             temp: 0,
             mod: [],
             label: ''
-        }, partialValueData) as ValueField;
+        }, partialValueData) as Shadowrun.ValueField;
     }
 
     /**
@@ -277,14 +273,14 @@ export class DataDefaults {
      * Differs from valueData as it's not only allowing number type values.
      * @param partialGenericValueData Inject any value property
      */
-    static genericValueData(partialGenericValueData: Partial<GenericValueField> = {}) {
+    static genericValueData(partialGenericValueData: Partial<Shadowrun.GenericValueField> = {}) {
         return foundry.utils.mergeObject({
             base: 0,
             value: 0,
             temp: 0,
             mod: [],
             label: ''
-        }, partialGenericValueData) as GenericValueField;
+        }, partialGenericValueData) as Shadowrun.GenericValueField;
     }
 
     /**
@@ -325,7 +321,7 @@ export class DataDefaults {
             value: '',
             chat: '',
             source: ''
-        }, partialDescriptionData) as Shadowrun.DescriptionData;
+        }, partialDescriptionData);
     }
 
     /**
@@ -352,8 +348,8 @@ export class DataDefaults {
                 max: 0,
             },
             wireless: true,
-            networkController: undefined
-        }, partialTechnologyData) as Shadowrun.TechnologyData;
+            master: undefined
+        }, partialTechnologyData);
     }
 
     /**
@@ -373,5 +369,13 @@ export class DataDefaults {
             temp: 0,
             limit: ''
         }, partialAttributeData) as Shadowrun.AttributeField;
+    }
+
+    static matrixData(partialMatrixTargetData: Partial<Shadowrun.MatrixMarkTarget> = {}) {
+        return foundry.utils.mergeObject({
+            uuid: null,
+            name: '',
+            marks: 0
+        }, partialMatrixTargetData);
     }
 }
