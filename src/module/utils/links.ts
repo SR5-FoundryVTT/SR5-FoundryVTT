@@ -46,8 +46,12 @@ export class LinksHelpers {
     static isUuid(candidate: string | undefined) {
         if (!candidate) return false;
 
-        // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
-        return !!foundry.utils.parseUuid(candidate).collection;
+        try {
+            // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
+            return !!foundry.utils.parseUuid(candidate).collection;
+          } catch (error) {
+            return false;
+          }
     }
 
     /**

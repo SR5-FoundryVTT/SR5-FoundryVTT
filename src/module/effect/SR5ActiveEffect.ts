@@ -241,6 +241,8 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (this.onlyForEquipped && !this.parent.isEquipped()) return true;
         if (this.onlyForWireless && !this.parent.isWireless()) return true;
+        if (this.parent.isCritterPower && !this.parent.isEnabled()) return true;
+        if (this.parent.isSpritePower && !this.parent.isEnabled()) return true;
 
         return false; 
     }

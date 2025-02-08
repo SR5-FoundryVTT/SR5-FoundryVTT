@@ -21,6 +21,31 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
 
+/**
+ * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
+ */
+export interface SheetItemData {
+    type: string,
+    name: string,
+    system: Shadowrun.ShadowrunItemDataData
+    properties: any,
+    description: any
+}
+
+export interface InventorySheetDataByType {
+    type: string;
+    label: string;
+    isOpen: boolean;
+    items: SheetItemData[];
+}
+
+export interface InventorySheetData {
+    name: string,
+    label: string,
+    types: Record<string, InventorySheetDataByType>
+}
+
+export type InventoriesSheetData = Record<string, InventorySheetData>;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -215,11 +240,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
+        data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
 
         data.situationModifiers = this._prepareSituationModifiers();
+
+        data.contentVisibility = this._prepareContentVisibility(data);
 
         // @ts-expect-error TODO: foundry-vtt-types v10
         // eslint-disable-next-line
@@ -257,6 +285,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
         html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
         html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
+        html.find('.item-enable-toggle').on('click', this._onListItemToggleEnabled.bind(this));
 
         // Item list description display handling...
         html.find('.hidden').hide();
@@ -982,6 +1011,56 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
+     * Categorize and sort spells to display cleanly.
+     * 
+     * @param inventories 
+     */
+    _prepareSortedCategorizedSpells(spellSheets: SheetItemData[]) {
+        const sortedSpells : Record<string, SheetItemData[]> = {};
+        const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
+
+        // Add all spell types in system.
+        spellTypes.forEach(type => {
+            sortedSpells[type] = [];
+        });
+
+        spellSheets.forEach(spell => {
+            // Check if the spell category is defined and if it's something we expect, if not we use the 'notfound' category
+            const category = ((spell.system.category === undefined) || !spellTypes.includes(spell.system.category)) ? 'notfound' : spell.system.category;
+            sortedSpells[category].push(spell);
+        });
+
+        spellTypes.forEach(type => {
+            sortedSpells[type].sort((a, b) : number => {
+                return a.name.localeCompare(b.name);
+            });
+        });
+
+        return sortedSpells;
+    }
+
+    /**
+     * Used by the sheet to choose whether to show or hide hideable fields
+     */
+    _prepareContentVisibility(data) {
+        const contentVisibility : Record<string, boolean> = {}
+        const defaultVisibility = data.system.category_visibility.default;
+
+        // If prefix is empty uses the category as a prefix
+        const setVisibility = (category: string, prefix?: string) => {
+            contentVisibility[prefix || category + '_list'] = defaultVisibility || data.itemType[category].length > 0;
+        }
+
+        contentVisibility['default'] = defaultVisibility;
+        setVisibility('adept_power');
+        setVisibility('spell');
+        setVisibility('ritual');
+        setVisibility('summoning');
+
+        return contentVisibility;
+    }
+
+    /**
      * Show if any items are in the inventory or if the actor is supposed to have an inventory.
      *
      * A sheet is supposed to show an inventory if there are item types defined or an item of some
@@ -1583,6 +1662,38 @@ export class SR5BaseActorSheet extends ActorSheet {
                 '_id': iid,
                 'system.technology.equipped': !item.isEquipped(),
             }]);
+        }
+
+        this.actor.render(false);
+    }
+
+    /**
+     * Change the enabled status of an item shown within a sheet item list.
+     */
+    async _onListItemToggleEnabled(event) {
+        event.preventDefault();
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        if (!item) return;
+        if (!item.isCritterPower && !item.isSpritePower) return;
+
+        switch (item.system.optional) {
+            case 'standard':
+                return;
+            case 'enabled_option':
+                await this.actor.updateEmbeddedDocuments('Item', [{
+                    '_id': iid,
+                    'system.optional': 'disabled_option',
+                    'system.enabled': false,
+                }]);
+                break;
+            case 'disabled_option':
+                await this.actor.updateEmbeddedDocuments('Item', [{
+                    '_id': iid,
+                    'system.optional': 'enabled_option',
+                    'system.enabled': true,
+                }]);
+                break;
         }
 
         this.actor.render(false);

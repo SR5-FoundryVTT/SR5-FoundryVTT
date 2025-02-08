@@ -1001,6 +1001,11 @@ export const SR5 = {
             permanent: 'SR5.CritterPower.Durations.Permanent',
             special: 'SR5.CritterPower.Durations.Special',
         },
+        optional: {
+            standard: 'SR5.CritterPower.Optional.Standard',
+            enabled_option: 'SR5.CritterPower.Optional.EnabledOption',
+            disabled_option: 'SR5.CritterPower.Optional.DisabledOption',
+        },
     },
 
     spriteTypes: {
@@ -1011,6 +1016,21 @@ export const SR5 = {
         machine: 'SR5.Sprite.Types.Machine',
         companion: 'SR5.Sprite.Types.Companion',
         generalist:'SR5.Sprite.Types.Generalist',
+    },
+
+    spritePower: {
+        durations: {
+            always: 'SR5.SpritePower.Durations.Always',
+            instant: 'SR5.SpritePower.Durations.Instant',
+            sustained: 'SR5.SpritePower.Durations.Sustained',
+            permanent: 'SR5.SpritePower.Durations.Permanent',
+            special: 'SR5.SpritePower.Durations.Special',
+        },
+        optional: {
+            standard: 'SR5.SpritePower.Optional.Standard',
+            enabled_option: 'SR5.SpritePower.Optional.EnabledOption',
+            disabled_option: 'SR5.SpritePower.Optional.DisabledOption',
+        },
     },
 
     vehicle: {

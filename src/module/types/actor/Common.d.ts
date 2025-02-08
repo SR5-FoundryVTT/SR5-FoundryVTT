@@ -15,6 +15,7 @@ declare namespace Shadowrun {
          */
         inventories: InventoriesData
         visibilityChecks: VisibilityChecks
+        category_visibility: CategoryVisibility
     }
 
     export interface MagicData {
@@ -80,6 +81,10 @@ declare namespace Shadowrun {
 
     export interface MatrixTrackActorData {
         track: MatrixTracks
+    }
+
+    export interface CategoryVisibility {
+        default: boolean
     }
 
     export interface NPCData {

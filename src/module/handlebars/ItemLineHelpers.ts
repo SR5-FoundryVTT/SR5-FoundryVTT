@@ -731,6 +731,10 @@ export const registerItemLineHelpers = () => {
             icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
+        const enableIcon = {
+            icon: `${wrapper.isEnabled() ? 'fas fa-check-circle' : 'far fa-circle'} item-enable-toggle`,
+            title: game.i18n.localize('SR5.ToggleEquip'),
+        }
         const pdfIcon = {
             icon: 'fas fa-file open-source',
             title: game.i18n.localize('SR5.OpenSource'),
@@ -747,6 +751,11 @@ export const registerItemLineHelpers = () => {
             case 'bioware':
             case 'weapon':
                 icons.unshift(equipIcon);
+                break;
+            case 'critter_power':
+            case 'sprite_power':
+                if(wrapper.canBeDisabled()) icons.unshift(enableIcon);
+                break;
         }
 
         return icons;
@@ -958,5 +967,9 @@ export const registerItemLineHelpers = () => {
             text: game.i18n.localize('SR5.Del'),
             cssClass: 'network-clear'
         }];
+    })
+
+    Handlebars.registerHelper('EmptyIcons', () => {
+        return [{}];
     })
 };

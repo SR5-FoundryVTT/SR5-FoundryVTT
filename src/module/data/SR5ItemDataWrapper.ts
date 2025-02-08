@@ -205,6 +205,16 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData().technology?.equipped || false;
     }
 
+    isEnabled(): boolean {
+        if(!this.isCritterPower && !this.isSpritePower) return false;
+        return this.getData().enabled !== undefined ? this.getData().enabled === true : true;
+    }
+
+    canBeDisabled(): boolean {
+        if(!this.isCritterPower && !this.isSpritePower) return false;
+        return (this.getData().optional || 'standard') !== 'standard'
+    }
+
     isWireless(): boolean {
         return this.getData().technology?.wireless || false;
     }
