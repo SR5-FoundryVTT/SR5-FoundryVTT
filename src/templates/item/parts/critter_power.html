@@ -4,14 +4,21 @@
     </div>
     <div class="form-line">
         <div class="label">
+            {{localize "SR5.CritterPower.IsOptional"}}
+        </div>
+        <div class="inputs">
+            <select name="system.optional" class="power-optional-input">
+                {{selectOptions config.critterPower.optional selected=system.optional localize=true}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
             {{localize "SR5.CritterPower.Type"}}
         </div>
         <div class="inputs">
             <select name="system.powerType">
-                {{#select system.powerType}}
-                    {{#each config.critterPower.types as |name type|}}
-                        <option value="{{type}}">{{localize name}}</option>
-                    {{/each}} {{/select}}
+                {{selectOptions config.critterPower.types selected=system.powerType localize=true}}
             </select>
         </div>
     </div>
@@ -21,9 +28,7 @@
         </div>
         <div class="inputs">
             <select name="system.duration">
-                {{#select system.duration}} {{#each config.critterPower.durations as |name type|}}
-                    <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
+                {{selectOptions config.critterPower.durations selected=system.duration localize=true}}
             </select>
         </div>
     </div>
@@ -33,9 +38,7 @@
         </div>
         <div class="inputs">
             <select name="system.range">
-                {{#select system.range}} {{#each config.critterPower.ranges as |name type|}}
-                    <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
+                {{selectOptions config.critterPower.ranges selected=system.range localize=true}}
             </select>
         </div>
     </div>

@@ -21,7 +21,7 @@ declare namespace Shadowrun {
             values: PhysicalCombatValues
             metatype: string | keyof typeof SR5CONFIG.character.types;
             full_defense_attribute: string;
-            // Can a character have critter powers?
+            // Drakes and Shapeshifters can have critter powers
             is_critter: boolean;
             // modifiers: CharacterModifiers;
             limits: CharacterLimits

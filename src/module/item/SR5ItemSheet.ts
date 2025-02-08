@@ -369,6 +369,8 @@ export class SR5ItemSheet extends ItemSheet {
 
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
 
+        html.find('.power-optional-input').on('change', this._onPowerOptionalInputChanged.bind(this));
+
         this._activateTagifyListeners(html);
     }
 
@@ -974,5 +976,35 @@ export class SR5ItemSheet extends ItemSheet {
         if (!this.document.isEquipped()) return;
 
         await this.document.parent.equipOnlyOneItemOfType(this.document);
+    }
+
+    /**
+     * Change the enabled status of an item shown within a sheet item list.
+     */
+    async _onPowerOptionalInputChanged(event) {
+        event.preventDefault();
+        if (!this.item.isCritterPower && !this.item.isSpritePower) return;
+
+        let selectedRangeCategory;
+
+        if (this.item.isCritterPower) {
+            selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.critterPower.optional;
+        } else {
+            selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.spritePower.optional;
+        }
+
+        this.item.system.optional = selectedRangeCategory;
+
+        switch (this.item.system.optional) {
+            case 'standard':
+            case 'enabled_option':
+                this.item.system.enabled = true;
+                break;
+            case 'disabled_option':
+                this.item.system.enabled = false;
+                break;
+        }
+
+        this.item.render(false);
     }
 }

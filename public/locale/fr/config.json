@@ -162,7 +162,13 @@
             "Special": "Special",
             "Sustained": "Maintenu"
         },
+        "IsOptional": "Optionel",
         "Karma": "Karma",
+        "Optional": {
+            "DisabledOption": "Optionel, disabled",
+            "EnabledOption": "Optionel, enabled",
+            "Standard": "Par défaut"
+        },
         "Range": "Portée",
         "Ranges": {
             "LineOfSight": "Champ de vision",
@@ -196,6 +202,7 @@
     "SR5.DamageResistanceTest": "Test de résistance aux dégâts",
     "SR5.DamageType": "Type",
     "SR5.DamageValue": "Valeur Dégâts",
+    "SR5.DefaultCategoryVisibility": "Montrer les catégories vides",
     "SR5.Defaulting": "Par défaut",
     "SR5.Defense": "Defense",
     "SR5.DefenseTest": "Test de défense",
@@ -356,6 +363,10 @@
         "ActorSheet": {
             "CritterPowers": "Pouvoirs",
             "DeviceRating": "Indice d'appareil",
+            "DisabledOptionCritterPowers": "Pouvoirs Optionels - Désactivés",
+            "DisabledOptionSpritePowers": "Pouvoirs Optionels - Désactivés",
+            "EnabledOptionCritterPowers": "Pouvoirs Optionels - Activés",
+            "EnabledOptionSpritePowers": "Pouvoirs Optionels - Activés",
             "Rituals": "Rituels",
             "RollDroneInfiltration": "Infiltration du drone",
             "RollDronePerception": "Perception du drone",
@@ -744,6 +755,12 @@
         }
     },
     "SR5.SpritePower": {
+        "IsOptional": "Optionel",
+        "Optional": {
+            "DisabledOption": "Optionel, disabled",
+            "EnabledOption": "Optionel, enabled",
+            "Standard": "Par défaut"
+        },
         "Type": "Type"
     },
     "SR5.Stock": "Stock",

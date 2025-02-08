@@ -931,6 +931,9 @@
                         "hasIcon": false,
                         "runningSilent": false
                     }
+                },
+                "category_visibility": {
+                    "default": true
                 }
             },
             "physical_combat_values": {
@@ -1413,6 +1416,11 @@
                     "isFreshImport": false,
                     "isImported": false
                 }
+            },
+            "powers": {
+                "duration": "always",
+                "optional": "standard",
+                "enabled": true
             }
         },
         "armor": {
@@ -1509,11 +1517,10 @@
             }
         },
         "critter_power": {
-            "templates": ["description", "action", "armor", "importFlags"],
+            "templates": ["description", "action", "armor", "powers", "importFlags"],
             "rating": 0,
             "powerType": "",
-            "range": "",
-            "duration": ""
+            "range": ""
         },
         "complex_form": {
             "templates": ["description", "action", "importFlags"],
@@ -1572,7 +1579,7 @@
             "templates": ["description", "action", "action_result", "importFlags"]
         },
         "sprite_power": {
-            "templates": ["description", "action", "importFlags"]
+            "templates": ["description", "action", "powers", "importFlags"]
         },
         "contact": {
             "templates": ["description", "importFlags"],
