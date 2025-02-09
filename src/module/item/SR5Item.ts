@@ -956,6 +956,25 @@ export class SR5Item extends Item {
         return this.wrapper.getTechnology();
     }
 
+    async parseAvailibility(avail: string) {
+        console.log(avail);
+
+        // Remove the computed modifier at the end, if present.
+        avail = avail.replace(/\([+-]\d{1,2}\)$/, '');
+
+        console.log(avail);
+
+        // Separates the availability value and any potential restriction
+        const availParts = avail.match(/^(\d+)(.*)$/);
+
+        if(!availParts) return null;
+
+        const availability = parseInt(availParts[1], 10);
+        const restriction = availParts[2];
+
+        return {availability, restriction}
+    }
+
     getNetworkController(): string | undefined {
         return this.getTechnologyData()?.networkController;
     }
