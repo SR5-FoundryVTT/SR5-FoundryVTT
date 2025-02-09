@@ -235,12 +235,12 @@
     "SR5.Contact": {
         "Blackmail": "Blackmail",
         "Connection": "Connection",
+        "DropActor": "Drag&Drop an actor to link it to this contact",
         "Family": "Family",
         "Group": "Group",
         "LinkedActor": "Actor",
-        "Loyalty": "Loyalty",        
-        "DropActor": "Drag&Drop an actor to link it to this contact",
-                "Type": "Type"
+        "Loyalty": "Loyalty",
+        "Type": "Type"
     },
     "SR5.Contacts": "Contacts",
     "SR5.Continue": "Continue",
@@ -268,7 +268,13 @@
             "Special": "Special",
             "Sustained": "Sustained"
         },
+        "IsOptional": "Optionality",
         "Karma": "Karma",
+        "Optional": {
+            "DisabledOption": "Optional, disabled",
+            "EnabledOption": "Optional, enabled",
+            "Standard": "By default"
+        },
         "Range": "Range",
         "Ranges": {
             "LineOfSight": "Line Of Sight",
@@ -304,6 +310,7 @@
     "SR5.DamageReplace": "Replace Damage",
     "SR5.DamageType": "Type",
     "SR5.DamageValue": "Damage Value",
+    "SR5.DefaultCategoryVisibility": "Show empty categories",
     "SR5.Defaulting": "Defaulting",
     "SR5.Defender": "Defender",
     "SR5.DefenderNetHits": "Defender Net Hits",
@@ -483,8 +490,8 @@
             "Binder": "Binder",
             "BlackIC": "Black IC",
             "Blaster": "Blaster",
-            "BlueGoo": "Blauer Schleim",
             "Bloodhound": "Bloodhound",
+            "BlueGoo": "Blauer Schleim",
             "Catapult": "Catapult",
             "Crash": "Crash",
             "Flicker": "Flicker",
@@ -594,6 +601,10 @@
             "CreateInventory": "Create inventory place",
             "CritterPowers": "Critter Powers",
             "DeviceRating": "Device Rating",
+            "DisabledOptionCritterPowers": "Optional Critter Powers - Disabled",
+            "DisabledOptionSpritePowers": "Optional Sprite Powers - Disabled",
+            "EnabledOptionCritterPowers": "Optional Critter Powers - Enabled",
+            "EnabledOptionSpritePowers": "Optional Sprite Powers - Enabled",
             "ICConfiguration": "IC Configuration",
             "Matrix": "Matrix",
             "PersonalInventory": "On Person",
@@ -1129,6 +1140,12 @@
         }
     },
     "SR5.SpritePower": {
+        "IsOptional": "Optionality",
+        "Optional": {
+            "DisabledOption": "Optional, disabled",
+            "EnabledOption": "Optional, enabled",
+            "Standard": "By default"
+        },
         "Type": "Type"
     },
     "SR5.Stock": "Stock",
@@ -1214,16 +1231,17 @@
             "NPC": "Mark actor as NPC to get additional features",
             "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
         },
+        "Actor.DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
         "CallInAction": {
             "ActorType": "Type of actor to call in"
-        },
-        "Contact": {
-            "LinkActor": "Drag&Drop an actor to link him to this contact"
         },
         "CompilationTest": {
             "Level": "Level of the compiled sprite",
             "PreparedSprite": "Use a prepared sprite actor instead of creating a generic one",
             "SpriteType": "Type of the compiled sprite"
+        },
+        "Contact": {
+            "LinkActor": "Drag&Drop an actor to link him to this contact"
         },
         "Effect": {
             "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
@@ -1437,15 +1455,16 @@
             "Thrown": "Thrown"
         },
         "Cliptype": {
-            "RemovableClip": "Removable Clip",
-            "BreakAction": "Break Action",
             "BeltFed": "Belt Fed",
-            "InternalMagazin": "Internal Magazin",
-            "MuzzleLoader": "Muzzle Loader",
+            "Bow": "Bow",
+            "BreakAction": "Break Action",
             "Cylinder": "Cylinder",
             "Drum": "Drum",
-            "Bow": "Bow"
+            "InternalMagazin": "Internal Magazin",
+            "MuzzleLoader": "Muzzle Loader",
+            "RemovableClip": "Removable Clip"
         },
+        "FullReload": "Full",
         "Mod": "Mod",
         "Mode": {
             "BurstFire": "BF",
@@ -1462,6 +1481,7 @@
             "SingleShotShort": "SS"
         },
         "Mods": "Mods",
+        "PartialReload": "Partial",
         "Range": {
             "Category": {
                 "AerodynamicThrownGrenade": "Aerodynamic Grenade",
@@ -1502,8 +1522,6 @@
         },
         "Reach": "Reach",
         "Reload": "Reload",
-        "FullReload": "Full",
-        "PartialReload": "Partial",
         "Type": "Type",
         "Weapon": "Weapon"
     },

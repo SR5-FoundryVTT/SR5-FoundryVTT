@@ -23,7 +23,7 @@
         "HideGMOnlyChatContent": "Verstecke kritische Informationen bei SL-Proben",
         "HideGMOnlyChatContentDescription": "Nachrichten durch SL-Proben zeigen kritische Informationen nur Spielern mit Besitzer-Rechten für den genutzten Akteur.",
         "IgnoreDiagonal": "Ignoriere diagonale Bewegung (1-1-1)",
-        "ImportIconFolderDescription": "Der Ordner, in dem der Importer die Icon-Dateien finden kann. Standard-Ort: 'systems/shadowrun5e/dist/icons/importer/'",        
+        "ImportIconFolderDescription": "Der Ordner, in dem der Importer die Icon-Dateien finden kann. Standard-Ort: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Importer Icon-Ordner",
         "ManualRollOnSuccessTest": "Manuelles Würfeln bei Proben",
         "ManualRollOnSuccessTestDescription": "Erlaubt Benutzern manuelle Würfelwürfe bei Proben und Rückmeldungen von Erfolgen und Patzern.",
@@ -266,7 +266,13 @@
             "Special": "Speziell",
             "Sustained": "Aufrechterhalten"
         },
+        "IsOptional": "Optional",
         "Karma": "Karma",
+        "Optional": {
+            "DisabledOption": "Optional, inaktiv",
+            "EnabledOption": "Optional, aktiv",
+            "Standard": "Standard"
+        },
         "Range": "Reichweite",
         "Ranges": {
             "LineOfSight": "Blickfeld",
@@ -300,6 +306,7 @@
     "SR5.DamageReplace": "Ersetze Waffenschaden",
     "SR5.DamageType": "Art",
     "SR5.DamageValue": "Schaden",
+    "SR5.DefaultCategoryVisibility": "Zeige leere Item Sektionen",
     "SR5.Defaulting": "Improvisieren",
     "SR5.Defender": "Verteidiger",
     "SR5.DefenderNetHits": "Verteidiger Netto-Erfolge",
@@ -479,8 +486,8 @@
             "Binder": "Bremse",
             "BlackIC": "Schwarzes IC",
             "Blaster": "Blaster",
-            "BlueGoo": "Blue Goo",
             "Bloodhound": "Bluthund",
+            "BlueGoo": "Blue Goo",
             "Catapult": "Katapult",
             "Crash": "Absturz",
             "Flicker": "Flackern",
@@ -590,6 +597,10 @@
             "CreateInventory": "Erstelle Inventar-Ort",
             "CritterPowers": "Critterkräfte",
             "DeviceRating": "Gerätestufe",
+            "DisabledOptionCritterPowers": "Optionale Critter Kräfte - Inaktiv",
+            "DisabledOptionSpritePowers": "Optionale Sprite Kräfte - Inaktiv",
+            "EnabledOptionCritterPowers": "Optionale Critter Kräfte - Aktiv",
+            "EnabledOptionSpritePowers": "Optionale Sprite Kräfte - Aktiv",
             "ICConfiguration": "IC-Konfiguration",
             "Matrix": "Matrix",
             "PersonalInventory": "Am Körper",
@@ -835,8 +846,8 @@
     "SR5.Qty": "Menge",
     "SR5.Quality": "Vorteile/Nachteile",
     "SR5.QualityType": "Typ",
-    "SR5.QualityTypeNegative": "Nachteil",
     "SR5.QualityTypeLifeModule": "Lebensmodul",
+    "SR5.QualityTypeNegative": "Nachteil",
     "SR5.QualityTypePositive": "Vorteil",
     "SR5.Quantity": "Menge",
     "SR5.QuickInfo": {
@@ -1125,6 +1136,12 @@
         }
     },
     "SR5.SpritePower": {
+        "IsOptional": "Optional",
+        "Optional": {
+            "DisabledOption": "Optional, inaktiv",
+            "EnabledOption": "Optional, aktiv",
+            "Standard": "Standard"
+        },
         "Type": "Typ"
     },
     "SR5.Stock": "Schulterstütze",
@@ -1203,6 +1220,7 @@
     "SR5.Tooltips": {
         "Actor": {
             "Critter": "Ermöglicht die Nutzung von Critterkräften",
+            "DefaultCategoryVisibility": "Zeige Item Sektionen selbst dann, wenn sie leer sind.",
             "Grunt": "Nutze Schergen-Regeln für Akteur",
             "Metatype": "Ein NSC-Akteur bekommt automatische Attributemodifikatoren abhängig vom Metatyp",
             "MissingSummoner": "Drag&Drop Charakter oder nutze Beschwörungs-Aktion",
@@ -1430,15 +1448,16 @@
             "Thrown": "Geworfen"
         },
         "Cliptype": {
-            "RemovableClip": "Ladestreifen",
-            "BreakAction": "Klapplademechanismus",
             "BeltFed": "Gurtmunition",
-            "InternalMagazin": "Internes Magazin",
-            "MuzzleLoader": "Vorderlader",
+            "Bow": "Bogen",
+            "BreakAction": "Klapplademechanismus",
             "Cylinder": "Aufklappbare Trommel",
             "Drum": "Große Trommel",
-            "Bow": "Bogen"
+            "InternalMagazin": "Internes Magazin",
+            "MuzzleLoader": "Vorderlader",
+            "RemovableClip": "Ladestreifen"
         },
+        "FullReload": "Komplett",
         "Mod": "Mod",
         "Mode": {
             "BurstFire": "SM",
@@ -1455,6 +1474,7 @@
             "SingleShotShort": "EM"
         },
         "Mods": "Mods",
+        "PartialReload": "Teilweise",
         "Range": {
             "Category": {
                 "AerodynamicThrownGrenade": "Aerodynamische Granate",
@@ -1495,8 +1515,6 @@
         },
         "Reach": "Reichweite",
         "Reload": "Nachladen",
-        "FullReload": "Komplett",
-        "PartialReload": "Teilweise",
         "Type": "Typ",
         "Weapon": "Waffen"
     },
