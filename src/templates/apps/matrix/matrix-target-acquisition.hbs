@@ -1,3 +1,22 @@
+{{#if hostNetwork}}
+<div class="list-header">
+        {{localize 'TYPES.Item.host'}}: {{this.network.name}}
+</div>
+{{/if}}
+
+{{#if gridNetwork}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Grids')
+}}
+{{#each grids}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=this.img
+        name=this.name
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.uuid
+}}
+{{/each}}
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
         name=(localize 'SR5.Hosts')
 }}
@@ -10,6 +29,7 @@
         itemId=this.uuid
 }}
 {{/each}}
+{{/if}}
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
         name=(localize 'SR5.Personas')
 }}

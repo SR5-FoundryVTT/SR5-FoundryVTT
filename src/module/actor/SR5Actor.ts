@@ -1740,6 +1740,7 @@ export class SR5Actor extends Actor {
         if (!this.isIC()) return;
         if (!item.isHost) return;
         await this._updateICHostData(item);
+        await item.addIC(this);
     }
 
     async _updateICHostData(host: SR5Item) {

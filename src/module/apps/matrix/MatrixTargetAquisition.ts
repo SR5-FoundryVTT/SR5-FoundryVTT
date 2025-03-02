@@ -28,6 +28,10 @@ interface MatrixTargetAcquisitionSheetData {
     placementActions: string[]
     targets: MatrixTargetSheetData[]
     hosts: SR5Item[]
+    grids: SR5Item[]
+    network: SR5Item|undefined
+    hostNetwork: boolean
+    gridNetwork: boolean
 }
 
 type MatrixPlacementTests = BruteForceTest | HackOnTheFlyTest;
@@ -72,17 +76,32 @@ export class MatrixTargetAcquisitionApplication extends Application {
     override async getData(options?: Partial<ApplicationOptions> | undefined): Promise<MatrixTargetAcquisitionSheetData> {
         const data = await super.getData(options) as MatrixTargetAcquisitionSheetData;
 
+        // Allow template to switch between network types.
+        const network = this.actor.network;
+        data.hostNetwork = network?.isHost ?? false;
+        data.gridNetwork = network?.isGrid ?? false;
+        data.network = network;
+
+        // Collect target data based on network type.
+        if (network?.isHost) {
+            data.targets = this.prepareMatrixHostTargets();
+            data.grids = this.prepareMatrixGrids();
+        }
+        else if (network?.isGrid) {
+            data.targets = this.prepareMatrixGridTargets();
+            data.hosts = this.prepareMatrixHosts();
+        }
+
+        // TODO: Needed and used? Replaced by actor system data entry for it?
         data.placementActions = ['brute_force', 'hack_on_the_fly'];
-        data.targets = this.prepareMatrixTargets();
-        data.hosts = this.prepareMatrixHosts();
 
         return data;
     }
 
     /**
-     * Collect all possible matrix targets visible to the matrix user.
+     * Collect all personas and devices connected to grids.
      */
-    prepareMatrixTargets() {
+    prepareMatrixGridTargets() {
         const targets: MatrixTargetSheetData[] = [];
 
         if (!canvas.scene?.tokens) return targets;
@@ -123,12 +142,46 @@ export class MatrixTargetAcquisitionApplication extends Application {
     }
 
     /**
-     * Collect all hosts for selection, based on current network.
+     * Collect all personas and devices connected to the current host network.
      */
-    prepareMatrixHosts() {
-        return game.items?.filter(item => item.isHost) ?? [];
+    prepareMatrixHostTargets() {
+        const host = this.actor.network;
+        if (!host?.isHost) {
+            console.error('Shadowrun 5e | Actor is not connected to a host network');
+            return [];
+        }
+
+        const targets: MatrixTargetSheetData[] = []
+
+        for (const slave of host.slaves()) {
+            console.error(slave);
+        }
+
+        for (const ic of host.getIC()) {
+            targets.push({
+                actor: ic,
+                marks: this.actor.getMarksPlaced(ic.uuid),
+                matrixItems: [],
+                runningSilent: false
+            })
+        }
+
+        return targets;
     }
 
+    /**
+     * Collect all hosts for selection.
+     */
+    prepareMatrixHosts() {
+        return game.items?.filter(item => item.isHost && item.isMatrixPlayerVisible) ?? [];
+    }
+
+    /**
+     * Collect all grids for selection.
+     */
+    prepareMatrixGrids() {
+        return game.items?.filter(item => item.isGrid && item.isMatrixPlayerVisible) ?? [];
+    }
 
     /**
      * Trigger Mark Placement for selected target document.

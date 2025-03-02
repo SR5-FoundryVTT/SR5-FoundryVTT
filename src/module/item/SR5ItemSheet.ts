@@ -478,10 +478,12 @@ export class SR5ItemSheet extends ItemSheet {
 
         // Add actors to hosts WAN.
         if (this.item.isHost && data.type === 'Actor') {
-            const actor = await fromUuid(data.uuid);
-            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-            await this.item.addIC(actor.id, data.pack);
-            return;
+            // TODO: Implement this correctly.
+            console.error('Shadowrun 5e | Implement dropping of IC on hosts');
+            // const actor = await fromUuid(data.uuid);
+            // if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+            // await this.item.addIC(actor.id, data.pack);
+            // return;
         }
 
         // Add items to a network (PAN/WAN).

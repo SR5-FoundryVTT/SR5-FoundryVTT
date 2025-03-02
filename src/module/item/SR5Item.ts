@@ -712,6 +712,14 @@ export class SR5Item extends Item {
     }
 
     /**
+     * Should this matrix item be visible to a player?
+     */
+    get isMatrixPlayerVisible(): boolean {
+        // @ts-expect-error No propper typing
+        return this.system?.matrix?.visible === true;
+    }
+
+    /**
      * SIN Item - remove a single license within this SIN
      *
      * @param index The license list index
@@ -1401,26 +1409,17 @@ export class SR5Item extends Item {
 
     /**
      * A host type item can store IC actors to spawn in order, use this method to add into that.
-     * @param id An IC type actor id to fetch the actor with.
-     * @param pack Optional pack collection to fetch from
+     * @param ic: The IC actor to add to this host item.
      */
-    async addIC(id: string, pack: string | null = null) {
+    async addIC(ic: SR5Actor) {
         const host = this.asHost;
-        if (!host || !id) return;
-
-        // Check if actor exists before adding.
-        const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors?.get(id)) as SR5Actor;
-        if (!actor || !actor.isIC()) {
-            console.error(`Provided actor id ${id} doesn't exist (with pack collection '${pack}') or isn't an IC type`);
-            return;
-        }
-
-        const icData = actor.asIC();
+        if (!host) return;
+        const icData = ic.asIC();
         if (!icData) return;
 
-        // Add IC to the hosts IC order
-        host.system.ic.push(actor.uuid);
+        if (host.system.ic.includes(ic.uuid)) return;
 
+        host.system.ic.push(ic.uuid);
         await this.update({ 'system.ic': host.system.ic });
     }
 
@@ -1438,6 +1437,16 @@ export class SR5Item extends Item {
         host.system.ic.splice(index, 1);
 
         await this.update({ 'system.ic': host.system.ic });
+    }
+
+    /**
+     * Get all active IC actors of a host
+     */
+    getIC() {
+        const host = this.asHost;
+        if (!host) return [];
+
+        return host.system.ic.map(uuid => fromUuidSync(uuid)) as SR5Actor[];
     }
 
     get _isNestedItem(): boolean {
