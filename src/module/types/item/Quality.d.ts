@@ -1,0 +1,16 @@
+/// <reference path="../Shadowrun.d.ts" />
+declare namespace Shadowrun {
+      export interface QualityData extends
+          QualityPartData,
+          DescriptionPartData,
+          ImportFlags,
+          ActionPartData {
+
+      }
+
+    export interface QualityPartData {
+        type: 'positive' | 'negative' | '';
+        rating: number;
+        karma: number;
+    }
+}

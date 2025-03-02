@@ -1,6 +1,6 @@
 import {FormDialog, FormDialogData, FormDialogOptions} from "./FormDialog";
-import {SuccessTest} from "../../tests/SuccessTest";
-import { SuccessTestData } from '../../tests/SuccessTest';
+import {SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
+
 import {SR5} from "../../config";
 import {Helpers} from "../../helpers";
 import { Translation } from '../../utils/strings';
@@ -18,7 +18,7 @@ export interface TestDialogData extends FormDialogData {
 export interface TestDialogListener {
     query: string
     on: string
-    callback: (event: JQuery<HTMLElement>, dialog: TestDialog) => void
+    callback: (event: any, dialog: TestDialog) => void
 }
 
 /**
@@ -45,7 +45,7 @@ export class TestDialog extends FormDialog {
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
-        // @ts-expect-error
+        // @ts-expect-error TODO: foundry-vtt-types v11
         options.width = 'auto';
         return options;
     }
@@ -54,7 +54,7 @@ export class TestDialog extends FormDialog {
         super.activateListeners(html);
 
         // Handle in-dialog entity links to render the respective sheets.
-        html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet)
+        html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers))
 
         this._injectExternalActiveListeners(html);
     }
@@ -64,7 +64,7 @@ export class TestDialog extends FormDialog {
      */
     _injectExternalActiveListeners(html: JQuery) {
         for (const listener of this.listeners) {
-            //@ts-expect-error
+            //@ts-expect-error // Lazy Typing
             html.find(listener.query).on(listener.on, (event: JQuery<HTMLElement>) => listener.callback.bind(this.data.test)(event, this));
         }
     }
@@ -78,8 +78,7 @@ export class TestDialog extends FormDialog {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html';
     }
 
-    //@ts-expect-error
-    getData() {
+    override getData() {
         const data = super.getData() as unknown as TestDialogData;
 
         //@ts-expect-error //TODO: default to general roll mode user setting

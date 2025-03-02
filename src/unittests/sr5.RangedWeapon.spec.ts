@@ -27,7 +27,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
 
     const getWeaponWithEquippedAmmo = async (weaponAmmo: number, weaponAmmoMax: number, ammoQuantity: number) => {
         const item = await testItem.create({type: 'weapon', system: {category: 'ranged', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}) as SR5Item;
-        //@ts-expect-error
+        //@ts-expect-error // Lazy Typing
         const ammoItem = new SR5Item({type: 'ammo', name: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}}, {parent: item});
         await item.createNestedItem(ammoItem.toObject());
 

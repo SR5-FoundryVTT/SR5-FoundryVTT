@@ -15,36 +15,36 @@ import RangeData = Shadowrun.RangeData;
 export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
     private GetSkill(weaponJson: object): SkillName {
         if (weaponJson.hasOwnProperty('useskill')) {
-            let jsonSkill = ImportHelper.StringValue(weaponJson, 'useskill');
+            const jsonSkill = ImportHelper.StringValue(weaponJson, 'useskill');
             if (Constants.MAP_CATEGORY_TO_SKILL.hasOwnProperty(jsonSkill)) {
                 return Constants.MAP_CATEGORY_TO_SKILL[jsonSkill];
             }
-            return jsonSkill.replace(/[\s\-]/g, '_').toLowerCase();
+        return jsonSkill.replace(/[\s-]/g, '_').toLowerCase();
         } else {
-            let category = ImportHelper.StringValue(weaponJson, 'category');
+            const category = ImportHelper.StringValue(weaponJson, 'category');
             if (Constants.MAP_CATEGORY_TO_SKILL.hasOwnProperty(category)) {
                 return Constants.MAP_CATEGORY_TO_SKILL[category];
             }
 
-            let type = ImportHelper.StringValue(weaponJson, 'type').toLowerCase();
+            const type = ImportHelper.StringValue(weaponJson, 'type').toLowerCase();
             return type === 'ranged' ? 'exotic_range' : 'exotic_melee';
         }
     }
 
     public static GetWeaponType(weaponJson: object): WeaponCategory {
-        let type = ImportHelper.StringValue(weaponJson, 'type');
+        const type = ImportHelper.StringValue(weaponJson, 'type');
         //melee is the least specific, all melee entries are accurate
         if (type === 'Melee') {
             return 'melee';
         } else {
             // skill takes priorities over category
             if (weaponJson.hasOwnProperty('useskill')) {
-                let skill = ImportHelper.StringValue(weaponJson, 'useskill');
+                const skill = ImportHelper.StringValue(weaponJson, 'useskill');
                 if (skill === 'Throwing Weapons') return 'thrown';
             }
 
             // category is the fallback
-            let category = ImportHelper.StringValue(weaponJson, 'category');
+            const category = ImportHelper.StringValue(weaponJson, 'category');
             if (category === 'Throwing Weapons') return 'thrown';
             // ranged is everything else
             return 'range';
