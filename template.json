@@ -1239,6 +1239,7 @@
             "echo",
             "equipment",
             "host",
+            "grid",
             "lifestyle",
             "metamagic",
             "modification",
@@ -1470,6 +1471,9 @@
                 "duration": "always",
                 "optional": "standard",
                 "enabled": true
+            },
+            "matrixNetwork": {
+                "visible": true
             }
         },
         "armor": {
@@ -1667,10 +1671,13 @@
             "templates": ["description", "action", "technology", "importFlags"]
         },
         "host": {
-            "templates": ["description", "matrix", "importFlags"],
+            "templates": ["description", "matrix", "importFlags", "matrixNetwork"],
             "marks": [],
             "rating": 0,
             "ic": []
+        },
+        "grid": {
+            "templates": ["description", "matrix", "matrixNetwork"]
         },
         "metamagic": {
             "templates": ["description", "action", "importFlags"]

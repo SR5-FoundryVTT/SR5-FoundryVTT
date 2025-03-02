@@ -86,6 +86,7 @@ declare namespace Shadowrun {
         Partial<EchoData> &
         Partial<EquipmentData> &
         Partial<HostData> &
+        Partial<GridData> &
         Partial<LifestyleData> &
         Partial<MetamagicData> &
         Partial<ModificationData> &
@@ -175,6 +176,12 @@ declare namespace Shadowrun {
         name: string;
         img: string;
         system: HostData;
+    }
+    export interface GridItemData {
+        type: 'grid';
+        name: string;
+        img: string;
+        system: GridData;
     }
     export interface LifestyleItemData {
         type: 'lifestyle';
