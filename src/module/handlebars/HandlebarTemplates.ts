@@ -30,6 +30,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         // item tabs
         'systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/GridDescriptionTab.hbs',
 
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',

@@ -28,6 +28,7 @@ declare namespace Shadowrun {
         | EquipmentItemData
         | EchoItemData
         | HostItemData
+        | GridItemData
         | LifestyleItemData
         | MetamagicItemData
         | ModificationItemData

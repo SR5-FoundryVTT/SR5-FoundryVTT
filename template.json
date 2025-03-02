@@ -1473,7 +1473,9 @@
                 "enabled": true
             },
             "matrixNetwork": {
-                "visible": true
+                "matrix": {
+                    "visible": true
+                }
             }
         },
         "armor": {

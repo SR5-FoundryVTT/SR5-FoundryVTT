@@ -5,13 +5,7 @@
         <a class="item" data-tab="network">{{localize "SR5.Labels.Sheet.WAN"}}</a>
     </nav>
     <section class="sheetbody">
-        <div class="tab" data-group="primary" data-tab="description">
-            {{> "systems/shadowrun5e/dist/templates/item/parts/description.html"}}
-        </div>
+        {{> "systems/shadowrun5e/dist/templates/item/tabs/GridDescriptionTab.hbs"}}
         {{> "systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs"}}
-        <div class="tab" data-group="primary" data-tab="network">
-            <div class="tabbody">
-            </div>
-        </div>
     </section>
 </form>

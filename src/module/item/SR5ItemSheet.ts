@@ -476,7 +476,7 @@ export class SR5ItemSheet extends ItemSheet {
             return await this.item.createNestedItem(item._source);
         }
 
-        // Add items to hosts WAN.
+        // Add actors to hosts WAN.
         if (this.item.isHost && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid);
             if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);

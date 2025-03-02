@@ -683,8 +683,13 @@ export class SR5Item extends Item {
     }
 
     get isGrid(): boolean {
-        // @ts-expect-error Type didn't exist as of writing this. If it does now, remove this.
         return this.type === 'grid';
+    }
+
+    get asGrid(): Shadowrun.GridItemData | undefined {
+        if (this.isGrid) {
+            return this as Shadowrun.GridItemData;
+        }
     }
 
     /**
