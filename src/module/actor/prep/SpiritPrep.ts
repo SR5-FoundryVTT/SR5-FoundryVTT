@@ -182,6 +182,21 @@ export class SpiritPrep {
                 overrides.attributes.strength = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
                 break;
+            case 'blood_shade':
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = -1;
+                overrides.attributes.charisma = 1;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'counterspelling', 'impersonation', 'perception', 'unarmed_combat');
+                break;
+            case 'bone':
+                overrides.attributes.body = 3;
+                overrides.attributes.strength = 2;
+                overrides.attributes.logic = -1;
+                overrides.attributes.charisma = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
             case 'ceramic':
                 overrides.attributes.agility = 1;
                 overrides.attributes.reaction = 2;

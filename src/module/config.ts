@@ -945,6 +945,10 @@ export const SR5 = {
         stabber: "SR5.Spirit.Types.Stabber",
         tungak: "SR5.Spirit.Types.Tungak",
         vucub: "SR5.Spirit.Types.Vucub",
+
+        // blood magic spirits
+        blood_shade: 'SR5.Spirit.Types.BloodShade',
+        bone: 'SR5.Spirit.Types.Bone',
     },
 
     /**
