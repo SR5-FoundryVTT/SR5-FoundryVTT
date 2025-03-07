@@ -682,6 +682,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
+        if (!Hooks.call('SR5_PreActorItemRoll', this.actor, item)) {
+            return;
+        }
         if (item) {
             await item.castAction(event);
         }
