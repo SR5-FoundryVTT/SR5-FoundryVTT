@@ -288,8 +288,12 @@ export class SR5Item extends Item {
      * @param event A PointerEvent by user interaction.
      */
     async castAction(event?: RollEvent) {
+        if (!Hooks.call('SR5_PreCastItemAction', this)) return;
+        
         // Only show the item's description by user intention or by lack of testability.
-        const dontRollTest = TestCreator.shouldPostItemDescription(event) || !this.hasRoll;
+        let dontRollTest = TestCreator.shouldPostItemDescription(event);
+        dontRollTest = !this.hasRoll;
+
         if (dontRollTest) return await this.postItemCard();
 
         if (!this.actor) return;
