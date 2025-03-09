@@ -64,8 +64,8 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
             // Finish the importing
             item.system.technology.rating = ImportHelper.IntValue(program, 'rating', 0);
             item.system.description.source = `${ImportHelper.StringValue(program, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(program, 'name'), ImportHelper.StringValue(program, 'page'))}`;
-            item.system.technology.availability = ImportHelper.StringValue(program, 'avail');
-            item.system.technology.cost = ImportHelper.IntValue(program, 'cost', 0);
+            item.system.technology.availability.base = item.system.technology.availability.value = ImportHelper.StringValue(program, 'avail');
+            item.system.technology.cost.base = item.system.technology.cost.value = ImportHelper.IntValue(program, 'cost', 0);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

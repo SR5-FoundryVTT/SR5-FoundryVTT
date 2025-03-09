@@ -476,6 +476,8 @@ export const SR5 = {
         alpha: 'SR5.CyberwareGradeAlpha',
         beta: 'SR5.CyberwareGradeBeta',
         delta: 'SR5.CyberwareGradeDelta',
+        gamma: 'SR5.CyberwareGradeGamma',
+        grey: 'SR5.CyberwareGradeGrey',
         used: 'SR5.CyberwareGradeUsed',
     },
 
