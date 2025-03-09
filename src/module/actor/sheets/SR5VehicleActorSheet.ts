@@ -1,18 +1,12 @@
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5Actor} from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
-import { NetworkDeviceFlow } from '../../item/flows/NetworkDeviceFlow';
+import { MatrixNetworkFlow } from '../../item/flows/MatrixNetworkFlow';
 
 interface VehicleSheetDataFields {
     driver: SR5Actor|undefined
-    networkController: SR5Item | undefined
+    master: SR5Item | undefined
 }
-
-interface VehicleActorSheetData extends SR5ActorSheetData {
-    vehicle: VehicleSheetDataFields
-}
-
 
 export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     /**
@@ -23,7 +17,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -57,8 +51,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     override async getData(options) {
         const data = await super.getData(options);
 
-        // Vehicle actor type specific fields.
-        data.vehicle = await this._prepareVehicleFields();
+        data.vehicle = this._prepareVehicleFields();
 
         return data;
     }
@@ -93,18 +86,18 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         }
 
         // Handle none specific drop events.
-        return super._onDrop(event);
+        return await super._onDrop(event);
     }
 
-    async _prepareVehicleFields(): Promise<VehicleSheetDataFields> {
+    _prepareVehicleFields(): VehicleSheetDataFields {
         const driver = this.actor.getVehicleDriver();
 
-        const networkControllerLink = this.actor.getNetworkController();
-        const networkController = networkControllerLink ? await NetworkDeviceFlow.resolveItemLink(networkControllerLink) : undefined;
+        const masterLink = this.actor.getMasterUuid();
+        const master = masterLink ? MatrixNetworkFlow.resolveItemLink(masterLink) : undefined;
 
         return {
             driver,
-            networkController,
+            master,
         };
     }
 
@@ -122,13 +115,13 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        // @ts-expect-error
+        // @ts-expect-error TODO: foundry-vtt-types v11
         device.sheet.render(true);
     }
 
     async _onControllerRemove(event) {
         event.preventDefault();
 
-        await NetworkDeviceFlow.removeDeviceFromController(this.actor);
+        await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
     }
 }

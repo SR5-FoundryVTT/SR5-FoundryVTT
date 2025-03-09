@@ -1,0 +1,50 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabGroup='matrix' tabId='decking'}}
+<div class="inventory">
+    <div class="flexrow align-start">
+        <div>
+            <label>
+                {{localize "SR5.Labels.ActorSheet.Network"}}:
+                {{#if network}}
+                {{network.name}}
+                <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                    <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                </a>
+                {{else}}
+                {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                {{/if}}
+            </label>
+        </div>
+        <div><button class="show-matrix-target-acquisition">{{localize "SR5.Labels.Sheet.TargetAcquisition"}}</button></div>
+        <div><button class="reboot-persona-device">{{localize "SR5.Labels.Sheet.RebootDevice"}}</button></div>
+        <div>
+            <select name="system.matrix.markPlacementAction" data-tooltip="SR5.Tooltips.Actor.PlaceMark">
+                {{#select system.matrix.markPlacementAction}}
+                {{#each config.matrixMarkPlacementActions}}
+                <option value="{{@key}}">{{localize this}}</option>
+                {{/each}}
+                {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="split-container">
+        <div class="scroll-area scroll-area-matrix-hacking">
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html' }}
+        </div>
+        <div>
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+            name=(localize 'SR5.Actions')
+            }}
+            <div class="scroll-area scroll-area-matrix-hacking matrix-hacking-actions">
+                {{#each matrixActions}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                name=this.name
+                itemId=this.uuid
+                itemType="matrix-action"
+                hasRoll="true"
+                }}
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

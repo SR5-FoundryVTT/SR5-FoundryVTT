@@ -14,7 +14,9 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "categories": ["matrix"],
+      "categories": [
+        "matrix"
+      ],
       "attribute": "",
       "attribute2": "",
       "skill": "",
@@ -91,17 +93,14 @@
       "dice_pool_mod": []
     },
     "result": {
-      "success": {
-        "matrix": {
-          "placeMarks": false
-        }
-      }
+      "success": {}
     },
     "importFlags": {
       "name": "",
       "type": "",
       "subType": "",
-      "isFreshImport": false
+      "isFreshImport": false,
+      "isImported": false
     }
   },
   "ownership": {
@@ -112,10 +111,12 @@
   "_stats": {
     "systemId": "shadowrun5e",
     "systemVersion": "0.13.0",
-    "coreVersion": "10.303",
+    "coreVersion": "12.331",
     "createdTime": null,
     "modifiedTime": 1697731134938,
-    "lastModifiedBy": "sr5ebuilder"
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
   },
   "_key": "!items!41yvYR7CSbDOQhmk"
 }

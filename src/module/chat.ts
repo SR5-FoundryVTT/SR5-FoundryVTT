@@ -34,7 +34,7 @@ const createChatData = async (template: string, templateData) => {
         rollMode: game.settings.get(CORE_NAME, CORE_FLAGS.RollMode)
     };
 
-    // @ts-expect-error
+    // @ts-expect-error // TODO: foundry-vtt-types v10
     ChatMessage.applyRollMode(chatData, chatData.rollMode);
 
     return chatData;
@@ -48,7 +48,7 @@ export async function createItemChatMessage(options) {
 function createChatTemplateData(options) {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let {actor, item, description, tests} = options;
+    const {actor, item, description, tests} = options;
 
     const token = actor?.getToken();
     const title = game.i18n.localize("SR5.Description");
