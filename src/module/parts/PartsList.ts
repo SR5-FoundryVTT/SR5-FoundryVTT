@@ -46,10 +46,10 @@ export class PartsList<TType> {
         this._list.length = 0;
     }
 
-    private _list: ModList<TType>;
+    private readonly _list: ModList<TType>;
 
     constructor(parts?: ModList<TType>) {
-        let actualParts = [] as ModList<TType>;
+        let actualParts: ModList<TType> = [];
         if (parts) {
             if (Array.isArray(parts)) {
                 actualParts = parts;

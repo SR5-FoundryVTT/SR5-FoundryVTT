@@ -17,7 +17,7 @@ import {SR5Actor} from "./actor/SR5Actor";
  * @param slot The slot to be dropped into on the Macro bar
  */
 export async function createItemMacro(dropData, slot) {
-    if (!game || !game.macros) return;
+    if (!game?.macros) return;
 
     const item = await SR5Item.fromDropData(dropData);
     if (!(item instanceof SR5Item)) return console.error(`Shadowrun 5e | Macro Drop expected an item document but got a different document type`, item);
@@ -27,11 +27,10 @@ export async function createItemMacro(dropData, slot) {
     if (!macro) {
         macro = await Macro.create(
             {
-                //@ts-expect-error
-                name: item.name,
+                name: item.name as string,
                 type: 'script',
                 img: item.img,
-                command: command,
+                command,
                 flags: { 'shadowrun5e.itemMacro': true },
             },
             { renderSheet: false },
@@ -48,7 +47,7 @@ export async function createItemMacro(dropData, slot) {
  * @return {Promise}
  */
 export function rollItemMacro(itemName) {
-    if (!game || !game.actors) return;
+    if (!game?.actors) return;
 
     const speaker = ChatMessage.getSpeaker();
     let actor;
@@ -72,7 +71,7 @@ export function rollItemMacro(itemName) {
 export async function createSkillMacro(data: {skillId: string, skill: SkillField}, slot) {
     if (!game.macros || !game.user) return;
 
-    const {skillId, skill} = data;
+    const {skill} = data;
 
     // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
     const name = Helpers.getSkillLabelOrName(skill);
@@ -96,7 +95,7 @@ export async function createSkillMacro(data: {skillId: string, skill: SkillField
  * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
  */
 export async function rollSkillMacro(skillLabel) {
-    if (!game || !game.actors) return;
+    if (!game?.actors) return;
     if (!skillLabel) return;
 
     // Fetch the actor from the current users token or the actor collection.

@@ -1,4 +1,3 @@
-import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 
@@ -12,7 +11,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
