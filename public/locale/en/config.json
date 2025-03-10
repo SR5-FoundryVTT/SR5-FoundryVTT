@@ -821,7 +821,7 @@
         "AddSelect": "Add selected tokens linked actor",
         "CantDeleteUserCharacter": "Player Character can't be removed from the tracker",
         "DeleteScore": "Delete score from tracker",
-        "GMOnly": "A GOD is tracking your location...",
+        "GMOnly": "GOD is tracking your location...",
         "NotifyNoSelectedTokens": "At least one linked token must be selected.",
         "OnlyLinkedActorsSupported": "Only linked actors are supported. Selected tokens with unlinked actors will be ignored.",
         "ResetScore": "Reset Overwatch Score"

@@ -819,7 +819,7 @@
         "AddSelect": "Füge den verbundenen Actor des ausgewählten und Tokens hinzu",
         "CantDeleteUserCharacter": "Spielercharakter können nicht aus dem Tracker entfernt werden",
         "DeleteScore": "Lösche Wert aus dem Tracker",
-        "GMOnly": "Ein GOD ist auf dem Weg zu deinem Standort...",
+        "GMOnly": "GOD ist auf dem Weg zu deinem Standort...",
         "NotifyNoSelectedTokens": "Mindestens ein verbundenes Token muss ausgewählt werden.",
         "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert.",
         "ResetScore": "Setze Overwatch-Wert zurück"
