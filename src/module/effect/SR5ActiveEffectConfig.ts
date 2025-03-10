@@ -190,14 +190,17 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 
+    /**
+     * Skill multi selection via tagify element.
+     * @param html  ActiveEffectConfig html
+     */
     _prepareSkillSelectionTagify(html: JQuery) {
         const inputElement = html.find('input#skill-selection').get(0) as HTMLInputElement;
 
         if (!this.object.parent) return console.error('Shadowrun 5e | SR5ActiveEffect unexpecedtly has no parent document', this.object, this);
 
-        // Discard token effects
-        // Create a SR5ActiveEffect.actorOwner similar to SR5Item.actorOwner
-        const actor = this.object.isOriginOwned ? this.object.parent.parent : this.object.parent;
+        // Make sure custom skills of an actor source are included.
+        const actor = this.object.actor;
         const actorOrNothing = !(actor instanceof SR5Actor) ? undefined : actor;
 
         // Use ActionFlow to assure either custom skills or global skills to be included.
