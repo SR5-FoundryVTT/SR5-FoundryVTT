@@ -23,6 +23,8 @@
         "HideGMOnlyChatContent": "GM 판정에서 중요한 정보 숨기기",
         "HideGMOnlyChatContentDescription": "사용된 액터를 소유한 플레이어어만 GM 판정 메시지에서 모든 정보를 볼 수 있음",
         "IgnoreDiagonal": "대각선 이동 무시 (1-1-1)",
+        "ImportIconFolderDescription": "불러오기 도구가 있는 폴더에 아이콘 파일이 있습니다. 기본 위치: 'systems/shadowrun5e/dist/icons/importer/'",
+        "ImportIconFolderName": "아이콘 폴더 불러오기 도구",
         "ManualRollOnSuccessTest": "모든 판정에서 수동 주사위 굴림",
         "ManualRollOnSuccessTestDescription": "판정 시 사용자가 주사위를 수동으로 굴리고, 성공횟수를 보고하게 함",
         "MarkImportsDescription": "액터 시트에 새로 불러온 물품을 표시하여 검토해야 함을 강조",
@@ -30,8 +32,8 @@
         "MustHaveRessourcesOnTest": "찾을 수 없는 자원을 사용하는 판정 중단",
         "MustHaveRessourcesOnTestDescription": "필요한 모든 자원을 가진 액터에게만 판정 허용",
         "NoMarking": "새로 불러온 물품을 표시하지 않음",
-        "OnlyAllowRollOnDefaultableSkills": "기본으로 이용 가능한 알 수 없는 기술 주사위 굴리기",
-        "OnlyAllowRollOnDefaultableSkillsDescription": "무리한 시도로 설정할 수 없거나 설정되지 않은 알 수 없는 기술도 주사위를 굴릴 수 있음",
+        "OnlyAllowRollOnDefaultableSkills": "무리한 시도 가능한 기술 굴림 가능",
+        "OnlyAllowRollOnDefaultableSkillsDescription": "알지 못하는 기술도 무리한 시도가 불가능하더라도 굴림 가능",
         "OnlyAutoRollNPCInCombat": "NPC만 우선권 주사위 자동 굴림",
         "OnlyAutoRollNPCInCombatDescription": "설정되지 않은 플레이어는 각 패스와 라운드에서 주사위를 수동으로 굴려야 함",
         "ShowGlitchAnimationDescription": "굴림 카드에 글리치 텍스트의 일부로 항상 애니메이션을 표시함",
@@ -43,12 +45,50 @@
         "TokenHealthBars": "토큰 체력 표시줄",
         "TokenHealthBarsDescription": "미러링 대신 토큰의 전체 피해 추적기에 빈 체력 막대가 표시됨",
         "UseDamageConditionDescription": "시스템이 상태 측정기에 따라 토큰을 표시",
-        "UseDamageConditionName": "토큰 상태 효과에 시스템 처리 사용"
+        "UseDamageConditionName": "토큰 상태 효과에 시스템 처리 사용",
+        "UseImportIconOverridesDescription": "물품 불러오기 시 서로 다른 물품 유형에 동일한 아이콘을 사용하는 것이 합리적일 경우 사용. 사용자 지정 아이콘을 사용하는 경우 체크 해제.",
+        "UseImportIconOverridesName": "기본 불러오기 아이콘 덮어쓰기 사용"
     },
     "SR5.AP": "AP",
     "SR5.Accessory": "부착물",
     "SR5.Accuracy": "정확도",
     "SR5.Action": "행동",
+    "SR5.ActionCategory": {
+        "Addiction": "중독 행동",
+        "AddictionMental": "정신적 중독",
+        "AddictionPhysical": "신체적 중독",
+        "Attack": "공격 행동",
+        "AttackMelee": "근접 공격",
+        "AttackRanged": "원거리 공격",
+        "AttackThrown": "투척 공격",
+        "BruteForce": "매트릭스 브루트 포스",
+        "Climbing": "등반 행동",
+        "Compiling": "컴파일링 행동",
+        "ComplexForm": "컴플렉스 폼 행동",
+        "Defense": "방어 행동",
+        "DefenseSuppression": "제압 사격 방어",
+        "Drain": "드레인 행동",
+        "Fade": "페이드 행동",
+        "HackOnTheFly": "매트릭스 즉석 해킹",
+        "Magic": "마법 행동",
+        "Matrix": "매트릭스 행동",
+        "Recovery": "회복 행동",
+        "RecoveryPhysical": "육체 회복",
+        "RecoveryStun": "정신 회복",
+        "Resist": "저항 행동",
+        "ResistDisease": "질병 저항",
+        "ResistToxin": "독소 저항",
+        "Resonance": "공명 행동",
+        "Rigging": "리깅 행동",
+        "Social": "사교 행동",
+        "SpellCombat": "주문시전 전투",
+        "SpellDetection": "주문시전 탐지",
+        "SpellHealing": "주문시전 치료",
+        "SpellIllusion": "주문시전 환각",
+        "SpellManipulation": "주문시전 조작",
+        "SpellRitual": "주문시전 의식",
+        "Summoning": "소환 행동"
+    },
     "SR5.ActionType": "유형",
     "SR5.ActionTypeComplex": "복잡",
     "SR5.ActionTypeFree": "자유",
@@ -64,6 +104,7 @@
             "TargetedActor": "목표 액터",
             "TestItem": "물품을 통한 판정"
         },
+				"CannotAddTestViaItemToActor": "액터에 '물품을 통한 판정' 종류의 액티브 이펙트 추가 불가",
         "Modes": {
             "Modify": "수정"
         },
@@ -72,6 +113,7 @@
         "OnlyForItemTest": "상위 물품 판정에만 적용",
         "OnlyForWireless": "무선이 활성화된 경우에만 적용",
         "Test": {
+					  "ActionCategories": "행동 범주 필터",
             "Attributes": "특성치 필터",
             "Limits": "한계치 필터",
             "Skills": "기술 필터",
@@ -193,11 +235,13 @@
     "SR5.Contact": {
         "Blackmail": "협박",
         "Connection": "영향력",
-        "Family": "가족",
+				"DropActor": "해당 연줄과 연결할 액터 끌어서 놓기",
+        "Family": "가족",	
         "Group": "그룹",
+				"LinkedActor": "액터",
         "Loyalty": "친밀도",
         "Type": "유형"
-    },
+    },		
     "SR5.Contacts": "연줄",
     "SR5.Continue": "계속",
     "SR5.Cost": "비용",
@@ -224,7 +268,13 @@
             "Special": "특별",
             "Sustained": "지속"
         },
+        "IsOptional": "능력 설정",
         "Karma": "카르마",
+        "Optional": {
+            "DisabledOption": "추가 능력, 사용 가능",
+            "EnabledOption": "추가 능력, 사용 불가능",
+            "Standard": "기본"
+        },
         "Range": "사거리",
         "Ranges": {
             "LineOfSight": "시야 범위 내",
@@ -258,6 +308,7 @@
     "SR5.DamageReplace": "피해 대체",
     "SR5.DamageType": "유형",
     "SR5.DamageValue": "피해량",
+		"SR5.DefaultCategoryVisibility": "비어있는 범주 보기",
     "SR5.Defaulting": "무리",
     "SR5.Defender": "방어자",
     "SR5.DefenderNetHits": "방어자 순 성공횟수",
@@ -430,28 +481,34 @@
     },
     "SR5.HotSim": "핫 심",
     "SR5.IC": {
-        "MissingHost": "호스트 물품을 끌어서 놓기",
+        "MissingHost": "호스트 물품 끌어서 놓기",
         "Type": "유형",
         "Types": {
-            "Acid": "산성",
+            "Acid": "애시드",
             "Binder": "바인더",
-            "BlackIC": "블랙IC",
+            "BlackIC": "블랙 IC",
             "Blaster": "블래스터",
+            "Bloodhound": "블러드하운드",
+            "BlueGoo": "블라워 슐레임",
+            "Catapult": "캐터펄트",
             "Crash": "크래쉬",
+            "Flicker": "플리커",
             "Jammer": "재머",
             "Killer": "킬러",
             "Marker": "마커",
             "Patrol": "패트롤",
             "Probe": "프로브",
             "Scramble": "스크램블",
+            "Shocker": "쇼커",
+            "Sleuther": "슬리우서",
             "Sparky": "스파키",
             "TarBaby": "탈 베이비",
-            "Track": "추적기"
+            "Track": "트랙"
         }
     },
     "SR5.Import": {
         "Spirit": {
-            "SpiritTypeNotFound": "해당 영혼 유형을 찾을 수 없습니다.  chummer에서 내보낸 json으로 github 이슈를 열어주세요."
+            "SpiritTypeNotFound": "해당 영혼 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
         }
     },
     "SR5.ImportCharacter": "캐릭터 불러오기",
@@ -522,14 +579,15 @@
             "Label": "상황 수정치"
         }
     },
-    "SR5.KnockedDown": "기절",
+    "SR5.KnockedDown": "넘어짐",
     "SR5.KnowledgeSkillAcademic": "학술적 지식",
     "SR5.KnowledgeSkillInterests": "흥미",
     "SR5.KnowledgeSkillProfessional": "전문적 지식",
     "SR5.KnowledgeSkillStreet": "길거리 지식",
     "SR5.Labels": {
         "Action": {
-            "ActiveTest": "판정",
+					  "ActiveTest": "판정",
+					  "Category": "범주",
             "DamageResistanceTest": "피해 저항 판정",
             "Modifier": "수정치",
             "Modifiers": "수정치",
@@ -541,6 +599,10 @@
             "CreateInventory": "물품 보관 장소 생성",
             "CritterPowers": "생명체 능력",
             "DeviceRating": "장치 등급",
+						"DisabledOptionCritterPowers": "추가 생명체 능력 - 사용 불가능",
+            "DisabledOptionSpritePowers": "추가 요정 능력 - 사용 불가능",
+            "EnabledOptionCritterPowers": "추가 생명체 능력 - 사용 가능",
+            "EnabledOptionSpritePowers": "추가 요정 능력 - 사용 가능",
             "ICConfiguration": "IC 배열",
             "Matrix": "매트릭스",
             "PersonalInventory": "개인 소지 중",
@@ -556,7 +618,7 @@
             "SpritePowers": "요정 능력",
             "TestKBoardModifiers": "{skip}: 결과창 생략. {descr}: 설명만 보임.",
             "VehicleConfiguration": "탑승물 설정"
-        },
+        },				
         "Inventory": {
             "All": "전체",
             "Carried": "소지",
@@ -665,6 +727,7 @@
         "SomeAmmo": "선택된 사격 방식으로 사격하기에 탄약이 충분하지 않음, 사격 방식 수정치가 감소",
         "SomeAmmoMelee": "근거리 공격 수행을 위한 탄약이 충분하지 않음"
     },
+    "SR5.ModPoints": "개조 점수",
     "SR5.Modification": "개조",
     "SR5.ModificationCategories": "개조 범위",
     "SR5.ModificationCategory": "개조 범위",
@@ -755,6 +818,9 @@
     "SR5.Override": "중단",
     "SR5.OverwatchScore": "감시 점수",
     "SR5.OverwatchScoreTracker": {
+        "AddSelect": "선택된 토큰을 연결된 액터에 추가",
+        "CantDeleteUserCharacter": "추적기에서 플레이어 캐릭터 제거할 수 없음",
+        "DeleteScore": "추적기에서 점수 삭제",
         "NotifyNoSelectedTokens": "최소 하나 이상의 연결된 토큰이 선택되어있어야 합니다.",
         "OnlyLinkedActorsSupported": "연결된 액터만 지원됩니다. 연결되지 않은 액터와 선택된 토큰은 무시됩니다.",
         "ResetScore": "감시 점수 초기화"
@@ -781,6 +847,7 @@
     "SR5.Qty": "수량",
     "SR5.Quality": "특징",
     "SR5.QualityType": "유형",
+    "SR5.QualityTypeLifeModule": "인생 모듈",		
     "SR5.QualityTypeNegative": "부정적",
     "SR5.QualityTypePositive": "긍정적",
     "SR5.Quantity": "수량",
@@ -806,7 +873,7 @@
     "SR5.RollComposure": "평정심",
     "SR5.RollCustom": "맞춤 설정",
     "SR5.RollDefense": "방어",
-    "SR5.RollDrain": "드레인",
+		"SR5.RollDrain": "드레인",
     "SR5.RollFade": "페이드",
     "SR5.RollJudgeIntentions": "의심",
     "SR5.RollLiftCarry": "들기&운반",
@@ -838,7 +905,7 @@
         "ClearLocalAll": "현재 수정치 삭제",
         "ClearLocalAllTokens": "장면에 있는 모든 토큰 수정치 삭제",
         "Magic": {
-            "BackgroundCount": "배경 계산"
+            "BackgroundCount": "배경 수치"
         },
         "Matrix": {
             "Noise": "노이즈"
@@ -892,7 +959,7 @@
         "HeavyWeapons": "중화기",
         "Impersonation": "연기",
         "IndustrialMechanic": "산업 정비",
-        "Instruction": "가르침",
+        "Instruction": "교육",
         "Intimidation": "협박",
         "Leadership": "지도력",
         "Locksmith": "자물쇠 따기",
@@ -1070,6 +1137,12 @@
         }
     },
     "SR5.SpritePower": {
+        "IsOptional": "능력 설정",
+        "Optional": {
+            "DisabledOption": "추가 능력, 사용 불가능",
+            "EnabledOption": "추가 능력, 사용 가능",
+            "Standard": "기본"
+        },
         "Type": "유형"
     },
     "SR5.Stock": "개머리판",
@@ -1155,6 +1228,7 @@
             "NPC": "액터를 NPC로 표시하여 추가 기능 사용",
             "ResetActorForNewRun": "신규 런을 위해 피해, 엣지 등을 초기화"
         },
+        "Actor.DefaultCategoryVisibility": "범주에 물품이 없더라도 물품 범주 표시",
         "CallInAction": {
             "ActorType": "호출할 액터 유형"
         },
@@ -1162,6 +1236,9 @@
             "Level": "컴파일 된 요정의 단계",
             "PreparedSprite": "신규 요정을 생성하는 대신 준비된 요정을 사용",
             "SpriteType": "컴파일 된 요정의 유형"
+        },
+        "Contact": {
+            "LinkActor": "해당 연줄과 연결할 액터 끌어서 놓기"
         },
         "Effect": {
             "AlterApplyToWithChanges": "효과를 적용하는 대상을 변경하기 전에 변경 사항을 제거합니다.",
@@ -1174,10 +1251,11 @@
             "OnlyForWireless": "무선 활성화 된 물품에만 효과가 적용됨"
         },
         "Item": {
+            "ActionCategories": "판정의 기본 범주 대신 사용할 행동 범주를 선택합니다. 액티브 이펙트를 사용하여 판정 수치를 수정하는데 범주를 사용 가능",					
             "ActionModifier": "판정의 기본 수정치 대신 선택한 풀 수정치가 사용됨",
             "ActionRollMode": "이 행동을 시전 할 때 무리한 굴림 방식을 사용함. 전체 채팅 설정에 덮어 써짐.",
             "AmmoReplaceDamage": "무기 피해를 수정하는 대신 대체하도록 설정",
-            "DisabledForPreparedActor": "준비된 액터를 사용하기에 비활성화됨"
+            "DisabledForPreparedActor": "준비된 액터를 사용하기에 비활성화됨"					
         },
         "Modifiers": {
             "armor": "총 방어구 수치 수정",
@@ -1255,7 +1333,7 @@
     "SR5.Total": "합계",
     "SR5.Tours": {
         "CharacterImport": {
-            "Description": "다음은 처머 캐릭터를 불러오는 방법에 대해 설명하고 있습니다. 세부 사항은 https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import 에서 확인 ",
+            "Description": "다음은 chummer 캐릭터를 불러오는 방법에 대한 설명입니다. 세부 사항은 https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import 에서 확인 ",
             "GeneralContent": "캐릭터를 불러오기 위해서는 chummer 5e에서 json을 내보내야 합니다.",
             "GeneralTitle": "캐릭터 불러오기",
             "Title": "캐릭터 불러오기"
@@ -1287,6 +1365,7 @@
             "Rigger": "리거 조종"
         },
         "Driver": "조종자",
+        "Drone": "드론",
         "Environments": {
             "Handling": "조작력",
             "Speed": "속력"
@@ -1294,13 +1373,13 @@
         "IsDrone": "은/는 드론",
         "IsOffRoad": "은/는 비포장 도로 주행 중",
         "Maneuvering": "기동",
-        "MissingDriver": "조종자로 액터를 끌어서 놓기",
+        "MissingDriver": "액터를 끌어서 놓아 조종자로 지정",
         "ModificationCategoryTypes": {
             "body": "몸체",
             "cosmetic": "외장",
             "electromagnetic": "전자기품",
-            "enhancement": "Enhancement",
-            "exotic": "Exotic",
+            "enhancement": "강화",
+            "exotic": "희귀",
             "power_train": "동력 전달부",
             "protection": "보호",
             "weapons": "무기"
@@ -1345,6 +1424,7 @@
         "CantRecoverPhysicalWithStunDamage": "기절 피해가 남아있어 물리 피해를 회복할 수 없음",
         "CantReloadAtAllDueToAmmo": "남은 탄약이 없습니다!",
         "CantReloadFullyDueToAmmo": "탄약이 부족하여 완전히 재장전할 수 없습니다!",
+        "CantReloadPartialDueToAmmo": "복잡한 재장전 행동에 필요한 탄약이 부족합니다!",
         "CantReloadWithoutSpareClip": "남은 탄창이 없습니다!",
         "CantSecondChanceAGlitch": "해당 판정에는 두 번째 기회가 없습니다. 판정 결과는 글리치입니다.",
         "CantSecondChanceWithoutNoneHits": "해당 판정에는 두 번째 기회가 없습니다.  성공 주사위만 남았습니다.",
@@ -1371,6 +1451,17 @@
             "Range": "원거리",
             "Thrown": "투척"
         },
+        "Cliptype": {
+            "BeltFed": "탄띠",
+            "Bow": "활",
+            "BreakAction": "중절식",
+            "Cylinder": "실린더",
+            "Drum": "드럼",
+            "InternalMagazin": "내장형 탄창",
+            "MuzzleLoader": "전장식 장전",
+            "RemovableClip": "분리식 탄창"
+        },
+        "FullReload": "완전 장전",
         "Mod": "부착물",
         "Mode": {
             "BurstFire": "BF",
@@ -1387,6 +1478,7 @@
             "SingleShotShort": "SS"
         },
         "Mods": "부착물",
+        "PartialReload": "일부 장전",
         "Range": {
             "Category": {
                 "AerodynamicThrownGrenade": "유체역학 수류탄",
@@ -1432,7 +1524,7 @@
     },
     "SR5.Wireless": "무선",
     "TYPES.Actor.character": "캐릭터",
-    "TYPES.Actor.critter": "Critter (deprecated)",
+    "TYPES.Actor.critter": "생명체 (삭제 예정)",
     "TYPES.Actor.ic": "IC",
     "TYPES.Actor.spirit": "영혼",
     "TYPES.Actor.sprite": "요정",
@@ -1460,5 +1552,6 @@
     "TYPES.Item.sin": "SIN",
     "TYPES.Item.spell": "주문",
     "TYPES.Item.sprite_power": "요정 능력",
+		"TYPES.Item.vehicle": "탑승물",
     "TYPES.Item.weapon": "무기"
 }
