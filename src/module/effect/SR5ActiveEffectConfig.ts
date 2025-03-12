@@ -96,7 +96,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         } else {
             // Make sure applyTo is saved but also save all other form data on sheet.
             const updateData = { 'flags.shadowrun5e.applyTo': select.value };
-            await this._onSubmit(event, {updateData, preventClose: true})
+            await this._onSubmit(event, { updateData, preventClose: true })
         }
     }
 
@@ -165,7 +165,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         // Fetch current selections.
         const value = this.object.getFlag(SYSTEM_NAME, 'selection_tests') as string;
         const selected = value ? JSON.parse(value) : [];
-        
+
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 
@@ -178,7 +178,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         const inputElement = html.find('input#categories-selection').get(0) as HTMLInputElement;
 
         // Tagify expects this format for localized tags.
-        const values = Object.entries(SR5.actionCategories).map(([category, label]) => ({label, id: category}));
+        const values = Object.entries(SR5.actionCategories).map(([category, label]) => ({ label, id: category }));
 
         // Tagify dropdown should show all whitelist tags.
         const maxItems = values.length;
@@ -204,11 +204,12 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         const actorOrNothing = !(actor instanceof SR5Actor) ? undefined : actor;
 
         // Use ActionFlow to assure either custom skills or global skills to be included.
-        const skills = ActionFlow.sortedActiveSkills(actorOrNothing);
-        const values = Object.entries(skills).map(([id, label]) => ({label: label as Translation, id}));
-        const maxItems = values.length;
         const value = this.object.getFlag(SYSTEM_NAME, 'selection_skills') as string;
         const selected = value ? JSON.parse(value) : [];
+        const selectedSkillNames = selected.map(({id}) => id);
+        const skills = ActionFlow.sortedActiveSkills(actorOrNothing, selectedSkillNames);
+        const values = Object.entries(skills).map(([id, label]) => ({ label: label as Translation, id }));
+        const maxItems = values.length;
 
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }
@@ -216,7 +217,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     _prepareAttributesSelectionTagify(html: JQuery) {
         const inputElement = html.find('input#attribute-selection').get(0) as HTMLInputElement;
 
-        const values = Object.entries(SR5.attributes).map(([attribute, label]) => ({label, id: attribute}));
+        const values = Object.entries(SR5.attributes).map(([attribute, label]) => ({ label, id: attribute }));
         const maxItems = values.length;
         const value = this.object.getFlag(SYSTEM_NAME, 'selection_attributes') as string;
         const selected = value ? JSON.parse(value) : [];
@@ -227,7 +228,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     _prepareLimitsSelectionTagify(html: JQuery) {
         const inputElement = html.find('input#limit-selection').get(0) as HTMLInputElement;
 
-        const values = Object.entries(SR5.limits).map(([limit, label]) => ({label, id: limit}));
+        const values = Object.entries(SR5.limits).map(([limit, label]) => ({ label, id: limit }));
         const maxItems = values.length;
         const value = this.object.getFlag(SYSTEM_NAME, 'selection_limits') as string;
         const selected = value ? JSON.parse(value) : [];
