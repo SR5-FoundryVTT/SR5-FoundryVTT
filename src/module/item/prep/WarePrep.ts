@@ -1,4 +1,6 @@
+import { SR } from "../../constants";
 import { ItemAvailabilityFlow } from "../flows/ItemAvailabilityFlow";
+
 
 /**
  * Prepare item data form Cyberware and Bioware items.
@@ -20,20 +22,9 @@ export const WarePrep = {
 
         if (grade === 'standard') return;
 
-        // TODO: Should live in SR5 const
-        const gradeModifiers = {
-            standard: { essence: 1, avail: 0, cost: 1 },
-            alpha: { essence: 0.8, avail: 2, cost: 1.2 },
-            beta: { essence: 0.7, avail: 4, cost: 1.5 },
-            delta: { essence: 0.5, avail: 8, cost: 2.5 },
-            gamma: { essence: 0.4, avail: 12, cost: 5 },
-            grey: {essence: 0.75, avail: 0, cost: 1.3},
-            used: { essence: 1.25, avail: -4, cost: 0.75 },
-        };
-
-        const essenceMod = gradeModifiers[grade].essence ?? 1;
-        const availMod = gradeModifiers[grade].avail ?? 0;
-        const costMod = gradeModifiers[grade].cost ?? 1;
+        const essenceMod = SR.gradeModifiers[grade].essence ?? 1;
+        const availMod = SR.gradeModifiers[grade].avail ?? 0;
+        const costMod = SR.gradeModifiers[grade].cost ?? 1;
 
         // Alter essence values.
         const actualEssence = Math.round((Number(system.essence.base) ?? 0) * essenceMod);
