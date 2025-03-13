@@ -1,4 +1,5 @@
 import { SR } from "../../constants";
+import { Helpers } from "../../helpers";
 import { ItemAvailabilityFlow } from "../flows/ItemAvailabilityFlow";
 
 
@@ -12,7 +13,7 @@ export const WarePrep = {
 
     /**
      * Calculate values based on grade.
-     * 
+     *
      * @param item The item for additional data
      * @param technology The system technology section to be altered
      */
@@ -27,7 +28,8 @@ export const WarePrep = {
         const costMod = SR.gradeModifiers[grade].cost ?? 1;
 
         // Alter essence values.
-        const actualEssence = Math.round((Number(system.essence.base) ?? 0) * essenceMod);
+        const floatEssence = Number(system.essence.base || 0) * essenceMod;
+        const actualEssence = Helpers.roundTo(floatEssence, 2);
 
         // Alter availability values.
         let availability = String(system.technology.availability.base ?? 0);
@@ -36,7 +38,7 @@ export const WarePrep = {
             availability += availMod !== 0 ? (availMod > 0 ? ` (+${availMod})` : ` (${availMod})`) : '';
         } else {
             const availabilityAdjusted = system.technology.availability.adjusted ?? false;
-              
+
             const actualAvailibility = availabilityAdjusted
                 ? availParts.availability * rating + availMod
                 : availParts.availability + availMod;
