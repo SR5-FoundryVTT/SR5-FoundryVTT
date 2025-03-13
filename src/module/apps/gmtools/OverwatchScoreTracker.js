@@ -37,6 +37,7 @@ export class OverwatchScoreTracker extends Application {
 
         return {
             actors,
+            isGM: game.user.isGM,
         };
     }
 
