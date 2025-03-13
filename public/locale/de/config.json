@@ -1251,6 +1251,7 @@
             "ActionCategories": "Überschreibe alle Standardkategorien der Probe mit dieser Auswahl. Mit einem Active Effect können dadurch die Werte der Action modifiziert werden.",
             "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",
             "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
+            "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
             "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
             "DisabledForPreparedActor": "Deaktiviert da ein vorbereiteter Akteur verwendet wird"
         },

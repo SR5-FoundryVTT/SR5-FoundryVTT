@@ -3,7 +3,7 @@
         {{#hasprop system 'grade'}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.CyberwareGrade"}}</label>
-            <select name="change-grade" class="display">
+            <select name="system.grade" class="display">
                 {{#select system.grade}} {{#each config.cyberwareGrades as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
@@ -16,11 +16,11 @@
                 class="display attribute-input"
                 type="text"
                 size="4"
-                name="system.essence.base"
+                {{! Input is used for both .base and .value. Hiding name will stop it from saving .value into .base }}
+                {{#ife system.grade 'standard'}}name="system.essence.base"{{/ife}}
                 value="{{#ife system.grade 'standard'}}{{system.essence.base}}{{else}}{{system.essence.value}}{{/ife}}"
                 data-dtype="Number"
                 placeholder="0"
-                data-action="update-essence"
                 {{#ifne system.grade 'standard'}}readonly{{/ifne}}
             />
         </div>
@@ -89,11 +89,11 @@
                 <input
                     class="display"
                     type="text"
-                    name="system.technology.cost.base"
+                    {{! Input is used for both .base and .value. Hiding name will stop it from saving .value into .base }}
+                    {{#if (not system.technology.cost.adjusted)}}name="system.technology.cost.base"{{/if}}
                     value="{{#if system.technology.cost.adjusted}}{{system.technology.cost.value}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.cost.value}}{{else}}{{system.technology.cost.base}}{{/ifne}}{{else}}{{system.technology.cost.base}}{{/hasprop}}{{/if}}"
                     data-dtype="Number"
                     placeholder="100"
-                    data-action="update-cost"
                     {{#if system.technology.cost.adjusted}}readonly{{/if}}
                     {{#hasprop system 'grade'}}
                         {{#ifne system.grade 'standard'}}readonly{{/ifne}}
@@ -119,10 +119,10 @@
             <input
                 class="display"
                 type="text"
-                name="system.technology.availability.base"
+                {{! Input is used for both .base and .value. Hiding name will stop it from saving .value into .base }}
+                {{#if (not system.technology.availability.adjusted)}}name="system.technology.availability.base"{{/if}}
                 value="{{#if system.technology.availability.adjusted}}{{system.technology.availability.value}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.availability.value}}{{else}}{{system.technology.availability.base}}{{/ifne}}{{else}}{{system.technology.availability.base}}{{/hasprop}}{{/if}}"
                 placeholder="2R"
-                data-action="update-availability"
                 {{#if system.technology.availability.adjusted}}readonly{{/if}}
                 {{#hasprop system 'grade'}}
                     {{#ifne system.grade 'standard'}}readonly{{/ifne}}
@@ -134,7 +134,7 @@
                     type="checkbox"
                     name="system.technology.availability.adjusted"
                     {{checked system.technology.availability.adjusted}}
-                    data-tooltip="Toggle Availability Adjustment"                    
+                    data-tooltip="{{localize 'SR5.Tooltips.Item.AvailabilityAdjustment'}}"
                     {{#hasprop system 'grade'}}
                         {{#ifne system.grade 'standard'}}disabled{{/ifne}}
                     {{/hasprop}}
