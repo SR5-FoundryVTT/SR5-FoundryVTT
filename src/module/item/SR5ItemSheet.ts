@@ -760,6 +760,7 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onCostAdjustmentChange(costAdjusted: boolean) {
+    
         const baseCost = Number(this.item.getTechnologyData()?.cost.base ?? 0);
         const rating = this.item.getRating();
 

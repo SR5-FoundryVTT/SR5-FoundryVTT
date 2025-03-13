@@ -74,6 +74,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -957,22 +958,7 @@ export class SR5Item extends Item {
     }
 
     async parseAvailibility(avail: string) {
-        console.log(avail);
-
-        // Remove the computed modifier at the end, if present.
-        avail = avail.replace(/\([+-]\d{1,2}\)$/, '');
-
-        console.log(avail);
-
-        // Separates the availability value and any potential restriction
-        const availParts = avail.match(/^(\d+)(.*)$/);
-
-        if(!availParts) return null;
-
-        const availability = parseInt(availParts[1], 10);
-        const restriction = availParts[2];
-
-        return {availability, restriction}
+        return ItemAvailabilityFlow.parseAvailibility(avail)
     }
 
     getNetworkController(): string | undefined {
