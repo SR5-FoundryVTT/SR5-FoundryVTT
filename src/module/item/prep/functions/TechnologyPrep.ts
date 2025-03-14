@@ -1,5 +1,6 @@
 import { Helpers } from "../../../helpers";
 import { PartsList } from "../../../parts/PartsList";
+import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
 import { SR5Item } from "../../SR5Item";
 
 /**
@@ -43,5 +44,35 @@ export const TechnologyPrep = {
 
         technology.conceal.mod = concealParts.list;
         technology.conceal.value = Helpers.calcTotal(technology.conceal);
-    }
+    },
+
+    /**
+     * Calculate availability values.
+     * 
+     * @param item The item for additional data
+     * @param technology The system technology section to be altered
+     */
+    prepareAvailability(item: SR5Item, technology: Shadowrun.TechnologyData) {
+        const availability = String(technology.availability.base ?? 0);
+
+        const {adjusted, value} = ItemAvailabilityFlow.prepareAvailabilityValue(availability, technology.availability.adjusted, item.getRating());
+
+        technology.availability.adjusted = adjusted;
+        technology.availability.value = value;
+    },
+
+    /**
+     * Calculate cost values.
+     * 
+     * @param item The item for additional data
+     * @param technology The system technology section to be altered
+     */
+    prepareCost(item: SR5Item, technology: Shadowrun.TechnologyData) {
+        const baseCost = Number(technology.cost.base ?? 0);
+        const rating = item.getRating();
+
+        const actualCost = technology.cost.adjusted ? baseCost * rating : baseCost;
+        technology.cost.value = actualCost
+    },
+
 }

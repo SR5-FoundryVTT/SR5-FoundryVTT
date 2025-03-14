@@ -151,7 +151,7 @@ export class SR5ItemSheet extends ItemSheet {
                 const technology = itemData.technology as any;
                 if (technology.rating === 0) delete technology.rating;
                 if (technology.quantity === 0) delete technology.quantity;
-                if (technology.cost === 0) delete technology.cost;
+                if (technology.cost.base === 0) delete technology.cost.base;
             } catch (e) {
                 console.log(e);
             }
@@ -688,7 +688,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     async _onClipEquip(clipType: string) {
         if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
-        
+
         const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
         await this.item.update({
             'system.ammo.clip_type': clipType,

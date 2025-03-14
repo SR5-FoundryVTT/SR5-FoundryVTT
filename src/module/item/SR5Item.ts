@@ -74,6 +74,8 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
+import { WarePrep } from './prep/WarePrep';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -240,10 +242,13 @@ export class SR5Item extends Item {
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
 
+        // Prepare technology data for all item types sharing it.
         const technology = this.getTechnologyData();
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
-            TechnologyPrep.prepareConceal(technology, equippedMods);
+            TechnologyPrep.prepareConceal(technology, equippedMods);            
+            TechnologyPrep.prepareAvailability(this, technology);
+            TechnologyPrep.prepareCost(this, technology);
         }
 
         const action = this.getAction();
@@ -257,7 +262,7 @@ export class SR5Item extends Item {
         }
 
         // Switch item data preparation between types...
-        // ... this is ongoing work to clean up SR5item.prepareData
+        // ... this work only begun to clean up SR5item.prepareData
         switch (this.type) {
             case 'host':
                 HostDataPreparation(this.system as Shadowrun.HostData);
@@ -268,6 +273,10 @@ export class SR5Item extends Item {
             case 'sin':
                 SinPrep.prepareBaseData(this.system as unknown as Shadowrun.SinData);
                 break;
+            case 'cyberware':
+            case 'bioware':
+                WarePrep.prepareBaseData(this.system as unknown as Shadowrun.WareData);
+                break
         }
     }
 
@@ -962,6 +971,10 @@ export class SR5Item extends Item {
 
     getTechnologyData(): TechnologyData | undefined {
         return this.wrapper.getTechnology();
+    }
+
+    parseAvailibility(avail: string) {
+        return ItemAvailabilityFlow.parseAvailibility(avail)
     }
 
     getNetworkController(): string | undefined {
