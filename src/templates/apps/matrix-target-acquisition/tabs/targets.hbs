@@ -1,8 +1,24 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='targets'}}
+
+{{#if hostNetwork}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'TYPES.Actor.ic')
+}}
+{{#each ics}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=(speakerImg this.actor)
+        name=(speakerName this.actor)
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.actor.uuid
+}}
+{{/each}}
+{{/if}}
+
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
         name=(localize 'SR5.Personas')
 }}
-{{#each targets}}
+{{#each personas}}
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
         img=(speakerImg this.actor)
         name=(speakerName this.actor)
@@ -20,4 +36,19 @@
     }}
     {{/each}} --}}
 {{/each}}
+
+{{#if hostNetwork}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'TYPES.Item.device')
+}}
+{{#each devices}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=this.item.img
+        name=this.item.name
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.item.uuid
+}}
+{{/each}}
+{{/if}}
 {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

@@ -16,7 +16,8 @@ interface MatrixItemSheetData {
 }
 // An atomic data point for a single matrix target, containing all matrix items within, used for display.
 interface MatrixTargetSheetData {
-    actor: SR5Actor
+    actor?: SR5Actor
+    item?: SR5Item
     marks: number
     matrixItems: MatrixItemSheetData[]
     // Indicates if the target is running silent.
@@ -27,6 +28,9 @@ interface MatrixTargetSheetData {
 interface MatrixTargetAcquisitionSheetData {
     placementActions: string[]
     targets: MatrixTargetSheetData[]
+    personas: MatrixTargetSheetData[]
+    ics: MatrixTargetSheetData[]
+    devices: MatrixTargetSheetData[]
     hosts: SR5Item[]
     grids: SR5Item[]
     network: SR5Item|undefined
@@ -93,6 +97,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
         data.hosts = this.prepareMatrixHosts();
 
         // Collect target data based on network type.
+        // TODO: a decker without host or grid is still 'in the grid' and should see personas / devices across grids
         if (network?.isHost) {
             data.targets = this.prepareMatrixHostTargets();
         }
@@ -103,6 +108,10 @@ export class MatrixTargetAcquisitionApplication extends Application {
         // Filter out invisible tokens.
         // TODO: Improve matrix and foundry visibility handling.
         data.targets = data.targets.filter(target => !target.actor || target.actor.visible)
+        // Filter personas from ic for better UI separation.
+        data.personas = data.targets.filter(target => target.actor?.hasPersona && !target.actor?.isIC());
+        data.ics = data.targets.filter(target => target.actor?.isIC());
+        data.devices = data.targets.filter(target => !target.actor);
 
         // TODO: Needed and used? Replaced by actor system data entry for it?
         data.placementActions = ['brute_force', 'hack_on_the_fly'];
@@ -166,7 +175,12 @@ export class MatrixTargetAcquisitionApplication extends Application {
         const targets: MatrixTargetSheetData[] = []
 
         for (const slave of host.slaves()) {
-            console.error(slave);
+            targets.push({
+                item: slave,
+                marks: this.actor.getMarksPlaced(slave.uuid),
+                matrixItems: [],
+                runningSilent: false
+            });
         }
 
         for (const ic of host.getIC()) {
