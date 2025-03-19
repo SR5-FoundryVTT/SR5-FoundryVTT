@@ -51,7 +51,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
     }
 
     override get template() {
-        return 'systems/shadowrun5e/dist/templates/apps/matrix/matrix-target-acquisition.hbs';
+        return 'systems/shadowrun5e/dist/templates/apps/matrix-target-acquisition/app.hbs';
     }
 
     static override get defaultOptions() {
@@ -63,6 +63,12 @@ export class MatrixTargetAcquisitionApplication extends Application {
 
         options.height = 'auto';
         options.resizable = true;
+
+        options.tabs = [{
+            navSelector: '.tabs[data-group="primary"]',
+            contentSelector: '.tabsbody[data-group="primary"]',
+            initial: 'targets'
+        }]
 
         return options;
     }
@@ -82,15 +88,21 @@ export class MatrixTargetAcquisitionApplication extends Application {
         data.gridNetwork = network?.isGrid ?? false;
         data.network = network;
 
+        // Prepare available networks for selection.
+        data.grids = this.prepareMatrixGrids();
+        data.hosts = this.prepareMatrixHosts();
+
         // Collect target data based on network type.
         if (network?.isHost) {
             data.targets = this.prepareMatrixHostTargets();
-            data.grids = this.prepareMatrixGrids();
         }
         else if (network?.isGrid) {
             data.targets = this.prepareMatrixGridTargets();
-            data.hosts = this.prepareMatrixHosts();
         }
+
+        // Filter out invisible tokens.
+        // TODO: Improve matrix and foundry visibility handling.
+        data.targets = data.targets.filter(target => !target.actor || target.actor.visible)
 
         // TODO: Needed and used? Replaced by actor system data entry for it?
         data.placementActions = ['brute_force', 'hack_on_the_fly'];

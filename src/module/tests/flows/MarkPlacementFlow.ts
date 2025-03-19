@@ -114,6 +114,8 @@ export const MarkPlacementFlow = {
         if (test.host) test.data.directConnection = true;
         // If a device has been pre-targeted before dialog, show this on the first render.
         if (test.icon instanceof SR5Item && !test.icon.isHost) test.data.placeOnMainIcon = false;
+        // Grid items don´t show any devices for now.
+        if (test.icon instanceof SR5Item && test.icon.isGrid) test.data.placeOnMainIcon = true;
     },
 
     /**
@@ -164,14 +166,17 @@ export const MarkPlacementFlow = {
         if (test.icon instanceof SR5Actor) { 
             test.data.personaUuid = test.icon.uuid;
         }
+        
+        // Store network type icons for easy access.
         if (test.icon instanceof SR5Item && test.icon.isHost) test.host = test.icon;
+        if (test.icon instanceof SR5Item && test.icon.isGrid) test.grid = test.icon;
 
         // When given a persona uuid, load it.
         if (test.data.personaUuid) test.persona = fromUuidSync(test.data.personaUuid) as SR5Actor;
 
         // If a device icon is targeted, it will not have a persona or host.
         // TODO: Maybe we should show the persona for visibility and to make it the same as when targeting the persona first and selecting the device
-        if (test.icon instanceof SR5Item && !test.persona && !test.host) {
+        if (test.icon instanceof SR5Item && !test.persona && !test.host && !test.grid) {
             test.data.personaUuid = test.icon.persona?.uuid;
             test.devices = [test.icon];
         }
@@ -286,11 +291,20 @@ export const MarkPlacementFlow = {
      */
     async setIconUuidBasedOnPlacementSelection(test: MarkPlacementTests) {
         // Assure main icon selection is set as the target icon.
-        if (test.data.placeOnMainIcon) test.data.iconUuid = test.persona?.uuid ?? test.host?.uuid ?? undefined;
+        if (test.data.placeOnMainIcon) test.data.iconUuid = this._getMainIconUuid(test);
         // Document might have changed in between initial preparation and dialog selections.
         test.icon = fromUuidSync(test.data.iconUuid as string);
     },
 
+    /**
+     * Based on targeted main icon type, return the uuid of the main icon.
+     */
+    _getMainIconUuid(test: MarkPlacementTests): string|undefined {
+        if (test.persona) return test.persona.uuid;
+        if (test.host) return test.host.uuid;
+        if (test.grid) return test.grid.uuid;
+        return undefined;
+    },
 
     /**
      * Provide easy way to set a target for mark placement tests.

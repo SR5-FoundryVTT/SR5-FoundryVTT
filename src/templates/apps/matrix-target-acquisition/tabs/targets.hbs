@@ -1,0 +1,23 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='targets'}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Personas')
+}}
+{{#each targets}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=(speakerImg this.actor)
+        name=(speakerName this.actor)
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.actor.uuid
+}}
+    {{!-- {{#each this.matrixItems}}
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=this.item.img
+        name=this.item.name
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.item.uuid
+    }}
+    {{/each}} --}}
+{{/each}}
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

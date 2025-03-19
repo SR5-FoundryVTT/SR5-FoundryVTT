@@ -34,10 +34,15 @@
             </div>
             {{/if}}
             {{#if test.host}}
-            <!-- List of hosts available -->
             <div class="form-group">
-                <label>{{localize "SR5.ItemTypes.Host"}}</label>
+                <label>{{localize "TYPES.Item.host"}}</label>
                 <div>{{test.host.name}}</div>
+            </div>
+            {{/if}}
+            {{#if test.grid}}
+            <div class="form-group">
+                <label>{{localize "TYPES.Item.grid"}}</label>
+                <div>{{test.grid.name}}</div>
             </div>
             {{/if}}
             <!-- Devices connected to persona or host -->

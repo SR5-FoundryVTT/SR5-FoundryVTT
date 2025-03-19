@@ -161,7 +161,11 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
 
         // Modifier management parts
-        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
+        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
+
+        // Matrix Target Acquisition
+        'systems/shadowrun5e/dist/templates/apps/matrix-target-acquisition/tabs/targets.hbs',
+        'systems/shadowrun5e/dist/templates/apps/matrix-target-acquisition/tabs/networks.hbs',
     ];
 
     return await loadTemplates(templatePaths);

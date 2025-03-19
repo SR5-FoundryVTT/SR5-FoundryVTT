@@ -1,0 +1,18 @@
+{{#if hostNetwork}}
+<div class="list-header">
+{{localize 'TYPES.Item.host'}}: {{this.network.name}}
+</div>
+{{/if}}
+{{#if gridNetwork}}
+<div class="list-header">
+{{localize 'TYPES.Item.grid'}}: {{this.network.name}}
+</div>
+{{/if}}
+<nav class="tabs" data-group="primary">
+        <a class="item" data-tab="targets">{{localize "SR5.Targets"}}</a>
+        <a class="item" data-tab="networks">{{localize "SR5.Networks"}}</a>
+</nav>
+<section class="sheetbody tabsbody" data-group="primary">
+        {{> "systems/shadowrun5e/dist/templates/apps/matrix-target-acquisition/tabs/targets.hbs"}}
+        {{> "systems/shadowrun5e/dist/templates/apps/matrix-target-acquisition/tabs/networks.hbs"}}
+</section>
