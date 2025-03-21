@@ -31,6 +31,9 @@ export const preloadHandlebarsTemplates = async () => {
         // item tabs
         'systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs',
         'systems/shadowrun5e/dist/templates/item/tabs/GridDescriptionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/DescriptionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/ActionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/MiscellaneousTab.hbs',
 
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
@@ -95,7 +98,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscVehicle.html',
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscCritter.html',
 
-
+        // item parts
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',
@@ -121,8 +124,11 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/summoning.html',
         'systems/shadowrun5e/dist/templates/item/parts/compilation.html',
         'systems/shadowrun5e/dist/templates/item/parts/ritual.html',
-
+        'systems/shadowrun5e/dist/templates/item/parts/misc_matrix.hbs',
+        
+        // roll parts
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
+        'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html',
 
         // to wrap the bodies of tabs

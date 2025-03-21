@@ -24,6 +24,8 @@ declare namespace Shadowrun {
         test: string
         // The type of combat action to be performed. @taMiF: I don't think this is in use.
         type: string
+        // Defines additional action category related values.
+        category: ActionCategory
         // A grouping of actions for different purposes.
         categories: ActionCategories[]
         // When set to true, the skill specialization modifier must be applied.
@@ -56,10 +58,22 @@ declare namespace Shadowrun {
     }
 
     /**
+     * Data for action category specific configurations around casting actions or necessities for actions 
+     * based on their action categories.
+     * 
+     * NOTE: The action category and the properties should match.
+     */
+    export interface ActionCategory {
+        matrix: {
+                marks: number
+        }
+    }
+
+    /**
      * Action limit data.
      */
-    export interface LimitData extends ModifiableValueLinked {}
-    export type FormulaOperator = 'add'|'subtract'|'multiply'|'divide';
+    export interface LimitData extends ModifiableValueLinked { }
+    export type FormulaOperator = 'add' | 'subtract' | 'multiply' | 'divide';
 
     /**
      * Info about the embedded source item that caused the damage
@@ -121,7 +135,7 @@ declare namespace Shadowrun {
      *
      * Mainly here to prohibit using missing packs in code.
      */
-    export type PackName = 'Matrix Actions'|'General Actions';
+    export type PackName = 'Matrix Actions' | 'General Actions';
     /**
      * A list of action names defined in any system pack.
      *
@@ -148,7 +162,7 @@ declare namespace Shadowrun {
     /*
      * A test label for item action chat message casting button creation
      */
-    export type ActionTestLabel =  {
+    export type ActionTestLabel = {
         label: string;
         uuid: string;
     }
@@ -169,7 +183,7 @@ declare namespace Shadowrun {
      * It can also be used for ActiveEffects to target a group of tests, if skill or test implementations used
      * are to specific.
      */
-    type ActionCategories = 
+    type ActionCategories =
         '' | // Empty values are allowed to allow users not having to set an action category.
         'addiction_mental' | // resisting against mental addiction
         'addiction_physical' | // resisting against physical addiction

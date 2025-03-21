@@ -1419,6 +1419,15 @@
                     "success": {}
                 }
             },
+            "action_matrix": {
+                "action": {
+                    "category": {
+                        "matrix": {
+                            "marks": 0
+                        }
+                    }
+                }
+            },
             "armor": {
                 "armor": {
                     "value": 0,
@@ -1631,7 +1640,7 @@
             "karma": 0
         },
         "action": {
-            "templates": ["description", "action", "action_result", "importFlags"]
+            "templates": ["description", "action", "action_result", "importFlags", "action_matrix"]
         },
         "sprite_power": {
             "templates": ["description", "action", "powers", "importFlags"]

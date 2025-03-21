@@ -82,6 +82,12 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     sourceIsUuid: boolean
 
     isUsingRangeCategory: boolean
+
+    // Define if the miscellaneous tab is shown or not.
+    showMiscTab: boolean
+
+    // Misc. Tab has different sections that can be shown or hidden.
+    miscMatrixPart: boolean
 }
 
 /**
@@ -236,7 +242,11 @@ export class SR5ItemSheet extends ItemSheet {
 
         data.rollModes = CONFIG.Dice.rollModes;
 
+        // What tabs should be shown on this sheet?
+        data.showMiscTab = this._prepareShowMiscTab();
 
+        // What sections should be shown on the misc. tab?
+        data.miscMatrixPart = this.item.hasActionCategory('matrix');
 
         return {
             ...data,
@@ -989,5 +999,24 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         this.item.render(false);
+    }
+
+    /**
+     * Go through an action item action categories and if at least one is found that needs additional 
+     * configuration, let the sheet show the misc. tab.
+     * 
+     * @returns true, when the tab is to be shown.
+     */
+    _prepareShowMiscTab() {
+        // Currently, only action items use this tab.
+        const action = this.object.asAction();
+        if (!action) return false;
+
+        const relevantCatogires: Shadowrun.ActionCategories[] = ['matrix'];
+        for (const category of relevantCatogires) {
+            if (this.document.hasActionCategory(category)) return true;
+        }
+
+        return false;
     }
 }
