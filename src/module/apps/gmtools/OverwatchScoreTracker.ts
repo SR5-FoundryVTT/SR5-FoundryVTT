@@ -29,6 +29,7 @@ export class OverwatchScoreTracker extends Application {
 
         return {
             scores: this.actors.map(actor => ({score: actor.getOverwatchScore(), actor})),
+            isGM: game.user?.isGM,
         };
     }
 

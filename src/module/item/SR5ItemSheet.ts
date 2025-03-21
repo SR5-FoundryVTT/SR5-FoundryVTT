@@ -275,8 +275,11 @@ export class SR5ItemSheet extends ItemSheet {
      * Sorted (by translation) active skills either from the owning actor or general configuration.
      */
     _getSortedActiveSkillsForSelect() {
+        // In case of custom skill used, inject it into the skill list.
+        const skill = this.document.system.action?.skill;
+        const skills = skill ? [skill] : undefined;
         // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
-        return ActionFlow.sortedActiveSkills(this.item.actorOwner, this.document.system.action?.skill);
+        return ActionFlow.sortedActiveSkills(this.item.actorOwner, skills);
     }
 
     /**

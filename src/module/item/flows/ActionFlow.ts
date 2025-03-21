@@ -104,16 +104,16 @@ export class ActionFlow {
      * Custom skills have a name but their id is random.
      * 
      * @param actor An optional actor to retrieve skills from (including custom skills)
-     * @param skillName An optional skill that should be included in the selection, even if it's missing from the global list.
+     * @param skillNames An optional list of skills that should be included in the selection, even if it's missing from the global list.
      * @returns Sorted list of skills with a name : label key-value structure for select elements on sheets.
      */
-    static sortedActiveSkills(actor?: SR5Actor, skillName?: string) {
+    static sortedActiveSkills(actor?: SR5Actor, skillNames?: string[]) {
         // CASE - Return default skills whenn no local actor skills are used.
         //        The major use case is the sidebar item creation, where no actor is available.
         if (!actor || actor.isIC()) {
             // Inject this items custom skill into the global skill list.
             const globalSkills = foundry.utils.deepClone(SR5.activeSkills);
-            ActionFlow._injectMissingCustomSkill(globalSkills, skillName);
+            skillNames?.forEach(skillName => { ActionFlow._injectMissingCustomSkill(globalSkills, skillName) });
             return Helpers.sortConfigValuesByTranslation(globalSkills);
         }
 
@@ -129,7 +129,7 @@ export class ActionFlow {
             skills[key] = label as Translation;
         }
 
-        ActionFlow._injectMissingCustomSkill(skills, skillName);
+        skillNames?.forEach(skillName => { ActionFlow._injectMissingCustomSkill(skills, skillName) });
         return Helpers.sortConfigValuesByTranslation(skills);
     }
 
