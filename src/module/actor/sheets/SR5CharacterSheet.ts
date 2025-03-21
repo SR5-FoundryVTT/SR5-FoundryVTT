@@ -16,10 +16,15 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     inventory: Record<string, any>
     network: SR5Item | undefined
     matrixActions: SR5Item[]
+    selectedMarkedDocumentUuid: string|undefined
 }
 
 
 export class SR5CharacterSheet extends SR5BaseActorSheet {
+    // Stores which document has been selected for a Decker in the matrix tab.
+    // We accept this selection to not be persistant across Foundry sessions.
+    selectedMarkedDocumentUuid: string|undefined;    
+
     static override get defaultOptions() {
         const defaultOptions = super.defaultOptions;
         return foundry.utils.mergeObject(defaultOptions, {
@@ -93,6 +98,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         data.network = this.actor.network;
         data.matrixActions = await this.getMatrixActions();
 
+        data.selectedMarkedDocumentUuid = this.selectedMarkedDocumentUuid;
+
         return data;
     }
 
@@ -103,6 +110,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         html.find('.reboot-persona-device').click(this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
 
+        html.find('.select-marked-document').on('click', this._onSelectMarkedDocument.bind(this));
         html.find('.open-marked-document').on('click', this._onOpenMarkedDocument.bind(this));
     }
 
@@ -183,6 +191,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
     /**
      * Retrieve all matrix actions from the corresponding pack to be displayed.
      * 
+     * If a marked document is selected, only actions with a mark requirement will show.
+     * 
      * @returns Alphabetically sorted array of matrix actions.
      */
     async getMatrixActions() {
@@ -191,9 +201,16 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         // Collect all sources for matrix actions.
         const packActions = await Helpers.getPackActions(matrixPackName);
         const actorActions = MatrixFlow.getMatrixActions(this.actor);
-        const actions = [...packActions, ...actorActions];
+        // Assume above collections return action only.
+        let actions = [...packActions, ...actorActions] as Shadowrun.ActionItemData[];
 
-        return actions.sort(Helpers.sortByName.bind(Helpers));
+        // Reduce actions to those matching the marks on the selected target.
+        if (this.selectedMarkedDocumentUuid) {
+            const marks = this.actor.getMarksPlaced(this.selectedMarkedDocumentUuid);
+            actions = actions.filter(action => action.system.action.category.matrix.marks <= marks);
+        }
+
+        return actions.sort(Helpers.sortByName.bind(Helpers)) as SR5Item[];
     }
 
     /**
@@ -229,4 +246,27 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         document.sheet?.render(true);
     }
 
+    /**
+     * Select a marked document on the deckers marks list.
+     * 
+     * This is intended to filter the available list of matrix actions and to 
+     * use the selected marked document as the target for rolling on that.
+     * 
+     * @param event Any interaction event
+     */
+    async _onSelectMarkedDocument(event) {
+        event.stopPropagation();
+
+        const uuid = event.currentTarget.dataset.uuid;
+        if (!uuid) return;
+
+        // Toggle selection on or off.
+        if (this.selectedMarkedDocumentUuid === uuid) {
+            this.selectedMarkedDocumentUuid = undefined;
+        } else {
+            this.selectedMarkedDocumentUuid = uuid;
+        }
+
+        this.render();
+    }
 }

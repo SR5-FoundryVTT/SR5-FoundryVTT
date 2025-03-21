@@ -211,6 +211,16 @@
         // Otherweise the height will grow out of the application bounds hide the overflow...
         height: 390px;
     }
+
+    // Use only to indicate interactibility within the HackingTab markslist.
+    .select-marked-document {
+        @include clickable;
+    }
+
+    // Use only to indicate interactibility within the HackingTab markslist.
+    .open-marked-document {
+        @include rollable;
+    }
 }
 
 .sr5 #filter-skills.display.text.left {
