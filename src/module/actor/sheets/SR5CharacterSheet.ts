@@ -3,6 +3,7 @@ import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
 import { FormDialog, FormDialogOptions } from '../../apps/dialogs/FormDialog';
+import { SR5Actor } from '../SR5Actor';
 
 
 export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
@@ -100,6 +101,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         html.find('.show-matrix-target-acquisition').click(this._onShowMatrixTargetAcquisition.bind(this));
         html.find('.reboot-persona-device').click(this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
+
+        html.find('.open-marked-document').on('click', this._onOpenMarkedDocument.bind(this));
     }
 
     /**
@@ -199,4 +202,25 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const options = { event };
         this.actor.rollMatrixAction(action.name as string, options);
     }
+
+    /**
+     * Open a document from a DOM node containing a dataset uuid.
+     * 
+     * This is intended to let deckers open marked documents they're FoundryVTT user has permissions for.
+     * 
+     * @param event Any interaction event
+     */
+    async _onOpenMarkedDocument(event) {
+        event.stopPropagation();
+
+        const uuid = event.currentTarget.dataset.uuid;
+        if (!uuid) return;
+
+        // Marked documents can´t live in packs.
+        const document = fromUuidSync(uuid) as SR5Item|SR5Actor;
+        if (!document) return;
+
+        document.sheet?.render(true);
+    }
+
 }
