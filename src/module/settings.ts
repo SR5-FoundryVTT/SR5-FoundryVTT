@@ -255,4 +255,15 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: true
     });
+
+    /**
+     * Override the default general actions pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.GeneralActionsPack, {
+        name: 'SETTINGS.GeneralActionsPackName',
+        hint: 'SETTINGS.GeneralActionsPackDescription',
+        scope: 'world',
+        config: true,
+        type: String
+    });
 };

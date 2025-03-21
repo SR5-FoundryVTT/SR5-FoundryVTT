@@ -1158,7 +1158,8 @@ export class SR5Actor extends Actor {
      * @param options Success Test options
      */
     async rollGeneralAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return await this.rollPackAction(SR5.packNames.generalActions as Shadowrun.PackName, actionName, options);
+        const generalPackName = Helpers.getGeneralActionsPackName();
+        return await this.rollPackAction(generalPackName, actionName, options);
     }
 
     /**

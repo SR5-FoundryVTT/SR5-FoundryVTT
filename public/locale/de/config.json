@@ -47,7 +47,9 @@
         "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
         "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden",
         "UseImportIconOverridesDescription": "Beim Importieren von Items die gleichen Symbole für verschiedene Itemtypen verwenden, wenn dies sinnvoll ist. Deaktivieren wenn benutzerdefinierte Symbole verwendet werden.",
-        "UseImportIconOverridesName": "Standard Importer Icon benutzen"
+        "UseImportIconOverridesName": "Standard Importer Icon benutzen",
+        "GeneralActionsPackName": "Überschreibe General Actions Pack",
+        "GeneralActionsPackDescription": "Überschreibe das General Actions Pack mit einem eigenen. Lasse Setting leer, um den Standard Pack zu nutzen. Benutze den Titel des Kompendium und achte darauf, dass alle Actions namentlich exakt zum Standard Pack passen."
     },
     "SR5.Accessory": "Zubehör",
     "SR5.Accuracy": "Präz.",

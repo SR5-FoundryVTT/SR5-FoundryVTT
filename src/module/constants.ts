@@ -56,7 +56,8 @@ export const FLAGS = {
     DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
     TeamworkTestFlow: 'TeamworkTestFlow',
     UseDamageCondition: 'UseDamageCondition',
-    GlobalDataStorage: 'GlobalDataStorage'
+    GlobalDataStorage: 'GlobalDataStorage',
+    GeneralActionsPack: 'GeneralActionsPack'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

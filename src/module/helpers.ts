@@ -1,3 +1,4 @@
+import { SR5 } from "./config";
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
@@ -913,11 +914,12 @@ export class Helpers {
      * @param packName The metadata name of the pack
      * @param actionName The name of the action within that pack
      */
-    static async getPackAction(packName, actionName): Promise<SR5Item | undefined> {
+    static async getPackAction(packName: string, actionName: string): Promise<SR5Item | undefined> {
         console.debug(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
         const pack = game.packs.find(pack =>
             pack.metadata.system === SYSTEM_NAME &&
-            pack.metadata.name === packName);
+            (pack.metadata.name === packName || pack.metadata.label === packName));
+
         if (!pack) return;
 
         // TODO: Use predefined ids instead of names...
@@ -1099,4 +1101,12 @@ export class Helpers {
         if (a.name < b.name) return -1;
         return 0;
     };
+
+    /**
+     * Returns the general actions pack name to use, when the general actions pack should references.
+     */
+    static getGeneralActionsPackName(): Shadowrun.PackName {
+        const overrideGeneralpackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) as Shadowrun.PackName;
+        return overrideGeneralpackName || SR5.packNames.generalActions as Shadowrun.PackName;
+    }
 }

@@ -47,7 +47,10 @@
         "UseDamageConditionDescription": "System marks tokens according to their condition monitor",
         "UseDamageConditionName": "Use system handling for token status effects",
         "UseImportIconOverridesDescription": "When importing items, use the same icons for some different item types when it makes sense. Uncheck if using custom icons.",
-        "UseImportIconOverridesName": "Use Default Importer Icon Overrides"
+        "UseImportIconOverridesName": "Use Default Importer Icon Overrides",
+        "GeneralActionsPackName": "Override General Actions Pack",
+        "GeneralActionsPackDescription": "Override the default general actions pack with a custom one. Leave empty to use the default pack. Use label as written in compendium, with actions matching their default name exactly."
+
     },
     "SR5.Accessory": "Accessory",
     "SR5.Accuracy": "Accuracy",
