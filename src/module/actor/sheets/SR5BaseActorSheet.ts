@@ -1289,8 +1289,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         console.error('IMPLEMENT PLACE MARK ON TARGET');
     }
 
+    /**
+     * When clicking on the disconnect button for the connected network, disconnect from it.
+     * @param event Any interaction event.
+     */
     async _onDisconnectNetwork(event) {
-        console.error('IMPLEMENT NETWORK DISCONNECT');
+        event.stopPropagation();
+
+        await this.actor.disconnectNetwork();
     }
 
     /**
