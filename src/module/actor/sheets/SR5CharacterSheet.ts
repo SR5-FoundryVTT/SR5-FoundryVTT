@@ -4,6 +4,7 @@ import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
 import { FormDialog, FormDialogOptions } from '../../apps/dialogs/FormDialog';
 import { SR5Actor } from '../SR5Actor';
+import { MatrixFlow } from '../../flows/MatrixFlow';
 
 
 export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
@@ -185,7 +186,13 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      * @returns Alphabetically sorted array of matrix actions.
      */
     async getMatrixActions() {
-        const actions = await Helpers.getPackActions('matrix-actions');
+        const matrixPackName = Helpers.getMatrixActionsPackName();
+
+        // Collect all sources for matrix actions.
+        const packActions = await Helpers.getPackActions(matrixPackName);
+        const actorActions = MatrixFlow.getMatrixActions(this.actor);
+        const actions = [...packActions, ...actorActions];
+
         return actions.sort(Helpers.sortByName.bind(Helpers));
     }
 
@@ -199,8 +206,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const action = await fromUuid(id) as SR5Item;
         if (!action) return;
 
-        const options = { event };
-        this.actor.rollMatrixAction(action.name as string, options);
+        this.actor.rollItem(action, {event});
     }
 
     /**

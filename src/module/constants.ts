@@ -57,7 +57,8 @@ export const FLAGS = {
     TeamworkTestFlow: 'TeamworkTestFlow',
     UseDamageCondition: 'UseDamageCondition',
     GlobalDataStorage: 'GlobalDataStorage',
-    GeneralActionsPack: 'GeneralActionsPack'
+    GeneralActionsPack: 'GeneralActionsPack',
+    MatrixActionsPack: 'MatrixActionsPack'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

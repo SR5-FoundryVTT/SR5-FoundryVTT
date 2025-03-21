@@ -81,6 +81,9 @@ export class SR5Actor extends Actor {
     // Holds all operations related to fetching an actors modifiers.
     modifiers: ModifierFlow;
 
+    // Quick access for all items of a type.
+    itemsForType = new Map<foundry.documents.BaseItem['data']['type'], SR5Item[]>();
+
     // TODO: foundry-vtt-types v10. Allows for {system: ...} to be given without type error
     constructor(data, context?) {
         super(data, context);
@@ -104,6 +107,7 @@ export class SR5Actor extends Actor {
      */
     override prepareData() {
         super.prepareData();
+        this.prepareItemsForType();
     }
 
     /**
@@ -264,6 +268,26 @@ export class SR5Actor extends Actor {
                 //@ts-expect-error // TODO: foundry-vtt-types v10
                 ICPrep.prepareDerivedData(this.system, itemDataWrappers);
                 break;
+        }
+    }
+
+    /**
+     * Prepare simple to use hash maps to retrieve specific items quickly.
+     * 
+     * The typical map would match the item type to their items on this actor.
+     */
+    prepareItemsForType() {
+        this.itemsForType = new Map();
+
+        // Prepare with all item types to avoid errors beacuse an actor misses a type.
+        for (const type of Object.keys(game.model.Item) as foundry.documents.BaseItem['data']['type'][]) {
+            this.itemsForType.set(type, []);
+        }
+
+        for (const item of this.items) {
+            const items = this.itemsForType.get(item.type) as any[];
+            items.push(item);
+            this.itemsForType.set(item.type, items);
         }
     }
 
@@ -1208,6 +1232,19 @@ export class SR5Actor extends Actor {
         const action = DataDefaults.actionRollData({ attribute: name, test: AttributeOnlyTest.name });
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, { showDialog });
+        if (!test) return;
+
+        return await test.execute();
+    }
+
+    /**
+     * Roll an item action for this actor.
+     * @param item The item action to roll
+     * @param options General Roll options.
+     */
+    async rollItem(item: SR5Item, options: Shadowrun.ActorRollOptions = {}) {
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.tests.fromItem(item, this, { showDialog });
         if (!test) return;
 
         return await test.execute();

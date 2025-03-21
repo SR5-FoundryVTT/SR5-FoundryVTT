@@ -937,6 +937,22 @@ export class Helpers {
     }
 
     /**
+     * Returns the general actions pack name to use, when the general actions pack is referenced.
+     */
+    static getGeneralActionsPackName(): Shadowrun.PackName {
+        const overrideGeneralpackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) as Shadowrun.PackName;
+        return overrideGeneralpackName || SR5.packNames.generalActions as Shadowrun.PackName;
+    }
+
+    /**
+     * Return the matrix action pack name to use, when the matrix actions pack is referenced.
+     */
+    static getMatrixActionsPackName(): Shadowrun.PackName {
+        const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.MatrixActionsPack) as Shadowrun.PackName;
+        return overrideMatrixPackName || SR5.packNames.matrixActions as Shadowrun.PackName;
+    }
+
+    /**
      * Retrieve all actions from a given pack.
      * 
      * Other item types in that pack will be ignored.
@@ -1096,17 +1112,9 @@ export class Helpers {
      * @param b Any type of document data
      * @returns
      */
-    static sortByName(a, b) {
+    static sortByName(a: {name: string}, b: {name: string}) {
         if (a.name > b.name) return 1;
         if (a.name < b.name) return -1;
         return 0;
     };
-
-    /**
-     * Returns the general actions pack name to use, when the general actions pack should references.
-     */
-    static getGeneralActionsPackName(): Shadowrun.PackName {
-        const overrideGeneralpackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) as Shadowrun.PackName;
-        return overrideGeneralpackName || SR5.packNames.generalActions as Shadowrun.PackName;
-    }
 }

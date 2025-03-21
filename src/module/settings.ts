@@ -266,4 +266,15 @@ export const registerSystemSettings = () => {
         config: true,
         type: String
     });
+
+    /**
+     * Override the default matrix actions pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.MatrixActionsPack, {
+        name: 'SETTINGS.MatrixActionsPackName',
+        hint: 'SETTINGS.MatrixActionsPackDescription',
+        scope: 'world',
+        config: true,
+        type: String
+    });
 };

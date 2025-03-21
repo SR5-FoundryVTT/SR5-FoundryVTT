@@ -204,6 +204,15 @@ export class SR5Item extends Item {
     }
 
     /**
+     * Determine if this action item has a specific action category configured.
+     */
+    hasActionCategory(category: Shadowrun.ActionCategories) {
+        const action = this.asAction();
+        if (!action) return false;
+        return action.system.action.categories.includes(category);
+    }
+
+    /**
      * Determine if a blast area should be placed using FoundryVTT area templates.
      */
     get hasBlastTemplate(): boolean {

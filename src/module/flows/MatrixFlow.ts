@@ -220,5 +220,18 @@ export const MatrixFlow = {
         if (!actor.isUsingVR) return DataDefaults.damageData({type: {base: 'stun', value: 'stun'}});
 
         return MatrixRules.dumpshockDamage(actor.isUsingHotSim);
+    },
+
+    /**
+     * Collect all matrix actions of an actor.
+     * @param actor The actor to collect matrix actions from.
+     */
+    getMatrixActions(actor: SR5Actor): SR5Item[] {
+        const actions = actor.itemsForType.get('action');
+        if (!actions) {
+            console.error('Shadowrun 5e | itemForTypes should always carry an entry for all item types', actor);
+            return [];
+        }
+        return actions.filter((action: SR5Item) => action.hasActionCategory('matrix'));
     }
 };
