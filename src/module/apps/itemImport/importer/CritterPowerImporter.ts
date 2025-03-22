@@ -1,7 +1,6 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
-import { Constants } from './Constants';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
@@ -20,7 +19,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
             return;
         }
 
-        let jsonCritterPoweri18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        const jsonCritterPoweri18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonCritterPoweri18n);
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonCritterPoweri18n, 'powers', 'power');
     }

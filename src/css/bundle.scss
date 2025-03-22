@@ -1089,6 +1089,9 @@ input[type='text'].display {
                 @include rollable;
             }
         }
+        .selected-list-item {
+            background: rgba($light, 0.1);
+        }
     }
 
     .list-item:nth-of-type(even) {

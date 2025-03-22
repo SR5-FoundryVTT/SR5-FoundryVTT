@@ -3,11 +3,11 @@ import Sr5Tour from "./sr5Tours";
 export default async function registerSR5Tours() {
   try {
 
-     // @ts-expect-error
+     // @ts-expect-error // TODO: foundry-vtt-types v10
     game.tours.register(
       'shadowrun5e',
       'ConditionMonitor',
-       // @ts-expect-error
+       // @ts-expect-error // TODO: foundry-vtt-types v10
       await Sr5Tour.fromJSON('/systems/shadowrun5e/dist/tours/ConditionMonitor.json'),
     );
 

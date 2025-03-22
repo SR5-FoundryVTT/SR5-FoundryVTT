@@ -1,18 +1,17 @@
 
 import AstralVisionFilter from './astralPerceptionFilter';
 
-//todo: v10 foundry-vtt-types 
-//@ts-expect-error
+//@ts-expect-error // TODO: foundry-vtt-types v10
 export default class AstralPerceptionDetectionMode extends DetectionMode {
 
-  //@ts-expect-error
+  //@ts-expect-error // TODO: foundry-vtt-types v10
   static override getDetectionFilter() {
-    //@ts-expect-error
+    //@ts-expect-error // TODO: foundry-vtt-types v10
     return (this._detectionFilter ??= AstralVisionFilter.create());
   }
 
   
-    //@ts-expect-error
+    //@ts-expect-error // TODO: foundry-vtt-types v10
     override _canDetect(visionSource, target) {
       const tgt = target?.document;
       const targetAstralActive =

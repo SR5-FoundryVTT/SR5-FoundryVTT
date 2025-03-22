@@ -100,7 +100,7 @@ export class LinksHelpers {
 
         const [code, page] = source.split(' ');
 
-        //@ts-expect-error 
+        //@ts-expect-error TODO: declaration merging in global.d.ts ... initial try didn't work (interface ui {pdfpager: any})
         ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
     }
 

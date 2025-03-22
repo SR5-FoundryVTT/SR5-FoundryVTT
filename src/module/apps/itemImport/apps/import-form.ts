@@ -24,7 +24,6 @@ export class Import extends Application {
     private parsedFiles: string[] = [];
     private disableImportButton: boolean = true;
     private currentParsedFile: string;
-    private icons: boolean;
 
     constructor() {
         super();
@@ -119,7 +118,7 @@ export class Import extends Application {
      * @param setIcons Wether or not to apply system icons to the imported documents.
      */
     async parseXML(xmlSource, fileName, setIcons) {
-        let jsonSource = await DataImporter.xml2json(xmlSource);
+        const jsonSource = await DataImporter.xml2json(xmlSource);
         ImportHelper.SetMode(ImportMode.XML);
 
         // Apply Item Importers based on file and their ability to parse that file.
@@ -143,7 +142,7 @@ export class Import extends Application {
         if (!xmlSource) {
             return;
         }
-        let jsonSource = await DataImporter.xml2json(xmlSource);
+        const jsonSource = await DataImporter.xml2json(xmlSource);
 
         if (DataImporter.CanParseI18n(jsonSource)) {
             DataImporter.ParseTranslation(jsonSource);

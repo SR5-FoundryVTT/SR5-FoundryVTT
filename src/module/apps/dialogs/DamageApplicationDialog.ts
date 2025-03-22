@@ -1,11 +1,12 @@
 import {FormDialog, FormDialogData} from "./FormDialog";
 import DamageData = Shadowrun.DamageData;
 import {SR5Actor} from "../../actor/SR5Actor";
+import { SR5Item } from "../../item/SR5Item";
 
 export class DamageApplicationDialog extends FormDialog {
 
-    constructor(actors : SR5Actor[], damage: DamageData, options?) {
-        const dialogData = DamageApplicationDialog.getDialogData(actors, damage);
+    constructor(targets : (SR5Actor|SR5Item)[], damage: DamageData, options?) {
+        const dialogData = DamageApplicationDialog.getDialogData(targets, damage);
         super(dialogData, options);
     }
 
@@ -19,15 +20,16 @@ export class DamageApplicationDialog extends FormDialog {
         return options; 
     }
 
-    static getDialogData(actors : SR5Actor[], damage: DamageData): FormDialogData {
+    static getDialogData(targets : (SR5Actor|SR5Item)[], damage: DamageData): FormDialogData {
         const title = game.i18n.localize('SR5.DamageApplication.Title');
         const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html';
 
-        // Simplify / refactor this
-        const actorDamage : any = actors.map(a => { return {actor:a} }) ;
+        // Restructure to allow template to differentiate between documents for token img/name usage.
+        const targetsData = targets.map(target => ({target, isActor: target instanceof SR5Actor}));
+
         const templateData = {
             damage,
-            actorDamage,
+            targetsData
         };
 
         const buttons = {
@@ -36,7 +38,7 @@ export class DamageApplicationDialog extends FormDialog {
             }
         }
 
-        const onAfterClose = () => actorDamage;
+        const onAfterClose = () => targets;
 
         return {
             title,
