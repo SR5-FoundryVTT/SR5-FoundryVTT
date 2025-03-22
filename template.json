@@ -1423,6 +1423,7 @@
                 "action": {
                     "category": {
                         "matrix": {
+                            "owner": false,
                             "marks": 0
                         }
                     }

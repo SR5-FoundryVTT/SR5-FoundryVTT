@@ -65,6 +65,9 @@ declare namespace Shadowrun {
      */
     export interface ActionCategory {
         matrix: {
+                // Owner the owner of a device can excute this action
+                owner: boolean
+                // Amount of marks necessary to execute this action
                 marks: number
         }
     }
