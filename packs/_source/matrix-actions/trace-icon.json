@@ -1,15 +1,13 @@
 {
-  "name": "Spoof Command",
+  "name": "Trace Icon",
   "type": "action",
-  "flags": {},
-  "img": "systems/shadowrun5e/dist/icons/circuitry.svg",
-  "effects": [],
-  "_id": "yap4ROqNxoIxKeU6",
+  "_id": "2Dc0o0KbeOfYnwxl",
+  "img": "systems/shadowrun5e/dist/icons/dodge.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 242"
+      "source": ""
     },
     "action": {
       "type": "complex",
@@ -17,9 +15,9 @@
       "categories": [
         "matrix"
       ],
-      "attribute": "intuition",
+      "attribute": "logic",
       "attribute2": "",
-      "skill": "hacking",
+      "skill": "computer",
       "armor": false,
       "spec": false,
       "mod": null,
@@ -28,8 +26,7 @@
       "limit": {
         "value": 0,
         "base": 0,
-        "attribute": "sleaze",
-        "mod": []
+        "attribute": "data_processing"
       },
       "threshold": {
         "value": 0,
@@ -49,8 +46,7 @@
         "base": 0,
         "ap": {
           "value": 0,
-          "base": 0,
-          "mod": []
+          "base": 0
         },
         "base_formula_operator": "add",
         "attribute": "",
@@ -59,14 +55,13 @@
           "itemId": "",
           "itemType": "",
           "itemName": ""
-        },
-        "mod": []
+        }
       },
       "opposed": {
-        "type": "custom",
+        "type": "",
         "test": "OpposedTest",
-        "attribute": "logic",
-        "attribute2": "firewall",
+        "attribute": "willpower",
+        "attribute2": "sleaze",
         "skill": "",
         "armor": false,
         "mod": 0,
@@ -88,18 +83,12 @@
         "armor": false,
         "mod": 0
       },
-      "modifiers": [
-        "noise",
-        "global",
-        "wounds"
-      ],
+      "modifiers": [],
       "category": {
         "matrix": {
-          "marks": 1
+          "marks": 2
         }
-      },
-      "alt_mod": 0,
-      "dice_pool_mod": []
+      }
     },
     "result": {
       "success": {}
@@ -112,20 +101,22 @@
       "isImported": false
     }
   },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
   "ownership": {
     "default": 0
   },
-  "folder": null,
-  "sort": 0,
+  "flags": {},
   "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "12.331",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "coreVersion": "12.331",
-    "createdTime": null,
-    "modifiedTime": 1742645787675,
-    "lastModifiedBy": "sr5ebuilder",
-    "compendiumSource": null,
-    "duplicateSource": null
+    "createdTime": 1742645805523,
+    "modifiedTime": 1742645901070,
+    "lastModifiedBy": "sr5ebuilder"
   },
-  "_key": "!items!yap4ROqNxoIxKeU6"
+  "_key": "!items!2Dc0o0KbeOfYnwxl"
 }

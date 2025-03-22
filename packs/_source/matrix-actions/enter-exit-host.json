@@ -89,6 +89,11 @@
         "mod": 0
       },
       "modifiers": [],
+      "category": {
+        "matrix": {
+          "marks": 1
+        }
+      },
       "alt_mod": 0,
       "dice_pool_mod": []
     },
@@ -110,11 +115,11 @@
   "sort": 0,
   "_stats": {
     "systemId": "shadowrun5e",
-    "systemVersion": "0.13.0",
+    "systemVersion": "0.30.0",
     "coreVersion": "12.331",
     "createdTime": null,
-    "modifiedTime": 1697731062715,
-    "lastModifiedBy": null,
+    "modifiedTime": 1742645688689,
+    "lastModifiedBy": "sr5ebuilder",
     "compendiumSource": null,
     "duplicateSource": null
   },

@@ -93,6 +93,11 @@
         "global",
         "wounds"
       ],
+      "category": {
+        "matrix": {
+          "marks": 0
+        }
+      },
       "alt_mod": 0,
       "dice_pool_mod": []
     },
@@ -117,8 +122,8 @@
     "systemVersion": "0.13.0",
     "coreVersion": "12.331",
     "createdTime": null,
-    "modifiedTime": 1697731189374,
-    "lastModifiedBy": null,
+    "modifiedTime": 1742645854945,
+    "lastModifiedBy": "sr5ebuilder",
     "compendiumSource": null,
     "duplicateSource": null
   },
