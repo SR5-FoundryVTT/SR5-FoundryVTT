@@ -24,6 +24,17 @@ The system implements tests of the Shadowrun 5th edition rules within the `Succe
 
 Data schemas are described in the `template.json` and defined in TypeScript types within the `Shadowrun` namespace.
 
+Data itself is stored in so called FoundryVTT document classes, which are:
+- `SR5Item`
+- `SR5Actor`
+- `SR5Combat`
+- `SR5Scene`
+- `SR5Message`
+
+All of these document classes contain FoundryVTT data, directly as properties on those classes object instances, and system related data stored in the `system` property directly on the objects. For example `SR5Item.system.attributes.body.value`.
+
+Additionally there is a central data storage for inter document data exchange which is handled by the `DataStorage` class and the `src/module/storage/storage.ts`.
+
 ## Core Game Mechanics
 
 The Shadorwun 5th edition ttrpg has these core game mechanics:
