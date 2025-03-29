@@ -120,6 +120,10 @@ export class Helpers {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
+    static listItemUuid(event): string {
+        return event.currentTarget.closest('.list-item').dataset.uuid;
+    }
+
     static listHeaderId(event): string {
         return event.currentTarget.closest('.list-header').dataset.itemId;
     }
@@ -499,33 +503,39 @@ export class Helpers {
     /**
      * Given a SuccessTestData subset fetch all target actors.
      *
+     * TODO: TEST this whole function with all use cases....
+     * TODO: CHECK THIS ASSUMPTION?
      * BEWARE: A target will always be token based BUT linked actors provide an actor uuid instead of
      * pointing to their token actors.
      *
      * @param testData The test data containing target uuids.
+     * @returns A list of documents targeted by the original test.
      */
-    static async getTestTargetActors(testData: SuccessTestData): Promise<SR5Actor[]> {
-        const actors: SR5Actor[] = [];
-        for (const uuid of testData.targetActorsUuid) {
-            const tokenOrActor = await fromUuid(uuid);
-            // Assume given target to be an actor.
-            let actor = tokenOrActor;
+    static async getTestTargetDocuments(testData: SuccessTestData): Promise<Shadowrun.TestTargetDocument[]> {
+        const documents: Shadowrun.TestTargetDocument[] = [];
+        for (const uuid of testData.targetUuids) {
+            const document = await fromUuid(uuid) as Shadowrun.TestTargetDocument;
 
-            // In case of a Token, extract it's synthetic actor.
-            if (tokenOrActor instanceof TokenDocument) {
-                if (!tokenOrActor.actor) continue;
-                actor = tokenOrActor.actor;
-            }
-
-            // Avoid fromUuid pulling an unwanted Document type.
-            if (!(actor instanceof SR5Actor)) {
-                console.error(`Shadowrun5e | testData with targets containt UUID ${uuid} which doesn't provide an actor or syntheic actor`, tokenOrActor);
+            if (document instanceof SR5Item) {
+                documents.push(document);
                 continue;
             }
 
-            actors.push(actor);
+            if (document instanceof SR5Actor) {
+                documents.push(document);
+                continue;
+            }
+
+            // In case of a Token, extract it's synthetic actor.
+            if (document instanceof TokenDocument) {
+                if (!document.actor) continue;
+                documents.push(document.actor);
+            }
+
+            // Inform about unexpected document types.
+            console.error(`Shadowrun5e | testData with targets containt UUID ${uuid} which doesn't provide an actor or syntheic actor`, document);
         }
-        return actors;
+        return documents;
     }
     /**
      * Check given test for actors to use for opposed tests.
@@ -533,12 +543,12 @@ export class Helpers {
      * @param testData The test to use for actor selection
      * @returns A list of actors that should be used for an opposed test.
      */
-    static async getOpposedTestActors(testData: SuccessTestData): Promise<SR5Actor[]> {
+    static async getOpposedTestTargets(testData: SuccessTestData): Promise<Shadowrun.TestTargetDocument[]> {
         const overwriteSelectionWithTarget = game.settings.get(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection) as boolean;
 
         // Honor user preference of using test targets, if any are set.
-        if (overwriteSelectionWithTarget && testData.targetActorsUuid.length > 0) {
-            return await Helpers.getTestTargetActors(testData);
+        if (overwriteSelectionWithTarget && testData.targetUuids.length > 0) {
+            return await Helpers.getTestTargetDocuments(testData);
         }
 
         // Otherwise fallback to default behavior
@@ -566,17 +576,20 @@ export class Helpers {
      * This can be relevant for when GMs either manually or by module change the tokens name, while the actors name
      * is untouched and might even be detrimental to share with players.
      *
-     * @param actor
+     * @param document Any document that can be targeted by a Success Test
+     * @returns A string representing this documents name.
      */
-    static getChatSpeakerName(actor: SR5Actor): string {
-        if (!actor) return '';
+    static getChatSpeakerName(document: Shadowrun.TestTargetDocument): string {
+        if (!document) return '';
+
+        if (document instanceof SR5Item) return document.name as string;
 
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = actor.getToken();
+        const token = document instanceof TokenDocument ? document : document.getToken();
 
         if (useTokenNameForChatOutput && token) return token.name;
 
-        return actor.name as string;
+        return document.name as string;
     }
 
     /**
@@ -584,18 +597,19 @@ export class Helpers {
      *
      * The use token name setting is also respected.
      *
-     * @param actor Either an actual or a virtual actor, taken from a token.
+     * @param document Any document that can be targeted by a Success Test
      * @returns A path pointing to an image.
      */
-    static getChatSpeakerImg(actor: SR5Actor): string {
-        if (!actor) return '';
+    static getChatSpeakerImg(document: Shadowrun.TestTargetDocument): string {
+        if (!document) return '';
+
+        if (document instanceof SR5Item) return document.img as string;
 
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = actor.getToken();
+        const token = document instanceof TokenDocument ? document : document.getToken();
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (useTokenForChatOutput && token) return token.texture.src || '';
-        return actor.img || '';
+        return document.img || '';
     }
 
     static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem?: SR5Item): DamageData {
@@ -896,7 +910,7 @@ export class Helpers {
      *
      * TODO: Why even do this? Does the ui actually not match to the pack document name?
      * @param documentName A string to be transformed. Malformed values will result in empty strings.
-     * @returns 
+     * @returns
      */
     static packDocumentName(documentName?: string) {
         // Fail gracefully.
@@ -954,12 +968,12 @@ export class Helpers {
 
     /**
      * Retrieve all actions from a given pack.
-     * 
+     *
      * Other item types in that pack will be ignored.
-     * 
+     *
      * TODO: Allow filtering by categories?
      * TODO: Generalize this to search for items and make the type paramater
-     * 
+     *
      * @param packName The item pack that contains actions.
      */
     static async getPackActions(packName: string): Promise<SR5Item[]> {
@@ -967,7 +981,7 @@ export class Helpers {
         const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName);
         if (!pack) return [];
 
-        // @ts-expect-error foundry-vtt-types v10 
+        // @ts-expect-error foundry-vtt-types v10
         const packEntries = pack.index.filter(data => data.type === 'action');
 
         const documents: SR5Item[] = [];
@@ -979,7 +993,7 @@ export class Helpers {
 
         console.debug(`Shadowrun5e | Fetched all actions from pack ${packName}`, documents);
         return documents;
-    }   
+    }
 
     /**
      * Show the DocumentSheet of whatever entity link uuid.

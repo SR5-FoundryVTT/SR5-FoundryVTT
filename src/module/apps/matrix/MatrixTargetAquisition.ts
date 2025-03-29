@@ -33,7 +33,7 @@ interface MatrixTargetAcquisitionSheetData {
     devices: MatrixTargetSheetData[]
     hosts: SR5Item[]
     grids: SR5Item[]
-    network: SR5Item|undefined
+    network: SR5Item|null
     hostNetwork: boolean
     gridNetwork: boolean
 }
@@ -96,10 +96,13 @@ export class MatrixTargetAcquisitionApplication extends Application {
         data.grids = this.prepareMatrixGrids();
         data.hosts = this.prepareMatrixHosts();
 
+        // Have an empty target list as fallback for failing network target collection.
+        data.targets = [];
+
         // Collect target data based on network type.
         // TODO: a decker without host or grid is still 'in the grid' and should see personas / devices across grids
         if (network?.isHost) {
-            data.targets = this.prepareMatrixHostTargets();
+            data.targets = await this.prepareMatrixHostTargets();
         }
         else if (network?.isGrid) {
             data.targets = this.prepareMatrixGridTargets();
@@ -165,7 +168,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
     /**
      * Collect all personas and devices connected to the current host network.
      */
-    prepareMatrixHostTargets() {
+    async prepareMatrixHostTargets() {
         const host = this.actor.network;
         if (!host?.isHost) {
             console.error('Shadowrun 5e | Actor is not connected to a host network');
@@ -174,7 +177,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
 
         const targets: MatrixTargetSheetData[] = []
 
-        for (const slave of host.slaves()) {
+        for (const slave of await host.slaves()) {
             targets.push({
                 item: slave,
                 marks: this.actor.getMarksPlaced(slave.uuid),
@@ -183,7 +186,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
             });
         }
 
-        for (const ic of host.getIC()) {
+        for (const ic of await host.getIC()) {
             targets.push({
                 actor: ic,
                 marks: this.actor.getMarksPlaced(ic.uuid),
@@ -211,7 +214,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
 
     /**
      * Trigger Mark Placement for selected target document.
-     * 
+     *
      * @param event A event triggered from within a Handble ListItem
      */
     async handleMarkPlacement(event) {

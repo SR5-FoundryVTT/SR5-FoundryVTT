@@ -428,7 +428,8 @@
     "SR5.Equipment": "Ausrüstung",
     "SR5.Equipped": "Ausgerüstet",
     "SR5.Errors": {
-        "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden.",
+        "CantConnectToPAN": "Dokument kann nicht zum PAN-Netzwerk hinzugefügt werden",
+        "CantConnectToWAN": "Dokument kann nicht zum WAN-Netzwerk hinzugefügt werden",
         "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
         "DefaultInventoryCantBeRemoved": "Das Standardinventar kann nicht entfernt werden.",
         "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",

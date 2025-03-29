@@ -1,5 +1,6 @@
 import { DataStorage } from "../data/DataStorage";
 import { MarksStorage } from "./MarksStorage";
+import { NetworkStorage } from "./NetworkStorage";
 import { OverwatchStorage } from "./OverwatchStorage";
 
 /**
@@ -11,7 +12,8 @@ export const SRStorage = {
     // Allow indirect access to specific storage data, matching the storage key they're connected to.
     matrix: {
         marks: MarksStorage,
-        ow: OverwatchStorage
+        ow: OverwatchStorage,
+        networks: NetworkStorage
     },
     // Allow direct access to global data storage.
     _storage: DataStorage

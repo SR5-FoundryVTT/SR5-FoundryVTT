@@ -15,5 +15,7 @@ declare namespace Shadowrun {
         marks: Record<string, string[]>
         // stores tracked actors and their scores.
         ow: Record<string, { score: number }>
+        // stores relationships between networks and their icons
+        networks: Record<string, string[]>
     }
 }

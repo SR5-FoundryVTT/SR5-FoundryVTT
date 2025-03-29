@@ -47,7 +47,7 @@ export const MarkPlacementFlow = {
      */
     _prepareData(data: MatrixPlacementData): any {
         // Allow for token targeting to be used to target the main icon.
-        if (!data.iconUuid) data.iconUuid = data.targetActorsUuid.length === 1 ? data.targetActorsUuid[0] : undefined;
+        if (!data.iconUuid) data.iconUuid = data.targetUuids.length === 1 ? data.targetUuids[0] : undefined;
 
         // Place a single mark as default
         data.marks = data.marks ?? 1;
@@ -319,5 +319,5 @@ export const MarkPlacementFlow = {
 
         test.data.iconUuid = document.uuid;
         await test.populateDocuments();
-    }
+    },
 }

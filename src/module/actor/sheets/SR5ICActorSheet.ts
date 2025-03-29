@@ -4,7 +4,7 @@ import {SR5Item} from "../../item/SR5Item";
 import MarkedDocument = Shadowrun.MarkedDocument;
 
 interface ICActorSheetData extends SR5ActorSheetData {
-    host: SR5Item|undefined
+    host: SR5Item|null
     markedDocuments: MarkedDocument[]
     disableMarksEdit: boolean
 }
@@ -25,7 +25,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         const data = await super.getData(options) as ICActorSheetData;
 
         // Fetch a connected host.
-        data.host = await this.actor.getICHost();
+        data.host = this.actor.network;
 
         // Display Matrix Marks
         data.markedDocuments = await this.actor.getAllMarkedDocuments();
@@ -46,7 +46,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
      */
     async _removeHost(event) {
         event.stopPropagation();
-        await this.actor.removeICHost();
+        await this.actor.disconnectNetwork();
     }
 
     override async _onDrop(event: DragEvent) {
@@ -67,7 +67,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
                 switch (item.type) {
                     case 'host':
                         // We don't have to narrow down type here, the SR5Actor will handle this for us.
-                        return await this.actor.addICHost(item);
+                        return await this.actor.connectNetwork(item);
                     }
                 
                 // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.

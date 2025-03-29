@@ -14,7 +14,7 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     markedDocuments: Shadowrun.MarkedDocument[]
     handledItemTypes: string[]
     inventory: Record<string, any>
-    network: SR5Item | undefined
+    network: SR5Item | null
     matrixActions: SR5Item[]
     selectedMarkedDocumentUuid: string|undefined
 }
@@ -223,7 +223,19 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const action = await fromUuid(id) as SR5Item;
         if (!action) return;
 
-        this.actor.rollItem(action, {event});
+        // this.actor.rollItem(action, {event});
+
+        const test = await this.actor.testFromItem(action, {event});
+        if (!test) return;
+
+        if (this.selectedMarkedDocumentUuid) {
+            const document = fromUuidSync(this.selectedMarkedDocumentUuid) as Shadowrun.NetworkDevice;
+            if (!document) return;
+
+            await test.addTarget(document);
+        }
+
+        await test.execute();
     }
 
     /**

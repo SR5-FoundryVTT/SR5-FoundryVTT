@@ -31,7 +31,7 @@ export const ActorMarksFlow = {
 
         // CASE - IC and hosts
         if (persona.isIC() && persona.hasHost()) {
-            const host = await persona.getICHost();
+            const host = persona.network;
             await host?.setMarks(target, marks, options);
             return;
         }
@@ -52,7 +52,7 @@ export const ActorMarksFlow = {
 
         // For IC targets: place marks on both ic and host.
         if (target instanceof SR5Actor && target.isIC() && target.hasHost()) {
-            const host = await target.getICHost();
+            const host = target.network;
             await persona.setMarks(host, marks, options);
         }
 

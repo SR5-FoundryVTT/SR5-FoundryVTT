@@ -306,13 +306,13 @@ export class SR5Item extends Item {
      * @param event A PointerEvent by user interaction.
      */
     async castAction(event?: RollEvent) {
-        
+
         // Only show the item's description by user intention or by lack of testability.
         let dontRollTest = TestCreator.shouldPostItemDescription(event);
         if (dontRollTest) return await this.postItemCard();
-        
-        // Should be right here so that TestCreator.shouldPostItemDescription(event); can prevent execution beforehand. 
-        if (!Hooks.call('SR5_CastItemAction', this)) return; 
+
+        // Should be right here so that TestCreator.shouldPostItemDescription(event); can prevent execution beforehand.
+        if (!Hooks.call('SR5_CastItemAction', this)) return;
 
         dontRollTest = !this.hasRoll;
 
@@ -1434,36 +1434,47 @@ export class SR5Item extends Item {
         const icData = ic.asIC();
         if (!icData) return;
 
-        if (host.system.ic.includes(ic.uuid)) return;
-
-        host.system.ic.push(ic.uuid);
-        await this.update({ 'system.ic': host.system.ic });
+        await MatrixNetworkFlow.addSlave(this, ic);
     }
 
     /**
      * A host type item can contain IC in an order. Use this function remove IC at the said position
      * @param index The position in the IC order to be removed
      */
-    async removeIC(index: number) {
-        if (isNaN(index) || index < 0) return;
-
+    async removeIC(ic: SR5Actor) {
         const host = this.asHost;
         if (!host) return;
-        if (host.system.ic.length <= index) return;
+        const icData = ic.asIC();
+        if (!icData) return;
 
-        host.system.ic.splice(index, 1);
-
-        await this.update({ 'system.ic': host.system.ic });
+        await MatrixNetworkFlow.removeSlave(this, ic);
     }
 
     /**
      * Get all active IC actors of a host
      */
-    getIC() {
+    async getIC() {
         const host = this.asHost;
         if (!host) return [];
 
-        return host.system.ic.map(uuid => fromUuidSync(uuid)) as SR5Actor[];
+        // return host.system.ic.map(uuid => fromUuidSync(uuid)) as SR5Actor[];
+        const slaves = await MatrixNetworkFlow.getSlaves(this);
+        // We can´t use isIC as both devices and actors might be returned
+        return slaves.filter(slave => slave.type === 'ic');
+    }
+
+    /**
+     * Retrieve slaved devices but not slaved personas.
+     *
+     * @returns A list of slaved devices.
+     */
+    async getDevices() {
+        const host = this.asHost;
+        if (!host) return [];
+
+        const slaves = await MatrixNetworkFlow.getSlaves(this);
+        // TODO: There are more than only devices that can be matrix devices.
+        return slaves.filter(slave => slave.type === 'device') as SR5Item[];
     }
 
     get _isNestedItem(): boolean {
@@ -1551,28 +1562,21 @@ export class SR5Item extends Item {
 
     /**
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
-     * @param target The matrix item to be connected.
+     * @param slave The matrix item to be connected.
      */
-    async addSlave(target: Shadowrun.NetworkDevice) {
-        // TODO: Add IC actor to WAN network
-        // TODO: setup master link on networked devices.
-        await MatrixNetworkFlow.addSlave(this, target);
+    async addSlave(slave: Shadowrun.NetworkDevice) {
+        await MatrixNetworkFlow.addSlave(this, slave);
     }
 
-    async removeSlave(index: number) {
-        const masterData = this.asMaster();
-        if (!masterData) return;
-
-        // Convert the index to a device link.
-        if (masterData.system.slaves[index] === undefined) return;
-        const slaveLink = masterData.system.slaves[index];
-        await MatrixNetworkFlow.removeSlaveFromNetwork(this, slaveLink);
+    /**
+    * In case this item is a network master, remove the slave from the network.
+    * @param slave The matrix item to be disconnected.
+    */
+    async removeSlave(slave: Shadowrun.NetworkDevice) {
+        await MatrixNetworkFlow.removeSlave(this, slave);
     }
 
     async removeAllSlaves() {
-        const masterData = this.asMaster();
-        if (!masterData) return;
-
         await MatrixNetworkFlow.removeAllSlaves(this);
     }
 
@@ -1607,8 +1611,8 @@ export class SR5Item extends Item {
 
     /**
      * Return the persona document for this matrix device.
-     * 
-     * @returns 
+     *
+     * @returns
      */
     get persona() {
         const technologyData = this.getTechnologyData();
@@ -1620,24 +1624,28 @@ export class SR5Item extends Item {
     /**
      * Return all network device items within a possible PAN or WAN.
      */
-    slaves() {
-        const master = this.asDevice || this.asHost;
-        if (!master) return [];
-
-        return MatrixNetworkFlow.getSlaves(this);
+    async slaves() {
+        return await MatrixNetworkFlow.getSlaves(this);
     }
 
     /**
      * Only devices can control a network.
      */
     get canBeMaster(): boolean {
-        return this.isDevice || this.isHost;
+        return this.isDevice || this.isHost || this.isGrid;
     }
 
     /**
      * Assume all items with that are technology (therefore have a rating) are active matrix devices.
      */
     get canBeSlave(): boolean {
+        return this.isMatrixDevice;
+    }
+
+    /**
+     * Determine if this icon can be used as a matrix icon.
+     */
+    get canBeMatrixIcon(): boolean {
         return this.isMatrixDevice;
     }
 

@@ -78,6 +78,7 @@ import { JournalEnrichers } from './journal/enricher';
 import { MatrixHooks } from './tests/hooks/MatrixHooks';
 import { DataStorage } from './data/DataStorage';
 import { SRStorage } from './storage/storage';
+import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -101,7 +102,8 @@ export class HooksManager {
         // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(HooksManager));
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
-        Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks.bind(HooksManager));
+        Hooks.on('deleteItem', HooksManager.onDeleteItem.bind(HooksManager));
+        Hooks.on('deleteActor', HooksManager.onDeleteActor.bind(HooksManager));
         Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
@@ -494,8 +496,19 @@ ___________________
         }
     }
 
-    static async removeDeletedItemsFromNetworks(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
-        await MatrixNetworkFlow.handleOnDeleteItem(item, data, id);
+    /**
+     * Collect all changes necessary when any item is deleted.
+     */
+    static async onDeleteItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
+        await MatrixNetworkFlow.handleOnDeleteDocument(item, data, id);
+        await ItemMarksFlow.handleOnDeleteItem(item, data, id);
+    }
+
+    /**
+     * Collect all changes necessary when any actor is deleted.
+     */
+    static async onDeleteActor(actor: SR5Actor, data: Shadowrun.ShadowrunActorDataData, id: string) {
+        await MatrixNetworkFlow.handleOnDeleteDocument(actor, data, id);
     }
 
     /**

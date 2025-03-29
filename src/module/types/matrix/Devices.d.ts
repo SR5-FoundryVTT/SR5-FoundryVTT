@@ -7,4 +7,9 @@ declare namespace Shadowrun {
      * - SR5Actor => Vehicle
      */
     export type NetworkDevice = SR5Actor | SR5Item;
+
+    /**
+     * Any document that can be targeted by a SuccessTest
+     */
+    export type TestTargetDocument = NetworkDevice | TokenDocument;
 }

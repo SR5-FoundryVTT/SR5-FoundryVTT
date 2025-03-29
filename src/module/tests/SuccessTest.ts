@@ -120,6 +120,7 @@ export interface SuccessTestData extends TestData {
     values: SuccessTestValues
     // Scene Token Ids marked as targets of this test.
     targetActorsUuid: string[]
+    targetUuids: string[]
 }
 
 export interface TestOptions {
@@ -179,7 +180,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     public source: SR5Actor | SR5Item | undefined;
 
     public rolls: SR5Roll[];
-    public targets: TokenDocument[];
+    // Targets can be either actor/item or a token.
+    public targets: Shadowrun.TestTargetDocument[];
     public dialog: TestDialog | null;
 
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
@@ -224,7 +226,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.type = data.type || this.type;
 
         // Store the current users targeted token ids for later use.
-        data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
+        // TODO: remove this.
+        // data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
+        data.targetUuids = data.targetUuids || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
 
         // Store given document uuids to be fetched during evaluation.
         data.sourceActorUuid = data.sourceActorUuid || this.actor?.uuid;
@@ -728,16 +732,27 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Populate all targets connected to this test.
      */
     async populateTargetDocuments() {
-        if (this.targets.length === 0 && this.data.targetActorsUuid) {
+        if (this.targets.length === 0 && this.data.targetUuids) {
             this.targets = [];
-            for (const uuid of this.data.targetActorsUuid) {
+            for (const uuid of this.data.targetUuids) {
                 const document = await fromUuid(uuid);
                 if (!document) continue;
+                
+                if (document instanceof SR5Item) {
+                    this.targets.push(document);
+                    continue;
+                }
 
-                const token = document instanceof SR5Actor ? document.getToken() : document;
-                if (!(token instanceof TokenDocument)) continue;
+                // TODO: Why and when are tokens needed? Range calulations? Or was it just the general assumption with Ranged Attack?
+                // Can´t we retrieve the token later always?
+                if (document instanceof SR5Actor) {
+                    const token = document.getToken();
+                    if (!(token instanceof TokenDocument)) continue;
+                    this.targets.push(token);
+                    continue;
+                }
 
-                this.targets.push(token);
+                this.targets.push(document);
             }
         }
     }
@@ -1752,6 +1767,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             test: this,
             // Note: While ChatData uses ids, this uses full documents.
             speaker: {
+                source: this.source,
+                // TODO: Check if speaker.actor is needed still or if speaker.source suffices
                 actor: this.actor,
                 token
             },
@@ -2124,29 +2141,30 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: TestOptions) {
         // Determine actors to roll test with.
-        let actors = await Helpers.getOpposedTestActors(againstData);
+        let documents = await Helpers.getOpposedTestTargets(againstData);
 
         // Inform user about tokens with deleted sidebar actors.
         // This can both happen for linked tokens immediately and unlinked tokens after reloading.
-        if (actors.filter(actor => !actor).length > 0) {
+        // TODO: Check when this error is relevant.
+        if (documents.filter(document => !document).length > 0) {
             ui.notifications?.warn('TOKEN.WarningNoActor', {localize: true});
             return;
         }
 
         // filter out actors current user shouldn't be able to test with.
-        actors = actors.filter(actor => actor.isOwner);
+        documents = documents.filter(document => document.isOwner);
         // Fallback to player character.
-        if (actors.length === 0 && game.user?.character) {
-            actors.push(game.user.character);
+        if (documents.length === 0 && game.user?.character) {
+            documents.push(game.user.character);
         }
 
-        console.log('Shadowrun 5e | Casting an opposed test using these actors', actors, againstData);
+        console.log('Shadowrun 5e | Casting an opposed test using these actors', documents, againstData);
 
-        for (const actor of actors) {
-            const data = await this._getOpposedActionTestData(againstData, actor, messageId);
+        for (const document of documents) {
+            const data = await this._getOpposedActionTestData(againstData, document, messageId);
             if (!data) return;
 
-            const documents = {source: actor};
+            const documents = {source: document};
             const test = new this(data, documents, options);
 
             // Await test chain resolution for each actor, to avoid dialog spam.
@@ -2203,9 +2221,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param document Any targetable FoundryVTT document
      */
     async addTarget(document: SR5Actor|SR5Item) {
-        if (this.data.targetActorsUuid.includes(document.uuid)) return;
+        if (this.data.targetUuids.includes(document.uuid)) return;
 
-        this.data.targetActorsUuid.push(document.uuid);
-        await this.populateTargetDocuments()        
+        this.data.targetUuids.push(document.uuid);
+        await this.populateTargetDocuments();
     }
 }

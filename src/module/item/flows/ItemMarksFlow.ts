@@ -84,5 +84,19 @@ export const ItemMarksFlow = {
         const host = device.asHost;
         if (!host) return;
         return host.system.marks;
+    },
+
+    /**
+     * Note: This handler will be called for all active users, even if they lack permission to alter item data.
+     *       This can result in lingering network devices or masters, when no GM or device owner is active.
+     *
+     * @param item This can be a network master or device or neither.
+     * @param data The item data given by FoundryVTT deleteItem event
+     * @param id The item id
+     */
+    async handleOnDeleteItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
+        console.debug(`Shadowrun 5e | Checking for marks for a deleted item ${item.name}`, item);
+
+        await MarksStorage.clearRelations(item.uuid);
     }
 }

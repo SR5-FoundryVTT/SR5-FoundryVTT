@@ -705,8 +705,21 @@ export class SR5Actor extends Actor {
         await this.update({ 'system.master': masterLink });
     }
 
+    /**
+     * Determine if this actor can be part of a network.
+     */
     get canBeSlave(): boolean {
         return this.isVehicle();
+    }
+
+    /**
+     * Determine if this actor can be a matrix icon.
+     */
+    get canBeMatrixIcon(): boolean {
+        if (this.isVehicle()) return true;
+        if (this.hasPersona) return true;
+
+        return false;
     }
 
     /**
@@ -714,25 +727,14 @@ export class SR5Actor extends Actor {
      * @returns true, if connected to a network
      */
     get hasNetwork() {
-        if (!this.isMatrixActor) return false;
-        return !!this.system['matrix']?.network?.uuid;
+        return MatrixNetworkFlow.isSlave(this);
     }
 
     /**
      * The network (host/grid) this matrix actor is connected to.
      */
-    get network(): SR5Item | undefined {
-        if (!this.isMatrixActor) return
-
-        // Avoid typing issues by using [''] notation.
-        const network = this.system['matrix'].network;
-        // Matrix actor without ability to connect to network
-        if (!network) return;
-
-        const item = fromUuidSync(network.uuid) as SR5Item;
-        if (!item) return;
-
-        return item;
+    get network() {
+        return MatrixNetworkFlow.getMaster(this);
     }
 
     /**
@@ -741,7 +743,7 @@ export class SR5Actor extends Actor {
      * @param network Must be an item of matching type
      */
     async connectNetwork(network: SR5Item) {
-        await MatrixNetworkFlow.connectNetwork(this, network);
+        await MatrixNetworkFlow.addSlave(network, this);
     }
 
     /**
@@ -1248,6 +1250,17 @@ export class SR5Actor extends Actor {
         if (!test) return;
 
         return await test.execute();
+    }
+
+    /**
+     * Get a test from an item and let the caller handle execution.
+     * @param item The action item to create the test from
+     * @param options General roll options
+     * @returns A test instance ready for execution.
+     */
+    async testFromItem(item: SR5Item, options: Shadowrun.ActorRollOptions = {}) {
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        return await this.tests.fromItem(item, this, { showDialog});
     }
 
     /**
@@ -1766,21 +1779,6 @@ export class SR5Actor extends Actor {
         return driver;
     }
 
-    /**
-     * Add a host to this IC type actor.
-     *
-     * Currently compendium hosts aren't supported.
-     * Any other actor type has no use for this method.
-     *
-     * @param item The host item
-     */
-    async addICHost(item: SR5Item) {
-        if (!this.isIC()) return;
-        if (!item.isHost) return;
-        await this._updateICHostData(item);
-        await item.addIC(this);
-    }
-
     async _updateICHostData(host: SR5Item) {
         const hostData = host.asHost;
         if (!hostData) return;
@@ -1815,22 +1813,8 @@ export class SR5Actor extends Actor {
      * Will return true if this ic type actor has been connected to a host.
      */
     hasHost(): boolean {
-        const ic = this.asIC();
-        if (!ic) return false;
-        return ic && !!ic.system.host.id;
-    }
-
-    /**
-     * Return the host this IC actor is connected with.
-     *
-     * @returns A item of type host or undefined.
-     */
-    async getICHost(): Promise<SR5Item | undefined> {
-        const ic = this.asIC();
-        if (!ic) return;
-        // legacy used id, new uses uuid. Try both.
-        const document = await fromUuid(ic?.system?.host.id) || game.actors?.get(ic?.system?.host.id);
-        if ((document instanceof SR5Item) && document.isHost) return document;
+        if (!this.isIC()) return false;
+        return MatrixNetworkFlow.isSlave(this);
     }
 
     /**
@@ -2055,12 +2039,12 @@ export class SR5Actor extends Actor {
      * @returns The document to retrieve all marks this actor has access to.
      */
     async _getDocumentWithMarks(): Promise<Shadowrun.NetworkDevice | undefined> {
-        // CASE 1 - IC marks are stored on their host item.
-        if (this.isIC() && this.hasHost()) {
-            return await this.getICHost();
+        // CASE - IC marks are stored on their host item.
+        if (this.isIC()) {
+            return this.network;
         }
-        // CASE 2 - Vehicle marks are stored on their master actor.
-        if (this.isVehicle() && this.hasMaster) {
+        // CASE - Vehicle marks are stored on their master actor.
+        if (this.isVehicle()) {
             const master = this.master;
             return master?.actorOwner;
         }
@@ -2081,10 +2065,8 @@ export class SR5Actor extends Actor {
      *
      * This applies only to actors that act as matrix devices (vehicles).
      */
-    get master(): SR5Item | undefined {
-        const masterUuid = this.getMasterUuid();
-        if (!masterUuid) return;
-        return fromUuidSync(masterUuid) as SR5Item;
+    get master(): SR5Item | null {
+        return MatrixNetworkFlow.getMaster(this);
     }
 
     /**

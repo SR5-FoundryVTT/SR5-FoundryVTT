@@ -61,7 +61,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Host Item.
     markedDocuments: Shadowrun.MarkedDocument[]
-    slaves: (SR5Item | SR5Actor)[]
+    slaves: Shadowrun.NetworkDevice[]
     master: SR5Item | undefined
 
     // Contact Item
@@ -171,7 +171,7 @@ export class SR5ItemSheet extends ItemSheet {
                 // itemData.descriptionHTML = await TextEditor.enrichHTML(itemData.system.description.value);
 
                 //@ts-expect-error// TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData); 
+                if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData);
                 //@ts-expect-error TODO: foundry-vtt-types v10
                 if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
                 //@ts-expect-error TODO: foundry-vtt-types v10
@@ -190,7 +190,7 @@ export class SR5ItemSheet extends ItemSheet {
             for (const item of itemType) {
                 // TODO: foundry-vtt-types v10
                 // @ts-expect-error // Lazy typing
-                // eslint-disable-next-line 
+                // eslint-disable-next-line
                 item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value);
             }
         }
@@ -213,9 +213,9 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         if (this.item.canBeMaster) {
-            data['slaves'] = this.item.slaves();
+            data.slaves = await this.item.slaves();
             // Prepare PAN counter (1/3) for simple use in handlebar
-            data['pan_counter'] = `(${data['slaves'].length}/${MatrixRules.maxPANSlaves(this.item.getRating())})`;
+            data['pan_counter'] = `(${data.slaves.length}/${MatrixRules.maxPANSlaves(this.item.getRating())})`;
         }
 
         if (this.item.canBeSlave) {
@@ -263,7 +263,7 @@ export class SR5ItemSheet extends ItemSheet {
      */
     async enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): Promise<string> {
         // TODO: foundry-vtt-types v10
-        // eslint-disable-next-line 
+        // eslint-disable-next-line
         return await TextEditor.enrichHTML(editorValue, options);
     }
 
@@ -386,7 +386,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     /**
      * Updating the contacts linked actor.
-     * 
+     *
      * @param actor The prepared actor
      */
     async updateLinkedActor(actor: SR5Actor) {
@@ -489,41 +489,23 @@ export class SR5ItemSheet extends ItemSheet {
             return await this.item.createNestedItem(item._source);
         }
 
-        // Add actors to hosts WAN.
-        if (this.item.isHost && data.type === 'Actor') {
-            // TODO: Implement this correctly.
-            console.error('Shadowrun 5e | Implement dropping of IC on hosts');
-            // const actor = await fromUuid(data.uuid);
-            // if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-            // await this.item.addIC(actor.id, data.pack);
-            // return;
-        }
-
-        // Add items to a network (PAN/WAN).
-        if (this.item.canBeMaster && data.type === 'Item') {
-            const item = await fromUuid(data.uuid) as SR5Item;
-
-            if (!item?.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
-
-            await this.item.addSlave(item);
+        // Add actors to WAN, both GRID and HOST
+        if (this.item.isNetwork && ['Item', 'Actor'].includes(data.type)) {
+            const document = await fromUuid(data.uuid) as SR5Actor;
+            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
+            await this.object.addSlave(document);
             return;
         }
 
-        // Add vehicles to a network (PAN/WAN).
-        if (this.item.canBeMaster && data.type === 'Actor') {
-            const actor = await fromUuid(data.uuid) as SR5Actor;
-
-            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-
-            if (!actor.isVehicle()) {
-                return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
-            }
-
-            await this.item.addSlave(actor);
-            
+        // Add document to a PAN.
+        if (this.item.isDevice && ['Item', 'Actor'].includes(data.type)) {
+            const document = await fromUuid(data.uuid) as Shadowrun.NetworkDevice;
+            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
+            await this.object.addSlave(document);
+            return;
         }
 
-        // link actors in existing contacts
+        // Link actors to existing contacts.
         if (this.item.isContact && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid) as SR5Actor;
 
@@ -682,7 +664,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     async _onClipEquip(clipType: string) {
         if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
-        
+
         const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
         await this.item.update({
             'system.ammo.clip_type': clipType,
@@ -714,9 +696,11 @@ export class SR5ItemSheet extends ItemSheet {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const slaveIndex = Helpers.parseInputToNumber(event.currentTarget.closest('.list-item').dataset.listItemIndex);
+        const uuid = Helpers.listItemUuid(event);
+        const document = await fromUuid(uuid) as Shadowrun.NetworkDevice;
+        if (!document) return;
 
-        await this.item.removeSlave(slaveIndex);
+        await this.item.removeSlave(document);
     }
 
     /**
@@ -730,7 +714,7 @@ export class SR5ItemSheet extends ItemSheet {
      * Add a tagify element for an action-modifier dom element.
      *
      * Usage: Call method after render with a singular item's html sub-dom-tree.
-     * 
+     *
      * Only action items will trigger the creation of a tagify element.
      *
      * @param html see DocumentSheet.activateListeners#html param for documentation.
@@ -770,11 +754,11 @@ export class SR5ItemSheet extends ItemSheet {
 
     /**
      * Add a tagify element for an action-categories dom element.
-     * 
+     *
      * Usage: Call method after render with a singular item's html sub-dom-tree.
-     * 
+     *
      * Only action items will trigger the creation of a tagify element.
-     * @param html 
+     * @param html
      */
     _createActionCategoriesTagify(html) {
         const inputElement = html.find('input#action-categories').get(0) as HTMLInputElement;
@@ -1002,9 +986,9 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     /**
-     * Go through an action item action categories and if at least one is found that needs additional 
+     * Go through an action item action categories and if at least one is found that needs additional
      * configuration, let the sheet show the misc. tab.
-     * 
+     *
      * @returns true, when the tab is to be shown.
      */
     _prepareShowMiscTab() {
