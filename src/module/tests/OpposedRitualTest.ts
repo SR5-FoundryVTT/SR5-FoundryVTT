@@ -63,7 +63,7 @@ export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
      */
     override async processSuccess() {
         await this.updateRitualTestForFollowup();
-        await this.cleanupAfterExecutionCancel();
+        await this._cleanUpAfterDialogCancel();
     }
 
     override get successLabel(): Translation {
@@ -76,7 +76,7 @@ export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
 
     async updateRitualTestForFollowup() {
         // Finalize the original test values.
-        let opposingHits = this.hits.value
+        const opposingHits = this.hits.value
 
         this.against.calcDrain(opposingHits);
         await this.against.saveToMessage();

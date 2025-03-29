@@ -107,8 +107,7 @@ export const ActionPrep = {
      * @param equippedMods Those item mods that are equipped
      */
     prepareWithMods(action: Shadowrun.ActionRollData, equippedMods: SR5Item[]) {
-        // @ts-expect-error
-        // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
+        // @ts-expect-error // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
         if (action.damage.base_formula_operator === '+') {
             action.damage.base_formula_operator = 'add';
         }

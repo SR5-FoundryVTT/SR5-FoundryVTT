@@ -47,7 +47,7 @@ export class ImportHelper {
         return await Folder.create({
             type: folder_type,
             folder: folder === null ? null : folder.id,
-            name: name,
+            name,
         });
     }
 
@@ -62,24 +62,24 @@ export class ImportHelper {
      * @returns A promise that will resolve with the found folder.
      */
     public static async GetFolderAtPath(folder_type: FolderTypes, path: string, mkdirs: boolean = false): Promise<Folder> {
-        let currentFolder,
-            lastFolder = null;
+        let currentFolder;
+        let lastFolder = null;
         const pathSegments = path.split('/');
         for (const pathSegment of pathSegments) {
              // Check if the path structure matches the folder structure.
             currentFolder = game.folders?.find((folder) => {
-                return folder.folder === lastFolder && folder.name === pathSegment && folder.type == folder_type
+                return folder.folder === lastFolder && folder.name === pathSegment && folder.type === folder_type
             });
 
             // Only create when allowed to. Otherwise abort with error.
-            if (!currentFolder && !mkdirs) return Promise.reject(`Unable to find folder: ${path}`);
+            if (!currentFolder && !mkdirs) return await Promise.reject(new Error(`Unable to find folder: ${path}`));
             // Create the missing folder for the current segment
             if (!currentFolder) currentFolder = await ImportHelper.NewFolder(folder_type, pathSegment, lastFolder);
 
             lastFolder = currentFolder;
         }
 
-        return Promise.resolve(currentFolder);
+        return await Promise.resolve(currentFolder);
     }
 
     /**
@@ -113,10 +113,10 @@ export class ImportHelper {
         return ImportHelper.s_Strategy.objectValue(jsonData, key, fallback);
     }
 
-    public static findItem(nameOrCmp: string | ItemComparer): SR5Item {
+    public static findItem(nameOrCmp: string | Shadowrun.ItemComparer): SR5Item {
         let result: any | null;
         if (typeof nameOrCmp === 'string') {
-            result = game.items?.find((item) => item.name == nameOrCmp);
+            result = game.items?.find((item) => item.name === nameOrCmp);
         } else {
             result = game.items?.find(nameOrCmp);
         }
@@ -124,7 +124,7 @@ export class ImportHelper {
     }
 
     public static TranslateCategory(name, jsonCategoryTranslations?) {
-        if (jsonCategoryTranslations && jsonCategoryTranslations.hasOwnProperty(name)) {
+        if (jsonCategoryTranslations?.hasOwnProperty(name)) {
             return jsonCategoryTranslations[name];
         }
 
@@ -135,16 +135,16 @@ export class ImportHelper {
         jsonData: object,
         path: string,
         jsonCategoryTranslations?: object | undefined,
-    ): Promise<{ [name: string]: Folder }> {
-        let folders = {};
-        let jsonCategories = jsonData['categories']['category'];
+    ): Promise<Record<string, Folder>> {
+        const folders = {};
+        const jsonCategories = jsonData['categories']['category'];
 
         for (let i = 0; i < jsonCategories.length; i++) {
             let categoryName = jsonCategories[i][ImportHelper.CHAR_KEY];
             // use untranslated category name for easier mapping during DataImporter.Parse implementations.
-            let origCategoryName = categoryName;
+            const origCategoryName = categoryName;
             categoryName = ImportHelper.TranslateCategory(categoryName, jsonCategoryTranslations);
-            categoryName = categoryName.replace(/[\/\\]/g, '_');
+            categoryName = categoryName.replace(/[/\\]/g, '_');
             folders[origCategoryName.toLowerCase()] = await ImportHelper.GetFolderAtPath(folder_type, `${Constants.ROOT_IMPORT_FOLDER_NAME}/${path}/${categoryName}`, true);
         }
 
@@ -174,7 +174,7 @@ export class ImportHelper {
      */
     public static ExtractCategoriesTranslation(jsonChummeri18n) {
         const categoryTranslations = {};
-        if (jsonChummeri18n && jsonChummeri18n.hasOwnProperty('categories')) {
+        if (jsonChummeri18n?.hasOwnProperty('categories')) {
             jsonChummeri18n.categories.category.forEach((category) => {
                 const name = category[ImportHelper.CHAR_KEY];
                 const translate = category.$.translate;
@@ -192,7 +192,7 @@ export class ImportHelper {
      */
     public static ExtractItemTranslation(jsonItemsi18n, typeKey, listKey) {
         const itemTranslation = {};
-        if (jsonItemsi18n && jsonItemsi18n[typeKey] && jsonItemsi18n[typeKey][listKey] && jsonItemsi18n[typeKey][listKey].length > 0) {
+        if (jsonItemsi18n?.[typeKey]?.[listKey] && jsonItemsi18n[typeKey][listKey].length > 0) {
             jsonItemsi18n[typeKey][listKey].forEach((item) => {
                 const name = item.name[ImportHelper.CHAR_KEY];
                 const translate = item.translate[ImportHelper.CHAR_KEY];
@@ -205,7 +205,7 @@ export class ImportHelper {
     }
 
     static MapNameToTranslationKey(translationMap, name, key, fallbackValue = ''): string {
-        if (translationMap && translationMap.hasOwnProperty(name) && translationMap[name].hasOwnProperty(key)) {
+        if (translationMap?.hasOwnProperty(name) && translationMap[name].hasOwnProperty(key)) {
             return translationMap[name][key];
         }
 
@@ -220,4 +220,3 @@ export class ImportHelper {
         return ImportHelper.MapNameToTranslationKey(translationMap, name, 'altpage', fallback);
     }
 }
-export type ItemComparer = (item: Item) => boolean;

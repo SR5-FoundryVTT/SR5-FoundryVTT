@@ -11,7 +11,7 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,

@@ -38,6 +38,7 @@ export const FLAGS = {
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
     DoNewActionPhase: 'doNewActionPhase',
+    addNetworkMaster: 'addNetworkMaster',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
     TokenHealthBars: 'tokenHealthBars',
@@ -55,7 +56,9 @@ export const FLAGS = {
     DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
     TeamworkTestFlow: 'TeamworkTestFlow',
     UseDamageCondition: 'UseDamageCondition',
-    GlobalDataStorage: 'GlobalDataStorage'
+    GlobalDataStorage: 'GlobalDataStorage',
+    GeneralActionsPack: 'GeneralActionsPack',
+    MatrixActionsPack: 'MatrixActionsPack'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

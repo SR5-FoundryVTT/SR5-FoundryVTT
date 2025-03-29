@@ -14,7 +14,9 @@
     "action": {
       "type": "complex",
       "test": "SuccessTest",
-      "categories": ["matrix"],
+      "categories": [
+        "matrix"
+      ],
       "attribute": "logic",
       "attribute2": "",
       "skill": "hacking",
@@ -22,6 +24,7 @@
       "spec": false,
       "mod": null,
       "mod_description": "",
+      "roll_mode": "",
       "limit": {
         "value": 0,
         "base": 0,
@@ -90,15 +93,23 @@
         "global",
         "wounds"
       ],
+      "category": {
+        "matrix": {
+          "marks": 1
+        }
+      },
       "alt_mod": 0,
       "dice_pool_mod": []
     },
     "result": {
-      "success": {
-        "matrix": {
-          "placeMarks": false
-        }
-      }
+      "success": {}
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false,
+      "isImported": false
     }
   },
   "ownership": {
@@ -108,11 +119,13 @@
   "sort": 0,
   "_stats": {
     "systemId": "shadowrun5e",
-    "systemVersion": "0.8.6",
-    "coreVersion": "10.291",
+    "systemVersion": "0.30.0",
+    "coreVersion": "12.331",
     "createdTime": null,
-    "modifiedTime": 1670064675058,
-    "lastModifiedBy": "sr5ebuilder"
+    "modifiedTime": 1742645664048,
+    "lastModifiedBy": "sr5ebuilder",
+    "compendiumSource": null,
+    "duplicateSource": null
   },
   "_key": "!items!EcRsJOjgnhnVj2XX"
 }

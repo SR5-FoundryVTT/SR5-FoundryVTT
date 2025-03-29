@@ -1,21 +1,41 @@
-import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import MarkedDocument = Shadowrun.MarkedDocument;
+import { MatrixTargetAcquisitionApplication } from './../../apps/matrix/MatrixTargetAquisition';
+import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
-import { SR5 } from "../../config";
+import { SR5Item } from '../../item/SR5Item';
+import { FormDialog, FormDialogOptions } from '../../apps/dialogs/FormDialog';
+import { SR5Actor } from '../SR5Actor';
+import { MatrixFlow } from '../../flows/MatrixFlow';
 
 
-export interface CharacterSheetData extends SR5ActorSheetData {
+export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     awakened: boolean
     emerged: boolean
     woundTolerance: number
-    markedDocuments: MarkedDocument[]
+    markedDocuments: Shadowrun.MarkedDocument[]
     handledItemTypes: string[]
     inventory: Record<string, any>
+    network: SR5Item | null
+    matrixActions: SR5Item[]
+    selectedMarkedDocumentUuid: string|undefined
 }
 
 
 export class SR5CharacterSheet extends SR5BaseActorSheet {
+    // Stores which document has been selected for a Decker in the matrix tab.
+    // We accept this selection to not be persistant across Foundry sessions.
+    selectedMarkedDocumentUuid: string|undefined;    
+
+    static override get defaultOptions() {
+        const defaultOptions = super.defaultOptions;
+        return foundry.utils.mergeObject(defaultOptions, {
+            tabs: [...defaultOptions.tabs,
+            {
+                navSelector: '.tabs[data-group="matrix"]',
+                contentSelector: '.tabsbody[data-group="matrix"]',
+                initial: 'actions',
+            }]
+        });
+    }
     /**
      * Character actors will handle these item types specifically.
      *
@@ -24,7 +44,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -73,9 +93,25 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
         // Character actor types are matrix actors.
         super._prepareMatrixAttributes(data);
-        data['markedDocuments'] = this.actor.getAllMarkedDocuments();
+
+        data.markedDocuments = await this.actor.getAllMarkedDocuments();
+        data.network = this.actor.network;
+        data.matrixActions = await this.getMatrixActions();
+
+        data.selectedMarkedDocumentUuid = this.selectedMarkedDocumentUuid;
 
         return data;
+    }
+
+    override async activateListeners(html: any) {
+        super.activateListeners(html);
+
+        html.find('.show-matrix-target-acquisition').click(this._onShowMatrixTargetAcquisition.bind(this));
+        html.find('.reboot-persona-device').click(this._onRebootPersonaDevice.bind(this));
+        html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
+
+        html.find('.select-marked-document').on('click', this._onSelectMarkedDocument.bind(this));
+        html.find('.open-marked-document').on('click', this._onOpenMarkedDocument.bind(this));
     }
 
     /**
@@ -94,7 +130,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      *
      * @param type The call in action sub type.
      */
-    async _onCallInActionCreate(type: 'summoning'|'compilation') {
+    async _onCallInActionCreate(type: 'summoning' | 'compilation') {
         // Determine actor type from sub item type.
         const typeToActorType = {
             'summoning': 'spirit',
@@ -110,6 +146,139 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'system.actor_type': actor_type
         };
 
-        await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
+        await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
+    }
+
+    /**
+     * Handle the user request to show the matrix target acquisition application.
+     * @param event Any pointer event
+     */
+    async _onShowMatrixTargetAcquisition(event: Event) {
+        const app = new MatrixTargetAcquisitionApplication(this.document);
+        app.render(true);
+    }
+
+    /**
+     * Handle the user request to reboot their main active matrix device or living persona.
+     * @param event Any pointer event
+     */
+    async _onRebootPersonaDevice(event: Event) {
+        const data = {
+            title: game.i18n.localize("SR5.RebootConfirmationDialog.Title"),
+            buttons: {
+                confirm: {
+                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Confirm')
+                },
+                cancel: {
+                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Cancel')
+                }
+            },
+            content: '',
+            default: 'cancel',
+            templateData: {},
+            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.html'
+        }
+        const options = {
+            classes: ['sr5', 'form-dialog'],
+        } as FormDialogOptions;
+        const dialog = new FormDialog(data, options);
+        await dialog.select();
+        if (dialog.canceled || dialog.selectedButton !== 'confirm') return;
+
+        await this.actor.rebootPersona();
+    }
+
+    /**
+     * Retrieve all matrix actions from the corresponding pack to be displayed.
+     * 
+     * If a marked document is selected, only actions with a mark requirement will show.
+     * 
+     * @returns Alphabetically sorted array of matrix actions.
+     */
+    async getMatrixActions() {
+        const matrixPackName = Helpers.getMatrixActionsPackName();
+
+        // Collect all sources for matrix actions.
+        const packActions = await Helpers.getPackActions(matrixPackName);
+        const actorActions = MatrixFlow.getMatrixActions(this.actor);
+        // Assume above collections return action only.
+        let actions = [...packActions, ...actorActions] as Shadowrun.ActionItemData[];
+
+        // Reduce actions to those matching the marks on the selected target.
+        if (this.selectedMarkedDocumentUuid) {
+            const marks = this.actor.getMarksPlaced(this.selectedMarkedDocumentUuid);
+            actions = actions.filter(action => action.system.action.category.matrix.marks <= marks);
+        }
+
+        return actions.sort(Helpers.sortByName.bind(Helpers)) as SR5Item[];
+    }
+
+    /**
+     * Cast a matrix action for this actor. Use the actions from the matrix pack for this.
+     */
+    async _onRollMatrixAction(event) {
+        event.preventDefault();
+
+        const id = Helpers.listItemId(event);
+        const action = await fromUuid(id) as SR5Item;
+        if (!action) return;
+
+        // this.actor.rollItem(action, {event});
+
+        const test = await this.actor.testFromItem(action, {event});
+        if (!test) return;
+
+        if (this.selectedMarkedDocumentUuid) {
+            const document = fromUuidSync(this.selectedMarkedDocumentUuid) as Shadowrun.NetworkDevice;
+            if (!document) return;
+
+            await test.addTarget(document);
+        }
+
+        await test.execute();
+    }
+
+    /**
+     * Open a document from a DOM node containing a dataset uuid.
+     * 
+     * This is intended to let deckers open marked documents they're FoundryVTT user has permissions for.
+     * 
+     * @param event Any interaction event
+     */
+    async _onOpenMarkedDocument(event) {
+        event.stopPropagation();
+
+        const uuid = event.currentTarget.dataset.uuid;
+        if (!uuid) return;
+
+        // Marked documents can´t live in packs.
+        const document = fromUuidSync(uuid) as SR5Item|SR5Actor;
+        if (!document) return;
+
+        document.sheet?.render(true);
+    }
+
+    /**
+     * Select a marked document on the deckers marks list.
+     * 
+     * This is intended to filter the available list of matrix actions and to 
+     * use the selected marked document as the target for rolling on that.
+     * 
+     * @param event Any interaction event
+     */
+    async _onSelectMarkedDocument(event) {
+        event.stopPropagation();
+
+        const uuid = event.currentTarget.dataset.uuid;
+        if (!uuid) return;
+
+        // Toggle selection on or off.
+        if (this.selectedMarkedDocumentUuid === uuid) {
+            this.selectedMarkedDocumentUuid = undefined;
+        } else {
+            this.selectedMarkedDocumentUuid = uuid;
+        }
+
+        this.render();
     }
 }

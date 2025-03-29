@@ -15,8 +15,6 @@ import AmmunitionData = Shadowrun.AmmunitionData;
 import WeaponData = Shadowrun.WeaponData;
 import DeviceData = Shadowrun.DeviceData;
 import AmmoData = Shadowrun.AmmoData;
-import SpritePowerData = Shadowrun.SpritePowerData;
-import CritterPowerData = Shadowrun.CritterPowerData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
@@ -239,9 +237,13 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return deviceData.category === 'commlink';
     }
 
+    /**
+     * Any action that includes the matrix action category counts as a matrix action.
+     *
+     * @returns true, this item contains a matrix action
+     */
     isMatrixAction(): boolean {
-        // @ts-expect-error
-        return this.isAction() && this.getData().result.success.matrix.placeMarks;
+        return this.isAction() && !!this.getAction()?.categories.includes('matrix');
     }
 
     isSin(): boolean {
@@ -281,7 +283,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData()?.armor?.hardened ?? false;
     }
 
-    getArmorElements(): { [key: string]: number } {
+    getArmorElements(): Record<string, number> {
         const { fire, electricity, cold, acid, radiation } = this.getData().armor || {};
         return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0, radiation: radiation ?? 0 };
     }
@@ -342,7 +344,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         if (this.isCyberdeck() || this.isRCC() || this.isCommlink()) {
             const atts = this.getData().atts;
             if (atts) {
-                for (let [key, att] of Object.entries(atts)) {
+                for (const [key, att] of Object.entries(atts)) {
                     matrix[att.att].value = att.value;
                     matrix[att.att].device_att = key;
                 }
@@ -441,13 +443,13 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         if (!("range" in this.data.system)) return;
 
         if (this.data.type === 'critter_power')
-            return this.data.system.range as CritterPowerRange;
+            return this.data.system.range;
 
         if (this.data.type === 'spell')
-            return this.data.system.range as SpellRange;
+            return this.data.system.range;
 
         if (this.data.type === 'weapon')
-            return this.data.system.range as RangeWeaponData;
+            return this.data.system.range;
     }
 
     getModificationCategory(): string {
@@ -467,7 +469,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getActionResult(): ActionResultData {
-        // @ts-expect-error
+        // @ts-expect-error // Easy typing...
         return this.getData().result;
     }
 }

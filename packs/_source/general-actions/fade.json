@@ -16,7 +16,9 @@
     "action": {
       "type": "none",
       "test": "FadeTest",
-      "categories": ["fade"],
+      "categories": [
+        "fade"
+      ],
       "attribute": "",
       "attribute2": "",
       "skill": "",
@@ -96,17 +98,14 @@
       ]
     },
     "result": {
-      "success": {
-        "matrix": {
-          "placeMarks": false
-        }
-      }
+      "success": {}
     },
     "importFlags": {
       "name": "",
       "type": "",
       "subType": "",
-      "isFreshImport": false
+      "isFreshImport": false,
+      "isImported": false
     }
   },
   "ownership": {
@@ -115,10 +114,12 @@
   "_stats": {
     "systemId": "shadowrun5e",
     "systemVersion": "0.16.1",
-    "coreVersion": "10.312",
+    "coreVersion": "12.331",
     "createdTime": null,
     "modifiedTime": 1700749627938,
-    "lastModifiedBy": "sr5ebuilder"
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
   },
   "_key": "!items!IyYJOPovXGure9SJ"
 }

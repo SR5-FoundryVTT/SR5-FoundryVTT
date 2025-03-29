@@ -6,12 +6,12 @@ import { DataDefaults } from '../../../../data/DataDefaults';
 
 export class ThrownParser extends WeaponParserBase {
     public GetBlast(jsonData: object, item: WeaponItemData): BlastData {
-        let blastData: BlastData = {
+        const blastData: BlastData = {
             radius: 0,
             dropoff: 0,
         };
 
-        let blastCode = ImportHelper.StringValue(jsonData, 'damage');
+        const blastCode = ImportHelper.StringValue(jsonData, 'damage');
 
         let radiusMatch = blastCode.match(/([0-9]+m)/)?.[0];
         if (radiusMatch !== undefined) {
