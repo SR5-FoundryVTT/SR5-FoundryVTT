@@ -102,7 +102,7 @@ export class ICPrep {
      * For connected hosts overwrite matrix attributes with the hosts attributes, otherwise leave as is.
      */
     static prepareHostAttributes(system: ICData) {
-        if (!system.host.id || !system.host.atts) return;
+        if (!system.host.atts) return;
 
         Object.keys(system.host.atts).forEach(deviceAttribute => {
             const attribute: DeviceAttribute = system.host.atts[deviceAttribute];

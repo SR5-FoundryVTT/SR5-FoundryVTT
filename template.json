@@ -1190,7 +1190,6 @@
             "track": {},
             "icType": "",
             "host": {
-                "id": null,
                 "rating": 0,
                 "customAttribute": false,
                 "atts": {
