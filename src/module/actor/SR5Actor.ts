@@ -2003,7 +2003,7 @@ export class SR5Actor extends Actor {
         const network = this.network;
         if (!network) return;
 
-        if (network.uuid === uuid) {
+        if (this.network?.uuid === uuid) {
             await this.disconnectNetwork();
         }
     }

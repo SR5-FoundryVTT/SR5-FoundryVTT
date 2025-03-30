@@ -950,14 +950,6 @@
                     "is_grunt": false,
                     "professional_rating": 0
                 }
-            },
-            "matrix_network": {
-                "matrix": {
-                    "network": {
-                        "uuid": "",
-                        "type": ""
-                    }
-                }
             }
         },
         "character": {
@@ -966,7 +958,6 @@
                 "skills",
                 "attributes",
                 "matrix",
-                "matrix_network",
                 "limits",
                 "armor",
                 "magic",
@@ -1054,7 +1045,6 @@
                 "armor",
                 "magic",
                 "matrix",
-                "matrix_network",
                 "movement",
                 "condition_monitors",
                 "physical_combat_values",

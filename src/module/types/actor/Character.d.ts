@@ -9,7 +9,7 @@ declare namespace Shadowrun {
 
     export interface CharacterData extends
         CommonData,
-        MatrixNetworkActorData,
+        MatrixActorData,
         TwoTrackActorData,
         ArmorActorData,
         MagicActorData,
@@ -71,11 +71,6 @@ declare namespace Shadowrun {
 
     export type MatrixActorData = {
         matrix: MatrixData;
-    }
-
-    // Allow the actor to connect to a host/grid
-    export type MatrixNetworkActorData = MatrixActorData & {
-        matrix: MatrixNetworkData;
     }
 
     export type NPCActorData = {

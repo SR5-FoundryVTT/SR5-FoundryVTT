@@ -520,7 +520,6 @@ ___________________
         if (!game.socket || !game.user) return;
         console.log('Registering Shadowrun5e system socket messages...');
         const hooks: Shadowrun.SocketMessageHooks = {
-            [FLAGS.addNetworkMaster]: [MatrixNetworkFlow._handleAddMasterSocketMessage.bind(MatrixNetworkFlow)],
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage.bind(SR5Combat)],
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage.bind(SR5Combat)],
             [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage.bind(SR5Combat)],
