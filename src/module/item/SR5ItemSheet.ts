@@ -62,7 +62,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     // Host Item.
     markedDocuments: Shadowrun.MarkedDocument[]
     slaves: Shadowrun.NetworkDevice[]
-    master: SR5Item | undefined
+    master: SR5Item | null
 
     // Contact Item
     linkedActor: SR5Actor | undefined

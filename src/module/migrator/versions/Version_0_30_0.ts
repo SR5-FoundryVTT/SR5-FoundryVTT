@@ -21,7 +21,7 @@ export class Version_0_30_0 extends VersionMigration {
     }
 
     protected override async ShouldMigrateItemData(item: SR5Item) {
-        return item.isHost || item.isDevice;
+        return item.isHost || item.isDevice || item.isMatrixDevice;
     }
 
     protected override async ShouldMigrateActorData(actor: SR5Actor) {
@@ -32,13 +32,13 @@ export class Version_0_30_0 extends VersionMigration {
         let updateData: UpdateData = {data: {}};
 
         if (item.isHost) {
-            updateData = await this.MigrateHostData(item);
+            updateData = await this.MigrateHostData(item, updateData);
         }
         if (item.isDevice) {
-            updateData = await this.MigrateDeviceData(item);
+            updateData = await this.MigrateDeviceData(item, updateData);
         }
         if (item.isMatrixDevice) {
-            updateData = await this.MigrateMatrixDeviceData(item);
+            updateData = await this.MigrateMatrixDeviceData(item, updateData);
         }
 
         return updateData;
@@ -52,9 +52,7 @@ export class Version_0_30_0 extends VersionMigration {
      * @param item 
      * @returns 
      */
-    protected async MigrateHostData(item: SR5Item): Promise<UpdateData> {
-        const updateData = {data: {}};
-
+    protected async MigrateHostData(item: SR5Item, updateData: UpdateData): Promise<UpdateData> {
         const marksData = item.system['marks'];
         if (!marksData) return updateData;
         if (Array.isArray(marksData)) return updateData;
@@ -71,16 +69,16 @@ export class Version_0_30_0 extends VersionMigration {
      * 
      * @param item A device item containing PAN slaves.
      */
-    protected async MigrateDeviceData(item: SR5Item): Promise<UpdateData> {
-        const updateData = {data: {}};
-
+    protected async MigrateDeviceData(item: SR5Item, updateData: UpdateData): Promise<UpdateData> {
         updateData.data['-=networkDevices'] = null;
+        // TODO: Check if necessary and removed from template.json and types.
+        updateData.data['-=slaves'] = null;
 
         // @ts-expect-error networkDevices is not part of the types anymore.
-        const deviceIds = item?.system?.networkDevices ?? [];
+        const deviceUuids = item?.system?.networkDevices ?? [];
 
-        for (const deviceId of deviceIds) {
-            const device = game.items?.get(deviceId);
+        for (const uuids of deviceUuids) {
+            const device = await fromUuid(uuids);
             if (!device) continue;
 
             await NetworkStorage.addSlave(item, device);
@@ -96,14 +94,12 @@ export class Version_0_30_0 extends VersionMigration {
      * 
      * @param item A matrix device item containing PAN master.
      */
-    protected async MigrateMatrixDeviceData(item: SR5Item): Promise<UpdateData> {
-        const updateData = {data: {}};
-
+    protected async MigrateMatrixDeviceData(item: SR5Item, updateData: UpdateData): Promise<UpdateData> {
         updateData.data['technology.-=networkController'] = null;
 
         // @ts-expect-error networkController is not part of the types anymore.
-        const controllerId = item.system?.technology?.networkController ?? '';
-        const controller = game.items?.get(controllerId);
+        const uuid = item.system?.technology?.networkController ?? '';
+        const controller = await fromUuid(uuid) as SR5Item;
         if (!controller) return updateData;
 
         await NetworkStorage.addSlave(controller, item);

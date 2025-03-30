@@ -1602,11 +1602,7 @@ export class SR5Item extends Item {
      * @returns The master item or undefined if not connected to a network.
      */
     get master() {
-        const technologyData = this.getTechnologyData();
-        if (!technologyData) return;
-        if (!technologyData.master) return;
-
-        return MatrixNetworkFlow.resolveItemLink(technologyData.master);
+        return MatrixNetworkFlow.getMaster(this);
     }
 
     /**

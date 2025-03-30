@@ -170,9 +170,15 @@ export class MatrixNetworkFlow {
         if (!slave) return;
         if (!slave.canBeSlave) return;
 
-        // TODO: This method makes little sense. Check if itś usefull.
+        // Retrieve master to update it's sheet.
+        const master = MatrixNetworkFlow.getMaster(slave);
 
+        // We clean this device from all networks, to clean up any issues.
         await NetworkStorage.removeFromNetworks(slave);
+
+        // Since no document update occures, we have to trigger a re-render.
+        master?.sheet?.render();
+        slave.sheet?.render();
     }
 
     /**
