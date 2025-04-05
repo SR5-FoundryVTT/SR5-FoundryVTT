@@ -100,13 +100,9 @@ export class MatrixTargetAcquisitionApplication extends Application {
         data.targets = [];
 
         // Collect target data based on network type.
-        // TODO: a decker without host or grid is still 'in the grid' and should see personas / devices across grids
-        if (network?.isHost) {
-            data.targets = await this.prepareMatrixHostTargets();
-        }
-        else if (network?.isGrid) {
-            data.targets = this.prepareMatrixGridTargets();
-        }
+        data.targets = network?.isHost ? 
+            await this.prepareMatrixHostTargets() : 
+            this.prepareMatrixGridTargets();
 
         // Filter out invisible tokens.
         // TODO: Improve matrix and foundry visibility handling.
@@ -134,17 +130,18 @@ export class MatrixTargetAcquisitionApplication extends Application {
             // Throw away unneeded tokens.
             if (!token.actor) continue;
             const target = token.actor;
-            // Skip the deckers token.
+
+            // Validate Foundry VTT visibility.
             if (target?.id === this.actor.id) continue;
-            // Skip based on FoundryVTT details.
             if (game.user?.isGM && token.hidden) continue;
-            // Skip actors based on their persona and visibility.
+
+            // Validate Shadowrun5e visibility.
             if (!target.hasPersona) continue;
+            if (target.isIC()) continue;
             if (!this.actor.matrixPersonaIsVisible(target)) continue;
 
-            // Collect matrix items from each token
+            // Collect all icons connected to persona icon.
             const matrixItems: MatrixItemSheetData[] = [];
-
             for (const item of token.actor.items) {
                 if (!item.isMatrixItem) continue;
                 const marks = this.actor.getMarksPlaced(item.uuid);
