@@ -731,9 +731,16 @@ export class SR5Item extends Item {
     /**
      * Should this matrix item be visible to a player?
      */
-    get isMatrixPlayerVisible(): boolean {
+    get matrixIconVisibleToPlayer(): boolean {
         // @ts-expect-error No propper typing
         return this.system?.matrix?.visible === true;
+    }
+
+    /**
+     * Determine if this items matrix icon is running silent.
+     */
+    get isRunningSilent(): boolean {
+        return false;
     }
 
     /**
@@ -1453,12 +1460,12 @@ export class SR5Item extends Item {
     /**
      * Get all active IC actors of a host
      */
-    async getIC() {
+    getIC() {
         const host = this.asHost;
         if (!host) return [];
 
         // return host.system.ic.map(uuid => fromUuidSync(uuid)) as SR5Actor[];
-        const slaves = await MatrixNetworkFlow.getSlaves(this);
+        const slaves = MatrixNetworkFlow.getSlaves(this);
         // We can´t use isIC as both devices and actors might be returned
         return slaves.filter(slave => slave.type === 'ic');
     }
@@ -1472,7 +1479,7 @@ export class SR5Item extends Item {
         const host = this.asHost;
         if (!host) return [];
 
-        const slaves = await MatrixNetworkFlow.getSlaves(this);
+        const slaves = MatrixNetworkFlow.getSlaves(this);
         // TODO: There are more than only devices that can be matrix devices.
         return slaves.filter(slave => slave.type === 'device') as SR5Item[];
     }
@@ -1620,8 +1627,8 @@ export class SR5Item extends Item {
     /**
      * Return all network device items within a possible PAN or WAN.
      */
-    async slaves() {
-        return await MatrixNetworkFlow.getSlaves(this);
+    get slaves() {
+        return MatrixNetworkFlow.getSlaves(this);
     }
 
     /**

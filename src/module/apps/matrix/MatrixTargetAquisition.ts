@@ -1,5 +1,6 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { Helpers } from "../../helpers";
+import { MatrixNetworkFlow } from "../../item/flows/MatrixNetworkFlow";
 import { SR5Item } from "../../item/SR5Item";
 import { BruteForceTest } from "../../tests/BruteForceTest";
 import { HackOnTheFlyTest } from "../../tests/HackOnTheFlyTest";
@@ -15,13 +16,19 @@ interface MatrixItemSheetData {
     marks: number
 }
 // An atomic data point for a single matrix target, containing all matrix items within, used for display.
-interface MatrixTargetSheetData {
-    actor?: SR5Actor
-    item?: SR5Item
-    marks: number
+export interface MatrixTargetSheetData {
+    // The targeted document.
+    document: Shadowrun.NetworkDevice
+    // Optional token for those documents having them.
+    token: TokenDocument | null
+    // Item icons conneceted to the target document
     matrixItems: MatrixItemSheetData[]
+
+    marks: number
     // Indicates if the target is running silent.
     runningSilent: boolean
+    // Shows the document name of the network the target is connected to.
+    networkName: string
 }
 
 // Overall Sheet Data for this application.
@@ -43,6 +50,8 @@ type MatrixPlacementTests = BruteForceTest | HackOnTheFlyTest;
 
 /**
  * This application collects matrix items from tokens and actors visible to the matrix user based on shadowrun rules.
+ * 
+ * TODO: matrixItems and marks are collected but not used. Either remove or use them.
  */
 export class MatrixTargetAcquisitionApplication extends Application {
     // The matrix user to be used for target acquisition.
@@ -101,16 +110,19 @@ export class MatrixTargetAcquisitionApplication extends Application {
 
         // Collect target data based on network type.
         data.targets = network?.isHost ? 
-            await this.prepareMatrixHostTargets() : 
+            this.prepareMatrixHostTargets() : 
             this.prepareMatrixGridTargets();
 
         // Filter out invisible tokens.
-        // TODO: Improve matrix and foundry visibility handling.
-        data.targets = data.targets.filter(target => !target.actor || target.actor.visible)
+        data.targets = data.targets.filter(target => !target.document || target.document.visible)
+
+        const actors = data.targets.filter(target => target.document instanceof SR5Actor);
+        const items = data.targets.filter(target => target.document instanceof SR5Item);
+
         // Filter personas from ic for better UI separation.
-        data.personas = data.targets.filter(target => target.actor?.hasPersona && !target.actor?.isIC());
-        data.ics = data.targets.filter(target => target.actor?.isIC());
-        data.devices = data.targets.filter(target => !target.actor);
+        data.personas = actors.filter(target => target.document.hasPersona);
+        data.ics = actors.filter(target => target.document.isIC());
+        data.devices = items.filter(target => !target.document);
 
         // TODO: Needed and used? Replaced by actor system data entry for it?
         data.placementActions = ['brute_force', 'hack_on_the_fly'];
@@ -119,13 +131,33 @@ export class MatrixTargetAcquisitionApplication extends Application {
     }
 
     /**
-     * Collect all personas and devices connected to grids.
+     * If the active persona is looking at grid targets, collect all matrix icons
+     * connected to grids or without any network connection.
+     * 
+     * This includes both scene tokens and matrix icons connected to any visible grid.
      */
     prepareMatrixGridTargets() {
         const targets: MatrixTargetSheetData[] = [];
 
         if (!canvas.scene?.tokens) return targets;
 
+        // Collect all grid connected documents without scene tokens.
+        for (const grid of MatrixNetworkFlow.getGrids({players: true})) {
+            for (const slave of grid.slaves) {
+                if (slave.getToken()) continue;
+                
+                targets.push({
+                    document: slave,
+                    token: null,
+                    marks: this.actor.getMarksPlaced(slave.uuid),
+                    matrixItems: this._prepareActorMatrixItems(slave),
+                    runningSilent: slave.isRunningSilent,
+                    networkName: grid.name || ''
+                });
+            }
+        }
+
+        // Collect all scene tokens.
         for (const token of canvas.scene?.tokens) {
             // Throw away unneeded tokens.
             if (!token.actor) continue;
@@ -140,24 +172,29 @@ export class MatrixTargetAcquisitionApplication extends Application {
             if (target.isIC()) continue;
             if (!this.actor.matrixPersonaIsVisible(target)) continue;
 
-            // Collect all icons connected to persona icon.
-            const matrixItems: MatrixItemSheetData[] = [];
-            for (const item of token.actor.items) {
-                if (!item.isMatrixItem) continue;
-                const marks = this.actor.getMarksPlaced(item.uuid);
-
-                matrixItems.push({
-                    item, marks
-                });
-            }
-
             targets.push({
-                actor: token.actor,
+                document: token.actor,
+                token,
                 marks: this.actor.getMarksPlaced(token.actor.uuid),
-                matrixItems,
-                runningSilent: false
+                matrixItems: this._prepareActorMatrixItems(token.actor),
+                runningSilent: token.actor.isRunningSilent,
+                networkName: token.actor.network?.name ?? ''
             })
         }
+
+        // Sort all targets by grid name first and target name second.
+        targets.sort((a, b) => {
+            const gridNameA = a.networkName.toLowerCase();
+            const gridNameB = b.networkName.toLowerCase();
+            const nameA = a.document.name.toLowerCase();
+            const nameB = b.document.name.toLowerCase();
+
+            if (gridNameA < gridNameB) return -1;
+            if (gridNameA > gridNameB) return 1;
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
+        });
 
         return targets;
     }
@@ -165,7 +202,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
     /**
      * Collect all personas and devices connected to the current host network.
      */
-    async prepareMatrixHostTargets() {
+    prepareMatrixHostTargets() {
         const host = this.actor.network;
         if (!host?.isHost) {
             console.error('Shadowrun 5e | Actor is not connected to a host network');
@@ -174,21 +211,25 @@ export class MatrixTargetAcquisitionApplication extends Application {
 
         const targets: MatrixTargetSheetData[] = []
 
-        for (const slave of await host.slaves()) {
+        for (const slave of host.slaves) {
             targets.push({
-                item: slave,
+                document: slave,
+                token: slave.getToken(),
                 marks: this.actor.getMarksPlaced(slave.uuid),
-                matrixItems: [],
-                runningSilent: false
+                matrixItems: this._prepareActorMatrixItems(slave),
+                runningSilent: slave.isRunningSilent,
+                networkName: host.name || ''
             });
         }
 
-        for (const ic of await host.getIC()) {
+        for (const ic of host.getIC()) {
             targets.push({
-                actor: ic,
+                document: ic,
+                token: ic.getToken(),
                 marks: this.actor.getMarksPlaced(ic.uuid),
                 matrixItems: [],
-                runningSilent: false
+                runningSilent: ic.isRunningSilent,
+                networkName: host.name || ''
             })
         }
 
@@ -196,17 +237,39 @@ export class MatrixTargetAcquisitionApplication extends Application {
     }
 
     /**
+     * Prepare items on the given document having matrix icons.
+     *
+     * @param document Any network document.
+     */
+    _prepareActorMatrixItems(document: Shadowrun.NetworkDevice) {
+        if (!(document instanceof SR5Actor)) return [];
+
+        const matrixItems: MatrixItemSheetData[] = [];
+
+        for (const item of document.items) {
+            if (!item.isMatrixItem) continue;
+            const marks = this.actor.getMarksPlaced(item.uuid);
+
+            matrixItems.push({
+                item, marks
+            });
+        }
+
+        return matrixItems;
+    }
+
+    /**
      * Collect all hosts for selection.
      */
     prepareMatrixHosts() {
-        return game.items?.filter(item => item.isHost && item.isMatrixPlayerVisible) ?? [];
+        return game.items?.filter(item => item.isHost && item.matrixIconVisibleToPlayer) ?? [];
     }
 
     /**
      * Collect all grids for selection.
      */
     prepareMatrixGrids() {
-        return game.items?.filter(item => item.isGrid && item.isMatrixPlayerVisible) ?? [];
+        return game.items?.filter(item => item.isGrid && item.matrixIconVisibleToPlayer) ?? [];
     }
 
     /**

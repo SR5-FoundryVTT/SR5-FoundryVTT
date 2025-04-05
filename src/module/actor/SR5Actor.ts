@@ -754,6 +754,15 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Determine if this actors matrix icon is running silent.
+     */
+    get isRunningSilent(): boolean {
+        const matrixData = this.matrixData;
+        if (!matrixData) return false;
+        return matrixData.running_silent;
+    }
+
+    /**
      * Determine if an actor can choose a special trait using the special field.
      */
     get hasSpecial(): boolean {

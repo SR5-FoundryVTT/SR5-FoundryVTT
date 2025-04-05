@@ -213,7 +213,7 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         if (this.item.canBeMaster) {
-            data.slaves = await this.item.slaves();
+            data.slaves = this.item.slaves;
             // Prepare PAN counter (1/3) for simple use in handlebar
             data['pan_counter'] = `(${data.slaves.length}/${MatrixRules.maxPANSlaves(this.item.getRating())})`;
         }

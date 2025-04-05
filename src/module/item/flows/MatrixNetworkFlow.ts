@@ -149,7 +149,7 @@ export class MatrixNetworkFlow {
     static async removeAllSlaves(master: SR5Item) {
         console.debug(`Shadowrun 5e | Removing all devices from network ${master.name}`);
 
-        const slaves = await NetworkStorage.getSlaves(master);
+        const slaves = NetworkStorage.getSlaves(master);
         await NetworkStorage.removeSlaves(master);
 
         // Since no document update occures, we have to trigger a re-render.
@@ -163,14 +163,14 @@ export class MatrixNetworkFlow {
      * @param master The master device to retrieve slaves for.
      * @returns A list of network devices slaved to the master.
      */
-    static async getSlaves(master: SR5Item): Promise<Shadowrun.NetworkDevice[]> {
+    static getSlaves(master: SR5Item): Shadowrun.NetworkDevice[] {
         console.debug(`Shadowrun 5e | Getting slaves for master ${master.name}`, master);
 
         if (!master.canBeMaster) {
             console.error(`Shadowrun 5e | Item ${master.name} can not be a network master`);
             return [];
         };
-        const slaves = await NetworkStorage.getSlaves(master);
+        const slaves = NetworkStorage.getSlaves(master);
 
         console.debug(`Shadowrun 5e | Found ${slaves.length} slaves for master ${master.name}`, slaves);
 
@@ -247,5 +247,16 @@ export class MatrixNetworkFlow {
         }
 
         return NetworkStorage.getMaster(slave);
+    }
+
+    /**
+     * Collect all grids.
+     * 
+     * @param options.players If true, only grids visible to players are returned.
+     */
+    static getGrids(options = {players: true}): SR5Item[] {
+        const grids = game.items?.filter(item => item.isGrid) ?? [];
+        if (options.players) return grids.filter(grid => grid.matrixIconVisibleToPlayer);
+        return grids;
     }
 }

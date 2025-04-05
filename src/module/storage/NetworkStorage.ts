@@ -119,7 +119,7 @@ export const NetworkStorage = {
      *
      * @returns An array of network icon documents.
      */
-    async getSlaves(master: SR5Item) {
+    getSlaves(master: SR5Item) {
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuids = networks[masterUuid] ?? [];

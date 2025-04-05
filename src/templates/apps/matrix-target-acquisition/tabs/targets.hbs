@@ -6,33 +6,35 @@
 }}
 {{#each ics}}
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-        img=(speakerImg this.actor)
-        name=(speakerName this.actor)
+        img=(speakerImg this.document)
+        name=(speakerName this.document)
         itemNameCssClass='Roll show-matrix-placement'
         hasRoll=true
-        itemId=this.actor.uuid
+        itemId=this.document.uuid
 }}
 {{/each}}
 {{/if}}
 
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
         name=(localize 'SR5.Personas')
+        rightSide=(NetworkTargetsHeaderRightSide)
 }}
 {{#each personas}}
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-        img=(speakerImg this.actor)
-        name=(speakerName this.actor)
+        img=(speakerImg this.document)
+        name=(speakerName this.document)
         itemNameCssClass='Roll show-matrix-placement'
         hasRoll=true
-        itemId=this.actor.uuid
+        itemId=this.document.uuid
+        rightSide=(NetworkTargetsRightSide this)
 }}
     {{!-- {{#each this.matrixItems}}
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-        img=this.item.img
-        name=this.item.name
+        img=this.document.img
+        name=this.document.name
         itemNameCssClass='Roll show-matrix-placement'
         hasRoll=true
-        itemId=this.item.uuid
+        itemId=this.document.uuid
     }}
     {{/each}} --}}
 {{/each}}
@@ -43,11 +45,11 @@
 }}
 {{#each devices}}
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-        img=this.item.img
-        name=this.item.name
+        img=this.document.img
+        name=this.document.name
         itemNameCssClass='Roll show-matrix-placement'
         hasRoll=true
-        itemId=this.item.uuid
+        itemId=this.document.uuid
 }}
 {{/each}}
 {{/if}}

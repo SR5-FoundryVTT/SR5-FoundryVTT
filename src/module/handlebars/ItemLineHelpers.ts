@@ -2,6 +2,7 @@ import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
 import {SR5} from "../config";
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
+import { MatrixTargetSheetData } from '../apps/matrix/MatrixTargetAquisition';
 
 /**
  * Typing around the legacy item list helper.
@@ -969,6 +970,27 @@ export const registerItemLineHelpers = () => {
         }];
     })
 
+    /**
+     * Used for Matrix Target Acquisition App to render right side columns
+     */
+    Handlebars.registerHelper('NetworkTargetsHeaderRightSide', () => {
+        return [{
+            text: {
+                text: game.i18n.localize('SR5.Network')
+            }
+        }]
+    });
+
+    /**
+     * Used for Matrix Target Acquisition App to render right side columns
+     */
+    Handlebars.registerHelper('NetworkTargetsRightSide', (target: MatrixTargetSheetData) => {
+        return [{
+            text: {
+                text: target.networkName
+            }
+        }]
+    });
     Handlebars.registerHelper('EmptyIcons', () => {
         return [{}];
     })
