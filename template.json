@@ -13,7 +13,7 @@
                     "rating": 0,
                     "is_cyberdeck": false,
                     "name": "",
-                    "silent": false,
+                    "running_silent": false,
                     "hot_sim": false,
                     "marks": [],
                     "firewall": {
