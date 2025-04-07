@@ -40,8 +40,7 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
         ];
 
         chummerData['categories']['category'] = chummerData['categories']['category']
-            .filter(({ _TEXT }) => !emptyCategories.includes(_TEXT))
-            .concat({ _TEXT: 'Other' });
+            .filter(({ _TEXT }) => !emptyCategories.includes(_TEXT));
 
         const folders = await ImportHelper.MakeCategoryFolders(
             'Actor',
@@ -50,8 +49,8 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
             this.categoryTranslations,
         );
 
-        // for (let i = 0; i < jsonDatas.length; i++) {
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < jsonDatas.length; i++) {
+        // for (let i = 0; i < 1; i++) {
             const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported and the correct category
@@ -67,7 +66,7 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
 
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
-            actor.folder = folders[category]?.id || folders['Other'].id;
+            actor.folder = folders[category]?.id;
 
             // actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
             // if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};

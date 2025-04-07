@@ -15,6 +15,7 @@ import { DeviceImporter } from "../importer/DeviceImporter";
 import { EquipmentImporter } from "../importer/EquipmentImporter";
 import { SpritePowerImporter } from '../importer/SpritePowerImporter';
 import { VehicleImporter } from '../importer/VehicleImporter';
+import { CritterImporter } from '../importer/CritterImporter';
 
 
 export class Import extends Application {
@@ -106,7 +107,8 @@ export class Import extends Application {
 
     //Order is important, ex. some weapons need mods to fully import
     static ActorImporters: DataImporter<Shadowrun.ShadowrunActorData, Shadowrun.ShadowrunActorDataData>[] = [
-        new VehicleImporter()
+        new VehicleImporter(),
+        new CritterImporter()
     ];
 
     /**
