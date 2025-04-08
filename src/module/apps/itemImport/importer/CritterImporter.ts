@@ -16,9 +16,9 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
             return;
         }
 
-        const jsonVehiclei18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
-        this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonVehiclei18n);
-        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonVehiclei18n, 'metatypes', 'metatype');
+        const jsonCritteri18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
+        this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonCritteri18n);
+        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonCritteri18n, 'metatypes', 'metatype');
     }
 
     async Parse(chummerData: object, setIcons: boolean): Promise<StoredDocument<SR5Actor>[]> {
@@ -50,11 +50,12 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
         );
 
         for (let i = 0; i < jsonDatas.length; i++) {
-        // for (let i = 0; i < 1; i++) {
             const jsonData = jsonDatas[i];
 
             // Check to ensure the data entry is supported and the correct category
-            if (DataImporter.unsupportedEntry(jsonData)) {
+            if (   DataImporter.unsupportedEntry(jsonData)
+                || ImportHelper.StringValue(jsonData, 'category') === 'Sprites'
+                || ImportHelper.StringValue(jsonData, 'bodmin', 'F').includes('F')) {
                 continue;
             }
 
