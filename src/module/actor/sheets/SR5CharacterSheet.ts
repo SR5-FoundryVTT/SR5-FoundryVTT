@@ -207,7 +207,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         // Reduce actions to those matching the marks on the selected target.
         if (this.selectedMarkedDocumentUuid) {
             const marks = this.actor.getMarksPlaced(this.selectedMarkedDocumentUuid);
-            actions = actions.filter(action => action.system.action.category.matrix.marks <= marks);
+            actions = actions.filter(action => (action.system.action.category.matrix?.marks ?? 0) <= marks);
         }
 
         return actions.sort(Helpers.sortByName.bind(Helpers)) as SR5Item[];
