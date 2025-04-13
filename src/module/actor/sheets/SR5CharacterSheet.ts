@@ -4,7 +4,7 @@ import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
 import { FormDialog, FormDialogOptions } from '../../apps/dialogs/FormDialog';
 import { SR5Actor } from '../SR5Actor';
-import { MatrixFlow } from '../../flows/MatrixFlow';
+import { MatrixFlow, MatrixTargetData } from '../../flows/MatrixFlow';
 
 
 export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
@@ -17,13 +17,23 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     network: SR5Item | null
     matrixActions: SR5Item[]
     selectedMarkedDocumentUuid: string|undefined
+    // Determine if the hacking tab should show marked documents or new targets.
+    showMatrixMarkedDocuments: boolean
+    showMatrixTargets: boolean
+    targets: {
+        personas: MatrixTargetData[],
+        ics: MatrixTargetData[],
+        devices: MatrixTargetData[]
+    }
 }
 
 
 export class SR5CharacterSheet extends SR5BaseActorSheet {
     // Stores which document has been selected for a Decker in the matrix tab.
     // We accept this selection to not be persistant across Foundry sessions.
-    selectedMarkedDocumentUuid: string|undefined;    
+    selectedMarkedDocumentUuid: string|undefined;
+    // Stores if the hacking tab should show marked documents or new targets.
+    showMatrixHackingTarget: 'marked'|'targets' = 'targets';
 
     static override get defaultOptions() {
         const defaultOptions = super.defaultOptions;
@@ -94,11 +104,19 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         // Character actor types are matrix actors.
         super._prepareMatrixAttributes(data);
 
-        data.markedDocuments = await this.actor.getAllMarkedDocuments();
         data.network = this.actor.network;
         data.matrixActions = await this.getMatrixActions();
 
         data.selectedMarkedDocumentUuid = this.selectedMarkedDocumentUuid;
+        data.showMatrixMarkedDocuments = this.showMatrixHackingTarget === 'marked';
+        data.showMatrixTargets = this.showMatrixHackingTarget === 'targets';
+
+        data.markedDocuments = await this.actor.getAllMarkedDocuments();
+
+        if (data.showMatrixTargets) {
+            const {personas, ics, devices} = MatrixFlow.getMatrixTargets(this.actor);
+            data.targets = {personas, ics, devices};
+        }
 
         return data;
     }
@@ -112,6 +130,9 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
         html.find('.select-marked-document').on('click', this._onSelectMarkedDocument.bind(this));
         html.find('.open-marked-document').on('click', this._onOpenMarkedDocument.bind(this));
+
+        html.find('.switch-matrix-hacking-target').on('click', this._onSwitchMatrixHackingTarget.bind(this));
+        html.find('.targets-refresh').on('click', this._onTargetsRefresh.bind(this));
     }
 
     /**
@@ -278,6 +299,26 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         } else {
             this.selectedMarkedDocumentUuid = uuid;
         }
+
+        this.render();
+    }
+
+    /**
+     * Switch between different display modes on the matrix hacking tab for what target type display to
+     * users.
+     */
+    async _onSwitchMatrixHackingTarget(event) {
+        event.stopPropagation();
+
+        this.showMatrixHackingTarget = this.showMatrixHackingTarget === 'marked' ? 'targets' : 'marked';
+        this.render();
+    }
+
+    /**
+     * Manual user interaction to refresh list of show matrix targets.
+     */
+    async _onTargetsRefresh(event) {
+        event.stopPropagation();
 
         this.render();
     }

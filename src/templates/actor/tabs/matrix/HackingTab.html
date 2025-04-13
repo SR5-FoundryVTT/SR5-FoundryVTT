@@ -14,6 +14,7 @@
                 {{/if}}
             </label>
         </div>
+        <div><button class="switch-matrix-hacking-target">{{localize "SR5.Labels.Sheet.TargetAcquisition"}}</button></div>
         <div><button class="show-matrix-target-acquisition">{{localize "SR5.Labels.Sheet.TargetAcquisition"}}</button></div>
         <div><button class="reboot-persona-device">{{localize "SR5.Labels.Sheet.RebootDevice"}}</button></div>
         <div>
@@ -28,7 +29,12 @@
     </div>
     <div class="split-container">
         <div class="scroll-area scroll-area-matrix-hacking">
+        {{#if showMatrixMarkedDocuments}}
             {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html' }}
+        {{/if}}
+        {{#if showMatrixTargets}}
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Targets.html' }}
+        {{/if}}
         </div>
         <div>
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'

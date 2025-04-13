@@ -1,11 +1,30 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
+import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
 import { MarksStorage } from '../storage/MarksStorage';
 import { MatrixResistTest } from '../tests/MatrixResistTest';
 import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
+
+
+
+/**
+ * Data representing a single matrix target.
+ */
+export interface MatrixTargetData {
+    // The targeted document.
+    document: Shadowrun.NetworkDevice
+    // Optional token for those documents having them.
+    token: TokenDocument | null
+    // Amount of marks placed on this target
+    marks: number
+    // Indicates if the target is running silent.
+    runningSilent: boolean
+    // Shows the document name of the network the target is connected to.
+    networkName: string
+}
 
 /**
  * General handling around handling everything matrix related.
@@ -233,5 +252,99 @@ export const MatrixFlow = {
             return [];
         }
         return actions.filter((action: SR5Item) => action.hasActionCategory('matrix'));
+    },
+
+    /**
+     * Return a list of matrix targets, of all types, for the given actor.
+     * 
+     * @param actor A matrix persona actor.
+     * @returns Any possible matrix traget visible to the actor.
+     */
+    getMatrixTargets(actor: SR5Actor) {
+        // Prepare all targets based on network connection.
+        const network = actor.network;
+        let targets = network?.isHost ?
+            this.prepareHostTargets(actor) : 
+            this.prepareGridTargets(actor);
+
+        // Filter types of target for clear separation.
+        targets = targets.filter(target => !target.document || target.document.visible);
+        const actors = targets.filter(target => target.document instanceof SR5Actor);
+        const items = targets.filter(target => target.document instanceof SR5Item);
+
+        const personas = actors.filter(target => target.document.hasPersona);
+        const ics = actors.filter(target => target.document.isIC());
+        const devices = items.filter(target => !target.document);
+
+        return {targets, personas, ics, devices};
+    },
+
+    prepareHostTargets(actor: SR5Actor) {
+        return [];
+    },
+
+    /**
+     * Prepare a list of possible matrix targets in a grid network for the given persona matrix icon.
+     * @param actor The actor to use as matrix icon.
+     */
+    prepareGridTargets(actor: SR5Actor) {
+        const targets: MatrixTargetData[] = [];
+
+        if (!canvas.scene?.tokens) return targets;
+
+        // Collect all grid connected documents without scene tokens.
+        for (const grid of MatrixNetworkFlow.getGrids({players: true})) {
+            for (const slave of grid.slaves) {
+                if (slave.getToken()) continue;
+                
+                targets.push({
+                    document: slave,
+                    token: null,
+                    marks: actor.getMarksPlaced(slave.uuid),
+                    runningSilent: slave.isRunningSilent,
+                    networkName: grid.name || ''
+                });
+            }
+        }
+
+        // Collect all scene tokens.
+        for (const token of canvas.scene?.tokens) {
+            // Throw away unneeded tokens.
+            if (!token.actor) continue;
+            const target = token.actor;
+
+            // Validate Foundry VTT visibility.
+            if (target?.id === actor.id) continue;
+            if (game.user?.isGM && token.hidden) continue;
+
+            // Validate Shadowrun5e visibility.
+            if (!target.hasPersona) continue;
+            if (target.isIC()) continue;
+            if (!actor.matrixPersonaIsVisible(target)) continue;
+
+            targets.push({
+                document: token.actor,
+                token,
+                marks: actor.getMarksPlaced(token.actor.uuid),
+                runningSilent: token.actor.isRunningSilent,
+                networkName: token.actor.network?.name ?? ''
+            })
+        }
+
+        // Sort all targets by grid name first and target name second.
+        targets.sort((a, b) => {
+            const gridNameA = a.networkName.toLowerCase();
+            const gridNameB = b.networkName.toLowerCase();
+            const nameA = a.document.name.toLowerCase();
+            const nameB = b.document.name.toLowerCase();
+
+            if (gridNameA < gridNameB) return -1;
+            if (gridNameA > gridNameB) return 1;
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
+        });
+
+        return targets;
     }
 };

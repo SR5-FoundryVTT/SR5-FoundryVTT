@@ -947,6 +947,15 @@ export const registerItemLineHelpers = () => {
         }];
     });
 
+    Handlebars.registerHelper('TargetListHeaderIcons', () => {
+        return [{
+            icon: 'fas fa-refresh',
+            title: game.i18n.localize('SR5.Refresh'),
+            text: game.i18n.localize('SR5.Refresh'),
+            cssClass: 'targets-refresh'
+        }];
+    });
+
     Handlebars.registerHelper('SlavesListRightSide', () => {
         return [
             {
