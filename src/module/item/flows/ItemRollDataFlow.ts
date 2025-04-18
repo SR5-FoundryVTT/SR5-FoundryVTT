@@ -20,14 +20,17 @@ export const ItemRollDataFlow = {
      *       the line.
      */
     getRollData(item: SR5Item, rollData: any, options: RollDataOptions) {
-        // Change how roll data behaves based on the action categories used.
-        const handlers: Record<string, ActionCategoryRollDataCallback> = {
-            'matrix': ItemRollDataFlow.matrixTestRollDataFlow.bind(ItemRollDataFlow),
-        };
 
         const action = options.action ?? undefined;
         const testData = options.testData ?? undefined;
         const againstData = options.againstData ?? undefined;
+
+        if (!againstData) return rollData;
+
+        // Change how roll data behaves based on the action categories used.
+        const handlers: Record<string, ActionCategoryRollDataCallback> = {
+            'matrix': ItemRollDataFlow.matrixTestRollDataFlow.bind(ItemRollDataFlow),
+        };
 
         // Alter roll data for each action category used that provides different handling.
         for (const category of againstData?.action?.categories) {
