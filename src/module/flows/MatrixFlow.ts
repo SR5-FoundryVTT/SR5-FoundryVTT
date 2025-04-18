@@ -130,7 +130,7 @@ export const MatrixFlow = {
      * @param damage The damage to be resited.
      * @returns Modified damage after resistance based on damage given.
      */
-    async executeMatrixDamageResistance(actor: SR5Actor, damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData|undefined> {
+    async executeMatrixDamageResistance(actor: SR5Actor, damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData | undefined> {
         const test = await actor.generalActionTest('resist_matrix') as MatrixResistTest;
         if (!test) {
             console.error('Shadowrun 5e | The General Action pack does not contain a recovery_matrix action.');
@@ -195,7 +195,7 @@ export const MatrixFlow = {
     /**
      * Inform GM and users about the result of a reboot action.
      */
-    async sendRebootDeviceMessage(actor: SR5Actor, device: SR5Item|undefined, delay: number, damage: Shadowrun.DamageData) {
+    async sendRebootDeviceMessage(actor: SR5Actor, device: SR5Item | undefined, delay: number, damage: Shadowrun.DamageData) {
         const speaker = {
             actor,
             alias: game.user?.name,
@@ -219,7 +219,7 @@ export const MatrixFlow = {
      * @param actor The actor that is affected by dumpshock.
      */
     getDumpshockDamage(actor: SR5Actor) {
-        if (!actor.isUsingVR) return DataDefaults.damageData({type: {base: 'stun', value: 'stun'}});
+        if (!actor.isUsingVR) return DataDefaults.damageData({ type: { base: 'stun', value: 'stun' } });
 
         return MatrixRules.dumpshockDamage(actor.isUsingHotSim);
     },
@@ -247,8 +247,8 @@ export const MatrixFlow = {
         // Prepare all targets based on network connection.
         const network = actor.network;
         let targets = network?.isHost ?
-            this.prepareHostTargets(actor) : 
-            this.prepareGridTargets(actor);
+            MatrixFlow.prepareHostTargets(actor) :
+            MatrixFlow.prepareGridTargets(actor);
 
         // Filter types of target for clear separation.
         targets = targets.filter(target => !target.document || target.document.visible);
@@ -259,11 +259,50 @@ export const MatrixFlow = {
         const ics = actors.filter(target => target.document.isIC());
         const devices = items.filter(target => !target.document);
 
-        return {targets, personas, ics, devices};
+        return { targets, personas, ics, devices };
     },
 
+    /**
+     * Prepare a list of possible matrix targets in a host network for the given persona matrix icon.
+     * 
+     * @param actor The actor to use as matrix icon.
+     */
     prepareHostTargets(actor: SR5Actor) {
-        return [];
+        const host = actor.network;
+        if (!host?.isHost) {
+            console.error('Shadowrun 5e | Actor is not connected to a host network');
+            return [];
+        }
+
+        const targets: Shadowrun.MatrixTargetDocument[] = []
+
+        for (const slave of host.slaves) {
+            const type = ActorMarksFlow.getDocumentType(slave);
+
+            targets.push({
+                name: slave.name,
+                type,
+                document: slave,
+                token: slave.getToken(),
+                runningSilent: slave.isRunningSilent,
+                network: host.name || ''
+            });
+        }
+
+        for (const ic of host.getIC()) {
+            const type = ActorMarksFlow.getDocumentType(ic);
+
+            targets.push({
+                name: ic.name,
+                type,
+                document: ic,
+                token: ic.getToken(),
+                runningSilent: ic.isRunningSilent,
+                network: host.name || ''
+            });
+        }
+
+        return targets;
     },
 
     /**
@@ -273,14 +312,12 @@ export const MatrixFlow = {
     prepareGridTargets(actor: SR5Actor) {
         const targets: Shadowrun.MatrixTargetDocument[] = [];
 
-        if (!canvas.scene?.tokens) return targets;
-
         // Collect all grid connected documents without scene tokens.
-        for (const grid of MatrixNetworkFlow.getGrids({players: true})) {
+        for (const grid of MatrixNetworkFlow.getGrids({ players: true })) {
             for (const slave of grid.slaves) {
                 if (slave.getToken()) continue;
                 const type = ActorMarksFlow.getDocumentType(document);
-                
+
                 targets.push({
                     name: slave.name,
                     document: slave,
@@ -292,31 +329,34 @@ export const MatrixFlow = {
             }
         }
 
-        // Collect all scene tokens.
-        for (const token of canvas.scene?.tokens) {
-            // Throw away unneeded tokens.
-            if (!token.actor) continue;
-            const target = token.actor;
+        if (canvas.scene?.tokens) {
+            // Collect all scene tokens.
+            for (const token of canvas.scene?.tokens) {
+                // Throw away unneeded tokens.
+                if (!token.actor) continue;
+                const target = token.actor;
 
-            // Validate Foundry VTT visibility.
-            if (target?.id === actor.id) continue;
-            if (game.user?.isGM && token.hidden) continue;
+                // Validate Foundry VTT visibility.
+                if (target?.id === actor.id) continue;
+                if (game.user?.isGM && token.hidden) continue;
 
-            // Validate Shadowrun5e visibility.
-            if (!target.hasPersona) continue;
-            if (target.isIC()) continue;
-            if (!actor.matrixPersonaIsVisible(target)) continue;
+                // Validate Shadowrun5e visibility.
+                if (!target.hasPersona) continue;
+                if (target.isIC()) continue;
+                if (!actor.matrixPersonaIsVisible(target)) continue;
 
-            const type = ActorMarksFlow.getDocumentType(document);
-            targets.push({
-                name: token.name,
-                document: token.actor,
-                token,
-                runningSilent: token.actor.isRunningSilent,
-                network: token.actor.network?.name ?? '',
-                type
-            })
+                const type = ActorMarksFlow.getDocumentType(document);
+                targets.push({
+                    name: token.name,
+                    document: token.actor,
+                    token,
+                    runningSilent: token.actor.isRunningSilent,
+                    network: token.actor.network?.name ?? '',
+                    type
+                })
+            }
         }
+
 
         // Sort all targets by grid name first and target name second.
         targets.sort((a, b) => {
