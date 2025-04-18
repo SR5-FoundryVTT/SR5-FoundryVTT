@@ -219,7 +219,12 @@
 
     // Use only to indicate interactibility within the HackingTab markslist.
     .open-document {
-        @include rollable;
+        @include clickable;
+    }
+
+    // Used to switch between the different hacking targets.
+    .switch-matrix-hacking-target {
+        @include clickable;
     }
 }
 

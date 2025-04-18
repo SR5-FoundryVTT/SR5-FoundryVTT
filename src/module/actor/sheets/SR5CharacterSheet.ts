@@ -20,12 +20,8 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     // Determine if the hacking tab should show marked documents or new targets.
     showMatrixMarkedDocuments: boolean
     showMatrixTargets: boolean
-    // Lists of documents by type for categorized display.
-    targets: {
-        personas: Shadowrun.MatrixTargetDocument[],
-        ics: Shadowrun.MatrixTargetDocument[],
-        devices: Shadowrun.MatrixTargetDocument[]
-    }
+    // Targets to be displayed in the matrix tab.
+    matrixTargets: Shadowrun.MatrixTargetDocument[]
 }
 
 
@@ -116,7 +112,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
         if (data.showMatrixTargets) {
             const {personas, ics, devices} = MatrixFlow.getMatrixTargets(this.actor);
-            data.targets = {personas, ics, devices};
+            data.matrixTargets = [...ics, ...personas, ...devices];
         }
 
         return data;
