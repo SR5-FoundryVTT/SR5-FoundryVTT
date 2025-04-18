@@ -24,19 +24,30 @@ declare namespace Shadowrun {
         showUntrainedSkills
     }
 
-    // Use to target a specific owned item anywhere in Foundry.
+    // Describe a targeted FoundryVTT document.
     export interface TargetedDocument {
         // Name of the document or manually entered by user.
         name: string
-        target: any | null // The Foundry Document marked.
+        // The Foundry Document marked.
+        document: any | null
+        // Optional token for those documents having them.
+        token: TokenDocument | null
+    }
+
+    // Describe a target FoundryVTT document for the Shadowrun Matrix.
+    export interface MatrixTargetDocument extends TargetedDocument {
+        // The network name of the document.
+        network: string
+        // Indicates if the target is running silent.
+        runningSilent: boolean
+        // The type of matrix icon
+        type: Translation
     }
 
     // Use to display Matrix Marks which Foundry Document their placed on.
-    export interface MarkedDocument extends TargetedDocument {
+    export interface MarkedDocument extends MatrixTargetDocument {
         marks: number // The amount of marks placed.
         markId: string | null // A foundryvtt uuid.
-        network: string // The host, grid or persona name the target is in
-        type: Translation // The type of matrix icon
     }
 
     /**

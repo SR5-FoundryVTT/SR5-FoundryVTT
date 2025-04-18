@@ -4,7 +4,7 @@ import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
 import { FormDialog, FormDialogOptions } from '../../apps/dialogs/FormDialog';
 import { SR5Actor } from '../SR5Actor';
-import { MatrixFlow, MatrixTargetData } from '../../flows/MatrixFlow';
+import { MatrixFlow } from '../../flows/MatrixFlow';
 
 
 export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
@@ -16,14 +16,15 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     inventory: Record<string, any>
     network: SR5Item | null
     matrixActions: SR5Item[]
-    selectedMarkedDocumentUuid: string|undefined
+    selectedMatrixTarget: string|undefined
     // Determine if the hacking tab should show marked documents or new targets.
     showMatrixMarkedDocuments: boolean
     showMatrixTargets: boolean
+    // Lists of documents by type for categorized display.
     targets: {
-        personas: MatrixTargetData[],
-        ics: MatrixTargetData[],
-        devices: MatrixTargetData[]
+        personas: Shadowrun.MatrixTargetDocument[],
+        ics: Shadowrun.MatrixTargetDocument[],
+        devices: Shadowrun.MatrixTargetDocument[]
     }
 }
 
@@ -31,7 +32,7 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
 export class SR5CharacterSheet extends SR5BaseActorSheet {
     // Stores which document has been selected for a Decker in the matrix tab.
     // We accept this selection to not be persistant across Foundry sessions.
-    selectedMarkedDocumentUuid: string|undefined;
+    selectedMatrixTarget: string|undefined;
     // Stores if the hacking tab should show marked documents or new targets.
     showMatrixHackingTarget: 'marked'|'targets' = 'targets';
 
@@ -107,7 +108,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         data.network = this.actor.network;
         data.matrixActions = await this.getMatrixActions();
 
-        data.selectedMarkedDocumentUuid = this.selectedMarkedDocumentUuid;
+        data.selectedMatrixTarget = this.selectedMatrixTarget;
         data.showMatrixMarkedDocuments = this.showMatrixHackingTarget === 'marked';
         data.showMatrixTargets = this.showMatrixHackingTarget === 'targets';
 
@@ -128,7 +129,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         html.find('.reboot-persona-device').click(this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
 
-        html.find('.select-marked-document').on('click', this._onSelectMarkedDocument.bind(this));
+        html.find('.select-document').on('click', this._onSelectMarkedDocument.bind(this));
         html.find('.open-marked-document').on('click', this._onOpenMarkedDocument.bind(this));
 
         html.find('.switch-matrix-hacking-target').on('click', this._onSwitchMatrixHackingTarget.bind(this));
@@ -226,8 +227,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         let actions = [...packActions, ...actorActions] as Shadowrun.ActionItemData[];
 
         // Reduce actions to those matching the marks on the selected target.
-        if (this.selectedMarkedDocumentUuid) {
-            const marks = this.actor.getMarksPlaced(this.selectedMarkedDocumentUuid);
+        if (this.selectedMatrixTarget) {
+            const marks = this.actor.getMarksPlaced(this.selectedMatrixTarget);
             actions = actions.filter(action => (action.system.action.category.matrix?.marks ?? 0) <= marks);
         }
 
@@ -249,8 +250,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const test = await this.actor.testFromItem(action, {event});
         if (!test) return;
 
-        if (this.selectedMarkedDocumentUuid) {
-            const document = fromUuidSync(this.selectedMarkedDocumentUuid) as Shadowrun.NetworkDevice;
+        if (this.selectedMatrixTarget) {
+            const document = fromUuidSync(this.selectedMatrixTarget) as Shadowrun.NetworkDevice;
             if (!document) return;
 
             await test.addTarget(document);
@@ -294,10 +295,10 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         if (!uuid) return;
 
         // Toggle selection on or off.
-        if (this.selectedMarkedDocumentUuid === uuid) {
-            this.selectedMarkedDocumentUuid = undefined;
+        if (this.selectedMatrixTarget === uuid) {
+            this.selectedMatrixTarget = undefined;
         } else {
-            this.selectedMarkedDocumentUuid = uuid;
+            this.selectedMatrixTarget = uuid;
         }
 
         this.render();

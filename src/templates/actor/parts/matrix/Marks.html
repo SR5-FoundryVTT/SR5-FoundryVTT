@@ -9,12 +9,11 @@
     {{!-- Don't use the ListItem Handlebar helper as to avoid it's item drag&drop functionality. --}}
     <div class="list-item" data-mark-id="{{this.markId}}">
         <div class="list-item-content">
-            <div class="item-left select-marked-document {{#ife ../selectedMarkedDocumentUuid this.markId}}selected-list-item{{/ife}}" data-uuid="{{this.markId}}">
+            <div class="item-left select-document {{#ife ../selectedMatrixTarget this.markId}}selected-list-item{{/ife}}" data-uuid="{{this.markId}}">
                 <div class="item-img">
-                    <img src="{{this.target.img}}" data-tooltip="{{this.target.name}}" height="24px" width="24px"/>
+                    <img src="{{this.document.img}}" data-tooltip="{{this.document.name}}" height="24px" width="24px"/>
                 </div>
-                {{!-- Roll open-marked-document --}}
-                <div class="item-text item-name"><span class="open-marked-document" data-uuid="{{this.markId}}">{{this.target.name}}</span></div>
+                <div class="item-text item-name"><span class="open-marked-document" data-uuid="{{this.markId}}">{{speakerName this.document}}</span></div>
             </div>
             <div class="item-right">
                 <div class="item-text">
@@ -27,7 +26,7 @@
                     <input class="display marks-qty" size="1" type="text" data-dtype="Number" placeholder="1" value="{{this.marks}}" data-mark-id="{{this.markId}}"/>
                 </div>
                 <div class="item-text item-icons">
-                    {{#if this.target.isNetwork}}
+                    {{#if this.document.isNetwork}}
                     <a class="" data-tooltip="SR5.Tooltips.Actor.ConnectNetwork">
                         <i class="item-icon fas fa-right-to-bracket marks-connect-network" data-mark-id="{{this.markId}}"></i>
                     </a>

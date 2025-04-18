@@ -1,3 +1,4 @@
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
@@ -7,24 +8,6 @@ import { MarksStorage } from '../storage/MarksStorage';
 import { MatrixResistTest } from '../tests/MatrixResistTest';
 import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
-
-
-
-/**
- * Data representing a single matrix target.
- */
-export interface MatrixTargetData {
-    // The targeted document.
-    document: Shadowrun.NetworkDevice
-    // Optional token for those documents having them.
-    token: TokenDocument | null
-    // Amount of marks placed on this target
-    marks: number
-    // Indicates if the target is running silent.
-    runningSilent: boolean
-    // Shows the document name of the network the target is connected to.
-    networkName: string
-}
 
 /**
  * General handling around handling everything matrix related.
@@ -288,7 +271,7 @@ export const MatrixFlow = {
      * @param actor The actor to use as matrix icon.
      */
     prepareGridTargets(actor: SR5Actor) {
-        const targets: MatrixTargetData[] = [];
+        const targets: Shadowrun.MatrixTargetDocument[] = [];
 
         if (!canvas.scene?.tokens) return targets;
 
@@ -296,13 +279,15 @@ export const MatrixFlow = {
         for (const grid of MatrixNetworkFlow.getGrids({players: true})) {
             for (const slave of grid.slaves) {
                 if (slave.getToken()) continue;
+                const type = ActorMarksFlow.getDocumentType(document);
                 
                 targets.push({
+                    name: slave.name,
                     document: slave,
                     token: null,
-                    marks: actor.getMarksPlaced(slave.uuid),
                     runningSilent: slave.isRunningSilent,
-                    networkName: grid.name || ''
+                    network: grid.name || '',
+                    type
                 });
             }
         }
@@ -322,19 +307,21 @@ export const MatrixFlow = {
             if (target.isIC()) continue;
             if (!actor.matrixPersonaIsVisible(target)) continue;
 
+            const type = ActorMarksFlow.getDocumentType(document);
             targets.push({
+                name: token.name,
                 document: token.actor,
                 token,
-                marks: actor.getMarksPlaced(token.actor.uuid),
                 runningSilent: token.actor.isRunningSilent,
-                networkName: token.actor.network?.name ?? ''
+                network: token.actor.network?.name ?? '',
+                type
             })
         }
 
         // Sort all targets by grid name first and target name second.
         targets.sort((a, b) => {
-            const gridNameA = a.networkName.toLowerCase();
-            const gridNameB = b.networkName.toLowerCase();
+            const gridNameA = a.network.toLowerCase();
+            const gridNameB = b.network.toLowerCase();
             const nameA = a.document.name.toLowerCase();
             const nameB = b.document.name.toLowerCase();
 

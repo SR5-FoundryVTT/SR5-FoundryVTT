@@ -147,10 +147,16 @@ export const ActorMarksFlow = {
         const documents: Shadowrun.MarkedDocument[] = [];
 
         for (const {uuid, name, marks} of matrixData) {
-            const target = uuid ? await ActorMarksFlow.getMarkedDocument(uuid) : null;
-            const network = ActorMarksFlow.getDocumentNetwork(target);
-            const type = ActorMarksFlow.getDocumentType(target);
-            documents.push({target, marks, markId: uuid, name, type, network});
+            const document = uuid ? await ActorMarksFlow.getMarkedDocument(uuid) : null;
+            const network = ActorMarksFlow.getDocumentNetwork(document);
+            const type = ActorMarksFlow.getDocumentType(document);
+            const markId = uuid;
+
+            // Default values for matrix targets.
+            const token = null;
+            const runningSilent = false;
+
+            documents.push({document, token, marks, markId, name, type, network, runningSilent});
         }
 
         return documents;
