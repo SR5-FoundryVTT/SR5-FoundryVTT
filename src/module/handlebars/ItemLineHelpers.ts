@@ -2,7 +2,6 @@ import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
 import {SR5} from "../config";
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
-import { MatrixTargetSheetData } from '../apps/matrix/MatrixTargetAquisition';
 
 /**
  * Typing around the legacy item list helper.
@@ -993,10 +992,10 @@ export const registerItemLineHelpers = () => {
     /**
      * Used for Matrix Target Acquisition App to render right side columns
      */
-    Handlebars.registerHelper('NetworkTargetsRightSide', (target: MatrixTargetSheetData) => {
+    Handlebars.registerHelper('NetworkTargetsRightSide', (target: Shadowrun.MatrixTargetDocument) => {
         return [{
             text: {
-                text: target.networkName
+                text: target.network
             }
         }]
     });

@@ -1,43 +1,18 @@
 import { SR5Actor } from "../../actor/SR5Actor";
+import { MatrixFlow } from "../../flows/MatrixFlow";
 import { Helpers } from "../../helpers";
-import { MatrixNetworkFlow } from "../../item/flows/MatrixNetworkFlow";
 import { SR5Item } from "../../item/SR5Item";
 import { BruteForceTest } from "../../tests/BruteForceTest";
 import { HackOnTheFlyTest } from "../../tests/HackOnTheFlyTest";
 import { TestCreator } from "../../tests/TestCreator";
 
-/**
- * This application is used by users and gms to acquire targets for their matrix actions
- * from the point of view of a specific matrix user.
- */
-// An atomic data point for a single matrix item
-interface MatrixItemSheetData {
-    item: SR5Item
-    marks: number
-}
-// An atomic data point for a single matrix target, containing all matrix items within, used for display.
-export interface MatrixTargetSheetData {
-    // The targeted document.
-    document: Shadowrun.NetworkDevice
-    // Optional token for those documents having them.
-    token: TokenDocument | null
-    // Item icons conneceted to the target document
-    matrixItems: MatrixItemSheetData[]
-
-    marks: number
-    // Indicates if the target is running silent.
-    runningSilent: boolean
-    // Shows the document name of the network the target is connected to.
-    networkName: string
-}
-
 // Overall Sheet Data for this application.
 interface MatrixTargetAcquisitionSheetData {
     placementActions: string[]
-    targets: MatrixTargetSheetData[]
-    personas: MatrixTargetSheetData[]
-    ics: MatrixTargetSheetData[]
-    devices: MatrixTargetSheetData[]
+    targets: Shadowrun.MatrixTargetDocument[]
+    personas: Shadowrun.MatrixTargetDocument[]
+    ics: Shadowrun.MatrixTargetDocument[]
+    devices: Shadowrun.MatrixTargetDocument[]
     hosts: SR5Item[]
     grids: SR5Item[]
     network: SR5Item|null
@@ -102,16 +77,16 @@ export class MatrixTargetAcquisitionApplication extends Application {
         data.network = network;
 
         // Prepare available networks for selection.
-        data.grids = this.prepareMatrixGrids();
-        data.hosts = this.prepareMatrixHosts();
+        data.grids = MatrixFlow.visibleGrids();
+        data.hosts = MatrixFlow.visibelHosts();
 
         // Have an empty target list as fallback for failing network target collection.
         data.targets = [];
 
         // Collect target data based on network type.
         data.targets = network?.isHost ? 
-            this.prepareMatrixHostTargets() : 
-            this.prepareMatrixGridTargets();
+            MatrixFlow.prepareHostTargets(this.actor) :
+            MatrixFlow.prepareGridTargets(this.actor);
 
         // Filter out invisible tokens.
         data.targets = data.targets.filter(target => !target.document || target.document.visible)
@@ -128,148 +103,6 @@ export class MatrixTargetAcquisitionApplication extends Application {
         data.placementActions = ['brute_force', 'hack_on_the_fly'];
 
         return data;
-    }
-
-    /**
-     * If the active persona is looking at grid targets, collect all matrix icons
-     * connected to grids or without any network connection.
-     * 
-     * This includes both scene tokens and matrix icons connected to any visible grid.
-     */
-    prepareMatrixGridTargets() {
-        const targets: MatrixTargetSheetData[] = [];
-
-        if (!canvas.scene?.tokens) return targets;
-
-        // Collect all grid connected documents without scene tokens.
-        for (const grid of MatrixNetworkFlow.getGrids({players: true})) {
-            for (const slave of grid.slaves) {
-                if (slave.getToken()) continue;
-                
-                targets.push({
-                    document: slave,
-                    token: null,
-                    marks: this.actor.getMarksPlaced(slave.uuid),
-                    matrixItems: this._prepareActorMatrixItems(slave),
-                    runningSilent: slave.isRunningSilent,
-                    networkName: grid.name || ''
-                });
-            }
-        }
-
-        // Collect all scene tokens.
-        for (const token of canvas.scene?.tokens) {
-            // Throw away unneeded tokens.
-            if (!token.actor) continue;
-            const target = token.actor;
-
-            // Validate Foundry VTT visibility.
-            if (target?.id === this.actor.id) continue;
-            if (game.user?.isGM && token.hidden) continue;
-
-            // Validate Shadowrun5e visibility.
-            if (!target.hasPersona) continue;
-            if (target.isIC()) continue;
-            if (!this.actor.matrixPersonaIsVisible(target)) continue;
-
-            targets.push({
-                document: token.actor,
-                token,
-                marks: this.actor.getMarksPlaced(token.actor.uuid),
-                matrixItems: this._prepareActorMatrixItems(token.actor),
-                runningSilent: token.actor.isRunningSilent,
-                networkName: token.actor.network?.name ?? ''
-            })
-        }
-
-        // Sort all targets by grid name first and target name second.
-        targets.sort((a, b) => {
-            const gridNameA = a.networkName.toLowerCase();
-            const gridNameB = b.networkName.toLowerCase();
-            const nameA = a.document.name.toLowerCase();
-            const nameB = b.document.name.toLowerCase();
-
-            if (gridNameA < gridNameB) return -1;
-            if (gridNameA > gridNameB) return 1;
-            if (nameA < nameB) return -1;
-            if (nameA > nameB) return 1;
-            return 0;
-        });
-
-        return targets;
-    }
-
-    /**
-     * Collect all personas and devices connected to the current host network.
-     */
-    prepareMatrixHostTargets() {
-        const host = this.actor.network;
-        if (!host?.isHost) {
-            console.error('Shadowrun 5e | Actor is not connected to a host network');
-            return [];
-        }
-
-        const targets: MatrixTargetSheetData[] = []
-
-        for (const slave of host.slaves) {
-            targets.push({
-                document: slave,
-                token: slave.getToken(),
-                marks: this.actor.getMarksPlaced(slave.uuid),
-                matrixItems: this._prepareActorMatrixItems(slave),
-                runningSilent: slave.isRunningSilent,
-                networkName: host.name || ''
-            });
-        }
-
-        for (const ic of host.getIC()) {
-            targets.push({
-                document: ic,
-                token: ic.getToken(),
-                marks: this.actor.getMarksPlaced(ic.uuid),
-                matrixItems: [],
-                runningSilent: ic.isRunningSilent,
-                networkName: host.name || ''
-            })
-        }
-
-        return targets;
-    }
-
-    /**
-     * Prepare items on the given document having matrix icons.
-     *
-     * @param document Any network document.
-     */
-    _prepareActorMatrixItems(document: Shadowrun.NetworkDevice) {
-        if (!(document instanceof SR5Actor)) return [];
-
-        const matrixItems: MatrixItemSheetData[] = [];
-
-        for (const item of document.items) {
-            if (!item.isMatrixItem) continue;
-            const marks = this.actor.getMarksPlaced(item.uuid);
-
-            matrixItems.push({
-                item, marks
-            });
-        }
-
-        return matrixItems;
-    }
-
-    /**
-     * Collect all hosts for selection.
-     */
-    prepareMatrixHosts() {
-        return game.items?.filter(item => item.isHost && item.matrixIconVisibleToPlayer) ?? [];
-    }
-
-    /**
-     * Collect all grids for selection.
-     */
-    prepareMatrixGrids() {
-        return game.items?.filter(item => item.isGrid && item.matrixIconVisibleToPlayer) ?? [];
     }
 
     /**

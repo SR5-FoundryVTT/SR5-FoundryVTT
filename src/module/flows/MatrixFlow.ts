@@ -278,12 +278,14 @@ export const MatrixFlow = {
 
         for (const slave of host.slaves) {
             const type = ActorMarksFlow.getDocumentType(slave);
+            // For persona slaves get their possible token.
+            const token = slave.getToken ? slave.getToken() : null;
 
             targets.push({
                 name: slave.name,
                 type,
                 document: slave,
-                token: slave.getToken(),
+                token,
                 runningSilent: slave.isRunningSilent,
                 network: host.name || ''
             });
@@ -373,5 +375,33 @@ export const MatrixFlow = {
         });
 
         return targets;
+    },
+
+    /**
+     * Collect visible hosts for selection.
+     */
+    visibelHosts() {
+        return game.items?.filter(item => item.isHost && item.matrixIconVisibleToPlayer) ?? [];
+    },
+
+    /**
+     * Collect all hosts for selection.
+     */
+    allHosts() {
+        return game.items?.filter(item => item.isHost) ?? [];
+    },
+
+    /**
+     * Collect visible grids for selection.
+     */
+    visibleGrids() {
+        return game.items?.filter(item => item.isGrid && item.matrixIconVisibleToPlayer) ?? [];
+    },
+
+    /**
+     * Collect all grids for selection.
+     */
+    allGrids() {
+        return game.items?.filter(item => item.isGrid) ?? [];
     }
 };
