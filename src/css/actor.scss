@@ -213,12 +213,12 @@
     }
 
     // Use only to indicate interactibility within the HackingTab markslist.
-    .select-marked-document {
+    .select-document {
         @include clickable;
     }
 
     // Use only to indicate interactibility within the HackingTab markslist.
-    .open-marked-document {
+    .open-document {
         @include rollable;
     }
 }

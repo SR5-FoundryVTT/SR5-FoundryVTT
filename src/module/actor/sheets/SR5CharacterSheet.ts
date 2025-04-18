@@ -130,7 +130,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
 
         html.find('.select-document').on('click', this._onSelectMarkedDocument.bind(this));
-        html.find('.open-marked-document').on('click', this._onOpenMarkedDocument.bind(this));
+        html.find('.open-document').on('click', this._onOpenMarkedDocument.bind(this));
 
         html.find('.switch-matrix-hacking-target').on('click', this._onSwitchMatrixHackingTarget.bind(this));
         html.find('.targets-refresh').on('click', this._onTargetsRefresh.bind(this));
