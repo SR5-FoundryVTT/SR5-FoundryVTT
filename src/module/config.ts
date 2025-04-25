@@ -1272,6 +1272,9 @@ export const SR5 = {
             'transgenic-alteration': 'bioware/transgenic-alteration',
             'transgenics': ''
         },
+        character: {
+            'dracoforms': 'critter/dracoforms'
+        },
         complex_form: {},
         contact: {},
         critter_power: {

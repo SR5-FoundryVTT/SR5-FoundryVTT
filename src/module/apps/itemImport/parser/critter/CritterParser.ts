@@ -44,8 +44,7 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
                 "powers.power",
                 "biowares.bioware",
                 "complexforms.complexform",
-                "qualities.positive.quality",
-                "qualities.negative.quality",
+                "qualities.positive.quality"
             ]
         >,
         searchType: string[],
