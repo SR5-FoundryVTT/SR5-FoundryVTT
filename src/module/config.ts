@@ -871,6 +871,7 @@ export const SR5 = {
         air: 'SR5.Spirit.Types.Air',
         aircraft: 'SR5.Spirit.Types.Aircraft',
         airwave: 'SR5.Spirit.Types.Airwave',
+        ally: 'SR5.Spirit.Types.Ally',
         automotive: 'SR5.Spirit.Types.Automotive',
         beasts: 'SR5.Spirit.Types.Beasts',
         ceramic: 'SR5.Spirit.Types.Ceramic',
@@ -879,6 +880,7 @@ export const SR5 = {
         fire: 'SR5.Spirit.Types.Fire',
         guardian: 'SR5.Spirit.Types.Guardian',
         guidance: 'SR5.Spirit.Types.Guidance',
+        homunculus: 'SR5.Spirit.Types.Homunculus',
         man: 'SR5.Spirit.Types.Man',
         metal: 'SR5.Spirit.Types.Metal',
         plant: 'SR5.Spirit.Types.Plant',
@@ -886,6 +888,7 @@ export const SR5 = {
         task: 'SR5.Spirit.Types.Task',
         train: 'SR5.Spirit.Types.Train',
         water: 'SR5.Spirit.Types.Water',
+        watcher: 'SR5.Spirit.Types.Watcher',
 
         // toxic types
         toxic_air: 'SR5.Spirit.Types.ToxicAir',
@@ -907,6 +910,10 @@ export const SR5 = {
 
         // shedim types
         shedim: 'SR5.Spirit.Types.Shedim',
+        hopper: 'SR5.Spirit.Types.Hopper',
+        blade_summoned: 'SR5.Spirit.Types.BladeSummoned',
+        horror_show: 'SR5.Spirit.Types.HorrorShow',
+        unbreakable: 'SR5.Spirit.Types.Unbreakable',
         master_shedim: 'SR5.Spirit.Types.MasterShedim',
 
         // insect types
@@ -933,24 +940,37 @@ export const SR5 = {
         chindi: "SR5.Spirit.Types.Chindi",
         croki: "SR5.Spirit.Types.Croki",
         duende: "SR5.Spirit.Types.Duende",
+        ejerian: "SR5.Spirit.Types.Ejerian",
         elvar: "SR5.Spirit.Types.Elvar",
         erinyes: "SR5.Spirit.Types.Erinyes",
-        greenman: "SR5.Spirit.Types.Greenman",
+        green_man: "SR5.Spirit.Types.GreenMan",
         imp: "SR5.Spirit.Types.Imp",
         jarl: "SR5.Spirit.Types.Jarl",
         kappa: "SR5.Spirit.Types.Kappa",
         kokopelli: "SR5.Spirit.Types.Kokopelli",
         morbi: "SR5.Spirit.Types.Morbi",
-        nocnitasa: "SR5.Spirit.Types.Nocnitasa",
+        nocnitsa: "SR5.Spirit.Types.Nocnitsa",
         phantom: "SR5.Spirit.Types.Phantom",
         preta: "SR5.Spirit.Types.Preta",
         stabber: "SR5.Spirit.Types.Stabber",
         tungak: "SR5.Spirit.Types.Tungak",
-        vucub: "SR5.Spirit.Types.Vucub",
+        vucub_caquix: "SR5.Spirit.Types.VucubCaquix",
 
         // blood magic spirits
         blood_shade: 'SR5.Spirit.Types.BloodShade',
         bone: 'SR5.Spirit.Types.Bone',
+
+        // aetherology spirits
+        gum_toad: 'SR5.Spirit.Types.GumToad',
+        crawler: 'SR5.Spirit.Types.Crawler',
+        ghasts: 'SR5.Spirit.Types.Ghasts',
+        vrygoths: 'SR5.Spirit.Types.Vrygoths',
+        gremlin: 'SR5.Spirit.Types.Gremlin',
+        anansi: 'SR5.Spirit.Types.Anansi',
+        tsuchigumo_warrior: 'SR5.Spirit.Types.TsuchigumoWarrior',
+
+        // horror terrors spirits
+        corps_cadavre: 'SR5.Spirit.Types.CorpsCadavre',
     },
 
     /**

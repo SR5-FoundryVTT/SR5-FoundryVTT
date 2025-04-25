@@ -2,7 +2,7 @@ import { Constants } from '../importer/Constants';
 import { XMLStrategy } from './XMLStrategy';
 import { JSONStrategy } from './JSONStrategy';
 import { ImportStrategy } from './ImportStrategy';
-import {SR5Item} from "../../../item/SR5Item";
+import { SR5Item } from "../../../item/SR5Item";
 import FolderTypes = foundry.CONST.FOLDER_DOCUMENT_TYPES;
 
 export enum ImportMode {
@@ -13,6 +13,35 @@ export enum LookupMode {
     Directory = 0,
     Actor = 1,
 }
+
+/** 
+ * Drill into `T` by a dot-string `P`, returning `never` if the path doesn’t exist,
+ * and `| undefined` only if an intermediate property was itself optional.
+ */
+export type TypeAtPath<T, P extends string> =
+    P extends `${infer Head}.${infer Tail}`
+        ? Head extends keyof T
+            ? TypeAtPath<NonNullable<T[Head]>, Tail> | undefined
+            : never
+        : P extends keyof T
+            ? T[P]
+            : never;
+
+/**
+ * Union together the results of a bunch of paths, removing any `never` branches.
+ * (You can wrap it in `NonNullable<…>` if you also want to strip `undefined`.)
+ */
+export type TypeAtPaths<T, P extends readonly string[]> =
+    P[number] extends infer K
+        ? K extends string
+            ? TypeAtPath<T, K>
+            : never
+        : never;
+
+/**
+ * Extracts the element type from an array (or returns never unchanged if not an array).
+ */
+export type ArrayItem<T> = T extends (infer U)[] ? U : never;
 
 /**
  * An import helper to standardize data extraction.
@@ -36,6 +65,22 @@ export class ImportHelper {
     }
 
     private constructor() {}
+
+    /**
+     * Ensures the provided value is returned as an array.
+     * If the value is already an array, it is returned as-is.
+     * If the value is a single item, it is wrapped in an array.
+     * If the value is null or undefined, an empty array is returned.
+     *
+     * @template T The type of the elements.
+     * @param {T | T[] | undefined | null} value The input value to normalize.
+     * @returns {T[]} An array containing the input value(s), or an empty array.
+     */
+    public static getArray<T>(value: T | T[] | undefined | null): T[] {
+        if (value)
+            return Array.isArray(value) ? value : [value];
+        return [];
+    }
 
     /**
      * Helper method to create a new folder.

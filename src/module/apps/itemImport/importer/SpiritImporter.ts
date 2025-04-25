@@ -1,11 +1,11 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper as IH } from '../helper/ImportHelper';
-import { CritterParser } from '../parser/critter/CritterParser';
+import { SpiritParser } from '../parser/spirit/SpiritParser';
 import { Constants } from './Constants';
 import { SR5Actor } from '../../../actor/SR5Actor';
 import { MetatypeSchema } from "../schema/MetatypeSchema";
 
-export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, Shadowrun.CharacterData> {
+export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shadowrun.SpiritData> {
     public files = ['critters.xml'];
 
     CanParse(jsonObject: object): boolean {
@@ -26,7 +26,7 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
         const attributeKeys = [
             "bodmin", "agimin", "reamin",
             "strmin", "chamin", "intmin",
-            "logmin", "wilmin", "edgmin",
+            "logmin", "wilmin",
         ];
     
         for (const key of attributeKeys) {
@@ -39,23 +39,39 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
     }
 
     async Parse(chummerData: MetatypeSchema, setIcons: boolean): Promise<StoredDocument<SR5Actor>[]> {
-        const actors: Shadowrun.CharacterActorData[] = [];
-        const jsonDatas = chummerData.metatypes.metatype;
+        const actors: Shadowrun.SpiritActorData[] = [];
+
+        
+        const baseMetatypes = chummerData.metatypes.metatype;
+
+        const metavariants = baseMetatypes.flatMap(metatype => {
+            const parentName = metatype.name._TEXT;
+            if (!metatype.metavariants) return [];
+
+            const variants = IH.getArray(metatype.metavariants?.metavariant ?? []);
+
+            return variants.map(variant => ({
+                ...variant,
+                name: { _TEXT: `${parentName} (${variant.name._TEXT})` },
+                category: { _TEXT: metatype.category?._TEXT ?? "" },
+            }));
+        });
+
+        const jsonDatas = [...baseMetatypes, ...metavariants];
+
         this.iconList = await this.getIconFiles();
-        const parserType = 'character';
-        const parser = new CritterParser();
+        const parserType = 'spirit';
+        const parser = new SpiritParser();
 
         const CategoriesList = [
-            'Dracoforms',
             'Extraplanar Travelers',
-            'Infected',
-            'Mundane Critters',
-            'Mutant Critters',
-            'Paranormal Critters',
-            'Protosapients',
-            'Technocritters',
-            'Toxic Critters',
-            'Warforms'
+            'Insect Spirits',
+            'Necro Spirits',
+            'Ritual',
+            'Shadow Spirits',
+            'Shedim',
+            'Spirits',
+            'Toxic Spirits'
         ];
 
         const Categories = {
@@ -67,13 +83,13 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
         const folders = await IH.MakeCategoryFolders(
             'Actor',
             Categories,
-            'Critters',
+            'Spirits',
             this.categoryTranslations,
         );
 
         for (const jsonData of jsonDatas) {
             // Check to ensure the data entry is supported and the correct category
-            if (   this.isSpirit(jsonData)
+            if (   !this.isSpirit(jsonData)
                 || DataImporter.unsupportedEntry(jsonData)
                 || IH.StringValue(jsonData, 'category') === 'Sprites') {
                 continue;
