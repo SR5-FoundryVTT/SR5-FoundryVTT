@@ -6,6 +6,7 @@ import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/Ski
 import CharacterActorData = Shadowrun.CharacterActorData;
 import { SR5 } from '../../../../config';
 import { Metatype } from "../../schema/MetatypeSchema";
+import { OneOrMany } from "../../schema/Types";
 import { json } from 'stream/consumers';
 
 export class CritterParser extends ActorParserBase<CharacterActorData> {
@@ -38,21 +39,11 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
     }
 
     private getItems(
-        array: TypeAtPaths<
-            Metatype,
-            [
-                "powers.power",
-                "biowares.bioware",
-                "complexforms.complexform",
-                "qualities.positive.quality"
-            ]
-        >,
+        array: OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }> | undefined,
         searchType: string[],
         msg_field: {type: string; critter: string},
         jsonTranslation?: object
     ): object[] {
-        if (!array) return [];
-
         return IH.getArray(array)
             .map((item) => {
                 let name = item._TEXT;
@@ -97,8 +88,6 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
         critterName: string,
         jsonTranslation?: object
     ): object[] {
-        if (!array) return [];
-
         return IH.getArray(array)
             .map((item) => {
                 let name = item._TEXT;

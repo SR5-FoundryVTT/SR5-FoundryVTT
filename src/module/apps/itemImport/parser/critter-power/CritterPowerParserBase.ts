@@ -1,18 +1,20 @@
-import { ImportHelper } from '../../helper/ImportHelper';
+import { ImportHelper as IH } from '../../helper/ImportHelper';
 import CritterPowerCategory = Shadowrun.CritterPowerCategory;
 import { ItemParserBase } from '../item/ItemParserBase';
 import CritterPowerItemData = Shadowrun.CritterPowerItemData;
+import { Power } from '../../schema/CritterpowersSchema';
+import { BonusHelper as BH } from '../../helper/BonusHelper';
 
 export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData> {
-    public override Parse(jsonData: object, item: CritterPowerItemData, jsonTranslation?: object): CritterPowerItemData {
-        item.name = ImportHelper.StringValue(jsonData, 'name');
+    public override Parse(jsonData: Power, item: CritterPowerItemData, jsonTranslation?: object): CritterPowerItemData {
+        item.name = jsonData.name._TEXT;
 
-        item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
+        item.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 
-        const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
+        const category = jsonData.category._TEXT.toLowerCase();
         item.system.category = (category.includes("infected") ? "infected" : category) as CritterPowerCategory;
 
-        let duration = ImportHelper.StringValue(jsonData, 'duration');
+        let duration = jsonData.duration._TEXT;
         if (duration === 'Always') {
             item.system.duration = 'always';
         } else if (duration === 'Instant') {
@@ -22,10 +24,10 @@ export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData>
         } else if (duration === 'Permanent') {
             item.system.duration = 'permanent';
         } else {
-              item.system.duration = 'special';
+            item.system.duration = 'special';
         }
 
-        let range = ImportHelper.StringValue(jsonData, 'range');
+        let range = jsonData.range._TEXT;
         if (range === 'T') {
             item.system.range = 'touch';
         } else if (range === 'LOS') {
@@ -35,10 +37,10 @@ export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData>
         } else if (range === 'Self') {
            item.system.range = 'self';
         } else {
-          item.system.range = 'special';
+            item.system.range = 'special';
         }
 
-        let type = ImportHelper.StringValue(jsonData, 'type');
+        let type = jsonData.type._TEXT;
         if (type === 'P') {
             item.system.powerType = 'physical';
         } else if (type === 'M') {
@@ -46,10 +48,13 @@ export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData>
         }
 
         if (jsonTranslation) {
-            const origName = ImportHelper.StringValue(jsonData, 'name');
-            item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-            item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+            const origName = item.name;
+            item.name = IH.MapNameToTranslation(jsonTranslation, origName);
+            item.system.description.source = `${jsonData.source._TEXT} ${IH.MapNameToPageSource(jsonTranslation, origName)}`;
         }
+
+        if (jsonData.bonus)
+            BH.addBonus(item, jsonData.bonus);
 
         return item;
     }

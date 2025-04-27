@@ -89,13 +89,8 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             actor.folder = folders[category]?.id;
 
-            // actor.system.track.physical.base;
-            // actor.system.modifiers.physical_track;
-
-            if (category === 'dracoforms') {
-                actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
-                if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
-            }
+            actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
+            if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
 
             actor.name = IH.MapNameToTranslation(this.itemTranslations, actor.name);
 

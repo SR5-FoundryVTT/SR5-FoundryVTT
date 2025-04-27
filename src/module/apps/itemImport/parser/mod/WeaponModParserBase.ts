@@ -1,20 +1,21 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import MountType = Shadowrun.MountType;
 import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
+import { Accessory } from '../../schema/WeaponsSchema';
 import ModificationItemData = Shadowrun.ModificationItemData;
 
 export class WeaponModParserBase extends TechnologyItemParserBase<ModificationItemData> {
-    override Parse(jsonData: object, item: ModificationItemData): ModificationItemData {
+    override Parse(jsonData: Accessory, item: ModificationItemData): ModificationItemData {
         item = super.Parse(jsonData, item);
 
         item.system.type = 'weapon';
 
-        item.system.mount_point = ImportHelper.StringValue(jsonData, 'mount')?.toLowerCase() as MountType;
+        item.system.mount_point = jsonData.mount._TEXT?.toLowerCase() as MountType;
 
-        item.system.rc = ImportHelper.IntValue(jsonData, 'rc', 0);
-        item.system.accuracy = ImportHelper.IntValue(jsonData, 'accuracy', 0);
+        item.system.rc = +(jsonData.rc?._TEXT ?? 0);
+        item.system.accuracy = +(jsonData.accuracy?._TEXT ?? 0);
 
-        item.system.technology.conceal.base = ImportHelper.IntValue(jsonData, 'conceal', 0);
+        item.system.technology.conceal.base = +(jsonData.conceal?._TEXT ?? 0);
 
         return item;
     }

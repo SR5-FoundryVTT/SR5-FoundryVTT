@@ -1,20 +1,22 @@
-import { ImportHelper } from '../../helper/ImportHelper';
+import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { ItemParserBase } from '../item/ItemParserBase';
+import { Complexform } from '../../schema/ComplexformsSchema';
+import { BonusHelper as BH } from '../../helper/BonusHelper';
 import ComplexFormTarget = Shadowrun.ComplexFormTarget;
 import ComplexFormItemData = Shadowrun.ComplexFormItemData;
 
 export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
-    override Parse(jsonData: object, item: ComplexFormItemData, jsonTranslation?: object): ComplexFormItemData {
-        item.name = ImportHelper.StringValue(jsonData, 'name');
+    override Parse(jsonData: Complexform, item: ComplexFormItemData, jsonTranslation?: object): ComplexFormItemData {
+        item.name = jsonData.name._TEXT;
 
-        item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
+        item.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 
-        let fade = ImportHelper.StringValue(jsonData, 'fv');
+        let fade = jsonData.fv._TEXT;
         if (fade.includes('+') || fade.includes('-')) {
             item.system.fade = parseInt(fade.substring(1, fade.length));
         }
 
-        let duration = ImportHelper.StringValue(jsonData, 'duration');
+        let duration = jsonData.duration._TEXT;
         if (duration === 'I') {
             item.system.duration = 'instant';
         } else if (duration === 'S') {
@@ -23,7 +25,7 @@ export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
             item.system.duration = 'permanent';
         }
 
-        let target = ImportHelper.StringValue(jsonData, 'target');
+        let target = jsonData.target._TEXT;
         switch (target) {
             case 'Device':
             case 'File':
@@ -38,10 +40,13 @@ export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
                 break;
         }
 
+        if (jsonData.bonus)
+            BH.addBonus(item, jsonData.bonus);
+
         if (jsonTranslation) {
-            const origName = ImportHelper.StringValue(jsonData, 'name');
-            item.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-            item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+            const origName = jsonData.name._TEXT;
+            item.name = IH.MapNameToTranslation(jsonTranslation, origName);
+            item.system.description.source = `${jsonData.source._TEXT} ${IH.MapNameToPageSource(jsonTranslation, origName)}`;
         }
 
         return item;

@@ -1273,7 +1273,11 @@ export const SR5 = {
             'transgenics': ''
         },
         character: {
-            'dracoforms': 'critter/dracoforms'
+            'dracoforms': 'critter/dracoforms',
+            'extraplanar-travelers': 'critter/extraplanar-travelers',
+            'infected': 'critter/infected',
+            'mundane-critters': 'critter/mundane-critters',
+            'mutant-critters': 'critter/mutant-critters',
         },
         complex_form: {},
         contact: {},

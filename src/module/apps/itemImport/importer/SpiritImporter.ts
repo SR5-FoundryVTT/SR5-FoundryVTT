@@ -41,9 +41,7 @@ export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shad
     async Parse(chummerData: MetatypeSchema, setIcons: boolean): Promise<StoredDocument<SR5Actor>[]> {
         const actors: Shadowrun.SpiritActorData[] = [];
 
-        
         const baseMetatypes = chummerData.metatypes.metatype;
-
         const metavariants = baseMetatypes.flatMap(metatype => {
             const parentName = metatype.name._TEXT;
             if (!metatype.metavariants) return [];

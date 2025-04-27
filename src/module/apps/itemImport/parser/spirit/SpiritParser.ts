@@ -193,8 +193,6 @@ export class SpiritParser extends ActorParserBase<SpiritActorData> {
         ]
 
         if (jsonData.qualities) {
-            console.log("quality", spirit.name);
-
             //@ts-expect-error
             spirit.items.concat([
                 ...this.getItems(jsonData.qualities?.positive?.quality, ['quality'], {type: 'Quality', critter: spirit.name}, jsonTranslation),

@@ -2,6 +2,7 @@ import { DataImporter } from "./DataImporter";
 import { ImportHelper } from "../helper/ImportHelper";
 import { Constants } from "./Constants";
 import { UpdateActionFlow } from "../../../item/flows/UpdateActionFlow";
+import { BonusHelper as BH } from "../helper/BonusHelper";
 
 export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData, Shadowrun.EquipmentData> {
     files = ['gear.xml'];
@@ -69,6 +70,8 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             item.system.technology.rating = ImportHelper.IntValue(equipment, 'rating', 0);
             item.system.technology.availability = ImportHelper.StringValue(equipment, 'avail');
             item.system.technology.cost = ImportHelper.IntValue(equipment, 'cost', 0);
+
+            if (equipment.bonus) BH.addBonus(item, equipment.bonus);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

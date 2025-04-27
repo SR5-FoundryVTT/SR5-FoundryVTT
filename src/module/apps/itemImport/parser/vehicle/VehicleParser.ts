@@ -3,6 +3,7 @@ import { ActorParserBase } from '../item/ActorParserBase';
 import { getArray } from "../../../importer/actorImport/itemImporter/importHelper/BaseParserFunctions.js";
 import { DataDefaults } from '../../../../data/DataDefaults';
 import VehicleActorData = Shadowrun.VehicleActorData;
+import { Vehicle } from '../../schema/VehiclesSchema';
 import { SR5 } from '../../../../config';
 
 export class VehicleParser extends ActorParserBase<VehicleActorData> {
@@ -39,7 +40,7 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
         return itemJson;
     }
 
-    private getMods(jsonData: object, jsonTranslation?: object | undefined) : any {
+    private getMods(jsonData: Vehicle, jsonTranslation?: object | undefined) : any {
         const modsData = (ImportHelper.ObjectValue(jsonData, 'mods') as { name: any[] })?.name;
 
         const modArray = getArray(modsData).map((item: { _TEXT: any; name: { _TEXT: any; }; $: { select: string } }) => {
@@ -62,7 +63,7 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
         return modArray;
     }
 
-    private getGears(jsonData: object, jsonTranslation?: object | undefined) : any {
+    private getGears(jsonData: Vehicle, jsonTranslation?: object | undefined) : any {
         const gearsData = (ImportHelper.ObjectValue(jsonData, 'gears') as { gear: any[] })?.gear;
 
         const gearArray = getArray(gearsData).map((item: any) => { return this.createMod(item, jsonTranslation); });
@@ -70,7 +71,7 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
         return gearArray;
     }
 
-    private getWeapons(jsonData: object, jsonTranslation?: object | undefined) : any {
+    private getWeapons(jsonData: Vehicle, jsonTranslation?: object | undefined) : any {
         const weaponsData = (ImportHelper.ObjectValue(jsonData, 'weapons') as { weapon: any[] })?.weapon;
 
         const weaponArray = getArray(weaponsData).map((item: { _TEXT: any; name: { _TEXT: any; }; }) => {
@@ -89,7 +90,7 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
         return weaponArray;
     }
     
-    override Parse(jsonData: object, actor: VehicleActorData, jsonTranslation?: object | undefined): VehicleActorData {
+    override Parse(jsonData: Vehicle, actor: VehicleActorData, jsonTranslation?: object | undefined): VehicleActorData {
         actor.name = ImportHelper.StringValue(jsonData, 'name');
         actor.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
 
@@ -98,8 +99,8 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
             return { base, offRoad: offRoad ?? base };
         }
 
-        const handlingValues = parseSeparatedValues(ImportHelper.StringValue(jsonData, 'handling'));
-        const speedValues = parseSeparatedValues(ImportHelper.StringValue(jsonData, 'speed'));
+        const handlingValues = parseSeparatedValues(jsonData.handling._TEXT);
+        const speedValues = parseSeparatedValues(jsonData.speed._TEXT);
 
         actor.system.vehicle_stats.pilot.base = +ImportHelper.StringValue(jsonData, 'pilot') || 0;
         actor.system.vehicle_stats.handling.base = handlingValues.base;
