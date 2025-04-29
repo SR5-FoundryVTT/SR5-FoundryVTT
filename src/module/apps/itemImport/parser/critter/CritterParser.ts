@@ -1,4 +1,4 @@
-import { ImportHelper as IH, TypeAtPath, TypeAtPaths } from '../../helper/ImportHelper';
+import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 import { ActorParserBase } from '../item/ActorParserBase';
 // import { getArray } from '../../../importer/actorImport/itemImporter/importHelper/BaseParserFunctions.js';
 import { DataDefaults } from '../../../../data/DataDefaults';
@@ -39,8 +39,8 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
     }
 
     private getItems(
-        array: OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }> | undefined,
-        searchType: string[],
+        array: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }>,
+        searchType: Parameters<typeof IH.findItem>[1],
         msg_field: {type: string; critter: string},
         jsonTranslation?: object
     ): object[] {
@@ -53,9 +53,7 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
                 else if (name === 'Regenerate') name = 'Regeneration';
 
                 const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-                const foundItem = IH.findItem((item) => {
-                    return !!item?.name && searchType.includes(item.type) && item.name === translatedName;
-                });
+                const foundItem = IH.findItem(translatedName, searchType);
 
                 if (!foundItem) {
                     console.log(
@@ -83,8 +81,32 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
             .filter((item): item is NonNullable<typeof item> => !!item);
     }
 
+    private getOptionalPowers(
+        array: NotEmpty<Metatype['optionalpowers']>['optionalpower' | 'power'],
+        critterName: string,
+        jsonTranslation?: object
+    ): object[] {
+        return IH.getArray(array)
+            .map((item) => {
+                let name = item._TEXT;
+                const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
+
+                const foundPower = IH.findItem(translatedName, 'critter_power');
+
+                if (!foundPower) {
+                    console.log(
+                        `[Optional Power Missing]\nCritter: ${critterName}\nSpell: ${name}`
+                    );
+                    return null;
+                }
+
+                return foundPower.toObject();
+            })
+            .filter((item): item is NonNullable<typeof item> => !!item);
+    }
+
     private getSpells(
-        array: TypeAtPath<Metatype, "powers.power">,
+        array: NotEmpty<Metatype['powers']>['power'],
         critterName: string,
         jsonTranslation?: object
     ): object[] {
@@ -95,10 +117,7 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
                 if (name === 'Innate Spell' && item.$?.select) {
                     let spellName = item.$.select;
                     const translatedName = IH.MapNameToTranslation(jsonTranslation, spellName);
-
-                    const foundSpell = IH.findItem((item) => {
-                        return !!item?.name && item.type === "spell" && item.name === translatedName;
-                    });
+                    const foundSpell = IH.findItem(translatedName, 'spell');
 
                     if (!foundSpell) {
                         console.log(
@@ -196,12 +215,12 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
 
         if (jsonData.run) {
             const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => +v || 0);
-            actor.system.movement.run = { value, mult, base } as TypeAtPath<Shadowrun.Movement, "run">;
+            actor.system.movement.run = { value, mult, base } as Shadowrun.Movement['run'];
         }
 
         if (jsonData.walk) {
             const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => +v || 0);
-            actor.system.movement.walk = { value, mult, base } as TypeAtPath<Shadowrun.Movement, "walk">;
+            actor.system.movement.walk = { value, mult, base } as Shadowrun.Movement['walk'];
         }
         actor.system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
@@ -209,7 +228,7 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
         //@ts-expect-error
         actor.items = [
             ...this.getItems(jsonData.biowares?.bioware, ['bioware'], {type: 'Bioware', critter: actor.name}, jsonTranslation),
-            ...this.getItems(jsonData.powers?.power, ['power', 'critter_power', 'sprite_power'], {type: 'Power', critter: actor.name}, jsonTranslation),
+            ...this.getItems(jsonData.powers?.power, ['critter_power', 'sprite_power'], {type: 'Power', critter: actor.name}, jsonTranslation),
             ...this.getItems(jsonData.complexforms?.complexform, ['complex_form'], {type: 'Complex Form', critter: actor.name}, jsonTranslation),
         ]
         
@@ -225,6 +244,13 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
             //@ts-expect-error
             actor.items = actor.items.concat([
                 ...this.getSpells(jsonData.powers.power, actor.name, jsonTranslation),
+            ]);
+        }
+        
+        if (jsonData.optionalpowers) {
+            //@ts-expect-error
+            actor.items = actor.items.concat([
+                
             ]);
         }
 

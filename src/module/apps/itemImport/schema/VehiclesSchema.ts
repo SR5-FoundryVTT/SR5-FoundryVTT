@@ -54,7 +54,7 @@ export interface Vehicle {
     handling: { _TEXT: string; };
     hide?: Empty;
     id: { _TEXT: string; };
-    mods?: OneOrMany<Empty | {
+    mods?: Empty | {
         addslots?: { _TEXT: string; };
         mod?: Many<{
             name: { _TEXT: string; };
@@ -65,7 +65,7 @@ export interface Vehicle {
             };
         }>;
         name?: OneOrMany<{ _TEXT: string; $?: { cost?: string; rating?: string; select?: string; }; }>;
-    }>;
+    };
     modslots?: { _TEXT: string; };
     name: { _TEXT: string; };
     page: { _TEXT: string; };

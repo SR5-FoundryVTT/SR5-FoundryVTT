@@ -3,6 +3,7 @@ import { XMLStrategy } from './XMLStrategy';
 import { JSONStrategy } from './JSONStrategy';
 import { ImportStrategy } from './ImportStrategy';
 import { SR5Item } from "../../../item/SR5Item";
+import { BaseItem } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents.mjs';
 import FolderTypes = foundry.CONST.FOLDER_DOCUMENT_TYPES;
 
 export enum ImportMode {
@@ -14,29 +15,8 @@ export enum LookupMode {
     Actor = 1,
 }
 
-/** 
- * Drill into `T` by a dot-string `P`, returning `never` if the path doesn’t exist,
- * and `| undefined` only if an intermediate property was itself optional.
- */
-export type TypeAtPath<T, P extends string> =
-    P extends `${infer Head}.${infer Tail}`
-        ? Head extends keyof T
-            ? TypeAtPath<NonNullable<T[Head]>, Tail> | undefined
-            : never
-        : P extends keyof T
-            ? T[P]
-            : never;
-
-/**
- * Union together the results of a bunch of paths, removing any `never` branches.
- * (You can wrap it in `NonNullable<…>` if you also want to strip `undefined`.)
- */
-export type TypeAtPaths<T, P extends readonly string[]> =
-    P[number] extends infer K
-        ? K extends string
-            ? TypeAtPath<T, K>
-            : never
-        : never;
+export type OneOrMany<T> = T | T[];
+export type NotEmpty<T> = T extends object ? NonNullable<T> : never;
 
 /**
  * Extracts the element type from an array (or returns never unchanged if not an array).
@@ -158,14 +138,10 @@ export class ImportHelper {
         return ImportHelper.s_Strategy.objectValue(jsonData, key, fallback);
     }
 
-    public static findItem(nameOrCmp: string | ItemComparer): SR5Item {
-        let result: any | null;
-        if (typeof nameOrCmp === 'string') {
-            result = game.items?.find((item) => item.name == nameOrCmp);
-        } else {
-            result = game.items?.find(nameOrCmp);
-        }
-        return result;
+    public static findItem(name: string, types?: OneOrMany<BaseItem['data']['type']>): SR5Item | undefined {
+        return game.items?.find(item => 
+            item.name === name && (!types || (this.getArray(types).includes(item.type)))
+        );
     }
 
     public static TranslateCategory(name, jsonCategoryTranslations?) {

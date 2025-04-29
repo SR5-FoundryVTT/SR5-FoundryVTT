@@ -1,4 +1,4 @@
-import { ImportHelper as IH, TypeAtPath, TypeAtPaths } from '../../helper/ImportHelper';
+import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 import { ActorParserBase } from '../item/ActorParserBase';
 // import { getArray } from '../../../importer/actorImport/itemImporter/importHelper/BaseParserFunctions.js';
 import { DataDefaults } from '../../../../data/DataDefaults';
@@ -41,15 +41,8 @@ export class SpiritParser extends ActorParserBase<SpiritActorData> {
     }
 
     private getItems(
-        array: TypeAtPaths<
-            Metatype,
-            [
-                "powers.power",
-                "qualities.positive.quality",
-                "qualities.negative.quality",
-            ]
-        >,
-        searchType: string[],
+        array: undefined | NotEmpty<Metatype['powers']>['power'] | NotEmpty<NotEmpty<Metatype['qualities']>['positive']>['quality'],
+        searchType: Parameters<typeof IH.findItem>[1],
         msg_field: {type: string; critter: string},
         jsonTranslation?: object
     ): object[] {
@@ -64,9 +57,7 @@ export class SpiritParser extends ActorParserBase<SpiritActorData> {
                 else if (name === 'Regenerate') name = 'Regeneration';
 
                 const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-                const foundItem = IH.findItem((item) => {
-                    return !!item?.name && searchType.includes(item.type) && item.name === translatedName;
-                });
+                const foundItem = IH.findItem(translatedName, searchType);
 
                 if (!foundItem) {
                     console.log(
@@ -96,12 +87,10 @@ export class SpiritParser extends ActorParserBase<SpiritActorData> {
     }
 
     private getSpells(
-        array: TypeAtPath<Metatype, "powers.power">,
+        array: undefined | NotEmpty<Metatype['powers']>['power'],
         critterName: string,
         jsonTranslation?: object
     ): object[] {
-        if (!array) return [];
-
         return IH.getArray(array)
             .map((item) => {
                 let name = item._TEXT;
@@ -110,9 +99,7 @@ export class SpiritParser extends ActorParserBase<SpiritActorData> {
                     let spellName = item.$.select;
                     const translatedName = IH.MapNameToTranslation(jsonTranslation, spellName);
 
-                    const foundSpell = IH.findItem((item) => {
-                        return !!item?.name && item.type === "spell" && item.name === translatedName;
-                    });
+                    const foundSpell = IH.findItem(translatedName, 'spell');
 
                     if (!foundSpell) {
                         console.log(
@@ -177,19 +164,19 @@ export class SpiritParser extends ActorParserBase<SpiritActorData> {
 
         if (jsonData.run) {
             const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => +v || 0);
-            spirit.system.movement.run = { value, mult, base } as TypeAtPath<Shadowrun.Movement, "run">;
+            spirit.system.movement.run = { value, mult, base } as Shadowrun.Movement['run'];
         }
 
         if (jsonData.walk) {
             const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => +v || 0);
-            spirit.system.movement.walk = { value, mult, base } as TypeAtPath<Shadowrun.Movement, "walk">;
+            spirit.system.movement.walk = { value, mult, base } as Shadowrun.Movement['walk'];
         }
         spirit.system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
         //TODO optionalpowers
         //@ts-expect-error
         spirit.items = [
-            ...this.getItems(jsonData.powers?.power, ['power', 'critter_power', 'sprite_power'], {type: 'Power', critter: spirit.name}, jsonTranslation),
+            ...this.getItems(jsonData.powers?.power, ['critter_power', 'sprite_power'], {type: 'Power', critter: spirit.name}, jsonTranslation),
         ]
 
         if (jsonData.qualities) {

@@ -1,6 +1,7 @@
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
 import { SR5ActiveEffect } from '../../../effect/SR5ActiveEffect'
+import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
@@ -9,6 +10,7 @@ import EffectTagsData = Shadowrun.EffectTagsData;
 import EffectChangeData = Shadowrun.EffectChangeData;
 import EffectOptionsData = Shadowrun.EffectOptionsData;
 import EffectDurationData = Shadowrun.EffectDurationData;
+import { SR5Item } from "../../../item/SR5Item";
 
 type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: number; }
 
@@ -21,7 +23,12 @@ const {
     OVERRIDE,
 } = CONST.ACTIVE_EFFECT_MODES;
 
-type ShadowrunSheetData = (ShadowrunItemData | ShadowrunActorData) & { effects?: EffectOptionsData[] };
+type ShadowrunSheetData = (
+    ShadowrunItemData | ShadowrunActorData
+) & {
+    effects?: EffectOptionsData[];
+    flags?: { shadowrun5e: { embeddedItems: ItemDataSource[] } };
+};
 
 export class BonusHelper {
     private static cnt1 : number = 0;
@@ -29,10 +36,23 @@ export class BonusHelper {
 
     private static isTrue(value: { _TEXT: string }): boolean { return value._TEXT === "True"; }
 
-    private static normalizeValue(value: string | number): string | number {
+    private static normalizeValue(sheet: any, value: string | number): string | number {
         if (typeof value === 'number')
             return value;
-        return value.replace("Rating", "(@system.rating)");
+
+        if (value.includes("Rating")) {
+            let path = "";
+
+            if ('rating' in sheet.system) path = "(@system.rating)";
+            else if ('rating' in sheet.system?.technology) path = "(@system.technology.rating)"
+
+            if (!path)
+                console.log("Didn't find rating on Item: " + sheet.name);
+
+            value = value.replace("Rating", path);
+        }
+
+        return value;
     }
 
     private static normalizeSkillName(rawName: string): string {
@@ -63,21 +83,23 @@ export class BonusHelper {
     }
 
     private static createEffect(
-        overrides: EffectOptionsData,
+        sheet: ShadowrunSheetData,
+        overrides: Partial<EffectOptionsData>,
         changes: EffectChangeParameter[],
         flags?: Partial<EffectTagsData>
-    ): EffectOptionsData {
+    ): void {
         const defaultEffect = {
-            name: "Unnamed Effect",
+            name: sheet.name,
+            img: sheet.img,
             transfer: true,
         };
 
-        const merged = {
+        const effect = {
             ...defaultEffect,
             ...overrides,
             changes: (changes ?? []).map(change  => ({
                 key: change.key,
-                value: this.normalizeValue(change.value),
+                value: this.normalizeValue(sheet, change.value),
                 mode: change.mode ?? CUSTOM,
                 priority: change.priority ?? change.mode ?? 0
             })),
@@ -91,18 +113,22 @@ export class BonusHelper {
             }),
         };
 
-        return merged;
+        sheet.effects?.push(effect);
     }
 
     public static addBonus(sheet: ShadowrunSheetData, bonus: BonusSchema) : void {
-        sheet.effects = [];
+        this.addEffects(sheet, bonus);
+        this.addItems(sheet, bonus);
+    }
+
+    private static addEffects(sheet: ShadowrunSheetData, bonus: BonusSchema) : void {
+        sheet.effects ??= [];
 
         if (bonus.armor) {
-            const armor = bonus.armor._TEXT;
-            sheet.effects.push(this.createEffect(
-                { name: "Add Armor", img: sheet.img },
-                [{ key: "system.armor.mod", value: armor, mode:0, priority:0 }],
-            ));
+            this.createEffect(
+                sheet, { name: "Add Armor" },
+                [{ key: "system.armor.mod", value: bonus.armor._TEXT }],
+            );
         }
 
         // TODO - threshold, sharedthresholdoffset, thresholdoffset
@@ -110,39 +136,39 @@ export class BonusHelper {
             const cm  = bonus.conditionmonitor;
 
             if (cm.overflow) {
-                sheet.effects.push(this.createEffect(
-                    { name: "Override Physical Overflow Track", img: sheet.img },
+                this.createEffect(
+                    sheet, { name: "Override Physical Overflow Track"},
                     [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, mode: OVERRIDE }],
-                ));
+                );
             }
 
             if (cm.physical) {
-                sheet.effects.push(this.createEffect(
-                    { name: "Override Physical Track", img: sheet.img },
+                this.createEffect(
+                    sheet, { name: "Override Physical Track" },
                     [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, mode: OVERRIDE }],
-                ));
+                );
             }
 
             if (cm.stun) {
-                sheet.effects.push(this.createEffect(
-                    { name: "Override Stun Track", img: sheet.img },
+                this.createEffect(
+                    sheet, { name: "Override Stun Track" },
                     [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: OVERRIDE }],
-                ));
+                );
             }
         }
 
         if (bonus.initiative) {
-            sheet.effects.push(this.createEffect(
-                { name: "Increase Initiative", img: sheet.img },
+            this.createEffect(
+                sheet, { name: "Increase Initiative" },
                 [{ key: "system.modifiers.initiative_dice", value: bonus.initiative._TEXT }]
-            ));
+            );
         }
 
         if (bonus.initiativedice) {
-            sheet.effects.push(this.createEffect(
-                { name: "Increase Initiative Dice", img: sheet.img },
+            this.createEffect(
+                sheet, { name: "Increase Initiative Dice" },
                 [{ key: "system.modifiers.initiative_dice", value: bonus.initiativedice._TEXT }]
-            ));
+            );
         }
 
         if (bonus.limitmodifier) {
@@ -151,28 +177,28 @@ export class BonusHelper {
                 const normalName = name.replace(' ', "_").toLowerCase();
                 const conditionTag = limitModifier.condition ? "*" : "";
 
-                sheet.effects.push(this.createEffect(
-                    { name: sheet.name + conditionTag, img: sheet.img },
+                this.createEffect(
+                    sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.limit.mod", value: limitModifier.value._TEXT }],
                     { applyTo: 'test_all', selection_limits: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`} 
-                ));
+                );
             }
         }
         
         if (bonus.matrixinitiative) {
-            sheet.effects.push(this.createEffect(
-                { name: "Increase Matrix Initiative", img: sheet.img },
+            this.createEffect(
+                sheet, { name: "Increase Matrix Initiative" },
                 [{ key: "system.modifiers.matrix_initiative", value: bonus.matrixinitiative._TEXT }]
-            ));
+            );
         }
 
         //TODO if (bonus.matrixinitiativedice)
         
         if (bonus.matrixinitiativediceadd) {
-            sheet.effects.push(this.createEffect(
-                { name: "Increase Matrix Initiative Dice", img: sheet.img },
+            this.createEffect(
+                sheet, { name: "Increase Matrix Initiative Dice" },
                 [{ key: "system.modifiers.matrix_initiative_dice", value: bonus.matrixinitiativediceadd._TEXT }]
-            ));
+            );
         }
 
         //TODO <critterpowerlevels>. Quite tricky. Needs other power that was not initialized
@@ -190,11 +216,11 @@ export class BonusHelper {
                 const name = attributeTable[skill.name._TEXT];
                 const conditionTag = skill.condition ? "*" : "";
 
-                sheet.effects.push(this.createEffect(
-                    { name: sheet.name + conditionTag, img: sheet.img },
+                this.createEffect(
+                    sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
                     { applyTo: 'test_all', selection_attributes: `[{\"value\":\"${name.capitalize()}\",\"id\":\"${name}\"}]`}
-                ));
+                );
             }
         }
 
@@ -229,14 +255,11 @@ export class BonusHelper {
                 if (!skills || !skills.length)
                     console.log("Error skillgroup: ", skillCategory.name._TEXT);
 
-                sheet.effects.push(this.createEffect(
-                    { name: sheet.name + conditionTag, img: sheet.img },
+                this.createEffect(
+                    sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.modifiers.mod", value: skillCategory.bonus._TEXT }],
-                    {
-                        applyTo: 'test_all',
-                        selection_skills: JSON.stringify(skills)
-                    }
-                ));
+                    { applyTo: 'test_all', selection_skills: JSON.stringify(skills) }
+                );
             }
         }
 
@@ -272,14 +295,11 @@ export class BonusHelper {
                 if (!skills || !skills.length)
                     console.log("Error skillgroup: ", skillGroup.name._TEXT);
 
-                sheet.effects.push(this.createEffect(
-                    { name: sheet.name + conditionTag, img: sheet.img },
+                this.createEffect(
+                    sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.modifiers.mod", value: skillGroup.bonus._TEXT }],
-                    {
-                        applyTo: 'test_all',
-                        selection_skills: JSON.stringify(skills)
-                    }
-                ));
+                    { applyTo: 'test_all', selection_skills: JSON.stringify(skills) }
+                );
             }
         }
 
@@ -290,20 +310,20 @@ export class BonusHelper {
                 const normalName = this.normalizeSkillName(name);
                 const conditionTag = skill.condition ? "*" : "";
 
-                sheet.effects.push(this.createEffect(
-                    { name: sheet.name + conditionTag, img: sheet.img },
+                this.createEffect(
+                    sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
                     { applyTo: 'test_all', selection_skills: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`}
-                ));
+                );
             }
         }
 
         if (bonus.spellresistance) {
-            sheet.effects.push(this.createEffect(
-                { name: sheet.name, img: sheet.img },
+            this.createEffect(
+                sheet, {},
                 [{ key: "data.modifiers.mod", value: bonus.spellresistance._TEXT }],
                 { applyTo: 'test_all', selection_tests: '[{"value":"Combat Spell Defense","id":"CombatSpellDefenseTest"}]' }
-            ));
+            );
         }
 
         if (sheet.effects.length) {
@@ -312,5 +332,68 @@ export class BonusHelper {
             this.cnt2 += sheet.effects.length;
             console.log(this.cnt1, this.cnt2);
         }
+    }
+
+    private static addItems(sheet: ShadowrunSheetData, bonus: BonusSchema) : void {
+        sheet.flags ??= { shadowrun5e: { embeddedItems: [] } };
+
+        if (bonus.addgear) {
+            const name = bonus.addgear.name._TEXT;
+            const foundItem = IH.findItem(name);
+    
+            if (foundItem) {
+                const itemBase = foundItem.toObject();
+
+                if (bonus.addgear.rating?._TEXT) {
+                    const rating = +bonus.addgear.rating._TEXT;
+
+                    if ('rating' in itemBase.system) {
+                        itemBase.system.rating = rating;
+                    } else if ('technology' in itemBase.system) {
+                        itemBase.system.technology.rating = rating;
+                    }
+                }
+
+                sheet.flags.shadowrun5e.embeddedItems.push(itemBase);
+            } else {
+                console.log(`[Gear Missing (Bonus)]\nSheet: ${sheet.name}\nMod: ${name}`);
+            }
+        }
+
+        if (bonus.addqualities) {
+            for (const quality of IH.getArray(bonus.addqualities.addquality)) {
+                const name = quality._TEXT;
+                
+                if (!name) continue;
+                const foundItem = IH.findItem(name);
+
+                if (!foundItem) {
+                    console.log(`[Quality Missing (Bonus)]\nSheet: ${sheet.name}\nMod: ${name}`);
+                    continue;
+                }
+
+                const itemBase = foundItem.toObject();
+
+                if (quality.$?.select)
+                    itemBase.name += ` (${quality.$.select})`
+    
+                if (quality.$?.rating && 'rating' in itemBase.system)
+                    itemBase.system.rating = +quality.$?.rating;
+
+                sheet.flags.shadowrun5e.embeddedItems.push(itemBase);
+            }
+        }
+
+        if (bonus.addspell) {
+            const name = bonus.addspell._TEXT;
+            const foundItem = IH.findItem(name);
+    
+            if (foundItem) {
+                sheet.flags.shadowrun5e.embeddedItems.push(foundItem.toObject());
+            } else {
+                console.log(`[Spell Missing (Bonus)]\nSheet: ${sheet.name}\nMod: ${name}`);
+            }
+        }
+
     }
 }

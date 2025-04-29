@@ -1,10 +1,12 @@
-import { ImportHelper } from '../../helper/ImportHelper';
+import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 import { ActorParserBase } from '../item/ActorParserBase';
 import { getArray } from "../../../importer/actorImport/itemImporter/importHelper/BaseParserFunctions.js";
 import { DataDefaults } from '../../../../data/DataDefaults';
 import VehicleActorData = Shadowrun.VehicleActorData;
 import { Vehicle } from '../../schema/VehiclesSchema';
 import { SR5 } from '../../../../config';
+import { SR5Item } from '../../../../item/SR5Item';
+import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
 export class VehicleParser extends ActorParserBase<VehicleActorData> {
 
@@ -25,14 +27,14 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
         return flags;
     }
 
-    private createMod(item : any, jsonTranslation?: object | undefined) : any {
+    private createMod(item : any, jsonTranslation?: object) : any {
         const itemJson = DataDefaults.baseEntityData<Shadowrun.ModificationItemData, Shadowrun.ModificationData>(
             "Item", { type: "modification" }
         );
 
         const name = item._TEXT ?? item.name?._TEXT;
 
-        itemJson.name = ImportHelper.MapNameToTranslation(jsonTranslation, name)
+        itemJson.name = IH.MapNameToTranslation(jsonTranslation, name)
         itemJson.system.technology.rating = item.rating?._TEXT ?? item.$?.rating;
 
         itemJson.system.importFlags = this.genImportFlags(name, "modification", this.formatAsSlug("gear"));
@@ -40,59 +42,77 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
         return itemJson;
     }
 
-    private getMods(jsonData: Vehicle, jsonTranslation?: object | undefined) : any {
-        const modsData = (ImportHelper.ObjectValue(jsonData, 'mods') as { name: any[] })?.name;
+    private getMods(modsData: Vehicle['mods'], vehicleName: string, jsonTranslation?: object) : object[] {
+        if (!modsData) return [];
 
-        const modArray = getArray(modsData).map((item: { _TEXT: any; name: { _TEXT: any; }; $: { select: string } }) => {
-            let itemName = item._TEXT ?? item.name?._TEXT;
+        const mods = IH.getArray(modsData.mod).map(item => {
+            let itemName = item.name._TEXT;
 
-            if (itemName === "Special Equipment" && item?.$?.select)
-                itemName = item.$.select;
-
-            const translatedName = ImportHelper.MapNameToTranslation(jsonTranslation, itemName);
-            const foundItem = ImportHelper.findItem(translatedName);
-
-            if (foundItem)
-                return foundItem.toObject();
-            
-            console.log(`Vehicle Mod ${itemName} not found on vehicle ${ImportHelper.StringValue(jsonData, 'name')}.`);
-
-            return this.createMod(item, jsonTranslation);
-        });
-
-        return modArray;
-    }
-
-    private getGears(jsonData: Vehicle, jsonTranslation?: object | undefined) : any {
-        const gearsData = (ImportHelper.ObjectValue(jsonData, 'gears') as { gear: any[] })?.gear;
-
-        const gearArray = getArray(gearsData).map((item: any) => { return this.createMod(item, jsonTranslation); });
-
-        return gearArray;
-    }
-
-    private getWeapons(jsonData: Vehicle, jsonTranslation?: object | undefined) : any {
-        const weaponsData = (ImportHelper.ObjectValue(jsonData, 'weapons') as { weapon: any[] })?.weapon;
-
-        const weaponArray = getArray(weaponsData).map((item: { _TEXT: any; name: { _TEXT: any; }; }) => {
-            const itemName = item._TEXT ?? item.name?._TEXT;
-            const translatedName = ImportHelper.MapNameToTranslation(jsonTranslation, itemName);
-            const foundItem = ImportHelper.findItem(translatedName);
+            const translatedName = IH.MapNameToTranslation(jsonTranslation, itemName);
+            const foundItem = IH.findItem(translatedName);
 
             if (!foundItem) {
-                console.log(`Vehicle Weapon ${itemName} not found on vehicle ${ImportHelper.StringValue(jsonData, 'name')}.`);
+                console.log(`[Vehicle Mod Missing 1]\nVehicle: ${vehicleName}\nMod: ${itemName}`);
+                return this.createMod(item, jsonTranslation);
+            }
+
+            return foundItem.toObject();
+        });
+
+        const names = IH.getArray(modsData.name).map(item => {
+            let itemName = item._TEXT;
+
+            const translatedName = IH.MapNameToTranslation(jsonTranslation, itemName);
+            const foundItem = IH.findItem(translatedName);
+
+            if (!foundItem) {
+                console.log(`[Vehicle Mod Missing 2]\nVehicle: ${vehicleName}\nMod: ${itemName}`);
+                return this.createMod(item, jsonTranslation);
+            }
+
+            const itemBase = foundItem.toObject();
+
+            if (item.$?.select)
+                itemBase.name += `(${item.$.select})`;
+
+            if (item.$?.rating) {
+                const rating = +item.$.rating;
+
+                if ('rating' in itemBase.system) {
+                    itemBase.system.rating = rating;
+                } else if ('technology' in itemBase.system) {
+                    itemBase.system.technology.rating = rating;
+                }
+            }
+
+            return itemBase;
+        });
+
+        return [...names, ...mods];
+    }
+
+    private getGears(gearsData: undefined | NotEmpty<Vehicle['gears']>['gear'], jsonTranslation?: object) : any {
+        return IH.getArray(gearsData).map(item => { return this.createMod(item, jsonTranslation); });
+    }
+
+    private getWeapons(weapons: undefined | NotEmpty<Vehicle['weapons']>['weapon'], vehicleName: string, jsonTranslation?: object ) : ItemDataSource[] {
+        return IH.getArray(weapons).map(item => {
+            const itemName = item.name?._TEXT;
+            const translatedName = IH.MapNameToTranslation(jsonTranslation, itemName);
+            const foundItem = IH.findItem(translatedName);
+
+            if (!foundItem) {
+                console.log(`[Vehicle Weapon Missing]\nVehicle: ${vehicleName}\nWeapon: ${itemName}`);
                 return null;
             }
 
             return foundItem.toObject();
-        }).filter((item: object | null) => item !== null);
-
-        return weaponArray;
+        }).filter((item): item is ItemDataSource => item !== null);
     }
     
     override Parse(jsonData: Vehicle, actor: VehicleActorData, jsonTranslation?: object | undefined): VehicleActorData {
-        actor.name = ImportHelper.StringValue(jsonData, 'name');
-        actor.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
+        actor.name = jsonData.name._TEXT;
+        actor.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 
         function parseSeparatedValues(value: string): { base: number; offRoad: number } {
             const [base, offRoad] = value.split("/").map(v => +v || 0);
@@ -102,18 +122,18 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
         const handlingValues = parseSeparatedValues(jsonData.handling._TEXT);
         const speedValues = parseSeparatedValues(jsonData.speed._TEXT);
 
-        actor.system.vehicle_stats.pilot.base = +ImportHelper.StringValue(jsonData, 'pilot') || 0;
+        actor.system.vehicle_stats.pilot.base = +jsonData.pilot._TEXT;
         actor.system.vehicle_stats.handling.base = handlingValues.base;
         actor.system.vehicle_stats.off_road_handling.base = handlingValues.offRoad;
         actor.system.vehicle_stats.speed.base = speedValues.base;
         actor.system.vehicle_stats.off_road_speed.base = speedValues.offRoad;
-        actor.system.vehicle_stats.acceleration.base = +ImportHelper.StringValue(jsonData, 'accel') || 0;
-        actor.system.vehicle_stats.sensor.base = +ImportHelper.StringValue(jsonData, 'sensor') || 0;
-        actor.system.vehicle_stats.seats.base = +ImportHelper.StringValue(jsonData, 'seats', "0") || 0;
-        actor.system.armor.base = +ImportHelper.StringValue(jsonData, 'armor') || 0;
-        actor.system.isDrone = ImportHelper.StringValue(jsonData, 'category').includes("Drone") || false;
+        actor.system.vehicle_stats.acceleration.base = +jsonData.accel._TEXT;
+        actor.system.vehicle_stats.sensor.base = +jsonData.sensor._TEXT;
+        actor.system.vehicle_stats.seats.base = +(jsonData.seats?._TEXT ?? 0);
+        actor.system.armor.base = +jsonData.armor._TEXT;
+        actor.system.isDrone = jsonData.category._TEXT.includes("Drone") || false;
 
-        const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
+        const category = IH.StringValue(jsonData, 'category').toLowerCase();
         actor.system.vehicleType = /drone|hovercraft/.test(category) ? "exotic"    :
                                    /boats|submarines/.test(category) ? "water"     :
                                    category.includes('craft')        ? "air"       :
@@ -121,15 +141,15 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
 
         //@ts-expect-error
         actor.items = [
-            ... this.getMods(jsonData, jsonTranslation),
-            ... this.getGears(jsonData, jsonTranslation),
-            ... this.getWeapons(jsonData, jsonTranslation)
+            ... this.getMods(jsonData.mods, actor.name, jsonTranslation),
+            ... this.getGears(jsonData.gears?.gear, jsonTranslation),
+            ... this.getWeapons(jsonData.weapons?.weapon, actor.name, jsonTranslation)
         ];
 
         if (jsonTranslation) {
-            const origName = ImportHelper.StringValue(jsonData, 'name');
-            actor.name = ImportHelper.MapNameToTranslation(jsonTranslation, origName);
-            actor.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.MapNameToPageSource(jsonTranslation, origName)}`;
+            const origName = actor.name;
+            actor.name = IH.MapNameToTranslation(jsonTranslation, origName);
+            actor.system.description.source = `${jsonData.source._TEXT} ${IH.MapNameToPageSource(jsonTranslation, origName)}`;
         }
 
         return actor;

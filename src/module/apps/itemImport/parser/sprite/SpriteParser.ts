@@ -1,4 +1,4 @@
-import { ImportHelper as IH, TypeAtPath, TypeAtPaths } from '../../helper/ImportHelper';
+import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 import { ActorParserBase } from '../item/ActorParserBase';
 // import { getArray } from '../../../importer/actorImport/itemImporter/importHelper/BaseParserFunctions.js';
 import { DataDefaults } from '../../../../data/DataDefaults';
@@ -10,20 +10,16 @@ import { json } from 'stream/consumers';
 
 export class SpriteParser extends ActorParserBase<SpriteActorData> {
     private getPowers(
-        array: TypeAtPath<Metatype, "powers.power">,
+        array: undefined | NotEmpty<Metatype['powers']>['power'],
         spriteName: string,
         jsonTranslation?: object
     ): object[] {
-        if (!array) return [];
-
         return IH.getArray(array)
             .map((item) => {
                 let name = item._TEXT;
 
                 const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-                const foundItem = IH.findItem((item) => {
-                    return !!item?.name && item.type === 'sprite_power' && item.name === translatedName;
-                });
+                const foundItem = IH.findItem(translatedName, 'sprite_power');
 
                 if (!foundItem) {
                     console.log(
