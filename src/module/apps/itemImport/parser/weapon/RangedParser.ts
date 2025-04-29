@@ -2,15 +2,16 @@ import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
 import WeaponItemData = Shadowrun.WeaponItemData;
 import { DataDefaults } from '../../../../data/DataDefaults';
+import { Weapon } from '../../schema/WeaponsSchema';
 
 export class RangedParser extends WeaponParserBase {
-    protected GetAmmo(weaponJson: object) {
+    protected GetAmmo(weaponJson: Weapon) {
         let jsonAmmo = ImportHelper.StringValue(weaponJson, 'ammo');
         let match = jsonAmmo.match(/([0-9]+)/g)?.[0];
         return match !== undefined ? parseInt(match) : 0;
     }
 
-    override Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+    override Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         item = super.Parse(jsonData, item, jsonTranslation);
 
         // Some new weapons don't have any rc defined in XML.

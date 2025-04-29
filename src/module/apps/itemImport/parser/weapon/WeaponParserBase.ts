@@ -1,4 +1,4 @@
-import { ImportHelper } from '../../helper/ImportHelper';
+import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 import { Constants } from '../../importer/Constants';
 import WeaponCategory = Shadowrun.WeaponCategory;
 import SkillName = Shadowrun.SkillName;
@@ -11,50 +11,80 @@ import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 import DamageData = Shadowrun.DamageData;
 import { SR5 } from '../../../../config';
 import RangeData = Shadowrun.RangeData;
+import { Weapon } from '../../schema/WeaponsSchema';
+import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
 export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
-    private GetSkill(weaponJson: object): SkillName {
+    private GetAcessories(accessories: undefined | NotEmpty<Weapon['accessories']>['accessory'], weaponName: string, jsonTranslation?: object) : ItemDataSource[] {
+        const result: ItemDataSource[] = []
+
+        for (const accessory of IH.getArray(accessories)) {
+            let name = accessory.name._TEXT;
+
+            const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
+            const foundItem = IH.findItem(translatedName, 'modification');
+
+            if (!foundItem) {
+                console.log(
+                    `[Modification Missing]\nWeapon: ${weaponName}\nAccessory: ${name}`
+                );
+                continue;
+            }
+
+            let accessoryBase = foundItem.toObject() as Shadowrun.ModificationItemData;
+
+            accessoryBase.system.technology.equipped = true;
+            if (accessory.rating)
+                accessoryBase.system.technology.rating = +accessory.rating._TEXT;
+
+            result.push(accessoryBase as ItemDataSource);
+        }
+
+        return result;
+    }
+
+    private GetSkill(weaponJson: Weapon): SkillName {
         if (weaponJson.hasOwnProperty('useskill')) {
-            let jsonSkill = ImportHelper.StringValue(weaponJson, 'useskill');
+            let jsonSkill = IH.StringValue(weaponJson, 'useskill');
             if (Constants.MAP_CATEGORY_TO_SKILL.hasOwnProperty(jsonSkill)) {
                 return Constants.MAP_CATEGORY_TO_SKILL[jsonSkill];
             }
             return jsonSkill.replace(/[\s\-]/g, '_').toLowerCase();
         } else {
-            let category = ImportHelper.StringValue(weaponJson, 'category');
+            let category = IH.StringValue(weaponJson, 'category');
             if (Constants.MAP_CATEGORY_TO_SKILL.hasOwnProperty(category)) {
                 return Constants.MAP_CATEGORY_TO_SKILL[category];
             }
 
-            let type = ImportHelper.StringValue(weaponJson, 'type').toLowerCase();
+            let type = IH.StringValue(weaponJson, 'type').toLowerCase();
             return type === 'ranged' ? 'exotic_range' : 'exotic_melee';
         }
     }
 
     public static GetWeaponType(weaponJson: object): WeaponCategory {
-        let type = ImportHelper.StringValue(weaponJson, 'type');
+        let type = IH.StringValue(weaponJson, 'type');
         //melee is the least specific, all melee entries are accurate
         if (type === 'Melee') {
             return 'melee';
         } else {
             // skill takes priorities over category
             if (weaponJson.hasOwnProperty('useskill')) {
-                let skill = ImportHelper.StringValue(weaponJson, 'useskill');
+                let skill = IH.StringValue(weaponJson, 'useskill');
                 if (skill === 'Throwing Weapons') return 'thrown';
             }
 
             // category is the fallback
-            let category = ImportHelper.StringValue(weaponJson, 'category');
+            let category = IH.StringValue(weaponJson, 'category');
             if (category === 'Throwing Weapons') return 'thrown';
             // ranged is everything else
             return 'range';
         }
     }
 
-    public override Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+    public override Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         item = super.Parse(jsonData, item, jsonTranslation);
 
-        let category = ImportHelper.StringValue(jsonData, 'category');
+        let category = IH.StringValue(jsonData, 'category');
         // A single item does not meet normal rules, thanks Chummer!
         // TODO: Check these rules after localization using a generic, non-english approach.
         if (category === 'Hold-outs') {
@@ -65,18 +95,27 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
         item.system.subcategory = category.toLowerCase();
 
         item.system.action.skill = this.GetSkill(jsonData);
-        item.system.action.damage = this.GetDamage(jsonData);
+        item.system.action.damage = this.GetDamage(jsonData as any);
 
-        item.system.action.limit.value = ImportHelper.IntValue(jsonData, 'accuracy');
-        item.system.action.limit.base = ImportHelper.IntValue(jsonData, 'accuracy');
+        item.system.action.limit.value = IH.IntValue(jsonData, 'accuracy');
+        item.system.action.limit.base = IH.IntValue(jsonData, 'accuracy');
 
-        item.system.technology.conceal.base = ImportHelper.IntValue(jsonData, 'conceal');
+        item.system.technology.conceal.base = IH.IntValue(jsonData, 'conceal');
+
+        //@ts-expect-error
+        item.flags ??= {
+            shadowrun5e: {
+                embeddedItems: [
+                    ...this.GetAcessories(jsonData.accessories?.accessory, jsonData.name._TEXT, jsonTranslation),
+                ]
+            }
+        };
 
         return item;
     }
 
-    protected GetDamage(jsonData: object): DamageData {
-        const jsonDamage = ImportHelper.StringValue(jsonData, 'damage');
+    protected GetDamage(jsonData: Partial<Weapon>): DamageData {
+        const jsonDamage = IH.StringValue(jsonData, 'damage');
         // ex. 15S(e)
         const simpleDamage = /^([0-9]+)([PSM])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
         // ex. ({STR}+1)P(fire)
@@ -99,7 +138,7 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
             damageElement = this.parseDamageElement(strengthDamage[3]);
         }
 
-        const damageAp = ImportHelper.IntValue(jsonData, 'ap', 0);
+        const damageAp = IH.IntValue(jsonData, 'ap', 0);
 
         const partialDamageData: RecursivePartial<DamageData> = {
             type: {

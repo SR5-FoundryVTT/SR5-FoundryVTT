@@ -3,26 +3,6 @@
 import { Empty, Many, OneOrMany } from './Types';
 
 export interface ConditionsSchema {
-    OR?: {
-        AND?: {
-            OR: {
-                category: Many<{ _TEXT: string; }>;
-            };
-            useskill: { $: { NOT: string; operation: string; }; };
-        };
-        category?: Many<{ _TEXT: string; }>;
-        useskill?: Many<{ _TEXT: string; }>;
-        weapondetails?: {
-            AND: {
-                OR: {
-                    category: Many<{ _TEXT: string; }>;
-                };
-                useskill: { $: { NOT: string; operation: string; }; };
-            };
-            category: Many<{ _TEXT: string; }>;
-            useskill: { _TEXT: string; };
-        };
-    };
     allof?: {
         art?: OneOrMany<{ _TEXT: string; }>;
         attribute?: OneOrMany<{

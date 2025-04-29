@@ -37,7 +37,7 @@ export interface Accessory {
     name: { _TEXT: string; };
     page: { _TEXT: string; };
     rangemodifier?: { _TEXT: string; };
-    rating: OneOrMany<{ _TEXT: string; }>;
+    rating: { _TEXT: string; };
     rc?: { _TEXT: string; };
     rcdeployable?: { _TEXT: string; };
     rcgroup?: { _TEXT: string; };
@@ -58,7 +58,7 @@ export interface Weapon {
                 }>;
             };
             mount?: { _TEXT: string; };
-            name: OneOrMany<{ _TEXT: string; }>;
+            name: { _TEXT: string; };
             rating?: { _TEXT: string; };
         }>;
     };
@@ -75,7 +75,7 @@ export interface Weapon {
     ammo: { _TEXT: string; };
     ammocategory?: { _TEXT: string; };
     ammoslots?: { _TEXT: string; };
-    ap?: { _TEXT: string; };
+    ap: { _TEXT: string; };
     avail: { _TEXT: string; };
     category: { _TEXT: string; };
     conceal: { _TEXT: string; };
@@ -94,8 +94,8 @@ export interface Weapon {
     name: { _TEXT: string; };
     page: { _TEXT: string; };
     range?: { _TEXT: string; };
-    rc?: { _TEXT: string; };
-    reach?: { _TEXT: string; };
+    rc: { _TEXT: string; };
+    reach: { _TEXT: string; };
     requireammo?: { _TEXT: string; };
     required?: ConditionsSchema;
     shortburst?: { _TEXT: string; };

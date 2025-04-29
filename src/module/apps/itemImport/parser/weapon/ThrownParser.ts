@@ -3,9 +3,10 @@ import { WeaponParserBase } from './WeaponParserBase';
 import BlastData = Shadowrun.BlastData;
 import WeaponItemData = Shadowrun.WeaponItemData;
 import { DataDefaults } from '../../../../data/DataDefaults';
+import { Weapon } from '../../schema/WeaponsSchema';
 
 export class ThrownParser extends WeaponParserBase {
-    public GetBlast(jsonData: object, item: WeaponItemData): BlastData {
+    public GetBlast(jsonData: Weapon, item: WeaponItemData): BlastData {
         let blastData: BlastData = {
             radius: 0,
             dropoff: 0,
@@ -36,7 +37,7 @@ export class ThrownParser extends WeaponParserBase {
         return blastData;
     }
 
-    override Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
+    override Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         item = super.Parse(jsonData, item, jsonTranslation);
 
         const rangeCategory = ImportHelper.StringValue(jsonData, jsonData.hasOwnProperty('range') ? 'range' : 'category');

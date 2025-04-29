@@ -2,9 +2,10 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { WeaponParserBase } from '../module/apps/itemImport/parser/weapon/WeaponParserBase';
 import DamageData = Shadowrun.DamageData;
 import { DataDefaults } from '../module/data/DataDefaults';
+import { Weapon } from '../module/apps/itemImport/schema/WeaponsSchema';
 
 class TestWeaponParser extends WeaponParserBase {
-    public override GetDamage(jsonData: object): DamageData {
+    public override GetDamage(jsonData: Partial<Weapon>): DamageData {
         return super.GetDamage(jsonData);
     }
 }
@@ -15,7 +16,7 @@ function mockXmlData(data: object): object {
             [key, { '_TEXT': value }]));
 }
 
-function getData(damageString: string): object {
+function getData(damageString: string): Partial<Weapon> {
     return mockXmlData({
         damage: damageString,
     });
