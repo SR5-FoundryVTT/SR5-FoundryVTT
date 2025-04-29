@@ -7,6 +7,7 @@ import SpiritActorData = Shadowrun.SpiritActorData;
 import { SR5 } from '../../../../config';
 import { Metatype } from "../../schema/MetatypeSchema";
 import { json } from 'stream/consumers';
+import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
 export class SpiritParser extends ActorParserBase<SpiritActorData> {
     private formatAsSlug(name: string): string {
@@ -41,79 +42,66 @@ export class SpiritParser extends ActorParserBase<SpiritActorData> {
     }
 
     private getItems(
-        array: undefined | NotEmpty<Metatype['powers']>['power'] | NotEmpty<NotEmpty<Metatype['qualities']>['positive']>['quality'],
+        array: undefined
+            | NotEmpty<Metatype['powers']>['power']
+            | NotEmpty<Metatype['optionalpowers']>['optionalpower']
+            | NotEmpty<NotEmpty<Metatype['qualities']>['positive']>['quality'],
         searchType: Parameters<typeof IH.findItem>[1],
         msg_field: {type: string; critter: string},
         jsonTranslation?: object
-    ): object[] {
-        if (!array) return [];
+    ): ItemDataSource[] {
+        const result: ItemDataSource[] = []
 
-        return IH.getArray(array)
-            .map((item) => {
-                let name = item._TEXT;
+        for(const item of IH.getArray(array)) {
+            let name = item._TEXT;
 
-                if (name === 'Deezz') name = 'Derezz';
-                else if (name === 'Shiva Arms') name += ' (Pair)';
-                else if (name === 'Regenerate') name = 'Regeneration';
+            if (name === 'Deezz') name = 'Derezz';
+            else if (name === 'Shiva Arms') name += ' (Pair)';
+            else if (name === 'Regenerate') name = 'Regeneration';
 
-                const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-                const foundItem = IH.findItem(translatedName, searchType);
+            if (name === 'Innate Spell' && item.$?.select) {
+                let spellName = item.$.select;
+                const translatedName = IH.MapNameToTranslation(jsonTranslation, spellName);
+                const foundSpell = IH.findItem(translatedName, 'spell');
 
-                if (!foundItem) {
-                    console.log(
-                        `[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`
-                    );
-                    return msg_field.type === 'Power' ? this.createPower(item, jsonTranslation) : null;
+                if (foundSpell)
+                    result.push(foundSpell.toObject());
+                else
+                    console.log(`[Spell Missing]\nCritter: ${msg_field.critter}\nSpell: ${spellName}`);
+            }
+
+            const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
+            const foundItem = IH.findItem(translatedName, searchType);
+
+            if (!foundItem) {
+                console.log(
+                    `[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`
+                );
+                continue;
+            }
+
+            let itemBase = foundItem.toObject();
+
+            if (item.$ && "rating" in item.$ && item.$.rating) {
+                const rating = +item.$.rating;
+
+                if ('rating' in itemBase.system) {
+                    itemBase.system.rating = rating;
+                } else if ('technology' in itemBase.system) {
+                    itemBase.system.technology.rating = rating;
                 }
+            }
 
-                let itemBase = foundItem.toObject();
+            if (item.$ && "select" in item.$ && item.$.select)
+                itemBase.name += ` (${item.$.select})`
 
-                if ("$" in item && item.$ && "rating" in item.$) {
-                    const rating = +(item.$.rating ?? 0);
+            if (msg_field.type === 'Optional Power' && 'optional' in itemBase.system)
+                itemBase.system.optional = 'disabled_option';
 
-                    if ('rating' in itemBase.system) {
-                        itemBase.system.rating = rating;
-                    } else if ('technology' in itemBase.system) {
-                        itemBase.system.technology.rating = rating;
-                    }
-                }
-
-                if (item.$ && "select" in item.$ && item.$.select)
-                    itemBase.name += ` (${item.$.select})`
-
-                return itemBase;
-            })
-            .filter(Boolean);
-    }
-
-    private getSpells(
-        array: undefined | NotEmpty<Metatype['powers']>['power'],
-        critterName: string,
-        jsonTranslation?: object
-    ): object[] {
-        return IH.getArray(array)
-            .map((item) => {
-                let name = item._TEXT;
-
-                if (name === 'Innate Spell' && item.$?.select) {
-                    let spellName = item.$.select;
-                    const translatedName = IH.MapNameToTranslation(jsonTranslation, spellName);
-
-                    const foundSpell = IH.findItem(translatedName, 'spell');
-
-                    if (!foundSpell) {
-                        console.log(
-                            `[Spell Missing]\nCritter: ${critterName}\nSpell: ${spellName}`
-                        );
-                        return null;
-                    }
-
-                    return foundSpell.toObject();
-                }
-
-                return null;
-            })
-            .filter((item): item is NonNullable<typeof item> => !!item);
+            result.push(itemBase);
+        }
+        
+        return result;
     }
 
     override Parse(
@@ -173,7 +161,6 @@ export class SpiritParser extends ActorParserBase<SpiritActorData> {
         }
         spirit.system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
-        //TODO optionalpowers
         //@ts-expect-error
         spirit.items = [
             ...this.getItems(jsonData.powers?.power, ['critter_power', 'sprite_power'], {type: 'Power', critter: spirit.name}, jsonTranslation),
@@ -187,10 +174,19 @@ export class SpiritParser extends ActorParserBase<SpiritActorData> {
             ])
         }
 
-        if (jsonData.powers) {
+        if (jsonData.optionalpowers) {
+            const optionalPowers = jsonData.optionalpowers.optionalpower;
             //@ts-expect-error
             spirit.items = spirit.items.concat([
-                ...this.getSpells(jsonData.powers.power, spirit.name, jsonTranslation),
+                ...this.getItems(optionalPowers, ['critter_power', 'sprite_power'], {type: 'Optional Power', critter: spirit.name}, jsonTranslation),
+            ]);
+        }
+
+        if (jsonData.bonus?.optionalpowers?.optionalpower) {
+            const optionalPowers = jsonData.bonus.optionalpowers.optionalpower;
+            //@ts-expect-error
+            spirit.items = spirit.items.concat([
+                ...this.getItems(optionalPowers, ['critter_power', 'sprite_power'], {type: 'Optional Power', critter: spirit.name}, jsonTranslation),
             ]);
         }
 

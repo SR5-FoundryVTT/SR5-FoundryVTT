@@ -7,30 +7,43 @@ import SpriteActorData = Shadowrun.SpriteActorData;
 import { SR5 } from '../../../../config';
 import { Metatype } from "../../schema/MetatypeSchema";
 import { json } from 'stream/consumers';
+import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
 export class SpriteParser extends ActorParserBase<SpriteActorData> {
-    private getPowers(
+    private getItems(
         array: undefined | NotEmpty<Metatype['powers']>['power'],
-        spriteName: string,
+        searchType: Parameters<typeof IH.findItem>[1],
+        msg_field: {type: string; critter: string},
         jsonTranslation?: object
-    ): object[] {
-        return IH.getArray(array)
-            .map((item) => {
-                let name = item._TEXT;
+    ): ItemDataSource[] {
+        const result: ItemDataSource[] = []
 
-                const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-                const foundItem = IH.findItem(translatedName, 'sprite_power');
+        for(const item of IH.getArray(array)) {
+            let name = item._TEXT;
 
-                if (!foundItem) {
-                    console.log(
-                        `[Power Missing]\nCritter: ${spriteName}\nPower: ${name}`
-                    );
-                    return null;
-                }
+            if (name === 'Deezz') name = 'Derezz';
+            else if (name === 'Shiva Arms') name += ' (Pair)';
+            else if (name === 'Regenerate') name = 'Regeneration';
 
-                return foundItem.toObject();
-            })
-            .filter((item): item is NonNullable<typeof item> => !!item);
+            const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
+            const foundItem = IH.findItem(translatedName, searchType);
+
+            if (!foundItem) {
+                console.log(
+                    `[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`
+                );
+                continue;
+            }
+
+            let itemBase = foundItem.toObject();
+
+            if (msg_field.type === 'Optional Power' && 'optional' in itemBase.system)
+                itemBase.system.optional = 'disabled_option';
+
+            result.push(itemBase);
+        }
+        
+        return result;
     }
 
     override Parse(
@@ -43,11 +56,18 @@ export class SpriteParser extends ActorParserBase<SpriteActorData> {
 
         sprite.system.spriteType = jsonData.name._TEXT.split(" ")[0].toLowerCase();
 
-        //TODO optionalpowers
         //@ts-expect-error
         sprite.items = [
-            ...this.getPowers(jsonData.powers?.power, sprite.name, jsonTranslation),
+            ...this.getItems(jsonData.powers?.power, ['critter_power', 'sprite_power'], {type: 'Power', critter: sprite.name}, jsonTranslation),
         ];
+
+        if (jsonData.bonus?.optionalpowers?.optionalpower) {
+            const optionalPowers = jsonData.bonus.optionalpowers.optionalpower;
+            //@ts-expect-error
+            sprite.items = sprite.items.concat([
+                ...this.getItems(optionalPowers, ['critter_power', 'sprite_power'], {type: 'Optional Power', critter: sprite.name}, jsonTranslation),
+            ]);
+        }
 
         if (jsonTranslation) {
             const page = IH.MapNameToPageSource(jsonTranslation, sprite.name);

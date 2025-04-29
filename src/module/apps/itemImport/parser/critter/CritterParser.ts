@@ -1,6 +1,5 @@
 import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 import { ActorParserBase } from '../item/ActorParserBase';
-// import { getArray } from '../../../importer/actorImport/itemImporter/importHelper/BaseParserFunctions.js';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
 import CharacterActorData = Shadowrun.CharacterActorData;
@@ -8,6 +7,7 @@ import { SR5 } from '../../../../config';
 import { Metatype } from "../../schema/MetatypeSchema";
 import { OneOrMany } from "../../schema/Types";
 import { json } from 'stream/consumers';
+import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
 export class CritterParser extends ActorParserBase<CharacterActorData> {
 
@@ -43,100 +43,59 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
         searchType: Parameters<typeof IH.findItem>[1],
         msg_field: {type: string; critter: string},
         jsonTranslation?: object
-    ): object[] {
-        return IH.getArray(array)
-            .map((item) => {
-                let name = item._TEXT;
+    ): ItemDataSource[] {
+        const result: ItemDataSource[] = []
 
-                if (name === 'Deezz') name = 'Derezz';
-                else if (name === 'Shiva Arms') name += ' (Pair)';
-                else if (name === 'Regenerate') name = 'Regeneration';
+        for(const item of IH.getArray(array)) {
+            let name = item._TEXT;
 
-                const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-                const foundItem = IH.findItem(translatedName, searchType);
+            if (name === 'Deezz') name = 'Derezz';
+            else if (name === 'Shiva Arms') name += ' (Pair)';
+            else if (name === 'Regenerate') name = 'Regeneration';
 
-                if (!foundItem) {
-                    console.log(
-                        `[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`
-                    );
-                    return foundItem;
+            if (name === 'Innate Spell' && item.$?.select) {
+                let spellName = item.$.select;
+                const translatedName = IH.MapNameToTranslation(jsonTranslation, spellName);
+                const foundSpell = IH.findItem(translatedName, 'spell');
+
+                if (foundSpell)
+                    result.push(foundSpell.toObject());
+                else
+                    console.log(`[Spell Missing]\nCritter: ${msg_field.critter}\nSpell: ${spellName}`);
+            }
+
+            const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
+            const foundItem = IH.findItem(translatedName, searchType);
+
+            if (!foundItem) {
+                console.log(
+                    `[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`
+                );
+                continue;
+            }
+
+            let itemBase = foundItem.toObject();
+
+            if (item.$ && "rating" in item.$ && item.$.rating) {
+                const rating = +item.$.rating;
+
+                if ('rating' in itemBase.system) {
+                    itemBase.system.rating = rating;
+                } else if ('technology' in itemBase.system) {
+                    itemBase.system.technology.rating = rating;
                 }
-                let itemBase = foundItem.toObject();
+            }
 
-                if (item.$ && "rating" in item.$ && item.$.rating) {
-                    const rating = +item.$.rating;
+            if (item.$ && "select" in item.$ && item.$.select)
+                itemBase.name += ` (${item.$.select})`
 
-                    if ('rating' in itemBase.system) {
-                        itemBase.system.rating = rating;
-                    } else if ('technology' in itemBase.system) {
-                        itemBase.system.technology.rating = rating;
-                    }
-                }
-
-                if (item.$ && "select" in item.$ && item.$.select)
-                    itemBase.name += ` (${item.$.select})`
-
-                return itemBase;
-            })
-            .filter((item): item is NonNullable<typeof item> => !!item);
-    }
-
-    private getOptionalPowers(
-        array: NotEmpty<Metatype['optionalpowers']>['optionalpower'],
-        critterName: string,
-        jsonTranslation?: object
-    ): object[] {
-        return IH.getArray(array)
-            .map((item) => {
-                let name = item._TEXT;
-                const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-                const foundPower = IH.findItem(translatedName, 'critter_power');
-
-                if (!foundPower) {
-                    console.log(
-                        `[Optional Power Missing]\nCritter: ${critterName}\nSpell: ${name}`
-                    );
-                    return null;
-                }
-
-                const itemBase = foundPower.toObject() as Shadowrun.CritterPowerItemData;
+            if (msg_field.type === 'Optional Power' && 'optional' in itemBase.system)
                 itemBase.system.optional = 'disabled_option';
 
-                if (item.$ && "select" in item.$ && item.$.select)
-                    itemBase.name += ` (${item.$.select})`
-
-                return itemBase;
-            })
-            .filter((item): item is NonNullable<typeof item> => !!item);
-    }
-
-    private getSpells(
-        array: NotEmpty<Metatype['powers']>['power'],
-        critterName: string,
-        jsonTranslation?: object
-    ): object[] {
-        return IH.getArray(array)
-            .map((item) => {
-                let name = item._TEXT;
-
-                if (name === 'Innate Spell' && item.$?.select) {
-                    let spellName = item.$.select;
-                    const translatedName = IH.MapNameToTranslation(jsonTranslation, spellName);
-                    const foundSpell = IH.findItem(translatedName, 'spell');
-
-                    if (!foundSpell) {
-                        console.log(
-                            `[Spell Missing]\nCritter: ${critterName}\nSpell: ${spellName}`
-                        );
-                        return null;
-                    }
-
-                    return foundSpell.toObject();
-                }
-
-                return null;
-            })
-            .filter((item): item is NonNullable<typeof item> => !!item);
+            result.push(itemBase);
+        }
+        
+        return result;
     }
 
     private setSkills(actor: CharacterActorData, jsonData: Metatype): void {
@@ -245,17 +204,11 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
             ])
         }
 
-        if (jsonData.powers) {
-            //@ts-expect-error
-            actor.items = actor.items.concat([
-                ...this.getSpells(jsonData.powers.power, actor.name, jsonTranslation),
-            ]);
-        }
-        
         if (jsonData.optionalpowers) {
+            const optionalPowers = jsonData.optionalpowers.optionalpower;
             //@ts-expect-error
             actor.items = actor.items.concat([
-                ...this.getOptionalPowers(jsonData.optionalpowers.optionalpower, actor.name, jsonTranslation),
+                ...this.getItems(optionalPowers, ['critter_power', 'sprite_power'], {type: 'Optional Power', critter: actor.name}, jsonTranslation),
             ]);
         }
 
