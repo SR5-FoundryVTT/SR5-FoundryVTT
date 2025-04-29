@@ -1,6 +1,7 @@
 // AUTO‑GENERATED — DO NOT EDIT
 
 import { BonusSchema } from './BonusSchema';
+import { ConditionsSchema } from './ConditionsSchema';
 import { Empty, Many, OneOrMany } from './Types';
 
 export interface Metatype {
@@ -23,9 +24,9 @@ export interface Metatype {
     complexforms?: {
         complexform: OneOrMany<{ _TEXT: string; $?: { select: string; }; }>;
     };
-    depaug?: { _TEXT: string; };
-    depmax?: { _TEXT: string; };
-    depmin?: { _TEXT: string; };
+    depaug: { _TEXT: string; };
+    depmax: { _TEXT: string; };
+    depmin: { _TEXT: string; };
     edgaug: { _TEXT: string; };
     edgmax: { _TEXT: string; };
     edgmin: { _TEXT: string; };
@@ -37,9 +38,9 @@ export interface Metatype {
     forms?: Empty;
     halveattributepoints?: Empty;
     id: { _TEXT: string; };
-    iniaug?: { _TEXT: string; };
-    inimax?: { _TEXT: string; };
-    inimin?: { _TEXT: string; };
+    iniaug: { _TEXT: string; };
+    inimax: { _TEXT: string; };
+    inimin: { _TEXT: string; };
     initiativedice?: { _TEXT: string; };
     intaug: { _TEXT: string; };
     intmax: { _TEXT: string; };
@@ -48,17 +49,16 @@ export interface Metatype {
     logaug: { _TEXT: string; };
     logmax: { _TEXT: string; };
     logmin: { _TEXT: string; };
-    magaug?: { _TEXT: string; };
-    magmax?: { _TEXT: string; };
-    magmin?: { _TEXT: string; };
-    metavariants?: Empty | {
-        metavariant?: OneOrMany<Metatype>;
+    magaug: { _TEXT: string; };
+    magmax: { _TEXT: string; };
+    magmin: { _TEXT: string; };
+    metavariants?: {
+        metavariant: OneOrMany<Metatype>;
     };
     movement?: { _TEXT: string; };
     name: { _TEXT: string; };
     optionalpowers?: Empty | {
         optionalpower?: OneOrMany<{ _TEXT: string; $?: { select: string; }; }>;
-        power?: Many<{ _TEXT: string; }>;
     };
     page: { _TEXT: string; };
     powers?: {
@@ -83,14 +83,14 @@ export interface Metatype {
     reaaug: { _TEXT: string; };
     reamax: { _TEXT: string; };
     reamin: { _TEXT: string; };
-    resaug?: { _TEXT: string; };
-    resmax?: { _TEXT: string; };
-    resmin?: { _TEXT: string; };
+    resaug: { _TEXT: string; };
+    resmax: { _TEXT: string; };
+    resmin: { _TEXT: string; };
     run?: { _TEXT: string; $?: { alt: string; }; };
     skills?: {
-        group?: OneOrMany<{ _TEXT: string; $?: { rating: string; }; }>;
+        group?: OneOrMany<{ _TEXT: string; $: { rating: string; }; }>;
         knowledge?: { _TEXT: string; $: { category: string; rating: string; }; };
-        skill: Many<{ _TEXT: string; $?: { rating?: string; select?: string; spec?: string; }; }>;
+        skill: Many<{ _TEXT: string; $: { rating: string; select?: string; spec?: string; }; }>;
     };
     source: { _TEXT: string; };
     sprint?: { _TEXT: string; $?: { alt: string; }; };
@@ -104,7 +104,7 @@ export interface Metatype {
 };
 
 export interface MetatypeSchema {
-    $?: { "xmlns:xsi": string; "xsi:schemaLocation": string; };
+    $: { xmlns?: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
     categories: {
         category: Many<{ _TEXT: string; }>;
     };

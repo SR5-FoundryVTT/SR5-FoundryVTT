@@ -82,7 +82,7 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
     }
 
     private getOptionalPowers(
-        array: NotEmpty<Metatype['optionalpowers']>['optionalpower' | 'power'],
+        array: NotEmpty<Metatype['optionalpowers']>['optionalpower'],
         critterName: string,
         jsonTranslation?: object
     ): object[] {
@@ -90,7 +90,6 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
             .map((item) => {
                 let name = item._TEXT;
                 const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-
                 const foundPower = IH.findItem(translatedName, 'critter_power');
 
                 if (!foundPower) {
@@ -100,7 +99,13 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
                     return null;
                 }
 
-                return foundPower.toObject();
+                const itemBase = foundPower.toObject() as Shadowrun.CritterPowerItemData;
+                itemBase.system.optional = 'disabled_option';
+
+                if (item.$ && "select" in item.$ && item.$.select)
+                    itemBase.name += ` (${item.$.select})`
+
+                return itemBase;
             })
             .filter((item): item is NonNullable<typeof item> => !!item);
     }
@@ -250,7 +255,7 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
         if (jsonData.optionalpowers) {
             //@ts-expect-error
             actor.items = actor.items.concat([
-                
+                ...this.getOptionalPowers(jsonData.optionalpowers.optionalpower, actor.name, jsonTranslation),
             ]);
         }
 

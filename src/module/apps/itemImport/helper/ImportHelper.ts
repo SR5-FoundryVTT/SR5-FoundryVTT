@@ -55,12 +55,13 @@ export class ImportHelper {
      * @template T The type of the elements.
      * @param {T | T[] | undefined | null} value The input value to normalize.
      * @returns {T[]} An array containing the input value(s), or an empty array.
-     */
+    */
     public static getArray<T>(value: T | T[] | undefined | null): T[] {
         if (value)
             return Array.isArray(value) ? value : [value];
         return [];
     }
+
 
     /**
      * Helper method to create a new folder.
