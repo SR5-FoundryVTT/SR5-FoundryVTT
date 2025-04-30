@@ -256,18 +256,6 @@ export class CharacterInfoUpdater {
                 .replace(/\s/g, '_')
                 .replace(/-/g, '_');
 
-            if (name.includes('exotic') && name.includes('_weapon')) {
-                name = name.replace('_weapon', '');
-            }
-
-            if (name.includes('exotic') && name.includes('_ranged')) {
-                name = name.replace('_ranged', '_range');
-            }
-               
-            if (name === 'pilot_watercraft') {
-                name = 'pilot_water_craft';
-            }
-                
             let parsedSkill = system.skills.active[name];
 
             parsedSkill.base = parseInt(skill.rating);
