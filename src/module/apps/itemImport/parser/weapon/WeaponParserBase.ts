@@ -1,17 +1,17 @@
-import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 import { Constants } from '../../importer/Constants';
-import WeaponCategory = Shadowrun.WeaponCategory;
-import SkillName = Shadowrun.SkillName;
+import { DataDefaults } from '../../../../data/DataDefaults';
+import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
+import { SR5 } from '../../../../config';
 import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
-import WeaponItemData = Shadowrun.WeaponItemData;
+import { Weapon } from '../../schema/WeaponsSchema';
+import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
 import DamageType = Shadowrun.DamageType;
-import { DataDefaults } from '../../../../data/DataDefaults';
 import PhysicalAttribute = Shadowrun.PhysicalAttribute;
-import DamageData = Shadowrun.DamageData;
-import { SR5 } from '../../../../config';
 import RangeData = Shadowrun.RangeData;
-import { Weapon } from '../../schema/WeaponsSchema';
+import SkillName = Shadowrun.SkillName;
+import WeaponCategory = Shadowrun.WeaponCategory;
+import WeaponItemData = Shadowrun.WeaponItemData;
 import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
 export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
@@ -57,7 +57,7 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
             }
 
             let type = IH.StringValue(weaponJson, 'type').toLowerCase();
-            return type === 'ranged' ? 'exotic_range' : 'exotic_melee';
+            return type === 'ranged' ? 'exotic_ranged_weapon' : 'exotic_melee_weapon';
         }
     }
 

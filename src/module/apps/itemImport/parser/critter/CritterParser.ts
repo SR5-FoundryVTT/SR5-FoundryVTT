@@ -12,30 +12,7 @@ import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/
 export class CritterParser extends ActorParserBase<CharacterActorData> {
 
     private normalizeSkillName(rawName: string): string {
-        let name = rawName
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '_')
-            .replace(/-/g, '_');
-    
-        if (name.includes('exotic') && name.includes('_weapon')) {
-            name = name.replace('_weapon', '');
-        }
-        if (name.includes('exotic') && name.includes('_ranged')) {
-            name = name.replace('_ranged', '_range');
-        }
-
-        if (name === 'shadowing' || name === 'infiltration') {
-            name = 'sneaking';
-        }
-        if (name === 'pilot_watercraft') {
-            name = 'pilot_water_craft';
-        }
-        if (name === 'thrown_weapons') {
-            name = 'throwing_weapons';
-        }
-    
-        return name;
+        return rawName.toLowerCase().trim().replace(/\s+/g, '_').replace(/-/g, '_');
     }
 
     private getItems(
@@ -48,10 +25,6 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
 
         for(const item of IH.getArray(array)) {
             let name = item._TEXT;
-
-            if (name === 'Deezz') name = 'Derezz';
-            else if (name === 'Shiva Arms') name += ' (Pair)';
-            else if (name === 'Regenerate') name = 'Regeneration';
 
             if (name === 'Innate Spell' && item.$?.select) {
                 let spellName = item.$.select;
