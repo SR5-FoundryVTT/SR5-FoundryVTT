@@ -16,12 +16,16 @@
                 class="display attribute-input"
                 type="text"
                 size="4"
-                {{! Input is used for both .base and .value. Hiding name will stop it from saving .value into .base }}
-                {{#ife system.grade 'standard'}}name="system.essence.base"{{/ife}}
-                value="{{#ife system.grade 'standard'}}{{system.essence.base}}{{else}}{{system.essence.value}}{{/ife}}"
                 data-dtype="Number"
                 placeholder="0"
-                {{#ifne system.grade 'standard'}}readonly{{/ifne}}
+                {{#if calculatedEssence}}
+                name="system.essence.value"
+                value="{{system.essence.value}}"
+                readonly
+                {{else}}
+                name="system.essence.base"
+                value="{{system.essence.base}}"
+                {{/if}}
             />
         </div>
         {{/hasprop}} {{#hasprop system 'capacity'}}
@@ -48,12 +52,8 @@
                 name="system.technology.rating"
                 value="{{system.technology.rating}}"
                 data-dtype="Number"
-                placeholder="0"
-                {{#if system.technology.cost.adjusted}}readonly{{/if}}
-                {{#if system.technology.availability.adjusted}}readonly{{/if}}
-                {{#hasprop system 'grade'}}
-                    {{#ifne system.grade 'standard'}}readonly{{/ifne}}
-                {{/hasprop}}
+                placeholder="0"                
+                {{#if ratingForCalculation}}readonly{{/if}}
             />
         </div>
         <div class="flexrow nowrap">
@@ -84,63 +84,63 @@
         </div>
         {{/unless}}
         <div class="flexrow nowrap">
-            <label>{{localize "SR5.Cost"}}</label>
-            <div class="input">
-                <input
-                    class="display"
-                    type="text"
-                    {{! Input is used for both .base and .value. Hiding name will stop it from saving .value into .base }}
-                    {{#if (not system.technology.cost.adjusted)}}name="system.technology.cost.base"{{/if}}
-                    value="{{#if system.technology.cost.adjusted}}{{system.technology.cost.value}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.cost.value}}{{else}}{{system.technology.cost.base}}{{/ifne}}{{else}}{{system.technology.cost.base}}{{/hasprop}}{{/if}}"
-                    data-dtype="Number"
-                    placeholder="100"
-                    {{#if system.technology.cost.adjusted}}readonly{{/if}}
-                    {{#hasprop system 'grade'}}
-                        {{#ifne system.grade 'standard'}}readonly{{/ifne}}
-                    {{/hasprop}}
-                />
-                <span class="unit">
-                    <i class="fas fa-yen-sign"></i>
-                </span>
-            </div>
-            <input
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <label>{{localize "SR5.Cost"}}</label>
+              <input
                 class="checkbox"
                 type="checkbox"
                 name="system.technology.cost.adjusted"
                 {{checked system.technology.cost.adjusted}}
-                data-tooltip="Toggle Cost Adjustment"                    
-                {{#hasprop system 'grade'}}
-                {{#ifne system.grade 'standard'}}disabled{{/ifne}}
-                {{/hasprop}}
-            />
-        </div>
-        <div class="flexrow nowrap">
-            <label>{{localize "SR5.Availability"}}</label>
-            <input
+                data-tooltip="Toggle Cost Adjustment"
+                {{#if calculatedEssence}}disabled{{/if}}
+              />
+            </div>
+            <div class="input" style="flex: 1;">
+              <input
                 class="display"
                 type="text"
-                {{! Input is used for both .base and .value. Hiding name will stop it from saving .value into .base }}
-                {{#if (not system.technology.availability.adjusted)}}name="system.technology.availability.base"{{/if}}
-                value="{{#if system.technology.availability.adjusted}}{{system.technology.availability.value}}{{else}}{{#hasprop system 'grade'}}{{#ifne system.grade 'standard'}}{{system.technology.availability.value}}{{else}}{{system.technology.availability.base}}{{/ifne}}{{else}}{{system.technology.availability.base}}{{/hasprop}}{{/if}}"
-                placeholder="2R"
-                {{#if system.technology.availability.adjusted}}readonly{{/if}}
-                {{#hasprop system 'grade'}}
-                    {{#ifne system.grade 'standard'}}readonly{{/ifne}}
-                {{/hasprop}}
-            />
-            <div class="input">
-                <input
-                    class="checkbox"
-                    type="checkbox"
-                    name="system.technology.availability.adjusted"
-                    {{checked system.technology.availability.adjusted}}
-                    data-tooltip="{{localize 'SR5.Tooltips.Item.AvailabilityAdjustment'}}"
-                    {{#hasprop system 'grade'}}
-                        {{#ifne system.grade 'standard'}}disabled{{/ifne}}
-                    {{/hasprop}}
-                />
+                data-dtype="Number"
+                placeholder="100"
+                style="width: 100%;"
+                {{#if calculatedCost}}
+                name="system.technology.cost.value"
+                value="{{system.technology.cost.value}}"
+                readonly
+                {{else}}
+                name="system.technology.cost.base"
+                value="{{system.technology.cost.base}}"
+                {{/if}}
+              />
+              <span class="unit"><i class="fas fa-yen-sign"></i></span>
             </div>
-        </div>
+          </div>
+          <div class="flexrow nowrap">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <label>{{localize "SR5.Availability"}}</label>
+              <input
+                class="checkbox"
+                type="checkbox"
+                name="system.technology.availability.adjusted"
+                {{checked system.technology.availability.adjusted}}
+                data-tooltip="{{localize 'SR5.Tooltips.Item.AvailabilityAdjustment'}}"
+                {{#if calculatedEssence}}disabled{{/if}}
+              />
+            </div>
+            <input
+              class="display"
+              type="text"
+              placeholder="2R"
+              style="flex: 1;"
+              {{#if calculatedAvailability}}
+              name="system.technology.availability.value"
+              value="{{system.technology.availability.value}}"
+              readonly
+              {{else}}
+              name="system.technology.availability.base"
+              value="{{system.technology.availability.base}}"
+              {{/if}}
+            />
+          </div>
         {{#unless hideConditionMonitor}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.ConditionMonitor"}}</label>

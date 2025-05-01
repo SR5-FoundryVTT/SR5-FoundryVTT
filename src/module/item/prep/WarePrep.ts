@@ -29,7 +29,7 @@ export const WarePrep = {
 
         // Alter essence values.
         const floatEssence = Number(system.essence.base || 0) * essenceMod;
-        const actualEssence = Helpers.roundTo(floatEssence, 2);
+        const actualEssence = Helpers.roundTo(floatEssence, 4);
 
         // Alter availability values.
         let availability = String(system.technology.availability.base ?? 0);
@@ -47,14 +47,15 @@ export const WarePrep = {
 
         // Alter cost values.
         const cost = Number(system.technology.cost.base ?? 0);
-        const actualCost = cost * rating * costMod;
+        const costAdjusted = system.technology.cost.adjusted ?? false;
+
+        const actualCost = costAdjusted
+            ? cost * rating * costMod
+            : cost * costMod;
 
 
         system.essence.value = actualEssence;
-        // Mark values as adjusted to not loose base values when changing sheet data.
-        system.technology.availability.adjusted = true;
         system.technology.availability.value = availability;
-        system.technology.cost.adjusted = true;
         system.technology.cost.value = actualCost;
     }
 }

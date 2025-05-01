@@ -8,6 +8,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
+import { SR } from '../constants';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -128,6 +129,11 @@ export class SR5ItemSheet extends ItemSheet {
         const itemData = this.item.system;
 
         const linkedActor = await this.item.getLinkedActor();
+        const calculatedEssence = itemData.grade !== undefined && itemData.grade !== 'standard' && itemData.grade in SR.gradeModifiers;
+        const calculatedCost = calculatedEssence ? true : itemData.technology?.cost.adjusted ?? false;
+        const calculatedAvailability = calculatedEssence ? true : itemData.technology?.availability.adjusted ?? false;
+        const ratingForCalculation = calculatedEssence || calculatedCost || calculatedAvailability;
+
 
         if (itemData.action) {
             try {
@@ -243,7 +249,11 @@ export class SR5ItemSheet extends ItemSheet {
 
         return {
             ...data,
-            linkedActor
+            calculatedAvailability,
+            calculatedCost,
+            calculatedEssence,
+            linkedActor,
+            ratingForCalculation
         }
     }
 
