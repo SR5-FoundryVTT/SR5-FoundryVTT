@@ -41,12 +41,16 @@ export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shad
     async Parse(chummerData: MetatypeSchema, setIcons: boolean): Promise<StoredDocument<SR5Actor>[]> {
         const actors: Shadowrun.SpiritActorData[] = [];
 
+        const insectTypes = new Set<string>();
+
         const baseMetatypes = chummerData.metatypes.metatype;
         const metavariants = baseMetatypes.flatMap(metatype => {
             const parentName = metatype.name._TEXT;
             if (!metatype.metavariants) return [];
 
             const variants = IH.getArray(metatype.metavariants?.metavariant ?? []);
+
+            for (const variant of variants) insectTypes.add(variant.name._TEXT);
 
             return variants.map(variant => ({
                 ...variant,
@@ -78,12 +82,13 @@ export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shad
             },
         };
 
-        const folders = await IH.MakeCategoryFolders(
-            'Actor',
-            Categories,
-            'Spirits',
-            this.categoryTranslations,
-        );
+        const folders = await IH.MakeCategoryFolders('Actor', Categories, 'Spirits', this.categoryTranslations);
+
+        // Add insect type folders
+        for (const insect of insectTypes) {
+            const path = `${Constants.ROOT_IMPORT_FOLDER_NAME}/Spirits/Insect Spirits/${insect}`;
+            folders[`insect spirits/${insect.toLowerCase()}`] = await IH.GetFolderAtPath("Actor", path, true);
+        }
 
         for (const jsonData of jsonDatas) {
             // Check to ensure the data entry is supported and the correct category
@@ -98,7 +103,15 @@ export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shad
                 this.GetDefaultData({ type: parserType, entityType: 'Actor' }),
                 this.itemTranslations,
             );
-            const category = IH.StringValue(jsonData, 'category').toLowerCase();
+            let category = IH.StringValue(jsonData, 'category').toLowerCase();
+
+            // handle insect folders
+            if (category === 'insect spirits' && jsonData.name._TEXT.includes("(")) {
+                const match = jsonData.name._TEXT.match(/\(([^)]+)\)/);
+
+                if (match)
+                    category += `/${match[1].toLowerCase()}`;
+            }
 
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             actor.folder = folders[category]?.id;
