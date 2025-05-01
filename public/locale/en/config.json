@@ -1262,7 +1262,8 @@
             "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
             "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
             "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
-            "DisabledForPreparedActor": "Disabled due to use of prepared actor"
+            "DisabledForPreparedActor": "Disabled due to use of prepared actor",
+            "CostAdjustment": "Adjust actual cost based on the item rating"
         },
         "Modifiers": {
             "armor": "Modifies total armor value",
