@@ -1,6 +1,6 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper as IH } from '../helper/ImportHelper';
-import { SpriteParser } from '../parser/sprite/SpriteParser';
+import { SpriteParser } from '../parser/metatype/SpriteParser';
 import { Constants } from './Constants';
 import { SR5Actor } from '../../../actor/SR5Actor';
 import { MetatypeSchema } from "../schema/MetatypeSchema";

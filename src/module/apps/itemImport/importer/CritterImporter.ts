@@ -1,7 +1,6 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper as IH } from '../helper/ImportHelper';
-import { CritterParser } from '../parser/critter/CritterParser';
-import { Constants } from './Constants';
+import { CritterParser } from '../parser/metatype/CritterParser';
 import { SR5Actor } from '../../../actor/SR5Actor';
 import { MetatypeSchema } from "../schema/MetatypeSchema";
 
@@ -64,12 +63,7 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
             },
         };
 
-        const folders = await IH.MakeCategoryFolders(
-            'Actor',
-            Categories,
-            'Critters',
-            this.categoryTranslations,
-        );
+        const folders = await IH.MakeCategoryFolders('Actor', Categories, 'Critters', this.categoryTranslations);
 
         for (const jsonData of jsonDatas) {
             // Check to ensure the data entry is supported and the correct category

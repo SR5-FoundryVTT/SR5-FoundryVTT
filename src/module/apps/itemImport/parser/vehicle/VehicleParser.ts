@@ -1,14 +1,12 @@
 import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
-import { ActorParserBase } from '../item/ActorParserBase';
-import { getArray } from "../../../importer/actorImport/itemImporter/importHelper/BaseParserFunctions.js";
 import { DataDefaults } from '../../../../data/DataDefaults';
+import { Parser } from '../Parser';
 import VehicleActorData = Shadowrun.VehicleActorData;
 import { Vehicle } from '../../schema/VehiclesSchema';
 import { SR5 } from '../../../../config';
-import { SR5Item } from '../../../../item/SR5Item';
 import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
-export class VehicleParser extends ActorParserBase<VehicleActorData> {
+export class VehicleParser extends Parser<VehicleActorData> {
 
     private formatAsSlug(name: string): string {
         return name.trim().toLowerCase().replace((/'|,|\[|\]|\(|\)/g), '').split((/-|\s|\//g)).join('-');

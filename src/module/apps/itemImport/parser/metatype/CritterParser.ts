@@ -1,74 +1,13 @@
-import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
-import { ActorParserBase } from '../item/ActorParserBase';
-import { DataDefaults } from '../../../../data/DataDefaults';
+import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { MetatypeParserBase } from './MetatypeParserBase';
 import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
 import CharacterActorData = Shadowrun.CharacterActorData;
-import { SR5 } from '../../../../config';
 import { Metatype } from "../../schema/MetatypeSchema";
-import { OneOrMany } from "../../schema/Types";
-import { json } from 'stream/consumers';
-import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
-export class CritterParser extends ActorParserBase<CharacterActorData> {
+export class CritterParser extends MetatypeParserBase<CharacterActorData> {
 
     private normalizeSkillName(rawName: string): string {
         return rawName.toLowerCase().trim().replace(/\s+/g, '_').replace(/-/g, '_');
-    }
-
-    private getItems(
-        array: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }>,
-        searchType: Parameters<typeof IH.findItem>[1],
-        msg_field: {type: string; critter: string},
-        jsonTranslation?: object
-    ): ItemDataSource[] {
-        const result: ItemDataSource[] = []
-
-        for(const item of IH.getArray(array)) {
-            let name = item._TEXT;
-
-            if (name === 'Innate Spell' && item.$?.select) {
-                let spellName = item.$.select;
-                const translatedName = IH.MapNameToTranslation(jsonTranslation, spellName);
-                const foundSpell = IH.findItem(translatedName, 'spell');
-
-                if (foundSpell)
-                    result.push(foundSpell.toObject());
-                else
-                    console.log(`[Spell Missing]\nCritter: ${msg_field.critter}\nSpell: ${spellName}`);
-            }
-
-            const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-            const foundItem = IH.findItem(translatedName, searchType);
-
-            if (!foundItem) {
-                console.log(
-                    `[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`
-                );
-                continue;
-            }
-
-            let itemBase = foundItem.toObject();
-
-            if (item.$ && "rating" in item.$ && item.$.rating) {
-                const rating = +item.$.rating;
-
-                if ('rating' in itemBase.system) {
-                    itemBase.system.rating = rating;
-                } else if ('technology' in itemBase.system) {
-                    itemBase.system.technology.rating = rating;
-                }
-            }
-
-            if (item.$ && "select" in item.$ && item.$.select)
-                itemBase.name += ` (${item.$.select})`
-
-            if (msg_field.type === 'Optional Power' && 'optional' in itemBase.system)
-                itemBase.system.optional = 'disabled_option';
-
-            result.push(itemBase);
-        }
-        
-        return result;
     }
 
     private setSkills(actor: CharacterActorData, jsonData: Metatype): void {
@@ -122,11 +61,7 @@ export class CritterParser extends ActorParserBase<CharacterActorData> {
         }
     }
 
-    override Parse(
-        jsonData: Metatype,
-        actor: CharacterActorData,
-        jsonTranslation?: object | undefined,
-    ): CharacterActorData {
+    override Parse(jsonData: Metatype, actor: CharacterActorData, jsonTranslation?: object): CharacterActorData {
         actor.name = jsonData.name._TEXT;
         actor.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 
