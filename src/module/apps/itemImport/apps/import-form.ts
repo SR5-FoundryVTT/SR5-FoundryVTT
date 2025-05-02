@@ -21,13 +21,22 @@ import { SpriteImporter } from '../importer/SpriteImporter';
 
 
 export class Import extends Application {
+    private githubConfig = {
+        user: "BM123499",
+        repo: "chummer5a",
+        branch: "893bb3b1438d5625df7e70f75c64566ae599e364",
+    } as const;
+    private gitURL = `https://raw.githubusercontent.com/${this.githubConfig.user}/${this.githubConfig.repo}/${this.githubConfig.branch}` as const;
+
     private supportedDataFiles: string[] = [];
     private dataFiles: File[] = [];
     private langDataFile: File;
     private parsedFiles: string[] = [];
     private disableImportButton: boolean = true;
     private currentParsedFile: string;
-    private icons: boolean;
+    private showAdvanced: boolean = false;
+    private selectedLanguage: string = "";
+    private icons: boolean = true;
 
     constructor() {
         super();
@@ -62,9 +71,16 @@ export class Import extends Application {
                 parsing
             };
         });
+        data.icons = this.icons;
+        data.showAdvanced = this.showAdvanced;
+        data.disableImportButton = this.disableImportButton;
         data.langDataFile = this.langDataFile ? this.langDataFile.name : '';
         data.finishedOverallParsing = this.supportedDataFiles.length === this.parsedFiles.length;
-        data.disableImportButton = this.disableImportButton;
+
+        data.info = {
+            version: "Temporary Database",
+            versionLink: `https://www.github.com/${this.githubConfig.user}/${this.githubConfig.repo}/tree/${this.githubConfig.branch}/Chummer/data`
+        };
 
         return { ...data };
     }
@@ -166,6 +182,65 @@ export class Import extends Application {
     };
 
     override activateListeners(html) {
+        html.find('.setIcons').on('click', () => {
+            this.icons = !this.icons;
+        });
+
+        html.find('.toggleAdvancedBtn').on('click', async () => {
+            this.showAdvanced = !this.showAdvanced;
+            await this.render();
+        });
+
+        html.find('.quickImportBtn').on('click', async () => {
+            const dataURL = this.gitURL + '/Chummer/data';
+            const setIcons = $('.setIcons').is(':checked');
+
+            this.clearParsingStatus();
+            this.disableImportButton = true;
+            await this.render();
+
+            if (this.selectedLanguage) {
+                try {
+                    const langUrl = this.gitURL + `/Chummer/lang/${this.selectedLanguage}`;
+                    const langResponse = await fetch(langUrl);
+                    if (!langResponse.ok) throw new Error();
+                    const langXml = await langResponse.text();
+                    await this.parseXmli18n(langXml);
+                } catch {
+                    ui.notifications?.warn(`Failed to load language file: ${this.selectedLanguage}`);
+                }
+            }
+
+            for (const fileName of this.supportedDataFiles) {
+                const url = `${dataURL}/${fileName}`;
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const xmlText = await response.text();
+
+                    this.currentParsedFile = fileName;
+                    await this.render();
+
+                    await this.parseXML(xmlText, fileName, setIcons);
+
+                    if (!this.parsedFiles.includes(fileName)) {
+                        this.parsedFiles.push(fileName);
+                    }
+
+                    await this.render();
+
+                } catch (err) {
+                    console.error(`Error importing ${fileName}:`, err);
+                    ui.notifications?.error(`Failed to import ${fileName}`);
+                }
+            }
+
+            this.disableImportButton = false;
+            await this.render();
+            ui.notifications?.warn('SR5.Warnings.BulkImportPerformanceWarning', { localize: true });
+        });
+
         html.find("button[type='submit']").on('click', async (event) => {
             event.preventDefault();
 

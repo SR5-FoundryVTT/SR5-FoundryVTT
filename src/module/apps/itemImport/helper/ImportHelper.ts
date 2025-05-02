@@ -186,9 +186,10 @@ export class ImportHelper {
     }
 
     public static findItem(name: string, types?: OneOrMany<BaseItem['data']['type']>): SR5Item | undefined {
-        const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY['Item'].pack) as CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
+        type ItemType = CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
+        const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY['Item'].pack) as ItemType;
 
-        return pack?.find(item =>
+        return pack.find(item =>
             item.name === name && (!types || this.getArray(types).includes(item.type))
         );
     }

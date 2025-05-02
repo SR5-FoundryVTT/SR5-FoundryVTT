@@ -1,46 +1,179 @@
-<form class="{{cssClass}}" autocomplete="off" onsubmit="event.preventDefault()">
-    <!-- <script src="modules/shadowrun5e-compendiums/module/external/xml-js.min.js"></script> -->
+<form class="chummer-import {{cssClass}}" autocomplete="off" onsubmit="event.preventDefault()">
     <header class="flexcol">
         <h1>Chummer XML Data Import</h1>
     </header>
+  
     <section>
-        <div class="flexcol">
-            <p>Nightly versions of Chummer5a aren't supported. GitHub issues for them will be ignored.
-            <br/>Latest supported stable version: 5.225.0</p>
-            <h3>Translation (optional for English) [lang\xx-xx_data.xml]</h3>
-            <input type="file" class="langDataFileDrop" accept="text/*"
-                   style="width: 250px; height: 250px; border: 1px solid gray;"/>
-            <div>Selected translation file: {{#if langDataFile}}<b>{{langDataFile}}</b>{{else}}None{{/if}}</div>
-            <h3>Data [data\*.xml]</h3>
-            <input type="file" class="filedatadrop" accept="text/*"
-                   style="width: 250px; height: 250px; border: 1px solid gray;" multiple/>
-            <div>(It's possible to simply select all data files)</div>
-            <p>Supported data files:</p>
-            <div style="display: grid; grid-template-columns: 200px 200px">
+        <!-- Quick Import Section -->
+        <div class="quickImportTab {{#if showAdvanced}}hidden{{/if}}">
+            <p>
+                Automatically downloads the latest supported Chummer5a XML files from GitHub.<br />
+                Approximate download size: <b>7 MB</b>.
+            </p>
+            <p>
+                Includes weapons, armor, vehicles, spells, and more.<br />
+                Optional translation adds <b>~2 MB</b>.
+            </p>
+    
+            <div class="section-divider"></div>
+            <h2>Quick Mode Import</h2>
+    
+            <div style="display: flex; align-items: center; gap: 1em;">
+                <label for="languageSelect" style="white-space: nowrap;">Translation Language:</label>
+                <select id="languageSelect">
+                    <option value="">English (default)</option>
+                    <option value="de-de_data.xml">Deutsch</option>
+                    <option value="fr-fr_data.xml">Français</option>
+                    <option value="ja-jp_data.xml">日本語</option>
+                    <option value="pt-br_data.xml">Português</option>
+                    <option value="zh-cn_data.xml">中文</option>
+                </select>
+            </div>
+    
+            <label><input type="checkbox" class="setIcons" {{#if icons}}checked{{/if}} /> Enable automatic icon assignment</label>
+    
+            <div class="button-row">
+                <button type="button" class="toggleAdvancedBtn">🔁 Change to Advanced Mode</button>
+                <button name="quick-import" type="submit" class="quickImportBtn">⬇️ Quick Import Data</button>
+            </div>
+        </div>
+    
+        <!-- Advanced Import Section -->
+        <div class="advancedImport {{#unless showAdvanced}}hidden{{/unless}}">
+            <p>
+                <b>Only <a href="{{info.versionLink}}" target="_blank">{{info.version}}</a></b> of Chummer5a is fully supported.<br />
+                Other versions may result in broken or missing data.
+            </p>
+            <p>
+                Upload XML files manually if using a different version.
+            </p>
+    
+            <div class="section-divider"></div>
+            <h2>Advanced Mode Import</h2>
+    
+            <h3>Translation (optional)</h3>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="file" class="langDataFileDrop" accept="text/*"  style="min-width: 200px; width: 200px;" />
+                <div><small>Selected file:</small> {{#if langDataFile}}<b>{{langDataFile}}</b>{{else}}None{{/if}}</div>
+            </div>
+
+            <h3>Data Files [data/*.xml]</h3>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="file" class="filedatadrop" accept="text/*" multiple style="min-width: 200px; width: 200px;" />
+                <div><small>(You may select multiple files)</small></div>
+            </div>
+    
+            <div class="fileStatusGrid">
                 {{#each dataFiles}}
-                <div>{{this.name}}:</div>
-                <div>
-                    {{#if this.parsed}}
-                        Imported
-                    {{else if this.parsing}}
-                    {{else if this.missing}}
-                        <b>Missing</b>
-                    {{else}}
-                        Selected
-                    {{/if}}
-                </div>
+                    <div>{{this.name}}:</div>
+                    <div style="flex-grow: 1; text-align: right;">
+                        {{#if this.parsed}}
+                            <b style="color: green;">✅ Imported</b>
+                        {{else if this.parsing}}
+                            <span style="color: #ff9800;">⏳ Importing...</span>
+                        {{else if this.missing}}
+                            <span style="color: red;">❌ Missing</span>
+                        {{else}}
+                            <span style="color: #4caf50;">📂 Selected</span>
+                        {{/if}}
+                    </div>
                 {{/each}}
                 {{#if finishedOverallParsing}}
-                    <div><b>All files:</b></div>
+                    <div><b>🎉 All files:</b></div>
                     <div><b>Imported, enjoy.</b></div>
                 {{/if}}
             </div>
-
-            <div>
-                Check to enable automatic icon assignment during the import <input type="checkbox" class="setIcons" checked />
+    
+            <label><input type="checkbox" class="setIcons" {{#if icons}}checked{{/if}} /> Enable automatic icon assignment</label>
+    
+            <div class="button-row">
+                <button type="button" class="toggleAdvancedBtn">🔁 Change to Quick Mode</button>
+                <button name="import" type="submit" {{#if disableImportButton}}disabled{{/if}}>📂 Import Files</button>
             </div>
-
         </div>
-        <button name='import' type="submit" {{#if disableImportButton}}disabled{{/if}}>Import</button>
     </section>
 </form>
+
+<style>
+    .chummer-import {
+        font-family: sans-serif;
+        line-height: 1.5;
+        color: #222;
+    }
+
+    .chummer-import h1{
+        margin: 0;
+    }
+
+    .chummer-import h2,
+    .chummer-import h3 {
+        margin: 0.5em 0 0.2em;
+        font-weight: bold;
+    }
+
+    .chummer-import section {
+        padding: 0.5em 0;
+    }
+
+    .chummer-import .quickImportTab,
+    .chummer-import .advancedImport {
+        padding: 0em 1em;
+        border-radius: 6px;
+    }
+
+    .chummer-import p {
+        margin: 0.5em 0;
+    }
+
+    .chummer-import label {
+        display: block;
+        margin: 0.5em 0;
+        font-weight: 500;
+    }
+
+    .chummer-import select,
+    .chummer-import input[type="file"] {
+        border-radius: 4px;
+        min-width: 150px;
+        text-align: center;
+    }
+
+    .chummer-import input[type="checkbox"] {
+        margin-right: 0.5em;
+    }
+
+    .chummer-import button {
+        margin-top: 0.5em;
+        font-size: 1em;
+        border: 1px solid #aaa;
+        border-radius: 5px;
+        background-color: #eaeaea;
+        cursor: pointer;
+    }
+
+    .chummer-import button:hover {
+        background-color: #ddd;
+    }
+
+    .chummer-import .fileStatusGrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.2em 1em;
+        padding: 0em 1em;
+    }
+
+    .chummer-import .hidden {
+        display: none !important;
+    }
+
+    .chummer-import .button-row {
+        display: flex;
+        gap: 0.5em;
+        justify-content: flex-start;
+    }
+
+    .chummer-import .button-row button {
+        flex: 0 1 auto;
+        min-width: max-content;
+    }
+</style>

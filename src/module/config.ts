@@ -1283,6 +1283,8 @@ export const SR5 = {
             'infected': 'critter/infected',
             'mundane-critters': 'critter/mundane-critters',
             'mutant-critters': 'critter/mutant-critters',
+            'paranormal-critters': 'critter/paranormal-critters',
+            'technocritters': 'critter/technocritters',
         },
         complex_form: {},
         contact: {},
