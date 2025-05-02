@@ -8,6 +8,7 @@ import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
 import { DataDefaults } from '../../../data/DataDefaults';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import { Constants } from "./Constants";
 
 export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowrun.SpellData> {
     public override categoryTranslations: any;
@@ -80,6 +81,6 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items);
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

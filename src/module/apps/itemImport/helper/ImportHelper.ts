@@ -5,6 +5,7 @@ import { ImportStrategy } from './ImportStrategy';
 import { SR5Item } from "../../../item/SR5Item";
 import { BaseItem } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents.mjs';
 import FolderTypes = foundry.CONST.FOLDER_DOCUMENT_TYPES;
+type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
 
 export enum ImportMode {
     XML = 1,
@@ -69,12 +70,53 @@ export class ImportHelper {
      * @param folder The parent folder.
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
-    public static async NewFolder(folder_type: FolderTypes, name: string, folder: Folder | null = null) {
-        return await Folder.create({
-            type: folder_type,
-            folder: folder === null ? null : folder.id,
-            name: name,
-        });
+    public static async NewFolder(ctype: CompendiumKey, name: string, folder: Folder | null = null): Promise<Folder> {
+        const { pack, type } = Constants.MAP_COMPENDIUM_KEY[ctype];
+
+        const folderCreated = await Folder.create(
+            { name: name, type: type, folder: folder?.id ?? null },
+            { pack: pack }
+        );
+
+        if (!folderCreated) throw new Error("Folder creation failed.");
+        return folderCreated;
+    }
+
+    /**
+     * Helper method to get or create a compendium collection.
+     *
+     * Retrieves a compendium by its mapped key. If the compendium does not exist, it will be created with the corresponding metadata.
+     *
+     * @param ctype The compendium key (e.g., "Actor" or "Item") mapped in MAP_COMPENDIUM_KEY.
+     * @returns A promise that resolves with the compendium collection.
+     * @throws If the compendium key is invalid or improperly formatted.
+     */
+    public static async GetCompendium(ctype: CompendiumKey): Promise<CompendiumCollection<CompendiumCollection.Metadata>> {
+        const { pack, type } = Constants.MAP_COMPENDIUM_KEY[ctype];
+        let compendium = game.packs.get(pack);
+
+        // Create the compendium if it doesn't exist
+        if (!compendium) {
+            const [scope, packName] = pack.split(".");
+            if (!scope || !packName) throw new Error(`Invalid compendium key: ${pack}`);
+
+            compendium = await CompendiumCollection.createCompendium({
+                name: packName,
+                label: game.i18n.localize(`SR5.Compendiums.${ctype}`),
+                type: type,
+                package: scope,
+                system: "shadowrun5e",
+                private: false,
+                path: `packs/${packName}`,
+                ownership: {
+                    "PLAYER": "OBSERVER",
+                    "TRUSTED": "OBSERVER",
+                    "ASSISTANT": "OWNER"
+                },
+            });
+        }
+
+        return compendium;
     }
 
     /**
@@ -87,25 +129,29 @@ export class ImportHelper {
      * @param mkdirs If true, will make all folders along the hierarchy if they do not exist.
      * @returns A promise that will resolve with the found folder.
      */
-    public static async GetFolderAtPath(folder_type: FolderTypes, path: string, mkdirs: boolean = false): Promise<Folder> {
-        let currentFolder,
-            lastFolder = null;
+    public static async GetFolderAtPath(ctype: CompendiumKey, path: string, mkdirs: boolean = false): Promise<Folder> {
+        let currentFolder: Folder | undefined;
+        let lastFolder: Folder | null = null;
+
+        const compendium = await this.GetCompendium(ctype);
+
         const pathSegments = path.split('/');
         for (const pathSegment of pathSegments) {
-             // Check if the path structure matches the folder structure.
-            currentFolder = game.folders?.find((folder) => {
-                return folder.folder === lastFolder && folder.name === pathSegment && folder.type == folder_type
-            });
-
-            // Only create when allowed to. Otherwise abort with error.
-            if (!currentFolder && !mkdirs) return Promise.reject(`Unable to find folder: ${path}`);
-            // Create the missing folder for the current segment
-            if (!currentFolder) currentFolder = await ImportHelper.NewFolder(folder_type, pathSegment, lastFolder);
-
+            //@ts-expect-error: folders is not typed but exists in Foundry VTT v12
+            currentFolder = compendium.folders?.find((folder: Folder) =>
+                folder.name === pathSegment && folder.folder === lastFolder
+            );
+    
+            if (!currentFolder && !mkdirs)
+                throw new Error(`Unable to find folder: ${path}`);
+            else if (!currentFolder)
+                currentFolder = await ImportHelper.NewFolder(ctype, pathSegment, lastFolder);
+    
             lastFolder = currentFolder;
         }
-
-        return Promise.resolve(currentFolder);
+    
+        if (!currentFolder) throw new Error(`Failed to resolve folder at path: ${path}`);
+        return currentFolder;
     }
 
     /**
@@ -140,8 +186,10 @@ export class ImportHelper {
     }
 
     public static findItem(name: string, types?: OneOrMany<BaseItem['data']['type']>): SR5Item | undefined {
-        return game.items?.find(item => 
-            item.name === name && (!types || (this.getArray(types).includes(item.type)))
+        const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY['Item'].pack) as CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
+
+        return pack?.find(item =>
+            item.name === name && (!types || this.getArray(types).includes(item.type))
         );
     }
 
@@ -152,8 +200,9 @@ export class ImportHelper {
 
         return name;
     }
+
     public static async MakeCategoryFolders(
-        folder_type: FolderTypes,
+        ctype: CompendiumKey,
         jsonData: object,
         path: string,
         jsonCategoryTranslations?: object | undefined,
@@ -167,7 +216,7 @@ export class ImportHelper {
             let origCategoryName = categoryName;
             categoryName = ImportHelper.TranslateCategory(categoryName, jsonCategoryTranslations);
             categoryName = categoryName.replace(/[\/\\]/g, '_');
-            folders[origCategoryName.toLowerCase()] = await ImportHelper.GetFolderAtPath(folder_type, `${Constants.ROOT_IMPORT_FOLDER_NAME}/${path}/${categoryName}`, true);
+            folders[origCategoryName.toLowerCase()] = await ImportHelper.GetFolderAtPath(ctype, `${path}/${categoryName}`, true);
         }
 
         return folders;

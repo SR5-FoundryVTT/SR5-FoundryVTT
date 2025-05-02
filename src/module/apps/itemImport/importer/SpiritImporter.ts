@@ -86,7 +86,7 @@ export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shad
 
         // Add insect type folders
         for (const insect of insectTypes) {
-            const path = `${Constants.ROOT_IMPORT_FOLDER_NAME}/Spirits/Insect Spirits/${insect}`;
+            const path = `Spirits/Insect Spirits/${insect}`;
             folders[`insect spirits/${insect.toLowerCase()}`] = await IH.GetFolderAtPath("Actor", path, true);
         }
 
@@ -125,6 +125,6 @@ export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shad
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Actor.create(actors);
+        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Actor'].pack });
     }
 }

@@ -67,6 +67,6 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items);
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

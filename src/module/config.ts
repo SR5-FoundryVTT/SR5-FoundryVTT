@@ -5,6 +5,11 @@
  */
 
 export const SR5 = {
+    compendiums: {
+        actor: 'SR5.Compendiums.Actor',
+        item: 'SR5.Compendiums.Item',
+    },
+    
     itemTypes: {
         action: 'SR5.ItemTypes.Action',
         adept_power: 'SR5.ItemTypes.AdeptPower',

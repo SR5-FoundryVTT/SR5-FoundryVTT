@@ -29,7 +29,7 @@ export class SpriteImporter extends DataImporter<Shadowrun.SpriteActorData, Shad
         const parserType = 'sprite';
         const parser = new SpriteParser();
 
-        const folder = await IH.GetFolderAtPath("Actor", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Sprites`, true);
+        const folder = await IH.GetFolderAtPath("Actor", `Sprites`, true);
 
         for (const jsonData of jsonDatas) {
             // Check to ensure the data entry is supported and the correct category
@@ -55,6 +55,6 @@ export class SpriteImporter extends DataImporter<Shadowrun.SpriteActorData, Shad
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Actor.create(actors);
+        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Actor'].pack });
     }
 }

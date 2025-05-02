@@ -51,7 +51,7 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
 
             // Get the item's folder information
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
-            let categoryFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Programs')}/${category}`, true);
+            let categoryFolder = await ImportHelper.GetFolderAtPath("Item", `${game.i18n.localize('SR5.Programs')}/${category}`, true);
             //@ts-expect-error TODO: foundry-vtt-types v10
             item.folder = categoryFolder.id;
 
@@ -81,6 +81,6 @@ export class ProgramImporter extends DataImporter<Shadowrun.ProgramItemData, Sha
         const programs = this.filterGearToPrograms(jsonObject);
         const items = await this.parsePrograms(programs, setIcons);
         // @ts-expect-error I have bigger issues than fully typing this.
-        return await Item.create(items);
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

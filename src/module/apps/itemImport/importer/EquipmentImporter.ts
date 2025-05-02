@@ -55,7 +55,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             // Get the item's folder information
             // Replace / as it's used as a separator in GetFolderAtPath.
             const category = ImportHelper.TranslateCategory(categoryEN, this.categoryTranslations).replace('/', ' ');
-            let categoryFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.Gear')}/${category}`, true);
+            let categoryFolder = await ImportHelper.GetFolderAtPath("Item", `${game.i18n.localize('SR5.Gear')}/${category}`, true);
             // @ts-expect-error
             item.folder = categoryFolder.id;
 
@@ -91,6 +91,6 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
         const items = await this.ParseEquipment(equipment, setIcons);
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items);
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

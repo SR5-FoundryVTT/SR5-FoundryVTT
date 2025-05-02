@@ -3,6 +3,7 @@ import { ImportHelper as IH } from '../helper/ImportHelper';
 import { CritterParser } from '../parser/metatype/CritterParser';
 import { SR5Actor } from '../../../actor/SR5Actor';
 import { MetatypeSchema } from "../schema/MetatypeSchema";
+import { Constants } from './Constants';
 
 export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, Shadowrun.CharacterData> {
     public files = ['critters.xml'];
@@ -92,6 +93,6 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Actor.create(actors);
+        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Actor'].pack });
     }
 }

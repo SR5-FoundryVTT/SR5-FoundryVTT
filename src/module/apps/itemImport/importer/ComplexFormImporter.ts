@@ -32,7 +32,7 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const parser = new ComplexFormParserBase();
-        const folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
+        const folder = await ImportHelper.GetFolderAtPath("Item", `Complex Forms`, true);
         let items: Shadowrun.ComplexFormItemData[] = [];
         let jsonDatas = jsonObject['complexforms']['complexform'];
         this.iconList = await this.getIconFiles();
@@ -70,6 +70,6 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
         }
 
         // @ts-expect-error
-        return await Item.create(items) as Item;
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack }) as Item;
     }
 }

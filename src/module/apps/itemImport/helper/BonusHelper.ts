@@ -302,13 +302,6 @@ export class BonusHelper {
                 { applyTo: 'test_all', selection_tests: '[{"value":"Combat Spell Defense","id":"CombatSpellDefenseTest"}]' }
             );
         }
-
-        if (sheet.effects.length) {
-            // console.log(sheet.name, sheet.effects);
-            this.cnt1++;
-            this.cnt2 += sheet.effects.length;
-            console.log(this.cnt1, this.cnt2);
-        }
     }
 
     private static addItems(sheet: ShadowrunSheetData, bonus: BonusSchema) : void {

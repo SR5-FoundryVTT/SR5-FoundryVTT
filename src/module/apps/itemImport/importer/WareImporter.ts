@@ -6,6 +6,7 @@ import WareItemData = Shadowrun.WareItemData;
 import CyberwareItemData = Shadowrun.CyberwareItemData;
 import BiowareItemData = Shadowrun.BiowareItemData;
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import { Constants } from "./Constants";
 
 export class WareImporter extends DataImporter<WareItemData, WareData> {
     public override categoryTranslations: any;
@@ -93,6 +94,6 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items);
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

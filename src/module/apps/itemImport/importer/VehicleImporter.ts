@@ -45,7 +45,7 @@ export class VehicleImporter extends DataImporter<Shadowrun.VehicleActorData, Sh
         const vehicleFolders = await ImportHelper.MakeCategoryFolders("Actor", vehiclesData, 'Vehicles', translations);
 
         const folders = { ...droneFolders, ...vehicleFolders };
-        folders['Other'] = await ImportHelper.GetFolderAtPath("Actor", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Vehicles/Other`, true);
+        folders['Other'] = await ImportHelper.GetFolderAtPath("Actor", "Vehicles/Other", true);
 
         return folders;
     }
@@ -81,6 +81,6 @@ export class VehicleImporter extends DataImporter<Shadowrun.VehicleActorData, Sh
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Actor.create(actors);
+        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Actor'].pack });
     }
 }

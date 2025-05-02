@@ -47,7 +47,7 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
             // Get the item's folder information
             const folderName = validCategory.includes(categoryName) ? categoryName : "Other";
 
-            const folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Vehicle-Mods/${folderName}`, true);
+            const folder = await ImportHelper.GetFolderAtPath("Item", `Vehicle-Mods/${folderName}`, true);
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 
@@ -67,6 +67,6 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(datas);
+        return await Item.create(datas, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

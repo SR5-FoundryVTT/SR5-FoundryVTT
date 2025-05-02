@@ -28,7 +28,8 @@ export class Constants {
         'Submachine Guns': 'automatics',
         'Tasers': 'pistols',
         'Unarmed': 'unarmed_combat',
-    };
+    } as const;
+
     public static readonly MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY: {
         [key: string]: Exclude<keyof typeof SR5.weaponRangeCategories, "manual">;
     } = {
@@ -63,10 +64,13 @@ export class Constants {
         'Flamethrowers': 'flamethrower',
     } as const;
 
-    public static readonly ROOT_IMPORT_FOLDER_NAME = 'SR5e';
+    public static readonly MAP_COMPENDIUM_KEY = {
+        'Actor': {pack: 'world.actor', type: 'Actor'},
+        'Item': {pack: 'world.item', type: 'Item'},
+    } as const;
 
     public static readonly MAP_CHUMMER_PROGRAMM_CATEGORY = {
         'Hacking Programs': 'hacking_program',
         'Common Programs': 'common_program'
-    }
+    } as const;
 }

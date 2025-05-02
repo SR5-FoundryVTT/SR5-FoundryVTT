@@ -188,16 +188,16 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
         const rccs = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Rigger Command Consoles');
 
-        let commlinksFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
-        let cyberdecksFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
-        let rccsFolder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatRCC')}`, true);
+        let commlinksFolder = await ImportHelper.GetFolderAtPath("Item", `${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
+        let cyberdecksFolder = await ImportHelper.GetFolderAtPath("Item", `${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
+        let rccsFolder = await ImportHelper.GetFolderAtPath("Item", `${game.i18n.localize('SR5.DeviceCatRCC')}`, true);
 
         entries = entries.concat(await this.ParseCommlinkDevices(commlinks, commlinksFolder, setIcons));
         entries = entries.concat(await this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder, setIcons));
         entries = entries.concat(await this.ParseRCCDevices(rccs, rccsFolder, setIcons));
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(entries)
+        return await Item.create(entries, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack })
     }
 
     /* List of unsupported Commlinks, due to dynamics value calculations.

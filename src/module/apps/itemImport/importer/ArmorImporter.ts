@@ -1,3 +1,4 @@
+import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
@@ -60,6 +61,6 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
         }
 
         // @ts-expect-error
-        return await Item.create(datas) as Item;
+        return await Item.create(datas, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack }) as Item;
     }
 }

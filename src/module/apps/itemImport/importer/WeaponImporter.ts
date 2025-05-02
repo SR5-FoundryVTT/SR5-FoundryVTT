@@ -38,8 +38,8 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders("Item", jsonObject, 'Weapons', this.categoryTranslations);
 
-        folders['gear'] = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Gear`, true);
-        folders['quality'] = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Quality`, true);
+        folders['gear'] = await ImportHelper.GetFolderAtPath("Item", "Weapons/Gear", true);
+        folders['quality'] = await ImportHelper.GetFolderAtPath("Item", "Weapons/Quality", true);
 
         const parser = new ParserMap<WeaponItemData>(WeaponParserBase.GetWeaponType, [
             { key: 'range', value: new RangedParser() },
@@ -94,6 +94,6 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
         }
 
         // @ts-expect-error // TODO: TYPE: This should be removed after typing of SR5Item
-        return await Item.create(items);
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

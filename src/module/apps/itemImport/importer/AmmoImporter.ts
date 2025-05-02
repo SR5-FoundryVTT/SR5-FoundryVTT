@@ -109,12 +109,12 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
                 folderName = splitName[0].trim();
             }
 
-            let folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Ammo/${folderName}`, true);
+            let folder = await ImportHelper.GetFolderAtPath("Item", `Ammo/${folderName}`, true);
             // @ts-expect-error TODO: Foundry Where is my foundry base data?
             ammo.folder = folder.id;
         }
 
         // @ts-expect-error
-        return await Item.create(ammoDatas) as Item;
+        return await Item.create(ammoDatas, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack }) as Item;
     }
 }

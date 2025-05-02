@@ -49,7 +49,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
 
     public async Parse(chummerData: object, setIcons: boolean): Promise<Item> {
         const parser = new SpritePowerParser();
-        const folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('TYPES.Item.sprite_power')}`, true);
+        const folder = await ImportHelper.GetFolderAtPath("Item", `${game.i18n.localize('TYPES.Item.sprite_power')}`, true);
 
         const items: Shadowrun.SpritePowerItemData[] = [];
         const chummerSpritePowers = this.filterObjects(chummerData['powers']['power']);
@@ -84,6 +84,6 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items);
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

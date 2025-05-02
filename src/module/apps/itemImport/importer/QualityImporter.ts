@@ -1,3 +1,4 @@
+import { Constants } from "./Constants";
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
@@ -61,6 +62,6 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items);
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

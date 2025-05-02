@@ -47,7 +47,7 @@ export class WeaponModImporter extends DataImporter<Shadowrun.ModificationItemDa
                 let splitName = folderName.split('/');
                 folderName = splitName[0];
             }
-            let folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapon-Mods/${folderName}`, true);
+            let folder = await ImportHelper.GetFolderAtPath("Item", `Weapon-Mods/${folderName}`, true);
             //@ts-expect-error TODO: Foundry Where is my foundry base data?
             item.folder = folder.id;
 
@@ -67,6 +67,6 @@ export class WeaponModImporter extends DataImporter<Shadowrun.ModificationItemDa
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(datas);
+        return await Item.create(datas, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }
