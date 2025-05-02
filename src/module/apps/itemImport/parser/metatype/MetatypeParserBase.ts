@@ -8,37 +8,6 @@ import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 export abstract class MetatypeParserBase<TResult extends ShadowrunActorData> extends Parser<TResult> {
     abstract override Parse(jsonData: object, item: TResult, jsonTranslation?: object): TResult;
 
-    private formatAsSlug(name: string): string {
-        return name.trim().toLowerCase().replace((/'|,|\[|\]|\(|\)/g), '').split((/-|\s|\//g)).join('-');
-    }
-
-    private genImportFlags(name: string, type: string, subType: string): Shadowrun.ImportFlagData {
-        const flags = {
-            name: this.formatAsSlug(name), // original english name
-            type: type,
-            subType: '',
-            isFreshImport: true
-        }
-        if (subType && Object.keys(SR5.itemSubTypeIconOverrides[type]).includes(subType)) {
-            flags.subType = subType;
-        }
-        return flags;
-    }
-
-    private createPower(item : any, jsonTranslation?: object | undefined) : any {
-        const itemJson = DataDefaults.baseEntityData<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData>(
-            "Item", { type: "critter_power" }
-        );
-
-        const name = item._TEXT ?? item.name?._TEXT;
-
-        itemJson.system.rating = item.rating?._TEXT ?? item.$?.rating ?? 0;
-        itemJson.name = IH.MapNameToTranslation(jsonTranslation, name)
-        itemJson.system.importFlags = this.genImportFlags(name, "critter_power", '');
-
-        return itemJson;
-    }
-
     getItems(
         array: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }>,
         searchType: Parameters<typeof IH.findItem>[1],
