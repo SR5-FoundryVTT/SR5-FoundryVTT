@@ -46,13 +46,6 @@ export const registerBasicHelpers = () => {
         return args.filter(a => typeof a === 'string').join('');
     });
 
-    Handlebars.registerHelper('concat', function (strs, c = ',') {
-        if (Array.isArray(strs)) {
-            return strs.join(c);
-        }
-        return strs;
-    });
-
     Handlebars.registerHelper('for', function (from: number, to: number, options) {
         let accum = '';
         for (let i = from; i < to; i += 1) {
