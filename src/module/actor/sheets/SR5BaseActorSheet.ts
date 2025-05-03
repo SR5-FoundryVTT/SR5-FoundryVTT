@@ -1548,7 +1548,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onListItemToggleDescriptionVisibility(event) {
         event.preventDefault();
         const item = $(event.currentTarget).parents('.list-item');
-        const iid = $(item).data().item;
+        const iid = item.data().itemId;
         const field = item.find('.list-item-description');
         field.toggle();
         if (iid) {
