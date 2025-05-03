@@ -409,13 +409,21 @@ ___________________
         console.debug('Shadowrun5e | Registering new chat messages related hooks');
     }
 
-    static renderItemDirectory(app: Application, html: JQuery) {
+    /**
+     * Extend rendering of Sidebar tab 'ItemDirectory' by
+     * - the Chummer Item Import button
+     * 
+     * @param app Foundry ItemDirectory app instance
+     * @param html HTML element of the app
+     * @returns 
+     */
+    static renderItemDirectory(app: Application, html: HTMLElement) {
         if(!game.user?.isGM){
             return 
         }
         
         const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
-        html.find('footer').before(button);
+        $(html).find('footer').before(button);
         button.on('click', (event) => {
             new Import().render(true);
         });
