@@ -126,6 +126,7 @@
                 white-space: nowrap;
                 // Override Foundry default header styling.
                 border-bottom: none;
+                color: $white;
 
                 &:hover {
                     text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower, 1px 1px 0 $cornflower;
