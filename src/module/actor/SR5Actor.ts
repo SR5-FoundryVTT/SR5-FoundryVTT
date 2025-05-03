@@ -595,7 +595,7 @@ export class SR5Actor extends Actor {
             case 'ground':
                 return 'pilot_ground_craft';
             case 'water':
-                return 'pilot_watercraft';
+                return 'pilot_water_craft';
             case 'aerospace':
                 return 'pilot_aerospace';
             case 'walker':

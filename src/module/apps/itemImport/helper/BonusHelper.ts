@@ -56,7 +56,30 @@ export class BonusHelper {
     }
 
     private static normalizeSkillName(rawName: string): string {
-        return rawName.toLowerCase().trim().replace(/\s+/g, '_').replace(/-/g, '_');
+        let name = rawName
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '_')
+            .replace(/-/g, '_');
+    
+        if (name.includes('exotic') && name.includes('_weapon')) {
+            name = name.replace('_weapon', '');
+        }
+        if (name.includes('exotic') && name.includes('_ranged')) {
+            name = name.replace('_ranged', '_range');
+        }
+
+        if (name === 'shadowing' || name === 'infiltration') {
+            name = 'sneaking';
+        }
+        if (name === 'pilot_watercraft') {
+            name = 'pilot_water_craft';
+        }
+        if (name === 'thrown_weapons') {
+            name = 'throwing_weapons';
+        }
+    
+        return name;
     }
 
     private static createEffect(
@@ -203,7 +226,7 @@ export class BonusHelper {
 
         if (bonus.skillcategory) {
             const skillCategoryTable: Record<string, string[]> = {
-                "Combat Active": ["archery", "automatics", "blades", "clubs", "exotic_melee_weapon", "exotic_ranged_weapon", "heavy_weapons", "longarms", "pistols", "throwing_weapons", "unarmed_combat"],
+                "Combat Active": ["archery", "automatics", "blades", "clubs", "exotic_melee", "exotic_range", "heavy_weapons", "longarms", "pistols", "throwing_weapons", "unarmed_combat"],
                 "Physical Active": ["disguise", "diving", "escape_artist", "flight", "free_fall", "gymnastics", "palming", "perception", "running", "sneaking", "survival", "swimming", "tracking"],
                 "Social Active": ["con", "etiquette", "impersonation", "instruction", "intimidation", "leadership", "negotiation", "performance"],
                 "Magical Active": ["alchemy", "artificing", "assensing", "astral_combat", "banishing", "binding", "counterspelling", "disenchanting", "ritual_spellcasting", "spellcasting", "summoning"],
@@ -211,7 +234,7 @@ export class BonusHelper {
                 "Resonance Active": ["compiling", "decompiling", "registering"],
                 "Technical Active": ["aeronautics_mechanic", "animal_handling", "armorer", "artisan", "automotive_mechanic", "biotechnology", "chemistry", "computer", "cybercombat", "cybertechnology",
                     "demolitions", "electronic_warfare", "first_aid", "forgery", "hacking", "hardware", "industrial_mechanic", "locksmith", "medicine", "nautical_mechanic", "navigation", "software"],
-                "Vehicle Active": ["pilot_exotic_vehicle", "gunnery", "pilot_aerospace", "pilot_aircraft", "pilot_ground_craft", "pilot_walker", "pilot_watercraft"],
+                "Vehicle Active": ["pilot_exotic_vehicle", "gunnery", "pilot_aerospace", "pilot_aircraft", "pilot_ground_craft", "pilot_walker", "pilot_water_craft"],
                 //TODO knowledge skill category
                 "Academic": [],
                 "Interest": [],

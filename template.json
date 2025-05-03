@@ -196,7 +196,7 @@
                             "mod": [],
                             "specs": []
                         },
-                        "exotic_melee_weapon": {
+                        "exotic_melee": {
                             "value": 0,
                             "values": [],
                             "weapons": [],
@@ -205,7 +205,7 @@
                             "mod": [],
                             "group": ""
                         },
-                        "exotic_ranged_weapon": {
+                        "exotic_range": {
                             "value": 0,
                             "values": [],
                             "weapons": [],
@@ -751,7 +751,7 @@
                             "mod": [],
                             "specs": []
                         },
-                        "pilot_watercraft": {
+                        "pilot_water_craft": {
                             "value": 0,
                             "attribute": "reaction",
                             "canDefault": false,

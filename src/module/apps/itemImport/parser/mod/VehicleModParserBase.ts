@@ -12,7 +12,11 @@ export class VehicleModParserBase extends TechnologyItemParserBase<ModificationI
 
         const categoryName = jsonData.category._TEXT;
 
-        item.system.modification_category = categoryName.toLowerCase() as ModificationCategoryType;
+        item.system.modification_category = (
+            categoryName === undefined         ? "" :
+            categoryName === "Powertrain"      ? "power_train"
+                                               : categoryName.toLowerCase()
+        ) as ModificationCategoryType;
 
         item.system.slots = +jsonData.slots;
 
