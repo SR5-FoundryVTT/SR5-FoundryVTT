@@ -17,7 +17,7 @@
     },
     "scripts": [],
     "esmodules": ["dist/bundle.js"],
-    "styles": ["dist/bundle.css", "dist/importTab.css"],
+    "styles": ["dist/bundle.css"],
     "languages": [
         {
             "lang": "en",
