@@ -63,6 +63,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     networkDevices: (SR5Item | SR5Actor)[]
     networkController: SR5Item | undefined
 
+    // Contact Item
+    linkedActor: SR5Actor | undefined
+
     // Action Items. (not only type = action)
     //@ts-expect-error
     tests: typeof game.shadowrun5e.tests
@@ -123,6 +126,8 @@ export class SR5ItemSheet extends ItemSheet {
         //@ts-expect-error // TODO: remove TODO: foundry-vtt-types v10
         data.data = data.item.system;
         const itemData = this.item.system;
+
+        const linkedActor = await this.item.getLinkedActor();
 
         if (itemData.action) {
             try {
@@ -210,6 +215,10 @@ export class SR5ItemSheet extends ItemSheet {
             data['networkController'] = await this.item.networkController();
         }
 
+        if (this.item.isContact) {
+            data['linkedActor'] = await this.item.getLinkedActor() as SR5Actor;
+        }
+
         // Provide action parts with all test variants.
         // @ts-expect-error // TODO: put 'opposed test types' into config (see data.config)
         data.tests = game.shadowrun5e.tests;
@@ -230,7 +239,12 @@ export class SR5ItemSheet extends ItemSheet {
 
         data.rollModes = CONFIG.Dice.rollModes;
 
-        return data;
+
+
+        return {
+            ...data,
+            linkedActor
+        }
     }
 
     /**
@@ -262,8 +276,11 @@ export class SR5ItemSheet extends ItemSheet {
      * Sorted (by translation) active skills either from the owning actor or general configuration.
      */
     _getSortedActiveSkillsForSelect() {
+        // In case of custom skill used, inject it into the skill list.
+        const skill = this.document.system.action?.skill;
+        const skills = skill ? [skill] : undefined;
         // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
-        return ActionFlow.sortedActiveSkills(this.item.actorOwner, this.document.system.action?.skill);
+        return ActionFlow.sortedActiveSkills(this.item.actorOwner, skills);
     }
 
     _getNetworkDevices(): SR5Item[] {
@@ -305,6 +322,11 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
 
         /**
+         * Contact item specific
+         */
+        html.find('.actor-remove').click(this.handleLinkedActorRemove.bind(this));
+
+        /**
          * Weapon item specific
          */
         html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
@@ -317,6 +339,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
+
         /**
          * SIN item specific
          */
@@ -349,7 +372,25 @@ export class SR5ItemSheet extends ItemSheet {
 
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
 
+        html.find('.power-optional-input').on('change', this._onPowerOptionalInputChanged.bind(this));
+
         this._activateTagifyListeners(html);
+    }
+
+    /**
+     * User requested removal of the linked actor.
+     */
+    async handleLinkedActorRemove(event: any) {
+        await this.item.update({ 'system.linkedActor': '' });
+    }
+
+    /**
+     * Updating the contacts linked actor.
+     * 
+     * @param actor The prepared actor
+     */
+    async updateLinkedActor(actor: SR5Actor) {
+        await this.item.update({ 'system.linkedActor': actor.uuid });
     }
 
     _addDragSupportToListItemTemplatePartial(i, item) {
@@ -374,19 +415,19 @@ export class SR5ItemSheet extends ItemSheet {
             switch (element.dataset.itemType) {
                 // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
                 case 'ActiveEffect':
-                {
-                    const effectId = element.dataset.itemId;
-                    const effect = this.item.effects.get(effectId);
-                    if (effect) {
-                        // Prepare data transfer
-                        dragData.type = 'ActiveEffect';
-                        dragData.data = effect; // this may blow up
+                    {
+                        const effectId = element.dataset.itemId;
+                        const effect = this.item.effects.get(effectId);
+                        if (effect) {
+                            // Prepare data transfer
+                            dragData.type = 'ActiveEffect';
+                            dragData.data = effect; // this may blow up
 
-                        // Set data transfer
-                        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                        return;
+                            // Set data transfer
+                            event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                            return;
+                        }
                     }
-                }
             }
         }
         return super._onDragStart(event);
@@ -403,13 +444,13 @@ export class SR5ItemSheet extends ItemSheet {
         const data = parseDropData(event);
         if (!data) return;
 
-
         // CASE - Handle dropping of documents directly into the source field like urls and pdfs.
-        if (event.toElement.name === 'system.description.source') {
+        const targetElement = event.toElement || event.target;
+        if (targetElement?.name === 'system.description.source') {
             this.item.setSource(data.uuid);
             return;
         }
-        
+
         // CASE - Handle ActiveEffects
         if (data.type === 'ActiveEffect') {
             if (data.itemId === this.item.id) {
@@ -475,6 +516,15 @@ export class SR5ItemSheet extends ItemSheet {
             }
 
             return await this.item.addNetworkDevice(actor);
+        }
+
+        // link actors in existing contacts
+        if (this.item.isContact && data.type === 'Actor') {
+            const actor = await fromUuid(data.uuid) as SR5Actor;
+
+            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+
+            return this.updateLinkedActor(actor);
         }
     }
 
@@ -637,9 +687,12 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onClipEquip(clipType: string) {
+        if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
+        
+        const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
         await this.item.update({
             'system.ammo.clip_type': clipType,
-            'system.ammo.partial_reload_value': RangedWeaponRules.partialReload(clipType, this.item.actor.getAttribute('agility').value)
+            'system.ammo.partial_reload_value': RangedWeaponRules.partialReload(clipType, agilityValue)
         }, { render: true });
     }
 
@@ -926,5 +979,35 @@ export class SR5ItemSheet extends ItemSheet {
         if (!this.document.isEquipped()) return;
 
         await this.document.parent.equipOnlyOneItemOfType(this.document);
+    }
+
+    /**
+     * Change the enabled status of an item shown within a sheet item list.
+     */
+    async _onPowerOptionalInputChanged(event) {
+        event.preventDefault();
+        if (!this.item.isCritterPower && !this.item.isSpritePower) return;
+
+        let selectedRangeCategory;
+
+        if (this.item.isCritterPower) {
+            selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.critterPower.optional;
+        } else {
+            selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.spritePower.optional;
+        }
+
+        this.item.system.optional = selectedRangeCategory;
+
+        switch (this.item.system.optional) {
+            case 'standard':
+            case 'enabled_option':
+                this.item.system.enabled = true;
+                break;
+            case 'disabled_option':
+                this.item.system.enabled = false;
+                break;
+        }
+
+        this.item.render(false);
     }
 }

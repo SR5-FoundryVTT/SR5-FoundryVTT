@@ -15,7 +15,7 @@ export class DronePerceptionTest extends SuccessTest {
             case "autopilot": {
                 const attribute = 'pilot';
                 const skill = 'perception';
-                const limit = 'sensor';
+                const limit = {attribute: 'sensor'};
 
                 return {attribute, skill, limit};
             }

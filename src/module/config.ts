@@ -945,6 +945,10 @@ export const SR5 = {
         stabber: "SR5.Spirit.Types.Stabber",
         tungak: "SR5.Spirit.Types.Tungak",
         vucub: "SR5.Spirit.Types.Vucub",
+
+        // blood magic spirits
+        blood_shade: 'SR5.Spirit.Types.BloodShade',
+        bone: 'SR5.Spirit.Types.Bone',
     },
 
     /**
@@ -986,6 +990,11 @@ export const SR5 = {
             permanent: 'SR5.CritterPower.Durations.Permanent',
             special: 'SR5.CritterPower.Durations.Special',
         },
+        optional: {
+            standard: 'SR5.CritterPower.Optional.Standard',
+            enabled_option: 'SR5.CritterPower.Optional.EnabledOption',
+            disabled_option: 'SR5.CritterPower.Optional.DisabledOption',
+        },
     },
 
     spriteTypes: {
@@ -996,6 +1005,21 @@ export const SR5 = {
         machine: 'SR5.Sprite.Types.Machine',
         companion: 'SR5.Sprite.Types.Companion',
         generalist:'SR5.Sprite.Types.Generalist',
+    },
+
+    spritePower: {
+        durations: {
+            always: 'SR5.SpritePower.Durations.Always',
+            instant: 'SR5.SpritePower.Durations.Instant',
+            sustained: 'SR5.SpritePower.Durations.Sustained',
+            permanent: 'SR5.SpritePower.Durations.Permanent',
+            special: 'SR5.SpritePower.Durations.Special',
+        },
+        optional: {
+            standard: 'SR5.SpritePower.Optional.Standard',
+            enabled_option: 'SR5.SpritePower.Optional.EnabledOption',
+            disabled_option: 'SR5.SpritePower.Optional.DisabledOption',
+        },
     },
 
     vehicle: {
@@ -1354,6 +1378,31 @@ export const SR5 = {
         },
         ritual: {},
         sprite_power: {},
+        vehicle: {
+            /* Vehicles */
+            'bikes': 'vehicle/bike',
+            'cars': 'vehicle/car',
+            'trucks': 'vehicle/truck',
+            'municipal-construction': 'vehicle/construction',
+            'corpsec-police-military': 'vehicle/military',
+            'boats': 'vehicle/boat',
+            'submarines': 'vehicle/submarine',
+            'fixed-wing-aircraft': 'vehicle/airplane',
+            'ltav': 'vehicle/ltav',
+            'rotorcraft': 'vehicle/rotorcraft',
+            'vtol-vstol': 'vehicle/vtol',
+            'hovercraft': 'vehicle/hovercraft',
+
+            /* Drones */
+            'micro': 'vehicle/drone',
+            'mini': 'vehicle/drone',
+            'small': 'vehicle/drone',
+            'medium': 'vehicle/drone',
+            'anthro': 'vehicle/anthro',
+            'large': 'vehicle/drone',
+            'huge': 'vehicle/drone',
+            'missile': 'vehicle/drone',
+        },
         weapon: {
             // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'
             'melee': '',

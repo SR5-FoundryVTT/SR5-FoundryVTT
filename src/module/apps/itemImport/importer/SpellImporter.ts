@@ -20,7 +20,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
 
     public override GetDefaultData({ type }: { type: any; }): Shadowrun.SpellItemData {
         const systemData = {action: {type: 'varies', attribute: 'magic', skill: 'spellcasting'}} as Shadowrun.SpellData;
-        return DataDefaults.baseItemData<Shadowrun.SpellItemData, Shadowrun.SpellData>({type}, systemData);
+        return DataDefaults.baseEntityData<Shadowrun.SpellItemData, Shadowrun.SpellData>("Item", {type}, systemData);
     }
 
     ExtractTranslation() {
@@ -34,7 +34,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
     }
 
     async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Spells', this.categoryTranslations);
+        const folders = await ImportHelper.MakeCategoryFolders("Item", jsonObject, 'Spells', this.categoryTranslations);
 
         const parser = new ParserMap<Shadowrun.SpellItemData>('category', [
             { key: 'Combat', value: new CombatSpellParser() },

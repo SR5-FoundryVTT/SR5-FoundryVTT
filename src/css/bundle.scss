@@ -58,6 +58,12 @@
         justify-content: flex-start;
     }
 
+    .flex5 { flex: 5; }
+    .flex6 { flex: 6; }
+    .flex7 { flex: 7; }
+    .flex8 { flex: 8; }
+    .flex9 { flex: 9; }
+
     .nowrap {
         flex-wrap: nowrap;
     }
@@ -920,6 +926,15 @@ input[type='text'].display {
             // &:first-child {
             //     border-top: 1px solid $yellow;
             // }
+
+            &.subcategory-header {
+                margin-left: 0.5em;
+                border-bottom: none;
+            }
+        }
+
+        &.subcategory-item {
+            margin-left: 0.5em;
         }
 
         .list-item-content {

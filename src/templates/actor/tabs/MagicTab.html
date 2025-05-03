@@ -1,10 +1,18 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='magic'}}
     <div class="inventory">
         <div class="scroll-area">
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html' }}
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html' }}
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/RitualList.html' }}
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/SummoningList.html' }}
+            {{#if contentVisibility.adept_power_list}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html' }}
+            {{/if}}
+            {{#if contentVisibility.spell_list}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html' }}
+            {{/if}}
+            {{#if contentVisibility.ritual_list}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/RitualList.html' }}
+            {{/if}}
+            {{#if contentVisibility.summoning_list}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/SummoningList.html' }}
+            {{/if}}
         </div>
     </div>
 {{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

@@ -38,7 +38,7 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
             }
 
             // Create the item
-            let item = this.GetDefaultData({type: parserType});
+            let item = this.GetDefaultData({type: parserType, entityType: "Item"});
             item.name = ImportHelper.StringValue(jsonData, 'name');
 
             // Import Flags
@@ -113,7 +113,7 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
                 folderName = splitName[0].trim();
             }
 
-            let folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Ammo/${folderName}`, true);
+            let folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Ammo/${folderName}`, true);
             // @ts-expect-error TODO: Foundry Where is my foundry base data?
             ammo.folder = folder.id;
         }

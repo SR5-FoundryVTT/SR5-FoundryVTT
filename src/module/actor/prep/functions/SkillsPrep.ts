@@ -5,6 +5,30 @@ import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class SkillsPrep {
     /**
+     * Prepare missing skill data as early in during data preparation as possible.
+     * 
+     * template.json is incomplete, so we need to fill in the missing fields.
+     * This is mostly a legacy design and should be fixed in the future when DataModel's are used.
+     * 
+     * NOTE: Foundry also calls the prepareData multiple times with incomplete source data, causing some value properties to be missing.
+     * @param system 
+     */
+    static prepareSkillData(system: ActorTypesData) {
+        const { language, active, knowledge } = system.skills;
+
+        // Active skills aren't grouped and can be prepared skill by skill.
+        Object.values(active).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+
+        // Language skills aren't group, but might lack the value property.
+        if (language.value) Object.values(language.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+
+        // Knowledge skills are groupd and might also lack the value property.
+        Object.values(knowledge).forEach((group) => {
+            if (group.value) Object.values(group.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+        });
+    }
+
+    /**
      * Prepare actor data for skills
      */
     static prepareSkills(system: ActorTypesData) {
@@ -33,9 +57,6 @@ export class SkillsPrep {
                 }
             }
             skill.value = Helpers.calcTotal(skill);
-
-            // Older Chummer imports miss some fields.
-            _mergeWithMissingSkillFields(skill);
         };
 
         // setup active skills
@@ -92,7 +113,7 @@ export const _mergeWithMissingSkillFields = (givenSkill) => {
     // Only the absolute most necessary fields, not datatype complete to SkillField
     const template = {
         name: "",
-        base: "",
+        base: 0,
         value: 0,
         attribute: "",
         mod: [],

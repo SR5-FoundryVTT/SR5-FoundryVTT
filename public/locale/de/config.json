@@ -23,6 +23,8 @@
         "HideGMOnlyChatContent": "Verstecke kritische Informationen bei SL-Proben",
         "HideGMOnlyChatContentDescription": "Nachrichten durch SL-Proben zeigen kritische Informationen nur Spielern mit Besitzer-Rechten für den genutzten Akteur.",
         "IgnoreDiagonal": "Ignoriere diagonale Bewegung (1-1-1)",
+        "ImportIconFolderDescription": "Der Ordner, in dem der Importer die Icon-Dateien finden kann. Standard-Ort: 'systems/shadowrun5e/dist/icons/importer/'",
+        "ImportIconFolderName": "Importer Icon-Ordner",
         "ManualRollOnSuccessTest": "Manuelles Würfeln bei Proben",
         "ManualRollOnSuccessTestDescription": "Erlaubt Benutzern manuelle Würfelwürfe bei Proben und Rückmeldungen von Erfolgen und Patzern.",
         "MarkImportsDescription": "Hervorheben von frisch importierten Einträgen in Akteur-Blättern, um zu verdeutlichen, dass sie überprüft werden sollten.",
@@ -43,45 +45,49 @@
         "TokenHealthBars": "Token Lebensbalken",
         "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken.",
         "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
-        "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden"
+        "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden",
+        "UseImportIconOverridesDescription": "Beim Importieren von Items die gleichen Symbole für verschiedene Itemtypen verwenden, wenn dies sinnvoll ist. Deaktivieren wenn benutzerdefinierte Symbole verwendet werden.",
+        "UseImportIconOverridesName": "Standard Importer Icon benutzen"
     },
     "SR5.AP": "DK",
     "SR5.Accessory": "Zubehör",
     "SR5.Accuracy": "Präz.",
     "SR5.Action": "Handlung",
     "SR5.ActionCategory": {
-        "Addiction": "Abhängigkeits Handlungen",
+        "Addiction": "Abhängigkeits-Handlungen",
         "AddictionMental": "Abhängigkeit Geistig",
         "AddictionPhysical": "Abhängigkeit Physisch",
-        "Attack": "Attacke Handlungen",
-        "AttackMelee": "Attacke Nahkampf Handlungen",
-        "AttackRanged": "Attacke Fernkampf Handlungen",
-        "AttackThrown": "Attacke Wurfwaffen Handlungen",
-        "BruteForce": "Matrix Brute Force",
-        "Climbing": "Kletter Handlungen",
-        "Compiling": "Kompilier Handlungen",
-        "ComplexForm": "Komplexe Form Handlungen",
-        "Defense": "Verteidgung Handlungen",
-        "DefenseSuppression": "Verteidugung Sperrfeuer Handlungen",
-        "Drain": "Entzug Handlungen",
-        "Fade": "Schwund Handlungen",
-        "HackOnTheFly": "Matrix Eiliges Hacken",
-        "Magic": "Magic Handlungen",
-        "Matrix": "Matrix Handlungen",
-        "Recovery": "Genesung Handlungen",
-        "RecoveryPhysical": "Genesung Physisch Handlungen",
-        "RecoveryStun": "Genesung Geistig Handlungen",
-        "Resist": "Widerstehen Handlungen",
-        "Resonance": "Resonanz Handlungen",
-        "Rigging": "Rigging Handlungen",
-        "Social": "Sozial Handlungen",
-        "SpellCombat": "Spruchzauberei Combat",
+        "Attack": "Angriffs-Handlungen",
+        "AttackMelee": "Nahkampf-Handlungen",
+        "AttackRanged": "Fernkampf-Handlungen",
+        "AttackThrown": "Wurfwaffen-Handlungen",
+        "BruteForce": "Brute Force",
+        "Climbing": "Kletter-Handlungen",
+        "Compiling": "Kompilier-Handlungen",
+        "ComplexForm": "Komplexe Form-Handlungen",
+        "Defense": "Verteidgungs-Handlungen",
+        "DefenseSuppression": "Verteidigung gegen Sperrfeuer",
+        "Drain": "Entzugs-Handlungen",
+        "Fade": "Schwund-Handlungen",
+        "HackOnTheFly": "Eiliges Hacken",
+        "Magic": "Magische Handlungen",
+        "Matrix": "Matrix-Handlungen",
+        "Recovery": "Genesungs-Handlungen",
+        "RecoveryPhysical": "Genesung Physisch",
+        "RecoveryStun": "Genesung Geistig",
+        "Resist": "Widerstehen-Handlungen",
+        "ResistDisease": "Krankheit widerstehen",
+        "ResistToxin": "Gift widerstehen",
+        "Resonance": "Resonanz-Handlungen",
+        "Rigging": "Rigger-Handlungen",
+        "Social": "Soziale Handlungen",
+        "SpellCombat": "Spruchzauberei Kampf",
         "SpellDetection": "Spruchzauberei Wahrnehmung",
         "SpellHealing": "Spruchzauberei Heilung",
         "SpellIllusion": "Spruchzauberei Illusion",
         "SpellManipulation": "Spruchzauberei Manipulation",
         "SpellRitual": "Spruchzauberei Ritual",
-        "Summoning": "Beschwörung Handlungen"
+        "Summoning": "BeschwörungsHandlungen"
     },
     "SR5.ActionType": "Handlung",
     "SR5.ActionTypeComplex": "Komplexe",
@@ -98,6 +104,7 @@
             "TargetedActor": "Anvisierten Akteur",
             "TestItem": "Probe aus Item"
         },
+        "CannotAddTestViaItemToActor": "Einem Akteur kann kein Active Effect vom Typ 'Probe aus Item' hinzugefügt werden.",
         "Modes": {
             "Modify": "Modifizieren"
         },
@@ -106,6 +113,7 @@
         "OnlyForItemTest": "Nur bei Tests des Items anwenden",
         "OnlyForWireless": "Nur bei aktivem WiFi anwenden",
         "Test": {
+            "ActionCategories": "Handlungs-Filter",
             "Attributes": "Attributs-Filter",
             "Limits": "Limits-Filter",
             "Skills": "Fertigkeits-Filter",
@@ -168,7 +176,6 @@
     "SR5.Base": "Basis",
     "SR5.BaseValue": "Basiswert",
     "SR5.Biography": "Biographie",
-    "SR5.Blackmail": "Erpressung",
     "SR5.BlastRadius": "Sprengradius",
     "SR5.Block": "Blocken",
     "SR5.Bonus": "Bonus",
@@ -225,8 +232,14 @@
     "SR5.ComplexForms": "Komplexe Formen",
     "SR5.Conceal": "Tarnbarkeit",
     "SR5.ConditionMonitor": "Zustandsmonitor",
-    "SR5.Connection": "Einfluss",
-    "SR5.ContactType": "Typ",
+    "SR5.Contact": {
+        "Blackmail": "Erpressung",
+        "Connection": "Einfluss",
+        "Family": "Familie",
+        "Group": "Gruppe",
+        "Loyalty": "Loyalität",
+        "Type": "Typ"
+    },
     "SR5.Contacts": "Kontakte",
     "SR5.Continue": "Fortsetzen",
     "SR5.Cost": "Kosten",
@@ -253,7 +266,13 @@
             "Special": "Speziell",
             "Sustained": "Aufrechterhalten"
         },
+        "IsOptional": "Optional",
         "Karma": "Karma",
+        "Optional": {
+            "DisabledOption": "Optional, inaktiv",
+            "EnabledOption": "Optional, aktiv",
+            "Standard": "Standard"
+        },
         "Range": "Reichweite",
         "Ranges": {
             "LineOfSight": "Blickfeld",
@@ -287,6 +306,7 @@
     "SR5.DamageReplace": "Ersetze Waffenschaden",
     "SR5.DamageType": "Art",
     "SR5.DamageValue": "Schaden",
+    "SR5.DefaultCategoryVisibility": "Zeige leere Item Sektionen",
     "SR5.Defaulting": "Improvisieren",
     "SR5.Defender": "Verteidiger",
     "SR5.DefenderNetHits": "Verteidiger Netto-Erfolge",
@@ -429,7 +449,6 @@
     "SR5.Fade": "Schwund",
     "SR5.FadeAttribute": "Schwund widerstehen",
     "SR5.FadeValue": "Schwund",
-    "SR5.Family": "Familie",
     "SR5.Filter": "Filter",
     "SR5.FireMode": "Feuermodus",
     "SR5.Force": "Kraft",
@@ -447,7 +466,6 @@
     "SR5.GlitchCritical": "Kritischer Patzer!",
     "SR5.Glitches": "Patzer:",
     "SR5.GoodCover": "Gute Deckung",
-    "SR5.GroupContact": "Gruppe",
     "SR5.HackingProgram": "Hackingprogramm",
     "SR5.Help": "Hilfe",
     "SR5.Hits": "Erfolge",
@@ -468,8 +486,8 @@
             "Binder": "Bremse",
             "BlackIC": "Schwarzes IC",
             "Blaster": "Blaster",
-            "BlueGoo": "Blue Goo",
             "Bloodhound": "Bluthund",
+            "BlueGoo": "Blue Goo",
             "Catapult": "Katapult",
             "Crash": "Absturz",
             "Flicker": "Flackern",
@@ -567,6 +585,7 @@
     "SR5.Labels": {
         "Action": {
             "ActiveTest": "Probe",
+            "Category": "Kategorie",
             "DamageResistanceTest": "Schadenswiderstandsprobe",
             "Modifier": "Modifikator",
             "Modifiers": "Modifikatoren",
@@ -578,6 +597,10 @@
             "CreateInventory": "Erstelle Inventar-Ort",
             "CritterPowers": "Critterkräfte",
             "DeviceRating": "Gerätestufe",
+            "DisabledOptionCritterPowers": "Optionale Critter Kräfte - Inaktiv",
+            "DisabledOptionSpritePowers": "Optionale Sprite Kräfte - Inaktiv",
+            "EnabledOptionCritterPowers": "Optionale Critter Kräfte - Aktiv",
+            "EnabledOptionSpritePowers": "Optionale Sprite Kräfte - Aktiv",
             "ICConfiguration": "IC-Konfiguration",
             "Matrix": "Matrix",
             "PersonalInventory": "Am Körper",
@@ -646,7 +669,6 @@
     "SR5.LivingPersona": "Lebende Persona",
     "SR5.Load": "Laden",
     "SR5.Loaded": "Geladen",
-    "SR5.Loyalty": "Loyalität",
     "SR5.MIGRATION.BeginMigration": "Starte Migration",
     "SR5.MIGRATION.BeginNotification": "Starte Shadowrun-System-Migration von Version",
     "SR5.MIGRATION.DoNotCloseNotification": "Bitte das Spiel nicht schließen oder FoundryVTT herunterfahren.",
@@ -703,6 +725,7 @@
         "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, Feuermodus-Modifikatoren werden reduziert",
         "SomeAmmoMelee": "Nicht genug Munition übrig, um zu zuschlagen"
     },
+    "SR5.ModPoints": "Upgradepunkte",
     "SR5.Modification": "Modifikation",
     "SR5.ModificationCategories": "Modification Categories",
     "SR5.ModificationCategory": "Modification Category",
@@ -796,6 +819,7 @@
         "AddSelect": "Füge den verbundenen Actor des ausgewählten und Tokens hinzu",
         "CantDeleteUserCharacter": "Spielercharakter können nicht aus dem Tracker entfernt werden",
         "DeleteScore": "Lösche Wert aus dem Tracker",
+        "GMOnly": "GOD ist auf dem Weg zu deinem Standort...",
         "NotifyNoSelectedTokens": "Mindestens ein verbundenes Token muss ausgewählt werden.",
         "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert.",
         "ResetScore": "Setze Overwatch-Wert zurück"
@@ -823,8 +847,8 @@
     "SR5.Qty": "Menge",
     "SR5.Quality": "Vorteile/Nachteile",
     "SR5.QualityType": "Typ",
-    "SR5.QualityTypeNegative": "Nachteil",
     "SR5.QualityTypeLifeModule": "Lebensmodul",
+    "SR5.QualityTypeNegative": "Nachteil",
     "SR5.QualityTypePositive": "Vorteil",
     "SR5.Quantity": "Menge",
     "SR5.QuickInfo": {
@@ -1037,7 +1061,9 @@
             "Beasts": "Tier",
             "Blackjack": "Blackjack",
             "Blood": "Blut",
+            "BloodShade": "Blutschatten",
             "Boggle": "Zersetzer",
+            "Bone": "Knochen",
             "Bugul": "Bugul",
             "Carcass": "Kadaver",
             "Caretaker": "Insekt: Pfleger",
@@ -1113,6 +1139,12 @@
         }
     },
     "SR5.SpritePower": {
+        "IsOptional": "Optional",
+        "Optional": {
+            "DisabledOption": "Optional, inaktiv",
+            "EnabledOption": "Optional, aktiv",
+            "Standard": "Standard"
+        },
         "Type": "Typ"
     },
     "SR5.Stock": "Schulterstütze",
@@ -1191,6 +1223,7 @@
     "SR5.Tooltips": {
         "Actor": {
             "Critter": "Ermöglicht die Nutzung von Critterkräften",
+            "DefaultCategoryVisibility": "Zeige Item Sektionen selbst dann, wenn sie leer sind.",
             "Grunt": "Nutze Schergen-Regeln für Akteur",
             "Metatype": "Ein NSC-Akteur bekommt automatische Attributemodifikatoren abhängig vom Metatyp",
             "MissingSummoner": "Drag&Drop Charakter oder nutze Beschwörungs-Aktion",
@@ -1331,6 +1364,7 @@
             "Rigger": "Rigger"
         },
         "Driver": "Fahrer",
+        "Drone": "Drohne",
         "Environments": {
             "Handling": "Handling",
             "Speed": "Geschwindigkeit"
@@ -1343,6 +1377,8 @@
             "body": "Body",
             "cosmetic": "Cosmetic",
             "electromagnetic": "Electromagnetic",
+            "enhancement": "Enhancement",
+            "exotic": "Exotic",
             "power_train": "Power Train",
             "protection": "Protection",
             "weapons": "Weapons"
@@ -1387,6 +1423,7 @@
         "CantRecoverPhysicalWithStunDamage": "Solange geistiger Schaden ungeheilt bleibt kann kein physischer Schaden kuriert werden",
         "CantReloadAtAllDueToAmmo": "Ausgerüstete Munition hat nicht genug Kugeln!",
         "CantReloadFullyDueToAmmo": "Nicht genug Munition um vollständig nachzuladen!",
+        "CantReloadPartialDueToAmmo": "Du hast nicht genügend Munition für eine komplexe Nachlade-Handlung",
         "CantReloadWithoutSpareClip": "Dir sind die Ersatzmagazine ausgegangen!",
         "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Patzer.",
         "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
@@ -1414,15 +1451,16 @@
             "Thrown": "Geworfen"
         },
         "Cliptype": {
-            "RemovableClip": "Ladestreifen",
-            "BreakAction": "Klapplademechanismus",
             "BeltFed": "Gurtmunition",
-            "InternalMagazin": "Internes Magazin",
-            "MuzzleLoader": "Vorderlader",
+            "Bow": "Bogen",
+            "BreakAction": "Klapplademechanismus",
             "Cylinder": "Aufklappbare Trommel",
             "Drum": "Große Trommel",
-            "Bow": "Bogen"
+            "InternalMagazin": "Internes Magazin",
+            "MuzzleLoader": "Vorderlader",
+            "RemovableClip": "Ladestreifen"
         },
+        "FullReload": "Komplett",
         "Mod": "Mod",
         "Mode": {
             "BurstFire": "SM",
@@ -1439,6 +1477,7 @@
             "SingleShotShort": "EM"
         },
         "Mods": "Mods",
+        "PartialReload": "Teilweise",
         "Range": {
             "Category": {
                 "AerodynamicThrownGrenade": "Aerodynamische Granate",
@@ -1479,8 +1518,6 @@
         },
         "Reach": "Reichweite",
         "Reload": "Nachladen",
-        "FullReload": "Komplett",
-        "PartialReload": "Teilweise",
         "Type": "Typ",
         "Weapon": "Waffen"
     },

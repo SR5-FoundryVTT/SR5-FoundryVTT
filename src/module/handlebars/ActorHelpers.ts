@@ -1,5 +1,6 @@
 import { MonitorRules } from './../rules/MonitorRules';
 import { SR5Item } from './../item/SR5Item';
+import { SR5Actor } from './../actor/SR5Actor';
 import ModificationCategoryType = Shadowrun.ModificationCategoryType;
 
 export const registerActorHelpers = () => {
@@ -29,11 +30,30 @@ export const registerActorHelpers = () => {
     */
     Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item], modificationCategory: ModificationCategoryType): number => {        
         if (!Array.isArray(items) || !items.length) { return 0 }        
-        const slotSum = items.reduce((arr, item) => {
-            if (item.system.modification_category == modificationCategory) { return arr += item.system.slots ? item.system.slots : 0 } else {return arr};            
-        } ,0)
+        let slotSum = 0;
+        
+        for (const item of items) {
+            if (item.system.modification_category === modificationCategory) {
+                // If item's technology exists and quantity has been defined, use the item's quantity. Else use 1.
+                const quantity = (item.system.technology !== undefined) && (item.system.technology.quantity !== '') ? item.system.technology.quantity : 1;
+                slotSum += (item.system.slots || 0) * quantity;
+            }
+        }
 
         return slotSum;
+    });
+
+    /** 
+    * Determine the amount of Modification slots available to a Vehicle actor from its Body attribute
+    * 
+    * @param actor The actor used to represent the vehicle
+    */
+    Handlebars.registerHelper('calcModificationSlotsAvailable', (actor: SR5Actor): number => {
+        const body = actor.getAttribute("body");
+        if (body === undefined)
+            return 0;
+        else
+            return body.value;
     });
 
     /** 
