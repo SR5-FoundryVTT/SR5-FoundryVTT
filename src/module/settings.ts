@@ -255,4 +255,26 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: true
     });
+
+    /**
+     * Override the default general actions pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.GeneralActionsPack, {
+        name: 'SETTINGS.GeneralActionsPackName',
+        hint: 'SETTINGS.GeneralActionsPackDescription',
+        scope: 'world',
+        config: true,
+        type: String
+    });
+
+    /**
+     * Override the default matrix actions pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.MatrixActionsPack, {
+        name: 'SETTINGS.MatrixActionsPackName',
+        hint: 'SETTINGS.MatrixActionsPackDescription',
+        scope: 'world',
+        config: true,
+        type: String
+    });
 };

@@ -14,7 +14,7 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
     private genImportFlags(name: string, type: string, subType: string): Shadowrun.ImportFlagData {
         const flags = {
             name: this.formatAsSlug(name), // original english name
-            type: type,
+            type,
             subType: '',
             isFreshImport: true
         }
@@ -118,7 +118,7 @@ export class VehicleParser extends ActorParserBase<VehicleActorData> {
                                    category.includes('craft')        ? "air"       :
                                    category.includes('vtol')         ? "aerospace" : "ground";
 
-        //@ts-expect-error
+        //@ts-expect-error We don't want to include the items collection in general actor typing.
         actor.items = [
             ... this.getMods(jsonData, jsonTranslation),
             ... this.getGears(jsonData, jsonTranslation),

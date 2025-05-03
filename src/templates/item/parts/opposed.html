@@ -59,6 +59,23 @@
     </div>
     <div class="form-line">
         <div class="label">
+            {{localize "SR5.DicePoolModifier"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="4"
+                maxlength="3"
+                type="number"
+                name="system.action.opposed.mod"
+                value="{{system.action.opposed.mod}}"
+                data-dtype="Number"
+                min="0"
+                placeholder="+Mod"
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
             {{localize "SR5.Armor"}}
         </div>
         <div class="inputs">

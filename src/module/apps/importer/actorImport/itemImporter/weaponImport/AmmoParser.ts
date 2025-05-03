@@ -27,7 +27,7 @@ export class AmmoParser extends BaseGearParser {
                 parsedGear.system.damageType = 'physical';
             }
 
-            parsedGear.system.element = chummerGear.weaponbonusdamage_english.match(/\(e\)/)?.pop() == '(e)' ? 'electricity' : '';
+            parsedGear.system.element = chummerGear.weaponbonusdamage_english.match(/\(e\)/)?.pop() === '(e)' ? 'electricity' : '';
         }
 
         parsedGear.system.accuracy = parseInt(chummerGear.weaponbonusacc);

@@ -1,8 +1,5 @@
-import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
-import { SR5 } from "../config";
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import MarkedDocument = Shadowrun.MarkedDocument;
-import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
+import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
+import {SR5} from "../config";
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
 
@@ -37,8 +34,8 @@ interface ItemListRightSide {
 }
 
 export const registerItemLineHelpers = () => {
-    Handlebars.registerHelper('InventoryHeaderIcons', function (section: InventorySheetDataByType) {
-        var icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
+    Handlebars.registerHelper('InventoryHeaderIcons', function (section: Shadowrun.InventorySheetDataByType) {
+        const icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
 
         icons.push(section.isOpen
             ? {
@@ -412,7 +409,7 @@ export const registerItemLineHelpers = () => {
      *                   ItemRightSide does. This is due to ItemRightSide showing content, while ItemHeaderRightSide
      *                   showing dscriptors for that content.
      */
-    Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData): ItemListRightSide[] {
+    Handlebars.registerHelper('ItemRightSide', function (item: Shadowrun.ShadowrunItemData): ItemListRightSide[] {
         const wrapper = new SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -508,6 +505,7 @@ export const registerItemLineHelpers = () => {
                         qtyInput,
                     ];
                 }
+                break;
             case 'device':
             case 'equipment':
             case 'cyberware':
@@ -676,7 +674,7 @@ export const registerItemLineHelpers = () => {
              */
             case 'call_in_action':
                 if (item.system.actor_type === 'spirit') {
-                    const summoningData = item.system as Shadowrun.CallInActionData;
+                    const summoningData = item.system;
                     const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
 
                     return [
@@ -694,7 +692,7 @@ export const registerItemLineHelpers = () => {
                 }
 
                 if (item.system.actor_type === 'sprite') {
-                    const compilationData = item.system as Shadowrun.CallInActionData;
+                    const compilationData = item.system;
                     const spriteTypeLabel = SR5.spriteTypes[compilationData.sprite.type] ?? '';
 
                     return [
@@ -710,13 +708,15 @@ export const registerItemLineHelpers = () => {
                         }
                     ]
                 }
-
+                break;
             default:
                 return [];
         }
+
+        return [];
     });
 
-    Handlebars.registerHelper('ItemIcons', function (item: ShadowrunItemData) {
+    Handlebars.registerHelper('ItemIcons', function (item: Shadowrun.ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
 
         const editIcon = {
@@ -796,7 +796,7 @@ export const registerItemLineHelpers = () => {
         ];
     });
 
-    Handlebars.registerHelper('InventoryItemIcons', function (item: ShadowrunItemData) {
+    Handlebars.registerHelper('InventoryItemIcons', function (item: Shadowrun.ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
@@ -891,7 +891,7 @@ export const registerItemLineHelpers = () => {
     });
 
     // Allow Matrix Marks to be changed on the spot on a Sheet.
-    Handlebars.registerHelper('MarksRightSide', (marked: MarkedDocument) => {
+    Handlebars.registerHelper('MarksRightSide', (marked: Shadowrun.MarkedDocument) => {
         const quantityInput = {
             input: {
                 type: 'number',
@@ -903,7 +903,7 @@ export const registerItemLineHelpers = () => {
     });
 
     // Matrix Mark interaction on a Sheet.
-    Handlebars.registerHelper('MarksIcons', (marked: MarkedDocument) => {
+    Handlebars.registerHelper('MarksIcons', (marked: Shadowrun.MarkedDocument) => {
         const incrementIcon = {
             icon: 'fas fa-plus marks-add-one',
             title: game.i18n.localize('SR5.Labels.Sheet.AddOne'),
@@ -922,12 +922,12 @@ export const registerItemLineHelpers = () => {
         return [
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Scene'),
+                    text: game.i18n.localize('SR5.Labels.Sheet.Type'),
                 },
             },
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                    text: game.i18n.localize('SR5.Labels.ActorSheet.Network'),
                 },
             },
             {
@@ -946,7 +946,16 @@ export const registerItemLineHelpers = () => {
         }];
     });
 
-    Handlebars.registerHelper('NetworkDevicesListRightSide', () => {
+    Handlebars.registerHelper('TargetListHeaderIcons', () => {
+        return [{
+            icon: 'fas fa-refresh',
+            title: game.i18n.localize('SR5.Refresh'),
+            text: game.i18n.localize('SR5.Refresh'),
+            cssClass: 'targets-refresh'
+        }];
+    });
+
+    Handlebars.registerHelper('SlavesListRightSide', () => {
         return [
             {
                 text: {
@@ -960,7 +969,7 @@ export const registerItemLineHelpers = () => {
             }]
     })
 
-    Handlebars.registerHelper('NetworkDevicesListHeaderIcons', () => {
+    Handlebars.registerHelper('SlavesListHeaderIcons', () => {
         return [{
             icon: 'fas fa-trash',
             title: game.i18n.localize('SR5.Labels.Sheet.ClearNetwork'),
@@ -969,6 +978,27 @@ export const registerItemLineHelpers = () => {
         }];
     })
 
+    /**
+     * Used for Matrix Target Acquisition App to render right side columns
+     */
+    Handlebars.registerHelper('NetworkTargetsHeaderRightSide', () => {
+        return [{
+            text: {
+                text: game.i18n.localize('SR5.Network')
+            }
+        }]
+    });
+
+    /**
+     * Used for Matrix Target Acquisition App to render right side columns
+     */
+    Handlebars.registerHelper('NetworkTargetsRightSide', (target: Shadowrun.MatrixTargetDocument) => {
+        return [{
+            text: {
+                text: target.network
+            }
+        }]
+    });
     Handlebars.registerHelper('EmptyIcons', () => {
         return [{}];
     })

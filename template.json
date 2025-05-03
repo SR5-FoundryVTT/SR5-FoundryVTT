@@ -1,13 +1,6 @@
 {
     "Actor": {
-        "types": [
-            "character",
-            "spirit",
-            "sprite",
-            "vehicle",
-            "critter",
-            "ic"
-        ],
+        "types": ["character", "spirit", "sprite", "vehicle", "critter", "ic"],
         "templates": {
             "matrix": {
                 "matrix": {
@@ -16,12 +9,13 @@
                         "max": 0
                     },
                     "vr": false,
+                    "link_locked": false,
                     "rating": 0,
                     "is_cyberdeck": false,
                     "name": "",
-                    "silent": false,
+                    "running_silent": false,
                     "hot_sim": false,
-                    "marks": {},
+                    "marks": [],
                     "firewall": {
                         "value": 0,
                         "mod": [],
@@ -920,8 +914,8 @@
                 },
                 "visibilityChecks": {
                     "astral": {
-                        "hasAura" : false,
-                        "astralActive" : false,
+                        "hasAura": false,
+                        "astralActive": false,
                         "affectedBySpell": false
                     },
                     "meat": {
@@ -959,7 +953,20 @@
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "technomancer", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "matrix",
+                "limits",
+                "armor",
+                "magic",
+                "technomancer",
+                "movement",
+                "condition_monitors",
+                "physical_combat_values",
+                "grunt"
+            ],
             "ethnicity": "",
             "age": "",
             "sex": "",
@@ -976,10 +983,10 @@
             "rent": {
                 "cost": 0,
                 "locations": []
-            },            
+            },
             "visibilityChecks": {
                 "astral": {
-                    "hasAura" : true
+                    "hasAura": true
                 },
                 "meat": {
                     "hasHeat": true
@@ -987,11 +994,25 @@
                 "matrix": {
                     "hasIcon": true
                 }
-            }, 
-            "situation_modifiers": {}
+            },
+            "situation_modifiers": {},
+            "matrix": {
+                "markPlacementAction": ""
+            }
         },
         "spirit": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "limits",
+                "armor",
+                "magic",
+                "movement",
+                "condition_monitors",
+                "physical_combat_values",
+                "grunt"
+            ],
             "summonerUuid": "",
             "services": 0,
             "bound": false,
@@ -1010,17 +1031,29 @@
             },
             "visibilityChecks": {
                 "astral": {
-                    "hasAura" : true,
-                    "astralActive" : true
+                    "hasAura": true,
+                    "astralActive": true
                 }
             }
         },
         "critter": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "limits",
+                "armor",
+                "magic",
+                "matrix",
+                "movement",
+                "condition_monitors",
+                "physical_combat_values",
+                "grunt"
+            ],
             "is_npc": true,
             "visibilityChecks": {
                 "astral": {
-                    "hasAura" : true
+                    "hasAura": true
                 },
                 "meat": {
                     "hasHeat": true
@@ -1042,13 +1075,23 @@
             }
         },
         "vehicle": {
-            "templates": [ "common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values" ],
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "limits",
+                "armor",
+                "matrix",
+                "movement",
+                "physical_combat_values"
+            ],
             "vehicleType": "ground",
             "controlMode": "autopilot",
             "environment": "speed",
             "isDrone": false,
             "isOffRoad": false,
             "driver": "",
+            "master": "",
             "modificationCategories": {
                 "body": 0,
                 "cosmetic": 0,
@@ -1056,7 +1099,7 @@
                 "power_train": 0,
                 "protection": 0,
                 "weapons": 0
-            },   
+            },
             "modPoints": 0,
             "vehicle_stats": {
                 "pilot": {
@@ -1131,11 +1174,10 @@
             }
         },
         "ic": {
-            "templates": ["common",  "skills", "attributes", "limits", "matrix"],
+            "templates": ["common", "skills", "attributes", "limits", "matrix"],
             "track": {},
             "icType": "",
             "host": {
-                "id": null,
                 "rating": 0,
                 "customAttribute": false,
                 "atts": {
@@ -1184,6 +1226,7 @@
             "echo",
             "equipment",
             "host",
+            "grid",
             "lifestyle",
             "metamagic",
             "modification",
@@ -1279,7 +1322,7 @@
                         "max": 9
                     },
                     "wireless": true,
-                    "networkController": null
+                    "master": ""
                 }
             },
             "action": {
@@ -1360,9 +1403,15 @@
             },
             "action_result": {
                 "result": {
-                    "success": {
+                    "success": {}
+                }
+            },
+            "action_matrix": {
+                "action": {
+                    "category": {
                         "matrix": {
-                            "placeMarks": false
+                            "owner": false,
+                            "marks": 0
                         }
                     }
                 }
@@ -1404,7 +1453,7 @@
                         "editable": true
                     }
                 },
-                "networkDevices": []
+                "slaves": []
             },
             "importFlags": {
                 "importFlags": {
@@ -1419,6 +1468,11 @@
                 "duration": "always",
                 "optional": "standard",
                 "enabled": true
+            },
+            "matrixNetwork": {
+                "matrix": {
+                    "visible": true
+                }
             }
         },
         "armor": {
@@ -1474,7 +1528,7 @@
                 "test": "SpellCastingTest",
                 "opposed": {
                     "test": "",
-                    "resist": {"test": ""}
+                    "resist": { "test": "" }
                 },
                 "followed": {
                     "test": "DrainTest"
@@ -1574,7 +1628,7 @@
             "karma": 0
         },
         "action": {
-            "templates": ["description", "action", "action_result", "importFlags"]
+            "templates": ["description", "action", "action_result", "importFlags", "action_matrix"]
         },
         "sprite_power": {
             "templates": ["description", "action", "powers", "importFlags"]
@@ -1605,7 +1659,8 @@
             "mods": []
         },
         "device": {
-            "templates": ["description", "technology", "matrix", "importFlags"]
+            "templates": ["description", "technology", "matrix", "importFlags"],
+            "programs": 0
         },
         "program": {
             "templates": ["description", "technology", "importFlags"],
@@ -1615,16 +1670,20 @@
             "templates": ["description", "action", "technology", "importFlags"]
         },
         "host": {
-            "templates": ["description", "matrix", "importFlags"],
-            "marks": {},
+            "templates": ["description", "matrix", "importFlags", "matrixNetwork"],
+            "marks": [],
             "rating": 0,
             "ic": []
+        },
+        "grid": {
+            "templates": ["description", "matrix", "matrixNetwork"]
         },
         "metamagic": {
             "templates": ["description", "action", "importFlags"]
         },
-        "echo" : {
+        "echo": {
             "templates": ["description", "importFlags"]
         }
     }
 }
+

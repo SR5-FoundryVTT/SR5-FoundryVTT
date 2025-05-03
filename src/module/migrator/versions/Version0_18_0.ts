@@ -1,6 +1,5 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { FormDialog } from "../../apps/dialogs/FormDialog";
-import { SR5ActiveEffect } from "../../effect/SR5ActiveEffect";
 import { VersionMigration } from "../VersionMigration";
 
 /**
@@ -41,7 +40,7 @@ export class Version0_18_0 extends VersionMigration {
         await dialog.select();
         if (dialog.canceled) return false;
 
-        // @ts-expect-error
+        // @ts-expect-error TODO: foundry-vtt-types v11
         this.onlyDisableEffects = dialog.data.templateData.onlyDisableEffects;
 
         return true;
@@ -104,7 +103,7 @@ export class Version0_18_0 extends VersionMigration {
      * @param actor 
      * @returns updateData{effects}
      */
-    static async DisableLocalItemOwnedEffects(actor: SR5Actor) {
+    static DisableLocalItemOwnedEffects(actor: SR5Actor) {
         const itemOriginEffects = migrateEffects(actor);
         
         if (itemOriginEffects.length === 0) return {};
@@ -127,7 +126,7 @@ class ConfigurationDialog extends FormDialog {
         data.templateData = {onlyDisableEffects: data.onlyDisableEffects};
         data.templatePath = `systems/shadowrun5e/dist/templates/apps/migrator/Version0.18.0.hbs`;
         data.title = Version0_18_0.TargetVersion;
-        //@ts-expect-error
+        //@ts-expect-error TODO: foundry-vtt-types v11 
         super(data, {applyFormChangesOnSubmit: true});
     }
     
