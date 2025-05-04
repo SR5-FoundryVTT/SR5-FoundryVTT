@@ -93,8 +93,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
 
                 items.push(item);
             } catch (error) {
-                console.error("Error while parsing Ware:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Ware:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Ware:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

@@ -79,8 +79,7 @@ export class VehicleImporter extends DataImporter<Shadowrun.VehicleActorData, Sh
 
                 actors.push(actor);
             } catch (error) {
-                console.error("Error while parsing Vehicle:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Vehicle:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Vehicle:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

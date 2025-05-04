@@ -58,8 +58,7 @@ export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Sha
 
                 items.push(item);
             } catch (error) {
-                console.error("Error while parsing Quality:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Quality:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Quality:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

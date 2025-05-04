@@ -64,8 +64,7 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
 
                 datas.push(item);
             } catch (error) {
-                console.error("Error while parsing Vehicle Mod:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Vehicle Mod:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Vehicle Mod:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

@@ -66,8 +66,7 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
 
                 items.push(item);
             } catch (error) {
-                console.error("Error while parsing Armor:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Armor:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Armor:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

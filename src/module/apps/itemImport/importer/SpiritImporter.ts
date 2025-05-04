@@ -124,8 +124,7 @@ export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shad
 
                 actors.push(actor);
             } catch (error) {
-                console.error("Error while parsing Spirit:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Spirit:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Spirit:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

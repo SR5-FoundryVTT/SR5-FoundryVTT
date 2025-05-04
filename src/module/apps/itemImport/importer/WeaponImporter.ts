@@ -92,8 +92,7 @@ export class WeaponImporter extends DataImporter<WeaponItemData, WeaponData> {
 
                 items.push(item);
             } catch (error) {
-                console.error("Error while parsing Weapon:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Weapon:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Weapon:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

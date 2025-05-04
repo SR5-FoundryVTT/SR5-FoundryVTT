@@ -54,8 +54,7 @@ export class SpriteImporter extends DataImporter<Shadowrun.SpriteActorData, Shad
 
                 actors.push(actor);
             } catch (error) {
-                console.error("Error while parsing Sprite:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Sprite:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Sprite:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

@@ -79,8 +79,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
 
                 items.push(item);
             } catch (error) {
-                console.error("Error while parsing Spell:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Spell:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Spell:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

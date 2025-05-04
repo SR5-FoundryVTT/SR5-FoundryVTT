@@ -57,7 +57,6 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
 
                 datas.push(item);
             } catch (error) {
-                console.error("Error while parsing Armor:", jsonData.name._TEXT ?? "Unknown");
                 ui.notifications?.error("Failed Parsing Armor:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }

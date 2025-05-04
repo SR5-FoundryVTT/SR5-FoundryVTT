@@ -64,8 +64,7 @@ export class WeaponModImporter extends DataImporter<Shadowrun.ModificationItemDa
 
                 datas.push(item);
             } catch (error) {
-                console.error("Error while parsing Weapon Mod:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Weapon Mod:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Weapon Mod:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

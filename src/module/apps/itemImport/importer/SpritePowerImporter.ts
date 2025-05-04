@@ -84,8 +84,7 @@ export class SpritePowerImporter extends DataImporter<Shadowrun.SpritePowerItemD
 
                 items.push(item);
             } catch (error) {
-                console.error("Error while parsing Sprite:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Sprite:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Sprite:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 

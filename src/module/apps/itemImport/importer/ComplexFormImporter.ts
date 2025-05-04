@@ -66,7 +66,6 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
 
                 items.push(item);
             } catch (error) {
-                console.error("Error while parsing Complex Form:", jsonData.name._TEXT ?? "Unknown");
                 ui.notifications?.error("Failed Parsing Complex Form:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }

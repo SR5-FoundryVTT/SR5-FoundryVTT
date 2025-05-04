@@ -92,8 +92,7 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
 
                 actors.push(actor);
             } catch (error) {
-                console.error("Error while parsing Critter:", jsonData.name._TEXT ?? "Unknown");
-                ui.notifications?.error("Falled Parsing Critter:" + (jsonData.name._TEXT ?? "Unknown"));
+                ui.notifications?.error("Failed Parsing Critter:" + (jsonData.name._TEXT ?? "Unknown"));
             }
         }
 
