@@ -1,114 +1,64 @@
-import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
-import { DataDefaults } from '../../../../data/DataDefaults';
-import { Parser } from '../Parser';
-import VehicleActorData = Shadowrun.VehicleActorData;
-import { Vehicle } from '../../schema/VehiclesSchema';
-import { SR5 } from '../../../../config';
 import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
+import { Parser } from '../Parser';
+import { SR5Item } from '../../../../item/SR5Item';
+import { Vehicle } from '../../schema/VehiclesSchema';
+import VehicleActorData = Shadowrun.VehicleActorData;
+import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 
 export class VehicleParser extends Parser<VehicleActorData> {
+    private getItems(
+        vehicleName: string,
+        items: SR5Item[],
+        itemsData: NotEmpty<Vehicle['mods']>['mod' | 'name'] | NotEmpty<Vehicle['gears']>['gear'] | NotEmpty<Vehicle['weapons']>['weapon'],
+        jsonTranslation?: object
+    ): ItemDataSource[] {
+        const itemMap = new Map(items.map(i => [i.name, i]));
 
-    private formatAsSlug(name: string): string {
-        return name.trim().toLowerCase().replace((/'|,|\[|\]|\(|\)/g), '').split((/-|\s|\//g)).join('-');
-    }
+        const result: ItemDataSource[] = [];
 
-    private genImportFlags(name: string, type: string, subType: string): Shadowrun.ImportFlagData {
-        const flags = {
-            name: this.formatAsSlug(name), // original english name
-            type: type,
-            subType: '',
-            isFreshImport: true
-        }
-        if (subType && Object.keys(SR5.itemSubTypeIconOverrides[type]).includes(subType)) {
-            flags.subType = subType;
-        }
-        return flags;
-    }
-
-    private createMod(item : any, jsonTranslation?: object) : any {
-        const itemJson = DataDefaults.baseEntityData<Shadowrun.ModificationItemData, Shadowrun.ModificationData>(
-            "Item", { type: "modification" }
-        );
-
-        const name = item._TEXT ?? item.name?._TEXT;
-
-        itemJson.name = IH.MapNameToTranslation(jsonTranslation, name)
-        itemJson.system.technology.rating = item.rating?._TEXT ?? item.$?.rating;
-
-        itemJson.system.importFlags = this.genImportFlags(name, "modification", this.formatAsSlug("gear"));
-        
-        return itemJson;
-    }
-
-    private getMods(modsData: Vehicle['mods'], vehicleName: string, jsonTranslation?: object) : object[] {
-        if (!modsData) return [];
-
-        const mods = IH.getArray(modsData.mod).map(item => {
-            let itemName = item.name._TEXT;
-
-            const translatedName = IH.MapNameToTranslation(jsonTranslation, itemName);
-            const foundItem = IH.findItem(translatedName);
+        for (const item of IH.getArray(itemsData)) {
+            const name = 'name' in item ? item.name?._TEXT : item._TEXT;
+            const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
+            const foundItem = itemMap.get(translatedName);
 
             if (!foundItem) {
-                console.log(`[Vehicle Mod Missing 1]\nVehicle: ${vehicleName}\nMod: ${itemName}`);
-                return this.createMod(item, jsonTranslation);
-            }
-
-            return foundItem.toObject();
-        });
-
-        const names = IH.getArray(modsData.name).map(item => {
-            let itemName = item._TEXT;
-
-            const translatedName = IH.MapNameToTranslation(jsonTranslation, itemName);
-            const foundItem = IH.findItem(translatedName);
-
-            if (!foundItem) {
-                console.log(`[Vehicle Mod Missing 2]\nVehicle: ${vehicleName}\nMod: ${itemName}`);
-                return this.createMod(item, jsonTranslation);
+                console.log(`[Vehicle Mod Missing]\nVehicle: ${vehicleName}\nMod: ${name}`);
+                continue;
             }
 
             const itemBase = foundItem.toObject();
 
-            if (item.$?.select)
+            if ('technology' in itemBase.system)
+                itemBase.system.technology.equipped = true;
+
+            if ('$' in item && item.$?.select)
                 itemBase.name += `(${item.$.select})`;
 
-            if (item.$?.rating) {
+            if ('$' in item && item.$?.rating) {
                 const rating = +item.$.rating;
-
-                if ('rating' in itemBase.system) {
+                if ('rating' in itemBase.system)
                     itemBase.system.rating = rating;
-                } else if ('technology' in itemBase.system) {
+                else if ('technology' in itemBase.system)
                     itemBase.system.technology.rating = rating;
-                }
             }
 
-            return itemBase;
-        });
+            result.push(itemBase);
+        }
 
-        return [...names, ...mods];
+        return result;
     }
 
-    private getGears(gearsData: undefined | NotEmpty<Vehicle['gears']>['gear'], jsonTranslation?: object) : any {
-        return IH.getArray(gearsData).map(item => { return this.createMod(item, jsonTranslation); });
-    }
+    override async Parse(jsonData: Vehicle, actor: VehicleActorData, jsonTranslation?: object | undefined): Promise<VehicleActorData> {        
+        // find items first to increase performance
+        const mods = jsonData.mods || undefined;
+        const allItemsName = [
+            ...IH.getArray(mods?.name).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+            ...IH.getArray(mods?.mod).map(item => IH.MapNameToTranslation(jsonTranslation, item.name?._TEXT)),
+            ...IH.getArray(jsonData.weapons?.weapon).map(item => IH.MapNameToTranslation(jsonTranslation, item.name?._TEXT)),
+            ...IH.getArray(jsonData.gears?.gear).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT ?? item.name?._TEXT)),
+        ];
+        const allItemsPromise = IH.findItem('Item', allItemsName);
 
-    private getWeapons(weapons: undefined | NotEmpty<Vehicle['weapons']>['weapon'], vehicleName: string, jsonTranslation?: object ) : ItemDataSource[] {
-        return IH.getArray(weapons).map(item => {
-            const itemName = item.name?._TEXT;
-            const translatedName = IH.MapNameToTranslation(jsonTranslation, itemName);
-            const foundItem = IH.findItem(translatedName);
-
-            if (!foundItem) {
-                console.log(`[Vehicle Weapon Missing]\nVehicle: ${vehicleName}\nWeapon: ${itemName}`);
-                return null;
-            }
-
-            return foundItem.toObject();
-        }).filter((item): item is ItemDataSource => item !== null);
-    }
-    
-    override Parse(jsonData: Vehicle, actor: VehicleActorData, jsonTranslation?: object | undefined): VehicleActorData {
         actor.name = jsonData.name._TEXT;
         actor.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 
@@ -137,11 +87,14 @@ export class VehicleParser extends Parser<VehicleActorData> {
                                    category.includes('craft')        ? "air"       :
                                    category.includes('vtol')         ? "aerospace" : "ground";
 
+        // delay item handling to give it time to find them
+        const allItems = await allItemsPromise;
         //@ts-expect-error
         actor.items = [
-            ... this.getMods(jsonData.mods, actor.name, jsonTranslation),
-            ... this.getGears(jsonData.gears?.gear, jsonTranslation),
-            ... this.getWeapons(jsonData.weapons?.weapon, actor.name, jsonTranslation)
+            ...this.getItems(actor.name, allItems, mods?.mod, jsonTranslation),
+            ...this.getItems(actor.name, allItems, mods?.name, jsonTranslation),
+            ...this.getItems(actor.name, allItems, jsonData.gears?.gear, jsonTranslation),
+            ...this.getItems(actor.name, allItems, jsonData.weapons?.weapon, jsonTranslation),
         ];
 
         if (jsonTranslation) {

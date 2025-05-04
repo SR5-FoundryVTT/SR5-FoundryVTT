@@ -15,14 +15,18 @@ import { Weapon } from '../../schema/WeaponsSchema';
 import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 
 export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
-    private GetAcessories(accessories: undefined | NotEmpty<Weapon['accessories']>['accessory'], weaponName: string, jsonTranslation?: object) : ItemDataSource[] {
+    private async GetAcessories(
+        accessories: undefined | NotEmpty<Weapon['accessories']>['accessory'],
+        weaponName: string,
+        jsonTranslation?: object
+    ) : Promise<ItemDataSource[]> {
         const result: ItemDataSource[] = []
 
         for (const accessory of IH.getArray(accessories)) {
             let name = accessory.name._TEXT;
 
             const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-            const foundItem = IH.findItem(translatedName, 'modification');
+            const foundItem = await IH.findItem('Item', translatedName, 'modification');
 
             if (!foundItem) {
                 console.log(
@@ -31,7 +35,7 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
                 continue;
             }
 
-            let accessoryBase = foundItem.toObject() as Shadowrun.ModificationItemData;
+            let accessoryBase = foundItem[0].toObject() as Shadowrun.ModificationItemData;
 
             accessoryBase.system.technology.equipped = true;
             if (accessory.rating)
@@ -81,8 +85,8 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
         }
     }
 
-    public override Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
-        item = super.Parse(jsonData, item, jsonTranslation);
+    public override async Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): Promise<WeaponItemData> {
+        item = await super.Parse(jsonData, item, jsonTranslation);
 
         let category = IH.StringValue(jsonData, 'category');
         // A single item does not meet normal rules, thanks Chummer!
@@ -106,7 +110,7 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
         item.flags ??= {
             shadowrun5e: {
                 embeddedItems: [
-                    ...this.GetAcessories(jsonData.accessories?.accessory, jsonData.name._TEXT, jsonTranslation),
+                    ...await this.GetAcessories(jsonData.accessories?.accessory, jsonData.name._TEXT, jsonTranslation),
                 ]
             }
         };

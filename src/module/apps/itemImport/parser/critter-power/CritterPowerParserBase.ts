@@ -6,7 +6,7 @@ import { Power } from '../../schema/CritterpowersSchema';
 import { BonusHelper as BH } from '../../helper/BonusHelper';
 
 export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData> {
-    public override Parse(jsonData: Power, item: CritterPowerItemData, jsonTranslation?: object): CritterPowerItemData {
+    public override async Parse(jsonData: Power, item: CritterPowerItemData, jsonTranslation?: object): Promise<CritterPowerItemData> {
         item.name = jsonData.name._TEXT;
 
         item.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
@@ -54,7 +54,7 @@ export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData>
         }
 
         if (jsonData.bonus)
-            BH.addBonus(item, jsonData.bonus);
+            await BH.addBonus(item, jsonData.bonus);
 
         return item;
     }

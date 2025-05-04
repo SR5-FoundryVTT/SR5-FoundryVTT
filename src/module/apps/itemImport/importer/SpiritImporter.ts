@@ -82,12 +82,12 @@ export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shad
             },
         };
 
-        const folders = await IH.MakeCategoryFolders('Actor', Categories, 'Spirits', this.categoryTranslations);
+        const folders = await IH.MakeCategoryFolders('Critter', Categories, 'Spirits', this.categoryTranslations);
 
         // Add insect type folders
         for (const insect of insectTypes) {
             const path = `Spirits/Insect Spirits/${insect}`;
-            folders[`insect spirits/${insect.toLowerCase()}`] = await IH.GetFolderAtPath("Actor", path, true);
+            folders[`insect spirits/${insect.toLowerCase()}`] = await IH.GetFolderAtPath("Critter", path, true);
         }
 
         for (const jsonData of jsonDatas) {
@@ -98,33 +98,38 @@ export class SpiritImporter extends DataImporter<Shadowrun.SpiritActorData, Shad
                 continue;
             }
 
-            const actor = parser.Parse(
-                jsonData,
-                this.GetDefaultData({ type: parserType, entityType: 'Actor' }),
-                this.itemTranslations,
-            );
-            let category = IH.StringValue(jsonData, 'category').toLowerCase();
+            try {
+                const actor = await parser.Parse(
+                    jsonData,
+                    this.GetDefaultData({ type: parserType, entityType: 'Actor' }),
+                    this.itemTranslations,
+                );
+                let category = IH.StringValue(jsonData, 'category').toLowerCase();
 
-            // handle insect folders
-            if (category === 'insect spirits' && jsonData.name._TEXT.includes("(")) {
-                const match = jsonData.name._TEXT.match(/\(([^)]+)\)/);
+                // handle insect folders
+                if (category === 'insect spirits' && jsonData.name._TEXT.includes("(")) {
+                    const match = jsonData.name._TEXT.match(/\(([^)]+)\)/);
 
-                if (match)
-                    category += `/${match[1].toLowerCase()}`;
+                    if (match)
+                        category += `/${match[1].toLowerCase()}`;
+                }
+
+                //@ts-expect-error TODO: Foundry Where is my foundry base data?
+                actor.folder = folders[category]?.id;
+
+                // actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
+                // if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
+
+                actor.name = IH.MapNameToTranslation(this.itemTranslations, actor.name);
+
+                actors.push(actor);
+            } catch (error) {
+                console.error("Error while parsing Spirit:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Falled Parsing Spirit:" + (jsonData.name._TEXT ?? "Unknown"));
             }
-
-            //@ts-expect-error TODO: Foundry Where is my foundry base data?
-            actor.folder = folders[category]?.id;
-
-            // actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
-            // if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
-
-            actor.name = IH.MapNameToTranslation(this.itemTranslations, actor.name);
-
-            actors.push(actor);
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Actor'].pack });
+        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Critter'].pack });
     }
 }

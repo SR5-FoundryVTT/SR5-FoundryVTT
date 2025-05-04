@@ -5,8 +5,8 @@ import { Mod } from '../../schema/VehiclesSchema';
 import ModificationItemData = Shadowrun.ModificationItemData;
 
 export class VehicleModParserBase extends TechnologyItemParserBase<ModificationItemData> {
-    override Parse(jsonData: Mod, item: ModificationItemData): ModificationItemData {
-        item = super.Parse(jsonData, item);
+    override async Parse(jsonData: Mod, item: ModificationItemData): Promise<ModificationItemData> {
+        item = await super.Parse(jsonData, item);
 
         item.system.type = 'vehicle';
 

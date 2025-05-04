@@ -3,8 +3,8 @@ import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
 import Ware = Shadowrun.WareItemData;
 
 export class CyberwareParser extends TechnologyItemParserBase<Ware> {
-    override Parse(jsonData: object, item: Ware, jsonTranslation?: object): Ware {
-        item = super.Parse(jsonData, item, jsonTranslation);
+    override async Parse(jsonData: object, item: Ware, jsonTranslation?: object): Promise<Ware> {
+        item = await super.Parse(jsonData, item, jsonTranslation);
 
         const essence = ImportHelper.StringValue(jsonData, 'ess', '0').match(/[0-9]\.?[0-9]*/g);
         if (essence !== null) {

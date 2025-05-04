@@ -16,7 +16,7 @@ export class ParserMap<TResult> extends Parser<TResult> {
         }
     }
 
-    public Parse(jsonData: object, item: TResult, jsonTranslation?: object): TResult {
+    public async Parse(jsonData: object, item: TResult, jsonTranslation?: object): Promise<TResult> {
         let key;
         if (typeof this.m_BranchKey === 'function') {
             key = this.m_BranchKey(jsonData);
@@ -30,7 +30,7 @@ export class ParserMap<TResult> extends Parser<TResult> {
             console.warn(`Could not find mapped parser for category ${key}.`);
             return item;
         }
-        return parser.Parse(jsonData, item, jsonTranslation);
+        return await parser.Parse(jsonData, item, jsonTranslation);
     }
 }
 

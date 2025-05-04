@@ -84,7 +84,35 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
         }
     }
 
-    override Parse(jsonData: Metatype, actor: CharacterActorData, jsonTranslation?: object): CharacterActorData {
+    override async Parse(jsonData: Metatype, actor: CharacterActorData, jsonTranslation?: object): Promise<CharacterActorData> {
+        const qualities = jsonData.qualities || undefined;
+        const optionalpowers = jsonData.optionalpowers || undefined;
+
+        const spells = IH.getArray(jsonData.powers?.power)
+                            .filter(spell => spell._TEXT === "Innate Spell" && spell.$?.select)
+                            .map(item => ({ _TEXT: IH.MapNameToTranslation(jsonTranslation, item.$?.select)}));
+
+        const allItemsName = [
+            ...IH.getArray(jsonData.biowares?.bioware).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+        ];
+        const allTraitsName = [
+            ...IH.getArray(jsonData.powers?.power).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+            ...IH.getArray(qualities?.positive?.quality).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+            ...IH.getArray(qualities?.negative?.quality).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+            ...IH.getArray(optionalpowers?.optionalpower).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+        ];
+        const allMagicName = [
+            ...IH.getArray(jsonData.complexforms?.complexform).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+            ...IH.getArray(spells).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+        ];
+
+        // Give it time to search
+        const allPromises = [
+            IH.findItem('Item', allItemsName),
+            IH.findItem('Trait', allTraitsName),
+            IH.findItem('Magic', allMagicName),
+        ];
+
         actor.name = jsonData.name._TEXT;
         actor.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 
@@ -119,34 +147,23 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
         }
         actor.system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
-        //TODO optionalpowers
-        //@ts-expect-error
-        actor.items = [
-            ...this.getItems(jsonData.biowares?.bioware, ['bioware'], {type: 'Bioware', critter: actor.name}, jsonTranslation),
-            ...this.getItems(jsonData.powers?.power, ['critter_power', 'sprite_power'], {type: 'Power', critter: actor.name}, jsonTranslation),
-            ...this.getItems(jsonData.complexforms?.complexform, ['complex_form'], {type: 'Complex Form', critter: actor.name}, jsonTranslation),
-        ]
-        
-        if (jsonData.qualities) {
-            //@ts-expect-error
-            actor.items = actor.items.concat([
-                ...this.getItems(jsonData.qualities.positive?.quality, ['quality'], {type: 'Quality', critter: actor.name}, jsonTranslation),
-                ...this.getItems(jsonData.qualities.negative?.quality, ['quality'], {type: 'Quality', critter: actor.name}, jsonTranslation)
-            ])
-        }
-
-        if (jsonData.optionalpowers) {
-            const optionalPowers = jsonData.optionalpowers.optionalpower;
-            //@ts-expect-error
-            actor.items = actor.items.concat([
-                ...this.getItems(optionalPowers, ['critter_power', 'sprite_power'], {type: 'Optional Power', critter: actor.name}, jsonTranslation),
-            ]);
-        }
-
         this.setSkills(actor, jsonData);
 
         actor.system.is_npc = true;
         actor.system.is_critter = true;
+
+        const [itemsObj, traitsObj, magicObj] = await Promise.all(allPromises);
+
+        //@ts-expect-error
+        actor.items = [
+            ...this.getItems(magicObj,  spells, {type: 'Spell', critter: actor.name}, jsonTranslation),
+            ...this.getItems(traitsObj, jsonData.powers?.power, {type: 'Power', critter: actor.name}, jsonTranslation),
+            ...this.getItems(itemsObj,  jsonData.biowares?.bioware, {type: 'Bioware', critter: actor.name}, jsonTranslation),
+            ...this.getItems(traitsObj, optionalpowers?.optionalpower, {type: 'Power', critter: actor.name}, jsonTranslation),
+            ...this.getItems(traitsObj, qualities?.positive?.quality, {type: 'Quality', critter: actor.name}, jsonTranslation),
+            ...this.getItems(traitsObj, qualities?.negative?.quality, {type: 'Quality', critter: actor.name}, jsonTranslation),
+            ...this.getItems(magicObj,  jsonData.complexforms?.complexform, {type: 'Complex Form', critter: actor.name}, jsonTranslation),
+        ];
 
         if (jsonTranslation) {
             const page = IH.MapNameToPageSource(jsonTranslation, actor.name);

@@ -29,7 +29,7 @@ export class SpriteImporter extends DataImporter<Shadowrun.SpriteActorData, Shad
         const parserType = 'sprite';
         const parser = new SpriteParser();
 
-        const folder = await IH.GetFolderAtPath("Actor", `Sprites`, true);
+        const folder = await IH.GetFolderAtPath("Critter", `Sprites`, true);
 
         for (const jsonData of jsonDatas) {
             // Check to ensure the data entry is supported and the correct category
@@ -37,24 +37,29 @@ export class SpriteImporter extends DataImporter<Shadowrun.SpriteActorData, Shad
                 continue;
             }
 
-            const actor = parser.Parse(
-                jsonData,
-                this.GetDefaultData({ type: parserType, entityType: 'Actor' }),
-                this.itemTranslations,
-            );
+            try {
+                const actor = await parser.Parse(
+                    jsonData,
+                    this.GetDefaultData({ type: parserType, entityType: 'Actor' }),
+                    this.itemTranslations,
+                );
 
-            //@ts-expect-error TODO: Foundry Where is my foundry base data?
-            actor.folder = folder;
+                //@ts-expect-error TODO: Foundry Where is my foundry base data?
+                actor.folder = folder;
 
-            // actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
-            // if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
+                // actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
+                // if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
 
-            actor.name = IH.MapNameToTranslation(this.itemTranslations, actor.name);
+                actor.name = IH.MapNameToTranslation(this.itemTranslations, actor.name);
 
-            actors.push(actor);
+                actors.push(actor);
+            } catch (error) {
+                console.error("Error while parsing Sprite:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Falled Parsing Sprite:" + (jsonData.name._TEXT ?? "Unknown"));
+            }
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Actor'].pack });
+        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Critter'].pack });
     }
 }

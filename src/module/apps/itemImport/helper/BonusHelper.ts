@@ -116,12 +116,12 @@ export class BonusHelper {
         sheet.effects?.push(effect);
     }
 
-    public static addBonus(sheet: ShadowrunSheetData, bonus: BonusSchema) : void {
-        this.addEffects(sheet, bonus);
-        this.addItems(sheet, bonus);
+    public static async addBonus(sheet: ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
+        await this.addEffects(sheet, bonus);
+        // await this.addItems(sheet, bonus);
     }
 
-    private static addEffects(sheet: ShadowrunSheetData, bonus: BonusSchema) : void {
+    private static async addEffects(sheet: ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
         sheet.effects ??= [];
 
         if (bonus.armor) {
@@ -326,13 +326,13 @@ export class BonusHelper {
             );
         }
     }
-
-    private static addItems(sheet: ShadowrunSheetData, bonus: BonusSchema) : void {
+/*
+    private static async addItems(sheet: ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
         sheet.flags ??= { shadowrun5e: { embeddedItems: [] } };
 
         if (bonus.addgear) {
             const name = bonus.addgear.name._TEXT;
-            const foundItem = IH.findItem(name);
+            const foundItem = await IH.findItem(name);
     
             if (foundItem) {
                 const itemBase = foundItem.toObject();
@@ -358,7 +358,7 @@ export class BonusHelper {
                 const name = quality._TEXT;
                 
                 if (!name) continue;
-                const foundItem = IH.findItem(name);
+                const foundItem = await IH.findTrait(name);
 
                 if (!foundItem) {
                     console.log(`[Quality Missing (Bonus)]\nSheet: ${sheet.name}\nMod: ${name}`);
@@ -379,7 +379,7 @@ export class BonusHelper {
 
         if (bonus.addspell) {
             const name = bonus.addspell._TEXT;
-            const foundItem = IH.findItem(name);
+            const foundItem = await IH.findMagic(name);
     
             if (foundItem) {
                 sheet.flags.shadowrun5e.embeddedItems.push(foundItem.toObject());
@@ -389,4 +389,5 @@ export class BonusHelper {
         }
 
     }
+*/
 }

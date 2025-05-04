@@ -4,16 +4,11 @@ import { JSONStrategy } from './JSONStrategy';
 import { ImportStrategy } from './ImportStrategy';
 import { SR5Item } from "../../../item/SR5Item";
 import { BaseItem } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents.mjs';
-import FolderTypes = foundry.CONST.FOLDER_DOCUMENT_TYPES;
 type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
 
 export enum ImportMode {
     XML = 1,
     JSON = 2,
-}
-export enum LookupMode {
-    Directory = 0,
-    Actor = 1,
 }
 
 export type OneOrMany<T> = T | T[];
@@ -100,20 +95,41 @@ export class ImportHelper {
             const [scope, packName] = pack.split(".");
             if (!scope || !packName) throw new Error(`Invalid compendium key: ${pack}`);
 
+            const folderName = game.i18n.localize("SR5.Compendiums.Root");
+            let currentFolder = game.folders?.find(
+                (folder) => folder.name === folderName
+                //@ts-expect-error
+                && folder.type === "Compendium"
+            );
+
+            if (!currentFolder) {
+                currentFolder = await Folder.create({
+                    name: folderName,
+                    //@ts-expect-error
+                    type: "Compendium",
+                    color: "#00cc00"
+                });
+            }
+
+            // Create the compendium pack
             compendium = await CompendiumCollection.createCompendium({
                 name: packName,
                 label: game.i18n.localize(`SR5.Compendiums.${ctype}`),
                 type: type,
                 package: scope,
-                system: "shadowrun5e",
                 private: false,
                 path: `packs/${packName}`,
                 ownership: {
-                    "PLAYER": "OBSERVER",
-                    "TRUSTED": "OBSERVER",
-                    "ASSISTANT": "OWNER"
-                },
+                    PLAYER: "OBSERVER",
+                    TRUSTED: "OBSERVER",
+                    ASSISTANT: "OWNER"
+                }
             });
+
+            // Manually assign compendium to the folder via settings
+            const config = game.settings.get("core", "compendiumConfiguration") ?? {};
+            Object.assign(config, { [`world.${packName}`]: { folder: currentFolder?.id ?? null } });
+            await game.settings.set("core", "compendiumConfiguration", config);
         }
 
         return compendium;
@@ -185,13 +201,17 @@ export class ImportHelper {
         return ImportHelper.s_Strategy.objectValue(jsonData, key, fallback);
     }
 
-    public static findItem(name: string, types?: OneOrMany<BaseItem['data']['type']>): SR5Item | undefined {
-        type ItemType = CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
-        const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY['Item'].pack) as ItemType;
+    public static async findItem(
+        compKey: CompendiumKey,
+        name: OneOrMany<string>,
+        types?: OneOrMany<BaseItem['data']['type']>
+    ): Promise<SR5Item[]> {
+        if (Array.isArray(name) ? name.length === 0 : !name) return [];
 
-        return pack.find(item =>
-            item.name === name && (!types || this.getArray(types).includes(item.type))
-        );
+        type ItemType = CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
+        const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY[compKey].pack) as ItemType;
+
+        return pack.getDocuments({ name__in: this.getArray(name), ...(types ? { type__in: this.getArray(types) } : {}) });
     }
 
     public static TranslateCategory(name, jsonCategoryTranslations?) {

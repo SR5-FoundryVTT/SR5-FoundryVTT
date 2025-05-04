@@ -11,8 +11,8 @@ export class RangedParser extends WeaponParserBase {
         return match !== undefined ? parseInt(match) : 0;
     }
 
-    override Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
-        item = super.Parse(jsonData, item, jsonTranslation);
+    override async Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): Promise<WeaponItemData> {
+        item = await super.Parse(jsonData, item, jsonTranslation);
 
         // Some new weapons don't have any rc defined in XML.
         if (jsonData.hasOwnProperty('rc')) {

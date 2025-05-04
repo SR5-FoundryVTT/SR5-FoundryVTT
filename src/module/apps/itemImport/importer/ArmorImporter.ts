@@ -3,6 +3,7 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import { ArmorSchema } from '../schema/ArmorSchema';
 
 export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowrun.ArmorData> {
     public armorTranslations: any;
@@ -23,41 +24,42 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
         this.armorTranslations = ImportHelper.ExtractItemTranslation(jsonArmori18n, 'armors', 'armor');
     }
 
-    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
+    async Parse(jsonObject: ArmorSchema, setIcons: boolean): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders("Item", jsonObject, 'Armor', this.categoryTranslations);
         const parser = new ArmorParserBase();
         let datas: Shadowrun.ArmorItemData[] = [];
-        let jsonDatas = jsonObject['armors']['armor'];
         this.iconList = await this.getIconFiles();
         const parserType = 'armor';
 
-        for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
-
+        for (const jsonData of jsonObject.armors.armor) {
             // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}));
-            const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
-            // @ts-expect-error TODO: Foundry Where is my foundry base data?
-            item.folder = folders[category].id;
+            try {
+                // Create the item
+                let item = await parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}));
 
-            // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
+                const category = jsonData.category._TEXT.toLowerCase();
+                // @ts-expect-error TODO: Foundry Where is my foundry base data?
+                item.folder = folders[category].id;
 
-            // Default icon
-            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+                // Import Flags
+                item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
+                if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
-            // Translate the name
-            item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
+                // Translate the name
+                item.name = ImportHelper.MapNameToTranslation(this.armorTranslations, item.name);
 
-            // Add relevant action tests
-            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                // Add relevant action tests
+                UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(item);
+                datas.push(item);
+            } catch (error) {
+                console.error("Error while parsing Armor:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Failed Parsing Armor:" + (jsonData.name._TEXT ?? "Unknown"));
+            }
         }
 
         // @ts-expect-error

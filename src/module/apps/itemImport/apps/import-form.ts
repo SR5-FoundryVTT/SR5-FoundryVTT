@@ -24,7 +24,7 @@ export class Import extends Application {
     private githubConfig = {
         user: "BM123499",
         repo: "chummer5a",
-        branch: "893bb3b1438d5625df7e70f75c64566ae599e364",
+        branch: "XSD_Remake",
     } as const;
     private gitURL = `https://raw.githubusercontent.com/${this.githubConfig.user}/${this.githubConfig.repo}/${this.githubConfig.branch}` as const;
 
@@ -141,6 +141,7 @@ export class Import extends Application {
      * @param setIcons Wether or not to apply system icons to the imported documents.
      */
     async parseXML(xmlSource, fileName, setIcons) {
+
         let jsonSource = await DataImporter.xml2json(xmlSource);
         ImportHelper.SetMode(ImportMode.XML);
 
@@ -242,6 +243,7 @@ export class Import extends Application {
         });
 
         html.find("button[type='submit']").on('click', async (event) => {
+            const start = performance.now();
             event.preventDefault();
 
             this.clearParsingStatus();
@@ -269,7 +271,6 @@ export class Import extends Application {
                     this.currentParsedFile = dataFile.name;
                     await this.render();
 
-
                     await this.parseXML(text, dataFile.name, setIcons);
 
                     // Store status to show parsing progression.
@@ -286,6 +287,8 @@ export class Import extends Application {
             await this.render();
 
             ui.notifications?.warn('SR5.Warnings.BulkImportPerformanceWarning', {localize: true});
+            const end = performance.now();
+            console.log(`Time used: ${(end - start).toFixed(2)} ms`);
         });
 
         html.find("input[type='file'].langDataFileDrop").on('change', async (event) => {

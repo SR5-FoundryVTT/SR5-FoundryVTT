@@ -224,8 +224,12 @@
     "SR5.CollapseAll": "Collapse All",
     "SR5.CommonProgram": "Common Program",
     "SR5.Compendiums": {
-        "Actor": "SR5e Actors",
-        "Item": "SR5e Items"
+        "Root": "SR5e Imports",
+        "Critter": "Critters & Spirits",
+        "Drone": "Drone & Vehicles",
+        "Item": "Items",
+        "Trait": "Traits",
+        "Magic": "Magic"
     },
     "SR5.Compilation": {
         "DropSprite": "Drop Sprite",

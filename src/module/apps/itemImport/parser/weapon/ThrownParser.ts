@@ -37,8 +37,8 @@ export class ThrownParser extends WeaponParserBase {
         return blastData;
     }
 
-    override Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
-        item = super.Parse(jsonData, item, jsonTranslation);
+    override async Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): Promise<WeaponItemData> {
+        item = await super.Parse(jsonData, item, jsonTranslation);
 
         const rangeCategory = ImportHelper.StringValue(jsonData, jsonData.hasOwnProperty('range') ? 'range' : 'category');
         item.system.thrown.ranges = DataDefaults.weaponRangeData(this.GetRangeDataFromImportedCategory(rangeCategory));

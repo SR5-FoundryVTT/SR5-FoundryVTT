@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { VehicleParser } from '../parser/vehicle/VehicleParser';
 import { Constants } from './Constants';
 import { SR5Actor } from '../../../actor/SR5Actor';
+import { VehiclesSchema } from '../schema/VehiclesSchema';
 
 export class VehicleImporter extends DataImporter<Shadowrun.VehicleActorData, Shadowrun.VehicleData> {
     public files = ["vehicles.xml"];
@@ -22,8 +23,8 @@ export class VehicleImporter extends DataImporter<Shadowrun.VehicleActorData, Sh
                                   ... ImportHelper.ExtractItemTranslation(jsonVehiclei18n, 'weapons', 'weapon') };
     }
 
-    async createFolders(chummerData: object, translations: Record<string, string>): Promise<Record<string, any>> {
-        const categories = (chummerData as { categories: any })?.categories?.category || [];
+    async createFolders(chummerData: VehiclesSchema, translations: Record<string, string>): Promise<Record<string, any>> {
+        const categories = chummerData.categories.category;
 
         const { drones, vehicles } = categories.reduce(
             (acc: { drones: any[]; vehicles: any[] }, category: { _TEXT: string }) => {
@@ -41,46 +42,49 @@ export class VehicleImporter extends DataImporter<Shadowrun.VehicleActorData, Sh
         const dronesData = { categories: { category: [...drones] } };
         const vehiclesData = { categories: { category: [...vehicles] } };
 
-        const droneFolders = await ImportHelper.MakeCategoryFolders("Actor", dronesData, 'Drones', translations);
-        const vehicleFolders = await ImportHelper.MakeCategoryFolders("Actor", vehiclesData, 'Vehicles', translations);
+        const droneFolders = await ImportHelper.MakeCategoryFolders("Drone", dronesData, 'Drones', translations);
+        const vehicleFolders = await ImportHelper.MakeCategoryFolders("Drone", vehiclesData, 'Vehicles', translations);
 
         const folders = { ...droneFolders, ...vehicleFolders };
-        folders['Other'] = await ImportHelper.GetFolderAtPath("Actor", "Vehicles/Other", true);
+        folders['Other'] = await ImportHelper.GetFolderAtPath("Drone", "Vehicles/Other", true);
 
         return folders;
     }
 
-    async Parse(chummerData: object, setIcons: boolean): Promise<StoredDocument<SR5Actor>[]> {
+    async Parse(chummerData: VehiclesSchema, setIcons: boolean): Promise<StoredDocument<SR5Actor>[]> {
         const actors: Shadowrun.VehicleActorData[] = [];
-        const jsonDatas = chummerData['vehicles']['vehicle'];
         this.iconList = await this.getIconFiles();
         const parserType = 'vehicle';
         const parser = new VehicleParser();
         const folders = await this.createFolders(chummerData, this.categoryTranslations);
         
-        for (let i = 0; i < jsonDatas.length; i++) {
-            const jsonData = jsonDatas[i];
+        for (const jsonData of chummerData.vehicles.vehicle) {
 
             // Check to ensure the data entry is supported and the correct category
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            const actor = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Actor"}), this.itemTranslations);
-            const category = ImportHelper.StringValue(jsonData, 'category').replace(/^drones:\s*/i, '').toLowerCase();
-            
-            //@ts-expect-error TODO: Foundry Where is my foundry base data?
-            actor.folder = folders[category]?.id || folders['Other'].id;
+            try {
+                const actor = await parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Actor"}), this.itemTranslations);
+                const category = ImportHelper.StringValue(jsonData, 'category').replace(/^drones:\s*/i, '').toLowerCase();
+                
+                //@ts-expect-error TODO: Foundry Where is my foundry base data?
+                actor.folder = folders[category]?.id || folders['Other'].id;
 
-            actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
-            if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
+                actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
+                if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
 
-            actor.name = ImportHelper.MapNameToTranslation(this.itemTranslations, actor.name);
+                actor.name = ImportHelper.MapNameToTranslation(this.itemTranslations, actor.name);
 
-            actors.push(actor);
+                actors.push(actor);
+            } catch (error) {
+                console.error("Error while parsing Vehicle:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Falled Parsing Vehicle:" + (jsonData.name._TEXT ?? "Unknown"));
+            }
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Actor'].pack });
+        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Drone'].pack });
     }
 }

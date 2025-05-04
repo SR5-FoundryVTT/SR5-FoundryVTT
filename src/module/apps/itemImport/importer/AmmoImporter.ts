@@ -78,7 +78,7 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
             });
             // NOTE: Should either weapons or gear not have been imported with translation, this will fail.
             if (shouldLookForWeapons) {
-                let foundWeapon = ImportHelper.findItem(item.name, 'weapon');
+                let foundWeapon = await ImportHelper.findItem('Item', item.name, 'weapon')[0];
 
                 if (foundWeapon != null && "action" in foundWeapon.system) {
                     const weaponData = foundWeapon.system as Shadowrun.WeaponData;

@@ -3,7 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
 import { DataDefaults } from '../../../data/DataDefaults';
-
+import { ComplexformsSchema } from '../schema/ComplexformsSchema';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemData, Shadowrun.ComplexFormData> {
@@ -30,46 +30,48 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
         this.nameTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, 'complexforms', 'complexform');
     }
 
-    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
+    async Parse(jsonObject: ComplexformsSchema, setIcons: boolean): Promise<Item> {
         const parser = new ComplexFormParserBase();
-        const folder = await ImportHelper.GetFolderAtPath("Item", `Complex Forms`, true);
+        const folder = await ImportHelper.GetFolderAtPath("Magic", "Complex Forms", true);
         let items: Shadowrun.ComplexFormItemData[] = [];
-        let jsonDatas = jsonObject['complexforms']['complexform'];
         this.iconList = await this.getIconFiles();
         const parserType = 'complex_form';
 
-        for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
-
+        for (const jsonData of jsonObject.complexforms.complexform) {
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.nameTranslations);
+            try {
+                // Create the item
+                let item = await parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.nameTranslations);
 
-            // Get the item's folder information
-            // @ts-expect-error TODO: Foundry Where is my foundry base data?
-            item.folder = folder.id;
+                // Get the item's folder information
+                // @ts-expect-error TODO: Foundry Where is my foundry base data?
+                item.folder = folder.id;
 
-            // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type, '');
+                // Import Flags
+                item.system.importFlags = this.genImportFlags(item.name, item.type, '');
 
-            // Default icon
-            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+                // Default icon
+                if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
-            // TODO: Follow ComplexFormParserBase approach.
-            // Item name translation
-            item.name = ImportHelper.MapNameToTranslation(this.nameTranslations, item.name);
+                // TODO: Follow ComplexFormParserBase approach.
+                // Item name translation
+                item.name = ImportHelper.MapNameToTranslation(this.nameTranslations, item.name);
 
-            // Add relevant action tests
-            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                // Add relevant action tests
+                UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            items.push(item);
+                items.push(item);
+            } catch (error) {
+                console.error("Error while parsing Complex Form:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Failed Parsing Complex Form:" + (jsonData.name._TEXT ?? "Unknown"));
+            }
         }
 
         // @ts-expect-error
-        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack }) as Item;
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Magic'].pack }) as Item;
     }
 }

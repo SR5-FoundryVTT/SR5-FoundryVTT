@@ -71,7 +71,7 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             item.system.technology.availability = ImportHelper.StringValue(equipment, 'avail');
             item.system.technology.cost = ImportHelper.IntValue(equipment, 'cost', 0);
 
-            if (equipment.bonus) BH.addBonus(item, equipment.bonus);
+            if (equipment.bonus) await BH.addBonus(item, equipment.bonus);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

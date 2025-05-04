@@ -65,8 +65,11 @@ export class Constants {
     } as const;
 
     public static readonly MAP_COMPENDIUM_KEY = {
-        'Actor': {pack: 'world.actor', type: 'Actor'},
+        'Critter': {pack: 'world.critter', type: 'Actor'},
+        'Drone': {pack: 'world.drone', type: 'Actor'},
         'Item': {pack: 'world.item', type: 'Item'},
+        'Trait': {pack: 'world.trait', type: 'Item'},
+        'Magic': {pack: 'world.magic', type: 'Item'},
     } as const;
 
     public static readonly MAP_CHUMMER_PROGRAMM_CATEGORY = {

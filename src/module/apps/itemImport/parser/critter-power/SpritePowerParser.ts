@@ -14,8 +14,8 @@ export class SpritePowerParser extends ItemParserBase<Shadowrun.SpritePowerItemD
         else return '';
     }
 
-    public override Parse(chummerData: object, itemData: Shadowrun.SpritePowerItemData, dataTranslation?: object): Shadowrun.SpritePowerItemData {
-        itemData = super.Parse(chummerData, itemData, dataTranslation);
+    public override async Parse(chummerData: object, itemData: Shadowrun.SpritePowerItemData, dataTranslation?: object): Promise<Shadowrun.SpritePowerItemData> {
+        itemData = await super.Parse(chummerData, itemData, dataTranslation);
 
         // Chummer has camel case for action, system uses lowercase for type. ('Complex' => 'complex', ...)
         // xml2js returns action as string, and category as Element._TEXT... Unsure why.

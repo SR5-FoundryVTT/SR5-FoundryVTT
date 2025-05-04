@@ -7,6 +7,8 @@ import CyberwareItemData = Shadowrun.CyberwareItemData;
 import BiowareItemData = Shadowrun.BiowareItemData;
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { Constants } from "./Constants";
+import { CyberwareSchema } from '../schema/CyberwareSchema';
+import { BiowareSchema } from '../schema/BiowareSchema';
 
 export class WareImporter extends DataImporter<WareItemData, WareData> {
     public override categoryTranslations: any;
@@ -45,7 +47,7 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, typeKey, listKey);
     }
 
-    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
+    async Parse(jsonObject: BiowareSchema | CyberwareSchema, setIcons: boolean): Promise<Item> {
         const cyberParser = new CyberwareParser();
 
         let key = jsonObject.hasOwnProperty('cyberwares') ? 'Cyberware' : 'Bioware';
@@ -57,40 +59,43 @@ export class WareImporter extends DataImporter<WareItemData, WareData> {
 
         this.iconList = await this.getIconFiles();
 
-        for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
-
+        for (const jsonData of jsonDatas) {
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            // Create the item
-            const defaultData = key === 'cyberware' ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
-            let item = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
-            const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
-            // TODO: Does this type mixture cause later issues? Will it carry over?
-            //@ts-expect-error
-            item.folder = folders[category].id;
+            try {
+                // Create the item
+                const defaultData = key === 'cyberware' ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
+                let item = await cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
+                const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
+                // TODO: Does this type mixture cause later issues? Will it carry over?
+                //@ts-expect-error
+                item.folder = folders[category].id;
 
-            // Bioware has no wireless feature, so disable it by default
-            if (key === 'bioware') {
-                item.system.technology.wireless = false;
+                // Bioware has no wireless feature, so disable it by default
+                if (key === 'bioware') {
+                    item.system.technology.wireless = false;
+                }
+
+                // Import Flags
+                item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
+
+                // Default icon
+                if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+
+                // Translate name if needed
+                item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+
+                // Add relevant action tests
+                UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+
+                items.push(item);
+            } catch (error) {
+                console.error("Error while parsing Ware:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Falled Parsing Ware:" + (jsonData.name._TEXT ?? "Unknown"));
             }
-
-            // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
-
-            // Default icon
-            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
-
-            // Translate name if needed
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
-
-            // Add relevant action tests
-            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
-
-            items.push(item);
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.

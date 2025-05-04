@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
 import { Constants } from './Constants';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import { CritterpowersSchema } from '../schema/CritterpowersSchema';
 
 export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
     public files = ['critterpowers.xml'];
@@ -26,47 +27,51 @@ export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerIte
     }
 
 
-    async Parse(chummerPowers: object, setIcons: boolean): Promise<Item> {
+    async Parse(chummerPowers: CritterpowersSchema, setIcons: boolean): Promise<Item> {
         const parser = new CritterPowerParserBase();
 
         chummerPowers['categories']['category'] = chummerPowers['categories']['category'].filter(
-            (power) => !["Emergent", "Toxic Critter Powers"].includes(power._TEXT)
+            (power) => !["Emergent", "Toxic Critter Powers", "Echoes"].includes(power._TEXT)
         ).concat({ _TEXT: "Other" });
-        const folders = await ImportHelper.MakeCategoryFolders("Item", chummerPowers, game.i18n.localize('TYPES.Item.critter_power'), this.categoryTranslations);
+        const folders = await ImportHelper.MakeCategoryFolders("Trait", chummerPowers, game.i18n.localize('TYPES.Item.critter_power'), this.categoryTranslations);
 
         const items: Shadowrun.CritterPowerItemData[] = [];
-        const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
         this.iconList = await this.getIconFiles();
         const parserType = 'critter_power';
 
-        for (const chummerCritterPower of chummerCritterPowers) {
+        for (const jsonData of chummerPowers.powers.power) {
 
             // Check to ensure the data entry is supported
-            if (DataImporter.unsupportedEntry(chummerCritterPower)) {
+            if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            // Create the item
-            const item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: parserType, entityType: "Item"}), this.itemTranslations);
-            // @ts-expect-error TODO: foundry-vtt-type v10
-            item.folder = folders[item.system.category]?.id || folders["other"].id;
+            try {
+                // Create the item
+                const item = await parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}), this.itemTranslations);
+                // @ts-expect-error TODO: foundry-vtt-type v10
+                item.folder = folders[item.system.category]?.id || folders["other"].id;
 
-            // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.powerType);
+                // Import Flags
+                item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.powerType);
 
-            // Default icon
-            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+                // Default icon
+                if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
-            // Translate name if needed
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+                // Translate name if needed
+                item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            // Add relevant action tests
-            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                // Add relevant action tests
+                UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            items.push(item);
+                items.push(item);
+            } catch (error) {
+                console.error("Error while parsing Armor:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Falled Parsing Armor:" + (jsonData.name._TEXT ?? "Unknown"));
+            }
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Trait'].pack });
     }
 }

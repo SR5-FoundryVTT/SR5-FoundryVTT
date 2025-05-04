@@ -9,6 +9,7 @@ import { ParserMap } from '../parser/ParserMap';
 import { DataDefaults } from '../../../data/DataDefaults';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { Constants } from "./Constants";
+import { SpellsSchema } from '../schema/SpellsSchema';
 
 export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowrun.SpellData> {
     public override categoryTranslations: any;
@@ -34,9 +35,7 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonSpelli18n, 'spells', 'spell');
     }
 
-    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
-        const folders = await ImportHelper.MakeCategoryFolders("Item", jsonObject, 'Spells', this.categoryTranslations);
-
+    async Parse(jsonObject: SpellsSchema, setIcons: boolean): Promise<Item> {
         const parser = new ParserMap<Shadowrun.SpellItemData>('category', [
             { key: 'Combat', value: new CombatSpellParser() },
             { key: 'Manipulation', value: new ManipulationSpellParser() },
@@ -47,40 +46,45 @@ export class SpellImporter extends DataImporter<Shadowrun.SpellItemData, Shadowr
             { key: 'Rituals', value: new SpellParserBase() },
         ]);
 
+        const folders = await ImportHelper.MakeCategoryFolders("Magic", jsonObject, 'Spells', this.categoryTranslations);
+
         let items: Shadowrun.SpellItemData[] = [];
-        let jsonDatas = jsonObject['spells']['spell'];
         this.iconList = await this.getIconFiles();
         const parserType = 'spell';
 
-        for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+        for (const jsonData of jsonObject.spells.spell) {
 
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            // Create the item
-            let item = parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
-            //@ts-expect-error TODO: Foundry Where is my foundry base data?
-            item.folder = folders[item.system.category].id;
+                try {
+                // Create the item
+                let item = await parser.Parse(jsonData, this.GetDefaultData({type: parserType}), this.itemTranslations);
+                //@ts-expect-error TODO: Foundry Where is my foundry base data?
+                item.folder = folders[item.system.category].id;
 
-            // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.category);
+                // Import Flags
+                item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.category);
 
-            // Default icon
-            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+                // Default icon
+                if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
-            // Translate name if needed
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
+                // Translate name if needed
+                item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
 
-            // Add relevant action tests
-            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                // Add relevant action tests
+                UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            items.push(item);
+                items.push(item);
+            } catch (error) {
+                console.error("Error while parsing Spell:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Falled Parsing Spell:" + (jsonData.name._TEXT ?? "Unknown"));
+            }
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
+        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Magic'].pack });
     }
 }

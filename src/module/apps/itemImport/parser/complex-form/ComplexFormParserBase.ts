@@ -6,7 +6,7 @@ import ComplexFormTarget = Shadowrun.ComplexFormTarget;
 import ComplexFormItemData = Shadowrun.ComplexFormItemData;
 
 export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
-    override Parse(jsonData: Complexform, item: ComplexFormItemData, jsonTranslation?: object): ComplexFormItemData {
+    override async Parse(jsonData: Complexform, item: ComplexFormItemData, jsonTranslation?: object): Promise<ComplexFormItemData> {
         item.name = jsonData.name._TEXT;
 
         item.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
@@ -41,7 +41,7 @@ export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
         }
 
         if (jsonData.bonus)
-            BH.addBonus(item, jsonData.bonus);
+            await BH.addBonus(item, jsonData.bonus);
 
         if (jsonTranslation) {
             const origName = jsonData.name._TEXT;

@@ -5,8 +5,8 @@ import { Accessory } from '../../schema/WeaponsSchema';
 import ModificationItemData = Shadowrun.ModificationItemData;
 
 export class WeaponModParserBase extends TechnologyItemParserBase<ModificationItemData> {
-    override Parse(jsonData: Accessory, item: ModificationItemData): ModificationItemData {
-        item = super.Parse(jsonData, item);
+    override async Parse(jsonData: Accessory, item: ModificationItemData): Promise<ModificationItemData> {
+        item = await super.Parse(jsonData, item);
 
         item.system.type = 'weapon';
 

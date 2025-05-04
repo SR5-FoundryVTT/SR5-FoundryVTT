@@ -4,7 +4,7 @@ import { ItemParserBase } from '../item/ItemParserBase';
 import SpellItemData = Shadowrun.SpellItemData;
 
 export class SpellParserBase extends ItemParserBase<SpellItemData> {
-    public override Parse(jsonData: object, item: SpellItemData, jsonTranslation?: object): SpellItemData {
+    public override async Parse(jsonData: object, item: SpellItemData, jsonTranslation?: object): Promise<SpellItemData> {
         item.name = ImportHelper.StringValue(jsonData, 'name');
 
         item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;

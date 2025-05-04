@@ -5,7 +5,7 @@ import { Quality } from '../../schema/QualitiesSchema';
 import { BonusHelper as BH } from '../../helper/BonusHelper';
 
 export class QualityParserBase extends ItemParserBase<QualityItemData> {
-    public override Parse(jsonData: Quality, item: QualityItemData, jsonTranslation?): QualityItemData {
+    public override async Parse(jsonData: Quality, item: QualityItemData, jsonTranslation?): Promise<QualityItemData> {
         item.name = jsonData.name._TEXT;
 
         item.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
@@ -14,7 +14,7 @@ export class QualityParserBase extends ItemParserBase<QualityItemData> {
         item.system.karma = +(jsonData.karma._TEXT ?? 0);
 
         if (jsonData.bonus)
-            BH.addBonus(item, jsonData.bonus);
+            await BH.addBonus(item, jsonData.bonus);
 
         if (jsonTranslation) {
             const origName = item.name;

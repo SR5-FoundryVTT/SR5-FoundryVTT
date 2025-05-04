@@ -7,7 +7,19 @@ import { Metatype } from "../../schema/MetatypeSchema";
 
 export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
 
-    override Parse(jsonData: Metatype, spirit: SpiritActorData, jsonTranslation?: object): SpiritActorData {
+    override async Parse(jsonData: Metatype, spirit: SpiritActorData, jsonTranslation?: object): Promise<SpiritActorData> {
+        const qualities = jsonData.qualities || undefined;
+        const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers || undefined;
+
+        const allTraitsName = [
+            ...IH.getArray(jsonData.powers?.power).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+            ...IH.getArray(qualities?.positive?.quality).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+            ...IH.getArray(qualities?.negative?.quality).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+            ...IH.getArray(optionalpowers?.optionalpower).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
+        ];
+
+        const traitsPromise = IH.findItem('Trait', allTraitsName);
+
         spirit.name = jsonData.name._TEXT;
         spirit.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 
@@ -60,36 +72,17 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
         }
         spirit.system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
+        spirit.system.is_npc = true;
+
+        const allTraits = await traitsPromise;
+
         //@ts-expect-error
         spirit.items = [
-            ...this.getItems(jsonData.powers?.power, ['critter_power', 'sprite_power'], {type: 'Power', critter: spirit.name}, jsonTranslation),
-        ]
-
-        if (jsonData.qualities) {
-            //@ts-expect-error
-            spirit.items.concat([
-                ...this.getItems(jsonData.qualities.positive?.quality, ['quality'], {type: 'Quality', critter: spirit.name}, jsonTranslation),
-                ...this.getItems(jsonData.qualities.negative?.quality, ['quality'], {type: 'Quality', critter: spirit.name}, jsonTranslation)
-            ])
-        }
-
-        if (jsonData.optionalpowers) {
-            const optionalPowers = jsonData.optionalpowers.optionalpower;
-            //@ts-expect-error
-            spirit.items = spirit.items.concat([
-                ...this.getItems(optionalPowers, ['critter_power', 'sprite_power'], {type: 'Optional Power', critter: spirit.name}, jsonTranslation),
-            ]);
-        }
-
-        if (jsonData.bonus?.optionalpowers?.optionalpower) {
-            const optionalPowers = jsonData.bonus.optionalpowers.optionalpower;
-            //@ts-expect-error
-            spirit.items = spirit.items.concat([
-                ...this.getItems(optionalPowers, ['critter_power', 'sprite_power'], {type: 'Optional Power', critter: spirit.name}, jsonTranslation),
-            ]);
-        }
-
-        spirit.system.is_npc = true;
+            ...this.getItems(allTraits, jsonData.powers?.power, {type: 'Power', critter: spirit.name}, jsonTranslation),
+            ...this.getItems(allTraits, qualities?.positive?.quality, {type: 'Power', critter: spirit.name}, jsonTranslation),
+            ...this.getItems(allTraits, qualities?.negative?.quality, {type: 'Power', critter: spirit.name}, jsonTranslation),
+            ...this.getItems(allTraits, optionalpowers?.optionalpower, {type: 'Optional Power', critter: spirit.name}, jsonTranslation),
+        ];
 
         if (jsonTranslation) {
             const page = IH.MapNameToPageSource(jsonTranslation, spirit.name);

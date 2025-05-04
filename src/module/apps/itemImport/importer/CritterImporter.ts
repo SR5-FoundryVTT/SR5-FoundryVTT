@@ -64,7 +64,7 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
             },
         };
 
-        const folders = await IH.MakeCategoryFolders('Actor', Categories, 'Critters', this.categoryTranslations);
+        const folders = await IH.MakeCategoryFolders('Critter', Categories, 'Critters', this.categoryTranslations);
 
         for (const jsonData of jsonDatas) {
             // Check to ensure the data entry is supported and the correct category
@@ -74,25 +74,30 @@ export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, 
                 continue;
             }
 
-            const actor = parser.Parse(
-                jsonData,
-                this.GetDefaultData({ type: parserType, entityType: 'Actor' }),
-                this.itemTranslations,
-            );
-            const category = IH.StringValue(jsonData, 'category').toLowerCase();
+            try {
+                const actor = await parser.Parse(
+                    jsonData,
+                    this.GetDefaultData({ type: parserType, entityType: 'Actor' }),
+                    this.itemTranslations,
+                );
+                const category = IH.StringValue(jsonData, 'category').toLowerCase();
 
-            //@ts-expect-error TODO: Foundry Where is my foundry base data?
-            actor.folder = folders[category]?.id;
+                //@ts-expect-error TODO: Foundry Where is my foundry base data?
+                actor.folder = folders[category]?.id;
 
-            actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
-            if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
+                actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
+                if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
 
-            actor.name = IH.MapNameToTranslation(this.itemTranslations, actor.name);
+                actor.name = IH.MapNameToTranslation(this.itemTranslations, actor.name);
 
-            actors.push(actor);
+                actors.push(actor);
+            } catch (error) {
+                console.error("Error while parsing Critter:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Falled Parsing Critter:" + (jsonData.name._TEXT ?? "Unknown"));
+            }
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Actor'].pack });
+        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Critter'].pack });
     }
 }

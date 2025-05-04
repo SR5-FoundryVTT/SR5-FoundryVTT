@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { VehicleModParserBase } from '../parser/mod/VehicleModParserBase';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import { VehiclesSchema } from '../schema/VehiclesSchema';
 
 export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemData, Shadowrun.ModificationData> {
     public override categoryTranslations: any;
@@ -23,47 +24,49 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
         this.accessoryTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponsi18n, 'mods', 'mod');
     }
 
-    async Parse(jsonObject: object, setIcons: boolean): Promise<Item> {
+    async Parse(jsonObject: VehiclesSchema, setIcons: boolean): Promise<Item> {
         const parser = new VehicleModParserBase();
         const datas: Shadowrun.ModificationItemData[] = [];
-        const jsonDatas = jsonObject['mods']['mod'];
         this.iconList = await this.getIconFiles();
         const parserType = 'modification';
         const validCategory = ['Body', 'Cosmetic', 'Electromagnetic', 'Powertrain', 'Protection', 'Weapons'];
 
-        for (let i = 0; i < jsonDatas.length; i++) {
-            const jsonData = jsonDatas[i];
-
+        for (const jsonData of jsonObject.mods.mod) {
             // Check to ensure the data entry is supported
             if (DataImporter.unsupportedEntry(jsonData)) {
                 continue;
             }
 
-            // Create the item
-            const item = parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}));
+            try {
+                // Create the item
+                const item = await parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}));
 
-            const categoryName = ImportHelper.StringValue(jsonData, 'category');
+                const categoryName = ImportHelper.StringValue(jsonData, 'category');
 
-            // Get the item's folder information
-            const folderName = validCategory.includes(categoryName) ? categoryName : "Other";
+                // Get the item's folder information
+                const folderName = validCategory.includes(categoryName) ? categoryName : "Other";
 
-            const folder = await ImportHelper.GetFolderAtPath("Item", `Vehicle-Mods/${folderName}`, true);
-            //@ts-expect-error TODO: Foundry Where is my foundry base data?
-            item.folder = folder.id;
+                const folder = await ImportHelper.GetFolderAtPath("Item", `Vehicle-Mods/${folderName}`, true);
+                //@ts-expect-error TODO: Foundry Where is my foundry base data?
+                item.folder = folder.id;
 
-            // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(folderName));
+                // Import Flags
+                item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(folderName));
 
-            // Default icon
-            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
+                // Default icon
+                if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
 
-            // Translate name if needed
-            item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
+                // Translate name if needed
+                item.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, item.name);
 
-            // Add relevant action tests
-            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                // Add relevant action tests
+                UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
 
-            datas.push(item);
+                datas.push(item);
+            } catch (error) {
+                console.error("Error while parsing Vehicle Mod:", jsonData.name._TEXT ?? "Unknown");
+                ui.notifications?.error("Falled Parsing Vehicle Mod:" + (jsonData.name._TEXT ?? "Unknown"));
+            }
         }
 
         // @ts-expect-error // TODO: TYPE: Remove this.

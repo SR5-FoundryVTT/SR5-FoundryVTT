@@ -4,47 +4,41 @@ import { SR5 } from '../../../../config';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+import { SR5Item } from '../../../../item/SR5Item';
 
 export abstract class MetatypeParserBase<TResult extends ShadowrunActorData> extends Parser<TResult> {
-    abstract override Parse(jsonData: object, item: TResult, jsonTranslation?: object): TResult;
+    abstract override Parse(jsonData: object, item: TResult, jsonTranslation?: object): Promise<TResult>;
 
     getItems(
-        array: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }>,
-        searchType: Parameters<typeof IH.findItem>[1],
+        items: SR5Item[],
+        itemData: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }>,
         msg_field: {type: string; critter: string},
         jsonTranslation?: object
     ): ItemDataSource[] {
-        const result: ItemDataSource[] = []
+        const itemMap = new Map(items.map(i => [i.name, i]));
 
-        for(const item of IH.getArray(array)) {
-            let name = item._TEXT;
+        const result: ItemDataSource[] = [];
 
-            if (name === 'Innate Spell' && item.$?.select) {
-                let spellName = item.$.select;
-                const translatedName = IH.MapNameToTranslation(jsonTranslation, spellName);
-                const foundSpell = IH.findItem(translatedName, 'spell');
-
-                if (foundSpell)
-                    result.push(foundSpell.toObject());
-                else
-                    console.log(`[Spell Missing]\nCritter: ${msg_field.critter}\nSpell: ${spellName}`);
-            }
-
+        for (const item of IH.getArray(itemData)) {
+            const name = item._TEXT;
             const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-            const foundItem = IH.findItem(translatedName, searchType);
-
+            const foundItem = itemMap.get(translatedName);
+    
             if (!foundItem) {
-                console.log(
-                    `[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`
-                );
+                console.log(`[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`);
                 continue;
             }
+    
+            const itemBase = foundItem.toObject();
 
-            let itemBase = foundItem.toObject();
-
-            if (item.$ && "rating" in item.$ && item.$.rating) {
+            if (item.$?.select)
+                itemBase.name += ` (${item.$.select})`;
+    
+            if (msg_field.type === 'Optional Power' && 'optional' in itemBase.system)
+                itemBase.system.optional = 'disabled_option';
+    
+            if (item.$?.rating) {
                 const rating = +item.$.rating;
-
                 if ('rating' in itemBase.system) {
                     itemBase.system.rating = rating;
                 } else if ('technology' in itemBase.system) {
@@ -52,15 +46,9 @@ export abstract class MetatypeParserBase<TResult extends ShadowrunActorData> ext
                 }
             }
 
-            if (item.$ && "select" in item.$ && item.$.select)
-                itemBase.name += ` (${item.$.select})`
-
-            if (msg_field.type === 'Optional Power' && 'optional' in itemBase.system)
-                itemBase.system.optional = 'disabled_option';
-
             result.push(itemBase);
         }
-        
+    
         return result;
-    }
+    }    
 }
