@@ -19,12 +19,12 @@
                 data-dtype="Number"
                 placeholder="0"
                 {{#if calculatedEssence}}
-                name="system.essence.value"
-                value="{{system.essence.value}}"
+                name="system.technology.calculated.essence"
+                value="{{system.technology.calculated.essence}}"
                 readonly
                 {{else}}
-                name="system.essence.base"
-                value="{{system.essence.base}}"
+                name="system.essence"
+                value="{{system.essence}}"
                 {{/if}}
             />
         </div>
@@ -84,62 +84,62 @@
         </div>
         {{/unless}}
         <div class="flexrow nowrap">
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="tech-adjustable-label">
               <label>{{localize "SR5.Cost"}}</label>
               <input
                 class="checkbox"
                 type="checkbox"
-                name="system.technology.cost.adjusted"
-                {{checked system.technology.cost.adjusted}}
+                name="system.technology.calculated.cost.adjusted"
+                {{checked system.technology.calculated.cost.adjusted}}
                 data-tooltip="{{localize 'SR5.Tooltips.Item.CostAdjustment'}}"
                 {{#if calculatedEssence}}disabled{{/if}}
               />
             </div>
-            <div class="input" style="flex: 1;">
+            <div class="tech-adjustable-input">
               <input
                 class="display"
                 type="text"
                 data-dtype="Number"
                 placeholder="100"
-                style="width: 100%;"
                 {{#if calculatedCost}}
-                name="system.technology.cost.value"
-                value="{{system.technology.cost.value}}"
+                name="system.technology.calculated.cost.value"
+                value="{{system.technology.calculated.cost.value}}"
                 readonly
                 {{else}}
-                name="system.technology.cost.base"
-                value="{{system.technology.cost.base}}"
+                name="system.technology.cost"
+                value="{{system.technology.cost}}"
                 {{/if}}
               />
               <span class="unit"><i class="fas fa-yen-sign"></i></span>
             </div>
           </div>
           <div class="flexrow nowrap">
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="tech-adjustable-label">
               <label>{{localize "SR5.Availability"}}</label>
               <input
                 class="checkbox"
                 type="checkbox"
-                name="system.technology.availability.adjusted"
-                {{checked system.technology.availability.adjusted}}
+                name="system.technology.calculated.availability.adjusted"
+                {{checked system.technology.calculated.availability.adjusted}}
                 data-tooltip="{{localize 'SR5.Tooltips.Item.AvailabilityAdjustment'}}"
                 {{#if calculatedEssence}}disabled{{/if}}
               />
             </div>
-            <input
-              class="display"
-              type="text"
-              placeholder="2R"
-              style="flex: 1;"
-              {{#if calculatedAvailability}}
-              name="system.technology.availability.value"
-              value="{{system.technology.availability.value}}"
-              readonly
-              {{else}}
-              name="system.technology.availability.base"
-              value="{{system.technology.availability.base}}"
-              {{/if}}
-            />
+            <div class="tech-adjustable-input">
+              <input
+                class="display"
+                type="text"
+                placeholder="2R"
+                {{#if calculatedAvailability}}
+                name="system.technology.calculated.availability.value"
+                value="{{system.technology.calculated.availability.value}}"
+                readonly
+               {{else}}
+                name="system.technology.availability"
+                value="{{system.technology.availability}}"
+                {{/if}}
+              />
+            </div>
           </div>
         {{#unless hideConditionMonitor}}
         <div class="flexrow nowrap">

@@ -14,7 +14,7 @@ export class Migrator {
         { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
         { versionNumber: Version0_18_0.TargetVersion, migration: new Version0_18_0() },
         { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() },
-        { versionNumber: Version0_26_0.TargetVersion, migration: new Version0_26_0() }
+        // { versionNumber: Version0_26_0.TargetVersion, migration: new Version0_26_0() }
     ];
 
     /**

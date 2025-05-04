@@ -130,8 +130,8 @@ export class SR5ItemSheet extends ItemSheet {
 
         const linkedActor = await this.item.getLinkedActor();
         const calculatedEssence = itemData.grade !== undefined && itemData.grade !== 'standard' && itemData.grade in SR.gradeModifiers;
-        const calculatedCost = calculatedEssence ? true : itemData.technology?.cost.adjusted ?? false;
-        const calculatedAvailability = calculatedEssence ? true : itemData.technology?.availability.adjusted ?? false;
+        const calculatedCost = calculatedEssence ? true : itemData.technology?.calculated.cost.adjusted ?? false;
+        const calculatedAvailability = calculatedEssence ? true : itemData.technology?.calculated.availability.adjusted ?? false;
         const ratingForCalculation = calculatedEssence || calculatedCost || calculatedAvailability;
 
 
@@ -157,7 +157,7 @@ export class SR5ItemSheet extends ItemSheet {
                 const technology = itemData.technology as any;
                 if (technology.rating === 0) delete technology.rating;
                 if (technology.quantity === 0) delete technology.quantity;
-                if (technology.cost.base === 0) delete technology.cost.base;
+                if (technology.cost === 0) delete technology.cost;
             } catch (e) {
                 console.log(e);
             }

@@ -49,8 +49,8 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(commlink, 'devicerating', 0);
-            item.system.technology.availability.base = item.system.technology.availability.value = ImportHelper.StringValue(commlink, 'avail');
-            item.system.technology.cost.base = item.system.technology.cost.value = ImportHelper.IntValue(commlink, 'cost', 0);
+            item.system.technology.availability = ImportHelper.StringValue(commlink, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(commlink, 'cost', 0);
             item.system.atts.att3.value = ImportHelper.IntValue(commlink, 'dataprocessing', 0);
             item.system.atts.att4.value = ImportHelper.IntValue(commlink, 'firewall', 0);
 
@@ -97,8 +97,8 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(rcc, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(rcc, 'name'), ImportHelper.StringValue(rcc, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(rcc, 'devicerating', 0);
-            item.system.technology.availability.base = item.system.technology.availability.value = ImportHelper.StringValue(rcc, 'avail');
-            item.system.technology.cost.base = item.system.technology.cost.value = ImportHelper.IntValue(rcc, 'cost', 0);
+            item.system.technology.availability = ImportHelper.StringValue(rcc, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(rcc, 'cost', 0);
             item.system.atts.att3.value = ImportHelper.IntValue(rcc, 'dataprocessing', 0);
             item.system.atts.att4.value = ImportHelper.IntValue(rcc, 'firewall', 0);
 
@@ -145,8 +145,8 @@ export class DeviceImporter extends DataImporter<Shadowrun.DeviceItemData, Shado
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(cyberdeck, 'devicerating', 0);
-            item.system.technology.availability.base = item.system.technology.availability.value = ImportHelper.StringValue(cyberdeck, 'avail');
-            item.system.technology.cost.base = item.system.technology.cost.value = ImportHelper.IntValue(cyberdeck, 'cost', 0);
+            item.system.technology.availability = ImportHelper.StringValue(cyberdeck, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(cyberdeck, 'cost', 0);
 
             // Some cyberdecks have a flexible attribute order
             // attributearray is a ',' separated list of values. Since it's hacky, be very unforgiving.

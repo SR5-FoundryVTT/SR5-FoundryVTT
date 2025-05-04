@@ -67,8 +67,8 @@ export class EquipmentImporter extends DataImporter<Shadowrun.EquipmentItemData,
             // Finish the importing
             item.system.description.source = `${ImportHelper.StringValue(equipment, 'source')} ${ImportHelper.MapNameToPageSource(this.itemTranslations, ImportHelper.StringValue(equipment, 'name'), ImportHelper.StringValue(equipment, 'page'))}`;
             item.system.technology.rating = ImportHelper.IntValue(equipment, 'rating', 0);
-            item.system.technology.availability.base = item.system.technology.availability.value = ImportHelper.StringValue(equipment, 'avail');
-            item.system.technology.cost.base = item.system.technology.cost.value = ImportHelper.IntValue(equipment, 'cost', 0);
+            item.system.technology.availability = ImportHelper.StringValue(equipment, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(equipment, 'cost', 0);
 
             // Translate name if needed
             item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);

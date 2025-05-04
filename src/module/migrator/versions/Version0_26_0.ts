@@ -1,14 +1,9 @@
 /**
- * Version 0.8 comes with a complete rework of the original roller design in ShadowrunRoller.
- * instead rolls are handled within the SuccessTest class or subclasses of that using ActionRollData as their basis.
- *
- * What class is to be used is defined within each action (active, followed, opposed, resist). Migration needs to map
- * these classes to their item types.
+
  */
 import { VersionMigration } from "../VersionMigration";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../../actor/SR5Actor";
-import { debug } from "console";
 
 export class Version0_26_0 extends VersionMigration {
     get SourceVersion(): string {
@@ -24,15 +19,15 @@ export class Version0_26_0 extends VersionMigration {
     }
 
     protected override async ShouldMigrateItemData(item: SR5Item) {
-        return true;
+        return item.system.technology ? true : false; 
     }
 
     protected override async ShouldMigrateSceneData(scene: Scene) {
-        return false;
+        return true;
     }
 
     protected override async ShouldMigrateActorData(actor: SR5Actor) {
-        return false;
+        return true;
     }
 
     protected override async MigrateItemData(item: SR5Item) {
@@ -50,10 +45,31 @@ export class Version0_26_0 extends VersionMigration {
             if (typeof availability !== "object") {
                 updateData.data["system.technology.availability.adjusted"] = false;
                 updateData.data["system.technology.availability.base"] = availability;
-                updateData.data["system.technology.availability.base"] = 0;
+                updateData.data["system.technology.availability.value"] = 0;
+            }
+
+            if (['bioware', 'cyberware'].includes(item.type)) {
+                updateData.data["system.essence.base"] = item.system.essence;
+                updateData.data["system.essence.value"] = 0;
             }
         }
 
         return updateData;
+    }
+
+    /**
+     * Migrate items on Actors and Token Actors.
+     * @param actor 
+     * @returns 
+     */
+    protected override async MigrateActorData(actor: SR5Actor) {
+        const updateData: {
+            data?: object,
+            items?: object[]
+        } = {
+            items: []
+        };
+
+        return await this.IterateActorItems(actor, updateData);
     }
 }

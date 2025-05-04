@@ -190,13 +190,13 @@ export const ChatData = {
     cyberware: (system, labels, props) => {
         ChatData.action(system, labels, props);
         ChatData.armor(system, labels, props);
-        if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.essence.value}`);
+        if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.technology.calculated.essence}`);
     },
 
     bioware: (system, labels, props) => {
         ChatData.action(system, labels, props);
         ChatData.armor(system, labels, props);
-        if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.essence.value}`);
+        if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.technology.calculated.essence}`);
     },
 
     device: (system: DeviceData, labels, props) => {

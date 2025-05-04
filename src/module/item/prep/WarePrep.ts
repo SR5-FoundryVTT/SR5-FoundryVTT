@@ -4,7 +4,7 @@ import { ItemAvailabilityFlow } from "../flows/ItemAvailabilityFlow";
 
 
 /**
- * Prepare item data form Cyberware and Bioware items.
+ * Prepare item data for Cyberware and Bioware items.
  */
 export const WarePrep = {
     prepareBaseData(system: Shadowrun.WareData) {
@@ -28,16 +28,16 @@ export const WarePrep = {
         const costMod = SR.gradeModifiers[grade].cost ?? 1;
 
         // Alter essence values.
-        const floatEssence = Number(system.essence.base || 0) * essenceMod;
+        const floatEssence = Number(system.essence || 0) * essenceMod;
         const actualEssence = Helpers.roundTo(floatEssence, 4);
 
         // Alter availability values.
-        let availability = String(system.technology.availability.base ?? 0);
+        let availability = String(system.technology.availability ?? 0);
         const availParts = ItemAvailabilityFlow.parseAvailibility(availability);
         if (!availParts) {
             availability += availMod !== 0 ? (availMod > 0 ? ` (+${availMod})` : ` (${availMod})`) : '';
         } else {
-            const availabilityAdjusted = system.technology.availability.adjusted ?? false;
+            const availabilityAdjusted = system.technology.calculated.availability.adjusted ?? false;
 
             const actualAvailibility = availabilityAdjusted
                 ? availParts.availability * rating + availMod
@@ -46,16 +46,16 @@ export const WarePrep = {
         }
 
         // Alter cost values.
-        const cost = Number(system.technology.cost.base ?? 0);
-        const costAdjusted = system.technology.cost.adjusted ?? false;
+        const cost = Number(system.technology.cost ?? 0);
+        const costAdjusted = system.technology.calculated.cost.adjusted ?? false;
 
         const actualCost = costAdjusted
             ? cost * rating * costMod
             : cost * costMod;
 
 
-        system.essence.value = actualEssence;
-        system.technology.availability.value = availability;
-        system.technology.cost.value = actualCost;
+        system.technology.calculated.essence = actualEssence;
+        system.technology.calculated.availability.value = availability;
+        system.technology.calculated.cost.value = actualCost;
     }
 }

@@ -8,7 +8,7 @@ export class CyberwareParser extends TechnologyItemParserBase<Ware> {
 
         const essence = ImportHelper.StringValue(jsonData, 'ess', '0').match(/[0-9]\.?[0-9]*/g);
         if (essence !== null) {
-            item.system.essence.base = item.system.essence.value = parseFloat(essence[0]);            
+            item.system.essence = parseFloat(essence[0]);            
         }
 
         const capacity = ImportHelper.StringValue(jsonData, 'capacity', '0').match(/[0-9]+/g);

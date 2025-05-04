@@ -50,8 +50,8 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
             // Parse the item information from the xml
             item.system.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
             item.system.technology.rating = 2;
-            item.system.technology.availability.base = item.system.technology.availability.value = ImportHelper.StringValue(jsonData, 'avail');
-            item.system.technology.cost.base = item.system.technology.cost.value = ImportHelper.IntValue(jsonData, 'cost', 0);
+            item.system.technology.availability = ImportHelper.StringValue(jsonData, 'avail');
+            item.system.technology.cost = ImportHelper.IntValue(jsonData, 'cost', 0);
 
             let bonusData = ImportHelper.ObjectValue(jsonData, 'weaponbonus', null);
             if (bonusData !== undefined && bonusData !== null) {

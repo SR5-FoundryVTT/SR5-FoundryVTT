@@ -53,12 +53,12 @@ export const TechnologyPrep = {
      * @param technology The system technology section to be altered
      */
     prepareAvailability(item: SR5Item, technology: Shadowrun.TechnologyData) {
-        const availability = String(technology.availability.base ?? 0);
+        const availability = String(technology.availability ?? 0);
 
-        const {adjusted, value} = ItemAvailabilityFlow.prepareAvailabilityValue(availability, technology.availability.adjusted, item.getRating());
+        const {adjusted, value} = ItemAvailabilityFlow.prepareAvailabilityValue(availability, technology.calculated.availability.adjusted, item.getRating());
 
-        technology.availability.adjusted = adjusted;
-        technology.availability.value = value;
+        technology.calculated.availability.adjusted = adjusted;
+        technology.calculated.availability.value = value;
     },
 
     /**
@@ -68,11 +68,11 @@ export const TechnologyPrep = {
      * @param technology The system technology section to be altered
      */
     prepareCost(item: SR5Item, technology: Shadowrun.TechnologyData) {
-        const baseCost = Number(technology.cost.base ?? 0);
+        const baseCost = Number(technology.cost ?? 0);
         const rating = item.getRating();
 
-        const actualCost = technology.cost.adjusted ? baseCost * rating : baseCost;
-        technology.cost.value = actualCost
+        const actualCost = technology.calculated.cost.adjusted ? baseCost * rating : baseCost;
+        technology.calculated.cost.value = actualCost
     },
 
 }

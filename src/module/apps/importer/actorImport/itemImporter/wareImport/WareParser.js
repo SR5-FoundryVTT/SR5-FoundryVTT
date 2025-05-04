@@ -34,7 +34,7 @@ export class WareParser {
 
         // Cyberware and Bioware have no equipped flag in chummer so it cannot be parsed - we consider it as always equipped
         system.technology.equipped = true;
-        system.essence.base = system.essence.value = chummerWare.ess;        
+        system.essence = chummerWare.ess;        
         system.grade = chummerWare.grade;
 
         // Bioware has no wireless feature, so disable it by default
