@@ -337,17 +337,9 @@ export class DataDefaults {
     static technologyData(partialTechnologyData: Partial<Shadowrun.TechnologyData> = {}) {
         return foundry.utils.mergeObject({
             rating: '',
-            availability: {
-                base: '',
-                value: '',
-                adjusted: false
-            },
-            quantity: 1,         
-            cost: {
-                base: 0,
-                value: 0,
-                adjusted: false
-            },
+            availability: '',
+            quantity: 1,
+            cost: '',
             equipped: false,
             conceal: {
                 base: 0,

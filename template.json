@@ -1268,8 +1268,8 @@
             "technology": {
                 "technology": {
                     "rating": 1,
-                    "availability": 0,
-                    "quantity": 1,         
+                    "availability": "",
+                    "quantity": 1,
                     "cost": 0,
                     "equipped": false,
                     "conceal": {
@@ -1557,7 +1557,7 @@
             "capacity": 0
         },
         "cyberware": {
-            "templates": ["description", "technology", "action", "armor", "importFlags"],            
+            "templates": ["description", "technology", "action", "armor", "importFlags"],
             "essence": 0,
             "grade": "standard",
             "capacity": 0

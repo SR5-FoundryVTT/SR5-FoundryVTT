@@ -56,7 +56,6 @@ export const parseTechnology = (chummerEntry) => {
     }
 
     if (chummerEntry.cost) {
-
         parsedTechnology.cost = parseFloat(chummerEntry.cost.replace(/[^\d\.\-]/g, ""));        
     }
 

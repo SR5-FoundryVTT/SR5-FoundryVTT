@@ -11,7 +11,7 @@ declare namespace Shadowrun {
     }
 
     export interface BiowarePartData {
-        essence: NumberOrEmpty;
+        essence: number;
         capacity: number;
         grade: string;
     }
