@@ -13,15 +13,18 @@ declare namespace Shadowrun {
         wireless: boolean
         networkController: string
         calculated: {
-            essence: NumberOrEmpty
+            essence: {
+                value: NumberOrEmpty
+                adjusted: boolean
+            }
             availability: {
                 value: string
                 adjusted: boolean
-            };
+            }
             cost: {
                 value: NumberOrEmpty
                 adjusted: boolean
-            };
+            }
         };
     };
 

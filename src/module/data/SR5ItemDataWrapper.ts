@@ -305,7 +305,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
      * @returns A decimal as essence modifier
      */
     getEssenceLoss(): number {
-        const lossRaw = Number(this.getData()?.technology?.calculated?.essence ?? this.getData()?.essence);
+        const lossRaw = Number(this.getData()?.technology?.calculated.essence.adjusted ? this.getData()?.technology?.calculated.essence.value : this.getData()?.essence);
         const loss = isNaN(lossRaw) ? 0 : lossRaw;
         const quantity = Number(this.getData()?.technology?.quantity) ?? 1;
 

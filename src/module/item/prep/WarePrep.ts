@@ -21,7 +21,11 @@ export const WarePrep = {
         const rating = system.technology.rating || 0;
         const grade = system.grade;
 
-        if (grade === 'standard') return;
+        if (grade === 'standard') {
+            system.technology.calculated.essence.value = system.essence;
+            system.technology.calculated.essence.adjusted = false;
+            return;
+        }
 
         const essenceMod = SR.gradeModifiers[grade].essence ?? 1;
         const availMod = SR.gradeModifiers[grade].avail ?? 0;
@@ -30,6 +34,7 @@ export const WarePrep = {
         // Alter essence values.
         const floatEssence = Number(system.essence || 0) * essenceMod;
         const actualEssence = Helpers.roundTo(floatEssence, 4);
+        system.technology.calculated.essence.adjusted = true;
 
         // Alter availability values.
         let availability = String(system.technology.availability ?? 0);
@@ -54,7 +59,7 @@ export const WarePrep = {
             : cost * costMod;
 
 
-        system.technology.calculated.essence = actualEssence;
+        system.technology.calculated.essence.value = actualEssence;
         system.technology.calculated.availability.value = availability;
         system.technology.calculated.cost.value = actualCost;
     }

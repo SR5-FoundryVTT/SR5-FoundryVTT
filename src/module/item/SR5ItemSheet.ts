@@ -129,7 +129,7 @@ export class SR5ItemSheet extends ItemSheet {
         const itemData = this.item.system;
 
         const linkedActor = await this.item.getLinkedActor();
-        const calculatedEssence = itemData.grade !== undefined && itemData.grade !== 'standard' && itemData.grade in SR.gradeModifiers;
+        const calculatedEssence = itemData.technology?.calculated.essence.adjusted;
         const calculatedCost = calculatedEssence ? true : itemData.technology?.calculated.cost.adjusted ?? false;
         const calculatedAvailability = calculatedEssence ? true : itemData.technology?.calculated.availability.adjusted ?? false;
         const ratingForCalculation = calculatedEssence || calculatedCost || calculatedAvailability;
