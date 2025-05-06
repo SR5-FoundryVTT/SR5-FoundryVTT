@@ -184,16 +184,16 @@ export class BonusHelper {
                 );
             }
         }
-        
-        if (bonus.matrixinitiative) {
-            this.createEffect(
-                sheet, { name: "Increase Matrix Initiative" },
-                [{ key: "system.modifiers.matrix_initiative", value: bonus.matrixinitiative._TEXT }]
-            );
-        }
+
+        // if (bonus.matrixinitiative) {
+        //     this.createEffect(
+        //         sheet, { name: "Increase Matrix Initiative" },
+        //         [{ key: "system.modifiers.matrix_initiative", value: bonus.matrixinitiative._TEXT }]
+        //     );
+        // }
 
         //TODO if (bonus.matrixinitiativedice)
-        
+
         if (bonus.matrixinitiativediceadd) {
             this.createEffect(
                 sheet, { name: "Increase Matrix Initiative Dice" },

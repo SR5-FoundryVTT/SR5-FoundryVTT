@@ -21,6 +21,7 @@ import { SpriteImporter } from '../importer/SpriteImporter';
 
 
 export class Import extends Application {
+    // Update Schemas in util/generate_schemas.py
     private githubConfig = {
         user: "BM123499",
         repo: "chummer5a",

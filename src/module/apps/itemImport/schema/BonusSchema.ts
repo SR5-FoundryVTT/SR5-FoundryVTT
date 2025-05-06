@@ -5,11 +5,7 @@ import { Empty, Many, OneOrMany } from './Types';
 export interface BonusSchema {
     $?: { unique?: string; useselected?: string; };
     accel?: { _TEXT: string; };
-    actiondicepool?: {
-        $?: { category: string; };
-        name?: { _TEXT: string; };
-        val?: { _TEXT: string; };
-    };
+    actiondicepool?: { $: { category: string; }; };
     activeskillkarmacost?: Many<{
         condition: { _TEXT: string; };
         max?: { _TEXT: string; };
@@ -21,15 +17,14 @@ export interface BonusSchema {
         val: { _TEXT: string; };
     };
     adapsin?: Empty;
-    addcontact?: OneOrMany<{
-        canwrite?: Empty;
+    addcontact?: {
         connection?: { _TEXT: string; };
-        forcedloyalty?: { _TEXT: string; };
+        forcedloyalty: { _TEXT: string; };
         forcegroup?: Empty;
         free: Empty;
-        group?: Empty;
+        group: Empty;
         loyalty?: { _TEXT: string; };
-    }>;
+    };
     addecho?: { _TEXT: string; };
     addesstophysicalcmrecovery?: Empty;
     addesstostuncmrecovery?: Empty;
@@ -52,24 +47,16 @@ export interface BonusSchema {
     };
     addmetamagic?: OneOrMany<{ _TEXT: string; $: { forced: string; }; }>;
     addqualities?: {
-        addquality: OneOrMany<{
-            $?: { forced?: string; rating?: string; select?: string; };
-            options?: {
-                collegeeducation: { _TEXT: string; };
-                technicalschooleducation: { _TEXT: string; };
-            };
-            _TEXT?: string;
-        }>;
+        addquality: OneOrMany<{ _TEXT: string; $?: { forced?: string; select?: string; }; }>;
     };
-    addskillspecializationoption?: OneOrMany<{
-        skill?: { _TEXT: string; };
-        skills?: {
-            skill: OneOrMany<{ _TEXT: string; }>;
+    addskillspecializationoption?: {
+        skills: {
+            skill: { _TEXT: string; };
         };
         spec: { _TEXT: string; };
-    }>;
+    };
     addspell?: { _TEXT: string; $: { alchemical: string; }; };
-    addspirit?: OneOrMany<{
+    addspirit?: Empty | OneOrMany<{
         addtoselected?: { _TEXT: string; };
         spirit?: OneOrMany<{ _TEXT: string; }>;
     }>;
@@ -89,28 +76,10 @@ export interface BonusSchema {
     ambidextrous?: Empty;
     armor?: { _TEXT: string; $?: { group: string; }; };
     astralreputation?: { _TEXT: string; };
-    attribute?: OneOrMany<{
-        name: { _TEXT: string; };
-        value: { _TEXT: string; };
-    }>;
     attributekarmacost?: {
         name: { _TEXT: string; };
         val: { _TEXT: string; };
     };
-    attributelevel?: OneOrMany<{
-        name?: { _TEXT: string; };
-        options?: {
-            agi: { _TEXT: string; };
-            bod: { _TEXT: string; };
-            cha?: { _TEXT: string; };
-            int: { _TEXT: string; };
-            log: { _TEXT: string; };
-            rea: { _TEXT: string; };
-            str: { _TEXT: string; };
-            wil: { _TEXT: string; };
-        };
-        val?: { _TEXT: string; };
-    }>;
     biowareessmultiplier?: { _TEXT: string; };
     blackmarketdiscount?: Empty;
     blockskillcategorydefaulting?: Many<{ _TEXT: string; }>;
@@ -167,11 +136,7 @@ export interface BonusSchema {
     drainvalue?: { _TEXT: string; };
     electricityarmor?: { _TEXT: string; };
     enableattribute?: {
-        aug?: { _TEXT: string; };
-        max?: { _TEXT: string; };
-        min?: { _TEXT: string; };
         name: { _TEXT: string; };
-        val?: { _TEXT: string; };
     };
     enabletab?: {
         name: OneOrMany<{ _TEXT: string; }>;
@@ -192,8 +157,6 @@ export interface BonusSchema {
         name: { _TEXT: string; };
         val: { _TEXT: string; };
     }>;
-    freenegativequalities?: { _TEXT: string; };
-    freepositivequalities?: { _TEXT: string; };
     freequality?: { _TEXT: string; };
     freespells?: { $: { attribute?: string; limit?: string; skill?: string; }; };
     friendsinhighplaces?: Empty;
@@ -202,7 +165,6 @@ export interface BonusSchema {
     initiative?: { _TEXT: string; $?: { precedence: string; }; };
     initiativedice?: { _TEXT: string; };
     initiativepass?: { _TEXT: string; $?: { precedence: string; }; };
-    initiativepassadd?: { _TEXT: string; };
     judgeintentions?: { _TEXT: string; };
     judgeintentionsdefense?: { _TEXT: string; };
     judgeintentionsoffense?: { _TEXT: string; };
@@ -219,113 +181,36 @@ export interface BonusSchema {
         name: Empty;
         val: { _TEXT: string; };
     };
-    knowledgeskilllevel?: OneOrMany<{
-        group?: {
-            options?: {
-                academic: { _TEXT: string; };
-                professional: { _TEXT: string; };
-            };
-            _TEXT?: string;
-        };
-        id?: { _TEXT: string; };
-        name?: { _TEXT: string; };
-        option?: {
-            afrikaans?: { _TEXT: string; };
-            bantu?: { _TEXT: string; };
-            city?: { _TEXT: string; };
-            english?: { _TEXT: string; };
-            german?: { _TEXT: string; };
-            isindebele?: { _TEXT: string; };
-            isixhosa?: { _TEXT: string; };
-            isizulu?: { _TEXT: string; };
-            newhlobane?: { _TEXT: string; };
-            sedepi?: { _TEXT: string; };
-            sesotho?: { _TEXT: string; };
-            setswana?: { _TEXT: string; };
-            siswati?: { _TEXT: string; };
-            tshivenda?: { _TEXT: string; };
-            xitsonga?: { _TEXT: string; };
-        };
-        options?: {
-            ani?: { _TEXT: string; };
-            ath?: { _TEXT: string; };
-            biology?: { _TEXT: string; };
-            chemistry?: { _TEXT: string; };
-            creole?: { _TEXT: string; };
-            dutch?: { _TEXT: string; };
-            eng?: { _TEXT: string; };
-            english?: { _TEXT: string; };
-            esk?: { _TEXT: string; };
-            film?: { _TEXT: string; };
-            flee?: { _TEXT: string; };
-            french?: { _TEXT: string; };
-            german?: { _TEXT: string; };
-            iro?: { _TEXT: string; };
-            italian?: { _TEXT: string; };
-            japanese?: { _TEXT: string; };
-            lucimi?: { _TEXT: string; };
-            magicaltheory?: { _TEXT: string; };
-            metaplanes?: { _TEXT: string; };
-            music?: { _TEXT: string; };
-            orange?: { _TEXT: string; };
-            ork?: { _TEXT: string; };
-            physics?: { _TEXT: string; };
-            polish?: { _TEXT: string; };
-            sal?: { _TEXT: string; };
-            sio?: { _TEXT: string; };
-            spanish?: { _TEXT: string; };
-            sports?: { _TEXT: string; };
-            taino?: { _TEXT: string; };
-            tli?: { _TEXT: string; };
-            tsi?: { _TEXT: string; };
-            uto?: { _TEXT: string; };
-            val?: { _TEXT: string; };
-            yiddish?: { _TEXT: string; };
-            zuni?: { _TEXT: string; };
-        };
-        spec?: { _TEXT: string; };
-        val?: { _TEXT: string; };
-    }>;
     knowledgeskillpoints?: {
         val: { _TEXT: string; };
     };
     lifestylecost?: OneOrMany<{ _TEXT: string; $?: { lifestyle: string; }; }>;
-    limit?: OneOrMany<{
-        name: { _TEXT: string; };
-        value: { _TEXT: string; };
-    }>;
     limitcritterpowercategory?: { _TEXT: string; };
     limitmodifier?: OneOrMany<{
         condition?: { _TEXT: string; };
         limit: { _TEXT: string; };
         value: { _TEXT: string; };
     }>;
-    limitspellcategory?: OneOrMany<{ _TEXT: string; $?: { exclude: string; }; }>;
-    limitspiritcategory?: OneOrMany<{
+    limitspellcategory?: Empty | { _TEXT?: string; $?: { exclude: string; }; };
+    limitspiritcategory?: Empty | {
         spirit?: { _TEXT: string; };
-    }>;
+    };
     livingpersona?: {
         attack?: { _TEXT: string; };
         dataprocessing?: { _TEXT: string; };
         firewall?: { _TEXT: string; };
-        signal?: { _TEXT: string; };
         sleaze?: { _TEXT: string; };
-        system?: { _TEXT: string; };
     };
     mademan?: Empty;
     magicianswaydiscount?: Empty;
     manaillusionresist?: { _TEXT: string; };
     martialart?: { _TEXT: string; };
-    matrixinitiative?: { _TEXT: string; };
     matrixinitiativedice?: { _TEXT: string; $: { precedence: string; }; };
     matrixinitiativediceadd?: { _TEXT: string; };
     memory?: { _TEXT: string; };
     mentallimit?: { _TEXT: string; };
     mentalmanipulationresist?: { _TEXT: string; };
     metageniclimit?: { _TEXT: string; };
-    metamagiclimit?: {
-        metamagic: Many<{ _TEXT: string; $: { grade: string; }; }>;
-    };
     movementreplace?: OneOrMany<{
         category: { _TEXT: string; };
         speed: { _TEXT: string; };
@@ -373,9 +258,6 @@ export interface BonusSchema {
     psychologicaladdictionalreadyaddicted?: { _TEXT: string; };
     psychologicaladdictionfirsttime?: { _TEXT: string; };
     publicawareness?: { _TEXT: string; };
-    pushtext?: { _TEXT: string; };
-    quality?: { _TEXT: string; $: { rating: string; }; };
-    quickeningmetamagic?: Empty;
     radiationresist?: { _TEXT: string; };
     reach?: { _TEXT: string; };
     reflexrecorderoptimization?: Empty;
@@ -412,7 +294,7 @@ export interface BonusSchema {
         }>;
     };
     selectcontact?: Empty;
-    selectcyberware?: {
+    selectcyberware?: Empty | {
         category?: { _TEXT: string; };
     };
     selectexpertise?: { $: { limittoskill: string; }; };
@@ -424,10 +306,9 @@ export interface BonusSchema {
     selectparagon?: Empty;
     selectpowers?: {
         selectpower: {
-            $?: { limittopowers: string; };
-            ignorerating?: { _TEXT: string; };
-            limit?: { _TEXT: string; };
-            pointsperlevel?: { _TEXT: string; };
+            ignorerating: { _TEXT: string; };
+            limit: { _TEXT: string; };
+            pointsperlevel: { _TEXT: string; };
             val: { _TEXT: string; };
         };
     };
@@ -440,7 +321,7 @@ export interface BonusSchema {
     selectrestricted?: Empty;
     selectside?: Empty;
     selectskill?: {
-        $?: { knowledgeskills?: string; limittoattribute?: string; limittoskill?: string; maximumrating?: string; minimumrating?: string; prompt?: string; skillcategory?: string; };
+        $?: { knowledgeskills?: string; limittoattribute?: string; limittoskill?: string; maximumrating?: string; minimumrating?: string; skillcategory?: string; };
         applytorating?: { _TEXT: string; };
         disablespecializationeffects?: Empty;
         max?: { _TEXT: string; };
@@ -449,11 +330,11 @@ export interface BonusSchema {
         };
         val?: { _TEXT: string; };
     };
-    selectspell?: { $?: { ignorerequirements: string; }; };
+    selectspell?: Empty | { $?: { ignorerequirements: string; }; };
     selectsprite?: Empty;
-    selecttext?: { $?: { allowedit?: string; xml: string; xpath: string; }; };
+    selecttext?: Empty | { $?: { allowedit?: string; xml: string; xpath: string; }; };
     selecttradition?: Empty;
-    selectweapon?: { $?: { weapondetails: string; }; };
+    selectweapon?: Empty | { $?: { weapondetails: string; }; };
     sensor?: { _TEXT: string; };
     skillattribute?: OneOrMany<{
         $?: { precedence: string; };
@@ -501,35 +382,6 @@ export interface BonusSchema {
     };
     skillgroupdisable?: OneOrMany<{ _TEXT: string; }>;
     skillgroupdisablechoice?: Empty;
-    skillgrouplevel?: OneOrMany<{
-        name?: { _TEXT: string; };
-        options?: {
-            conjuring: { _TEXT: string; };
-            enchanting: { _TEXT: string; };
-            sorcery: { _TEXT: string; };
-        };
-        val?: { _TEXT: string; };
-    }>;
-    skilllevel?: OneOrMany<{
-        name?: { _TEXT: string; };
-        options?: {
-            clubs?: { _TEXT: string; };
-            gunnery?: { _TEXT: string; };
-            longarms?: { _TEXT: string; };
-            mech1?: { _TEXT: string; };
-            mech2?: { _TEXT: string; };
-            mech3?: { _TEXT: string; };
-            mech4?: { _TEXT: string; };
-            pilotaircraft?: { _TEXT: string; };
-            pilotexoticvehicle?: { _TEXT: string; };
-            pilotgroundcraft?: { _TEXT: string; };
-            pilotwalker?: { _TEXT: string; };
-            pilotwatercraft?: { _TEXT: string; };
-            unarmedcombat?: { _TEXT: string; };
-        };
-        spec?: { _TEXT: string; };
-        val?: { _TEXT: string; };
-    }>;
     skilllinkedattribute?: {
         bonus: { _TEXT: string; };
         name: { _TEXT: string; };
@@ -552,22 +404,6 @@ export interface BonusSchema {
         name: { _TEXT: string; };
         val?: { _TEXT: string; };
     }>;
-    specificpower?: OneOrMany<{
-        bonusoverride?: {
-            selectattribute?: {
-                attribute: { _TEXT: string; };
-            };
-            selectskill?: {
-                $: { limittoskill?: string; minimumrating: string; skillcategory?: string; skillgroup?: string; };
-                skillcategories?: {
-                    category: Many<{ _TEXT: string; }>;
-                };
-                val: { _TEXT: string; };
-            };
-        };
-        name: { _TEXT: string; };
-        val?: { _TEXT: string; };
-    }>;
     specificskill?: OneOrMany<{
         applytorating?: { _TEXT: string; };
         bonus: { _TEXT: string; };
@@ -575,11 +411,10 @@ export interface BonusSchema {
         name: { _TEXT: string; };
     }>;
     speed?: { _TEXT: string; };
-    spellcategory?: OneOrMany<{
-        bonus?: { _TEXT: string; };
+    spellcategory?: {
         name: { _TEXT: string; };
-        val?: { _TEXT: string; };
-    }>;
+        val: { _TEXT: string; };
+    };
     spellcategorydamage?: {
         category: { _TEXT: string; };
         val: { _TEXT: string; };
@@ -596,11 +431,10 @@ export interface BonusSchema {
         descriptor: { _TEXT: string; };
         val: { _TEXT: string; };
     };
-    spelldicepool?: OneOrMany<{
-        id?: { _TEXT: string; };
-        name?: { _TEXT: string; };
+    spelldicepool?: {
+        name: { _TEXT: string; };
         val: { _TEXT: string; };
-    }>;
+    };
     spellresistance?: { _TEXT: string; };
     sprintbonus?: {
         category: { _TEXT: string; };
@@ -653,11 +487,10 @@ export interface BonusSchema {
         bonus: { _TEXT: string; };
         selectskill: { $: { limittoskill: string; }; };
     };
-    weaponskillaccuracy?: OneOrMany<{
-        name?: { _TEXT: string; };
-        selectskill?: { $: { excludecategory?: string; excludeskill?: string; knowledgeskills?: string; skillcategory?: string; }; };
+    weaponskillaccuracy?: {
+        selectskill: { $: { excludecategory?: string; excludeskill?: string; knowledgeskills?: string; skillcategory?: string; }; };
         value: { _TEXT: string; };
-    }>;
+    };
     weaponspecificdice?: { _TEXT: string; $: { type: string; }; };
     _TEXT?: string;
 };

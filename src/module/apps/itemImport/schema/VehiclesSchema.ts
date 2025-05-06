@@ -5,7 +5,10 @@ import { ConditionsSchema } from './ConditionsSchema';
 import { Empty, Many, OneOrMany } from './Types';
 
 export interface Mod {
-    avail: { _TEXT: string; };
+    ammobonus?: { _TEXT: string; };
+    ammobonuspercent?: { _TEXT: string; };
+    ammoreplace?: { _TEXT: string; };
+    avail: Empty | { _TEXT: string; };
     bonus?: BonusSchema;
     capacity?: { _TEXT: string; };
     category: { _TEXT: string; };

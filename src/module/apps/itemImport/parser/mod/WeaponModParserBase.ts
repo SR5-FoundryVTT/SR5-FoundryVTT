@@ -10,7 +10,7 @@ export class WeaponModParserBase extends TechnologyItemParserBase<ModificationIt
 
         item.system.type = 'weapon';
 
-        item.system.mount_point = jsonData.mount._TEXT?.toLowerCase() as MountType;
+        item.system.mount_point = jsonData.mount ? (jsonData.mount._TEXT.toLowerCase() as MountType) : "";
 
         item.system.rc = +(jsonData.rc?._TEXT ?? 0);
         item.system.accuracy = +(jsonData.accuracy?._TEXT ?? 0);

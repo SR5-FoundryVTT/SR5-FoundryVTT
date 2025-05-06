@@ -33,7 +33,7 @@ export interface Accessory {
     hide?: Empty;
     id: { _TEXT: string; };
     modifyammocapacity?: { _TEXT: string; };
-    mount: { _TEXT: string; };
+    mount: Empty | { _TEXT: string; };
     name: { _TEXT: string; };
     page: { _TEXT: string; };
     rangemodifier?: { _TEXT: string; };

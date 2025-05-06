@@ -26,9 +26,9 @@ export interface Cyberware {
     };
     blocksmounts?: { _TEXT: string; };
     bonus?: BonusSchema;
-    capacity?: { _TEXT: string; };
+    capacity: { _TEXT: string; };
     category: { _TEXT: string; };
-    cost?: { _TEXT: string; };
+    cost: { _TEXT: string; };
     devicerating?: { _TEXT: string; };
     ess: { _TEXT: string; };
     forbidden?: ConditionsSchema;
@@ -42,7 +42,7 @@ export interface Cyberware {
     };
     hide?: Empty;
     id: { _TEXT: string; };
-    inheritattributes?: OneOrMany<Empty>;
+    inheritattributes?: Empty;
     limbslot?: { _TEXT: string; };
     limbslotcount?: { _TEXT: string; };
     limit?: { _TEXT: string; };

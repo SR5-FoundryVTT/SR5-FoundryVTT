@@ -8,7 +8,7 @@ export interface Spell {
     bonus?: BonusSchema;
     category: { _TEXT: string; };
     damage: { _TEXT: string; };
-    descriptor?: { _TEXT: string; };
+    descriptor?: Empty | { _TEXT: string; };
     duration: { _TEXT: string; };
     dv: { _TEXT: string; };
     id: { _TEXT: string; };

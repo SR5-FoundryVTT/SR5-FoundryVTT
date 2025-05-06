@@ -6,7 +6,7 @@ import { Empty, Many, OneOrMany } from './Types';
 
 export interface Bioware {
     addtoparentess?: Empty;
-    addweapon?: { _TEXT: string; };
+    addweapon?: Empty | { _TEXT: string; };
     allowgear?: {
         gearcategory: Many<{ _TEXT: string; }>;
     };

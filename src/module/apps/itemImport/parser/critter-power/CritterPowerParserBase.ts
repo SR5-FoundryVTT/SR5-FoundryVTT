@@ -14,7 +14,7 @@ export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData>
         const category = jsonData.category._TEXT.toLowerCase();
         item.system.category = (category.includes("infected") ? "infected" : category) as CritterPowerCategory;
 
-        let duration = jsonData.duration._TEXT;
+        let duration = jsonData.duration ? jsonData.duration._TEXT : "";
         if (duration === 'Always') {
             item.system.duration = 'always';
         } else if (duration === 'Instant') {
@@ -27,7 +27,7 @@ export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData>
             item.system.duration = 'special';
         }
 
-        let range = jsonData.range._TEXT;
+        let range = jsonData.range ? jsonData.range._TEXT : "";
         if (range === 'T') {
             item.system.range = 'touch';
         } else if (range === 'LOS') {
@@ -40,7 +40,7 @@ export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData>
             item.system.range = 'special';
         }
 
-        let type = jsonData.type._TEXT;
+        let type = jsonData.type ? jsonData.type._TEXT : "";
         if (type === 'P') {
             item.system.powerType = 'physical';
         } else if (type === 'M') {

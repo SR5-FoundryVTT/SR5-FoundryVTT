@@ -9,7 +9,7 @@ export interface Enhancement {
     id: { _TEXT: string; };
     name: { _TEXT: string; };
     page: { _TEXT: string; };
-    power: { _TEXT: string; };
+    power: Empty | { _TEXT: string; };
     required: ConditionsSchema;
     source: { _TEXT: string; };
 };
@@ -37,7 +37,6 @@ export interface Power {
     page: { _TEXT: string; };
     points: { _TEXT: string; };
     required?: ConditionsSchema;
-    selectskill?: Empty;
     source: { _TEXT: string; };
 };
 

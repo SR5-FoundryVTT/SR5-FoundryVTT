@@ -54,8 +54,8 @@ export interface Armor {
 
 export interface Mod {
     addoncategory?: Many<{ _TEXT: string; }>;
-    armor?: { _TEXT: string; };
-    armorcapacity?: { _TEXT: string; };
+    armor: { _TEXT: string; };
+    armorcapacity: { _TEXT: string; };
     avail: { _TEXT: string; };
     bonus?: BonusSchema;
     category: { _TEXT: string; };
