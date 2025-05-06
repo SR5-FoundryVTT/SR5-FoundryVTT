@@ -1,9 +1,56 @@
-<div class="sr5 chat-card rollRequest-card">
-    {{localize 'SR5.GMRequest.General'}}
-    <br>
-    <a class="sr5-requestAnswer" data-request="{{rollType}}" data-rollEntity={{rollEntity}} data-threshold={{threshold}}><em class="fas fa-dice"></em> {{localize rollTypeName}} {{ rollEntityName }}</a>
-    <br>
-    {{#if threshold}}
-        {{localize 'SR5.GMRequest.Threshold'}} {{ threshold }}
+<div class="sr5 chat-card roll-card rollRequest-card">
+    <div class="card-title card-header">
+      <span class="test-name">Roll Request</span>
+    </div>
+  
+    {{#if actor}}
+    <div class="card-title card-header">
+      <div class="container container--fluid">
+        <div class="container__row">
+          <div class="container__col">
+            <div class="document">
+              <a class="chat-select-link">
+                <img src="{{actor.img}}" class="entity-selectable" data-tooltip="{{actor.name}}">
+              </a>
+              <h3 class="header-name">
+                <a class="chat-document-link" data-uuid="{{actor.uuid}}">{{actor.name}}</a>
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     {{/if}}
-</div>
+  
+    <div class="card-main-content">
+      <div class="card-content">
+        <div class="test-line">
+          <span class="test-code">fragt eine Aktion an:</span>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card-buttons">
+      <div
+        class="button sr5-roll-request"
+        data-request="{{testType}}"
+        {{#if skill}}data-skill="{{skill}}"{{/if}}
+        {{#if attribute}}data-attribute="{{attribute}}"{{/if}}
+        {{#if attribute2}}data-attribute2="{{attribute2}}"{{/if}}
+        {{#if limit}}data-limit="{{limit}}"{{/if}}
+        {{#if threshold}}data-threshold="{{threshold}}"{{/if}}
+        {{#if interval}}data-interval="{{interval}}"{{/if}}
+        {{#if opposedSkill}}data-opposedSkill="{{opposedSkill}}"{{/if}}
+        {{#if opposedAttribute}}data-opposedAttribute="{{opposedAttribute}}"{{/if}}
+        {{#if opposedAttribute2}}data-opposedAttribute2="{{opposedAttribute2}}"{{/if}}
+        {{#if opposedLimit}}data-opposedLimit="{{opposedLimit}}"{{/if}}
+        {{#if name}}data-name="{{name}}"{{/if}}
+        {{#if label}}data-label="{{label}}"{{/if}} 
+        {{#if compendiumKey}}data-compendiumKey="{{compendiumKey}}"{{/if}} 
+        data-document-uuid="{{documentUuid}}"
+        title="{{label}}"
+      >
+        {{label}}
+      </div>
+    </div>
+  </div>

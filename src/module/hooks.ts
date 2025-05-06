@@ -365,7 +365,9 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await TestCreator.promptSuccessTest());
 
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
-        Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks);
+        ["renderJournalPageSheet", "renderItemSheet", "renderActorSheet"].forEach(hook =>
+            Hooks.on(hook, (data) => JournalEnrichers.setEnricherHooks())
+          );
         HooksManager.registerSocketListeners();
     }
 
@@ -520,7 +522,8 @@ ___________________
         await OpposedTest.chatMessageListeners(message, html, data);
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
         await TeamworkTest.chatMessageListeners(message, html);
-        await JournalEnrichers.messageRequestHooks(html);
+        // TODO: Thogrim
+        // await JournalEnrichers.messageRequestHooks(html);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
@@ -528,7 +531,8 @@ ___________________
         await OpposedTest.chatLogListeners(chatLog, html, data);
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
         await TeamworkTest.chatLogListeners(chatLog, html);
-        await JournalEnrichers.chatlogRequestHooks(html)
+        // TODO: Thogrim
+        // await JournalEnrichers.chatlogRequestHooks(html)
     }
 
     static configureVision() {
@@ -541,5 +545,6 @@ ___________________
 
     static async configureTextEnrichers() {
        await JournalEnrichers.setEnrichers();
+       await JournalEnrichers.setEnricherHooks();
     }
 }

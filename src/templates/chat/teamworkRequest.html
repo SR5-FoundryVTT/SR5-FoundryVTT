@@ -1,0 +1,9 @@
+<div class="sr5 chat-card rollRequest-card">
+    {{localize 'SR5.GMRequest.General'}}
+    <br>
+    <a class="sr5-requestAnswer" data-request="{{rollType}}" data-rollEntity={{rollEntity}} data-threshold={{threshold}}><em class="fas fa-dice"></em> {{localize rollTypeName}} {{ rollEntityName }}</a>
+    <br>
+    {{#if threshold}}
+        {{localize 'SR5.GMRequest.Threshold'}} {{ threshold }}
+    {{/if}}
+</div>
