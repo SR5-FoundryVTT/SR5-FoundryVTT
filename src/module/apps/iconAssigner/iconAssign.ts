@@ -20,7 +20,11 @@ export async function getIconFiles(): Promise<string[]> {
     return fileList
 }
 
-export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: Shadowrun.ShadowrunItemDataData, iconList: string[]): Promise<string> {
+export function iconAssign(
+    importFlags: Shadowrun.ImportFlagData,
+    iconList: string[],
+    system?: Partial<Shadowrun.WeaponData>
+): string {
 
     const defaultImg = "icons/svg/item-bag.svg";
     const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/dist/icons/importer/";
@@ -52,7 +56,7 @@ export async function iconAssign(importFlags: Shadowrun.ImportFlagData, system: 
             fileNamePriority = [
                 imgFolder + override,
                 imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType,
-                imgFolder + imgType + '/' + system.category,
+                imgFolder + imgType + '/' + system?.category,
                 imgFolder + imgType + '/' + imgType,
                 imgFolder + imgSubType,
                 imgFolder + imgType

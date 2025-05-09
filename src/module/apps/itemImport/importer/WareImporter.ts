@@ -1,103 +1,53 @@
-import { DataImporter } from './DataImporter';
-import { ImportHelper } from '../helper/ImportHelper';
-import { CyberwareParser } from '../parser/ware/CyberwareParser';
-import WareData = Shadowrun.WareData
-import WareItemData = Shadowrun.WareItemData;
-import CyberwareItemData = Shadowrun.CyberwareItemData;
-import BiowareItemData = Shadowrun.BiowareItemData;
-import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { Constants } from "./Constants";
-import { CyberwareSchema } from '../schema/CyberwareSchema';
-import { BiowareSchema } from '../schema/BiowareSchema';
+import { DataImporter } from './DataImporter';
+import { BiowareParser } from '../parser/ware/BiowareParser';
+import { CyberwareParser } from '../parser/ware/CyberwareParser';
+import { Bioware, BiowareSchema } from '../schema/BiowareSchema';
+import { Cyberware, CyberwareSchema } from '../schema/CyberwareSchema';
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import WareItemData = Shadowrun.WareItemData;
+type WareTypes = Bioware | Cyberware;
 
-export class WareImporter extends DataImporter<WareItemData, WareData> {
-    public override categoryTranslations: any;
-    public override itemTranslations: any;
+export class WareImporter extends DataImporter {
     public files = ['cyberware.xml', 'bioware.xml'];
 
     CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('cyberwares') && jsonObject['cyberwares'].hasOwnProperty('cyberware') ||
-               jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware');
+        return jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware') ||
+               jsonObject.hasOwnProperty('cyberwares') && jsonObject['cyberwares'].hasOwnProperty('cyberware');
     }
 
-    GetDefaultCyberwareData(): CyberwareItemData {
-        return this.GetDefaultData({type: 'cyberware', entityType: "Item"}) as CyberwareItemData;
-    }
+    static parserWrap = class {
+        constructor(private wareType: 'bioware' | 'cyberware') {}
 
-    GetDefaultBiowareData(): BiowareItemData {
-        return this.GetDefaultData({type: 'bioware', entityType: "Item"}) as BiowareItemData;
+        public async Parse(jsonData: WareTypes): Promise<WareItemData> {
+            const biowareParser = new BiowareParser();
+            const cyberwareParser = new CyberwareParser();
 
-    }
+            const selectedParser = this.wareType === 'bioware' ? biowareParser : cyberwareParser;
 
-    ExtractTranslation(fileName) {
-        if (!DataImporter.jsoni18n) {
-            return;
+            return await selectedParser.Parse(jsonData);
         }
+    };
 
-        let jsonItemi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, fileName);
-         // TODO: Move ExtractTranslation phase before the parsing phase and initiate it with the filename to parse.
-            if (this.files.length !== 2) console.error('Lazily hacked code will fail for more or less than two files.');
+    async Parse(jsonObject: BiowareSchema | CyberwareSchema): Promise<void> {
+        const key = 'biowares' in jsonObject ? 'bioware' : 'cyberware';
+        const jsonDatas = 'biowares' in jsonObject ? jsonObject.biowares.bioware
+                                                   : jsonObject.cyberwares.cyberware;
 
-        this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonItemi18n);
-
-        const {typeKey, listKey} = fileName === 'cyberware.xml' ?
-                {typeKey: 'cyberwares', listKey: 'cyberware'} :
-                {typeKey: 'biowares', listKey: 'bioware'};
-
-        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, typeKey, listKey);
-    }
-
-    async Parse(jsonObject: BiowareSchema | CyberwareSchema, setIcons: boolean): Promise<Item> {
-        const cyberParser = new CyberwareParser();
-
-        let key = jsonObject.hasOwnProperty('cyberwares') ? 'Cyberware' : 'Bioware';
-        const folders = await ImportHelper.MakeCategoryFolders("Item", jsonObject, key);
-
-        key = key.toLowerCase();
-        let items: WareItemData[] = [];
-        let jsonDatas = jsonObject[key + 's'][key];
-
-        this.iconList = await this.getIconFiles();
-
-        for (const jsonData of jsonDatas) {
-            // Check to ensure the data entry is supported
-            if (DataImporter.unsupportedEntry(jsonData)) {
-                continue;
+        const items = await WareImporter.ParseItems<WareTypes, WareItemData>(
+            jsonDatas,
+            {
+                compendiumKey: "Item",
+                parser: new WareImporter.parserWrap(key),
+                filter: jsonData => !DataImporter.unsupportedEntry(jsonData),
+                injectActionTests: item => {
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                },
+                errorPrefix: `Failed Parsing ${key.capitalize()}`
             }
-
-            try {
-                // Create the item
-                const defaultData = key === 'cyberware' ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
-                let item = await cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
-                const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
-                // TODO: Does this type mixture cause later issues? Will it carry over?
-                //@ts-expect-error
-                item.folder = folders[category].id;
-
-                // Bioware has no wireless feature, so disable it by default
-                if (key === 'bioware') {
-                    item.system.technology.wireless = false;
-                }
-
-                // Import Flags
-                item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
-
-                // Default icon
-                if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
-
-                // Translate name if needed
-                item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
-
-                // Add relevant action tests
-                UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
-
-                items.push(item);
-            } catch (error) {
-                ui.notifications?.error("Failed Parsing Ware:" + (jsonData.name._TEXT ?? "Unknown"));
-            }
-        }
+        );
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
+        await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

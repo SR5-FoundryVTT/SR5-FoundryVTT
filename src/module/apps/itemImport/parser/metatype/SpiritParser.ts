@@ -1,31 +1,20 @@
-import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
+import { Metatype } from "../../schema/MetatypeSchema";
 import { MetatypeParserBase } from './MetatypeParserBase';
-import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
+import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import SpiritActorData = Shadowrun.SpiritActorData;
 
-import { Metatype } from "../../schema/MetatypeSchema";
-
 export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
+    protected override parseType: string = 'spirit';
 
-    override async Parse(jsonData: Metatype, spirit: SpiritActorData, jsonTranslation?: object): Promise<SpiritActorData> {
-        const qualities = jsonData.qualities || undefined;
-        const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers || undefined;
+    protected override getSystem(jsonData: Metatype): SpiritActorData['system'] {
+        const system = this.getBaseSystem('Actor');
 
-        const allTraitsName = [
-            ...IH.getArray(jsonData.powers?.power).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
-            ...IH.getArray(qualities?.positive?.quality).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
-            ...IH.getArray(qualities?.negative?.quality).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
-            ...IH.getArray(optionalpowers?.optionalpower).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
-        ];
-
-        const traitsPromise = IH.findItem('Trait', allTraitsName);
-
-        spirit.name = jsonData.name._TEXT;
-        spirit.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
+        system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 
         switch (jsonData.category?._TEXT) {
             case "Insect Spirits":
-                spirit.system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as Shadowrun.SpiritType;
+                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as Shadowrun.SpiritType;
                 break;
 
             case "Toxic Spirits": {
@@ -35,7 +24,7 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
                     ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
                 ]);
 
-                spirit.system.spiritType = specialMapping.get(jsonData.name._TEXT) ?? "";
+                system.spiritType = specialMapping.get(jsonData.name._TEXT) ?? "";
                 break;
             }
 
@@ -47,15 +36,15 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
                 } as const;
 
                 for (const [attr, key] of Object.entries(attrMap)) {
-                    spirit.system.attributes[attr].base = +jsonData[key]._TEXT;
+                    system.attributes[attr].base = +jsonData[key]._TEXT;
                 }
 
-                spirit.system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
+                system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
                     ? jsonData.name._TEXT.replace(" ", "_").toLowerCase() : "homunculus";
                 break;
 
             default:
-                spirit.system.spiritType = jsonData.name._TEXT
+                system.spiritType = jsonData.name._TEXT
                     .replace(" Spirit", "").replace("Spirit of ", "")
                     .replace(" (Demon)", "").replace(/[\s\-]/g, "_")
                     .split("/")[0].toLowerCase();
@@ -63,33 +52,47 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
 
         if (jsonData.run) {
             const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => +v || 0);
-            spirit.system.movement.run = { value, mult, base } as Shadowrun.Movement['run'];
+            system.movement.run = { value, mult, base } as Shadowrun.Movement['run'];
         }
 
         if (jsonData.walk) {
             const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => +v || 0);
-            spirit.system.movement.walk = { value, mult, base } as Shadowrun.Movement['walk'];
+            system.movement.walk = { value, mult, base } as Shadowrun.Movement['walk'];
         }
-        spirit.system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
+        system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
+        system.is_npc = true;
 
-        spirit.system.is_npc = true;
+        return system;
+    }
 
-        const allTraits = await traitsPromise;
+    protected override async getItems(jsonData: Metatype): Promise<Shadowrun.ShadowrunItemData[]> {
+        const qualities = jsonData.qualities || undefined;
+        const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers || undefined;
 
-        //@ts-expect-error
-        spirit.items = [
-            ...this.getItems(allTraits, jsonData.powers?.power, {type: 'Power', critter: spirit.name}, jsonTranslation),
-            ...this.getItems(allTraits, qualities?.positive?.quality, {type: 'Power', critter: spirit.name}, jsonTranslation),
-            ...this.getItems(allTraits, qualities?.negative?.quality, {type: 'Power', critter: spirit.name}, jsonTranslation),
-            ...this.getItems(allTraits, optionalpowers?.optionalpower, {type: 'Optional Power', critter: spirit.name}, jsonTranslation),
+        const allTraitsName = [
+            ...IH.getArray(jsonData.powers?.power),
+            ...IH.getArray(qualities?.positive?.quality),
+            ...IH.getArray(qualities?.negative?.quality),
+            ...IH.getArray(optionalpowers?.optionalpower),
+        ].map(item => item._TEXT);
+
+        const allTraits = await IH.findItem('Trait', allTraitsName);
+
+        const spiritName = jsonData.name._TEXT;
+        return [
+            ...this.getMetatypeItems(allTraits, jsonData.powers?.power, {type: 'Power', critter: spiritName}),
+            ...this.getMetatypeItems(allTraits, qualities?.positive?.quality, {type: 'Power', critter: spiritName}),
+            ...this.getMetatypeItems(allTraits, qualities?.negative?.quality, {type: 'Power', critter: spiritName}),
+            ...this.getMetatypeItems(allTraits, optionalpowers?.optionalpower, {type: 'Optional Power', critter: spiritName}),
         ];
+    }
 
-        if (jsonTranslation) {
-            const page = IH.MapNameToPageSource(jsonTranslation, spirit.name);
-            spirit.system.description.source = `${jsonData.source._TEXT} ${page}`;
-            spirit.name = IH.MapNameToTranslation(jsonTranslation, spirit.name);
-        }
+    protected override async getFolder(jsonData: Metatype): Promise<Folder> {
+        const category = jsonData.category ? jsonData.category._TEXT : "Other";
+        const rootFolder = TH.getTranslation("Spirit", {type: 'category'});
+        const folderName = TH.getTranslation(category, {type: 'category'});
+        const specFolder = category === 'Insect Spirits' ? jsonData.name._TEXT.match(/\(([^)]+)\)/)?.[1] : undefined;
 
-        return spirit;
+        return IH.getFolder('Critter', rootFolder, folderName, specFolder);
     }
 }

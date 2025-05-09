@@ -1407,6 +1407,7 @@ export const SR5 = {
             'negative': '',
             'positive': ''
         },
+        ritual: {},
         sin: {},
         spell: {
             'combat': '',
@@ -1416,7 +1417,10 @@ export const SR5 = {
             'illusion': '',
             'manipulation': ''
         },
-        ritual: {},
+        spirit: {
+            'extraplanar-travelers': 'critter/extraplanar-travelers',
+        },
+        sprite: {},
         sprite_power: {},
         vehicle: {
             /* Vehicles */
@@ -1434,14 +1438,14 @@ export const SR5 = {
             'hovercraft': 'vehicle/hovercraft',
 
             /* Drones */
-            'micro': 'vehicle/drone',
-            'mini': 'vehicle/drone',
-            'small': 'vehicle/drone',
-            'medium': 'vehicle/drone',
-            'anthro': 'vehicle/anthro',
-            'large': 'vehicle/drone',
-            'huge': 'vehicle/drone',
-            'missile': 'vehicle/drone',
+            'drones-micro': 'vehicle/drone',
+            'drones-mini': 'vehicle/drone',
+            'drones-small': 'vehicle/drone',
+            'drones-medium': 'vehicle/drone',
+            'drones-anthro': 'vehicle/anthro',
+            'drones-large': 'vehicle/drone',
+            'drones-huge': 'vehicle/drone',
+            'drones-missile': 'vehicle/drone',
         },
         weapon: {
             // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'

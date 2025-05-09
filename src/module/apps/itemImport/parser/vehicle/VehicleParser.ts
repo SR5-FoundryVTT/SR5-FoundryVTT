@@ -2,15 +2,17 @@ import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/
 import { Parser } from '../Parser';
 import { SR5Item } from '../../../../item/SR5Item';
 import { Vehicle } from '../../schema/VehiclesSchema';
-import VehicleActorData = Shadowrun.VehicleActorData;
+import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
+import VehicleActorData = Shadowrun.VehicleActorData;
 
 export class VehicleParser extends Parser<VehicleActorData> {
-    private getItems(
+    protected override parseType: string = 'vehicle';
+
+    private getVehicleItems(
         vehicleName: string,
         items: SR5Item[],
         itemsData: NotEmpty<Vehicle['mods']>['mod' | 'name'] | NotEmpty<Vehicle['gears']>['gear'] | NotEmpty<Vehicle['weapons']>['weapon'],
-        jsonTranslation?: object
     ): ItemDataSource[] {
         const itemMap = new Map(items.map(i => [i.name, i]));
 
@@ -18,8 +20,7 @@ export class VehicleParser extends Parser<VehicleActorData> {
 
         for (const item of IH.getArray(itemsData)) {
             const name = 'name' in item ? item.name?._TEXT : item._TEXT;
-            const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-            const foundItem = itemMap.get(translatedName);
+            const foundItem = itemMap.get(name || '');
 
             if (!foundItem) {
                 console.log(`[Vehicle Mod Missing]\nVehicle: ${vehicleName}\nMod: ${name}`);
@@ -48,20 +49,9 @@ export class VehicleParser extends Parser<VehicleActorData> {
         return result;
     }
 
-    override async Parse(jsonData: Vehicle, actor: VehicleActorData, jsonTranslation?: object | undefined): Promise<VehicleActorData> {        
-        // find items first to increase performance
-        const mods = jsonData.mods || undefined;
-        const allItemsName = [
-            ...IH.getArray(mods?.name).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT)),
-            ...IH.getArray(mods?.mod).map(item => IH.MapNameToTranslation(jsonTranslation, item.name?._TEXT)),
-            ...IH.getArray(jsonData.weapons?.weapon).map(item => IH.MapNameToTranslation(jsonTranslation, item.name?._TEXT)),
-            ...IH.getArray(jsonData.gears?.gear).map(item => IH.MapNameToTranslation(jsonTranslation, item._TEXT ?? item.name?._TEXT)),
-        ];
-        const allItemsPromise = IH.findItem('Item', allItemsName);
-
-        actor.name = jsonData.name._TEXT;
-        actor.system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
-
+    protected override getSystem(jsonData: Vehicle): VehicleActorData['system'] {    
+        const system = this.getBaseSystem('Actor');
+    
         function parseSeparatedValues(value: string): { base: number; offRoad: number } {
             const [base, offRoad] = value.split("/").map(v => +v || 0);
             return { base, offRoad: offRoad ?? base };
@@ -70,39 +60,53 @@ export class VehicleParser extends Parser<VehicleActorData> {
         const handlingValues = parseSeparatedValues(jsonData.handling._TEXT);
         const speedValues = parseSeparatedValues(jsonData.speed._TEXT);
 
-        actor.system.vehicle_stats.pilot.base = +jsonData.pilot._TEXT;
-        actor.system.vehicle_stats.handling.base = handlingValues.base;
-        actor.system.vehicle_stats.off_road_handling.base = handlingValues.offRoad;
-        actor.system.vehicle_stats.speed.base = speedValues.base;
-        actor.system.vehicle_stats.off_road_speed.base = speedValues.offRoad;
-        actor.system.vehicle_stats.acceleration.base = +jsonData.accel._TEXT;
-        actor.system.vehicle_stats.sensor.base = +jsonData.sensor._TEXT;
-        actor.system.vehicle_stats.seats.base = +(jsonData.seats?._TEXT ?? 0);
-        actor.system.armor.base = +jsonData.armor._TEXT;
-        actor.system.isDrone = jsonData.category._TEXT.includes("Drone") || false;
+        system.vehicle_stats.pilot.base = +jsonData.pilot._TEXT;
+        system.vehicle_stats.handling.base = handlingValues.base;
+        system.vehicle_stats.off_road_handling.base = handlingValues.offRoad;
+        system.vehicle_stats.speed.base = speedValues.base;
+        system.vehicle_stats.off_road_speed.base = speedValues.offRoad;
+        system.vehicle_stats.acceleration.base = Number(jsonData.accel._TEXT) || 0;
+        system.vehicle_stats.sensor.base = Number(jsonData.sensor._TEXT) || 0;
+        system.vehicle_stats.seats.base = Number(jsonData.seats?._TEXT) || 0;
+        system.armor.base = Number(jsonData.armor._TEXT) || 0;
+        system.isDrone = jsonData.category._TEXT.includes("Drone") || false;
 
-        const category = IH.StringValue(jsonData, 'category').toLowerCase();
-        actor.system.vehicleType = /drone|hovercraft/.test(category) ? "exotic"    :
-                                   /boats|submarines/.test(category) ? "water"     :
-                                   category.includes('craft')        ? "air"       :
-                                   category.includes('vtol')         ? "aerospace" : "ground";
+        const category = jsonData.category._TEXT.toLowerCase();
+        system.vehicleType = /drone|hovercraft/.test(category) ? "exotic"    :
+                             /boats|submarines/.test(category) ? "water"     :
+                             category.includes('craft')        ? "air"       :
+                             category.includes('vtol')         ? "aerospace" : "ground";
 
-        // delay item handling to give it time to find them
-        const allItems = await allItemsPromise;
-        //@ts-expect-error
-        actor.items = [
-            ...this.getItems(actor.name, allItems, mods?.mod, jsonTranslation),
-            ...this.getItems(actor.name, allItems, mods?.name, jsonTranslation),
-            ...this.getItems(actor.name, allItems, jsonData.gears?.gear, jsonTranslation),
-            ...this.getItems(actor.name, allItems, jsonData.weapons?.weapon, jsonTranslation),
+        return system;
+    }
+
+    protected override async getItems(jsonData: Vehicle): Promise<Shadowrun.ShadowrunItemData[]> {
+        // find items first to increase performance
+        const mods = jsonData.mods || undefined;
+        const allItemsName = [
+            ...IH.getArray(mods?.name).map(item => item._TEXT),
+            ...IH.getArray(mods?.mod).map(item => item.name?._TEXT),
+            ...IH.getArray(jsonData.weapons?.weapon).map(item => item.name?._TEXT),
+            ...IH.getArray(jsonData.gears?.gear).map(item => item._TEXT ?? item.name?._TEXT),
+        ].filter(Boolean);
+
+        const allItems = await IH.findItem('Item', allItemsName as string[]);
+
+        const vehicleName = jsonData.name._TEXT;
+        return [
+            ...this.getVehicleItems(vehicleName, allItems, mods?.mod),
+            ...this.getVehicleItems(vehicleName, allItems, mods?.name),
+            ...this.getVehicleItems(vehicleName, allItems, jsonData.gears?.gear),
+            ...this.getVehicleItems(vehicleName, allItems, jsonData.weapons?.weapon),
         ];
+    }
 
-        if (jsonTranslation) {
-            const origName = actor.name;
-            actor.name = IH.MapNameToTranslation(jsonTranslation, origName);
-            actor.system.description.source = `${jsonData.source._TEXT} ${IH.MapNameToPageSource(jsonTranslation, origName)}`;
-        }
+    protected override async getFolder(jsonData: Vehicle): Promise<Folder> {
+        const category = jsonData.category._TEXT;
+        const isDrone = category.startsWith("Drones:");
+        const rootFolder = TH.getTranslation(isDrone ? "Drones" : "Vehicles");
+        const folderName = isDrone ? category.substring(8) : category;
 
-        return actor;
+        return IH.getFolder('Drone', rootFolder, folderName);
     }
 }

@@ -1,102 +1,75 @@
+import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
 import { ImportHelper as IH } from '../helper/ImportHelper';
+import { SpiritParser } from '../parser/metatype/SpiritParser';
+import { SpriteParser } from '../parser/metatype/SpriteParser';
 import { CritterParser } from '../parser/metatype/CritterParser';
-import { SR5Actor } from '../../../actor/SR5Actor';
-import { MetatypeSchema } from "../schema/MetatypeSchema";
-import { Constants } from './Constants';
+import { MetatypeSchema, Metatype } from "../schema/MetatypeSchema";
 
-export class CritterImporter extends DataImporter<Shadowrun.CharacterActorData, Shadowrun.CharacterData> {
+type CrittersDataTypes = Shadowrun.CharacterActorData | Shadowrun.SpiritActorData | Shadowrun.SpriteActorData;
+
+export class CritterImporter extends DataImporter {
     public files = ['critters.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('metatypes') && jsonObject['metatypes'].hasOwnProperty('metatype');
     }
 
-    ExtractTranslation() {
-        if (!DataImporter.jsoni18n) {
-            return;
-        }
+    static parserWrap = class {
+        private isSpirit(jsonData: Metatype): Boolean {
+            const attributeKeys = [
+                "bodmin", "agimin", "reamin",
+                "strmin", "chamin", "intmin",
+                "logmin", "wilmin", "edgmin",
+            ] as const;
 
-        const jsonCritteri18n = IH.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
-        this.categoryTranslations = IH.ExtractCategoriesTranslation(jsonCritteri18n);
-        this.itemTranslations = IH.ExtractItemTranslation(jsonCritteri18n, 'metatypes', 'metatype');
-    }
-
-    private isSpirit(jsonData: object): Boolean {
-        const attributeKeys = [
-            "bodmin", "agimin", "reamin",
-            "strmin", "chamin", "intmin",
-            "logmin", "wilmin", "edgmin",
-        ];
+            for (const key of attributeKeys)
+                if ((jsonData[key]?._TEXT || '').includes("F"))
+                    return true;
     
-        for (const key of attributeKeys) {
-            if (IH.StringValue(jsonData, key, "F").includes("F")) {
-                return true;
-            }
+            return false;
         }
 
-        return false;
-    }
+        public async Parse(jsonData: Metatype): Promise<CrittersDataTypes> {
+            const critterParser = new CritterParser();
+            const spiritParser = new SpiritParser();
+            const spriteParser = new SpriteParser();
 
-    async Parse(chummerData: MetatypeSchema, setIcons: boolean): Promise<StoredDocument<SR5Actor>[]> {
-        const actors: Shadowrun.CharacterActorData[] = [];
-        const jsonDatas = chummerData.metatypes.metatype;
-        this.iconList = await this.getIconFiles();
-        const parserType = 'character';
-        const parser = new CritterParser();
+            const selectedParser = jsonData.category?._TEXT === 'Sprites' ? spriteParser
+                                 : this.isSpirit(jsonData) ? spiritParser : critterParser;
 
-        const CategoriesList = [
-            'Dracoforms',
-            'Extraplanar Travelers',
-            'Infected',
-            'Mundane Critters',
-            'Mutant Critters',
-            'Paranormal Critters',
-            'Protosapients',
-            'Technocritters',
-            'Toxic Critters',
-            'Warforms'
-        ];
-
-        const Categories = {
-            categories: {
-                category: chummerData['categories']['category'].filter(({ _TEXT }) => CategoriesList.includes(_TEXT))
-            },
-        };
-
-        const folders = await IH.MakeCategoryFolders('Critter', Categories, 'Critters', this.categoryTranslations);
-
-        for (const jsonData of jsonDatas) {
-            // Check to ensure the data entry is supported and the correct category
-            if (   this.isSpirit(jsonData)
-                || DataImporter.unsupportedEntry(jsonData)
-                || IH.StringValue(jsonData, 'category') === 'Sprites') {
-                continue;
-            }
-
-            try {
-                const actor = await parser.Parse(
-                    jsonData,
-                    this.GetDefaultData({ type: parserType, entityType: 'Actor' }),
-                    this.itemTranslations,
-                );
-                const category = IH.StringValue(jsonData, 'category').toLowerCase();
-
-                //@ts-expect-error TODO: Foundry Where is my foundry base data?
-                actor.folder = folders[category]?.id;
-
-                actor.system.importFlags = this.genImportFlags(actor.name, actor.type, this.formatAsSlug(category));
-                if (setIcons) {actor.img = await this.iconAssign(actor.system.importFlags, actor.system, this.iconList)};
-
-                actor.name = IH.MapNameToTranslation(this.itemTranslations, actor.name);
-
-                actors.push(actor);
-            } catch (error) {
-                ui.notifications?.error("Failed Parsing Critter:" + (jsonData.name._TEXT ?? "Unknown"));
-            }
+            return await selectedParser.Parse(jsonData);
         }
+    };
+
+    async Parse(chummerData: MetatypeSchema): Promise<void> {
+        // get metavariants as well
+        const baseMetatypes = chummerData.metatypes.metatype;
+        const metavariants = baseMetatypes.flatMap(metatype => {
+            const parentName = metatype.name._TEXT;
+
+            return IH.getArray(metatype.metavariants?.metavariant).map(variant => ({
+                ...variant,
+                name: { _TEXT: `${parentName} (${variant.name._TEXT})` },
+                category: { _TEXT: metatype.category?._TEXT ?? "" },
+            }));
+        });
+
+        const jsonDatas = [...baseMetatypes, ...metavariants].filter(
+            jsonData => !DataImporter.unsupportedEntry(jsonData)
+        );
+
+        const critters = await CritterImporter.ParseItems<Metatype, CrittersDataTypes>(
+            jsonDatas,
+            {
+                compendiumKey: 'Critter',
+                parser: new CritterImporter.parserWrap(),
+                filter: jsonData => !DataImporter.unsupportedEntry(jsonData),
+                errorPrefix: "Failed Parsing Critter"
+            }
+        );
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Critter'].pack });
-    }
+        await Actor.create(critters, { pack: Constants.MAP_COMPENDIUM_KEY['Critter'].pack });
+    }    
 }

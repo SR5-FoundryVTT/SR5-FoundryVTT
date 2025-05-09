@@ -4,11 +4,11 @@ import WeaponItemData = Shadowrun.WeaponItemData;
 import { Weapon } from '../../schema/WeaponsSchema';
 
 export class MeleeParser extends WeaponParserBase {
-    override async Parse(jsonData: Weapon, item: WeaponItemData, jsonTranslation?: object): Promise<WeaponItemData> {
-        item = await super.Parse(jsonData, item, jsonTranslation);
+    protected override getSystem(jsonData: Weapon): WeaponItemData['system'] {
+        const system = super.getSystem(jsonData);
 
-        item.system.melee.reach = ImportHelper.IntValue(jsonData, 'reach');
+        system.melee.reach = Number(jsonData.reach._TEXT);
 
-        return item;
+        return system;
     }
 }

@@ -18,7 +18,6 @@ FILES = [
     'critters.xml', 'cyberware.xml', 'echoes.xml', 'gear.xml', 'metatypes.xml',
     'powers.xml', 'qualities.xml', 'spells.xml', 'vehicles.xml', 'weapons.xml'
 ]
-FILES_LANG = ['de-de_data.xml', 'fr-fr_data.xml', 'ja-jp_data.xml', 'pt-br_data.xml', 'zh-cn_data.xml']
 
 # -------------------------------------------------------------------
 # Table of Contents
@@ -85,7 +84,6 @@ RECURSIVE_ALIAS: dict[str, tuple[str, str]] = {
 # Interface merge configuration
 MERGE_GROUPS = [
     (["critters.xml", "metatypes.xml"], "Metatype"),
-    (FILES_LANG, "Language")
 ]
 
 # -------------------------------------------------------------------
@@ -282,10 +280,6 @@ def build_type(
         if child in EXTRACT_TAGS.keys() and struct[child_path].children and depth < 5:
             base = EXTRACT_TAGS[child]
         elif second_defs is not None and depth == 1 and struct[child_path].children:
-            # Rename for translation file
-            if child == "chummer":
-                child = "languagefile"
-
             base = child.capitalize()
 
             if struct[child_path].empty_count:
@@ -436,7 +430,7 @@ def main() -> None:
 
     xml_cache: dict[str, Tuple[Structure, Multiplicity]] = {}
 
-    for xml_name in FILES + FILES_LANG:
+    for xml_name in FILES:
         if xml_name not in files_in_merge:
             xml_stem = xml_name[:-4]
             xml_url = f"{REPO_URL}data/{xml_name}"

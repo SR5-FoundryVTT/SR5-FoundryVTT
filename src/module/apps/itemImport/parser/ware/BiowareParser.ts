@@ -1,13 +1,13 @@
 import { Parser } from '../Parser';
-import { Cyberware } from '../../schema/CyberwareSchema';
+import { Bioware } from '../../schema/BiowareSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import Ware = Shadowrun.WareItemData;
 
-export class CyberwareParser extends Parser<Ware> {
+export class BiowareParser extends Parser<Ware> {
     protected override parseType: string = 'bioware';
 
-    protected override getSystem(jsonData: Cyberware): Ware['system'] {
+    protected override getSystem(jsonData: Bioware): Ware['system'] {
         const system = this.getBaseSystem('Item');
 
         const essence = (jsonData.ess._TEXT || '0').match(/[0-9]\.?[0-9]*/g);
@@ -21,8 +21,8 @@ export class CyberwareParser extends Parser<Ware> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Cyberware): Promise<Folder> {
-        const rootFolder = TH.getTranslation('Cyberware', {type: 'category'});
+    protected override async getFolder(jsonData: Bioware): Promise<Folder> {
+        const rootFolder = TH.getTranslation('Bioware', {type: 'category'});
         const folderName = TH.getTranslation(jsonData.category._TEXT, {type: 'category'});
 
         return IH.getFolder('Item', rootFolder, folderName);

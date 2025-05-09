@@ -1,8 +1,8 @@
-import { ProgramImporter } from './../importer/ProgramImporter';
 import { WeaponImporter } from '../importer/WeaponImporter';
+import { GearImporter } from '../importer/GearImporter';
 import { ArmorImporter } from '../importer/ArmorImporter';
 import { DataImporter } from '../importer/DataImporter';
-import { AmmoImporter } from '../importer/AmmoImporter';
+import { TranslationHelper } from '../helper/TranslationHelper';
 import { WeaponModImporter } from '../importer/WeaponModImporter';
 import { VehicleModImporter } from '../importer/VehicleModImporter';
 import { SpellImporter } from '../importer/SpellImporter';
@@ -11,13 +11,9 @@ import { ComplexFormImporter } from '../importer/ComplexFormImporter';
 import { WareImporter } from '../importer/WareImporter';
 import { CritterPowerImporter } from '../importer/CritterPowerImporter';
 import { ImportHelper, ImportMode } from '../helper/ImportHelper';
-import { DeviceImporter } from "../importer/DeviceImporter";
-import { EquipmentImporter } from "../importer/EquipmentImporter";
-import { SpritePowerImporter } from '../importer/SpritePowerImporter';
 import { VehicleImporter } from '../importer/VehicleImporter';
 import { CritterImporter } from '../importer/CritterImporter';
-import { SpiritImporter } from '../importer/SpiritImporter';
-import { SpriteImporter } from '../importer/SpriteImporter';
+import * as IconAssign from  '../../iconAssigner/iconAssign';
 
 
 export class Import extends Application {
@@ -107,29 +103,23 @@ export class Import extends Application {
     }
 
     //Order is important, ex. some weapons need mods to fully import
-    static ItemImporters: DataImporter<Shadowrun.ShadowrunItemData, Shadowrun.ShadowrunItemDataData>[] = [
+    static ItemImporters: DataImporter[] = [
         new WeaponModImporter(),
         new WeaponImporter(),
         new ArmorImporter(),
-        new AmmoImporter(),
+        new GearImporter(),
         new SpellImporter(),
         new ComplexFormImporter(),
         new QualityImporter(),
         new WareImporter(),
         new CritterPowerImporter(),
-        new SpritePowerImporter(),
-        new DeviceImporter(),
-        new EquipmentImporter(),
-        new ProgramImporter(),
-        new VehicleModImporter()
+        new VehicleModImporter(),
     ];
 
     //Order is important, ex. some weapons need mods to fully import
-    static ActorImporters: DataImporter<Shadowrun.ShadowrunActorData, Shadowrun.ShadowrunActorDataData>[] = [
+    static ActorImporters: DataImporter[] = [
         new VehicleImporter(),
         new CritterImporter(),
-        new SpiritImporter(),
-        new SpriteImporter(),
     ];
 
     /**
@@ -142,36 +132,28 @@ export class Import extends Application {
      * @param setIcons Wether or not to apply system icons to the imported documents.
      */
     async parseXML(xmlSource, fileName, setIcons) {
-
-        let jsonSource = await DataImporter.xml2json(xmlSource);
-        ImportHelper.SetMode(ImportMode.XML);
+        const start = performance.now();
+        const jsonSource = await DataImporter.xml2json(xmlSource);
 
         // Apply Item Importers based on file and their ability to parse that file.
-        for (const di of Import.ItemImporters.filter(importer => importer.files.includes(fileName))) {
-            if (di.CanParse(jsonSource)) {
-                di.ExtractTranslation(fileName);
-                await di.Parse(jsonSource, setIcons);
-            }
-        }
+        for (const di of Import.ItemImporters.filter(importer => importer.files.includes(fileName)))
+            if (di.CanParse(jsonSource))
+                await di.Parse(jsonSource);
 
         // Apply Actor Importers based on their ability to parse that file.
-        for (const di of Import.ActorImporters.filter(importer => importer.files.includes(fileName))) {
-            if (di.CanParse(jsonSource)) {
-                di.ExtractTranslation(fileName);
-                await di.Parse(jsonSource, setIcons);
-            }
-        }
+        for (const di of Import.ActorImporters.filter(importer => importer.files.includes(fileName)))
+            if (di.CanParse(jsonSource))
+                await di.Parse(jsonSource);
+        
+        const end = performance.now();
+        console.log(fileName, end - start, "ms");
     }
 
     async parseXmli18n(xmlSource) {
-        if (!xmlSource) {
-            return;
-        }
-        let jsonSource = await DataImporter.xml2json(xmlSource);
+        if (!xmlSource) return;
 
-        if (DataImporter.CanParseI18n(jsonSource)) {
-            DataImporter.ParseTranslation(jsonSource);
-        }
+        const jsonSource = await DataImporter.xml2json(xmlSource);
+        TranslationHelper.ParseTranslation(jsonSource);
     }
 
     isDataFile = (file: File): boolean => {
@@ -198,6 +180,7 @@ export class Import extends Application {
             const setIcons = $('.setIcons').is(':checked');
 
             this.clearParsingStatus();
+            DataImporter.iconList = await IconAssign.getIconFiles();
             this.disableImportButton = true;
             await this.render();
 
@@ -248,6 +231,7 @@ export class Import extends Application {
             event.preventDefault();
 
             this.clearParsingStatus();
+            DataImporter.iconList = await IconAssign.getIconFiles();
             this.disableImportButton = true;
 
             await this.render();

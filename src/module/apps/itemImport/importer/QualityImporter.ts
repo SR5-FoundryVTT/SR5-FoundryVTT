@@ -1,68 +1,31 @@
 import { Constants } from "./Constants";
 import { DataImporter } from './DataImporter';
-import { ImportHelper } from '../helper/ImportHelper';
-import { QualityParserBase } from '../parser/quality/QualityParserBase';
+import { QualityParser } from '../parser/quality/QualityParser';
+import { QualitiesSchema, Quality } from "../schema/QualitiesSchema";
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
-import { QualitiesSchema } from "../schema/QualitiesSchema";
 
-export class QualityImporter extends DataImporter<Shadowrun.QualityItemData, Shadowrun.QualityData> {
-    public override categoryTranslations: any;
-    public override itemTranslations: any;
+export class QualityImporter extends DataImporter {
     public files = ['qualities.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('qualities') && jsonObject['qualities'].hasOwnProperty('quality');
     }
 
-    ExtractTranslation() {
-        if (!DataImporter.jsoni18n) {
-            return;
-        }
-
-        let jsonQualityi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
-        this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonQualityi18n);
-        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonQualityi18n, 'qualities', 'quality');
-    }
-
-    async Parse(jsonObject: QualitiesSchema, setIcons: boolean): Promise<Item> {
-        const folders = await ImportHelper.MakeCategoryFolders("Trait", jsonObject, 'Qualities', this.categoryTranslations);
-        const parser = new QualityParserBase();
-        let items: Shadowrun.QualityItemData[] = [];
-        this.iconList = await this.getIconFiles();
-        const parserType = 'quality';
-
-        for (const jsonData of jsonObject.qualities.quality) {
-            // Check to ensure the data entry is supported and the correct category
-            if (DataImporter.unsupportedEntry(jsonData)) {
-                continue;
+    async Parse(jsonObject: QualitiesSchema): Promise<void> {
+        const items = await QualityImporter.ParseItems<Quality, Shadowrun.QualityItemData>(
+            jsonObject.qualities.quality,
+            {
+                compendiumKey: "Trait",
+                parser: new QualityParser(),
+                filter: jsonData => !DataImporter.unsupportedEntry(jsonData),
+                injectActionTests: item => {
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                },
+                errorPrefix: "Failed Parsing Quality"
             }
-
-            try {
-                // Create the item
-                let item = await parser.Parse(jsonData, this.GetDefaultData({type: parserType, entityType: "Item"}), this.itemTranslations);
-                let category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
-                //@ts-expect-error TODO: Foundry Where is my foundry base data?
-                item.folder = folders[category].id;
-
-                // Import Flags
-                item.system.importFlags = this.genImportFlags(item.name, item.type, this.formatAsSlug(category));
-
-                // Default icon
-                if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
-
-                // Translate the name
-                item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
-
-                // Add relevant action tests
-                UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
-
-                items.push(item);
-            } catch (error) {
-                ui.notifications?.error("Failed Parsing Quality:" + (jsonData.name._TEXT ?? "Unknown"));
-            }
-        }
+        );
 
         // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Trait'].pack });
+        await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Trait'].pack });
     }
 }

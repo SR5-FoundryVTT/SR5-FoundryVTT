@@ -7,13 +7,10 @@ import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import { SR5Item } from '../../../../item/SR5Item';
 
 export abstract class MetatypeParserBase<TResult extends ShadowrunActorData> extends Parser<TResult> {
-    abstract override Parse(jsonData: object, item: TResult, jsonTranslation?: object): Promise<TResult>;
-
-    getItems(
+    getMetatypeItems(
         items: SR5Item[],
         itemData: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }>,
-        msg_field: {type: string; critter: string},
-        jsonTranslation?: object
+        msg_field: {type: string; critter: string}
     ): ItemDataSource[] {
         const itemMap = new Map(items.map(i => [i.name, i]));
 
@@ -21,8 +18,7 @@ export abstract class MetatypeParserBase<TResult extends ShadowrunActorData> ext
 
         for (const item of IH.getArray(itemData)) {
             const name = item._TEXT;
-            const translatedName = IH.MapNameToTranslation(jsonTranslation, name);
-            const foundItem = itemMap.get(translatedName);
+            const foundItem = itemMap.get(name);
     
             if (!foundItem) {
                 console.log(`[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`);

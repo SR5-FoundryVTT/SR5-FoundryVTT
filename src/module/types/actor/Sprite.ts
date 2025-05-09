@@ -5,6 +5,7 @@ declare namespace Shadowrun {
 
     export interface SpriteData extends
         CommonData,
+        ImportFlags,
         MatrixActorData {
             level: number;
             services: number;
