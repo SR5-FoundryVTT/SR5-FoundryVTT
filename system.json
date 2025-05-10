@@ -1,6 +1,5 @@
 {
     "id": "shadowrun5e",
-    "name": "shadowrun5e",
     "title": "Shadowrun 5th Edition",
     "description": "Shadowrun 5th Edition game",
     "authors": [
@@ -16,7 +15,6 @@
         "verified": "13",
         "maximum": "13"
     },
-    "minimumCoreVersion": "12",
     "scripts": [],
     "esmodules": ["dist/bundle.js"],
     "styles": ["dist/bundle.css"],
@@ -96,8 +94,10 @@
     "download": "#{DOWNLOAD}#",
     "protected": false,
     "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
-    "gridDistance": 1,
-    "gridUnits": "m",
+    "grid": {
+        "distance": 1,
+        "units": "m"
+    },
     "primaryTokenAttribute": "track.physical",
     "secondaryTokenAttribute": "track.stun"
 }
