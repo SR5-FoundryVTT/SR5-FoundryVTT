@@ -39,7 +39,7 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
 
     public async Parse(jsonData: ParseData): Promise<TResult> {
         const itemPromise = this.getItems(jsonData);
-        let bonusPromise: Promise<void> | undefined = undefined;
+        let bonusPromise: Promise<void> | undefined;
 
         const name = jsonData.name._TEXT;
         const options = {id: jsonData.id._TEXT, type: this.parseType as TranslationType };

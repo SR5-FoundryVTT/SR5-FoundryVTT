@@ -99,7 +99,7 @@ export abstract class DataImporter {
             errorPrefix?: string;
         }
     ): Promise<TOutput[]> {
-        const { compendiumKey, parser, filter: filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
+        const { compendiumKey, parser, filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
         const items: TOutput[] = [];
 
         await IH.GetCompendium(compendiumKey);
