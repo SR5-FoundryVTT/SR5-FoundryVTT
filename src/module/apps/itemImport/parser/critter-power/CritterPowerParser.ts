@@ -9,7 +9,7 @@ export class CritterPowerParser extends Parser<CritterPowerItemData> {
     protected override parseType: string = 'critter_power';
 
     protected override getSystem(jsonData: Power): CritterPowerItemData['system'] {
-        const system =  this.getBaseSystem('Item');
+        const system = this.getBaseSystem('Item');
 
         const category = jsonData.category._TEXT.toLowerCase();
         system.category = (category.includes("infected") ? "infected" : category) as CritterPowerCategory;

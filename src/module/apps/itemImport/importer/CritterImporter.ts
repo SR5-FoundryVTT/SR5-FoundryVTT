@@ -71,5 +71,5 @@ export class CritterImporter extends DataImporter {
 
         // @ts-expect-error // TODO: TYPE: Remove this.
         await Actor.create(critters, { pack: Constants.MAP_COMPENDIUM_KEY['Critter'].pack });
-    }    
+    }
 }

@@ -10,7 +10,7 @@ import { QualityImporter } from '../importer/QualityImporter';
 import { ComplexFormImporter } from '../importer/ComplexFormImporter';
 import { WareImporter } from '../importer/WareImporter';
 import { CritterPowerImporter } from '../importer/CritterPowerImporter';
-import { ImportHelper, ImportMode } from '../helper/ImportHelper';
+import { EchoesImporter } from '../importer/EchoesImporter';
 import { VehicleImporter } from '../importer/VehicleImporter';
 import { CritterImporter } from '../importer/CritterImporter';
 import * as IconAssign from  '../../iconAssigner/iconAssign';
@@ -112,6 +112,7 @@ export class Import extends Application {
         new ComplexFormImporter(),
         new QualityImporter(),
         new WareImporter(),
+        new EchoesImporter(),
         new CritterPowerImporter(),
         new VehicleModImporter(),
     ];

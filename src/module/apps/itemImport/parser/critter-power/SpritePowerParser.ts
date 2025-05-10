@@ -11,20 +11,11 @@ import SpritePowerItemData = Shadowrun.SpritePowerItemData;
 export class SpritePowerParser extends Parser<SpritePowerItemData> {
     protected override parseType: string = 'sprite_power';
 
-    _parseSpritePowerActionType(jsonData: Power): string {
-        const action = jsonData.action ? jsonData.action._TEXT : undefined;
-        if (action && foundry.utils.getType(action) === 'string') return action.toLowerCase();
-        else return '';
-    }
-
     protected override getSystem(jsonData: Power): SpritePowerItemData['system'] {
-        const system =  this.getBaseSystem('Item');
+        const system = this.getBaseSystem('Item');
 
-        system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : "";
-
-        // Chummer has camel case for action, system uses lowercase for type. ('Complex' => 'complex', ...)
-        // xml2js returns action as string, and category as Element._TEXT... Unsure why.
-        system.action.type = this._parseSpritePowerActionType(jsonData);
+        system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : '';
+        system.action.type = jsonData.action ? jsonData.action._TEXT.toLowerCase() : '';
 
         return system;
     }

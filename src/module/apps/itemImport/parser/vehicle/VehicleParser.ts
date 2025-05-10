@@ -105,7 +105,7 @@ export class VehicleParser extends Parser<VehicleActorData> {
         const category = jsonData.category._TEXT;
         const isDrone = category.startsWith("Drones:");
         const rootFolder = TH.getTranslation(isDrone ? "Drones" : "Vehicles");
-        const folderName = isDrone ? category.substring(8) : category;
+        const folderName = TH.getTranslation(category);
 
         return IH.getFolder('Drone', rootFolder, folderName);
     }
