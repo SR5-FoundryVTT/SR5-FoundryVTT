@@ -181,7 +181,7 @@ export class ImportHelper {
      */
     public static async getFolder(ctype: CompendiumKey, folder1: string, folder2?: string, folder3?: string): Promise<Folder> {
         let path = ctype + '.' + folder1;
-        let folder = this.folders[folder1] ??= this.FindOrCreateFolder(ctype, folder1);
+        let folder = this.folders[path] ??= this.FindOrCreateFolder(ctype, folder1);
 
         path += "." + folder2;
         if (folder2)
