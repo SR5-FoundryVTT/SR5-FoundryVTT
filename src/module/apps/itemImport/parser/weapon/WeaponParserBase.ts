@@ -33,9 +33,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
             const foundItem = await IH.findItem('Modification', name, 'modification');
 
             if (!foundItem.length) {
-                console.log(
-                    `[Modification Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`
-                );
+                console.log(`[Modification Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`);
                 continue;
             }
 

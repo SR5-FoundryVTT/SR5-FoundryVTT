@@ -24,7 +24,6 @@ export class EquipmentParser extends Parser<EquipmentItemData> {
         if (rootFolder.includes(','))
             rootFolder = "Multiple Categories";
 
-        console.log(rootFolder, folderName);
         return IH.getFolder('Gear', rootFolder, folderName);
     }
 }
