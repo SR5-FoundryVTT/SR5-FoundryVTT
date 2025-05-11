@@ -2,11 +2,12 @@ import { TestCreator } from './../tests/TestCreator';
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
+import { DataDefaults } from '../data/DataDefaults';
 
 interface TestAttributes {
     skill?: string;
-    attribute?: string;
-    attribute2?: string;
+    attribute?: Shadowrun.ActorAttribute;
+    attribute2?: Shadowrun.ActorAttribute;
     limit?: string;
     threshold?: string;
     interval?: string;
@@ -140,11 +141,6 @@ export class JournalEnrichers {
 
                 if (actor) templateData["actor"] = { name: actor.name, img: actor.img, uuid: actor.uuid };
 
-                // // "name" nur setzen, wenn es für action oder macro relevant ist
-                // if ((dataset.request === "action" || dataset.request === "macro") && dataset.name?.trim()) {
-                //     templateData.name = dataset.name;
-                // }
-
                 console.log("handleClick templateData: ", templateData);
 
                 const html = await renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.html', templateData);
@@ -161,7 +157,7 @@ export class JournalEnrichers {
                     case "opposed":
                     case "extended":
                     case "success":
-                        // await JournalEnrichers.rollSuccessTest(testAttributes);
+                        await JournalEnrichers.rollSuccessTest(testAttributes);
                         break;
 
                     case "teamwork":
@@ -191,6 +187,71 @@ export class JournalEnrichers {
         Hooks.on('renderChatMessage', (app, html, data) => {
             html.on("click", ".sr5-roll-request", handleClick(data));
         });
+    }
+    static rollSuccessTest(testAttributes: TestAttributes) {
+        const testData = DataDefaults.actionRollData({
+            type: 'success',
+            categories: [],
+            attribute: testAttributes.attribute ?? '',
+            attribute2: testAttributes.attribute2 ?? '',
+            skill: testAttributes.skill ?? '',
+            spec: false,
+            mod: 0,
+            mod_description: '',
+            damage: DataDefaults.damageData(),
+            modifiers: [],
+            limit: {
+                value: (testAttributes.limit && Number.isInteger(+testAttributes.limit)) ? +testAttributes.limit : 0,
+                base: (testAttributes.limit && Number.isInteger(+testAttributes.limit)) ? +testAttributes.limit : 0,
+                attribute: '',
+                mod: []
+            },
+            threshold: {
+                value: 0,
+                base: 0
+            },
+            extended: false,
+            opposed: {
+                test: '',
+                type: '',
+                attribute: '',
+                attribute2: '',
+                skill: '',
+                mod: 0,
+                description: ''
+            },
+            followed: {
+                test: '',
+                attribute: '',
+                attribute2: '',
+                skill: '',
+                mod: 0,
+            },
+            alt_mod: 0,
+            dice_pool_mod: []
+        });
+
+        
+
+        testData.skill = testAttributes.skill;
+
+        skill?: string;
+        attribute?: string;
+        attribute2?: string;
+        limit?: string;
+        threshold?: string;
+        interval?: string;
+        opposedSkill?: string;
+        opposedAttribute?: string;
+        opposedAttribute2?: string;
+        opposedLimit?: string;
+        name?: string;
+        documentUuid?: string;
+        compendiumKey?: string;
+        label: string;
+        value: string;
+        testType: "success" | "opposed" | "extended" | "teamwork" | "action" | "macro" | "invalid";
+
     }
 
     static async executeMacro(testattributes: TestAttributes) {
