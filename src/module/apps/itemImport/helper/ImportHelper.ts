@@ -180,14 +180,14 @@ export class ImportHelper {
      * @returns Promise resolving to the deepest folder.
      */
     public static async getFolder(ctype: CompendiumKey, folder1: string, folder2?: string, folder3?: string): Promise<Folder> {
-        let path = folder1;
+        let path = ctype + '.' + folder1;
         let folder = this.folders[folder1] ??= this.FindOrCreateFolder(ctype, folder1);
 
-        path += "/" + folder2;
+        path += "." + folder2;
         if (folder2)
             folder = this.folders[path] ??= this.FindOrCreateFolder(ctype, folder2, await folder);
 
-        path += "/" + folder3;
+        path += "." + folder3;
         if (folder3)
             folder = this.folders[path] ??= this.FindOrCreateFolder(ctype, folder3, await folder);
 

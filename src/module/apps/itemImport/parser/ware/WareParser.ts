@@ -31,7 +31,7 @@ export class WareParser extends Parser<Ware> {
     }
 
     protected override async getFolder(jsonData: Bioware | Cyberware): Promise<Folder> {
-        let rootFolder: string | undefined;
+        let rootFolder: string = "Other";
         const categoryData = jsonData.category._TEXT;
         const folderName = TH.getTranslation(categoryData, {type: 'category'});
 
@@ -39,10 +39,6 @@ export class WareParser extends Parser<Ware> {
             if (category._TEXT === categoryData)
                 rootFolder = category.$.blackmarket;
 
-        if (!rootFolder)
-            rootFolder = "Other";
-
-        console.log(rootFolder, folderName);
         return IH.getFolder('Trait', rootFolder, folderName);
     }
 }

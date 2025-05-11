@@ -15,18 +15,16 @@ export class EquipmentParser extends Parser<EquipmentItemData> {
     protected override async getFolder(jsonData: Gear): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
         const folderName = TH.getTranslation(categoryData, {type: 'category'});
-        let rootFolder: string | undefined;
+        let rootFolder = "Other";
 
         for (const category of this.categories)
-            if (category._TEXT === categoryData)
+            if (category._TEXT === categoryData && category.$?.blackmarket)
                 rootFolder = category.$?.blackmarket;
-
-        if (!rootFolder)
-            rootFolder = "Other";
 
         if (rootFolder.includes(','))
             rootFolder = "Multiple Categories";
 
+        console.log(rootFolder, folderName);
         return IH.getFolder('Gear', rootFolder, folderName);
     }
 }
