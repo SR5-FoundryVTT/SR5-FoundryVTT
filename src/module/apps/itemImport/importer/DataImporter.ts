@@ -112,6 +112,7 @@ export abstract class DataImporter {
                 injectActionTests?.(item);
                 items.push(item);
             } catch (error) {
+                console.error(error);
                 ui.notifications?.error(`${errorPrefix}: ${data?.name?._TEXT ?? "Unknown"}`);
             }
         };

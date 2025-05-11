@@ -26,13 +26,12 @@ export class SpellParserBase extends Parser<SpellItemData> {
         }
 
         const duration = jsonData.duration._TEXT;
-        if (duration === 'I') {
+        if (duration === 'I')
             system.duration = 'instant';
-        } else if (duration === 'S') {
+        else if (duration === 'S')
             system.duration = 'sustained';
-        } else if (duration === 'P') {
+        else if (duration === 'P')
             system.duration = 'permanent';
-        }
 
         const drain = jsonData.dv._TEXT;
         if (drain.includes('+') || drain.includes('-'))

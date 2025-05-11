@@ -8,24 +8,22 @@ export class ComplexFormParser extends Parser<ComplexFormItemData> {
     protected override parseType: string = 'complex_form';
 
     protected override getSystem(jsonData: Complexform): ComplexFormItemData['system'] {
-        const system =  this.getBaseSystem(
+        const system = this.getBaseSystem(
             'Item',
             {action: {type: 'complex', attribute: 'resonance', skill: 'compiling'}} as Shadowrun.ComplexFormData
         );
 
         const fade = jsonData.fv._TEXT;
-        if (fade.includes('+') || fade.includes('-')) {
+        if (fade.includes('+') || fade.includes('-'))
             system.fade = parseInt(fade.substring(1, fade.length));
-        }
 
         const duration = jsonData.duration._TEXT;
-        if (duration === 'I') {
+        if (duration === 'I')
             system.duration = 'instant';
-        } else if (duration === 'S') {
+        else if (duration === 'S')
             system.duration = 'sustained';
-        } else if (duration === 'P') {
+        else if (duration === 'P')
             system.duration = 'permanent';
-        }
 
         const target = jsonData.target._TEXT;
         switch (target) {

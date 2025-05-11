@@ -9,7 +9,7 @@ export class ArmorParser extends Parser<ArmorItemData> {
     protected override parseType: string = 'armor';
 
     protected override getSystem(jsonData: Armor): ArmorData {
-        const system =  this.getBaseSystem('Item');
+        const system = this.getBaseSystem('Item');
 
         system.armor.value = Number(jsonData.armor._TEXT) || 0;
         system.armor.mod = jsonData.armor._TEXT.includes('+');
