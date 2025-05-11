@@ -1,22 +1,28 @@
 import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
-import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import { Constants } from '../../importer/Constants';
-import WeaponCategory = Shadowrun.WeaponCategory;
-import SkillName = Shadowrun.SkillName;
 import { Parser } from '../Parser';
-import WeaponItemData = Shadowrun.WeaponItemData;
-import DamageElement = Shadowrun.DamageElement;
-import DamageType = Shadowrun.DamageType;
-import { DataDefaults } from '../../../../data/DataDefaults';
-import PhysicalAttribute = Shadowrun.PhysicalAttribute;
-import DamageData = Shadowrun.DamageData;
 import { SR5 } from '../../../../config';
+import { Constants } from '../../importer/Constants';
+import { DataDefaults } from '../../../../data/DataDefaults';
+import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { Weapon, WeaponsSchema } from '../../schema/WeaponsSchema';
+import { TranslationHelper as TH } from '../../helper/TranslationHelper';
+
 import RangeData = Shadowrun.RangeData;
-import { Weapon } from '../../schema/WeaponsSchema';
+import SkillName = Shadowrun.SkillName;
+import DamageType = Shadowrun.DamageType;
+import DamageData = Shadowrun.DamageData;
+import DamageElement = Shadowrun.DamageElement;
+import WeaponCategory = Shadowrun.WeaponCategory;
+import WeaponItemData = Shadowrun.WeaponItemData;
+import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 
 export class WeaponParserBase extends Parser<WeaponItemData> {
     protected override parseType: string = 'weapon';
+    private categories: WeaponsSchema['categories']['category'];
+
+    constructor(categories: WeaponsSchema['categories']['category']) {
+        super(); this.categories = categories;
+    }
 
     protected override async getItems(jsonData: Weapon) : Promise<ItemDataSource[]> {
         const result: ItemDataSource[] = []
@@ -24,7 +30,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
 
         for (const accessory of IH.getArray(accessories)) {
             const name = accessory.name._TEXT;
-            const foundItem = await IH.findItem('Item', name, 'modification');
+            const foundItem = await IH.findItem('Modification', name, 'modification');
 
             if (!foundItem.length) {
                 console.log(
@@ -79,7 +85,6 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
 
     protected override getSystem(jsonData: Weapon): WeaponItemData['system'] {
         const system = this.getBaseSystem(
-            'Item',
             {action: {type: 'varies', attribute: 'agility'}} as Shadowrun.WeaponData
         );
 
@@ -187,9 +192,13 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
     }
 
     protected override async getFolder(jsonData: Weapon): Promise<Folder> {
-        const rootFolder = TH.getTranslation('Weapon', {type: 'category'});
-        const folderName = TH.getTranslation(jsonData.category._TEXT, {type: 'category'});
+        const categoryData = jsonData.category._TEXT;
+        const folderName = TH.getTranslation(categoryData, { type: 'category' });
+        const match = this.categories.find(c => c._TEXT === categoryData);
+        const root = match?.$?.type?.capitalize?.() ?? 'Other';
 
-        return IH.getFolder('Item', rootFolder, folderName);
+        return ['Gun', 'Melee', 'Other'].includes(root)
+            ? IH.getFolder('Weapon', root, folderName)
+            : IH.getFolder('Weapon', folderName);
     }
 }

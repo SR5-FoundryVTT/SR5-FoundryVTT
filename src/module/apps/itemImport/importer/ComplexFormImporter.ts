@@ -12,20 +12,16 @@ export class ComplexFormImporter extends DataImporter {
     }
 
     async Parse(jsonObject: ComplexformsSchema): Promise<void> {
-        const items = await ComplexFormImporter.ParseItems<Complexform, Shadowrun.ComplexFormItemData>(
+        return ComplexFormImporter.ParseItems<Complexform, Shadowrun.ComplexFormItemData>(
             jsonObject.complexforms.complexform,
             {
                 compendiumKey: "Magic",
                 parser: new ComplexFormParser(),
-                filter: jsonData => !DataImporter.unsupportedEntry(jsonData),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Complex Form"
             }
         );
-
-        // @ts-expect-error
-        await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Magic'].pack }) as Item;
     }
 }

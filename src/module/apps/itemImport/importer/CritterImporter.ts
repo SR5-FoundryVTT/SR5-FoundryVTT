@@ -59,17 +59,13 @@ export class CritterImporter extends DataImporter {
             jsonData => !DataImporter.unsupportedEntry(jsonData)
         );
 
-        const critters = await CritterImporter.ParseItems<Metatype, CrittersDataTypes>(
+        return CritterImporter.ParseItems<Metatype, CrittersDataTypes>(
             jsonDatas,
             {
                 compendiumKey: 'Critter',
                 parser: new CritterImporter.parserWrap(),
-                filter: jsonData => !DataImporter.unsupportedEntry(jsonData),
                 errorPrefix: "Failed Parsing Critter"
             }
         );
-
-        // @ts-expect-error // TODO: TYPE: Remove this.
-        await Actor.create(critters, { pack: Constants.MAP_COMPENDIUM_KEY['Critter'].pack });
     }
 }

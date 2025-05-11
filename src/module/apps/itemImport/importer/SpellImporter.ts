@@ -35,20 +35,16 @@ export class SpellImporter extends DataImporter{
     };
 
     async Parse(jsonObject: SpellsSchema): Promise<void> {
-        const items = await SpellImporter.ParseItems<Spell, Shadowrun.SpellItemData>(
+        return SpellImporter.ParseItems<Spell, Shadowrun.SpellItemData>(
             jsonObject.spells.spell,
             {
                 compendiumKey: "Magic",
                 parser: new SpellImporter.parserWrap(),
-                filter: jsonData => !DataImporter.unsupportedEntry(jsonData),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Spell"
             }
         );
-
-        // @ts-expect-error // TODO: TYPE: Remove this.
-        await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Magic'].pack });
     }
 }

@@ -11,17 +11,13 @@ export class VehicleImporter extends DataImporter {
     }
 
     async Parse(jsonObject: VehiclesSchema): Promise<void> {
-        const actors = await VehicleImporter.ParseItems<Vehicle, Shadowrun.VehicleActorData>(
+        return VehicleImporter.ParseItems<Vehicle, Shadowrun.VehicleActorData>(
             jsonObject.vehicles.vehicle,
             {
                 compendiumKey: "Drone",
                 parser: new VehicleParser(),
-                filter: jsonData => !DataImporter.unsupportedEntry(jsonData),
                 errorPrefix: "Failed Parsing Vehicle"
             }
         );
-
-        // @ts-expect-error // TODO: TYPE: Remove this.
-        await Actor.create(actors, { pack: Constants.MAP_COMPENDIUM_KEY['Drone'].pack });
     }
 }

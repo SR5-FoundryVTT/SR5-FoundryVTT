@@ -7,11 +7,17 @@
 export const SR5 = {
     compendiums: {
         root: 'SR5.Compendiums.Root',
+
+        // Actors
         critter: 'SR5.Compendiums.Critter',
         drone: 'SR5.Compendiums.Drone',
-        item: 'SR5.Compendiums.Item',
+
+        //Items
+        gear: 'SR5.Compendiums.Gear',
         trait: 'SR5.Compendiums.Trait',
         magic: 'SR5.Compendiums.Magic',
+        modification: 'SR5.Compendiums.Modification',
+        weapon: 'SR5.Compendiums.Weapon',
     },
     
     itemTypes: {

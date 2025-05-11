@@ -1,25 +1,35 @@
 import { Parser } from "../Parser";
-import { Gear } from "../../schema/GearSchema";
-import { Constants } from "../../importer/Constants";
+import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
 import ProgramItemData = Shadowrun.ProgramItemData;
 
 export class ProgramParser extends Parser<ProgramItemData> {
     protected override parseType: string = 'program';
+    protected categories: GearSchema['categories']['category'];
+
+    constructor(categories: GearSchema['categories']['category']) {
+        super(); this.categories = categories;
+    }
 
     protected override getSystem(jsonData: Gear): ProgramItemData['system'] {
-        const system =  this.getBaseSystem('Item');
+        const programCategories = {
+            'Hacking Programs': 'hacking_program',
+            'Common Programs': 'common_program'
+        } as const;
 
-        system.type = Constants.MAP_CHUMMER_PROGRAMM_CATEGORY[jsonData.category._TEXT];
+        const system = this.getBaseSystem();
+
+        system.type = programCategories[jsonData.category._TEXT];
 
         return system;
     }
 
     protected override async getFolder(jsonData: Gear): Promise<Folder> {
-        const rootFolder = game.i18n.localize('SR5.Programs');
-        const folderName = TH.getTranslation(jsonData.category._TEXT, {type: 'category'});
+        const categoryData = jsonData.category._TEXT;
+        const rootFolder = TH.getTranslation('Software', {type: 'category'})
+        const folderName = TH.getTranslation(categoryData, {type: 'category'});
 
-        return IH.getFolder('Item', rootFolder, folderName);
+        return IH.getFolder('Gear', rootFolder, folderName);
     }
 }

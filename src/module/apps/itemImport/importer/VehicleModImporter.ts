@@ -12,20 +12,16 @@ export class VehicleModImporter extends DataImporter {
     }
 
     async Parse(jsonObject: VehiclesSchema): Promise<void> {
-        const items = await VehicleModImporter.ParseItems<Mod, Shadowrun.ModificationItemData>(
+        return VehicleModImporter.ParseItems<Mod, Shadowrun.ModificationItemData>(
             jsonObject.mods.mod,
             {
-                compendiumKey: "Item",
+                compendiumKey: "Modification",
                 parser: new VehicleModParser(),
-                filter: jsonData => !DataImporter.unsupportedEntry(jsonData),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Vehicle Mod"
             }
         );
-
-        // @ts-expect-error // TODO: TYPE: Remove this.
-        await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }
 }

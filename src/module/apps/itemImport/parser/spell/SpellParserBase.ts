@@ -10,7 +10,6 @@ export class SpellParserBase extends Parser<SpellItemData> {
 
     protected override getSystem(jsonData: Spell): SpellItemData['system'] {
         const system = this.getBaseSystem(
-            'Item',
             {action: {type: 'varies', attribute: 'magic', skill: 'spellcasting'}} as Shadowrun.SpellData
         );
 

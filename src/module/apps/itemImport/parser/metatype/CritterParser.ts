@@ -87,7 +87,7 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
     }
 
     protected override getSystem(jsonData: Metatype): CharacterActorData['system'] {
-        const system = this.getBaseSystem('Actor');
+        const system = this.getBaseSystem();
 
         system.attributes["body"].base = Number(jsonData.bodmin._TEXT) || 0;
         system.attributes["agility"].base = Number(jsonData.agimin._TEXT) || 0;
@@ -137,9 +137,8 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
                             .filter(spell => spell._TEXT === "Innate Spell" && spell.$?.select)
                             .map(item => ({ _TEXT: item.$?.select})) as {_TEXT: string}[];
 
-        const allItemsName = IH.getArray(jsonData.biowares?.bioware).map(item => item._TEXT);
-
         const allTraitsName = [
+            ...IH.getArray(jsonData.biowares?.bioware),
             ...IH.getArray(jsonData.powers?.power),
             ...IH.getArray(qualities?.positive?.quality),
             ...IH.getArray(qualities?.negative?.quality),
@@ -151,20 +150,16 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
             ...IH.getArray(spells),
         ].map(item => item._TEXT).filter(Boolean) as string[];
 
-        // Give it time to search
-        const allPromises = [
-            IH.findItem('Item', allItemsName),
-            IH.findItem('Trait', allTraitsName),
+        const [magicObj, traitsObj] = await Promise.all([
             IH.findItem('Magic', allMagicName),
-        ];
-
-        const [itemsObj, traitsObj, magicObj] = await Promise.all(allPromises);
-
+            IH.findItem('Trait', allTraitsName),
+        ]);
+        
         const critteName = jsonData.name._TEXT;
         return [
             ...this.getMetatypeItems(magicObj,  spells, {type: 'Spell', critter: critteName}),
             ...this.getMetatypeItems(traitsObj, jsonData.powers?.power, {type: 'Power', critter: critteName}),
-            ...this.getMetatypeItems(itemsObj,  jsonData.biowares?.bioware, {type: 'Bioware', critter: critteName}),
+            ...this.getMetatypeItems(traitsObj, jsonData.biowares?.bioware, {type: 'Bioware', critter: critteName}),
             ...this.getMetatypeItems(traitsObj, optionalpowers?.optionalpower, {type: 'Power', critter: critteName}),
             ...this.getMetatypeItems(traitsObj, qualities?.positive?.quality, {type: 'Quality', critter: critteName}),
             ...this.getMetatypeItems(traitsObj, qualities?.negative?.quality, {type: 'Quality', critter: critteName}),

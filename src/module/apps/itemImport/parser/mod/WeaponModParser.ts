@@ -9,7 +9,7 @@ export class WeaponModParser extends Parser<ModificationItemData> {
     protected override parseType: string = 'modification';
 
     protected override getSystem(jsonData: Accessory): ModificationItemData['system'] {
-        const system = this.getBaseSystem('Item');
+        const system = this.getBaseSystem();
 
         system.type = 'weapon';
 
@@ -29,6 +29,6 @@ export class WeaponModParser extends Parser<ModificationItemData> {
         if (folderName.includes("/")) 
             folderName = "Multiple Points";
 
-        return IH.getFolder('Item', rootFolder, folderName);
+        return IH.getFolder('Modification', rootFolder, folderName);
     }
 }

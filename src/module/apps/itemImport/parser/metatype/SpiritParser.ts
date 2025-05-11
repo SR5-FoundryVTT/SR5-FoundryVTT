@@ -8,7 +8,7 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
     protected override parseType: string = 'spirit';
 
     protected override getSystem(jsonData: Metatype): SpiritActorData['system'] {
-        const system = this.getBaseSystem('Actor');
+        const system = this.getBaseSystem();
 
         system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 

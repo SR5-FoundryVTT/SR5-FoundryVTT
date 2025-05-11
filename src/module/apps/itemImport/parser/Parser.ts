@@ -34,8 +34,8 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
     }
 
     protected abstract getFolder(jsonData: ParseData): Promise<Folder>;
-    protected abstract getSystem(jsonData: ParseData): TResult['system'];
     protected async getItems(jsonData: ParseData): Promise<ShadowrunItemData[]> { return []; }
+    protected getSystem(jsonData: ParseData): TResult['system'] { return this.getBaseSystem(); }
 
     public async Parse(jsonData: ParseData): Promise<TResult> {
         const itemPromise = this.getItems(jsonData);
@@ -111,13 +111,15 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
         }
     }
 
-    protected getBaseSystem(entityType: keyof Game["model"], systemData: Partial<TResult['system']> = {}): TResult['system'] {
+    protected getBaseSystem(systemData: Partial<TResult['system']> = {}): TResult['system'] {
+        const actor_item = this.isActor() ? 'Actor' : 'Item';
+
         try {
             // foundry.utils.duplicate source to avoid keeping reference to model data.
-            const modelSystemData = foundry.utils.duplicate(game.model[entityType][this.parseType]);
+            const modelSystemData = foundry.utils.duplicate(game.model[actor_item][this.parseType]);
             return foundry.utils.mergeObject(modelSystemData, systemData) as TResult['system'];
         } catch (error) {
-            throw new Error(`FoundryVTT doesn't have item type: ${this.parseType} registered in ${entityType}`);
+            throw new Error(`FoundryVTT doesn't have item type: ${this.parseType} registered in ${actor_item}`);
         }
     };
 }

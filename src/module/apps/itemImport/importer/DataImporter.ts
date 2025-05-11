@@ -98,7 +98,7 @@ export abstract class DataImporter {
             injectActionTests?: (item: TOutput) => void;
             errorPrefix?: string;
         }
-    ): Promise<TOutput[]> {
+    ): Promise<void> {
         const { compendiumKey, parser, filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
         const items: TOutput[] = [];
 
@@ -106,7 +106,7 @@ export abstract class DataImporter {
 
         for (const data of inputs) {
             try {
-                if (!filter(data)) continue;
+                if (this.unsupportedEntry(data) || !filter(data)) continue;
 
                 const item = await parser.Parse(data);
                 injectActionTests?.(item);
@@ -117,6 +117,8 @@ export abstract class DataImporter {
             }
         };
 
-        return items;
+        const compendium = Constants.MAP_COMPENDIUM_KEY[compendiumKey];
+        //@ts-expect-error
+        await (compendium.type === 'Actor' ? Actor : Item).create(items, { pack: compendium.pack });
     }
 }

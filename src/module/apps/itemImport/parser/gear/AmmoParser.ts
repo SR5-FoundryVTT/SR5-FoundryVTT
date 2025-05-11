@@ -1,14 +1,19 @@
-import { ParseData, Parser } from "../Parser";
-import AmmoItemData = Shadowrun.AmmoItemData;
-import { Gear } from "../../schema/GearSchema";
+import { Parser } from "../Parser";
+import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
+import AmmoItemData = Shadowrun.AmmoItemData;
 
 export class AmmoParser extends Parser<AmmoItemData> {
     protected override parseType: string = 'ammo';
+    protected categories: GearSchema['categories']['category'];
+
+    constructor(categories: GearSchema['categories']['category']) {
+        super(); this.categories = categories;
+    }
 
     protected override getSystem(jsonData: Gear): AmmoItemData['system'] {
-        const system =  this.getBaseSystem('Item');
+        const system = this.getBaseSystem();
 
         const bonusData = jsonData.weaponbonus;
         if (bonusData) {
@@ -33,7 +38,7 @@ export class AmmoParser extends Parser<AmmoItemData> {
         // TODO: This can be improved by using the stored english name in item.system.importFlags.name
         if (jsonData.addweapon?._TEXT) {
             const weaponName = jsonData.addweapon._TEXT;
-            const [foundWeapon] = await IH.findItem('Item', weaponName, 'weapon') ?? [];
+            const [foundWeapon] = await IH.findItem('Weapon', weaponName, 'weapon') ?? [];
 
             if (foundWeapon && "action" in foundWeapon.system) {
                 const weaponData = foundWeapon.system as Shadowrun.WeaponData;
@@ -51,13 +56,18 @@ export class AmmoParser extends Parser<AmmoItemData> {
     }
 
     protected override async getFolder(jsonData: Gear): Promise<Folder> {
-        let folderName = 'Misc';
+        const categoryData = jsonData.category._TEXT;
+        const rootFolder = TH.getTranslation("Weapons", {type: 'category'})
+        const folderName = TH.getTranslation(categoryData, {type: 'category'});
 
-        const splitName = TH.getTranslation(jsonData.name._TEXT).split(':');
-        if (splitName.length > 1)
-            folderName = splitName[0].trim();
+        let specFolder: string | undefined;
+        if (categoryData === "Ammunition") {
+            specFolder = 'Misc';
+            const splitName = TH.getTranslation(jsonData.name._TEXT).split(':');
+            if (splitName.length > 1)
+                specFolder = splitName[0].trim();
+        }
 
-        const rootFolder = TH.getTranslation('Ammunition', {type: 'category'});
-        return IH.getFolder('Item', rootFolder, folderName);
+        return IH.getFolder('Gear', rootFolder, folderName, specFolder);
     }
 }

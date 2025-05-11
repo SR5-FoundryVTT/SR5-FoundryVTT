@@ -28,20 +28,16 @@ export class CritterPowerImporter extends DataImporter {
     };
 
     async Parse(jsonObject: CritterpowersSchema): Promise<void> {
-        const items = await CritterPowerImporter.ParseItems<Power, CritterPowerType>(
+        return CritterPowerImporter.ParseItems<Power, CritterPowerType>(
             jsonObject.powers.power,
             {
                 compendiumKey: "Trait",
                 parser: new CritterPowerImporter.parserWrap(),
-                filter: jsonData => !DataImporter.unsupportedEntry(jsonData),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Critter Power"
             }
         );
-
-        // @ts-expect-error // TODO: TYPE: Remove this.
-        await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Trait'].pack });
     }    
 }

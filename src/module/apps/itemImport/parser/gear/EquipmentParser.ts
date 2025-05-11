@@ -1,20 +1,32 @@
 import { Parser } from "../Parser";
-import { Gear } from "../../schema/GearSchema";
+import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 
 export class EquipmentParser extends Parser<EquipmentItemData> {
     protected override parseType: string = 'equipment';
+    protected categories: GearSchema['categories']['category'];
 
-    protected override getSystem(jsonData: Gear): EquipmentItemData['system'] {
-        return this.getBaseSystem('Item');
+    constructor(categories: GearSchema['categories']['category']) {
+        super(); this.categories = categories;
     }
 
     protected override async getFolder(jsonData: Gear): Promise<Folder> {
-        const rootFolder = TH.getTranslation('Gear', {type: 'category'});
-        const folderName = TH.getTranslation(jsonData.category._TEXT, {type: 'category'});
+        const categoryData = jsonData.category._TEXT;
+        const folderName = TH.getTranslation(categoryData, {type: 'category'});
+        let rootFolder: string | undefined;
 
-        return IH.getFolder('Item', rootFolder, folderName);
+        for (const category of this.categories)
+            if (category._TEXT === categoryData)
+                rootFolder = category.$?.blackmarket;
+
+        if (!rootFolder)
+            rootFolder = "Other";
+
+        if (rootFolder.includes(','))
+            rootFolder = "Multiple Categories";
+
+        return IH.getFolder('Gear', rootFolder, folderName);
     }
 }

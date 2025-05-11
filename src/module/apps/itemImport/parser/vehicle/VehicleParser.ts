@@ -50,7 +50,7 @@ export class VehicleParser extends Parser<VehicleActorData> {
     }
 
     protected override getSystem(jsonData: Vehicle): VehicleActorData['system'] {    
-        const system = this.getBaseSystem('Actor');
+        const system = this.getBaseSystem();
     
         function parseSeparatedValues(value: string): { base: number; offRoad: number } {
             const [base, offRoad] = value.split("/").map(v => +v || 0);
@@ -83,21 +83,27 @@ export class VehicleParser extends Parser<VehicleActorData> {
     protected override async getItems(jsonData: Vehicle): Promise<Shadowrun.ShadowrunItemData[]> {
         // find items first to increase performance
         const mods = jsonData.mods || undefined;
-        const allItemsName = [
-            ...IH.getArray(mods?.name).map(item => item._TEXT),
-            ...IH.getArray(mods?.mod).map(item => item.name?._TEXT),
-            ...IH.getArray(jsonData.weapons?.weapon).map(item => item.name?._TEXT),
-            ...IH.getArray(jsonData.gears?.gear).map(item => item._TEXT ?? item.name?._TEXT),
-        ].filter(Boolean);
 
-        const allItems = await IH.findItem('Item', allItemsName as string[]);
+        const allModName = [
+            ...IH.getArray(mods?.name).map(item => item._TEXT),
+            ...IH.getArray(mods?.mod).map(item => item.name?._TEXT)
+        ];
+
+        const allWeaponName = IH.getArray(jsonData.weapons?.weapon).map(item => item.name._TEXT);
+        const allGearName = IH.getArray(jsonData.gears?.gear).map(item => item._TEXT ?? item.name?._TEXT).filter(Boolean);
+
+        const [modItem, gearItem, weaponItem] = await Promise.all([
+            IH.findItem('Modification', allModName),
+            IH.findItem('Gear', allGearName as string[]),
+            IH.findItem('Weapon', allWeaponName),
+        ]);
 
         const vehicleName = jsonData.name._TEXT;
         return [
-            ...this.getVehicleItems(vehicleName, allItems, mods?.mod),
-            ...this.getVehicleItems(vehicleName, allItems, mods?.name),
-            ...this.getVehicleItems(vehicleName, allItems, jsonData.gears?.gear),
-            ...this.getVehicleItems(vehicleName, allItems, jsonData.weapons?.weapon),
+            ...this.getVehicleItems(vehicleName, modItem, mods?.mod),
+            ...this.getVehicleItems(vehicleName, modItem, mods?.name),
+            ...this.getVehicleItems(vehicleName, gearItem, jsonData.gears?.gear),
+            ...this.getVehicleItems(vehicleName, weaponItem, jsonData.weapons?.weapon),
         ];
     }
 

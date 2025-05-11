@@ -12,20 +12,16 @@ export class ArmorImporter extends DataImporter {
     }
 
     async Parse(jsonObject: ArmorSchema): Promise<void> {
-        const items = await ArmorImporter.ParseItems<Armor, Shadowrun.ArmorItemData>(
+        return ArmorImporter.ParseItems<Armor, Shadowrun.ArmorItemData>(
             jsonObject.armors.armor,
             {
-                compendiumKey: "Item",
+                compendiumKey: "Gear",
                 parser: new ArmorParser(),
-                filter: jsonData => !ArmorImporter.unsupportedEntry(jsonData),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Armor"
             }
         );
-
-        // @ts-expect-error
-        await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack });
     }    
 }

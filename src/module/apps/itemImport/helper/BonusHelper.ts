@@ -14,14 +14,7 @@ import { SR5Item } from "../../../item/SR5Item";
 
 type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: number; }
 
-const {
-    CUSTOM,
-    MULTIPLY,
-    ADD,
-    DOWNGRADE,
-    UPGRADE,
-    OVERRIDE,
-} = CONST.ACTIVE_EFFECT_MODES;
+const { CUSTOM, MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACTIVE_EFFECT_MODES;
 
 type ShadowrunSheetData = (
     ShadowrunItemData | ShadowrunActorData
@@ -31,10 +24,9 @@ type ShadowrunSheetData = (
 };
 
 export class BonusHelper {
-    private static cnt1 : number = 0;
-    private static cnt2 : number = 0;
-
-    private static isTrue(value: { _TEXT: string }): boolean { return value._TEXT === "True"; }
+    private static isTrue(value: "" | { _TEXT: string }): boolean {
+        return value === "" || value._TEXT === "True";
+    }
 
     private static normalizeValue(sheet: any, value: string | number): string | number {
         if (typeof value === 'number')
@@ -49,7 +41,7 @@ export class BonusHelper {
                 path = "(@system.technology.rating)"
 
             if (!path)
-                console.log("Didn't find rating on Item: " + sheet.name);
+                console.error("Didn't find rating on Item: " + sheet.name);
 
             value = value.replace("Rating", path);
         }

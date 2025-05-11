@@ -8,7 +8,7 @@ export class VehicleModParser extends Parser<ModificationItemData> {
     protected override parseType: string = 'modification';
 
     protected override getSystem(jsonData: Mod): ModificationItemData['system'] {
-        const system = this.getBaseSystem('Item');
+        const system = this.getBaseSystem();
         
         system.type = 'vehicle';
         
@@ -19,8 +19,10 @@ export class VehicleModParser extends Parser<ModificationItemData> {
             categoryName === "Powertrain"   ? "power_train"
                                             : categoryName.toLowerCase()
         ) as ModificationCategoryType;
-        
-        system.slots = Number(jsonData.slots) || 0;
+
+        const slots = jsonData.slots._TEXT.match(/[0-9]\.?[0-9]*/g);
+        if (slots)
+            system.slots = Number(slots[0]);
 
         return system;
     }
@@ -31,6 +33,6 @@ export class VehicleModParser extends Parser<ModificationItemData> {
         const rootFolder = "Vehicle-Mods";
         const folderName = validCategory.includes(category) ? category : "Other";
 
-        return IH.getFolder('Item', rootFolder, folderName);
+        return IH.getFolder('Modification', rootFolder, folderName);
     }
 }

@@ -8,7 +8,7 @@ export class QualityParser extends Parser<QualityItemData> {
     protected override parseType: string = 'quality';
 
     protected override getSystem(jsonData: Quality): QualityItemData['system'] {
-        const system = this.getBaseSystem('Item');
+        const system = this.getBaseSystem();
 
         system.type = jsonData.category._TEXT === 'Positive' ? 'positive' : 'negative';
         system.karma = Number(jsonData.karma._TEXT) || 0;

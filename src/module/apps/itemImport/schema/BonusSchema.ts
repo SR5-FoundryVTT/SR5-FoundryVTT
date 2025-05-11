@@ -5,7 +5,7 @@ import { Empty, Many, OneOrMany } from './Types';
 export interface BonusSchema {
     $?: { unique?: string; useselected?: string; };
     accel?: { _TEXT: string; };
-    actiondicepool?: { $: { category: string; }; };
+    actiondicepool?: Empty | { $: { category: string; }; };
     activeskillkarmacost?: Many<{
         condition: { _TEXT: string; };
         max?: { _TEXT: string; };
@@ -56,7 +56,7 @@ export interface BonusSchema {
         spec: { _TEXT: string; };
     };
     addspell?: { _TEXT: string; $: { alchemical: string; }; };
-    addspirit?: Empty | OneOrMany<{
+    addspirit?: OneOrMany<{
         addtoselected?: { _TEXT: string; };
         spirit?: OneOrMany<{ _TEXT: string; }>;
     }>;
@@ -158,13 +158,14 @@ export interface BonusSchema {
         val: { _TEXT: string; };
     }>;
     freequality?: { _TEXT: string; };
-    freespells?: { $: { attribute?: string; limit?: string; skill?: string; }; };
+    freespells?: Empty | { $: { attribute?: string; limit?: string; skill?: string; }; };
     friendsinhighplaces?: Empty;
     handling?: { _TEXT: string; };
     hardwires?: { _TEXT: string; $: { excludecategory?: string; knowledgeskill?: string; }; };
     initiative?: { _TEXT: string; $?: { precedence: string; }; };
     initiativedice?: { _TEXT: string; };
     initiativepass?: { _TEXT: string; $?: { precedence: string; }; };
+    initiativepassadd?: { _TEXT: string; };
     judgeintentions?: { _TEXT: string; };
     judgeintentionsdefense?: { _TEXT: string; };
     judgeintentionsoffense?: { _TEXT: string; };
@@ -191,15 +192,17 @@ export interface BonusSchema {
         limit: { _TEXT: string; };
         value: { _TEXT: string; };
     }>;
-    limitspellcategory?: Empty | { _TEXT?: string; $?: { exclude: string; }; };
-    limitspiritcategory?: Empty | {
+    limitspellcategory?: Empty | { _TEXT: string; $?: { exclude: string; }; };
+    limitspiritcategory?: {
         spirit?: { _TEXT: string; };
     };
     livingpersona?: {
         attack?: { _TEXT: string; };
         dataprocessing?: { _TEXT: string; };
         firewall?: { _TEXT: string; };
+        signal?: { _TEXT: string; };
         sleaze?: { _TEXT: string; };
+        system?: { _TEXT: string; };
     };
     mademan?: Empty;
     magicianswaydiscount?: Empty;
@@ -294,10 +297,10 @@ export interface BonusSchema {
         }>;
     };
     selectcontact?: Empty;
-    selectcyberware?: Empty | {
+    selectcyberware?: {
         category?: { _TEXT: string; };
     };
-    selectexpertise?: { $: { limittoskill: string; }; };
+    selectexpertise?: Empty | { $: { limittoskill: string; }; };
     selectinherentaiprogram?: Empty;
     selectlimit?: {
         val: { _TEXT: string; };
@@ -485,10 +488,10 @@ export interface BonusSchema {
     };
     weaponcategorydv?: {
         bonus: { _TEXT: string; };
-        selectskill: { $: { limittoskill: string; }; };
+        selectskill: Empty | { $: { limittoskill: string; }; };
     };
     weaponskillaccuracy?: {
-        selectskill: { $: { excludecategory?: string; excludeskill?: string; knowledgeskills?: string; skillcategory?: string; }; };
+        selectskill: Empty | { $: { excludecategory?: string; excludeskill?: string; knowledgeskills?: string; skillcategory?: string; }; };
         value: { _TEXT: string; };
     };
     weaponspecificdice?: { _TEXT: string; $: { type: string; }; };

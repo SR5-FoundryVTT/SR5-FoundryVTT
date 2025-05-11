@@ -1,6 +1,20 @@
 import { SR5 } from '../../../config';
 
 export class Constants {
+    
+    public static readonly MAP_COMPENDIUM_KEY = {
+        // Actors
+        'Critter':          { pack: 'world.sr5critter',         type: 'Actor' }, // Critters, Spirits and Sprites
+        'Drone':            { pack: 'world.sr5drone',           type: 'Actor' }, // Vehicles and Drones
+
+        // Items 
+        'Gear':             { pack: 'world.sr5gear',            type: 'Item' }, // Armor + General Gear
+        'Trait':            { pack: 'world.sr5trait',           type: 'Item' }, // Bioware + Cyberware + Quality + Powers
+        'Magic':            { pack: 'world.sr5magic',           type: 'Item' }, // Spells, rituals, complex forms
+        'Modification':     { pack: 'world.sr5modification',    type: 'Item' }, // Armor/Vehicle/weapon mods + ammo
+        'Weapon':           { pack: 'world.sr5weapon',          type: 'Item' }, // Weapons
+    } as const;
+
     public static readonly MAP_CATEGORY_TO_SKILL = {
         'Assault Cannons': 'heavy_weapons',
         'Assault Rifles': 'automatics',
@@ -10,13 +24,13 @@ export class Constants {
         'Clubs': 'clubs',
         'Crossbows': 'archery',
         'Exotic Melee Weapons': 'exotic_melee',
-        'Exotic Ranged Weapons': 'exotic_ranged',
-        'Flamethrowers': 'exotic_ranged',
+        'Exotic Ranged Weapons': 'exotic_range',
+        'Flamethrowers': 'exotic_range',
         'Grenade Launchers': 'heavy_weapons',
         'Heavy Machine Guns': 'heavy_weapons',
         'Heavy Pistols': 'pistols',
         'Holdouts': 'pistols',
-        'Laser Weapons': 'exotic_ranged',
+        'Laser Weapons': 'exotic_range',
         'Light Machine Guns': 'heavy_weapons',
         'Light Pistols': 'pistols',
         'Machine Pistols': 'automatics',
@@ -62,18 +76,5 @@ export class Constants {
         'Harpoon Gun': 'harpoonGun',
         'Harpoon Gun (Underwater)': 'harpoonGunUnderwater',
         'Flamethrowers': 'flamethrower',
-    } as const;
-
-    public static readonly MAP_COMPENDIUM_KEY = {
-        'Critter': {pack: 'world.critter', type: 'Actor'},
-        'Drone': {pack: 'world.drone', type: 'Actor'},
-        'Item': {pack: 'world.item', type: 'Item'},
-        'Trait': {pack: 'world.trait', type: 'Item'},
-        'Magic': {pack: 'world.magic', type: 'Item'},
-    } as const;
-
-    public static readonly MAP_CHUMMER_PROGRAMM_CATEGORY = {
-        'Hacking Programs': 'hacking_program',
-        'Common Programs': 'common_program'
     } as const;
 }

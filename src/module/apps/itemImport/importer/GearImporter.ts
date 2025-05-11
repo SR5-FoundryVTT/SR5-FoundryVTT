@@ -19,11 +19,16 @@ export class GearImporter extends DataImporter {
     }
 
     static parserWrap = class {
+        private categories: GearSchema['categories']['category'];
+        constructor(categories: GearSchema['categories']['category']) {
+            this.categories = categories;
+        }
+
         public async Parse(jsonData: Gear): Promise<gearTypes> {
-            const ammoParser = new AmmoParser();
-            const deviceParser = new DeviceParser();
-            const programParser = new ProgramParser();
-            const equipmentParser = new EquipmentParser();
+            const ammoParser = new AmmoParser(this.categories);
+            const deviceParser = new DeviceParser(this.categories);
+            const programParser = new ProgramParser(this.categories);
+            const equipmentParser = new EquipmentParser(this.categories);
 
             const category = jsonData.category._TEXT;
             const programTypes = ['Hacking Programs', 'Common Programs'];
@@ -39,22 +44,17 @@ export class GearImporter extends DataImporter {
     };
 
     async Parse(jsonObject: GearSchema): Promise<void> {
-        const items = await GearImporter.ParseItems<Gear, gearTypes>(
+        return GearImporter.ParseItems<Gear, gearTypes>(
             jsonObject.gears.gear,
             {
-                compendiumKey: "Item",
-                parser: new GearImporter.parserWrap(),
-                filter: jsonData => {
-                    return !DataImporter.unsupportedEntry(jsonData) && jsonData.id._TEXT !== 'd63eb841-7b15-4539-9026-b90a4924aeeb';
-                },
+                compendiumKey: "Gear",
+                parser: new GearImporter.parserWrap(jsonObject.categories.category),
+                filter: jsonData => jsonData.id._TEXT !== 'd63eb841-7b15-4539-9026-b90a4924aeeb',
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Gear"
             }
         );
-
-        // @ts-expect-error
-        await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Item'].pack }) as Item;
     }    
 }

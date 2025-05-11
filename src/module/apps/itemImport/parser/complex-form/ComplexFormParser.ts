@@ -9,7 +9,6 @@ export class ComplexFormParser extends Parser<ComplexFormItemData> {
 
     protected override getSystem(jsonData: Complexform): ComplexFormItemData['system'] {
         const system = this.getBaseSystem(
-            'Item',
             {action: {type: 'complex', attribute: 'resonance', skill: 'compiling'}} as Shadowrun.ComplexFormData
         );
 

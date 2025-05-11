@@ -12,7 +12,7 @@ export class SpritePowerParser extends Parser<SpritePowerItemData> {
     protected override parseType: string = 'sprite_power';
 
     protected override getSystem(jsonData: Power): SpritePowerItemData['system'] {
-        const system = this.getBaseSystem('Item');
+        const system = this.getBaseSystem();
 
         system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : '';
         system.action.type = jsonData.action ? jsonData.action._TEXT.toLowerCase() : '';

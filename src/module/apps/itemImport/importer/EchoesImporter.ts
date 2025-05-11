@@ -12,20 +12,16 @@ export class EchoesImporter extends DataImporter {
     }
 
     async Parse(jsonObject: EchoesSchema): Promise<void> {
-        const items = await EchoesImporter.ParseItems<Echo, Shadowrun.EchoItemData>(
+        return EchoesImporter.ParseItems<Echo, Shadowrun.EchoItemData>(
             jsonObject.echoes.echo,
             {
                 compendiumKey: "Trait",
                 parser: new EchoParser(),
-                filter: jsonData => !EchoesImporter.unsupportedEntry(jsonData),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Echoes"
             }
         );
-
-        // @ts-expect-error
-        await Item.create(items, { pack: Constants.MAP_COMPENDIUM_KEY['Trait'].pack });
     }    
 }

@@ -1,14 +1,19 @@
 import { Parser } from "../Parser";
-import { Gear } from "../../schema/GearSchema";
+import { Gear,GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
 import DeviceItemData = Shadowrun.DeviceItemData;
 
 export class DeviceParser extends Parser<DeviceItemData> {
     protected override parseType: string = 'device';
+    protected categories: GearSchema['categories']['category'];
+
+    constructor(categories: GearSchema['categories']['category']) {
+        super(); this.categories = categories;
+    }
 
     protected override getSystem(jsonData: Gear): DeviceItemData['system'] {
-        const system =  this.getBaseSystem('Item');
+        const system =  this.getBaseSystem();
 
         const category = jsonData.category._TEXT;
         system.category = category === 'Cyberdecks' ? 'cyberdeck'
@@ -39,8 +44,10 @@ export class DeviceParser extends Parser<DeviceItemData> {
     }
 
     protected override async getFolder(jsonData: Gear): Promise<Folder> {
-        const folderName = TH.getTranslation(jsonData.category._TEXT, {type: 'category'});
+        const categoryData = jsonData.category._TEXT;
+        const rootFolder = TH.getTranslation('Electronics', {type: 'category'});
+        const folderName = TH.getTranslation(categoryData, {type: 'category'});
 
-        return IH.getFolder('Item', folderName);
+        return IH.getFolder('Gear', rootFolder, folderName);
     }
 }
