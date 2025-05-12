@@ -755,11 +755,13 @@ export class SR5Actor extends Actor {
      * @return The first skill found with a matching translation or name.
      */
     getSkillByLabel(searchedFor: string): Shadowrun.SkillField | undefined {
+        console.log("   ↪ getSkillByLabel(): looking for exact label/name:", searchedFor);
         if (!searchedFor) return;
 
         const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
 
         const skills = this.getSkills();
+        console.log("   ↪ getSkillByLabel(): full skills object:", skills);
 
         for (const [id, skill] of Object.entries(skills.language.value)) {
             if (searchedFor === possibleMatch(skill))
@@ -778,9 +780,12 @@ export class SR5Actor extends Actor {
         }
 
         for (const [id, skill] of Object.entries(skills.active)) {
+            const label = possibleMatch(skill);
+            console.log(`     • language[${id}] =`, label);
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
         }
+        console.warn("   ↪ getSkillByLabel(): no match found for", searchedFor);
     }
 
     /**
@@ -1237,8 +1242,7 @@ export class SR5Actor extends Actor {
 
         // Derive limit from skill attribute.
         const attribute = this.getAttribute(skill.attribute);
-        // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
-        const limit = attribute.limit as Shadowrun.ActorAttribute || '';
+        const limit: Shadowrun.Limit = attribute.limit || '';
         // Should a specialization be used?
         const spec = options.specialization || false;
 

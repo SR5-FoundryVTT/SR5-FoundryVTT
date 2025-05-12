@@ -3,18 +3,19 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { DataDefaults } from '../data/DataDefaults';
+import { SR5 } from '../config';
 
 interface TestAttributes {
     skill?: string;
-    attribute?: Shadowrun.ActorAttribute;
-    attribute2?: Shadowrun.ActorAttribute;
-    limit?: string;
+    attribute?: string;
+    attribute2?: string;
+    limit?: string | Number;
     threshold?: string;
     interval?: string;
     opposedSkill?: string;
     opposedAttribute?: string;
     opposedAttribute2?: string;
-    opposedLimit?: string;
+    opposedLimit?: string | Number;
     name?: string;
     documentUuid?: string;
     compendiumKey?: string;
@@ -36,17 +37,21 @@ export class JournalEnrichers {
     static setEnrichers() {
         const typePattern = `(${JournalEnrichers.keywords.join("|")})`;
         const opening = "\\[\\[";
-        const valuePattern = "((?:[^\\[\\]]|\\[[^\\[\\]]*\\])*)";
-        const closing = "\\]\\]";
+        // const valuePattern = "((?:[^\\[\\]]|\\[[^\\[\\]]*\\])*)";
+        const valuePattern = "([\\s\\S]*?)";
+
+        const closing = "\\]\\](?!\\])";
         const labelPattern = "(?:\\{([^}]+)\\})?";
+
+        const pattern = new RegExp(`@${typePattern}${opening}${valuePattern}${closing}${labelPattern}`, "g");
 
         //@ts-expect-error
         CONFIG.TextEditor.enrichers.push(
             {
-                pattern: new RegExp(`@${typePattern}${opening}${valuePattern}${closing}${labelPattern}`, "g"),
+                pattern: pattern,
                 enricher: (match, options) => {
                     const type = match[1]
-                    const value = match[2].trim() as string
+                    const value = match[2].replace(/<\/?[^>]+>/g, "").trim() as string
                     const label = match[3] || value.replace(/_/g, " "); // Use label if provided, else use action name
 
                     const testAttributes: TestAttributes = { label: label, testType: "success", value: value }
@@ -117,141 +122,107 @@ export class JournalEnrichers {
         )
     }
 
-    static setEnricherHooks() {
-        const handleClick = (data) => async (ev: JQuery.TriggeredEvent) => {
-            const user = game.user;
-            if (!user) return;
+    static async handleClick(ev: JQuery.TriggeredEvent) {
+        const user = game.user;
+        if (!user) return;
 
-            const documentUuid = data.document?.uuid;
+        const dataset = ev.currentTarget.dataset;
 
-            const actor = await this.findActor(documentUuid);
+        const documentUuid = dataset.documentUuid;
 
-            const dataset = ev.currentTarget.dataset;
+        const actor = await this.findActor(documentUuid);
 
-            if ($(ev.target).hasClass('fa-comment-alt')) {
-                ev.preventDefault();
-                ev.stopPropagation();
+        if ($(ev.target).hasClass('fa-comment-alt')) {
+            ev.preventDefault();
+            ev.stopPropagation();
 
-                console.log("Sending test request to chat:", ev.currentTarget.dataset.request, ev.currentTarget.title);
+            // --- Speaker-Bestimmung ---
+            let speaker = actor ? { actor: actor.id } : { alias: user.name };
 
-                // --- Speaker-Bestimmung ---
-                let speaker = actor ? { actor: actor.id } : { alias: user.name };
+            const templateData = JournalEnrichers.deconstructRollRequestAttributes(dataset);
 
-                const templateData = JournalEnrichers.deconstructRollRequestAttributes(dataset);
+            if (actor) templateData["actor"] = { name: actor.name, img: actor.img, uuid: actor.uuid };
 
-                if (actor) templateData["actor"] = { name: actor.name, img: actor.img, uuid: actor.uuid };
+            const html = await renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.html', templateData);
 
-                console.log("handleClick templateData: ", templateData);
-
-                const html = await renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.html', templateData);
-
-                await ChatMessage.create({
-                    user: game.user?.id,
-                    speaker: speaker,
-                    content: html
-                });
-            } else {
-                const testAttributes: TestAttributes = JournalEnrichers.deconstructRollRequestAttributes(dataset);
-                switch (testAttributes.testType) {
-
-                    case "opposed":
-                    case "extended":
-                    case "success":
-                        await JournalEnrichers.rollSuccessTest(testAttributes);
-                        break;
-
-                    case "teamwork":
-                        // await JournalEnrichers.initiateTeamworkTest(testAttributes)
-                        break;
-
-                    case "action":
-                        await JournalEnrichers.rollAction(testAttributes);
-                        break;
-
-                    case "macro":
-                        await JournalEnrichers.executeMacro(testAttributes);
-                        break;
-
-                    default:
-                        console.warn(`Unhandled testType: ${testAttributes.testType}`);
-                }
-            }
-        };
-
-        ["renderJournalPageSheet", "renderItemSheet", "renderActorSheet"].forEach(hook => {
-            Hooks.on(hook, (app, html, data) => {
-                html.on("click", ".sr5-roll-request", handleClick(data));
+            await ChatMessage.create({
+                user: game.user?.id,
+                speaker: speaker,
+                content: html
             });
-        });
+        } else {
+            const testAttributes: TestAttributes = JournalEnrichers.deconstructRollRequestAttributes(dataset);
+            switch (testAttributes.testType) {
 
-        Hooks.on('renderChatMessage', (app, html, data) => {
-            html.on("click", ".sr5-roll-request", handleClick(data));
-        });
-    }
-    static rollSuccessTest(testAttributes: TestAttributes) {
+                case "opposed":
+                case "extended":
+                case "success":
+                    await JournalEnrichers.rollTest(testAttributes);
+                    break;
+
+                case "teamwork":
+                    // await JournalEnrichers.initiateTeamworkTest(testAttributes)
+                    break;
+
+                case "action":
+                    await JournalEnrichers.rollAction(testAttributes);
+                    break;
+
+                case "macro":
+                    await JournalEnrichers.executeMacro(testAttributes);
+                    break;
+
+                default:
+                    console.warn(`Unhandled testType: ${testAttributes.testType}`);
+            }
+        }
+    };
+
+    static async rollTest(testAttributes: TestAttributes) {
+        const user = game.user;
+        if (!user || !testAttributes) return;
+
+        let actor = await this.findActor(testAttributes.documentUuid);
+        if (!actor) {
+            ui.notifications?.error("No actor found to perform this test.");
+            return;
+        }
+
+        console.log("🔍 [rollTest] searching for skill label:", testAttributes.skill, testAttributes.opposedSkill);
+        console.log("🔍 [rollTest] actor.system.skills:", actor.system.skills);
+        const rawLabel = testAttributes.skill;
+        const found = actor.getSkillByLabel(rawLabel!);
+        console.log("   → actor.getSkillByLabel returned:", found);
+        //TODO: Opposed Limit und Schwellenwert einbauen
         const testData = DataDefaults.actionRollData({
-            type: 'success',
-            categories: [],
-            attribute: testAttributes.attribute ?? '',
-            attribute2: testAttributes.attribute2 ?? '',
-            skill: testAttributes.skill ?? '',
-            spec: false,
-            mod: 0,
-            mod_description: '',
-            damage: DataDefaults.damageData(),
-            modifiers: [],
+            attribute: getAttributeKeyByLabel(testAttributes.attribute),
+            attribute2: getAttributeKeyByLabel(testAttributes.attribute2),
+            skill: actor.getSkillByLabel(`${testAttributes.skill}`)?.id ?? '',
             limit: {
                 value: (testAttributes.limit && Number.isInteger(+testAttributes.limit)) ? +testAttributes.limit : 0,
                 base: (testAttributes.limit && Number.isInteger(+testAttributes.limit)) ? +testAttributes.limit : 0,
-                attribute: '',
-                mod: []
+                attribute: getLimitKeyByLabel(`${testAttributes.limit}`) ?? ''
             },
             threshold: {
-                value: 0,
-                base: 0
+                value: (testAttributes.threshold && Number.isInteger(+testAttributes.threshold)) ? +testAttributes.threshold : 0,
+                base: (testAttributes.threshold && Number.isInteger(+testAttributes.threshold)) ? +testAttributes.threshold : 0
             },
-            extended: false,
+            extended: testAttributes.testType === "extended",
             opposed: {
-                test: '',
-                type: '',
-                attribute: '',
-                attribute2: '',
-                skill: '',
-                mod: 0,
-                description: ''
-            },
-            followed: {
-                test: '',
-                attribute: '',
-                attribute2: '',
-                skill: '',
-                mod: 0,
-            },
-            alt_mod: 0,
-            dice_pool_mod: []
+                test: testAttributes.testType === "opposed" ? 'OpposedTest' : '',
+                attribute: getAttributeKeyByLabel(testAttributes.opposedAttribute),
+                attribute2: getAttributeKeyByLabel(testAttributes.opposedAttribute2),
+                skill: actor.getSkillByLabel(`${testAttributes.opposedSkill}`)?.id ?? '',
+            }
         });
 
-        
-
-        testData.skill = testAttributes.skill;
-
-        skill?: string;
-        attribute?: string;
-        attribute2?: string;
-        limit?: string;
-        threshold?: string;
-        interval?: string;
-        opposedSkill?: string;
-        opposedAttribute?: string;
-        opposedAttribute2?: string;
-        opposedLimit?: string;
-        name?: string;
-        documentUuid?: string;
-        compendiumKey?: string;
-        label: string;
-        value: string;
-        testType: "success" | "opposed" | "extended" | "teamwork" | "action" | "macro" | "invalid";
-
+        try {
+            const test = await TestCreator.fromAction(testData, actor);
+            if (test) test.data.title = testAttributes.label;
+            await test?.execute();
+        } catch (error) {
+            ui.notifications?.error("Error using TestCreator.fromPackAction:", error);
+        }
     }
 
     static async executeMacro(testattributes: TestAttributes) {
@@ -289,14 +260,14 @@ export class JournalEnrichers {
         }
     }
 
-    static async rollAction(testattributes: TestAttributes) {
+    static async rollAction(testAttributes: TestAttributes) {
         const user = game.user;
-        if (!user || !testattributes.name) return;
-        const compendiumKey = testattributes.compendiumKey ?? "actions"; // Use the same compendium key that worked in the macro
+        if (!user || !testAttributes.name) return;
+        const compendiumKey = testAttributes.compendiumKey ?? "actions"; // Use the same compendium key that worked in the macro
 
-        console.log(`Attempting to roll action: ${testattributes.name} from compendium: ${compendiumKey}`);
+        console.log(`Attempting to roll action: ${testAttributes.name} from compendium: ${compendiumKey}`);
 
-        let actor = await this.findActor(testattributes.documentUuid);
+        let actor = await this.findActor(testAttributes.documentUuid);
 
         if (!actor) {
             ui.notifications?.error("No actor found to perform this action.");
@@ -304,7 +275,7 @@ export class JournalEnrichers {
         }
 
         try {
-            const test = await TestCreator.fromPackAction(compendiumKey, testattributes.name, actor);
+            const test = await TestCreator.fromPackAction(compendiumKey, testAttributes.name, actor);
             await test?.execute();
         } catch (error) {
             ui.notifications?.error("Error using TestCreator.fromPackAction:", error);
@@ -440,9 +411,9 @@ export class JournalEnrichers {
     //     await ChatMessage.create(chatData)
     // };
 
-    static parseTestString(input: TestAttributes): TestAttributes {
-        const result = input;
-        const rawString = input.value;
+    static parseTestString(testAttributes: TestAttributes): TestAttributes {
+        const result = testAttributes;
+        const rawString = testAttributes.value;
 
         // Helper: parse one side of a test
         const parsePart = (part: string) => {
@@ -534,7 +505,7 @@ export class JournalEnrichers {
         ];
 
         for (const [key, attr] of fields) {
-            const value = data[key]?.trim();
+            const value = data[key] != null ? `${data[key]}`.trim() : "";;
             if (typeof value === "string" && value !== "" && value !== "0") {
                 attrs[attr] = value;
             }
@@ -549,8 +520,6 @@ export class JournalEnrichers {
             testType: dataset.request as TestAttributes["testType"] ?? "invalid",
             value: ""
         };
-
-        console.log(dataset);
 
         // Mapping von lowercase keys zu echten Feldnamen
         const keyMap: Record<string, keyof Omit<TestAttributes, "label" | "testType">> = {
@@ -625,3 +594,41 @@ export class JournalEnrichers {
     //     return undefined;
     // }
 }
+
+function getAttributeKeyByLabel(searchedFor?: string): Shadowrun.ActorAttribute {
+    if (!searchedFor) return '';
+
+    const disallowedKeys = ['pilot', 'force', 'initiation', 'submersion', 'rating'];
+
+    for (const [key, i18nKey] of Object.entries(SR5.attributes)) {
+        if (disallowedKeys.includes(key)) continue;
+
+        const translated = game.i18n.localize(i18nKey);
+        if (normalizeLabel(translated) === normalizeLabel(searchedFor)) {
+            return key as Shadowrun.ActorAttribute;
+        }
+    }
+
+    return '';
+}
+
+function getLimitKeyByLabel(searchedFor?: string): Shadowrun.Limit {
+    if (!searchedFor) return '';
+
+    for (const [key, i18nKey] of Object.entries(SR5.limits)) {
+        const translated = game.i18n.localize(i18nKey);
+        if (normalizeLabel(translated) === normalizeLabel(searchedFor)) {
+            return key as keyof typeof SR5.limits;
+        }
+    }
+
+    return '';
+}
+
+function normalizeLabel(label: string): string {
+    return label
+        .toLowerCase()
+        .trim()
+        .replace(/[\s_\-–—]+/g, ""); // ersetzt Leerzeichen, Unterstriche, Bindestriche, Gedankenstriche etc.
+}
+

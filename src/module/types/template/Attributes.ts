@@ -16,7 +16,7 @@ declare namespace Shadowrun {
         CanHideFiled &
         ModifiableValue &
         LabelField & {
-            limit?: string;
+            limit?: Limit;
             temp?: number;
         };
 }
