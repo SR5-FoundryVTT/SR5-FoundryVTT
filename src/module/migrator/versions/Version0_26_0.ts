@@ -33,16 +33,14 @@ export class Version0_26_0 extends VersionMigration {
     protected override async MigrateActorData(actor: SR5Actor) {
         const updateData = {data: {}};
 
-        // Some actors did have heat, when they shouldn't.
+        // Rename spirit types to match Chummer formatting
         if (actor.type === 'spirit') {
-            //@ts-expect-error
-            if (actor.system.spiritType === 'nocnitasa')
+            const spiritSystem = actor.system as Shadowrun.SpiritData;
+            if (spiritSystem.spiritType === 'nocnitasa')
                 updateData.data['spiritType'] = 'nocnitsa';
-            //@ts-expect-error
-            if (actor.system.spiritType === 'greenman')
+            if (spiritSystem.spiritType === 'greenman')
                 updateData.data['spiritType'] = 'green_man';
-            //@ts-expect-error
-            if (actor.system.spiritType === 'vucub')
+            if (spiritSystem.spiritType === 'vucub')
                 updateData.data['spiritType'] = 'vucub_caquix';
         }
 

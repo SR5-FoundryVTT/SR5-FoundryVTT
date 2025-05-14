@@ -23,7 +23,7 @@ export async function getIconFiles(): Promise<string[]> {
 export function iconAssign(
     importFlags: Shadowrun.ImportFlagData,
     iconList: string[],
-    system?: Partial<Shadowrun.WeaponData>
+    system?: Shadowrun.ShadowrunItemDataData | Shadowrun.ShadowrunActorDataData
 ): string {
 
     const defaultImg = "icons/svg/item-bag.svg";
@@ -53,10 +53,11 @@ export function iconAssign(
             break;
 
         case 'weapon':
+            const weaponSystem = system as Shadowrun.WeaponItemData['system'];
             fileNamePriority = [
                 imgFolder + override,
                 imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType,
-                imgFolder + imgType + '/' + system?.category,
+                imgFolder + imgType + '/' + weaponSystem.category,
                 imgFolder + imgType + '/' + imgType,
                 imgFolder + imgSubType,
                 imgFolder + imgType

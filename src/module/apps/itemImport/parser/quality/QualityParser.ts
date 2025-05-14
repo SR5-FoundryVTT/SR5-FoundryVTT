@@ -17,8 +17,11 @@ export class QualityParser extends Parser<QualityItemData> {
     }
 
     protected override async getFolder(jsonData: Quality): Promise<Folder> {
-        const rootFolder = TH.getTranslation('Quality', {type: 'category'});
-        const folderName = TH.getTranslation(jsonData.category._TEXT, {type: 'category'});
+        const isMetagenic = jsonData.metagenic?._TEXT === 'True';
+        const rootFolder = isMetagenic
+            ? TH.getTranslation('Quality (Metagenic)', { type: 'category' })
+            : TH.getTranslation('Quality', { type: 'category' });
+        const folderName = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
 
         return IH.getFolder('Trait', rootFolder, folderName);
     }

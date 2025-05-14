@@ -5,7 +5,6 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import { ParseData } from "../parser/Parser";
 
-
 const xml2js = require('xml2js');
 
 /**
@@ -14,12 +13,12 @@ const xml2js = require('xml2js');
  * Generic type ItemDataType is the items data type DataImporter creates per entry in that Chummer5a data .xml file.
  */
 export abstract class DataImporter {
-    public abstract files: string[];
-    public static setIcons: boolean = true;
-    public static translationMap: Record<string, any> = {};
-    public static unsupportedBooks: string[] = ['2050'];
-    public static iconList: string[];
     public static SR5 = SR5;
+    public abstract files: string[];
+    public static iconList: string[];
+    public static setIcons: boolean = true;
+    public static supportedBooks: string[] = ['2050'];
+    public static translationMap: Record<string, any> = {};
 
     // Used to filter down a files entries based on category.
     // See filterObjects for use.
@@ -55,16 +54,15 @@ export abstract class DataImporter {
         return (await parser.parseStringPromise(xmlString))['chummer'];
     }
 
-    public static unsupportedBookSource(jsonObject: ParseData): boolean {
-        const source = jsonObject.source?._TEXT ?? '';
-        return DataImporter.unsupportedBooks.includes(source);
-    }
-
-    public static unsupportedEntry(jsonObject: ParseData): boolean {
-        if (DataImporter.unsupportedBookSource(jsonObject))
-            return true;
-
-        return false;
+    /**
+     * Checks if the provided JSON object originates from a supported book source.
+     * 
+     * @param jsonObject - The JSON object containing source information.
+     * @returns `true` if the source is supported or undefined; otherwise, `false`.
+     */
+    private static supportedBookSource(jsonObject: ParseData): boolean {
+        const source = jsonObject?.source?._TEXT ?? '';
+        return !source || this.supportedBooks.includes(source);
     }
 
     /**
@@ -106,7 +104,7 @@ export abstract class DataImporter {
 
         for (const data of inputs) {
             try {
-                if (this.unsupportedEntry(data) || !filter(data)) continue;
+                if (!this.supportedBookSource(data) || !filter(data)) continue;
 
                 const item = await parser.Parse(data);
                 injectActionTests?.(item);

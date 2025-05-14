@@ -1,23 +1,32 @@
 <form class="chummer-import {{cssClass}}" autocomplete="off" onsubmit="event.preventDefault()">
     <header class="flexcol">
-        <h1>Chummer XML Data Import</h1>
+        <div class="header-row">
+            <h1>Chummer XML Data Import</h1>
+            <button
+                type="button"
+                class="importOptionsBtn {{#if disableImportButton}}disabled{{/if}}"
+                {{#if disableImportButton}}disabled{{/if}}
+            >
+                ⚙️
+            </button>
+        </div>
     </header>
-  
+
     <section>
         <!-- Quick Import Section -->
         <div class="quickImportTab {{#if showAdvanced}}hidden{{/if}}">
             <p>
                 Automatically downloads the latest supported Chummer5a XML files from <a href="{{info.versionLink}}" target="_blank">source</a>.<br />
-                Approximate download size: <b>7 MB</b>.
+                Approximate download size: <b>7 MB</b>.
             </p>
             <p>
                 Includes weapons, armor, vehicles, spells, and more.<br />
-                Optional translation adds <b>~2 MB</b>.
+                Optional translation adds <b>~2 MB</b>.
             </p>
-    
+
             <div class="section-divider"></div>
             <h2>Quick Mode Import</h2>
-    
+
             <div style="display: flex; align-items: center; gap: 1em;">
                 <label for="languageSelect" style="white-space: nowrap;">Translation Language:</label>
                 <select id="languageSelect">
@@ -25,19 +34,44 @@
                     <option value="de-de_data.xml">Deutsch</option>
                     <option value="fr-fr_data.xml">Français</option>
                     <option value="ja-jp_data.xml">日本語</option>
-                    <option value="pt-br_data.xml">Português</option>
+                    <option value="pt-br_data.xml">Português (Brasil)</option>
                     <option value="zh-cn_data.xml">中文</option>
                 </select>
             </div>
-    
-            <label><input type="checkbox" class="setIcons" {{#if icons}}checked{{/if}} /> Enable automatic icon assignment</label>
-    
+
+            {{#if currentParsedFile}}
+                <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                    <div><b>Parsing Content: {{currentParsedFile}}{{filesImported}}</b></div>
+                </div>
+            {{/if}}
+            {{#if finishedOverallParsing}}
+                <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                    <div><b>🎉 All files:</b></div>
+                    <div style="flex-grow: 1; text-align: right;"><b>Imported, enjoy.</b></div>
+                </div>
+            {{/if}}
+
             <div class="button-row">
-                <button type="button" class="toggleAdvancedBtn">🔁 Change to Advanced Mode</button>
-                <button name="quick-import" type="submit" class="quickImportBtn">⬇️ Quick Import Data</button>
+                <button
+                    type="button"
+                    class="toggleAdvancedBtn {{#if disableImportButton}}disabled{{/if}}"
+                    {{#if disableImportButton}}disabled{{/if}}
+                >
+                    🔁 Change to Advanced Mode
+                </button>
+
+                <button
+                    name="quick-import"
+                    type="submit"
+                    id="quickImportBtn"
+                    class="{{#if disableImportButton}}disabled{{/if}}"
+                    {{#if disableImportButton}}disabled{{/if}}
+                >
+                    ⬇️ Quick Import Data
+                </button>
             </div>
         </div>
-    
+
         <!-- Advanced Import Section -->
         <div class="advancedImport {{#unless showAdvanced}}hidden{{/unless}}">
             <p>
@@ -47,10 +81,10 @@
             <p>
                 Upload XML files manually if using a different version.
             </p>
-    
+
             <div class="section-divider"></div>
             <h2>Advanced Mode Import</h2>
-    
+
             <h3>Translation (optional)</h3>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <input type="file" class="langDataFileDrop" accept="text/*"  style="min-width: 200px; width: 200px;" />
@@ -62,118 +96,289 @@
                 <input type="file" class="filedatadrop" accept="text/*" multiple style="min-width: 200px; width: 200px;" />
                 <div><small>(You may select multiple files)</small></div>
             </div>
-    
+
             <div class="fileStatusGrid">
                 {{#each dataFiles}}
-                    <div>{{this.name}}:</div>
+                    <div><b>{{this.name}}:</b></div>
                     <div style="flex-grow: 1; text-align: right;">
                         {{#if this.parsed}}
                             <b style="color: green;">✅ Imported</b>
                         {{else if this.parsing}}
                             <span style="color: #ff9800;">⏳ Importing...</span>
                         {{else if this.missing}}
-                            <span style="color: red;">❌ Missing</span>
+                        <span style="color: red;">❌ Missing</span>
                         {{else}}
+                            {{#unless ../disableImportButton}}
+                                <button
+                                    type="button"
+                                    class="deleteFileBtn"
+                                    data-name="{{this.name}}"
+                                    title="Remove file"
+                                >
+                                    🗑️
+                                </button>
+                            {{/unless}}
                             <span style="color: #4caf50;">📂 Selected</span>
                         {{/if}}
                     </div>
                 {{/each}}
                 {{#if finishedOverallParsing}}
                     <div><b>🎉 All files:</b></div>
+                    <div></div>
+                    <div></div>
                     <div style="flex-grow: 1; text-align: right;"><b>Imported, enjoy.</b></div>
                 {{/if}}
             </div>
-    
-            <label><input type="checkbox" class="setIcons" {{#if icons}}checked{{/if}} /> Enable automatic icon assignment</label>
-    
+
             <div class="button-row">
-                <button type="button" class="toggleAdvancedBtn">🔁 Change to Quick Mode</button>
-                <button name="import" type="submit" {{#if disableImportButton}}disabled{{/if}}>📂 Import Files</button>
+                <button
+                    type="button"
+                    class="toggleAdvancedBtn {{#if disableImportButton}}disabled{{/if}}"
+                    {{#if disableImportButton}}disabled{{/if}}
+                >
+                    🔁 Change to Quick Mode
+                </button>
+                <button
+                    name="import"
+                    type="submit"
+                    id="advanceImportBtn"
+                    class="{{#if disableImportButton}}disabled{{/if}}"
+                    {{#if disableImportButton}}disabled{{/if}}
+                >
+                    📂 Import Files
+                </button>
             </div>
         </div>
     </section>
 </form>
 
+<div class="import-options-modal {{#if showImportOptions}}show{{else}}hidden{{/if}}">
+    <div class="import-options-content">
+        <h2>Import Options</h2>
+
+        <div class="book-options-actions">
+            <button type="button" class="bookSelectAllBtn">Select All</button>
+            <button type="button" class="bookUnselectAllBtn">Unselect All</button>
+            <button type="button" class="bookDefaultsBtn">Restore Defaults</button>
+        </div>
+
+        <h3>Books to Import</h3>
+
+        <div class="book-checkbox-grid">
+            {{#each shadowrunBooks}}
+                <label>
+                <input type="checkbox" class="bookOption" data-book="{{this.code}}" {{#if this.value}}checked{{/if}} />
+                {{this.name}}
+                </label>
+            {{/each}}
+        </div>
+
+        <h3>Other Settings</h3>
+        <div class="book-checkbox-grid">
+            <label>
+                <input type="checkbox" class="setIcons" {{#if icons}}checked{{/if}} />
+                Enable automatic icon assignment
+            </label>
+            <label>
+                <input type="checkbox" class="deleteCompendiums" {{#if deleteCompendiums}}checked{{/if}} />
+                Clear Previously Imported Data
+            </label>
+        </div>
+
+        <div class="button-row">
+            <button type="button" class="closeOptionsBtn">Close</button>
+        </div>
+    </div>
+</div>
+
 <style>
-    .chummer-import {
-        font-family: sans-serif;
-        line-height: 1.5;
-        color: #222;
-    }
+.chummer-import {
+    font-family: sans-serif;
+    line-height: 1.5;
+    color: #222;
+}
 
-    .chummer-import h1{
-        margin: 0;
-    }
+.chummer-import .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--color-underline-header)
+}
 
-    .chummer-import h2,
-    .chummer-import h3 {
-        margin: 0.5em 0 0.2em;
-        font-weight: bold;
-    }
+.chummer-import .importOptionsBtn {
+    font-size: 1em;
+    margin: 0;
+    min-width: auto;
+    width: auto;
+    cursor: pointer;
+}
 
-    .chummer-import section {
-        padding: 0.5em 0;
-    }
+.chummer-import h1{
+    margin: 0;
+    border-bottom: 0;
+}
 
-    .chummer-import .quickImportTab,
-    .chummer-import .advancedImport {
-        padding: 0em 1em;
-        border-radius: 6px;
-    }
+.chummer-import h2,
+.chummer-import h3 {
+    margin: 0.5em 0 0.2em;
+    font-weight: bold;
+}
 
-    .chummer-import p {
-        margin: 0.5em 0;
-    }
+.chummer-import section {
+    padding: 0.5em 0;
+}
 
-    .chummer-import label {
-        display: block;
-        margin: 0.5em 0;
-        font-weight: 500;
-    }
+.chummer-import .quickImportTab,
+.chummer-import .advancedImport {
+    padding: 0em 1em;
+    border-radius: 6px;
+}
 
-    .chummer-import select,
-    .chummer-import input[type="file"] {
-        border-radius: 4px;
-        min-width: 150px;
-        text-align: center;
-    }
+.chummer-import p {
+    margin: 0.5em 0;
+}
 
-    .chummer-import input[type="checkbox"] {
-        margin-right: 0.5em;
-    }
+.chummer-import label {
+    display: block;
+    margin: 0.5em 0;
+    font-weight: 500;
+}
 
-    .chummer-import button {
-        margin-top: 0.5em;
-        font-size: 1em;
-        border: 1px solid #aaa;
-        border-radius: 5px;
-        background-color: #eaeaea;
-        cursor: pointer;
-    }
+.chummer-import select,
+.chummer-import input[type="file"] {
+    border-radius: 4px;
+    min-width: 150px;
+    text-align: center;
+}
 
-    .chummer-import button:hover {
-        background-color: #ddd;
-    }
+.chummer-import input[type="checkbox"] {
+    margin-right: 0.5em;
+}
 
-    .chummer-import .fileStatusGrid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.2em 1em;
-        padding: 0em 1em;
-    }
+.chummer-import button {
+    margin-top: 0.5em;
+    font-size: 1em;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    background-color: #eaeaea;
+    cursor: pointer;
+}
 
-    .chummer-import .hidden {
-        display: none !important;
-    }
+.chummer-import button:hover {
+    background-color: #ddd;
+}
 
-    .chummer-import .button-row {
-        display: flex;
-        gap: 0.5em;
-        justify-content: flex-start;
-    }
+.chummer-import .fileStatusGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0.2em 1em;
+    padding: 0em 1em;
+    margin-top: 0.5em;
 
-    .chummer-import .button-row button {
-        flex: 0 1 auto;
-        min-width: max-content;
+    div {
+        height: 23px;
     }
+}
+
+.chummer-import .hidden {
+    display: none !important;
+}
+
+.chummer-import .button-row {
+    display: flex;
+    gap: 0.5em;
+    justify-content: flex-start;
+}
+
+.chummer-import .button-row button {
+    flex: 0 1 auto;
+    min-width: max-content;
+}
+
+.chummer-import button.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(50%);
+    transition: all 0.2s ease;
+}
+
+.chummer-import .deleteFileBtn {
+    margin-left: 0.5em;
+    color: red;
+    border: none;
+    cursor: pointer;
+    font-size: 8px;
+    width: auto;
+    margin-top: 0;
+    line-height: 2.25;
+}
+
+.chummer-import .deleteFileBtn.hidden {
+    display: none !important;
+}
+
+.import-options-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.import-options-modal .import-options-content {
+    background: white;
+    padding: 1.5em;
+    border-radius: 10px;
+    width: 1080px;
+    max-width: 90vw;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.import-options-modal.hidden {
+    display: none;
+}
+
+.book-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.3em 1em;
+    margin-bottom: 1em;
+}
+
+.import-options-modal .import-options-content h3 {
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.import-options-modal .book-checkbox-grid label {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+.import-options-modal .button-row {
+    display: flex;
+    gap: 0.5em;
+    justify-content: flex-start;
+    margin-top: 1em;
+}
+
+.import-options-modal .book-options-actions {
+  display: flex;
+  gap: 0.5em;
+  float: right;
+}
+
+.import-options-modal .book-options-actions button {
+  font-size: 0.85em;
+  padding: 0em 0.5em;
+  width: auto;
+}
 </style>

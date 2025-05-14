@@ -55,12 +55,8 @@ export class CritterImporter extends DataImporter {
             }));
         });
 
-        const jsonDatas = [...baseMetatypes, ...metavariants].filter(
-            jsonData => !DataImporter.unsupportedEntry(jsonData)
-        );
-
         return CritterImporter.ParseItems<Metatype, CrittersDataTypes>(
-            jsonDatas,
+            [...baseMetatypes, ...metavariants],
             {
                 compendiumKey: 'Critter',
                 parser: new CritterImporter.parserWrap(),

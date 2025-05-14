@@ -4,11 +4,6 @@ import { Constants } from '../importer/Constants';
 import { TranslationHelper as TH } from './TranslationHelper';
 type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
 
-export enum ImportMode {
-    XML = 1,
-    JSON = 2,
-}
-
 export type OneOrMany<T> = T | T[];
 export type ArrayItem<T> = T extends (infer U)[] ? U : never;
 export type NotEmpty<T> = T extends object ? NonNullable<T> : never;

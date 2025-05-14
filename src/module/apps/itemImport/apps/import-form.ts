@@ -13,27 +13,86 @@ import { CritterPowerImporter } from '../importer/CritterPowerImporter';
 import { EchoesImporter } from '../importer/EchoesImporter';
 import { VehicleImporter } from '../importer/VehicleImporter';
 import { CritterImporter } from '../importer/CritterImporter';
+import { Constants } from '../importer/Constants';
 import * as IconAssign from  '../../iconAssigner/iconAssign';
-
 
 export class Import extends Application {
     // Update Schemas in util/generate_schemas.py
     private githubConfig = {
-        user: "BM123499",
+        owner: "BM123499",
         repo: "chummer5a",
         branch: "XSD_Remake",
     } as const;
-    private gitURL = `https://raw.githubusercontent.com/${this.githubConfig.user}/${this.githubConfig.repo}/${this.githubConfig.branch}` as const;
 
-    private supportedDataFiles: string[] = [];
-    private dataFiles: File[] = [];
-    private langDataFile: File;
-    private parsedFiles: string[] = [];
-    private disableImportButton: boolean = true;
     private currentParsedFile: string;
-    private showAdvanced: boolean = false;
+    private dataFiles: File[] = [];
+    private parsedFiles: string[] = [];
+    private supportedDataFiles: string[] = [];
+
+    private langDataFile: File;
     private selectedLanguage: string = "";
+
     private icons: boolean = true;
+    private deleteCompendiums: boolean = false;
+    private disableImportButton: boolean = false;
+
+    private showAdvanced: boolean = false;
+    private showImportOptions: boolean = false;
+
+    private shadowrunBooks = [
+        { name: "Aetherology", code: "AET", default: true, value: true },
+        { name: "Assassin's Primer", code: "AP", default: true, value: true },
+        { name: "Better Than Bad", code: "BTB", default: true, value: true },
+        { name: "Bloody Business", code: "BLB", default: true, value: true },
+        { name: "Book of the Lost", code: "BOTL", default: true, value: true },
+        { name: "Bullets & Bandages", code: "BB", default: true, value: true },
+        { name: "Chrome Flesh", code: "CF", default: true, value: true },
+        { name: "Cutting Aces", code: "CA", default: true, value: true },
+        { name: "Dark Terrors", code: "DTR", default: true, value: true },
+        { name: "Data Trails", code: "DT", default: true, value: true },
+        { name: "Data Trails (Dissonant Echoes)", code: "DTD", default: false, value: false },
+        { name: "Datapuls SOTA 2080 (German-exclusive)", code: "SOTG", default: false, value: false },
+        { name: "Datapuls Verschlusssache (German-exclusive)", code: "DPVG", default: false, value: false },
+        { name: "Forbidden Arcana", code: "FA", default: true, value: true },
+        { name: "Grimmes Erwachen (German-exclusive)", code: "GE", default: false, value: false },
+        { name: "Gun Heaven 3", code: "GH3", default: true, value: true },
+        { name: "Hamburg (German-exclusive)", code: "HAMG", default: false, value: false },
+        { name: "Hard Targets", code: "HT", default: true, value: true },
+        { name: "Hong Kong Sourcebook", code: "HKS", default: false, value: false },
+        { name: "Howling Shadows", code: "HS", default: true, value: true },
+        { name: "Kill Code", code: "KC", default: true, value: true },
+        { name: "Krime Katalog", code: "KK", default: true, value: true },
+        { name: "Lockdown", code: "LCD", default: true, value: true },
+        { name: "No Future", code: "NF", default: true, value: true },
+        { name: "Nothing Personal", code: "NP", default: true, value: true },
+        { name: "Rigger 5.0", code: "R5", default: true, value: true },
+        { name: "Run Faster", code: "RF", default: true, value: true },
+        { name: "Run and Gun", code: "RG", default: true, value: true },
+        { name: "Sail Away, Sweet Sister", code: "SASS", default: true, value: true },
+        { name: "Schattenhandbuch (German Handbook)", code: "SHB", default: false, value: false },
+        { name: "Schattenhandbuch 2 (German Handbook)", code: "SHB2", default: false, value: false },
+        { name: "Schattenhandbuch 3 (German Handbook)", code: "SHB3", default: false, value: false },
+        { name: "Shadow Spells", code: "SSP", default: true, value: true },
+        { name: "Shadowrun 2050 (5th Edition)", code: "2050", default: false, value: false },
+        { name: "Shadowrun 5th Edition", code: "SR5", default: true, value: true },
+        { name: "Shadowrun Missions 0803: 10 Block Tango", code: "SRM0803", default: true, value: true },
+        { name: "Shadowrun Missions 0804: Dirty Laundry", code: "SRM0804", default: true, value: true },
+        { name: "Shadowrun Quick-Start Rules", code: "QSR", default: true, value: true },
+        { name: "Shadows In Focus: Butte", code: "SFB", default: true, value: true },
+        { name: "Shadows In Focus: Metropole", code: "SFME", default: true, value: true },
+        { name: "Shadows In Focus: San Francisco Metroplex", code: "SFM", default: true, value: true },
+        { name: "Shadows In Focus: Sioux Nation: Counting Coup", code: "SFCC", default: true, value: true },
+        { name: "Splintered State", code: "SPS", default: true, value: true },
+        { name: "Sprawl Wilds", code: "SW", default: true, value: true },
+        { name: "State of the Art ADL (German Handbook)", code: "SAG", default: false, value: false },
+        { name: "Stolen Souls", code: "SS", default: true, value: true },
+        { name: "Street Grimoire", code: "SG", default: true, value: true },
+        { name: "Street Grimoire Errata", code: "SGE", default: true, value: true },
+        { name: "Street Lethal", code: "SL", default: true, value: true },
+        { name: "The Complete Trog", code: "TCT", default: true, value: true },
+        { name: "The Seattle Gambit", code: "TSG", default: true, value: true },
+        { name: "The Vladivostok Gauntlet", code: "TVG", default: true, value: true }
+    ];
 
     constructor() {
         super();
@@ -68,18 +127,27 @@ export class Import extends Application {
                 parsing
             };
         });
+
         data.icons = this.icons;
         data.showAdvanced = this.showAdvanced;
+        data.deleteCompendiums = this.deleteCompendiums;
+        data.showImportOptions = this.showImportOptions;
         data.disableImportButton = this.disableImportButton;
         data.langDataFile = this.langDataFile ? this.langDataFile.name : '';
         data.finishedOverallParsing = this.supportedDataFiles.length === this.parsedFiles.length;
 
+        if (!data.finishedOverallParsing) {
+            data.currentParsedFile = this.currentParsedFile?.replace(/\.xml$/i, '').capitalize() || '';
+            data.filesImported = " (" + (this.parsedFiles.length + 1) + "/" + this.supportedDataFiles.length + ")";
+        }
+
+        const {owner, repo, branch} = this.githubConfig;
         data.info = {
             version: "Temporary Database",
-            versionLink: `https://www.github.com/${this.githubConfig.user}/${this.githubConfig.repo}/tree/${this.githubConfig.branch}/Chummer/data`
+            versionLink: `https://www.github.com/${owner}/${repo}/tree/${branch}/Chummer/data`
         };
 
-        return { ...data };
+        return { ...data, shadowrunBooks: this.shadowrunBooks };
     }
 
     private collectDataImporterFileSupport() {
@@ -96,10 +164,6 @@ export class Import extends Application {
             }
             this.supportedDataFiles = this.supportedDataFiles.concat(importer.files);
         });
-    }
-
-    private clearParsingStatus() {
-        this.parsedFiles = [];
     }
 
     //Order is important, ex. some weapons need mods to fully import
@@ -132,7 +196,7 @@ export class Import extends Application {
      * @param fileName The XML file name. Only imported supporting this file will be considered.
      * @param setIcons Wether or not to apply system icons to the imported documents.
      */
-    async parseXML(xmlSource, fileName, setIcons) {
+    async parseXML(xmlSource: string, fileName: string) {
         const start = performance.now();
         const jsonSource = await DataImporter.xml2json(xmlSource);
 
@@ -150,7 +214,7 @@ export class Import extends Application {
         console.log(fileName, end - start, "ms");
     }
 
-    async parseXmli18n(xmlSource) {
+    async parseXmli18n(xmlSource: string) {
         if (!xmlSource) return;
 
         const jsonSource = await DataImporter.xml2json(xmlSource);
@@ -166,137 +230,148 @@ export class Import extends Application {
         return file.name.match(pattern) !== null;
     };
 
-    override activateListeners(html) {
-        html.find('.setIcons').on('click', () => {
-            this.icons = !this.icons;
-        });
+    async fetchGitHubFile(path: string): Promise<string> {
+        const { owner, repo, branch } = this.githubConfig;
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
 
-        html.find('.toggleAdvancedBtn').on('click', async () => {
-            this.showAdvanced = !this.showAdvanced;
-            await this.render();
-        });
+        const attempts = 5;
+        const delayMs = 2000;
 
-        html.find('.quickImportBtn').on('click', async () => {
-            const dataURL = this.gitURL + '/Chummer/data';
-            const setIcons = $('.setIcons').is(':checked');
-
-            this.clearParsingStatus();
-            DataImporter.iconList = await IconAssign.getIconFiles();
-            this.disableImportButton = true;
-            await this.render();
-
-            if (this.selectedLanguage) {
-                try {
-                    const langUrl = this.gitURL + `/Chummer/lang/${this.selectedLanguage}`;
-                    const langResponse = await fetch(langUrl);
-                    if (!langResponse.ok) throw new Error();
-                    const langXml = await langResponse.text();
-                    await this.parseXmli18n(langXml);
-                } catch {
-                    ui.notifications?.warn(`Failed to load language file: ${this.selectedLanguage}`);
-                }
-            }
-
-            for (const fileName of this.supportedDataFiles) {
-                const url = `${dataURL}/${fileName}`;
-
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const xmlText = await response.text();
-
-                    this.currentParsedFile = fileName;
-                    await this.render();
-
-                    await this.parseXML(xmlText, fileName, setIcons);
-
-                    if (!this.parsedFiles.includes(fileName)) {
-                        this.parsedFiles.push(fileName);
+        for (let i = 0; i < attempts; i++) {
+            try {
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3.raw'
                     }
+                });
 
-                    await this.render();
+                if (!response.ok)
+                    throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
 
-                } catch (err) {
-                    console.error(`Error importing ${fileName}:`, err);
-                    ui.notifications?.error(`Failed to import ${fileName}`);
-                }
+                return await response.text();
+            } catch (err) {
+                if (i === attempts - 1) throw err;
+                console.warn(`Retrying fetch from git after failure... (${i + 1}/${attempts})`, err);
+                await new Promise(res => setTimeout(res, delayMs));
             }
+        }
 
-            this.disableImportButton = false;
-            await this.render();
-            ui.notifications?.warn('SR5.Warnings.BulkImportPerformanceWarning', { localize: true });
-        });
+        throw new Error(`fetchGitHubFile failed after ${attempts} attempts`);
+    }
 
-        html.find("button[type='submit']").on('click', async (event) => {
+    async handleBulkImport(
+        setIcons: boolean,
+        deleteCompendiums: boolean,
+        languageText: string | undefined,
+        getTextForFile: (param: any) => Promise<{ text: string; name: string; }>
+    ) {
+        if (deleteCompendiums)
+            for (const [_, compendium] of Object.entries(Constants.MAP_COMPENDIUM_KEY))
+                await game.packs?.get(compendium.pack)?.deleteCompendium();
+
+        this.parsedFiles = [];
+
+        DataImporter.setIcons = setIcons;
+        DataImporter.supportedBooks = this.shadowrunBooks
+        .filter((book) => book.value).map((book) => book.code);
+        DataImporter.iconList = await IconAssign.getIconFiles();
+
+        this.disableImportButton = true;
+        await this.render();
+
+        // Parse language if available
+        if (languageText) {
+            try {
+                await this.parseXmli18n(languageText);
+            } catch (err) {
+                ui.notifications?.warn(`Failed to parse language text`);
+            }
+        }
+
+        for (const fileName of this.supportedDataFiles) {
+            try {
+                const result = await getTextForFile(fileName);
+                if (!result) continue;
+                const { text, name } = result;
+
+                this.currentParsedFile = name;
+                await this.render();
+
+                await this.parseXML(text, name);
+
+                if (!this.parsedFiles.includes(name))
+                    this.parsedFiles.push(name);
+
+                await this.render();
+            } catch (err) {
+                console.error(`Error importing ${fileName}:`, err);
+                ui.notifications?.error(`Failed to import ${fileName}`);
+            }
+        }
+
+        this.disableImportButton = false;
+        await this.render();
+
+        ui.notifications?.warn('SR5.Warnings.BulkImportPerformanceWarning', { localize: true });
+    }
+
+    override activateListeners(html: JQuery<HTMLElement>) {
+        html.find('#quickImportBtn').on('click', async () => {
             const start = performance.now();
-            event.preventDefault();
-
-            this.clearParsingStatus();
-            DataImporter.iconList = await IconAssign.getIconFiles();
-            this.disableImportButton = true;
-
-            await this.render();
-
-            if (this.langDataFile) {
-                const text = await this.langDataFile.text();
-                await this.parseXmli18n(text);
-            }
 
             const setIcons = $('.setIcons').is(':checked');
+            const deleteCompendiums = $('.deleteCompendiums').is(':checked');
 
-            // Use 'for of'-loop to allow await to actually pause.
-            // don't use .forEach as it won't await for async callbacks.
-            // iterate over supportedDataFiles to adhere to Importer order
-            for (const supportedFile of this.supportedDataFiles) {
-                // Only try supported files.
-                const dataFile = this.dataFiles.find((dataFile) => dataFile.name === supportedFile);
-                if (dataFile) {
-                    const text = await dataFile.text();
+            const languageText = this.selectedLanguage 
+                ? await this.fetchGitHubFile(`Chummer/lang/${this.selectedLanguage}`) 
+                : undefined;
 
-                     // Show status for current parsing progression.
-                    this.currentParsedFile = dataFile.name;
-                    await this.render();
+            const getTextForFile = async (fileName: string) => {
+                const text = await this.fetchGitHubFile(`Chummer/data/${fileName}`);
+                return { text, name: fileName };
+            };
 
-                    await this.parseXML(text, dataFile.name, setIcons);
-
-                    // Store status to show parsing progression.
-                    if (!this.parsedFiles.some((parsedFileName) => parsedFileName === dataFile.name)) {
-                        this.parsedFiles.push(dataFile.name);
-                    }
-
-                    await this.render();
-                }
-            }
-
-            this.disableImportButton = false;
-
-            await this.render();
-
-            ui.notifications?.warn('SR5.Warnings.BulkImportPerformanceWarning', {localize: true});
-            const end = performance.now();
-            console.log(`Time used: ${(end - start).toFixed(2)} ms`);
+            await this.handleBulkImport(setIcons, deleteCompendiums, languageText, getTextForFile);
+            console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
         });
 
-        html.find("input[type='file'].langDataFileDrop").on('change', async (event) => {
+        html.find('#advanceImportBtn').on('click', async () => {
+            const start = performance.now();
+
+            const setIcons = $('.setIcons').is(':checked');
+            const deleteCompendiums = $('.deleteCompendiums').is(':checked');
+
+            const languageText = this.langDataFile
+                ? await this.langDataFile.text()
+                : undefined;
+            
+            const getTextForFile = async (fileName: string) => {
+                const file = this.dataFiles.find(f => f.name === fileName) as File;
+                const text = await file.text();
+                return { text, name: file.name };
+            };
+
+            await this.handleBulkImport(setIcons, deleteCompendiums, languageText, getTextForFile);
+            console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
+        });
+
+        html.find("input[type='file'].langDataFileDrop").on('change', async (event: JQuery.ChangeEvent<HTMLInputElement>) => {
             Array.from(event.target.files).forEach((file: File) => {
-                if (this.isLangDataFile(file)) {
+                if (this.isLangDataFile(file))
                     this.langDataFile = file;
-                    this.render();
-                }
             });
-            return true;
+            await this.render();
         });
 
-        html.find("input[type='file'].filedatadrop").on('change', async (event) => {
+        html.find("input[type='file'].filedatadrop").on('change', async (event: JQuery.ChangeEvent<HTMLInputElement>) => {
             Array.from(event.target.files).forEach((file: File) => {
                 if (this.isDataFile(file)) {
                     // Allow user to overwrite an already added file, they have their reasons.
                     const existingIdx = this.dataFiles.findIndex((dataFile) => dataFile.name === file.name);
-                    if (existingIdx === -1) {
+                    if (existingIdx === -1)
                         this.dataFiles.push(file);
-                    } else {
+                    else
                         this.dataFiles[existingIdx] = file;
-                    }
                 }
             });
 
@@ -304,7 +379,68 @@ export class Import extends Application {
                 this.disableImportButton = false;
             }
 
-            this.render();
+            await this.render();
+        });
+
+        html.find('.setIcons').on('click', () => {
+            this.icons = !this.icons;
+        });
+
+        html.find('.deleteCompendiums').on('click', () => {
+            this.deleteCompendiums = !this.deleteCompendiums;
+        });
+
+        html.find('.toggleAdvancedBtn').on('click', async () => {
+            this.showAdvanced = !this.showAdvanced;
+            await this.render();
+        });
+
+        html.find('.deleteFileBtn').on('click', async (event) => {
+            const name = event.currentTarget.getAttribute('data-name');
+            if (!name) return;
+
+            this.dataFiles = this.dataFiles.filter(file => file.name !== name);
+
+            await this.render();
+        });
+
+        html.find('.importOptionsBtn').on('click', async () => {
+            this.showImportOptions = true;
+            await this.render();
+        });
+
+        html.find('.closeOptionsBtn').on('click', async () => {
+            this.showImportOptions = false;
+            await this.render();
+        });
+
+        html.find('.bookOption').on('click', (event: JQuery.ClickEvent<HTMLInputElement>) => {
+            const checkbox = event.currentTarget;
+            const bookCode = checkbox.dataset.book;
+            const isChecked = checkbox.checked;
+
+            const book = this.shadowrunBooks.find(b => b.code === bookCode);
+            if (book)
+                book.value = isChecked;
+        });
+
+        html.find('#languageSelect').on('change', (event: JQuery.ChangeEvent<HTMLSelectElement>) => {
+            this.selectedLanguage = event.currentTarget.value;
+        });
+
+        html.find('.bookSelectAllBtn').on('click', async () => {
+            this.shadowrunBooks.forEach(book => book.value = true);
+            await this.render();
+        });
+
+        html.find('.bookUnselectAllBtn').on('click', async () => {
+            this.shadowrunBooks.forEach(book => book.value = false);
+            await this.render();
+        });
+
+        html.find('.bookDefaultsBtn').on('click', async () => {
+            this.shadowrunBooks.forEach(book => book.value = book.default);
+            await this.render();
         });
     }
 }
