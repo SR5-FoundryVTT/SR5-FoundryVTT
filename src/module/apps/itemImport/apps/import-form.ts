@@ -252,7 +252,7 @@ export class Import extends Application {
             } catch (err) {
                 if (i === attempts - 1) throw err;
                 console.warn(`Retrying fetch from git after failure... (${i + 1}/${attempts})`, err);
-                await new Promise(res => setTimeout(res, delayMs));
+                await new Promise(resolve => setTimeout(resolve, delayMs));
             }
         }
 
