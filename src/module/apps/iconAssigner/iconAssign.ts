@@ -37,6 +37,8 @@ export function iconAssign(
     // Get the override, if any
     let override = ''
     if (imgSubType && useOverrides) override = SR5.itemSubTypeIconOverrides[imgType][imgSubType];
+    else if (imgType && useOverrides && typeof SR5.itemSubTypeIconOverrides[imgType] === 'string')
+        override = SR5.itemSubTypeIconOverrides[imgType];
 
     // Priority of file names to check
     let fileNamePriority = [

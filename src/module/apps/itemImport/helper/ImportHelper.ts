@@ -60,7 +60,7 @@ export class ImportHelper {
         const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY[compKey].pack) as ItemType;
 
         return pack.getDocuments({
-            name__in: this.getArray(name).map(name => TH.getTranslation(name)),
+            name__in: this.getArray(name),
             ...(types ? { type__in: this.getArray(types) } : {})
         });
     }

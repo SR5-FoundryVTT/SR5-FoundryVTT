@@ -60,9 +60,6 @@ export class TranslationHelper {
             else
                 this.translationMap[name] = [this.translationMap[name], item];
         });
-
-        console.log(types);
-        console.log(Object.entries(this.translationMap).filter(([_, value]) => Array.isArray(value)))
     }
 
     private static getTranslationEntry(

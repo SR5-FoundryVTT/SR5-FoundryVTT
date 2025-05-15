@@ -38,7 +38,8 @@ export class AmmoParser extends Parser<AmmoItemData> {
         // TODO: This can be improved by using the stored english name in item.system.importFlags.name
         if (jsonData.addweapon?._TEXT) {
             const weaponName = jsonData.addweapon._TEXT;
-            const [foundWeapon] = await IH.findItem('Weapon', weaponName, 'weapon') ?? [];
+            const weaponTranslation = TH.getTranslation(weaponName, { type: 'weapon' });
+            const [foundWeapon] = await IH.findItem('Weapon', weaponTranslation, 'weapon') ?? [];
 
             if (foundWeapon && "action" in foundWeapon.system) {
                 const weaponData = foundWeapon.system as Shadowrun.WeaponData;

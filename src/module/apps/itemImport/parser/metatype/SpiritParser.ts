@@ -1,7 +1,7 @@
 import { Metatype } from "../../schema/MetatypeSchema";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { TranslationHelper as TH } from '../../helper/TranslationHelper';
+import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 import SpiritActorData = Shadowrun.SpiritActorData;
 
 export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
@@ -66,24 +66,31 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
     }
 
     protected override async getItems(jsonData: Metatype): Promise<Shadowrun.ShadowrunItemData[]> {
+        const { name, powers } = jsonData;
         const qualities = jsonData.qualities || undefined;
-        const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers || undefined;
+        const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers;
 
-        const allTraitsName = [
-            ...IH.getArray(jsonData.powers?.power),
+        const powerList = [...IH.getArray(powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
+        const qualityList = [
             ...IH.getArray(qualities?.positive?.quality),
             ...IH.getArray(qualities?.negative?.quality),
-            ...IH.getArray(optionalpowers?.optionalpower),
-        ].map(item => item._TEXT);
+        ].map(i => i._TEXT);
 
-        const allTraits = await IH.findItem('Trait', allTraitsName);
+        const translationMap: Record<string, string> = {};
+        const addTranslations = (items: any[], type: TranslationType) =>
+            items.forEach(i => translationMap[i] = TH.getTranslation(i, { type }));
 
-        const spiritName = jsonData.name._TEXT;
+        addTranslations(powerList, 'power');
+        addTranslations(qualityList, 'quality');
+
+        const allTraits = await IH.findItem('Trait', [...powerList, ...qualityList].map(i => translationMap[i]));
+        const spiritName = name._TEXT;
+
         return [
-            ...this.getMetatypeItems(allTraits, jsonData.powers?.power, {type: 'Power', critter: spiritName}),
-            ...this.getMetatypeItems(allTraits, qualities?.positive?.quality, {type: 'Power', critter: spiritName}),
-            ...this.getMetatypeItems(allTraits, qualities?.negative?.quality, {type: 'Power', critter: spiritName}),
-            ...this.getMetatypeItems(allTraits, optionalpowers?.optionalpower, {type: 'Optional Power', critter: spiritName}),
+            ...this.getMetatypeItems(allTraits, powers?.power, { type: 'Power', critter: spiritName }, translationMap),
+            ...this.getMetatypeItems(allTraits, qualities?.positive?.quality, { type: 'Power', critter: spiritName }, translationMap),
+            ...this.getMetatypeItems(allTraits, qualities?.negative?.quality, { type: 'Power', critter: spiritName }, translationMap),
+            ...this.getMetatypeItems(allTraits, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }, translationMap),
         ];
     }
 

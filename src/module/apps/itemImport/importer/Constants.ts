@@ -15,6 +15,27 @@ export class Constants {
         'Weapon':           { pack: 'world.sr5weapon',          type: 'Item' }, // Weapons
     } as const;
 
+    public static readonly MAP_TRANSLATION_TYPE: { [key: string]: string } = {
+        'ammo': 'gear',
+        'armor': 'armor',
+        'bioware': 'bioware',
+        'complex_form': 'complexform',
+        'critter_power': 'power',
+        'cyberware': 'cyberware',
+        'device': 'gear',
+        'echo': 'echo',
+        'equipment': 'gear',
+        'modification': 'mod',
+        'program': 'gear',
+        'quality': 'quality',
+        'spell': 'spell',
+        'spirit': 'metatype',
+        'sprite': 'metatype',
+        'sprite_power': 'power',
+        'vehicle': 'vehicle',
+        'weapon': 'weapon'
+    } as const;
+
     public static readonly MAP_CATEGORY_TO_SKILL = {
         'Assault Cannons': 'heavy_weapons',
         'Assault Rifles': 'automatics',

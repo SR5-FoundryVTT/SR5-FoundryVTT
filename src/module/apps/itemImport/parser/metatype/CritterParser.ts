@@ -1,8 +1,8 @@
 import { Metatype } from "../../schema/MetatypeSchema";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
+import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 import CharacterActorData = Shadowrun.CharacterActorData;
 
 export class CritterParser extends MetatypeParserBase<CharacterActorData> {
@@ -129,41 +129,49 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
     }
 
     protected override async getItems(jsonData: Metatype): Promise<Shadowrun.ShadowrunItemData[]> {
-        
-        const qualities = jsonData.qualities || undefined;
         const optionalpowers = jsonData.optionalpowers || undefined;
+        const qualities = jsonData.qualities || undefined;
 
-        const spells = IH.getArray(jsonData.powers?.power)
-                            .filter(spell => spell._TEXT === "Innate Spell" && spell.$?.select)
-                            .map(item => ({ _TEXT: item.$?.select})) as {_TEXT: string}[];
+        const spellsData = IH.getArray(jsonData.powers?.power)
+            .filter(s => s._TEXT === "Innate Spell" && s.$?.select)
+            .map(s => ({ _TEXT: s.$?.select })) as { _TEXT: string }[];
 
-        const allTraitsName = [
-            ...IH.getArray(jsonData.biowares?.bioware),
+        const bioware = IH.getArray(jsonData.biowares?.bioware).map(v => v._TEXT);
+        const complex = IH.getArray(jsonData.complexforms?.complexform).map(v => v._TEXT);
+        const spells = spellsData.map(v => v._TEXT);
+        const power = [
             ...IH.getArray(jsonData.powers?.power),
+            ...IH.getArray(optionalpowers?.optionalpower)
+        ].map(v => v._TEXT);
+        const quality = [
             ...IH.getArray(qualities?.positive?.quality),
-            ...IH.getArray(qualities?.negative?.quality),
-            ...IH.getArray(optionalpowers?.optionalpower),
-        ].map(item => item._TEXT);
+            ...IH.getArray(qualities?.negative?.quality)
+        ].map(v => v._TEXT);
 
-        const allMagicName = [
-            ...IH.getArray(jsonData.complexforms?.complexform),
-            ...IH.getArray(spells),
-        ].map(item => item._TEXT).filter(Boolean) as string[];
+        const translationMap: Record<string, string> = {};
+        const mapTranslation = (names: string[], type: TranslationType) =>
+            names.forEach(name => translationMap[name] = TH.getTranslation(name, { type }));
+
+        mapTranslation(bioware, 'bioware');
+        mapTranslation(complex, 'complexform');
+        mapTranslation(quality, 'quality');
+        mapTranslation(spells, 'spell');
+        mapTranslation(power, 'power');
 
         const [magicObj, traitsObj] = await Promise.all([
-            IH.findItem('Magic', allMagicName),
-            IH.findItem('Trait', allTraitsName),
+            IH.findItem('Magic', [...complex, ...spells].map(name => translationMap[name])),
+            IH.findItem('Trait', [...bioware, ...quality, ...power].map(name => translationMap[name])),
         ]);
-        
-        const critteName = jsonData.name._TEXT;
+
+        const name = jsonData.name._TEXT;
         return [
-            ...this.getMetatypeItems(magicObj,  spells, {type: 'Spell', critter: critteName}),
-            ...this.getMetatypeItems(traitsObj, jsonData.powers?.power, {type: 'Power', critter: critteName}),
-            ...this.getMetatypeItems(traitsObj, jsonData.biowares?.bioware, {type: 'Bioware', critter: critteName}),
-            ...this.getMetatypeItems(traitsObj, optionalpowers?.optionalpower, {type: 'Power', critter: critteName}),
-            ...this.getMetatypeItems(traitsObj, qualities?.positive?.quality, {type: 'Quality', critter: critteName}),
-            ...this.getMetatypeItems(traitsObj, qualities?.negative?.quality, {type: 'Quality', critter: critteName}),
-            ...this.getMetatypeItems(magicObj,  jsonData.complexforms?.complexform, {type: 'Complex Form', critter: critteName}),
+            ...this.getMetatypeItems(magicObj, spellsData, { type: 'Spell', critter: name }, translationMap),
+            ...this.getMetatypeItems(traitsObj, jsonData.powers?.power, { type: 'Power', critter: name }, translationMap),
+            ...this.getMetatypeItems(traitsObj, jsonData.biowares?.bioware, { type: 'Bioware', critter: name }, translationMap),
+            ...this.getMetatypeItems(traitsObj, optionalpowers?.optionalpower, { type: 'Power', critter: name }, translationMap),
+            ...this.getMetatypeItems(traitsObj, qualities?.positive?.quality, { type: 'Quality', critter: name }, translationMap),
+            ...this.getMetatypeItems(traitsObj, qualities?.negative?.quality, { type: 'Quality', critter: name }, translationMap),
+            ...this.getMetatypeItems(magicObj, jsonData.complexforms?.complexform, { type: 'Complex Form', critter: name }, translationMap),
         ];
     }
 

@@ -3,6 +3,7 @@ import { TranslationHelper as TH, TranslationType } from "../helper/TranslationH
 import * as IconAssign from "../../iconAssigner/iconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 import { BonusHelper as BH } from "../helper/BonusHelper";
+import { Constants } from "../importer/Constants";
 
 import { Armor, Mod as ArmorMod } from "../schema/ArmorSchema";
 import { Bioware } from "../schema/BiowareSchema";
@@ -42,28 +43,29 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
         let bonusPromise: Promise<void> | undefined;
 
         const name = jsonData.name._TEXT;
-        const options = {id: jsonData.id._TEXT, type: this.parseType as TranslationType };
-        
+        const typeOption = Constants.MAP_TRANSLATION_TYPE[this.parseType] as TranslationType;
+        const options = {id: jsonData.id._TEXT, type: typeOption};
+
         const entity = {
             name: TH.getTranslation(name, options),
             type: this.parseType,
             system: this.getSystem(jsonData),
         } as TResult;
-        
+
         //@ts-expect-error
         entity.folder = await this.getFolder(jsonData);
-        
+
         // Add technology
         if ('technology' in entity.system)
             this.setTechnology(entity.system, jsonData);
-        
+
         // Add Icon
         if (DataImporter.setIcons)
             this.setIcons(entity, jsonData);
-        
+
         if ('bonus' in jsonData && jsonData.bonus)
             bonusPromise = BH.addBonus(entity, jsonData.bonus);
-        
+
         const page = jsonData.page._TEXT;
         const source = jsonData.source._TEXT;
         entity.system.description.source = `${source} ${TH.getAltPage(name, page, options)}`;

@@ -17,16 +17,17 @@ export class SpriteParser extends MetatypeParserBase<SpriteActorData> {
 
     protected override async getItems(jsonData: Metatype): Promise<Shadowrun.ShadowrunItemData[]> {
         const optionalpowers = jsonData.bonus?.optionalpowers;
-        const allPowersName = [
-            ...IH.getArray(jsonData.powers?.power), ...IH.getArray(optionalpowers?.optionalpower),
-        ].map(item => item._TEXT);
+        const allPowers = [...IH.getArray(jsonData.powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
+        const translationMap: Record<string, string> = {};
 
-        const allPowers = await IH.findItem('Trait', allPowersName);
+        allPowers.forEach(p => translationMap[p] = TH.getTranslation(p, { type: 'power' }));
 
-        const spriteName = jsonData.name._TEXT;
+        const traits = await IH.findItem('Trait', allPowers.map(p => translationMap[p]));
+        const name = jsonData.name._TEXT;
+
         return [
-            ...this.getMetatypeItems(allPowers, jsonData.powers?.power, {type: 'Power', critter: spriteName}),
-            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, {type: 'Optional Power', critter: spriteName}),
+            ...this.getMetatypeItems(traits, jsonData.powers?.power, { type: 'Power', critter: name }, translationMap),
+            ...this.getMetatypeItems(traits, optionalpowers?.optionalpower, { type: 'Optional Power', critter: name }, translationMap),
         ];
     }
 

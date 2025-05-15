@@ -1294,7 +1294,10 @@ export const SR5 = {
             'mundane-critters': 'critter/mundane-critters',
             'mutant-critters': 'critter/mutant-critters',
             'paranormal-critters': 'critter/paranormal-critters',
+            'protosapients': 'critter/protosapients',
             'technocritters': 'critter/technocritters',
+            'toxic-critters': 'critter/toxic-critters',
+            'warforms': 'critter/warforms',
         },
         complex_form: {},
         contact: {},
@@ -1425,8 +1428,15 @@ export const SR5 = {
         },
         spirit: {
             'extraplanar-travelers': 'critter/extraplanar-travelers',
+            'insect-spirits': 'critter/insect-spirits',
+            'necro-spirits': 'critter/necro-spirits',
+            'shadow-spirits': 'critter/shadow-spirits',
+            'shedim': 'critter/shedim',
+            'spirits': 'critter/spirits',
+            'ritual': 'critter/ritual',
+            'toxic-spirits': 'critter/toxic-spirits',
         },
-        sprite: {},
+        sprite: 'critter/sprites',
         sprite_power: {},
         vehicle: {
             /* Vehicles */

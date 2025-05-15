@@ -24,24 +24,35 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
         super(); this.categories = categories;
     }
 
-    protected override async getItems(jsonData: Weapon) : Promise<ItemDataSource[]> {
-        const result: ItemDataSource[] = []
-        const accessories = jsonData.accessories?.accessory;
+    protected override async getItems(jsonData: Weapon): Promise<ItemDataSource[]> {
+        if (!jsonData.accessories?.accessory) return [];
 
-        for (const accessory of IH.getArray(accessories)) {
-            const name = accessory.name._TEXT;
-            const foundItem = await IH.findItem('Modification', name, 'modification');
+        const accessories = IH.getArray(jsonData.accessories.accessory);
+        const accessoriesNames = accessories.map(acc => acc.name._TEXT);
+        const translationMap: Record<string, string> = {};
+        for (const name of accessoriesNames)
+            translationMap[name] = TH.getTranslation(name, { type: 'accessory' });
 
-            if (!foundItem.length) {
-                console.log(`[Modification Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`);
+        const foundItems = await IH.findItem('Modification', Object.values(translationMap));
+        const itemMap = new Map(foundItems.map(item => [item.name, item]));
+
+        const result: ItemDataSource[] = [];
+        for (const accessory of accessories) {
+            const rawName = accessory.name._TEXT;
+            const translatedName = translationMap[rawName] || rawName;
+            const foundItem = itemMap.get(translatedName);
+
+            if (!foundItem) {
+                console.log(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${rawName}, ${translatedName}`);
                 continue;
             }
 
-            const accessoryBase = foundItem[0].toObject() as Shadowrun.ModificationItemData;
-
+            const accessoryBase = foundItem.toObject() as Shadowrun.ModificationItemData;
             accessoryBase.system.technology.equipped = true;
-            if (accessory.rating)
-                accessoryBase.system.technology.rating = Number(accessory.rating._TEXT) || 0;
+
+            const ratingText = accessory.rating?._TEXT;
+            if (ratingText)
+                accessoryBase.system.technology.rating = Number(ratingText) || 0;
 
             result.push(accessoryBase as ItemDataSource);
         }

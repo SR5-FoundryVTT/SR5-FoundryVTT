@@ -13,14 +13,16 @@ export class VehicleParser extends Parser<VehicleActorData> {
         vehicleName: string,
         items: SR5Item[],
         itemsData: NotEmpty<Vehicle['mods']>['mod' | 'name'] | NotEmpty<Vehicle['gears']>['gear'] | NotEmpty<Vehicle['weapons']>['weapon'],
+        translationMap: Record<string, string>
     ): ItemDataSource[] {
         const itemMap = new Map(items.map(i => [i.name, i]));
 
         const result: ItemDataSource[] = [];
 
         for (const item of IH.getArray(itemsData)) {
-            const name = 'name' in item ? item.name?._TEXT : item._TEXT;
-            const foundItem = itemMap.get(name || '');
+            const name = ('name' in item ? item.name?._TEXT : item._TEXT) || '';
+            const translatedName = translationMap[name] || name;
+            const foundItem = itemMap.get(translatedName);
 
             if (!foundItem) {
                 console.log(`[Vehicle Mod Missing]\nVehicle: ${vehicleName}\nMod: ${name}`);
@@ -81,32 +83,35 @@ export class VehicleParser extends Parser<VehicleActorData> {
     }
 
     protected override async getItems(jsonData: Vehicle): Promise<Shadowrun.ShadowrunItemData[]> {
-        // find items first to increase performance
-        const mods = jsonData.mods || undefined;
+        const mods = jsonData.mods || {};
 
         const allModName = [
-            ...IH.getArray(mods?.name).map(item => item._TEXT),
-            ...IH.getArray(mods?.mod).map(item => item.name?._TEXT)
-        ];
+            ...IH.getArray(mods.name).map(m => m._TEXT),
+            ...IH.getArray(mods.mod).map(m => m.name._TEXT),
+        ].filter(Boolean);
 
-        const allWeaponName = IH.getArray(jsonData.weapons?.weapon).map(item => item.name._TEXT);
-        const allGearName = IH.getArray(jsonData.gears?.gear).map(item => item._TEXT ?? item.name?._TEXT).filter(Boolean);
+        const allGearName = IH.getArray(jsonData.gears?.gear).map(v => v?._TEXT || v?.name?._TEXT || '');
+        const allWeaponName = IH.getArray(jsonData.weapons?.weapon).map(w => w.name._TEXT);
+
+        const translationMap: Record<string, string> = {};
+        for (const name of allModName) translationMap[name] = TH.getTranslation(name, { type: 'mod' });
+        for (const name of allGearName) translationMap[name] = TH.getTranslation(name, { type: 'gear' });
+        for (const name of allWeaponName) translationMap[name] = TH.getTranslation(name, { type: 'weapon' });
 
         const [modItem, gearItem, weaponItem] = await Promise.all([
-            IH.findItem('Modification', allModName),
-            IH.findItem('Gear', allGearName as string[]),
-            IH.findItem('Weapon', allWeaponName),
+            IH.findItem('Modification', allModName.map(name => translationMap[name])),
+            IH.findItem('Gear', allGearName.map(name => translationMap[name])),
+            IH.findItem('Weapon', allWeaponName.map(name => translationMap[name])),
         ]);
 
-        const vehicleName = jsonData.name._TEXT;
+        const name = jsonData.name._TEXT;
         return [
-            ...this.getVehicleItems(vehicleName, modItem, mods?.mod),
-            ...this.getVehicleItems(vehicleName, modItem, mods?.name),
-            ...this.getVehicleItems(vehicleName, gearItem, jsonData.gears?.gear),
-            ...this.getVehicleItems(vehicleName, weaponItem, jsonData.weapons?.weapon),
+            ...this.getVehicleItems(name, modItem, mods.mod, translationMap),
+            ...this.getVehicleItems(name, modItem, mods.name, translationMap),
+            ...this.getVehicleItems(name, gearItem, jsonData.gears?.gear, translationMap),
+            ...this.getVehicleItems(name, weaponItem, jsonData.weapons?.weapon, translationMap),
         ];
     }
-
     protected override async getFolder(jsonData: Vehicle): Promise<Folder> {
         const category = jsonData.category._TEXT;
         const isDrone = category.startsWith("Drones:");
