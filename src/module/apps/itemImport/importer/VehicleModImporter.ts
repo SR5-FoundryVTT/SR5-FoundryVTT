@@ -1,4 +1,3 @@
-import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
 import { VehiclesSchema, Mod } from '../schema/VehiclesSchema';
 import { VehicleModParser } from '../parser/mod/VehicleModParser';

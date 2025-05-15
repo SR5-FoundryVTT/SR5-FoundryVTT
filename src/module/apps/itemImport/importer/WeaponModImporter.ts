@@ -1,4 +1,3 @@
-import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
 import { WeaponModParser } from '../parser/mod/WeaponModParser';
 import { Accessory, WeaponsSchema } from '../schema/WeaponsSchema';

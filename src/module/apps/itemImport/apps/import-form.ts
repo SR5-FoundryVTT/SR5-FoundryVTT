@@ -1,18 +1,19 @@
-import { WeaponImporter } from '../importer/WeaponImporter';
-import { GearImporter } from '../importer/GearImporter';
+import { AdeptPowerImporter } from '../importer/AdeptPowerImporter';
 import { ArmorImporter } from '../importer/ArmorImporter';
-import { DataImporter } from '../importer/DataImporter';
-import { TranslationHelper } from '../helper/TranslationHelper';
-import { WeaponModImporter } from '../importer/WeaponModImporter';
-import { VehicleModImporter } from '../importer/VehicleModImporter';
-import { SpellImporter } from '../importer/SpellImporter';
-import { QualityImporter } from '../importer/QualityImporter';
 import { ComplexFormImporter } from '../importer/ComplexFormImporter';
-import { WareImporter } from '../importer/WareImporter';
-import { CritterPowerImporter } from '../importer/CritterPowerImporter';
-import { EchoesImporter } from '../importer/EchoesImporter';
-import { VehicleImporter } from '../importer/VehicleImporter';
 import { CritterImporter } from '../importer/CritterImporter';
+import { CritterPowerImporter } from '../importer/CritterPowerImporter';
+import { DataImporter } from '../importer/DataImporter';
+import { EchoesImporter } from '../importer/EchoesImporter';
+import { GearImporter } from '../importer/GearImporter';
+import { QualityImporter } from '../importer/QualityImporter';
+import { SpellImporter } from '../importer/SpellImporter';
+import { TranslationHelper } from '../helper/TranslationHelper';
+import { VehicleImporter } from '../importer/VehicleImporter';
+import { VehicleModImporter } from '../importer/VehicleModImporter';
+import { WareImporter } from '../importer/WareImporter';
+import { WeaponImporter } from '../importer/WeaponImporter';
+import { WeaponModImporter } from '../importer/WeaponModImporter';
 import { Constants } from '../importer/Constants';
 import * as IconAssign from  '../../iconAssigner/iconAssign';
 
@@ -179,6 +180,7 @@ export class Import extends Application {
         new EchoesImporter(),
         new CritterPowerImporter(),
         new VehicleModImporter(),
+        new AdeptPowerImporter(),
     ];
 
     //Order is important, ex. some weapons need mods to fully import

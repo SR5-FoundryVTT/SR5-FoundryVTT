@@ -1,4 +1,3 @@
-import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { SpiritParser } from '../parser/metatype/SpiritParser';

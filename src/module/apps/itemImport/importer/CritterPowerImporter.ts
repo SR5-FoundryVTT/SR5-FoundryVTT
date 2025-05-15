@@ -1,10 +1,8 @@
-import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
-import { ImportHelper as IH } from '../helper/ImportHelper';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
-import { SpritePowerParser } from '../parser/critter-power/SpritePowerParser';
-import { CritterPowerParser } from '../parser/critter-power/CritterPowerParser';
+import { SpritePowerParser } from '../parser/powers/SpritePowerParser';
+import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
 
 type CritterPowerType = Shadowrun.CritterPowerItemData | Shadowrun.SpritePowerItemData;
 

@@ -35,7 +35,7 @@ export function iconAssign(
     const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides) as boolean;
 
     // Get the override, if any
-    let override = ''
+    let override = '';
     if (imgSubType && useOverrides) override = SR5.itemSubTypeIconOverrides[imgType][imgSubType];
     else if (imgType && useOverrides && typeof SR5.itemSubTypeIconOverrides[imgType] === 'string')
         override = SR5.itemSubTypeIconOverrides[imgType];

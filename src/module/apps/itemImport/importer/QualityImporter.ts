@@ -1,4 +1,3 @@
-import { Constants } from "./Constants";
 import { DataImporter } from './DataImporter';
 import { QualityParser } from '../parser/quality/QualityParser';
 import { QualitiesSchema, Quality } from "../schema/QualitiesSchema";

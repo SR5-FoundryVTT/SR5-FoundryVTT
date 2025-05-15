@@ -1,7 +1,6 @@
-import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
 import { EchoesSchema, Echo } from '../schema/EchoesSchema';
-import { EchoParser } from '../parser/critter-power/EchoParser';
+import { EchoParser } from '../parser/powers/EchoParser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class EchoesImporter extends DataImporter {

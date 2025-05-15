@@ -1,4 +1,3 @@
-import { Constants } from "./Constants";
 import { DataImporter } from './DataImporter';
 import { SpellsSchema, Spell } from '../schema/SpellsSchema';
 import { SpellParserBase } from '../parser/spell/SpellParserBase';

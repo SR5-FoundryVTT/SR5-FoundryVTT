@@ -1,4 +1,3 @@
-import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
 import { MeleeParser } from '../parser/weapon/MeleeParser';
 import { RangedParser } from '../parser/weapon/RangedParser';

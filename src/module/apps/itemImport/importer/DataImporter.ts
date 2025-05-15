@@ -1,9 +1,9 @@
 import { SR5 } from "../../../config";
 import { Constants } from './Constants';
+import { ParseData } from "../parser/Parser";
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import { ParseData } from "../parser/Parser";
 
 const xml2js = require('xml2js');
 

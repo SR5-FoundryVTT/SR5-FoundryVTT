@@ -16,6 +16,7 @@ export class Constants {
     } as const;
 
     public static readonly MAP_TRANSLATION_TYPE: { [key: string]: string } = {
+        'adept_power': 'power',
         'ammo': 'gear',
         'armor': 'armor',
         'bioware': 'bioware',

@@ -39,6 +39,8 @@ export class BonusHelper {
                 path = "(@system.rating)";
             else if (sheet.system?.technology && 'rating' in sheet.system?.technology)
                 path = "(@system.technology.rating)"
+            else if ('level' in sheet.system)
+                path = "(@system.level)"
 
             if (!path)
                 console.error("Didn't find rating on Item: " + sheet.name);

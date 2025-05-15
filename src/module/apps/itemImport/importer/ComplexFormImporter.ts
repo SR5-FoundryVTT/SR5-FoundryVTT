@@ -1,4 +1,3 @@
-import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { ComplexFormParser } from '../parser/complex-form/ComplexFormParser';

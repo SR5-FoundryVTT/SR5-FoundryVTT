@@ -1,4 +1,3 @@
-import { Constants } from './Constants';
 import { DataImporter } from './DataImporter';
 import { ArmorParser } from '../parser/armor/ArmorParser';
 import { ArmorSchema, Armor } from '../schema/ArmorSchema';
