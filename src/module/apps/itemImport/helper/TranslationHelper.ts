@@ -65,7 +65,6 @@ export class TranslationHelper {
     private static getTranslationEntry(
         name: string,
         options?: TranslationOption,
-        strict: boolean = false
     ): TranslationEntry | undefined {
         const values = this.translationMap[name] as undefined | TranslationEntry | TranslationEntry[];
     
@@ -75,16 +74,15 @@ export class TranslationHelper {
         return (
             (options?.id && values.find(v => v.id === options.id)) ||
             (options?.type && values.find(v => v.type === options.type)) ||
-            !strict && values[0] || undefined
+            values[0] || undefined
         );
     }
 
     public static getTranslation(
         name: string,
         options?: TranslationOption,
-        strict: boolean = false
     ): string {
-        const entry = this.getTranslationEntry(name, options, strict);
+        const entry = this.getTranslationEntry(name, options);
         return entry?.translate ?? name;
     }
 
@@ -92,9 +90,8 @@ export class TranslationHelper {
         name: string,
         fallback: string,
         options?: TranslationOption,
-        strict: boolean = false
     ): string {
-        const entry = this.getTranslationEntry(name, options, strict);
+        const entry = this.getTranslationEntry(name, options);
         return entry?.altpage ?? fallback;
     }
     

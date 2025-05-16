@@ -155,13 +155,7 @@ export class Import extends Application {
 
     private collectDataImporterFileSupport() {
         this.supportedDataFiles = [];
-        Import.ItemImporters.forEach(importer => {
-            if (this.supportedDataFiles.some(supported => importer.files.includes(supported))) {
-                return;
-            }
-            this.supportedDataFiles = this.supportedDataFiles.concat(importer.files);
-        });
-        Import.ActorImporters.forEach(importer => {
+        Import.Importers.forEach(importer => {
             if (this.supportedDataFiles.some(supported => importer.files.includes(supported))) {
                 return;
             }
@@ -169,26 +163,22 @@ export class Import extends Application {
         });
     }
 
-    //Order is important, ex. some weapons need mods to fully import
-    static ItemImporters: DataImporter[] = [
+    //Order is important, ex. some weapons need mods to fully import, or it might take longer to import.
+    static Importers: DataImporter[] = [
         new WeaponModImporter(),
         new WeaponImporter(),
-        new ArmorImporter(),
         new GearImporter(),
+        new VehicleModImporter(),
+        new VehicleImporter(),
         new SpellImporter(),
         new ComplexFormImporter(),
-        new QualityImporter(),
         new WareImporter(),
-        new EchoesImporter(),
+        new QualityImporter(),
         new CritterPowerImporter(),
-        new VehicleModImporter(),
-        new AdeptPowerImporter(),
-    ];
-
-    //Order is important, ex. some weapons need mods to fully import
-    static ActorImporters: DataImporter[] = [
-        new VehicleImporter(),
         new CritterImporter(),
+        new EchoesImporter(),
+        new AdeptPowerImporter(),
+        new ArmorImporter(),
     ];
 
     /**
@@ -205,15 +195,10 @@ export class Import extends Application {
         const jsonSource = await DataImporter.xml2json(xmlSource);
 
         // Apply Item Importers based on file and their ability to parse that file.
-        for (const di of Import.ItemImporters.filter(importer => importer.files.includes(fileName)))
+        for (const di of Import.Importers.filter(importer => importer.files.includes(fileName)))
             if (di.CanParse(jsonSource))
                 await di.Parse(jsonSource);
 
-        // Apply Actor Importers based on their ability to parse that file.
-        for (const di of Import.ActorImporters.filter(importer => importer.files.includes(fileName)))
-            if (di.CanParse(jsonSource))
-                await di.Parse(jsonSource);
-        
         const end = performance.now();
         console.log(fileName, end - start, "ms");
     }
@@ -267,7 +252,7 @@ export class Import extends Application {
         setIcons: boolean,
         deleteCompendiums: boolean,
         languageText: string | undefined,
-        getTextForFile: (param: any) => Promise<{ text: string; name: string; }>
+        getTextForFile: (param: any) => Promise<{ text: string; name: string; } | null>
     ) {
         if (deleteCompendiums)
             for (const [_, compendium] of Object.entries(Constants.MAP_COMPENDIUM_KEY))
@@ -351,7 +336,8 @@ export class Import extends Application {
                 : undefined;
             
             const getTextForFile = async (fileName: string) => {
-                const file = this.dataFiles.find(f => f.name === fileName) as File;
+                const file = this.dataFiles.find(f => f.name === fileName);
+                if (!file) return null;
                 const text = await file.text();
                 return { text, name: file.name };
             };
