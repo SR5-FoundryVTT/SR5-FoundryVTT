@@ -2,33 +2,21 @@ import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
 import { SR5ActiveEffect } from '../../../effect/SR5ActiveEffect'
 import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
-
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+import * as BC from "./BonusConstant";
 
 import EffectTagsData = Shadowrun.EffectTagsData;
 import EffectChangeData = Shadowrun.EffectChangeData;
 import EffectOptionsData = Shadowrun.EffectOptionsData;
 import EffectDurationData = Shadowrun.EffectDurationData;
 import { SR5Item } from "../../../item/SR5Item";
-
-type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: number; }
-
-const { CUSTOM, MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACTIVE_EFFECT_MODES;
-
-type ShadowrunSheetData = (
-    ShadowrunItemData | ShadowrunActorData
-) & {
-    effects?: EffectOptionsData[];
-    flags?: { shadowrun5e: { embeddedItems: ItemDataSource[] } };
-};
+import { CharacterSheetData } from "../../../actor/sheets/SR5CharacterSheet";
 
 export class BonusHelper {
     private static isTrue(value: "" | { _TEXT: string }): boolean {
         return value === "" || value._TEXT === "True";
     }
 
-    private static normalizeValue(sheet: any, value: string | number): string | number {
+    private static normalizeValue(sheet: BC.ShadowrunSheetData, value: string | number): string | number {
         if (typeof value === 'number')
             return value;
 
@@ -37,10 +25,10 @@ export class BonusHelper {
 
             if ('rating' in sheet.system)
                 path = "(@system.rating)";
-            else if (sheet.system?.technology && 'rating' in sheet.system?.technology)
-                path = "(@system.technology.rating)"
+            else if ('technology' in sheet.system && 'rating' in sheet.system.technology)
+                path = "(@system.technology.rating)";
             else if ('level' in sheet.system)
-                path = "(@system.level)"
+                path = "(@system.level)";
 
             if (!path)
                 console.error("Didn't find rating on Item: " + sheet.name);
@@ -58,30 +46,21 @@ export class BonusHelper {
             .replace(/\s+/g, '_')
             .replace(/-/g, '_');
     
-        if (name.includes('exotic') && name.includes('_weapon')) {
+        if (name.includes('exotic') && name.includes('_weapon'))
             name = name.replace('_weapon', '');
-        }
-        if (name.includes('exotic') && name.includes('_ranged')) {
+        if (name.includes('exotic') && name.includes('_ranged'))
             name = name.replace('_ranged', '_range');
-        }
 
-        if (name === 'shadowing' || name === 'infiltration') {
-            name = 'sneaking';
-        }
-        if (name === 'pilot_watercraft') {
+        if (name === 'pilot_watercraft')
             name = 'pilot_water_craft';
-        }
-        if (name === 'thrown_weapons') {
-            name = 'throwing_weapons';
-        }
-    
+
         return name;
     }
 
     private static createEffect(
-        sheet: ShadowrunSheetData,
+        sheet: BC.ShadowrunSheetData,
         overrides: Partial<EffectOptionsData>,
-        changes: EffectChangeParameter[],
+        changes: BC.EffectChangeParameter[],
         flags?: Partial<EffectTagsData>
     ): void {
         const defaultEffect = {
@@ -93,16 +72,16 @@ export class BonusHelper {
         const effect = {
             ...defaultEffect,
             ...overrides,
-            changes: (changes ?? []).map(change  => ({
-                key: change.key,
+            changes: changes.map(change  => ({
+                key: change.key as string,
                 value: this.normalizeValue(sheet, change.value),
-                mode: change.mode ?? CUSTOM,
+                mode: change.mode ?? BC.CUSTOM,
                 priority: change.priority ?? change.mode ?? 0
             })),
             ...(flags && {
                 flags: {
                     shadowrun5e: {
-                        applyTo: 'actor' as Shadowrun.EffectApplyTo,
+                        applyTo: 'test_all' as Shadowrun.EffectApplyTo,
                         ...flags,
                     },
                 },
@@ -112,19 +91,20 @@ export class BonusHelper {
         sheet.effects?.push(effect);
     }
 
-    public static async addBonus(sheet: ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
+    public static async addBonus(sheet: BC.ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
         await this.addEffects(sheet, bonus);
         // await this.addItems(sheet, bonus);
     }
 
-    private static async addEffects(sheet: ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
+    private static async addEffects(sheet: BC.ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
         sheet.effects ??= [];
 
-        if (bonus.armor) {
-            this.createEffect(
-                sheet, { name: "Add Armor" },
-                [{ key: "system.armor.mod", value: bonus.armor._TEXT }],
-            );
+        for (const [key, effect] of Object.entries(BC.BonusConstant.simpleEffects)) {
+            if (bonus[key]) {
+                const value = bonus[key]._TEXT as string;
+                const { overrides, tags, ...change } = effect;
+                this.createEffect( sheet, overrides || {}, [{ ...change, value: value }], tags);
+            }
         }
 
         // TODO - threshold, sharedthresholdoffset, thresholdoffset
@@ -134,37 +114,23 @@ export class BonusHelper {
             if (cm.overflow) {
                 this.createEffect(
                     sheet, { name: "Override Physical Overflow Track"},
-                    [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, mode: OVERRIDE }],
+                    [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, mode: BC.OVERRIDE }],
                 );
             }
 
             if (cm.physical) {
                 this.createEffect(
                     sheet, { name: "Override Physical Track" },
-                    [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, mode: OVERRIDE }],
+                    [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, mode: BC.OVERRIDE }],
                 );
             }
 
             if (cm.stun) {
                 this.createEffect(
                     sheet, { name: "Override Stun Track" },
-                    [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: OVERRIDE }],
+                    [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: BC.OVERRIDE }],
                 );
             }
-        }
-
-        if (bonus.initiative) {
-            this.createEffect(
-                sheet, { name: "Increase Initiative" },
-                [{ key: "system.modifiers.initiative_dice", value: bonus.initiative._TEXT }]
-            );
-        }
-
-        if (bonus.initiativedice) {
-            this.createEffect(
-                sheet, { name: "Increase Initiative Dice" },
-                [{ key: "system.modifiers.initiative_dice", value: bonus.initiativedice._TEXT }]
-            );
         }
 
         if (bonus.limitmodifier) {
@@ -176,28 +142,10 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.limit.mod", value: limitModifier.value._TEXT }],
-                    { applyTo: 'test_all', selection_limits: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`} 
+                    { selection_limits: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`} 
                 );
             }
         }
-
-        // if (bonus.matrixinitiative) {
-        //     this.createEffect(
-        //         sheet, { name: "Increase Matrix Initiative" },
-        //         [{ key: "system.modifiers.matrix_initiative", value: bonus.matrixinitiative._TEXT }]
-        //     );
-        // }
-
-        //TODO if (bonus.matrixinitiativedice)
-
-        if (bonus.matrixinitiativediceadd) {
-            this.createEffect(
-                sheet, { name: "Increase Matrix Initiative Dice" },
-                [{ key: "system.modifiers.matrix_initiative_dice", value: bonus.matrixinitiativediceadd._TEXT }]
-            );
-        }
-
-        //TODO <critterpowerlevels>. Quite tricky. Needs other power that was not initialized
 
         //TODO Precedent
         if (bonus.skillattribute) {
@@ -215,86 +163,45 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
-                    { applyTo: 'test_all', selection_attributes: `[{\"value\":\"${name.capitalize()}\",\"id\":\"${name}\"}]`}
+                    { selection_attributes: `[{\"value\":\"${name.capitalize()}\",\"id\":\"${name}\"}]`}
                 );
             }
         }
 
         if (bonus.skillcategory) {
-            const skillCategoryTable: Record<string, string[]> = {
-                "Combat Active": ["archery", "automatics", "blades", "clubs", "exotic_melee", "exotic_range", "heavy_weapons", "longarms", "pistols", "throwing_weapons", "unarmed_combat"],
-                "Physical Active": ["disguise", "diving", "escape_artist", "flight", "free_fall", "gymnastics", "palming", "perception", "running", "sneaking", "survival", "swimming", "tracking"],
-                "Social Active": ["con", "etiquette", "impersonation", "instruction", "intimidation", "leadership", "negotiation", "performance"],
-                "Magical Active": ["alchemy", "artificing", "assensing", "astral_combat", "banishing", "binding", "counterspelling", "disenchanting", "ritual_spellcasting", "spellcasting", "summoning"],
-                "Pseudo-Magical Active": ["arcana"],
-                "Resonance Active": ["compiling", "decompiling", "registering"],
-                "Technical Active": ["aeronautics_mechanic", "animal_handling", "armorer", "artisan", "automotive_mechanic", "biotechnology", "chemistry", "computer", "cybercombat", "cybertechnology",
-                    "demolitions", "electronic_warfare", "first_aid", "forgery", "hacking", "hardware", "industrial_mechanic", "locksmith", "medicine", "nautical_mechanic", "navigation", "software"],
-                "Vehicle Active": ["pilot_exotic_vehicle", "gunnery", "pilot_aerospace", "pilot_aircraft", "pilot_ground_craft", "pilot_walker", "pilot_water_craft"],
-                //TODO knowledge skill category
-                "Academic": [],
-                "Interest": [],
-                "Language": [],
-                "Professional": [],
-                "Street": [],
-            };
-
-            for (const skillCategory of IH.getArray(bonus.skillgroup)) {
+            for (const skillCategory of IH.getArray(bonus.skillcategory)) {
                 const conditionTag = skillCategory.condition ? "*" : "";
                 const excludedSkill = this.normalizeSkillName(skillCategory.exclude?._TEXT ?? "");
                 
-                const skills = skillCategoryTable[skillCategory.name._TEXT]
+                const skills = BC.BonusConstant.skillCategoryTable[skillCategory.name._TEXT]
                                 .filter(skillId => !excludedSkill || skillId !== excludedSkill)
                                 .map(skillId => ({ value: skillId.replace("_", " ").capitalize(), id: skillId }))
 
                 // TODO remove
                 if (!skills || !skills.length)
-                    console.log("Error skillgroup: ", skillCategory.name._TEXT);
-
-                this.createEffect(
-                    sheet, { name: sheet.name + conditionTag },
-                    [{ key: "data.modifiers.mod", value: skillCategory.bonus._TEXT }],
-                    { applyTo: 'test_all', selection_skills: JSON.stringify(skills) }
-                );
+                    console.log("Error skillcategory:", skillCategory.name._TEXT);
+                else
+                    this.createEffect(
+                        sheet, { name: sheet.name + conditionTag },
+                        [{ key: "data.modifiers.mod", value: skillCategory.bonus._TEXT }],
+                        { selection_skills: JSON.stringify(skills) }
+                    );
             }
         }
 
-        //
         if (bonus.skillgroup) {
-            const skillGroupTable: Record<string, string[]> = {
-                "Acting": ["con", "impersonation", "performance"],
-                "Athletics": ["gymnastics", "running", "swimming", "flight"],
-                "Biotech": ["cybertechnology", "first_aid", "medicine"],
-                "Close Combat": ["blades", "clubs", "unarmed_combat"],
-                "Conjuring": ["banishing", "binding", "summoning"],
-                "Cracking": ["cybercombat", "electronic_warfare", "hacking"],
-                "Electronics": ["computer", "hardware", "software"],
-                "Enchanting": ["alchemy", "artificing", "disenchanting"],
-                "Firearms": ["automatics", "longarms", "pistols"],
-                "Influence": ["etiquette", "leadership", "negotiation"],
-                "Engineering": ["aeronautics_mechanic", "automotive_mechanic", "industrial_mechanic", "nautical_mechanic"],
-                "Outdoors": ["navigation", "survival", "tracking"],
-                "Sorcery": ["counterspelling", "ritual_spellcasting", "spellcasting"],
-                "Stealth": ["disguise", "palming", "sneaking"],
-                "Tasking": ["compiling", "decompiling", "registering"],
-            };
-
             for (const skillGroup of IH.getArray(bonus.skillgroup)) {
                 const conditionTag = skillGroup.condition ? "*" : "";
                 const excludedSkill = this.normalizeSkillName(skillGroup.exclude?._TEXT ?? "");
-                
-                const skills = skillGroupTable[skillGroup.name._TEXT]
+
+                const skills = BC.BonusConstant.skillGroupTable[skillGroup.name._TEXT]
                                 .filter(skillId => !excludedSkill || skillId !== excludedSkill)
                                 .map(skillId => ({ value: skillId.replace("_", " ").capitalize(), id: skillId }))
-                
-                //TODO Remove
-                if (!skills || !skills.length)
-                    console.log("Error skillgroup: ", skillGroup.name._TEXT);
 
                 this.createEffect(
                     sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.modifiers.mod", value: skillGroup.bonus._TEXT }],
-                    { applyTo: 'test_all', selection_skills: JSON.stringify(skills) }
+                    { selection_skills: JSON.stringify(skills) }
                 );
             }
         }
@@ -309,17 +216,9 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
-                    { applyTo: 'test_all', selection_skills: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`}
+                    { selection_skills: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`}
                 );
             }
-        }
-
-        if (bonus.spellresistance) {
-            this.createEffect(
-                sheet, {},
-                [{ key: "data.modifiers.mod", value: bonus.spellresistance._TEXT }],
-                { applyTo: 'test_all', selection_tests: '[{"value":"Combat Spell Defense","id":"CombatSpellDefenseTest"}]' }
-            );
         }
     }
 /*

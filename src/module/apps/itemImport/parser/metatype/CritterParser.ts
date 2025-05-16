@@ -15,22 +15,13 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
             .replace(/\s+/g, '_')
             .replace(/-/g, '_');
     
-        if (name.includes('exotic') && name.includes('_weapon')) {
+        if (name.includes('exotic') && name.includes('_weapon'))
             name = name.replace('_weapon', '');
-        }
-        if (name.includes('exotic') && name.includes('_ranged')) {
+        if (name.includes('exotic') && name.includes('_ranged'))
             name = name.replace('_ranged', '_range');
-        }
 
-        if (name === 'shadowing' || name === 'infiltration') {
-            name = 'sneaking';
-        }
-        if (name === 'pilot_watercraft') {
+        if (name === 'pilot_watercraft')
             name = 'pilot_water_craft';
-        }
-        if (name === 'thrown_weapons') {
-            name = 'throwing_weapons';
-        }
     
         return name;
     }

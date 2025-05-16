@@ -30,12 +30,12 @@
             <div style="display: flex; align-items: center; gap: 1em;">
                 <label for="languageSelect" style="white-space: nowrap;">Translation Language:</label>
                 <select id="languageSelect">
-                    <option value="">English (default)</option>
-                    <option value="de-de_data.xml">Deutsch</option>
-                    <option value="fr-fr_data.xml">Français</option>
-                    <option value="ja-jp_data.xml">日本語</option>
-                    <option value="pt-br_data.xml">Português (Brasil)</option>
-                    <option value="zh-cn_data.xml">中文</option>
+                    <option value="" {{#if (eq selectedLanguage "")}}selected{{/if}}>English (default)</option>
+                    <option value="de-de_data.xml" {{#if (eq selectedLanguage "de-de_data.xml")}}selected{{/if}}>Deutsch</option>
+                    <option value="fr-fr_data.xml" {{#if (eq selectedLanguage "fr-fr_data.xml")}}selected{{/if}}>Français</option>
+                    <option value="ja-jp_data.xml" {{#if (eq selectedLanguage "ja-jp_data.xml")}}selected{{/if}}>日本語</option>
+                    <option value="pt-br_data.xml" {{#if (eq selectedLanguage "pt-br_data.xml")}}selected{{/if}}>Português (Brasil)</option>
+                    <option value="zh-cn_data.xml" {{#if (eq selectedLanguage "zh-cn_data.xml")}}selected{{/if}}>简体中文</option>
                 </select>
             </div>
 

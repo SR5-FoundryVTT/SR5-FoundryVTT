@@ -20,9 +20,10 @@ import * as IconAssign from  '../../iconAssigner/iconAssign';
 export class Import extends Application {
     // Update Schemas in util/generate_schemas.py
     private githubConfig = {
-        owner: "BM123499",
+        owner: "chummer5a",
         repo: "chummer5a",
-        branch: "XSD_Remake",
+        version: "v5.225.884",
+        branch: "2279966a4e9cae60c225a94c5e5289d7a2fadce4",
     } as const;
 
     private currentParsedFile: string;
@@ -131,6 +132,7 @@ export class Import extends Application {
 
         data.icons = this.icons;
         data.showAdvanced = this.showAdvanced;
+        data.selectedLanguage = this.selectedLanguage;
         data.deleteCompendiums = this.deleteCompendiums;
         data.showImportOptions = this.showImportOptions;
         data.disableImportButton = this.disableImportButton;
@@ -142,9 +144,9 @@ export class Import extends Application {
             data.filesImported = " (" + (this.parsedFiles.length + 1) + "/" + this.supportedDataFiles.length + ")";
         }
 
-        const {owner, repo, branch} = this.githubConfig;
+        const {owner, repo, branch, version} = this.githubConfig;
         data.info = {
-            version: "Temporary Database",
+            version,
             versionLink: `https://www.github.com/${owner}/${repo}/tree/${branch}/Chummer/data`
         };
 
@@ -236,7 +238,7 @@ export class Import extends Application {
         const { owner, repo, branch } = this.githubConfig;
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
 
-        const attempts = 5;
+        const attempts = 3;
         const delayMs = 2000;
 
         for (let i = 0; i < attempts; i++) {
@@ -295,6 +297,7 @@ export class Import extends Application {
                 const result = await getTextForFile(fileName);
                 if (!result) continue;
                 const { text, name } = result;
+                if (!text) continue;
 
                 this.currentParsedFile = name;
                 await this.render();
