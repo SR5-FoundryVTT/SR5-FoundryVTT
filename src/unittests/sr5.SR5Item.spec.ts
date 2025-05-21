@@ -6,7 +6,9 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     /**
      * Setup handling for all items within this test.
      */
-        const {describe, it, assert, before, after} = context;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
+
     let testItem;
 
     before(async () => {
@@ -27,7 +29,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.notStrictEqual(item.id, null);
 
             // Check foundry item collection integrity
-            const itemFromCollection = game.items?.get(item.id);
+            const itemFromCollection = game.items.get(item.id);
             assert.notStrictEqual(itemFromCollection, null);
             assert.strictEqual(item.id, itemFromCollection?.id);
         });

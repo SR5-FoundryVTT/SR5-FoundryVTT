@@ -15,6 +15,24 @@ declare global {
         socket: never; // disable socket ready checks
     }
 
+    interface AssumeHookRan {
+        i18nReady: never;
+        ready: never;
+        init: never;
+        setup: never;
+    }
+
+    interface System {
+        id: "shadowrun5e";
+    }
+
+    interface ReadyGame {
+        shadowrun5e: Record<string, unknown>;
+        action_manager?: any;
+    }
+
+    interface CONFIG {}
+
     // Configuration of shadowrun5e system
     interface SourceConfig {
         Item: ShadowrunItemData;
@@ -24,6 +42,14 @@ declare global {
     interface DataConfig {
         Item: ShadowrunItemData;
         Actor: ShadowrunActorData;
+    }
+
+    interface FlagConfig {
+        ChatMessage: {
+            shadowrun5e: {
+                [key: string]: unknown;
+            }
+        }
     }
 
     interface DocumentClassConfig {
@@ -67,5 +93,28 @@ declare global {
         localize(stringId: Translation): string;
 
         format(stringId: Translation, data?: Record<string, unknown>): string;
+    }
+
+    interface SettingConfig {
+        "shadowrun5e.applyLimits": boolean;
+        "shadowrun5e.diagonalMovement": string;
+        "shadowrun5e.GlobalDataStorage": Record<string, unknown>;
+        "shadowrun5e.showGlitchAnimation": boolean;
+        "shadowrun5e.systemMigrationVersion": string;
+        "shadowrun5e.showTokenNameInsteadOfActor": boolean;
+        "shadowrun5e.onlyAllowRollOnDefaultableSkills": boolean;
+        "shadowrun5e.showSkillsWithDetails": boolean;
+        "shadowrun5e.onlyAutoRollNPCInCombat": boolean;
+        "shadowrun5e.tokenHealthBars": boolean;
+        "shadowrun5e.HideGMOnlyChatContent": boolean;
+        "shadowrun5e.MustConsumeRessourcesOnTest": boolean;
+        "shadowrun5e.UseDamageCondition": boolean;
+        "shadowrun5e.AutomateMultiDefenseModifier": boolean;
+        "shadowrun5e.AutomateProgressiveRecoil": boolean;
+        "shadowrun5e.ManualRollOnSuccessTest": boolean;
+        "shadowrun5e.DefaultOpposedTestActorSelection": boolean;
+        "shadowrun5e.MarkImports": string;
+        "shadowrun5e.ImportIconFolder": string;
+        "shadowrun5e.UseImportIconOverrides": boolean;
     }
 }

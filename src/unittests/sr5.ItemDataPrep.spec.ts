@@ -10,7 +10,8 @@ import { RangePrep } from "../module/item/prep/functions/RangePrep";
  * Tests involving data preparation for SR5Item types.
  */
 export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testItem: SR5TestingDocuments<SR5Item>;
     let testActor: SR5TestingDocuments<SR5Actor>;
@@ -98,9 +99,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const weapon = new SR5Item({type: 'weapon', name: 'Test'});
             // unique names are necessary
             const mods: SR5Item[] = [];
-            //@ts-expect-error
             mods.push(new SR5Item({type: 'modification', name: 'TestModA', system: {type: 'weapon', dice_pool: 2}}));
-            //@ts-expect-error
             mods.push(new SR5Item({type: 'modification', name: 'TestModB', system: {type: 'weapon', dice_pool: 4}}));
 
             ActionPrep.prepareWithMods(weapon.system.action as Shadowrun.ActionRollData, mods);
@@ -113,9 +112,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const weapon = new SR5Item({type: 'weapon', name: 'Test'});
             // unique names are necessary
             const mods: SR5Item[] = [];
-            //@ts-expect-error
             mods.push(new SR5Item({type: 'modification', name: 'TestModA', system: {type: 'weapon', accuracy: 2}}));
-            //@ts-expect-error
             mods.push(new SR5Item({type: 'modification', name: 'TestModB', system: {type: 'weapon', accuracy: 4}}));
 
             ActionPrep.prepareWithMods(weapon.system.action as Shadowrun.ActionRollData, mods);
@@ -126,7 +123,6 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
         it('Check for ammo to apply its damage to the weapon', async () => {
             const weapon = new SR5Item({type: 'weapon', name: 'Test'});
-            //@ts-expect-error
             const ammo = new SR5Item({type: 'ammo', name: 'TestModA', system: {damage: 2}});
             
             ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
@@ -137,7 +133,6 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
         it('Check for ammo to modify the weapon armor piercing', async () => {
             const weapon = new SR5Item({type: 'weapon', name: 'Test'});
-            //@ts-expect-error
             const ammo = new SR5Item({type: 'ammo', name: 'TestModA', system: {ap: -2}});
             
             ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
@@ -147,14 +142,12 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Check for ammo to override the weapon damage info', async () => {
-            //@ts-expect-error
             const weapon = new SR5Item({type: 'weapon', name: 'Test', system: {action: 
                 {damage: {
                     element: {value: 'fire'}, 
                     base: 3,
                     type: {base: 'physical'}
             }}}});
-            //@ts-expect-error
             const ammo = new SR5Item({type: 'ammo', name: 'TestModA', system: {replaceDamage: true, damage: 2, damageType: 'stun', element: 'cold'}});
             
             ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
@@ -171,10 +164,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
     describe('RangeData preparation', () => {
         it('Check for weapon modification recoil modifiers' , async () => {
-            //@ts-expect-error
             const weapon = new SR5Item({type: 'weapon', name: 'Test', system: {range: {rc: {base: 2}}}}) as unknown as Shadowrun.WeaponItemData;
             const mods: SR5Item[] = [];
-            //@ts-expect-error
             mods.push(new SR5Item({type: 'modification', name: 'TestModA', system: {type: 'weapon', rc: 2}}));
 
             RangePrep.prepareRecoilCompensation(weapon.system.range, mods);

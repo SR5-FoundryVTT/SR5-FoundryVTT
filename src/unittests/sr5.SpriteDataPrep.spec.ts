@@ -4,7 +4,8 @@ import { SR5TestingDocuments } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, before, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testActor;
     let testItem;

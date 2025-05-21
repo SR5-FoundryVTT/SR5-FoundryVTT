@@ -29,14 +29,12 @@ export const registerSystemSettings = () => {
         config: true,
         type: String,
         default: 'EUCL',
-        // @ts-expect-error TODO: foundry-vtt-types v10
         choices: {
             '1-1-1': 'SETTINGS.IgnoreDiagonal',
             '1-2-1': 'SETTINGS.EstimateDiagonal',
             'EUCL': 'SETTINGS.Euclidean',
         },
         onChange: (rule) => {
-            // @ts-expect-error canvas grid should not be undefined here...
             // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
             canvas.grid.diagonalRule = rule
         },
@@ -223,7 +221,6 @@ export const registerSystemSettings = () => {
         config: true,
         type: String,
         default: 'BOTH',
-        // @ts-expect-error TODO: foundry-vtt-types v10
         choices: {
             'BOTH': 'SETTINGS.FreshColorAndIcon',
             'COLOR': 'SETTINGS.FreshColor',

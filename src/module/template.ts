@@ -133,7 +133,6 @@ export default class Template extends MeasuredTemplate {
     async _finishPlacement(event) {
         if (!canvas.stage || !canvas.app) return;
 
-        // @ts-expect-error TEST
         this.layer._onDragLeftCancel(event);
         canvas.stage.off("mousemove", this.#events.move);
         canvas.stage.off("mousedown", this.#events.confirm);
@@ -155,11 +154,8 @@ export default class Template extends MeasuredTemplate {
         const now = Date.now(); // Apply a 20ms throttle
         if (now - this.#moveTime <= 20) return;
         const center = event.data.getLocalPosition(this.layer);
-        // @ts-expect-error TODO: foundry-vtt-types v11
         const interval = canvas.grid.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
-        // @ts-expect-error TODO: foundry-vtt-types v11
         const snapped = canvas.grid.getSnappedPosition(center.x, center.y, interval);
-        // @ts-expect-error TODO: foundry-vtt-types v11
         this.document.updateSource({ x: snapped.x, y: snapped.y });
         this.refresh();
         this.#moveTime = now;
@@ -174,12 +170,9 @@ export default class Template extends MeasuredTemplate {
     _onRotatePlacement(event) {
         if (event.ctrlKey) event.preventDefault(); // Avoid zooming the browser window
         event.stopPropagation();
-        // @ts-expect-error TODO: foundry-vtt-types v11
         const delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
         const snap = event.shiftKey ? delta : 5;
-        // @ts-expect-error TODO: foundry-vtt-types v11
         const update = { direction: this.document.direction + (snap * Math.sign(event.deltaY)) };
-        // @ts-expect-error TODO: foundry-vtt-types v11
         this.document.updateSource(update);
         this.refresh();
     }
@@ -192,13 +185,9 @@ export default class Template extends MeasuredTemplate {
      */
     async _onConfirmPlacement(event) {
         await this._finishPlacement(event);
-        // @ts-expect-error TODO: foundry-vtt-types v11
         const interval = canvas.grid.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
-        // @ts-expect-error TODO: foundry-vtt-types v11
         const destination = canvas.grid.getSnappedPosition(this.document.x, this.document.y, interval);
-        // @ts-expect-error TODO: foundry-vtt-types v11
         this.document.updateSource(destination);
-        // @ts-expect-error TODO: foundry-vtt-types v11
         this.#events.resolve(canvas.scene.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]));
     }
 

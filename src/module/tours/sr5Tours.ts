@@ -1,6 +1,5 @@
 import { SR5Actor } from "../actor/SR5Actor";
 
-// @ts-expect-error
 export default class Sr5Tour extends Tour {
     //the type of actor that should be created for the tour
     actorType: String;
@@ -18,9 +17,7 @@ export default class Sr5Tour extends Tour {
         //create actor if needed
         if(this.actor == undefined) {
             this.actor = new SR5Actor.implementation({
-                //@ts-expect-error
                 name: "Tour " + this.id,
-                // @ts-expect-error
                 type: this.config.actorType,
                 ownership: {
                     default: 3
@@ -38,9 +35,8 @@ export default class Sr5Tour extends Tour {
         }
     }
 
-    /** @override */
-    async complete() {
+    override async complete() {
         await this.actor?.sheet?.close()
         return super.complete()
-      }
+    }
 }

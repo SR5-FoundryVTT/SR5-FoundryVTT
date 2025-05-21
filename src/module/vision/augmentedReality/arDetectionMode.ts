@@ -3,12 +3,9 @@
 
 import AugmentedRealityVisionFilter from "./arFilter";
 
-//@ts-expect-error
 export default class AugmentedRealityVisionDetectionMode extends DetectionMode {
 
-  //@ts-expect-error
   static override getDetectionFilter() {
-    //@ts-expect-error
     return this._detectionFilter ??= AugmentedRealityVisionFilter.create();
 
     // return this._detectionFilter ??= GlowOverlayFilter.create({
@@ -16,7 +13,6 @@ export default class AugmentedRealityVisionDetectionMode extends DetectionMode {
     // });
   }
   
-    //@ts-expect-error
     override _canDetect(visionSource, target) {
       const tgt = target?.document;
       const targetHasIcon =

@@ -11,7 +11,8 @@ import DamageElement = Shadowrun.DamageElement;
 import DamageData = Shadowrun.DamageData;
 
 export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     before(async () => {})
     after(async () => {})

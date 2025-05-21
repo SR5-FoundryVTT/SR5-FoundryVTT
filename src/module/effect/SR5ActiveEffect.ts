@@ -1,9 +1,9 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
-import { EffectChangeData, EffectChangeDataSource } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import { SYSTEM_NAME } from "../constants";
 import { SR5Item } from "../item/SR5Item";
 import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
+import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs";
 
 
 
@@ -44,7 +44,6 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     public get source(): SR5Actor | SR5Item | null {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         return this.origin ? fromUuidSync(this.origin) : null;
     }
 
@@ -126,7 +125,6 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (value === undefined) return null;
 
         // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
-        //@ts-expect-error // TODO: foundry-vtt-types
         return super._applyAdd(actor, change, current, delta, changes);
     }
 
@@ -152,7 +150,6 @@ export class SR5ActiveEffect extends ActiveEffect {
             return null;
         }
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         return super._applyOverride(actor, change, current, delta, changes);
     }
 
@@ -357,11 +354,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         const changes = {};
         switch (change.mode) {
             case modes.ADD:
-                //@ts-expect-error TODO: foundry-vtt-types v10
                 this._applyAdd(object, change, current, delta, changes);
                 break;
             case modes.MULTIPLY:
-                //@ts-expect-error TODO: foundry-vtt-types v10
                 this._applyMultiply(object, change, current, delta, changes);
                 break;
             case modes.OVERRIDE:
@@ -369,7 +364,6 @@ export class SR5ActiveEffect extends ActiveEffect {
                 break;
             case modes.UPGRADE:
             case modes.DOWNGRADE:
-                //@ts-expect-error TODO: foundry-vtt-types v10
                 this._applyUpgrade(object, change, current, delta, changes);
                 break;
             default:

@@ -121,7 +121,6 @@ export class LinksHelpers {
         try {
             if (document instanceof SR5Item || document instanceof SR5Actor || document instanceof JournalEntry) {
                 document.sheet?.render(true);
-                // @ts-expect-error TODO: foundry-vtt-types v10
             } else if (document instanceof JournalEntryPage) {
                 document.parent.sheet.render(true, { pageId: document.id, anchor: anchor ?? undefined });
             } else {

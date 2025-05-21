@@ -5,7 +5,8 @@ import {TestCreator} from "../module/tests/TestCreator";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testActor;
     let testItem;

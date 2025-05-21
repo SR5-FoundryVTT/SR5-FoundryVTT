@@ -132,7 +132,6 @@ export class SR5BaseActorSheet extends ActorSheet {
     selectedInventory: string;
 
     constructor(...args) {
-        // @ts-expect-error // Since we don't need any actual data, don't define args to avoid breaking changes.
         super(...args);
 
         // Preselect default inventory.
@@ -222,9 +221,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data = {
             ...data,
-            // @ts-expect-error TODO: foundry-vtt-types v10
             data: actorData.system,
-            // @ts-expect-error TODO: foundry-vtt-types v10
             system: actorData.system
         }
 
@@ -253,11 +250,9 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.contentVisibility = this._prepareContentVisibility(data);
 
-        // @ts-expect-error TODO: foundry-vtt-types v10
         data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
             // secrets: this.actor.isOwner,
             // rollData: this.actor.getRollData.bind(this.actor),
-            // @ts-expect-error TODO: foundry-vtt-types v10
             relativeTo: this.actor
         });
 
@@ -933,7 +928,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._addInventoryTypes(inventoriesSheet[this.actor.defaultInventory.name]);
 
         Object.values(this.actor.system.inventories).forEach(inventory => {
-            const { name, label, itemIds } = inventory
+            const { name, label, itemIds } = inventory;
 
             // Avoid re-adding default inventories.
             if (!inventoriesSheet.hasOwnProperty(name)) {
@@ -1087,7 +1082,6 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
-        // @ts-expect-error
         sheetItem.properties = chatData.properties;
 
         return sheetItem as unknown as SheetItemData;
@@ -1335,7 +1329,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._delays.skills = setTimeout(() => {
             this._filters.skills = event.currentTarget.value;
             this.render();
-            //@ts-expect-error TODO: foundry-vtt-types v10. Add to typing.
         }, game.shadowrun5e.inputDelay);
     }
 

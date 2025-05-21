@@ -103,7 +103,7 @@ export const registerBasicHelpers = () => {
     Handlebars.registerHelper('empty', function (value) {
         if (foundry.utils.getType(value) === 'Array') return value.length === 0;
         if (foundry.utils.getType(value) === 'Object') return Object.keys(value).length === 0;
-        if (foundry.utils.getType(value) === 'String') return value.length === 0;
+        if (foundry.utils.getType(value) === 'string') return value.length === 0;
     });
     Handlebars.registerHelper('not', function (v1) {
         return !v1;

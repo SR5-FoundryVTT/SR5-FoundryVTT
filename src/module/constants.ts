@@ -56,7 +56,7 @@ export const FLAGS = {
     TeamworkTestFlow: 'TeamworkTestFlow',
     UseDamageCondition: 'UseDamageCondition',
     GlobalDataStorage: 'GlobalDataStorage'
-};
+} as const;
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
     RollMode: 'rollMode'

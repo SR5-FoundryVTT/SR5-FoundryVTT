@@ -10,7 +10,8 @@ import { SkillTest } from "../module/tests/SkillTest";
 import { Helpers } from "../module/helpers";
 
 export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, before, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testActor;
     let testItem;
@@ -558,7 +559,6 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            // @ts-expect-error DeepPartial fails for partial sub object literals
             const action = DataDefaults.actionRollData({ test: SkillTest.name, limit: {attribute: 'social'} });
             const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
 

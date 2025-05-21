@@ -52,7 +52,7 @@ import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
-import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
+import DocumentModificationOptions from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
 import { SinPrep } from './prep/SinPrep';
@@ -328,12 +328,9 @@ export class SR5Item extends Item {
 
         const props = [];
         // Add additional chat data fields depending on item type.
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
         const chatDataForItemType = ChatData[this.type];
         if (chatDataForItemType) chatDataForItemType(system, labels, props, this);
 
-        //@ts-expect-error // This is a hacky monkey patch solution to add a property to the item data
-        //              that's not actually defined in any SR5Item typing.
         system.properties = props.filter((p) => !!p);
 
         return system;
@@ -751,7 +748,6 @@ export class SR5Item extends Item {
     static getTargets() {
         if (!game.ready || !game.user) return;
         const { character } = game.user;
-        // @ts-expect-error
         const { controlled } = canvas.tokens;
         const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
         if (character && controlled.length === 0) targets.push(character);
@@ -825,7 +821,6 @@ export class SR5Item extends Item {
         // Merge and overwrite existing owned items with new changes.
         const tempItems = items.map((item) => {
             // Set user permissions to owner, to allow none-GM users to edit their own nested items.
-            //@ts-expect-error v10
             const data = game.user ? { ownership: { [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER } } :
                 {};
             item = foundry.utils.mergeObject(item, data);
@@ -1661,7 +1656,6 @@ export class SR5Item extends Item {
         await super._preCreate(changed, options, user);
 
         // Don't kill DocumentData by applying empty objects. Also performance.
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (!foundry.utils.isEmpty(applyData)) await this.update(applyData);
     }
 
@@ -1670,7 +1664,7 @@ export class SR5Item extends Item {
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-    override async _preUpdate(changed, options: DocumentModificationOptions, user: User) {
+    override async _preUpdate(changed, options, user: User) {
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff !== false && options.recursive !== false) {

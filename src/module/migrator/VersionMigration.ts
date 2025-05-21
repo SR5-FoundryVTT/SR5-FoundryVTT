@@ -138,7 +138,6 @@ export abstract class VersionMigration {
      * @param entityUpdates
      */
     protected async IterateScenes(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        // @ts-expect-error // ignore null state
         for (const scene of game.scenes.contents) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
@@ -159,10 +158,8 @@ export abstract class VersionMigration {
                 // Migrate embedded TokenDocument / ActorData within SceneData
                 for (const token of scene.tokens) {
                     // Don't migrate tokens without or a linked actor.
-                    // @ts-expect-error TODO: foundry-vtt-types v10
                     if (!token.actor || token.actorLink) continue;
-                    
-                    //@ts-expect-error // TODO: foundry-vtt-types v10
+
                     if (foundry.utils.isEmpty(token.actor)) continue;
 
                     const updateData = await this.MigrateActorData(token.actor);
@@ -175,7 +172,6 @@ export abstract class VersionMigration {
                     });
                 }
 
-                //@ts-expect-error // TODO: foundry-vtt-types v10
                 if (foundry.utils.isEmpty(updateData)) {
                     continue;
                 }
@@ -198,7 +194,6 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateItems(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        // @ts-expect-error // ignore null state
         for (const item of game.items.contents) {
             try {
                 if (!(await this.ShouldMigrateItemData(item))) {
@@ -208,7 +203,6 @@ export abstract class VersionMigration {
                 console.log(`Migrating Item: ${item.name}`);
                 const updateData = await this.MigrateItemData(item);
 
-                //@ts-expect-error // TODO: foundry-vtt-types v10
                 if (foundry.utils.isEmpty(updateData)) {
                     continue;
                 }
@@ -231,7 +225,6 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateActors(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        // @ts-expect-error // ignore null state
         for (const actor of game.actors.contents) {
             try {
                 if (!(await this.ShouldMigrateActorData(actor))) {
@@ -396,10 +389,8 @@ export abstract class VersionMigration {
             try {
                 let updateData: any = null;
                 if (pack.metadata.type === 'Item') {
-                    // @ts-expect-error // TODO: vtt-types v9 document.data.type check added to type gate... but didn't work
                     updateData = await this.MigrateItemData(document);
 
-                    //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
                         continue;
                     }
@@ -410,10 +401,8 @@ export abstract class VersionMigration {
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
-                    //@ts-expect-error
                     updateData = await this.MigrateActorData(document);
 
-                    //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
                         continue;
                     }
@@ -434,7 +423,6 @@ export abstract class VersionMigration {
                 } else if (pack.metadata.type === 'Scene') {
                     updateData = await this.MigrateSceneData(document as unknown as Scene);
 
-                    //@ts-expect-error // TODO: foundry-vtt-types v10
                     if (foundry.utils.isEmpty(updateData)) {
                         continue;
                     }

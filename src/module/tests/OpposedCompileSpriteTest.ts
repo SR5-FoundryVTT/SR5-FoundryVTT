@@ -157,7 +157,6 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
         users.forEach(user => {
             if (user.isGM) return;
             // #TODO: Add a setting to define that this should be done and what permission it should be done with.
-            //@ts-expect-error v10
             ownership[user.id] = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
         })
         updateData['ownership'] = ownership

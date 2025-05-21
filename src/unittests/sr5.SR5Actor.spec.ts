@@ -4,8 +4,10 @@ import {SR5Item} from "../module/item/SR5Item";
 import {SR5TestingDocuments} from "./utils";
 
 export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
-    let  testActor;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
+
+    let testActor;
     let testItem;
 
     before(async () => {

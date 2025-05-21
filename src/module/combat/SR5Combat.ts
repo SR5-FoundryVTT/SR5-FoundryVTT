@@ -263,7 +263,6 @@ export class SR5Combat extends Combat {
         for (let [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            // @ts-expect-error
             if (!combatant.defeated && combatant.initiative > 0) {
                 return turnInPass;
             }
@@ -280,7 +279,6 @@ export class SR5Combat extends Combat {
         for (let [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            // @ts-expect-error
             if (combatant.initiative > 0) {
                 return turnInPass;
             }
@@ -388,9 +386,7 @@ export class SR5Combat extends Combat {
         return this;
     }
 
-    //@ts-expect-error TODO: foundry-vtt-types v11
     override _playCombatSound(name: string) {
-    //@ts-expect-error TODO: foundry-vtt-types v11
         super._playCombatSound(name)
     }
 

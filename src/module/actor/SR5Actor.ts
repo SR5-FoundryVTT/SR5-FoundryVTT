@@ -16,9 +16,6 @@ import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
 import {SkillRules} from "../rules/SkillRules";
 import {MatrixRules} from "../rules/MatrixRules";
 import {ICPrep} from "./prep/ICPrep";
-import {
-    EffectChangeData
-} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import {InventoryFlow} from "./flows/InventoryFlow";
 import {ModifierFlow} from "./flows/ModifierFlow";
 import {TestCreator} from "../tests/TestCreator";
@@ -30,6 +27,7 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { EffectChangeData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs';
 
 
 /**
@@ -181,7 +179,6 @@ export class SR5Actor extends Actor {
      * 
      * NOTE: FoundryVTT applyActiveEffects will check for disabled effects.
      */
-    //@ts-expect-error TODO: foundry-vtt-types v10
     override *allApplicableEffects() {
         for (const effect of allApplicableDocumentEffects(this, {applyTo: ['actor', 'targeted_actor']})) {
             yield effect;
@@ -203,9 +200,7 @@ export class SR5Actor extends Actor {
      * 
      * NOTE: Foundry also shows disabled effects by default. We behave the same.
      */
-    // @ts-expect-error NOTE: I don't fully understand the typing here.
     override get temporaryEffects() {
-        // @ts-expect-error // TODO: foundry-vtt-types v10
         const showEffectIcon = (effect: SR5ActiveEffect) => !effect.disabled && !effect.isSuppressed && effect.isTemporary && effect.appliesToLocalActor;
 
         // Collect actor effects.
@@ -274,9 +269,7 @@ export class SR5Actor extends Actor {
             return changes.concat(effect.data.changes
                 .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
                 .map(change => {
-                    // @ts-expect-error // Foundry internal code, duplicate doesn't like EffectChangeData
                     change = foundry.utils.duplicate(change);
-                    // @ts-expect-error
                     change.effect = effect;
                     change.priority = change.priority ?? (change.mode * 10);
 
@@ -284,11 +277,9 @@ export class SR5Actor extends Actor {
                 }));
         }, []);
         // Sort changes according to priority, in case it's ever needed.
-        // @ts-expect-error // a / b can't be null here...
         changes.sort((a, b) => a.priority - b.priority);
 
         for (const change of changes) {
-            // @ts-expect-error
             change.effect.apply(this, change);
         }
     }
@@ -311,7 +302,6 @@ export class SR5Actor extends Actor {
         const overrides = {};
 
         for (const change of changes) {
-            // @ts-expect-error
             const result = change.effect.apply(this, change);
             if (result !== null) overrides[change.key] = result;
         }
@@ -332,9 +322,7 @@ export class SR5Actor extends Actor {
             return changes.concat(effect.data.changes
                 .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
                 .map(change => {
-                    // @ts-expect-error // Foundry internal code, duplicate doesn't like EffectChangeData
                     change = foundry.utils.duplicate(change);
-                    // @ts-expect-error
                     change.effect = effect;
                     change.priority = change.priority ?? (change.mode * 10);
 
@@ -342,7 +330,6 @@ export class SR5Actor extends Actor {
                 }));
         }, []);
         // Sort changes according to priority, in case it's ever needed.
-        // @ts-expect-error // TODO: foundry-vtt-types v10
         changes.sort((a, b) => a.priority - b.priority);
 
         return changes;
@@ -916,7 +903,6 @@ export class SR5Actor extends Actor {
         if (skill.name === '' && skill.label !== undefined && skill.label !== '') {
             await this.hideSkill(skillId);
             // NOTE: For some reason unlinked token actors won't cause a render on update?
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             if (!this.prototypeToken.actorLink)
                 await this.sheet?.render();
             return;
@@ -979,7 +965,6 @@ export class SR5Actor extends Actor {
 
         await this.update(updateData);
         // NOTE: For some reason unlinked token actors won't cause a render on update?
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (!this.prototypeToken.actorLink)
             await this.sheet?.render();
     }
@@ -1262,7 +1247,6 @@ export class SR5Actor extends Actor {
      * @param key
      * @param value
      */
-    //@ts-expect-error // TODO: foundry-vtt-types v10
     setFlag(scope: string, key: string, value: any): Promise<any> {
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
@@ -1273,7 +1257,6 @@ export class SR5Actor extends Actor {
      * @param scope
      * @param key
      */
-    //@ts-expect-error // TODO: foundry-vtt-types v10
     getFlag(scope: string, key: string): any {
         const data = super.getFlag(scope, key);
         return Helpers.onGetFlag(data);
@@ -1300,7 +1283,6 @@ export class SR5Actor extends Actor {
      * There is no need for a token to placed. The prototype token is enough.
      */
     _isLinkedToToken(): boolean {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         // If an actor is linked, all it's copies also contain this linked status, even if they're not.
         return this.prototypeToken.actorLink && !this.token;
     }
@@ -1331,7 +1313,6 @@ export class SR5Actor extends Actor {
     }
 
     getActivePlayerOwners(): User[] {
-        // @ts-expect-error
         return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
@@ -1688,7 +1669,6 @@ export class SR5Actor extends Actor {
         const existing = this.effects.reduce((arr, e) => {
             // @ts-expect-error TODO: foundry-vtt-types v10
             if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
-                // @ts-expect-error
                 arr.push(e.id);
             }
             return arr;
@@ -1717,7 +1697,6 @@ export class SR5Actor extends Actor {
         // Remove out old defeated effects.
         if (removeStatus.length) {
             const existing = this.effects.reduce((arr, e) => {
-                // @ts-expect-error TODO: foundry-vtt-types v10
                 if ( (e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status)) ) arr.push(e.id);
                 return arr; 
             }, []);

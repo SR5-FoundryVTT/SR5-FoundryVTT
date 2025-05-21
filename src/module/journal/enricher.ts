@@ -17,7 +17,6 @@ export class JournalEnrichers {
         const closing = "(\\]|\\))";
         const threshold = "\\s*(\\d*)"; 
 
-        //@ts-expect-error
         CONFIG.TextEditor.enrichers.push(
             {
                 pattern: new RegExp(`\\@(${JournalEnrichers.actorKeywords.join("|")})${opening}([a-z]+)${threshold}${closing}`, "g"),

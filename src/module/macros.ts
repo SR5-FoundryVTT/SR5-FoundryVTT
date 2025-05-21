@@ -27,7 +27,6 @@ export async function createItemMacro(dropData, slot) {
     if (!macro) {
         macro = await Macro.create(
             {
-                //@ts-expect-error
                 name: item.name,
                 type: 'script',
                 img: item.img,

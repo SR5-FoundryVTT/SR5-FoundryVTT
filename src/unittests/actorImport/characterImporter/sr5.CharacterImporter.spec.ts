@@ -5,7 +5,8 @@ import { SR5Actor } from '../../../module/actor/SR5Actor';
 import { SR5Item } from '../../../module/item/SR5Item';
 
 export const characterImporterTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, before, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testActor;
     let importOptions = {};

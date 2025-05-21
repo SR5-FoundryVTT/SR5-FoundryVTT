@@ -393,7 +393,6 @@ export class Helpers {
         
         const distanceInGridUnits3D = Math.round(Helpers.measurePointDistance(origin3D, dest3D));
 
-        //@ts-expect-error TODO: foundry-vtt-types v10
         const sceneUnit = canvas.scene.grid.units;
         return Helpers.convertLengthUnit(distanceInGridUnits3D, sceneUnit);
     }
@@ -820,7 +819,6 @@ export class Helpers {
 
         return game.users.filter(user => {
             if (user.isGM) return false;
-            // @ts-expect-error // Check for permissions. String is allowed
             if (!document.testUserPermission(user, permission)) return false;
             // Check for active state.
             if (active && !user.active) return false;
@@ -867,7 +865,6 @@ export class Helpers {
      */
     static async getEntityFromCollection(collection: string, id: string): Promise<Document> {
         const pack = game.packs.find((p) => p.collection === collection);
-        // @ts-expect-error // All Document types COULD be returned...
         return await pack.getDocument(id);
     }
 
@@ -1006,7 +1003,6 @@ export class Helpers {
         if (!document) return;
         if (document instanceof TokenDocument && resolveTokenToActor && document.actor)
             document = document.actor;
-        // @ts-expect-error
         await document.sheet.render(true);
     }
 

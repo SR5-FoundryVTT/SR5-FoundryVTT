@@ -8,7 +8,7 @@ import { Translation } from '../../utils/strings';
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
 
-    override get document(): SR5Actor {
+    get document(): SR5Actor {
         return super.document as SR5Actor;
     }
 
@@ -21,7 +21,7 @@ export class SkillEditSheet extends DocumentSheet {
         return `system.skills.active.${this.skillId}`;
     }
 
-    static override get defaultOptions() {
+    static get defaultOptions() {
         const options = super.defaultOptions;
         return foundry.utils.mergeObject(options, {
             id: 'skill-editor',
@@ -36,7 +36,7 @@ export class SkillEditSheet extends DocumentSheet {
         });
     }
 
-    override get title(): string {
+    get title(): string {
         const label = this.document.getSkillLabel(this.skillId);
         return `${game.i18n.localize('SR5.EditSkill')} - ${game.i18n.localize(label as Translation)}`;
     }
@@ -102,7 +102,6 @@ export class SkillEditSheet extends DocumentSheet {
 
 
     /** @override */
-    // @ts-expect-error // SkillEditSheet vs DocumentSheet typing, I don't quite get it...
     async _updateObject(event, formData) {
         // Without an actual input field used, avoid a unneeded update...
         // ...the update would happen due to how _onUpdateObject works.
@@ -113,7 +112,7 @@ export class SkillEditSheet extends DocumentSheet {
         }
     }
 
-    override activateListeners(html) {
+    activateListeners(html) {
         super.activateListeners(html);
 
         /**
@@ -142,7 +141,7 @@ export class SkillEditSheet extends DocumentSheet {
         await this.document.update(updateData);
     }
 
-    override async _onDrop(event) {
+    async _onDrop(event) {
         if (!game.items || !game.actors || !game.scenes) return;
 
         event.preventDefault();
@@ -217,11 +216,9 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
-    // @ts-expect-error // Missing DocumentSheetData typing
     getData(): SkillEditFormData {
         const data = super.getData();
 
-        //@ts-expect-error TODO: foundry-vtt-types v10'
         // skill property will hold a direct skill reference
         data['skill'] = foundry.utils.getProperty(data.data, this._updateString());
         data['editable_name'] = this._allowSkillNameEditing();

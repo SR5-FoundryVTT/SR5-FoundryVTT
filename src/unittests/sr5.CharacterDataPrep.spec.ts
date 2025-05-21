@@ -10,7 +10,8 @@ import VehicleActorData = Shadowrun.VehicleActorData;
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
 export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, before, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testActor;
     let testItem;

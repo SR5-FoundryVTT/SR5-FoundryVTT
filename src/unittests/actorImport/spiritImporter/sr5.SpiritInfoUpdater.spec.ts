@@ -5,7 +5,7 @@ import { SR5Actor } from '../../../module/actor/SR5Actor';
 import { emptySpirit } from './spirits';
 
 export const spiritInfoUpdaterTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, assert, before, beforeEach, after } = context;
 
     let testActorFactory;
     const actorType = 'spirit';

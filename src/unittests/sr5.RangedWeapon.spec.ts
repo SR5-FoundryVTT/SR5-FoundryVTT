@@ -10,7 +10,8 @@ import { SR5Item } from '../module/item/SR5Item';
  * @param context 
  */
 export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testActor;
     let testItem;

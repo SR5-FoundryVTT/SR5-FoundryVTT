@@ -677,7 +677,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.actor && this.data.sourceActorUuid) {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
             const document = await fromUuid(this.data.sourceActorUuid) || undefined;
-            // @ts-expect-error
             this.actor = document instanceof TokenDocument ?
                 document.actor :
                 document as SR5Actor;
@@ -1617,7 +1616,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
     async rollDiceSoNice() {
-        // @ts-expect-error
         if (!game.dice3d || !game.user || !game.users) return;
 
         console.debug('Shadowrun5e | Initiating DiceSoNice throw');
@@ -1644,7 +1642,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const blind = this.data.options?.rollMode === 'blindroll';
         const synchronize = this.data.options?.rollMode === 'publicroll';
 
-        // @ts-expect-error
         game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
@@ -1839,7 +1836,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        // @ts-expect-error TODO: Types Provide proper SuccessTestData and SuccessTestOptions
         ChatMessage.applyRollMode(messageData, this._rollMode);
 
         return messageData;

@@ -766,13 +766,9 @@ export const registerItemLineHelpers = () => {
      */
     Handlebars.registerHelper('EffectRightSide', function (effect: SR5ActiveEffect) {
         const getDurationLabel = () => {
-            // @ts-expect-error - duration is not typed correctly
             if (effect.duration.seconds) return `${effect.duration.seconds}s`;
-            // @ts-expect-error - duration is not typed correctly
             if (effect.duration.rounds && effect.duration.turns) return `${effect.duration.rounds}r, ${effect.duration.turns}t`;
-            // @ts-expect-error - duration is not typed correctly
             if (effect.duration.rounds) return `${effect.duration.rounds}r`;
-            // @ts-expect-error - duration is not typed correctly
             if (effect.duration.turns) return `${effect.duration.turns}t`;
 
             return '';
@@ -782,7 +778,7 @@ export const registerItemLineHelpers = () => {
             {
                 // Apply To Column
                 text: {
-                    text: game.i18n.localize(SR5.effectApplyTo[effect.applyTo]),
+                    text: game.i18n?.localize(SR5.effectApplyTo[effect.applyTo]),
                     cssClass: 'six',
                 }
             },

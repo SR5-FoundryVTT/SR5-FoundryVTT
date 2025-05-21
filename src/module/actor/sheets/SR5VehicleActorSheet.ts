@@ -122,7 +122,6 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        // @ts-expect-error
         device.sheet.render(true);
     }
 

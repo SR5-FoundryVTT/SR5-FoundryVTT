@@ -67,13 +67,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     linkedActor: SR5Actor | undefined
 
     // Action Items. (not only type = action)
-    //@ts-expect-error
     tests: typeof game.shadowrun5e.tests
-    // @ts-expect-error
     opposedTests: typeof game.shadowrun5e.opposedTests
-    // @ts-expect-error
     activeTests: typeof game.shadowrun5e.activeTests
-    // @ts-expect-error
     resistTests: typeof game.shadowrun5e.resistTests
 
     // Rendered description field
@@ -185,7 +181,6 @@ export class SR5ItemSheet extends ItemSheet {
 
         for (const itemType of itemTypes) {
             for (const item of itemType) {
-                // @ts-expect-error
                 item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value);
             }
         }
@@ -220,17 +215,14 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // Provide action parts with all test variants.
-        // @ts-expect-error // TODO: put 'opposed test types' into config (see data.config)
         data.tests = game.shadowrun5e.tests;
-        // @ts-expect-error
         data.opposedTests = game.shadowrun5e.opposedTests;
-        // @ts-expect-error
         data.activeTests = game.shadowrun5e.activeTests;
-        // @ts-expect-error
         data.resistTests = game.shadowrun5e.resistTests;
 
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
+        if (this.item.system.description)
+            data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
+
         data.sourceIsURL = this.item.sourceIsUrl;
         data.sourceIsPDF = this.item.sourceIsPDF;
         data.sourceIsUuid = this.item.sourceIsUuid
@@ -646,9 +638,7 @@ export class SR5ItemSheet extends ItemSheet {
             type: type,
             system: { type: 'weapon' }
         };
-        // @ts-expect-error
         const item = new SR5Item(itemData, { parent: this.item });
-        //@ts-expect-error TODO: foundry-vtt-types v10
         await this.item.createNestedItem(item._source);
     }
 
@@ -680,9 +670,7 @@ export class SR5ItemSheet extends ItemSheet {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type: type
         };
-        // @ts-expect-error
         const item = new SR5Item(itemData, { parent: this.item });
-        // @ts-expect-error TODO: foundry-vtt-types v10
         await this.item.createNestedItem(item._source);
     }
 
@@ -915,7 +903,6 @@ export class SR5ItemSheet extends ItemSheet {
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        // @ts-expect-error
         device.sheet.render(true);
     }
 

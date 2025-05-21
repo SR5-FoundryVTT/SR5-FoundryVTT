@@ -4,6 +4,7 @@
     "src/module/types/global.d.ts"
   ],
   "exclude": ["node_modules", "**/*.spec.ts"],
+  "name": "shadowrun5e",
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
@@ -16,6 +17,7 @@
     "skipLibCheck": true,
     "noEmitOnError": false,
     "noImplicitOverride": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "useDefineForClassFields": false,
   }
 }
