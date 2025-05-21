@@ -1,29 +1,29 @@
-import {Helpers} from '../helpers';
-import {SR5Item} from '../item/SR5Item';
-import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
-import {PartsList} from '../parts/PartsList';
-import {SR5Combat} from "../combat/SR5Combat";
-import {DataDefaults} from '../data/DataDefaults';
-import {SkillFlow} from "./flows/SkillFlow";
-import {SR5} from "../config";
-import {CharacterPrep} from "./prep/CharacterPrep";
-import {SR5ItemDataWrapper} from "../data/SR5ItemDataWrapper";
-import {CritterPrep} from "./prep/CritterPrep";
-import {SpiritPrep} from "./prep/SpiritPrep";
-import {SpritePrep} from "./prep/SpritePrep";
-import {VehiclePrep} from "./prep/VehiclePrep";
-import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
-import {SkillRules} from "../rules/SkillRules";
-import {MatrixRules} from "../rules/MatrixRules";
-import {ICPrep} from "./prep/ICPrep";
+import { Helpers } from '../helpers';
+import { SR5Item } from '../item/SR5Item';
+import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
+import { PartsList } from '../parts/PartsList';
+import { SR5Combat } from "../combat/SR5Combat";
+import { DataDefaults } from '../data/DataDefaults';
+import { SkillFlow } from "./flows/SkillFlow";
+import { SR5 } from "../config";
+import { CharacterPrep } from "./prep/CharacterPrep";
+import { SR5ItemDataWrapper } from "../data/SR5ItemDataWrapper";
+import { CritterPrep } from "./prep/CritterPrep";
+import { SpiritPrep } from "./prep/SpiritPrep";
+import { SpritePrep } from "./prep/SpritePrep";
+import { VehiclePrep } from "./prep/VehiclePrep";
+import { DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
+import { SkillRules } from "../rules/SkillRules";
+import { MatrixRules } from "../rules/MatrixRules";
+import { ICPrep } from "./prep/ICPrep";
 import {
     EffectChangeData
 } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
-import {InventoryFlow} from "./flows/InventoryFlow";
-import {ModifierFlow} from "./flows/ModifierFlow";
-import {TestCreator} from "../tests/TestCreator";
-import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
-import {RecoveryRules} from "../rules/RecoveryRules";
+import { InventoryFlow } from "./flows/InventoryFlow";
+import { ModifierFlow } from "./flows/ModifierFlow";
+import { TestCreator } from "../tests/TestCreator";
+import { AttributeOnlyTest } from "../tests/AttributeOnlyTest";
+import { RecoveryRules } from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
@@ -183,11 +183,11 @@ export class SR5Actor extends Actor {
      */
     //@ts-expect-error TODO: foundry-vtt-types v10
     override *allApplicableEffects() {
-        for (const effect of allApplicableDocumentEffects(this, {applyTo: ['actor', 'targeted_actor']})) {
+        for (const effect of allApplicableDocumentEffects(this, { applyTo: ['actor', 'targeted_actor'] })) {
             yield effect;
         }
 
-        for (const effect of allApplicableItemsEffects(this, {applyTo: ['actor']})) {
+        for (const effect of allApplicableItemsEffects(this, { applyTo: ['actor'] })) {
             yield effect;
         }
     }
@@ -316,7 +316,7 @@ export class SR5Actor extends Actor {
             if (result !== null) overrides[change.key] = result;
         }
 
-        this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
+        this.overrides = { ...this.overrides, ...foundry.utils.expandObject(overrides) };
     }
 
     /**
@@ -408,7 +408,7 @@ export class SR5Actor extends Actor {
 
         const uses = Math.min(edge.value, usesLeft + by);
 
-        await this.update({'system.attributes.edge.uses': uses});
+        await this.update({ 'system.attributes.edge.uses': uses });
     }
 
     getEdge(): Shadowrun.EdgeAttributeField {
@@ -425,10 +425,10 @@ export class SR5Actor extends Actor {
      * @param damage If given will be applied to the armor to get modified armor.
      * @returns Armor or modified armor.
      */
-    getArmor(damage?:Shadowrun.DamageData) {
+    getArmor(damage?: Shadowrun.DamageData) {
         // Prepare base armor data.
-        const armor = "armor" in this.system ? 
-            foundry.utils.duplicate(this.system.armor) : 
+        const armor = "armor" in this.system ?
+            foundry.utils.duplicate(this.system.armor) :
             DataDefaults.actorArmor();
         // Prepare damage to apply to armor.
         damage = damage || DataDefaults.damageData();
@@ -439,15 +439,15 @@ export class SR5Actor extends Actor {
         // Modify by penetration
         if (damage.ap.value !== 0)
             PartsList.AddUniquePart(armor.mod, 'SR5.AP', damage.ap.value);
-                
+
         // Modify by element
         if (damage.element.value !== '') {
             const armorForDamageElement = armor[damage.element.value] || 0;
             if (armorForDamageElement > 0)
                 PartsList.AddUniquePart(armor.mod, 'SR5.Element', armorForDamageElement);
         }
-        
-        Helpers.calcTotal(armor, {min: 0});
+
+        Helpers.calcTotal(armor, { min: 0 });
 
         return armor;
     }
@@ -479,12 +479,12 @@ export class SR5Actor extends Actor {
      * Amount of recoil compensation this actor has available (without the weapon used).
      */
     get recoilCompensation(): number {
-        if(!this.system.values.hasOwnProperty('recoil_compensation')) return 0;
+        if (!this.system.values.hasOwnProperty('recoil_compensation')) return 0;
         //@ts-expect-error
         return this.system.values.recoil_compensation.value;
     }
 
-    
+
     /**
      * Current recoil compensation with current recoil included.
      * 
@@ -493,12 +493,12 @@ export class SR5Actor extends Actor {
     get currentRecoilCompensation(): number {
         return Math.max(this.recoilCompensation - this.recoil, 0);
     }
-    
+
     /**
      * Amount of progressive recoil this actor has accrued.
      */
     get recoil(): number {
-        if(!this.system.values.hasOwnProperty('recoil')) return 0;
+        if (!this.system.values.hasOwnProperty('recoil')) return 0;
         //@ts-expect-error
         return this.system.values.recoil.value;
     }
@@ -537,6 +537,7 @@ export class SR5Actor extends Actor {
     }
 
     getLimit(name: string): Shadowrun.LimitField {
+        console.log("Limitname", name)
         const limits = this.getLimits();
         return limits[name];
     }
@@ -626,14 +627,14 @@ export class SR5Actor extends Actor {
         return this.system.skills.active;
     }
 
-    getNetworkController(): string|undefined {
-        if(!this.isVehicle()) return;
+    getNetworkController(): string | undefined {
+        if (!this.isVehicle()) return;
 
         return this.asVehicle()?.system?.networkController;
     }
 
-    async setNetworkController(networkController: string|undefined): Promise<void> {
-        if(!this.isVehicle()) return;
+    async setNetworkController(networkController: string | undefined): Promise<void> {
+        if (!this.isVehicle()) return;
 
         await this.update({ 'system.networkController': networkController });
     }
@@ -689,7 +690,7 @@ export class SR5Actor extends Actor {
      *                The property specialization will trigger the pool value to be raised by a specialization modifier
      *                The property byLabel will cause the param skillId to be interpreted as the shown i18n label.
      */
-    getPool(skillId: string, options = {specialization: false, byLabel: false}): number {
+    getPool(skillId: string, options = { specialization: false, byLabel: false }): number {
         const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
         if (!skill || !skill.attribute) return 0;
         if (!SkillFlow.allowRoll(skill)) return 0;
@@ -721,11 +722,12 @@ export class SR5Actor extends Actor {
      * @param id Either the searched id, name or translated label of a skill
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
-    getSkill(id: string, options = {byLabel: false}): Shadowrun.SkillField | undefined {
+    getSkill(id: string, options = { byLabel: false }): Shadowrun.SkillField | undefined {
+        console.log(id)
         if (options.byLabel)
             return this.getSkillByLabel(id);
 
-        const {skills} = this.system;
+        const { skills } = this.system;
 
         // Find skill by direct id to key matching.
         if (skills.active.hasOwnProperty(id)) {
@@ -765,7 +767,7 @@ export class SR5Actor extends Actor {
 
         for (const [id, skill] of Object.entries(skills.language.value)) {
             if (searchedFor === possibleMatch(skill))
-                return {...skill, id};
+                return { ...skill, id };
         }
 
         // Iterate over all different knowledge skill categories
@@ -775,7 +777,7 @@ export class SR5Actor extends Actor {
             const categorySkills = skills.knowledge[categoryKey].value as Shadowrun.SkillField[];
             for (const [id, skill] of Object.entries(categorySkills)) {
                 if (searchedFor === possibleMatch(skill))
-                    return {...skill, id};
+                    return { ...skill, id };
             }
         }
 
@@ -783,7 +785,7 @@ export class SR5Actor extends Actor {
             const label = possibleMatch(skill);
             console.log(`     • language[${id}] =`, label);
             if (searchedFor === possibleMatch(skill))
-                return {...skill, id};
+                return { ...skill, id };
         }
         console.warn("   ↪ getSkillByLabel(): no match found for", searchedFor);
     }
@@ -814,12 +816,12 @@ export class SR5Actor extends Actor {
      * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The id of the created knowledge skill.
      */
-    async addKnowledgeSkill(category: keyof Shadowrun.KnowledgeSkills, skill: Partial<Shadowrun.SkillField>={name: SKILL_DEFAULT_NAME}): Promise<string|undefined> {
+    async addKnowledgeSkill(category: keyof Shadowrun.KnowledgeSkills, skill: Partial<Shadowrun.SkillField> = { name: SKILL_DEFAULT_NAME }): Promise<string | undefined> {
         if (!this.system.skills.knowledge.hasOwnProperty(category)) {
             console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
             return;
         }
-        
+
         skill = DataDefaults.skillData(skill);
         const id = randomID(16);
         const value = {};
@@ -839,7 +841,7 @@ export class SR5Actor extends Actor {
      * @param skillData Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The new active skill id.
      */
-    async addActiveSkill(skillData: Partial<Shadowrun.SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
+    async addActiveSkill(skillData: Partial<Shadowrun.SkillField> = { name: SKILL_DEFAULT_NAME }): Promise<string | undefined> {
         const skill = DataDefaults.skillData(skillData);
 
         const activeSkillsPath = 'system.skills.active';
@@ -847,7 +849,7 @@ export class SR5Actor extends Actor {
 
         if (!updateSkillDataResult) return;
 
-        const {updateSkillData, id} = updateSkillDataResult;
+        const { updateSkillData, id } = updateSkillDataResult;
 
         await this.update(updateSkillData as object);
 
@@ -1007,7 +1009,7 @@ export class SR5Actor extends Actor {
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
         const testCls = this.tests._getTestClass('SuccessTest');
-        const test = new testCls({}, {actor: this}, {showDialog});
+        const test = new testCls({}, { actor: this }, { showDialog });
 
         // Build pool values.
         const pool = new PartsList<number>(test.pool.mod);
@@ -1032,7 +1034,7 @@ export class SR5Actor extends Actor {
      */
     async packActionTest(packName: Shadowrun.PackName, actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        return await this.tests.fromPackAction(packName, actionName, this, {showDialog});
+        return await this.tests.fromPackAction(packName, actionName, this, { showDialog });
     }
 
     /**
@@ -1078,17 +1080,17 @@ export class SR5Actor extends Actor {
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async rollSkill(skillId: string, options: Shadowrun.SkillRollOptions={}) {
+    async rollSkill(skillId: string, options: Shadowrun.SkillRollOptions = {}) {
         console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
 
         const action = this.skillActionData(skillId, options);
         if (!action) return;
-        if(options.threshold) {
+        if (options.threshold) {
             action.threshold = options.threshold
         }
 
         const showDialog = this.tests.shouldShowDialog(options.event);
-        const test = await this.tests.fromAction(action, this, {showDialog});
+        const test = await this.tests.fromAction(action, this, { showDialog });
         if (!test) return;
 
         return await test.execute();
@@ -1100,13 +1102,13 @@ export class SR5Actor extends Actor {
      * @param name The attributes name as defined within data
      * @param options Change general roll options.
      */
-    async rollAttribute(name, options: Shadowrun.ActorRollOptions={}) {
+    async rollAttribute(name, options: Shadowrun.ActorRollOptions = {}) {
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
-        const action = DataDefaults.actionRollData({attribute: name, test: AttributeOnlyTest.name});
+        const action = DataDefaults.actionRollData({ attribute: name, test: AttributeOnlyTest.name });
         const showDialog = this.tests.shouldShowDialog(options.event);
-        const test = await this.tests.fromAction(action, this, {showDialog});
+        const test = await this.tests.fromAction(action, this, { showDialog });
         if (!test) return;
 
         return await test.execute();
@@ -1119,7 +1121,7 @@ export class SR5Actor extends Actor {
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async startTeamworkTest(skillId: string, options: Shadowrun.SkillRollOptions={}) {
+    async startTeamworkTest(skillId: string, options: Shadowrun.SkillRollOptions = {}) {
         console.info(`Shadowrun5e | Starting teamwork test for ${skillId}`);
 
         // Prepare message content.
@@ -1134,7 +1136,7 @@ export class SR5Actor extends Actor {
         };
         const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.html', templateData);
         // Prepare the actual message.
-        const messageData =  {
+        const messageData = {
             user: game.user?.id,
             // Use type roll, for Foundry built in content visibility.
             type: CONST.CHAT_MESSAGE_TYPES.ROLL,
@@ -1148,7 +1150,7 @@ export class SR5Actor extends Actor {
             // This test data is needed for all subsequent testing based on this chat messages.
             flags: {
                 // Add test data to message to allow ChatMessage hooks to access it.
-                [SYSTEM_NAME]: {[FLAGS.Test]: {skill: skillId}},
+                [SYSTEM_NAME]: { [FLAGS.Test]: { skill: skillId } },
                 'core.canPopout': true
             },
             sound: CONFIG.sounds.dice,
@@ -1162,31 +1164,44 @@ export class SR5Actor extends Actor {
         return message;
     }
 
-        /**
-     * Roll a skill test for a specific skill
-     * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
-     * @param options Optional options to configure the roll.
-     * @param options.byLabel true to search the skill by label as displayed on the sheet.
-     * @param options.specialization true to configure the skill test to use a specialization.
-     */
-        async rollTeamworkTest(skillId: string, teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions={}) {
-            console.info(`Shadowrun5e | Rolling teamwork test for ${skillId}`);
-    
-            const action = this.skillActionData(skillId, options);
-            if (!action) return;
-            if(teamworkData.criticalGlitch != true) {
-                action.limit.mod.push({name: "Teamwork", value: teamworkData.additionalLimit})
-            }
+    /**
+ * Roll a skill test for a specific skill
+ * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
+ * @param options Optional options to configure the roll.
+ * @param options.byLabel true to search the skill by label as displayed on the sheet.
+ * @param options.specialization true to configure the skill test to use a specialization.
+ */
+    async rollTeamworkTest(teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions = {}) {
+        console.info(`Shadowrun5e | Rolling teamwork test for ${teamworkData.skill}`);
 
-            action.dice_pool_mod.push({name: "Teamwork", value: teamworkData.additionalDice})
-    
-            const showDialog = this.tests.shouldShowDialog(options.event);
-            const test = await this.tests.fromAction(action, this, {showDialog});
-            if (!test) return;
+        const defaultSpecialization = teamworkData.specialization ?? false;
+        const defaultThreshold = {
+            value: teamworkData.threshold ?? 0,
+            base: teamworkData.threshold ?? 0
+        };
 
-    
-            return await test.execute();
+        // Dann options „aufstocken“, dabei vorhandene Werte in options nicht überschreiben
+        const finalOptions = {
+            ...options,
+            specialization: options.specialization ?? defaultSpecialization,
+            threshold: options.threshold ?? defaultThreshold
+        };
+
+        const action = this.skillActionData(options.byLabel ? teamworkData.skill.label : teamworkData.skill.id, options);
+        if (!action) return;
+        if (!teamworkData.criticalGlitch) {
+            action.limit.mod.push({ name: "Teamwork", value: teamworkData.additionalLimit })
         }
+
+        action.dice_pool_mod.push({ name: "Teamwork", value: Math.min(teamworkData.additionalDice.value, teamworkData.additionalDice.max) })
+
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.tests.fromAction(action, this, { showDialog });
+        if (!test) return;
+
+
+        return await test.execute();
+    }
 
     /**
      * Is the given attribute id a matrix attribute
@@ -1229,9 +1244,9 @@ export class SR5Actor extends Actor {
      * @param skillId Any skill, no matter if active, knowledge or language
      * @param options
      */
-    skillActionData(skillId: string, options: Shadowrun.SkillRollOptions = {}): Shadowrun.ActionRollData|undefined {
+    skillActionData(skillId: string, options: Shadowrun.SkillRollOptions = {}): Shadowrun.ActionRollData | undefined {
         const byLabel = options.byLabel || false;
-        const skill = this.getSkill(skillId, {byLabel});
+        const skill = this.getSkill(skillId, { byLabel });
         if (!skill) {
             console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
             return;
@@ -1367,7 +1382,7 @@ export class SR5Actor extends Actor {
 
         condition = this.__addDamageToTrackValue(damage, condition);
 
-        const updateData = {['system.technology.condition_monitor']: condition};
+        const updateData = { ['system.technology.condition_monitor']: condition };
         await device.update(updateData);
     }
 
@@ -1392,7 +1407,7 @@ export class SR5Actor extends Actor {
 
         // Apply damage to track and trigger derived value calculation.
         track = this.__addDamageToTrackValue(damage, track);
-        const updateData = {[`system.track.${damage.type.value}`]: track};
+        const updateData = { [`system.track.${damage.type.value}`]: track };
         await this.update(updateData);
 
         // Apply any wounds modifier delta to an active combatant.
@@ -1421,7 +1436,7 @@ export class SR5Actor extends Actor {
         overflow.value += damage.value;
         overflow.value = Math.min(overflow.value, overflow.max);
 
-        const updateData = {[`system.track.${damage.type.value}.overflow`]: overflow};
+        const updateData = { [`system.track.${damage.type.value}.overflow`]: overflow };
         await this.update(updateData);
     }
 
@@ -1441,7 +1456,7 @@ export class SR5Actor extends Actor {
         // @ts-expect-error
         const current = Math.max(this.system.track[track].value - healing, 0);
 
-        await this.update({[`system.track.${track}.value`]: current});
+        await this.update({ [`system.track.${track}.value`]: current });
     }
 
     async healStunDamage(healing: number) {
@@ -1471,7 +1486,7 @@ export class SR5Actor extends Actor {
         if (!track)
             return damage;
 
-        const {overflow, rest} = this._calcDamageOverflow(damage, track);
+        const { overflow, rest } = this._calcDamageOverflow(damage, track);
 
         // Only change damage type when needed, in order to avoid confusion of callers.
         if (overflow.value > 0) {
@@ -1494,20 +1509,20 @@ export class SR5Actor extends Actor {
         if (damage.type.value !== 'physical') {
             return damage;
         }
-        
+
 
         const track = this.getPhysicalTrack();
         if (!track) {
             return damage;
-        }  
+        }
 
-        const {overflow, rest} = this._calcDamageOverflow(damage, track);
+        const { overflow, rest } = this._calcDamageOverflow(damage, track);
 
         await this._addDamageToTrack(rest, track);
         await this._addDamageToOverflow(overflow, track);
     }
 
-    
+
     /**
      * Matrix damage can be added onto different tracks:
      * - IC has a local matrix.condition_monitor
@@ -1521,7 +1536,7 @@ export class SR5Actor extends Actor {
         const track = this.getMatrixTrack();
         if (!track) return damage;
 
-        const {overflow, rest} = this._calcDamageOverflow(damage, track);
+        const { overflow, rest } = this._calcDamageOverflow(damage, track);
 
         if (device) {
             await this._addDamageToDeviceTrack(rest, device);
@@ -1538,7 +1553,7 @@ export class SR5Actor extends Actor {
      * @returns overflow damage.
      */
     async addDamage(damage: Shadowrun.DamageData) {
-        switch(damage.type.value) {
+        switch (damage.type.value) {
             case 'matrix':
                 await this.addMatrixDamage(damage);
                 break;
@@ -1570,7 +1585,7 @@ export class SR5Actor extends Actor {
 
         // Use artificial damage to be consistent across other damage application Actor methods.
         const damage = DataDefaults.damageData({
-            type: {base: 'matrix', value: 'matrix'},
+            type: { base: 'matrix', value: 'matrix' },
             base: value,
             value: value
         });
@@ -1587,17 +1602,17 @@ export class SR5Actor extends Actor {
         // If a matrix device is used, damage that instead of the actor.
         const device = this.getMatrixDevice();
         if (device) {
-            return await device.update({'system.technology.condition_monitor': track});
+            return await device.update({ 'system.technology.condition_monitor': track });
         }
 
         // IC actors use a matrix track.
         if (this.isIC()) {
-            return await this.update({'system.track.matrix': track});
+            return await this.update({ 'system.track.matrix': track });
         }
 
         // Emerged actors use a personal device like condition monitor.
         if (this.isMatrixActor) {
-            return await this.update({'system.matrix.condition_monitor': track});
+            return await this.update({ 'system.matrix.condition_monitor': track });
         }
     }
 
@@ -1617,7 +1632,7 @@ export class SR5Actor extends Actor {
         overflow.value = overflowDamage;
         rest.value = restDamage;
 
-        return {overflow, rest};
+        return { overflow, rest };
     }
 
     getStunTrack(): Shadowrun.TrackType | undefined {
@@ -1675,7 +1690,7 @@ export class SR5Actor extends Actor {
 
         // Apply the appropriate combatant status.
         if (defeated.unconscious || defeated.dying || defeated.dead) {
-            await this.combatant?.update({defeated: true});
+            await this.combatant?.update({ defeated: true });
         } else {
             return await this.combatant?.update({ defeated: false });
         }
@@ -1691,7 +1706,7 @@ export class SR5Actor extends Actor {
         // Avoid applying defeated status multiple times.
         const existing = this.effects.reduce((arr, e) => {
             // @ts-expect-error TODO: foundry-vtt-types v10
-            if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
+            if ((e.statuses.size === 1) && e.statuses.has(effect.id)) {
                 // @ts-expect-error
                 arr.push(e.id);
             }
@@ -1717,13 +1732,13 @@ export class SR5Actor extends Actor {
         const removeStatus: string[] = [];
         if ((!defeated.unconscious && !defeated.dying) || defeated.dead) removeStatus.push('unconscious');
         if (!defeated.dead) removeStatus.push('dead');
-        
+
         // Remove out old defeated effects.
         if (removeStatus.length) {
             const existing = this.effects.reduce((arr, e) => {
                 // @ts-expect-error TODO: foundry-vtt-types v10
-                if ( (e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status)) ) arr.push(e.id);
-                return arr; 
+                if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status))) arr.push(e.id);
+                return arr;
             }, []);
 
             if (existing.length) await this.deleteEmbeddedDocuments('ActiveEffect', existing);
@@ -1738,7 +1753,7 @@ export class SR5Actor extends Actor {
         const modified = foundry.utils.duplicate(this.getArmor());
         if (modified) {
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
-            modified.value = Helpers.calcTotal(modified, {min: 0});
+            modified.value = Helpers.calcTotal(modified, { min: 0 });
         }
 
         return modified;
@@ -1765,7 +1780,7 @@ export class SR5Actor extends Actor {
 
         // While not prohibiting, inform user about missing resource.
         if (combatant.initiative + modifier < 0) {
-            ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+            ui.notifications?.warn('SR5.MissingRessource.Initiative', { localize: true });
         }
 
         await combat.adjustInitiative(combatant, modifier);
@@ -1859,13 +1874,13 @@ export class SR5Actor extends Actor {
         // NOTE: In THEORY almost all actor types can drive a vehicle.
         // ... drek, in theory a drone could drive another vehicle even...
 
-        await this.update({'system.driver': driver.id});
+        await this.update({ 'system.driver': driver.id });
     }
 
     async removeVehicleDriver() {
         if (!this.hasDriver()) return;
 
-        await this.update({'system.driver': ''});
+        await this.update({ 'system.driver': '' });
     }
 
     hasDriver(): boolean {
@@ -1914,7 +1929,7 @@ export class SR5Actor extends Actor {
         }
 
         // Some host data isn't stored on the IC actor (marks) and won't cause an automatic render.
-        await this.update({'system.host': updateData}, {render: false});
+        await this.update({ 'system.host': updateData }, { render: false });
         await this.sheet?.render();
     }
 
@@ -1930,7 +1945,7 @@ export class SR5Actor extends Actor {
             atts: null
         }
 
-        await this.update({'system.host': updateData});
+        await this.update({ 'system.host': updateData });
     }
 
     /**
@@ -2071,7 +2086,7 @@ export class SR5Actor extends Actor {
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
         matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
-        await this.update({'system.matrix.marks': matrixData.marks});
+        await this.update({ 'system.matrix.marks': matrixData.marks });
     }
 
     /**
@@ -2087,7 +2102,7 @@ export class SR5Actor extends Actor {
             updateData[`-=${markId}`] = null;
         }
 
-        await this.update({'system.matrix.marks': updateData});
+        await this.update({ 'system.matrix.marks': updateData });
     }
 
     /**
@@ -2099,7 +2114,7 @@ export class SR5Actor extends Actor {
         const updateData = {}
         updateData[`-=${markId}`] = null;
 
-        await this.update({'system.matrix.marks': updateData});
+        await this.update({ 'system.matrix.marks': updateData });
     }
 
     getAllMarks(): Shadowrun.MatrixMarks | undefined {
@@ -2187,14 +2202,14 @@ export class SR5Actor extends Actor {
      * 
      * @param previousAttacks Attacks within a combat turn. If left out, will guess based on current modifier.
      */
-    async calculateNextDefenseMultiModifier(previousAttacks: number=this.previousAttacks) {
+    async calculateNextDefenseMultiModifier(previousAttacks: number = this.previousAttacks) {
         console.debug('Shadowrun 5e | Applying consecutive defense modifier for. Last amount of attacks: ', previousAttacks);
 
         const automateDefenseMod = game.settings.get(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier);
         if (!automateDefenseMod || !this.combatActive) return;
 
         const multiDefenseModi = CombatRules.defenseModifierForPreviousAttacks(previousAttacks + 1);
-        await this.update({'system.modifiers.multi_defense': multiDefenseModi});
+        await this.update({ 'system.modifiers.multi_defense': multiDefenseModi });
     }
 
     /**
@@ -2207,7 +2222,7 @@ export class SR5Actor extends Actor {
         if (this.system.modifiers.multi_defense === 0) return;
 
         console.debug('Shadowrun 5e | Removing consecutive defense modifier.', this);
-        await this.update({'system.modifiers.multi_defense': 0});
+        await this.update({ 'system.modifiers.multi_defense': 0 });
     }
 
     /**
@@ -2221,7 +2236,7 @@ export class SR5Actor extends Actor {
 
         if (!this.hasPhysicalBody) return;
         if (!fireMode.recoil) return;
-        
+
         await this.addRecoil(fireMode.value);
     }
 
@@ -2231,7 +2246,7 @@ export class SR5Actor extends Actor {
      */
     async addRecoil(additional: number) {
         const base = this.recoil + additional;
-        await this.update({'system.values.recoil.base': base});
+        await this.update({ 'system.values.recoil.base': base });
     }
 
     /**
@@ -2240,7 +2255,7 @@ export class SR5Actor extends Actor {
     async clearProgressiveRecoil() {
         if (!this.hasPhysicalBody) return;
         if (this.recoil === 0) return;
-        await this.update({'system.values.recoil.base': 0});
+        await this.update({ 'system.values.recoil.base': 0 });
     }
 
     /**
@@ -2257,7 +2272,7 @@ export class SR5Actor extends Actor {
      */
     async resetRunData() {
         console.log(`Shadowrun 5e | Resetting actor ${this.name} (${this.id}) for a new run`);
-        
+
         const updateData: Record<string, any> = {};
 
         if (this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle()) {
@@ -2289,14 +2304,14 @@ export class SR5Actor extends Actor {
 
         // If the given item is the only of it's type, allow unequipping.
         if (sameTypeItems.length === 1 && sameTypeItems[0].id === unequipItem.id) {
-            await unequipItem.update({'system.technology.equipped': !unequipItem.isEquipped()});
+            await unequipItem.update({ 'system.technology.equipped': !unequipItem.isEquipped() });
             return
         }
-        
+
         // For a set of items, assure only the selected is equipped.
         const updateData = sameTypeItems.map(item => ({
-                _id: item.id,
-                'system.technology.equipped': item.id === unequipItem.id
+            _id: item.id,
+            'system.technology.equipped': item.id === unequipItem.id
         }));
 
         await this.updateEmbeddedDocuments('Item', updateData);

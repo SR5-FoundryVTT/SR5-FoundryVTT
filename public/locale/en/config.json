@@ -992,6 +992,7 @@
         "Survival": "Survival",
         "Swimming": "Swimming",
         "Teamwork": {
+            "CriticalGlitched": "Critical Glitched",
             "Glitched": "Glitched",
             "ParticipantActor": "Choose actor",
             "RollIt": "Roll it",

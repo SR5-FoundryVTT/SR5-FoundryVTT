@@ -721,6 +721,9 @@ export class JournalEnrichers {
     }
 
     static normalizeLabel(label: string): string {
+
+        if (typeof label !== 'string') return "";
+
         return label
             .toLowerCase()
             .trim()

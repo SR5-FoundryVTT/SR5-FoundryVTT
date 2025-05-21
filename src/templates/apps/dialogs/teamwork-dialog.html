@@ -87,18 +87,16 @@
       name="threshold"
       value="{{threshold}}"
       min="0"
-      {{#ifn request}}disabled{{/if}}
+      {{#if (not request)}}disabled{{/if}}
     />
 
       <!-- Spezialisierung -->
-  {{#ifn request}}
   <label>{{localize "SR5.Dialogs.Teamwork.Specialization"}}</label>
   <input
     type="checkbox"
     name="specialization"
-    {{#if specialization}}checked{{/ife}}
+    {{#if specialization}}checked{{/if}}
   />
-  {{/if}}
 
 
     <!-- Checkbox “Andere Skills erlauben” -->
@@ -107,8 +105,8 @@
       <input
         type="checkbox"
         name="allowOtherSkills"
-        {{#if allowOtherSkills}}checked{{/ife}}
-        {{#ifn request}}disabled{{/if}}
+        {{#if allowOtherSkills}}checked{{/if}}
+        {{#if (not request)}}disabled{{/if}}
       />
     {{/if}}
   </div>

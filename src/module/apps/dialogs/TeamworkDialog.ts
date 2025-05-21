@@ -61,9 +61,9 @@ export class TeamWorkDialog extends FormDialog {
     const actors = teamworkData.actors ?? game.actors?.filter(actor => actor.testUserPermission(game.user!, "OWNER")) ?? [];
     const selectedActor = teamworkData.selectedActor ?? actors[0] ?? null;
     const attributes = selectedActor
-      ? TeamworkFlow.buildAttributesList(selectedActor)
+      ? TeamworkFlow.buildAttributeList(selectedActor)
       : [];
-    const skills = TeamworkFlow.buildSkillsList(selectedActor);
+    const skills = TeamworkFlow.buildSkillGroups(selectedActor);
     const selectedSkill = teamworkData.selectedSkill
       ? skills
         .flatMap(group => group.skills)
@@ -118,7 +118,7 @@ export class TeamWorkDialog extends FormDialog {
 
     // Initialisiere Deine Caches
     this.baseActors = actors;
-    this.baseSkills = TeamworkFlow.buildSkillsList(selectedActor);
+    this.baseSkills = TeamworkFlow.buildSkillGroups(selectedActor);
   }
 
   static override get defaultOptions() {
@@ -141,7 +141,7 @@ export class TeamWorkDialog extends FormDialog {
 
     if (!this.baseActors) {
       this.baseActors = this.data.actors;
-      this.baseSkills = TeamworkFlow.buildSkillsList(this.data.selectedActor);
+      this.baseSkills = TeamworkFlow.buildSkillGroups(this.data.selectedActor);
     }
     this.data.skills = this.baseSkills;
     return data;
@@ -227,7 +227,7 @@ export class TeamWorkDialog extends FormDialog {
       if (!actor) return;                  // falls nichts gefunden wurde, abbrechen
       data.selectedActor = actor;
 
-      this.baseSkills = TeamworkFlow.buildSkillsList(actor);
+      this.baseSkills = TeamworkFlow.buildSkillGroups(actor);
       data.skills = this.baseSkills;
 
       data.filter = '';

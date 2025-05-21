@@ -111,6 +111,10 @@ export class SR5Roll extends Roll {
         return this.glitches > Math.floor(this.pool / 2);
     }
 
+    get criticalGlitched(): boolean {
+        return this.glitched && this.total === 0;
+    }
+
     override get total(): number {
         return this.hits;
     }
