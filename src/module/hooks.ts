@@ -27,7 +27,7 @@ import { SR5SpriteActorSheet } from "./actor/sheets/SR5SpriteActorSheet";
 
 import { SR5Roll } from "./rolls/SR5Roll";
 import { SuccessTest } from "./tests/SuccessTest";
-import { TeamworkTest } from "./actor/flows/TeamworkFlow";
+import { TeamworkFlow } from "./actor/flows/TeamworkFlow";
 import { OpposedTest } from "./tests/OpposedTest";
 import { PhysicalDefenseTest } from "./tests/PhysicalDefenseTest";
 import { RangedAttackTest } from "./tests/RangedAttackTest";
@@ -366,6 +366,8 @@ ___________________
 
         $(document).off("click", ".sr5-roll-request");
         $(document).on("click", ".sr5-roll-request", async (ev: JQuery.TriggeredEvent) => { await JournalEnrichers.handleClick(ev); });
+
+        Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
         HooksManager.registerSocketListeners();
     }
 
@@ -495,7 +497,7 @@ ___________________
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
             [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage],
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage],
-            [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage],
+            [FLAGS.TeamworkTestFlow]: [TeamworkFlow._handleUpdateSocketMessage],
             [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage],
         }
 
@@ -519,7 +521,7 @@ ___________________
         await SuccessTest.chatMessageListeners(message, html, data);
         await OpposedTest.chatMessageListeners(message, html, data);
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
-        await TeamworkTest.chatMessageListeners(message, html);
+        await TeamworkFlow.chatMessageListeners(message, html);
         // TODO: Thogrim
         // await JournalEnrichers.messageRequestHooks(html);
     }
@@ -528,7 +530,7 @@ ___________________
         await SuccessTest.chatLogListeners(chatLog, html, data);
         await OpposedTest.chatLogListeners(chatLog, html, data);
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
-        await TeamworkTest.chatLogListeners(chatLog, html);
+        await TeamworkFlow.chatLogListeners(chatLog, html);
         // TODO: Thogrim
         // await JournalEnrichers.chatlogRequestHooks(html)
     }

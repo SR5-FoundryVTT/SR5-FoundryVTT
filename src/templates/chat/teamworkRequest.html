@@ -1,9 +1,80 @@
-<div class="sr5 chat-card rollRequest-card">
-    {{localize 'SR5.GMRequest.General'}}
-    <br>
-    <a class="sr5-requestAnswer" data-request="{{rollType}}" data-rollEntity={{rollEntity}} data-threshold={{threshold}}><em class="fas fa-dice"></em> {{localize rollTypeName}} {{ rollEntityName }}</a>
-    <br>
-    {{#if threshold}}
-        {{localize 'SR5.GMRequest.Threshold'}} {{ threshold }}
-    {{/if}}
+<div class="sr5 chat-card teamwork-card rollRequest-card">
+  {{!-- Header mit Test-Icon und Titel --}}
+  <div class="card-title card-header">
+    <i class="fas fa-users"></i>
+    <span class="test-name">{{localize "SR5.Dialogs.Teamwork.Title"}}</span>
+  </div>
+
+  {{!-- Ausgewählter Schauspieler --}}
+  {{#if actor}}
+  <div class="card-title card-header">
+    <div class="container container--fluid">
+      <div class="container__row">
+        <div class="container__col">
+          <div class="document">
+            <a class="chat-select-link">
+              <img src="{{actor.img}}" class="entity-selectable" data-tooltip="{{actor.name}}">
+            </a>
+            <h3 class="header-name">
+              <a class="chat-document-link" data-uuid="{{actor.uuid}}">{{actor.name}}</a>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+
+  {{!-- Test-Parameter --}}
+  <div class="card-main-content">
+    <div class="card-content">
+      <ul class="test-params">
+        <li><strong>{{localize "SR5.Skill"}}:</strong> {{skill.label}}</li>
+        {{#if attribute}}
+        <li><strong>{{localize "SR5.Attribute"}}:</strong> {{localize attribute}}</li>
+        {{/if}}
+        {{#if threshold}}
+        <li><strong>{{localize "SR5.Threshold"}}:</strong> {{threshold}}</li>
+        {{/if}}
+        {{#if limit}}
+        <li><strong>{{localize "SR5.Limit"}}:</strong> {{limit}}</li>
+        {{/if}}
+        {{#if allowOtherSkills}}
+        <li><em>{{localize "SR5.Dialogs.Teamwork.AllowOtherSkills"}}</em></li>
+        {{/if}}
+      </ul>
+    </div>
+  </div>
+
+  {{!-- Bereits abgegebene Ergebnisse --}}
+  <div class="card-participants">
+    <div class="card-content">
+      <h4>{{localize "SR5.Skill.Teamwork.Participants"}}</h4>
+      <div class="sr5-teamwork-participants">
+        {{#each participants}}
+          <div class="participant-line">
+            <strong>{{this.name}}:</strong> {{this.netHits}}
+            {{#if this.glitched}}<em>({{localize "SR5.Skill.Teamwork.Glitched"}})</em>{{/if}}
+          </div>
+        {{/each}}
+        {{#if criticalGlitch}}
+          <div class="participant-line glitch-warning">
+            <em>{{localize "SR5.Skill.Teamwork.CriticalGlitch"}}</em>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+
+  {{!-- Action-Buttons --}}
+  <div class="card-buttons">
+    <button class="button sr5-teamwork-addparticipant">
+      <i class="fas fa-user-plus"></i>
+      {{localize "SR5.Skill.Teamwork.AddParticipant"}}
+    </button>
+    <button class="button sr5-teamwork-start">
+      <i class="fas fa-dice"></i>
+      {{localize "SR5.Skill.Teamwork.StartTest"}}
+    </button>
+  </div>
 </div>

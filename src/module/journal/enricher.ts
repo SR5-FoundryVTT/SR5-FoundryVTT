@@ -1,26 +1,30 @@
+import { TeamworkFlow } from './../actor/flows/TeamworkFlow';
 import { TestCreator } from './../tests/TestCreator';
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { DataDefaults } from '../data/DataDefaults';
 import { SR5 } from '../config';
+import { TeamWorkDialog } from '../apps/dialogs/TeamworkDialog';
+import { FLAGS, SYSTEM_NAME } from '../constants';
 
-interface TestAttributes {
+export interface TestAttributes {
     skill?: string;
     attribute?: string;
     attribute2?: string;
-    limit?: string | Number;
+    limit?: string | number;
     threshold?: string;
     interval?: string;
     opposedSkill?: string;
     opposedAttribute?: string;
     opposedAttribute2?: string;
-    opposedLimit?: string | Number;
+    opposedLimit?: string | number;
     name?: string;
     documentUuid?: string;
     compendiumKey?: string;
     label: string;
     value: string;
+    allowOtherSkills?: boolean;
     testType: "success" | "opposed" | "extended" | "teamwork" | "action" | "macro" | "invalid";
 }
 
@@ -78,7 +82,7 @@ export class JournalEnrichers {
                             break;
 
                         case "RollTeamwork":
-                            testAttributes.testType = "teamwork";
+                            Object.assign(testAttributes, this.parseTeamworkString(testAttributes));
                             break;
 
                         case "RollTest":
@@ -137,7 +141,7 @@ export class JournalEnrichers {
             ev.stopPropagation();
 
             // --- Speaker-Bestimmung ---
-            let speaker = actor ? { actor: actor.id } : { alias: user.name };
+            const speaker = actor ? { actor: actor.id } : { alias: user.name };
 
             const templateData = JournalEnrichers.deconstructRollRequestAttributes(dataset);
 
@@ -161,7 +165,7 @@ export class JournalEnrichers {
                     break;
 
                 case "teamwork":
-                    // await JournalEnrichers.initiateTeamworkTest(testAttributes)
+                    await TeamworkFlow.initiateTeamworkTest(testAttributes)
                     break;
 
                 case "action":
@@ -176,7 +180,7 @@ export class JournalEnrichers {
                     console.warn(`Unhandled testType: ${testAttributes.testType}`);
             }
         }
-    };
+    }
 
     static async rollTest(testAttributes: TestAttributes) {
         const user = game.user;
@@ -195,13 +199,13 @@ export class JournalEnrichers {
         console.log("   → actor.getSkillByLabel returned:", found);
         //TODO: Opposed Limit und Schwellenwert einbauen
         const testData = DataDefaults.actionRollData({
-            attribute: getAttributeKeyByLabel(testAttributes.attribute),
-            attribute2: getAttributeKeyByLabel(testAttributes.attribute2),
+            attribute: this.getAttributeKeyByLabel(testAttributes.attribute),
+            attribute2: this.getAttributeKeyByLabel(testAttributes.attribute2),
             skill: actor.getSkillByLabel(`${testAttributes.skill}`)?.id ?? '',
             limit: {
                 value: (testAttributes.limit && Number.isInteger(+testAttributes.limit)) ? +testAttributes.limit : 0,
                 base: (testAttributes.limit && Number.isInteger(+testAttributes.limit)) ? +testAttributes.limit : 0,
-                attribute: getLimitKeyByLabel(`${testAttributes.limit}`) ?? ''
+                attribute: this.getLimitKeyByLabel(`${testAttributes.limit}`) ?? ''
             },
             threshold: {
                 value: (testAttributes.threshold && Number.isInteger(+testAttributes.threshold)) ? +testAttributes.threshold : 0,
@@ -210,8 +214,8 @@ export class JournalEnrichers {
             extended: testAttributes.testType === "extended",
             opposed: {
                 test: testAttributes.testType === "opposed" ? 'OpposedTest' : '',
-                attribute: getAttributeKeyByLabel(testAttributes.opposedAttribute),
-                attribute2: getAttributeKeyByLabel(testAttributes.opposedAttribute2),
+                attribute: this.getAttributeKeyByLabel(testAttributes.opposedAttribute),
+                attribute2: this.getAttributeKeyByLabel(testAttributes.opposedAttribute2),
                 skill: actor.getSkillByLabel(`${testAttributes.opposedSkill}`)?.id ?? '',
             }
         });
@@ -411,9 +415,96 @@ export class JournalEnrichers {
     //     await ChatMessage.create(chatData)
     // };
 
+    static parseTeamworkString(testAttributes: TestAttributes) {
+        const result = testAttributes;
+        const raw = (result.value || '').trim();
+
+        // Leerer String ist OK
+        if (!raw) {
+            result.testType = "teamwork";
+            return result;
+        }
+
+        const tokens = raw
+            .split('|')
+            .map(s => s.trim())
+            .filter(s => !!s);
+
+        // Set zum Tracken verwendeter Keys
+        const seen = new Set<string>();
+
+        // Defaults
+        let skill: string | undefined;
+        result.allowOtherSkills = false;
+        delete result.attribute;
+        delete result.threshold;
+        delete result.limit;
+
+        for (const tok of tokens) {
+            // 1) X-Flag?
+            if (/^x$/i.test(tok)) {
+                if (seen.has('x')) {
+                    return ui.notifications?.error(`"x" darf nur einmal verwendet werden.`);
+                }
+                seen.add('x');
+                result.allowOtherSkills = true;
+                continue;
+            }
+
+            // 2) key=val?
+            const [keyRaw, val] = tok.split('=');
+            if (val !== undefined) {
+                const key = keyRaw.toLowerCase();
+                if (seen.has(key)) {
+                    return ui.notifications?.error(`Parameter "${keyRaw}" wurde mehrfach angegeben.`);
+                }
+                seen.add(key);
+
+                switch (key) {
+                    case 'skill':
+                        skill = val;
+                        break;
+                    case 'attribute':
+                        result.attribute = val;
+                        break;
+                    case 'threshold':
+                        if (!/^\d+$/.test(val)) {
+                            return ui.notifications?.error(`Threshold muss eine Ganzzahl sein: ${val}`);
+                        }
+                        result.threshold = val;
+                        break;
+                    case 'limit':
+                        result.limit = val;
+                        break;
+                    default:
+                        return ui.notifications?.error(`Unbekannter Parameter: ${keyRaw}`);
+                }
+                continue;
+            }
+
+            // 3) freier Token → Skill
+            if (!skill) {
+                seen.add('skill');
+                skill = tok;
+                continue;
+            }
+
+            // 4) alles andere ist Fehler
+            return ui.notifications?.error(`Ungültiger Eintrag: ${tok}`);
+        }
+
+        if (!skill) {
+            return ui.notifications?.error("Mindestens ein Skill muss angegeben sein.");
+        }
+        result.skill = skill;
+        result.testType = "teamwork";
+        return result;
+    }
+
+
     static parseTestString(testAttributes: TestAttributes): TestAttributes {
         const result = testAttributes;
-        const rawString = testAttributes.value;
+        const rawString = result.value;
 
         // Helper: parse one side of a test
         const parsePart = (part: string) => {
@@ -535,13 +626,16 @@ export class JournalEnrichers {
             opposedlimit: "opposedLimit",
             name: "name",
             documentuuid: "documentUuid",
-            compendiumkey: "compendiumKey"
+            compendiumkey: "compendiumKey",
+            allowOtherSkills: "allowOtherSkills"
         };
 
         for (const [key, value] of Object.entries(dataset)) {
             const mappedKey = keyMap[key.toLowerCase()];
-            if (mappedKey && typeof value === "string") {
+            if (mappedKey && typeof value === "string" && mappedKey !== "allowOtherSkills") {
                 testAttributes[mappedKey] = value;
+            } else if (mappedKey === "allowOtherSkills") {
+                testAttributes[mappedKey] = true;
             }
         }
 
@@ -593,42 +687,44 @@ export class JournalEnrichers {
 
     //     return undefined;
     // }
-}
 
-function getAttributeKeyByLabel(searchedFor?: string): Shadowrun.ActorAttribute {
-    if (!searchedFor) return '';
 
-    const disallowedKeys = ['pilot', 'force', 'initiation', 'submersion', 'rating'];
 
-    for (const [key, i18nKey] of Object.entries(SR5.attributes)) {
-        if (disallowedKeys.includes(key)) continue;
+    static getAttributeKeyByLabel(searchedFor?: string): Shadowrun.ActorAttribute {
+        if (!searchedFor) return '';
 
-        const translated = game.i18n.localize(i18nKey);
-        if (normalizeLabel(translated) === normalizeLabel(searchedFor)) {
-            return key as Shadowrun.ActorAttribute;
+        const disallowedKeys = ['pilot', 'force', 'initiation', 'submersion', 'rating'];
+
+        for (const [key, i18nKey] of Object.entries(SR5.attributes)) {
+            if (disallowedKeys.includes(key)) continue;
+
+            const translated = game.i18n.localize(i18nKey);
+            if (this.normalizeLabel(translated) === this.normalizeLabel(searchedFor)) {
+                return key as Shadowrun.ActorAttribute;
+            }
         }
+
+        return '';
     }
 
-    return '';
-}
+    static getLimitKeyByLabel(searchedFor?: string): Shadowrun.Limit {
+        if (!searchedFor) return '';
 
-function getLimitKeyByLabel(searchedFor?: string): Shadowrun.Limit {
-    if (!searchedFor) return '';
-
-    for (const [key, i18nKey] of Object.entries(SR5.limits)) {
-        const translated = game.i18n.localize(i18nKey);
-        if (normalizeLabel(translated) === normalizeLabel(searchedFor)) {
-            return key as keyof typeof SR5.limits;
+        for (const [key, i18nKey] of Object.entries(SR5.limits)) {
+            const translated = game.i18n.localize(i18nKey);
+            if (this.normalizeLabel(translated) === this.normalizeLabel(searchedFor)) {
+                return key as keyof typeof SR5.limits;
+            }
         }
+
+        return '';
     }
 
-    return '';
-}
-
-function normalizeLabel(label: string): string {
-    return label
-        .toLowerCase()
-        .trim()
-        .replace(/[\s_\-–—]+/g, ""); // ersetzt Leerzeichen, Unterstriche, Bindestriche, Gedankenstriche etc.
+    static normalizeLabel(label: string): string {
+        return label
+            .toLowerCase()
+            .trim()
+            .replace(/[\s_\-–—]+/g, ""); // ersetzt Leerzeichen, Unterstriche, Bindestriche, Gedankenstriche etc.
+    }
 }
 

@@ -1,0 +1,115 @@
+<form>
+  <div class="dialog-content-teamwork grid-two-col">
+    <!-- Actor-Filter -->
+    <label>{{localize "SR5.Dialogs.Teamwork.FilterActor"}}</label>
+    <input
+      type="text"
+      name="filter"
+      value="{{filter}}"
+      placeholder="{{localize "SR5.Dialogs.Teamwork.SearchActor"}}"
+    />
+
+    <!-- Actor-Auswahl -->
+    <label>{{localize "SR5.Dialogs.Teamwork.Actor"}}</label>
+    <select class="form-control" name="actor">
+      {{#each actors}}
+        <option
+          value="{{this.uuid}}"
+          {{#ife this.uuid ../selectedActor.uuid}}selected{{/ife}}
+          style="
+            background-image: url('{{this.img}}');
+            background-repeat: no-repeat;
+            background-position: left center;
+            padding-left: 2em;
+          "
+        >
+          {{this.name}}
+        </option>
+      {{/each}}
+    </select>
+
+    <!-- Skill-Auswahl -->
+    <label>{{localize "SR5.Dialogs.Teamwork.Skill"}}</label>
+        <select class="form-control" name="selectedSkill.id" {{#if lockedSkill}}disabled{{/if}}>
+      {{#each skills}}
+        <optgroup label="{{localize this.group}}">
+          {{#each this.skills}}
+            <option
+              value="{{this.id}}"
+              {{#ife this.id ../../selectedSkill.id}}selected{{/ife}}
+            >{{localize this.label}}</option>
+          {{/each}}
+        </optgroup>
+      {{/each}}
+    </select>
+
+    <!-- Attribut-Auswahl -->
+<label>{{localize "SR5.Dialogs.Teamwork.Attribute"}}</label>
+        <select class="form-control" name="selectedAttribute"  {{#if lockedSkill}}disabled{{/if}}>
+  {{#each attributes}}
+    <option value="{{this.name}}" {{#ife this.name ../selectedAttribute}}selected{{/ife}}>
+  {{this.label}}
+</option>
+  {{/each}}
+</select>
+
+<!-- Limit -->
+<label>{{localize "SR5.Dialogs.Teamwork.Limit"}}</label>
+        <div class="limit-controls" {{#if lockedSkill}}style="opacity:0.5;pointer-events:none"{{/if}}>
+  <input
+    type="number"
+    name="limitNumber"
+  data-dtype="Number"
+    inputmode="numeric"
+    pattern="\d*"
+    min="0"
+    placeholder="0"
+  value="{{limitNumber}}"
+  {{#if lockedSkill}}disabled{{/if}}
+  />
+  <select name="limitSelect" class="limit-select form-control" {{#if lockedSkill}}disabled{{/if}}>
+  <option value="" {{#ife "" ../limitSelect}}selected{{/ife}}></option>
+    {{#each limits as |label key|}}
+      <option value="{{key}}" {{#ife key ../limitSelect}}selected{{/ife}}>
+        {{localize label}}
+      </option>
+    {{/each}}
+  </select>
+</div>
+
+
+
+
+    <!-- Schwellenwert -->
+    <label>{{localize "SR5.Dialogs.Teamwork.Threshold"}}</label>
+    <input
+      type="number"
+      name="threshold"
+      value="{{threshold}}"
+      min="0"
+      {{#ifn request}}disabled{{/if}}
+    />
+
+      <!-- Spezialisierung -->
+  {{#ifn request}}
+  <label>{{localize "SR5.Dialogs.Teamwork.Specialization"}}</label>
+  <input
+    type="checkbox"
+    name="specialization"
+    {{#if specialization}}checked{{/ife}}
+  />
+  {{/if}}
+
+
+    <!-- Checkbox “Andere Skills erlauben” -->
+    {{#if showAllowOtherSkills}}
+      <label>{{localize "SR5.Dialogs.Teamwork.AllowOtherSkills"}}</label>
+      <input
+        type="checkbox"
+        name="allowOtherSkills"
+        {{#if allowOtherSkills}}checked{{/ife}}
+        {{#ifn request}}disabled{{/if}}
+      />
+    {{/if}}
+  </div>
+</form>

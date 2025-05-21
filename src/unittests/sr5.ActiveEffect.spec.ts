@@ -555,7 +555,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            // @ts-expect-error DeepPartial fails for partial sub object literals
+            //// @ts-expect-error DeepPartial fails for partial sub object literals
             const action = DataDefaults.actionRollData({ test: SkillTest.name, limit: {attribute: 'social'} });
             const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
 
