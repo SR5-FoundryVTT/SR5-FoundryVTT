@@ -1,0 +1,36 @@
+import { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/fields.mjs";
+import { ShadowrunModel as SM } from "../ShadowrunModel";
+
+export const DevicePartData: DataSchema = {
+    category: new StringField({
+        required: true,
+        initial: '',
+        choices: ['commlink', 'cyberdeck', 'rcc', 'host', ''],
+    }),
+    //todo
+    //atts: new SchemaField(SM.MatrixAttributes),
+    networkDevices: new ArrayField(new StringField({ required: true, initial: '' })),
+};
+
+export const DeviceAttribute: DataSchema = {
+    value: new NumberField({ required: true, initial: 0 }),
+    att: new StringField({
+        required: true,
+        initial: '',
+        choices: ['attack', 'sleaze', 'data_processing', 'firewall'],
+    }),
+    editable: new BooleanField({ required: true, initial: false }),
+};
+    
+const DeviceData: DataSchema = {
+    ...DevicePartData,
+    ...SM.DescriptionPartData,
+    ...SM.TechnologyPartData,
+    ...SM.ImportFlags,
+};
+
+export class Device extends foundry.abstract.TypeDataModel<typeof DeviceData, Item> {
+    static override defineSchema(): DataSchema {
+        return DeviceData;
+    }
+}

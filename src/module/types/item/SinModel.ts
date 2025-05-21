@@ -1,0 +1,21 @@
+import { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/fields.mjs";
+import { ShadowrunModel as SM } from "../ShadowrunModel";
+
+const LicenseData: DataSchema = {
+    name: new StringField({ required: true, initial: '' }),
+    rtg: new StringField({ required: true, initial: '' }),
+    description: new HTMLField({ required: true, initial: '' }),
+}
+
+const SinData: DataSchema = {
+    ...SM.DescriptionPartData,
+    ...SM.TechnologyPartData,
+    ...SM.ImportFlags,
+    licences: new ArrayField(new SchemaField(LicenseData), { required: true, initial: [] }),
+}
+
+export class Sin extends foundry.abstract.TypeDataModel<typeof SinData, Item> {
+    static override defineSchema(): DataSchema {
+        return SinData;
+    }
+}

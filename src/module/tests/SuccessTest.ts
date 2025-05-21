@@ -1137,7 +1137,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This can either be from an items action or a pre-configured action.
      */
     get hasAction(): boolean {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         return !foundry.utils.isEmpty(this.data.action);
     }
 
@@ -1629,7 +1628,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         let whisper: User[] | null = null;
         // ...for gmOnlyContent check permissions
         if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
-            // @ts-expect-error TODO: foundry-vtt-types v10
             whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER'));
         }
         // ...for rollMode include GM when GM roll
