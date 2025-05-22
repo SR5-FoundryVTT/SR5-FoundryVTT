@@ -29,6 +29,15 @@ export interface TeamworkMessageData {
     additionalLimit: number;
     criticalGlitch: boolean;
     specialization: boolean;
+    participants: ParticipantEntry[];
+    criticalGlitched: boolean;
+}
+
+interface ParticipantEntry {
+    name: string;
+    netHits: number;
+    glitched: boolean;
+    criticalGlitched: boolean;
 }
 
 export interface SkillEntry {
@@ -274,10 +283,10 @@ export class TeamworkFlow {
             await TeamworkFlow.addResultsToMessage(
                 message,
                 actor,
-                results,
-                teamworkData
+                results
             );
         } catch (err) {
+            console.error("Fehler im Teilnehmer-Wurf:", err);
             ui.notifications?.error("Fehler im Teilnehmer-Wurf:", err);
         }
     }
@@ -288,52 +297,45 @@ export class TeamworkFlow {
      * @param message to add text too
      * @param actor that made the roll
      * @param results of the roll
-     * @param teamworkData flag data to add too
      */
-    static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest, teamworkData: TeamworkMessageData) {
-        //wrap the old content to presever it, this is necessary for pre-render hooks
-        const wrapper = document.createElement("dív");
-        //@ts-expect-error v11 type
-        wrapper.innerHTML = message.content;
+    static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest) {
 
-        // 2. Finde den Container für Teilnehmer
-        const participantsRoot = wrapper.querySelector<HTMLElement>(".sr5-teamwork-participants");
-        if (!participantsRoot) return;
+        // 1.) Flag auslesen
+        const data = (await message.getFlag(SYSTEM_NAME, FLAGS.Test)) as TeamworkMessageData;
 
-        // 3. Hole den ersten Roll und berechne NetHits
-        const roll: SR5Roll = results.rolls[0];
+        // 2.) Neue Teilnehmer-Info anhängen
         const netHits = results.data.values.netHits.value;
+        data.participants.push({
+            name: actor.name ?? '',
+            netHits,
+            glitched: results.rolls[0].glitched,
+            criticalGlitched: data.criticalGlitched
+        });
 
-        // 4. Baue neuen Teilnehmer-Block
-        const participant = document.createElement("div");
-        participant.classList.add("sr5-teamwork-participant");
-        participant.innerText = `${actor.name}: ${netHits}`;
-
-        if (roll.criticalGlitched) {
-            participant.innerHTML += ` <em>(${game.i18n.localize("SR5.Skill.Teamwork.CriticalGlitched")})</em>`;
-        } else if (roll.glitched) {
-            participant.innerHTML += ` <em>(${game.i18n.localize("SR5.Skill.Teamwork.Glitched")})</em>`;
-        }
+        // 3.) Content komplett neu rendern
+        const content = await renderTemplate(
+            "systems/shadowrun5e/dist/templates/chat/teamworkRequest.html",
+            data
+        );
 
         // 5. Aktualisiere teamworkData
-        teamworkData.additionalDice.value = (teamworkData.additionalDice.value ?? 0) + netHits;
-        teamworkData.additionalLimit = (teamworkData.additionalLimit ?? 0) + (roll.total > 0 && !roll.glitched ? 1 : 0);
-        teamworkData.criticalGlitch = teamworkData.criticalGlitch || (roll.criticalGlitched);
+        data.additionalDice.value = (data.additionalDice.value ?? 0) + netHits;
+        data.additionalLimit = (data.additionalLimit ?? 0) + (results.rolls[0].total > 0 && !results.rolls[0].glitched ? 1 : 0);
+        data.criticalGlitch = data.criticalGlitch || (results.rolls[0].criticalGlitched);
 
-        participantsRoot.appendChild(participant)
-
-        // 7. Setze neue Flags und aktualisiere Message
+        // 4.) ChatMessage updaten — Content + Flag
         try {
             if (game.user?.isGM) {
-                message.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData)
-                message.update({ content: wrapper.innerHTML })
+                await message.setFlag(SYSTEM_NAME, FLAGS.Test, data);
+                await message.update({ content });
             }
             else {
-                this._sendUpdateSocketMessage(message, wrapper.innerHTML, teamworkData)
+                this._sendUpdateSocketMessage(message, content, data)
             }
         } catch (err) {
             ui.notifications?.error(`Teamwork: ${err}`);
         }
+
     }
 
     /**

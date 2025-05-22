@@ -50,19 +50,16 @@
   <div class="card-participants">
     <div class="card-content">
       <h4>{{localize "SR5.Skill.Teamwork.Participants"}}</h4>
-      <div class="sr5-teamwork-participants">
-        {{#each participants}}
-          <div class="participant-line">
-            <strong>{{this.name}}:</strong> {{this.netHits}}
-            {{#if this.glitched}}<em>({{localize "SR5.Skill.Teamwork.Glitched"}})</em>{{/if}}
-          </div>
-        {{/each}}
-        {{#if criticalGlitch}}
-          <div class="participant-line glitch-warning">
-            <em>{{localize "SR5.Skill.Teamwork.CriticalGlitch"}}</em>
-          </div>
-        {{/if}}
-      </div>
+<div class="sr5-teamwork-participants">
+  {{#each participants}}
+    {{> systems/shadowrun5e/dist/templates/chat/parts/teamworkParticipant.html
+        name=this.name
+        netHits=this.netHits
+        glitched=this.glitched
+        criticalGlitch=this.criticalGlitch
+    }}
+  {{/each}}
+</div>
     </div>
   </div>
 
