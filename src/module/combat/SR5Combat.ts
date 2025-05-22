@@ -31,10 +31,10 @@ export class SR5Combat extends Combat {
      * Use the given actors token to get the combatant.
      * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
      */
-    getActorCombatant(actor: SR5Actor): undefined | Combatant {
+    getActorCombatant(actor: SR5Actor): undefined | Combatant[] {
         const token = actor.getToken();
         if (!token) return;
-        return this.getCombatantByToken(token.id as string);
+        return this.getCombatantByToken(token);
     }
 
     /**
@@ -196,7 +196,7 @@ export class SR5Combat extends Combat {
 
         const turnsSinceLastAttack = Number(turnsSinceLastAttackSetting);
         if (turnsSinceLastAttack > 0) await combatant.actor?.clearProgressiveRecoil();
-        else await combatant.setFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack, 1);
+        else combatant.flags[SYSTEM_NAME]![FLAGS.TurnsSinceLastAttack] = 1;
     }
 
     /**
@@ -241,7 +241,7 @@ export class SR5Combat extends Combat {
                 Number(actor.getEdge().value),
                 Number(actor.findAttribute('reaction')?.value),
                 Number(actor.findAttribute('intuition')?.value),
-                new Roll('1d2').evaluate({ async: false }).total as number,
+                Math.floor(Math.random() * 2)
             ];
         };
 
@@ -263,7 +263,7 @@ export class SR5Combat extends Combat {
         for (let [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            if (!combatant.defeated && combatant.initiative > 0) {
+            if (!combatant.defeated && combatant.initiative && combatant.initiative > 0) {
                 return turnInPass;
             }
         }
@@ -279,7 +279,7 @@ export class SR5Combat extends Combat {
         for (let [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            if (combatant.initiative > 0) {
+            if (combatant.initiative && combatant.initiative > 0) {
                 return turnInPass;
             }
         }
@@ -314,7 +314,7 @@ export class SR5Combat extends Combat {
      *
      * * @Override
      */
-    override async nextTurn(): Promise<this | undefined> {
+    override async nextTurn(): Promise<this> {
         // Maybe advance to the next round/init pass
         let nextRound = this.round;
         let initiativePass = this.initiativePass;
@@ -326,25 +326,25 @@ export class SR5Combat extends Combat {
         // Start of the combat Handling
         if (nextRound === 0 && initiativePass === 0) {
             await this.startCombat();
-            return;
+            return this;
         }
 
         // Just step from one combatant to the next!
         if (nextTurn < this.turns.length) {
             await this.update({ turn: nextTurn });
             await this.handleActionPhase();
-            return;
+            return this;
         }
 
         // Initiative Pass Handling. Owner permissions are needed to change the initiative pass.
         if (!game.user?.isGM && this.doIniPass(nextTurn)) {
             await this._createDoIniPassSocketMessage();
-            return;
+            return this;
         }
 
         if (game.user?.isGM && this.doIniPass(nextTurn)) {
             await SR5Combat.handleIniPass(this.id as string);
-            return;
+            return this;
         }
 
 
@@ -386,7 +386,7 @@ export class SR5Combat extends Combat {
         return this;
     }
 
-    override _playCombatSound(name: string) {
+    override _playCombatSound(name: "startEncounter" | "nextUp" | "yourTurn") {
         super._playCombatSound(name)
     }
 
@@ -434,7 +434,7 @@ export class SR5Combat extends Combat {
     }
 
     static _getSystemInitiativeBaseFormula() {
-        return String(CONFIG.Combat.initiative.formula || game.system.data.initiative);
+        return String(CONFIG.Combat.initiative.formula || game.system.initiative);
     }
 
     static _getSystemInitiativeFormula(initiativePass: number): string {

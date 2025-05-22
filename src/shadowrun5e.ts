@@ -1,6 +1,13 @@
 import { SR5Actor } from "./module/actor/SR5Actor";
 import { SR5Item } from "./module/item/SR5Item";
-import { ShadowrunModel as SM } from "./module/types/ShadowrunModel";
+
+import { Character } from "./module/types/actor/CharacterModel";
+import { Critter } from "./module/types/actor/CritterModel";
+import { IC } from "./module/types/actor/ICModel";
+import { Spirit } from "./module/types/actor/SpiritModel";
+import { Sprite } from "./module/types/actor/SpriteModel";
+import { Vehicle } from "./module/types/actor/VehicleModel";
+
 import { Action } from "./module/types/item/ActionModel";
 import { Armor } from "./module/types/item/ArmorModel";
 import { AdeptPower } from "./module/types/item/AdeptPowerModel";
@@ -48,10 +55,18 @@ Hooks.once("init", () => {
     CONFIG.Item.dataModels["SpritePower"] = SpritePower;
     CONFIG.Item.dataModels["Weapon"] = Weapon;
 
+    CONFIG.Actor.dataModels["Character"] = Character;
+    CONFIG.Actor.dataModels["Critter"] = Critter;
+    CONFIG.Actor.dataModels["IC"] = IC;
+    CONFIG.Actor.dataModels["Spirit"] = Spirit;
+    CONFIG.Actor.dataModels["Sprite"] = Sprite;
+    CONFIG.Actor.dataModels["Vehicle"] = Vehicle;
+
     game.shadowrun5e = {
         canvas: {},
     };
 
+    CONFIG.Actor.documentClass = SR5Actor;
     CONFIG.Item.documentClass = SR5Item;
 });
 

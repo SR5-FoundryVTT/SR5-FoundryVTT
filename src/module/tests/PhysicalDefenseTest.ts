@@ -228,13 +228,16 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         // Check if the actor is in active combat situation and has enough initiative score left.
         if (this.actor && this.data.iniMod && game.combat) {
             const combat: SR5Combat = game.combat as unknown as SR5Combat;
-            const combatant = combat.getActorCombatant(this.actor);
-            if (!combatant || !combatant.initiative) return true;
-            
-            if (combatant && combatant.initiative + this.data.iniMod < 0) {
-                ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
-                return false;
+            const combatants = combat.getActorCombatant(this.actor);
+            if (!combatants) return true;
+            for (const combatant of combatants) {
+                if (combatant.initiative && combatant.initiative + this.data.iniMod < 0) {
+                    ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+                    return false;
+                }
             }
+
+            return true;
         }
 
         return super.canConsumeDocumentResources();

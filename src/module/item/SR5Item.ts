@@ -102,7 +102,7 @@ export class SR5Item extends Item {
     // Item Sheet labels for quick info on an item dropdown.
     labels: {} = {};
 
-    // Add v10 type helper
+    //@ts-expect-error Add v10 type helper
     system: ShadowrunItemDataData; // TODO: foundry-vtt-types v10
 
     /**
@@ -143,35 +143,35 @@ export class SR5Item extends Item {
 
     // Flag Functions
     getLastFireMode(): FireModeData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) as FireModeData || DataDefaults.fireModeData();
+        return this.flags[game.system.id]?.lastFireMode || DataDefaults.fireModeData();
     }
     async setLastFireMode(fireMode: FireModeData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
+        return this.flags[game.system.id]!.lastFireMode = fireMode;
     }
     getLastSpellForce(): SpellForceData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastSpellForce) as SpellForceData || { value: 0 };
+        return this.flags[game.system.id]?.lastSpellForce || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
+        return this.flags[game.system.id]!.lastSpellForce = force;
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel) as ComplexFormLevelData || { value: 0 };
+        return this.flags[game.system.id]?.lastComplexFormLevel || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
+        return this.flags[game.system.id]!.lastComplexFormLevel = level;
     }
     getLastFireRangeMod(): FireRangeData {
-        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireRange) as FireRangeData || { value: 0 };
+        return this.flags[game.system.id]?.lastFireRange || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
+        return this.flags[game.system.id]!.lastFireRange = environmentalMod;
     }
 
     /**
      * Return an Array of the Embedded Item Data
      */
     getNestedItems(): any[] {
-        let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems) as any[];
+        let items = this.flags[game.system.id]?.embeddedItems;
 
         items = items ? items : [];
 
@@ -195,10 +195,10 @@ export class SR5Item extends Item {
      * Set the embedded item data
      * @param items
      */
-    async setNestedItems(items: any[]) {
+    setNestedItems(items: any[]) {
         // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
         // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
-        await this.setFlag(SYSTEM_NAME, FLAGS.EmbeddedItems, items);
+        this.flags[game.system.id]!.embeddedItems = items;
     }
 
     async clearNestedItems() {
@@ -331,6 +331,7 @@ export class SR5Item extends Item {
         const chatDataForItemType = ChatData[this.type];
         if (chatDataForItemType) chatDataForItemType(system, labels, props, this);
 
+        //@ts-expect-error TODO: foundry-vtt-types v10
         system.properties = props.filter((p) => !!p);
 
         return system;
@@ -748,9 +749,9 @@ export class SR5Item extends Item {
     static getTargets() {
         if (!game.ready || !game.user) return;
         const { character } = game.user;
-        const { controlled } = canvas.tokens;
-        const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
-        if (character && controlled.length === 0) targets.push(character);
+        const { controlled } = canvas!.tokens!;
+        const targets = controlled.reduce<SR5Actor[]>((arr, t) => t.actor ? [...arr, t.actor] : arr, []);
+        if (character instanceof SR5Actor && controlled.length === 0) targets.push(character);
         if (!targets.length) throw new Error(`You must designate a specific Token as the roll target`);
         return targets;
     }
@@ -1457,7 +1458,7 @@ export class SR5Item extends Item {
      *       SR5Item and SR5Actor.
      */
     async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: Item, overwrite?: boolean }) {
-        if (!canvas.ready) return;
+        if (!canvas!.ready) return;
 
         if (!this.isHost) {
             console.error('Only Host item types can place matrix marks!');
@@ -1465,7 +1466,7 @@ export class SR5Item extends Item {
         }
 
         // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene as Scene;
+        const scene = options?.scene || canvas!.scene as Scene;
         const item = options?.item;
 
         // Build the markId string. If no item has been given, there still will be a third split element.
@@ -1504,11 +1505,11 @@ export class SR5Item extends Item {
      * @return Will always return a number. At least zero, for no marks placed.
      */
     getMarks(target: SR5Actor, item?: SR5Item, options?: { scene?: Scene }): number {
-        if (!canvas.ready) return 0;
+        if (!canvas!.ready) return 0;
         if (!this.isHost) return 0;
 
         // Scene is optional.
-        const scene = options?.scene || canvas.scene as Scene;
+        const scene = options?.scene || canvas!.scene as Scene;
         item = item || target.getMatrixDevice();
 
         const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);

@@ -4,6 +4,7 @@ import { SYSTEM_NAME } from "../constants";
 import { SR5Item } from "../item/SR5Item";
 import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
 import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs";
+import { AnyDocument } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/data/abstract/client-document.mjs";
 
 
 
@@ -20,11 +21,6 @@ import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-type
  * can apply to actors, tests and also only to actors targeted by tests.
  */
 export class SR5ActiveEffect extends ActiveEffect {
-    // Foundry Core typing missing... TODO: foundry-vtt-types v10
-    public active: boolean;
-    public origin: string | null;
-    public changes: EffectChangeData[];
-
     /**
      * Can be used to determine if the origin of the effect is a document owned by another document.
      *
@@ -43,7 +39,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
-    public get source(): SR5Actor | SR5Item | null {
+    public get source(): AnyDocument | Record<string, unknown> | null {
         return this.origin ? fromUuidSync(this.origin) : null;
     }
 
@@ -76,11 +72,11 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Render the sheet of the active effect source
      */
     public renderSourceSheet() {
-        return this.source?.sheet?.render(true);
+        if (this.source instanceof SR5Actor || this.source instanceof SR5Item)
+            return this.source?.sheet?.render(true);
     }
 
     async toggleDisabled() {
-        // @ts-expect-error  TODO: foundry-vtt-types v10
         return this.update({ disabled: !this.disabled });
     }
 
@@ -173,7 +169,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns Either the configured value or 'actor' as a default.
      */
     get applyTo() {
-        return this.getFlag(SYSTEM_NAME, 'applyTo') as Shadowrun.EffectApplyTo || 'actor';
+        return this.flags[game.system.id]?.applyTo || 'actor';
     }
 
     /**
@@ -182,7 +178,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * When this flag is set, the parent item wireless status is taken into account.
      */
     get onlyForWireless(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'onlyForWireless') as boolean || false;
+        return this.flags[game.system.id]?.onlyForEquipped || false;
     }
 
     /**
@@ -191,7 +187,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * When this flag is set, the parent item enabled status is taken into account.
      */
     get onlyForEquipped(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'onlyForEquipped') as boolean || false;
+        return this.flags[game.system.id]?.onlyForEquipped || false;
     }
 
     /**
@@ -200,7 +196,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * When this flag is set, this effect shouldn't apply always.
      */
     get onlyForItemTest(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'onlyForItemTest') as boolean || false;
+        return this.flags[game.system.id]?.onlyForItemTest || false;
     }
 
     /**
@@ -210,7 +206,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns true, when the effect has been applied by a test.
      */
     get appliedByTest(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'appliedByTest') as boolean || false;
+        return this.flags[game.system.id]?.appliedByTest || false;
     }
 
     get selectionTests(): string[] {
@@ -275,7 +271,6 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param change 
      */
     override apply(object: any, change) {
-        // @ts-expect-error
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
@@ -387,7 +382,6 @@ export class SR5ActiveEffect extends ActiveEffect {
      * All migrations here are taken from FoundryVtt common.js BaseActiveEffect#migrateData
      * for v11.315
      */
-    // @ts-expect-error foundry-vtt-types v10
     static override migrateData(data: any) {
         /**
          * label -> name

@@ -122,7 +122,8 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        device.sheet.render(true);
+        if (device instanceof SR5Item || device instanceof SR5Actor)
+            device?.sheet?.render(true);
     }
 
     async _onControllerRemove(event) {

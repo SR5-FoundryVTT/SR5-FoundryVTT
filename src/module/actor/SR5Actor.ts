@@ -63,7 +63,7 @@ export class SR5Actor extends Actor {
     // Allow users to access to tests creation.
     tests: typeof TestCreator = TestCreator;
 
-    // Add v10 type helper
+    // @ts-expect-error - Foundry initializes this.
     system: Shadowrun.ShadowrunActorDataData; // TODO: foundry-vtt-types v10
 
     // Holds all operations related to this actors inventory.
@@ -200,7 +200,7 @@ export class SR5Actor extends Actor {
      * 
      * NOTE: Foundry also shows disabled effects by default. We behave the same.
      */
-    override get temporaryEffects() {
+    override get temporaryEffects(): ReturnType<this["effects"]["filter"]> {
         const showEffectIcon = (effect: SR5ActiveEffect) => !effect.disabled && !effect.isSuppressed && effect.isTemporary && effect.appliesToLocalActor;
 
         // Collect actor effects.
@@ -263,18 +263,23 @@ export class SR5Actor extends Actor {
      */
     applyOverrideActiveEffects() {
         const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
-            if (effect.data.disabled) return changes;
+            if (effect.disabled) return changes;
 
             // include changes partially matching given keys.
-            return changes.concat(effect.data.changes
+            const overrideChanges = effect.changes
                 .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
-                .map(change => {
-                    change = foundry.utils.duplicate(change);
+                .map(origChange => {
+                    const change: EffectChangeData = {
+                        key: String(origChange.key),
+                        value: String(origChange.value),
+                        mode: Number(origChange.mode),
+                        priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
+                    };
+                    //@ts-expect-error
                     change.effect = effect;
-                    change.priority = change.priority ?? (change.mode * 10);
-
                     return change;
-                }));
+                });
+            return changes.concat(overrideChanges);
         }, []);
         // Sort changes according to priority, in case it's ever needed.
         changes.sort((a, b) => a.priority - b.priority);
@@ -316,18 +321,24 @@ export class SR5Actor extends Actor {
     _reduceEffectChangesByKeys(partialKeys: string[]): EffectChangeData[] {
         // Collect only those changes matching the given partial keys.
         const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
-            if (effect.data.disabled) return changes;
+            if (effect.disabled) return changes;
 
             // include changes partially matching given keys.
-            return changes.concat(effect.data.changes
+            const overrideChanges = effect.changes
                 .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
-                .map(change => {
-                    change = foundry.utils.duplicate(change);
+                .map(origChange => {
+                    const change: EffectChangeData = {
+                        key: String(origChange.key),
+                        value: String(origChange.value),
+                        mode: Number(origChange.mode),
+                        priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
+                    };
+                    //@ts-expect-error
                     change.effect = effect;
-                    change.priority = change.priority ?? (change.mode * 10);
-
                     return change;
-                }));
+                });
+
+            return changes.concat(overrideChanges);
         }, []);
         // Sort changes according to priority, in case it's ever needed.
         changes.sort((a, b) => a.priority - b.priority);
@@ -1116,8 +1127,6 @@ export class SR5Actor extends Actor {
         // Prepare the actual message.
         const messageData =  {
             user: game.user?.id,
-            // Use type roll, for Foundry built in content visibility.
-            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             speaker: {
                 actor: this.id,
                 alias: game.user?.name,
@@ -1239,27 +1248,6 @@ export class SR5Actor extends Actor {
 
             test: 'SkillTest'
         });
-    }
-
-    /**
-     * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
-     * @param scope
-     * @param key
-     * @param value
-     */
-    setFlag(scope: string, key: string, value: any): Promise<any> {
-        const newValue = Helpers.onSetFlag(value);
-        return super.setFlag(scope, key, newValue);
-    }
-
-    /**
-     * Override getFlag to add back the 'SR5.' keys correctly to be handled
-     * @param scope
-     * @param key
-     */
-    getFlag(scope: string, key: string): any {
-        const data = super.getFlag(scope, key);
-        return Helpers.onGetFlag(data);
     }
 
     /** Return either the linked token or the token of the synthetic actor.

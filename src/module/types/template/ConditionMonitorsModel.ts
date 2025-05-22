@@ -10,29 +10,29 @@ const Overflow: DataSchema = {
     overflow: new SchemaField(SM.ValueMaxPair),
 }
 
-const TrackType: DataSchema = {
+export const TrackType: DataSchema = {
     ...SM.ValueMaxPair,
     ...SM.ModifiableValue,
     label: new StringField({ required: false, initial: '' }),
     disable: new BooleanField({ required: false, initial: false })
 }
 
-const OverflowTrackType: DataSchema = {
+export const OverflowTrackType: DataSchema = {
     ...TrackType,
     ...Overflow,
 }
 
-const PhysicalTrack: DataSchema = {
+export const PhysicalTrack: DataSchema = {
     ...OverflowTrackType,
     ...Living,
 }
 
-const StunTrack: DataSchema = {
+export const StunTrack: DataSchema = {
     ...TrackType,
     ...Living,
 }
 
-const MatrickTrack: DataSchema = {
+export const MatrickTrack: DataSchema = {
     ...TrackType
 }
 

@@ -7,6 +7,10 @@ import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { Translation } from '../utils/strings';
 
+interface AEFlags {
+    
+}
+
 declare global {
     // Configuration of foundry-vtt-types
     interface LenientGlobalVariableTypes {
@@ -15,11 +19,12 @@ declare global {
         socket: never; // disable socket ready checks
     }
 
+    interface DocumentClassConfig {
+        ActiveEffect: typeof SR5ActiveEffect;
+    }
+
     interface AssumeHookRan {
-        i18nReady: never;
         ready: never;
-        init: never;
-        setup: never;
     }
 
     interface System {
@@ -45,11 +50,35 @@ declare global {
     }
 
     interface FlagConfig {
-        ChatMessage: {
-            shadowrun5e: {
-                [key: string]: unknown;
+        ActiveEffect: {
+            shadowrun5e?: {
+                applyTo?: Shadowrun.EffectApplyTo;
+                appliedByTest?: boolean;
+                onlyForEquipped?: boolean;
+                onlyForWireless?: boolean;
+                onlyForItemTest?: boolean;
+            };
+        };
+        Actor: {
+            shadowrun5e?: {
+                turnsSinceLastAttack?: number;
             }
-        }
+        };
+        Combatant: {
+            shadowrun5e?: {
+                combatInitiativePass?: number;
+                turnsSinceLastAttack?: number;
+            };
+        };
+        Item: {
+            shadowrun5e?: {
+                lastFireMode?: Shadowrun.FireModeData;
+                lastSpellForce?: Shadowrun.SpellForceData;
+                lastComplexFormLevel?: Shadowrun.ComplexFormLevelData;
+                lastFireRange?: Shadowrun.FireRangeData;
+                embeddedItems?: any[];
+            };
+        };
     }
 
     interface DocumentClassConfig {

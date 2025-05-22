@@ -463,7 +463,10 @@ ___________________
                 // All sidebar actors should also include tokens with linked actors.
                 ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
                 // All token actors that aren't linked.
-                ...canvas.scene.tokens.filter(token => !token.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
+                ...canvas.scene!.tokens.filter(token => {
+                    const actor = token.actor;
+                    return !token.actorLink && !!actor && actor.isIC() && actor.hasHost();
+                }).map(t => t.actor)
             ];
 
             // Update host data on the ic actor.

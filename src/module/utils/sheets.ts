@@ -90,8 +90,9 @@ export function createTagifyOnInput(element: HTMLInputElement, values: TagifyVal
     return tagify;
 }
 
+type FlagType = "applyTo" | "appliedByTest" | "onlyForEquipped" | "onlyForWireless" | "onlyForItemTest";
 const tagsToIds = (tags: TagifyTags) => tags.map(tag => tag.id);
-export const tagifyFlagsToIds = (effect: SR5ActiveEffect, flag: string): string[] => {
+export const tagifyFlagsToIds = (effect: SR5ActiveEffect, flag: FlagType): string[] => {
     const value = effect.getFlag(SYSTEM_NAME, flag);
     if (!value) return [];
     const tags = JSON.parse(value as string);

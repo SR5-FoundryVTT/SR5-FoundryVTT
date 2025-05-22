@@ -375,21 +375,18 @@ export class Helpers {
         if (!tokenOrigin || !tokenDest) return 0;
 
         // 2d coordinates and distance
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        const origin2D = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.x, tokenOrigin.y));
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        const dest2D = new PIXI.Point(...canvas.grid.getCenter(tokenDest.x, tokenDest.y));
+        const origin2D = canvas.grid.getCenterPoint({x: tokenOrigin.x, y: tokenOrigin.y});
+        const dest2D = canvas.grid.getCenterPoint({x: tokenDest.x, y: tokenDest.y});
 
         // Use gridSpace to measure in grids instead of distance. This will give results parity to FoundryVTTs canvas ruler.
-        const distanceInGridUnits2D = canvas.grid.measureDistance(origin2D, dest2D);
+        const distanceInGridUnits2D = canvas.grid.measurePath([origin2D, dest2D], {});
 
         // 3d coordinates and distance
         const originLOSHeight = Helpers.getTokenLOSHeight(tokenOrigin);
         const destLOSHeight = Helpers.getTokenLOSHeight(tokenDest);
-        // @ts-expect-error TODO: foundry-vtt-types v10
         const elevationDifference = (tokenOrigin.elevation + originLOSHeight) - (tokenDest.elevation + destLOSHeight);
         const origin3D = new PIXI.Point(0, 0);
-        const dest3D = new PIXI.Point(distanceInGridUnits2D, elevationDifference);
+        const dest3D = new PIXI.Point(distanceInGridUnits2D.distance, elevationDifference);
         
         const distanceInGridUnits3D = Math.round(Helpers.measurePointDistance(origin3D, dest3D));
 
@@ -404,7 +401,7 @@ export class Helpers {
      * @param destination 
      * @returns Distance without a unit.
      */
-    static measurePointDistance(origin: Point, destination: Point): number {
+    static measurePointDistance(origin: PIXI.Point, destination: PIXI.Point): number {
         const sideA = origin.x + destination.x;
         const sideB = origin.y + destination.y;
         return Math.sqrt(Math.pow(sideA, 2) + Math.pow(sideB, 2))
@@ -483,8 +480,9 @@ export class Helpers {
         const actors = Helpers.getControlledTokenActors();
 
         // Try to default to a users character.
-        if (actors.length === 0 && game.user.character) {
-            actors.push(game.user.character);
+        if (actors.length === 0 && game.user.character?.uuid) {
+            const character = fromUuidSync(game.user.character.uuid);
+            if (character && character instanceof SR5Actor) actors.push(character);
         }
 
         return actors as SR5Actor[];
@@ -587,7 +585,6 @@ export class Helpers {
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (useTokenForChatOutput && token) return token.texture.src || '';
         return actor.img || '';
     }
@@ -814,7 +811,11 @@ export class Helpers {
      * @param permission A foundry access permission
      * @param active If true, will only return users that are also currently active.
      */
-    static getPlayersWithPermission(document: foundry.abstract.Document<any>, permission: string, active: boolean = true): User[] {
+    static getPlayersWithPermission(
+        document: foundry.abstract.Document<any>,
+        permission: keyof typeof CONST.DOCUMENT_OWNERSHIP_LEVELS,
+        active: boolean = true
+    ): User[] {
         if (!game.users) return [];
 
         return game.users.filter(user => {
@@ -863,9 +864,9 @@ export class Helpers {
      * @param collection The pack name as stored in the collection property
      * @param id The entity id in that collection
      */
-    static async getEntityFromCollection(collection: string, id: string): Promise<Document> {
+    static async getEntityFromCollection(collection: string, id: string): Promise<ClientDocument | null | undefined> {
         const pack = game.packs.find((p) => p.collection === collection);
-        return await pack.getDocument(id);
+        return await pack?.getDocument(id);
     }
 
     /**
@@ -1003,7 +1004,8 @@ export class Helpers {
         if (!document) return;
         if (document instanceof TokenDocument && resolveTokenToActor && document.actor)
             document = document.actor;
-        await document.sheet.render(true);
+        if (document instanceof SR5Actor || document instanceof SR5Item)
+            await document?.sheet?.render(true);
     }
 
     /**

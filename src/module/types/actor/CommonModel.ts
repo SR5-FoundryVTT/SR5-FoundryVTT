@@ -1,5 +1,6 @@
 import { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { track } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/prosemirror/schema/other.mjs";
 
 export const CommonData: DataSchema = {
     attributes: new SchemaField(SM.Attributes, { required: true }),
@@ -52,7 +53,7 @@ export const MagicData: DataSchema = {
     initiation: new NumberField({ required: true, initial: 0, }),
 }
 
-export const MatrixAttribute: DataSchema = {
+export const MatrixAttributes: DataSchema = {
     att1: new SchemaField(SM.DeviceAttribute, { required: true }),
     att2: new SchemaField(SM.DeviceAttribute, { required: true }),
     att3: new SchemaField(SM.DeviceAttribute, { required: true }),
@@ -131,4 +132,67 @@ export const VisibilityChecks: DataSchema = {
     astral: new SchemaField(AstralVisibility, { required: true }),
     meat: new SchemaField(MeatSpaceVisibility, { required: true }),
     matrix: new SchemaField(MatrixVisibility, { required: true }),
+}
+
+export const ArmorActorData: DataSchema = {
+    armor: new SchemaField(SM.ActorArmor, { required: true }),
+}
+
+export const WoundType: DataSchema = {
+    value: new NumberField({ required: true, initial: 0 }),
+}
+
+export const WoundsActorData: DataSchema = {
+    wounds: new SchemaField(SM.WoundType, { required: true }),
+}
+
+export const PhysicalTrackActorData: DataSchema = {
+    track: new SchemaField({ physical: new SchemaField(SM.PhysicalTrack, { required: true }) }, { required: true }),
+}
+
+export const StunTrackActorData: DataSchema = {
+    track: new SchemaField({ physical: new SchemaField(SM.StunTrack, { required: true }) }, { required: true }),
+}
+
+export const TwoTrackActorData: DataSchema = {
+    track: new SchemaField(SM.Tracks, { required: true }),
+}
+
+export const MagicActorData: DataSchema = {
+    magic: new SchemaField(MagicData, { required: true }),
+}
+
+export const MatrixActorData: DataSchema = {
+    matrix: new SchemaField(MatrixData, { required: true }),
+}
+
+export const MovementActorData: DataSchema = {
+    movement: new SchemaField(SM.Movement, { required: true }),
+}
+
+export const NPCActorData: DataSchema = {
+    is_npc: new BooleanField({ required: true, initial: false }),
+    npc: new SchemaField(NPCData, { required: true }),
+}
+
+export const CharacterLimits: DataSchema = {
+    ...SM.AwakendLimits,
+    ...SM.MatrixLimits,
+}
+
+export const CommonModifiers: DataSchema = {
+    defense: new NumberField({ required: false, initial: 0 }),
+    defense_dodge: new NumberField({ required: false, initial: 0 }),
+    defense_parry: new NumberField({ required: false, initial: 0 }),
+    defense_block: new NumberField({ required: false, initial: 0 }),
+    defense_melee: new NumberField({ required: false, initial: 0 }),
+    defense_ranged: new NumberField({ required: false, initial: 0 }),
+    soak: new NumberField({ required: false, initial: 0 }),
+    recoil: new NumberField({ required: false, initial: 0 }),
+}
+
+export const MatrixModifiers: DataSchema = {
+    matrix_initiative: new NumberField({ required: false, initial: 0 }),
+    matrix_initiative_dice: new NumberField({ required: false, initial: 0 }),
+    matrix_track: new NumberField({ required: false, initial: 0 }),
 }
