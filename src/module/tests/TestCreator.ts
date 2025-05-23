@@ -224,11 +224,16 @@ export const TestCreator = {
             return;
         }
 
-        // filter out actors current user shouldn't be able to test with.
+        // Filter out actors the current user shouldn't be able to test with.
         actors = actors.filter(actor => actor.isOwner);
-        // Fallback to player character.
-        if (actors.length === 0 && game.user.character) {
-            actors.push(game.user.character);
+
+        // Fallback to player-assigned character.
+        if (actors.length === 0) {
+            const characterId = game.user?.getFlag("core" as any, "character");
+            if (typeof characterId === "string") {
+                const character = game.actors.get(characterId);
+                if (character?.isOwner) actors.push(character);
+            }
         }
 
         if (actors.length === 0) {

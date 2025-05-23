@@ -50,20 +50,18 @@ export class FadeTest extends SuccessTest<FadeTestData> {
         };
     }
     
-    static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor) {
+    static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor<'character'>) {
         const documentAction = await super._getDocumentTestAction(item, actor);
 
-        const character = actor.asCharacter();
-
-        if (!character || !actor.isEmerged) {
+        if (!actor.isCharacter() || !actor.isEmerged) {
             console.error(`Shadowrun 5e | A ${this.name} expected an emerged actor but got this`, actor);
             return documentAction;
         }
 
         // Get technomancer fade attribute
-        const attribute = character.system.technomancer.attribute;
+        const attribute = actor.system.technomancer.attribute;
         foundry.utils.mergeObject(documentAction, {attribute});
-        
+
         return documentAction;
     }
 

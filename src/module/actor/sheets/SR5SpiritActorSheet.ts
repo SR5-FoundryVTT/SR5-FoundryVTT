@@ -30,13 +30,9 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
      */
     override async getData(options: any) {
         const data = await super.getData(options);
-        
-        const spirit = this.document.asSpirit();
-        if (spirit) {
-            if (spirit.system.summonerUuid) {
-                data['summoner'] = await fromUuid((this.document.system as Shadowrun.SpiritData).summonerUuid);
-            }
-        }
+
+        if (this.document.isSpirit() && this.document.system.summonerUuid)
+            data['summoner'] = await fromUuid(this.document.system.summonerUuid);
 
         return data;
     }

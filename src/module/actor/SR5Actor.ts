@@ -28,12 +28,7 @@ import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { EffectChangeData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs';
-import { Vehicle } from '../types/actor/VehicleModel';
-import { Character } from '../types/actor/CharacterModel';
-import { Critter } from '../types/actor/CritterModel';
-import { Spirit } from '../types/actor/SpiritModel';
-import { Sprite } from '../types/actor/SpriteModel';
-import { IC } from '../types/actor/ICModel';
+import { ConfiguredData } from '@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes.mjs';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -50,7 +45,7 @@ import { IC } from '../types/actor/ICModel';
  * </code></pre>
  *
  */
-export class SR5Actor extends Actor {
+export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends Actor {
     // This is the default inventory name and label for when no other inventory has been created.
     defaultInventory: Shadowrun.InventoryData = {
         name: 'Carried',
@@ -67,9 +62,8 @@ export class SR5Actor extends Actor {
 
     // Allow users to access to tests creation.
     tests: typeof TestCreator = TestCreator;
-
-    // @ts-expect-error - Foundry initializes this.
-    system: Shadowrun.ShadowrunActorDataData; // TODO: foundry-vtt-types v10
+    //@ts-expect-error
+    system: Extract<Shadowrun.ShadowrunActorData, {type: T}>['system'];
 
     // Holds all operations related to this actors inventory.
     inventory: InventoryFlow;
@@ -115,32 +109,18 @@ export class SR5Actor extends Actor {
     override prepareBaseData() {
         super.prepareBaseData();
 
-        switch (this.type) {
-            case 'character':
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                CharacterPrep.prepareBaseData(this.system);
-                break;
-            case "critter":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                CritterPrep.prepareBaseData(this.system);
-                break;
-            case "spirit":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                SpiritPrep.prepareBaseData(this.system);
-                break;
-            case "sprite":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                SpritePrep.prepareBaseData(this.system);
-                break;
-            case "vehicle":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                VehiclePrep.prepareBaseData(this.system);
-                break;
-            case "ic":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                ICPrep.prepareBaseData(this.system);
-                break;
-        }
+        if (this.isCharacter())
+            CharacterPrep.prepareBaseData(this.system);
+        else if (this.isCritter())
+            CritterPrep.prepareBaseData(this.system);
+        else if (this.isSpirit())
+            SpiritPrep.prepareBaseData(this.system);
+        else if (this.isSprite())
+            SpritePrep.prepareBaseData(this.system);
+        else if (this.isVehicle())
+            VehiclePrep.prepareBaseData(this.system);
+        else if (this.isIC())
+            ICPrep.prepareBaseData(this.system);
     }
 
     /**
@@ -235,32 +215,18 @@ export class SR5Actor extends Actor {
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
         const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item as unknown as Shadowrun.ShadowrunItemData));
-        switch (this.type) {
-            case 'character':
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                CharacterPrep.prepareDerivedData(this.system, itemDataWrappers);
-                break;
-            case "critter":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                CritterPrep.prepareDerivedData(this.system, itemDataWrappers);
-                break;
-            case "spirit":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                SpiritPrep.prepareDerivedData(this.system, itemDataWrappers);
-                break;
-            case "sprite":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                SpritePrep.prepareDerivedData(this.system, itemDataWrappers);
-                break;
-            case "vehicle":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                VehiclePrep.prepareDerivedData(this.system, itemDataWrappers);
-                break;
-            case "ic":
-                //@ts-expect-error // TODO: foundry-vtt-types v10
-                ICPrep.prepareDerivedData(this.system, itemDataWrappers);
-                break;
-        }
+        if (this.isCharacter())
+            CharacterPrep.prepareDerivedData(this.system, itemDataWrappers);
+        else if (this.isCritter())
+            CritterPrep.prepareDerivedData(this.system, itemDataWrappers);
+        else if (this.isSpirit())
+            SpiritPrep.prepareDerivedData(this.system, itemDataWrappers);
+        else if (this.isSprite())
+            SpritePrep.prepareDerivedData(this.system, itemDataWrappers);
+        else if (this.isVehicle())
+            VehiclePrep.prepareDerivedData(this.system, itemDataWrappers);
+        else if (this.isIC())
+            ICPrep.prepareDerivedData(this.system, itemDataWrappers);
     }
 
     /**
@@ -465,12 +431,9 @@ export class SR5Actor extends Actor {
         if (this.isVehicle()) {
             return this.findVehicleStat('pilot');
         } else if (this.isCharacter()) {
-            const character = this.asCharacter();
-            if (character) {
-                let att = character.system.full_defense_attribute;
-                if (!att) att = 'willpower';
-                return this.findAttribute(att);
-            }
+            let att = this.system.full_defense_attribute;
+            if (!att) att = 'willpower';
+            return this.findAttribute(att);
         }
     }
 
@@ -551,19 +514,19 @@ export class SR5Actor extends Actor {
         return this.type;
     }
 
-    isCharacter(): boolean {
+    isCharacter():  this is SR5Actor<'character'> {
         return this.getType() === 'character';
     }
 
-    isSpirit(): boolean {
+    isSpirit():  this is SR5Actor<'spirit'> {
         return this.getType() === 'spirit';
     }
 
-    isSprite(): boolean {
+    isSprite(): this is SR5Actor<'sprite'> {
         return this.getType() === 'sprite';
     }
 
-    isVehicle() {
+    isVehicle(): this is SR5Actor<'vehicle'> {
         return this.getType() === 'vehicle';
     }
 
@@ -573,11 +536,11 @@ export class SR5Actor extends Actor {
         return this.system.is_npc && this.system.npc.is_grunt;
     }
 
-    isCritter() {
+    isCritter(): this is SR5Actor<'critter'> {
         return this.getType() === 'critter';
     }
 
-    isIC() {
+    isIC(): this is SR5Actor<'ic'> {
         return this.getType() === 'ic';
     }
 
@@ -629,16 +592,19 @@ export class SR5Actor extends Actor {
         return this.system.skills.active;
     }
 
-    getNetworkController(): string|undefined {
+    getNetworkController(): string | undefined {
         if(!this.isVehicle()) return;
 
-        return this.asVehicle()?.system?.networkController;
+        return this.system.networkController;
     }
 
     async setNetworkController(networkController: string|undefined): Promise<void> {
         if(!this.isVehicle()) return;
 
-        await this.update({ 'system.networkController': networkController });
+        if ('networkController' in this.system) {
+            this.system.networkController;
+            await this.update({ system: { 'networkController': networkController }});
+        }
     }
 
     get canBeNetworkDevice(): boolean {
@@ -1690,9 +1656,9 @@ export class SR5Actor extends Actor {
         // Remove out old defeated effects.
         if (removeStatus.length) {
             const existing = this.effects.reduce((arr, e) => {
-                if ( (e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status)) ) arr.push(e.id);
+                if ( (e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status)) ) arr.push(e.id as string);
                 return arr; 
-            }, []);
+            }, [] as string[]);
 
             if (existing.length) await this.deleteEmbeddedDocuments('ActiveEffect', existing);
         }
@@ -1779,44 +1745,8 @@ export class SR5Actor extends Actor {
         return "track" in this.system;
     }
 
-    asVehicle(): Shadowrun.VehicleActorData | undefined {
-        if (this.isVehicle())
-            return this as unknown as Shadowrun.VehicleActorData;
-    }
-
-    asCharacter(): Shadowrun.CharacterActorData | undefined {
-        if (this.isCharacter())
-            return this as unknown as Shadowrun.CharacterActorData;
-    }
-
-    asSpirit(): Shadowrun.SpiritActorData | undefined {
-        if (this.isSpirit()) {
-            return this as unknown as Shadowrun.SpiritActorData;
-        }
-    }
-
-    asSprite(): Shadowrun.SpriteActorData | undefined {
-        if (this.isSprite()) {
-            return this as unknown as Shadowrun.SpriteActorData;
-        }
-    }
-
-    asCritter(): Shadowrun.CritterActorData | undefined {
-        if (this.isCritter()) {
-            return this as unknown as Shadowrun.CritterActorData;
-        }
-    }
-
-    asIC(): Shadowrun.ICActorData | undefined {
-        if (this.isIC()) {
-            return this as unknown as Shadowrun.ICActorData;
-        }
-    }
-
     getVehicleStats(): Shadowrun.VehicleStats | undefined {
-        if (this.isVehicle() && "vehicle_stats" in this.system) {
-            return this.system.vehicle_stats;
-        }
+        if (this.isVehicle()) return this.system.vehicle_stats;
     }
 
     /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
@@ -1836,25 +1766,20 @@ export class SR5Actor extends Actor {
     }
 
     async removeVehicleDriver() {
-        if (!this.hasDriver()) return;
+        if (!this.isVehicle() || !this.hasDriver()) return;
 
         await this.update({'system.driver': ''});
     }
 
     hasDriver(): boolean {
-        const vehicle = this.asVehicle();
-        if (!vehicle) return false;
+        if (!this.isVehicle()) return false;
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         return this.system.driver.length > 0;
     }
 
     getVehicleDriver(): SR5Actor | undefined {
-        if (!this.hasDriver()) return;
-        const vehicle = this.asVehicle();
-        if (!vehicle) return;
+        if (!this.isVehicle() || !this.hasDriver()) return;
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         const driver = game.actors?.get(this.system.driver) as SR5Actor;
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver) return;
@@ -1910,18 +1835,16 @@ export class SR5Actor extends Actor {
      * Will return true if this ic type actor has been connected to a host.
      */
     hasHost(): boolean {
-        const ic = this.asIC();
-        if (!ic) return false;
-        return ic && !!ic.system.host.id;
+        if (!this.isIC()) return false;
+        return !!this.system.host.id;
     }
 
     /**
      * Get the host item connect to this ic type actor.
      */
     getICHost(): SR5Item | undefined {
-        const ic = this.asIC();
-        if (!ic) return;
-        return game.items?.get(ic?.system?.host.id);
+        if (!this.isIC()) return;
+        return game.items?.get(this.system.host.id);
     }
 
     /**

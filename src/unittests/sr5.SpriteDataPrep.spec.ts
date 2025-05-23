@@ -37,8 +37,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Sprites default/override values by example type', async () => {
-            const actor = await testActor.create({ type: 'sprite', 'system.spriteType': 'courier' }) as SR5Actor;
-            let sprite = actor.asSprite() as Shadowrun.SpriteActorData;
+            const sprite = await testActor.create({ type: 'sprite', 'system.spriteType': 'courier' }) as SR5Actor<'sprite'>;
 
             assert.strictEqual(sprite.system.matrix.sleaze.base, 3);
             assert.strictEqual(sprite.system.matrix.data_processing.base, 1);
@@ -49,11 +48,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(sprite.system.skills.active.hacking.base, 0);
 
-            await actor.update({
-                'system.level': 6
-            });
-
-            sprite = actor.asSprite() as Shadowrun.SpriteActorData;
+            await sprite.update({ 'system.level': 6 });
 
             assert.strictEqual(sprite.system.level, 6);
 
@@ -71,13 +66,10 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
         })
 
         it('Matrix condition monitor track calculation with modifiers', async () => {
-            const actor = await testActor.create({ type: 'sprite' }) as SR5Actor;
-
-            let sprite = actor.asSprite() as Shadowrun.SpriteActorData;
+            const sprite = await testActor.create({ type: 'sprite' }) as SR5Actor<'sprite'>;
             assert.equal(sprite.system.matrix.condition_monitor.max, 8);
 
-            await actor.update({ 'system.modifiers.matrix_track': 1 });
-            sprite = actor.asSprite() as Shadowrun.SpriteActorData;
+            await sprite.update({ 'system.modifiers.matrix_track': 1 });
             assert.equal(sprite.system.matrix.condition_monitor.max, 9);
         });
     });
