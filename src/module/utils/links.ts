@@ -47,7 +47,6 @@ export class LinksHelpers {
         if (!candidate) return false;
 
         try {
-            // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
             return !!foundry.utils.parseUuid(candidate).collection;
           } catch (error) {
             return false;
@@ -59,7 +58,6 @@ export class LinksHelpers {
      * @param source 
      */
     static async resolveUuid(source: string) {
-        // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
         const resolvedUuid = foundry.utils.parseUuid(source);
 
         const uuid = resolvedUuid.uuid.split('#')[0];
@@ -122,7 +120,7 @@ export class LinksHelpers {
             if (document instanceof SR5Item || document instanceof SR5Actor || document instanceof JournalEntry) {
                 document.sheet?.render(true);
             } else if (document instanceof JournalEntryPage) {
-                document.parent.sheet.render(true, { pageId: document.id, anchor: anchor ?? undefined });
+                document.parent?.sheet?.render(true);
             } else {
                 ui.notifications?.error(`The document has no associated sheet.`);
             }

@@ -52,6 +52,7 @@ export default class VehicleParser {
             }
 
             await vehicleActor.update({
+                // @ts-expect-error
                 'system.driver': actor.id,
                 'system.vehicle_stats.pilot.base': vehicle.pilot,
                 'system.vehicle_stats.handling.base': handling,

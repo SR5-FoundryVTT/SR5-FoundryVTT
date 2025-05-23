@@ -66,7 +66,6 @@ export class TeamworkTest {
     static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest, teamworkData: TeamworkMessageData) {
         //wrap the old content to presever it, this is necessary for pre-render hooks
         const wrapper = document.createElement("dív");
-        //@ts-expect-error v11 type
         wrapper.innerHTML = message.content;
 
         let participantsRoot = wrapper.getElementsByClassName("sr5-teamwork-participants")[0];

@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import * as IconAssign from '../../../apps/iconAssigner/iconAssign';
 import { SR5 } from "../../../config";
 import { SR5Actor } from '../../../actor/SR5Actor';
+import { StoredDocument } from '@league-of-foundry-developers/foundry-vtt-types/src/types/utils.mjs';
 
 const xml2js = require('xml2js');
 

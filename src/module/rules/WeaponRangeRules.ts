@@ -74,7 +74,6 @@ export class WeaponRangeTestBehavior {
      * This will overwrite the default weapon range selection.
      */
     private static prepareTargetRanges(test: WeaponRangeTest) {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (foundry.utils.isEmpty(test.data.ranges)) return;
         if (!test.actor) return;
         if (!test.hasTargets) return;

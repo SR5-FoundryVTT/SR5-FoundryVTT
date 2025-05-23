@@ -1,15 +1,16 @@
 import { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
-import { track } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/prosemirror/schema/other.mjs";
 
 export const CommonData: DataSchema = {
+    ...SM.DescriptionPartData,
     attributes: new SchemaField(SM.Attributes, { required: true }),
     limits: new SchemaField(SM.Limits, { required: true }),
     skills: new SchemaField(SM.CharacterSkills, { required: true }),
     // special: new SchemaField(SM.SpecialTrait, { required: true }),
     initiative: new SchemaField(SM.Initiative, { required: true }),
     // modifiers: new SchemaField(SM.Modifiers, { required: true }),
-    // situation_modifiers: new SchemaField(SM.SituationModifiersSourceData, { required: true }),
+    //todo fix
+    situation_modifiers: new ObjectField({ required: true, initial: {} }),
     values: new SchemaField(SM.CommonValues, { required: true }),
     // inventories: new SchemaField(SM.InventoriesData, { required: true }),
     visibilityChecks: new SchemaField(SM.VisibilityChecks, { required: true }),

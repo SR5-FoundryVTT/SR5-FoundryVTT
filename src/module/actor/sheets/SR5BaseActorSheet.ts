@@ -487,8 +487,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
-    // @ts-expect-error
-    async _onDrop(event: DragEvent) {
+    override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -537,7 +536,6 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Enhance Foundry state restore on rerender by more user interaction state.
-     * @override
      */
     override async _render(...args) {
         const focus = this._saveInputCursorPosition();

@@ -71,6 +71,34 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 
+import { Character } from './types/actor/CharacterModel';
+import { Critter } from './types/actor/CritterModel';
+import { IC } from './types/actor/ICModel';
+import { Spirit } from './types/actor/SpiritModel';
+import { Sprite } from './types/actor/SpriteModel';
+import { Vehicle } from './types/actor/VehicleModel';
+import { Action } from './types/item/ActionModel';
+import { AdeptPower } from './types/item/AdeptPowerModel';
+import { Armor } from './types/item/ArmorModel';
+import { Bioware } from './types/item/BiowareModel';
+import { ComplexForm } from './types/item/ComplexFormModel';
+import { Contact } from './types/item/ContactModel';
+import { CritterPower } from './types/item/CritterPowerModel';
+import { Cyberware } from './types/item/CyberwareModel';
+import { Device } from './types/item/DeviceModel';
+import { Echo } from './types/item/EchoModel';
+import { Equipment } from './types/item/EquipmentModel';
+import { Host } from './types/item/HostModel';
+import { Lifestyle } from './types/item/LifeStyleModel';
+import { Metamagic } from './types/item/MetamagicModel';
+import { Modification } from './types/item/ModificationModel';
+import { Program } from './types/item/ProgramModel';
+import { Quality } from './types/item/QualityModel';
+import { Sin } from './types/item/SinModel';
+import { Spell } from './types/item/SpellModel';
+import { SpritePower } from './types/item/SpritePowerModel';
+import { Weapon } from './types/item/WeaponModel';
+
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -118,6 +146,7 @@ ___________________
 `);
         // Create a shadowrun5e namespace within the game global
         game['shadowrun5e'] = {
+            canvas: {},
             /**
              * System level Document implementations.
              */
@@ -249,6 +278,35 @@ ___________________
              */
             storage: DataStorage
         };
+
+        CONFIG.Item.dataModels["Action"] = Action;
+        CONFIG.Item.dataModels["Armor"] = Armor;
+        CONFIG.Item.dataModels["AdeptPower"] = AdeptPower;
+        CONFIG.Item.dataModels["Bioware"] = Bioware;
+        CONFIG.Item.dataModels["ComplexForm"] = ComplexForm;
+        CONFIG.Item.dataModels["Contact"] = Contact;
+        CONFIG.Item.dataModels["CritterPower"] = CritterPower;
+        CONFIG.Item.dataModels["Cyberware"] = Cyberware;
+        CONFIG.Item.dataModels["Device"] = Device;
+        CONFIG.Item.dataModels["Echo"] = Echo;
+        CONFIG.Item.dataModels["Equipment"] = Equipment;
+        CONFIG.Item.dataModels["Host"] = Host;
+        CONFIG.Item.dataModels["Lifestyle"] = Lifestyle;
+        CONFIG.Item.dataModels["Metamagic"] = Metamagic;
+        CONFIG.Item.dataModels["Modification"] = Modification;
+        CONFIG.Item.dataModels["Program"] = Program;
+        CONFIG.Item.dataModels["Quality"] = Quality;
+        CONFIG.Item.dataModels["Sin"] = Sin;
+        CONFIG.Item.dataModels["Spell"] = Spell;
+        CONFIG.Item.dataModels["SpritePower"] = SpritePower;
+        CONFIG.Item.dataModels["Weapon"] = Weapon;
+    
+        CONFIG.Actor.dataModels["Character"] = Character;
+        CONFIG.Actor.dataModels["Critter"] = Critter;
+        CONFIG.Actor.dataModels["IC"] = IC;
+        CONFIG.Actor.dataModels["Spirit"] = Spirit;
+        CONFIG.Actor.dataModels["Sprite"] = Sprite;
+        CONFIG.Actor.dataModels["Vehicle"] = Vehicle;
 
         // Register document classes
         CONFIG.Actor.documentClass = SR5Actor;

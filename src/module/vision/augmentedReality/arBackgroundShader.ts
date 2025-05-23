@@ -3,8 +3,8 @@ export default class AugmentedRealityVisionBackgroundVisionShader extends Amplif
     static COLOR_TINT = [0.15, 0.15, 0.88];
   
     static override defaultUniforms = {
-      ...super.defaultUniforms,
-      colorTint: this.COLOR_TINT,
+        ...super.defaultUniforms,
+        colorTint: this.COLOR_TINT,
     };
-  }
+}
   

@@ -92,7 +92,7 @@ export class SR5Roll extends Roll {
     get pool(): number {
         // 0.7.x > FoundryVTT
         if (this.terms) {
-            return this.dice[0].number;
+            return this.dice[0].number!;
         }
 
         //@ts-expect-error

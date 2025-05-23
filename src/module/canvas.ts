@@ -1,4 +1,4 @@
-import { BaseGrid, SquareGrid } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/grid/_module.mjs';
+import { BaseGrid, SquareHex } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/grid/_module.mjs';
 import {FLAGS, SYSTEM_NAME} from './constants';
 
 interface DistanceOptions {
@@ -37,17 +37,17 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
         if (rule === '1-2-1') {
             let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
             let spaces = nd10 * 2 + (nd - nd10) + ns;
-            return spaces * canvas.dimensions.distance;
+            return spaces * canvas.dimensions!.distance;
         }
 
         // Treat diagonal as straight line
         else if (rule === 'EUCL') {
             // return Math.round(Math.hypot(nx, ny) * canvas.scene.data.gridDistance);
-            return Math.round(Math.hypot(nx, ny) * canvas.scene?.grid.distance);
+            return Math.round(Math.hypot(nx, ny) * canvas.scene!.grid!.distance);
         }
 
         // Treat diagonal as straight movement
-        else return (ns + nd) * canvas.scene?.grid.distance;
+        else return (ns + nd) * canvas.scene!.grid!.distance;
     });
 };
 
@@ -56,5 +56,5 @@ export function canvasInit() {
     // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
     canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, FLAGS.DiagonalMovement);
     // Add a custom measureDistances function, overwriting default to add more movement styles.
-    SquareGrid.prototype.measureDistances = measureDistances;
+    SquareHex.prototype.measureDistances = measureDistances;
 }

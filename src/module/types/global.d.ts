@@ -7,9 +7,34 @@ import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { Translation } from '../utils/strings';
 
-interface AEFlags {
-    
-}
+import { Character } from "./actor/CharacterModel";
+import { Critter } from "./actor/CritterModel";
+import { IC } from "./actor/ICModel";
+import { Spirit } from "./actor/SpiritModel";
+import { Sprite } from "./actor/SpriteModel";
+import { Vehicle } from "./actor/VehicleModel";
+
+import { Action } from './item/ActionModel';
+import { AdeptPower } from './item/AdeptPowerModel';
+import { Armor } from './item/ArmorModel';
+import { Bioware } from './item/BiowareModel';
+import { ComplexForm } from './item/ComplexFormModel';
+import { Contact } from './item/ContactModel';
+import { CritterPower } from './item/CritterPowerModel';
+import { Cyberware } from './item/CyberwareModel';
+import { Device } from './item/DeviceModel';
+import { Echo } from './item/EchoModel';
+import { Equipment } from './item/EquipmentModel';
+import { Host } from './item/HostModel';
+import { Lifestyle } from './item/LifeStyleModel';
+import { Metamagic } from './item/MetamagicModel';
+import { Modification } from './item/ModificationModel';
+import { Program } from './item/ProgramModel';
+import { Quality } from './item/QualityModel';
+import { Sin } from './item/SinModel';
+import { Spell } from './item/SpellModel';
+import { SpritePower } from './item/SpritePowerModel';
+import { Weapon } from './item/WeaponModel';
 
 declare global {
     // Configuration of foundry-vtt-types
@@ -49,35 +74,86 @@ declare global {
         Actor: ShadowrunActorData;
     }
 
+    interface DataModelConfig {
+        Actor: {
+            character: Character;
+            critter: Critter;
+            ic: IC;
+            spirit: Spirit;
+            sprite: Sprite;
+            vehicle: Vehicle;
+        };
+        Item: {
+            action: Action;
+            adept_power: AdeptPower;
+            armor: Armor;
+            bioware: Bioware;
+            complex_form: ComplexForm;
+            contact: Contact;
+            critter_power: CritterPower;
+            cyberware: Cyberware;
+            device: Device;
+            echo: Echo;
+            equipment: Equipment;
+            host: Host;
+            lifestyle: Lifestyle;
+            metamagic: Metamagic;
+            modification: Modification;
+            program: Program;
+            quality: Quality;
+            sin: Sin;
+            spell: Spell;
+            spritePower: SpritePower;
+            weapon: Weapon;
+        }
+    }
+
     interface FlagConfig {
         ActiveEffect: {
-            shadowrun5e?: {
+            shadowrun5e: {
                 applyTo?: Shadowrun.EffectApplyTo;
                 appliedByTest?: boolean;
                 onlyForEquipped?: boolean;
                 onlyForWireless?: boolean;
                 onlyForItemTest?: boolean;
+                selection_tests?: string;
+                selection_categories?: string;
+                selection_skills?: string;
+                selection_attributes?: string;
+                selection_limits?: string;
             };
         };
         Actor: {
-            shadowrun5e?: {
+            shadowrun5e: {
                 turnsSinceLastAttack?: number;
+                overwatchScore?: number;
+            }
+        };
+        ChatMessage: {
+            shadowrun5e: {
+                TestData?: any;
             }
         };
         Combatant: {
-            shadowrun5e?: {
+            shadowrun5e: {
                 combatInitiativePass?: number;
                 turnsSinceLastAttack?: number;
             };
         };
         Item: {
-            shadowrun5e?: {
+            shadowrun5e: {
                 lastFireMode?: Shadowrun.FireModeData;
                 lastSpellForce?: Shadowrun.SpellForceData;
                 lastComplexFormLevel?: Shadowrun.ComplexFormLevelData;
                 lastFireRange?: Shadowrun.FireRangeData;
                 embeddedItems?: any[];
             };
+        };
+        User: {
+            shadowrun5e: {
+                showApplication?: boolean;
+                changelogShownForVersion?: string;
+            }
         };
     }
 

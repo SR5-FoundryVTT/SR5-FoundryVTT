@@ -10,8 +10,7 @@ export default class Sr5Tour extends Tour {
     //this field is only for internal handling
     actor?: SR5Actor;
 
-    /** @override */
-    async _preStep() {
+    override async _preStep() {
         await super._preStep();
 
         //create actor if needed

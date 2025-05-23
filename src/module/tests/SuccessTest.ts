@@ -269,7 +269,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     _prepareRollMode(data, options: TestOptions): Shadowrun.FoundryRollMode {
         if (options.rollMode !== undefined) return options.rollMode;
         if (data.action && data.action.roll_mode) return data.action.roll_mode;
-        else return game.settings.get(CORE_NAME, CORE_FLAGS.RollMode) as Shadowrun.FoundryRollMode;
+        else return game.settings.get(CORE_NAME, 'rollMode') as Shadowrun.FoundryRollMode;
     }
 
     /**
@@ -678,8 +678,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
             const document = await fromUuid(this.data.sourceActorUuid) || undefined;
             this.actor = document instanceof TokenDocument ?
-                document.actor :
-                document as SR5Actor;
+                (document.actor ?? undefined) :
+                (document as SR5Actor | undefined);
         }
 
         // Populate the item document.
@@ -1615,7 +1615,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
     async rollDiceSoNice() {
-        if (!game.dice3d || !game.user || !game.users) return;
+        if (!game.user || !game.users) return;
+
+        const dice3d = game.modules.get("dice-so-nice")?.api;
+        if (!dice3d) return;
 
         console.debug('Shadowrun5e | Initiating DiceSoNice throw');
 
@@ -1628,7 +1631,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         let whisper: User[] | null = null;
         // ...for gmOnlyContent check permissions
         if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
-            whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER'));
+            whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true);
         }
         // ...for rollMode include GM when GM roll
         if (this.data.options?.rollMode === 'gmroll' || this.data.options?.rollMode === "blindroll") {
@@ -1640,7 +1643,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const blind = this.data.options?.rollMode === 'blindroll';
         const synchronize = this.data.options?.rollMode === 'publicroll';
 
-        game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
+        dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
     /**
@@ -1790,7 +1793,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * What ChatMessage rollMode is this test supposed to use?
      */
     get _rollMode(): string {
-        return this.data.options?.rollMode as string ?? game.settings.get('core', 'rollmode');
+        return this.data.options?.rollMode as string ?? game.settings.get('core', 'rollMode');
     }
 
     /**
@@ -1815,7 +1818,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const messageData = {
             user: game.user?.id,
             // Use type roll, for Foundry built in content visibility.
-            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             speaker: {
                 actor,
                 alias,
@@ -1834,7 +1836,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        ChatMessage.applyRollMode(messageData, this._rollMode);
+        ChatMessage.applyRollMode(messageData, game.settings.get("core", "rollMode")!);
 
         return messageData;
     }

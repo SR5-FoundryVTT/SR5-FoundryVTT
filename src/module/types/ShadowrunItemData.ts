@@ -105,6 +105,7 @@ declare namespace Shadowrun {
         img: string;
         data: AmmoData;
         system: AmmoData;
+        descriptionHTML?: string;
     }
     export interface ArmorItemData {
         type: 'armor';
@@ -196,6 +197,7 @@ declare namespace Shadowrun {
         img: string;
         data: ModificationData;
         system: ModificationData;
+        descriptionHTML?: string;
     }
     export interface ProgramItemData {
         type: 'program';

@@ -3,8 +3,8 @@ export default class LowLightBackgroundVisionShader extends AmplificationBackgro
     static COLOR_TINT = [0.25, 1, 0.25];
   
     static override defaultUniforms = {
-      ...super.defaultUniforms,
-      colorTint: this.COLOR_TINT,
+        ...super.defaultUniforms,
+        colorTint: this.COLOR_TINT,
     };
-  }
+}
   

@@ -28,7 +28,12 @@ import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { EffectChangeData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs';
-
+import { Vehicle } from '../types/actor/VehicleModel';
+import { Character } from '../types/actor/CharacterModel';
+import { Critter } from '../types/actor/CritterModel';
+import { Spirit } from '../types/actor/SpiritModel';
+import { Sprite } from '../types/actor/SpriteModel';
+import { IC } from '../types/actor/ICModel';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -200,7 +205,7 @@ export class SR5Actor extends Actor {
      * 
      * NOTE: Foundry also shows disabled effects by default. We behave the same.
      */
-    override get temporaryEffects(): ReturnType<this["effects"]["filter"]> {
+    override get temporaryEffects(): SR5ActiveEffect[] {
         const showEffectIcon = (effect: SR5ActiveEffect) => !effect.disabled && !effect.isSuppressed && effect.isTemporary && effect.appliesToLocalActor;
 
         // Collect actor effects.
@@ -1657,10 +1662,10 @@ export class SR5Actor extends Actor {
         const existing = this.effects.reduce((arr, e) => {
             // @ts-expect-error TODO: foundry-vtt-types v10
             if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
-                arr.push(e.id);
+                arr.push(e.id as string);
             }
             return arr;
-        }, []);
+        }, [] as string[]);
 
         if (existing.length) return;
 
@@ -1720,18 +1725,20 @@ export class SR5Actor extends Actor {
         if (modifier === 0) return;
 
         const combat: SR5Combat = game.combat as unknown as SR5Combat;
-        const combatant = combat.getActorCombatant(this);
+        const combatants = combat.getActorCombatant(this);
+        if (!combatants) return;
 
-        // Token might not be part of active combat.
-        if (!combatant) return;
-        if (!combatant.initiative) return;
+        for (const combatant of combatants) {
+            // Token might not be part of active combat.
+            if (!combatant || !combatant.initiative) continue;
 
-        // While not prohibiting, inform user about missing resource.
-        if (combatant.initiative + modifier < 0) {
-            ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+            // While not prohibiting, inform user about missing resource.
+            if (combatant.initiative + modifier < 0) {
+                ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+            }
+
+            await combat.adjustInitiative(combatant, modifier);
         }
-
-        await combat.adjustInitiative(combatant, modifier);
     }
 
     /**
@@ -1741,16 +1748,19 @@ export class SR5Actor extends Actor {
      */
     get combatActive(): boolean {
         if (!game.combat) return false;
-        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
-        if (!combatant) return false;
-        if (!combatant.initiative) return false;
+        const combatants = (game.combat as SR5Combat).getActorCombatant(this);
+        if (!combatants) return false;
 
-        return true;
+        for (const combatant of combatants)
+            if (combatant && combatant.initiative)
+                return true;
+
+        return false;
     }
 
     get combatant(): Combatant | undefined {
         if (!this.combatActive) return;
-        return (game.combat as SR5Combat).getActorCombatant(this);
+        return (game.combat as SR5Combat).getActorCombatant(this)?.[0];
     }
 
     /**
@@ -1760,7 +1770,7 @@ export class SR5Actor extends Actor {
      */
     get combatInitiativeScore(): number {
         if (!game.combat) return 0;
-        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
+        const combatant = (game.combat as SR5Combat).getActorCombatant(this)?.[0];
         if (!combatant || !combatant.initiative) return 0;
         return combatant.initiative;
     }

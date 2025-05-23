@@ -10,6 +10,7 @@ import ValueField = Shadowrun.ValueField;
 import GenericValueField = Shadowrun.GenericValueField;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import RangeData = Shadowrun.RangeData;
+import { DeepPartial } from "@league-of-foundry-developers/foundry-vtt-types/src/types/utils.mjs";
 
 interface MinimalItemData {
     // Whatever name you want to give but not ''.

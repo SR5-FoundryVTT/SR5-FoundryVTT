@@ -1,5 +1,6 @@
 import { SR5Item } from "../SR5Item";
 import { SR5 } from '../../config';
+import { DeepPartial } from "@league-of-foundry-developers/foundry-vtt-types/src/types/utils.mjs";
 
 /**
  * Handling of SR5Item.update changes around ActionRollData.

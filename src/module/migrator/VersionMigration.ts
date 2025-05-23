@@ -62,8 +62,8 @@ export abstract class VersionMigration {
      * @param game The world that should be migrated.
      */
     public async Migrate(game: Game) {
-        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
-        ui.notifications?.warn(game.i18n.localize('SR5.MIGRATION.DoNotCloseNotification'), {
+        ui.notifications?.info(`${game.i18n!.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
+        ui.notifications?.warn(game.i18n!.localize('SR5.MIGRATION.DoNotCloseNotification'), {
             permanent: true,
         });
 
@@ -108,7 +108,7 @@ export abstract class VersionMigration {
         await this.Apply(entityUpdates);
 
         await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
-        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
+        ui.notifications?.info(`${game.i18n!.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
     /**
@@ -138,7 +138,7 @@ export abstract class VersionMigration {
      * @param entityUpdates
      */
     protected async IterateScenes(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        for (const scene of game.scenes.contents) {
+        for (const scene of game.scenes!.contents) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
                     continue;
@@ -194,7 +194,7 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateItems(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        for (const item of game.items.contents) {
+        for (const item of game.items!.contents) {
             try {
                 if (!(await this.ShouldMigrateItemData(item))) {
                     continue;
@@ -225,7 +225,7 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateActors(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        for (const actor of game.actors.contents) {
+        for (const actor of game.actors!.contents) {
             try {
                 if (!(await this.ShouldMigrateActorData(actor))) {
                     continue;
@@ -381,7 +381,7 @@ export abstract class VersionMigration {
         if (!['Actor', 'Item', 'Scene'].includes(pack.metadata.type)) return;
 
         // Begin by requesting server-side data model migration and get the migrated content
-        await pack.migrate({});
+        await pack.migrate();
         const documents = await pack.getDocuments();
 
         // Iterate over compendium entries - applying fine-tuned migration functions
@@ -389,7 +389,7 @@ export abstract class VersionMigration {
             try {
                 let updateData: any = null;
                 if (pack.metadata.type === 'Item') {
-                    updateData = await this.MigrateItemData(document);
+                    updateData = await this.MigrateItemData(document as SR5Item);
 
                     if (foundry.utils.isEmpty(updateData)) {
                         continue;
@@ -401,7 +401,7 @@ export abstract class VersionMigration {
                     }
 
                 } else if (pack.metadata.type === 'Actor') {
-                    updateData = await this.MigrateActorData(document);
+                    updateData = await this.MigrateActorData(document as SR5Actor);
 
                     if (foundry.utils.isEmpty(updateData)) {
                         continue;
@@ -412,7 +412,7 @@ export abstract class VersionMigration {
                     }
 
                     if (updateData.effects) {
-                        await document.updateEmbeddedDocuments('Effect', updateData.effects);
+                        await document.updateEmbeddedDocuments('ActiveEffect', updateData.effects);
                     }
 
                     if (updateData.data) {
@@ -421,7 +421,7 @@ export abstract class VersionMigration {
                     }
 
                 } else if (pack.metadata.type === 'Scene') {
-                    updateData = await this.MigrateSceneData(document as unknown as Scene);
+                    updateData = await this.MigrateSceneData(document as Scene);
 
                     if (foundry.utils.isEmpty(updateData)) {
                         continue;
