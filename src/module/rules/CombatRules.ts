@@ -129,7 +129,7 @@ export class CombatRules {
      * @param actor The active defender
      */
     static isBlockedByVehicleArmor(incomingDamage: DamageData, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
-        if(!actor.isVehicle()) {
+        if(!actor.isType('vehicle')) {
             return false;
         }
 
@@ -176,7 +176,7 @@ export class CombatRules {
      * @param actor The active defender
      */
     static doesNoPhysicalDamageToVehicle(incomingDamage: DamageData, actor: SR5Actor): boolean {
-        return actor.isVehicle() && incomingDamage.type.value === 'stun' && incomingDamage.element.value !== "electricity";
+        return actor.isType('vehicle') && incomingDamage.type.value === 'stun' && incomingDamage.element.value !== "electricity";
     }
 
     /**
@@ -263,7 +263,7 @@ export class CombatRules {
         // Careful, order of damage conversion is very important
         // Electricity stun damage is considered physical for vehicles
         let updatedDamage = foundry.utils.duplicate(damage) as DamageData;
-        if (actor.isVehicle() && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
+        if (actor.isType('vehicle') && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
             updatedDamage.type.value = 'physical';
         }
 

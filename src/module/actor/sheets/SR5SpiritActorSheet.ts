@@ -31,7 +31,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     override async getData(options: any) {
         const data = await super.getData(options);
 
-        if (this.document.isSpirit() && this.document.system.summonerUuid)
+        if (this.document.isType('spirit') && this.document.system.summonerUuid)
             data['summoner'] = await fromUuid(this.document.system.summonerUuid);
 
         return data;
@@ -69,7 +69,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     async _addSummonerOnDrop(dropData: { type: string; uuid: string; }) {
         if (dropData.type !== 'Actor') return;
         const actor = await fromUuid(dropData.uuid) as SR5Actor;
-        if (!actor.isCharacter()) return;
+        if (!actor.isType('character')) return;
 
         await this.document.addSummoner(actor);
     }

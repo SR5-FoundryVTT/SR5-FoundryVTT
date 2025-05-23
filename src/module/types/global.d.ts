@@ -16,8 +16,10 @@ import { Vehicle } from "./actor/VehicleModel";
 
 import { Action } from './item/ActionModel';
 import { AdeptPower } from './item/AdeptPowerModel';
+import { Ammo } from './item/AmmoModel';
 import { Armor } from './item/ArmorModel';
 import { Bioware } from './item/BiowareModel';
+import { CallInAction } from './item/CallInActionModel';
 import { ComplexForm } from './item/ComplexFormModel';
 import { Contact } from './item/ContactModel';
 import { CritterPower } from './item/CritterPowerModel';
@@ -76,35 +78,37 @@ declare global {
 
     interface DataModelConfig {
         Actor: {
-            character: Character;
-            critter: Critter;
-            ic: IC;
-            spirit: Spirit;
-            sprite: Sprite;
-            vehicle: Vehicle;
+            character: typeof Character;
+            critter: typeof Critter;
+            ic: typeof IC;
+            spirit: typeof Spirit;
+            sprite: typeof Sprite;
+            vehicle: typeof Vehicle;
         };
         Item: {
-            action: Action;
-            adept_power: AdeptPower;
-            armor: Armor;
-            bioware: Bioware;
-            complex_form: ComplexForm;
-            contact: Contact;
-            critter_power: CritterPower;
-            cyberware: Cyberware;
-            device: Device;
-            echo: Echo;
-            equipment: Equipment;
-            host: Host;
-            lifestyle: Lifestyle;
-            metamagic: Metamagic;
-            modification: Modification;
-            program: Program;
-            quality: Quality;
-            sin: Sin;
-            spell: Spell;
-            spritePower: SpritePower;
-            weapon: Weapon;
+            action: typof Action;
+            adept_power: typeof AdeptPower;
+            ammo: typeof Ammo;
+            armor: typeof Armor;
+            bioware: typeof Bioware;
+            call_in_action: typeof CallInAction;
+            complex_form:  typeof ComplexForm;
+            contact: typeof Contact;
+            critter_power: typeof CritterPower;
+            cyberware: typeof Cyberware;
+            device: typeof Device;
+            echo: typeof Echo;
+            equipment: typeof Equipment;
+            host: typeof Host;
+            lifestyle: typeof Lifestyle;
+            metamagic: typeof Metamagic;
+            modification: typeof Modification;
+            program: typeof Program;
+            quality: typeof Quality;
+            sin: typeof Sin;
+            spell: typeof Spell;
+            sprite_power: typeof SpritePower;
+            weapon: typeof Weapon;
         }
     }
 

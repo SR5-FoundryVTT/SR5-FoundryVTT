@@ -29,7 +29,7 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
         const data = await super.getData(options);
 
         // Collect sprite technomancer for easy interaction.
-        if (this.document.isSprite() && this.document.system.technomancerUuid !== '')
+        if (this.document.isType('sprite') && this.document.system.technomancerUuid !== '')
             data['technomancer'] = await fromUuid(this.document.system.technomancerUuid);
 
         return data;
@@ -58,7 +58,7 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
     async _addTechnomancerOnDrop(dropData: any): Promise<void> {
         if (dropData.type !== 'Actor') return;
         const actor = await fromUuid(dropData.uuid) as SR5Actor;
-        if (!actor.isCharacter()) return;
+        if (!actor.isType('character')) return;
 
         this.document.addTechnomancer(actor);
     }

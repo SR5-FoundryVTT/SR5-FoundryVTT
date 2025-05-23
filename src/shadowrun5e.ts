@@ -12,6 +12,7 @@ import { Action } from "./module/types/item/ActionModel";
 import { Armor } from "./module/types/item/ArmorModel";
 import { AdeptPower } from "./module/types/item/AdeptPowerModel";
 import { Bioware } from "./module/types/item/BiowareModel";
+import { CallInAction } from "./module/types/item/CallInActionModel";
 import { ComplexForm } from "./module/types/item/ComplexFormModel";
 import { Contact } from "./module/types/item/ContactModel";
 import { CritterPower } from "./module/types/item/CritterPowerModel";
@@ -37,6 +38,7 @@ Hooks.once("init", () => {
     CONFIG.Item.dataModels["Armor"] = Armor;
     CONFIG.Item.dataModels["AdeptPower"] = AdeptPower;
     CONFIG.Item.dataModels["Bioware"] = Bioware;
+    CONFIG.Item.dataModels["CallInAction"] = CallInAction;
     CONFIG.Item.dataModels["ComplexForm"] = ComplexForm;
     CONFIG.Item.dataModels["Contact"] = Contact;
     CONFIG.Item.dataModels["CritterPower"] = CritterPower;

@@ -24,7 +24,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
     static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<MinimalActionData> {
         const action = DataDefaults.minimalActionData(await super._getDocumentTestAction(item, actor));
 
-        const spellData = item.asSpell
+        const spellData = item.asType('spell');
         if (!spellData) return action;
 
         const itemAction = CombatSpellRules.defenseTestAction(spellData.system.type, spellData.system.combat.type);
@@ -37,7 +37,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
-        const spell = this.item?.asSpell;
+        const spell = this.item?.asType('spell');
         if (!spell) return [];
 
         // Defending against a indirect physical spell, is a physical defense test.
@@ -49,7 +49,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
     }
 
     override get testModifiers(): ModifierTypes[] {
-        const spell = this.item?.asSpell;
+        const spell = this.item?.asType('spell');
         if (!spell) return ['global'];
 
         if (spell.system.type === 'mana' && spell.system.combat.type === 'direct') {
@@ -69,7 +69,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
      * A combat spells damage depends on
      */
     calculateCombatSpellDamage() {
-        const spell = this.item?.asSpell;
+        const spell = this.item?.asType('spell');
         if (!spell) return;
 
         this.data.incomingDamage = CombatSpellRules.calculateBaseDamage(spell.system.combat.type, this.data.incomingDamage, this.data.against.force);
@@ -95,7 +95,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
      * A failure on a defense test is a HIT on the initial attack.
      */
     override async processFailure() {
-        const spell = this.item?.asSpell;
+        const spell = this.item?.asType('spell');
         if (!spell) return;
         if (!this.actor) return;
 
@@ -111,7 +111,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
     override async afterFailure() {
         await super.afterFailure();
 
-        const spell = this.item?.asSpell;
+        const spell = this.item?.asType('spell');
         if (!spell) return;
 
         // Only allow a defense test for in
@@ -128,9 +128,10 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
     async applyActorEffectsForDefense() {
         if (!this.actor) return;
 
-        const spell = this.item?.asSpell;
-        if (!spell) return;
-        if (spell.system.category !== 'combat' || spell.system.combat.type === 'direct') return;
+        const spell = this.item?.asType('spell');
+        
+        if (!spell || spell.system.category !== 'combat' || spell.system.combat.type === 'direct')
+            return;
 
         this.actor.calculateNextDefenseMultiModifier();
     }

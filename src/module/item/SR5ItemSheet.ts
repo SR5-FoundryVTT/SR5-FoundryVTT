@@ -8,6 +8,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
+import { ConfiguredData } from '@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes.mjs';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -18,7 +19,7 @@ interface FoundryItemSheetData {
     // Legacy Item Document Data
     data: Shadowrun.ShadowrunItemData
     // Item Document System Data
-    system: Shadowrun.ShadowrunItemDataData
+    system: SR5Item['system']
     // A descriptive document  reference
     item: SR5Item
     document: SR5Item
@@ -125,7 +126,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         const linkedActor = await this.item.getLinkedActor();
 
-        if (itemData.action) {
+        if ('action' in itemData && itemData.action) {
             try {
                 const action = itemData.action as any;
                 if (itemData.action.mod === 0) delete action.mod;
@@ -142,7 +143,7 @@ export class SR5ItemSheet extends ItemSheet {
             }
         }
 
-        if (itemData.technology) {
+        if ('technology' in itemData && itemData.technology) {
             try {
                 const technology = itemData.technology as any;
                 if (technology.rating === 0) delete technology.rating;
@@ -459,7 +460,7 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // CASE - Add items to a weapons modification / ammo
-        if (this.item.isWeapon && data.type === 'Item') {
+        if (this.item.isType('weapon') && data.type === 'Item') {
             let item;
             // Case 1 - Data explicitly provided
             if (data.data) {
@@ -503,7 +504,7 @@ export class SR5ItemSheet extends ItemSheet {
 
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
-            if (!actor.isVehicle()) {
+            if (!actor.isType('vehicle')) {
                 return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
             }
 
@@ -511,7 +512,7 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // link actors in existing contacts
-        if (this.item.isContact && data.type === 'Actor') {
+        if (this.item.isType('contact') && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid) as SR5Actor;
 
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
@@ -563,7 +564,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     //Swap slots (att1, att2, etc.) for ASDF matrix attributes
     async _onMatrixAttributeSelected(event) {
-        if (!this.item.system.atts) return;
+        if (!('atts' in this.item.system) || !this.item.system.atts) return;
 
         // sleaze, attack, etc.
         const selectedAtt = event.currentTarget.value;
@@ -631,11 +632,11 @@ export class SR5ItemSheet extends ItemSheet {
 
     async _onAddWeaponMod(event) {
         event.preventDefault();
-        const type = 'modification';
         // TODO: Move this into DataDefaults...
+        const type = 'modification';
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type,
+            type: type as ConfiguredData<'Item'>['type'],
             system: { type: 'weapon' }
         };
         const item = new SR5Item(itemData, { parent: this.item });
@@ -668,7 +669,7 @@ export class SR5ItemSheet extends ItemSheet {
         const type = 'ammo';
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type
+            type: type as ConfiguredData<'Item'>['type']
         };
         const item = new SR5Item(itemData, { parent: this.item });
         await this.item.createNestedItem(item._source);
@@ -730,6 +731,7 @@ export class SR5ItemSheet extends ItemSheet {
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
+        if ('action' in this.item.system === false) return;
         const inputElement = html.find('input#action-modifier').get(0);
 
         if (!inputElement) {
@@ -771,6 +773,7 @@ export class SR5ItemSheet extends ItemSheet {
      * @param html 
      */
     _createActionCategoriesTagify(html) {
+        if ('action' in this.item.system === false) return;
         const inputElement = html.find('input#action-categories').get(0) as HTMLInputElement;
 
         if (!inputElement) {
@@ -963,7 +966,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         // Assure owned item device.
         if (!(this.document.parent instanceof SR5Actor)) return;
-        if (!this.document.isDevice) return;
+        if (!this.document.isType('device')) return;
         if (!this.document.isEquipped()) return;
 
         await this.document.parent.equipOnlyOneItemOfType(this.document);
@@ -974,25 +977,26 @@ export class SR5ItemSheet extends ItemSheet {
      */
     async _onPowerOptionalInputChanged(event) {
         event.preventDefault();
-        if (!this.item.isCritterPower && !this.item.isSpritePower) return;
+        const power = this.item.asType('critter_power') || this.item.asType('sprite_power') || undefined;
+        if (!power) return;
 
         let selectedRangeCategory;
 
-        if (this.item.isCritterPower) {
+        if (this.item.isType('critter_power')) {
             selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.critterPower.optional;
         } else {
             selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.spritePower.optional;
         }
 
-        this.item.system.optional = selectedRangeCategory;
+        power.system.optional = selectedRangeCategory;
 
-        switch (this.item.system.optional) {
+        switch (power.system.optional) {
             case 'standard':
             case 'enabled_option':
-                this.item.system.enabled = true;
+                power.system.enabled = true;
                 break;
             case 'disabled_option':
-                this.item.system.enabled = false;
+                power.system.enabled = false;
                 break;
         }
 

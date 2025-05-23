@@ -27,7 +27,7 @@ export const UpdateActionFlow = {
      */
     onSkillUpdateAlterAttribute(changeData: DeepPartial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
         // Only change to connected attribute when no attribute has already been chosen.
-        if (item.system.action?.attribute !== '') return;
+        if (!('action' in item.system) || item.system.action?.attribute !== '') return;
         const skillIdOrLabel = foundry.utils.getProperty(changeData, 'system.action.skill');
         if (skillIdOrLabel === undefined || skillIdOrLabel === '') return;
 

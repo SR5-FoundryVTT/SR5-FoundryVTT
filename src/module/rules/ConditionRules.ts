@@ -22,9 +22,9 @@ export const ConditionRules = {
         let dead = false;
 
         // Some actor types die differently.
-        if (actor.isIC() || actor.isSprite()) {
+        if (actor.isType('ic') || actor.isType('sprite')) {
             dead = matrix?.value === matrix?.max;
-        } else if (actor.isVehicle() || actor.isGrunt()) {
+        } else if (actor.isType('vehicle') || actor.isGrunt()) {
             dead = phyiscal?.value === phyiscal?.max;
         } else {
             unconscious = stun?.value === stun?.max;

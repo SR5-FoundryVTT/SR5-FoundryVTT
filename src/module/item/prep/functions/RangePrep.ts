@@ -19,9 +19,9 @@ export const RangePrep = {
      * @param range The system range data for weapons to be altered.
      * @param equippedMods Those item mods that are equipped.
      */
-    prepareRecoilCompensation(range: Shadowrun.RangeWeaponData, equippedMods: SR5Item[]) {
+    prepareRecoilCompensation(range: Shadowrun.RangeWeaponData, equippedMods: SR5Item<'modification'>[]) {
         const rangeParts = new PartsList<number>();
-        
+
         // Apply ammo recoil compensation.
         equippedMods.forEach(mod => {
             if (mod.system.rc) rangeParts.addPart(mod.name as string, mod.system.rc);            

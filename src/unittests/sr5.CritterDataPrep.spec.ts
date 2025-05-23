@@ -22,19 +22,19 @@ export const shadowrunSR5CritterDataPrep = (context: QuenchBatchContext) => {
 
     describe('CritterDataPrep', () => {
         it('Critter character recoil compensation', () => {
-            let critter = new SR5Actor<'critter'>({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 5 } } } });
+            let critter = new SR5Actor({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 5 } } } });
             if (!critter) return assert.fail();
 
             assert.strictEqual(critter.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
 
-            critter = new SR5Actor<'critter'>({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 1 } } } });
+            critter = new SR5Actor({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 1 } } } });
             if (!critter) return assert.fail();
 
             assert.strictEqual(critter.system.values.recoil_compensation.value, 2); // SR5#175: 1 / 3 = 0,3 (rounded up) = 1 => 1 + 1
         });
 
         it('visibility checks', async () => {
-            const critter = new SR5Actor<'critter'>({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 5 } } } });
+            const critter = new SR5Actor({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 5 } } } });
             assert.strictEqual(critter.system.visibilityChecks.astral.hasAura, true);
             assert.strictEqual(critter.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(critter.system.visibilityChecks.astral.affectedBySpell, false);

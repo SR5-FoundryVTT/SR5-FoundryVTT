@@ -30,7 +30,7 @@ export const TechnologyPrep = {
      * @param technology The system technology section to be altered
      * @param equippedMods Those item mods that are equipped.
      */
-    prepareConceal(technology: Shadowrun.TechnologyData, equippedMods: SR5Item[]) {
+    prepareConceal(technology: Shadowrun.TechnologyData, equippedMods: SR5Item<'modification'>[]) {
         // Calculate conceal data.
         if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: []};
 

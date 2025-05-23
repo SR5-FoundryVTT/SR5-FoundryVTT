@@ -559,7 +559,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            const action = DataDefaults.actionRollData({ test: SkillTest.name, limit: {attribute: 'social'} });
+            const action = DataDefaults.actionRollData({ test: SkillTest.name, limit: { attribute: 'social' } });
             const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
 
             // Simulate relevant part of #execute

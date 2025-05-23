@@ -80,7 +80,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
      */
     _prepareFireMode() {        
         // No fire modes selectable on dialog for invalid item provided.
-        const weapon = this.item.asWeapon;
+        const weapon = this.item.asType('weapon');
         if (!weapon) return;
 
         this.data.fireModes = FireModeRules.availableFireModes(weapon.system.range.modes);

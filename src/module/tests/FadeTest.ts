@@ -53,7 +53,7 @@ export class FadeTest extends SuccessTest<FadeTestData> {
     static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor<'character'>) {
         const documentAction = await super._getDocumentTestAction(item, actor);
 
-        if (!actor.isCharacter() || !actor.isEmerged) {
+        if (!actor.isType('character') || !actor.isEmerged) {
             console.error(`Shadowrun 5e | A ${this.name} expected an emerged actor but got this`, actor);
             return documentAction;
         }

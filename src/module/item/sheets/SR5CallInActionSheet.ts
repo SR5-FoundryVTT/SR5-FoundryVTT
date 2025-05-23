@@ -54,8 +54,8 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
         if (data.type !== 'Actor') return;
         const actor = await fromUuid(data.uuid) as SR5Actor;
 
-        if (actor.isSpirit()) await this.updatePreparedSpirit(actor);
-        if (actor.isSprite()) await this.updatePreparedSprite(actor);
+        if (actor.isType('spirit')) await this.updatePreparedSpirit(actor);
+        if (actor.isType('sprite')) await this.updatePreparedSprite(actor);
     }
 
     override activateListeners(html: any): void {

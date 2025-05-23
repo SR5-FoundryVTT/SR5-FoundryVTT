@@ -302,7 +302,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.track.physical.wounds, 1);
         });
         it('Character recoil compensation', () => {
-            let character = new SR5Actor<'character'>({ name: 'Testing', type: 'character', system: { attributes: { strength: { base: 5 } } } });
+            let character = new SR5Actor({ name: 'Testing', type: 'character', system: { attributes: { strength: { base: 5 } } } });
             if (!character) return assert.fail();
 
             assert.strictEqual(character.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1

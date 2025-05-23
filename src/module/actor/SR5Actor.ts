@@ -45,7 +45,7 @@ import { ConfiguredData } from '@league-of-foundry-developers/foundry-vtt-types/
  * </code></pre>
  *
  */
-export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends Actor {
+export class SR5Actor<Type extends ConfiguredData<'Actor'>['type'] = any> extends Actor {
     // This is the default inventory name and label for when no other inventory has been created.
     defaultInventory: Shadowrun.InventoryData = {
         name: 'Carried',
@@ -63,7 +63,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     // Allow users to access to tests creation.
     tests: typeof TestCreator = TestCreator;
     //@ts-expect-error
-    system: Extract<Shadowrun.ShadowrunActorData, {type: T}>['system'];
+    system: Extract<Shadowrun.ShadowrunActorData, {type: Type}>['system'];
 
     // Holds all operations related to this actors inventory.
     inventory: InventoryFlow;
@@ -71,7 +71,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     modifiers: ModifierFlow;
 
     // TODO: foundry-vtt-types v10. Allows for {system: ...} to be given without type error
-    constructor(data, context?) {
+    constructor(data: ConstructorParameters<typeof Actor>[0] & { type: Type }, context?: ConstructorParameters<typeof Actor>[1]) {
         super(data, context);
 
         this.inventory = new InventoryFlow(this);
@@ -109,17 +109,17 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     override prepareBaseData() {
         super.prepareBaseData();
 
-        if (this.isCharacter())
+        if (this.isType('character'))
             CharacterPrep.prepareBaseData(this.system);
-        else if (this.isCritter())
+        else if (this.isType('critter'))
             CritterPrep.prepareBaseData(this.system);
-        else if (this.isSpirit())
+        else if (this.isType('spirit'))
             SpiritPrep.prepareBaseData(this.system);
-        else if (this.isSprite())
+        else if (this.isType('sprite'))
             SpritePrep.prepareBaseData(this.system);
-        else if (this.isVehicle())
+        else if (this.isType('vehicle'))
             VehiclePrep.prepareBaseData(this.system);
-        else if (this.isIC())
+        else if (this.isType('ic'))
             ICPrep.prepareBaseData(this.system);
     }
 
@@ -215,17 +215,17 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
         const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item as unknown as Shadowrun.ShadowrunItemData));
-        if (this.isCharacter())
+        if (this.isType('character'))
             CharacterPrep.prepareDerivedData(this.system, itemDataWrappers);
-        else if (this.isCritter())
+        else if (this.isType('critter'))
             CritterPrep.prepareDerivedData(this.system, itemDataWrappers);
-        else if (this.isSpirit())
+        else if (this.isType('spirit'))
             SpiritPrep.prepareDerivedData(this.system, itemDataWrappers);
-        else if (this.isSprite())
+        else if (this.isType('sprite'))
             SpritePrep.prepareDerivedData(this.system, itemDataWrappers);
-        else if (this.isVehicle())
+        else if (this.isType('vehicle'))
             VehiclePrep.prepareDerivedData(this.system, itemDataWrappers);
-        else if (this.isIC())
+        else if (this.isType('ic'))
             ICPrep.prepareDerivedData(this.system, itemDataWrappers);
     }
 
@@ -428,9 +428,9 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     }
 
     getFullDefenseAttribute(): Shadowrun.AttributeField | undefined {
-        if (this.isVehicle()) {
+        if (this.isType('vehicle')) {
             return this.findVehicleStat('pilot');
-        } else if (this.isCharacter()) {
+        } else if (this.isType('character')) {
             let att = this.system.full_defense_attribute;
             if (!att) att = 'willpower';
             return this.findAttribute(att);
@@ -507,41 +507,29 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
         return limits[name];
     }
 
-    /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
-     *  Please check SR5ActorType for reference.
-     */
-    getType(): string {
-        return this.type;
-    }
-
-    isCharacter():  this is SR5Actor<'character'> {
-        return this.getType() === 'character';
-    }
-
-    isSpirit():  this is SR5Actor<'spirit'> {
-        return this.getType() === 'spirit';
-    }
-
-    isSprite(): this is SR5Actor<'sprite'> {
-        return this.getType() === 'sprite';
-    }
-
-    isVehicle(): this is SR5Actor<'vehicle'> {
-        return this.getType() === 'vehicle';
-    }
-
     isGrunt() {
         if (!("is_npc" in this.system) || !("npc" in this.system)) return false;
 
         return this.system.is_npc && this.system.npc.is_grunt;
     }
 
-    isCritter(): this is SR5Actor<'critter'> {
-        return this.getType() === 'critter';
+    /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
+     *  Please check SR5ActorType for reference.
+     */
+    isType<T extends ConfiguredData<'Actor'>['type']>(type: T): this is SR5Actor<T> {
+        return this.type === type;
     }
 
-    isIC(): this is SR5Actor<'ic'> {
-        return this.getType() === 'ic';
+    isNotType<T extends ConfiguredData<'Actor'>['type']>(type: T): this is SR5Actor<Exclude<ConfiguredData<'Actor'>['type'], T>> {
+        return this.type !== type;
+    }
+
+    asType<T extends ConfiguredData<'Actor'>['type']>(type: T): SR5Actor<T> | undefined {
+        if (this.isType(type)) return this;
+    }
+
+    asTypes<T extends ConfiguredData<'Actor'>['type'][]>(...types: T): SR5Actor<T[number]> | undefined {
+        return types.includes(this.type as T[number]) ? (this as unknown as SR5Actor<T[number]>) : undefined;
     }
 
     /**
@@ -549,7 +537,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * @returns true in case of possible natural recovery.
      */
     get hasNaturalRecovery(): boolean {
-        return this.isCharacter() || this.isCritter();
+        return this.isType('character') || this.isType('critter');
     }
 
     getVehicleTypeSkillName(): string | undefined {
@@ -574,7 +562,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     }
 
     getVehicleTypeSkill(): Shadowrun.SkillField | undefined {
-        if (!this.isVehicle()) return;
+        if (!this.isType('vehicle')) return;
 
         const name = this.getVehicleTypeSkillName();
         return this.findActiveSkill(name);
@@ -593,13 +581,13 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     }
 
     getNetworkController(): string | undefined {
-        if(!this.isVehicle()) return;
+        if(!this.isType('vehicle')) return;
 
         return this.system.networkController;
     }
 
     async setNetworkController(networkController: string|undefined): Promise<void> {
-        if(!this.isVehicle()) return;
+        if(!this.isType('vehicle')) return;
 
         if ('networkController' in this.system) {
             this.system.networkController;
@@ -608,7 +596,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     }
 
     get canBeNetworkDevice(): boolean {
-        return this.isVehicle();
+        return this.isType('vehicle');
     }
 
     /**
@@ -644,8 +632,8 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      *
      */
     get isEmerged(): boolean {
-        if (this.isSprite()) return true;
-        if (this.isCharacter() && this.system.special === 'resonance') return true;
+        if (this.isType('sprite')) return true;
+        if (this.isType('character') && this.system.special === 'resonance') return true;
 
         return false;
     }
@@ -1462,7 +1450,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
         if (device) {
             await this._addDamageToDeviceTrack(rest, device);
         }
-        if (this.isIC() || this.isSprite()) {
+        if (this.isType('ic') || this.isType('sprite')) {
             await this._addDamageToTrack(rest, track);
         }
     }
@@ -1527,7 +1515,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
         }
 
         // IC actors use a matrix track.
-        if (this.isIC()) {
+        if (this.isType('ic')) {
             return await this.update({'system.track.matrix': track});
         }
 
@@ -1746,7 +1734,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     }
 
     getVehicleStats(): Shadowrun.VehicleStats | undefined {
-        if (this.isVehicle()) return this.system.vehicle_stats;
+        if (this.isType('vehicle')) return this.system.vehicle_stats;
     }
 
     /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
@@ -1754,7 +1742,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * @param uuid An actors id. Should be a character able to drive a vehicle
      */
     async addVehicleDriver(uuid: string) {
-        if (!this.isVehicle()) return;
+        if (!this.isType('vehicle')) return;
 
         const driver = await fromUuid(uuid) as SR5Actor;
         if (!driver) return;
@@ -1766,19 +1754,19 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     }
 
     async removeVehicleDriver() {
-        if (!this.isVehicle() || !this.hasDriver()) return;
+        if (!this.isType('vehicle') || !this.hasDriver()) return;
 
         await this.update({'system.driver': ''});
     }
 
     hasDriver(): boolean {
-        if (!this.isVehicle()) return false;
+        if (!this.isType('vehicle')) return false;
 
         return this.system.driver.length > 0;
     }
 
     getVehicleDriver(): SR5Actor | undefined {
-        if (!this.isVehicle() || !this.hasDriver()) return;
+        if (!this.isType('vehicle') || !this.hasDriver()) return;
 
         const driver = game.actors?.get(this.system.driver) as SR5Actor;
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
@@ -1795,7 +1783,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * @param item The host item
      */
     async addICHost(item: SR5Item) {
-        if (!this.isIC()) return;
+        if (!this.isType('ic')) return;
         if (!item.isHost) return;
 
         const host = item.asHost;
@@ -1820,7 +1808,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * Remove a connect Host item from an ic type actor.
      */
     async removeICHost() {
-        if (!this.isIC()) return;
+        if (!this.isType('ic')) return;
 
         const updateData = {
             id: null,
@@ -1835,7 +1823,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * Will return true if this ic type actor has been connected to a host.
      */
     hasHost(): boolean {
-        if (!this.isIC()) return false;
+        if (!this.isType('ic')) return false;
         return !!this.system.host.id;
     }
 
@@ -1843,7 +1831,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * Get the host item connect to this ic type actor.
      */
     getICHost(): SR5Item | undefined {
-        if (!this.isIC()) return;
+        if (!this.isType('ic')) return;
         return game.items?.get(this.system.host.id);
     }
 
@@ -1852,7 +1840,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * @param actor A character actor to be used as summoner
      */
     async addSummoner(actor: SR5Actor) {
-        if (!this.isSpirit() || !actor.isCharacter()) return;
+        if (!this.isType('spirit') || !actor.isType('character')) return;
         await this.update({ 'system.summonerUuid': actor.uuid });
     }
 
@@ -1860,7 +1848,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * Remove a summoner from this spirit actor.
      */
     async removeSummoner() {
-        if (!this.isSpirit()) return;
+        if (!this.isType('spirit')) return;
         await this.update({ 'system.summonerUuid': null });
     }
 
@@ -1869,7 +1857,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * @param actor A character actor to be used as technomancer
      */
     async addTechnomancer(actor: SR5Actor) {
-        if (!this.isSprite() || !actor.isCharacter()) return;
+        if (!this.isType('sprite') || !actor.isType('character')) return;
         await this.update({ 'system.technomancerUuid': actor.uuid });
     }
 
@@ -1877,7 +1865,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * Remove a technomancer from this sprite actor.
      */
     async removeTechnomancer() {
-        if (!this.isSprite()) return;
+        if (!this.isType('sprite')) return;
         await this.update({ 'system.technomancerUuid': '' });
     }
     /** Check if this actor is of one or multiple given actor types
@@ -1916,7 +1904,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
 
     get matrixData(): Shadowrun.MatrixData | undefined {
         if (!this.isMatrixActor) return;
-        // @ts-expect-error // isMatrixActor handles it, TypeScript doesn't know.
+        // @ts-expect-error
         return this.system.matrix as Shadowrun.MatrixData;
     }
 
@@ -1934,7 +1922,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
     async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
         if (!canvas.ready) return;
 
-        if (this.isIC() && this.hasHost()) {
+        if (this.isType('ic') && this.hasHost()) {
             return await this.getICHost()?.setMarks(target, marks, options);
         }
 
@@ -2047,7 +2035,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      */
     get matrixController(): SR5Actor | SR5Item {
         // In case of a broken host connection, return the IC actor.
-        if (this.isIC() && this.hasHost()) return this.getICHost() || this;
+        if (this.isType('ic') && this.hasHost()) return this.getICHost() || this;
         // TODO: Implement PAN
         // if (this.isMatrixActor && this.hasController()) return this.getController();
 
@@ -2145,7 +2133,7 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
      * @returns true, if the actor can interact with the physical plane
      */
     get hasPhysicalBody() {
-        return this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle();
+        return this.isType('character') || this.isType('critter') || this.isType('spirit') || this.isType('vehicle');
     }
 
     /**
@@ -2156,16 +2144,16 @@ export class SR5Actor<T extends ConfiguredData<'Actor'>['type'] = any> extends A
         
         const updateData: Record<string, any> = {};
 
-        if (this.isCharacter() || this.isCritter() || this.isSpirit() || this.isVehicle()) {
+        if (this.isType('character') || this.isType('critter') || this.isType('spirit') || this.isType('vehicle')) {
             updateData['system.track.physical.value'] = 0;
             updateData['system.track.physical.overflow.value'] = 0;
         }
 
-        if (this.isCharacter() || this.isCritter() || this.isSpirit()) {
+        if (this.isType('character') || this.isType('critter') || this.isType('spirit')) {
             updateData['system.track.stun.value'] = 0;
         }
 
-        if (this.isCharacter() || this.isCritter()) {
+        if (this.isType('character') || this.isType('critter')) {
             updateData['system.attributes.edge.uses'] = this.getEdge().value;
         }
 

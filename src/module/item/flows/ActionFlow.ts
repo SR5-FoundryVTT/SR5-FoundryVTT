@@ -111,7 +111,7 @@ export class ActionFlow {
     static sortedActiveSkills(actor?: SR5Actor, skillNames?: string[]) {
         // CASE - Return default skills whenn no local actor skills are used.
         //        The major use case is the sidebar item creation, where no actor is available.
-        if (!actor || actor.isIC()) {
+        if (!actor || (actor as SR5Actor).isType('ic')) {
             // Inject this items custom skill into the global skill list.
             const globalSkills = foundry.utils.deepClone(SR5.activeSkills);
             skillNames?.forEach(skillName => { ActionFlow._injectMissingCustomSkill(globalSkills, skillName) });

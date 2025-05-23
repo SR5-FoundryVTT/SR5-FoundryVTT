@@ -81,6 +81,7 @@ import { Action } from './types/item/ActionModel';
 import { AdeptPower } from './types/item/AdeptPowerModel';
 import { Armor } from './types/item/ArmorModel';
 import { Bioware } from './types/item/BiowareModel';
+import { CallInAction } from './types/item/CallInActionModel';
 import { ComplexForm } from './types/item/ComplexFormModel';
 import { Contact } from './types/item/ContactModel';
 import { CritterPower } from './types/item/CritterPowerModel';
@@ -283,6 +284,7 @@ ___________________
         CONFIG.Item.dataModels["Armor"] = Armor;
         CONFIG.Item.dataModels["AdeptPower"] = AdeptPower;
         CONFIG.Item.dataModels["Bioware"] = Bioware;
+        CONFIG.Item.dataModels["CallInAction"] = CallInAction;
         CONFIG.Item.dataModels["ComplexForm"] = ComplexForm;
         CONFIG.Item.dataModels["Contact"] = Contact;
         CONFIG.Item.dataModels["CritterPower"] = CritterPower;
@@ -519,11 +521,11 @@ ___________________
             // Collect actors from sidebar and active scene to update / rerender
             let connectedIC = [
                 // All sidebar actors should also include tokens with linked actors.
-                ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
+                ...game.actors.filter((actor: SR5Actor) => actor.isType('ic') && actor.hasHost()) as SR5Actor[],
                 // All token actors that aren't linked.
                 ...canvas.scene!.tokens.filter(token => {
                     const actor = token.actor;
-                    return !token.actorLink && !!actor && actor.isIC() && actor.hasHost();
+                    return !token.actorLink && !!actor && actor.isType('ic') && actor.hasHost();
                 }).map(t => t.actor)
             ];
 

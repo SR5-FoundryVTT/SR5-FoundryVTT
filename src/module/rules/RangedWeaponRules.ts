@@ -56,7 +56,7 @@ export const RangedWeaponRules = {
      */
     actorRecoilCompensation(actor: SR5Actor): number {
         // Each new attack allows one free compensation.
-        if (actor.isVehicle()) return RangedWeaponRules.vehicleRecoilCompensation(actor);
+        if (actor.isType('vehicle')) return RangedWeaponRules.vehicleRecoilCompensation(actor);
         else return RangedWeaponRules.humanoidRecoilCompensation(actor);
     },
 
@@ -66,7 +66,7 @@ export const RangedWeaponRules = {
      * @returns The recoil compensation part a vehicle will add to the total recoil compensation.
      */
     vehicleRecoilCompensation(actor: SR5Actor): number {
-        if (!actor.isVehicle()) return 0;
+        if (!actor.isType('vehicle')) return 0;
 
         const body = actor.getAttribute('body');
         return body ? body.value : 0;
@@ -90,7 +90,8 @@ export const RangedWeaponRules = {
      * @returns The recoil compensation part a humanoid will add to the total recoil compensation.
      */
     humanoidRecoilCompensation(actor: SR5Actor): number {
-        if (actor.isVehicle() || actor.isIC() || actor.isSprite()) return 0;
+        const noBody = actor.asTypes('vehicle', 'ic', 'sprite');
+        if (noBody) return 0;
 
         const strength = actor.getAttribute('strength');
         if (!strength) return 0;

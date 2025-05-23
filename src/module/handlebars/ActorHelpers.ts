@@ -28,7 +28,7 @@ export const registerActorHelpers = () => {
     * @param items The items to be considered
     * @param modificationCategory The modification category 
     */
-    Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item], modificationCategory: ModificationCategoryType): number => {        
+    Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item<'modification'>], modificationCategory: ModificationCategoryType): number => {        
         if (!Array.isArray(items) || !items.length) { return 0 }        
         let slotSum = 0;
         
@@ -61,7 +61,7 @@ export const registerActorHelpers = () => {
     * 
     * @param items The items to be considered
     */
-    Handlebars.registerHelper('calcModPointSlots', (items: [SR5Item]): number => {
+    Handlebars.registerHelper('calcModPointSlots', (items: [SR5Item<'modification'>]): number => {
         if (!Array.isArray(items) || !items.length) { return 0 }
         var dronestring = 'drone';
         const slotSum = items.reduce((arr, item) => {            
@@ -70,6 +70,4 @@ export const registerActorHelpers = () => {
 
         return slotSum;
     });
-
-
 }

@@ -8,6 +8,7 @@ import { DocumentSituationModifiers } from './DocumentSituationModifiers';
 import { SuccessTest, SuccessTestData } from '../tests/SuccessTest';
 import RangeData = Shadowrun.RangeData;
 import WeaponItemData = Shadowrun.WeaponItemData;
+import { SR5Item } from '../item/SR5Item';
 
 export interface WeaponRangeTestDataFragment {
     damage: Shadowrun.DamageData
@@ -38,9 +39,9 @@ export class WeaponRangeTestBehavior {
      * In case of selected targets, test will be overwritten.
      *
      */
-    private static prepareWeaponRanges(test: WeaponRangeTest, rangesAccessor: (weapon: WeaponItemData) => RangeData) {
+    private static prepareWeaponRanges(test: WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeData) {
         // Don't let missing weapon ranges break test.
-        const weapon = test.item?.asWeapon;
+        const weapon = test.item?.asType('weapon');
         if (!weapon) return;
 
         // Transform weapon ranges to something usable
@@ -112,7 +113,7 @@ export class WeaponRangeTestBehavior {
         test.data.range = modifiers.environmental.applied.active.range || test.data.targetRanges[0].range.modifier;
     }
 
-    static prepareDocumentData(test:WeaponRangeTest, rangesAccessor: (weapon: WeaponItemData) => RangeData){
+    static prepareDocumentData(test:WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeData){
         WeaponRangeTestBehavior.prepareWeaponRanges(test, rangesAccessor);
         WeaponRangeTestBehavior.prepareTargetRanges(test);
     }

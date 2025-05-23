@@ -56,7 +56,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
         it('Calculate conceal data for a device', async () => {
             const device = foundry.utils.duplicate(game.model.Item.device) as Shadowrun.DeviceData;
-            const mods: SR5Item[] = [];
+            const mods: SR5Item<'modification'>[] = [];
             
             // prepareConceal relies on the item name to be unique.
             mods.push(await testItem.create({type: 'modification', name: 'UniqueNameA', system: {conceal: 2}}));
@@ -83,7 +83,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         it('Setup damage source data', async () => {
             const actor = await testActor.create({type: 'character'});
             const documents = await actor.createEmbeddedDocuments('Item', [{type: 'action', name: 'TestAction'}]);
-            const action = documents[0] as SR5Item;
+            const action = documents![0] as SR5Item;
 
             ActionPrep.prepareDamageSource(action.system.action as Shadowrun.ActionRollData, action)
 
@@ -149,7 +149,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
                     type: {base: 'physical'}
             }}}});
             const ammo = new SR5Item({type: 'ammo', name: 'TestModA', system: {replaceDamage: true, damage: 2, damageType: 'stun', element: 'cold'}});
-            
+
             ActionPrep.prepareWithAmmo(weapon.system.action as Shadowrun.ActionRollData, ammo);
             ActionPrep.calculateValues(weapon.system.action as Shadowrun.ActionRollData);
 

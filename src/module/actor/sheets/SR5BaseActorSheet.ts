@@ -1141,10 +1141,10 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param sheetData An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
     _prepareActorTypeFields(sheetData: SR5ActorSheetData) {
-        sheetData.isCharacter = this.actor.isCharacter();
-        sheetData.isSpirit = this.actor.isSpirit();
-        sheetData.isCritter = this.actor.isCritter();
-        sheetData.isVehicle = this.actor.isVehicle();
+        sheetData.isCharacter = this.actor.isType('character');
+        sheetData.isSpirit = this.actor.isType('spirit');
+        sheetData.isCritter = this.actor.isType('critter');
+        sheetData.isVehicle = this.actor.isType('vehicle');
         sheetData.hasSkills = this.actor.hasSkills;
         sheetData.canAlterSpecial = this.actor.canAlterSpecial;
         sheetData.hasFullDefense = this.actor.hasFullDefense;
@@ -1153,7 +1153,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
+        if (this.actor.isType('ic') && this.actor.hasHost()) {
             return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
@@ -1172,7 +1172,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
+        if (this.actor.isType('ic') && this.actor.hasHost()) {
             return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
@@ -1190,7 +1190,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksDelete(event) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
+        if (this.actor.isType('ic') && this.actor.hasHost()) {
             return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
@@ -1206,7 +1206,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksClearAll(event) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
+        if (this.actor.isType('ic') && this.actor.hasHost()) {
             return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
@@ -1550,7 +1550,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const quantity = parseInt(event.currentTarget.value);
 
         // Inform users about issues with templating or programming.
-        if (item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
+        if (!item?.system || !('technology' in item?.system) || item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
             return console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item);
         }
 
@@ -1579,7 +1579,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!item) return;
 
         // Handle the equipped state.
-        if (item.isDevice) {
+        if (item.isType('device')) {
             await this.document.equipOnlyOneItemOfType(item);
         } else {
             await this.actor.updateEmbeddedDocuments('Item', [{
@@ -1599,7 +1599,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
         if (!item) return;
-        if (!item.isCritterPower && !item.isSpritePower) return;
+        if (!item.isType('critter_power') && !item.isType('sprite_power')) return;
 
         switch (item.system.optional) {
             case 'standard':
@@ -1915,7 +1915,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             case 'background_count':
                 return !this.actor.isAwakened;
             case 'environmental':
-                return this.actor.isSprite();
+                return this.actor.isType('sprite');
             // Defense modifier is already shown in general modifier section.
             case 'defense':
                 return true;
