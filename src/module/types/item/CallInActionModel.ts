@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const SummoningData: DataSchema = {
@@ -30,7 +31,7 @@ const CallInActionData: DataSchema = {
     }),
 }
 
-export class CallInAction extends foundry.abstract.TypeDataModel<typeof CallInActionData, Item> {
+export class CallInAction extends foundry.abstract.TypeDataModel<typeof CallInActionData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return CallInActionData;
     }

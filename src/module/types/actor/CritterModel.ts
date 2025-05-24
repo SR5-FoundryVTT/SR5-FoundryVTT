@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 export const CritterData: DataSchema = {
@@ -14,7 +15,7 @@ export const CritterData: DataSchema = {
     limits: new SchemaField(SM.CharacterLimits, { required: true }),
 }
 
-export class Critter extends foundry.abstract.TypeDataModel<typeof CritterData, Actor> {
+export class Critter extends foundry.abstract.TypeDataModel<typeof CritterData, Actor.Implementation> {
     static override defineSchema(): DataSchema {
         return CritterData;
     }

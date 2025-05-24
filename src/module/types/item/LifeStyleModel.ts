@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const LifestyleData: DataSchema = {
@@ -15,7 +16,7 @@ const LifestyleData: DataSchema = {
     // mods: new ArrayField({ required: true, initial: [] }),
 }
 
-export class Lifestyle extends foundry.abstract.TypeDataModel<typeof LifestyleData, Item> {
+export class Lifestyle extends foundry.abstract.TypeDataModel<typeof LifestyleData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return LifestyleData;
     }

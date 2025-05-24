@@ -1,4 +1,5 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const TechnomancerActorData: DataSchema = {
@@ -68,7 +69,7 @@ const CharacterData: DataSchema = {
     }, { required: true }),
 }
 
-export class Character extends foundry.abstract.TypeDataModel<typeof CharacterData, Actor> {
+export class Character extends foundry.abstract.TypeDataModel<typeof CharacterData, Actor.Implementation> {
     static override defineSchema(): DataSchema {
         return CharacterData;
     }

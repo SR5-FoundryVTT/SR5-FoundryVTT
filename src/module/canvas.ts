@@ -1,4 +1,3 @@
-import { BaseGrid, SquareHex } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/grid/_module.mjs';
 import {FLAGS, SYSTEM_NAME} from './constants';
 
 interface DistanceOptions {

@@ -73,7 +73,6 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
-import { ConfiguredData } from '@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes.mjs';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -94,20 +93,13 @@ ActionResultFlow; // DON'T TOUCH!
  *
  *       Be wary of SR5Item.actor for this reason!
  */
-export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends Item {
-    constructor(data: ConstructorParameters<typeof Item>[0] & { type: Type }, context?: ConstructorParameters<typeof Item>[1]) {
-        super(data, context);   
-    }
-
+export class SR5Item<SubType extends Item.SubType = Item.SubType> extends Item<SubType> {
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
     // to allow for embedded items in items in actors.
     items: SR5Item[];
 
     // Item Sheet labels for quick info on an item dropdown.
     labels: {} = {};
-
-    //@ts-expect-error Add v10 type helper
-    system: Extract<Shadowrun.ShadowrunItemData, {type: Type}>['system']; // TODO: foundry-vtt-types v10
 
     /**
      * Return the owner of this item, which can either be
@@ -694,11 +686,10 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
      * @param index The license list index
      */
     async removeLicense(index) {
-        if (this.type !== 'sin') return;
-
-        //@ts-expect-error TODO: foundry-vtt-types v10
-        const licenses = this.system.licenses.splice(index, 1);
-        await this.update({ 'system.licenses': licenses });
+        if (this.isType('sin')) {
+            const licenses = this.system.licenses.splice(index, 1);
+            await this.update({ 'system.licenses': licenses });
+        }
     }
 
     isAction(): boolean {
@@ -999,12 +990,12 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
         return DEFAULT_ROLL_NAME;
     }
 
-    isType<T extends ConfiguredData<'Item'>['type']>(type: T): this is SR5Item<T> {
+    isType<ST extends Item.SubType = Item.SubType>(type: ST): this is SR5Item<ST> {
         return this.type === type;
     }
 
-    asType<T extends ConfiguredData<'Item'>['type'][]>(...types: T): SR5Item<T[number]> | undefined {
-        return types.includes(this.type as T[number]) ? (this as unknown as SR5Item<T[number]>) : undefined;
+    asType<T extends readonly Item.SubType[]>(...types: T): SR5Item<T[number]> | undefined {
+        return types.some((t) => this.isType(t)) ? this : undefined;
     }
 
     /**
@@ -1312,7 +1303,6 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
         }
 
         // Actor.item => Directly owned item by an actor!
-        // @ts-expect-error
         return await super.update(data, options);
     }
 
@@ -1468,7 +1458,6 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
-        // @ts-expect-error
         return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => ({

@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const QualityData: DataSchema = {
@@ -14,7 +15,7 @@ const QualityData: DataSchema = {
     rating: new NumberField({ required: true, initial: 0 }),
 }
 
-export class Quality extends foundry.abstract.TypeDataModel<typeof QualityData, Item> {
+export class Quality extends foundry.abstract.TypeDataModel<typeof QualityData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return QualityData;
     }

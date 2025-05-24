@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 export const ActionTypeLabel: DataSchema = {
@@ -73,7 +74,7 @@ export const ActionData: DataSchema = {
     result: new SchemaField(ActionResultData),
 };
 
-export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, Item> {
+export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return ActionData;
     }

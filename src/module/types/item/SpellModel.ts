@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const CombatSpellData: DataSchema = {
@@ -80,7 +81,7 @@ const SpellPartData: DataSchema = {
     ritual: new SchemaField(RitualSpellData, { required: true }),
 }
 
-export class Spell extends foundry.abstract.TypeDataModel<typeof SpellPartData, Item> {
+export class Spell extends foundry.abstract.TypeDataModel<typeof SpellPartData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return SpellPartData;
     }

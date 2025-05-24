@@ -1,6 +1,6 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
-import { data } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/client-esm/client.mjs";
 
 const SourceEntityField: DataSchema = {
     id: new StringField({ required: true }),
@@ -21,7 +21,7 @@ const HostData: DataSchema = {
     customAttributes: new BooleanField({ required: true, initial: false }),
 }
 
-export class Host extends foundry.abstract.TypeDataModel<typeof HostData, Item> {
+export class Host extends foundry.abstract.TypeDataModel<typeof HostData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return HostData;
     }

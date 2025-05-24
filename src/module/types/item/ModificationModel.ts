@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const ModificationData: DataSchema = {
@@ -27,7 +28,7 @@ const ModificationData: DataSchema = {
     slots: new NumberField({ required: true, initial: 0 }),
 }
 
-export class Modification extends foundry.abstract.TypeDataModel<typeof ModificationData, Item> {
+export class Modification extends foundry.abstract.TypeDataModel<typeof ModificationData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return ModificationData;
     }

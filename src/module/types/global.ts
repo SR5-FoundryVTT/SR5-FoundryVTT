@@ -2,6 +2,7 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
+import { SR5ChatMessage } from "../chatMessage/SR5ChatMessage";
 import { SR5Combat } from "../combat/SR5Combat";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
@@ -38,17 +39,11 @@ import { Spell } from './item/SpellModel';
 import { SpritePower } from './item/SpritePowerModel';
 import { Weapon } from './item/WeaponModel';
 
-declare global {
-    // Configuration of foundry-vtt-types
-    interface LenientGlobalVariableTypes {
-        game: never; // disable game ready checks
-        canvas: never; // disable canvas ready checks
-        socket: never; // disable socket ready checks
-    }
-
+declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
         ActiveEffect: typeof SR5ActiveEffect;
         Actor: typeof SR5Actor;
+        ChatMessage: typeof SR5ChatMessage;
         Combat: typeof SR5Combat;
         Item: typeof SR5Item;
         Roll: typeof SR5Roll;
@@ -72,17 +67,6 @@ declare global {
     }
 
     interface CONFIG {}
-
-    // Configuration of shadowrun5e system
-    interface SourceConfig {
-        Item: ShadowrunItemData;
-        Actor: ShadowrunActorData;
-    }
-
-    interface DataConfig {
-        Item: ShadowrunItemData;
-        Actor: ShadowrunActorData;
-    }
 
     interface DataModelConfig {
         Actor: {
@@ -184,35 +168,9 @@ declare global {
         };
     }
 
-    // Inject model basic structure into foundry-vtt-types
-    interface Game {
-        model: {
-            Item: typeof SR5Item;
-            Actor: typeof SR5Actor;
-            Card: any;
-            Cards: any;
-            JournalEntryPage: any;
-        };
-    }
-
     type RecursivePartial<T> = {
         [P in keyof T]?: RecursivePartial<T[P]>;
     };
-
-
-    /**
-     * Retrieve an Entity or Embedded Entity by its Universally Unique Identifier (uuid).
-     * @param uuid - The uuid of the Entity or Embedded Entity to retrieve
-     */
-    declare function fromUuidSync(uuid: string): foundry.abstract.Document<any, any> | null;
-
-    // Use declaration merging to add strong typing to Foundry's game.i18n localize and format functions,
-    // sourcing valid translation strings from this system's english translations file
-    declare class Localization {
-        localize(stringId: Translation): string;
-
-        format(stringId: Translation, data?: Record<string, unknown>): string;
-    }
 
     interface SettingConfig {
         "shadowrun5e.applyLimits": boolean;
@@ -235,5 +193,21 @@ declare global {
         "shadowrun5e.MarkImports": string;
         "shadowrun5e.ImportIconFolder": string;
         "shadowrun5e.UseImportIconOverrides": boolean;
+    }
+}
+
+declare global {
+    /**
+     * Retrieve an Entity or Embedded Entity by its Universally Unique Identifier (uuid).
+     * @param uuid - The uuid of the Entity or Embedded Entity to retrieve
+     */
+    function fromUuidSync(uuid: string): foundry.abstract.Document<any, any> | null;
+
+    // Use declaration merging to add strong typing to Foundry's game.i18n localize and format functions,
+    // sourcing valid translation strings from this system's english translations file
+    interface Localization {
+        localize(stringId: Translation): string;
+
+        format(stringId: Translation, data?: Record<string, unknown>): string;
     }
 }

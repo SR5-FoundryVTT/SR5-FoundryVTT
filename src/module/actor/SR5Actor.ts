@@ -27,8 +27,6 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import { EffectChangeData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs';
-import { ConfiguredData } from '@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes.mjs';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -45,7 +43,7 @@ import { ConfiguredData } from '@league-of-foundry-developers/foundry-vtt-types/
  * </code></pre>
  *
  */
-export class SR5Actor<Type extends ConfiguredData<'Actor'>['type'] = any> extends Actor {
+export class SR5Actor<Type extends keyof DataModelConfig["Actor"] = any> extends Actor {
     // This is the default inventory name and label for when no other inventory has been created.
     defaultInventory: Shadowrun.InventoryData = {
         name: 'Carried',
@@ -516,15 +514,15 @@ export class SR5Actor<Type extends ConfiguredData<'Actor'>['type'] = any> extend
     /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
      *  Please check SR5ActorType for reference.
      */
-    isType<T extends ConfiguredData<'Actor'>['type']>(type: T): this is SR5Actor<T> {
+    isType<T extends keyof DataModelConfig["Actor"]>(type: T): this is SR5Actor<T> {
         return this.type === type;
     }
 
-    isNotType<T extends ConfiguredData<'Actor'>['type']>(type: T): this is SR5Actor<Exclude<ConfiguredData<'Actor'>['type'], T>> {
+    isNotType<T extends keyof DataModelConfig["Actor"]>(type: T): this is SR5Actor<Exclude<keyof DataModelConfig["Actor"], T>> {
         return this.type !== type;
     }
 
-    asType<T extends ConfiguredData<'Actor'>['type'][]>(...types: T): SR5Actor<T[number]> | undefined {
+    asType<T extends readonly (keyof DataModelConfig["Actor"])[]>(...types: T): SR5Actor<T[number]> | undefined {
         return types.includes(this.type as T[number]) ? (this as unknown as SR5Actor<T[number]>) : undefined;
     }
 
@@ -1540,12 +1538,12 @@ export class SR5Actor<Type extends ConfiguredData<'Actor'>['type'] = any> extend
         return {overflow, rest};
     }
 
-    getStunTrack(): Shadowrun.TrackType | undefined {
+    getStunTrack(): Shadowrun.TrackType | void {
         if ("track" in this.system && "stun" in this.system.track)
             return this.system.track.stun;
     }
 
-    getPhysicalTrack(): Shadowrun.OverflowTrackType | undefined {
+    getPhysicalTrack(): Shadowrun.OverflowTrackType | void {
         if ("track" in this.system && "physical" in this.system.track)
             return this.system.track.physical;
     }

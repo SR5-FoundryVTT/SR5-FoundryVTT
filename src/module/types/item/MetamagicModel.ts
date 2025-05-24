@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const MetamagicData: DataSchema = {
@@ -7,7 +8,7 @@ const MetamagicData: DataSchema = {
     ...SM.ImportFlags,
 }
 
-export class Metamagic extends foundry.abstract.TypeDataModel<typeof MetamagicData, Item> {
+export class Metamagic extends foundry.abstract.TypeDataModel<typeof MetamagicData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return MetamagicData;
     }

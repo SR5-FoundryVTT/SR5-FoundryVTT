@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 export const SpiritData: DataSchema = {
@@ -27,7 +28,7 @@ export const SpiritData: DataSchema = {
     }, { required: true }),
 }
 
-export class Spirit extends foundry.abstract.TypeDataModel<typeof SpiritData, Actor> {
+export class Spirit extends foundry.abstract.TypeDataModel<typeof SpiritData, Actor.Implementation> {
     static override defineSchema(): DataSchema {
         return SpiritData;
     }

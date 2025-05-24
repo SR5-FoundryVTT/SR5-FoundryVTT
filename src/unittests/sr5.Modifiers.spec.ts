@@ -200,7 +200,6 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers({}).source, defaultSourceModifiers);
                 assert.deepEqual(new DocumentSituationModifiers(undefined).source, defaultSourceModifiers);
-                //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers(null).source, defaultSourceModifiers);
                 //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers(0).source, defaultSourceModifiers);

@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const BiowareData: DataSchema = {
@@ -16,7 +17,7 @@ const BiowareData: DataSchema = {
     }),
 }
 
-export class Bioware extends foundry.abstract.TypeDataModel<typeof BiowareData, Item> {
+export class Bioware extends foundry.abstract.TypeDataModel<typeof BiowareData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return BiowareData;
     }

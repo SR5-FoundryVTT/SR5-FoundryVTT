@@ -99,6 +99,7 @@ import { Sin } from './types/item/SinModel';
 import { Spell } from './types/item/SpellModel';
 import { SpritePower } from './types/item/SpritePowerModel';
 import { Weapon } from './types/item/WeaponModel';
+import { Ammo } from './types/item/AmmoModel';
 
 
 
@@ -280,6 +281,32 @@ ___________________
             storage: DataStorage
         };
 
+        // Register document classes
+        CONFIG.Actor.documentClass = SR5Actor;
+        CONFIG.Item.documentClass = SR5Item;
+        CONFIG.Combat.documentClass = SR5Combat;
+        CONFIG.ChatMessage.documentClass = SR5ChatMessage;
+        CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
+        // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
+        // Setting to true, will duplicate item effects on actors. Only effects on actors will be traversed.
+        CONFIG.ActiveEffect.legacyTransferral = false;
+        
+        CONFIG.Token.objectClass = SR5Token;
+
+        // Register initiative directly (outside of system.json) as DnD5e does it.
+        CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
+        // @ts-expect-error
+        Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
+
+        // Register general SR5Roll for JSON serialization support.
+        CONFIG.Dice.rolls.push(SR5Roll);
+        // @ts-expect-error // Register the SR5Roll dnd5e style.
+        CONFIG.Roll = SR5Roll;
+
+        // Add Shadowrun configuration onto general Foundry config for module access.
+        // @ts-expect-error // TODO: Add declaration merging
+        CONFIG.SR5 = SR5;
+
         CONFIG.Item.dataModels["Action"] = Action;
         CONFIG.Item.dataModels["Armor"] = Armor;
         CONFIG.Item.dataModels["AdeptPower"] = AdeptPower;
@@ -309,33 +336,6 @@ ___________________
         CONFIG.Actor.dataModels["Spirit"] = Spirit;
         CONFIG.Actor.dataModels["Sprite"] = Sprite;
         CONFIG.Actor.dataModels["Vehicle"] = Vehicle;
-
-        // Register document classes
-        CONFIG.Actor.documentClass = SR5Actor;
-        CONFIG.Item.documentClass = SR5Item;
-        CONFIG.Combat.documentClass = SR5Combat;
-        CONFIG.ChatMessage.documentClass = SR5ChatMessage;
-        CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
-        // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
-        // Setting to true, will duplicate item effects on actors. Only effects on actors will be traversed.
-        CONFIG.ActiveEffect.legacyTransferral = false;
-        
-        CONFIG.Token.objectClass = SR5Token;
-
-        // Register initiative directly (outside of system.json) as DnD5e does it.
-        CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
-        // @ts-expect-error
-        Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
-
-        // Register general SR5Roll for JSON serialization support.
-        // @ts-expect-error // Register the SR5Roll dnd5e style.
-        CONFIG.Dice.rolls.push(SR5Roll);
-        // @ts-expect-error // Register the SR5Roll dnd5e style.
-        CONFIG.Roll = SR5Roll;
-
-        // Add Shadowrun configuration onto general Foundry config for module access.
-        // @ts-expect-error // TODO: Add declaration merging
-        CONFIG.SR5 = SR5;
 
 
         registerSystemSettings();

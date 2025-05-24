@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const SpriteData: DataSchema = {
@@ -21,7 +22,7 @@ const SpriteData: DataSchema = {
     technomancerUuid: new StringField({ required: true, initial: "" }),
 }
 
-export class Sprite extends foundry.abstract.TypeDataModel<typeof SpriteData, Actor> {
+export class Sprite extends foundry.abstract.TypeDataModel<typeof SpriteData, Actor.Implementation> {
     static override defineSchema(): DataSchema {
         return SpriteData;
     }

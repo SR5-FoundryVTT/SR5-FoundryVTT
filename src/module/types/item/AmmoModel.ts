@@ -1,4 +1,5 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const AmmoData: DataSchema = {
@@ -34,7 +35,7 @@ const AmmoData: DataSchema = {
     accuracy: new NumberField({ required: true, initial: 0 }),
 }
 
-export class Ammo extends foundry.abstract.TypeDataModel<typeof AmmoData, Item> {
+export class Ammo extends foundry.abstract.TypeDataModel<typeof AmmoData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return AmmoData;
     }

@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const ContactData: DataSchema = {
@@ -13,7 +14,7 @@ const ContactData: DataSchema = {
     linkedActor: new StringField({ required: true, initial: '' }),
 }
 
-export class Contact extends foundry.abstract.TypeDataModel<typeof ContactData, Item> {
+export class Contact extends foundry.abstract.TypeDataModel<typeof ContactData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return ContactData;
     }

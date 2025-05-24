@@ -9,6 +9,7 @@ import { SR5Item } from './item/SR5Item';
 import {Helpers} from "./helpers";
 import SkillField = Shadowrun.SkillField;
 import {SR5Actor} from "./actor/SR5Actor";
+import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
 
 /**
  * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.
@@ -94,7 +95,7 @@ export async function createSkillMacro(data: {skillId: string, skill: SkillField
  *
  * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
  */
-export async function rollSkillMacro(skillLabel) {
+export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData>| void> {
     if (!game || !game.actors) return;
     if (!skillLabel) return;
 

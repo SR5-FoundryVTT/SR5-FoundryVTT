@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const LicenseData: DataSchema = {
@@ -14,7 +15,7 @@ const SinData: DataSchema = {
     licences: new ArrayField(new SchemaField(LicenseData), { required: true, initial: [] }),
 }
 
-export class Sin extends foundry.abstract.TypeDataModel<typeof SinData, Item> {
+export class Sin extends foundry.abstract.TypeDataModel<typeof SinData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return SinData;
     }

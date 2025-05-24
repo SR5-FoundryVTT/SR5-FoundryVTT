@@ -5,7 +5,7 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowrun.ArmorData> {
     public armorTranslations: any;
-    public override categoryTranslations: any;
+    public declare categoryTranslations: any;
     public files = ['armor.xml'];
 
     CanParse(jsonObject: object): boolean {

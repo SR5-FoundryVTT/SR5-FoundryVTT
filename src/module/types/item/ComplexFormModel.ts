@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const ComplexFormData: DataSchema = {
@@ -14,7 +15,7 @@ const ComplexFormData: DataSchema = {
     fade: new NumberField({ required: true, initial: 0 }),
 }
 
-export class ComplexForm extends foundry.abstract.TypeDataModel<typeof ComplexFormData, Item> {
+export class ComplexForm extends foundry.abstract.TypeDataModel<typeof ComplexFormData, Item.Implementation> {
     static override defineSchema(): DataSchema {
         return ComplexFormData;
     }
