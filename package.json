@@ -6,7 +6,6 @@
         "@ethaks/fvtt-quench": "^0.10.0",
         "@foundryvtt/foundryvtt-cli": "^1.0.0-rc.4",
         "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
-        "@league-of-foundry-developers/foundry-vtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
         "@types/node": "^22.5.2",
         "@typescript-eslint/eslint-plugin": "^6.13.2",
         "@yaireo/tagify": "^4.17.9",
