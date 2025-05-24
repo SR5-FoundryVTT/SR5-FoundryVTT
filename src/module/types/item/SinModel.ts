@@ -12,7 +12,7 @@ const SinData = {
     ...SM.DescriptionPartData,
     ...SM.TechnologyPartData,
     ...SM.ImportFlags,
-    licences: new ArrayField(new SchemaField(LicenseData), { required: true, initial: [] }),
+    licenses: new ArrayField(new SchemaField(LicenseData), { required: true, initial: [] }),
 }
 
 export class Sin extends foundry.abstract.TypeDataModel<typeof SinData, Item.Implementation> {

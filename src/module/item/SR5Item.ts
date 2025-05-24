@@ -994,7 +994,7 @@ export class SR5Item<SubType extends Item.SubType = Item.SubType> extends Item<S
         return this.type === type;
     }
 
-    asType<T extends readonly Item.SubType[]>(...types: T): SR5Item<T[number]> | undefined {
+    asType<ST extends readonly Item.SubType[]>(...types: ST): SR5Item<ST[number]> | undefined {
         return types.some((t) => this.isType(t)) ? this : undefined;
     }
 

@@ -27,6 +27,7 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import AEChangeData = ActiveEffect.ChangeData;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -43,7 +44,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
  * </code></pre>
  *
  */
-export class SR5Actor<Type extends keyof DataModelConfig["Actor"] = any> extends Actor {
+export class SR5Actor<SubType extends Actor.SubType = Actor.SubType> extends Actor<SubType> {
     // This is the default inventory name and label for when no other inventory has been created.
     defaultInventory: Shadowrun.InventoryData = {
         name: 'Carried',
@@ -60,8 +61,6 @@ export class SR5Actor<Type extends keyof DataModelConfig["Actor"] = any> extends
 
     // Allow users to access to tests creation.
     tests: typeof TestCreator = TestCreator;
-    //@ts-expect-error
-    system: Extract<Shadowrun.ShadowrunActorData, {type: Type}>['system'];
 
     // Holds all operations related to this actors inventory.
     inventory: InventoryFlow;
@@ -69,8 +68,8 @@ export class SR5Actor<Type extends keyof DataModelConfig["Actor"] = any> extends
     modifiers: ModifierFlow;
 
     // TODO: foundry-vtt-types v10. Allows for {system: ...} to be given without type error
-    constructor(data: ConstructorParameters<typeof Actor>[0] & { type: Type }, context?: ConstructorParameters<typeof Actor>[1]) {
-        super(data, context);
+    constructor(...args: Actor.ConstructorArgs) {
+        super(...args);
 
         this.inventory = new InventoryFlow(this);
         this.modifiers = new ModifierFlow(this);
@@ -231,21 +230,20 @@ export class SR5Actor<Type extends keyof DataModelConfig["Actor"] = any> extends
      * NOTE: This method is unused at the moment, keep it for future inspiration.
      */
     applyOverrideActiveEffects() {
-        const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
+        const changes = this.effects.reduce((changes: ChangeData[], effect) => {
             if (effect.disabled) return changes;
 
             // include changes partially matching given keys.
             const overrideChanges = effect.changes
                 .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
                 .map(origChange => {
-                    const change: EffectChangeData = {
+                    const change: AEChangeData = {
                         key: String(origChange.key),
                         value: String(origChange.value),
-                        mode: Number(origChange.mode),
+                        mode: Number(origChange.mode) as CONST.ACTIVE_EFFECT_MODES,
                         priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
+                        effect: effect,
                     };
-                    //@ts-expect-error
-                    change.effect = effect;
                     return change;
                 });
             return changes.concat(overrideChanges);
@@ -514,16 +512,12 @@ export class SR5Actor<Type extends keyof DataModelConfig["Actor"] = any> extends
     /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
      *  Please check SR5ActorType for reference.
      */
-    isType<T extends keyof DataModelConfig["Actor"]>(type: T): this is SR5Actor<T> {
+    isType<ST extends Actor.SubType = Actor.SubType>(type: ST): this is SR5Actor<ST> {
         return this.type === type;
     }
 
-    isNotType<T extends keyof DataModelConfig["Actor"]>(type: T): this is SR5Actor<Exclude<keyof DataModelConfig["Actor"], T>> {
-        return this.type !== type;
-    }
-
-    asType<T extends readonly (keyof DataModelConfig["Actor"])[]>(...types: T): SR5Actor<T[number]> | undefined {
-        return types.includes(this.type as T[number]) ? (this as unknown as SR5Actor<T[number]>) : undefined;
+    asType<ST extends readonly Actor.SubType[]>(...types: ST): SR5Actor<ST[number]> | undefined {
+        return types.some((t) => this.isType(t)) ? this : undefined;
     }
 
     /**
