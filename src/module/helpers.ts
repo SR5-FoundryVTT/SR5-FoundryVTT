@@ -585,7 +585,7 @@ export class Helpers {
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        if (useTokenForChatOutput && token) return token.texture.src || '';
+        if (useTokenForChatOutput && token?.document) return token.document.texture.src || '';
         return actor.img || '';
     }
 
@@ -812,7 +812,7 @@ export class Helpers {
      * @param active If true, will only return users that are also currently active.
      */
     static getPlayersWithPermission(
-        document: foundry.abstract.Document<any>,
+        document: SR5Actor | SR5Item,
         permission: keyof typeof CONST.DOCUMENT_OWNERSHIP_LEVELS,
         active: boolean = true
     ): User[] {

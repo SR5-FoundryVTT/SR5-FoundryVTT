@@ -125,7 +125,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
     async finalizeSummonedSpirit() {
         if (!this.actor) return;
 
-        const summoner = this.against.actor as Actor;        
+        const summoner = this.against.actor as SR5Actor;        
 
         const updateData = {
             'system.services': this.deriveSpiritServices(),
@@ -143,7 +143,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      * @param updateData The update data to add the permission to, that's applied to the spirit actor. 
      */
     _addOwnershipToUpdateData(updateData: object) {
-        const summoner = this.against.actor as Actor;
+        const summoner = this.against.actor as SR5Actor;
 
         // Set permissions for all users using the summoner as main character.
         const users = game.users?.filter(user => user.character?.uuid === summoner.uuid);

@@ -250,11 +250,13 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.contentVisibility = this._prepareContentVisibility(data);
 
-        data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
-            // secrets: this.actor.isOwner,
-            // rollData: this.actor.getRollData.bind(this.actor),
-            relativeTo: this.actor
-        });
+        if ('description' in actorData.system)
+            //@ts-expect-error
+            data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
+                // secrets: this.actor.isOwner,
+                // rollData: this.actor.getRollData.bind(this.actor),
+                relativeTo: this.actor
+            });
 
         data.bindings = this._prepareKeybindings();
 
@@ -516,7 +518,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                     type: 'contact',
                     'system.linkedActor': actor.uuid
                 };
-                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
+                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
             }
         }
         // Keep upstream document created for actions base on it.
@@ -642,12 +644,12 @@ export class SR5BaseActorSheet extends ActorSheet {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type: type,
         };
-        const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
+        const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
         if (!items) return;
 
         // Add the item to the selected inventory.
         if (this.selectedInventory !== this.actor.defaultInventory.name)
-            await this.actor.inventory.addItems(this.selectedInventory, items);
+            await this.actor.inventory.addItems(this.selectedInventory, new items[0](itemData, { parent: this.actor }));
     }
 
     async _onItemEdit(event) {
@@ -1080,6 +1082,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
+        //@ts-expect-error
         sheetItem.properties = chatData.properties;
 
         return sheetItem as unknown as SheetItemData;

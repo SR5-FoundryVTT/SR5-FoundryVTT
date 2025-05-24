@@ -34,10 +34,10 @@ export const registerSystemSettings = () => {
             '1-2-1': 'SETTINGS.EstimateDiagonal',
             'EUCL': 'SETTINGS.Euclidean',
         },
-        onChange: (rule) => {
-            // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
-            canvas.grid.diagonalRule = rule
-        },
+        onChange: async () => {
+            if (!canvas.ready) return;
+            await canvas.scene?.view(); // Re-renders the whole scene canvas
+        }
     });
 
     /**

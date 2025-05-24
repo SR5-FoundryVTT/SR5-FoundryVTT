@@ -4,10 +4,11 @@ import ModList = Shadowrun.ModList;
 // TODO: Data for casting actor / item (uuid)
 // TODO: maybe copy of the action data from the casting item / actor
 interface ShadowrunRollData {
-    limit: number
-    threshold: number
-    parts: ModList<number> // TODO: Is this useful?
-    explodeSixes: boolean
+    limit: number;
+    threshold: number;
+    parts: ModList<number>; // TODO: Is this useful?
+    explodeSixes: boolean;
+    [key: string]: number | boolean | ModList<number>;
 }
 
 interface ShadowrunChatMessageData {

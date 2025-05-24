@@ -25,7 +25,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
             const ic = await testActor.create({ type: 'ic' }) as SR5Actor<'ic'>;
             assert.equal(ic.system.matrix.condition_monitor.max, 8);
 
-            await actor.update({ 'system.modifiers.matrix_track': 1 });
+            await ic.update({ 'system.modifiers.matrix_track': 1 });
             assert.equal(ic.system.matrix.condition_monitor.max, 9);
         });
 

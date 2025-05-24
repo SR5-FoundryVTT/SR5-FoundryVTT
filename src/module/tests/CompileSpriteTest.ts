@@ -42,7 +42,7 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
 
     _prepareCompilationData(data) {
         if (!this.item) return;
-        const compilation = this.item.asCallInAction;
+        const compilation = this.item.asType('call_in_action');
         if (!compilation || !this.item.isCompilation) return;
 
         // Choose the most explicit value given, making sure it's still usable.

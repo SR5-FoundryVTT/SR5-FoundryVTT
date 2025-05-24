@@ -23,7 +23,7 @@ export async function createItemMacro(dropData, slot) {
     if (!(item instanceof SR5Item)) return console.error(`Shadowrun 5e | Macro Drop expected an item document but got a different document type`, item);
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    let macro = game.macros.contents.find((m) => m.name === item.name);
+    let macro = game.macros.contents.find((m) => m.name === item.name) as Macro;
     if (!macro) {
         macro = await Macro.create(
             {
@@ -31,10 +31,10 @@ export async function createItemMacro(dropData, slot) {
                 type: 'script',
                 img: item.img,
                 command: command,
-                flags: { 'shadowrun5e.itemMacro': true },
+                flags: { shadowrun5e: { itemMacro: true } },
             },
             { renderSheet: false },
-        );
+        ) as Macro;
     }
 
     if (macro) game.user?.assignHotbarMacro(macro, slot);

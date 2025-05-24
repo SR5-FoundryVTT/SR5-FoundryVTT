@@ -21,7 +21,7 @@ export const AutocompleteInlineHooksFlow =  {
      */
     setupHook: () => {
         // Module might not be installed.
-        const aipModule = game.modules.get("autocomplete-inline-properties");
+        const aipModule = game.modules.get("autocomplete-inline-properties") as any;
         if (!aipModule) return;
         // API might be missing.
         const api = aipModule.API;

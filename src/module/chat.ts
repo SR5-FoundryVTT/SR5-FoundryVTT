@@ -31,7 +31,7 @@ const createChatData = async (template: string, templateData) => {
         },
         item: templateData.item,
         content: html,
-        rollMode: game.settings.get(CORE_NAME, 'rollMode')
+        rollMode: game.settings.get(CORE_NAME, 'rollMode')!
     };
 
     ChatMessage.applyRollMode(chatData, chatData.rollMode);

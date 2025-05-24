@@ -1643,7 +1643,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const blind = this.data.options?.rollMode === 'blindroll';
         const synchronize = this.data.options?.rollMode === 'publicroll';
 
-        dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
+        (dice3d as any).showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
     /**
@@ -1848,7 +1848,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async saveToMessage(uuid: string | undefined = this.data.messageUuid) {
         if (!uuid) return;
 
-        const message = await fromUuid(uuid);
+        const message = await fromUuid(uuid) as ChatMessage;
 
         await message?.setFlag(SYSTEM_NAME, FLAGS.Test, this.toJSON());
     }

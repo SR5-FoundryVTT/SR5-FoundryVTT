@@ -33,7 +33,9 @@ export const UpdateActionFlow = {
 
         // CASE - Sidebar item not owned by actor.
         if (item.actor === null) {
-            const skill = game.model.Actor.character.skills.active[skillIdOrLabel];
+            // Attempt to safely access the skill data structure, fallback to undefined if not present
+            const skillsActive = (game as any)?.model?.Actor?.character?.skills?.active;
+            const skill = skillsActive ? skillsActive[skillIdOrLabel] : undefined;
             if (skill === undefined) return;
 
             changeData['system.action.attribute'] = skill.attribute;

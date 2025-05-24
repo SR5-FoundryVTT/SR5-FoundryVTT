@@ -48,6 +48,11 @@ declare global {
 
     interface DocumentClassConfig {
         ActiveEffect: typeof SR5ActiveEffect;
+        Actor: typeof SR5Actor;
+        Combat: typeof SR5Combat;
+        Item: typeof SR5Item;
+        Roll: typeof SR5Roll;
+        Sheet: typeof FormApplication;
     }
 
     interface AssumeHookRan {
@@ -59,7 +64,10 @@ declare global {
     }
 
     interface ReadyGame {
-        shadowrun5e: Record<string, unknown>;
+        shadowrun5e: {
+            inputDelay: number;
+            [key: string]: any;
+        };
         action_manager?: any;
     }
 
@@ -86,7 +94,7 @@ declare global {
             vehicle: typeof Vehicle;
         };
         Item: {
-            action: typof Action;
+            action: typeof Action;
             adept_power: typeof AdeptPower;
             ammo: typeof Ammo;
             armor: typeof Armor;
@@ -138,9 +146,13 @@ declare global {
                 TestData?: any;
             }
         };
-        Combatant: {
+        Combat: {
             shadowrun5e: {
                 combatInitiativePass?: number;
+            };
+        };
+        Combatant: {
+            shadowrun5e: {
                 turnsSinceLastAttack?: number;
             };
         };
@@ -153,32 +165,30 @@ declare global {
                 embeddedItems?: any[];
             };
         };
+        Macro: {
+            shadowrun5e: {
+                itemMacro?: boolean;
+            }
+        };
         User: {
             shadowrun5e: {
                 showApplication?: boolean;
                 changelogShownForVersion?: string;
+                lastRollPromptValue?: number;
             }
         };
-    }
-
-    interface DocumentClassConfig {
-        Item: typeof SR5Item;
-        Actor: typeof SR5Actor;
-        ActiveEffect: typeof SR5ActiveEffect;
-        Combat: typeof SR5Combat;
-        Roll: typeof SR5Roll;
-    }
-
-    // Declaration Merging
-    interface DocumentClassConfig {
-        sheet: FormApplication;
+        Scene: {
+            shadowrun5e: {
+                modifier?: Shadowrun.SituationModifiersSourceData;
+            }
+        };
     }
 
     // Inject model basic structure into foundry-vtt-types
     interface Game {
         model: {
-            Item: any;
-            Actor: any;
+            Item: typeof SR5Item;
+            Actor: typeof SR5Actor;
             Card: any;
             Cards: any;
             JournalEntryPage: any;

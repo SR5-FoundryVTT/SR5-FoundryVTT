@@ -81,9 +81,12 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Setup damage source data', async () => {
-            const actor = await testActor.create({type: 'character'});
+            const actor = await testActor.create({type: 'character'}) as SR5Actor<'character'>;
             const documents = await actor.createEmbeddedDocuments('Item', [{type: 'action', name: 'TestAction'}]);
-            const action = documents![0] as SR5Item;
+
+            if (!documents || documents.length === 0) throw new Error('Failed to create action item');
+
+            const action = new documents[0]({type: 'action', name: 'TestAction'}, {parent: actor});
 
             ActionPrep.prepareDamageSource(action.system.action as Shadowrun.ActionRollData, action)
 

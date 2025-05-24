@@ -9,7 +9,7 @@ import { TestCreator } from "../tests/TestCreator";
  */
 export class SR5ChatMessage extends ChatMessage {
     get _testData(): any {
-        return this.getFlag(SYSTEM_NAME, FLAGS.Test);
+        return this.flags.shadowrun5e.TestData;
     }
     /**
      * Return a SuccessTest implementation for this chat message instance, if there is one.

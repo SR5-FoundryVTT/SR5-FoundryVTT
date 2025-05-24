@@ -15,13 +15,13 @@ export default class Sr5Tour extends Tour {
 
         //create actor if needed
         if(this.actor == undefined) {
-            this.actor = new SR5Actor.implementation({
+            this.actor = new SR5Actor({
                 name: "Tour " + this.id,
-                type: this.config.actorType,
+                type: 'character',
                 ownership: {
                     default: 3
                 }
-            }) as SR5Actor;
+            });
         }
 
         // @ts-expect-error

@@ -1,4 +1,4 @@
-export interface FormDialogData extends Dialog.Data{
+export interface FormDialogData extends DialogData{
 	templateData: object;
 	templatePath: string;
 	onAfterClose?: Function;

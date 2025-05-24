@@ -19,7 +19,7 @@ export class SR5Combat extends Combat {
     }
 
     get initiativePass(): number {
-        return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) as number || SR.combat.INITIAL_INI_PASS;
+        return (this as SR5Combat).getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) as number || SR.combat.INITIAL_INI_PASS;
     }
 
     static async setInitiativePass(combat: SR5Combat, pass: number) {

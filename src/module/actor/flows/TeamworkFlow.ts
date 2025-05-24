@@ -3,6 +3,7 @@ import {FLAGS, SYSTEM_NAME} from '../../constants';
 import { SocketMessage } from "../../sockets";
 import { SuccessTest } from '../../tests/SuccessTest';
 import { Helpers } from '../../helpers'
+import { AnyDocument } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/data/abstract/client-document.mjs';
 
 export interface TeamworkMessageData {
     skill: string,
@@ -136,8 +137,11 @@ export class TeamworkTest {
 
         const message = fromUuidSync(socketMessage.data.messageUuid);
 
-        message?.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData)
-        message?.update({content: socketMessage.data.content})
+        if (message instanceof AnyDocument) {
+            //@ts-expect-error
+            message?.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData);
+            message?.update({content: socketMessage.data.content});
+        }
     }
 
 }

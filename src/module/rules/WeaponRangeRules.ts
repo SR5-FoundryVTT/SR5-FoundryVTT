@@ -79,7 +79,7 @@ export class WeaponRangeTestBehavior {
         if (!test.actor) return;
         if (!test.hasTargets) return;
 
-        const attacker = test.actor.getToken();
+        const attacker = test.actor.getToken()?.document;
 
         if (!attacker) {
             ui.notifications?.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));

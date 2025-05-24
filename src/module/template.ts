@@ -71,7 +71,7 @@ export default class Template extends MeasuredTemplate {
             direction: 0,
             x: 0,
             y: 0,
-            fillColor: game.user?.color,
+            fillColor: game.user?.color?.toRGBA(1),
             distance: blast?.radius || 1, // Adhere to DataModel validation.
             dropoff: blast?.dropoff || 0
         };
@@ -92,53 +92,67 @@ export default class Template extends MeasuredTemplate {
      * Draw a preview of this Template instance on the currently active scene.
      */
     async drawPreview() {
-        if (!canvas.ready || !this.layer.preview) return;
+        if (!canvas.ready || !canvas.templates) return;
 
-        const initialLayer = canvas.activeLayer;
-        if (!initialLayer) return;
-
+        const layer = canvas.templates;
         await this.draw();
-        this.layer.activate();
-        this.layer.preview.addChild(this);
-        return this.activatePreviewListeners(initialLayer);
+
+        const previewGroup = new PIXI.Container();
+        layer.addChild(previewGroup);
+        previewGroup.addChild(this);
+
+        return this.activatePreviewListeners(layer);
     }
 
-    activatePreviewListeners(initialLayer: CanvasLayer) {
+    activatePreviewListeners(initialLayer: CanvasLayer): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (!canvas.ready || !canvas.stage || !canvas.app) return;
+            if (!canvas.ready) return;
 
             this.#initialLayer = initialLayer;
+
+            // Store listeners
             this.#events = {
-                cancel: this._onCancelPlacement.bind(this),
-                confirm: this._onConfirmPlacement.bind(this),
                 move: this._onMovePlacement.bind(this),
-                resolve,
-                reject,
-                rotate: this._onRotatePlacement.bind(this)
+                confirm: this._onConfirmPlacement.bind(this),
+                cancel: this._onCancelPlacement.bind(this),
+                rotate: this._onRotatePlacement.bind(this),
+                resolve: resolve,
+                reject: reject
             };
 
-            // Activate listeners
-            canvas.stage?.on("mousemove", this.#events.move);
-            canvas.stage?.on("mousedown", this.#events.confirm);
-            canvas.app.view.oncontextmenu = this.#events.cancel;
-            canvas.app.view.onwheel = this.#events.rotate;
+            const canvasElement = canvas!.app!.renderer!.view! as HTMLCanvasElement;
+
+            // Use canvas.view to attach DOM events
+            canvasElement.addEventListener("mousemove", this.#events.move);
+            canvasElement.addEventListener("mousedown", this.#events.confirm);
+            canvasElement.addEventListener("contextmenu", this.#events.cancel);
+            canvasElement.addEventListener("wheel", this.#events.rotate, { passive: false });
         });
     }
     /**
      * Shared code for when template placement ends by being confirmed or canceled.
     * @param {Event} event  Triggering event that ended the placement.
     */
-    async _finishPlacement(event) {
-        if (!canvas.stage || !canvas.app) return;
+    async _finishPlacement(event: PointerEvent) {
+        if (!canvas.ready) return;
 
-        this.layer._onDragLeftCancel(event);
-        canvas.stage.off("mousemove", this.#events.move);
-        canvas.stage.off("mousedown", this.#events.confirm);
-        canvas.app.view.oncontextmenu = null;
-        canvas.app.view.onwheel = null;
-        this.#initialLayer.activate();
+        // Remove this template from the preview
+        this.destroy();
 
-        if (this.onComplete) this.onComplete();
+        // Detach event listeners from the canvas DOM element
+        const canvasElement = canvas!.app!.renderer!.view! as HTMLCanvasElement;
+        canvasElement.removeEventListener("mousemove", this.#events.move);
+        canvasElement.removeEventListener("mousedown", this.#events.confirm);
+        canvasElement.removeEventListener("contextmenu", this.#events.cancel);
+        canvasElement.removeEventListener("wheel", this.#events.rotate);
+
+        // Reactivate previous layer, if necessary
+        if (this.#initialLayer) {
+            (canvas as any)._setActiveLayer(this.#initialLayer);
+        }
+
+        // Run the completion callback
+        this.onComplete?.();
     }
 
     /* -------------------------------------------- */

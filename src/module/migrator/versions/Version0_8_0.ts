@@ -47,7 +47,7 @@ export class Version0_8_0 extends VersionMigration {
             data?: object
         } = {};
 
-        UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item.toObject(), item.toObject());
+        UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item.toObject() as any, item.toObject());
 
         return updateData;
     }

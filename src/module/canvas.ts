@@ -17,7 +17,7 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
 
     // Track the total number of diagonals
     let nDiagonal = 0;
-    const rule = this.diagonalRule;
+    const rule = game.settings.get(SYSTEM_NAME, FLAGS.DiagonalMovement);;
     const d = canvas.dimensions as Canvas.Dimensions;
 
     // Iterate over measured segments
@@ -53,8 +53,6 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
 
 
 export function canvasInit() {
-    // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
-    canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, FLAGS.DiagonalMovement);
     // Add a custom measureDistances function, overwriting default to add more movement styles.
     SquareHex.prototype.measureDistances = measureDistances;
 }

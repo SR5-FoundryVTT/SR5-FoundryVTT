@@ -52,7 +52,6 @@ import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
-import DocumentModificationOptions from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
 import { SinPrep } from './prep/SinPrep';
@@ -225,7 +224,7 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
      * Determine if a blast area should be placed using FoundryVTT area templates.
      */
     get hasBlastTemplate(): boolean {
-        return this.isAreaOfEffect;
+        return this.isAreaOfEffect();
     }
 
     /**
@@ -356,7 +355,7 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
         const parts = new PartsList<number>();
 
         if (this.hasOpposedTest()) {
-            if (this.isAreaOfEffect) {
+            if (this.isAreaOfEffect()) {
                 parts.addUniquePart('SR5.Aoe', -2);
             }
         }
@@ -467,9 +466,8 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
      * @param fired Amount of bullets fired.
      */
     async useAmmo(fired) {
-        if (this.type !== 'weapon') return;
+        if (!this.isType('weapon')) return;
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
         const value = Math.max(0, this.system.ammo.current.value - fired);
         return await this.update({ 'system.ammo.current.value': value });
     }
@@ -479,8 +477,8 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
      * 
      * @returns true, for weapons with ammunition.
      */
-    get usesAmmo(): boolean {
-        return this.system.ammo?.current.max !== 0 && this.system.ammo?.current.max !== null;
+    usesAmmo(): boolean {
+        return this.isType('weapon') && this.system.ammo.current.max !== 0 && this.system.ammo?.current.max !== null;
     }
 
     /**
@@ -1005,8 +1003,8 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
         return this.type === type;
     }
 
-    asType<T extends ConfiguredData<'Item'>['type']>(type: T): SR5Item<T> | undefined {
-        if (this.isType(type)) return this;
+    asType<T extends ConfiguredData<'Item'>['type'][]>(...types: T): SR5Item<T[number]> | undefined {
+        return types.includes(this.type as T[number]) ? (this as unknown as SR5Item<T[number]>) : undefined;
     }
 
     /**
@@ -1016,7 +1014,7 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
      * both directly connected to the item and / or some of it's nested items.
      * 
      */
-    isAreaOfEffect(): this is SR5Item<'ammo' | 'spell' | 'weapon'> {
+    isAreaOfEffect(): boolean {
         return false
             || (this.isType('weapon') && this.system.category === 'thrown' && this.system.thrown.blast.radius > 0)
             || (this.isType('weapon') && (this.getEquippedAmmo()?.system.blast?.radius ?? 0) > 0)
@@ -1061,13 +1059,11 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
     }
 
     get isSummoning(): boolean {
-        //@ts-expect-error
-        return this.type === 'call_in_action' && this.system.actor_type === 'spirit';
+        return this.isType('call_in_action') && this.system.actor_type === 'spirit';
     }
 
     get isCompilation(): boolean {
-        //@ts-expect-error
-        return this.type === 'call_in_action' && this.system.actor_type === 'sprite';
+        return this.isType('call_in_action') && this.system.actor_type === 'sprite';
     }
 
     /**    
@@ -1332,7 +1328,7 @@ export class SR5Item<Type extends ConfiguredData<'Item'>['type'] = any> extends 
      * TODO: It might be useful to create a 'MatrixDocument' class sharing matrix methods to avoid duplication between
      *       SR5Item and SR5Actor.
      */
-    async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: Item, overwrite?: boolean }) {
+    async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
         if (!canvas!.ready) return;
 
         if (!this.isHost) {

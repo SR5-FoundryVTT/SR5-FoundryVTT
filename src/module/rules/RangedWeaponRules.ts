@@ -90,7 +90,7 @@ export const RangedWeaponRules = {
      * @returns The recoil compensation part a humanoid will add to the total recoil compensation.
      */
     humanoidRecoilCompensation(actor: SR5Actor): number {
-        const noBody = actor.asTypes('vehicle', 'ic', 'sprite');
+        const noBody = actor.asType('vehicle', 'ic', 'sprite');
         if (noBody) return 0;
 
         const strength = actor.getAttribute('strength');

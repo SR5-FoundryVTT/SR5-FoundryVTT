@@ -79,8 +79,8 @@ export class SR5Actor<Type extends ConfiguredData<'Actor'>['type'] = any> extend
     }
 
     getOverwatchScore() {
-        const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
-        return os !== undefined ? os : 0;
+        const os = this.flags.shadowrun5e.overwatchScore;
+        return os || 0;
     }
 
     async setOverwatchScore(value) {
@@ -438,7 +438,7 @@ export class SR5Actor<Type extends ConfiguredData<'Actor'>['type'] = any> extend
     }
 
     getEquippedWeapons(): SR5Item[] {
-        return this.items.filter((item: SR5Item) => item.isEquipped() && item.isWeapon);
+        return this.items.filter((item: SR5Item) => item.isEquipped() && item.isType('weapon'));
     }
 
     /**
@@ -524,11 +524,7 @@ export class SR5Actor<Type extends ConfiguredData<'Actor'>['type'] = any> extend
         return this.type !== type;
     }
 
-    asType<T extends ConfiguredData<'Actor'>['type']>(type: T): SR5Actor<T> | undefined {
-        if (this.isType(type)) return this;
-    }
-
-    asTypes<T extends ConfiguredData<'Actor'>['type'][]>(...types: T): SR5Actor<T[number]> | undefined {
+    asType<T extends ConfiguredData<'Actor'>['type'][]>(...types: T): SR5Actor<T[number]> | undefined {
         return types.includes(this.type as T[number]) ? (this as unknown as SR5Actor<T[number]>) : undefined;
     }
 
@@ -1213,17 +1209,17 @@ export class SR5Actor<Type extends ConfiguredData<'Actor'>['type'] = any> extend
      *
      * @return Will return null should no token have been placed on scene.
      */
-    getToken(): TokenDocument | null {
+    getToken(): Token | null {
         // Linked actors can only have one token, which isn't stored within actor data...
         if (this._isLinkedToToken() && this.hasToken()) {
             const linked = true;
             const tokens = this.getActiveTokens(linked) as unknown as Token[];
             // This assumes for a token to exist and should fail if not.
-            return tokens[0].document;
+            return tokens[0];
         }
 
         // Unlinked actors can have multiple active token but each have theirs directly attached...
-        return this.token;
+        return null;
     }
 
     /**
@@ -2184,5 +2180,10 @@ export class SR5Actor<Type extends ConfiguredData<'Actor'>['type'] = any> extend
         }));
 
         await this.updateEmbeddedDocuments('Item', updateData);
+    }
+
+    override async update(data, options?): Promise<this> {
+        // @ts-expect-error
+        return await super.update(data, options);
     }
 }

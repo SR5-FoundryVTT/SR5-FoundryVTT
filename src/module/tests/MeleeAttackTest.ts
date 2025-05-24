@@ -75,7 +75,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
      */
     override canConsumeDocumentResources(): boolean {
         if (this.item === undefined) return true;
-        if (!this.item.usesAmmo) return true;
+        if (!this.item.usesAmmo()) return true;
 
         // Consume one ammo per attack.
         if (!this.item.hasAmmo(1)) {
@@ -101,7 +101,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
      */
     async consumeWeaponAmmo(): Promise<boolean> {  
         if (this.item === undefined) return true;
-        if (!this.item.usesAmmo) return true;
+        if (!this.item.usesAmmo()) return true;
 
         // Notify user about some but not no ammo. Still let them punch though.
         if (!this.item.hasAmmo(1)) {

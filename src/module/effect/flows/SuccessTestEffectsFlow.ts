@@ -157,7 +157,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         const effectsData: ActiveEffectData[] = [];
         for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
-            const effectData = effect.toObject() as ActiveEffectData;
+            const effectData = effect.toObject() as unknown as ActiveEffectData;
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {
@@ -169,7 +169,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         }
 
         for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
-            const effectData = effect.toObject() as ActiveEffectData;
+            const effectData = effect.toObject() as unknown as ActiveEffectData;
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {

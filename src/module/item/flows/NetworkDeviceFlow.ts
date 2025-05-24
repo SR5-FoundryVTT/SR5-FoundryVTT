@@ -85,7 +85,7 @@ export class NetworkDeviceFlow {
     private static async _handleAddDeviceToNetwork(controller: SR5Item, device: SR5Item|SR5Actor): Promise<any> {
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller) && !NetworkDeviceFlow._currentUserCanModifyDevice(device)) return console.error(`User isn't owner or GM of this device`, controller);
 
-        const controllerData = controller.asDevice || controller.asHost;
+        const controllerData = controller.asType('device', 'host');
         if (!controllerData) return console.error(`Device isn't capable of accepting network devices`, controller);
         const networkController = device.getNetworkController();
 
